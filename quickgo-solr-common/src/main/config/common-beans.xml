@@ -1,0 +1,96 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!-- ########## PRODUCTION/DEV ENVIRONMENT PROPERTIES ########### -->
+	<!-- Add "-Dspring.profiles.active=PROFILE" in catalina.sh  where PROFILE can be "dev" or "prod"-->
+		
+	<context:property-placeholder location="classpath:quickgo-${spring.profiles.active}.properties" />
+	
+	<!-- CONTAINS COMMON BEANS FOR ALL THE SOLR MODULES -->
+
+	<!-- SolR server bean -->
+	<bean name="serverProcessor" class="uk.ac.ebi.quickgo.solr.server.SolrServerProcessorImpl">
+		<property name="solrURL" value="${solr.url}" />
+	</bean>
+
+	<!-- ############### TERMS ############# -->
+
+	<!-- Solr Terms server bean -->
+	<bean name="termServerProcessor" class="uk.ac.ebi.quickgo.solr.server.SolrServerProcessorImpl">
+		<property name="solrURL" value="${solr.url.ontology}" />
+	</bean>
+
+	<!-- Bean to map Solr terms into QuickGO terms -->
+	<bean name="ecoTermEntityMapper" class="uk.ac.ebi.quickgo.solr.mapper.term.eco.EntityECOTermMapper">
+	</bean>
+
+	<bean name="goTermEntityMapper" class="uk.ac.ebi.quickgo.solr.mapper.term.go.EntityGOTermMapper">
+	</bean>
+
+	<!-- Bean to map Terms into Solr terms -->
+
+	<bean name="solrECOTermMapper" class="uk.ac.ebi.quickgo.solr.mapper.term.eco.SolrECOTermMapper">
+	</bean>
+	
+	<bean name="solrGOTermMapper" class="uk.ac.ebi.quickgo.solr.mapper.term.go.SolrGOTermMapper">
+	</bean>
+
+	<!-- ############### GENE PRODUCTS ############# -->
+
+	<!-- Solr Gene Products server bean -->
+	<bean name="geneProductServerProcessor" class="uk.ac.ebi.quickgo.solr.server.SolrServerProcessorImpl">
+		<property name="solrURL" value="${solr.url.geneproduct}" />
+	</bean>
+
+	<!-- Bean to map Gene products into Solr gene products -->
+
+	<bean name="solrGeneProductMapper"
+		class="uk.ac.ebi.quickgo.solr.mapper.geneproduct.SolrGeneProductMapper">
+	</bean>
+
+	<!-- Bean to map Solr gene products into QuickGO gene products -->
+	<bean name="geneProductEntityMapper" class="uk.ac.ebi.quickgo.solr.mapper.geneproduct.EntityGeneProductMapper">
+	</bean>
+
+	<!-- ############## ANNOTATIONS  ############### -->
+
+	<!-- Solr Annotations server bean -->
+	<bean name="annotationServerProcessor" class="uk.ac.ebi.quickgo.solr.server.SolrServerProcessorImpl">
+		<property name="solrURL" value="${solr.url.annotation}" />
+	</bean>
+	
+	<!-- Bean to map Annotations into Solr annotations -->
+
+	<bean name="solrAnnotationMapper"
+		class="uk.ac.ebi.quickgo.solr.mapper.annotation.SolrAnnotationMapper">
+	</bean>
+	
+	<!-- Bean to map Solr annotations into QuickGO ones -->
+	<bean name="annotationEntityMapper" class="uk.ac.ebi.quickgo.solr.mapper.annotation.EntityAnnotationMapper">
+	</bean>
+	
+	<!-- ############## MISCELLANEOUS #################  -->
+	
+	<!-- Solr Miscellaneous server bean -->
+	<bean name="miscellaneousServerProcessor" class="uk.ac.ebi.quickgo.solr.server.SolrServerProcessorImpl">
+		<property name="solrURL" value="${solr.url.miscellaneous}" />
+	</bean>
+
+	<!-- Bean to map Miscellaneous data into Solr objects -->
+
+	<bean name="solrMiscellaneousMapper"
+		class="uk.ac.ebi.quickgo.solr.mapper.miscellaneous.SolrMiscellaneousMapper">
+	</bean>
+
+	<!-- Bean to map Solr miscellaneous information into Java Objects -->
+	<bean name="miscellaneousEntityMapper" class="uk.ac.ebi.quickgo.solr.mapper.miscellaneous.EntityMiscellaneousMapper">
+	</bean>
+
+	<!-- Auto scan the components -->
+	<context:component-scan base-package="uk.ac.ebi.quickgo" />
+
+</beans>

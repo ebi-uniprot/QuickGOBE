@@ -1,0 +1,7 @@
+quickgo-common-util/target
+quickgo-main/.settings/org.eclipse.core.resources.prefs
+quickgo-main/target
+quickgo-solr-common/target
+quickgo-solr-indexing/target
+quickgo-solr/target
+quickgo-webapp/src/main/webapp/js/uniprot.js

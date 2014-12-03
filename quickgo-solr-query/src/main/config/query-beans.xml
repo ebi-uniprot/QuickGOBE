@@ -1,0 +1,92 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!-- Auto scan the components -->
+	<context:component-scan base-package="uk.ac.ebi.quickgo" />
+	<import resource="classpath:common-beans.xml" />
+
+	<!-- CONTAINS QUERY BEANS FOR SOLR-QUERY MODULE -->
+
+	<!-- GO/ECO Terms beans -->
+	<bean name="goTermCacheRetrieval"
+		class="uk.ac.ebi.quickgo.cache.query.service.CacheRetrievalImpl">
+		<property name="cacheBuilder" ref="goTermCacheBuilder" />
+	</bean>
+	
+	<bean name="ecoTermCacheRetrieval"
+		class="uk.ac.ebi.quickgo.cache.query.service.CacheRetrievalImpl">
+		<property name="cacheBuilder" ref="ecoTermCacheBuilder" />
+	</bean>
+	
+	<bean name="goTermCacheBuilder"
+		class="uk.ac.ebi.quickgo.cache.query.service.CacheBuilderImpl">
+		<property name="retrieval" ref="goTermRetrieval" />
+	</bean>
+
+	<bean name="ecoTermCacheBuilder"
+		class="uk.ac.ebi.quickgo.cache.query.service.CacheBuilderImpl">
+		<property name="retrieval" ref="ecoTermRetrieval" />
+	</bean>
+
+	<bean name="goTermRetrieval" class="uk.ac.ebi.quickgo.solr.query.service.ontology.TermRetrievalImpl" >
+		<property name="serverProcessor" ref="termServerProcessor"></property>
+		<property name="termEntityMapper" ref ="entityGOTermMapper"/>
+	</bean>
+	
+	<bean name="ecoTermRetrieval" class="uk.ac.ebi.quickgo.solr.query.service.ontology.TermRetrievalImpl" >
+		<property name="serverProcessor" ref="termServerProcessor"></property>
+		<property name="termEntityMapper" ref ="entityECOTermMapper"/>
+	</bean>
+	
+	<!-- Gene Products -->	
+	<bean name="gpCacheRetrieval"
+		class="uk.ac.ebi.quickgo.cache.query.service.CacheRetrievalImpl">
+		<property name="cacheBuilder" ref="gpCacheBuilder" />
+	</bean>
+			
+	<bean name="gpCacheBuilder"
+		class="uk.ac.ebi.quickgo.cache.query.service.CacheBuilderImpl">
+		<property name="retrieval" ref="geneProductRetrieval" />
+	</bean>	
+	
+	<bean name="geneProductRetrieval" class="uk.ac.ebi.quickgo.solr.query.service.geneproduct.GeneProductRetrievalImpl" >
+		<property name="serverProcessor" ref="geneProductServerProcessor"></property>
+		<property name="geneProductEntityMapper" ref ="geneProductEntityMapper"/>
+	</bean>	
+	
+	<!-- Annotations -->	
+	<bean name="annotationCacheRetrieval"
+		class="uk.ac.ebi.quickgo.cache.query.service.CacheRetrievalImpl">
+		<property name="cacheBuilder" ref="annotationCacheBuilder" />
+	</bean>
+			
+	<bean name="annotationCacheBuilder"
+		class="uk.ac.ebi.quickgo.cache.query.service.CacheBuilderImpl">
+		<property name="retrieval" ref="annotationRetrieval" />
+	</bean>	
+	
+	<bean name="annotationRetrieval" class="uk.ac.ebi.quickgo.solr.query.service.annotation.AnnotationRetrievalImpl">
+		<property name="annotationServerProcessor" ref="annotationServerProcessor"></property>
+		<property name="annotationEntityMapper" ref ="annotationEntityMapper"/>
+	</bean>
+	
+	<!-- Miscellaneous information -->	
+	<bean name="miscellaneousCacheRetrieval"
+		class="uk.ac.ebi.quickgo.cache.query.service.CacheRetrievalImpl">
+		<property name="cacheBuilder" ref="miscellaneousCacheBuilder" />
+	</bean>
+			
+	<bean name="miscellaneousCacheBuilder"
+		class="uk.ac.ebi.quickgo.cache.query.service.CacheBuilderImpl">
+		<property name="retrieval" ref="miscellaneousRetrieval" />
+	</bean>	
+	
+	<bean name="miscellaneousRetrieval" class="uk.ac.ebi.quickgo.solr.query.service.miscellaneous.MiscellaneousRetrievalImpl" >
+		<property name="serverProcessor" ref="miscellaneousServerProcessor"></property>
+		<property name="miscellaneousEntityMapper" ref ="miscellaneousEntityMapper"/>
+	</bean>	
+</beans>

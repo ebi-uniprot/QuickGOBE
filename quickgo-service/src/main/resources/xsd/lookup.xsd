@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://uk.ac.ebi/ws/quickgo"
+	targetNamespace="http://uk.ac.ebi/ws/quickgo" elementFormDefault="qualified">
+
+	<xs:element name="lookup" type="lookupdeftype" />
+
+	<xs:complexType name="lookupdeftype">
+		<xs:sequence>
+			<xs:element name="scope" type="xs:string" />
+			<!-- GO/ECO term -->
+			<xs:element name="id" type="xs:string" />
+			<xs:element name="name" type="xs:string" />
+			<xs:element name="namespace" type="xs:string" />
+			<xs:element name="def" type="deftype" />
+			<xs:element name="comment" type="xs:string" />
+			<xs:element name="usage" type="xs:string" />
+			<xs:element name="definition" type="xs:string" />
+			<xs:element name="synonym" type="synonymtype" maxOccurs="unbounded" />
+			<xs:element name="alt_id" type="xs:string" maxOccurs="unbounded" />
+			<xs:element name="is_obsolete" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="replacedBy" type="xs:string" maxOccurs="unbounded" />
+			<xs:element name="consider" type="xs:string" maxOccurs="unbounded" />
+			<xs:element name="xref" type="xreftype" maxOccurs="unbounded" />
+			<xs:element name="is_a" type="xs:string" maxOccurs="unbounded" />
+			<xs:element name="ancestors" type="xs:string" />
+			<!-- Protein specific -->
+			<xs:element name="accession" type="xs:string" />
+			<xs:element name="gene_name" type="xs:string" />
+			<xs:element name="description" type="xs:string" />
+			<xs:element name="taxon_id" type="xs:string" />
+			<xs:element name="taxon_name" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deftype">
+		<xs:sequence>
+			<xs:element name="defstr" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="synonymtype">
+		<xs:sequence>
+			<xs:element name="synonym_text" type="xs:string" />
+		</xs:sequence>
+		<xs:attribute name="scope" type="xs:string"></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="xreftype">
+		<xs:sequence>
+			<xs:element name="acc" type="xs:string" />
+			<xs:element name="dbname" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- <xs:complexType name="ancestorstype">
+		<xs:sequence>
+			<xs:element name="id" type="xs:string" />			
+		</xs:sequence>
+	</xs:complexType>-->
+	
+</xs:schema>	

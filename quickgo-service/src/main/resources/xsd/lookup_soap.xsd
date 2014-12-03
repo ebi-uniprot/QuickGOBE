@@ -1,0 +1,40 @@
+<!-- @deprecated We are providing REST web services. This file would be useful
+          in case we wanted to provide SOAP services -->
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://www.ebi.ac.uk/QuickGO/ws" targetNamespace="http://www.ebi.ac.uk/QuickGO/ws">
+
+<!--	<xs:element name="findByIdRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="xs:string" />
+				<xs:element name="format" type="xs:string" />
+				<xs:element name="scope" type="tns:format" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="format">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="json" />
+			<xs:enumeration value="xml" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="findByIdResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="term" type="tns:term" />				
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="term">
+		<xs:sequence>
+			<xs:element name="id" type="xs:string" />
+			<xs:element name="name" type="xs:string" />
+			<xs:element name="obsolete" type="xs:string" />
+			<xs:element name="aspect" type="xs:string" />
+			<xs:element name="definition" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>-->	
+</xs:schema>

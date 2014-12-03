@@ -1,0 +1,118 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd
+    	http://www.springframework.org/schema/cache
+    	http://www.springframework.org/schema/cache/spring-cache-3.2.xsd">
+
+	<!-- Auto scan the components -->
+	<context:component-scan base-package="uk.ac.ebi.quickgo" />
+	<cache:annotation-driven />
+	<!-- Enables the caching through annotations -->
+	<cache:annotation-driven />
+	
+	<import resource="classpath:query-beans.xml" />	
+	
+	<!-- Generic cache manager based on the JDK ConcurrentMap -->
+	
+	<bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+		<property name="caches">
+			<set>
+				<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="childTerms" />
+				<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="replacesTerms" />
+				<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="term" />
+				<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="xrefDbInformation" />
+				<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="subsetCount" />			
+				<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="taxonNames" />					
+			</set>
+		</property>
+	</bean>
+
+	<!-- CONTAINS BEANS FOR QUICKGO-SERVICES MODULE -->
+
+	<!--  Annotation Service -->
+
+	<bean name="annotationService" class="uk.ac.ebi.quickgo.service.annotation.AnnotationServiceImpl" autowire-candidate="true">
+		<property name="annotationCacheRetrieval" ref="annotationCacheRetrieval"></property>
+		<property name="annotationRetrieval" ref="annotationRetrieval"></property>
+	</bean>
+
+	<!--  Term Service -->
+
+	<bean name="termService" class="uk.ac.ebi.quickgo.service.term.TermServiceImpl" autowire-candidate="true">
+		<property name="goTermRetrieval" ref="goTermRetrieval"></property>
+		<property name="goTermEntityToStream" ref="goTermEntityToStream"></property>		
+		<property name="ecoTermEntityToStream" ref="ecoTermEntityToStream"></property>
+	</bean>
+	
+	<!-- Gene Product Service -->
+
+	<bean name="geneProductService" class="uk.ac.ebi.quickgo.service.geneproduct.GeneProductServiceImpl" autowire-candidate="true">
+		<property name="geneProductRetrieval" ref="geneProductRetrieval"></property>
+		<property name="gpEntityToStream" ref="gpEntityToStream"></property>		
+	</bean>
+
+	<!--  Miscellaneous Service -->
+
+	<bean name="miscellaneousService" class="uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousServiceImpl" autowire-candidate="true">
+		<property name="miscellaneousRetrieval" ref="miscellaneousRetrieval"></property>				
+	</bean>
+
+	<!--  Statistics Service -->
+
+	<bean name="statisticService" class="uk.ac.ebi.quickgo.service.statistic.StatisticServiceImpl" autowire-candidate="true">
+		<property name="annotationService" ref="annotationService"></property>
+		<property name="miscellaneousService" ref="miscellaneousService"></property>
+		<property name="statisticsUtil" ref="statisticsUtil"></property>		
+	</bean>
+
+	<!-- Terms to Stream -->
+			<!-- GO -->
+	<bean name="goTermEntityToStream" class="uk.ac.ebi.quickgo.output.EntityToStream">
+		<property name="entityToXMLStream" ref="goEntityToXMLStream"></property>
+	</bean>
+
+	<bean name="goEntityToXMLStream" class="uk.ac.ebi.quickgo.output.xml.EntityToXMLStream">
+		<property name="entityToXMLEntity" ref="entityTermToTermXMLEntity"></property>
+		<property name="xmlEntityToStream" ref="goTermXMLEntityToStream"></property>
+	</bean>
+
+	<bean name="entityTermToTermXMLEntity" class="uk.ac.ebi.quickgo.output.xml.term.TermEntityToTermXMLEntity">
+	</bean>
+
+	<bean name="goTermXMLEntityToStream" class="uk.ac.ebi.quickgo.output.xml.term.GOTermXMLEntityToXMLStream">
+	</bean>
+			<!-- ECO -->
+	<bean name="ecoTermEntityToStream" class="uk.ac.ebi.quickgo.output.EntityToStream">
+		<property name="entityToXMLStream" ref="ecoEntityToXMLStream"></property>
+	</bean>
+
+	<bean name="ecoEntityToXMLStream" class="uk.ac.ebi.quickgo.output.xml.EntityToXMLStream">
+		<property name="entityToXMLEntity" ref="entityTermToTermXMLEntity"></property>
+		<property name="xmlEntityToStream" ref="ecoTermXMLEntityToStream"></property>
+	</bean>	
+
+	<bean name="ecoTermXMLEntityToStream" class="uk.ac.ebi.quickgo.output.xml.term.ECOTermXMLEntityToXMLStream">
+	</bean>
+	
+	<!-- Gene Products to Stream -->
+	
+	<bean name="gpEntityToStream" class="uk.ac.ebi.quickgo.output.EntityToStream">
+		<property name="entityToXMLStream" ref="gpEntityToXMLStream"></property>
+	</bean>
+
+	<bean name="gpEntityToXMLStream" class="uk.ac.ebi.quickgo.output.xml.EntityToXMLStream">
+		<property name="entityToXMLEntity" ref="entityGPToTermXMLEntity"></property>
+		<property name="xmlEntityToStream" ref="gpXMLEntityToStream"></property>
+	</bean>
+
+	<bean name="entityGPToTermXMLEntity" class="uk.ac.ebi.quickgo.output.xml.geneproduct.GPEntityToGPXMLEntity">
+	</bean>
+
+	<bean name="gpXMLEntityToStream" class="uk.ac.ebi.quickgo.output.xml.geneproduct.GPXMLEntityToXMLStream">
+	</bean>
+	
+</beans>
