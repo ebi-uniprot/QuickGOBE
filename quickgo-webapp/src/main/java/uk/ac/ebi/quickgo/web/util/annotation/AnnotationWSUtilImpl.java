@@ -32,18 +32,18 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Autowired
 	AnnotationService annotationService;
-	
+
 	@Autowired
 	FileService fileService;
-	
+
 	private static final Logger logger = Logger.getLogger(AnnotationWSUtilImpl.class);
-	
+
 	/**
 	 * Map GAnnotation columns to the *new* QuickGO ones
 	 * @param cols Columns to map
 	 * @return COlumns mapped
 	 */
-	public AnnotationColumn[] mapColumns(String cols) {		
+	public AnnotationColumn[] mapColumns(String cols) {
 		List<AnnotationColumn> enumColumnsList = new ArrayList<>();
 		String[] columns = cols.split(",");
 		for(String col : columns){
@@ -65,64 +65,64 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		switch(col){
 		case "protein_db":
 		case "proteinDB":
-			return AnnotationColumn.DATABASE;			
+			return AnnotationColumn.DATABASE;
 		case "protein_id":
 		case "proteinID":
 			return AnnotationColumn.PROTEIN;
 		case "protein_symbol":
 		case "proteinSymbol":
-			return AnnotationColumn.SYMBOL;			
+			return AnnotationColumn.SYMBOL;
 		case "qualifier":
-			return AnnotationColumn.QUALIFIER;			
+			return AnnotationColumn.QUALIFIER;
 		case "go_id":
 		case "goID":
-			return AnnotationColumn.GOID;			
+			return AnnotationColumn.GOID;
 		case "go_name":
 		case "goName":
-			return AnnotationColumn.TERMNAME;			
+			return AnnotationColumn.TERMNAME;
 		case "aspect":
-			return AnnotationColumn.ASPECT;			
+			return AnnotationColumn.ASPECT;
 		case "evidence":
-			return AnnotationColumn.EVIDENCE;		
+			return AnnotationColumn.EVIDENCE;
 		case "ref":
-			return AnnotationColumn.REFERENCE;		
+			return AnnotationColumn.REFERENCE;
 		case "with":
-			return AnnotationColumn.WITH;		
+			return AnnotationColumn.WITH;
 		case "protein_taxonomy":
 		case "proteinTaxon":
-			return AnnotationColumn.TAXON;		
+			return AnnotationColumn.TAXON;
 		case "date":
-			return AnnotationColumn.DATE;		
+			return AnnotationColumn.DATE;
 		case "from":
-			return AnnotationColumn.ASSIGNEDBY;	
+			return AnnotationColumn.ASSIGNEDBY;
 		case "splice":
-			return AnnotationColumn.EXTENSION;		
+			return AnnotationColumn.EXTENSION;
 		case "protein_name":
 		case "proteinName":
-			return AnnotationColumn.NAME;			
+			return AnnotationColumn.NAME;
 		case "protein_synonym":
 		case "proteinSynonym":
-			return AnnotationColumn.SYNONYM;	
+			return AnnotationColumn.SYNONYM;
 		case "protein_type":
 		case "proteinType":
-			return AnnotationColumn.TYPE;		
+			return AnnotationColumn.TYPE;
 		case "protein_taxonomy_name":
 		case "proteinTaxonName":
-			return AnnotationColumn.TAXONNAME;		
+			return AnnotationColumn.TAXONNAME;
 		case "original_term_id":
 		case "originalTermID":
-			return AnnotationColumn.ORIGINALTERMID;		
+			return AnnotationColumn.ORIGINALTERMID;
 		case "original_go_name":
 		case "originalGOName":
-			return AnnotationColumn.ORIGINALTERMNAME;		
+			return AnnotationColumn.ORIGINALTERMNAME;
 		}
 		return null;
 	}
 
 	/**
-	 * Generate a file with the annotations results 
+	 * Generate a file with the annotations results
 	 * @param format File format
-	 * @param gzip 
+	 * @param gzip
 	 * @param query Query to run
 	 * @param columns Columns to display
 	 */
@@ -151,15 +151,19 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 				break;
 			case GENE2GO:
 				sb = fileService.generateGene2GoFile(query, totalAnnotations, limit);
-				break;			
-			}			
+				break;
+			case JSON:
+				sb = fileService.generateJsonFile(query, totalAnnotations, limit);
+				break;
+			}
+
 			String extension = format;
-			if (gzip) {	
+			if (gzip) {
 				extension = extension + ".gz";
 				httpServletResponse.setContentType("application/x-gzip");
 				httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + extension);
 				OutputStream os = new GZIPOutputStream(httpServletResponse.getOutputStream());
-				
+
 				Writer wr = new OutputStreamWriter(os, "ASCII");
 				wr.write(sb.toString());
 				wr.close();
@@ -171,7 +175,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 				httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + extension);
 				httpServletResponse.setContentLength(sb.length());
 				httpServletResponse.flushBuffer();
-			}			
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
