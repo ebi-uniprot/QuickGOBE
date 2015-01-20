@@ -322,6 +322,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/configuration/Configuration.j
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/configuration/DatabaseConfiguration.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/configuration/GOXrfAbbs.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/configuration/StatisticsConfiguration.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/servlet/CorsFilter.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/servlet/QuickGOCookie.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/servlet/QuickGOServlet.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/staticcontent/annotation/AnnotationBlackListContent.java -text svneol=unset#text/plain
