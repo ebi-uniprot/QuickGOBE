@@ -348,6 +348,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatisticsCalculat
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatsDownload.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/term/TermUtil.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/term/XRefBean.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/JsonClass.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolver.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolverImpl.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/dispatcher-servlet.xml -text svneol=unset#text/plain
