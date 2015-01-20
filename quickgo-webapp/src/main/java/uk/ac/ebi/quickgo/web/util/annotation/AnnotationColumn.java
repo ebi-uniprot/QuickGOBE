@@ -1,15 +1,18 @@
 package uk.ac.ebi.quickgo.web.util.annotation;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.util.StringUtils;
 
 import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm.EGOAspect;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.web.util.FileService;
+import uk.ac.ebi.quickgo.web.util.url.JsonClass;
 
 /**
  * Enum with the annotation columns that can be displayed
@@ -17,7 +20,7 @@ import uk.ac.ebi.quickgo.web.util.FileService;
  *
  */
 public enum AnnotationColumn {
-	//Selected by default	
+	//Selected by default
 	PROTEIN("dbObjectID","Gene Product ID","protein",true,true),
 	SYMBOL("dbObjectSymbol","Symbol","symbol",true,false),
 	QUALIFIER("qualifiers","Qualifier","qualifier",true,false),
@@ -27,7 +30,7 @@ public enum AnnotationColumn {
 	EVIDENCE("goEvidence","Evidence","evidence",true,true),
 	REFERENCE("references","Reference","reference",true,true),
 	WITH("with","With","with",true,true),
-	TAXON("taxonomyId","Taxon","taxon",true,true),	
+	TAXON("taxonomyId","Taxon","taxon",true,true),
 	ASSIGNEDBY("assignedBy","Assigned By","assignedby",true,true),
 	EXTENSION("extension","Annotation Extension","extension",true,false),
 
@@ -41,13 +44,13 @@ public enum AnnotationColumn {
 	SEQUENCE("sequenceLength","Sequence","sequence",false,false),
 	ORIGINALTERMID("goID","Original Term ID","originaltermid",false,true),
 	ORIGINALTERMNAME("termName","Original Term Name","originaltermname",false,false);
-	
+
 	private String id;
 	private String description;
-	private String name;	
+	private String name;
 	private boolean checkedByDefault;
 	private boolean showURL;
-	
+
 	private AnnotationColumn(String id, String description, String name, boolean checkedByDefault, boolean showURL){
 		this.id= id;
 		this.description = description;
@@ -57,7 +60,7 @@ public enum AnnotationColumn {
 	}
 
 	public static AnnotationColumn[] getAnnotationHeaders(String[] values){
-		if(values.length == 1 && values[0].equals("")){//Return the ones checked by default			
+		if(values.length == 1 && values[0].equals("")){//Return the ones checked by default
 			List<AnnotationColumn> annotationHeadersList = new ArrayList<>();
 			for(AnnotationColumn annotationHeader : AnnotationColumn.values()){
 				if(annotationHeader.isCheckedByDefault()){
@@ -73,7 +76,7 @@ public enum AnnotationColumn {
 			return annotationHeaders.toArray(new AnnotationColumn[annotationHeaders.size()]);
 		}
 	}
-	
+
 	public static AnnotationColumn[] sort(AnnotationColumn[] list){
 		List<AnnotationColumn> result = new ArrayList<>();
 		result.addAll(Arrays.asList(list));
@@ -86,7 +89,7 @@ public enum AnnotationColumn {
 		result.addAll(unsorted);
 		return result.toArray(new AnnotationColumn[result.size()]);
 	}
-	
+
 	/**
 	 * Get annotation column from ID
 	 * @param id Annotation column ID
@@ -106,10 +109,10 @@ public enum AnnotationColumn {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Given an annotation and a list of columns, return all the annotation fields for those columns 
-	 * @throws Exception 
+	 * Given an annotation and a list of columns, return all the annotation fields for those columns
+	 * @throws Exception
 	 */
 	public static String getAnnotationColumns(FileService.FILE_FORMAT format, Annotation annotation, AnnotationColumn[] columns, String separator) throws Exception{
 		String annotationString = "";
@@ -201,7 +204,105 @@ public enum AnnotationColumn {
 		}
 		return annotationString;
 	}
-	
+
+	public static String getAnnotationColumnsForJson(Annotation annotation, AnnotationColumn[] columns, JsonClass jsonClass) throws Exception{
+
+		for(AnnotationColumn annotationColumn : columns){
+
+			switch(annotationColumn){
+				case PROTEIN:
+					jsonClass.setProtein(annotation.getDbObjectID());
+					break;
+				case SYMBOL:
+					jsonClass.setSymbol(annotation.getDbObjectSymbol());
+					break;
+				case QUALIFIER:
+					String qualifierString = "";
+					if(annotation.getQualifiers() != null){
+						qualifierString = StringUtils.arrayToDelimitedString(annotation.getQualifiers().toArray(), "|");
+					}
+					jsonClass.setQualifier(qualifierString);
+					break;
+				case GOID:
+					jsonClass.setGoId(annotation.getGoID());
+					break;
+				case TERMNAME:
+					jsonClass.setTermName(annotation.getTermName());
+					break;
+				case ASPECT:
+					jsonClass.setAspect(EGOAspect.fromString(annotation.getGoAspect()).abbreviation);
+					break;
+				case EVIDENCE:
+//					if(format == FileService.FILE_FORMAT.GAF){
+//						annotationString = annotationString + annotation.getGoEvidence() + separator;
+//					} else if(format == FileService.FILE_FORMAT.GPAD){
+//						annotationString = annotationString + annotation.getEcoID() + separator;
+//					}
+					jsonClass.setEvidenceGo(annotation.getGoEvidence());
+					jsonClass.setEvidenceEco(annotation.getEcoID());
+					break;
+				case REFERENCE:
+					String referenceString = "";
+					if (annotation.getReferences() != null) {
+						referenceString = StringUtils.arrayToDelimitedString(annotation.getReferences().toArray(), "|");
+					}
+					jsonClass.setReference(referenceString);
+					break;
+				case WITH:
+					String withString = "";
+					if (annotation.getWith() != null) {
+						jsonClass.setWithList(annotation.getWith());
+					}
+
+					break;
+				case TAXON:
+					jsonClass.setTaxon(annotation.getTaxonomyId());
+					break;
+				case ASSIGNEDBY:
+					jsonClass.setAssignedBy(annotation.getAssignedBy());
+					break;
+				case DATABASE:
+					jsonClass.setDatabase(annotation.getDb());
+					break;
+				case DATE:
+					jsonClass.setDate(annotation.getDate());
+					break;
+				case NAME:
+					jsonClass.setName(annotation.getDbObjectName());
+					break;
+				case SYNONYM:
+					String synonymString = "";
+					if(annotation.getDbObjectSynonyms() != null){
+						synonymString = StringUtils.arrayToDelimitedString(annotation.getDbObjectSynonyms().toArray(), "|");
+					}
+					jsonClass.setSynonym(synonymString);
+					break;
+				case TYPE:
+					jsonClass.setType(annotation.getDbObjectType());
+				break;
+				case TAXONNAME:
+					jsonClass.setTaxonName(annotation.getTaxonomyName());
+					break;
+				case SEQUENCE:
+					jsonClass.setSequence(annotation.getSequenceLength());
+					break;
+				case ORIGINALTERMID:
+					jsonClass.setOriginalTermId(annotation.getGoID());
+					break;
+				case ORIGINALTERMNAME:
+					jsonClass.setOriginalTermName(annotation.getTermName());
+					break;
+				default:
+					break;
+			}
+		}
+		StringWriter writer = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writeValue(writer, jsonClass);
+		return writer.toString();
+	}
+
+
 	public String getId() {
 		return id;
 	}
@@ -216,15 +317,15 @@ public enum AnnotationColumn {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}		
-	
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
-	}	
+	}
 
 	public boolean isCheckedByDefault() {
 		return checkedByDefault;
@@ -240,5 +341,6 @@ public enum AnnotationColumn {
 
 	public void setShowURL(boolean showURL) {
 		this.showURL = showURL;
-	}	
+	}
+
 }
