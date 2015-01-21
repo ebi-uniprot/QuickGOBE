@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.controller;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,28 +69,29 @@ public class WebServiceController {
 
 	@Autowired
 	TermService termService;
-	
+
 	@Autowired
 	GeneProductService geneProductService;
 
 	@Autowired
-	MiscellaneousUtil miscellaneousUtil;	
-	
+	MiscellaneousUtil miscellaneousUtil;
+
 	@Autowired
-	MiscellaneousService miscellaneousService;		
-	
+	MiscellaneousService miscellaneousService;
+
 	@Autowired
-	ChartService chartService;	
-	
+	ChartService chartService;
+
 	@Autowired
 	QueryProcessor queryProcessor;
-	
+
 	@Autowired
 	AnnotationWSUtil annotationWSUtil;
-	
+
 	@Autowired
 	AnnotationBlackListContent annotationBlackListContent;
-	
+
+
 	/**
 	 * Lookup web service
 	 * @param format Response format
@@ -102,14 +104,14 @@ public class WebServiceController {
 	public void lookup(
 			@RequestParam(value = "format", required = false, defaultValue = "json") String format,
 			@RequestParam(value = "id", required = true, defaultValue = "") String id,
-			@RequestParam(value = "scope", required = false, defaultValue = "go") String scope,			
+			@RequestParam(value = "scope", required = false, defaultValue = "go") String scope,
 			HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-			
+
 			String callback = httpServletRequest.getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
 			id = id.toUpperCase();
 			Scope enumScope = Scope.valueOf(scope.trim().toUpperCase());
 			Format enumFormat = Format.valueOf(format.trim().toUpperCase());
-			
+
 			switch (enumScope) {
 			case COMPLEX:
 				id = "\""+ id + "\""; //Put id between " " to escape '-' character
@@ -119,12 +121,12 @@ public class WebServiceController {
 			case ECO:
 			case GO:
 				lookupTerm(id, enumScope, enumFormat, httpServletResponse, callback);
-				break;				
+				break;
 			default:
 				break;
-			}											
-	}	
-	
+			}
+	}
+
 	/**
 	 * Search web service
 	 * @param format Response format
@@ -142,7 +144,7 @@ public class WebServiceController {
 			@RequestParam(value = "scope", required = false, defaultValue = "go") String scope,
 			@RequestParam(value = "limit", required = false, defaultValue = "10") String limit,
 			HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, SolrServerException {
-		
+
 		String callback = httpServletRequest.getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
 		List<Scope> scopes = new ArrayList<>();
 		if (scope.contains(",")) {
@@ -154,33 +156,33 @@ public class WebServiceController {
 		} else {// Just 1
 			scopes.add(Scope.valueOf(scope.trim().toUpperCase()));
 		}
-		
+
 		Format enumFormat = Format.valueOf(format.trim().toUpperCase());
-		int limitValue = Integer.valueOf(limit);		
-		
+		int limitValue = Integer.valueOf(limit);
+
 		Map<String,List<Map<String, Object>>> serialised = new HashMap<>();
-		
-		for(Scope enumScope : scopes){		
+
+		for(Scope enumScope : scopes){
 			switch (enumScope) {
-			case COMPLEX:				
+			case COMPLEX:
 			case PROTEIN:
 				Map<String,List<Map<String, Object>>> proteins = new HashMap<>();
 				List<Map<String, Object>> proteinsSerialised =  searchProtein(query, enumScope, limitValue, enumFormat, httpServletResponse);
 				proteins.put(enumScope.value, proteinsSerialised);
 				serialised.putAll(proteins);
 				break;
-			case ECO:		
-				Map<String,List<Map<String, Object>>> ecoTerms = new HashMap<>();				
+			case ECO:
+				Map<String,List<Map<String, Object>>> ecoTerms = new HashMap<>();
 				List<Map<String, Object>> ecoTermsSerialised = searchTerm(query, TermField.ID.getValue() + ":" + "ECO*", limitValue, enumScope, enumFormat,  httpServletResponse ,callback);
 				ecoTerms.put("eco", ecoTermsSerialised);
 				serialised.putAll(ecoTerms);
 				break;
 			case GO:
-				Map<String,List<Map<String, Object>>> goTerms = new HashMap<>();				
+				Map<String,List<Map<String, Object>>> goTerms = new HashMap<>();
 				List<Map<String, Object>> goTermsSerialised = searchTerm(query, TermField.ID.getValue() + ":" + "GO*", limitValue, enumScope, enumFormat,  httpServletResponse, callback);
 				goTerms.put("go", goTermsSerialised);
 				serialised.putAll(goTerms);
-				break;		
+				break;
 			default:
 				break;
 			}
@@ -188,11 +190,11 @@ public class WebServiceController {
 		Gson gson = new Gson();
 		Type listOfserialisedElementsType = new TypeToken<Map<String,List<Map<String, Object>>>>(){}.getType();
 		String json = gson.toJson(serialised, listOfserialisedElementsType);
-		
+
 		httpServletResponse.setContentType("application/json");
 		httpServletResponse.getWriter().write(generateContentResponse(callback, json));
-	}		
-	
+	}
+
 	/**
 	 * Validate service
 	 * @param format Response format
@@ -212,18 +214,18 @@ public class WebServiceController {
 			@RequestParam(value = "action", required = false, defaultValue = "get_relations") String action,
 			@RequestParam(value = "taxon_id", required = false, defaultValue = "9606") String taxonId,
 			HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
-		
+
 			String callback = httpServletRequest.getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
 			ValidateType validateType = ValidateType.valueOf(type.trim().toUpperCase());
 			ValidateAction validateAction = ValidateAction.valueOf(action.trim().toUpperCase());
-			
-			String responseFormat = "application/json";						
+
+			String responseFormat = "application/json";
 			Format responseFormatEnum = Format.valueOf(format.trim().toUpperCase());
 			switch (responseFormatEnum) {
 			case XML:
 				responseFormat = "text/xml";
 				break;
-			}			
+			}
 			httpServletResponse.setContentType(responseFormat);
 			switch(validateType){
 			case ANN_EXT:
@@ -231,7 +233,7 @@ public class WebServiceController {
 				switch(validateAction){
 				case GET_RELATIONS:
 					Map<String, Object> relations = annotationExtensionRelations.forDomain(id);
-					httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(relations)));					
+					httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(relations)));
 					break;
 				case VALIDATE_RELATION:
 					Map<String, String> validation = new HashMap<>();
@@ -241,17 +243,17 @@ public class WebServiceController {
 					} catch (Exception e) {
 						validation.clear();
 						validation.put("valid", "false");
-						validation.put("message", e.getMessage());						
-					}					
+						validation.put("message", e.getMessage());
+					}
 			        if(responseFormatEnum.name() == Format.XML.name()){//XML response
 			        	String xmlResponse = "<status ";
 			        	if(validation.get("message")!=null){
 			        		xmlResponse = xmlResponse + "message=\"" + validation.get("message") +"\" ";
 			        	}
-			        	xmlResponse = xmlResponse + "valid=\"" + validation.get("valid") + "\"/>";			        	
+			        	xmlResponse = xmlResponse + "valid=\"" + validation.get("valid") + "\"/>";
 			        	httpServletResponse.getWriter().write(xmlResponse);
 			        }else{//JSON
-						httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(validation)));						
+						httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(validation)));
 			        }
 			        break;
 				}
@@ -260,16 +262,16 @@ public class WebServiceController {
 				switch (validateAction) {
 				case GET_BLACKLIST:
 					List<BlacklistEntryMinimal> taxonBlackList = annotationBlackListContent.getTaxonBlackList(Integer.valueOf(taxonId));
-					httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(taxonBlackList)));					
+					httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(taxonBlackList)));
 					break;
 				case GET_CONSTRAINTS:
-					httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(TaxonConstraintsContent.getAllTaxonConstraintsSerialised())));					
+					httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(TaxonConstraintsContent.getAllTaxonConstraintsSerialised())));
 					break;
 				}
 				break;
 			}
 	}
-	
+
 	/**
 	 * Statistics service
 	 * @param format Response format
@@ -299,7 +301,7 @@ public class WebServiceController {
 				termStat.put("s", String.valueOf(coOccurrenceStatsTerm.getProbabilitySimilarityRatio()));
 				termsStats.add(termStat);
 			}
-		}		
+		}
 		if(termsStats.size() > Integer.valueOf(limit)){
 			termsStats = termsStats.subList(0, Integer.valueOf(limit));
 		}
@@ -308,50 +310,50 @@ public class WebServiceController {
 		httpServletResponse.setContentType("application/json");
 		httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(results)));
 	}
-	
+
 	/**
 	 * Generate the ancestors chart for a list of ginved ids
 	 * @param ids Ids to display on the chart
 	 */
 	@RequestMapping("/chart")
-	public void statistics(			
-			@RequestParam(value = "ids", required = true, defaultValue = "") String ids,			
+	public void statistics(
+			@RequestParam(value = "ids", required = true, defaultValue = "") String ids,
 			@RequestParam(value = "scope", required = false, defaultValue = "") String scope,
 			HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-		
-		chartService.createChart(ids, scope);	
-	
+
+		chartService.createChart(ids, scope);
+
 	    ImageWriter iw = ImageIO.getImageWritersByFormatName("png").next();
 	    ImageOutputStream ios = new MemoryCacheImageOutputStream(httpServletResponse.getOutputStream());
 	    iw.setOutput(ios);
 	    iw.write(chartService.getRenderableImage());
 	}
-	
+
 	/**
 	 * Annotation web service
 	 */
 	@RequestMapping("/annotation")
 	public void annotation(@RequestParam(value = "format", required = false, defaultValue = "gpad") String format,
-			@RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
-			@RequestParam(value = "gz", required = false, defaultValue = "") String gz,
-			@RequestParam(value = "go_id", required = false, defaultValue = "") String goid,
-			@RequestParam(value = "aspect", required = false, defaultValue = "") String aspect,
-			@RequestParam(value = "enable_slim", required = false, defaultValue = "false") String enableSlim,
-			@RequestParam(value = "go_relations", required = false, defaultValue = "") String goRelations,			
-			@RequestParam(value = "evidence", required = false, defaultValue = "") String evidence,
-			@RequestParam(value = "source", required = false, defaultValue = "") String source,
-			@RequestParam(value = "reference", required = false, defaultValue = "") String ref,
-			@RequestParam(value = "with", required = false, defaultValue = "") String with,
-			@RequestParam(value = "taxonomy_id", required = false, defaultValue = "") String tax,
-			@RequestParam(value = "protein", required = false, defaultValue = "") String protein,
-			@RequestParam(value = "qualifier", required = false, defaultValue = "") String qualifier,
-			@RequestParam(value = "database", required = false, defaultValue = "") String db,
-			@RequestParam(value = "columns", required = false, defaultValue = "") String cols,
-			HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
-		
+						   @RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
+						   @RequestParam(value = "gz", required = false, defaultValue = "") String gz,
+						   @RequestParam(value = "go_id", required = false, defaultValue = "") String goid,
+						   @RequestParam(value = "aspect", required = false, defaultValue = "") String aspect,
+						   @RequestParam(value = "enable_slim", required = false, defaultValue = "false") String enableSlim,
+						   @RequestParam(value = "go_relations", required = false, defaultValue = "") String goRelations,
+						   @RequestParam(value = "evidence", required = false, defaultValue = "") String evidence,
+						   @RequestParam(value = "source", required = false, defaultValue = "") String source,
+						   @RequestParam(value = "reference", required = false, defaultValue = "") String ref,
+						   @RequestParam(value = "with", required = false, defaultValue = "") String with,
+						   @RequestParam(value = "taxonomy_id", required = false, defaultValue = "") String tax,
+						   @RequestParam(value = "protein", required = false, defaultValue = "") String protein,
+						   @RequestParam(value = "qualifier", required = false, defaultValue = "") String qualifier,
+						   @RequestParam(value = "database", required = false, defaultValue = "") String db,
+						   @RequestParam(value = "columns", required = false, defaultValue = "") String cols,
+						   HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+
 		String query = "";
 		boolean gzip = false;
-		
+
 		if(!format.trim().isEmpty()){
 			query = query + "\"format\""  + ":\"" + format + "\",\"";
 		}
@@ -365,29 +367,29 @@ public class WebServiceController {
 			if(!enableSlim.trim().isEmpty() && Boolean.valueOf(enableSlim) == true){
 				if(!goRelations.trim().isEmpty()){
 					switch(goRelations){
-					case "=":
-						query = query + "\"" + "\"goid\""  + "\""  + ":\"" + goid + "\",\"";
-					case "I":
-						query = query + "\"" + AnnotationField.ANCESTORSI.getValue() + "\""  + ":\"" + goid + "\",\"";
-						break;
-					case "?":						
-					case "POI":
-					case "IPO":
-						query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
-						break;
-					case "RPOI":
-					case "IRPO":
-					case "POIR":
-					case "PORI":
-					case "IPOR":
-						query = query + "\"" + AnnotationField.ANCESTORSIPOR.getValue() + "\""  + ":\"" + goid + "\",\"";
-						break;
+						case "=":
+							query = query + "\"" + "\"goid\""  + "\""  + ":\"" + goid + "\",\"";
+						case "I":
+							query = query + "\"" + AnnotationField.ANCESTORSI.getValue() + "\""  + ":\"" + goid + "\",\"";
+							break;
+						case "?":
+						case "POI":
+						case "IPO":
+							query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+							break;
+						case "RPOI":
+						case "IRPO":
+						case "POIR":
+						case "PORI":
+						case "IPOR":
+							query = query + "\"" + AnnotationField.ANCESTORSIPOR.getValue() + "\""  + ":\"" + goid + "\",\"";
+							break;
 					}
-				}	
+				}
 			}else{
-				query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";	
+				query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
 			}
-						
+
 		}
 		if(!aspect.trim().isEmpty()){
 			query = query + "\"aspect\""  + ":\"" + aspect + "\",\"";
@@ -415,34 +417,448 @@ public class WebServiceController {
 		}
 		if(!db.trim().isEmpty()){
 			query = query + "\"db\""  + ":\"" + db + "\",\"";
-		}	
-		
+		}
+
 		AnnotationParameters annotationParameters = new AnnotationParameters();
-		
-		queryProcessor.processQuery(query, annotationParameters, new AppliedFilterSet(), false);				 		
-		
+
+		/**
+		 * new
+		 */
+
 		String solrQuery = annotationParameters.toSolrQuery();
-		
+
 		// Get columns to display
 		AnnotationColumn[] columns = { AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.GOID};
 		if (format.equals(FileService.FILE_FORMAT.TSV.getValue()) && (cols != null && !cols.trim().isEmpty())) {
 			columns = annotationWSUtil.mapColumns(cols);
 		}
-		
+
 		// Download file
 		annotationWSUtil.downloadAnnotations(format, gzip, solrQuery, columns, Integer.valueOf(limit), httpServletResponse);
 	}
-	
+
+
+	/**
+	 * Annotation web service
+	 */
+	@RequestMapping("/annotationjson")
+	public void annotation(@RequestParam(value = "format", required = false, defaultValue = "gpad") String format,
+						   @RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
+						   @RequestParam(value = "gz", required = false, defaultValue = "") String gz,
+						   @RequestParam(value = "go_id", required = false, defaultValue = "") String goid,
+						   @RequestParam(value = "aspect", required = false, defaultValue = "") String aspect,
+						   @RequestParam(value = "enable_slim", required = false, defaultValue = "false") String enableSlim,
+						   @RequestParam(value = "go_relations", required = false, defaultValue = "") String goRelations,
+						   @RequestParam(value = "evidence", required = false, defaultValue = "") String evidence,
+						   @RequestParam(value = "source", required = false, defaultValue = "") String source,
+						   @RequestParam(value = "reference", required = false, defaultValue = "") String ref,
+						   @RequestParam(value = "with", required = false, defaultValue = "") String with,
+						   @RequestParam(value = "taxonomy_id", required = false, defaultValue = "") String tax,
+						   @RequestParam(value = "protein", required = false, defaultValue = "") String protein,
+						   @RequestParam(value = "qualifier", required = false, defaultValue = "") String qualifier,
+						   @RequestParam(value = "database", required = false, defaultValue = "") String db,
+						   @RequestParam(value = "columns", required = false, defaultValue = "") String cols,
+						   @RequestParam(value = "page", defaultValue = "1") int page,
+						   @RequestParam(value = "rows", defaultValue = "25") int rows,
+						   @RequestParam(value = "removeFilter", defaultValue = "") String removeFilter,
+						   @RequestParam(value = "removeAllFilters", defaultValue = "") String removeAllFilters,
+						   @RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter,
+						   HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+
+		String query = "";
+		boolean gzip = false;
+
+		if(!format.trim().isEmpty()){
+			query = query + "\"format\""  + ":\"" + format + "\",\"";
+		}
+		if(!limit.trim().isEmpty()){
+			query = query + "\"limit\""  + ":\"" + limit + "\",\"";
+		}
+		if (httpServletRequest.getParameter("gz") != null) {
+			gzip = true;
+		}
+		if(!goid.trim().isEmpty()){
+			if(!enableSlim.trim().isEmpty() && Boolean.valueOf(enableSlim) == true){
+				if(!goRelations.trim().isEmpty()){
+					switch(goRelations){
+						case "=":
+							query = query + "\"" + "\"goid\""  + "\""  + ":\"" + goid + "\",\"";
+						case "I":
+							query = query + "\"" + AnnotationField.ANCESTORSI.getValue() + "\""  + ":\"" + goid + "\",\"";
+							break;
+						case "?":
+						case "POI":
+						case "IPO":
+							query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+							break;
+						case "RPOI":
+						case "IRPO":
+						case "POIR":
+						case "PORI":
+						case "IPOR":
+							query = query + "\"" + AnnotationField.ANCESTORSIPOR.getValue() + "\""  + ":\"" + goid + "\",\"";
+							break;
+					}
+				}
+			}else{
+				query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+			}
+
+		}
+		if(!aspect.trim().isEmpty()){
+			query = query + "\"aspect\""  + ":\"" + aspect + "\",\"";
+		}
+		if(!evidence.trim().isEmpty()){
+			query = query + "\"evidence\""  + ":\"" + evidence + "\",\"";
+		}
+		if(!source.trim().isEmpty()){
+			query = query + "\"source\""  + ":\"" + source + "\",\"";
+		}
+		if(!ref.trim().isEmpty()){
+			query = query + "\"ref\""  + ":\"" + ref + "\",\"";
+		}
+		if(!with.trim().isEmpty()){
+			query = query + "\"with\""  + ":\"" + with + "\",\"";
+		}
+		if(!tax.trim().isEmpty()){
+			query = query + "\"tax\""  + ":\"" + tax + "\",\"";
+		}
+		if(!protein.trim().isEmpty()){
+			query = query + "\"protein\""  + ":\"" + protein + "\",\"";
+		}
+		if(!qualifier.trim().isEmpty()){
+			query = query + "\"qualifier\""  + ":\"" + qualifier + "\",\"";
+		}
+		if(!db.trim().isEmpty()){
+			query = query + "\"db\""  + ":\"" + db + "\",\"";
+		}
+
+
+		/**
+		 * New
+		 */
+		// Get current applied filters from session
+//		AppliedFilterSet appliedFilterSet = (AppliedFilterSet) session.getAttribute("appliedFilters");
+//		if (appliedFilterSet == null) {
+//			appliedFilterSet = new AppliedFilterSet();
+//		}
+
+		//End New
+
+
+		AnnotationParameters annotationParameters = new AnnotationParameters();
+
+		/**
+		 * new
+		 */
+
+		//todo put the following line back
+		//annotationParameters.setParameters(new HashMap<String, List<String>>(appliedFilterSet.getParameters()));
+		/**
+		 * End new
+		 */
+
+		queryProcessor.processQuery(query, annotationParameters, new AppliedFilterSet(), false);
+		//queryProcessor.processQuery(query, annotationParameters, appliedFilterSet, Boolean.valueOf(advancedFilter)); todo put this version back
+
+		String solrQuery = annotationParameters.toSolrQuery();
+
+
+		/**
+		 * New
+		 */
+
+		//todo this method is already defined in the AnnotaiionWSUtilImpl
+//		this.totalNumberAnnotations = annotationService.getTotalNumberAnnotations(solrQuery);
+
+
+		// Create annotation wrappers todo put back
+//		List<AnnotationBean> annotationBeans = new ArrayList<>();
+//		for (Annotation annotation : annotations) {
+//			List<String> slimValue = appliedFilterSet.getParameters().get("slim");
+//			List<String> filterGOIds = appliedFilterSet.getParameters().get(AnnotationField.ANCESTORSIPO.getValue());
+//			AnnotationBean annotationBean = slimmingUtil.calculateOriginalAndSlimmingTerm(annotation, filterGOIds, slimValue);
+//			urLsResolver.setURLs(annotationBean);
+//			annotationBeans.add(annotationBean);
+//		}
+
+//		// Set list of annotations to display
+//		session.setAttribute("annotationsList", annotationBeans);
+//		// Set visible columns
+//		AnnotationColumn[] sortedVisibleAnnotationHeaders = (AnnotationColumn[]) session.getAttribute("visibleAnnotationsColumns");
+//		if (sortedVisibleAnnotationHeaders == null || !cols.isEmpty()) {
+//			sortedVisibleAnnotationHeaders = AnnotationColumn.getAnnotationHeaders(URLDecoder.decode(cols, "UTF-8").split(","));
+//			// Set visible columns in session
+//			session.setAttribute("visibleAnnotationsColumns", sortedVisibleAnnotationHeaders);
+//		}
+//		// All columns
+//		AnnotationColumn[] allAnnotationsColumns = (AnnotationColumn[]) session.getAttribute("allAnnotationsColumns");
+//		if(allAnnotationsColumns == null){
+//			session.setAttribute("allAnnotationsColumns", allColumns);
+//		}
+
+
+//		// Set annotations columns ordered
+//		session.setAttribute("annotationsColumns", AnnotationColumn.sort(sortedVisibleAnnotationHeaders));
+//		// Set current page
+//		model.addAttribute("currentPage", this.selectedPage);
+//		// Set total number of annotations
+//		model.addAttribute("totalNumberAnnotations", this.totalNumberAnnotations);
+//		// Set applied filters in session
+//		session.setAttribute("appliedFilters", appliedFilterSet);
+
+
+		/**
+		 * EndNew
+		 *
+		 */
+
+
+		// Get columns to display
+		AnnotationColumn[] columns = { AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.GOID};
+		if (format.equals(FileService.FILE_FORMAT.TSV.getValue()) && (cols != null && !cols.trim().isEmpty())) {
+			columns = annotationWSUtil.mapColumns(cols);
+		}
+
+		// Download file
+		//List<Annotation> annotations = annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
+		annotationWSUtil.downloadAnnotationsInternal(format, solrQuery, columns, Integer.valueOf(limit),
+				(page - 1) * rows, rows, httpServletResponse);
+	}
+
+
+
+	/**
+	 * Annotation web service
+	 */
+	@RequestMapping("/annotationtotal")
+	public void annotationTotal(@RequestParam(value = "format", required = false, defaultValue = "gpad") String format,
+						   @RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
+						   @RequestParam(value = "gz", required = false, defaultValue = "") String gz,
+						   @RequestParam(value = "go_id", required = false, defaultValue = "") String goid,
+						   @RequestParam(value = "aspect", required = false, defaultValue = "") String aspect,
+						   @RequestParam(value = "enable_slim", required = false, defaultValue = "false") String enableSlim,
+						   @RequestParam(value = "go_relations", required = false, defaultValue = "") String goRelations,
+						   @RequestParam(value = "evidence", required = false, defaultValue = "") String evidence,
+						   @RequestParam(value = "source", required = false, defaultValue = "") String source,
+						   @RequestParam(value = "reference", required = false, defaultValue = "") String ref,
+						   @RequestParam(value = "with", required = false, defaultValue = "") String with,
+						   @RequestParam(value = "taxonomy_id", required = false, defaultValue = "") String tax,
+						   @RequestParam(value = "protein", required = false, defaultValue = "") String protein,
+						   @RequestParam(value = "qualifier", required = false, defaultValue = "") String qualifier,
+						   @RequestParam(value = "database", required = false, defaultValue = "") String db,
+						   @RequestParam(value = "columns", required = false, defaultValue = "") String cols,
+						   @RequestParam(value = "page", defaultValue = "1") int page,
+						   @RequestParam(value = "rows", defaultValue = "25") int rows,
+						   @RequestParam(value = "removeFilter", defaultValue = "") String removeFilter,
+						   @RequestParam(value = "removeAllFilters", defaultValue = "") String removeAllFilters,
+						   @RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter,
+						   HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+
+		String query = "";
+		boolean gzip = false;
+
+		if(!format.trim().isEmpty()){
+			query = query + "\"format\""  + ":\"" + format + "\",\"";
+		}
+		if(!limit.trim().isEmpty()){
+			query = query + "\"limit\""  + ":\"" + limit + "\",\"";
+		}
+		if (httpServletRequest.getParameter("gz") != null) {
+			gzip = true;
+		}
+		if(!goid.trim().isEmpty()){
+			if(!enableSlim.trim().isEmpty() && Boolean.valueOf(enableSlim) == true){
+				if(!goRelations.trim().isEmpty()){
+					switch(goRelations){
+						case "=":
+							query = query + "\"" + "\"goid\""  + "\""  + ":\"" + goid + "\",\"";
+						case "I":
+							query = query + "\"" + AnnotationField.ANCESTORSI.getValue() + "\""  + ":\"" + goid + "\",\"";
+							break;
+						case "?":
+						case "POI":
+						case "IPO":
+							query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+							break;
+						case "RPOI":
+						case "IRPO":
+						case "POIR":
+						case "PORI":
+						case "IPOR":
+							query = query + "\"" + AnnotationField.ANCESTORSIPOR.getValue() + "\""  + ":\"" + goid + "\",\"";
+							break;
+					}
+				}
+			}else{
+				query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+			}
+
+		}
+		if(!aspect.trim().isEmpty()){
+			query = query + "\"aspect\""  + ":\"" + aspect + "\",\"";
+		}
+		if(!evidence.trim().isEmpty()){
+			query = query + "\"evidence\""  + ":\"" + evidence + "\",\"";
+		}
+		if(!source.trim().isEmpty()){
+			query = query + "\"source\""  + ":\"" + source + "\",\"";
+		}
+		if(!ref.trim().isEmpty()){
+			query = query + "\"ref\""  + ":\"" + ref + "\",\"";
+		}
+		if(!with.trim().isEmpty()){
+			query = query + "\"with\""  + ":\"" + with + "\",\"";
+		}
+		if(!tax.trim().isEmpty()){
+			query = query + "\"tax\""  + ":\"" + tax + "\",\"";
+		}
+		if(!protein.trim().isEmpty()){
+			query = query + "\"protein\""  + ":\"" + protein + "\",\"";
+		}
+		if(!qualifier.trim().isEmpty()){
+			query = query + "\"qualifier\""  + ":\"" + qualifier + "\",\"";
+		}
+		if(!db.trim().isEmpty()){
+			query = query + "\"db\""  + ":\"" + db + "\",\"";
+		}
+
+
+		/**
+		 * New
+		 */
+		// Get current applied filters from session
+//		AppliedFilterSet appliedFilterSet = (AppliedFilterSet) session.getAttribute("appliedFilters");
+//		if (appliedFilterSet == null) {
+//			appliedFilterSet = new AppliedFilterSet();
+//		}
+
+		//End New
+
+
+		AnnotationParameters annotationParameters = new AnnotationParameters();
+
+		/**
+		 * new
+		 */
+
+		//todo put the following line back
+		//annotationParameters.setParameters(new HashMap<String, List<String>>(appliedFilterSet.getParameters()));
+		/**
+		 * End new
+		 */
+
+		queryProcessor.processQuery(query, annotationParameters, new AppliedFilterSet(), false);
+		//queryProcessor.processQuery(query, annotationParameters, appliedFilterSet, Boolean.valueOf(advancedFilter)); todo put this version back
+
+		String solrQuery = annotationParameters.toSolrQuery();
+
+
+		/**
+		 * New
+		 */
+
+		//todo this method is already defined in the AnnotaiionWSUtilImpl
+//		this.totalNumberAnnotations = annotationService.getTotalNumberAnnotations(solrQuery);
+
+
+		// Create annotation wrappers todo put back
+//		List<AnnotationBean> annotationBeans = new ArrayList<>();
+//		for (Annotation annotation : annotations) {
+//			List<String> slimValue = appliedFilterSet.getParameters().get("slim");
+//			List<String> filterGOIds = appliedFilterSet.getParameters().get(AnnotationField.ANCESTORSIPO.getValue());
+//			AnnotationBean annotationBean = slimmingUtil.calculateOriginalAndSlimmingTerm(annotation, filterGOIds, slimValue);
+//			urLsResolver.setURLs(annotationBean);
+//			annotationBeans.add(annotationBean);
+//		}
+
+//		// Set list of annotations to display
+//		session.setAttribute("annotationsList", annotationBeans);
+//		// Set visible columns
+//		AnnotationColumn[] sortedVisibleAnnotationHeaders = (AnnotationColumn[]) session.getAttribute("visibleAnnotationsColumns");
+//		if (sortedVisibleAnnotationHeaders == null || !cols.isEmpty()) {
+//			sortedVisibleAnnotationHeaders = AnnotationColumn.getAnnotationHeaders(URLDecoder.decode(cols, "UTF-8").split(","));
+//			// Set visible columns in session
+//			session.setAttribute("visibleAnnotationsColumns", sortedVisibleAnnotationHeaders);
+//		}
+//		// All columns
+//		AnnotationColumn[] allAnnotationsColumns = (AnnotationColumn[]) session.getAttribute("allAnnotationsColumns");
+//		if(allAnnotationsColumns == null){
+//			session.setAttribute("allAnnotationsColumns", allColumns);
+//		}
+
+
+//		// Set annotations columns ordered
+//		session.setAttribute("annotationsColumns", AnnotationColumn.sort(sortedVisibleAnnotationHeaders));
+//		// Set current page
+//		model.addAttribute("currentPage", this.selectedPage);
+//		// Set total number of annotations
+//		model.addAttribute("totalNumberAnnotations", this.totalNumberAnnotations);
+//		// Set applied filters in session
+//		session.setAttribute("appliedFilters", appliedFilterSet);
+
+
+		/**
+		 * EndNew
+		 *
+		 */
+
+
+		// Get columns to display
+		AnnotationColumn[] columns = { AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.GOID};
+		if (format.equals(FileService.FILE_FORMAT.TSV.getValue()) && (cols != null && !cols.trim().isEmpty())) {
+			columns = annotationWSUtil.mapColumns(cols);
+		}
+
+		// Download file
+		//List<Annotation> annotations = annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
+		annotationWSUtil.downloadAnnotationsTotalInternal(solrQuery, httpServletResponse);
+	}
+
+
+
+
+//	@RequestMapping(value="/total")
+//	public String calculateStatistics() {tot
+//		// Calculate stats
+//		if(statisticsCalculation != null && !statisticsCalculation.getQuery().equals(currentQuery)){
+//			statisticsCalculation.interrupt();
+//			createStatsThread(currentQuery);
+//		} else if(statisticsCalculation == null){
+//			createStatsThread(currentQuery);
+//		}
+//
+//		while (statisticsCalculation.isAlive()){
+//		}
+//		model.addAttribute("statsBean", this.statisticsBean);
+//
+//		// Set total number annotations
+//		model.addAttribute("totalNumberAnnotations", totalNumberAnnotations);
+//		long totalNumberProteins = annotationService.getTotalNumberProteins(this.currentQuery);
+//		// Set total number proteins
+//		model.addAttribute("totalNumberProteins", totalNumberProteins);
+//
+//		return View.ANNOTATIONS_PATH + "/" + View.ANNOTATIONS_LIST;
+//
+//	}
+//
+//	private void createStatsThread(String solrQuery){
+//		statisticsBean = new StatisticsBean();
+//		statisticsCalculation = new StatisticsCalculation(statisticsBean, solrQuery);
+//		statisticsCalculation.setStatisticService(statisticService);
+//		statisticsCalculation.start();
+//	}
+
 	private List<Map<String, Object>> searchTerm(String query, String filterQuery, int limit, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse, String callback) throws IOException, SolrServerException {
-		
+
 		if ((query.length() == 10 && query //Check if query is GO or ECO term. In that case, retrieve term
 				.matches(AnnotationParameters.GO_ID_REG_EXP + "\\d{7}"))
 				|| (query.length() == 11 && query
 						.matches(AnnotationParameters.ECO_ID_REG_EXP + "\\d{7}"))) {
-			
-			GenericTerm genericTerm = TermUtil.getTerm(query);			
+
+			GenericTerm genericTerm = TermUtil.getTerm(query);
 			return Arrays.asList(genericTerm.serialise());
-			
+
 		} else {
 
 			List<GenericTerm> genericTerms = termService.autosuggest(query, filterQuery, limit);
@@ -451,12 +867,12 @@ public class WebServiceController {
 				GenericTerm term = TermUtil.getTerm(genericTerm.getId());//to get ancestors and other info
 				termsSerialised.add(term.serialise());
 			}
-			
+
 			return termsSerialised;
 		}
 	}
 
-	private List<Map<String, Object>> searchProtein(String query, Scope enumScope, int limit, Format enumFormat, HttpServletResponse httpServletResponse) throws IOException {		
+	private List<Map<String, Object>> searchProtein(String query, Scope enumScope, int limit, Format enumFormat, HttpServletResponse httpServletResponse) throws IOException {
 		List<GeneProduct> geneProducts = geneProductService.autosuggest(query, GeneProductField.DBOBJECTTYPE.getValue() + ":" + enumScope.value, limit);
 		List<Map<String, Object>> gpSerialised = new ArrayList<>();
 		Map<String, String> taxName = new HashMap<>();
@@ -466,7 +882,7 @@ public class WebServiceController {
 			}
 			geneProduct.setTaxonName(taxName.get(String.valueOf(geneProduct.getTaxonId())));
 			gpSerialised.add(geneProduct.serialise());
-		}		
+		}
 
 		return gpSerialised;
 	}
@@ -483,56 +899,56 @@ public class WebServiceController {
 		}
 		Map<String, String> taxName = miscellaneousUtil.getTaxonomiesNames(Arrays.asList(String.valueOf(geneProduct.getTaxonId())));
 		geneProduct.setTaxonName(taxName.get(String.valueOf(geneProduct.getTaxonId())));
-		
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();		
-		
+
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
 		switch (enumFormat) {
 			case XML:
-				httpServletResponse.setContentType("text/xml");				
+				httpServletResponse.setContentType("text/xml");
 				break;
 			case JSON:
-				httpServletResponse.setContentType("application/json");				
+				httpServletResponse.setContentType("application/json");
 				break;
 			default:
-				httpServletResponse.setContentType("application/json");				
+				httpServletResponse.setContentType("application/json");
 				break;
 		}
-		
+
 		httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
-		geneProductService.convertToStream(geneProduct, enumFormat, byteArrayOutputStream);	
-		httpServletResponse.getWriter().write(generateContentResponse(callback, new String(byteArrayOutputStream.toByteArray())));		
+		geneProductService.convertToStream(geneProduct, enumFormat, byteArrayOutputStream);
+		httpServletResponse.getWriter().write(generateContentResponse(callback, new String(byteArrayOutputStream.toByteArray())));
 	}
-	
+
 	private void lookupTerm(String id, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse, String callback) throws IOException{
-		GenericTerm genericTerm = TermUtil.getTerm(id);		
+		GenericTerm genericTerm = TermUtil.getTerm(id);
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		
+
 		httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
-		
+
 		switch (enumFormat) {
 			case OBOXML:
 			case XML:
 				httpServletResponse.setContentType("text/xml");
-				termService.convertToStream(genericTerm, enumFormat, byteArrayOutputStream);				
+				termService.convertToStream(genericTerm, enumFormat, byteArrayOutputStream);
 				httpServletResponse.getWriter().write(generateContentResponse(callback, new String(byteArrayOutputStream.toByteArray())));
 				break;
 			case JSON:
 				httpServletResponse.setContentType("application/json");
-				termService.convertToStream(genericTerm, enumFormat, byteArrayOutputStream);				
+				termService.convertToStream(genericTerm, enumFormat, byteArrayOutputStream);
 				httpServletResponse.getWriter().write(generateContentResponse(callback, new String(byteArrayOutputStream.toByteArray())));
 				break;
-			case OBO:				
+			case OBO:
 				String obo = termService.convertToOBO(genericTerm);
 				httpServletResponse.getWriter().write(generateContentResponse(callback, obo));
 				break;
 			default:
 				httpServletResponse.setContentType("application/json");
-				termService.convertToStream(genericTerm, enumFormat, byteArrayOutputStream);				
+				termService.convertToStream(genericTerm, enumFormat, byteArrayOutputStream);
 				httpServletResponse.getWriter().write(generateContentResponse(callback, new String(byteArrayOutputStream.toByteArray())));
 				break;
 		}
 	}
-	
+
 	/**
 	 * Data scope
 	 * @author cbonill
@@ -544,9 +960,9 @@ public class WebServiceController {
 		PROTEIN("protein"),
 		COMPLEX("complex"),
 		ALL("all");
-		
+
 		String value;
-		
+
 		private Scope(String value) {
 			this.value = value;
 		}
@@ -560,14 +976,14 @@ public class WebServiceController {
 	enum ValidateType{
 		ANN_EXT("ann_ext"),
 		TAXON("taxon");
-		
+
 		String value;
-		
+
 		private ValidateType(String value) {
 			this.value = value;
 		}
-	}	
-	
+	}
+
 	/**
 	 * Validate web service actions
 	 * @author cbonill
@@ -578,14 +994,14 @@ public class WebServiceController {
 		GET_RELATIONS("get_relations"),
 		GET_BLACKLIST("get_blacklist"),
 		GET_CONSTRAINTS("get_constraints");
-		
+
 		String value;
-		
+
 		private ValidateAction(String value) {
 			this.value = value;
 		}
 	}
-	
+
 	/**
 	 * To handle WS exceptions
 	 * @param e Exception
@@ -599,7 +1015,7 @@ public class WebServiceController {
 	    errors.put("error_message", "The request cannot be fulfilled due to bad syntax");
 		return new Gson().toJson(errors);
 	}
-	
+
 	/**
 	 * Generate content response
 	 * @param callback {@link Callback} parameter

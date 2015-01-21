@@ -14,4 +14,12 @@ public interface AnnotationWSUtil {
 	public void downloadAnnotations(String format, boolean gzip, String query,
 			AnnotationColumn[] columns, int limit,
 			HttpServletResponse httpServletResponse);
+
+	public void downloadAnnotationsInternal(String format, String query,
+									AnnotationColumn[] columns, int limit,
+									int start, int row,
+									HttpServletResponse httpServletResponse);
+
+	public void downloadAnnotationsTotalInternal( String query,HttpServletResponse httpServletResponse);
+
 }

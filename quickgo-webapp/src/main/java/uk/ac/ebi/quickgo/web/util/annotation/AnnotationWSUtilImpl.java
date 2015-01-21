@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 import uk.ac.ebi.quickgo.web.util.FileService;
+import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
 
 /**
  * Annotation WS util methods
@@ -126,7 +127,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	 * @param query Query to run
 	 * @param columns Columns to display
 	 */
-	public void downloadAnnotations(String format, boolean gzip, String query, AnnotationColumn[] columns, int limit, HttpServletResponse httpServletResponse){
+	public void downloadAnnotations(String format, boolean gzip, String query, AnnotationColumn[] columns, int limit,
+									HttpServletResponse httpServletResponse){
+
 		// Get total number annotations
 		long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
 
@@ -153,7 +156,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 				sb = fileService.generateGene2GoFile(query, totalAnnotations, limit);
 				break;
 			case JSON:
-				sb = fileService.generateJsonFile(query, totalAnnotations, limit);
+				sb = fileService.generateJsonFile(query, totalAnnotations, limit );
 				break;
 			}
 
@@ -176,6 +179,94 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 				httpServletResponse.setContentLength(sb.length());
 				httpServletResponse.flushBuffer();
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	/**
+	 * Generate a file with the annotations results
+	 * @param format File format
+	 * @param gzip
+	 * @param query Query to run
+	 * @param columns Columns to display
+	 */
+	public void downloadAnnotationsInternal(String format, String query, AnnotationColumn[] columns, int limit,
+									int start, int rows, HttpServletResponse httpServletResponse){
+
+		// Get total number annotations
+		long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
+
+		// Check file format
+		StringBuffer sb = null;
+		try {
+			switch (FileService.FILE_FORMAT.valueOf(format.toUpperCase())) {
+				case TSV:
+					sb = fileService.generateTSVfile(FileService.FILE_FORMAT.TSV, "", query, totalAnnotations, columns, limit);
+					break;
+				case FASTA:
+					sb = fileService.generateFastafile(query, totalAnnotations, limit);
+					break;
+				case GAF:
+					sb = fileService.generateGAFFile(query, totalAnnotations, limit);
+					break;
+				case GPAD:
+					sb = fileService.generateGPADFile(query, totalAnnotations, limit);
+					break;
+				case PROTEINLIST:
+					sb = fileService.generateProteinListFile(query, totalAnnotations, limit);
+					break;
+				case GENE2GO:
+					sb = fileService.generateGene2GoFile(query, totalAnnotations, limit);
+					break;
+				case JSON:
+					sb = fileService.generateJsonFileWithPageAndRow(query, totalAnnotations, start, rows);
+					break;
+			}
+
+			String extension = format;
+
+			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+			IOUtils.copy(in, httpServletResponse.getOutputStream());
+			// Set response header and content
+			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + extension);
+			httpServletResponse.setContentLength(sb.length());
+			httpServletResponse.flushBuffer();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+
+	/**
+	 * Generate a file with the annotations results
+	 * @param format File format
+	 * @param gzip
+	 * @param query Query to run
+	 * @param columns Columns to display
+	 */
+	public void downloadAnnotationsTotalInternal( String query,HttpServletResponse httpServletResponse){
+
+		// Get total number annotations
+		long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
+
+		// Check file format
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFileWithTotalAnnotations(totalAnnotations);
+
+			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+			IOUtils.copy(in, httpServletResponse.getOutputStream());
+			// Set response header and content
+			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
+			httpServletResponse.setContentLength(sb.length());
+			httpServletResponse.flushBuffer();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());

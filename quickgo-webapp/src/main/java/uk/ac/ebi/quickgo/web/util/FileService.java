@@ -21,6 +21,8 @@ import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousServiceImpl;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.solr.query.model.miscellaneous.enums.MiscellaneousField;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationColumn;
+import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
+import uk.ac.ebi.quickgo.web.util.url.JsonClass;
 
 /**
  * Class to deal with the generation of common files (gpad,gaff,fasta,...)
@@ -32,25 +34,26 @@ public class FileService {
 
 	@Autowired
 	AnnotationService annotationService;
-	
+
 	@Autowired
 	MiscellaneousServiceImpl miscellaneousService;
-	
+
 	@Autowired
 	GeneProductService geneProductService;
-		
-	private final int NUM_ROWS = 5000;
-	
-	private static final Logger logger = Logger.getLogger(FileService.class);	
 
-	
+	private final int NUM_ROWS = 5000;
+
+	private static final Logger logger = Logger.getLogger(FileService.class);
+
+
 	public enum FILE_FORMAT {
 		TSV("tsv"),
 		FASTA("fasta"),
 		GAF("gaf"),
 		GPAD("gpad"),
 		PROTEINLIST("proteinlist"),
-		GENE2GO("gene2go");
+		GENE2GO("gene2go"),
+		JSON("json");
 
 		private String value;
 
@@ -62,11 +65,11 @@ public class FileService {
 			return value;
 		}
 	}
-	
+
 	/**
 	 * To generate GPAD file
 	 * @param query Query
-	 * @param numberAnnotations Total number of annotations 
+	 * @param numberAnnotations Total number of annotations
 	 * @return GPAD file
 	 */
 	public StringBuffer generateGPADFile(String query, long numberAnnotations, int numResults) {
@@ -76,9 +79,9 @@ public class FileService {
 				AnnotationColumn.EVIDENCE, AnnotationColumn.WITH,
 				AnnotationColumn.DATE, AnnotationColumn.ASSIGNEDBY };
 		String header= getGPADHeader();
-		return generateTSVfile(FILE_FORMAT.GPAD, header, query, numberAnnotations, columns, numResults);		
+		return generateTSVfile(FILE_FORMAT.GPAD, header, query, numberAnnotations, columns, numResults);
 	}
-	
+
 	/**
 	 * Generate fasta files
 	 * @param query Filter query
@@ -87,7 +90,7 @@ public class FileService {
 	 * @return String buffer with the annotations information
 	 */
 	public StringBuffer generateFastafile(String query, long numberAnnotations, int numResults) {
-		StringBuffer writer = new StringBuffer();		
+		StringBuffer writer = new StringBuffer();
 		List<Count> counts = annotationService.getFacetFields(query, null, AnnotationField.DBOBJECTID.getValue(), numResults);
 		for (Count count : counts){
 			List<Miscellaneous> entry;
@@ -112,12 +115,12 @@ public class FileService {
 			}
 		}
 		return writer;
-	}	
+	}
 
 	/**
 	 * To generate GAF file
 	 * @param query Query
-	 * @param numberAnnotations Total number of annotations 
+	 * @param numberAnnotations Total number of annotations
 	 * @return GAF file
 	 */
 	public StringBuffer generateGAFFile(String query, long numberAnnotations, int numResults) {
@@ -130,26 +133,26 @@ public class FileService {
 				AnnotationColumn.TYPE, AnnotationColumn.TAXON,
 				AnnotationColumn.DATE, AnnotationColumn.ASSIGNEDBY };
 		String header= FileService.getGAFFHeader();
-		return generateTSVfile(FileService.FILE_FORMAT.GAF, header, query, numberAnnotations, columns, numResults);		
-	}	
-	
+		return generateTSVfile(FileService.FILE_FORMAT.GAF, header, query, numberAnnotations, columns, numResults);
+	}
+
 	/**
 	 * To generate Protein List file
 	 * @param query Query
-	 * @param numberAnnotations Total number of annotations 
+	 * @param numberAnnotations Total number of annotations
 	 * @return Protein List file
 	 */
 	public StringBuffer generateProteinListFile(String query, long numberAnnotations, int numResults) {
 		AnnotationColumn[] columns = { AnnotationColumn.DATABASE,
 				AnnotationColumn.PROTEIN, AnnotationColumn.SYMBOL,
 				AnnotationColumn.NAME, AnnotationColumn.SYNONYM,
-				AnnotationColumn.TYPE, AnnotationColumn.TAXON};		
+				AnnotationColumn.TYPE, AnnotationColumn.TAXON};
 		StringBuffer writer = new StringBuffer();
 		writer.append(StringUtils.arrayToDelimitedString(columns, "\t"));
 		writer.append("\n");
 		List<Count> counts = annotationService.getFacetFields(query, null, AnnotationField.DBOBJECTID.getValue(), numResults);
 		for (Count count : counts){
-			GeneProduct entry;			
+			GeneProduct entry;
 			entry = geneProductService.findById(count.getName().toUpperCase());
 			if (entry != null) {
 				writer.append(entry.getDb() + "\t" + entry.getDbObjectId()
@@ -157,16 +160,16 @@ public class FileService {
 						+ entry.getDbObjectName() + "\t"
 						+ StringUtils.arrayToDelimitedString(entry.getDbObjectSynonyms().toArray(), "|") + "\t"
 						+ entry.getDbObjectType() + "\t" + entry.getTaxonId());
-			}		
+			}
 		}
-		return writer;		
+		return writer;
 	}
-	
-	
+
+
 	/**
 	 * To generate gene2go file
 	 * @param query Query
-	 * @param numberAnnotations Total number of annotations 
+	 * @param numberAnnotations Total number of annotations
 	 * @return gene2go file
 	 */
 	public StringBuffer generateGene2GoFile(String query, long numberAnnotations, int numResults) {
@@ -174,19 +177,19 @@ public class FileService {
 				AnnotationColumn.PROTEIN, AnnotationColumn.EVIDENCE,
 				AnnotationColumn.QUALIFIER, AnnotationColumn.TERMNAME,
 				AnnotationColumn.REFERENCE, AnnotationColumn.ASPECT};
-		String header = StringUtils.arrayToDelimitedString(columns, "\t");		
-		return generateTSVfile(FileService.FILE_FORMAT.GAF, header, query, numberAnnotations, columns, numResults);		
-	}	
-	
+		String header = StringUtils.arrayToDelimitedString(columns, "\t");
+		return generateTSVfile(FileService.FILE_FORMAT.GAF, header, query, numberAnnotations, columns, numResults);
+	}
+
 	/**
 	 * Generate TSV annotations file
 	 * @param query Filter query
 	 * @param numberAnnotations Total number of annotations to download
-	 * @param numResults 
+	 * @param numResults
 	 * @param visibleColumns Columns to display
 	 * @return String buffer with the annotations information
 	 */
-	public StringBuffer generateTSVfile(FILE_FORMAT format, String header, String query, long numberAnnotations, AnnotationColumn[] columns, int numResults) {	
+	public StringBuffer generateTSVfile(FILE_FORMAT format, String header, String query, long numberAnnotations, AnnotationColumn[] columns, int numResults) {
 		StringBuffer writer = new StringBuffer();
 		int rows = NUM_ROWS;
 		if (numResults > 0) {// Limit specified
@@ -194,7 +197,7 @@ public class FileService {
 			if(numResults < NUM_ROWS){
 				rows = numResults;
 			}
-		}		
+		}
 		int start = 0;
 		writer.append(header + "\n");
 		while (start < numberAnnotations) {
@@ -202,27 +205,154 @@ public class FileService {
 			for (Annotation annotation : annotations) {
 				try {
 					writer.append(AnnotationColumn.getAnnotationColumns(format,annotation,columns,"\t") + "\n");
-				} catch (Exception e) {					
+				} catch (Exception e) {
 					logger.error(e.getMessage());
 				}
-			}			
+			}
 			start = start + rows;
 		}
 		return writer;
 	}
-	
+
+
+	/**
+	 * To generate GPAD file
+	 * @param query Query
+	 * @param numberAnnotations Total number of annotations
+	 * @return GPAD file
+	 */
+	public StringBuffer generateJsonFile(String query, long numberAnnotations, int numResults) {
+		AnnotationColumn[] columns = {
+				AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.SYMBOL, AnnotationColumn.QUALIFIER,
+				AnnotationColumn.GOID, AnnotationColumn.REFERENCE, AnnotationColumn.EVIDENCE, AnnotationColumn.WITH,
+				AnnotationColumn.DATE, AnnotationColumn.ASSIGNEDBY, AnnotationColumn.TERMNAME, AnnotationColumn.ASPECT,
+				AnnotationColumn.TAXON};
+
+
+		int rows = NUM_ROWS;
+		if (numResults > 0) {// Limit specified
+			numberAnnotations = numResults;
+			if(numResults < NUM_ROWS){
+				rows = numResults;
+			}
+		}
+		int start = 0;
+		boolean firstIteration=true;
+		StringBuffer writer = new StringBuffer();
+		writer.append("[");
+		while (start < numberAnnotations) {
+			List<Annotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
+			//annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
+			for (Annotation annotation : annotations) {
+
+				if(!firstIteration){
+					writer.append(",");
+				}
+
+				JsonClass targetClass = new JsonClass();
+
+
+				try {
+					writer.append(AnnotationColumn.getAnnotationColumnsForJson(annotation,columns, targetClass));
+					firstIteration=false;
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
+			}
+			start = start + rows;
+		}
+		writer.append("]");
+		return writer;
+	}
+
+
+	/**
+	 * To generate GPAD file
+	 * @param query Query
+	 * @param numberAnnotations Total number of annotations
+	 * @return GPAD file
+	 */
+	public StringBuffer generateJsonFileWithPageAndRow(String query, long numberAnnotations, int start, int rows) {
+		AnnotationColumn[] columns = {
+				AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.SYMBOL, AnnotationColumn.QUALIFIER,
+				AnnotationColumn.GOID, AnnotationColumn.REFERENCE, AnnotationColumn.EVIDENCE, AnnotationColumn.WITH,
+				AnnotationColumn.DATE, AnnotationColumn.ASSIGNEDBY, AnnotationColumn.TERMNAME, AnnotationColumn.ASPECT,
+				AnnotationColumn.TAXON};
+
+
+		//		int rows = NUM_ROWS;
+		//		if (numResults > 0) {// Limit specified
+		//			numberAnnotations = numResults;
+		//			if(numResults < NUM_ROWS){
+		//				rows = numResults;
+		//			}
+		//		}
+		//		int start = 0;
+
+		boolean firstIteration=true;
+		StringBuffer writer = new StringBuffer();
+		writer.append("[");
+//		while (start < numberAnnotations) {
+			List<Annotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
+			//annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
+			for (Annotation annotation : annotations) {
+
+				if(!firstIteration){
+					writer.append(",");
+				}
+
+				JsonClass targetClass = new JsonClass();
+
+
+				try {
+					writer.append(AnnotationColumn.getAnnotationColumnsForJson(annotation,columns, targetClass));
+					firstIteration=false;
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
+			}
+//			start = start + rows;
+//		}
+		writer.append("]");
+		return writer;
+	}
+
+
+	/**
+	 * To generate json file with total number of annotations
+	 * @param numberAnnotations Total number of annotations
+	 * @return json file
+	 */
+	public StringBuffer generateJsonFileWithTotalAnnotations(long numberAnnotations) {
+
+		StringBuffer writer = new StringBuffer();
+//		writer.append("[");
+
+			try {
+				writer.append(AnnotationColumn.getAnnotationTotalInJson(numberAnnotations, new AnnotationTotal()));
+
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
+
+
+//		writer.append("]");
+		return writer;
+	}
+
+
 	/**
 	 * GAFF header
 	 * @return GAFF header
 	 */
-	public static String getGAFFHeader(){	
+	public static String getGAFFHeader(){
 		return "!gaf-version: 2.0\n" +
 				"!Project_name: UniProt GO Annotation (UniProt-GOA)\n" +
 				"!URL: http://www.ebi.ac.uk/GOA\n" +
 				"!Contact Email: goa@ebi.ac.uk\n" +
-				"!Date downloaded from the QuickGO browser: " + getCurrentDate();	
-	}	
-	
+				"!Date downloaded from the QuickGO browser: " + getCurrentDate();
+	}
+
 	/**
 	 * GPAD header
 	 * @return GPAD header
@@ -234,7 +364,7 @@ public class FileService {
 				"!Contact Email: goa@ebi.ac.uk\n" +
 				"!Date downloaded from the QuickGO browser: " + getCurrentDate();
 	}
-	
+
 	/**
 	 * Get current date
 	 * @return Current date

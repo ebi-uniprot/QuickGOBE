@@ -12,6 +12,7 @@ import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm.EGOAspect;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.web.util.FileService;
+import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
 import uk.ac.ebi.quickgo.web.util.url.JsonClass;
 
 /**
@@ -302,6 +303,14 @@ public enum AnnotationColumn {
 		return writer.toString();
 	}
 
+
+	public static String getAnnotationTotalInJson(long annotationTotal, AnnotationTotal totalObj) throws Exception{
+		StringWriter writer = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+		totalObj.setTotal(annotationTotal);
+		mapper.writeValue(writer, totalObj);
+		return writer.toString();
+	}
 
 	public String getId() {
 		return id;
