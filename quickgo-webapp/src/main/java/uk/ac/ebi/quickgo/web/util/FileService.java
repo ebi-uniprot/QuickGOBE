@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
+import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 import uk.ac.ebi.quickgo.service.geneproduct.GeneProductService;
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousServiceImpl;
@@ -23,6 +24,7 @@ import uk.ac.ebi.quickgo.solr.query.model.miscellaneous.enums.MiscellaneousField
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationColumn;
 import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
 import uk.ac.ebi.quickgo.web.util.url.JsonClass;
+import uk.ac.ebi.quickgo.web.util.url.TermJsonClass;
 
 /**
  * Class to deal with the generation of common files (gpad,gaff,fasta,...)
@@ -86,7 +88,6 @@ public class FileService {
 	 * Generate fasta files
 	 * @param query Filter query
 	 * @param numberAnnotations Total number of annotations to download
-	 * @param visibleColumns Columns to display
 	 * @return String buffer with the annotations information
 	 */
 	public StringBuffer generateFastafile(String query, long numberAnnotations, int numResults) {
@@ -186,7 +187,6 @@ public class FileService {
 	 * @param query Filter query
 	 * @param numberAnnotations Total number of annotations to download
 	 * @param numResults
-	 * @param visibleColumns Columns to display
 	 * @return String buffer with the annotations information
 	 */
 	public StringBuffer generateTSVfile(FILE_FORMAT format, String header, String query, long numberAnnotations, AnnotationColumn[] columns, int numResults) {
@@ -339,6 +339,24 @@ public class FileService {
 //		writer.append("]");
 		return writer;
 	}
+
+
+	public StringBuffer generateJsonFileForTerm(GOTerm term) {
+
+		StringBuffer buffer = new StringBuffer();
+
+		try {
+
+			TermJsonClass termJson = new TermJsonClass();
+			buffer.append(AnnotationColumn.getTermInJson(term, termJson));
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		return buffer;
+	}
+
 
 
 	/**
