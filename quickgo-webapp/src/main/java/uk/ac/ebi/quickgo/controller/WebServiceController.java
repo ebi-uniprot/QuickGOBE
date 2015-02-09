@@ -2,14 +2,10 @@ package uk.ac.ebi.quickgo.controller;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
@@ -18,19 +14,19 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
+import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
+import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationBlacklist.BlacklistEntryMinimal;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationExtensionRelations;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
@@ -48,6 +44,7 @@ import uk.ac.ebi.quickgo.web.staticcontent.annotation.AnnotationBlackListContent
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.TaxonConstraintsContent;
 import uk.ac.ebi.quickgo.web.util.ChartService;
 import uk.ac.ebi.quickgo.web.util.FileService;
+import uk.ac.ebi.quickgo.web.util.View;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationColumn;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationWSUtil;
 import uk.ac.ebi.quickgo.web.util.annotation.AppliedFilterSet;
@@ -56,6 +53,7 @@ import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import uk.ac.ebi.quickgo.web.util.term.XRefBean;
 
 /**
  * REST services controller
@@ -848,6 +846,72 @@ public class WebServiceController {
 //		statisticsCalculation.setStatisticService(statisticService);
 //		statisticsCalculation.start();
 //	}
+
+
+	@RequestMapping(value="/term/{id}", method = RequestMethod.GET)
+	public void termInformation(@PathVariable(value="id") String id,
+//								  Model model,
+								  HttpServletResponse httpServletResponse,
+								  HttpServletRequest httpServletRequest)
+			throws UnsupportedEncodingException {
+
+
+//		GOTerm term = goTermService.retrieveTerm(id);
+
+		// Calculate ancestors graph
+//		ontologyGraphController.generateTermOntologyGraph(id, null, model);
+//
+//		model.addAttribute("term", term);
+//
+//		if(id.contains(GOTerm.GO)){
+//
+//			// Calculate extra information
+//			List<TermRelation> childTermsRelations = termUtil.calculateChildTerms(id);
+//			// Calculate replaces terms names
+//			termUtil.calculateReplacesTermsNames(term);
+//			// Calculate ancestors graph
+//			ontologyGraphController.generateTermOntologyGraph(id, null, model);
+//			// Calculate Xrefs URLs
+//			List<XRefBean> xRefBeans = urLsResolver.calculateXrefsUrls(term.getXrefs());
+//			// Calculate subsets counts
+//			List<Miscellaneous> subsetsCounts = miscellaneousUtil.getSubsetCount(term.getSubsetsNames());
+//			// Co-occurring stats
+//			allCoOccurrenceStatsTerms = (TreeSet)miscellaneousService.allCOOccurrenceStatistics(id.replaceAll("GO:", ""));
+//			nonIEACOOccurrenceStatistics = (TreeSet)miscellaneousService.nonIEACOOccurrenceStatistics(id.replaceAll("GO:", ""));
+//
+//			model.addAttribute("termXrefs", xRefBeans);
+//			model.addAttribute("childTermsRelations", childTermsRelations);
+//			model.addAttribute("subsetsCounts", subsetsCounts);
+//
+//			// All stats
+//			List<COOccurrenceStatsTerm> allStats = new ArrayList<>();
+//			allStats.addAll(allCoOccurrenceStatsTerms);
+//			allStats = getFirstOnes(allStats);
+//			processStats(allStats);
+//			model.addAttribute("allCoOccurrenceStatsTerms", allStats);
+//
+//
+//			// Non-IEA stats
+//			List<COOccurrenceStatsTerm> nonIEAStats = new ArrayList<>();
+//			nonIEAStats.addAll(nonIEACOOccurrenceStatistics);
+//			nonIEAStats = getFirstOnes(nonIEAStats);
+//			processStats(nonIEAStats);
+//			model.addAttribute("nonIEACOOccurrenceStatistics", nonIEAStats);
+//		}
+
+		// Is GO term attribute
+//		model.addAttribute("isGO", id.contains(GOTerm.GO));
+
+//		return View.TERMS_PATH + "/" + View.TERM;
+		annotationWSUtil.downloadTerm(id, httpServletResponse);
+
+	}
+
+
+
+
+
+
 
 	private List<Map<String, Object>> searchTerm(String query, String filterQuery, int limit, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse, String callback) throws IOException, SolrServerException {
 
