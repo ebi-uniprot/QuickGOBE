@@ -14,6 +14,8 @@ import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
 import uk.ac.ebi.quickgo.web.util.url.JsonClass;
+import uk.ac.ebi.quickgo.ontology.go.GOTerm;
+import uk.ac.ebi.quickgo.web.util.url.TermJsonClass;
 
 /**
  * Enum with the annotation columns that can be displayed
@@ -312,6 +314,38 @@ public enum AnnotationColumn {
 		return writer.toString();
 	}
 
+	public static String getTermInJson(GOTerm term, TermJsonClass termJson) throws Exception{
+
+		termJson.setTermId(term.getId());
+		termJson.setName(term.getName());
+		termJson.setActive(term.active());
+		termJson.setIsGoTerm(term.isGOTerm());
+		termJson.setAspectDescription(term.getAspectDescription());
+		termJson.setgetDefinition(term.getDefinition());
+		termJson.setDefinitionXrefs(term.getDefinitionXrefs());
+		termJson.setUsage(term.getUsage());
+		termJson.setComment(term.getComment());
+		termJson.setAltIds(term.getAltIds());
+		termJson.setAltIdsString(term.getAltIdsString());
+		termJson.setCredits(term.getCredits());
+		termJson.setSynonyms(term.getSynonyms());
+		termJson.setTaxonConstraints(term.getTaxonConstraints());
+		termJson.setGuidelines(term.getGuidelines());
+		termJson.setCrossOntologyRelations(term.getCrossOntologyRelations());
+		termJson.setSubsets(term.getSubsets());
+		termJson.setXrefs(term.getXrefs());
+		termJson.setReplaces(term.getReplaces());
+		termJson.setReplacements(term.getReplacements());
+
+		StringWriter writer = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+
+		mapper.writeValue(writer, termJson);
+		String result = writer.toString();
+		System.out.println(result);
+		return result;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -351,5 +385,7 @@ public enum AnnotationColumn {
 	public void setShowURL(boolean showURL) {
 		this.showURL = showURL;
 	}
+
+
 
 }

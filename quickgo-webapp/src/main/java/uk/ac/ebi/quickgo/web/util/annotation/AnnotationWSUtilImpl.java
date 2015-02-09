@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
+import uk.ac.ebi.quickgo.service.term.TermService;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
 
@@ -33,6 +35,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Autowired
 	AnnotationService annotationService;
+
+	@Autowired
+	TermService goTermService;
 
 	@Autowired
 	FileService fileService;
@@ -188,7 +193,6 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	/**
 	 * Generate a file with the annotations results
 	 * @param format File format
-	 * @param gzip
 	 * @param query Query to run
 	 * @param columns Columns to display
 	 */
@@ -244,10 +248,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	/**
 	 * Generate a file with the annotations results
-	 * @param format File format
-	 * @param gzip
 	 * @param query Query to run
-	 * @param columns Columns to display
 	 */
 	public void downloadAnnotationsTotalInternal( String query,HttpServletResponse httpServletResponse){
 
@@ -261,6 +262,30 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
 			IOUtils.copy(in, httpServletResponse.getOutputStream());
+
+			// Set response header and content
+			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
+			httpServletResponse.setContentLength(sb.length());
+			httpServletResponse.flushBuffer();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	@Override
+	public void downloadTerm(String termId, HttpServletResponse httpServletResponse){
+		StringBuffer sb = null;
+		try {
+			GOTerm term = goTermService.retrieveTerm(termId);
+
+			sb = fileService.generateJsonFileForTerm(term);
+
+			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+			IOUtils.copy(in, httpServletResponse.getOutputStream());
+
 			// Set response header and content
 			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
