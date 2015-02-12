@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
@@ -18,9 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
+import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousService;
 import uk.ac.ebi.quickgo.service.term.TermService;
+import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
+import uk.ac.ebi.quickgo.util.term.TermUtil;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
 
@@ -40,7 +45,13 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	TermService goTermService;
 
 	@Autowired
+	TermUtil termUtil;
+
+	@Autowired
 	FileService fileService;
+
+	@Autowired
+	MiscellaneousService miscellaneousService;
 
 	private static final Logger logger = Logger.getLogger(AnnotationWSUtilImpl.class);
 
@@ -281,7 +292,29 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		try {
 			GOTerm term = goTermService.retrieveTerm(termId);
 
-			sb = fileService.generateJsonFileForTerm(term);
+			// Calculate extra information
+			List<TermRelation> childTermsRelations = termUtil.calculateChildTerms(termId);
+
+			//co-occurring
+			TreeSet<COOccurrenceStatsTerm> allCoOccurrenceStatsTerms =
+					(TreeSet)miscellaneousService.allCOOccurrenceStatistics(termId.replaceAll("GO:", ""));
+			TreeSet<COOccurrenceStatsTerm> nonIEACOOccurrenceStatistics =
+					(TreeSet)miscellaneousService.nonIEACOOccurrenceStatistics(termId.replaceAll("GO:", ""));
+
+			// All stats
+			List<COOccurrenceStatsTerm> allStats = new ArrayList<>();
+			allStats.addAll(allCoOccurrenceStatsTerms);
+			allStats = getFirstOnes(allStats);
+			processStats(allStats);
+
+			// Non-IEA stats
+			List<COOccurrenceStatsTerm> nonIEAStats = new ArrayList<>();
+			nonIEAStats.addAll(nonIEACOOccurrenceStatistics);
+			nonIEAStats = getFirstOnes(nonIEAStats);
+			processStats(nonIEAStats);
+
+
+			sb = fileService.generateJsonFileForTerm(term, childTermsRelations, allStats, nonIEAStats);
 
 			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
 			IOUtils.copy(in, httpServletResponse.getOutputStream());
@@ -295,6 +328,74 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
+		}
+	}
+
+
+	public void downloadOntologyGraph(String termId, HttpServletResponse httpServletResponse){
+
+		StringBuffer sb = null;
+		try {
+
+			sb = fileService.generateJsonFileForOntologyTerm(termId);
+
+			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+			IOUtils.copy(in, httpServletResponse.getOutputStream());
+
+			// Set response header and content
+			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
+			httpServletResponse.setContentLength(sb.length());
+			httpServletResponse.flushBuffer();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	/**
+	 * Get first stats values (by default 100)
+	 * @param stats Stats values
+	 */
+	public List<COOccurrenceStatsTerm> getFirstOnes(List<COOccurrenceStatsTerm> stats){
+		if (stats != null && stats.size() > 0) {
+			int end = calculateEnd(stats.size());
+			stats = new ArrayList<>(stats.subList(0, end));
+		}
+		return stats;
+	}
+
+	/**
+	 * Calculate number term to display for co-occurring term stats
+	 * @param size Size of stats
+	 * @return Num terms to display
+	 */
+	private int calculateEnd(int size) {
+		int NUM_VALUES = 100;
+		int end = NUM_VALUES;
+		if (size < NUM_VALUES) {
+			end = size - 1;
+		}
+		return end;
+	}
+
+	/**
+	 * Process stats values
+	 * @param stats Stats to process
+	 */
+	private void processStats(List<COOccurrenceStatsTerm> stats){
+		for (COOccurrenceStatsTerm coOccurrenceStatsTerm : stats) {
+			String comparedId = "GO:" + coOccurrenceStatsTerm.getComparedTerm();
+			coOccurrenceStatsTerm.setComparedTerm(comparedId);
+			if (uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTerms().get(comparedId) != null) {
+				coOccurrenceStatsTerm
+						.setAspect(((GOTerm) uk.ac.ebi.quickgo.web.util.term.TermUtil
+								.getGOTerms().get(comparedId)).getAspect().abbreviation);
+				coOccurrenceStatsTerm
+						.setName(uk.ac.ebi.quickgo.web.util.term.TermUtil
+								.getGOTerms().get(comparedId).getName());
+			}
 		}
 	}
 }

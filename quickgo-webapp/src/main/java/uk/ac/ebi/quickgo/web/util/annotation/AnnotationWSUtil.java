@@ -23,4 +23,6 @@ public interface AnnotationWSUtil {
 	public void downloadAnnotationsTotalInternal( String query,HttpServletResponse httpServletResponse);
 
 	void downloadTerm(String termId, HttpServletResponse httpServletResponse);
+
+	void downloadOntologyGraph(String termId, HttpServletResponse httpServletResponse);
 }

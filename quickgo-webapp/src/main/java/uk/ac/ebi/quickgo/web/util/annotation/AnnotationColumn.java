@@ -1,21 +1,24 @@
 package uk.ac.ebi.quickgo.web.util.annotation;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.StringUtils;
 
 import uk.ac.ebi.quickgo.annotation.Annotation;
+import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
+import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm.EGOAspect;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
+import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
-import uk.ac.ebi.quickgo.web.util.url.JsonClass;
+import uk.ac.ebi.quickgo.webservice.model.ChildTermRelationJson;
+import uk.ac.ebi.quickgo.webservice.model.GoAnnotationJson;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
-import uk.ac.ebi.quickgo.web.util.url.TermJsonClass;
+import uk.ac.ebi.quickgo.webservice.model.OntologyGraphJson;
+import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
 /**
  * Enum with the annotation columns that can be displayed
@@ -208,32 +211,32 @@ public enum AnnotationColumn {
 		return annotationString;
 	}
 
-	public static String getAnnotationColumnsForJson(Annotation annotation, AnnotationColumn[] columns, JsonClass jsonClass) throws Exception{
+	public static String getAnnotationColumnsForJson(Annotation annotation, AnnotationColumn[] columns, GoAnnotationJson goAnnotationJson) throws Exception{
 
 		for(AnnotationColumn annotationColumn : columns){
 
 			switch(annotationColumn){
 				case PROTEIN:
-					jsonClass.setProtein(annotation.getDbObjectID());
+					goAnnotationJson.setProtein(annotation.getDbObjectID());
 					break;
 				case SYMBOL:
-					jsonClass.setSymbol(annotation.getDbObjectSymbol());
+					goAnnotationJson.setSymbol(annotation.getDbObjectSymbol());
 					break;
 				case QUALIFIER:
 					String qualifierString = "";
 					if(annotation.getQualifiers() != null){
 						qualifierString = StringUtils.arrayToDelimitedString(annotation.getQualifiers().toArray(), "|");
 					}
-					jsonClass.setQualifier(qualifierString);
+					goAnnotationJson.setQualifier(qualifierString);
 					break;
 				case GOID:
-					jsonClass.setGoId(annotation.getGoID());
+					goAnnotationJson.setGoId(annotation.getGoID());
 					break;
 				case TERMNAME:
-					jsonClass.setTermName(annotation.getTermName());
+					goAnnotationJson.setTermName(annotation.getTermName());
 					break;
 				case ASPECT:
-					jsonClass.setAspect(EGOAspect.fromString(annotation.getGoAspect()).abbreviation);
+					goAnnotationJson.setAspect(EGOAspect.fromString(annotation.getGoAspect()).abbreviation);
 					break;
 				case EVIDENCE:
 //					if(format == FileService.FILE_FORMAT.GAF){
@@ -241,59 +244,59 @@ public enum AnnotationColumn {
 //					} else if(format == FileService.FILE_FORMAT.GPAD){
 //						annotationString = annotationString + annotation.getEcoID() + separator;
 //					}
-					jsonClass.setEvidenceGo(annotation.getGoEvidence());
-					jsonClass.setEvidenceEco(annotation.getEcoID());
+					goAnnotationJson.setEvidenceGo(annotation.getGoEvidence());
+					goAnnotationJson.setEvidenceEco(annotation.getEcoID());
 					break;
 				case REFERENCE:
 					String referenceString = "";
 					if (annotation.getReferences() != null) {
 						referenceString = StringUtils.arrayToDelimitedString(annotation.getReferences().toArray(), "|");
 					}
-					jsonClass.setReference(referenceString);
+					goAnnotationJson.setReference(referenceString);
 					break;
 				case WITH:
 					String withString = "";
 					if (annotation.getWith() != null) {
-						jsonClass.setWithList(annotation.getWith());
+						goAnnotationJson.setWithList(annotation.getWith());
 					}
 
 					break;
 				case TAXON:
-					jsonClass.setTaxon(annotation.getTaxonomyId());
+					goAnnotationJson.setTaxon(annotation.getTaxonomyId());
 					break;
 				case ASSIGNEDBY:
-					jsonClass.setAssignedBy(annotation.getAssignedBy());
+					goAnnotationJson.setAssignedBy(annotation.getAssignedBy());
 					break;
 				case DATABASE:
-					jsonClass.setDatabase(annotation.getDb());
+					goAnnotationJson.setDatabase(annotation.getDb());
 					break;
 				case DATE:
-					jsonClass.setDate(annotation.getDate());
+					goAnnotationJson.setDate(annotation.getDate());
 					break;
 				case NAME:
-					jsonClass.setName(annotation.getDbObjectName());
+					goAnnotationJson.setName(annotation.getDbObjectName());
 					break;
 				case SYNONYM:
 					String synonymString = "";
 					if(annotation.getDbObjectSynonyms() != null){
 						synonymString = StringUtils.arrayToDelimitedString(annotation.getDbObjectSynonyms().toArray(), "|");
 					}
-					jsonClass.setSynonym(synonymString);
+					goAnnotationJson.setSynonym(synonymString);
 					break;
 				case TYPE:
-					jsonClass.setType(annotation.getDbObjectType());
+					goAnnotationJson.setType(annotation.getDbObjectType());
 				break;
 				case TAXONNAME:
-					jsonClass.setTaxonName(annotation.getTaxonomyName());
+					goAnnotationJson.setTaxonName(annotation.getTaxonomyName());
 					break;
 				case SEQUENCE:
-					jsonClass.setSequence(annotation.getSequenceLength());
+					goAnnotationJson.setSequence(annotation.getSequenceLength());
 					break;
 				case ORIGINALTERMID:
-					jsonClass.setOriginalTermId(annotation.getGoID());
+					goAnnotationJson.setOriginalTermId(annotation.getGoID());
 					break;
 				case ORIGINALTERMNAME:
-					jsonClass.setOriginalTermName(annotation.getTermName());
+					goAnnotationJson.setOriginalTermName(annotation.getTermName());
 					break;
 				default:
 					break;
@@ -301,7 +304,7 @@ public enum AnnotationColumn {
 		}
 		StringWriter writer = new StringWriter();
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(writer, jsonClass);
+		mapper.writeValue(writer, goAnnotationJson);
 		return writer.toString();
 	}
 
@@ -314,8 +317,11 @@ public enum AnnotationColumn {
 		return writer.toString();
 	}
 
-	public static String getTermInJson(GOTerm term, TermJsonClass termJson) throws Exception{
+	public static String getTermInJson(GOTerm term, List<TermRelation> childTermsRelations,
+									   List<COOccurrenceStatsTerm> allStats,
+									   List<COOccurrenceStatsTerm> nonIEAStats, TermJson termJson) throws Exception{
 
+		//Move in Term information
 		termJson.setTermId(term.getId());
 		termJson.setName(term.getName());
 		termJson.setActive(term.active());
@@ -336,11 +342,44 @@ public enum AnnotationColumn {
 		termJson.setXrefs(term.getXrefs());
 		termJson.setReplaces(term.getReplaces());
 		termJson.setReplacements(term.getReplacements());
+		termJson.setHistory(term.getHistory());
 
+		List<ChildTermRelationJson> childRelationsJson = new ArrayList<>();
+
+		//Move in child term relations
+		for (TermRelation childTermsRelation : childTermsRelations){
+			ChildTermRelationJson childTermRelationJson = new ChildTermRelationJson();
+
+			GenericTerm aChild = childTermsRelation.getChild();
+			childTermRelationJson.setId(aChild.getId());
+			childTermRelationJson.setName(aChild.getName());
+
+			childTermRelationJson.setTypeOf(childTermsRelation.getTypeof());
+			childRelationsJson.add(childTermRelationJson);
+		}
+		termJson.setChildTermsRelations(childRelationsJson);
+
+		//Stats
+		termJson.setAllCoOccurrenceStatsTerms(allStats);
+		termJson.setNonIEACOOccurrenceStatistics(nonIEAStats);
+
+
+		//Write out object
 		StringWriter writer = new StringWriter();
 		ObjectMapper mapper = new ObjectMapper();
 
 		mapper.writeValue(writer, termJson);
+		String result = writer.toString();
+		System.out.println(result);
+		return result;
+	}
+
+	public static String getOntologyGraphInJson(OntologyGraphJson ontologyGraphJson)
+			throws Exception{
+
+		StringWriter writer = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writeValue(writer, ontologyGraphJson);
 		String result = writer.toString();
 		System.out.println(result);
 		return result;

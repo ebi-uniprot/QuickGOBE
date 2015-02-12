@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.controller;
 
+import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -24,9 +25,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
+import uk.ac.ebi.quickgo.graphics.GraphImage;
+import uk.ac.ebi.quickgo.graphics.GraphPresentation;
+import uk.ac.ebi.quickgo.graphics.ImageArchive;
+import uk.ac.ebi.quickgo.graphics.OntologyGraph;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
-import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
-import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
+import uk.ac.ebi.quickgo.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationBlacklist.BlacklistEntryMinimal;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationExtensionRelations;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
@@ -54,6 +58,7 @@ import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import uk.ac.ebi.quickgo.web.util.term.XRefBean;
+import uk.ac.ebi.quickgo.webservice.model.OntologyGraphJson;
 
 /**
  * REST services controller
@@ -815,102 +820,28 @@ public class WebServiceController {
 
 
 
-
-//	@RequestMapping(value="/total")
-//	public String calculateStatistics() {tot
-//		// Calculate stats
-//		if(statisticsCalculation != null && !statisticsCalculation.getQuery().equals(currentQuery)){
-//			statisticsCalculation.interrupt();
-//			createStatsThread(currentQuery);
-//		} else if(statisticsCalculation == null){
-//			createStatsThread(currentQuery);
-//		}
-//
-//		while (statisticsCalculation.isAlive()){
-//		}
-//		model.addAttribute("statsBean", this.statisticsBean);
-//
-//		// Set total number annotations
-//		model.addAttribute("totalNumberAnnotations", totalNumberAnnotations);
-//		long totalNumberProteins = annotationService.getTotalNumberProteins(this.currentQuery);
-//		// Set total number proteins
-//		model.addAttribute("totalNumberProteins", totalNumberProteins);
-//
-//		return View.ANNOTATIONS_PATH + "/" + View.ANNOTATIONS_LIST;
-//
-//	}
-//
-//	private void createStatsThread(String solrQuery){
-//		statisticsBean = new StatisticsBean();
-//		statisticsCalculation = new StatisticsCalculation(statisticsBean, solrQuery);
-//		statisticsCalculation.setStatisticService(statisticService);
-//		statisticsCalculation.start();
-//	}
-
-
 	@RequestMapping(value="/term/{id}", method = RequestMethod.GET)
 	public void termInformation(@PathVariable(value="id") String id,
-//								  Model model,
 								  HttpServletResponse httpServletResponse,
 								  HttpServletRequest httpServletRequest)
 			throws UnsupportedEncodingException {
 
 
-//		GOTerm term = goTermService.retrieveTerm(id);
 
-		// Calculate ancestors graph
-//		ontologyGraphController.generateTermOntologyGraph(id, null, model);
-//
-//		model.addAttribute("term", term);
-//
-//		if(id.contains(GOTerm.GO)){
-//
-//			// Calculate extra information
-//			List<TermRelation> childTermsRelations = termUtil.calculateChildTerms(id);
-//			// Calculate replaces terms names
-//			termUtil.calculateReplacesTermsNames(term);
-//			// Calculate ancestors graph
-//			ontologyGraphController.generateTermOntologyGraph(id, null, model);
-//			// Calculate Xrefs URLs
-//			List<XRefBean> xRefBeans = urLsResolver.calculateXrefsUrls(term.getXrefs());
-//			// Calculate subsets counts
-//			List<Miscellaneous> subsetsCounts = miscellaneousUtil.getSubsetCount(term.getSubsetsNames());
-//			// Co-occurring stats
-//			allCoOccurrenceStatsTerms = (TreeSet)miscellaneousService.allCOOccurrenceStatistics(id.replaceAll("GO:", ""));
-//			nonIEACOOccurrenceStatistics = (TreeSet)miscellaneousService.nonIEACOOccurrenceStatistics(id.replaceAll("GO:", ""));
-//
-//			model.addAttribute("termXrefs", xRefBeans);
-//			model.addAttribute("childTermsRelations", childTermsRelations);
-//			model.addAttribute("subsetsCounts", subsetsCounts);
-//
-//			// All stats
-//			List<COOccurrenceStatsTerm> allStats = new ArrayList<>();
-//			allStats.addAll(allCoOccurrenceStatsTerms);
-//			allStats = getFirstOnes(allStats);
-//			processStats(allStats);
-//			model.addAttribute("allCoOccurrenceStatsTerms", allStats);
-//
-//
-//			// Non-IEA stats
-//			List<COOccurrenceStatsTerm> nonIEAStats = new ArrayList<>();
-//			nonIEAStats.addAll(nonIEACOOccurrenceStatistics);
-//			nonIEAStats = getFirstOnes(nonIEAStats);
-//			processStats(nonIEAStats);
-//			model.addAttribute("nonIEACOOccurrenceStatistics", nonIEAStats);
-//		}
-
-		// Is GO term attribute
-//		model.addAttribute("isGO", id.contains(GOTerm.GO));
-
-//		return View.TERMS_PATH + "/" + View.TERM;
 		annotationWSUtil.downloadTerm(id, httpServletResponse);
 
 	}
 
 
 
+	@RequestMapping(value="/ontologyGraph/{id}", method = RequestMethod.GET)
+	public void ontologyGraph(@PathVariable(value="id") String id,
+							  HttpServletResponse httpServletResponse,
+							  HttpServletRequest httpServletRequest)
+			throws UnsupportedEncodingException {
 
-
+		annotationWSUtil.downloadOntologyGraph(id, httpServletResponse);
+	}
 
 
 	private List<Map<String, Object>> searchTerm(String query, String filterQuery, int limit, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse, String callback) throws IOException, SolrServerException {
