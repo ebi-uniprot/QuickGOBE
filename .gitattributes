@@ -353,6 +353,10 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/AnnotationTotal.java
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/JsonClass.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolver.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolverImpl.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/ChildTermRelationJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoAnnotationJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/OntologyGraphJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/TermJson.java -text
 quickgo-webapp/src/main/webapp/WEB-INF/dispatcher-servlet.xml -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/advancedFilters.jsp -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/annotationList.jsp -text svneol=unset#text/plain
