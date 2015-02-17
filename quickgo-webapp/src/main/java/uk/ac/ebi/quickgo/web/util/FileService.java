@@ -53,6 +53,8 @@ public class FileService {
 	private static final Logger logger = Logger.getLogger(FileService.class);
 
 
+
+
 	public enum FILE_FORMAT {
 		TSV("tsv"),
 		FASTA("fasta"),
@@ -353,6 +355,18 @@ public class FileService {
 		try {
 			TermJson termJson = new TermJson();
 			buffer.append(AnnotationColumn.getTermInJson(term, childTermsRelations, allStats, nonIEAStats, termJson));
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return buffer;
+	}
+
+
+	public StringBuffer generateJsonFileForPredefinedSlims(List<Miscellaneous> subsetsCounts) {
+		StringBuffer buffer = new StringBuffer();
+		try {
+			TermJson termJson = new TermJson();
+			buffer.append(AnnotationColumn.toJson(subsetsCounts));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}

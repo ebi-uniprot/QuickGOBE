@@ -22,12 +22,16 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
+
+
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousService;
 import uk.ac.ebi.quickgo.service.term.TermService;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.util.term.TermUtil;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
+import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
+import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
 
 /**
  * Annotation WS util methods
@@ -52,6 +56,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Autowired
 	MiscellaneousService miscellaneousService;
+
+	@Autowired
+	MiscellaneousUtil miscellaneousUtil;
 
 	private static final Logger logger = Logger.getLogger(AnnotationWSUtilImpl.class);
 
@@ -398,4 +405,47 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 			}
 		}
 	}
+
+
+
+
+	@Override
+	public void downloadPredefinedSlims(HttpServletResponse httpServletResponse){
+
+		// Calculate subsets counts for slimming
+		List<Miscellaneous> subsetsCounts = new ArrayList<>();
+		subsetsCounts = miscellaneousUtil.getSubsetCount(null);
+
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFileForPredefinedSlims(subsetsCounts);
+
+			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+			IOUtils.copy(in, httpServletResponse.getOutputStream());
+
+			// Set response header and content
+			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
+			httpServletResponse.setContentLength(sb.length());
+			httpServletResponse.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+
+		// Remove all previous applied filters
+//		session.removeAttribute("appliedFilters");
+
+		// Remove searched text value
+//		session.removeAttribute("searchedText");
+
+		// Remove all sliming attributes
+//		SlimmingUtil.removeAllSlimAttributes(session);
+
+		// Load GO terms and calculate terms by ontology
+//		TermUtil.getGOOntology();
+//
+
+	}
+
 }

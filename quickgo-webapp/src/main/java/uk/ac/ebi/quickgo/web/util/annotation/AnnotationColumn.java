@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.StringUtils;
 
 import uk.ac.ebi.quickgo.annotation.Annotation;
+import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm.EGOAspect;
@@ -385,6 +386,17 @@ public enum AnnotationColumn {
 		return result;
 	}
 
+
+	public static String toJson(List<Miscellaneous> subsetsCounts) throws Exception{
+
+		StringWriter writer = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writeValue(writer, subsetsCounts);
+		String result = writer.toString();
+		System.out.println(result);
+		return result;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -424,7 +436,6 @@ public enum AnnotationColumn {
 	public void setShowURL(boolean showURL) {
 		this.showURL = showURL;
 	}
-
 
 
 }

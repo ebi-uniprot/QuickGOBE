@@ -25,4 +25,6 @@ public interface AnnotationWSUtil {
 	void downloadTerm(String termId, HttpServletResponse httpServletResponse);
 
 	void downloadOntologyGraph(String termId, HttpServletResponse httpServletResponse);
+
+	public void downloadPredefinedSlims(HttpServletResponse httpServletResponse);
 }
