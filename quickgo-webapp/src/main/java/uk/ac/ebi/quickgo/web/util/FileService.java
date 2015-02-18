@@ -52,9 +52,6 @@ public class FileService {
 
 	private static final Logger logger = Logger.getLogger(FileService.class);
 
-
-
-
 	public enum FILE_FORMAT {
 		TSV("tsv"),
 		FASTA("fasta"),
@@ -372,6 +369,20 @@ public class FileService {
 		}
 		return buffer;
 	}
+
+
+	public StringBuffer generateJsonFileForPredefinedSetTerms(List<TermJson> setTerms) {
+		StringBuffer buffer = new StringBuffer();
+		try {
+			TermJson termJson = new TermJson();
+			buffer.append(AnnotationColumn.toJson(setTerms));
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return buffer;
+	}
+
+
 
 
 	public StringBuffer generateJsonFileForOntologyTerm(String termids) {

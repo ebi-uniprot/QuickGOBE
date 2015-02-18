@@ -387,11 +387,11 @@ public enum AnnotationColumn {
 	}
 
 
-	public static String toJson(List<Miscellaneous> subsetsCounts) throws Exception{
+	public static String toJson(Object target) throws Exception{
 
 		StringWriter writer = new StringWriter();
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(writer, subsetsCounts);
+		mapper.writeValue(writer, target);
 		String result = writer.toString();
 		System.out.println(result);
 		return result;

@@ -59,6 +59,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import uk.ac.ebi.quickgo.web.util.term.XRefBean;
 import uk.ac.ebi.quickgo.webservice.model.OntologyGraphJson;
+import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
 /**
  * REST services controller
@@ -94,12 +95,12 @@ public class WebServiceController {
 	@Autowired
 	AnnotationBlackListContent annotationBlackListContent;
 
-
 	/**
 	 * Lookup web service
-	 * @param format Response format
-	 * @param id Id to lookup
-	 * @param scope Scope of the searched term
+	 *
+	 * @param format              Response format
+	 * @param id                  Id to lookup
+	 * @param scope               Scope of the searched term
 	 * @param httpServletResponse
 	 * @throws IOException
 	 */
@@ -110,14 +111,14 @@ public class WebServiceController {
 			@RequestParam(value = "scope", required = false, defaultValue = "go") String scope,
 			HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
 
-			String callback = httpServletRequest.getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
-			id = id.toUpperCase();
-			Scope enumScope = Scope.valueOf(scope.trim().toUpperCase());
-			Format enumFormat = Format.valueOf(format.trim().toUpperCase());
+		String callback = httpServletRequest.getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
+		id = id.toUpperCase();
+		Scope enumScope = Scope.valueOf(scope.trim().toUpperCase());
+		Format enumFormat = Format.valueOf(format.trim().toUpperCase());
 
-			switch (enumScope) {
+		switch (enumScope) {
 			case COMPLEX:
-				id = "\""+ id + "\""; //Put id between " " to escape '-' character
+				id = "\"" + id + "\""; //Put id between " " to escape '-' character
 			case PROTEIN:
 				lookupProtein(id, enumScope, enumFormat, httpServletResponse, callback);
 				break;
@@ -127,15 +128,16 @@ public class WebServiceController {
 				break;
 			default:
 				break;
-			}
+		}
 	}
 
 	/**
 	 * Search web service
-	 * @param format Response format
-	 * @param query Text to search
-	 * @param scope Type of data searching for
-	 * @param limit Max number of results of each type of data to return
+	 *
+	 * @param format              Response format
+	 * @param query               Text to search
+	 * @param scope               Type of data searching for
+	 * @param limit               Max number of results of each type of data to return
 	 * @param httpServletResponse Servlet response
 	 * @throws IOException
 	 * @throws SolrServerException
@@ -163,35 +165,36 @@ public class WebServiceController {
 		Format enumFormat = Format.valueOf(format.trim().toUpperCase());
 		int limitValue = Integer.valueOf(limit);
 
-		Map<String,List<Map<String, Object>>> serialised = new HashMap<>();
+		Map<String, List<Map<String, Object>>> serialised = new HashMap<>();
 
-		for(Scope enumScope : scopes){
+		for (Scope enumScope : scopes) {
 			switch (enumScope) {
-			case COMPLEX:
-			case PROTEIN:
-				Map<String,List<Map<String, Object>>> proteins = new HashMap<>();
-				List<Map<String, Object>> proteinsSerialised =  searchProtein(query, enumScope, limitValue, enumFormat, httpServletResponse);
-				proteins.put(enumScope.value, proteinsSerialised);
-				serialised.putAll(proteins);
-				break;
-			case ECO:
-				Map<String,List<Map<String, Object>>> ecoTerms = new HashMap<>();
-				List<Map<String, Object>> ecoTermsSerialised = searchTerm(query, TermField.ID.getValue() + ":" + "ECO*", limitValue, enumScope, enumFormat,  httpServletResponse ,callback);
-				ecoTerms.put("eco", ecoTermsSerialised);
-				serialised.putAll(ecoTerms);
-				break;
-			case GO:
-				Map<String,List<Map<String, Object>>> goTerms = new HashMap<>();
-				List<Map<String, Object>> goTermsSerialised = searchTerm(query, TermField.ID.getValue() + ":" + "GO*", limitValue, enumScope, enumFormat,  httpServletResponse, callback);
-				goTerms.put("go", goTermsSerialised);
-				serialised.putAll(goTerms);
-				break;
-			default:
-				break;
+				case COMPLEX:
+				case PROTEIN:
+					Map<String, List<Map<String, Object>>> proteins = new HashMap<>();
+					List<Map<String, Object>> proteinsSerialised = searchProtein(query, enumScope, limitValue, enumFormat, httpServletResponse);
+					proteins.put(enumScope.value, proteinsSerialised);
+					serialised.putAll(proteins);
+					break;
+				case ECO:
+					Map<String, List<Map<String, Object>>> ecoTerms = new HashMap<>();
+					List<Map<String, Object>> ecoTermsSerialised = searchTerm(query, TermField.ID.getValue() + ":" + "ECO*", limitValue, enumScope, enumFormat, httpServletResponse, callback);
+					ecoTerms.put("eco", ecoTermsSerialised);
+					serialised.putAll(ecoTerms);
+					break;
+				case GO:
+					Map<String, List<Map<String, Object>>> goTerms = new HashMap<>();
+					List<Map<String, Object>> goTermsSerialised = searchTerm(query, TermField.ID.getValue() + ":" + "GO*", limitValue, enumScope, enumFormat, httpServletResponse, callback);
+					goTerms.put("go", goTermsSerialised);
+					serialised.putAll(goTerms);
+					break;
+				default:
+					break;
 			}
 		}
 		Gson gson = new Gson();
-		Type listOfserialisedElementsType = new TypeToken<Map<String,List<Map<String, Object>>>>(){}.getType();
+		Type listOfserialisedElementsType = new TypeToken<Map<String, List<Map<String, Object>>>>() {
+		}.getType();
 		String json = gson.toJson(serialised, listOfserialisedElementsType);
 
 		httpServletResponse.setContentType("application/json");
@@ -200,11 +203,12 @@ public class WebServiceController {
 
 	/**
 	 * Validate service
-	 * @param format Response format
-	 * @param id Id to validate
-	 * @param candidate Candidates to validate with
-	 * @param type Type of validation
-	 * @param action Action
+	 *
+	 * @param format              Response format
+	 * @param id                  Id to validate
+	 * @param candidate           Candidates to validate with
+	 * @param type                Type of validation
+	 * @param action              Action
 	 * @param httpServletResponse
 	 * @throws Exception
 	 */
@@ -218,69 +222,70 @@ public class WebServiceController {
 			@RequestParam(value = "taxon_id", required = false, defaultValue = "9606") String taxonId,
 			HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
 
-			String callback = httpServletRequest.getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
-			ValidateType validateType = ValidateType.valueOf(type.trim().toUpperCase());
-			ValidateAction validateAction = ValidateAction.valueOf(action.trim().toUpperCase());
+		String callback = httpServletRequest.getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
+		ValidateType validateType = ValidateType.valueOf(type.trim().toUpperCase());
+		ValidateAction validateAction = ValidateAction.valueOf(action.trim().toUpperCase());
 
-			String responseFormat = "application/json";
-			Format responseFormatEnum = Format.valueOf(format.trim().toUpperCase());
-			switch (responseFormatEnum) {
+		String responseFormat = "application/json";
+		Format responseFormatEnum = Format.valueOf(format.trim().toUpperCase());
+		switch (responseFormatEnum) {
 			case XML:
 				responseFormat = "text/xml";
 				break;
-			}
-			httpServletResponse.setContentType(responseFormat);
-			switch(validateType){
+		}
+		httpServletResponse.setContentType(responseFormat);
+		switch (validateType) {
 			case ANN_EXT:
 				AnnotationExtensionRelations annotationExtensionRelations = new AnnotationExtensionRelations(TermUtil.getGOOntology(), TermUtil.getSourceFiles().goSourceFiles);
-				switch(validateAction){
-				case GET_RELATIONS:
-					Map<String, Object> relations = annotationExtensionRelations.forDomain(id);
-					httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(relations)));
-					break;
-				case VALIDATE_RELATION:
-					Map<String, String> validation = new HashMap<>();
-					validation.put("valid", "true");
-					try {
-						annotationExtensionRelations.validate(id, candidate);
-					} catch (Exception e) {
-						validation.clear();
-						validation.put("valid", "false");
-						validation.put("message", e.getMessage());
-					}
-			        if(responseFormatEnum.name() == Format.XML.name()){//XML response
-			        	String xmlResponse = "<status ";
-			        	if(validation.get("message")!=null){
-			        		xmlResponse = xmlResponse + "message=\"" + validation.get("message") +"\" ";
-			        	}
-			        	xmlResponse = xmlResponse + "valid=\"" + validation.get("valid") + "\"/>";
-			        	httpServletResponse.getWriter().write(xmlResponse);
-			        }else{//JSON
-						httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(validation)));
-			        }
-			        break;
+				switch (validateAction) {
+					case GET_RELATIONS:
+						Map<String, Object> relations = annotationExtensionRelations.forDomain(id);
+						httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(relations)));
+						break;
+					case VALIDATE_RELATION:
+						Map<String, String> validation = new HashMap<>();
+						validation.put("valid", "true");
+						try {
+							annotationExtensionRelations.validate(id, candidate);
+						} catch (Exception e) {
+							validation.clear();
+							validation.put("valid", "false");
+							validation.put("message", e.getMessage());
+						}
+						if (responseFormatEnum.name() == Format.XML.name()) {//XML response
+							String xmlResponse = "<status ";
+							if (validation.get("message") != null) {
+								xmlResponse = xmlResponse + "message=\"" + validation.get("message") + "\" ";
+							}
+							xmlResponse = xmlResponse + "valid=\"" + validation.get("valid") + "\"/>";
+							httpServletResponse.getWriter().write(xmlResponse);
+						} else {//JSON
+							httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(validation)));
+						}
+						break;
 				}
 				break;
 			case TAXON:
 				switch (validateAction) {
-				case GET_BLACKLIST:
-					List<BlacklistEntryMinimal> taxonBlackList = annotationBlackListContent.getTaxonBlackList(Integer.valueOf(taxonId));
-					httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(taxonBlackList)));
-					break;
-				case GET_CONSTRAINTS:
-					httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(TaxonConstraintsContent.getAllTaxonConstraintsSerialised())));
-					break;
+					case GET_BLACKLIST:
+						List<BlacklistEntryMinimal> taxonBlackList = annotationBlackListContent.getTaxonBlackList(Integer.valueOf(taxonId));
+						httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(taxonBlackList)));
+						break;
+					case GET_CONSTRAINTS:
+						httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(TaxonConstraintsContent.getAllTaxonConstraintsSerialised())));
+						break;
 				}
 				break;
-			}
+		}
 	}
 
 	/**
 	 * Statistics service
-	 * @param format Response format
-	 * @param id GO Term id to calculate the statistics for
-	 * @param threshold Minimum threshold
-	 * @param limit Max number of statistics to retrieve
+	 *
+	 * @param format              Response format
+	 * @param id                  GO Term id to calculate the statistics for
+	 * @param threshold           Minimum threshold
+	 * @param limit               Max number of statistics to retrieve
 	 * @param httpServletResponse
 	 * @throws IOException
 	 */
@@ -294,21 +299,21 @@ public class WebServiceController {
 
 		String callback = httpServletRequest.getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
 		Set<COOccurrenceStatsTerm> coOccurrenceStatsTerms = miscellaneousService.nonIEACOOccurrenceStatistics(id.replaceAll("GO:", ""));
-		List<Map<String,String>> termsStats = new ArrayList<>();
-		for(COOccurrenceStatsTerm coOccurrenceStatsTerm : coOccurrenceStatsTerms){
-			if(coOccurrenceStatsTerm.getProbabilitySimilarityRatio() >= Float.valueOf(threshold)){
-				Map<String,String> termStat = new HashMap<>();
-				termStat.put("id", "GO:"+coOccurrenceStatsTerm.getComparedTerm());
+		List<Map<String, String>> termsStats = new ArrayList<>();
+		for (COOccurrenceStatsTerm coOccurrenceStatsTerm : coOccurrenceStatsTerms) {
+			if (coOccurrenceStatsTerm.getProbabilitySimilarityRatio() >= Float.valueOf(threshold)) {
+				Map<String, String> termStat = new HashMap<>();
+				termStat.put("id", "GO:" + coOccurrenceStatsTerm.getComparedTerm());
 				termStat.put("name", TermUtil.getGOTerms().get("GO:" + coOccurrenceStatsTerm.getComparedTerm()).getName());
-				termStat.put("aspect", ((GOTerm)TermUtil.getGOTerms().get("GO:" + coOccurrenceStatsTerm.getComparedTerm())).getAspectDescription());
+				termStat.put("aspect", ((GOTerm) TermUtil.getGOTerms().get("GO:" + coOccurrenceStatsTerm.getComparedTerm())).getAspectDescription());
 				termStat.put("s", String.valueOf(coOccurrenceStatsTerm.getProbabilitySimilarityRatio()));
 				termsStats.add(termStat);
 			}
 		}
-		if(termsStats.size() > Integer.valueOf(limit)){
+		if (termsStats.size() > Integer.valueOf(limit)) {
 			termsStats = termsStats.subList(0, Integer.valueOf(limit));
 		}
-		Map<String,List<Map<String,String>>> results = new HashMap<>();
+		Map<String, List<Map<String, String>>> results = new HashMap<>();
 		results.put("co_occurring_terms", termsStats);
 		httpServletResponse.setContentType("application/json");
 		httpServletResponse.getWriter().write(generateContentResponse(callback, new Gson().toJson(results)));
@@ -316,6 +321,7 @@ public class WebServiceController {
 
 	/**
 	 * Generate the ancestors chart for a list of ginved ids
+	 *
 	 * @param ids Ids to display on the chart
 	 */
 	@RequestMapping("/chart")
@@ -326,10 +332,10 @@ public class WebServiceController {
 
 		chartService.createChart(ids, scope);
 
-	    ImageWriter iw = ImageIO.getImageWritersByFormatName("png").next();
-	    ImageOutputStream ios = new MemoryCacheImageOutputStream(httpServletResponse.getOutputStream());
-	    iw.setOutput(ios);
-	    iw.write(chartService.getRenderableImage());
+		ImageWriter iw = ImageIO.getImageWritersByFormatName("png").next();
+		ImageOutputStream ios = new MemoryCacheImageOutputStream(httpServletResponse.getOutputStream());
+		iw.setOutput(ios);
+		iw.write(chartService.getRenderableImage());
 	}
 
 	/**
@@ -352,74 +358,74 @@ public class WebServiceController {
 						   @RequestParam(value = "qualifier", required = false, defaultValue = "") String qualifier,
 						   @RequestParam(value = "database", required = false, defaultValue = "") String db,
 						   @RequestParam(value = "columns", required = false, defaultValue = "") String cols,
-						   HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+						   HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
 
 		String query = "";
 		boolean gzip = false;
 
-		if(!format.trim().isEmpty()){
-			query = query + "\"format\""  + ":\"" + format + "\",\"";
+		if (!format.trim().isEmpty()) {
+			query = query + "\"format\"" + ":\"" + format + "\",\"";
 		}
-		if(!limit.trim().isEmpty()){
-			query = query + "\"limit\""  + ":\"" + limit + "\",\"";
+		if (!limit.trim().isEmpty()) {
+			query = query + "\"limit\"" + ":\"" + limit + "\",\"";
 		}
 		if (httpServletRequest.getParameter("gz") != null) {
 			gzip = true;
 		}
-		if(!goid.trim().isEmpty()){
-			if(!enableSlim.trim().isEmpty() && Boolean.valueOf(enableSlim) == true){
-				if(!goRelations.trim().isEmpty()){
-					switch(goRelations){
+		if (!goid.trim().isEmpty()) {
+			if (!enableSlim.trim().isEmpty() && Boolean.valueOf(enableSlim) == true) {
+				if (!goRelations.trim().isEmpty()) {
+					switch (goRelations) {
 						case "=":
-							query = query + "\"" + "\"goid\""  + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + "\"goid\"" + "\"" + ":\"" + goid + "\",\"";
 						case "I":
-							query = query + "\"" + AnnotationField.ANCESTORSI.getValue() + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + AnnotationField.ANCESTORSI.getValue() + "\"" + ":\"" + goid + "\",\"";
 							break;
 						case "?":
 						case "POI":
 						case "IPO":
-							query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\"" + ":\"" + goid + "\",\"";
 							break;
 						case "RPOI":
 						case "IRPO":
 						case "POIR":
 						case "PORI":
 						case "IPOR":
-							query = query + "\"" + AnnotationField.ANCESTORSIPOR.getValue() + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + AnnotationField.ANCESTORSIPOR.getValue() + "\"" + ":\"" + goid + "\",\"";
 							break;
 					}
 				}
-			}else{
-				query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+			} else {
+				query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\"" + ":\"" + goid + "\",\"";
 			}
 
 		}
-		if(!aspect.trim().isEmpty()){
-			query = query + "\"aspect\""  + ":\"" + aspect + "\",\"";
+		if (!aspect.trim().isEmpty()) {
+			query = query + "\"aspect\"" + ":\"" + aspect + "\",\"";
 		}
-		if(!evidence.trim().isEmpty()){
-			query = query + "\"evidence\""  + ":\"" + evidence + "\",\"";
+		if (!evidence.trim().isEmpty()) {
+			query = query + "\"evidence\"" + ":\"" + evidence + "\",\"";
 		}
-		if(!source.trim().isEmpty()){
-			query = query + "\"source\""  + ":\"" + source + "\",\"";
+		if (!source.trim().isEmpty()) {
+			query = query + "\"source\"" + ":\"" + source + "\",\"";
 		}
-		if(!ref.trim().isEmpty()){
-			query = query + "\"ref\""  + ":\"" + ref + "\",\"";
+		if (!ref.trim().isEmpty()) {
+			query = query + "\"ref\"" + ":\"" + ref + "\",\"";
 		}
-		if(!with.trim().isEmpty()){
-			query = query + "\"with\""  + ":\"" + with + "\",\"";
+		if (!with.trim().isEmpty()) {
+			query = query + "\"with\"" + ":\"" + with + "\",\"";
 		}
-		if(!tax.trim().isEmpty()){
-			query = query + "\"tax\""  + ":\"" + tax + "\",\"";
+		if (!tax.trim().isEmpty()) {
+			query = query + "\"tax\"" + ":\"" + tax + "\",\"";
 		}
-		if(!protein.trim().isEmpty()){
-			query = query + "\"protein\""  + ":\"" + protein + "\",\"";
+		if (!protein.trim().isEmpty()) {
+			query = query + "\"protein\"" + ":\"" + protein + "\",\"";
 		}
-		if(!qualifier.trim().isEmpty()){
-			query = query + "\"qualifier\""  + ":\"" + qualifier + "\",\"";
+		if (!qualifier.trim().isEmpty()) {
+			query = query + "\"qualifier\"" + ":\"" + qualifier + "\",\"";
 		}
-		if(!db.trim().isEmpty()){
-			query = query + "\"db\""  + ":\"" + db + "\",\"";
+		if (!db.trim().isEmpty()) {
+			query = query + "\"db\"" + ":\"" + db + "\",\"";
 		}
 
 		AnnotationParameters annotationParameters = new AnnotationParameters();
@@ -431,7 +437,7 @@ public class WebServiceController {
 		String solrQuery = annotationParameters.toSolrQuery();
 
 		// Get columns to display
-		AnnotationColumn[] columns = { AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.GOID};
+		AnnotationColumn[] columns = {AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.GOID};
 		if (format.equals(FileService.FILE_FORMAT.TSV.getValue()) && (cols != null && !cols.trim().isEmpty())) {
 			columns = annotationWSUtil.mapColumns(cols);
 		}
@@ -466,74 +472,74 @@ public class WebServiceController {
 						   @RequestParam(value = "removeFilter", defaultValue = "") String removeFilter,
 						   @RequestParam(value = "removeAllFilters", defaultValue = "") String removeAllFilters,
 						   @RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter,
-						   HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+						   HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
 
 		String query = "";
 		boolean gzip = false;
 
-		if(!format.trim().isEmpty()){
-			query = query + "\"format\""  + ":\"" + format + "\",\"";
+		if (!format.trim().isEmpty()) {
+			query = query + "\"format\"" + ":\"" + format + "\",\"";
 		}
-		if(!limit.trim().isEmpty()){
-			query = query + "\"limit\""  + ":\"" + limit + "\",\"";
+		if (!limit.trim().isEmpty()) {
+			query = query + "\"limit\"" + ":\"" + limit + "\",\"";
 		}
 		if (httpServletRequest.getParameter("gz") != null) {
 			gzip = true;
 		}
-		if(!goid.trim().isEmpty()){
-			if(!enableSlim.trim().isEmpty() && Boolean.valueOf(enableSlim) == true){
-				if(!goRelations.trim().isEmpty()){
-					switch(goRelations){
+		if (!goid.trim().isEmpty()) {
+			if (!enableSlim.trim().isEmpty() && Boolean.valueOf(enableSlim) == true) {
+				if (!goRelations.trim().isEmpty()) {
+					switch (goRelations) {
 						case "=":
-							query = query + "\"" + "\"goid\""  + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + "\"goid\"" + "\"" + ":\"" + goid + "\",\"";
 						case "I":
-							query = query + "\"" + AnnotationField.ANCESTORSI.getValue() + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + AnnotationField.ANCESTORSI.getValue() + "\"" + ":\"" + goid + "\",\"";
 							break;
 						case "?":
 						case "POI":
 						case "IPO":
-							query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\"" + ":\"" + goid + "\",\"";
 							break;
 						case "RPOI":
 						case "IRPO":
 						case "POIR":
 						case "PORI":
 						case "IPOR":
-							query = query + "\"" + AnnotationField.ANCESTORSIPOR.getValue() + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + AnnotationField.ANCESTORSIPOR.getValue() + "\"" + ":\"" + goid + "\",\"";
 							break;
 					}
 				}
-			}else{
-				query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+			} else {
+				query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\"" + ":\"" + goid + "\",\"";
 			}
 
 		}
-		if(!aspect.trim().isEmpty()){
-			query = query + "\"aspect\""  + ":\"" + aspect + "\",\"";
+		if (!aspect.trim().isEmpty()) {
+			query = query + "\"aspect\"" + ":\"" + aspect + "\",\"";
 		}
-		if(!evidence.trim().isEmpty()){
-			query = query + "\"evidence\""  + ":\"" + evidence + "\",\"";
+		if (!evidence.trim().isEmpty()) {
+			query = query + "\"evidence\"" + ":\"" + evidence + "\",\"";
 		}
-		if(!source.trim().isEmpty()){
-			query = query + "\"source\""  + ":\"" + source + "\",\"";
+		if (!source.trim().isEmpty()) {
+			query = query + "\"source\"" + ":\"" + source + "\",\"";
 		}
-		if(!ref.trim().isEmpty()){
-			query = query + "\"ref\""  + ":\"" + ref + "\",\"";
+		if (!ref.trim().isEmpty()) {
+			query = query + "\"ref\"" + ":\"" + ref + "\",\"";
 		}
-		if(!with.trim().isEmpty()){
-			query = query + "\"with\""  + ":\"" + with + "\",\"";
+		if (!with.trim().isEmpty()) {
+			query = query + "\"with\"" + ":\"" + with + "\",\"";
 		}
-		if(!tax.trim().isEmpty()){
-			query = query + "\"tax\""  + ":\"" + tax + "\",\"";
+		if (!tax.trim().isEmpty()) {
+			query = query + "\"tax\"" + ":\"" + tax + "\",\"";
 		}
-		if(!protein.trim().isEmpty()){
-			query = query + "\"protein\""  + ":\"" + protein + "\",\"";
+		if (!protein.trim().isEmpty()) {
+			query = query + "\"protein\"" + ":\"" + protein + "\",\"";
 		}
-		if(!qualifier.trim().isEmpty()){
-			query = query + "\"qualifier\""  + ":\"" + qualifier + "\",\"";
+		if (!qualifier.trim().isEmpty()) {
+			query = query + "\"qualifier\"" + ":\"" + qualifier + "\",\"";
 		}
-		if(!db.trim().isEmpty()){
-			query = query + "\"db\""  + ":\"" + db + "\",\"";
+		if (!db.trim().isEmpty()) {
+			query = query + "\"db\"" + ":\"" + db + "\",\"";
 		}
 
 
@@ -618,7 +624,7 @@ public class WebServiceController {
 
 
 		// Get columns to display
-		AnnotationColumn[] columns = { AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.GOID};
+		AnnotationColumn[] columns = {AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.GOID};
 		if (format.equals(FileService.FILE_FORMAT.TSV.getValue()) && (cols != null && !cols.trim().isEmpty())) {
 			columns = annotationWSUtil.mapColumns(cols);
 		}
@@ -630,100 +636,99 @@ public class WebServiceController {
 	}
 
 
-
 	/**
 	 * Annotation web service
 	 */
 	@RequestMapping("/annotationtotal")
 	public void annotationTotal(@RequestParam(value = "format", required = false, defaultValue = "gpad") String format,
-						   @RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
-						   @RequestParam(value = "gz", required = false, defaultValue = "") String gz,
-						   @RequestParam(value = "go_id", required = false, defaultValue = "") String goid,
-						   @RequestParam(value = "aspect", required = false, defaultValue = "") String aspect,
-						   @RequestParam(value = "enable_slim", required = false, defaultValue = "false") String enableSlim,
-						   @RequestParam(value = "go_relations", required = false, defaultValue = "") String goRelations,
-						   @RequestParam(value = "evidence", required = false, defaultValue = "") String evidence,
-						   @RequestParam(value = "source", required = false, defaultValue = "") String source,
-						   @RequestParam(value = "reference", required = false, defaultValue = "") String ref,
-						   @RequestParam(value = "with", required = false, defaultValue = "") String with,
-						   @RequestParam(value = "taxonomy_id", required = false, defaultValue = "") String tax,
-						   @RequestParam(value = "protein", required = false, defaultValue = "") String protein,
-						   @RequestParam(value = "qualifier", required = false, defaultValue = "") String qualifier,
-						   @RequestParam(value = "database", required = false, defaultValue = "") String db,
-						   @RequestParam(value = "columns", required = false, defaultValue = "") String cols,
-						   @RequestParam(value = "page", defaultValue = "1") int page,
-						   @RequestParam(value = "rows", defaultValue = "25") int rows,
-						   @RequestParam(value = "removeFilter", defaultValue = "") String removeFilter,
-						   @RequestParam(value = "removeAllFilters", defaultValue = "") String removeAllFilters,
-						   @RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter,
-						   HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest){
+								@RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
+								@RequestParam(value = "gz", required = false, defaultValue = "") String gz,
+								@RequestParam(value = "go_id", required = false, defaultValue = "") String goid,
+								@RequestParam(value = "aspect", required = false, defaultValue = "") String aspect,
+								@RequestParam(value = "enable_slim", required = false, defaultValue = "false") String enableSlim,
+								@RequestParam(value = "go_relations", required = false, defaultValue = "") String goRelations,
+								@RequestParam(value = "evidence", required = false, defaultValue = "") String evidence,
+								@RequestParam(value = "source", required = false, defaultValue = "") String source,
+								@RequestParam(value = "reference", required = false, defaultValue = "") String ref,
+								@RequestParam(value = "with", required = false, defaultValue = "") String with,
+								@RequestParam(value = "taxonomy_id", required = false, defaultValue = "") String tax,
+								@RequestParam(value = "protein", required = false, defaultValue = "") String protein,
+								@RequestParam(value = "qualifier", required = false, defaultValue = "") String qualifier,
+								@RequestParam(value = "database", required = false, defaultValue = "") String db,
+								@RequestParam(value = "columns", required = false, defaultValue = "") String cols,
+								@RequestParam(value = "page", defaultValue = "1") int page,
+								@RequestParam(value = "rows", defaultValue = "25") int rows,
+								@RequestParam(value = "removeFilter", defaultValue = "") String removeFilter,
+								@RequestParam(value = "removeAllFilters", defaultValue = "") String removeAllFilters,
+								@RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter,
+								HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
 
 		String query = "";
 		boolean gzip = false;
 
-		if(!format.trim().isEmpty()){
-			query = query + "\"format\""  + ":\"" + format + "\",\"";
+		if (!format.trim().isEmpty()) {
+			query = query + "\"format\"" + ":\"" + format + "\",\"";
 		}
-		if(!limit.trim().isEmpty()){
-			query = query + "\"limit\""  + ":\"" + limit + "\",\"";
+		if (!limit.trim().isEmpty()) {
+			query = query + "\"limit\"" + ":\"" + limit + "\",\"";
 		}
 		if (httpServletRequest.getParameter("gz") != null) {
 			gzip = true;
 		}
-		if(!goid.trim().isEmpty()){
-			if(!enableSlim.trim().isEmpty() && Boolean.valueOf(enableSlim) == true){
-				if(!goRelations.trim().isEmpty()){
-					switch(goRelations){
+		if (!goid.trim().isEmpty()) {
+			if (!enableSlim.trim().isEmpty() && Boolean.valueOf(enableSlim) == true) {
+				if (!goRelations.trim().isEmpty()) {
+					switch (goRelations) {
 						case "=":
-							query = query + "\"" + "\"goid\""  + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + "\"goid\"" + "\"" + ":\"" + goid + "\",\"";
 						case "I":
-							query = query + "\"" + AnnotationField.ANCESTORSI.getValue() + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + AnnotationField.ANCESTORSI.getValue() + "\"" + ":\"" + goid + "\",\"";
 							break;
 						case "?":
 						case "POI":
 						case "IPO":
-							query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\"" + ":\"" + goid + "\",\"";
 							break;
 						case "RPOI":
 						case "IRPO":
 						case "POIR":
 						case "PORI":
 						case "IPOR":
-							query = query + "\"" + AnnotationField.ANCESTORSIPOR.getValue() + "\""  + ":\"" + goid + "\",\"";
+							query = query + "\"" + AnnotationField.ANCESTORSIPOR.getValue() + "\"" + ":\"" + goid + "\",\"";
 							break;
 					}
 				}
-			}else{
-				query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\""  + ":\"" + goid + "\",\"";
+			} else {
+				query = query + "\"" + AnnotationField.ANCESTORSIPO.getValue() + "\"" + ":\"" + goid + "\",\"";
 			}
 
 		}
-		if(!aspect.trim().isEmpty()){
-			query = query + "\"aspect\""  + ":\"" + aspect + "\",\"";
+		if (!aspect.trim().isEmpty()) {
+			query = query + "\"aspect\"" + ":\"" + aspect + "\",\"";
 		}
-		if(!evidence.trim().isEmpty()){
-			query = query + "\"evidence\""  + ":\"" + evidence + "\",\"";
+		if (!evidence.trim().isEmpty()) {
+			query = query + "\"evidence\"" + ":\"" + evidence + "\",\"";
 		}
-		if(!source.trim().isEmpty()){
-			query = query + "\"source\""  + ":\"" + source + "\",\"";
+		if (!source.trim().isEmpty()) {
+			query = query + "\"source\"" + ":\"" + source + "\",\"";
 		}
-		if(!ref.trim().isEmpty()){
-			query = query + "\"ref\""  + ":\"" + ref + "\",\"";
+		if (!ref.trim().isEmpty()) {
+			query = query + "\"ref\"" + ":\"" + ref + "\",\"";
 		}
-		if(!with.trim().isEmpty()){
-			query = query + "\"with\""  + ":\"" + with + "\",\"";
+		if (!with.trim().isEmpty()) {
+			query = query + "\"with\"" + ":\"" + with + "\",\"";
 		}
-		if(!tax.trim().isEmpty()){
-			query = query + "\"tax\""  + ":\"" + tax + "\",\"";
+		if (!tax.trim().isEmpty()) {
+			query = query + "\"tax\"" + ":\"" + tax + "\",\"";
 		}
-		if(!protein.trim().isEmpty()){
-			query = query + "\"protein\""  + ":\"" + protein + "\",\"";
+		if (!protein.trim().isEmpty()) {
+			query = query + "\"protein\"" + ":\"" + protein + "\",\"";
 		}
-		if(!qualifier.trim().isEmpty()){
-			query = query + "\"qualifier\""  + ":\"" + qualifier + "\",\"";
+		if (!qualifier.trim().isEmpty()) {
+			query = query + "\"qualifier\"" + ":\"" + qualifier + "\",\"";
 		}
-		if(!db.trim().isEmpty()){
-			query = query + "\"db\""  + ":\"" + db + "\",\"";
+		if (!db.trim().isEmpty()) {
+			query = query + "\"db\"" + ":\"" + db + "\",\"";
 		}
 
 
@@ -808,7 +813,7 @@ public class WebServiceController {
 
 
 		// Get columns to display
-		AnnotationColumn[] columns = { AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.GOID};
+		AnnotationColumn[] columns = {AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.GOID};
 		if (format.equals(FileService.FILE_FORMAT.TSV.getValue()) && (cols != null && !cols.trim().isEmpty())) {
 			columns = annotationWSUtil.mapColumns(cols);
 		}
@@ -819,13 +824,11 @@ public class WebServiceController {
 	}
 
 
-
-	@RequestMapping(value="/term/{id}", method = RequestMethod.GET)
-	public void termInformation(@PathVariable(value="id") String id,
-								  HttpServletResponse httpServletResponse,
-								  HttpServletRequest httpServletRequest)
+	@RequestMapping(value = "/term/{id}", method = RequestMethod.GET)
+	public void termInformation(@PathVariable(value = "id") String id,
+								HttpServletResponse httpServletResponse,
+								HttpServletRequest httpServletRequest)
 			throws UnsupportedEncodingException {
-
 
 
 		annotationWSUtil.downloadTerm(id, httpServletResponse);
@@ -833,9 +836,8 @@ public class WebServiceController {
 	}
 
 
-
-	@RequestMapping(value="/ontologyGraph/{id}", method = RequestMethod.GET)
-	public void ontologyGraph(@PathVariable(value="id") String id,
+	@RequestMapping(value = "/ontologyGraph/{id}", method = RequestMethod.GET)
+	public void ontologyGraph(@PathVariable(value = "id") String id,
 							  HttpServletResponse httpServletResponse,
 							  HttpServletRequest httpServletRequest)
 			throws UnsupportedEncodingException {
@@ -843,6 +845,54 @@ public class WebServiceController {
 		annotationWSUtil.downloadOntologyGraph(id, httpServletResponse);
 	}
 
+
+	@RequestMapping(value = "/predefinedslims", method = RequestMethod.GET)
+	public void index(HttpServletResponse httpServletResponse) {
+
+		annotationWSUtil.downloadPredefinedSlims(httpServletResponse);
+
+	}
+
+
+	@RequestMapping(value = {"/predefinedSetTerms/{id}"}, method = {RequestMethod.GET})
+	public void addPredefinedSetTerms(@PathVariable(value = "id") String id,
+			HttpServletResponse httpServletResponse) {
+
+		annotationWSUtil.downloadPredefinedSetTerms(httpServletResponse,id);
+
+
+	}
+
+
+//	@RequestMapping(value = { "/terms/{id}" }, method = {RequestMethod.GET }, params = { "inactiveSlimmingTermId" })
+//	public String inactivateSlimmingTerm(
+//			@PathVariable(value="id") String id,
+//			@RequestParam(value = "inactiveSlimmingTermId", defaultValue = "", required = false) String inactiveSlimmingTermId,
+//			HttpServletRequest httpRequest,
+//			HttpSession session) {
+//
+//		Map<String, String> slimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.SLIMMING_TERMS_ATTRIBUTE, session);
+//
+//		Map<String, String> inactiveSlimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.INACTIVE_SLIMMING_TERMS_ATTRIBUTE, session);
+//
+//		if (inactiveSlimmingTermId.equals(EGOAspect.F.abbreviation)) {
+//			inactiveSlimmingTerms.putAll(SlimmingUtil.getTermsFromSession(SlimmingUtil.MF_SLIMMING_TERMS_ATTRIBUTE, session));
+//		} else if (inactiveSlimmingTermId.equals(EGOAspect.P.abbreviation)) {
+//			inactiveSlimmingTerms.putAll(SlimmingUtil.getTermsFromSession(SlimmingUtil.BP_SLIMMING_TERMS_ATTRIBUTE, session));
+//		} else if (inactiveSlimmingTermId.equals(EGOAspect.C.abbreviation)) {
+//			inactiveSlimmingTerms.putAll(SlimmingUtil.getTermsFromSession(SlimmingUtil.CC_SLIMMING_TERMS_ATTRIBUTE, session));
+//		} else { // GO term
+//			inactiveSlimmingTerms.put(inactiveSlimmingTermId, slimmingTerms.get(inactiveSlimmingTermId));
+//		}
+//		session.setAttribute(SlimmingUtil.INACTIVE_SLIMMING_TERMS_ATTRIBUTE, inactiveSlimmingTerms);
+//
+//		setSlimmingTermsByAspect(session);
+//		return View.INDEX;
+//	}
+
+
+
+	//----------------------- End of public interface   ------------------------------------ //
 
 	private List<Map<String, Object>> searchTerm(String query, String filterQuery, int limit, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse, String callback) throws IOException, SolrServerException {
 
@@ -1023,4 +1073,30 @@ public class WebServiceController {
 		}
 		return content;
 	}
+
+
+	/**
+	 * Set slimming terms by aspect
+	 * @param session
+	 * @param model
+	 */
+//	private void setSlimmingTermsByAspect(HttpSession session){
+//		Map<String, String>  slimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.SLIMMING_TERMS_ATTRIBUTE, session);
+//		Map<String, String>  mf_slimmingTerms = new HashMap<String, String>();
+//		Map<String, String>  bp_slimmingTerms = new HashMap<String, String>();
+//		Map<String, String>  cc_slimmingTerms = new HashMap<String, String>();
+//
+//		for (String termId : slimmingTerms.keySet()) {
+//			if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.F) {
+//				mf_slimmingTerms.put(termId, slimmingTerms.get(termId));
+//			} else if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.C) {
+//				cc_slimmingTerms.put(termId, slimmingTerms.get(termId));
+//			} else if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.P) {
+//				bp_slimmingTerms.put(termId, slimmingTerms.get(termId));
+//			}
+//		}
+//		session.setAttribute(SlimmingUtil.MF_SLIMMING_TERMS_ATTRIBUTE, mf_slimmingTerms);
+//		session.setAttribute(SlimmingUtil.CC_SLIMMING_TERMS_ATTRIBUTE, cc_slimmingTerms);
+//		session.setAttribute(SlimmingUtil.BP_SLIMMING_TERMS_ATTRIBUTE, bp_slimmingTerms);
+//	}
 }

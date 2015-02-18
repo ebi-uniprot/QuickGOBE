@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.zip.GZIPOutputStream;
 
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
@@ -29,9 +31,9 @@ import uk.ac.ebi.quickgo.service.term.TermService;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.util.term.TermUtil;
 import uk.ac.ebi.quickgo.web.util.FileService;
-import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
+import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
 /**
  * Annotation WS util methods
@@ -59,6 +61,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Autowired
 	MiscellaneousUtil miscellaneousUtil;
+
+	// All go terms
+	Map<String, GenericTerm> terms = uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTerms(); //todo this should be properly cached.
 
 	private static final Logger logger = Logger.getLogger(AnnotationWSUtilImpl.class);
 
@@ -445,6 +450,72 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		// Load GO terms and calculate terms by ontology
 //		TermUtil.getGOOntology();
 //
+
+	}
+
+	@Override
+	public void downloadPredefinedSetTerms(HttpServletResponse httpServletResponse, String setName) {
+		//Map<String, String> predefinedSetTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.SETS_TERMS_ADDED, session);
+		//Map<String, String> slimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.SLIMMING_TERMS_ATTRIBUTE, session);
+
+		if (setName == null || setName.isEmpty()) {
+			return;
+		}
+
+		List<TermJson> setTerms = new ArrayList<>();
+
+//			if (!predefindSetTerms.containsKey(setName)) {// Check if it was calculated before
+		for (GenericTerm goTerm : terms.values()) {
+			if (goTerm.getSubsetsNames().contains(setName)) {
+				TermJson termJson = new TermJson();
+				termJson.setTermId(goTerm.getId());
+				termJson.setName(goTerm.getName());
+				termJson.setAspectDescription(((GOTerm)goTerm).getAspectDescription());
+				setTerms.add(termJson);
+			}
+		}
+		//predefindSetTerms.put(setName, setTerms);
+//			} else {
+//				// Get cached values
+//				setTerms = predefindSetTerms.get(setName);
+//			}
+		//predefinedSetTerms.putAll(setTerms);
+		//session.setAttribute(SlimmingUtil.SETS_TERMS_ADDED, predefinedSetTerms);
+		//session.setAttribute("selectedSet", setName);
+		//slimmingTerms.putAll(setTerms);
+		//session.setAttribute(SlimmingUtil.SLIMMING_TERMS_ATTRIBUTE, slimmingTerms);
+
+
+		//setSlimmingTermsByAspect(session);
+
+//		for (String termId : slimmingTerms.keySet()) {
+//			if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.F) {
+//				mf_slimmingTerms.put(termId, slimmingTerms.get(termId));
+//			} else if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.C) {
+//				cc_slimmingTerms.put(termId, slimmingTerms.get(termId));
+//			} else if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.P) {
+//				bp_slimmingTerms.put(termId, slimmingTerms.get(termId));
+//			}
+//		}
+
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFileForPredefinedSetTerms(setTerms);
+
+			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+			IOUtils.copy(in, httpServletResponse.getOutputStream());
+
+			// Set response header and content
+			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
+			httpServletResponse.setContentLength(sb.length());
+			httpServletResponse.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+
+
 
 	}
 
