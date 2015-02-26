@@ -437,26 +437,10 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 			e.printStackTrace();
 			logger.error(e.getMessage());
 		}
-
-		// Remove all previous applied filters
-//		session.removeAttribute("appliedFilters");
-
-		// Remove searched text value
-//		session.removeAttribute("searchedText");
-
-		// Remove all sliming attributes
-//		SlimmingUtil.removeAllSlimAttributes(session);
-
-		// Load GO terms and calculate terms by ontology
-//		TermUtil.getGOOntology();
-//
-
 	}
 
 	@Override
 	public void downloadPredefinedSetTerms(HttpServletResponse httpServletResponse, String setName) {
-		//Map<String, String> predefinedSetTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.SETS_TERMS_ADDED, session);
-		//Map<String, String> slimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.SLIMMING_TERMS_ATTRIBUTE, session);
 
 		if (setName == null || setName.isEmpty()) {
 			return;
@@ -464,7 +448,6 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 		List<TermJson> setTerms = new ArrayList<>();
 
-//			if (!predefindSetTerms.containsKey(setName)) {// Check if it was calculated before
 		for (GenericTerm goTerm : terms.values()) {
 			if (goTerm.getSubsetsNames().contains(setName)) {
 				TermJson termJson = new TermJson();
@@ -474,29 +457,6 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 				setTerms.add(termJson);
 			}
 		}
-		//predefindSetTerms.put(setName, setTerms);
-//			} else {
-//				// Get cached values
-//				setTerms = predefindSetTerms.get(setName);
-//			}
-		//predefinedSetTerms.putAll(setTerms);
-		//session.setAttribute(SlimmingUtil.SETS_TERMS_ADDED, predefinedSetTerms);
-		//session.setAttribute("selectedSet", setName);
-		//slimmingTerms.putAll(setTerms);
-		//session.setAttribute(SlimmingUtil.SLIMMING_TERMS_ATTRIBUTE, slimmingTerms);
-
-
-		//setSlimmingTermsByAspect(session);
-
-//		for (String termId : slimmingTerms.keySet()) {
-//			if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.F) {
-//				mf_slimmingTerms.put(termId, slimmingTerms.get(termId));
-//			} else if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.C) {
-//				cc_slimmingTerms.put(termId, slimmingTerms.get(termId));
-//			} else if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.P) {
-//				bp_slimmingTerms.put(termId, slimmingTerms.get(termId));
-//			}
-//		}
 
 		StringBuffer sb = null;
 		try {
@@ -514,9 +474,5 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 			e.printStackTrace();
 			logger.error(e.getMessage());
 		}
-
-
-
 	}
-
 }
