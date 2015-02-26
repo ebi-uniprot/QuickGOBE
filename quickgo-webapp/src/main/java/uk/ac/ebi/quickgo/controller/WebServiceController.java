@@ -860,8 +860,15 @@ public class WebServiceController {
 
 		annotationWSUtil.downloadPredefinedSetTerms(httpServletResponse,id);
 
-
 	}
+
+//	@RequestMapping(value = {"/go/{id}"}, method = {RequestMethod.GET})
+//	public void goAnnotation(@PathVariable(value = "id") String id,
+//									  HttpServletResponse httpServletResponse) {
+//
+//		annotationWSUtil.singleGo(httpServletResponse,id);
+//
+//	}
 
 
 //	@RequestMapping(value = { "/terms/{id}" }, method = {RequestMethod.GET }, params = { "inactiveSlimmingTermId" })
