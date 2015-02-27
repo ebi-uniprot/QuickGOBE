@@ -1,11 +1,9 @@
 package uk.ac.ebi.quickgo.controller;
 
-import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.URLDecoder;
 import java.util.*;
 
 import javax.imageio.ImageIO;
@@ -15,21 +13,15 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
-import uk.ac.ebi.quickgo.graphics.GraphImage;
-import uk.ac.ebi.quickgo.graphics.GraphPresentation;
-import uk.ac.ebi.quickgo.graphics.ImageArchive;
-import uk.ac.ebi.quickgo.graphics.OntologyGraph;
-import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
+
 import uk.ac.ebi.quickgo.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationBlacklist.BlacklistEntryMinimal;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationExtensionRelations;
@@ -48,7 +40,6 @@ import uk.ac.ebi.quickgo.web.staticcontent.annotation.AnnotationBlackListContent
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.TaxonConstraintsContent;
 import uk.ac.ebi.quickgo.web.util.ChartService;
 import uk.ac.ebi.quickgo.web.util.FileService;
-import uk.ac.ebi.quickgo.web.util.View;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationColumn;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationWSUtil;
 import uk.ac.ebi.quickgo.web.util.annotation.AppliedFilterSet;
@@ -57,9 +48,6 @@ import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import uk.ac.ebi.quickgo.web.util.term.XRefBean;
-import uk.ac.ebi.quickgo.webservice.model.OntologyGraphJson;
-import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
 /**
  * REST services controller
@@ -862,6 +850,13 @@ public class WebServiceController {
 
 	}
 
+
+	@RequestMapping(value={"/dataset"}, method = {RequestMethod.GET })
+	public void getAnnotationUpdates(HttpServletResponse httpServletResponse){
+
+		annotationWSUtil.downloadAnnotationUpdates(httpServletResponse);
+	}
+
 //	@RequestMapping(value = {"/go/{id}"}, method = {RequestMethod.GET})
 //	public void goAnnotation(@PathVariable(value = "id") String id,
 //									  HttpServletResponse httpServletResponse) {
@@ -897,7 +892,15 @@ public class WebServiceController {
 //		return View.INDEX;
 //	}
 
+	@RequestMapping(value = { "/dataset/goTermHistory"}, method = {RequestMethod.POST, RequestMethod.GET })
+	public void getGoTermsHistory(HttpServletResponse httpServletResponse,
+										  @RequestParam(value = "from", defaultValue = "2013-01-01", required=false) String from,
+										  @RequestParam(value = "to", defaultValue = "NOW", required=false) String to,
+										  @RequestParam(value = "limit", defaultValue = "500", required=false) String limit){
 
+		annotationWSUtil.downloadGoTermHistory(httpServletResponse, from, to, limit);
+
+	}
 
 	//----------------------- End of public interface   ------------------------------------ //
 

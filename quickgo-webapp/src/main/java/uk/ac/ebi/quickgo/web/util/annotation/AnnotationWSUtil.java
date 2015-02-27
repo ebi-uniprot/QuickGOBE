@@ -29,4 +29,8 @@ public interface AnnotationWSUtil {
 	public void downloadPredefinedSlims(HttpServletResponse httpServletResponse);
 
 	void downloadPredefinedSetTerms(HttpServletResponse httpServletResponse, String setName);
+
+	void downloadAnnotationUpdates(HttpServletResponse httpServletResponse);
+
+	void downloadGoTermHistory(HttpServletResponse httpServletResponse, String from, String to, String limit);
 }

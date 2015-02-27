@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationColumn;
 import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
+import uk.ac.ebi.quickgo.webservice.model.AnnotationUpdatersJson;
 import uk.ac.ebi.quickgo.webservice.model.GoAnnotationJson;
 import uk.ac.ebi.quickgo.webservice.model.OntologyGraphJson;
 import uk.ac.ebi.quickgo.webservice.model.TermJson;
@@ -374,7 +376,6 @@ public class FileService {
 	public StringBuffer generateJsonFileForPredefinedSetTerms(List<TermJson> setTerms) {
 		StringBuffer buffer = new StringBuffer();
 		try {
-			TermJson termJson = new TermJson();
 			buffer.append(AnnotationColumn.toJson(setTerms));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -451,6 +452,38 @@ public class FileService {
 		ontologyGraphJson.setTermGraphImageHeight(renderableImage.getHeight());
 
 		return ontologyGraphJson;
+	}
+
+
+	public StringBuffer generateJsonFile(List<Count> assignedByCount) {
+		StringBuffer buffer = new StringBuffer();
+
+		List<AnnotationUpdatersJson> annotationUpdatersJsonList = new ArrayList<>();
+
+		for (Count count : assignedByCount) {
+			annotationUpdatersJsonList.add(new AnnotationUpdatersJson(count.getName(), count.getCount()));
+		}
+
+		try {
+			buffer.append(AnnotationColumn.toJson(annotationUpdatersJsonList));
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return buffer;
+	}
+
+
+	public StringBuffer generateJsonFile(Object target) {
+		StringBuffer buffer = new StringBuffer();
+
+		try {
+			buffer.append(AnnotationColumn.toJson(target));
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return buffer;
 	}
 
 	/**

@@ -6,20 +6,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.servlet.ModelAndView;
+import uk.ac.ebi.quickgo.ontology.generic.AuditRecord;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
@@ -28,11 +31,14 @@ import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousService;
 import uk.ac.ebi.quickgo.service.term.TermService;
+import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.util.term.TermUtil;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
+import uk.ac.ebi.quickgo.web.util.View;
+import uk.ac.ebi.quickgo.webservice.model.GoTermHistoryJson;
 import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
 /**
@@ -475,4 +481,93 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 			logger.error(e.getMessage());
 		}
 	}
+
+
+
+	@Override
+	public void downloadAnnotationUpdates(HttpServletResponse httpServletResponse) {
+
+		List<FacetField.Count> assignedByCount = annotationService.getFacetFields("*:*", null,
+				AnnotationField.ASSIGNEDBY.getValue(), 1000);
+
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(assignedByCount);
+
+			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+			IOUtils.copy(in, httpServletResponse.getOutputStream());
+
+			// Set response header and content
+			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
+			httpServletResponse.setContentLength(sb.length());
+			httpServletResponse.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	@Override
+	public void downloadGoTermHistory(HttpServletResponse httpServletResponse, String from, String to, String limit) {
+
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date fromDate = null, toDate = null;
+		try {
+			fromDate = formatter.parse(from);
+			if (to.contains("NOW")) {
+				toDate = new Date();
+			} else {
+				formatter.parse(to);
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		List<GOTerm> historyChanges = goTermService.retrieveByHistoryDate(fromDate, toDate, Integer.valueOf(limit));
+
+		List<AuditRecord> allChanges = new ArrayList<>();
+		List<AuditRecord> termsRecords = new ArrayList<>();
+		List<AuditRecord> definitionsRecords = new ArrayList<>();
+		List<AuditRecord> relationsRecords = new ArrayList<>();
+		List<AuditRecord> xrefRecords = new ArrayList<>();
+
+
+
+		for(GOTerm term : historyChanges){
+			allChanges.addAll(term.history.auditRecords);
+			termsRecords.addAll(term.history.getHistoryTerms());
+			definitionsRecords.addAll(term.history.getHistoryDefinitions());
+			relationsRecords.addAll(term.history.getHistoryRelations());
+			xrefRecords.addAll(term.history.getHistoryXRefs());
+		}
+
+		GoTermHistoryJson goTermHistoryJson = new GoTermHistoryJson();
+		goTermHistoryJson.setFrom(from);
+		goTermHistoryJson.setAllChanges(allChanges);
+		goTermHistoryJson.setTermsRecords(termsRecords);
+		goTermHistoryJson.setDefinitionRecords(definitionsRecords);
+		goTermHistoryJson.setRelationsRecords(relationsRecords);
+		goTermHistoryJson.setXrefRecords(xrefRecords);
+
+
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(goTermHistoryJson);
+
+			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+			IOUtils.copy(in, httpServletResponse.getOutputStream());
+
+			// Set response header and content
+			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
+			httpServletResponse.setContentLength(sb.length());
+			httpServletResponse.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+
+	}
+
 }
