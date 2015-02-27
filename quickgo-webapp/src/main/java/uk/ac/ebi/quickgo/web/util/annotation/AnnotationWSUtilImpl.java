@@ -37,7 +37,6 @@ import uk.ac.ebi.quickgo.util.term.TermUtil;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
-import uk.ac.ebi.quickgo.web.util.View;
 import uk.ac.ebi.quickgo.webservice.model.GoTermHistoryJson;
 import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
@@ -289,14 +288,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		try {
 			sb = fileService.generateJsonFileWithTotalAnnotations(totalAnnotations);
 
-			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-			IOUtils.copy(in, httpServletResponse.getOutputStream());
-
-			// Set response header and content
-			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
-			httpServletResponse.setContentLength(sb.length());
-			httpServletResponse.flushBuffer();
+			writeOutJsonResponse(httpServletResponse, sb);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -334,14 +326,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 			sb = fileService.generateJsonFileForTerm(term, childTermsRelations, allStats, nonIEAStats);
 
-			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-			IOUtils.copy(in, httpServletResponse.getOutputStream());
-
-			// Set response header and content
-			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
-			httpServletResponse.setContentLength(sb.length());
-			httpServletResponse.flushBuffer();
+			writeOutJsonResponse(httpServletResponse, sb);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -357,20 +342,14 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 			sb = fileService.generateJsonFileForOntologyTerm(termId);
 
-			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-			IOUtils.copy(in, httpServletResponse.getOutputStream());
-
-			// Set response header and content
-			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
-			httpServletResponse.setContentLength(sb.length());
-			httpServletResponse.flushBuffer();
+			writeOutJsonResponse(httpServletResponse, sb);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
 		}
 	}
+
 
 	/**
 	 * Get first stats values (by default 100)
@@ -431,14 +410,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		try {
 			sb = fileService.generateJsonFileForPredefinedSlims(subsetsCounts);
 
-			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-			IOUtils.copy(in, httpServletResponse.getOutputStream());
-
-			// Set response header and content
-			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
-			httpServletResponse.setContentLength(sb.length());
-			httpServletResponse.flushBuffer();
+			writeOutJsonResponse(httpServletResponse, sb);
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
@@ -468,14 +440,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		try {
 			sb = fileService.generateJsonFileForPredefinedSetTerms(setTerms);
 
-			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-			IOUtils.copy(in, httpServletResponse.getOutputStream());
-
-			// Set response header and content
-			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
-			httpServletResponse.setContentLength(sb.length());
-			httpServletResponse.flushBuffer();
+			writeOutJsonResponse(httpServletResponse, sb);
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
@@ -494,14 +459,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		try {
 			sb = fileService.generateJsonFile(assignedByCount);
 
-			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-			IOUtils.copy(in, httpServletResponse.getOutputStream());
-
-			// Set response header and content
-			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
-			httpServletResponse.setContentLength(sb.length());
-			httpServletResponse.flushBuffer();
+			writeOutJsonResponse(httpServletResponse, sb);
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
@@ -555,19 +513,24 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		try {
 			sb = fileService.generateJsonFile(goTermHistoryJson);
 
-			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-			IOUtils.copy(in, httpServletResponse.getOutputStream());
-
-			// Set response header and content
-			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
-			httpServletResponse.setContentLength(sb.length());
-			httpServletResponse.flushBuffer();
+			writeOutJsonResponse(httpServletResponse, sb);
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
 		}
 
 	}
+
+	private void writeOutJsonResponse(HttpServletResponse httpServletResponse, StringBuffer sb) throws IOException {
+		InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+		IOUtils.copy(in, httpServletResponse.getOutputStream());
+
+		// Set response header and content
+		httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+		httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
+		httpServletResponse.setContentLength(sb.length());
+		httpServletResponse.flushBuffer();
+	}
+
 
 }
