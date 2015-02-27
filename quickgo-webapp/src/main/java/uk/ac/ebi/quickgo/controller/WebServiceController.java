@@ -857,40 +857,6 @@ public class WebServiceController {
 		annotationWSUtil.downloadAnnotationUpdates(httpServletResponse);
 	}
 
-//	@RequestMapping(value = {"/go/{id}"}, method = {RequestMethod.GET})
-//	public void goAnnotation(@PathVariable(value = "id") String id,
-//									  HttpServletResponse httpServletResponse) {
-//
-//		annotationWSUtil.singleGo(httpServletResponse,id);
-//
-//	}
-
-
-//	@RequestMapping(value = { "/terms/{id}" }, method = {RequestMethod.GET }, params = { "inactiveSlimmingTermId" })
-//	public String inactivateSlimmingTerm(
-//			@PathVariable(value="id") String id,
-//			@RequestParam(value = "inactiveSlimmingTermId", defaultValue = "", required = false) String inactiveSlimmingTermId,
-//			HttpServletRequest httpRequest,
-//			HttpSession session) {
-//
-//		Map<String, String> slimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.SLIMMING_TERMS_ATTRIBUTE, session);
-//
-//		Map<String, String> inactiveSlimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.INACTIVE_SLIMMING_TERMS_ATTRIBUTE, session);
-//
-//		if (inactiveSlimmingTermId.equals(EGOAspect.F.abbreviation)) {
-//			inactiveSlimmingTerms.putAll(SlimmingUtil.getTermsFromSession(SlimmingUtil.MF_SLIMMING_TERMS_ATTRIBUTE, session));
-//		} else if (inactiveSlimmingTermId.equals(EGOAspect.P.abbreviation)) {
-//			inactiveSlimmingTerms.putAll(SlimmingUtil.getTermsFromSession(SlimmingUtil.BP_SLIMMING_TERMS_ATTRIBUTE, session));
-//		} else if (inactiveSlimmingTermId.equals(EGOAspect.C.abbreviation)) {
-//			inactiveSlimmingTerms.putAll(SlimmingUtil.getTermsFromSession(SlimmingUtil.CC_SLIMMING_TERMS_ATTRIBUTE, session));
-//		} else { // GO term
-//			inactiveSlimmingTerms.put(inactiveSlimmingTermId, slimmingTerms.get(inactiveSlimmingTermId));
-//		}
-//		session.setAttribute(SlimmingUtil.INACTIVE_SLIMMING_TERMS_ATTRIBUTE, inactiveSlimmingTerms);
-//
-//		setSlimmingTermsByAspect(session);
-//		return View.INDEX;
-//	}
 
 	@RequestMapping(value = { "/dataset/goTermHistory"}, method = {RequestMethod.POST, RequestMethod.GET })
 	public void getGoTermsHistory(HttpServletResponse httpServletResponse,
@@ -1083,30 +1049,4 @@ public class WebServiceController {
 		}
 		return content;
 	}
-
-
-	/**
-	 * Set slimming terms by aspect
-	 * @param session
-	 * @param model
-	 */
-//	private void setSlimmingTermsByAspect(HttpSession session){
-//		Map<String, String>  slimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.SLIMMING_TERMS_ATTRIBUTE, session);
-//		Map<String, String>  mf_slimmingTerms = new HashMap<String, String>();
-//		Map<String, String>  bp_slimmingTerms = new HashMap<String, String>();
-//		Map<String, String>  cc_slimmingTerms = new HashMap<String, String>();
-//
-//		for (String termId : slimmingTerms.keySet()) {
-//			if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.F) {
-//				mf_slimmingTerms.put(termId, slimmingTerms.get(termId));
-//			} else if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.C) {
-//				cc_slimmingTerms.put(termId, slimmingTerms.get(termId));
-//			} else if (((GOTerm) terms.get(termId)).getAspect() == EGOAspect.P) {
-//				bp_slimmingTerms.put(termId, slimmingTerms.get(termId));
-//			}
-//		}
-//		session.setAttribute(SlimmingUtil.MF_SLIMMING_TERMS_ATTRIBUTE, mf_slimmingTerms);
-//		session.setAttribute(SlimmingUtil.CC_SLIMMING_TERMS_ATTRIBUTE, cc_slimmingTerms);
-//		session.setAttribute(SlimmingUtil.BP_SLIMMING_TERMS_ATTRIBUTE, bp_slimmingTerms);
-//	}
 }
