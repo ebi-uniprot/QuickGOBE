@@ -35,10 +35,12 @@ import uk.ac.ebi.quickgo.service.term.TermService;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.util.term.TermUtil;
+import uk.ac.ebi.quickgo.web.staticcontent.annotation.AnnotationBlackListContent;
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.TaxonConstraintsContent;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
+import uk.ac.ebi.quickgo.webservice.model.AnnotationBlacklistJson;
 import uk.ac.ebi.quickgo.webservice.model.GoTermHistoryJson;
 import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
@@ -68,6 +70,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Autowired
 	MiscellaneousUtil miscellaneousUtil;
+
+	@Autowired
+	AnnotationBlackListContent annotationBlackListContent;
 
 	// All go terms
 	Map<String, GenericTerm> terms = uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTerms(); //todo this should be properly cached.
@@ -536,6 +541,22 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		}
 	}
 
+	@Override
+	public void downloadAnnotationBlacklist(HttpServletResponse httpServletResponse){
+
+		AnnotationBlacklistJson annotationBlacklistJson = new AnnotationBlacklistJson();
+		annotationBlacklistJson.setIEAReview(annotationBlackListContent.getIEAReview());
+		annotationBlacklistJson.setBlackListNotQualified(annotationBlackListContent.getBlackListNotQualified());
+		annotationBlacklistJson.setBlackListUniProtCaution(annotationBlackListContent.getBlackListUniProtCaution());
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(annotationBlacklistJson);
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
 
 	private void writeOutJsonResponse(HttpServletResponse httpServletResponse, StringBuffer sb) throws IOException {
 		InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
@@ -547,6 +568,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		httpServletResponse.setContentLength(sb.length());
 		httpServletResponse.flushBuffer();
 	}
+
 
 
 }

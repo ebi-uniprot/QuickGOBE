@@ -35,4 +35,6 @@ public interface AnnotationWSUtil {
 	void downloadGoTermHistory(HttpServletResponse httpServletResponse, String from, String to, String limit);
 
 	void downloadTaxonConstraints(HttpServletResponse httpServletResponse);
+
+	void downloadAnnotationBlacklist(HttpServletResponse httpServletResponse);
 }
