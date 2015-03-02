@@ -858,13 +858,21 @@ public class WebServiceController {
 	}
 
 
-	@RequestMapping(value = { "/dataset/goTermHistory"}, method = {RequestMethod.POST, RequestMethod.GET })
+	@RequestMapping(value = { "/dataset/goTermHistory"}, method = {RequestMethod.GET })
 	public void getGoTermsHistory(HttpServletResponse httpServletResponse,
 										  @RequestParam(value = "from", defaultValue = "2013-01-01", required=false) String from,
 										  @RequestParam(value = "to", defaultValue = "NOW", required=false) String to,
 										  @RequestParam(value = "limit", defaultValue = "500", required=false) String limit){
 
 		annotationWSUtil.downloadGoTermHistory(httpServletResponse, from, to, limit);
+
+	}
+
+
+	@RequestMapping(value = { "/dataset/taxonConstraints"}, method = { RequestMethod.GET })
+	public void getTaxonConstraints(HttpServletResponse httpServletResponse){
+
+		annotationWSUtil.downloadTaxonConstraints(httpServletResponse);
 
 	}
 
