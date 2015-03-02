@@ -26,6 +26,7 @@ import uk.ac.ebi.quickgo.ontology.generic.AuditRecord;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
+import uk.ac.ebi.quickgo.ontology.go.TaxonConstraint;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 
 
@@ -34,6 +35,7 @@ import uk.ac.ebi.quickgo.service.term.TermService;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.util.term.TermUtil;
+import uk.ac.ebi.quickgo.web.staticcontent.annotation.TaxonConstraintsContent;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
@@ -512,7 +514,6 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		StringBuffer sb = null;
 		try {
 			sb = fileService.generateJsonFile(goTermHistoryJson);
-
 			writeOutJsonResponse(httpServletResponse, sb);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -520,6 +521,21 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		}
 
 	}
+
+
+	@Override
+	public void downloadTaxonConstraints(HttpServletResponse httpServletResponse) {
+		List<TaxonConstraint> taxonConstraints = TaxonConstraintsContent.getTaxonConstraints();
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(taxonConstraints);
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
 
 	private void writeOutJsonResponse(HttpServletResponse httpServletResponse, StringBuffer sb) throws IOException {
 		InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
