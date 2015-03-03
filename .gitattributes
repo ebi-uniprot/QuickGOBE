@@ -352,6 +352,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/term/XRefBean.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/AnnotationTotal.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolver.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolverImpl.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationBlacklistJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationUpdatersJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/ChildTermRelationJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoAnnotationJson.java -text
