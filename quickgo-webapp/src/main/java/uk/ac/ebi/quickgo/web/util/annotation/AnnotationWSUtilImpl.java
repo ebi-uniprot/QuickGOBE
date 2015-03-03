@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
-import org.springframework.web.servlet.ModelAndView;
 import uk.ac.ebi.quickgo.ontology.generic.AuditRecord;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
@@ -36,11 +35,13 @@ import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.util.term.TermUtil;
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.AnnotationBlackListContent;
+import uk.ac.ebi.quickgo.web.staticcontent.annotation.AnnotationPostProcessingContent;
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.TaxonConstraintsContent;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
 import uk.ac.ebi.quickgo.webservice.model.AnnotationBlacklistJson;
+import uk.ac.ebi.quickgo.webservice.model.AnnotationPostProcessingJson;
 import uk.ac.ebi.quickgo.webservice.model.GoTermHistoryJson;
 import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
@@ -73,6 +74,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Autowired
 	AnnotationBlackListContent annotationBlackListContent;
+
+	@Autowired
+	AnnotationPostProcessingContent annotationPostProcessingContent;
 
 	// All go terms
 	Map<String, GenericTerm> terms = uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTerms(); //todo this should be properly cached.
@@ -551,6 +555,20 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		StringBuffer sb = null;
 		try {
 			sb = fileService.generateJsonFile(annotationBlacklistJson);
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	@Override
+	public void getAnnotationPostProcessing(HttpServletResponse httpServletResponse) {
+		AnnotationPostProcessingJson annotationPostProcessingJson = new AnnotationPostProcessingJson();
+		annotationPostProcessingJson.setContent(annotationPostProcessingContent.getPostProcessingRules());
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(annotationPostProcessingJson);
 			writeOutJsonResponse(httpServletResponse, sb);
 		} catch (IOException e) {
 			e.printStackTrace();

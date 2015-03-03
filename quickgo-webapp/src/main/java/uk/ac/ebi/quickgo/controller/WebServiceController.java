@@ -884,6 +884,11 @@ public class WebServiceController {
 	}
 
 
+	@RequestMapping(value = { "/dataset/annotationPostProcessing"},  method = { RequestMethod.GET })
+	public void getAnnotationPostProcessing(HttpServletResponse httpServletResponse){
+		annotationWSUtil.getAnnotationPostProcessing(httpServletResponse);
+	}
+
 	//----------------------- End of public interface   ------------------------------------ //
 
 	private List<Map<String, Object>> searchTerm(String query, String filterQuery, int limit, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse, String callback) throws IOException, SolrServerException {
