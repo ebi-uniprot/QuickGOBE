@@ -876,6 +876,14 @@ public class WebServiceController {
 
 	}
 
+
+	@RequestMapping(value = { "/dataset/annotationBlacklist"}, method = { RequestMethod.GET })
+	public void getAnnotationBlacklist(HttpServletResponse httpServletResponse){
+
+		annotationWSUtil.downloadAnnotationBlacklist(httpServletResponse);
+	}
+
+
 	//----------------------- End of public interface   ------------------------------------ //
 
 	private List<Map<String, Object>> searchTerm(String query, String filterQuery, int limit, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse, String callback) throws IOException, SolrServerException {
