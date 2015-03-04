@@ -480,14 +480,8 @@ public class WebServiceController {
 			throws UnsupportedEncodingException {
 
 
-		int selectedPage=0;
-		int selectedRows=0;
-		selectedPage = page;
-		selectedRows = rows;
-
 		AppliedFilterSet appliedFilterSet = new AppliedFilterSet();
 
-		//processFilters(removeFilter, removeAllFilters, appliedFilterSet);
 
 		// Calculate Annotations Parameters from Query parameter
 		AnnotationParameters annotationParameters = new AnnotationParameters();
@@ -499,12 +493,6 @@ public class WebServiceController {
 
 		// Create query from filter values
 		String solrQuery = annotationParameters.toSolrQuery();
-
-		//String currentQuery = solrQuery;
-
-		// Calculate total number annotations
-		//long totalNumberAnnotations = annotationService.getTotalNumberAnnotations(solrQuery);
-
 
 		// Retrieve annotations
 		List<Annotation> annotations = annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
@@ -520,34 +508,6 @@ public class WebServiceController {
 			annotationBeans.add(annotationBean);
 		}
 
-		// Set list of annotations to display
-//		session.setAttribute("annotationsList", annotationBeans);
-
-		// Set visible columns
-//		AnnotationColumn[] sortedVisibleAnnotationHeaders = (AnnotationColumn[]) session.getAttribute("visibleAnnotationsColumns");
-//		if (sortedVisibleAnnotationHeaders == null || !cols.isEmpty()) {
-//			sortedVisibleAnnotationHeaders = AnnotationColumn.getAnnotationHeaders(URLDecoder.decode(cols, "UTF-8").split(","));
-//			// Set visible columns in session
-//			session.setAttribute("visibleAnnotationsColumns", sortedVisibleAnnotationHeaders);
-//		}
-
-		// All columns
-//		AnnotationColumn[] allAnnotationsColumns = (AnnotationColumn[]) session.getAttribute("allAnnotationsColumns");
-//		if(allAnnotationsColumns == null){
-//			session.setAttribute("allAnnotationsColumns", allColumns);
-//		}
-
-		// Set annotations columns ordered
-		//session.setAttribute("annotationsColumns", AnnotationColumn.sort(sortedVisibleAnnotationHeaders));
-
-		// Set current page
-		//model.addAttribute("currentPage", this.selectedPage);
-
-		// Set total number of annotations
-		//model.addAttribute("totalNumberAnnotations", this.totalNumberAnnotations);
-
-		// Set applied filters in session
-		//session.setAttribute("appliedFilters", appliedFilterSet);
 
 		String format = "JSON";					//ignored
 		AnnotationColumn[] columns = new AnnotationColumn[0];	//ignored
