@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.URLDecoder;
 import java.util.*;
 
 import javax.imageio.ImageIO;
@@ -13,13 +14,17 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import uk.ac.ebi.quickgo.annotation.Annotation;
+import uk.ac.ebi.quickgo.bean.annotation.AnnotationBean;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 
 import uk.ac.ebi.quickgo.ontology.generic.*;
@@ -27,6 +32,7 @@ import uk.ac.ebi.quickgo.ontology.go.AnnotationBlacklist.BlacklistEntryMinimal;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationExtensionRelations;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.render.Format;
+import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 import uk.ac.ebi.quickgo.service.annotation.parameter.AnnotationParameters;
 import uk.ac.ebi.quickgo.service.geneproduct.GeneProductService;
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousService;
@@ -40,14 +46,17 @@ import uk.ac.ebi.quickgo.web.staticcontent.annotation.AnnotationBlackListContent
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.TaxonConstraintsContent;
 import uk.ac.ebi.quickgo.web.util.ChartService;
 import uk.ac.ebi.quickgo.web.util.FileService;
+import uk.ac.ebi.quickgo.web.util.View;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationColumn;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationWSUtil;
 import uk.ac.ebi.quickgo.web.util.annotation.AppliedFilterSet;
+import uk.ac.ebi.quickgo.web.util.annotation.SlimmingUtil;
 import uk.ac.ebi.quickgo.web.util.query.QueryProcessor;
 import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import uk.ac.ebi.quickgo.web.util.url.URLsResolver;
 
 /**
  * REST services controller
@@ -82,6 +91,15 @@ public class WebServiceController {
 
 	@Autowired
 	AnnotationBlackListContent annotationBlackListContent;
+
+	@Autowired
+	AnnotationService annotationService;
+
+	@Autowired
+	SlimmingUtil slimmingUtil;
+
+	@Autowired
+	URLsResolver urLsResolver;
 
 	/**
 	 * Lookup web service
@@ -624,6 +642,101 @@ public class WebServiceController {
 	}
 
 
+	@RequestMapping(value="annotationfiltered", method = {RequestMethod.GET})
+	public void annotationListWithFilter(
+			HttpServletResponse httpServletResponse,
+			@RequestParam(value = "q", required = false) String query,
+			@RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "rows", defaultValue = "25") int rows,
+			@RequestParam(value = "cols", defaultValue = "") String cols,
+			@RequestParam(value = "removeFilter", defaultValue = "") String removeFilter,
+			@RequestParam(value = "removeAllFilters", defaultValue = "") String removeAllFilters,
+			@RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter)
+			throws UnsupportedEncodingException {
+
+
+		int selectedPage=0;
+		int selectedRows=0;
+		selectedPage = page;
+		selectedRows = rows;
+
+		AppliedFilterSet appliedFilterSet = new AppliedFilterSet();
+
+		//processFilters(removeFilter, removeAllFilters, appliedFilterSet);
+
+		// Calculate Annotations Parameters from Query parameter
+		AnnotationParameters annotationParameters = new AnnotationParameters();
+
+		// Process query
+		queryProcessor.processQuery(query, annotationParameters, appliedFilterSet, Boolean.valueOf(advancedFilter));
+
+		annotationParameters.setParameters(new HashMap<String, List<String>>(appliedFilterSet.getParameters()));
+
+		// Create query from filter values
+		String solrQuery = annotationParameters.toSolrQuery();
+
+		//String currentQuery = solrQuery;
+
+		// Calculate total number annotations
+		//long totalNumberAnnotations = annotationService.getTotalNumberAnnotations(solrQuery);
+
+
+		// Retrieve annotations
+		List<Annotation> annotations = annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
+
+		// Create annotation wrappers
+		List<AnnotationBean> annotationBeans = new ArrayList<>();
+
+		for (Annotation annotation : annotations) {
+			List<String> slimValue = appliedFilterSet.getParameters().get("slim");
+			List<String> filterGOIds = appliedFilterSet.getParameters().get(AnnotationField.ANCESTORSIPO.getValue());
+			AnnotationBean annotationBean = slimmingUtil.calculateOriginalAndSlimmingTerm(annotation, filterGOIds, slimValue);
+			urLsResolver.setURLs(annotationBean);
+			annotationBeans.add(annotationBean);
+		}
+
+		// Set list of annotations to display
+//		session.setAttribute("annotationsList", annotationBeans);
+
+		// Set visible columns
+//		AnnotationColumn[] sortedVisibleAnnotationHeaders = (AnnotationColumn[]) session.getAttribute("visibleAnnotationsColumns");
+//		if (sortedVisibleAnnotationHeaders == null || !cols.isEmpty()) {
+//			sortedVisibleAnnotationHeaders = AnnotationColumn.getAnnotationHeaders(URLDecoder.decode(cols, "UTF-8").split(","));
+//			// Set visible columns in session
+//			session.setAttribute("visibleAnnotationsColumns", sortedVisibleAnnotationHeaders);
+//		}
+
+		// All columns
+//		AnnotationColumn[] allAnnotationsColumns = (AnnotationColumn[]) session.getAttribute("allAnnotationsColumns");
+//		if(allAnnotationsColumns == null){
+//			session.setAttribute("allAnnotationsColumns", allColumns);
+//		}
+
+		// Set annotations columns ordered
+		//session.setAttribute("annotationsColumns", AnnotationColumn.sort(sortedVisibleAnnotationHeaders));
+
+		// Set current page
+		//model.addAttribute("currentPage", this.selectedPage);
+
+		// Set total number of annotations
+		//model.addAttribute("totalNumberAnnotations", this.totalNumberAnnotations);
+
+		// Set applied filters in session
+		//session.setAttribute("appliedFilters", appliedFilterSet);
+
+		String format = "JSON";					//ignored
+		AnnotationColumn[] columns = new AnnotationColumn[0];	//ignored
+		annotationWSUtil.downloadAnnotationsInternal(format, solrQuery, columns, Integer.valueOf(limit),
+				(page - 1) * rows, rows, httpServletResponse);
+	}
+
+
+
+
+
+
+
 	/**
 	 * Annotation web service
 	 */
@@ -1069,5 +1182,37 @@ public class WebServiceController {
 			return callback + "(" + content + ")";
 		}
 		return content;
+	}
+
+	private void processFilters(String removeFilter, String removeAllFilters, AppliedFilterSet appliedFilterSet){
+
+		// Reset applied filters and top taxonomies
+		if(removeAllFilters.equals("true")){
+			appliedFilterSet.setParameters(new HashMap<String,List<String>>());
+		}
+
+		// Remove filter (if any)
+		if(!removeFilter.equals("")){
+			String[] idValue = null;
+			if (removeFilter.startsWith(AnnotationField.QUALIFIER.getValue())) {
+				idValue = removeFilter.split("-");
+			} else {
+				idValue = removeFilter.split("-", 2);
+			}
+			String key = idValue[0];
+			String value = idValue[1];
+			// Check "NOT" value  special case for qualifier
+			if(key.equals(AnnotationField.QUALIFIER.getValue()) && value.contains("NOT")){
+				value = value.replaceAll("NOT","\"NOT\"");
+			}
+
+			List<String> currentFilterValues = appliedFilterSet.getParameters().get(key);
+
+			if(currentFilterValues != null && currentFilterValues.size() > 0){
+				List<String> currentValues = new ArrayList<>(currentFilterValues);
+				currentValues.remove(value);// Remove filter
+				appliedFilterSet.setValues(key, currentValues);
+			}
+		}
 	}
 }
