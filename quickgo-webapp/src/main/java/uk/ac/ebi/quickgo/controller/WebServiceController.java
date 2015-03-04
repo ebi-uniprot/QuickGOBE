@@ -642,6 +642,19 @@ public class WebServiceController {
 	}
 
 
+	/**
+	 * USE THIS ONE
+	 * @param httpServletResponse
+	 * @param query
+	 * @param limit
+	 * @param page
+	 * @param rows
+	 * @param cols
+	 * @param removeFilter
+	 * @param removeAllFilters
+	 * @param advancedFilter
+	 * @throws UnsupportedEncodingException
+	 */
 	@RequestMapping(value="annotationfiltered", method = {RequestMethod.GET})
 	public void annotationListWithFilter(
 			HttpServletResponse httpServletResponse,

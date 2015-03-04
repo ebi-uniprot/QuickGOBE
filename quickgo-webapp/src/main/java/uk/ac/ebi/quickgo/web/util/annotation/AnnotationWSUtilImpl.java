@@ -278,7 +278,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 			httpServletResponse.setContentLength(sb.length());
 			httpServletResponse.flushBuffer();
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
 		}
@@ -287,25 +287,25 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	/**
 	 * Generate a file with the annotations results
-	 * @param query Query to run
+//	 * @param query Query to run
 	 */
-	public void downloadAnnotationsTotalInternal( String query,HttpServletResponse httpServletResponse){
-
-		// Get total number annotations
-		long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
-
-		// Check file format
-		StringBuffer sb = null;
-		try {
-			sb = fileService.generateJsonFileWithTotalAnnotations(totalAnnotations);
-
-			writeOutJsonResponse(httpServletResponse, sb);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-		}
-	}
+//	public void downloadAnnotationsTotalInternal( String query,HttpServletResponse httpServletResponse){
+//
+//		// Get total number annotations
+//		long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
+//
+//		// Check file format
+//		StringBuffer sb = null;
+//		try {
+//			sb = fileService.generateJsonFileWithTotalAnnotations(totalAnnotations);
+//
+//			writeOutJsonResponse(httpServletResponse, sb);
+//
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			logger.error(e.getMessage());
+//		}
+//	}
 
 	@Override
 	public void downloadTerm(String termId, HttpServletResponse httpServletResponse){
