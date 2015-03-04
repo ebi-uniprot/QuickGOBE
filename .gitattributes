@@ -357,6 +357,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationPostPr
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationUpdatersJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/ChildTermRelationJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoAnnotationJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoAnnotationsContainer.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoTermHistoryJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/OntologyGraphJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/TermJson.java -text
