@@ -28,10 +28,7 @@ import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationColumn;
 import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
-import uk.ac.ebi.quickgo.webservice.model.AnnotationUpdatersJson;
-import uk.ac.ebi.quickgo.webservice.model.GoAnnotationJson;
-import uk.ac.ebi.quickgo.webservice.model.OntologyGraphJson;
-import uk.ac.ebi.quickgo.webservice.model.TermJson;
+import uk.ac.ebi.quickgo.webservice.model.*;
 
 /**
  * Class to deal with the generation of common files (gpad,gaff,fasta,...)
@@ -278,7 +275,8 @@ public class FileService {
 	 * @param numberAnnotations Total number of annotations
 	 * @return GPAD file
 	 */
-	public StringBuffer generateJsonFileWithPageAndRow(String query, long numberAnnotations, int start, int rows) {
+	public StringBuffer generateJsonFileWithPageAndRow(String query, long numberAnnotations, int start, int rows)
+			throws Exception{
 		AnnotationColumn[] columns = {
 				AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.SYMBOL, AnnotationColumn.QUALIFIER,
 				AnnotationColumn.GOID, AnnotationColumn.REFERENCE, AnnotationColumn.EVIDENCE, AnnotationColumn.WITH,
@@ -286,41 +284,123 @@ public class FileService {
 				AnnotationColumn.TAXON};
 
 
-		//		int rows = NUM_ROWS;
-		//		if (numResults > 0) {// Limit specified
-		//			numberAnnotations = numResults;
-		//			if(numResults < NUM_ROWS){
-		//				rows = numResults;
-		//			}
-		//		}
-		//		int start = 0;
+		GoAnnotationsContainer goAnnotationsContainer = new GoAnnotationsContainer();
+		goAnnotationsContainer.setNumberAnnotations(numberAnnotations);
+		List<GoAnnotationJson> goAnnotationJsonList = new ArrayList<>();
+		List<Annotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
 
-		boolean firstIteration=true;
-		StringBuffer writer = new StringBuffer();
-		writer.append("[");
-//		while (start < numberAnnotations) {
-			List<Annotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
-			//annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
-			for (Annotation annotation : annotations) {
+		//Iterate through each annotation and populate json class
+		for (Annotation annotation : annotations) {
 
-				if(!firstIteration){
-					writer.append(",");
-				}
+			GoAnnotationJson goAnnotationJson = new GoAnnotationJson();
 
-				GoAnnotationJson targetClass = new GoAnnotationJson();
+			for (AnnotationColumn annotationColumn : columns) {
+
+				switch (annotationColumn) {
+					case PROTEIN:
+						goAnnotationJson.setProtein(annotation.getDbObjectID());
+						break;
+					case SYMBOL:
+						goAnnotationJson.setSymbol(annotation.getDbObjectSymbol());
+						break;
+					case QUALIFIER:
+						String qualifierString = "";
+						if (annotation.getQualifiers() != null) {
+							qualifierString = StringUtils.arrayToDelimitedString(annotation.getQualifiers().toArray(), "|");
+						}
+						goAnnotationJson.setQualifier(qualifierString);
+						break;
+					case GOID:
+						goAnnotationJson.setGoId(annotation.getGoID());
+						break;
+					case TERMNAME:
+						goAnnotationJson.setTermName(annotation.getTermName());
+						break;
+					case ASPECT:
+						goAnnotationJson.setAspect(GOTerm.EGOAspect.fromString(annotation.getGoAspect()).abbreviation);
+						break;
+					case EVIDENCE:
+//					if(format == FileService.FILE_FORMAT.GAF){
+//						annotationString = annotationString + annotation.getGoEvidence() + separator;
+//					} else if(format == FileService.FILE_FORMAT.GPAD){
+//						annotationString = annotationString + annotation.getEcoID() + separator;
+//					}
+						goAnnotationJson.setEvidenceGo(annotation.getGoEvidence());
+						goAnnotationJson.setEvidenceEco(annotation.getEcoID());
+						break;
+					case REFERENCE:
+						String referenceString = "";
+						if (annotation.getReferences() != null) {
+							referenceString = StringUtils.arrayToDelimitedString(annotation.getReferences().toArray(), "|");
+						}
+						goAnnotationJson.setReference(referenceString);
+						break;
+					case WITH:
+						String withString = "";
+						if (annotation.getWith() != null) {
+							goAnnotationJson.setWithList(annotation.getWith());
+						}
+
+						break;
+					case TAXON:
+						goAnnotationJson.setTaxon(annotation.getTaxonomyId());
+						break;
+					case ASSIGNEDBY:
+						goAnnotationJson.setAssignedBy(annotation.getAssignedBy());
+						break;
+					case DATABASE:
+						goAnnotationJson.setDatabase(annotation.getDb());
+						break;
+					case DATE:
+						goAnnotationJson.setDate(annotation.getDate());
+						break;
+					case NAME:
+						goAnnotationJson.setName(annotation.getDbObjectName());
+						break;
+					case SYNONYM:
+						String synonymString = "";
+						if (annotation.getDbObjectSynonyms() != null) {
+							synonymString = StringUtils.arrayToDelimitedString(annotation.getDbObjectSynonyms().toArray(), "|");
+						}
+						goAnnotationJson.setSynonym(synonymString);
+						break;
+					case TYPE:
+						goAnnotationJson.setType(annotation.getDbObjectType());
+						break;
+					case TAXONNAME:
+						goAnnotationJson.setTaxonName(annotation.getTaxonomyName());
+						break;
+					case SEQUENCE:
+						goAnnotationJson.setSequence(annotation.getSequenceLength());
+						break;
+					case ORIGINALTERMID:
+						goAnnotationJson.setOriginalTermId(annotation.getGoID());
+						break;
+					case ORIGINALTERMNAME:
+						goAnnotationJson.setOriginalTermName(annotation.getTermName());
+						break;
+					default:
+						break;
+				}//End of switch
+
+			} //End of columns iteration
+
+			goAnnotationJsonList.add(goAnnotationJson);
+
+		}// End of annotations iteration
+
+		goAnnotationsContainer.setAnnotationsList(goAnnotationJsonList);
 
 
-				try {
-					writer.append(AnnotationColumn.getAnnotationColumnsForJson(annotation,columns, targetClass));
-					firstIteration=false;
-				} catch (Exception e) {
-					logger.error(e.getMessage());
-				}
-			}
-//			start = start + rows;
-//		}
-		writer.append("]");
-		return writer;
+		StringBuffer stringBuffer = new StringBuffer();
+		try {
+
+			stringBuffer.append(AnnotationColumn.toJson(goAnnotationsContainer));
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		return stringBuffer;
 	}
 
 
