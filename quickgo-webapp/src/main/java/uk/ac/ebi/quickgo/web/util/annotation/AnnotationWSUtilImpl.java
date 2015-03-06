@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.quickgo.ontology.generic.AuditRecord;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
+import uk.ac.ebi.quickgo.ontology.go.GOEvidence2ECOMap;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.ontology.go.TaxonConstraint;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
@@ -40,10 +41,7 @@ import uk.ac.ebi.quickgo.web.staticcontent.annotation.TaxonConstraintsContent;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
-import uk.ac.ebi.quickgo.webservice.model.AnnotationBlacklistJson;
-import uk.ac.ebi.quickgo.webservice.model.AnnotationPostProcessingJson;
-import uk.ac.ebi.quickgo.webservice.model.GoTermHistoryJson;
-import uk.ac.ebi.quickgo.webservice.model.TermJson;
+import uk.ac.ebi.quickgo.webservice.model.*;
 
 /**
  * Annotation WS util methods
@@ -569,6 +567,36 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		StringBuffer sb = null;
 		try {
 			sb = fileService.generateJsonFile(annotationPostProcessingJson);
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	@Override
+	public void downloadEvidenceTypes(HttpServletResponse httpServletResponse) {
+
+		Map<String,String> evidences = miscellaneousUtil.getEvidenceTypes();
+		//Map<String,String> evidenceTypes = new HashMap<>();
+
+		List<EvidenceTypeJson> evidenceTypesJson = new ArrayList<>();
+
+		// Get corresponding ECO term
+		for(String goEvidence : evidences.keySet()){
+			String ecoTerm = GOEvidence2ECOMap.find(goEvidence);
+			//evidenceTypes.put(ecoTerm, ecoTerm + " (" + goEvidence + ")\t" + evidences.get(goEvidence));
+
+			EvidenceTypeJson evidenceTypeJson = new EvidenceTypeJson();
+			evidenceTypeJson.setKey(ecoTerm);
+			evidenceTypeJson.setValue(ecoTerm + " (" + goEvidence + ")\t" + evidences.get(goEvidence));
+			evidenceTypesJson.add(evidenceTypeJson);
+		}
+
+
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(evidenceTypesJson);
 			writeOutJsonResponse(httpServletResponse, sb);
 		} catch (IOException e) {
 			e.printStackTrace();

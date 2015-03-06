@@ -554,6 +554,12 @@ public class WebServiceController {
 
 	}
 
+	@RequestMapping(value={"/evidencetypes"}, method = {RequestMethod.GET })
+	public void getEvidenceTypes(HttpServletResponse httpServletResponse){
+
+		annotationWSUtil.downloadEvidenceTypes(httpServletResponse);
+	}
+
 
 	@RequestMapping(value={"/dataset"}, method = {RequestMethod.GET })
 	public void getAnnotationUpdates(HttpServletResponse httpServletResponse){
