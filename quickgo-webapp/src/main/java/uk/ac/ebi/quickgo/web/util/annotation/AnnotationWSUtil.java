@@ -39,4 +39,6 @@ public interface AnnotationWSUtil {
 	void getAnnotationPostProcessing(HttpServletResponse httpServletResponse);
 
 	void downloadEvidenceTypes(HttpServletResponse httpServletResponse);
+
+	void downloadWithDBs(HttpServletResponse httpServletResponse);
 }

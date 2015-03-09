@@ -560,6 +560,12 @@ public class WebServiceController {
 		annotationWSUtil.downloadEvidenceTypes(httpServletResponse);
 	}
 
+	@RequestMapping(value={"/withdbs"}, method = {RequestMethod.GET })
+	public void getWithDBs(HttpServletResponse httpServletResponse){
+
+		annotationWSUtil.downloadWithDBs(httpServletResponse);
+	}
+
 
 	@RequestMapping(value={"/dataset"}, method = {RequestMethod.GET })
 	public void getAnnotationUpdates(HttpServletResponse httpServletResponse){

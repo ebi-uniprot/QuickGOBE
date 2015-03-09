@@ -604,6 +604,37 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		}
 	}
 
+	@Override
+	public void downloadWithDBs(HttpServletResponse httpServletResponse) {
+
+		//TreeMap<String, String> withs = new TreeMap<>();
+		List<DBJson> dbJsons = new ArrayList<>();
+
+		for (Miscellaneous withDB : miscellaneousService.getWithDBs()) {
+
+			List<FacetField.Count> annotations = annotationService.getFacetFields(
+					AnnotationField.WITH.getValue() + ":" + withDB.getXrefAbbreviation() + "*",
+					null,
+					AnnotationField.WITH.getValue(), 1);
+
+			if (annotations != null && !annotations.isEmpty()) {
+
+				dbJsons.add(new DBJson(withDB.getXrefAbbreviation() + "*",
+						withDB.getXrefDatabase()));
+			}
+		}
+
+
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(dbJsons);
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
 	private void writeOutJsonResponse(HttpServletResponse httpServletResponse, StringBuffer sb) throws IOException {
 		InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
 		IOUtils.copy(in, httpServletResponse.getOutputStream());
