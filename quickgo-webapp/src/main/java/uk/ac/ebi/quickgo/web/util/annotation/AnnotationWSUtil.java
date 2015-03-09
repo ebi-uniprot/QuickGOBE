@@ -41,4 +41,6 @@ public interface AnnotationWSUtil {
 	void downloadEvidenceTypes(HttpServletResponse httpServletResponse);
 
 	void downloadWithDBs(HttpServletResponse httpServletResponse);
+
+	void downloadAssignedDBs(HttpServletResponse httpServletResponse);
 }
