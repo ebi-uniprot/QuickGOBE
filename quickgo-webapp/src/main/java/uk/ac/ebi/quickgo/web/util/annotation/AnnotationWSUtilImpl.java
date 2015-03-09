@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,17 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	Map<String, GenericTerm> terms = uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTerms(); //todo this should be properly cached.
 
 	private static final Logger logger = Logger.getLogger(AnnotationWSUtilImpl.class);
+
+	//Static members acting as a cache...
+	private static List<Miscellaneous> subsetsCounts;
+	private static List<FacetField.Count> assignedByCount;
+	private static List<TaxonConstraint> taxonConstraints;
+	private static AnnotationBlacklistJson annotationBlacklistJson;
+	private static AnnotationPostProcessingJson annotationPostProcessingJson;
+	private static List<EvidenceTypeJson> evidenceTypesJson = new ArrayList<>();
+	private static List<DBJson> withDBs = new ArrayList<>();
+	private static List<DBJson> assignedByDBs = new ArrayList<>();
+
 
 	/**
 	 * Map GAnnotation columns to the *new* QuickGO ones
@@ -283,27 +295,6 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	}
 
 
-	/**
-	 * Generate a file with the annotations results
-//	 * @param query Query to run
-	 */
-//	public void downloadAnnotationsTotalInternal( String query,HttpServletResponse httpServletResponse){
-//
-//		// Get total number annotations
-//		long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
-//
-//		// Check file format
-//		StringBuffer sb = null;
-//		try {
-//			sb = fileService.generateJsonFileWithTotalAnnotations(totalAnnotations);
-//
-//			writeOutJsonResponse(httpServletResponse, sb);
-//
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			logger.error(e.getMessage());
-//		}
-//	}
 
 	@Override
 	public void downloadTerm(String termId, HttpServletResponse httpServletResponse){
@@ -406,14 +397,16 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	}
 
 
-
-
+	/**
+	 * // Calculate subsets counts for slimming
+	 * @param httpServletResponse
+	 */
 	@Override
 	public void downloadPredefinedSlims(HttpServletResponse httpServletResponse){
 
-		// Calculate subsets counts for slimming
-		List<Miscellaneous> subsetsCounts = new ArrayList<>();
-		subsetsCounts = miscellaneousUtil.getSubsetCount(null);
+		if(subsetsCounts==null) {
+			subsetsCounts = miscellaneousUtil.getSubsetCount(null);
+		}
 
 		StringBuffer sb = null;
 		try {
@@ -461,9 +454,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	@Override
 	public void downloadAnnotationUpdates(HttpServletResponse httpServletResponse) {
 
-		List<FacetField.Count> assignedByCount = annotationService.getFacetFields("*:*", null,
-				AnnotationField.ASSIGNEDBY.getValue(), 1000);
-
+		if( assignedByCount==null) {
+			assignedByCount = annotationService.getFacetFields("*:*", null, AnnotationField.ASSIGNEDBY.getValue(), 1000);
+		}
 		StringBuffer sb = null;
 		try {
 			sb = fileService.generateJsonFile(assignedByCount);
@@ -475,6 +468,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		}
 	}
 
+	//Todo - cache  the history look up?
 	@Override
 	public void downloadGoTermHistory(HttpServletResponse httpServletResponse, String from, String to, String limit) {
 
@@ -532,7 +526,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Override
 	public void downloadTaxonConstraints(HttpServletResponse httpServletResponse) {
-		List<TaxonConstraint> taxonConstraints = TaxonConstraintsContent.getTaxonConstraints();
+		if(taxonConstraints==null) {
+			taxonConstraints = TaxonConstraintsContent.getTaxonConstraints();
+		}
 		StringBuffer sb = null;
 		try {
 			sb = fileService.generateJsonFile(taxonConstraints);
@@ -543,13 +539,16 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		}
 	}
 
+
 	@Override
 	public void downloadAnnotationBlacklist(HttpServletResponse httpServletResponse){
 
-		AnnotationBlacklistJson annotationBlacklistJson = new AnnotationBlacklistJson();
-		annotationBlacklistJson.setIEAReview(annotationBlackListContent.getIEAReview());
-		annotationBlacklistJson.setBlackListNotQualified(annotationBlackListContent.getBlackListNotQualified());
-		annotationBlacklistJson.setBlackListUniProtCaution(annotationBlackListContent.getBlackListUniProtCaution());
+		if(annotationBlacklistJson==null) {
+			 annotationBlacklistJson = new AnnotationBlacklistJson();
+			annotationBlacklistJson.setIEAReview(annotationBlackListContent.getIEAReview());
+			annotationBlacklistJson.setBlackListNotQualified(annotationBlackListContent.getBlackListNotQualified());
+			annotationBlacklistJson.setBlackListUniProtCaution(annotationBlackListContent.getBlackListUniProtCaution());
+		}
 		StringBuffer sb = null;
 		try {
 			sb = fileService.generateJsonFile(annotationBlacklistJson);
@@ -562,8 +561,11 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Override
 	public void getAnnotationPostProcessing(HttpServletResponse httpServletResponse) {
-		AnnotationPostProcessingJson annotationPostProcessingJson = new AnnotationPostProcessingJson();
-		annotationPostProcessingJson.setContent(annotationPostProcessingContent.getPostProcessingRules());
+
+		if(annotationPostProcessingJson==null) {
+			annotationPostProcessingJson = new AnnotationPostProcessingJson();
+			annotationPostProcessingJson.setContent(annotationPostProcessingContent.getPostProcessingRules());
+		}
 		StringBuffer sb = null;
 		try {
 			sb = fileService.generateJsonFile(annotationPostProcessingJson);
@@ -577,20 +579,18 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	@Override
 	public void downloadEvidenceTypes(HttpServletResponse httpServletResponse) {
 
-		Map<String,String> evidences = miscellaneousUtil.getEvidenceTypes();
-		//Map<String,String> evidenceTypes = new HashMap<>();
+		if(evidenceTypesJson.isEmpty()) {
 
-		List<EvidenceTypeJson> evidenceTypesJson = new ArrayList<>();
+			Map<String, String> evidences = miscellaneousUtil.getEvidenceTypes();
 
-		// Get corresponding ECO term
-		for(String goEvidence : evidences.keySet()){
-			String ecoTerm = GOEvidence2ECOMap.find(goEvidence);
-			//evidenceTypes.put(ecoTerm, ecoTerm + " (" + goEvidence + ")\t" + evidences.get(goEvidence));
-
-			EvidenceTypeJson evidenceTypeJson = new EvidenceTypeJson();
-			evidenceTypeJson.setKey(ecoTerm);
-			evidenceTypeJson.setValue(ecoTerm + " (" + goEvidence + ")\t" + evidences.get(goEvidence));
-			evidenceTypesJson.add(evidenceTypeJson);
+			// Get corresponding ECO term
+			for (String goEvidence : evidences.keySet()) {
+				String ecoTerm = GOEvidence2ECOMap.find(goEvidence);
+				EvidenceTypeJson evidenceTypeJson = new EvidenceTypeJson();
+				evidenceTypeJson.setKey(ecoTerm);
+				evidenceTypeJson.setValue(ecoTerm + " (" + goEvidence + ")\t" + evidences.get(goEvidence));
+				evidenceTypesJson.add(evidenceTypeJson);
+			}
 		}
 
 
@@ -607,27 +607,43 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	@Override
 	public void downloadWithDBs(HttpServletResponse httpServletResponse) {
 
-		//TreeMap<String, String> withs = new TreeMap<>();
-		List<DBJson> dbJsons = new ArrayList<>();
+		if(withDBs.isEmpty()) {
+			for (Miscellaneous withDB : miscellaneousService.getWithDBs()) {
 
-		for (Miscellaneous withDB : miscellaneousService.getWithDBs()) {
+				List<FacetField.Count> annotations = annotationService.getFacetFields(
+						AnnotationField.WITH.getValue() + ":" + withDB.getXrefAbbreviation() + "*",
+						null,
+						AnnotationField.WITH.getValue(), 1);
 
-			List<FacetField.Count> annotations = annotationService.getFacetFields(
-					AnnotationField.WITH.getValue() + ":" + withDB.getXrefAbbreviation() + "*",
-					null,
-					AnnotationField.WITH.getValue(), 1);
+				if (annotations != null && !annotations.isEmpty()) {
 
-			if (annotations != null && !annotations.isEmpty()) {
-
-				dbJsons.add(new DBJson(withDB.getXrefAbbreviation() + "*",
-						withDB.getXrefDatabase()));
+					withDBs.add(new DBJson(withDB.getXrefAbbreviation() + "*",
+							withDB.getXrefDatabase()));
+				}
 			}
 		}
 
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(withDBs);
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+
+	@Override
+	public void downloadAssignedDBs(HttpServletResponse httpServletResponse) {
+
+		if (assignedByDBs.isEmpty()) {
+			populateByFacetField(assignedByDBs, AnnotationField.ASSIGNEDBY.getValue());
+		}
 
 		StringBuffer sb = null;
 		try {
-			sb = fileService.generateJsonFile(dbJsons);
+			sb = fileService.generateJsonFile(assignedByDBs);
 			writeOutJsonResponse(httpServletResponse, sb);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -646,6 +662,15 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		httpServletResponse.flushBuffer();
 	}
 
+	private void populateByFacetField(List<DBJson> dbJsons, String field){
+		List<FacetField.Count> counts = annotationService.getFacetFields("*:*", null, field, 1000);
+		for (FacetField.Count count : counts) {
+			String dbAbbreviation = count.getName();
+			String dbDescription = miscellaneousUtil.getDBInformation(ClientUtils.escapeQueryChars(dbAbbreviation)).getXrefDatabase();
+			DBJson dbJson = new DBJson(dbAbbreviation, dbDescription);
+			dbJsons.add(dbJson);
+		}
+	}
 
 
 }
