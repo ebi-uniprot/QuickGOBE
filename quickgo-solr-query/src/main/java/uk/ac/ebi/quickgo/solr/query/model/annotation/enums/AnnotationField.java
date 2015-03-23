@@ -26,9 +26,10 @@ public enum AnnotationField {
 	ANCESTORSIPOR("ancestorsIPOR"),
 	ECOANCESTORSI("ecoAncestorsI"),
 	GP2PROTEIN("gp2protein"),
-	SUBSET("subSet");
+	SUBSET("subSet"),
+	REFERENCE("dbXref");
 
-	
+
 	String value;
 
 	private AnnotationField(String value) {
