@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package uk.ac.ebi.quickgo.annotation;
 
@@ -10,14 +10,14 @@ import java.util.List;
 /**
  * Class that holds the data for one row read from a gp_association (GPAD) file
  * (i.e., a single GO annotation)
- * 
+ *
  * @author tonys
- * 
+ *
  */
 public class Annotation implements Serializable{
-	
+
 	private static final long serialVersionUID = 2592634776573970012L;
-	
+
 	private String goEvidence;
 	private String db;
 	private String dbObjectID;
@@ -31,7 +31,7 @@ public class Annotation implements Serializable{
 	private String assignedBy;
 	private List<String> references;
 	private List<String> with;
-	private List<String> qualifiers;
+	private String qualifiers;
 	private String interactingTaxID;
 	private String date;
 	private List<String> extensions;
@@ -44,7 +44,7 @@ public class Annotation implements Serializable{
 
 	// ECO Ancestors
 	private List<String> ecoAncestorsI;
-	
+
 	// Extra fields
 	private String targetSet;
 	private String goAspect;
@@ -54,14 +54,14 @@ public class Annotation implements Serializable{
 	private int sequenceLength;
 	private List<String> gp2protein;
 	private List<String> subset;
-	
+
 	public Annotation() {
 	}
 
 	public Annotation(String goEvidence, String db,
 			String dbObjectID, String goID, String ecoID, String termName, String assignedBy,
 			List<String> references, List<String> with,
-			List<String> qualifiers, String interactingTaxID, String date,
+			String qualifiers, String interactingTaxID, String date,
 			List<String> extensions, String properties) {
 
 		this.goEvidence = goEvidence;
@@ -136,11 +136,11 @@ public class Annotation implements Serializable{
 		this.references = references;
 	}
 
-	public List<String> getQualifiers() {
+	public String getQualifiers() {
 		return qualifiers;
 	}
 
-	public void setQualifiers(List<String> qualifiers) {
+	public void setQualifiers(String qualifiers) {
 		this.qualifiers = qualifiers;
 	}
 
@@ -175,7 +175,7 @@ public class Annotation implements Serializable{
 	public void setProperties(String properties) {
 		this.properties = properties;
 	}
-	
+
 	public String getGoEvidence() {
 		return goEvidence;
 	}
@@ -319,8 +319,8 @@ public class Annotation implements Serializable{
 	public void setEcoAncestorsI(List<String> ecoAncestorsI) {
 		this.ecoAncestorsI = ecoAncestorsI;
 	}
-	
-	
+
+
 	/*public String getSequence() {
 		return sequence;
 	}

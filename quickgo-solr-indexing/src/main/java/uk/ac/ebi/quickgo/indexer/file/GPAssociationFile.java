@@ -379,7 +379,7 @@ public class GPAssociationFile extends GPDataFile {
 		String assignedBy;
 		List<String> references;
 		List<String> with;
-		List<String> qualifiers;
+		String qualifiers;
 		String interactingTaxID;
 		String date;
 		String extensions;
@@ -394,7 +394,7 @@ public class GPAssociationFile extends GPDataFile {
 			this.assignedBy = columns[COLUMN_ASSIGNED_BY];
 			this.references = parsePipeSeparatedValues(columns[COLUMN_REFERENCE]);
 			this.with = parsePipeSeparatedValues(columns[COLUMN_WITH]);
-			this.qualifiers = parsePipeSeparatedValues(columns[COLUMN_QUALIFIER]);
+			this.qualifiers = columns[COLUMN_QUALIFIER];
 			this.interactingTaxID = columns[COLUMN_INTERACTING_TAXID];
 			this.date = columns[COLUMN_DATE];
 			this.extensions = columns[COLUMN_EXTENSION];
