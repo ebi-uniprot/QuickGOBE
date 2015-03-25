@@ -88,7 +88,7 @@ public class QueryProcessorImpl implements QueryProcessor{
 		if(idValue[0].equals(ECONAME) || idValue[0].equals(AnnotationField.QUALIFIER.getValue())){// Comma separated values
 			formatedValuesList = new ArrayList<>(Arrays.asList(idValue[1].split(",")));
 		} else {
-			formatedValuesList = new ArrayList<String>(	WebUtils.processFilterValues(idValue[1]));
+			formatedValuesList = new ArrayList<String>(	WebUtils.parseAndFormatFilterValues(idValue[1]));
 		}
 
 		// Remove duplicated elements
@@ -154,7 +154,6 @@ public class QueryProcessorImpl implements QueryProcessor{
 
 	/**
 	 * Change ECO filters depending on checked options
-	 * @param key ECO field used for filtering
 	 * @param filtersString Filters to apply
 	 * @param appliedFilterSet Applied filters
 	 */
