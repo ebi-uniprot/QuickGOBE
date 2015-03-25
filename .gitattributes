@@ -344,6 +344,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/annotation/SlimmingUtil.
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/annotation/SlimmingUtilImpl.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryProcessor.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryProcessorImpl.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryTo.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatisticsCalculation.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatisticsCalculationThread.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatsDownload.java -text svneol=unset#text/plain
