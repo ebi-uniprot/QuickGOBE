@@ -225,7 +225,6 @@ public class SlimmingController {
 	/**
 	 * Set slimming terms by aspect
 	 * @param session
-	 * @param model
 	 */
 	private void setSlimmingTermsByAspect(HttpSession session){
 		Map<String, String>  slimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.SLIMMING_TERMS_ATTRIBUTE, session);
