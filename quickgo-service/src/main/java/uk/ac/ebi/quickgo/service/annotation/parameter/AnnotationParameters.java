@@ -70,10 +70,13 @@ public class AnnotationParameters {
 	 */
 	private String processFields() {
 		String solrQuery = "*:*";
+
 		// List of queries
 		List<String> queries = new ArrayList<>();
+
 		// Iterate over all the parameters
 		Iterator<String> keys = parameters.keySet().iterator();
+
 		// If not, process all the fields
 		while (keys.hasNext()) {
 			String key = keys.next();
@@ -85,6 +88,7 @@ public class AnnotationParameters {
 				} catch (Exception e) {
 					continue;
 				}
+
 				String query = annotationField.getValue() + ":(";
 				// Field values
 				String values = StringUtils.arrayToDelimitedString(parameters.get(key).toArray(), " OR ");
@@ -176,5 +180,12 @@ public class AnnotationParameters {
 
 	public void setParameters(Map<String, List<String>> parameters) {
 		this.parameters = parameters;
+	}
+
+	@Override
+	public String toString() {
+		return "AnnotationParameters{" +
+				"parameters=" + parameters +
+				'}';
 	}
 }
