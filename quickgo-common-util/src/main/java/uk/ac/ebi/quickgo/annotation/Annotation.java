@@ -31,7 +31,7 @@ public class Annotation implements Serializable{
 	private String assignedBy;
 	private List<String> references;
 	private List<String> with;
-	private String qualifiers;
+	private List<String> qualifiers;
 	private String interactingTaxID;
 	private String date;
 	private List<String> extensions;
@@ -61,7 +61,7 @@ public class Annotation implements Serializable{
 	public Annotation(String goEvidence, String db,
 			String dbObjectID, String goID, String ecoID, String termName, String assignedBy,
 			List<String> references, List<String> with,
-			String qualifiers, String interactingTaxID, String date,
+			List<String> qualifiers, String interactingTaxID, String date,
 			List<String> extensions, String properties) {
 
 		this.goEvidence = goEvidence;
@@ -136,11 +136,11 @@ public class Annotation implements Serializable{
 		this.references = references;
 	}
 
-	public String getQualifiers() {
+	public  List<String> getQualifiers() {
 		return qualifiers;
 	}
 
-	public void setQualifiers(String qualifiers) {
+	public void setQualifiers( List<String> qualifiers) {
 		this.qualifiers = qualifiers;
 	}
 
