@@ -305,8 +305,8 @@ public class FileService {
 						break;
 					case QUALIFIER:
 						String qualifierString = "";
-						if (annotation.getQualifiers() != null) {
-							qualifierString = StringUtils.arrayToDelimitedString(annotation.getQualifiers().toArray(), "|");
+						if (annotation.getQualifier() != null) {
+							qualifierString =annotation.getQualifier();
 						}
 						goAnnotationJson.setQualifier(qualifierString);
 						break;
@@ -330,8 +330,8 @@ public class FileService {
 						break;
 					case REFERENCE:
 						String referenceString = "";
-						if (annotation.getReferences() != null) {
-							referenceString = StringUtils.arrayToDelimitedString(annotation.getReferences().toArray(), "|");
+						if (annotation.getReference() != null) {
+							referenceString = annotation.getReference();
 						}
 						goAnnotationJson.setReference(referenceString);
 						break;

@@ -133,8 +133,8 @@ public enum AnnotationColumn {
 					break;
 				case QUALIFIER:
 					String qualifierString = "";
-					if(annotation.getQualifiers() != null){
-						qualifierString = StringUtils.arrayToDelimitedString(annotation.getQualifiers().toArray(), "|");
+					if(annotation.getQualifier() != null){
+						qualifierString =annotation.getQualifier();
 					}
 					annotationString = annotationString + qualifierString + separator;
 					break;
@@ -156,8 +156,8 @@ public enum AnnotationColumn {
 					break;
 				case REFERENCE:
 					String referenceString = "";
-					if (annotation.getReferences() != null) {
-						referenceString = StringUtils.arrayToDelimitedString(annotation.getReferences().toArray(), "|");
+					if (annotation.getReference() != null) {
+						referenceString = annotation.getReference();
 					}
 					annotationString = annotationString + referenceString + separator;
 					break;
@@ -214,95 +214,7 @@ public enum AnnotationColumn {
 
 	public static String getAnnotationColumnsForJson(Annotation annotation, AnnotationColumn[] columns, GoAnnotationJson goAnnotationJson) throws Exception{
 
-		for(AnnotationColumn annotationColumn : columns){
 
-			switch(annotationColumn){
-				case PROTEIN:
-					goAnnotationJson.setProtein(annotation.getDbObjectID());
-					break;
-				case SYMBOL:
-					goAnnotationJson.setSymbol(annotation.getDbObjectSymbol());
-					break;
-				case QUALIFIER:
-					String qualifierString = "";
-					if(annotation.getQualifiers() != null){
-						qualifierString = StringUtils.arrayToDelimitedString(annotation.getQualifiers().toArray(), "|");
-					}
-					goAnnotationJson.setQualifier(qualifierString);
-					break;
-				case GOID:
-					goAnnotationJson.setGoId(annotation.getGoID());
-					break;
-				case TERMNAME:
-					goAnnotationJson.setTermName(annotation.getTermName());
-					break;
-				case ASPECT:
-					goAnnotationJson.setAspect(EGOAspect.fromString(annotation.getGoAspect()).abbreviation);
-					break;
-				case EVIDENCE:
-//					if(format == FileService.FILE_FORMAT.GAF){
-//						annotationString = annotationString + annotation.getGoEvidence() + separator;
-//					} else if(format == FileService.FILE_FORMAT.GPAD){
-//						annotationString = annotationString + annotation.getEcoID() + separator;
-//					}
-					goAnnotationJson.setEvidenceGo(annotation.getGoEvidence());
-					goAnnotationJson.setEvidenceEco(annotation.getEcoID());
-					break;
-				case REFERENCE:
-					String referenceString = "";
-					if (annotation.getReferences() != null) {
-						referenceString = StringUtils.arrayToDelimitedString(annotation.getReferences().toArray(), "|");
-					}
-					goAnnotationJson.setReference(referenceString);
-					break;
-				case WITH:
-					String withString = "";
-					if (annotation.getWith() != null) {
-						goAnnotationJson.setWithList(annotation.getWith());
-					}
-
-					break;
-				case TAXON:
-					goAnnotationJson.setTaxon(annotation.getTaxonomyId());
-					break;
-				case ASSIGNEDBY:
-					goAnnotationJson.setAssignedBy(annotation.getAssignedBy());
-					break;
-				case DATABASE:
-					goAnnotationJson.setDatabase(annotation.getDb());
-					break;
-				case DATE:
-					goAnnotationJson.setDate(annotation.getDate());
-					break;
-				case NAME:
-					goAnnotationJson.setName(annotation.getDbObjectName());
-					break;
-				case SYNONYM:
-					String synonymString = "";
-					if(annotation.getDbObjectSynonyms() != null){
-						synonymString = StringUtils.arrayToDelimitedString(annotation.getDbObjectSynonyms().toArray(), "|");
-					}
-					goAnnotationJson.setSynonym(synonymString);
-					break;
-				case TYPE:
-					goAnnotationJson.setType(annotation.getDbObjectType());
-				break;
-				case TAXONNAME:
-					goAnnotationJson.setTaxonName(annotation.getTaxonomyName());
-					break;
-				case SEQUENCE:
-					goAnnotationJson.setSequence(annotation.getSequenceLength());
-					break;
-				case ORIGINALTERMID:
-					goAnnotationJson.setOriginalTermId(annotation.getGoID());
-					break;
-				case ORIGINALTERMNAME:
-					goAnnotationJson.setOriginalTermName(annotation.getTermName());
-					break;
-				default:
-					break;
-			}
-		}
 		StringWriter writer = new StringWriter();
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.writeValue(writer, goAnnotationJson);
@@ -323,46 +235,50 @@ public enum AnnotationColumn {
 									   List<COOccurrenceStatsTerm> nonIEAStats, TermJson termJson) throws Exception{
 
 		//Move in Term information
-		termJson.setTermId(term.getId());
-		termJson.setName(term.getName());
-		termJson.setActive(term.active());
-		termJson.setIsGoTerm(term.isGOTerm());
-		termJson.setAspectDescription(term.getAspectDescription());
-		termJson.setgetDefinition(term.getDefinition());
-		termJson.setDefinitionXrefs(term.getDefinitionXrefs());
-		termJson.setUsage(term.getUsage());
-		termJson.setComment(term.getComment());
-		termJson.setAltIds(term.getAltIds());
-		termJson.setAltIdsString(term.getAltIdsString());
-		termJson.setCredits(term.getCredits());
-		termJson.setSynonyms(term.getSynonyms());
-		termJson.setTaxonConstraints(term.getTaxonConstraints());
-		termJson.setGuidelines(term.getGuidelines());
-		termJson.setCrossOntologyRelations(term.getCrossOntologyRelations());
-		termJson.setSubsets(term.getSubsets());
-		termJson.setXrefs(term.getXrefs());
-		termJson.setReplaces(term.getReplaces());
-		termJson.setReplacements(term.getReplacements());
-		termJson.setHistory(term.getHistory());
+		try {
+			termJson.setTermId(term.getId());
+			termJson.setName(term.getName());
+//			termJson.setActive(term.active());
+//			termJson.setIsGoTerm(term.isGOTerm());
+			termJson.setAspectDescription(term.getAspectDescription());
+//			termJson.setgetDefinition(term.getDefinition());
+//			termJson.setDefinitionXrefs(term.getDefinitionXrefs());
+//			termJson.setUsage(term.getUsage());
+//			termJson.setComment(term.getComment());
+//			termJson.setAltIds(term.getAltIds());
+//			termJson.setAltIdsString(term.getAltIdsString());
+//			termJson.setCredits(term.getCredits());
+//			termJson.setSynonyms(term.getSynonyms());
+//			termJson.setTaxonConstraints(term.getTaxonConstraints());
+//			termJson.setGuidelines(term.getGuidelines());
+//			termJson.setCrossOntologyRelations(term.getCrossOntologyRelations());
+//			termJson.setSubsets(term.getSubsets());
+//			termJson.setXrefs(term.getXrefs());
+//			termJson.setReplaces(term.getReplaces());
+//			termJson.setReplacements(term.getReplacements());
+//			termJson.setHistory(term.getHistory());
+//
+//			List<ChildTermRelationJson> childRelationsJson = new ArrayList<>();
 
-		List<ChildTermRelationJson> childRelationsJson = new ArrayList<>();
+			//Move in child term relations
+//		for (TermRelation childTermsRelation : childTermsRelations){
+//			ChildTermRelationJson childTermRelationJson = new ChildTermRelationJson();
+//
+//			GenericTerm aChild = childTermsRelation.getChild();
+//			childTermRelationJson.setId(aChild.getId());
+//			childTermRelationJson.setName(aChild.getName());
+//
+//			childTermRelationJson.setTypeOf(childTermsRelation.getTypeof());
+//			childRelationsJson.add(childTermRelationJson);
+//		}
+//		termJson.setChildTermsRelations(childRelationsJson);
 
-		//Move in child term relations
-		for (TermRelation childTermsRelation : childTermsRelations){
-			ChildTermRelationJson childTermRelationJson = new ChildTermRelationJson();
-
-			GenericTerm aChild = childTermsRelation.getChild();
-			childTermRelationJson.setId(aChild.getId());
-			childTermRelationJson.setName(aChild.getName());
-
-			childTermRelationJson.setTypeOf(childTermsRelation.getTypeof());
-			childRelationsJson.add(childTermRelationJson);
+			//Stats
+			termJson.setAllCoOccurrenceStatsTerms(allStats);
+			termJson.setNonIEACOOccurrenceStatistics(nonIEAStats);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		termJson.setChildTermsRelations(childRelationsJson);
-
-		//Stats
-		termJson.setAllCoOccurrenceStatsTerms(allStats);
-		termJson.setNonIEACOOccurrenceStatistics(nonIEAStats);
 
 
 		//Write out object

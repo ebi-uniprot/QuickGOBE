@@ -22,32 +22,32 @@ import uk.ac.ebi.quickgo.web.util.term.XRefBean;
 public class URLsResolverImpl implements URLsResolver{
 
 	private static String EXAMPLE_ID = "[example_id]";
-	
+
 	@Autowired
 	MiscellaneousUtil miscellaneousUtil;
-	
+
 	/**
 	 * Set databases URL for a given annotation
 	 * @param annotationBean Annotation
 	 */
 	public void setURLs(AnnotationBean annotationBean) {
 		// DB
-		Miscellaneous xrefInformation = miscellaneousUtil.getDBInformation(annotationBean.getAnnotation().getDb());				
+		Miscellaneous xrefInformation = miscellaneousUtil.getDBInformation(annotationBean.getAnnotation().getDb());
 		annotationBean.setDb(new NameURL(xrefInformation.getXrefAbbreviation(), xrefInformation.getXrefGenericURL()));
-		
-		// DB Object ID						
+
+		// DB Object ID
 		String elementURL = xrefInformation.getXrefUrlSyntax().replace(EXAMPLE_ID, annotationBean.getAnnotation().getDbObjectID());
 		annotationBean.setDbObjectID(new NameURL(annotationBean.getAnnotation().getDbObjectID(), elementURL));
-		
+
 		// Reference
-		xrefInformation = miscellaneousUtil.getDBInformation(annotationBean.getAnnotation().getReferences().get(0).split(":")[0]);//Index 0 contains database ID
-		elementURL = xrefInformation.getXrefUrlSyntax().replace(EXAMPLE_ID, annotationBean.getAnnotation().getReferences().get(0).split(":")[1]);//Index 1 contains database element 
-		annotationBean.setReferences(new NameURL(annotationBean.getAnnotation().getReferences().get(0), elementURL));
-		
+		xrefInformation = miscellaneousUtil.getDBInformation(annotationBean.getAnnotation().getReference().split(":")[0]);//Index 0 contains database ID
+		elementURL = xrefInformation.getXrefUrlSyntax().replace(EXAMPLE_ID, annotationBean.getAnnotation().getReference().split(":")[1]);//Index 1 contains database element
+		annotationBean.setReferences(new NameURL(annotationBean.getAnnotation().getReference(), elementURL));
+
 		// Assigned by
 		xrefInformation = miscellaneousUtil.getDBInformation(annotationBean.getAnnotation().getAssignedBy());
-		annotationBean.setAssignedBy(new NameURL(annotationBean.getAnnotation().getAssignedBy(), xrefInformation.getXrefGenericURL()));		
-		
+		annotationBean.setAssignedBy(new NameURL(annotationBean.getAnnotation().getAssignedBy(), xrefInformation.getXrefGenericURL()));
+
 		//With
 		List<NameURL> nameURLs = new ArrayList<>();
 		List<String> withs = annotationBean.getAnnotation().getWith();
@@ -59,7 +59,7 @@ public class URLsResolverImpl implements URLsResolver{
 				}
 				xrefInformation = miscellaneousUtil.getDBInformation(withs.get(i).split(":", 2)[0]);
 				if(xrefInformation.getXrefUrlSyntax() != null){
-					String id = withs.get(i).split(":", 2)[1];					
+					String id = withs.get(i).split(":", 2)[1];
 					elementURL = xrefInformation.getXrefUrlSyntax().replace(EXAMPLE_ID, id);// id contains the database element
 					nameURLs.add(new NameURL(withs.get(i) + separator, elementURL));
 				}
@@ -67,7 +67,7 @@ public class URLsResolverImpl implements URLsResolver{
 		}
 		annotationBean.setWith(nameURLs);
 	}
-	
+
 	/**
 	 * Calculate generic URL for a list of cross-references
 	 * @param xRefs Cross-references
@@ -83,7 +83,7 @@ public class URLsResolverImpl implements URLsResolver{
 				url = xrefInformation.getXrefUrlSyntax().replace(EXAMPLE_ID, xRef.getId());
 			}
 			XRefBean xRefBean =	new XRefBean(xRef.getDb(), xRef.getId(), new NameURL(name, url));
-			
+
 			refBeans.add(xRefBean);
 		}
 		return refBeans;

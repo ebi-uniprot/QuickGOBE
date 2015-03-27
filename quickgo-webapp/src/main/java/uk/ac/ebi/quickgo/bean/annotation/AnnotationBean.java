@@ -20,7 +20,7 @@ public class AnnotationBean implements Serializable{
 	private static final long serialVersionUID = -4850838934084333982L;
 
 	Annotation annotation;
-	
+
 	// Attributes that contain URL
 	NameURL db;
 	NameURL dbObjectID;
@@ -28,19 +28,19 @@ public class AnnotationBean implements Serializable{
 	NameURL references;
 	NameURL assignedBy;
 	List<NameURL> with;
-	
+
 	String termIDSlimmingToString;
 	NameURL termIDSlimmingTo;
 	String termNameSlimmingTo;
-	
-	public AnnotationBean(Annotation annotation) {		
+
+	public AnnotationBean(Annotation annotation) {
 		this.annotation = annotation;
-	}	
-	
-	public NameURL getDb() {
-		return this.db;		
 	}
-	
+
+	public NameURL getDb() {
+		return this.db;
+	}
+
 	public void setDb(NameURL db) {
 		this.db = db;
 	}
@@ -48,11 +48,11 @@ public class AnnotationBean implements Serializable{
 	public NameURL getGoEvidence() {
 		return new NameURL(annotation.getGoEvidence(), "http://www.geneontology.org/GO.evidence.shtml#" + annotation.getGoEvidence().toLowerCase());
 	}
-	
+
 	public NameURL getDbObjectID() {
 		return this.dbObjectID;
-	}	
-	
+	}
+
 	public void setDbObjectID(NameURL dbObjectID) {
 		this.dbObjectID = dbObjectID;
 	}
@@ -72,26 +72,26 @@ public class AnnotationBean implements Serializable{
 	public String getDbObjectSynonyms() {
 		if (annotation.getDbObjectSynonyms() != null) {
 			return StringUtils.arrayToDelimitedString(annotation.getDbObjectSynonyms().toArray(), " | ");
-		}		
+		}
 		return "";
 	}
 
-	public NameURL getGoID() {		
+	public NameURL getGoID() {
 		return new NameURL(annotation.getGoID(), "");
 	}
-	
+
 	public String getEcoID() {
 		return annotation.getEcoID();
 	}
 
-	public String getTermName() {				
+	public String getTermName() {
 		return annotation.getTermName();
 	}
 
 	public NameURL getAssignedBy() {
-		return this.assignedBy;		
-	}	
-	
+		return this.assignedBy;
+	}
+
 	public void setAssignedBy(NameURL assignedBy) {
 		this.assignedBy = assignedBy;
 	}
@@ -99,7 +99,7 @@ public class AnnotationBean implements Serializable{
 	public NameURL getReferences() {
 		return this.references;
 	}
-	
+
 	public void setReferences(NameURL references) {
 		this.references = references;
 	}
@@ -107,13 +107,13 @@ public class AnnotationBean implements Serializable{
 	public List<NameURL> getWith() {
 		return this.with;
 	}
-	
+
 	public void setWith(List<NameURL> with) {
 		this.with = with;
 	}
 
 	public String getQualifiers() {
-		return annotation.getQualifiers().get(0);
+		return annotation.getQualifier();
 	}
 
 	public String getInteractingTaxID() {
@@ -159,7 +159,7 @@ public class AnnotationBean implements Serializable{
 	public NameURL getTaxonomyId() {
 		return new NameURL(String.valueOf(annotation.getTaxonomyId()), "http://www.uniprot.org/taxonomy/" + annotation.getTaxonomyId());
 	}
-	
+
 	public String getTaxonomyName() {
 		return annotation.getTaxonomyName();
 	}
@@ -191,7 +191,7 @@ public class AnnotationBean implements Serializable{
 	public void setTermIDSlimmingToString(String termIDSlimmingToString) {
 		this.termIDSlimmingToString = termIDSlimmingToString;
 	}
-	
+
 	public String getExtension() {
 		List<String> formattedExtensions = new ArrayList<>();
 		if (annotation.getExtensions() != null) {
@@ -212,7 +212,7 @@ public class AnnotationBean implements Serializable{
 		}
 		return "";
 	}
-	
+
 	/**
 	 * Format an annotation extension
 	 * @param extension Extension to format
