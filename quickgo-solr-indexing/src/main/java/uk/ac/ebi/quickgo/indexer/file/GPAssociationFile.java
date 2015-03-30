@@ -170,7 +170,7 @@ public class GPAssociationFile extends GPDataFile {
 
 		// Create annotation
 		Annotation annotation = new Annotation(goEvidence, gpaFile.db, gpaFile.dbObjectID, gpaFile.goID, gpaFile.ecoID,
-				term.getName(), gpaFile.assignedBy, gpaFile.references, gpaFile.with, gpaFile.qualifiers,
+				term.getName(), gpaFile.assignedBy, gpaFile.reference, gpaFile.with, gpaFile.qualifier,
 				gpaFile.interactingTaxID, gpaFile.date, extensionsList, gpaFile.properties);
 
 		//GP2Protein identifiers
@@ -377,9 +377,9 @@ public class GPAssociationFile extends GPDataFile {
 		String goID;
 		String ecoID;
 		String assignedBy;
-		List<String> references;
+		String reference;
 		List<String> with;
-		String qualifiers;
+		String qualifier;
 		String interactingTaxID;
 		String date;
 		String extensions;
@@ -392,9 +392,9 @@ public class GPAssociationFile extends GPDataFile {
 			this.goID = columns[COLUMN_GO_ID];
 			this.ecoID = columns[COLUMN_EVIDENCE];
 			this.assignedBy = columns[COLUMN_ASSIGNED_BY];
-			this.references = parsePipeSeparatedValues(columns[COLUMN_REFERENCE]);
+			this.reference = columns[COLUMN_REFERENCE];
 			this.with = parsePipeSeparatedValues(columns[COLUMN_WITH]);
-			this.qualifiers = columns[COLUMN_QUALIFIER];
+			this.qualifier = columns[COLUMN_QUALIFIER];
 			this.interactingTaxID = columns[COLUMN_INTERACTING_TAXID];
 			this.date = columns[COLUMN_DATE];
 			this.extensions = columns[COLUMN_EXTENSION];
