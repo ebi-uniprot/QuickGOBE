@@ -76,6 +76,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-ejb-plugin</artifactId>
+                <version>2.4</version>
 				<configuration>
 					<ejbVersion>3.0</ejbVersion>
 					<clientIncludes></clientIncludes>
