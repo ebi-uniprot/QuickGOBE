@@ -29,9 +29,9 @@ public class Annotation implements Serializable{
 	private String ecoID;
 	private String termName;
 	private String assignedBy;
-	private List<String> references;
+	private String reference;
 	private List<String> with;
-	private List<String> qualifiers;
+	private String qualifier;
 	private String interactingTaxID;
 	private String date;
 	private List<String> extensions;
@@ -60,8 +60,8 @@ public class Annotation implements Serializable{
 
 	public Annotation(String goEvidence, String db,
 			String dbObjectID, String goID, String ecoID, String termName, String assignedBy,
-			List<String> references, List<String> with,
-			List<String> qualifiers, String interactingTaxID, String date,
+			String reference, List<String> with,
+			String qualifier, String interactingTaxID, String date,
 			List<String> extensions, String properties) {
 
 		this.goEvidence = goEvidence;
@@ -71,9 +71,9 @@ public class Annotation implements Serializable{
 		this.ecoID = ecoID;
 		this.termName = termName;
 		this.assignedBy = assignedBy;
-		this.references = references;
+		this.reference = reference;
 		this.with = with;
-		this.qualifiers = qualifiers;
+		this.qualifier = qualifier;
 		this.interactingTaxID = interactingTaxID;
 		this.date = date;
 		this.extensions = extensions;
@@ -128,20 +128,20 @@ public class Annotation implements Serializable{
 		this.with = with;
 	}
 
-	public List<String> getReferences() {
-		return references;
+	public String getReference() {
+		return reference;
 	}
 
-	public void setReferences(List<String> references) {
-		this.references = references;
+	public void setReference(String reference) {
+		this.reference = reference;
 	}
 
-	public  List<String> getQualifiers() {
-		return qualifiers;
+	public  String getQualifier() {
+		return qualifier;
 	}
 
-	public void setQualifiers( List<String> qualifiers) {
-		this.qualifiers = qualifiers;
+	public void setQualifier( String qualifier) {
+		this.qualifier = qualifier;
 	}
 
 	public String getInteractingTaxID() {
