@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.indexer;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -9,9 +10,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Process to index all the information in Solr
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 public class QuickGOIndexerProcess {
 
@@ -21,17 +22,20 @@ public class QuickGOIndexerProcess {
 
 		/**
 		 * We can use this method for indexing the data in Solr for the moment
-		 * 
+		 *
 		 * @param args
 		 */
 		public static void main(String[] args) {
 
 			appContext = new ClassPathXmlApplicationContext("common-beans.xml",	"indexing-beans.xml", "query-beans.xml");
 			quickGOIndexer = (QuickGOIndexer) appContext.getBean("quickGOIndexer");
-			String start = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+			String start = DateFormat.getInstance().format(Calendar.getInstance().getTime());
+			System.out.println("================================================================");
 			System.out.println("STARTED: " + start);
+			System.out.println("================================================================");
 			quickGOIndexer.index();
-			String end = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-			System.out.println("DONE: " + end);
-		}	
+			System.out.println("================================================================");
+			System.out.println("DONE: " + DateFormat.getInstance().format(Calendar.getInstance().getTime()));
+			System.out.println("================================================================");
+		}
 }
