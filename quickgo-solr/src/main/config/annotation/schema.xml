@@ -98,7 +98,7 @@
         <field name="ecoAncestorsI" type="string" indexed="true" stored="false" multiValued="true"  />
 
 	<!-- Cross references -->
-	<field name="dbXref" type="string" indexed="true" stored="true" multiValued="true"  />
+	<field name="dbXref" type="string" indexed="true" stored="true" multiValued="false"  />
 
 	<!-- Interacting With -->
 	<field name="with" type="string" indexed="true" stored="true" multiValued="true"  />
