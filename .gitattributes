@@ -356,6 +356,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolverImpl.jav
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationBlacklistJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationPostProcessingJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationUpdatersJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/ChartJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/ChildTermRelationJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/DBJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/EvidenceTypeJson.java -text

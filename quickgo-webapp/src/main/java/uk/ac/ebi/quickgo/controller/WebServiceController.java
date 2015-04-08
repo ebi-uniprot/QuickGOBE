@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.URLDecoder;
 import java.util.*;
 
 import javax.imageio.ImageIO;
@@ -14,19 +13,18 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.bean.annotation.AnnotationBean;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 
+import uk.ac.ebi.quickgo.graphics.ImageArchive;
 import uk.ac.ebi.quickgo.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationBlacklist.BlacklistEntryMinimal;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationExtensionRelations;
@@ -46,17 +44,18 @@ import uk.ac.ebi.quickgo.web.staticcontent.annotation.AnnotationBlackListContent
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.TaxonConstraintsContent;
 import uk.ac.ebi.quickgo.web.util.ChartService;
 import uk.ac.ebi.quickgo.web.util.FileService;
-import uk.ac.ebi.quickgo.web.util.View;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationColumn;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationWSUtil;
 import uk.ac.ebi.quickgo.web.util.annotation.AppliedFilterSet;
 import uk.ac.ebi.quickgo.web.util.annotation.SlimmingUtil;
 import uk.ac.ebi.quickgo.web.util.query.QueryProcessor;
+import uk.ac.ebi.quickgo.web.util.query.QueryTo;
 import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import uk.ac.ebi.quickgo.web.util.url.URLsResolver;
+import uk.ac.ebi.quickgo.webservice.model.ChartJson;
 
 /**
  * REST services controller
@@ -479,36 +478,25 @@ public class WebServiceController {
 			@RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter)
 			throws UnsupportedEncodingException {
 
-
-		AppliedFilterSet appliedFilterSet = new AppliedFilterSet();
-
+		System.out.println("The query passed to the Webservice controller is " + query);
+		//query = "\"goID\":\"GO:0033014\",\"ancestorsIPO\":\"ancestorsIPO\",";
+		//System.out.println("The query hardcoded is " + query);
 
 		// Calculate Annotations Parameters from Query parameter
-		AnnotationParameters annotationParameters = new AnnotationParameters();
+		QueryTo queryTo = new QueryTo();
+		AnnotationParameters annotationParameters = queryTo.queryToAnnotationParameters(query, Boolean.valueOf(advancedFilter));
+		System.out.println("Annotation Parameters: " + annotationParameters);
 
-		// Process query
-		queryProcessor.processQuery(query, annotationParameters, appliedFilterSet, Boolean.valueOf(advancedFilter));
-
-		annotationParameters.setParameters(new HashMap<String, List<String>>(appliedFilterSet.getParameters()));
+		// Calculate Applied Filter from Query parameter
+		AppliedFilterSet appliedFilterSet = queryTo.queryToAppliedFilterSet(query, Boolean.valueOf(advancedFilter));
+		System.out.println("Applied Filter Set: " + appliedFilterSet);
 
 		// Create query from filter values
 		String solrQuery = annotationParameters.toSolrQuery();
-
-		// Retrieve annotations
-		List<Annotation> annotations = annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
-
-		// Create annotation wrappers
-		List<AnnotationBean> annotationBeans = new ArrayList<>();
-
-		for (Annotation annotation : annotations) {
-			List<String> slimValue = appliedFilterSet.getParameters().get("slim");
-			List<String> filterGOIds = appliedFilterSet.getParameters().get(AnnotationField.ANCESTORSIPO.getValue());
-			AnnotationBean annotationBean = slimmingUtil.calculateOriginalAndSlimmingTerm(annotation, filterGOIds, slimValue);
-			urLsResolver.setURLs(annotationBean);
-			annotationBeans.add(annotationBean);
-		}
+		System.out.println("Solr Query: " + solrQuery);
 
 
+		//todo should we be using the annotation service?
 		String format = "JSON";					//ignored
 		AnnotationColumn[] columns = new AnnotationColumn[0];	//ignored
 		annotationWSUtil.downloadAnnotationsInternal(format, solrQuery, columns, Integer.valueOf(limit),
@@ -610,6 +598,18 @@ public class WebServiceController {
 	@RequestMapping(value = { "/dataset/annotationPostProcessing"},  method = { RequestMethod.GET })
 	public void getAnnotationPostProcessing(HttpServletResponse httpServletResponse){
 		annotationWSUtil.getAnnotationPostProcessing(httpServletResponse);
+	}
+
+
+	@RequestMapping("/chartfull")
+	public void generateChart(HttpServletResponse httpServletResponse,
+			@RequestParam(value = "ids", required = true, defaultValue = "") String ids,
+			@RequestParam(value = "scope", required = false, defaultValue = "") String scope){
+
+		annotationWSUtil.downloadChartFullModel(httpServletResponse,ids,scope);
+
+
+
 	}
 
 	//----------------------- End of public interface   ------------------------------------ //

@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import uk.ac.ebi.quickgo.graphics.ImageArchive;
+import uk.ac.ebi.quickgo.graphics.TermNode;
 import uk.ac.ebi.quickgo.ontology.generic.AuditRecord;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
@@ -39,10 +41,13 @@ import uk.ac.ebi.quickgo.util.term.TermUtil;
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.AnnotationBlackListContent;
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.AnnotationPostProcessingContent;
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.TaxonConstraintsContent;
+import uk.ac.ebi.quickgo.web.util.ChartService;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
 import uk.ac.ebi.quickgo.webservice.model.*;
+
+import static uk.ac.ebi.quickgo.webservice.model.ChartJson.*;
 
 /**
  * Annotation WS util methods
@@ -76,6 +81,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Autowired
 	AnnotationPostProcessingContent annotationPostProcessingContent;
+
+	@Autowired
+	ChartService chartService;
 
 	// All go terms
 	Map<String, GenericTerm> terms = uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTerms(); //todo this should be properly cached.
@@ -644,6 +652,38 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		StringBuffer sb = null;
 		try {
 			sb = fileService.generateJsonFile(assignedByDBs);
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	@Override
+	public void downloadChartFullModel(HttpServletResponse httpServletResponse, String ids, String scope) {
+
+		chartService.createChart(ids,scope);
+
+		String src = ImageArchive.store(chartService.getGraphImage());
+
+		ChartJson chartJson = new ChartJson();
+		Collection<TermNode> ontTerms = chartService.getGraphImage().getOntologyTerms();
+		for (Iterator<TermNode> iterator = ontTerms.iterator();iterator.hasNext();) {
+			TermNode next = iterator.next();
+			chartJson.addLayoutNode(chartJson.new LayoutNode(next.getId(),next.left(), next.right(), next.top(), next.bottom()));
+		}
+		chartJson.setLegendNodes(chartService.getGraphImage().legend);
+		chartJson.setGraphImageSrc(src);
+		chartJson.setGraphImageWidth(chartService.getRenderableImage().getWidth());
+		chartJson.setGraphImageHeight(chartService.getRenderableImage().getHeight());
+		chartJson.setTermsToDisplay(chartService.getTermsToDisplay());
+
+
+
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(chartJson);
+
 			writeOutJsonResponse(httpServletResponse, sb);
 		} catch (IOException e) {
 			e.printStackTrace();
