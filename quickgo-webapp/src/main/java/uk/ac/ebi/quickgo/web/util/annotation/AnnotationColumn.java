@@ -238,39 +238,39 @@ public enum AnnotationColumn {
 		try {
 			termJson.setTermId(term.getId());
 			termJson.setName(term.getName());
-//			termJson.setActive(term.active());
-//			termJson.setIsGoTerm(term.isGOTerm());
+			termJson.setActive(term.active());
+			termJson.setIsGoTerm(term.isGOTerm());
 			termJson.setAspectDescription(term.getAspectDescription());
-//			termJson.setgetDefinition(term.getDefinition());
-//			termJson.setDefinitionXrefs(term.getDefinitionXrefs());
-//			termJson.setUsage(term.getUsage());
-//			termJson.setComment(term.getComment());
-//			termJson.setAltIds(term.getAltIds());
-//			termJson.setAltIdsString(term.getAltIdsString());
-//			termJson.setCredits(term.getCredits());
-//			termJson.setSynonyms(term.getSynonyms());
-//			termJson.setTaxonConstraints(term.getTaxonConstraints());
-//			termJson.setGuidelines(term.getGuidelines());
-//			termJson.setCrossOntologyRelations(term.getCrossOntologyRelations());
-//			termJson.setSubsets(term.getSubsets());
-//			termJson.setXrefs(term.getXrefs());
-//			termJson.setReplaces(term.getReplaces());
-//			termJson.setReplacements(term.getReplacements());
-//			termJson.setHistory(term.getHistory());
-//
-//			List<ChildTermRelationJson> childRelationsJson = new ArrayList<>();
+			termJson.setgetDefinition(term.getDefinition());
+			termJson.setDefinitionXrefs(term.getDefinitionXrefs());
+			termJson.setUsage(term.getUsage());
+			termJson.setComment(term.getComment());
+			termJson.setAltIds(term.getAltIds());
+			termJson.setAltIdsString(term.getAltIdsString());
+			termJson.setCredits(term.getCredits());
+			termJson.setSynonyms(term.getSynonyms());
+			termJson.setTaxonConstraints(term.getTaxonConstraints());
+			termJson.setGuidelines(term.getGuidelines());
+			termJson.setCrossOntologyRelations(term.getCrossOntologyRelations());
+			termJson.setSubsets(term.getSubsets());
+			termJson.setXrefs(term.getXrefs());
+			termJson.setReplaces(term.getReplaces());
+			termJson.setReplacements(term.getReplacements());
+			termJson.setHistory(term.getHistory());
+
+			List<ChildTermRelationJson> childRelationsJson = new ArrayList<>();
 
 			//Move in child term relations
-//		for (TermRelation childTermsRelation : childTermsRelations){
-//			ChildTermRelationJson childTermRelationJson = new ChildTermRelationJson();
-//
-//			GenericTerm aChild = childTermsRelation.getChild();
-//			childTermRelationJson.setId(aChild.getId());
-//			childTermRelationJson.setName(aChild.getName());
-//
-//			childTermRelationJson.setTypeOf(childTermsRelation.getTypeof());
-//			childRelationsJson.add(childTermRelationJson);
-//		}
+		for (TermRelation childTermsRelation : childTermsRelations){
+			ChildTermRelationJson childTermRelationJson = new ChildTermRelationJson();
+
+			GenericTerm aChild = childTermsRelation.getChild();
+			childTermRelationJson.setId(aChild.getId());
+			childTermRelationJson.setName(aChild.getName());
+
+			childTermRelationJson.setTypeOf(childTermsRelation.getTypeof());
+			childRelationsJson.add(childTermRelationJson);
+		}
 //		termJson.setChildTermsRelations(childRelationsJson);
 
 			//Stats
