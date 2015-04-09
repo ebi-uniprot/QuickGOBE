@@ -76,19 +76,6 @@ public class ChartJson {
 		return termsToDisplay;
 	}
 
-//	public void removeRecursiveData() {
-//
-//
-//		for (Iterator<TermNode> iterator = termNodes.iterator();iterator.hasNext();) {
-//			TermNode next = iterator.next();
-//			next.getTerm().children=null;
-//			next.getTerm().parents=null;
-//			next.getTerm().ancestry=null;
-//			GenericTerm term = next.getTerm();
-//			term=null;
-//
-//		}
-//	}
 
 	 public class LayoutNode{
 		 private final String id;
