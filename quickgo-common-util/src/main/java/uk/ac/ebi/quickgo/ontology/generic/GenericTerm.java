@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package uk.ac.ebi.quickgo.ontology.generic;
 
@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.springframework.util.StringUtils;
 
 import uk.ac.ebi.quickgo.ontology.eco.ECOTerm;
@@ -23,19 +25,20 @@ import uk.ac.ebi.quickgo.util.XRef;
 
 /**
  * Class that represents a term in a GenericOntology
- * 
+ *
  * @author tonys
  *
  */
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
 	public String id;
 	public String name;
 	public boolean isObsolete;
-	
+
     public static final String ALT_ID = "ALT_ID";
     public static final String CONSIDER = "consider";
     public static final String REPLACED_BY = "replaced_by";
-    
+
     public List<TermRelation> parents = new ArrayList<>();
     public List<TermRelation> children = new ArrayList<>();
     private List<TermRelation> ancestors;
@@ -52,9 +55,9 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
     public List<CrossOntologyRelation> crossOntologyRelations = new ArrayList<>();
     public String definition;
     public String comment;
-    
+
     public Map<String, List<GenericTerm>> ancestry = new HashMap<>();
-     
+
     public GenericTerm() {
 	}
 
@@ -71,7 +74,7 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
 	public void addCredit(TermCredit credit) {
 		credits.add(credit);
 	}
-	
+
     public void addCrossOntologyRelation(String relation, String foreignNamespace, String foreignID, String foreignTerm, String url) {
         crossOntologyRelations.add(new CrossOntologyRelation(relation, foreignNamespace, foreignID, foreignTerm, url));
     }
@@ -142,20 +145,20 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
     public List<GenericTerm> getAllAncestors() {
         return getFilteredAncestors(null);
     }
-    
+
     /**
      * return the set of terms that feature somewhere in this term's ancestry, as traversed over a specified set of relation type
-     * 
+     *
      * @param relationCodes - a string containing codes that represent the relation types (cf {@link RelationType} for details)
      *                        examples:
      *                           relation types for is_a: "I="
      *                           relation types for is_a, part_of, occurs_in: "I=PO"
      *                           relation types for is_a, part_of, occurs_in & all regulates relations: "I=POR+-"
-     *                           
+     *
      * @return the set of GenericTerm objects that are part of this term's ancestry
      */
     public List<GenericTerm> getAncestry(String relationCodes) {
-    	// have we passed this way before? 
+    	// have we passed this way before?
     	List<GenericTerm> anc = ancestry.get(relationCodes);
     	if (anc == null) {
     		// no, so calculate the set of ancestor terms...
@@ -174,7 +177,7 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
     public List<GenericTerm> getAncestry(EnumSet<RelationType> relationTypes) {
     	return this.getAncestry(RelationType.toCodes(relationTypes));
     }
-    
+
     public BitSet getAncestors(GenericTerm[] terms, EnumSet<RelationType> relations) {
         BitSet results = new BitSet();
         List<GenericTerm> anc = getFilteredAncestors(relations);
@@ -295,22 +298,22 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
     public static class MinimalTermInfo {
 		public String id;
 		public String name;
-	
+
 		public MinimalTermInfo(String id, String name) {
 			this.id = id;
 			this.name = name;
 		}
-		
+
 		public MinimalTermInfo(String id) {
-			this.id = id;			
+			this.id = id;
 		}
 	}
 
 	/**
 	 * get minimal information about the term
-	 * 
+	 *
 	 * may be overridden in child classes to extend the set of data returned
-	 * 
+	 *
 	 * @return a MinimalTermInfo object containing the id and name of the term
 	 */
     public MinimalTermInfo getMinimalTermInfo() {
@@ -327,14 +330,14 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
 		map.put("obsolete", isObsolete);
 		map.put("comment", comment);
 		map.put("definition", definition);
-		
+
 	    Set<String> lineage = new HashSet<>();
 	    for (TermRelation r : getAncestors()) {
 		    if (r.typeof.polarity != RelationType.Polarity.NEGATIVE) {
 				lineage.add(r.parent.getId());
 		    }
-	    }	    
-		map.put("ancestors", lineage);	 
+	    }
+		map.put("ancestors", lineage);
 		return map;
 	}
 
@@ -397,7 +400,7 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
 		}
 		return StringUtils.arrayToDelimitedString(altIdsString.toArray(), ", ");
 	}
-	
+
 	public void setAltIds(List<XRef> altIds) {
 		this.altIds = altIds;
 	}
@@ -429,7 +432,7 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
 		}
 		return subSetNames;
 	}
-	
+
 	public void setSubsets(List<GenericTermSet> subsets) {
 		this.subsets = subsets;
 	}
@@ -464,8 +467,8 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
 
 	public void setComment(String comment) {
 		this.comment = comment;
-	}	
-	
+	}
+
 	public List<XRef> getDefinitionXrefs() {
 		return definitionXrefs;
 	}
@@ -507,15 +510,15 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	public void addQCCheck(String s) {
 		// default is a no-op, as this will mean different things for different types of term
 	}
-	
+
 	public boolean isGOTerm(){
 		return this.getId().startsWith(GOTerm.GO);
 	}
-	
+
 	public boolean isECOTerm(){
 		return this.getId().startsWith(ECOTerm.ECO);
 	}
@@ -527,5 +530,5 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
 	public void setCrossOntologyRelations(
 			List<CrossOntologyRelation> crossOntologyRelations) {
 		this.crossOntologyRelations = crossOntologyRelations;
-	}	
+	}
 }

@@ -1,7 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.generic;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.util.*;
 
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class TermRelation {
     public GenericTerm child;
     public GenericTerm parent;
@@ -131,5 +135,5 @@ public class TermRelation {
 
 	public void setTypeof(RelationType typeof) {
 		this.typeof = typeof;
-	}	
+	}
 }
