@@ -566,6 +566,18 @@ public class FileService {
 		return buffer;
 	}
 
+	public StringBuffer generateJsonFile(Object target,StringBuffer buffer) {
+
+		try {
+			buffer.append(AnnotationColumn.toJson(target));
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return buffer;
+	}
+
+
 	/**
 	 * Generates ancestors graph for a list of terms
 	 * @param termsIds List of terms to calculate the graph for
