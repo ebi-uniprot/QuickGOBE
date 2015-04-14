@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.web.util.annotation;
 
+import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,11 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
-import uk.ac.ebi.quickgo.graphics.ImageArchive;
-import uk.ac.ebi.quickgo.graphics.TermNode;
-import uk.ac.ebi.quickgo.ontology.generic.AuditRecord;
-import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
-import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
+import uk.ac.ebi.quickgo.graphics.*;
+import uk.ac.ebi.quickgo.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.go.GOEvidence2ECOMap;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.ontology.go.TaxonConstraint;
@@ -691,6 +689,75 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		}
 	}
 
+	@Override
+	public void downloadAnnotationOntologyGraph(HttpServletResponse httpServletResponse, String termsIds, String relations, String requestType) {
+		// Basket terms
+		//Map<String, String> basketTerms = new HashMap<String, String>();
+		String[] basketTerms;
+
+		List<String> termsIdsList = new ArrayList<>();
+//		if(requestType.equals("allBasketTerms")){
+//			//Nothing to do - we already have our list with commas delimiting
+//
+//		}
+//		else if (requestType.equals("slimming")){
+//			Map<String, String> activeSlimmingGraphTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.ACTIVE_SLIMMING_GRAPH_TERMS_ATTRIBUTE, session);
+//			termsIdsList = new ArrayList<>(activeSlimmingGraphTerms.keySet());
+//			if(termsIdsList.isEmpty()){// No term selected
+//				model.addAttribute("graphImageSrc", null);
+//				return redirect(request);
+//			}
+//			termsIds = StringUtils.arrayToDelimitedString(termsIdsList.toArray(), ",");
+//		} else {
+
+
+		termsIdsList = Arrays.asList(termsIds.split(","));
+
+		// Get corresponding ontology
+		GenericOntology genericOntology = uk.ac.ebi.quickgo.web.util.term.TermUtil.getOntology(termsIdsList.get(0));
+
+		// Create graph image
+		GraphImage graphImage = createRenderableImage(genericOntology, termsIds);
+
+		ChartJson chartJson = new ChartJson();
+
+		if(termsIdsList.size() == 1){//Just one term, set id as the graph title
+			String id = termsIdsList.get(0);
+			String name = genericOntology.getTerm(id).getName();
+			String title = id;
+			if (id.contains(GOTerm.GO)) {// Add name for GO terms
+				title = title + " " + name;
+			}
+			chartJson.setTermGraphTitle(title);
+		}
+
+		//model.addAttribute("termsNodes", graphImage.getOntologyTerms());
+		Collection<TermNode> ontTerms =  graphImage.getOntologyTerms();
+		for (Iterator<TermNode> iterator = ontTerms.iterator();iterator.hasNext();) {
+			TermNode next = iterator.next();
+			chartJson.addLayoutNode(chartJson.new LayoutNode(next.getId(),next.left(), next.right(), next.top(), next.bottom()));
+		}
+
+
+		chartJson.setLegendNodes(graphImage.legend);
+		chartJson.setGraphImageSrc(ImageArchive.store(graphImage));
+
+		RenderedImage renderableImage = graphImage.render();
+		chartJson.setGraphImageWidth(renderableImage.getWidth());
+		chartJson.setGraphImageHeight(renderableImage.getHeight());
+
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(chartJson);
+
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+
 	private void writeOutJsonResponse(HttpServletResponse httpServletResponse, StringBuffer sb) throws IOException {
 		InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
 		IOUtils.copy(in, httpServletResponse.getOutputStream());
@@ -712,5 +779,33 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		}
 	}
 
+	/**
+	 * Generates ancestors graph for a list of terms
+	 *
+	 * @param genericOntology
+	 * @param termsIds List of terms to calculate the graph for
+	 * @return Graph image
+	 */
+	public GraphImage createRenderableImage(GenericOntology genericOntology, String termsIds){
+		// Check if the selected terms exist
+		List<GenericTerm> terms = new ArrayList<GenericTerm>();
+		List<String> termsIdsList = Arrays.asList(termsIds.split(","));
+		for(String id : termsIdsList){
+			GenericTerm term = genericOntology.getTerm(id);
+			if(term != null){
+				terms.add(term);
+			}
+		}
+
+		// Build GO term set
+		GenericTermSet termSet = new GenericTermSet(genericOntology, "Term Set", 0);
+		for(GenericTerm term : terms){
+			termSet.addTerm(term);
+		}
+
+		// Create ontology graph
+		OntologyGraph ontologyGraph = OntologyGraph.makeGraph(termSet, EnumSet.of(RelationType.USEDIN, RelationType.ISA, RelationType.PARTOF, RelationType.REGULATES, /*RelationType.HASPART,*/ RelationType.OCCURSIN), 0, 0, new GraphPresentation());
+		return ontologyGraph.layout();
+	}
 
 }

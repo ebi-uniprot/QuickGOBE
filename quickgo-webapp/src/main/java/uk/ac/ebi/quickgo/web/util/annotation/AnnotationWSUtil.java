@@ -45,4 +45,6 @@ public interface AnnotationWSUtil {
 	void downloadAssignedDBs(HttpServletResponse httpServletResponse);
 
 	void downloadChartFullModel(HttpServletResponse httpServletResponse, String ids, String scope);
+
+	void downloadAnnotationOntologyGraph(HttpServletResponse httpServletResponse, String termsIds, String relations, String requestType);
 }
