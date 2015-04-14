@@ -24,6 +24,7 @@ public class ChartJson {
 	private int graphImageWidth;
 	private int graphImageHeight;
 	private String termsToDisplay;
+	private String termGraphTitle;
 
 	public ChartJson() {
 		this.layoutNodeList = new ArrayList<>();
@@ -76,8 +77,16 @@ public class ChartJson {
 		return termsToDisplay;
 	}
 
+	public void setTermGraphTitle(String termGraphTitle) {
+		this.termGraphTitle = termGraphTitle;
+	}
 
-	 public class LayoutNode{
+	public String getTermGraphTitle() {
+		return termGraphTitle;
+	}
+
+
+	public class LayoutNode{
 		 private final String id;
 		 int left, right, top, bottom;
 
