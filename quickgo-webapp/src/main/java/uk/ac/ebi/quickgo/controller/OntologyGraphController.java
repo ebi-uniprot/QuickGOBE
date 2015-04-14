@@ -180,41 +180,6 @@ public class OntologyGraphController {
 		return base64Image;
 	}
 
-	/**
-	 * To retrieve graph images
-	 * @param id Image id
-	 * @return Graph image in base 64
-	 */
-	@RequestMapping(value = { "/jsongraphs",}, method = { RequestMethod.GET }, params = { "id"})
-	@ResponseBody
-	public void getJsonGraphImage(HttpServletResponse httpServletResponse,
-								  @RequestParam(value = "id", required = true) int id){
-		String base64Image = "";
-		try {
-			RenderedImage image = ImageArchive.getContent().get(id).render();
-
-			ByteArrayOutputStream bas = new ByteArrayOutputStream();
-			ImageIO.write(image, "png", bas);
-
-			byte[] byteArray=bas.toByteArray();
-			base64Image = new String(Base64.encodeBase64(byteArray));
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		}
-		//return base64Image;
-		StringBuffer sb = new StringBuffer();
-		sb.append("data:image/png;base64, ");
-		try {
-			fileService.generateJsonFile(base64Image,sb);
-
-			writeOutJsonResponse(httpServletResponse, sb);
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-		}
-
-	}
-
 
 	/**
 	 * Generates ancestors graph for a list of terms
@@ -251,16 +216,5 @@ public class OntologyGraphController {
 		} else {
 			return View.INDEX;
 		}
-	}
-
-	private void writeOutJsonResponse(HttpServletResponse httpServletResponse, StringBuffer sb) throws IOException {
-		InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-		IOUtils.copy(in, httpServletResponse.getOutputStream());
-
-		// Set response header and content
-		httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-		httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
-		httpServletResponse.setContentLength(sb.length());
-		httpServletResponse.flushBuffer();
 	}
 }
