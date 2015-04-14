@@ -538,7 +538,7 @@ public class WebServiceController {
 	public void addPredefinedSetTerms(@PathVariable(value = "id") String id,
 			HttpServletResponse httpServletResponse) {
 
-		annotationWSUtil.downloadPredefinedSetTerms(httpServletResponse,id);
+		annotationWSUtil.downloadPredefinedSetTerms(httpServletResponse, id);
 
 	}
 
@@ -606,9 +606,19 @@ public class WebServiceController {
 			@RequestParam(value = "ids", required = true, defaultValue = "") String ids,
 			@RequestParam(value = "scope", required = false, defaultValue = "") String scope){
 
-		annotationWSUtil.downloadChartFullModel(httpServletResponse,ids,scope);
+		annotationWSUtil.downloadChartFullModel(httpServletResponse, ids, scope);
+	}
 
 
+	@RequestMapping(value = { "/graphmulti"}, method = { RequestMethod.GET })
+	public void generateAnnotationOntologyGraph(
+			HttpServletResponse httpServletResponse,
+			@RequestParam(value = "ids", required = true) String termsIds,
+			@RequestParam(value = "relations",  required = false, defaultValue="ISA") String relations,
+			@RequestParam(value = "type", required = false, defaultValue = "allBasketTerms") String requestType,
+			HttpServletRequest request){
+
+		annotationWSUtil.downloadAnnotationOntologyGraph(httpServletResponse, termsIds, relations, requestType);
 
 	}
 
