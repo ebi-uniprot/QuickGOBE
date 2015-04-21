@@ -481,19 +481,7 @@ public class WebServiceController {
 		System.out.println("The query passed to the Webservice controller is " + query);
 		//query = "\"goID\":\"GO:0033014\",\"ancestorsIPO\":\"ancestorsIPO\",";
 		//System.out.println("The query hardcoded is " + query);
-
-		// Calculate Annotations Parameters from Query parameter
-		QueryTo queryTo = new QueryTo();
-		AnnotationParameters annotationParameters = queryTo.queryToAnnotationParameters(query, Boolean.valueOf(advancedFilter));
-		System.out.println("Annotation Parameters: " + annotationParameters);
-
-		// Calculate Applied Filter from Query parameter
-		AppliedFilterSet appliedFilterSet = queryTo.queryToAppliedFilterSet(query, Boolean.valueOf(advancedFilter));
-		System.out.println("Applied Filter Set: " + appliedFilterSet);
-
-		// Create query from filter values
-		String solrQuery = annotationParameters.toSolrQuery();
-		System.out.println("Solr Query: " + solrQuery);
+		String solrQuery = createSolrQuery(query, advancedFilter);
 
 
 		//todo should we be using the annotation service?
@@ -622,6 +610,39 @@ public class WebServiceController {
 
 	}
 
+
+	/**
+	 * Return list of terms by ontology (Bot-friendly page)
+	 * @param ontology Ontology
+	 *
+	 * @throws UnsupportedEncodingException
+	 */
+	@RequestMapping(value="terms/{ontology}", method = RequestMethod.GET)
+	public void ontologyTerms(HttpServletResponse httpServletResponse,
+								@PathVariable(value="ontology") String ontology) throws UnsupportedEncodingException {
+
+		annotationWSUtil.downloadOntologyList(httpServletResponse, ontology);
+
+	}
+
+
+
+	/**
+	 * Return stats information
+	 * @return
+	 */
+	@RequestMapping(value="/stats", method = {RequestMethod.POST,RequestMethod.GET})
+	public void calculateStatistics(
+			HttpServletResponse httpServletResponse,
+			@RequestParam(value = "q", required = false) String query,
+			@RequestParam(value = "advancedFilter",  required = false, defaultValue = "false") String advancedFilter)
+			throws UnsupportedEncodingException {
+
+		String solrQuery = createSolrQuery(query, advancedFilter);
+		annotationWSUtil.downloadStatistics(httpServletResponse, query, advancedFilter, solrQuery);
+
+
+	}
 	//----------------------- End of public interface   ------------------------------------ //
 
 	private List<Map<String, Object>> searchTerm(String query, String filterQuery, int limit, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse, String callback) throws IOException, SolrServerException {
@@ -834,5 +855,24 @@ public class WebServiceController {
 				appliedFilterSet.setValues(key, currentValues);
 			}
 		}
+	}
+
+
+
+	private String createSolrQuery(@RequestParam(value = "q", required = false) String query,
+								   @RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter) {
+		// Calculate Annotations Parameters from Query parameter
+		QueryTo queryTo = new QueryTo();
+		AnnotationParameters annotationParameters = queryTo.queryToAnnotationParameters(query, Boolean.valueOf(advancedFilter));
+		System.out.println("Annotation Parameters: " + annotationParameters);
+
+		// Calculate Applied Filter from Query parameter
+		AppliedFilterSet appliedFilterSet = queryTo.queryToAppliedFilterSet(query, Boolean.valueOf(advancedFilter));
+		System.out.println("Applied Filter Set: " + appliedFilterSet);
+
+		// Create query from filter values
+		String solrQuery = annotationParameters.toSolrQuery();
+		System.out.println("Solr Query: " + solrQuery);
+		return solrQuery;
 	}
 }

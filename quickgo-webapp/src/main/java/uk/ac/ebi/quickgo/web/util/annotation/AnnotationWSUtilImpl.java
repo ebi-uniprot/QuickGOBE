@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import uk.ac.ebi.quickgo.bean.statistics.StatisticsBean;
 import uk.ac.ebi.quickgo.graphics.*;
 import uk.ac.ebi.quickgo.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.go.GOEvidence2ECOMap;
@@ -32,6 +33,7 @@ import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 
 
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousService;
+import uk.ac.ebi.quickgo.service.statistic.StatisticService;
 import uk.ac.ebi.quickgo.service.term.TermService;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
@@ -43,9 +45,8 @@ import uk.ac.ebi.quickgo.web.util.ChartService;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
+import uk.ac.ebi.quickgo.web.util.stats.StatisticsCalculation;
 import uk.ac.ebi.quickgo.webservice.model.*;
-
-import static uk.ac.ebi.quickgo.webservice.model.ChartJson.*;
 
 /**
  * Annotation WS util methods
@@ -82,6 +83,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Autowired
 	ChartService chartService;
+
+	@Autowired
+	StatisticService statisticService;
 
 	// All go terms
 	Map<String, GenericTerm> terms = uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTerms(); //todo this should be properly cached.
@@ -749,6 +753,77 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		StringBuffer sb = null;
 		try {
 			sb = fileService.generateJsonFile(chartJson);
+
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+
+	/**
+	 *  @param query
+	 * @param advancedFilter
+	 * @param solrQuery
+	 */
+	@Override
+	public void downloadStatistics(HttpServletResponse httpServletResponse, String query, String advancedFilter, String solrQuery) {
+
+		// Calculate stats
+		StatisticsBean 		statisticsBean = new StatisticsBean();
+		StatisticsCalculation statisticsCalculation = new StatisticsCalculation(statisticsBean, solrQuery);
+		statisticsCalculation.setStatisticService(statisticService);
+		statisticsCalculation.start();
+
+//		if(statisticsCalculation != null && !statisticsCalculation.getQuery().equals(currentQuery)){
+//			statisticsCalculation.interrupt();
+//			createStatsThread(currentQuery);
+//		} else if(statisticsCalculation == null){
+//			createStatsThread(currentQuery);
+//		}
+
+		try {
+			statisticsCalculation.join();
+		} catch (InterruptedException e) {
+			System.out.println("Statistics calculation interrupted");
+			throw new RuntimeException(e);
+		}
+
+		StatisticsJson statisticsJson = new StatisticsJson();
+		statisticsJson.setStatsBean(statisticsBean);
+
+		//todo get this from other methods
+		// Calculate total number annotations
+		long totalNumberAnnotations = annotationService.getTotalNumberAnnotations(solrQuery);
+		statisticsJson.setTotalNumberAnnotations(totalNumberAnnotations);
+
+		long totalNumberProteins = annotationService.getTotalNumberProteins(solrQuery);
+		statisticsJson.setTotalNumberProteins(totalNumberProteins);
+
+
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(statisticsJson);
+
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+
+	}
+
+	@Override
+	public void downloadOntologyList(HttpServletResponse httpServletResponse, String ontology) {
+		GOTerm.EGOAspect aspect = GOTerm.EGOAspect.valueOf(ontology);
+		Map<String,String> terms = uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTermsByOntology(aspect);
+		OntologyListJson ontologyListJson = new OntologyListJson();
+		ontologyListJson.setOntology(aspect.description);
+		ontologyListJson.setTerms(terms);
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(ontologyListJson);
 
 			writeOutJsonResponse(httpServletResponse, sb);
 		} catch (IOException e) {
