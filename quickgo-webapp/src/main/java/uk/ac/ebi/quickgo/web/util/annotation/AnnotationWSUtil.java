@@ -16,9 +16,9 @@ public interface AnnotationWSUtil {
 			HttpServletResponse httpServletResponse);
 
 	public void downloadAnnotationsInternal(String format, String query,
-									AnnotationColumn[] columns, int limit,
-									int start, int row,
-									HttpServletResponse httpServletResponse);
+											AnnotationColumn[] columns, int limit,
+											int start, int row,
+											HttpServletResponse httpServletResponse, boolean b);
 
 	void downloadTerm(String termId, HttpServletResponse httpServletResponse);
 
@@ -51,4 +51,7 @@ public interface AnnotationWSUtil {
 	void downloadStatistics(HttpServletResponse httpServletResponse, String query, String advancedFilter, String solrQuery);
 
 	void downloadOntologyList(HttpServletResponse httpServletResponse, String ontology);
+
+//	void downloadSlim(HttpServletResponse httpServletResponse, String termsIds, String proteinIds,
+//					  String proteinSets, int page, int rows);
 }
