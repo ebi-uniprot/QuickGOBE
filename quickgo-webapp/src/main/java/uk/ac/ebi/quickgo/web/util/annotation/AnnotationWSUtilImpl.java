@@ -23,6 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import org.springframework.util.StringUtils;
+import uk.ac.ebi.quickgo.annotation.Annotation;
+import uk.ac.ebi.quickgo.bean.annotation.AnnotationBean;
 import uk.ac.ebi.quickgo.bean.statistics.StatisticsBean;
 import uk.ac.ebi.quickgo.graphics.*;
 import uk.ac.ebi.quickgo.ontology.generic.*;
@@ -32,6 +35,7 @@ import uk.ac.ebi.quickgo.ontology.go.TaxonConstraint;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 
 
+import uk.ac.ebi.quickgo.service.annotation.parameter.AnnotationParameters;
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousService;
 import uk.ac.ebi.quickgo.service.statistic.StatisticService;
 import uk.ac.ebi.quickgo.service.term.TermService;
@@ -45,7 +49,10 @@ import uk.ac.ebi.quickgo.web.util.ChartService;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
+import uk.ac.ebi.quickgo.web.util.WebUtils;
+import uk.ac.ebi.quickgo.web.util.query.QueryProcessor;
 import uk.ac.ebi.quickgo.web.util.stats.StatisticsCalculation;
+import uk.ac.ebi.quickgo.web.util.url.URLsResolver;
 import uk.ac.ebi.quickgo.webservice.model.*;
 
 /**
@@ -86,6 +93,15 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	@Autowired
 	StatisticService statisticService;
+
+	@Autowired
+	QueryProcessor queryProcessor;
+
+	@Autowired
+	SlimmingUtil slimmingUtil;
+
+	@Autowired
+	URLsResolver urLsResolver;
 
 	// All go terms
 	Map<String, GenericTerm> terms = uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTerms(); //todo this should be properly cached.
@@ -254,9 +270,10 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	 * @param format File format
 	 * @param query Query to run
 	 * @param columns Columns to display
+	 * @param b
 	 */
 	public void downloadAnnotationsInternal(String format, String query, AnnotationColumn[] columns, int limit,
-									int start, int rows, HttpServletResponse httpServletResponse){
+											int start, int rows, HttpServletResponse httpServletResponse, boolean isSlim){
 
 		// Get total number annotations
 		long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
@@ -284,7 +301,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 					sb = fileService.generateGene2GoFile(query, totalAnnotations, limit);
 					break;
 				case JSON:
-					sb = fileService.generateJsonFileWithPageAndRow(query, totalAnnotations, start, rows);
+					sb = fileService.generateJsonFileWithPageAndRow(query, totalAnnotations, start, rows, isSlim);
 					break;
 			}
 
@@ -833,6 +850,152 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	}
 
 
+	@Override
+	public void downloadSlim(HttpServletResponse httpServletResponse, String termsIds, String proteinIds,
+							 String proteinSets, int page, int rows) {
+		// Go Ids
+//		Map<String, String> slimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.SLIMMING_TERMS_ATTRIBUTE, session);
+//		Map<String, String> inactiveSlimmingTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.INACTIVE_SLIMMING_TERMS_ATTRIBUTE, session);
+
+
+		//Carryout the mapping that was done in the Slimming Controller
+		List<String> terms = WebUtils.parseAndFormatFilterValues(termsIds);
+		Map<String, String> idName = calculateNames(terms);
+		//setSlimmingTermsByAspect(idName) - save terms to different aspects (BioProcess; Mol Func; Cell Comp)
+
+		//slimmingTerms.keySet().removeAll(inactiveSlimmingTerms.keySet());//Active slimming terms
+
+		AppliedFilterSet appliedFilterSet = new AppliedFilterSet();
+
+		Map<String, List<String>> goSlimmingTerms = new HashMap<>();
+		goSlimmingTerms.put(AnnotationField.ANCESTORSIPO.getValue(), new ArrayList<>(idName.keySet()));
+		appliedFilterSet.addParameters(goSlimmingTerms);
+
+
+		// Proteins Ids
+		if(!proteinIds.trim().isEmpty()){
+			List<String> proteinsIds = WebUtils.parseAndFormatFilterValues(proteinIds);
+			Map<String, List<String>> proteins = new HashMap<>();
+			proteins.put(AnnotationField.DBOBJECTID.getValue(), proteinsIds);
+			appliedFilterSet.addParameters(proteins);
+		}
+		// Proteins Sets
+		if(!proteinSets.trim().isEmpty()){
+			List<String> proteinsSets = WebUtils.parseAndFormatFilterValues(proteinSets);
+			Map<String, List<String>> sets = new HashMap<>();
+			sets.put(AnnotationField.TARGETSET.getValue(), proteinsSets);
+			appliedFilterSet.addParameters(sets);
+		}
+
+		//Now do something with the applied filter set
+
+
+		// Calculate Annotations Parameters from Query parameter
+		AnnotationParameters annotationParameters = new AnnotationParameters();
+
+		// Process query //todo required wtfk?
+		//queryProcessor.processQuery(query, annotationParameters, appliedFilterSet, Boolean.valueOf(advancedFilter));
+
+		annotationParameters.setParameters(new HashMap<String, List<String>>(appliedFilterSet.getParameters()));
+
+		// Create query from filter values
+		String solrQuery = annotationParameters.toSolrQuery();
+
+		// Calculate total number annotations
+		long totalNumberAnnotations = annotationService.getTotalNumberAnnotations(solrQuery);
+
+		// Retrieve annotations
+		List<Annotation> annotations = annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
+
+		// Create annotation wrappers
+		//List<AnnotationBean> annotationBeans = new ArrayList<>();
+		GoAnnotationsContainer goAnnotationsContainer = new GoAnnotationsContainer();
+		goAnnotationsContainer.setNumberAnnotations(totalNumberAnnotations);
+		List<GoAnnotationJson> goAnnotationJsonList = new ArrayList<>();
+
+		for (Annotation annotation : annotations) {
+			//List<String> slimValue = appliedFilterSet.getParameters().get("slim");
+			List<String> slimValue= Arrays.asList("true");
+			List<String> filterGOIds = appliedFilterSet.getParameters().get(AnnotationField.ANCESTORSIPO.getValue());
+
+			//Create model to be turned into Json
+			GoAnnotationJson goAnnotationJson = new GoAnnotationJson();
+
+			//Load annotation bean with annotation
+			AnnotationBean annotationBean = slimmingUtil.calculateOriginalAndSlimmingTerm(annotation, filterGOIds, slimValue);
+
+			//Populate json object
+			goAnnotationJson.setProtein(annotation.getDbObjectID());
+			goAnnotationJson.setSymbol(annotation.getDbObjectSymbol());
+			goAnnotationJson.setGoId(annotation.getGoID());
+			goAnnotationJson.setTermName(annotation.getTermName());
+			try {
+				goAnnotationJson.setAspect(GOTerm.EGOAspect.fromString(annotation.getGoAspect()).abbreviation);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			goAnnotationJson.setEvidenceGo(annotation.getGoEvidence());
+			goAnnotationJson.setEvidenceEco(annotation.getEcoID());
+			goAnnotationJson.setTaxon(annotation.getTaxonomyId());
+			goAnnotationJson.setAssignedBy(annotation.getAssignedBy());
+			goAnnotationJson.setDatabase(annotation.getDb());
+			goAnnotationJson.setDate(annotation.getDate());
+			goAnnotationJson.setName(annotation.getDbObjectName());
+			goAnnotationJson.setType(annotation.getDbObjectType());
+			goAnnotationJson.setTaxonName(annotation.getTaxonomyName());
+			goAnnotationJson.setSequence(annotation.getSequenceLength());
+			goAnnotationJson.setOriginalTermId(annotation.getGoID());
+			goAnnotationJson.setOriginalTermName(annotation.getTermName());
+
+			//Reference
+			String referenceString = "";
+			if (annotation.getReference() != null) {
+				referenceString = annotation.getReference();
+			}
+			goAnnotationJson.setReference(referenceString);
+
+			//With
+			String withString = "";
+			if (annotation.getWith() != null) {
+				goAnnotationJson.setWithList(annotation.getWith());
+			}
+
+			//Synonym
+			String synonymString = "";
+			if (annotation.getDbObjectSynonyms() != null) {
+				synonymString = StringUtils.arrayToDelimitedString(annotation.getDbObjectSynonyms().toArray(), "|");
+			}
+			goAnnotationJson.setSynonym(synonymString);
+
+			//Qualifier
+			String qualifierString = "";
+			if (annotation.getQualifier() != null) {
+				qualifierString =annotation.getQualifier();
+			}
+			goAnnotationJson.setQualifier(qualifierString);
+
+
+
+			//urLsResolver.setURLs(annotationBean);		//todo what is this for?
+			//annotationBeans.add(annotationBean);
+			goAnnotationJsonList.add(goAnnotationJson);
+		}
+
+		StringBuffer sb = null;
+		try {
+			goAnnotationsContainer.setAnnotationsList(goAnnotationJsonList);
+			sb = fileService.generateJsonFile(goAnnotationsContainer);
+
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+
+	}
+
+
+
 	private void writeOutJsonResponse(HttpServletResponse httpServletResponse, StringBuffer sb) throws IOException {
 		InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
 		IOUtils.copy(in, httpServletResponse.getOutputStream());
@@ -881,6 +1044,21 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		// Create ontology graph
 		OntologyGraph ontologyGraph = OntologyGraph.makeGraph(termSet, EnumSet.of(RelationType.USEDIN, RelationType.ISA, RelationType.PARTOF, RelationType.REGULATES, /*RelationType.HASPART,*/ RelationType.OCCURSIN), 0, 0, new GraphPresentation());
 		return ontologyGraph.layout();
+	}
+
+	/**
+	 * Given a list of terms ids, return associated names
+	 * @param ids Terms ids
+	 * @return Terms names
+	 */
+	private Map<String, String> calculateNames(List<String> ids){
+		Map<String, String> idName = new HashMap<String, String>();
+		for(String id : ids){
+			if(id.matches(AnnotationParameters.GO_ID_REG_EXP + "\\d{7}")){// Valid GO id
+				idName.put(id, terms.get(id).getName());
+			}
+		}
+		return idName;
 	}
 
 }
