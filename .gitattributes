@@ -440,3 +440,4 @@ quickgo-webapp/src/main/webapp/templates/slimmingGraph.jsp -text svneol=unset#te
 quickgo-webapp/src/main/webapp/templates/slimmingProtein.jsp -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/templates/term-sidebar.jsp -text svneol=unset#text/plain
 quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/graphics/OntologyGraphTest.java -text svneol=unset#text/plain
+quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/web/util/query/QueryToTest.java -text
