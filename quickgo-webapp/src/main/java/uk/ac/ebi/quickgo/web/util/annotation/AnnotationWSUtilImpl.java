@@ -271,7 +271,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	 * @param query Query to run
 	 * @param columns Columns to display
 	 */
-	public void downloadAnnotationsInternal(String format, String query, AnnotationColumn[] columns, int limit,
+	public void downloadAnnotationsInternal(String query, AnnotationColumn[] columns, int limit,
 											int start, int rows, HttpServletResponse httpServletResponse, boolean isSlim){
 
 		// Get total number annotations
@@ -280,37 +280,13 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		// Check file format
 		StringBuffer sb = null;
 		try {
-			switch (FileService.FILE_FORMAT.valueOf(format.toUpperCase())) {
-				case TSV:
-					sb = fileService.generateTSVfile(FileService.FILE_FORMAT.TSV, "", query, totalAnnotations, columns, limit);
-					break;
-				case FASTA:
-					sb = fileService.generateFastafile(query, totalAnnotations, limit);
-					break;
-				case GAF:
-					sb = fileService.generateGAFFile(query, totalAnnotations, limit);
-					break;
-				case GPAD:
-					sb = fileService.generateGPADFile(query, totalAnnotations, limit);
-					break;
-				case PROTEINLIST:
-					sb = fileService.generateProteinListFile(query, totalAnnotations, limit);
-					break;
-				case GENE2GO:
-					sb = fileService.generateGene2GoFile(query, totalAnnotations, limit);
-					break;
-				case JSON:
-					sb = fileService.generateJsonFileWithPageAndRow(query, totalAnnotations, start, rows, isSlim);
-					break;
-			}
-
-			String extension = format;
+			sb = fileService.generateJsonFileWithPageAndRow(query, totalAnnotations, start, rows, isSlim);
 
 			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
 			IOUtils.copy(in, httpServletResponse.getOutputStream());
 			// Set response header and content
 			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + extension);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "JSON");
 			httpServletResponse.setContentLength(sb.length());
 			httpServletResponse.flushBuffer();
 

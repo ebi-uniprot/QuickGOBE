@@ -15,7 +15,7 @@ public interface AnnotationWSUtil {
 			AnnotationColumn[] columns, int limit,
 			HttpServletResponse httpServletResponse);
 
-	public void downloadAnnotationsInternal(String format, String query,
+	public void downloadAnnotationsInternal(String query,
 											AnnotationColumn[] columns, int limit,
 											int start, int row,
 											HttpServletResponse httpServletResponse, boolean b);
