@@ -1,5 +1,10 @@
 package uk.ac.ebi.quickgo.webservice.model;
 
+import uk.ac.ebi.quickgo.annotation.Annotation;
+import uk.ac.ebi.quickgo.web.util.NameURL;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -8,7 +13,7 @@ import java.util.List;
  * Time: 16:18
  * Created with IntelliJ IDEA.
  */
-public class GoAnnotationJson {
+public class GoAnnotationJson implements Cloneable{
 	private String protein;
 	private String symbol;
 	private String qualifier;
@@ -30,6 +35,28 @@ public class GoAnnotationJson {
 	private int sequence;
 	private String originalTermId;
 	private String originalTermName;
+
+
+	//slimming stuff
+//	private static final long serialVersionUID = -4850838934084333982L;
+//
+//	Annotation annotation;
+//
+//	// Attributes that contain URL
+//	NameURL db;
+//	NameURL dbObjectID;
+//	NameURL goEvidence;
+//	NameURL references;
+//	//NameURL assignedBy;
+//	List<NameURL> with;
+
+	String termIDSlimmingToString;
+	NameURL termIDSlimmingTo;
+	String termNameSlimmingTo;
+
+
+
+	//----------------------------------------------- Getters and Setters -----------------------------------------
 
 	public String getProtein() {
 		return protein;
@@ -197,5 +224,52 @@ public class GoAnnotationJson {
 
 	public void setOriginalTermName(String originalTermName) {
 		this.originalTermName = originalTermName;
+	}
+
+
+
+	//------------------------------------- Slimming Getters and Setters -----------------------------------------
+
+
+	public String getTermIDSlimmingToString() {
+		return termIDSlimmingToString;
+	}
+
+	public void setTermIDSlimmingToString(String termIDSlimmingToString) {
+		this.termIDSlimmingToString = termIDSlimmingToString;
+	}
+
+	public NameURL getTermIDSlimmingTo() {
+		return termIDSlimmingTo;
+	}
+
+	public void setTermIDSlimmingTo(NameURL termIDSlimmingTo) {
+		this.termIDSlimmingTo = termIDSlimmingTo;
+	}
+
+	public String getTermNameSlimmingTo() {
+		return termNameSlimmingTo;
+	}
+
+	public void setTermNameSlimmingTo(String termNameSlimmingTo) {
+		this.termNameSlimmingTo = termNameSlimmingTo;
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		Object aClone =  super.clone();  //Create shallow copy.
+
+		//Need to copy seperately non-primatives to achieve a deep copy
+		List<String> clonesWithList = new ArrayList<>();
+		for (Iterator<String> iterator = withList.iterator();iterator.hasNext();) {
+			String next = iterator.next();
+			clonesWithList.add(next);
+		}
+		((GoAnnotationJson)aClone).setWithList(clonesWithList);
+		return  aClone;
+	}
+
+	public GoAnnotationJson copy() throws CloneNotSupportedException {
+		return (GoAnnotationJson)this.clone();
 	}
 }
