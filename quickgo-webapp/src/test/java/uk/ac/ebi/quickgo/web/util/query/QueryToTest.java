@@ -76,4 +76,38 @@ public class QueryToTest {
 	 * Using a slim
 	 * {"dbObjectID":"","taxonomyId":"","subSet":"","goID":"GO:0033014","slim":"true","ancestorsIPO":"ancestorsIPO","ecoName":"","ecoID":"","ecoAncestorsI":""}
 	 */
+
+
+	/**
+	 * Quey To was creating the following output
+	 * AnnotationParameters{parameters={GO=[0003870], ancestorsIPO=[GO:0003824]}}
+	 * Solr Query: ancestorsIPO:(*0003824) AND *:*
+	 * Applied Filter Set: AppliedFilterSet{parameters={GO=[0003870], ancestorsIPO=[GO:0003824]}}
+	 * //todo the above is obviously borked
+	 *
+	 * After changing QueryTo the following is much better
+	 *
+	 * The query passed to the Webservice controller is "goID":"GO:0003824","goID":"GO:0003870",
+	 * Annotation Parameters: AnnotationParameters{parameters={ancestorsIPO=[GO:0003824, GO:0003870]}}
+	 * Applied Filter Set: AppliedFilterSet{parameters={ancestorsIPO=[GO:0003824, GO:0003870]}}
+	 * Solr Query: ancestorsIPO:(*0003824 OR *0003870) AND *:*
+	 *
+	 */
+	@Test
+	public void testSimpleGoTermList(){
+
+		QueryTo queryTo = new QueryTo();
+
+		String query = "\"goID\":\"GO:0003824\",\"GO:0003870\",";
+
+		AnnotationParameters annotationParameters = queryTo.queryToAnnotationParameters(query, false);
+		System.out.println(annotationParameters);
+
+		// Create query from filter values
+		String solrQuery = annotationParameters.toSolrQuery();
+		System.out.println("Solr Query: " + solrQuery);
+
+		AppliedFilterSet appliedFilterSet = queryTo.queryToAppliedFilterSet(query, false);
+		System.out.println("Applied Filter Set: " + appliedFilterSet);
+	}
 }
