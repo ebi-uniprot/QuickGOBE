@@ -475,7 +475,8 @@ public class WebServiceController {
 			@RequestParam(value = "cols", defaultValue = "") String cols,
 			@RequestParam(value = "removeFilter", defaultValue = "") String removeFilter,
 			@RequestParam(value = "removeAllFilters", defaultValue = "") String removeAllFilters,
-			@RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter)
+			@RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter,
+			@RequestParam(value = "slim", required = false, defaultValue = "false") String slim)
 			throws UnsupportedEncodingException {
 
 		System.out.println("The query passed to the Webservice controller is " + query);
@@ -485,10 +486,9 @@ public class WebServiceController {
 
 
 		//todo should we be using the annotation service?
-		String format = "JSON";					//ignored
 		AnnotationColumn[] columns = new AnnotationColumn[0];	//ignored
-		annotationWSUtil.downloadAnnotationsInternal(format, solrQuery, columns, Integer.valueOf(limit),
-				(page - 1) * rows, rows, httpServletResponse);
+		annotationWSUtil.downloadAnnotationsInternal(solrQuery, columns, Integer.valueOf(limit),
+				(page - 1) * rows, rows, httpServletResponse, Boolean.parseBoolean(slim));
 	}
 
 
@@ -640,9 +640,20 @@ public class WebServiceController {
 
 		String solrQuery = createSolrQuery(query, advancedFilter);
 		annotationWSUtil.downloadStatistics(httpServletResponse, query, advancedFilter, solrQuery);
-
-
 	}
+
+
+
+//	@RequestMapping(value = { "/slim" }, method = {RequestMethod.POST, RequestMethod.GET }, params = { "q", "slim", "proteinIds", "proteinSets" })
+//	public void slim(@RequestParam(value = "termList", required = false) String termList,
+//					 @@RequestParam(value = "proteinIds", defaultValue = "", required = false) String proteinIds,
+//							 @RequestParam(value = "proteinSets", defaultValue = "", required = false) String proteinSets,
+//							 HttpServletResponse httpServletResponse) {
+//
+//		int rows,pages;
+//		annotationWSUtil.downloadSlim(httpServletResponse, termList, proteinIds, proteinSets, rows, pages);
+//	}
+
 	//----------------------- End of public interface   ------------------------------------ //
 
 	private List<Map<String, Object>> searchTerm(String query, String filterQuery, int limit, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse, String callback) throws IOException, SolrServerException {

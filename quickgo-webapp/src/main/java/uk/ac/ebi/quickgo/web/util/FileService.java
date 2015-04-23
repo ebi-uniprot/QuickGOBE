@@ -19,6 +19,8 @@ import uk.ac.ebi.quickgo.graphics.*;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
+import uk.ac.ebi.quickgo.ontology.go.GOTermSet;
+import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 import uk.ac.ebi.quickgo.service.geneproduct.GeneProductService;
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousServiceImpl;
@@ -47,9 +49,13 @@ public class FileService {
 	@Autowired
 	GeneProductService geneProductService;
 
+//	@Autowired
+//	QuickGOOntologyIndexer quickGOOntologyIndexer;
+
 	private final int NUM_ROWS = 5000;
 
 	private static final Logger logger = Logger.getLogger(FileService.class);
+
 
 	public enum FILE_FORMAT {
 		TSV("tsv"),
@@ -273,16 +279,17 @@ public class FileService {
 	 * To generate GPAD file
 	 * @param query Query
 	 * @param numberAnnotations Total number of annotations
+	 * @param isSlim
 	 * @return GPAD file
 	 */
-	public StringBuffer generateJsonFileWithPageAndRow(String query, long numberAnnotations, int start, int rows)
+	public StringBuffer generateJsonFileWithPageAndRow(String query, long numberAnnotations, int start, int rows, boolean isSlim)
 			throws Exception{
+
 		AnnotationColumn[] columns = {
 				AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.SYMBOL, AnnotationColumn.QUALIFIER,
 				AnnotationColumn.GOID, AnnotationColumn.REFERENCE, AnnotationColumn.EVIDENCE, AnnotationColumn.WITH,
 				AnnotationColumn.DATE, AnnotationColumn.ASSIGNEDBY, AnnotationColumn.TERMNAME, AnnotationColumn.ASPECT,
-				AnnotationColumn.TAXON};
-
+				AnnotationColumn.TAXON, AnnotationColumn.ORIGINALTERMID, AnnotationColumn.ORIGINALTERMNAME};
 
 		GoAnnotationsContainer goAnnotationsContainer = new GoAnnotationsContainer();
 		goAnnotationsContainer.setNumberAnnotations(numberAnnotations);
@@ -385,9 +392,45 @@ public class FileService {
 
 			} //End of columns iteration
 
-			goAnnotationJsonList.add(goAnnotationJson);
+			//If a slim has been request, work out the mapping for this term id to the slim set
+			if(isSlim){
+
+
+				//slimTermset will need to contain the terms entered as the slim, so retrieve them from the queryString
+				//or applied filters
+				ITermContainer slimTermSet = null;
+
+				//todo make the relationTypes selectable
+				EnumSet<RelationType> relationTypes = EnumSet.of(RelationType.ISA, RelationType.PARTOF);
+				TermSlimmer termSlimmer = new TermSlimmer(TermUtil.getGOOntology(), slimTermSet, relationTypes);
+
+
+				List<GenericTerm> slimTerms = termSlimmer.map(goAnnotationJson.getOriginalTermId());
+
+				List<GoAnnotationJson> annotationsAsSlimmingTerms = new ArrayList<>();
+
+				for (int i = 0;i < slimTerms.size();i++) {
+					GenericTerm genericTerm = slimTerms.get(i);
+
+					//Create a json annotation object for each annotation returned in the map
+					//Set the original term id and name to the pre-mapped version
+					GoAnnotationJson clonedAnnotation = (GoAnnotationJson)goAnnotationJson.copy();
+					clonedAnnotation.setOriginalTermId(goAnnotationJson.getGoId());
+					clonedAnnotation.setOriginalTermName(goAnnotationJson.getTermName());
+					annotationsAsSlimmingTerms.add(clonedAnnotation);
+				}
+				goAnnotationJsonList.addAll(annotationsAsSlimmingTerms);
+			}else{
+
+				//Not a slim, just add the annotation to the list.
+				goAnnotationJsonList.add(goAnnotationJson);
+
+			}
+
+
 
 		}// End of annotations iteration
+
 
 		goAnnotationsContainer.setAnnotationsList(goAnnotationJsonList);
 
