@@ -23,9 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
-import org.springframework.util.StringUtils;
-import uk.ac.ebi.quickgo.annotation.Annotation;
-import uk.ac.ebi.quickgo.bean.annotation.AnnotationBean;
 import uk.ac.ebi.quickgo.bean.statistics.StatisticsBean;
 import uk.ac.ebi.quickgo.graphics.*;
 import uk.ac.ebi.quickgo.ontology.generic.*;
@@ -49,7 +46,6 @@ import uk.ac.ebi.quickgo.web.util.ChartService;
 import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
-import uk.ac.ebi.quickgo.web.util.WebUtils;
 import uk.ac.ebi.quickgo.web.util.query.QueryProcessor;
 import uk.ac.ebi.quickgo.web.util.stats.StatisticsCalculation;
 import uk.ac.ebi.quickgo.web.util.url.URLsResolver;
@@ -267,12 +263,13 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 	/**
 	 * Generate a file with the annotations results
-	 * @param format File format
 	 * @param query Query to run
 	 * @param columns Columns to display
+	 * @param slimTermSet
 	 */
 	public void downloadAnnotationsInternal(String query, AnnotationColumn[] columns, int limit,
-											int start, int rows, HttpServletResponse httpServletResponse, boolean isSlim){
+											int start, int rows, HttpServletResponse httpServletResponse, boolean isSlim,
+											ITermContainer slimTermSet){
 
 		// Get total number annotations
 		long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
@@ -280,7 +277,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		// Check file format
 		StringBuffer sb = null;
 		try {
-			sb = fileService.generateJsonFileWithPageAndRow(query, totalAnnotations, start, rows, isSlim);
+			sb = fileService.generateJsonFileWithPageAndRow(query, totalAnnotations, start, rows, isSlim,slimTermSet);
 
 			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
 			IOUtils.copy(in, httpServletResponse.getOutputStream());

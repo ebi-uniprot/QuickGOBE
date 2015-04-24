@@ -29,6 +29,8 @@ import uk.ac.ebi.quickgo.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationBlacklist.BlacklistEntryMinimal;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationExtensionRelations;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
+import uk.ac.ebi.quickgo.ontology.go.GOTermSet;
+import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.render.Format;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 import uk.ac.ebi.quickgo.service.annotation.parameter.AnnotationParameters;
@@ -482,14 +484,24 @@ public class WebServiceController {
 		System.out.println("The query passed to the Webservice controller is " + query);
 		//query = "\"goID\":\"GO:0033014\",\"ancestorsIPO\":\"ancestorsIPO\",";
 		//System.out.println("The query hardcoded is " + query);
-		String solrQuery = createSolrQuery(query, advancedFilter);
+		AnnotationParameters annotationParameters = createAnnotationParameters(query, advancedFilter);
+		String solrQuery = annotationParameters.toSolrQuery();
+
+		//Do slimming if required
+		ITermContainer slimTermSet = null;
+		Boolean slimmingRequired = Boolean.parseBoolean(slim);
+		if(slimmingRequired) {
+			slimTermSet = createSlimTermSet(annotationParameters);
+		}
 
 
 		//todo should we be using the annotation service?
 		AnnotationColumn[] columns = new AnnotationColumn[0];	//ignored
 		annotationWSUtil.downloadAnnotationsInternal(solrQuery, columns, Integer.valueOf(limit),
-				(page - 1) * rows, rows, httpServletResponse, Boolean.parseBoolean(slim));
+				(page - 1) * rows, rows, httpServletResponse, slimmingRequired, slimTermSet);
 	}
+
+
 
 
 	@RequestMapping(value = "/term/{id}", method = RequestMethod.GET)
@@ -638,7 +650,8 @@ public class WebServiceController {
 			@RequestParam(value = "advancedFilter",  required = false, defaultValue = "false") String advancedFilter)
 			throws UnsupportedEncodingException {
 
-		String solrQuery = createSolrQuery(query, advancedFilter);
+		AnnotationParameters annotationParameters = createAnnotationParameters(query, advancedFilter);
+		String solrQuery = annotationParameters.toSolrQuery();
 		annotationWSUtil.downloadStatistics(httpServletResponse, query, advancedFilter, solrQuery);
 	}
 
@@ -870,7 +883,7 @@ public class WebServiceController {
 
 
 
-	private String createSolrQuery(@RequestParam(value = "q", required = false) String query,
+	private AnnotationParameters createAnnotationParameters(@RequestParam(value = "q", required = false) String query,
 								   @RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter) {
 		// Calculate Annotations Parameters from Query parameter
 		QueryTo queryTo = new QueryTo();
@@ -878,12 +891,30 @@ public class WebServiceController {
 		System.out.println("Annotation Parameters: " + annotationParameters);
 
 		// Calculate Applied Filter from Query parameter
-		AppliedFilterSet appliedFilterSet = queryTo.queryToAppliedFilterSet(query, Boolean.valueOf(advancedFilter));
-		System.out.println("Applied Filter Set: " + appliedFilterSet);
+		//AppliedFilterSet appliedFilterSet = queryTo.queryToAppliedFilterSet(query, Boolean.valueOf(advancedFilter));
+		//System.out.println("Applied Filter Set: " + appliedFilterSet);
 
 		// Create query from filter values
-		String solrQuery = annotationParameters.toSolrQuery();
-		System.out.println("Solr Query: " + solrQuery);
-		return solrQuery;
+		//String solrQuery = annotationParameters.toSolrQuery();
+		//System.out.println("Solr Query: " + solrQuery);
+		//return solrQuery;
+		return annotationParameters;
+	}
+
+	/**
+	 * Populate the slimset with fully fledged go terms for each request slimming term
+	 * @param annotationParameters
+	 * @return
+	 */
+	private ITermContainer createSlimTermSet(AnnotationParameters annotationParameters) {
+
+		GeneOntology slimTerms = new GeneOntology();
+		List<String> slimsetGOTerms = annotationParameters.getParameters().get("ancestorsIPO");	//todo should change to requested
+		for (Iterator iterator = slimsetGOTerms.iterator();iterator.hasNext();) {
+			String next =  (String)iterator.next();
+			slimTerms.addTerm(TermUtil.getTerm(next));
+		}
+
+		return slimTerms;
 	}
 }

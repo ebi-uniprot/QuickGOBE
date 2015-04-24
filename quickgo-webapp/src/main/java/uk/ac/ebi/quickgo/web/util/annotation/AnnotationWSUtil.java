@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.web.util.annotation;
 
+import uk.ac.ebi.quickgo.ontology.generic.ITermContainer;
+
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -18,7 +20,7 @@ public interface AnnotationWSUtil {
 	public void downloadAnnotationsInternal(String query,
 											AnnotationColumn[] columns, int limit,
 											int start, int row,
-											HttpServletResponse httpServletResponse, boolean b);
+											HttpServletResponse httpServletResponse, boolean b, ITermContainer slimTermSet);
 
 	void downloadTerm(String termId, HttpServletResponse httpServletResponse);
 

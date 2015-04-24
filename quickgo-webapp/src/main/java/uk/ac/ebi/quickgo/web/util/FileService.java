@@ -282,7 +282,8 @@ public class FileService {
 	 * @param isSlim
 	 * @return GPAD file
 	 */
-	public StringBuffer generateJsonFileWithPageAndRow(String query, long numberAnnotations, int start, int rows, boolean isSlim)
+	public StringBuffer generateJsonFileWithPageAndRow(String query, long numberAnnotations, int start, int rows,
+													   boolean isSlim, ITermContainer slimTermSet )
 			throws Exception{
 
 		AnnotationColumn[] columns = {
@@ -294,6 +295,9 @@ public class FileService {
 		GoAnnotationsContainer goAnnotationsContainer = new GoAnnotationsContainer();
 		goAnnotationsContainer.setNumberAnnotations(numberAnnotations);
 		List<GoAnnotationJson> goAnnotationJsonList = new ArrayList<>();
+
+
+		//Get the annotations back
 		List<Annotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
 
 		//Iterate through each annotation and populate json class
@@ -395,34 +399,39 @@ public class FileService {
 			//If a slim has been request, work out the mapping for this term id to the slim set
 			if(isSlim){
 
-
 				//slimTermset will need to contain the terms entered as the slim, so retrieve them from the queryString
 				//or applied filters
-				ITermContainer slimTermSet = null;
 
 				//todo make the relationTypes selectable
 				EnumSet<RelationType> relationTypes = EnumSet.of(RelationType.ISA, RelationType.PARTOF);
 				TermSlimmer termSlimmer = new TermSlimmer(TermUtil.getGOOntology(), slimTermSet, relationTypes);
 
-
+				//Get the list of goTerms to be reported at the slimset level, for the go term that appears in the
+				//annotation
 				List<GenericTerm> slimTerms = termSlimmer.map(goAnnotationJson.getOriginalTermId());
 
-				List<GoAnnotationJson> annotationsAsSlimmingTerms = new ArrayList<>();
 
 				for (int i = 0;i < slimTerms.size();i++) {
 					GenericTerm genericTerm = slimTerms.get(i);
 
 					//Create a json annotation object for each annotation returned in the map
-					//Set the original term id and name to the pre-mapped version
 					GoAnnotationJson clonedAnnotation = (GoAnnotationJson)goAnnotationJson.copy();
+
+					//Set the termId and name to the slim term requested
+					clonedAnnotation.setGoId(genericTerm.getId());
+					clonedAnnotation.setTermName(genericTerm.getName());
+
+					//Set the original term id and name to the pre-mapped version
+					//it should be these values already
 					clonedAnnotation.setOriginalTermId(goAnnotationJson.getGoId());
 					clonedAnnotation.setOriginalTermName(goAnnotationJson.getTermName());
-					annotationsAsSlimmingTerms.add(clonedAnnotation);
+
+					goAnnotationJsonList.add(clonedAnnotation);
 				}
-				goAnnotationJsonList.addAll(annotationsAsSlimmingTerms);
+
 			}else{
 
-				//Not a slim, just add the annotation to the list.
+				//Not a slim so just add the annotation to the list.
 				goAnnotationJsonList.add(goAnnotationJson);
 
 			}
