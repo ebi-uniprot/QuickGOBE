@@ -486,6 +486,7 @@ public class WebServiceController {
 		//System.out.println("The query hardcoded is " + query);
 		AnnotationParameters annotationParameters = createAnnotationParameters(query, advancedFilter);
 		String solrQuery = annotationParameters.toSolrQuery();
+		System.out.println("Solr query is :" + solrQuery);
 
 		//Do slimming if required
 		ITermContainer slimTermSet = null;
