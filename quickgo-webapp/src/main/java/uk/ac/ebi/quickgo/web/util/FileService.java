@@ -300,7 +300,21 @@ public class FileService {
 		//Get the annotations back
 		List<Annotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
 
-		//Iterate through each annotation and populate json class
+
+		//Set up the term slimmer if slimming has been requested
+		TermSlimmer termSlimmer = null;
+		if(isSlim) {
+
+			//slimTermset will need to contain the terms entered as the slim, so retrieve them from the queryString
+			//or applied filters
+
+			//todo make the relationTypes selectable
+			EnumSet<RelationType> relationTypes = EnumSet.of(RelationType.ISA, RelationType.PARTOF);
+			termSlimmer = new TermSlimmer(TermUtil.getGOOntology(), slimTermSet, relationTypes);
+
+		}
+
+			//Iterate through each annotation and populate json class
 		for (Annotation annotation : annotations) {
 
 			GoAnnotationJson goAnnotationJson = new GoAnnotationJson();
@@ -399,16 +413,9 @@ public class FileService {
 			//If a slim has been request, work out the mapping for this term id to the slim set
 			if(isSlim){
 
-				//slimTermset will need to contain the terms entered as the slim, so retrieve them from the queryString
-				//or applied filters
-
-				//todo make the relationTypes selectable
-				EnumSet<RelationType> relationTypes = EnumSet.of(RelationType.ISA, RelationType.PARTOF);
-				TermSlimmer termSlimmer = new TermSlimmer(TermUtil.getGOOntology(), slimTermSet, relationTypes);
-
 				//Get the list of goTerms to be reported at the slimset level, for the go term that appears in the
 				//annotation
-				List<GenericTerm> slimTerms = termSlimmer.map(goAnnotationJson.getOriginalTermId());
+				List<GenericTerm> slimTerms = termSlimmer.map(goAnnotationJson.getGoId());
 
 
 				for (int i = 0;i < slimTerms.size();i++) {
