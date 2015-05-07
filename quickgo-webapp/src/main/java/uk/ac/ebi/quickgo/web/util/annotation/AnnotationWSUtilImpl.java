@@ -277,7 +277,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		// Check file format
 		StringBuffer sb = null;
 		try {
-			sb = fileService.generateJsonFileWithPageAndRow(query, totalAnnotations, start, rows, isSlim,slimTermSet);
+			sb = fileService.generateJsonFileWithPageAndRow(query, totalAnnotations, start, rows, isSlim, slimTermSet);
 
 			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
 			IOUtils.copy(in, httpServletResponse.getOutputStream());

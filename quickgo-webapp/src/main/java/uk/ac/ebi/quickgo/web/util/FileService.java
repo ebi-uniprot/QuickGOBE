@@ -301,9 +301,10 @@ public class FileService {
 		List<Annotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
 
 
-		//Set up the term slimmer if slimming has been requested
+		//Set up the term slimmer if slimming has been requested - i.e. with arrived here via the slimming pages,
+		//and some go terms to slim with have been supplied (not left blank on page one of the form).
 		TermSlimmer termSlimmer = null;
-		if(isSlim) {
+		if(isSlim && slimTermSet!=null) {
 
 			//slimTermset will need to contain the terms entered as the slim, so retrieve them from the queryString
 			//or applied filters
@@ -411,7 +412,7 @@ public class FileService {
 			} //End of columns iteration
 
 			//If a slim has been request, work out the mapping for this term id to the slim set
-			if(isSlim){
+			if(isSlim && slimTermSet!=null){
 
 				//Get the list of goTerms to be reported at the slimset level, for the go term that appears in the
 				//annotation

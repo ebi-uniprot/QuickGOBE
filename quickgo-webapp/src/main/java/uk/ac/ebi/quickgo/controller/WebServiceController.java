@@ -482,6 +482,7 @@ public class WebServiceController {
 			throws UnsupportedEncodingException {
 
 		System.out.println("The query passed to the Webservice controller is " + query);
+		System.out.println("The value of slim passed to the Webservice controller is " + slim);
 		//query = "\"goID\":\"GO:0033014\",\"ancestorsIPO\":\"ancestorsIPO\",";
 		//System.out.println("The query hardcoded is " + query);
 		AnnotationParameters annotationParameters = createAnnotationParameters(query, advancedFilter);
@@ -909,8 +910,15 @@ public class WebServiceController {
 	 */
 	private ITermContainer createSlimTermSet(AnnotationParameters annotationParameters) {
 
-		GeneOntology slimTerms = new GeneOntology();
+
 		List<String> slimsetGOTerms = annotationParameters.getParameters().get("ancestorsIPO");	//todo should change to requested
+
+		//If not slim terms have been selected then return with a null
+		if(slimsetGOTerms==null) {
+			return null;
+		}
+
+		GeneOntology slimTerms = new GeneOntology();
 		for (Iterator iterator = slimsetGOTerms.iterator();iterator.hasNext();) {
 			String next =  (String)iterator.next();
 			slimTerms.addTerm(TermUtil.getTerm(next));

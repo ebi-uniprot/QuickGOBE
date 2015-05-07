@@ -261,11 +261,13 @@ public class GoAnnotationJson implements Cloneable{
 
 		//Need to copy seperately non-primatives to achieve a deep copy
 		List<String> clonesWithList = new ArrayList<>();
-		for (Iterator<String> iterator = withList.iterator();iterator.hasNext();) {
-			String next = iterator.next();
-			clonesWithList.add(next);
+		if(this.withList!=null) {
+			for (Iterator<String> iterator = withList.iterator();iterator.hasNext();) {
+				String next = iterator.next();
+				clonesWithList.add(next);
+			}
+			((GoAnnotationJson) aClone).setWithList(clonesWithList);
 		}
-		((GoAnnotationJson)aClone).setWithList(clonesWithList);
 		return  aClone;
 	}
 
