@@ -274,6 +274,8 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		// Get total number annotations
 		long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
 
+
+
 		// Check file format
 		StringBuffer sb = null;
 		try {
@@ -284,6 +286,71 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 			// Set response header and content
 			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "JSON");
+			httpServletResponse.setContentLength(sb.length());
+			httpServletResponse.flushBuffer();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+
+	/**
+	 * Generate a file with the annotations results
+	 * @param format
+	 * @param query Query to run
+	 * @param slimTermSet
+	 */
+	public void downloadAnnotationsFile(String query,  int limit, HttpServletResponse httpServletResponse,
+										boolean isSlim,	ITermContainer slimTermSet, String format){
+
+		// Get total number annotations
+		long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
+
+
+		AnnotationColumn[] columns = {
+				AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.SYMBOL, AnnotationColumn.QUALIFIER,
+				AnnotationColumn.GOID, AnnotationColumn.REFERENCE, AnnotationColumn.EVIDENCE, AnnotationColumn.WITH,
+				AnnotationColumn.DATE, AnnotationColumn.ASSIGNEDBY, AnnotationColumn.TERMNAME, AnnotationColumn.ASPECT,
+				AnnotationColumn.TAXON, AnnotationColumn.ORIGINALTERMID, AnnotationColumn.ORIGINALTERMNAME};
+
+		// Check file format
+		StringBuffer sb = null;
+		try {
+
+			switch (FileService.FILE_FORMAT.valueOf(format.toUpperCase())) {
+				case TSV:
+					sb = fileService.generateTSVfile(FileService.FILE_FORMAT.TSV, "", query, totalAnnotations, columns, limit);
+					break;
+				case FASTA:
+					sb = fileService.generateFastafile(query, totalAnnotations, limit);
+					break;
+				case GAF:
+					sb = fileService.generateGAFFile(query, totalAnnotations, limit);
+					break;
+				case GPAD:
+					sb = fileService.generateGPADFile(query, totalAnnotations, limit);
+					break;
+				case PROTEINLIST:
+					sb = fileService.generateProteinListFile(query, totalAnnotations, limit);
+					break;
+				case GENE2GO:
+					sb = fileService.generateGene2GoFile(query, totalAnnotations, limit);
+					break;
+				case JSON:
+					sb = fileService.generateJsonFile(query, totalAnnotations, limit );
+					break;
+			}
+
+
+
+
+			InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+			IOUtils.copy(in, httpServletResponse.getOutputStream());
+			// Set response header and content
+			httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + format.toUpperCase());
 			httpServletResponse.setContentLength(sb.length());
 			httpServletResponse.flushBuffer();
 

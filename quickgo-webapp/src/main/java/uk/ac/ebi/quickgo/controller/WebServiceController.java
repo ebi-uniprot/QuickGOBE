@@ -462,8 +462,6 @@ public class WebServiceController {
 	 * @param page
 	 * @param rows
 	 * @param cols
-	 * @param removeFilter
-	 * @param removeAllFilters
 	 * @param advancedFilter
 	 * @throws UnsupportedEncodingException
 	 */
@@ -475,8 +473,6 @@ public class WebServiceController {
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "rows", defaultValue = "25") int rows,
 			@RequestParam(value = "cols", defaultValue = "") String cols,
-			@RequestParam(value = "removeFilter", defaultValue = "") String removeFilter,
-			@RequestParam(value = "removeAllFilters", defaultValue = "") String removeAllFilters,
 			@RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter,
 			@RequestParam(value = "slim", required = false, defaultValue = "false") String slim)
 			throws UnsupportedEncodingException {
@@ -501,6 +497,46 @@ public class WebServiceController {
 		AnnotationColumn[] columns = new AnnotationColumn[0];	//ignored
 		annotationWSUtil.downloadAnnotationsInternal(solrQuery, columns, Integer.valueOf(limit),
 				(page - 1) * rows, rows, httpServletResponse, slimmingRequired, slimTermSet);
+	}
+
+
+	/**
+	 * USE THIS ONE
+	 * @param httpServletResponse
+	 * @param query
+	 * @param limit
+	 * @param advancedFilter
+	 * @throws UnsupportedEncodingException
+	 */
+	@RequestMapping(value="downloadfiltered", method = {RequestMethod.GET})
+	public void downloadListWithFilter(
+			HttpServletResponse httpServletResponse,
+			@RequestParam(value = "format", required = false, defaultValue = "json") String format,
+			@RequestParam(value = "q", required = false) String query,
+			@RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
+			@RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter,
+			@RequestParam(value = "slim", required = false, defaultValue = "false") String slim)
+			throws UnsupportedEncodingException {
+
+		System.out.println("The query passed to the Webservice controller is " + query);
+		System.out.println("The value of slim passed to the Webservice controller is " + slim);
+		//query = "\"goID\":\"GO:0033014\",\"ancestorsIPO\":\"ancestorsIPO\",";
+		//System.out.println("The query hardcoded is " + query);
+		AnnotationParameters annotationParameters = createAnnotationParameters(query, advancedFilter);
+		String solrQuery = annotationParameters.toSolrQuery();
+		System.out.println("Solr query is :" + solrQuery);
+
+		//Do slimming if required
+		ITermContainer slimTermSet = null;
+		Boolean slimmingRequired = Boolean.parseBoolean(slim);
+		if(slimmingRequired) {
+			slimTermSet = createSlimTermSet(annotationParameters);
+		}
+
+
+		//todo should we be using the annotation service?
+		annotationWSUtil.downloadAnnotationsFile(solrQuery, Integer.valueOf(limit),
+				 httpServletResponse, slimmingRequired, slimTermSet, format);
 	}
 
 

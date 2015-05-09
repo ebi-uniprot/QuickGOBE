@@ -22,6 +22,9 @@ public interface AnnotationWSUtil {
 											int start, int row,
 											HttpServletResponse httpServletResponse, boolean b, ITermContainer slimTermSet);
 
+	public void downloadAnnotationsFile(String query, int limit, HttpServletResponse httpServletResponse, boolean b,
+										ITermContainer slimTermSet, String format);
+
 	void downloadTerm(String termId, HttpServletResponse httpServletResponse);
 
 	void downloadOntologyGraph(String termId, HttpServletResponse httpServletResponse);
