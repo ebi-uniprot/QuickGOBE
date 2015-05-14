@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.controller;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -14,10 +12,13 @@ import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.annotation.Annotation;
@@ -101,6 +102,9 @@ public class WebServiceController {
 
 	@Autowired
 	URLsResolver urLsResolver;
+
+	@Autowired
+	FileService fileService;
 
 	/**
 	 * Lookup web service
@@ -705,7 +709,37 @@ public class WebServiceController {
 //		annotationWSUtil.downloadSlim(httpServletResponse, termList, proteinIds, proteinSets, rows, pages);
 //	}
 
+
+	@RequestMapping("/annotationExtensionRelations")
+	public void showAnnotationExtensionRelationsGraph(
+			HttpServletResponse httpServletResponse ) throws Exception {
+		AnnotationExtensionRelations annotationExtensionRelations = new AnnotationExtensionRelations(TermUtil.getGOOntology(), TermUtil.getSourceFiles().goSourceFiles);
+		//model.addAttribute("data", new Gson().toJson(annotationExtensionRelations.toGraph()));
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(annotationExtensionRelations.toGraph());
+			//sb.append(new Gson().toJson(annotationExtensionRelations.toGraph().toString()));
+
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+			//logger.error(e.getMessage());
+		}
+	}
+
+
 	//----------------------- End of public interface   ------------------------------------ //
+
+	private void writeOutJsonResponse(HttpServletResponse httpServletResponse, StringBuffer sb) throws IOException {
+		InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+		IOUtils.copy(in, httpServletResponse.getOutputStream());
+
+		// Set response header and content
+		httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+		httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
+		httpServletResponse.setContentLength(sb.length());
+		httpServletResponse.flushBuffer();
+	}
 
 	private List<Map<String, Object>> searchTerm(String query, String filterQuery, int limit, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse, String callback) throws IOException, SolrServerException {
 
