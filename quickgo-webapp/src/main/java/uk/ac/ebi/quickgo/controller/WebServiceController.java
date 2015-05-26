@@ -469,7 +469,7 @@ public class WebServiceController {
 	 * @param advancedFilter
 	 * @throws UnsupportedEncodingException
 	 */
-	@RequestMapping(value="annotationfiltered", method = {RequestMethod.GET})
+	@RequestMapping(value="/annotationfiltered", method = {RequestMethod.GET})
 	public void annotationListWithFilter(
 			HttpServletResponse httpServletResponse,
 			@RequestParam(value = "q", required = false) String query,
@@ -512,7 +512,7 @@ public class WebServiceController {
 	 * @param advancedFilter
 	 * @throws UnsupportedEncodingException
 	 */
-	@RequestMapping(value="downloadfiltered", method = {RequestMethod.GET})
+	@RequestMapping(value="/downloadfiltered", method = {RequestMethod.GET})
 	public void downloadListWithFilter(
 			HttpServletResponse httpServletResponse,
 			@RequestParam(value = "format", required = false, defaultValue = "json") String format,
