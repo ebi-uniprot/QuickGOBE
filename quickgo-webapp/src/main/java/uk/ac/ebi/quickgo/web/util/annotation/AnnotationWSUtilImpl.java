@@ -654,7 +654,9 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 				String ecoTerm = GOEvidence2ECOMap.find(goEvidence);
 				EvidenceTypeJson evidenceTypeJson = new EvidenceTypeJson();
 				evidenceTypeJson.setKey(ecoTerm);
-				evidenceTypeJson.setValue(ecoTerm + " (" + goEvidence + ")\t" + evidences.get(goEvidence));
+				evidenceTypeJson.setEvidence(evidences.get(goEvidence));
+				evidenceTypeJson.setEvidenceKey(goEvidence);
+
 				evidenceTypesJson.add(evidenceTypeJson);
 			}
 		}
