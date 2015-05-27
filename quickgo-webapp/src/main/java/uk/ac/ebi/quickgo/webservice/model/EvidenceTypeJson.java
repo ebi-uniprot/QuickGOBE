@@ -8,7 +8,8 @@ package uk.ac.ebi.quickgo.webservice.model;
  */
 public class EvidenceTypeJson {
 	private String ecoTerm;
-	private String value;
+	private String evidence;
+	private String evidenceKey;
 
 	public void setKey(String ecoTerm) {
 		this.ecoTerm = ecoTerm;
@@ -18,11 +19,20 @@ public class EvidenceTypeJson {
 		return ecoTerm;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+
+	public void setEvidence(String evidence) {
+		this.evidence = evidence;
 	}
 
-	public String getValue() {
-		return value;
+	public String getEvidence() {
+		return evidence;
+	}
+
+	public void setEvidenceKey(String evidenceKey) {
+		this.evidenceKey = evidenceKey;
+	}
+
+	public String getEvidenceKey() {
+		return evidenceKey;
 	}
 }
