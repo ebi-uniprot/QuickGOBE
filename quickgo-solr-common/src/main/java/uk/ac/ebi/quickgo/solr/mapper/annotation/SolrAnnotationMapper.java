@@ -67,8 +67,10 @@ public class SolrAnnotationMapper implements SolrMapper<Annotation, SolrAnnotati
 		solrAnnotation.setAssignedBy(annotation.getAssignedBy());
 		solrAnnotation.setDbXref(annotation.getReference());
 		solrAnnotation.setWith(annotation.getWith());
+		solrAnnotation.setFullWith(annotation.getFullWith());
 		solrAnnotation.setGoAspect(annotation.getGoAspect());
 		solrAnnotation.setExtensions(annotation.getExtensions());
+		solrAnnotation.setFullExtension(annotation.getFullExtension());
 		solrAnnotation.setTaxonomyId(annotation.getTaxonomyId());
 		solrAnnotation.setTaxonomyName(annotation.getTaxonomyName());
 		solrAnnotation.setTaxonomyClosures(annotation.getTaxonomyClosure());

@@ -61,6 +61,7 @@ public class EntityAnnotationMapper implements EntityMapper<SolrAnnotation, Anno
 		annotation.setEcoID(associatedSolrTerm.getEcoID());
 		annotation.setTermName(associatedSolrTerm.getTermName());
 		annotation.setExtensions(associatedSolrTerm.getExtensions());
+		annotation.setFullExtension(associatedSolrTerm.getFullExtension());
 		annotation.setGoAspect(associatedSolrTerm.getGoAspect());
 		annotation.setGoEvidence(associatedSolrTerm.getGoEvidence());
 		annotation.setGoID(associatedSolrTerm.getGoID());
@@ -71,6 +72,7 @@ public class EntityAnnotationMapper implements EntityMapper<SolrAnnotation, Anno
 		annotation.setTaxonomyId(associatedSolrTerm.getTaxonomyId());
 		annotation.setTaxonomyName(associatedSolrTerm.getTermName());
 		annotation.setWith(associatedSolrTerm.getWith());
+		annotation.setFullWith(associatedSolrTerm.getFullWith());
 		annotation.setSequenceLength(associatedSolrTerm.getSequenceLength());
 		annotation.setGp2protein(associatedSolrTerm.getGp2proteinList());
 		annotation.setSubset(associatedSolrTerm.getSubSets());
