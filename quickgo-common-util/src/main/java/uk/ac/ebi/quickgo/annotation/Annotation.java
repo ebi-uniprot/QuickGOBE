@@ -31,10 +31,12 @@ public class Annotation implements Serializable{
 	private String assignedBy;
 	private String reference;
 	private List<String> with;
+	private String fullWith;
 	private String qualifier;
 	private String interactingTaxID;
 	private String date;
 	private List<String> extensions;
+	private String fullExtension;
 	private String properties;
 
 	// Ancestors
@@ -60,9 +62,9 @@ public class Annotation implements Serializable{
 
 	public Annotation(String goEvidence, String db,
 			String dbObjectID, String goID, String ecoID, String termName, String assignedBy,
-			String reference, List<String> with,
+			String reference, List<String> with, String fullWith,
 			String qualifier, String interactingTaxID, String date,
-			List<String> extensions, String properties) {
+			List<String> extensions, String fullExtension, String properties) {
 
 		this.goEvidence = goEvidence;
 		this.db = db;
@@ -73,10 +75,12 @@ public class Annotation implements Serializable{
 		this.assignedBy = assignedBy;
 		this.reference = reference;
 		this.with = with;
+		this.fullWith = fullWith;
 		this.qualifier = qualifier;
 		this.interactingTaxID = interactingTaxID;
 		this.date = date;
 		this.extensions = extensions;
+		this.fullExtension=fullExtension;
 		this.properties = properties;
 	}
 
@@ -128,6 +132,14 @@ public class Annotation implements Serializable{
 		this.with = with;
 	}
 
+	public String getFullWith() {
+		return fullWith;
+	}
+
+	public void setFullWith(String fullWith) {
+		this.fullWith = fullWith;
+	}
+
 	public String getReference() {
 		return reference;
 	}
@@ -166,6 +178,12 @@ public class Annotation implements Serializable{
 
 	public void setExtensions(List<String> extensions) {
 		this.extensions = extensions;
+	}
+
+	public String getFullExtension() {	return fullExtension;	}
+
+	public void setFullExtension(String fullExtension) {
+		this.fullExtension = fullExtension;
 	}
 
 	public String getProperties() {

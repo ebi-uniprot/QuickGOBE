@@ -288,9 +288,10 @@ public class FileService {
 
 		AnnotationColumn[] columns = {
 				AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.SYMBOL, AnnotationColumn.QUALIFIER,
-				AnnotationColumn.GOID, AnnotationColumn.REFERENCE, AnnotationColumn.EVIDENCE, AnnotationColumn.WITH,
+				AnnotationColumn.GOID, AnnotationColumn.REFERENCE, AnnotationColumn.EVIDENCE, AnnotationColumn.WITH,  AnnotationColumn.ORIGINALWITH,
 				AnnotationColumn.DATE, AnnotationColumn.ASSIGNEDBY, AnnotationColumn.TERMNAME, AnnotationColumn.ASPECT,
-				AnnotationColumn.TAXON, AnnotationColumn.ORIGINALTERMID, AnnotationColumn.ORIGINALTERMNAME};
+				AnnotationColumn.TAXON, AnnotationColumn.ORIGINALTERMID, AnnotationColumn.ORIGINALTERMNAME,
+		AnnotationColumn.EXTENSION, AnnotationColumn.ORIGINALEXTENSION};
 
 		GoAnnotationsContainer goAnnotationsContainer = new GoAnnotationsContainer();
 		goAnnotationsContainer.setNumberAnnotations(numberAnnotations);
@@ -368,6 +369,8 @@ public class FileService {
 						}
 
 						break;
+					case ORIGINALWITH:
+						goAnnotationJson.setFullWith(annotation.getFullWith());
 					case TAXON:
 						goAnnotationJson.setTaxon(annotation.getTaxonomyId());
 						break;
@@ -404,6 +407,12 @@ public class FileService {
 						break;
 					case ORIGINALTERMNAME:
 						goAnnotationJson.setOriginalTermName(annotation.getTermName());
+						break;
+					case EXTENSION:
+						goAnnotationJson.setExtensionList(annotation.getExtensions());
+						break;
+					case ORIGINALEXTENSION:
+						goAnnotationJson.setFullExtension(annotation.getFullExtension());
 						break;
 					default:
 						break;

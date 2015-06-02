@@ -53,7 +53,9 @@ public class GoAnnotationJson implements Cloneable{
 	String termIDSlimmingToString;
 	NameURL termIDSlimmingTo;
 	String termNameSlimmingTo;
-
+	private List<String> extensionList;
+	private String fullExtension;
+	private String fullWith;
 
 
 	//----------------------------------------------- Getters and Setters -----------------------------------------
@@ -273,5 +275,29 @@ public class GoAnnotationJson implements Cloneable{
 
 	public GoAnnotationJson copy() throws CloneNotSupportedException {
 		return (GoAnnotationJson)this.clone();
+	}
+
+	public void setExtensionList(List<String> extensionList) {
+		this.extensionList = extensionList;
+	}
+
+	public List<String> getExtensionList() {
+		return extensionList;
+	}
+
+	public void setFullExtension(String fullExtension) {
+		this.fullExtension = fullExtension;
+	}
+
+	public String getFullExtension() {
+		return fullExtension;
+	}
+
+	public void setFullWith(String fullWith) {
+		this.fullWith = fullWith;
+	}
+
+	public String getFullWith() {
+		return fullWith;
 	}
 }

@@ -50,8 +50,9 @@ public enum AnnotationColumn {
 	TAXONNAME("taxonomyName","Taxonomy name","taxonname",false,false),
 	SEQUENCE("sequenceLength","Sequence","sequence",false,false),
 	ORIGINALTERMID("goID","Original Term ID","originaltermid",false,true),
-	ORIGINALTERMNAME("termName","Original Term Name","originaltermname",false,false);
-
+	ORIGINALTERMNAME("termName","Original Term Name","originaltermname",false,false),
+	ORIGINALWITH("with","With","with",true,true),
+	ORIGINALEXTENSION("extension","Annotation Extension","extension",true,false);
 	private String id;
 	private String description;
 	private String name;

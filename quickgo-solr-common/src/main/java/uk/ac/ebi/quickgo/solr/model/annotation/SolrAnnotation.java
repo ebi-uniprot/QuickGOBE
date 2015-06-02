@@ -53,12 +53,16 @@ public class SolrAnnotation {
 	private String assignedBy;
 	@Field("extension")
 	private List<String> extensions;
+	@Field("fullExtension")
+	private String fullExtension;
 	@Field
 	private String properties;
 	@Field("dbXref")
 	private String dbXref;
 	@Field
 	private List<String> with;
+	@Field
+	private String fullWith;
 
 	// Ancestors
 	@Field
@@ -186,6 +190,11 @@ public class SolrAnnotation {
 		return extensions;
 	}
 
+	public String getFullExtension() {
+		return fullExtension;
+	}
+
+
 	public void setExtensions(List<String> extensions) {
 		this.extensions = extensions;
 	}
@@ -228,6 +237,12 @@ public class SolrAnnotation {
 
 	public void setWith(List<String> with) {
 		this.with = with;
+	}
+
+	public String getFullWith(){return fullWith;}
+
+	public void setFullWith(String fullWith){
+		this.fullWith = fullWith;
 	}
 
 	public int getTaxonomyId() {
@@ -340,6 +355,10 @@ public class SolrAnnotation {
 
 	public void setEcoAncestorsI(List<String> ecoAncestorsI) {
 		this.ecoAncestorsI = ecoAncestorsI;
+	}
+
+	public void setFullExtension(String fullExtension) {
+		this.fullExtension = fullExtension;
 	}
 
 
