@@ -12,6 +12,10 @@ import java.util.*;
  * Date: 24/03/2015
  * Time: 15:56
  * Created with IntelliJ IDEA.
+ *
+ * Interpret the query recieved from the front end as something else
+ * - annotation parameters
+ * - applied filter set.
  */
 public class QueryTo {
 
@@ -43,21 +47,6 @@ public class QueryTo {
 		return annotationParameters;
 	}
 
-	private void removeFilterValuesIfAdvanced(boolean advancedFilter, AppliedFilterSet appliedFilterSet, AnnotationParameters annotationParameters) {
-		if (advancedFilter) {
-			if(annotationParameters.getParameters().keySet().size() == 0){// No filter applied, remove all previously applied filters
-				appliedFilterSet.getParameters().clear();
-			}
-			else{// Filters applied
-				for (String key : annotationParameters.getParameters().keySet()) {
-					if (appliedFilterSet.getParameters().containsKey(key)) {
-						appliedFilterSet.getParameters().get(key).clear();
-					}
-				}
-			}
-		}
-	}
-
 
 	/**
 	 * Process query and calculate filter session parameters
@@ -81,6 +70,22 @@ public class QueryTo {
 		appliedFilterSet.addParameters(annotationParameters.getParameters());
 
 		return appliedFilterSet;
+	}
+
+
+	private void removeFilterValuesIfAdvanced(boolean advancedFilter, AppliedFilterSet appliedFilterSet, AnnotationParameters annotationParameters) {
+		if (advancedFilter) {
+			if(annotationParameters.getParameters().keySet().size() == 0){// No filter applied, remove all previously applied filters
+				appliedFilterSet.getParameters().clear();
+			}
+			else{// Filters applied
+				for (String key : annotationParameters.getParameters().keySet()) {
+					if (appliedFilterSet.getParameters().containsKey(key)) {
+						appliedFilterSet.getParameters().get(key).clear();
+					}
+				}
+			}
+		}
 	}
 
 
