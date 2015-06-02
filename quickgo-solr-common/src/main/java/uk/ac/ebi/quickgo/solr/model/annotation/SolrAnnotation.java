@@ -53,7 +53,7 @@ public class SolrAnnotation {
 	private String assignedBy;
 	@Field("extension")
 	private List<String> extensions;
-	@Field("fullExtension")
+	@Field
 	private String fullExtension;
 	@Field
 	private String properties;
