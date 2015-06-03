@@ -17,12 +17,12 @@ import uk.ac.ebi.quickgo.util.MemoryMonitor;
 
 /**
  * Class that represents a gene_association (gaf), gp_association (gpad) or gp_information (gpi) file.
- * 
+ *
  * Lines that start with "!" are comments.
- * 
+ *
  * The file is assumed to have a header that consists of one or more comment lines that contain directives; at present the only
  * types of directive that we recognise are the format version (in gaf, gpad & gpi) and namespace (in gpi).
- *   
+ *
  * @author tonys
  *
  */
@@ -38,7 +38,7 @@ public abstract class GPDataFile {
 
 	private final static Pattern directivePattern = Pattern.compile("^!\\s*([A-Za-z0-9_\\.-]+)\\s*:\\s*([A-Za-z0-9_\\.-]+)");
 	private final static Matcher directiveMatcher = directivePattern.matcher("");
-	
+
 	public GPDataFile(NamedFile f, int columnCount, String versionDirective, String versionSupported) throws Exception {
 		this.gpdf = f;
 		this.columnCount = columnCount;
@@ -48,14 +48,14 @@ public abstract class GPDataFile {
 
 		this.directives = readHeader();
 	}
-	
+
 	public String getName() {
 		return gpdf.getName();
 	}
-	
+
 	public class GPDataFileReader {
 	    BufferedReader reader;
-	
+
 		public void open() throws IOException {
 			reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(gpdf.getDirectory() + File.separator + gpdf.getName())), "UTF8"));
 	    }
@@ -92,25 +92,25 @@ public abstract class GPDataFile {
 
 			String[] columns = line.split("\\t", columnCount);
 			if (columns.length != columnCount) {
-				throw new Exception("Expected " + columnCount + " columns, found " + columns.length);
+				throw new Exception("Reading " + gpdf.getName() + " and expected " + columnCount + " columns, found " + columns.length + ", line is: " + line);
 			}
 			return columns;
 		}
 	}
-	
+
 	/**
 	 * Read the header of the file and extracts any directives that it finds
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public Map<String, String> readHeader() throws Exception {
 		Map<String, String> directives = new HashMap<>();
 		reader.open();
-		
+
 		String line;
 		while (true) {
 			line = reader.readLine();
-			if (line == null) { 
+			if (line == null) {
 				// eof
 				break;
 			}
@@ -118,11 +118,11 @@ public abstract class GPDataFile {
 				// blank line
 				continue;
 			}
-			else if (!line.startsWith("!")) { 
+			else if (!line.startsWith("!")) {
 				// non-blank, non-comment line, meaning we've gone beyond the header
 				break;
 			}
-			
+
 			// check whether the line contains a directive, or is just a plain ol' comment
 			directiveMatcher.reset(line);
 			if (directiveMatcher.matches()) {
@@ -147,7 +147,7 @@ public abstract class GPDataFile {
 
 		// make sure we're dealing with a file that's in the expected format
 		checkVersion();
-		
+
 		// read the records & index them
 		reader.open();
 		int count = 0;
@@ -168,9 +168,9 @@ public abstract class GPDataFile {
 		System.out.println("Load " + getName() + " done - " + mm.end());
 		return count;
 	}
-	
+
 	public abstract boolean index(IIndexer indexer, String[] columns) throws Exception;
-	
+
 	public abstract Object calculateRow (String[] columns) throws Exception;
-	
+
 }
