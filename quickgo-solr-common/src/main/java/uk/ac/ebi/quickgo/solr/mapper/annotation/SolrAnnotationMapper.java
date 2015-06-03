@@ -82,6 +82,11 @@ public class SolrAnnotationMapper implements SolrMapper<Annotation, SolrAnnotati
 		solrAnnotation.setSequenceLength(annotation.getSequenceLength());
 		solrAnnotation.setGp2proteinList(annotation.getGp2protein());
 		solrAnnotation.setSubSets(annotation.getSubset());
+
+		if(solrAnnotation.getFullExtension()!=null || solrAnnotation.getFullWith()!=null){
+			System.out.println("Have got a Solr Annotation with some fullness " + solrAnnotation.toString());
+		}
+
 		return solrAnnotation;
 	}
 }
