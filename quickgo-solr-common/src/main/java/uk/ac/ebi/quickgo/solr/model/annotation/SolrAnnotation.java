@@ -406,4 +406,44 @@ public class SolrAnnotation {
 			return documentType;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "SolrAnnotation{" +
+				"id='" + id + '\'' +
+				", goEvidence='" + goEvidence + '\'' +
+				", docType='" + docType + '\'' +
+				", db='" + db + '\'' +
+				", dbObjectID='" + dbObjectID + '\'' +
+				", dbObjectSymbol='" + dbObjectSymbol + '\'' +
+				", dbObjectName='" + dbObjectName + '\'' +
+				", dbObjectType='" + dbObjectType + '\'' +
+				", dbObjectSynonyms=" + dbObjectSynonyms +
+				", targetSet='" + targetSet + '\'' +
+				", qualifier='" + qualifier + '\'' +
+				", goID='" + goID + '\'' +
+				", goAspect='" + goAspect + '\'' +
+				", ecoID='" + ecoID + '\'' +
+				", termName='" + termName + '\'' +
+				", interactingTaxID='" + interactingTaxID + '\'' +
+				", date='" + date + '\'' +
+				", assignedBy='" + assignedBy + '\'' +
+				", extensions=" + extensions +
+				", fullExtension='" + fullExtension + '\'' +
+				", properties='" + properties + '\'' +
+				", dbXref='" + dbXref + '\'' +
+				", with=" + with +
+				", fullWith='" + fullWith + '\'' +
+				", ancestorsI=" + ancestorsI +
+				", ancestorsIPO=" + ancestorsIPO +
+				", ancestorsIPOR=" + ancestorsIPOR +
+				", ecoAncestorsI=" + ecoAncestorsI +
+				", taxonomyId=" + taxonomyId +
+				", taxonomyName='" + taxonomyName + '\'' +
+				", taxonomyClosures=" + taxonomyClosures +
+				", sequenceLength=" + sequenceLength +
+				", gp2proteinList=" + gp2proteinList +
+				", subSets=" + subSets +
+				'}';
+	}
 }
