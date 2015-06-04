@@ -11,6 +11,7 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -19,13 +20,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.servlet.ModelAndView;
 import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.bean.annotation.AnnotationBean;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 
 import uk.ac.ebi.quickgo.graphics.ImageArchive;
+import uk.ac.ebi.quickgo.ontology.eco.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationBlacklist.BlacklistEntryMinimal;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationExtensionRelations;
@@ -38,6 +42,7 @@ import uk.ac.ebi.quickgo.service.annotation.parameter.AnnotationParameters;
 import uk.ac.ebi.quickgo.service.geneproduct.GeneProductService;
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousService;
 import uk.ac.ebi.quickgo.service.term.TermService;
+import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.solr.query.model.geneproduct.enums.GeneProductField;
 import uk.ac.ebi.quickgo.solr.query.model.ontology.enums.TermField;
@@ -47,6 +52,7 @@ import uk.ac.ebi.quickgo.web.staticcontent.annotation.AnnotationBlackListContent
 import uk.ac.ebi.quickgo.web.staticcontent.annotation.TaxonConstraintsContent;
 import uk.ac.ebi.quickgo.web.util.ChartService;
 import uk.ac.ebi.quickgo.web.util.FileService;
+import uk.ac.ebi.quickgo.web.util.View;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationColumn;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationWSUtil;
 import uk.ac.ebi.quickgo.web.util.annotation.AppliedFilterSet;
@@ -211,6 +217,231 @@ public class WebServiceController {
 		httpServletResponse.setContentType("application/json");
 		httpServletResponse.getWriter().write(generateContentResponse(callback, json));
 	}
+
+
+	@RequestMapping(value = "searchfull", method = { RequestMethod.POST, RequestMethod.GET })
+	public ModelAndView searchfull(
+			@RequestParam(value = "query", defaultValue="", required=false) String query,
+			@RequestParam(value = "text", defaultValue="", required=false) String text,
+			@RequestParam(value = "isProtein", defaultValue="false", required=false) String isProtein,
+			@RequestParam(value = "viewBy", defaultValue="", required=false) String viewBy,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "rows", defaultValue = "25") int rows,
+			HttpSession session, HttpServletResponse httpServletResponse,Model model) throws IOException,
+			SolrServerException {
+		boolean sameQuery = false;
+
+		List<Object> searchResults = new ArrayList<>();
+
+		if(!query.isEmpty()){
+			AppliedFilterSet appliedFilterSet = new AppliedFilterSet();
+			queryProcessor.processQuery(query, new AnnotationParameters(), appliedFilterSet, false);
+
+			if(isProtein.equals("true")){
+//				session.setAttribute("searchedText", appliedFilterSet.getParameters().get(AnnotationField.DBOBJECTID.getValue()));
+//				session.setAttribute("appliedFilters", appliedFilterSet);
+//				return new ModelAndView("redirect:" + View.ANNOTATIONS_PATH);
+
+			} else {
+
+				// Text
+				Properties data = gson.fromJson(query, Properties.class);
+				String text = data.getProperty("text");
+				// Remove leading and trailing white spaces from query
+				text = StringUtils.trimLeadingWhitespace(text);
+				text = StringUtils.trimTrailingWhitespace(text);
+
+				String previousQuery = (String)session.getAttribute("searchedText");
+				if(text.equals(previousQuery)){// Query hasn't changed. No need to recalculate all the counts and search results
+					sameQuery = true;
+				}
+
+				session.setAttribute("searchedText", text);
+
+				long gpNumberResults = 0, goTotalResults = 0,
+						bpGoNumberResults = 0, mfGoNumberResults = 0,
+						ccGoNumberResults = 0,ecoTotalResults = 0,
+						expEcoTotalResults = 0,automaticEcoTotalResults = 0,
+						evidenceEcoResults = 0;
+
+				String expEcofilterQuery = "", automaticEcofilterQuery = "";
+				String ecoFilterQuery = TermField.ID.getValue() + ":" + ECOTerm.ECO.toString() + "*" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
+
+				if(!sameQuery){// Recalculate counts
+
+					// Calculate number of results of each type
+
+					// #Gene Products
+					gpNumberResults = geneProductService.getTotalNumberHighlightResults("*" + text  + "*", null);
+					session.setAttribute("gpNumberResults", gpNumberResults);
+
+					// #GO terms
+					goTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "*" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue());
+					session.setAttribute("goNumberResults", goTotalResults);
+
+					String textToSearch = "*" + text + "*";
+					// #BP GO terms
+					bpGoNumberResults = calculateAspectsTotalResults(textToSearch, GOTerm.EGOAspect.P.text, "bpGoNumberResults", session);
+
+					// #MF GO terms
+					mfGoNumberResults = calculateAspectsTotalResults(textToSearch, GOTerm.EGOAspect.F.text, "mfGoNumberResults", session);
+
+					// #CC GO terms
+					ccGoNumberResults = calculateAspectsTotalResults(textToSearch, GOTerm.EGOAspect.C.text, "ccGoNumberResults", session);
+
+					// #ECO terms
+					ecoTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", ecoFilterQuery + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue());
+					session.setAttribute("ecoNumberResults", ecoTotalResults);
+					// Retrieve values
+					List<GenericTerm> ecoTerms = highlightedTerms("*" + text  + "*", ecoFilterQuery, 1, 60000);
+					// Remove null elements
+					List<GenericTerm> noNullTerms = new ArrayList<>();
+					for(GenericTerm genericTerm : ecoTerms){
+						if(genericTerm != null && genericTerm.getId() != null){
+							noNullTerms.add(genericTerm);
+						}
+					}
+
+					ecoTerms = noNullTerms;
+
+					// #Experimental ECO terms
+					String expEcoValues = StringUtils.arrayToDelimitedString(getAllManualECOCodes(ecoTerms).toArray(), " OR ");
+					if(!expEcoValues.isEmpty()){
+						expEcofilterQuery = TermField.ID.getValue() + ":(" + expEcoValues.replaceAll(":","*") + ")" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();;
+						session.setAttribute("expEcofilterQuery", expEcofilterQuery);
+						expEcoTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", expEcofilterQuery);
+					}
+					session.setAttribute("expEcoTotalResults", expEcoTotalResults);
+
+					// #Automatic ECO terms
+					String automaticEcoValues = StringUtils.arrayToDelimitedString(getAllAutomaticECOCodes(ecoTerms).toArray(), " OR ");
+					if(!automaticEcoValues.isEmpty()){
+						automaticEcofilterQuery =  TermField.ID.getValue() + ":(" + automaticEcoValues.replaceAll(":","*") + ")" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();;
+						session.setAttribute("automaticEcofilterQuery", automaticEcofilterQuery);
+						automaticEcoTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", automaticEcofilterQuery);
+
+					}
+					session.setAttribute("automaticEcoTotalResults", automaticEcoTotalResults);
+
+					// #Evidence ECO Terms
+					evidenceEcoResults = ecoTotalResults - (expEcoTotalResults + automaticEcoTotalResults);
+					session.setAttribute("evidenceEcoTotalResults", evidenceEcoResults);
+				} else {// Same query. Get counts from session
+					gpNumberResults = (long)session.getAttribute("gpNumberResults");
+					goTotalResults = (long)session.getAttribute("goNumberResults");
+					bpGoNumberResults = (long)session.getAttribute("bpGoNumberResults");
+					mfGoNumberResults = (long)session.getAttribute("mfGoNumberResults");
+					ccGoNumberResults = (long)session.getAttribute("ccGoNumberResults");
+					ecoTotalResults = (long)session.getAttribute("ecoNumberResults");
+					expEcoTotalResults = (long)session.getAttribute("expEcoTotalResults");
+					automaticEcoTotalResults = (long)session.getAttribute("automaticEcoTotalResults");
+					evidenceEcoResults = (long)session.getAttribute("evidenceEcoTotalResults");
+				}
+
+				// Set default view
+				if (viewBy.isEmpty()) {
+					viewBy = ViewBy.ENTITY.getValue();
+					if (gpNumberResults > 0){
+						viewBy = ViewBy.ENTITY.getValue();
+					} else if (goTotalResults > 0) {
+						viewBy = ViewBy.GOID.getValue();
+					} else if (ecoTotalResults > 0) {
+						viewBy = ViewBy.ECOID.getValue();
+					}
+				}
+
+				if (viewBy.equalsIgnoreCase(ViewBy.ENTITY.getValue())){
+					totalResults = gpNumberResults;
+					List<GeneProduct> gpResults = geneProductService.highlight("*" + text  + "*", null, (page-1)*rows, rows);
+					searchResults.addAll(gpResults);
+
+				} else if (viewBy.equalsIgnoreCase(ViewBy.GOID.getValue())
+						|| viewBy.equalsIgnoreCase(ViewBy.ECOID.getValue())
+						|| viewBy.equalsIgnoreCase(ViewBy.BP.getValue())
+						|| viewBy.equalsIgnoreCase(ViewBy.MF.getValue())
+						|| viewBy.equalsIgnoreCase(ViewBy.CC.getValue())
+						|| viewBy.equalsIgnoreCase(ViewBy.ECOAUTOMATIC.getValue())
+						|| viewBy.equalsIgnoreCase(ViewBy.ECOMANUAL.getValue())
+						|| viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())) {
+
+					String filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "*" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
+					totalResults = goTotalResults;
+					if(viewBy.equalsIgnoreCase(ViewBy.BP.getValue())){
+						filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "* AND "
+								+ TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue() + " AND "
+								+ SolrTerm.SolrTermDocumentType.ONTOLOGY
+								.getValue() + ":"
+								+ GOTerm.EGOAspect.P.text;
+						totalResults = bpGoNumberResults;
+					}
+					else if(viewBy.equalsIgnoreCase(ViewBy.MF.getValue())){
+						filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "* AND "
+								+ TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue() + " AND "
+								+ SolrTerm.SolrTermDocumentType.ONTOLOGY
+								.getValue() + ":"
+								+ GOTerm.EGOAspect.F.text;
+						totalResults = mfGoNumberResults;
+					}
+					else if(viewBy.equalsIgnoreCase(ViewBy.CC.getValue())){
+						filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "*  AND "
+								+ TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue() + " AND "
+								+ SolrTerm.SolrTermDocumentType.ONTOLOGY
+								.getValue() + ":"
+								+ GOTerm.EGOAspect.C.text;
+						totalResults = ccGoNumberResults;
+					}
+					else if(viewBy.equalsIgnoreCase(ViewBy.ECOID.getValue())){
+						filterQuery = ecoFilterQuery;
+						totalResults = ecoTotalResults;
+					}
+					else if(viewBy.equalsIgnoreCase(ViewBy.ECOMANUAL.getValue())){
+						filterQuery = (String)session.getAttribute("expEcofilterQuery");
+						totalResults = expEcoTotalResults;
+					}
+					else if(viewBy.equalsIgnoreCase(ViewBy.ECOAUTOMATIC.getValue())){
+						filterQuery = (String)session.getAttribute("automaticEcofilterQuery");
+						totalResults = automaticEcoTotalResults;
+					}
+					else if(viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())){
+						String evidencefilterQuery = ecoFilterQuery;
+
+						if(session.getAttribute("expEcofilterQuery") != null && !((String)session.getAttribute("expEcofilterQuery")).isEmpty()){
+							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)session.getAttribute("expEcofilterQuery");
+						}
+
+						if(session.getAttribute("automaticEcofilterQuery") != null && !((String)session.getAttribute("automaticEcofilterQuery")).isEmpty()){
+							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)session.getAttribute("automaticEcofilterQuery");
+						}
+
+						filterQuery = evidencefilterQuery;
+						totalResults = evidenceEcoResults;
+					}
+					List<GenericTerm> termsResults = highlightedTerms("*" + text  + "*", filterQuery, page, rows);
+					searchResults.addAll(termsResults);
+				}
+
+				// Set results in session
+				model.addAttribute("searchResults", searchResults);
+
+				// Set total number results
+				model.addAttribute("totalNumberResults", totalResults);
+
+				// Set current page
+				model.addAttribute("searchCurrentPage", this.selectedPage);
+
+				// View by
+				model.addAttribute("viewBy", viewBy);
+
+				return new ModelAndView(View.SEARCH);
+			}
+		}
+		return new ModelAndView("");
+	}
+
+
+
+
+
 
 	/**
 	 * Validate service
