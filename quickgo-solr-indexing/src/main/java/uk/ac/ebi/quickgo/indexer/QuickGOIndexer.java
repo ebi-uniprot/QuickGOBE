@@ -99,19 +99,19 @@ public class QuickGOIndexer implements IIndexer {
 			quickGOOntologyIndexer.indexOntologies(sourceFiles);
 
 			// index miscellaneous data
-			//temp quickGOMiscellaneousIndexer.index(sourceFiles, quickGOOntologyIndexer.getOntology());
+			quickGOMiscellaneousIndexer.index(sourceFiles, quickGOOntologyIndexer.getOntology());
 
 			// index the gene products - this will also build a cache that will be used when indexing the annotations
-			//temp quickGOGeneProductIndexer.indexGeneProducts(gpiList);
+			quickGOGeneProductIndexer.indexGeneProducts(gpiList);
 
 			// index any DB Xrefs - this augments the information indexed by indexGeneProducts
-			//temp quickGOGeneProductIndexer.indexDBXRefs(Arrays.asList(sourceFiles.getMappingFiles()));
+			quickGOGeneProductIndexer.indexDBXRefs(Arrays.asList(sourceFiles.getMappingFiles()));
 
 			//now we can index the annotations themselves
 			indexAnnotations(gpaList, quickGOOntologyIndexer.getOntology(), quickGOOntologyIndexer.getEvidenceCodeOntology(), quickGOMiscellaneousIndexer.getTaxonomiesMap());
 
 			// Index Co-Occurrence stats
-			//temp quickGOCOOccurrenceStatsIndexer.index();
+			quickGOCOOccurrenceStatsIndexer.index();
 
 		} catch (Exception e) {
 			logger.error(e.getMessage());
