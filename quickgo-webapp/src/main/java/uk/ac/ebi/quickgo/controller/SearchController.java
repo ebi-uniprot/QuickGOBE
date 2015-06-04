@@ -49,25 +49,25 @@ import com.google.gson.Gson;
 @Controller
 @RequestMapping(value = { "/", "annotation", "/search" })
 public class SearchController {
-	
+
 	@Autowired
-	TermService termService; 
+	TermService termService;
 
 	@Autowired
 	GeneProductService geneProductService;
-	
+
 	@Autowired
 	QueryProcessor queryProcessor;
-	
+
 	private int selectedPage;
-	
+
 	private long totalResults;
-	
+
 	private List<Object> searchResults = new ArrayList<>();
 	Gson gson = new Gson();
-	
+
 	private final int NUMBER_SHOWN_HITS = 10;
-	
+
 	@RequestMapping(value = "autoSuggestByName", method = { RequestMethod.POST, RequestMethod.GET })
 	public ResponseEntity<String> findByName(
 			@RequestParam(value = "q") String query,
@@ -75,7 +75,7 @@ public class SearchController {
 			SolrServerException {
 
 		List<Object> results = new ArrayList<>();
-		
+
 		List<GeneProduct> geneproducts = new ArrayList<>();
 		List<GenericTerm> terms = termService.autosuggest(query,null, 30);
 		if (!query.contains(":")) {
@@ -83,12 +83,12 @@ public class SearchController {
 			addTerms(query, results, terms);
 			addGeneProducts(query, results, geneproducts);
 		} else {// GO or ECO id
-			addTermsIds(query, results, terms);			
-		}	
-		
+			addTermsIds(query, results, terms);
+		}
+
 		// Sort results (shortest first)
 		Collections.sort(results, new HistsComparator());
-		
+
 		if (results.size() > NUMBER_SHOWN_HITS) {
 			results = results.subList(0, NUMBER_SHOWN_HITS);// first 10 results
 		} else {
@@ -112,11 +112,13 @@ public class SearchController {
 			@RequestParam(value = "rows", defaultValue = "25") int rows,
 			HttpSession session, HttpServletResponse httpServletResponse,Model model) throws IOException,
 			SolrServerException {
+
+		System.out.println("Search run " + "query:" + query + "<<isProtein:" + isProtein + "<<viewBy " + viewBy);
 		boolean sameQuery = false;
-		
+
 		this.selectedPage = page;
 		searchResults = new ArrayList<>();
-		
+
 		if(!query.isEmpty()){
 			AppliedFilterSet appliedFilterSet = new AppliedFilterSet();
 			queryProcessor.processQuery(query, new AnnotationParameters(), appliedFilterSet, false);
@@ -124,85 +126,85 @@ public class SearchController {
 				session.setAttribute("searchedText", appliedFilterSet.getParameters().get(AnnotationField.DBOBJECTID.getValue()));
 				session.setAttribute("appliedFilters", appliedFilterSet);
 				return new ModelAndView("redirect:" + View.ANNOTATIONS_PATH);
-			} else {// Text				
+			} else {// Text
 				Properties data = gson.fromJson(query, Properties.class);
 				String text = data.getProperty("text");
 				// Remove leading and trailing white spaces from query
 				text = StringUtils.trimLeadingWhitespace(text);
 				text = StringUtils.trimTrailingWhitespace(text);
-				
+
 				String previousQuery = (String)session.getAttribute("searchedText");
 				if(text.equals(previousQuery)){// Query hasn't changed. No need to recalculate all the counts and search results
 					sameQuery = true;
 				}
-				
-				session.setAttribute("searchedText", text);				
-				
+
+				session.setAttribute("searchedText", text);
+
 				long gpNumberResults = 0, goTotalResults = 0,
 						bpGoNumberResults = 0, mfGoNumberResults = 0,
 						ccGoNumberResults = 0,ecoTotalResults = 0,
 						expEcoTotalResults = 0,automaticEcoTotalResults = 0,
 						evidenceEcoResults = 0;
-				
-				String expEcofilterQuery = "", automaticEcofilterQuery = "";				
+
+				String expEcofilterQuery = "", automaticEcofilterQuery = "";
 				String ecoFilterQuery = TermField.ID.getValue() + ":" + ECOTerm.ECO.toString() + "*" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
-				
-				if(!sameQuery){// Recalculate counts				
-					
+
+				if(!sameQuery){// Recalculate counts
+
 					// Calculate number of results of each type
-					
-					// #Gene Products 
+
+					// #Gene Products
 					gpNumberResults = geneProductService.getTotalNumberHighlightResults("*" + text  + "*", null);
 					session.setAttribute("gpNumberResults", gpNumberResults);
-					
+
 					// #GO terms
 					goTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "*" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue());
-					session.setAttribute("goNumberResults", goTotalResults);					
-					
+					session.setAttribute("goNumberResults", goTotalResults);
+
 					String textToSearch = "*" + text + "*";
 					// #BP GO terms
 					bpGoNumberResults = calculateAspectsTotalResults(textToSearch, GOTerm.EGOAspect.P.text, "bpGoNumberResults", session);
-					
+
 					// #MF GO terms
 					mfGoNumberResults = calculateAspectsTotalResults(textToSearch, GOTerm.EGOAspect.F.text, "mfGoNumberResults", session);
-					
+
 					// #CC GO terms
 					ccGoNumberResults = calculateAspectsTotalResults(textToSearch, GOTerm.EGOAspect.C.text, "ccGoNumberResults", session);
-					
-					// #ECO terms					
+
+					// #ECO terms
 					ecoTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", ecoFilterQuery + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue());
-					session.setAttribute("ecoNumberResults", ecoTotalResults);				
+					session.setAttribute("ecoNumberResults", ecoTotalResults);
 					// Retrieve values
 					List<GenericTerm> ecoTerms = highlightedTerms("*" + text  + "*", ecoFilterQuery, 1, 60000);
 					// Remove null elements
-					List<GenericTerm> noNullTerms = new ArrayList<>();				
+					List<GenericTerm> noNullTerms = new ArrayList<>();
 					for(GenericTerm genericTerm : ecoTerms){
 						if(genericTerm != null && genericTerm.getId() != null){
 							noNullTerms.add(genericTerm);
 						}
 					}
-					
+
 					ecoTerms = noNullTerms;
-					
-					// #Experimental ECO terms				
-					String expEcoValues = StringUtils.arrayToDelimitedString(getAllManualECOCodes(ecoTerms).toArray(), " OR ");				
+
+					// #Experimental ECO terms
+					String expEcoValues = StringUtils.arrayToDelimitedString(getAllManualECOCodes(ecoTerms).toArray(), " OR ");
 					if(!expEcoValues.isEmpty()){
 						expEcofilterQuery = TermField.ID.getValue() + ":(" + expEcoValues.replaceAll(":","*") + ")" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();;
 						session.setAttribute("expEcofilterQuery", expEcofilterQuery);
 						expEcoTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", expEcofilterQuery);
 					}
 					session.setAttribute("expEcoTotalResults", expEcoTotalResults);
-			
+
 					// #Automatic ECO terms
-					String automaticEcoValues = StringUtils.arrayToDelimitedString(getAllAutomaticECOCodes(ecoTerms).toArray(), " OR ");				
+					String automaticEcoValues = StringUtils.arrayToDelimitedString(getAllAutomaticECOCodes(ecoTerms).toArray(), " OR ");
 					if(!automaticEcoValues.isEmpty()){
 						automaticEcofilterQuery =  TermField.ID.getValue() + ":(" + automaticEcoValues.replaceAll(":","*") + ")" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();;
 						session.setAttribute("automaticEcofilterQuery", automaticEcofilterQuery);
-						automaticEcoTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", automaticEcofilterQuery);					
-	
+						automaticEcoTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", automaticEcofilterQuery);
+
 					}
 					session.setAttribute("automaticEcoTotalResults", automaticEcoTotalResults);
-					
+
 					// #Evidence ECO Terms
 					evidenceEcoResults = ecoTotalResults - (expEcoTotalResults + automaticEcoTotalResults);
 					session.setAttribute("evidenceEcoTotalResults", evidenceEcoResults);
@@ -217,8 +219,8 @@ public class SearchController {
 					automaticEcoTotalResults = (long)session.getAttribute("automaticEcoTotalResults");
 					evidenceEcoResults = (long)session.getAttribute("evidenceEcoTotalResults");
 				}
-				
-				// Set default view 
+
+				// Set default view
 				if (viewBy.isEmpty()) {
 					viewBy = ViewBy.ENTITY.getValue();
 					if (gpNumberResults > 0){
@@ -227,14 +229,14 @@ public class SearchController {
 						viewBy = ViewBy.GOID.getValue();
 					} else if (ecoTotalResults > 0) {
 						viewBy = ViewBy.ECOID.getValue();
-					}  
+					}
 				}
-				
+
 				if (viewBy.equalsIgnoreCase(ViewBy.ENTITY.getValue())){
 					totalResults = gpNumberResults;
 					List<GeneProduct> gpResults = geneProductService.highlight("*" + text  + "*", null, (page-1)*rows, rows);
 					searchResults.addAll(gpResults);
-					
+
 				} else if (viewBy.equalsIgnoreCase(ViewBy.GOID.getValue())
 						|| viewBy.equalsIgnoreCase(ViewBy.ECOID.getValue())
 						|| viewBy.equalsIgnoreCase(ViewBy.BP.getValue())
@@ -242,8 +244,8 @@ public class SearchController {
 						|| viewBy.equalsIgnoreCase(ViewBy.CC.getValue())
 						|| viewBy.equalsIgnoreCase(ViewBy.ECOAUTOMATIC.getValue())
 						|| viewBy.equalsIgnoreCase(ViewBy.ECOMANUAL.getValue())
-						|| viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())) {																				
-					
+						|| viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())) {
+
 					String filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "*" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
 					totalResults = goTotalResults;
 					if(viewBy.equalsIgnoreCase(ViewBy.BP.getValue())){
@@ -282,47 +284,47 @@ public class SearchController {
 						filterQuery = (String)session.getAttribute("automaticEcofilterQuery");
 						totalResults = automaticEcoTotalResults;
 					}
-					else if(viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())){		
+					else if(viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())){
 						String evidencefilterQuery = ecoFilterQuery;
-						
+
 						if(session.getAttribute("expEcofilterQuery") != null && !((String)session.getAttribute("expEcofilterQuery")).isEmpty()){
-							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)session.getAttribute("expEcofilterQuery"); 
+							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)session.getAttribute("expEcofilterQuery");
 						}
-						
+
 						if(session.getAttribute("automaticEcofilterQuery") != null && !((String)session.getAttribute("automaticEcofilterQuery")).isEmpty()){
-							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)session.getAttribute("automaticEcofilterQuery"); 
+							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)session.getAttribute("automaticEcofilterQuery");
 						}
-						
+
 						filterQuery = evidencefilterQuery;
-						totalResults = evidenceEcoResults;						
+						totalResults = evidenceEcoResults;
 					}
 					List<GenericTerm> termsResults = highlightedTerms("*" + text  + "*", filterQuery, page, rows);
 					searchResults.addAll(termsResults);
 				}
-				
+
 				// Set results in session
 				model.addAttribute("searchResults", searchResults);
-				
+
 				// Set total number results
-				model.addAttribute("totalNumberResults", totalResults);				
-				
+				model.addAttribute("totalNumberResults", totalResults);
+
 				// Set current page
 				model.addAttribute("searchCurrentPage", this.selectedPage);
-				
+
 				// View by
 				model.addAttribute("viewBy", viewBy);
-				
-				return new ModelAndView(View.SEARCH);		        
+
+				return new ModelAndView(View.SEARCH);
 			}
 		}
-		return new ModelAndView("");		
+		return new ModelAndView("");
 	}
-	
+
 	private List<GenericTerm> highlightedTerms(String text, String filterQuery, int page, int rows){
 		return termService.highlight("*" + text  + "*", filterQuery, (page-1)*rows, rows);
 	}
-	
-	
+
+
 	private long calculateAspectsTotalResults(String query, String aspect, String attibute, HttpSession session){
 		long numberResults = termService.getTotalNumberHighlightResults(query,
 				TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "* AND "
@@ -332,7 +334,7 @@ public class SearchController {
 		session.setAttribute(attibute, numberResults);
 		return numberResults;
 	}
-	
+
 	public enum ViewBy{
 		ENTITY("entity"),
 		GOID("goID"),
@@ -343,7 +345,7 @@ public class SearchController {
 		ECOMANUAL("ecoManual"),
 		ECOAUTOMATIC("ecoAutomatic"),
 		EVIDENCEECO("evidenceEco");
-				
+
 		String value;
 
 		private ViewBy(String value) {
@@ -354,7 +356,7 @@ public class SearchController {
 			return value;
 		}
 	}
-	
+
 	/**
 	 * Return ECO terms used in manual assertion
 	 * @param results EXO terms to check
@@ -381,14 +383,14 @@ public class SearchController {
 		}
 		return allExperimentalECOCodes;
 	}
-	
+
 	/**
 	 * Return ECO terms used in automatic assertion
 	 * @param results EXO terms to check
 	 * @return ECO terms used in automatic assertion
 	 */
 	private List<String> getAllAutomaticECOCodes(List<GenericTerm> results) {
-		List<String> allAutomaticECOCodes = new ArrayList<>();		
+		List<String> allAutomaticECOCodes = new ArrayList<>();
 		for (GenericTerm term : results) {
 			GenericTerm ecoTerm = TermUtil.getECOTerms().get(term.getId());
 			List<GenericTerm> ancestors = ecoTerm.getAncestry(EnumSet.of(
@@ -408,9 +410,9 @@ public class SearchController {
 		}
 		return allAutomaticECOCodes;
 	}
-	
+
 	/**
-	 * Check if lists intersection is empty 
+	 * Check if lists intersection is empty
 	 */
 	private boolean emptyIntersection(List<GenericTerm> terms, List<String> ecoIds){
 		boolean empty = true;
@@ -421,7 +423,7 @@ public class SearchController {
 		}
 		return empty;
 	}
-	
+
 	/**
 	 * Check term/synonym contains query text before adding to results
 	 * @param query Auto complete query
@@ -440,7 +442,7 @@ public class SearchController {
 			}
 		}
 	}
-	
+
 	/**
 	 * Check gene product contains query text before adding to results
 	 * @param query Auto complete query
@@ -456,7 +458,7 @@ public class SearchController {
 			}
 		}
 	}
-	
+
 	/**
 	 * Add terms when specific ids are searched
 	 * @param query Query to search for
@@ -465,13 +467,13 @@ public class SearchController {
 	 */
 	private void addTermsIds(String query, List<Object> results, List<GenericTerm> terms) {
 		for (GenericTerm term : terms) {
-			if (term.getId() != null && (term.getId().toLowerCase().trim().matches(".*" + query.toLowerCase().replaceAll("\\s+",".*") + ".*") || 
+			if (term.getId() != null && (term.getId().toLowerCase().trim().matches(".*" + query.toLowerCase().replaceAll("\\s+",".*") + ".*") ||
 					(term.getId() + term.getName()).toLowerCase().trim().matches(".*" + query.toLowerCase().replaceAll("\\s+",".*") + ".*"))) {//Don't want to add synonyms to results when we are looking for specific ECO/GO ids
 				results.add(term);
 			}
-		}		
+		}
 	}
-	
+
 	/**
 	 * Shortest hits are displayed first
 	 * @author cbonill
@@ -482,7 +484,7 @@ public class SearchController {
 		@Override
 		public int compare(Object o1, Object o2) {
 			String text1 = getText(o1);
-			String text2 = getText(o2);			
+			String text2 = getText(o2);
 			if (text1.length() < text2.length()) {
 				return -1;
 			} else if (text1.length() > text2.length()) {
@@ -490,7 +492,7 @@ public class SearchController {
 			}
 			return 0;
 		}
-		
+
 		private String getText(Object o) {
 			if (o instanceof GeneProduct) {
 				return ((GeneProduct) o).getDbObjectName();
@@ -506,6 +508,6 @@ public class SearchController {
 			}
 			return "";
 		}
-		
+
 	}
 }
