@@ -194,6 +194,7 @@ public class SolrAnnotation {
 		return fullExtension;
 	}
 
+	public void setFullExtension(String fullExtension) {this.fullExtension = fullExtension;	}
 
 	public void setExtensions(List<String> extensions) {
 		this.extensions = extensions;
@@ -357,9 +358,6 @@ public class SolrAnnotation {
 		this.ecoAncestorsI = ecoAncestorsI;
 	}
 
-	public void setFullExtension(String fullExtension) {
-		this.fullExtension = fullExtension;
-	}
 
 
 	public enum SolrAnnotationDocumentType implements SolrDocumentType {
