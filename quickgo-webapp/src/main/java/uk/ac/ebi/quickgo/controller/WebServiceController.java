@@ -220,7 +220,8 @@ public class WebServiceController {
 			@RequestParam(value = "viewBy", defaultValue="", required=false) String viewBy,
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "rows", defaultValue = "25") int rows,
-			HttpSession session, HttpServletResponse httpServletResponse) throws IOException,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse) throws IOException,
 			SolrServerException {
 
 		String query = "\"text\":"+ "\"" + text + "\"";
@@ -317,7 +318,7 @@ public class WebServiceController {
 
 				if(!expEcoValues.isEmpty()){
 						expEcofilterQuery = TermField.ID.getValue() + ":(" + expEcoValues.replaceAll(":","*") + ")" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();;
-						session.setAttribute("expEcofilterQuery", expEcofilterQuery);
+						//session.setAttribute("expEcofilterQuery", expEcofilterQuery);
 						expEcoTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", expEcofilterQuery);
 					}
 					resultsJson.setManualEcoTotalResults(expEcoTotalResults);
@@ -326,7 +327,7 @@ public class WebServiceController {
 					String automaticEcoValues = StringUtils.arrayToDelimitedString(getAllAutomaticECOCodes(ecoTerms).toArray(), " OR ");
 					if(!automaticEcoValues.isEmpty()){
 						automaticEcofilterQuery =  TermField.ID.getValue() + ":(" + automaticEcoValues.replaceAll(":","*") + ")" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();;
-						session.setAttribute("automaticEcofilterQuery", automaticEcofilterQuery);
+						//session.setAttribute("automaticEcofilterQuery", automaticEcofilterQuery);
 						automaticEcoTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", automaticEcofilterQuery);
 
 					}
@@ -407,23 +408,23 @@ public class WebServiceController {
 						totalResults = ecoTotalResults;
 					}
 					else if(viewBy.equalsIgnoreCase(ViewBy.ECOMANUAL.getValue())){
-						filterQuery = (String)session.getAttribute("expEcofilterQuery");
+						//filterQuery = (String)session.getAttribute("expEcofilterQuery");
 						totalResults = expEcoTotalResults;
 					}
 					else if(viewBy.equalsIgnoreCase(ViewBy.ECOAUTOMATIC.getValue())){
-						filterQuery = (String)session.getAttribute("automaticEcofilterQuery");
+						//filterQuery = (String)session.getAttribute("automaticEcofilterQuery");
 						totalResults = automaticEcoTotalResults;
 					}
 					else if(viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())){
 						String evidencefilterQuery = ecoFilterQuery;
 
-						if(session.getAttribute("expEcofilterQuery") != null && !((String)session.getAttribute("expEcofilterQuery")).isEmpty()){
-							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)session.getAttribute("expEcofilterQuery");
-						}
-
-						if(session.getAttribute("automaticEcofilterQuery") != null && !((String)session.getAttribute("automaticEcofilterQuery")).isEmpty()){
-							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)session.getAttribute("automaticEcofilterQuery");
-						}
+//						if(session.getAttribute("expEcofilterQuery") != null && !((String)session.getAttribute("expEcofilterQuery")).isEmpty()){
+//							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)session.getAttribute("expEcofilterQuery");
+//						}
+//
+//						if(session.getAttribute("automaticEcofilterQuery") != null && !((String)session.getAttribute("automaticEcofilterQuery")).isEmpty()){
+//							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)session.getAttribute("automaticEcofilterQuery");
+//						}
 
 						filterQuery = evidencefilterQuery;
 						totalResults = evidenceEcoResults;
