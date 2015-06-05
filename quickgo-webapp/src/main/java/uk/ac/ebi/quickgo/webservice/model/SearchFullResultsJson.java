@@ -20,6 +20,8 @@ public class SearchFullResultsJson {
 	private long expEcoTotalResults;
 	private long automaticEcoTotalResults;
 	private long evidenceEcoTotalResults;
+	private long goNumberResults;
+	private long gpNumberResults;
 
 	public void setSearchResults(List<Object> searchResults) {
 		this.searchResults = searchResults;
@@ -103,5 +105,21 @@ public class SearchFullResultsJson {
 
 	public long getEvidenceEcoTotalResults() {
 		return evidenceEcoTotalResults;
+	}
+
+	public void setGoNumberResults(long goNumberResults) {
+		this.goNumberResults = goNumberResults;
+	}
+
+	public long getGoNumberResults() {
+		return goNumberResults;
+	}
+
+	public void setGpNumberResults(long gpNumberResults) {
+		this.gpNumberResults = gpNumberResults;
+	}
+
+	public long getGpNumberResults() {
+		return gpNumberResults;
 	}
 }

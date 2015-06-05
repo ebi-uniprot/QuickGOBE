@@ -275,11 +275,11 @@ public class WebServiceController {
 
 					// #Gene Products
 					gpNumberResults = geneProductService.getTotalNumberHighlightResults("*" + text  + "*", null);
-//					session.setAttribute("gpNumberResults", gpNumberResults);
+					resultsJson.setGpNumberResults(gpNumberResults);
 
 					// #GO terms
 					goTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "*" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue());
-//					session.setAttribute("goNumberResults", goTotalResults);
+					resultsJson.setGoNumberResults(goTotalResults);
 
 					String textToSearch = "*" + text + "*";
 
@@ -314,7 +314,8 @@ public class WebServiceController {
 
 					// #Experimental ECO terms
 					String expEcoValues = StringUtils.arrayToDelimitedString(getAllManualECOCodes(ecoTerms).toArray(), " OR ");
-					if(!expEcoValues.isEmpty()){
+
+				if(!expEcoValues.isEmpty()){
 						expEcofilterQuery = TermField.ID.getValue() + ":(" + expEcoValues.replaceAll(":","*") + ")" + " AND " + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();;
 						session.setAttribute("expEcofilterQuery", expEcofilterQuery);
 						expEcoTotalResults = termService.getTotalNumberHighlightResults("*" + text  + "*", expEcofilterQuery);
