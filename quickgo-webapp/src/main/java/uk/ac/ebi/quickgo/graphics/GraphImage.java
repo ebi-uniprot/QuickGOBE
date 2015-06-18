@@ -159,7 +159,7 @@ public class GraphImage extends RenderableImage {
 				}
 			}
 
-	        RelationType rta[] = {RelationType.ISA,  RelationType.PARTOF, /*RelationType.HASPART,*/ RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES, RelationType.OCCURSIN, RelationType.USEDIN};
+	        RelationType rta[] = {RelationType.ISA,  RelationType.PARTOF, /*RelationType.HASPART,*/ RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES, RelationType.OCCURSIN, RelationType.USEDIN, RelationType.CAPABLEOF, RelationType.CAPABLEOFPARTOF};
 
 			int knHeight = style.height / 2;
 			int knY = knHeight;
