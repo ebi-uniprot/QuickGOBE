@@ -52,7 +52,7 @@ public class OntologyGraphController {
 	GenericOntology genericOntology;
 	
 	// Basket terms
-	private Map<String, String> basketTerms = new HashMap<String, String>();
+	private Map<String, String> basketTerms = new HashMap<>();
 	
 	@RequestMapping(value = { "/","annotation"}, method = {RequestMethod.POST, RequestMethod.GET }, params = { "graphTermsIds", "relations" })
 	public String generateAnnotationOntologyGraph(
@@ -120,8 +120,7 @@ public class OntologyGraphController {
 			String relations,
 			Model model){
 		
-		List<String> termsIdsList = new ArrayList<>();
-		termsIdsList = Arrays.asList(termsIds.split(","));
+		List<String> termsIdsList = Arrays.asList(termsIds.split(","));
 		
 		// Get corresponding ontology
 		genericOntology = TermUtil.getOntology(termsIdsList.get(0));
@@ -148,10 +147,8 @@ public class OntologyGraphController {
 	
 	/**
 	 * To retrieve graph images
-	 * @param session Session
 	 * @param id Image id
-	 * @param model Model
-	 * @return Graph image in base 64 
+	 * @return Graph image in base 64
 	 */
 	@RequestMapping(value = { "/graphs",}, method = {RequestMethod.POST, RequestMethod.GET }, params = { "id"})	
 	@ResponseBody
@@ -178,7 +175,7 @@ public class OntologyGraphController {
 	 */
 	public GraphImage createRenderableImage(String termsIds){
 		// Check if the selected terms exist
-		List<GenericTerm> terms = new ArrayList<GenericTerm>();
+		List<GenericTerm> terms = new ArrayList<>();
 		List<String> termsIdsList = Arrays.asList(termsIds.split(","));
 		for(String id : termsIdsList){			
 			GenericTerm term = genericOntology.getTerm(id);
@@ -194,7 +191,7 @@ public class OntologyGraphController {
 		}		
 		
 		// Create ontology graph
-		OntologyGraph ontologyGraph = OntologyGraph.makeGraph(termSet, EnumSet.of(RelationType.USEDIN, RelationType.ISA, RelationType.PARTOF, RelationType.REGULATES, /*RelationType.HASPART,*/ RelationType.OCCURSIN), 0, 0, new GraphPresentation());
+		OntologyGraph ontologyGraph = OntologyGraph.makeGraph(termSet, EnumSet.of(RelationType.USEDIN, RelationType.ISA, RelationType.PARTOF, RelationType.REGULATES, /*RelationType.HASPART,*/ RelationType.OCCURSIN, RelationType.CAPABLEOF, RelationType.CAPABLEOFPARTOF), 0, 0, new GraphPresentation());
 		return ontologyGraph.layout();			
 	}
 	
