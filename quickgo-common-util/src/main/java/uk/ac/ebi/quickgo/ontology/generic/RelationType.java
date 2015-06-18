@@ -12,19 +12,21 @@ import java.util.Set;
  * change this template use File | Settings | File Templates.
  */
 public enum RelationType {
-	   UNDEFINED("?", "Ancestor", "ancestor"),
-	   IDENTITY("=", "Identity", "equals"),
-	   ISA("I", "Is a", "is_a", new Color(0,0,0)),
-	   PARTOF("P", "Part of", "part_of", new Color(0,0,255)),
-	   REGULATES("R", "Regulates", "regulates", new Color(255,192,0)),
-	   POSITIVEREGULATES("+", "Positively regulates", "positively_regulates", "PR", new Color(0,255,0)),
-	   NEGATIVEREGULATES("-", "Negatively regulates", "negatively_regulates", "NR", new Color(255,0,0)),
-	   REPLACEDBY(">", "Replaced by", "replaced_by", "replaced_by", new Color(255,0,255)),
-	   CONSIDER("~", "Consider", "consider", "consider", new Color(192,0,255)),
-	   HASPART("H", "Has part", "has_part", new Color(128,0,128), Polarity.NEGATIVE, new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1.0f, new float[] { 3.0f, 3.0f }, 0.0f)),
-	   OCCURSIN("O", "Occurs in", "occurs_in", "OI", new Color(0,128,128)),
-	   USEDIN("U", "Used in", "used_in", "UI", new Color(156,102,31)),
-		;
+	UNDEFINED("?", "Ancestor", "ancestor"),
+	IDENTITY("=", "Identity", "equals"),
+	ISA("I", "Is a", "is_a", new Color(0,0,0)),
+	PARTOF("P", "Part of", "part_of", new Color(0,0,255)),
+	REGULATES("R", "Regulates", "regulates", new Color(255,192,0)),
+	POSITIVEREGULATES("+", "Positively regulates", "positively_regulates", "PR", new Color(0,255,0)),
+	NEGATIVEREGULATES("-", "Negatively regulates", "negatively_regulates", "NR", new Color(255,0,0)),
+	REPLACEDBY(">", "Replaced by", "replaced_by", "replaced_by", new Color(255,0,255)),
+	CONSIDER("~", "Consider", "consider", "consider", new Color(192,0,255)),
+	HASPART("H", "Has part", "has_part", new Color(128,0,128), Polarity.NEGATIVE, new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1.0f, new float[] { 3.0f, 3.0f }, 0.0f)),
+	OCCURSIN("O", "Occurs in", "occurs_in", "OI", new Color(0,128,128)),
+	USEDIN("U", "Used in", "used_in", "UI", new Color(156,102,31)),
+	CAPABLEOF("C", "Capable of", "capable_of", "CO", new Color(0,128,255), Polarity.POSITIVE, new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1.0f, new float[] { 3.0f, 3.0f }, 0.0f)),
+	CAPABLEOFPARTOF("<", "Capable of part of", "capable_of_part_of", "CP", new Color(255,128,0), Polarity.POSITIVE, new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1.0f, new float[] { 3.0f, 3.0f }, 0.0f))
+	;
 
 	public enum Polarity {
 		POSITIVE, // relation is unidirectional from child to parent
@@ -93,7 +95,7 @@ public enum RelationType {
 	}
 
 	public static EnumSet<RelationType> toSet(String types) {
-		Set<RelationType> rt = new HashSet<RelationType>();
+		Set<RelationType> rt = new HashSet<>();
 		for (int i = 0; i < types.length(); i++) {
 			rt.add(byCode("" + types.charAt(i)));
 		}
