@@ -341,10 +341,14 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/annotation/AnnotationWSU
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/annotation/AppliedFilterSet.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/annotation/SlimmingUtil.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/annotation/SlimmingUtilImpl.java -text svneol=unset#text/plain
-quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/FilterRequestToSolr.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryProcessor.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryProcessorImpl.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryTo.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/FilterNameToSolrField.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/FilterRequestToSolr.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/FiltersContainer.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/MappingFactory.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/SingleFilter.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatisticsCalculation.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatisticsCalculationThread.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatsDownload.java -text svneol=unset#text/plain
@@ -353,6 +357,12 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/term/XRefBean.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/AnnotationTotal.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolver.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolverImpl.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/FilterNameToSolrFieldMapper.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/FilterRequestName.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/RequestedFilterList.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/RequestedFilterToFilterType.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/WebServiceFilter.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/WebServiceFilterType.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationBlacklistJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationPostProcessingJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationUpdatersJson.java -text
@@ -360,6 +370,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/ChartJson.java -
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/ChildTermRelationJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/DBJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/EvidenceTypeJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/FilterJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/FilterRequestJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoAnnotationJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoAnnotationsContainer.java -text

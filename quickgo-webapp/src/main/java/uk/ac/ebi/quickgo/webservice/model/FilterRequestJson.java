@@ -13,7 +13,7 @@ public class FilterRequestJson {
 	private int rows;
 	private int page;
 	private boolean isSlim;
-	private List<Filter> list;
+	private List<FilterJson> list;
 
 	public int getRows() {
 		return rows;
@@ -23,11 +23,11 @@ public class FilterRequestJson {
 		this.rows = rows;
 	}
 
-	public List<Filter> getList() {
+	public List<FilterJson> getList() {
 		return list;
 	}
 
-	public void setList(List<Filter> list) {
+	public void setList(List<FilterJson> list) {
 		this.list = list;
 	}
 
@@ -56,36 +56,6 @@ public class FilterRequestJson {
 				", filterList=" + list +
 				'}';
 	}
-
-	public class Filter {
-		private String type;
-		private String value;
-
-		public String getType() {
-			return type;
-		}
-
-		public void setType(String type) {
-			this.type = type;
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-
-		@Override
-		public String toString() {
-			return "Filter{" +
-					"type='" + type + '\'' +
-					", value='" + value + '\'' +
-					'}';
-		}
-	}
-
 
 }
 

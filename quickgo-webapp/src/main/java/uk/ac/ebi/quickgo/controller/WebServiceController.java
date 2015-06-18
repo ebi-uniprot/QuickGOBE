@@ -11,8 +11,10 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,7 @@ import uk.ac.ebi.quickgo.web.util.annotation.AnnotationColumn;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationWSUtil;
 import uk.ac.ebi.quickgo.web.util.annotation.AppliedFilterSet;
 import uk.ac.ebi.quickgo.web.util.annotation.SlimmingUtil;
+import uk.ac.ebi.quickgo.web.util.query.mapping.FilterRequestToSolr;
 import uk.ac.ebi.quickgo.web.util.query.QueryProcessor;
 import uk.ac.ebi.quickgo.web.util.query.QueryTo;
 import uk.ac.ebi.quickgo.web.util.term.TermUtil;
@@ -57,6 +60,7 @@ import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import uk.ac.ebi.quickgo.web.util.url.URLsResolver;
+import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
 import uk.ac.ebi.quickgo.webservice.model.SearchFullResultsJson;
 
 /**
@@ -104,6 +108,8 @@ public class WebServiceController {
 
 	@Autowired
 	FileService fileService;
+
+	private static final int LIMIT = 1000;
 
 	/**
 	 * Lookup web service
@@ -759,7 +765,136 @@ public class WebServiceController {
 	}
 
 
+	static class FormData{
+		public String myString;
+	}
+
 	/**
+	 */
+	@RequestMapping(value="/annotationPostNewNames", method = {RequestMethod.POST})
+	@ResponseBody public void  postQueryRequest(@RequestBody FormData formData){
+
+
+//			HttpServletRequest request,
+//			HttpServletResponse httpServletResponse,
+//			@RequestParam(value = "filterRequest", required = false) Map filterRequest,
+//			@RequestParam(value = "myObject", required = false) Object myObject,
+//			@RequestParam(value = "myString", required = false) String myString,
+//			//@RequestParam(value = "myjson", required = false) Object myjson,
+//			@RequestParam(value = "myList", required = false) List myList)
+//			throws UnsupportedEncodingException {
+
+//		System.out.println("Request::" +  request);
+//		System.out.println("filterRequest::" +  filterRequest);
+//		System.out.println("myObject::" + myObject);
+//		System.out.println("myList::" + myList);
+//		System.out.println("myString::" + myString);
+
+		System.out.println(formData.myString);
+
+//		ObjectMapper mapper = new ObjectMapper();
+//		try {
+//			System.out.println("write myjson as json string" + mapper.writeValueAsString(myjson));
+//		} catch (JsonProcessingException e) {
+//			e.printStackTrace();
+//		}
+//		try {
+//			System.out.println("write myString as json string" + mapper.writeValueAsString(myString));
+//		} catch (JsonProcessingException e) {
+//			e.printStackTrace();
+//		}
+
+		//FilterParametersToSolr filterParametersToSr = new FilterParametersToSolr();ol
+		//filterParametersToSolr.queryToAnnotationParameters(filterRequest, false);
+
+	}
+
+//	static class FilterData{
+//		public int rows;
+//		public int page;
+//		public boolean isSlim;
+//		public List<Filter> list;
+//
+//		@Override
+//		public String toString() {
+//			return "FilterData{" +
+//					"rows=" + rows +
+//					", page=" + page +
+//					", isSlim=" + isSlim +
+//					", filterList=" + list +
+//					'}';
+//		}
+//	}
+//
+//	static class Filter {
+//		public String type;
+//		public String value;
+//
+//		@Override
+//		public String toString() {
+//			return "Filter{" +
+//					"type='" + type + '\'' +
+//					", value='" + value + '\'' +
+//					'}';
+//		}
+//	}
+
+
+	@RequestMapping(value="/annotationPostNewNamesNotSpring", method = {RequestMethod.POST})
+	public void postQueryRequestNotSpring(HttpServletRequest request,
+										  HttpServletResponse response) {
+
+		FilterRequestJson filterRequest = null;
+
+		StringBuffer jb = new StringBuffer();
+		String line = null;
+		try {
+			BufferedReader reader = request.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+		} catch (Exception e) { /*report an error*/ }
+
+		try {
+			ObjectMapper om = new ObjectMapper();
+			String result = jb.toString();
+			System.out.println("raw string is " + result);
+			 filterRequest = om.readValue(result, FilterRequestJson.class);
+			System.out.println("Not Spring " + filterRequest);
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		FilterRequestToSolr filterRequestToSolr = new FilterRequestToSolr();
+		//AnnotationParameters annotationParameters = filterRequestToSolr.queryToAnnotationParameters(filterRequest);
+
+		AnnotationParameters annotationParameters = null;
+		String solrQuery = filterRequestToSolr.toSolrQuery(filterRequest);
+		System.out.println("Solr query is :" + solrQuery);
+
+		//Do slimming if required
+		ITermContainer slimTermSet = null;
+		Boolean slimmingRequired = filterRequest.isSlim();
+
+
+		if(slimmingRequired) {
+			slimTermSet = createSlimTermSet(annotationParameters);
+		}
+
+
+		//todo should we be using the annotation service?
+		AnnotationColumn[] columns = new AnnotationColumn[0];	//ignored
+		annotationWSUtil.downloadAnnotationsInternal(solrQuery, columns, Integer.valueOf(LIMIT),
+				(filterRequest.getPage() - 1) * filterRequest.getRows(), filterRequest.getRows(), response,
+				slimmingRequired, slimTermSet);
+
+	}
+
+
+		/**
 	 * USE THIS ONE
 	 * @param httpServletResponse
 	 * @param query
