@@ -110,15 +110,11 @@ public class GraphImage extends RenderableImage {
 		public int getBottom() {
 			return this.bottom();
 		}
-
-		public String getTopic() {
-			return relType.formalCode;
-		}
 	}
 
     public Collection<TermNode> terms = new ArrayList<>();
     public Collection<RelationEdge> relations = new ArrayList<>();
-	public Collection<KeyNode> legend = new ArrayList<KeyNode>();
+	public Collection<KeyNode> legend = new ArrayList<>();
 
     private GraphPresentation style;
 
@@ -139,7 +135,7 @@ public class GraphImage extends RenderableImage {
         this.errorMessage = errorMessage;
     }
 
-    public GraphImage(int width, int height, Collection<TermNode> terms, Collection<RelationEdge> relations, GraphPresentation style) {
+    public GraphImage(int width, int height, Collection<TermNode> terms, Collection<RelationEdge> relations, GraphPresentation style,  Collection<RelationType> relationTypes) {
         super(Math.max(minWidth, width + (style.key ? keyMargin + (style.width * 2) + rightMargin : 0)), height + bottomMargin);
 
         this.errorMessage = null;
@@ -159,13 +155,13 @@ public class GraphImage extends RenderableImage {
 				}
 			}
 
-	        RelationType rta[] = {RelationType.ISA,  RelationType.PARTOF, /*RelationType.HASPART,*/ RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES, RelationType.OCCURSIN, RelationType.USEDIN, RelationType.CAPABLEOF, RelationType.CAPABLEOFPARTOF};
+//	        RelationType rta[] = {RelationType.ISA,  RelationType.PARTOF, /*RelationType.HASPART,*/ RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES, RelationType.OCCURSIN, RelationType.USEDIN, RelationType.CAPABLEOF, RelationType.CAPABLEOFPARTOF};
 
 			int knHeight = style.height / 2;
 			int knY = knHeight;
 
 	        int yMax = knY;
-	        for (RelationType rt : rta) {
+	        for (RelationType rt : relationTypes) {
 	            KeyNode kn = new KeyNode(super.width - style.width - rightMargin, knY, style.width * 2, knHeight, rt);
 				legend.add(kn);
 		        knY += knHeight;

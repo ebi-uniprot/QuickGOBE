@@ -116,7 +116,7 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
     	        image = new GraphImage("Chart too large: limit is " + pixelLimit + " pixels, actual size is " + pixelCount + " pixels");
             }
     	    else {
-    	        image = new GraphImage(layout.getWidth(), layout.getHeight(), getNodes(), getEdges(), presentation);
+    	        image = new GraphImage(layout.getWidth(), layout.getHeight(), getNodes(), getEdges(), presentation, relationTypes);
             }
         }        
         return image;
