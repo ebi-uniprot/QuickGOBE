@@ -707,11 +707,13 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 					AER relation = new AER(aer);
 					allRelations.addRelation(relation);
 					for (String subsetName : aer.subsets) {
-						AERSubset subset = subsets.get(subsetName);
-						if (subset == null) {
-							subsets.put(subsetName, subset = new AERSubset(subsetName));
+						if (!"all_relations".equals(subsetName)) {
+							AERSubset subset = subsets.get(subsetName);
+							if (subset == null) {
+								subsets.put(subsetName, subset = new AERSubset(subsetName));
+							}
+							subset.addRelation(relation);
 						}
-						subset.addRelation(relation);
 					}
 				}
 			}
