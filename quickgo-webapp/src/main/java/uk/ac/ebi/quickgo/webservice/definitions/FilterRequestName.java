@@ -8,7 +8,7 @@ package uk.ac.ebi.quickgo.webservice.definitions;
  */
 public enum FilterRequestName {
 
-	ecoID("ecoId"),
+	ecoID("ecoID"),
 	ecoTermUse("ecoTermUse");
 
 	String value;

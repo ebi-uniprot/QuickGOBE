@@ -26,7 +26,7 @@ public class FilterRequestToSolr {
 		FiltersContainer filtersContainer = new FiltersContainer();
 
 		for( FilterJson aFilter : filterRequest.getList()){
-			MappingFactory.populateFiltersContainerWithSingleFilter(aFilter.getType(), aFilter.getValues(), filtersContainer);
+			MappingFactory.populateFiltersContainerWithSingleFilter(aFilter, filtersContainer);
 		}
 
 		return filtersContainer.And();

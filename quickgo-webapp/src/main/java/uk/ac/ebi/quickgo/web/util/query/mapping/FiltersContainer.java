@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.web.util.query.mapping;
 
 import uk.ac.ebi.quickgo.webservice.definitions.WebServiceFilter;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,6 +17,9 @@ public class FiltersContainer {
 
 	private Map<WebServiceFilter, SingleFilter> filters;
 
+	public FiltersContainer() {
+		this.filters = new HashMap<>();
+	}
 
 	public SingleFilter lookupFilter(WebServiceFilter webServiceFilter){
 		return  filters.get(webServiceFilter);

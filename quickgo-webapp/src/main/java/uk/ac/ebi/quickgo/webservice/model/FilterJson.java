@@ -11,7 +11,7 @@ import java.util.List;
 public class FilterJson {
 
 	private String type;
-	private List values;
+	private String value;
 
 	public String getType() {
 		return type;
@@ -21,19 +21,19 @@ public class FilterJson {
 		this.type = type;
 	}
 
-	public List getValues() {
-		return values;
+	public String getValue() {
+		return value;
 	}
 
-	public void setValues(List values) {
-		this.values = values;
+	public void setValues(String value) {
+		this.value = value;
 	}
 
 	@Override
 	public String toString() {
 		return "Filter{" +
 				"type='" + type + '\'' +
-				", value='" + values + '\'' +
+				", value='" + value + '\'' +
 				'}';
 	}
 

@@ -19,7 +19,7 @@ public class FilterNameToSolrFieldMapper {
 
 
 	static{
-		map.put("ecoId",               new FilterNameToSolrField( FilterRequestName.ecoID,      AnnotationField.ECOANCESTORSI));
+		map.put("ecoid",               new FilterNameToSolrField( FilterRequestName.ecoID,      AnnotationField.ECOANCESTORSI));
 		map.put("ecotermuse:ancestor", new FilterNameToSolrField( FilterRequestName.ecoTermUse, AnnotationField.ECOANCESTORSI));
 		map.put("ecotermuse:exact",    new FilterNameToSolrField( FilterRequestName.ecoTermUse, AnnotationField.ECOID));
 	}

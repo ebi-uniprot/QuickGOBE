@@ -14,14 +14,15 @@ import java.util.Map;
  */
 public class RequestedFilterList {
 
-	private static Map<FilterRequestName, WebServiceFilterType> map = new HashMap<>();
+	private static Map<String, WebServiceFilterType> map = new HashMap<>();
 
 	static {
-		map.put(FilterRequestName.ecoID,      WebServiceFilterType.ArgumentsAsValues);
-		map.put(FilterRequestName.ecoTermUse, WebServiceFilterType.ArgumentAsBehaviour);
+		map.put(FilterRequestName.ecoID.getValue().toLowerCase(),      WebServiceFilterType.ArgumentsAsValues);
+		map.put(FilterRequestName.ecoTermUse.getValue().toLowerCase(), WebServiceFilterType.ArgumentAsBehaviour);
 	}
 
 	public static boolean isFilterWithArgsAsValues(String requestedFilter) {
-		 return map.get(requestedFilter) == WebServiceFilterType.ArgumentsAsValues;
+		WebServiceFilterType frn = map.get(requestedFilter.toLowerCase());
+		return frn == WebServiceFilterType.ArgumentsAsValues;
 	}
 }

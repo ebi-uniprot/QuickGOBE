@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.webservice.definitions.FilterNameToSolrFieldMapper;
 import uk.ac.ebi.quickgo.webservice.definitions.RequestedFilterList;
 import uk.ac.ebi.quickgo.webservice.definitions.RequestedFilterToFilterType;
 import uk.ac.ebi.quickgo.webservice.definitions.WebServiceFilter;
+import uk.ac.ebi.quickgo.webservice.model.FilterJson;
 
 import java.util.List;
 
@@ -24,25 +25,25 @@ import java.util.List;
 public class MappingFactory {
 
 
-	public static void populateFiltersContainerWithSingleFilter(String requestedFilter, List<String> args, FiltersContainer container){
+	public static void populateFiltersContainerWithSingleFilter(FilterJson requestedFilter, FiltersContainer container){
 
 		boolean newFilter = false;
-		WebServiceFilter wsFilter = RequestedFilterToFilterType.lookupWsFilter(requestedFilter);
+		WebServiceFilter wsFilter = RequestedFilterToFilterType.lookupWsFilter(requestedFilter.getType());
 
 		//Does this filter already exist in the container?
 		SingleFilter singleFilter = container.lookupFilter(wsFilter);
 
 		if(singleFilter==null){
 			newFilter=true;
-			singleFilter = new SingleFilter(FilterNameToSolrFieldMapper.map(requestedFilter));
+			singleFilter = new SingleFilter(FilterNameToSolrFieldMapper.map(requestedFilter.getType()));
 			container.saveFilter(wsFilter, singleFilter);
 		}
 
-		if(RequestedFilterList.isFilterWithArgsAsValues(requestedFilter)){
-			singleFilter.setArgs(args);
+		if(RequestedFilterList.isFilterWithArgsAsValues(requestedFilter.getType())){
+			singleFilter.addArg(requestedFilter.getValue());
 		}else{
 			if(!newFilter) {
-				singleFilter.replace(FilterNameToSolrFieldMapper.map(requestedFilter));
+				singleFilter.replace(FilterNameToSolrFieldMapper.map(requestedFilter.getType(),requestedFilter.getValue()));
 			}
 		}
 	}

@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.web.util.query.mapping;
 import org.apache.commons.lang3.StringUtils;
 import uk.ac.ebi.quickgo.web.util.query.mapping.FilterNameToSolrField;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public class SingleFilter {
 
 	public SingleFilter(FilterNameToSolrField designate){
 		this.designate = designate;
+		this.args = new ArrayList<>();
 	}
 
 	public void replace(FilterNameToSolrField designate){
@@ -36,11 +38,14 @@ public class SingleFilter {
 		if(args==null) return "";
 
 		String argList = StringUtils.join(args.toArray(), " OR ");
-		return(designate.getSolrField().getValue() + ":(" +  (argList.toString()).replaceAll(GO_ID_REG_EXP, "*").replaceAll(":","\\\\:"));
+		return designate.getSolrField().getValue()
+				+ ":("
+				+  (argList.toString()).replaceAll(GO_ID_REG_EXP, "*").replaceAll(":","\\\\:")
+		        + ")";
 
 	}
 
-	public void setArgs(List<String> args) {
-		this.args = args;
+	public void addArg(String arg) {
+		this.args.add(arg);
 	}
 }
