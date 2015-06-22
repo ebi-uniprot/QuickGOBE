@@ -13,8 +13,12 @@ import java.util.Map;
  */
 public enum FilterRequest {
 
+	//Evidence
 	EcoId("ecoID", "ecoid", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ECOANCESTORSI),
-	EcoTermUse("ecoTermUse", "ecotermuse", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentAsBehaviour, null);
+	EcoTermUse("ecoTermUse", "ecotermuse", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentAsBehaviour, null),
+
+	Taxon("taxon", "taxon", WebServiceFilter.Taxon,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.TAXONOMYID);
+
 
 	//Allow the enums to be looked up using their lowerCase value;
 	private static Map<String, FilterRequest> map = new HashMap<>();
