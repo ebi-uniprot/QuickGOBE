@@ -14,10 +14,13 @@ import java.util.Map;
 public enum FilterRequest {
 
 	//Evidence
-	EcoId("ecoID", "ecoid", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ECOANCESTORSI),
-	EcoTermUse("ecoTermUse", "ecotermuse", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentAsBehaviour, null),
+	EcoId("ecoid", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ECOANCESTORSI),
+	EcoTermUse("ecotermuse", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentAsBehaviour, null),
 
-	Taxon("taxon", "taxon", WebServiceFilter.Taxon,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.TAXONOMYID);
+	Taxon("taxon", WebServiceFilter.Taxon,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.TAXONOMYID),
+
+	AssignedBy("assignedBy", WebServiceFilter.Taxon,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.TAXONOMYID);
+
 
 
 	//Allow the enums to be looked up using their lowerCase value;
@@ -34,23 +37,16 @@ public enum FilterRequest {
 
 
 	private final WebServiceFilter wsFilter;
-	private final String value;
 	private final String lc;
 	private final WebServiceFilterType wsType;
 	private final AnnotationField solrField;
 
-	FilterRequest(String value, String lowerCase, WebServiceFilter wsFilter, WebServiceFilterType wsType,
+	FilterRequest( String lowerCase, WebServiceFilter wsFilter, WebServiceFilterType wsType,
 				  AnnotationField defaultSolr)  {
-		this.value = value;
 		this.lc = lowerCase;
 		this.wsFilter = wsFilter;
 		this.wsType = wsType;
 		this.solrField=defaultSolr;
-	}
-
-	public String getValue()
-	{
-		return value;
 	}
 
 	public String getLowerCase(){
