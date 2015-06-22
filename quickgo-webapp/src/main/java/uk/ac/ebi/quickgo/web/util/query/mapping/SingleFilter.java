@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.web.util.query.mapping;
 
 import org.apache.commons.lang3.StringUtils;
-import uk.ac.ebi.quickgo.web.util.query.mapping.FilterNameToSolrField;
+import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +16,15 @@ public class SingleFilter {
 
 	public static final String GO_ID_REG_EXP = "(go:|GO:|gO:|Go:)";
 
-	private FilterNameToSolrField designate = null;
+	private AnnotationField designate = null;
 	private List<String> args;
 
-	public SingleFilter(FilterNameToSolrField designate){
+	public SingleFilter(AnnotationField designate){
 		this.designate = designate;
 		this.args = new ArrayList<>();
 	}
 
-	public void replace(FilterNameToSolrField designate){
+	public void replace(AnnotationField designate){
 		this.designate = designate;
 	}
 
@@ -38,7 +38,7 @@ public class SingleFilter {
 		if(args==null) return "";
 
 		String argList = StringUtils.join(args.toArray(), " OR ");
-		return designate.getSolrField().getValue()
+		return designate.getValue()
 				+ ":("
 				+  (argList.toString()).replaceAll(GO_ID_REG_EXP, "*").replaceAll(":","\\\\:")
 		        + ")";

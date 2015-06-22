@@ -1,9 +1,7 @@
 package uk.ac.ebi.quickgo.web.util.query.mapping;
 
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
-import uk.ac.ebi.quickgo.webservice.definitions.FilterRequestName;
-
-import java.util.List;
+import uk.ac.ebi.quickgo.webservice.definitions.FilterRequest;
 
 /**
  * @Author Tony Wardell
@@ -13,16 +11,16 @@ import java.util.List;
  */
 public class FilterNameToSolrField {
 
-	private FilterRequestName filterRequestName;
+	private FilterRequest filterRequest;
 	private AnnotationField solrField;
 
-	public FilterNameToSolrField(FilterRequestName filterRequestName, AnnotationField solrField) {
-		this.filterRequestName = filterRequestName;
+	public FilterNameToSolrField(FilterRequest filterRequest, AnnotationField solrField) {
+		this.filterRequest = filterRequest;
 		this.solrField = solrField;
 	}
 
-	public FilterRequestName getFilterRequestName() {
-		return filterRequestName;
+	public FilterRequest getFilterRequest() {
+		return filterRequest;
 	}
 
 	public AnnotationField getSolrField() {

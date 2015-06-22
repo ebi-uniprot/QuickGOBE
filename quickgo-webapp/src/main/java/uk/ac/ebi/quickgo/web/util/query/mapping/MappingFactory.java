@@ -1,12 +1,7 @@
 package uk.ac.ebi.quickgo.web.util.query.mapping;
 
-import uk.ac.ebi.quickgo.webservice.definitions.FilterNameToSolrFieldMapper;
-import uk.ac.ebi.quickgo.webservice.definitions.RequestedFilterList;
-import uk.ac.ebi.quickgo.webservice.definitions.RequestedFilterToFilterType;
-import uk.ac.ebi.quickgo.webservice.definitions.WebServiceFilter;
+import uk.ac.ebi.quickgo.webservice.definitions.*;
 import uk.ac.ebi.quickgo.webservice.model.FilterJson;
-
-import java.util.List;
 
 /**
  * @Author Tony Wardell
@@ -27,25 +22,42 @@ public class MappingFactory {
 
 	public static void populateFiltersContainerWithSingleFilter(FilterJson requestedFilter, FiltersContainer container){
 
-		boolean newFilter = false;
-		WebServiceFilter wsFilter = RequestedFilterToFilterType.lookupWsFilter(requestedFilter.getType());
+
+		//lookup definitions for parameters
+		FilterRequest filterRequest = FilterRequest.lookup(requestedFilter.getType().toLowerCase());
 
 		//Does this filter already exist in the container?
-		SingleFilter singleFilter = container.lookupFilter(wsFilter);
+		SingleFilter singleFilter = container.lookupFilter(filterRequest);
 
+		//No it doesn't so create it
 		if(singleFilter==null){
-			newFilter=true;
-			singleFilter = new SingleFilter(FilterNameToSolrFieldMapper.map(requestedFilter.getType()));
-			container.saveFilter(wsFilter, singleFilter);
+
+			if(filterRequest.getWsType() == WebServiceFilterType.ArgumentsAsValues){
+				singleFilter = new SingleFilter(filterRequest.getDefaultSolrField());
+				singleFilter.addArg(requestedFilter.getValue());
+
+			}else{
+				//WebServiceFilterType.ArgumentAsBehaviour
+				FilterParameter filterParameter = FilterParameter.lookup(requestedFilter.getValue().toLowerCase());
+				singleFilter = new SingleFilter(FilterNameToSolrFieldMapper.lookup(filterRequest, filterParameter));
+			}
+
+			container.saveFilter(filterRequest.getWsFilter(), singleFilter);
+
+		}else{
+
+			//Filter already exists
+			if(filterRequest.getWsType() == WebServiceFilterType.ArgumentsAsValues){
+				singleFilter.addArg(requestedFilter.getValue());
+			}else{
+				FilterParameter filterParameter = FilterParameter.lookup(requestedFilter.getValue().toLowerCase());
+				singleFilter.replace(FilterNameToSolrFieldMapper.lookup(filterRequest, filterParameter));
+
+			}
+
 		}
 
-		if(RequestedFilterList.isFilterWithArgsAsValues(requestedFilter.getType())){
-			singleFilter.addArg(requestedFilter.getValue());
-		}else{
-			if(!newFilter) {
-				singleFilter.replace(FilterNameToSolrFieldMapper.map(requestedFilter.getType(),requestedFilter.getValue()));
-			}
-		}
+
 	}
 
 }
