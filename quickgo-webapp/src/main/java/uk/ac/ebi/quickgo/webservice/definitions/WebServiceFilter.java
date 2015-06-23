@@ -9,6 +9,7 @@ package uk.ac.ebi.quickgo.webservice.definitions;
 public enum WebServiceFilter {
 
 	EcoEvidence,
-	Taxon,
-	AssignedBy;
+	With,
+	AssignedBy,
+	Taxon;
 }
