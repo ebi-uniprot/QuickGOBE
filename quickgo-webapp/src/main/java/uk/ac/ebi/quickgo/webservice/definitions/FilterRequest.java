@@ -17,11 +17,15 @@ public enum FilterRequest {
 	EcoId("ecoid", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ECOANCESTORSI),
 	EcoTermUse("ecotermuse", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentAsBehaviour, null),
 
-	Taxon("taxon", WebServiceFilter.Taxon,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.TAXONOMYID),
+
+
+	Reference("reference", WebServiceFilter.Reference, WebServiceFilterType.ArgumentsAsValues, AnnotationField.REFERENCE),
 
 	AssignedBy("assignedby", WebServiceFilter.AssignedBy,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ASSIGNEDBY),
 
-	With("with", WebServiceFilter.With, WebServiceFilterType.ArgumentsAsValues, AnnotationField.WITH);
+	With("with", WebServiceFilter.With, WebServiceFilterType.ArgumentsAsValues, AnnotationField.WITH),
+
+	Taxon("taxon", WebServiceFilter.Taxon,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.TAXONOMYID);
 
 
 
