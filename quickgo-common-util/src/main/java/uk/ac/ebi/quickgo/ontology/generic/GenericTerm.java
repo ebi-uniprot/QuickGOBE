@@ -329,11 +329,9 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
 		map.put("definition", definition);
 		
 	    Set<String> lineage = new HashSet<>();
-	    for (TermRelation r : getAncestors()) {
-		    if (r.typeof.polarity != RelationType.Polarity.NEGATIVE) {
-				lineage.add(r.parent.getId());
-		    }
-	    }	    
+		for (GenericTerm t : getFilteredAncestors(EnumSet.of(RelationType.ISA, RelationType.PARTOF, RelationType.OCCURSIN))) {
+			lineage.add(t.getId());
+		}
 		map.put("ancestors", lineage);	 
 		return map;
 	}
