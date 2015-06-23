@@ -13,5 +13,5 @@ public enum WebServiceFilter {
 	Reference,
 	With,
 	AssignedBy,
-	Taxon;
+	Taxon, Aspect;
 }

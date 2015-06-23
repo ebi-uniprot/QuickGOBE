@@ -19,6 +19,8 @@ public enum FilterRequest {
 
 	Qualifier("qualifier", WebServiceFilter.Qualifier, WebServiceFilterType.ArgumentsAsValues, AnnotationField.QUALIFIER),
 
+	Aspect("aspect", WebServiceFilter.Aspect, WebServiceFilterType.ArgumentsAsValues, AnnotationField.GOASPECT),
+
 	Reference("reference", WebServiceFilter.Reference, WebServiceFilterType.ArgumentsAsValues, AnnotationField.REFERENCE),
 
 	AssignedBy("assignedby", WebServiceFilter.AssignedBy,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ASSIGNEDBY),
