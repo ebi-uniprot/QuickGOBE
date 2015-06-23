@@ -8,6 +8,7 @@ package uk.ac.ebi.quickgo.webservice.definitions;
  */
 public enum WebServiceFilter {
 
+	Qualifier,
 	EcoEvidence,
 	Reference,
 	With,

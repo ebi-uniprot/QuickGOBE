@@ -17,7 +17,7 @@ public enum FilterRequest {
 	EcoId("ecoid", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ECOANCESTORSI),
 	EcoTermUse("ecotermuse", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentAsBehaviour, null),
 
-
+	Qualifier("qualifier", WebServiceFilter.Qualifier, WebServiceFilterType.ArgumentsAsValues, AnnotationField.QUALIFIER),
 
 	Reference("reference", WebServiceFilter.Reference, WebServiceFilterType.ArgumentsAsValues, AnnotationField.REFERENCE),
 
