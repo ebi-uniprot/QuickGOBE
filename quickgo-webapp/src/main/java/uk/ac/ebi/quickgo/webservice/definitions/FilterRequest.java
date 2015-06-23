@@ -19,7 +19,9 @@ public enum FilterRequest {
 
 	Taxon("taxon", WebServiceFilter.Taxon,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.TAXONOMYID),
 
-	AssignedBy("assignedby", WebServiceFilter.AssignedBy,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ASSIGNEDBY);
+	AssignedBy("assignedby", WebServiceFilter.AssignedBy,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ASSIGNEDBY),
+
+	With("with", WebServiceFilter.With, WebServiceFilterType.ArgumentsAsValues, AnnotationField.WITH);
 
 
 
