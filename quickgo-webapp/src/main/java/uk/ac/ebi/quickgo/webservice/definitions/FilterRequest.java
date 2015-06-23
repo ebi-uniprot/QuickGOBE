@@ -17,6 +17,8 @@ public enum FilterRequest {
 	EcoId("ecoid", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ECOANCESTORSI),
 	EcoTermUse("ecotermuse", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentAsBehaviour, null),
 
+	GoSlim("goslim", WebServiceFilter.GoSlim, WebServiceFilterType.ArgumentsAsValues, AnnotationField.SUBSET),
+
 	Qualifier("qualifier", WebServiceFilter.Qualifier, WebServiceFilterType.ArgumentsAsValues, AnnotationField.QUALIFIER),
 
 	Aspect("aspect", WebServiceFilter.Aspect, WebServiceFilterType.ArgumentsAsValues, AnnotationField.GOASPECT),
