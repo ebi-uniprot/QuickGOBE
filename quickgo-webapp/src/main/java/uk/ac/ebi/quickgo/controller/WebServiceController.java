@@ -860,6 +860,31 @@ public class WebServiceController {
 			System.out.println("raw string is " + result);
 			 filterRequest = om.readValue(result, FilterRequestJson.class);
 			System.out.println("Not Spring " + filterRequest);
+
+
+			FilterRequestToSolr filterRequestToSolr = new FilterRequestToSolr();
+			//AnnotationParameters annotationParameters = filterRequestToSolr.queryToAnnotationParameters(filterRequest);
+
+			AnnotationParameters annotationParameters = null;
+			String solrQuery = filterRequestToSolr.toSolrQuery(filterRequest);
+			System.out.println("Solr query is :" + solrQuery);
+
+			//Do slimming if required
+			ITermContainer slimTermSet = null;
+			Boolean slimmingRequired = filterRequest.isSlim();
+
+
+			if(slimmingRequired) {
+				slimTermSet = createSlimTermSet(annotationParameters);
+			}
+
+
+			//todo should we be using the annotation service?
+			AnnotationColumn[] columns = new AnnotationColumn[0];	//ignored
+			annotationWSUtil.downloadAnnotationsInternal(solrQuery, columns, Integer.valueOf(LIMIT),
+					(filterRequest.getPage() - 1) * filterRequest.getRows(), filterRequest.getRows(), response,
+					slimmingRequired, slimTermSet);
+
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
 		} catch (JsonParseException e) {
@@ -867,29 +892,6 @@ public class WebServiceController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		FilterRequestToSolr filterRequestToSolr = new FilterRequestToSolr();
-		//AnnotationParameters annotationParameters = filterRequestToSolr.queryToAnnotationParameters(filterRequest);
-
-		AnnotationParameters annotationParameters = null;
-		String solrQuery = filterRequestToSolr.toSolrQuery(filterRequest);
-		System.out.println("Solr query is :" + solrQuery);
-
-		//Do slimming if required
-		ITermContainer slimTermSet = null;
-		Boolean slimmingRequired = filterRequest.isSlim();
-
-
-		if(slimmingRequired) {
-			slimTermSet = createSlimTermSet(annotationParameters);
-		}
-
-
-		//todo should we be using the annotation service?
-		AnnotationColumn[] columns = new AnnotationColumn[0];	//ignored
-		annotationWSUtil.downloadAnnotationsInternal(solrQuery, columns, Integer.valueOf(LIMIT),
-				(filterRequest.getPage() - 1) * filterRequest.getRows(), filterRequest.getRows(), response,
-				slimmingRequired, slimTermSet);
 
 	}
 
