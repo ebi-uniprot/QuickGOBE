@@ -17,5 +17,8 @@ public enum WebServiceFilter {
 	Taxon,
 	Aspect,
 	GoTerm,
-	GoRelations;
+	GoRelations,
+	Database,
+	GeneProductType,
+	GeneProductId;
 }
