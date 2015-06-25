@@ -13,6 +13,17 @@ import java.util.Map;
  */
 public enum FilterRequest {
 
+	//Limits the scope to annotations where the target (annotated gene product) is of the specified type(s)
+	GeneProductType("gptype", WebServiceFilter.GeneProductType , WebServiceFilterType.ArgumentsAsValues , AnnotationField.DBOBJECTTYPE ),
+
+	//Select annotations where the target has an identifier from the specified database.
+	//Eg UniProtKB, Ensembl
+	Database("db", WebServiceFilter.Database , WebServiceFilterType.ArgumentsAsValues , AnnotationField.DB ),
+
+	//List of gene product identifiers
+	//Eg P12345; Q4VCS5-1; URS000053207F_559292
+	GeneProductID("gpid", WebServiceFilter.GeneProductId , WebServiceFilterType.ArgumentsAsValues , AnnotationField.DBOBJECTID ),
+
 	// GoTerm - The default behaviour is to match the goIds to the AncestorsIPO list
 	// If the exact goIds are to be matched, then goTermUse must be specified
 	GoID("goid", WebServiceFilter.GoTerm,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ANCESTORSIPO),
@@ -43,7 +54,7 @@ public enum FilterRequest {
 
 	With("with", WebServiceFilter.With, WebServiceFilterType.ArgumentsAsValues, AnnotationField.WITH),
 
-	Taxon("taxon", WebServiceFilter.Taxon,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.TAXONOMYID);
+	Taxon("taxon", WebServiceFilter.Taxon,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.TAXONOMYID) ;
 
 
 
