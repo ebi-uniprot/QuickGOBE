@@ -362,6 +362,12 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/FilterPara
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/FilterRequest.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/WebServiceFilter.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/WebServiceFilterType.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/Evidence.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/FilterMapping.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/FilterMappingSimple.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/GeneProductId.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/GoTerm.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/QueryToSolrProcess.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationBlacklistJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationPostProcessingJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationUpdatersJson.java -text
