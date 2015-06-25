@@ -874,9 +874,9 @@ public class WebServiceController {
 			Boolean slimmingRequired = filterRequest.isSlim();
 
 
-			if(slimmingRequired) {
-				slimTermSet = createSlimTermSet(annotationParameters);
-			}
+//			if(slimmingRequired) {
+//				slimTermSet = createSlimTermSet(annotationParameters);
+//			}
 
 
 			//todo should we be using the annotation service?

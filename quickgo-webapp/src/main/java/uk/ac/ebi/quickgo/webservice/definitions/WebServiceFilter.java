@@ -14,5 +14,8 @@ public enum WebServiceFilter {
 	Reference,
 	With,
 	AssignedBy,
-	Taxon, Aspect;
+	Taxon,
+	Aspect,
+	GoTerm,
+	GoRelations;
 }

@@ -12,14 +12,14 @@ import java.util.List;
  * Time: 13:46
  * Holds filter argument values and mapping to use
  */
-public class SingleFilter {
+public class SolrFilter  {
 
 	public static final String GO_ID_REG_EXP = "(go:|GO:|gO:|Go:)";
 
 	private AnnotationField designate = null;
 	private List<String> args;
 
-	public SingleFilter(AnnotationField designate){
+	public SolrFilter(AnnotationField designate){
 		this.designate = designate;
 		this.args = new ArrayList<>();
 	}

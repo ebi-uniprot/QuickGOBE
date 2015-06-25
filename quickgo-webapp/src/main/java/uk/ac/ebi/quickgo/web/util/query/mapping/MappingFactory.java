@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.web.util.query.mapping;
 
+import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.webservice.definitions.*;
 import uk.ac.ebi.quickgo.webservice.model.FilterJson;
 
@@ -22,42 +23,57 @@ public class MappingFactory {
 
 	public static void populateFiltersContainerWithSingleFilter(FilterJson requestedFilter, FiltersContainer container){
 
-
 		//lookup definitions for parameters
 		FilterRequest filterRequest = FilterRequest.lookup(requestedFilter.getType().toLowerCase());
+		FilterParameter filterParameter = FilterParameter.lookup(requestedFilter.getValue().toLowerCase());
 
 		//Does this filter already exist in the container?
-		SingleFilter singleFilter = container.lookupFilter(filterRequest);
+		SolrFilter solrFilter = container.lookupFilter(filterRequest);
 
 		//No it doesn't so create it
-		if(singleFilter==null){
+		if(solrFilter ==null){
 
 			if(filterRequest.getWsType() == WebServiceFilterType.ArgumentsAsValues){
-				singleFilter = new SingleFilter(filterRequest.getDefaultSolrField());
-				singleFilter.addArg(requestedFilter.getValue());
+				solrFilter = new SolrFilter(filterRequest.getDefaultSolrField());
+				solrFilter.addArg(requestedFilter.getValue());
 
 			}else{
+
 				//WebServiceFilterType.ArgumentAsBehaviour
-				FilterParameter filterParameter = FilterParameter.lookup(requestedFilter.getValue().toLowerCase());
-				singleFilter = new SingleFilter(FilterNameToSolrFieldMapper.lookup(filterRequest, filterParameter));
+				AnnotationField field = FilterNameToSolrFieldMapper.lookup(filterRequest, filterParameter);
+				if(field!=null) {
+					solrFilter = new SolrFilter(field);
+				}
 			}
 
-			container.saveFilter(filterRequest.getWsFilter(), singleFilter);
+			container.saveFilter(filterRequest.getWsFilter(), solrFilter);
 
 		}else{
 
 			//Filter already exists
 			if(filterRequest.getWsType() == WebServiceFilterType.ArgumentsAsValues){
-				singleFilter.addArg(requestedFilter.getValue());
+				solrFilter.addArg(requestedFilter.getValue());
 			}else{
-				FilterParameter filterParameter = FilterParameter.lookup(requestedFilter.getValue().toLowerCase());
-				singleFilter.replace(FilterNameToSolrFieldMapper.lookup(filterRequest, filterParameter));
+
+				//Lookup new mapping, use if its defined (some aren't deliberately)
+				AnnotationField field = FilterNameToSolrFieldMapper.lookup(filterRequest, filterParameter);
+				if(field!=null) {
+					solrFilter.replace(field);
+				}
 
 			}
-
 		}
 
 
+		//Check to see if the filter contains a slimming request
+		//I hate to do  this as an exception
+		if(!container.isSlim()){
+			container.setSlim(filterRequest == FilterRequest.GoTermUse && filterParameter == FilterParameter.Slim);
+		}
+
+		if(filterRequest == FilterRequest.GoSlim && filterParameter == FilterParameter.Slim){
+			//Create a filter and populate for goids for slim set.
+		}
 	}
 
 }

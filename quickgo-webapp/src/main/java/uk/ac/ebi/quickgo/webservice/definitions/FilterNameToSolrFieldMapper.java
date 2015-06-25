@@ -18,6 +18,22 @@ public class FilterNameToSolrFieldMapper {
 
 	static{
 
+		//Go Term
+		map.put(new CompositeKey(FilterRequest.GoRelations, FilterParameter.I), AnnotationField.ANCESTORSI);
+
+		//Don't need to include the goTermUse=ancestor mapping, since this is the default for GoId
+		//map.put(new CompositeKey(FilterRequest.GoTermUse, FilterParameter.Ancestor), AnnotationField.ANCESTORSI);
+
+
+		map.put(new CompositeKey(FilterRequest.GoTermUse, FilterParameter.Slim), null);
+		map.put(new CompositeKey(FilterRequest.GoTermUse, FilterParameter.Exact), AnnotationField.GOID);
+
+		//Go Term - Go Relations
+		map.put(new CompositeKey(FilterRequest.GoRelations, FilterParameter.I), AnnotationField.ANCESTORSI);
+		map.put(new CompositeKey(FilterRequest.GoRelations, FilterParameter.IPO), AnnotationField.ANCESTORSIPO);
+		map.put(new CompositeKey(FilterRequest.GoRelations, FilterParameter.IPOR), AnnotationField.ANCESTORSIPOR);
+
+		//Evidence
 		map.put(new CompositeKey(FilterRequest.EcoTermUse, FilterParameter.Ancestor), AnnotationField.ECOANCESTORSI );
 		map.put(new CompositeKey(FilterRequest.EcoTermUse, FilterParameter.Exact), AnnotationField.ECOID);
 	}

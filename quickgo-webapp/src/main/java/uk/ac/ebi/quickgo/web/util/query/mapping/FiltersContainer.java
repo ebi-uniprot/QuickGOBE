@@ -16,28 +16,39 @@ public class FiltersContainer {
 
 	public static final String SOLR_QUERY_NO_FILTERS = "*:*";
 
-	private Map<WebServiceFilter, SingleFilter> filters;
+	private Map<WebServiceFilter, SolrFilter> filters;
+
+	private boolean slim=false;
 
 	public FiltersContainer() {
 		this.filters = new HashMap<>();
 	}
 
-	public SingleFilter lookupFilter(FilterRequest filterRequest){
+	public SolrFilter lookupFilter(FilterRequest filterRequest){
 		return  filters.get(filterRequest.getWsFilter());
 	}
 
-	public void saveFilter(WebServiceFilter webServiceFilter, SingleFilter singleFilter) {
-		filters.put(webServiceFilter, singleFilter);
+	public void saveFilter(WebServiceFilter webServiceFilter, SolrFilter solrFilter) {
+		filters.put(webServiceFilter, solrFilter);
 	}
 
 	public String And() {
 		if(filters.size()==0) return SOLR_QUERY_NO_FILTERS;
 
 		StringBuffer solrQuery = new StringBuffer();
-		for(SingleFilter singleFilter:filters.values()){
-			solrQuery.append(singleFilter.writeSolrQueryFragment());
+		for(SolrFilter solrFilter :filters.values()){
+			solrQuery.append(solrFilter.writeSolrQueryFragment());
 			solrQuery.append(" ");
 		}
 		return solrQuery.toString();
 	}
+
+	public void setSlim(boolean slim) {
+		this.slim = slim;
+	}
+
+	public boolean isSlim(){
+		return this.slim;
+	}
+
 }

@@ -9,15 +9,29 @@ import java.util.Map;
  * @Author Tony Wardell
  * Date: 18/06/2015
  * Time: 15:15
- * Created with IntelliJ IDEA.
+ * A list of the filters that come in from via the web service front end.
  */
 public enum FilterRequest {
 
-	//Evidence
+	// GoTerm - The default behaviour is to match the goIds to the AncestorsIPO list
+	// If the exact goIds are to be matched, then goTermUse must be specified
+	GoID("goid", WebServiceFilter.GoTerm,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ANCESTORSIPO),
+
+	// GoTerm - GoTermUse - ancestor, slim or exact. Requires GoID to be specified.
+	// One must be specified of course - no default
+	GoTermUse("gotermuse", WebServiceFilter.GoTerm,  WebServiceFilterType.ArgumentAsBehaviour, null),
+
+	// GoTerm - GoRelations. Requires GoID to be specified.
+	// Determines which set of relations to traverse when calculating ancestry (or which closure field to search in Solr)
+	// AncestorI, AncestorIPO, AncestorIPOR
+	GoRelations("gorelations", WebServiceFilter.GoTerm, WebServiceFilterType.ArgumentAsBehaviour, null),
+
+	// The name of a pre-defined GO slim set
+	GoSlim("goslim", WebServiceFilter.GoSlim, WebServiceFilterType.ArgumentsAsValues, AnnotationField.SUBSET),
+
+	// Evidence
 	EcoId("ecoid", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ECOANCESTORSI),
 	EcoTermUse("ecotermuse", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentAsBehaviour, null),
-
-	GoSlim("goslim", WebServiceFilter.GoSlim, WebServiceFilterType.ArgumentsAsValues, AnnotationField.SUBSET),
 
 	Qualifier("qualifier", WebServiceFilter.Qualifier, WebServiceFilterType.ArgumentsAsValues, AnnotationField.QUALIFIER),
 

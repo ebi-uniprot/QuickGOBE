@@ -12,7 +12,11 @@ import java.util.Map;
 public enum FilterParameter {
 
 	Exact("exact"),
-	Ancestor("ancestor");
+	Ancestor("ancestor"),
+	Slim("slim"),
+	I("i"),
+	IPO("ipo"),
+	IPOR("ipor");
 
 	private String lc;
 	private static Map<String,FilterParameter> map = new HashMap<>();
