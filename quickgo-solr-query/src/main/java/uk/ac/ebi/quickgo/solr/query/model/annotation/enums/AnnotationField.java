@@ -8,7 +8,9 @@ package uk.ac.ebi.quickgo.solr.query.model.annotation.enums;
 public enum AnnotationField {
 
 	ID("id"),
+	DBOBJECTTYPE("dbObjectType"),
 	DBOBJECTID("dbObjectID"),
+	DB("db"),
 	TARGETSET("targetSet"),
 	DOCTYPE("docType"),
 	GOASPECT("goAspect"),
