@@ -29,6 +29,12 @@ public class FilterRequestToSolr {
 			MappingFactory.populateFiltersContainerWithSingleFilter(aFilter, filtersContainer);
 		}
 
+		//Could do it this way
+//		if(filtersContainer.explodeGoSlim()){
+//			//Get
+//		}
+
+
 		return filtersContainer.And();
 
 
