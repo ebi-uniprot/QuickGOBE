@@ -23,7 +23,7 @@ public enum FilterParameter {
 
 	static {
 		for(FilterParameter aParm:FilterParameter.values()){
-			map.put(aParm.getLowerCase(),aParm);
+			map.put(aParm.toLowerCase(),aParm);
 		}
 	}
 
@@ -31,7 +31,7 @@ public enum FilterParameter {
 		this.lc = lowerCase;
 	}
 
-	public String getLowerCase() {
+	public String toLowerCase() {
 		return lc;
 	}
 
