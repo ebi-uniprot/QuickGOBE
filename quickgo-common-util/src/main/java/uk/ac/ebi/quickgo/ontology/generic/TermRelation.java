@@ -41,6 +41,9 @@ public class TermRelation {
         else if (parent.ofType(RelationType.IDENTITY)) {
 	        mergedType = child.typeof;
         }
+        else if (child.ofType(RelationType.HASPART) || parent.ofType(RelationType.HASPART)) {
+            mergedType = RelationType.UNDEFINED;
+        }
         else if (child.ofType(RelationType.ISA)) {
 	        mergedType = parent.typeof;
         }
@@ -56,11 +59,6 @@ public class TermRelation {
         else if (child.ofType(RelationType.REGULATES) && parent.ofType(RelationType.PARTOF)) {
 	        mergedType = RelationType.REGULATES;
         }
-/*
-        else if (child.ofType(RelationType.HASPART) && parent.ofType(RelationType.HASPART)) {
-	        mergedType = RelationType.HASPART;
-        }
-*/
 
         return new TermRelation(child.child, parent.parent, mergedType);
     }
