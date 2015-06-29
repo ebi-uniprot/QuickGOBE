@@ -15,11 +15,15 @@ import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
  */
 public class Evidence extends FilterMapping{
 
+	public Evidence() {
+		super(null);
+	}
+
 	public void processRequestObject(FilterRequestJson filterRequestJson){
 
 		for( FilterJson aFilter : filterRequestJson.getList()){
 
-			if(FilterRequest.EcoId.getLowerCase().equals(aFilter.getType().toLowerCase()) && solrField !=null) {
+			if(FilterRequest.EcoId.getLowerCase().equals(aFilter.getType().toLowerCase()) && solrField == null) {
 				solrField = AnnotationField.ECOANCESTORSI;
 				args.add(aFilter.getValue());
 			}

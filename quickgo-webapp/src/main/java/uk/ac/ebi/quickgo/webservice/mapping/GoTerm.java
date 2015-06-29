@@ -1,10 +1,12 @@
 package uk.ac.ebi.quickgo.webservice.mapping;
 
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
+import uk.ac.ebi.quickgo.web.util.annotation.AnnotationWSUtil;
 import uk.ac.ebi.quickgo.webservice.definitions.FilterParameter;
 import uk.ac.ebi.quickgo.webservice.definitions.FilterRequest;
 import uk.ac.ebi.quickgo.webservice.model.FilterJson;
 import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
+import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +19,13 @@ import java.util.List;
  */
 public class GoTerm extends FilterMapping {
 
+	private final AnnotationWSUtil annotationWSUtil;
 	private boolean slimmingRequired=false;
+
+	public GoTerm(AnnotationWSUtil annotationWSUtil) {
+		super(null);
+		this.annotationWSUtil = annotationWSUtil;
+	}
 
 	@Override
 	public void processRequestObject(FilterRequestJson filterRequestJson) {
@@ -32,7 +40,7 @@ public class GoTerm extends FilterMapping {
 
 			//We need to get the go ids represented by this go slim set
 			if(FilterRequest.GoSlim.getLowerCase().equals(aFilter.getType().toLowerCase())){
-				List<String > idsForSlimSet = new ArrayList<>();      // todo
+				List<String> idsForSlimSet = annotationWSUtil.goTermsForSlimSet(aFilter.getValue());
 				args.addAll(idsForSlimSet);
 			}
 
@@ -65,7 +73,8 @@ public class GoTerm extends FilterMapping {
 		}
 	}
 
-	public boolean isSlimmingRequired() {
+
+	public boolean useTermsAsGoSlim() {
 		return slimmingRequired;
 	}
 }

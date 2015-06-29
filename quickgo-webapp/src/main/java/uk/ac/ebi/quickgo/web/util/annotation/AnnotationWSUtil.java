@@ -1,8 +1,10 @@
 package uk.ac.ebi.quickgo.web.util.annotation;
 
 import uk.ac.ebi.quickgo.ontology.generic.ITermContainer;
+import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * Interface for annotation WS util methods
@@ -56,6 +58,8 @@ public interface AnnotationWSUtil {
 	void downloadStatistics(HttpServletResponse httpServletResponse, String query, String advancedFilter, String solrQuery);
 
 	void downloadOntologyList(HttpServletResponse httpServletResponse, String ontology);
+
+	List<String> goTermsForSlimSet(String slimSet);
 
 //	void downloadSlim(HttpServletResponse httpServletResponse, String termsIds, String proteinIds,
 //					  String proteinSets, int page, int rows);

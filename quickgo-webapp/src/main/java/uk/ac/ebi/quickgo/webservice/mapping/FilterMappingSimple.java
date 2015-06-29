@@ -15,11 +15,10 @@ import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
 public class FilterMappingSimple extends FilterMapping {
 
 	FilterRequest requestField;
-	AnnotationField solrField;
 
 	public FilterMappingSimple(FilterRequest requestField, AnnotationField solrField) {
-		this.requestField = requestField;
-		this.solrField = solrField;
+		super(solrField);
+		this.requestField=requestField;
 	}
 
 	@Override

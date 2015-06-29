@@ -941,6 +941,20 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		return ontologyGraph.layout();
 	}
 
+	@Override
+	public List<String> goTermsForSlimSet(String slimSet){
+
+		List<String> setTerms = new ArrayList<>();
+
+		for (GenericTerm goTerm : terms.values()) {
+			if (goTerm.getSubsetsNames().contains(slimSet)) {
+				setTerms.add(goTerm.getId());
+			}
+		}
+		return  setTerms;
+	}
+
+
 	/**
 	 * Given a list of terms ids, return associated names
 	 * @param ids Terms ids

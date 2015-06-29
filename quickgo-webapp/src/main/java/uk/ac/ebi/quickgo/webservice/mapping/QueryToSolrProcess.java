@@ -1,8 +1,10 @@
 package uk.ac.ebi.quickgo.webservice.mapping;
 
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
+import uk.ac.ebi.quickgo.web.util.annotation.AnnotationWSUtil;
 import uk.ac.ebi.quickgo.web.util.query.mapping.MappingFactory;
 import uk.ac.ebi.quickgo.webservice.definitions.FilterRequest;
+import uk.ac.ebi.quickgo.webservice.definitions.WebServiceFilter;
 import uk.ac.ebi.quickgo.webservice.model.FilterJson;
 import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
 
@@ -15,40 +17,99 @@ import java.util.Map;
  * @Author Tony Wardell
  * Date: 25/06/2015
  * Time: 13:30
- * Created with IntelliJ IDEA.
+ * Turn the filter request into a solr query, with a class dedicated to each filter type
  */
 public class QueryToSolrProcess {
 
-	public void execute(FilterRequestJson filterRequestJson) {
+	private final FilterRequestJson filterRequest;
+	private final Map<WebServiceFilter, FilterMapping> filterMappings;
 
-		List<FilterMapping> filterMappings =  createMappingsList();
+	public QueryToSolrProcess(FilterRequestJson filterRequest, AnnotationWSUtil annotationWSUtil) {
 
+		this.filterRequest = filterRequest;
+
+		 filterMappings =  createMappingsList(annotationWSUtil);
 	}
 
-	private List<FilterMapping> createMappingsList() {
 
-		List<FilterMapping> filterMappings = new ArrayList<>();
+	public String toSolrQuery() {
+
+		boolean first=true;
+
+		StringBuilder stringBuilder = new StringBuilder();
+		for(FilterMapping aMapping: filterMappings.values()){
+
+			aMapping.processRequestObject(this.filterRequest);
+			String fragment = aMapping.solrQueryFragment();
+			if(fragment.length()>0){
+
+				if(first){
+					stringBuilder.append("(");
+					stringBuilder.append(fragment);
+					stringBuilder.append(")");
+					first=false;
+				}else {
+
+					//
+					stringBuilder.append(" AND (");
+					stringBuilder.append(fragment);
+					stringBuilder.append(")");
+				}
+			}
+
+		}
+
+		String solrQuery = stringBuilder.toString();
+
+		if(solrQuery.length()==0){
+			return  "*:*";
+		}else{
+			return solrQuery;
+		}
+	}
+
+	private Map<WebServiceFilter, FilterMapping> createMappingsList(AnnotationWSUtil annotationWSUtil) {
+
+		Map<WebServiceFilter, FilterMapping> filterMappings = new HashMap<>();
 
 		//These mappings are simple - the argument to the filter is the value to use in the solr query
 		//so there is a simple one to one mapping
-		filterMappings.add(new FilterMappingSimple(FilterRequest.GeneProductType, AnnotationField.DBOBJECTTYPE));
-		filterMappings.add(new FilterMappingSimple(FilterRequest.Database, AnnotationField.DBXREF));
-		filterMappings.add(new FilterMappingSimple(FilterRequest.GeneProductID, AnnotationField.DBOBJECTID));
-		filterMappings.add(new FilterMappingSimple(FilterRequest.Aspect, AnnotationField.GOASPECT));
-		filterMappings.add(new FilterMappingSimple(FilterRequest.Qualifier, AnnotationField.QUALIFIER));
-		filterMappings.add(new FilterMappingSimple(FilterRequest.Reference, AnnotationField.REFERENCE));
-		filterMappings.add(new FilterMappingSimple(FilterRequest.With, AnnotationField.WITH));
-		filterMappings.add(new FilterMappingSimple(FilterRequest.AssignedBy, AnnotationField.ASSIGNEDBY));
-		filterMappings.add(new FilterMappingSimple(FilterRequest.Taxon, AnnotationField.TAXONOMYID));
+
+		//Gene Product Type
+		//Limits the scope to annotations where the target (annotated gene product) is of the specified type(s)
+		//Eg protein, rna, complex
+		filterMappings.put(WebServiceFilter.GeneProductType, new FilterMappingSimple(FilterRequest.GeneProductType, AnnotationField.DBOBJECTTYPE));
+
+		filterMappings.put(WebServiceFilter.Database, new FilterMappingSimple(FilterRequest.Database, AnnotationField.DBXREF));
+
+		//todo OK??
+		filterMappings.put(WebServiceFilter.GeneProductSet, new FilterMappingSimple(FilterRequest.GeneProductSet, AnnotationField.TARGETSET));
+
+		//todo does this exist??
+		//proteome --> something.
+
+		//filterMappings.put(WebServiceFilter.GeneProductId, new FilterMappingSimple(FilterRequest.GeneProductID, AnnotationField.DBOBJECTID));
+		filterMappings.put(WebServiceFilter.Aspect,new FilterMappingSimple(FilterRequest.Aspect, AnnotationField.GOASPECT));
+		filterMappings.put(WebServiceFilter.Qualifier,new FilterMappingSimple(FilterRequest.Qualifier, AnnotationField.QUALIFIER));
+		filterMappings.put(WebServiceFilter.Reference,new FilterMappingSimple(FilterRequest.Reference, AnnotationField.REFERENCE));
+		filterMappings.put(WebServiceFilter.With,new FilterMappingSimple(FilterRequest.With, AnnotationField.WITH));
+		filterMappings.put(WebServiceFilter.AssignedBy,new FilterMappingSimple(FilterRequest.AssignedBy, AnnotationField.ASSIGNEDBY));
+		filterMappings.put(WebServiceFilter.Taxon,new FilterMappingSimple(FilterRequest.Taxon, AnnotationField.TAXONOMYID));
+
 
 		//Here are the complicated mappings where there could be several parameters that affect the mapping to be used,
 		//and sometimes change the operation completely
 
-		filterMappings.add(new GeneProductId());
-		filterMappings.add(new GoTerm());
-		filterMappings.add(new Evidence());
+		filterMappings.put(WebServiceFilter.GeneProductId,new GeneProductId());
+		filterMappings.put(WebServiceFilter.GoTerm,new GoTerm(annotationWSUtil));
+		filterMappings.put(WebServiceFilter.EcoEvidence,new Evidence());
 
 
 		return filterMappings;
+	}
+
+	public boolean isSlimmingRequired() {
+		GoTerm goTermMapping = ((GoTerm)(filterMappings.get(WebServiceFilter.GoTerm)));
+		return goTermMapping.useTermsAsGoSlim();
 	}
 }

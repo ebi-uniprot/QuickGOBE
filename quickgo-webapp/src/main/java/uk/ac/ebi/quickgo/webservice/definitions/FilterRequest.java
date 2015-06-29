@@ -24,6 +24,11 @@ public enum FilterRequest {
 	//Eg P12345; Q4VCS5-1; URS000053207F_559292
 	GeneProductID("gpid", WebServiceFilter.GeneProductId , WebServiceFilterType.ArgumentsAsValues , AnnotationField.DBOBJECTID ),
 
+	Proteome("proteome", WebServiceFilter.GeneProductId , WebServiceFilterType.ArgumentsAsValues , AnnotationField.DBOBJECTID ),
+
+	//A name of a set of gene products eg KRUK
+	GeneProductSet("gpset", WebServiceFilter.GeneProductSet , WebServiceFilterType.ArgumentsAsValues , AnnotationField.TARGETSET ),
+
 	// GoTerm - The default behaviour is to match the goIds to the AncestorsIPO list
 	// If the exact goIds are to be matched, then goTermUse must be specified
 	GoID("goid", WebServiceFilter.GoTerm,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ANCESTORSIPO),

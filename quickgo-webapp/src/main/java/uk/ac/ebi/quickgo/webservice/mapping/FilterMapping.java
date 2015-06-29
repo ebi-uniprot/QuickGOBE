@@ -19,14 +19,19 @@ public abstract class FilterMapping {
 	protected List<String> args = new ArrayList<>();
 	public static final String GO_ID_REG_EXP = "(go:|GO:|gO:|Go:)";
 
+	public FilterMapping(AnnotationField solrField) {
+		this.solrField = solrField;
+	}
+
 	public String solrQueryFragment(){
 
 		if(args.size()<=0) return "";
 
 		String argList = StringUtils.join(args.toArray(), " OR ");
-		return(solrField + ":(" +  (argList.toString()).replaceAll(Evidence.GO_ID_REG_EXP, "*").replaceAll(":","\\\\:"));
+		return(solrField.getValue() + ":(" +  (argList.toString()).replaceAll(Evidence.GO_ID_REG_EXP, "*").replaceAll(":","\\\\:") + ")");
 
 	}
 
 	public abstract void processRequestObject(FilterRequestJson filterRequestJson);
+
 }

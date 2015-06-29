@@ -20,5 +20,6 @@ public enum WebServiceFilter {
 	GoRelations,
 	Database,
 	GeneProductType,
-	GeneProductId;
+	GeneProductId,
+	GeneProductSet;
 }

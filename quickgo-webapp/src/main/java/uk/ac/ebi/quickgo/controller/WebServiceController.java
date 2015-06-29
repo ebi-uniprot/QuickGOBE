@@ -60,6 +60,7 @@ import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import uk.ac.ebi.quickgo.web.util.url.URLsResolver;
+import uk.ac.ebi.quickgo.webservice.mapping.QueryToSolrProcess;
 import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
 import uk.ac.ebi.quickgo.webservice.model.SearchFullResultsJson;
 
@@ -861,17 +862,21 @@ public class WebServiceController {
 			 filterRequest = om.readValue(result, FilterRequestJson.class);
 			System.out.println("Not Spring " + filterRequest);
 
-
-			FilterRequestToSolr filterRequestToSolr = new FilterRequestToSolr();
 			//AnnotationParameters annotationParameters = filterRequestToSolr.queryToAnnotationParameters(filterRequest);
-
 			AnnotationParameters annotationParameters = null;
-			String solrQuery = filterRequestToSolr.toSolrQuery(filterRequest);
+
+			//Old new way to do it
+			//FilterRequestToSolr filterRequestToSolr = new FilterRequestToSolr();
+			//String solrQuery = filterRequestToSolr.toSolrQuery(filterRequest);
+
+			QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(filterRequest, annotationWSUtil);
+			String solrQuery = queryToSolrProcess.toSolrQuery();
+
 			System.out.println("Solr query is :" + solrQuery);
 
 			//Do slimming if required
 			ITermContainer slimTermSet = null;
-			Boolean slimmingRequired = filterRequest.isSlim();
+			//Boolean slimmingRequired = filterRequest.isSlim();
 
 
 //			if(slimmingRequired) {
@@ -883,7 +888,7 @@ public class WebServiceController {
 			AnnotationColumn[] columns = new AnnotationColumn[0];	//ignored
 			annotationWSUtil.downloadAnnotationsInternal(solrQuery, columns, Integer.valueOf(LIMIT),
 					(filterRequest.getPage() - 1) * filterRequest.getRows(), filterRequest.getRows(), response,
-					slimmingRequired, slimTermSet);
+					queryToSolrProcess.isSlimmingRequired(), slimTermSet);
 
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
