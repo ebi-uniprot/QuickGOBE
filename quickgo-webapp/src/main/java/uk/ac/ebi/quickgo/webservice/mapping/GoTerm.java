@@ -23,13 +23,12 @@ public class GoTerm extends FilterMapping {
 	private boolean slimmingRequired=false;
 
 	public GoTerm(AnnotationWSUtil annotationWSUtil) {
-		super(null);
+		super(AnnotationField.ANCESTORSIPOR);			//default
 		this.annotationWSUtil = annotationWSUtil;
 	}
 
 	@Override
 	public void processRequestObject(FilterRequestJson filterRequestJson) {
-
 
 		for( FilterJson aFilter : filterRequestJson.getList()) {
 
@@ -49,14 +48,8 @@ public class GoTerm extends FilterMapping {
 
 
 				//The default to use for the solr field is AncestorIPO, so use this if the solr field hasn't already
-				//been set.
-				if(FilterParameter.Ancestor.toLowerCase().equals(aFilter.getValue().toLowerCase())){
+				//been set. This has been set in the constructor
 
-					if(solrField==null){
-						solrField = AnnotationField.ANCESTORSIPOR;
-					}
-
-				}
 
 				//Check if slimming required
 				if(FilterParameter.Slim.toLowerCase().equals(aFilter.getValue().toLowerCase())){
