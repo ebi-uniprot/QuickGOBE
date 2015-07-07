@@ -7,11 +7,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
-import uk.ac.ebi.quickgo.geneproduct.GeneProduct.GeneProductProperty;
 import uk.ac.ebi.quickgo.solr.mapper.SolrMapper;
 import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
 import uk.ac.ebi.quickgo.solr.model.geneproduct.SolrGeneProduct;
 import uk.ac.ebi.quickgo.solr.model.geneproduct.SolrGeneProduct.SolrGeneProductDocumentType;
+import uk.ac.ebi.quickgo.util.KeyValuePair;
 import uk.ac.ebi.quickgo.util.XRef;
 
 /**
@@ -31,7 +31,7 @@ public class SolrGeneProductMapper implements SolrMapper<GeneProduct, SolrGenePr
 	public Collection<SolrGeneProduct> toSolrObject(GeneProduct geneProduct,
 			List<SolrDocumentType> solrDocumentTypes) {
 		
-		List<SolrGeneProduct> solrGeneProducts = new ArrayList<SolrGeneProduct>();
+		List<SolrGeneProduct> solrGeneProducts = new ArrayList<>();
 		
 		for (SolrDocumentType gpDocumentType : solrDocumentTypes) {
 			SolrGeneProductDocumentType solrGPDocumentType = ((SolrGeneProductDocumentType) gpDocumentType);
@@ -78,12 +78,12 @@ public class SolrGeneProductMapper implements SolrMapper<GeneProduct, SolrGenePr
 	 */
 	private Collection<SolrGeneProduct> mapProperties(GeneProduct geneProduct){
 		Collection<SolrGeneProduct> solrGeneProducts = new ArrayList<>();		
-		for(GeneProductProperty geneProductProperty : geneProduct.getGeneProductProperties()){
+		for(KeyValuePair geneProductProperty : geneProduct.getGeneProductProperties()){
 			SolrGeneProduct solrGeneProduct = new SolrGeneProduct();
 			solrGeneProduct.setDbObjectId(geneProduct.getDbObjectId());
 			solrGeneProduct.setDocType(SolrGeneProductDocumentType.PROPERTY.getValue());
-			solrGeneProduct.setPropertyName(geneProductProperty.getPropertyName());
-			solrGeneProduct.setPropertyValue(geneProductProperty.getPropertyValue());
+			solrGeneProduct.setPropertyName(geneProductProperty.key);
+			solrGeneProduct.setPropertyValue(geneProductProperty.value);
 			solrGeneProducts.add(solrGeneProduct);
 		}
 		return solrGeneProducts;

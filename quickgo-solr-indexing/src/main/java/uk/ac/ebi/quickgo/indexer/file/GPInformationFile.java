@@ -9,8 +9,8 @@ import java.util.List;
 
 import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
-import uk.ac.ebi.quickgo.geneproduct.GeneProduct.GeneProductProperty;
 import uk.ac.ebi.quickgo.indexer.IIndexer;
+import uk.ac.ebi.quickgo.util.KeyValuePair;
 
 /**
  * class to represent (and read on a row-by-row basis) a gp_information file
@@ -19,7 +19,7 @@ import uk.ac.ebi.quickgo.indexer.IIndexer;
  * 
  */
 public class GPInformationFile extends GPDataFile {
-	// columns in GPI 1.1 format files:
+	// columns in GPI 1.2 format files:
 	//
 	// 0 DB
 	private static final int COLUMN_DB = 0;
@@ -47,7 +47,7 @@ public class GPInformationFile extends GPDataFile {
 	String namespace;
 
 	public GPInformationFile(NamedFile f) throws Exception {
-		super(f, columnCount, "gpi-version", "1.1");
+		super(f, columnCount, "gpi-version", "1.2");
 		this.namespace = directives.get("namespace");
 		// if (namespace == null || "".equals(namespace)) { //TODO Check this
 		// throw new Exception("Namespace not defined in " + f.getName());
@@ -56,13 +56,11 @@ public class GPInformationFile extends GPDataFile {
 
 	/**
 	 * Builds a new Gene Product object using the columns information 
-	 * @param geneProducts List of rows already read
 	 * @param columns Columns values
 	 * @throws Exception
 	 */
 	public GeneProduct calculateRow (String[] columns) throws Exception {
-			
-		if (columns[COLUMN_PARENT_OBJECT_ID] == null || columns[COLUMN_PARENT_OBJECT_ID].trim().isEmpty()){// Just index GPs with no parent		
+		if (columns[COLUMN_PARENT_OBJECT_ID] == null || columns[COLUMN_PARENT_OBJECT_ID].trim().isEmpty()){// Just index GPs with no parent
 			String db = columns[COLUMN_DB];
 			String dbObjectId = columns[COLUMN_DB_OBJECT_ID];
 			String dbObjectSymbol = columns[COLUMN_DB_OBJECT_SYMBOL];
@@ -72,25 +70,23 @@ public class GPInformationFile extends GPDataFile {
 			String dbObjectType = columns[COLUMN_DB_OBJECT_TYPE];
 			String taxonId = columns[COLUMN_TAXON];
 			taxonId = taxonId.replace("taxon:", "");
-			// currentRow.setpparentObjectID = columns[COLUMN_PARENT_OBJECT_ID];		
-			
+
 			if (taxonId.trim().isEmpty() || !taxonId.matches("^\\d*$")) {//Some lines in the InTact file don't contain taxonomy		    
 				taxonId = "0";
 			}		
-			GeneProduct geneProduct = new GeneProduct(db, dbObjectId, dbObjectSymbol, dbObjectName, Arrays.asList(synonyms), dbObjectType, Integer.valueOf(taxonId), new ArrayList<GeneProductProperty>());
-			
+
 			String[] properties = columns[COLUMN_PROPERTIES].split("\\|");
-			List<GeneProductProperty> geneProductProperties = new ArrayList<>();
+			List<KeyValuePair> geneProductProperties = new ArrayList<>();
 			for (String property : properties) {		
-				if(!property.trim().isEmpty()){
-					GeneProductProperty geneProductProperty = geneProduct.new GeneProductProperty(property.split("=")[0], property.split("=")[1]);
-					geneProductProperties.add(geneProductProperty);
+				if (!property.trim().isEmpty()) {
+					String[] kv = property.split("=");
+					if (kv.length == 2) {
+						geneProductProperties.add(new KeyValuePair(kv[0], kv[1]));
+					}
 				}
 			}
 			
-			geneProduct.setGeneProductProperties(geneProductProperties);
-			
-			return geneProduct;
+			return new GeneProduct(db, dbObjectId, dbObjectSymbol, dbObjectName, Arrays.asList(synonyms), dbObjectType, Integer.valueOf(taxonId), geneProductProperties);
 		}
 		return null;
 	}

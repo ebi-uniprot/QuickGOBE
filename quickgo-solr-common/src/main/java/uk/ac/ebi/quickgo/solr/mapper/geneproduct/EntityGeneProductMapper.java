@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.List;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
-import uk.ac.ebi.quickgo.geneproduct.GeneProduct.GeneProductProperty;
 import uk.ac.ebi.quickgo.solr.mapper.EntityMapper;
 import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
 import uk.ac.ebi.quickgo.solr.model.geneproduct.SolrGeneProduct;
 import uk.ac.ebi.quickgo.solr.model.geneproduct.SolrGeneProduct.SolrGeneProductDocumentType;
+import uk.ac.ebi.quickgo.util.KeyValuePair;
 import uk.ac.ebi.quickgo.util.XRef;
 
 /**
@@ -81,15 +81,13 @@ public class EntityGeneProductMapper implements EntityMapper<SolrGeneProduct, Ge
 	 * @param associatedSolrTerms Solr gene product properties
 	 * @param geneProduct GeneProduct
 	 */
-	private void mapProperty(List<SolrGeneProduct> associatedSolrTerms,
-			GeneProduct geneProduct) {
-		List<GeneProductProperty> geneProductProperties = new ArrayList<>();
+	private void mapProperty(List<SolrGeneProduct> associatedSolrTerms, GeneProduct geneProduct) {
+		List<KeyValuePair> geneProductProperties = new ArrayList<>();
 		for (SolrGeneProduct gpProperty : associatedSolrTerms) {
 			if (geneProduct.getDbObjectId() == null) {
 				geneProduct.setDbObjectId(gpProperty.getDbObjectId());
 			}
-			GeneProductProperty geneProductProperty = geneProduct.new GeneProductProperty(
-					gpProperty.getPropertyName(), gpProperty.getPropertyValue());
+			KeyValuePair geneProductProperty = new KeyValuePair(gpProperty.getPropertyName(), gpProperty.getPropertyValue());
 			geneProductProperties.add(geneProductProperty);
 		}
 		geneProduct.setGeneProductProperties(geneProductProperties);

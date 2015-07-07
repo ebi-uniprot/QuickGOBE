@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.ebi.quickgo.render.JSONSerialise;
+import uk.ac.ebi.quickgo.util.KeyValuePair;
 import uk.ac.ebi.quickgo.util.XRef;
 
 /**
@@ -31,7 +32,7 @@ public class GeneProduct implements JSONSerialise{
 	List<XRef> xRefs = new ArrayList<>();	
 	
 	// Properties
-	List<GeneProductProperty> geneProductProperties = new ArrayList<>();
+	List<KeyValuePair> geneProductProperties = new ArrayList<>();
 	
 	// Extra info
 	private String taxonName;
@@ -41,7 +42,7 @@ public class GeneProduct implements JSONSerialise{
 
 	public GeneProduct(String db, String dbObjectId, String dbObjectSymbol,
 			String dbObjectName, List<String> dbObjectSynonyms,
-			String dbObjectType, int taxonId, List<GeneProductProperty> geneProductProperties) {
+			String dbObjectType, int taxonId, List<KeyValuePair> geneProductProperties) {
 		super();
 		this.db = db;
 		this.dbObjectId = dbObjectId;
@@ -53,35 +54,6 @@ public class GeneProduct implements JSONSerialise{
 		this.geneProductProperties = geneProductProperties;
 	}
 
-	public class GeneProductProperty {
-
-		// Other properties
-		String propertyName;
-		String propertyValue;
-
-		public GeneProductProperty(String propertyName, String propertyValue) {
-
-			this.propertyName = propertyName;
-			this.propertyValue = propertyValue;
-		}
-
-		public String getPropertyName() {
-			return propertyName;
-		}
-
-		public void setPropertyName(String propertyName) {
-			this.propertyName = propertyName;
-		}
-
-		public String getPropertyValue() {
-			return propertyValue;
-		}
-
-		public void setPropertyValue(String propertyValue) {
-			this.propertyValue = propertyValue;
-		}
-	}
-	
 	public String getDb() {
 		return db;
 	}
@@ -154,12 +126,11 @@ public class GeneProduct implements JSONSerialise{
 		this.xRefs = xRefs;
 	}
 
-	public List<GeneProductProperty> getGeneProductProperties() {
+	public List<KeyValuePair> getGeneProductProperties() {
 		return geneProductProperties;
 	}
 
-	public void setGeneProductProperties(
-			List<GeneProductProperty> geneProductProperties) {
+	public void setGeneProductProperties(List<KeyValuePair> geneProductProperties) {
 		this.geneProductProperties = geneProductProperties;
 	}	
 	
@@ -176,9 +147,9 @@ public class GeneProduct implements JSONSerialise{
 	 */
 	public String getTargetSet() {
 		if (!this.geneProductProperties.isEmpty()) {
-			for (GeneProductProperty geneProductProperty : this.geneProductProperties) {
-				if (geneProductProperty.getPropertyName().equals("target_set")) {
-					return geneProductProperty.getPropertyValue();
+			for (KeyValuePair geneProductProperty : this.geneProductProperties) {
+				if ("target_set".equals(geneProductProperty.key)) {
+					return geneProductProperty.value;
 				}
 			}
 		}

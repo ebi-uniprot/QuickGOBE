@@ -21,7 +21,7 @@ import uk.ac.ebi.quickgo.util.MemoryMonitor;
  * Lines that start with "!" are comments.
  * 
  * The file is assumed to have a header that consists of one or more comment lines that contain directives; at present the only
- * types of directive that we recognise are the format version (in gaf, gpad & gpi) and namespace (in gpi).
+ * type of directive that we recognise is the format version (in gaf, gpad & gpi).
  *   
  * @author tonys
  *
@@ -135,10 +135,10 @@ public abstract class GPDataFile {
 	}
 
 	public void checkVersion() throws Exception {
-		/*String version = directives.get(versionDirective);
+		String version = directives.get(versionDirective);
 		if (version == null || !versionSupported.equals(version)) {
 			throw new Exception(versionDirective + ": " + versionSupported + " directive not found");
-		}*/
+		}
 	}
 
 	public int load(IIndexer indexer) throws Exception {
