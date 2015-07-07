@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.indexer.file.GPAssociationFile;
-import uk.ac.ebi.quickgo.indexer.file.GPDataFile;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
@@ -41,8 +40,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 	Map<Integer, Miscellaneous> taxonomies;
 
 	public void run() {
-		int indexed = 0;
-		int chunkSize = 150000;//TODO Increase this value to speed up the indexing process
+		int chunkSize = 150000; //TODO Increase this value to speed up the indexing process
 		MemoryMonitor mm = new MemoryMonitor(true);
 		try {
 			// gp_association files
@@ -50,7 +48,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 
 			//todo make gpAssociationFile of type GpaDataFile, once the later uses Generics
 			GPAssociationFile gpAssociationFile = new GPAssociationFile(file, ontology.terms, evidenceCodeOntology.terms, taxonomies, chunkSize);
-			indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer, chunkSize);
+			int indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer, chunkSize);
 
 			logger.info("indexAnnotations of file: " + file.getName() + " done: " + mm.end() + "  total indexed: " + indexed);
 		} catch (Exception e) {
@@ -72,7 +70,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 	 */
 	private int readAndIndexGPDataFileByChunks(GPAssociationFile gpDataFile, Indexer solrIndexer, int chunkSize) throws Exception {
 
-		List<Annotation> rows = new ArrayList();
+		List<Annotation> rows = new ArrayList<>();
 		MemoryMonitor mm = new MemoryMonitor(true);
 		logger.info("Load " + gpDataFile.getName());
 
@@ -90,7 +88,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 				count = 0;
 				rows = new ArrayList<>();
 				// Set first row of chunk to true
-				((GPAssociationFile)gpDataFile).setFirstRowOfChunk(true);
+				gpDataFile.setFirstRowOfChunk(true);
 			}
 		}
 
@@ -98,7 +96,6 @@ public class QuickGOAnnotationIndexer extends Thread{
 		if (rows.size() > 0) {
 			solrIndexer.index(rows);
 			indexed = indexed + rows.size();
-			rows = new ArrayList<>();
 		}
 
 		gpDataFile.reader.close();

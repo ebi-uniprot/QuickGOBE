@@ -51,7 +51,7 @@ public class AnnotationIndexer implements Indexer<Annotation> {
 	 */
 	private Collection<SolrAnnotation> mapBeans(List<Annotation> annotations) {
 
-		List<SolrAnnotation> beans = new ArrayList<SolrAnnotation>();
+		List<SolrAnnotation> beans = new ArrayList<>();
 
 		// Iterate over all the annotations and convert them into Solr objects to be indexed
 		for (Annotation annotation : annotations) {
