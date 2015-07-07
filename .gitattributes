@@ -50,6 +50,7 @@ quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/ColourUtils.java -text 
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/CountingInputStream.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/IOUtils.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/Interval.java -text svneol=unset#text/plain
+quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/KeyValuePair.java -text
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/MemoryMonitor.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/NamedXRef.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/Progress.java -text svneol=unset#text/plain
