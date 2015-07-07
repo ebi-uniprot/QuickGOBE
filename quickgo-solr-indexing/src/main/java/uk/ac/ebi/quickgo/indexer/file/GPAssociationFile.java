@@ -91,7 +91,7 @@ public class GPAssociationFile extends GPDataFile {
 	/**
 	 * The complete set of gene ontology terms
 	 */
-	Map<String, GenericTerm> ontologyTerms;
+	Map<String, GenericTerm> goTerms;
 
 	/**
 	 * The complete set of eco terms
@@ -113,10 +113,10 @@ public class GPAssociationFile extends GPDataFile {
 	 */
 	boolean firstRowOfChunk;
 
-	public GPAssociationFile(NamedFile f, Map<String, GenericTerm> terms, Map<String, GenericTerm> ecoTerms, Map<Integer, Miscellaneous> taxonomies, int chunkSize) throws Exception {
+	public GPAssociationFile(NamedFile f, Map<String, GenericTerm> goTerms, Map<String, GenericTerm> ecoTerms, Map<Integer, Miscellaneous> taxonomies, int chunkSize) throws Exception {
 		super(f, columnCount, "gpa-version", "1.1");
 
-		this.ontologyTerms = terms;
+		this.goTerms = goTerms;
 		this.ecoTerms = ecoTerms;
 		this.taxonomies = taxonomies;
 		this.chunkSize = chunkSize;
@@ -161,7 +161,7 @@ public class GPAssociationFile extends GPDataFile {
 		}
 
 		//Get associated term to get its name
-		GOTerm term = (GOTerm) ontologyTerms.get(gpaFile.goID);
+		GOTerm term = (GOTerm)goTerms.get(gpaFile.goID);
 
 		if(term == null){//TODO Temp solution because annotation files are inconsistent with terms ones
 			term = new GOTerm();
@@ -179,7 +179,7 @@ public class GPAssociationFile extends GPDataFile {
 		annotation.setGp2protein(proteinIDs);
 
 		// GO Aspect
-		GOTerm goTerm = (GOTerm)this.ontologyTerms.get(gpaFile.goID);
+		GOTerm goTerm = (GOTerm)this.goTerms.get(gpaFile.goID);
 		if (goTerm != null) {
 			annotation.setGoAspect(goTerm.getOntologyText());
 		} else {
@@ -224,19 +224,12 @@ public class GPAssociationFile extends GPDataFile {
 			annotation.setSequenceLength(miscellaneous.getSequence().length());
 		}
 
-		//Set taxonomy name
-		final GenericTerm genericTerm = ontologyTerms.get(geneProduct.getTaxonId());
-		if (genericTerm != null) {
-			annotation.setTaxonomyName(genericTerm.getName());
-		}
-
-
-		//Set taxonomy closure
+		//Set taxonomy name and closure
 		final Miscellaneous misc = taxonomies.get(geneProduct.getTaxonId());
 		if (misc != null) {
+			annotation.setTaxonomyName(misc.getTaxonomyName());
 			annotation.setTaxonomyClosure(misc.getTaxonomyClosure());
 		}
-
 	}
 
 	/**
@@ -301,7 +294,7 @@ public class GPAssociationFile extends GPDataFile {
 	 * @param annotation Annotation to index
 	 */
 	private void calculateAncestors(String goID, Annotation annotation){
-		GOTerm term = (GOTerm) ontologyTerms.get(goID);
+		GOTerm term = (GOTerm)goTerms.get(goID);
 
 		if (term == null) {
 			logger.warn("No ontology with id : " + goID);
