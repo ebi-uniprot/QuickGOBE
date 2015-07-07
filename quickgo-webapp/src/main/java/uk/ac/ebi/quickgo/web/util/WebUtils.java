@@ -14,7 +14,7 @@ public class WebUtils {
 
 	/**
 	 * Utility to retrieve a named cookie's value.
-	 * 
+	 *
 	 * @param req
 	 *            Request containing cookie
 	 * @param name
@@ -33,11 +33,12 @@ public class WebUtils {
 	}
 
 	/**
-	 * Given a string with all the filtering values, process them and return a list with each of them formatted 
+	 * Given a string with all the filtering values, process them and return a list with each of them formatted
 	 * @param filteringValues Values as a simple string
 	 * @return List with parameters values
 	 */
-	public static List<String> processFilterValues(String filteringValues) {
+	public static List<String> parseAndFormatFilterValues(String filteringValues) {
+
 		List<String> formattedValuesList = new ArrayList<>();
 		// Values separated by comma, space or new line character
 		String[] values = null;
@@ -57,7 +58,7 @@ public class WebUtils {
 		// Keep processing values until all of them are formatted
 		for (String value : values) {
 			if (value.trim().length() > 0 && value.replaceAll("\\\\t", "").length() > 0) {// Skip empty strings
-				formattedValuesList.addAll(processFilterValues(value));
+				formattedValuesList.addAll(parseAndFormatFilterValues(value));
 			}
 		}
 

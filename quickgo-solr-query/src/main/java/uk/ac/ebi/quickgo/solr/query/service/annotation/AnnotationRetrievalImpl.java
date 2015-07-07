@@ -20,12 +20,12 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 
 /**
  * Service for retrieving annotations from Solr
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 public class AnnotationRetrievalImpl implements AnnotationRetrieval {
-	
+
 	SolrServerProcessor annotationServerProcessor;
 
 	EntityMapper<SolrAnnotation, Annotation> annotationEntityMapper;
@@ -49,13 +49,13 @@ public class AnnotationRetrievalImpl implements AnnotationRetrieval {
 		List<SolrAnnotation> results = (List<SolrAnnotation>) annotationServerProcessor.findByQuery(new SolrQuery("*:*"), SolrAnnotation.class, -1);
 		for(SolrAnnotation solrAnnotation : results){
 			annotations.add(annotationEntityMapper.toEntityObject(Arrays.asList(solrAnnotation), SolrAnnotationDocumentType.getAsInterfaces()));
-		}		
+		}
 		return annotations;
 	}
 
 	@Override
 	public List<Annotation> findByQuery(String query, int numRows)
-			throws SolrServerException {		
+			throws SolrServerException {
 		return annotationServerProcessor.findByQuery(new SolrQuery(query), Annotation.class, -1);
 	}
 
@@ -66,20 +66,20 @@ public class AnnotationRetrievalImpl implements AnnotationRetrieval {
 
 	@Override
 	public List<Term> getTopTerms(String termFields, int numRows) throws SolrServerException {
-		SolrQuery solrQuery = new SolrQuery();		
+		SolrQuery solrQuery = new SolrQuery();
 		solrQuery.setRequestHandler("/terms");
 		solrQuery.setTerms(true);
 		for(String term : termFields.split(",")){
 			solrQuery.addTermsField(term);
 		}
 		solrQuery.setTermsLimit(numRows);
-		
-		return annotationServerProcessor.getTopTerms(solrQuery);		
+
+		return annotationServerProcessor.getTopTerms(solrQuery);
 	}
 
 	@Override
 	public List<Count> getFacetFields(String query, String facetQuery, String facetFields, int numTerms) throws SolrServerException {
-		
+
 		SolrQuery solrQuery = new SolrQuery(query);
 		solrQuery.setFacetMinCount(1);
 		if (facetQuery != null) {
@@ -99,8 +99,8 @@ public class AnnotationRetrievalImpl implements AnnotationRetrieval {
 		}
 		solrQuery.addFacetField(facetFields);
 		solrQuery.setFacetLimit(numTerms);
-		solrQuery.setFacetMinCount(1);		
-		solrQuery.addFacetPivotField(pivotFields);		
+		solrQuery.setFacetMinCount(1);
+		solrQuery.addFacetPivotField(pivotFields);
 		solrQuery.setFacetSort("count");// Highest first
 		return annotationServerProcessor.getFacetTermsWithPivot(solrQuery);
 	}
@@ -111,7 +111,7 @@ public class AnnotationRetrievalImpl implements AnnotationRetrieval {
 	}
 
 	@Override
-	public long getTotalNumberProteins(String query) throws SolrServerException {		
+	public long getTotalNumberProteins(String query) throws SolrServerException {
 		return annotationServerProcessor.getTotalNumberDistinctValues(query, AnnotationField.DBOBJECTID.getValue());
 	}
 
@@ -140,5 +140,5 @@ public class AnnotationRetrievalImpl implements AnnotationRetrieval {
 
 	public void setAnnotationServerProcessor(SolrServerProcessor annotationServerProcessor) {
 		this.annotationServerProcessor = annotationServerProcessor;
-	}	
+	}
 }

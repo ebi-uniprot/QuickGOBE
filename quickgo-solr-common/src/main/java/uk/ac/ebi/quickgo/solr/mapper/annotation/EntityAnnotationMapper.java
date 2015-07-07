@@ -24,7 +24,7 @@ public class EntityAnnotationMapper implements EntityMapper<SolrAnnotation, Anno
 	@Override
 	public Annotation toEntityObject(Collection<SolrAnnotation> solrObjects,
 			List<SolrDocumentType> solrDocumentTypes) {
-		
+
 		Annotation annotation = new Annotation();
 
 		for (SolrDocumentType annotationDocumentType : solrDocumentTypes) {
@@ -36,13 +36,13 @@ public class EntityAnnotationMapper implements EntityMapper<SolrAnnotation, Anno
 					mapAnnotation(getAssociatedSolrTerms(solrObjects,
 								SolrAnnotationDocumentType.ANNOTATION).get(0), annotation);
 				}
-				break;				
+				break;
 			}
 		}
 		return annotation;
 	}
 
-	
+
 	/**
 	 * Maps a Solr annotation to an Annotation
 	 * @param associatedSolrTerm Solr annotations
@@ -61,16 +61,18 @@ public class EntityAnnotationMapper implements EntityMapper<SolrAnnotation, Anno
 		annotation.setEcoID(associatedSolrTerm.getEcoID());
 		annotation.setTermName(associatedSolrTerm.getTermName());
 		annotation.setExtensions(associatedSolrTerm.getExtensions());
+		annotation.setFullExtension(associatedSolrTerm.getFullExtension());
 		annotation.setGoAspect(associatedSolrTerm.getGoAspect());
 		annotation.setGoEvidence(associatedSolrTerm.getGoEvidence());
 		annotation.setGoID(associatedSolrTerm.getGoID());
 		annotation.setInteractingTaxID(associatedSolrTerm.getInteractingTaxID());
 		annotation.setProperties(associatedSolrTerm.getProperties());
-		annotation.setQualifiers(associatedSolrTerm.getQualifiers());
-		annotation.setReferences(associatedSolrTerm.getDbXrefs());
+		annotation.setQualifier(associatedSolrTerm.getQualifier());
+		annotation.setReference(associatedSolrTerm.getDbXref());
 		annotation.setTaxonomyId(associatedSolrTerm.getTaxonomyId());
 		annotation.setTaxonomyName(associatedSolrTerm.getTermName());
 		annotation.setWith(associatedSolrTerm.getWith());
+		annotation.setFullWith(associatedSolrTerm.getFullWith());
 		annotation.setSequenceLength(associatedSolrTerm.getSequenceLength());
 		annotation.setGp2protein(associatedSolrTerm.getGp2proteinList());
 		annotation.setSubset(associatedSolrTerm.getSubSets());
@@ -81,7 +83,7 @@ public class EntityAnnotationMapper implements EntityMapper<SolrAnnotation, Anno
 	/**
 	 * Given a list of Solr annotations, returns the ones that match with the
 	 * specified document type
-	 * 
+	 *
 	 * @param solrObjects
 	 *            Solr annotations objects
 	 * @param solrAnnotationDocumentType
@@ -97,5 +99,5 @@ public class EntityAnnotationMapper implements EntityMapper<SolrAnnotation, Anno
 			}
 		}
 		return solrAnnotations;
-	}	
+	}
 }

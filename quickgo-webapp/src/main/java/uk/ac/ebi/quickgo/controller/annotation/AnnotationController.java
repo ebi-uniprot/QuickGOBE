@@ -18,6 +18,10 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -49,19 +53,19 @@ import uk.ac.ebi.quickgo.web.util.url.URLsResolver;
 
 /**
  * Annotation controller
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 
 @Controller
 public class AnnotationController{
-	
-	private static final Logger logger = Logger.getLogger(AnnotationController.class);		
+
+	private static final Logger logger = Logger.getLogger(AnnotationController.class);
 	// Number top organisms to show
-	private final static int NUMBER_TOP_ORGANISMS = 17;	
+	private final static int NUMBER_TOP_ORGANISMS = 17;
 	// Most used taxonomies for filtering
-	private static List<TopTaxonomy> mostCommonTaxonomies = new ArrayList<TopTaxonomy>(NUMBER_TOP_ORGANISMS);	
+	private static List<TopTaxonomy> mostCommonTaxonomies = new ArrayList<TopTaxonomy>(NUMBER_TOP_ORGANISMS);
 	// Taxonomies including GOC model organisms
 	private static List<String> taxonomiesIds = Arrays.asList("9606", "10090",
 			"10116", "3702", "559292", "284812", "83333", "6239", "7955",
@@ -78,82 +82,84 @@ public class AnnotationController{
 	private static List<Miscellaneous> subsetsCounts = new ArrayList<>();
 	// Excel format for stats
 	private static final String contentTypeXLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-	
+
 	private int selectedPage;
 	private int selectedRows;
 	private long totalNumberAnnotations;
 
 	AnnotationParameters annotationParameters;
-	
+
 	// To keep statistics values
 	private StatisticsBean statisticsBean = new StatisticsBean();
-	
+
 	@Autowired
 	AnnotationService annotationService;
-	
+
 	@Autowired
 	MiscellaneousUtil miscellaneousUtil;
-	
+
 	@Autowired
 	MiscellaneousService miscellaneousService;
-	
+
 	@Autowired
 	TermService termService;
-	
+
 	@Autowired
 	URLsResolver urLsResolver;
-	
+
 	@Autowired
-	QueryProcessor queryProcessor;	
-	
+	QueryProcessor queryProcessor;
+
 	@Autowired
 	SlimmingUtil slimmingUtil;
-	
+
 	@Autowired
 	StatisticService statisticService;
-	
+
 	StatisticsCalculation statisticsCalculation;
-	
+
 	String currentQuery;
-	
+
 	@RequestMapping(value="annotation", method = {RequestMethod.POST,RequestMethod.GET})
 	public String annotationList(
 			HttpSession session,
-			@RequestParam(value = "q", required = false) String query,		
+			@RequestParam(value = "q", required = false) String query,
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "rows", defaultValue = "25") int rows,
 			@RequestParam(value = "cols", defaultValue = "") String cols,
 			@RequestParam(value = "removeFilter", defaultValue = "") String removeFilter,
 			@RequestParam(value = "removeAllFilters", defaultValue = "") String removeAllFilters,
-			@RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter,		
+			@RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter,
 			Model model) throws UnsupportedEncodingException {
-		
+
+
+
 		this.selectedPage = page;
 		this.selectedRows = rows;
-		
+
 		// Get current applied filters from session
 		AppliedFilterSet appliedFilterSet = (AppliedFilterSet) session.getAttribute("appliedFilters");
 		if (appliedFilterSet == null) {
 			appliedFilterSet = new AppliedFilterSet();
 		}
-		
+
 		initializeStructures(session);
 
 		processFilters(removeFilter, removeAllFilters, appliedFilterSet);
-		
-		// Calculate Annotations Parameters from Query parameter		
+
+		// Calculate Annotations Parameters from Query parameter
 		annotationParameters = new AnnotationParameters();
 		// Process query
 		queryProcessor.processQuery(query, annotationParameters, appliedFilterSet, Boolean.valueOf(advancedFilter));
-		
+
 		annotationParameters.setParameters(new HashMap<String, List<String>>(appliedFilterSet.getParameters()));
-		
+
 		// Create query from filter values
 		String solrQuery = annotationParameters.toSolrQuery();
-		
+
 		currentQuery = solrQuery;
-		
-		// Calculate total number annotations		
+
+		// Calculate total number annotations
 		this.totalNumberAnnotations = annotationService.getTotalNumberAnnotations(solrQuery);
 		// Retrieve annotations
 		List<Annotation> annotations = annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
@@ -162,22 +168,22 @@ public class AnnotationController{
 		for (Annotation annotation : annotations) {
 			List<String> slimValue = appliedFilterSet.getParameters().get("slim");
 			List<String> filterGOIds = appliedFilterSet.getParameters().get(AnnotationField.ANCESTORSIPO.getValue());
-			AnnotationBean annotationBean = slimmingUtil.calculateOriginalAndSlimmingTerm(annotation, filterGOIds, slimValue);			
+			AnnotationBean annotationBean = slimmingUtil.calculateOriginalAndSlimmingTerm(annotation, filterGOIds, slimValue);
 			urLsResolver.setURLs(annotationBean);
 			annotationBeans.add(annotationBean);
 		}
-		
+
 		// Set list of annotations to display
 		session.setAttribute("annotationsList", annotationBeans);
 		// Set visible columns
-		AnnotationColumn[] sortedVisibleAnnotationHeaders = (AnnotationColumn[]) session.getAttribute("visibleAnnotationsColumns");		
+		AnnotationColumn[] sortedVisibleAnnotationHeaders = (AnnotationColumn[]) session.getAttribute("visibleAnnotationsColumns");
 		if (sortedVisibleAnnotationHeaders == null || !cols.isEmpty()) {
 			sortedVisibleAnnotationHeaders = AnnotationColumn.getAnnotationHeaders(URLDecoder.decode(cols,"UTF-8").split(","));
 			// Set visible columns in session
 			session.setAttribute("visibleAnnotationsColumns", sortedVisibleAnnotationHeaders);
 		}
 		// All columns
-		AnnotationColumn[] allAnnotationsColumns = (AnnotationColumn[]) session.getAttribute("allAnnotationsColumns");		
+		AnnotationColumn[] allAnnotationsColumns = (AnnotationColumn[]) session.getAttribute("allAnnotationsColumns");
 		if(allAnnotationsColumns == null){
 			session.setAttribute("allAnnotationsColumns", allColumns);
 		}
@@ -186,16 +192,18 @@ public class AnnotationController{
 		// Set current page
 		model.addAttribute("currentPage", this.selectedPage);
 		// Set total number of annotations
-		model.addAttribute("totalNumberAnnotations", this.totalNumberAnnotations);		
+		model.addAttribute("totalNumberAnnotations", this.totalNumberAnnotations);
 		// Set applied filters in session
 		session.setAttribute("appliedFilters", appliedFilterSet);
-		
+
 		return View.ANNOTATIONS_PATH + "/" + View.ANNOTATIONS_LIST;
 	}
 
+
+
 	/**
 	 * Initialize some useful structures
-	 * @param session 
+	 * @param session
 	 */
 	private void initializeStructures(HttpSession session) {
 		if (session.getAttribute("mostCommonTaxonomies") == null) {
@@ -227,7 +235,7 @@ public class AnnotationController{
 			session.setAttribute("assignedByDBs", assignedByDBs);
 		}
 
-		if (session.getAttribute("withDBs") == null) {		
+		if (session.getAttribute("withDBs") == null) {
 			if (withDBs.isEmpty()) {
 				withDBs.putAll(getWithDBs());
 			}
@@ -243,7 +251,7 @@ public class AnnotationController{
 			session.setAttribute("allSubsetsCounts", subsetsCounts);
 		}
 	}
-	
+
 	/**
 	 * Populate with facet fields
 	 * @param treeMap Structure to populate
@@ -255,9 +263,9 @@ public class AnnotationController{
 			String dbAbbreviation = count.getName();
 			String dbDescription = miscellaneousUtil.getDBInformation(ClientUtils.escapeQueryChars(dbAbbreviation)).getXrefDatabase();
 			treeMap.put(dbAbbreviation, dbDescription);
-		}		
+		}
 	}
-	
+
 	/**
 	 * Get Dbs that appear in at least 1 annotation
 	 * @return With Dbs
@@ -277,7 +285,7 @@ public class AnnotationController{
 		}
 		return withs;
 	}
-	
+
 	/**
 	 * Calculate taxonomies names from a list of taxonomies ids
 	 */
@@ -288,17 +296,17 @@ public class AnnotationController{
 			topTaxonomy.setId(Long.valueOf(taxId));
 			topTaxonomy.setName(idName.get(String.valueOf(topTaxonomy.getId())));
 			mostCommonTaxonomies.add(topTaxonomy);
-		}		
-	}	
-	
+		}
+	}
+
 	private void processFilters(String removeFilter, String removeAllFilters, AppliedFilterSet appliedFilterSet){
 		// Reset applied filters and top taxonomies
 		if(removeAllFilters.equals("true")){
 			appliedFilterSet.setParameters(new HashMap<String,List<String>>());
-		}		
-				
+		}
+
 		// Remove filter (if any)
-		if(!removeFilter.equals("")){			
+		if(!removeFilter.equals("")){
 			String[] idValue = null;
 			if (removeFilter.startsWith(AnnotationField.QUALIFIER.getValue())) {
 				idValue = removeFilter.split("-");
@@ -319,7 +327,7 @@ public class AnnotationController{
 			}
 		}
 	}
-	
+
 	@ExceptionHandler(Exception.class)
 	public String handleIOException(Exception ex) {
 		ex.printStackTrace();
@@ -343,7 +351,7 @@ public class AnnotationController{
 	 * To process annotations stats request
 	 * @return Annotations stats
 	 */
-	@RequestMapping(value="annotation/stats", method = {RequestMethod.POST,RequestMethod.GET})	
+	@RequestMapping(value="annotation/stats", method = {RequestMethod.POST,RequestMethod.GET})
 	public String calculateStatistics(Model model) {
 		// Calculate stats
 		if(statisticsCalculation != null && !statisticsCalculation.getQuery().equals(currentQuery)){
@@ -352,31 +360,31 @@ public class AnnotationController{
 		} else if(statisticsCalculation == null){
 			createStatsThread(currentQuery);
 		}
-		
+
 		while (statisticsCalculation.isAlive()){
 		}
 		model.addAttribute("statsBean", this.statisticsBean);
-		
+
 		// Set total number annotations
 		model.addAttribute("totalNumberAnnotations", totalNumberAnnotations);
 		long totalNumberProteins = annotationService.getTotalNumberProteins(this.currentQuery);
 		// Set total number proteins
 		model.addAttribute("totalNumberProteins", totalNumberProteins);
-		
+
 		return View.ANNOTATIONS_PATH + "/" + View.ANNOTATIONS_LIST;
 
-	}	
-	
+	}
+
 	/**
-	 * Download annotation statistics in excel format 
+	 * Download annotation statistics in excel format
 	 */
 	@RequestMapping(value="annotation/downloadStats", method = {RequestMethod.POST,RequestMethod.GET})
 	public void downloadStatistics(
 			@RequestParam(value = "categories", required = false) String categories,
 			@RequestParam(value = "statsBy", required = false) String statsBy,
 			Model model, HttpServletResponse httpServletResponse) {
-	
-		try{		
+
+		try{
 			StatsDownload statsDownload = new StatsDownload();
 			boolean byAnnotation = false, byProtein = false;
 			switch(statsBy){
@@ -390,21 +398,21 @@ public class AnnotationController{
 					byProtein = true;
 					byAnnotation = true;
 					break;
-			}			
-			
-			// Calculate total number annotations			
-			long totalNumberProteins = annotationService.getTotalNumberProteins(this.currentQuery);			
-			
-			ByteArrayOutputStream excelStatisticsOutputStream =  statsDownload.generateFile(this.statisticsBean, Arrays.asList(categories.split(",")), this.totalNumberAnnotations, totalNumberProteins, byAnnotation, byProtein);			
-			
+			}
+
+			// Calculate total number annotations
+			long totalNumberProteins = annotationService.getTotalNumberProteins(this.currentQuery);
+
+			ByteArrayOutputStream excelStatisticsOutputStream =  statsDownload.generateFile(this.statisticsBean, Arrays.asList(categories.split(",")), this.totalNumberAnnotations, totalNumberProteins, byAnnotation, byProtein);
+
 			String fileName = "annotation_statistics.xlsx";
 			httpServletResponse.setContentType(contentTypeXLSX);
-			httpServletResponse.setHeader("Content-disposition", "attachment; filename=" + fileName);					
-			
+			httpServletResponse.setHeader("Content-disposition", "attachment; filename=" + fileName);
+
 			OutputStream outputStream = httpServletResponse.getOutputStream();
-			
+
 			outputStream.write(excelStatisticsOutputStream.toByteArray());
-			
+
 			outputStream.flush();
 			outputStream.close();
 		} catch (Exception e) {

@@ -14,15 +14,15 @@ import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 
 /**
  * Possible filter values for retrieving annotations
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 public class AnnotationParameters {
 
-	public final static String GO_ID_REG_EXP = "(go:|GO:|gO:|Go:)"; 
+	public final static String GO_ID_REG_EXP = "(go:|GO:|gO:|Go:)";
 	public final static String ECO_ID_REG_EXP = "(eco:|ECO:|Eco:|eCo:|ECo:|eCO:|ecO:|EcO:)";
-	
+
 	private Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 
 	/**
@@ -32,16 +32,16 @@ public class AnnotationParameters {
 	public String toSolrQuery() {
 		String solrQuery = "*:*";
 
-		// The Solr query will be the result of the advanced query plus the rest of the fields 
+		// The Solr query will be the result of the advanced query plus the rest of the fields
 		String fieldsQuery = processFields();
 		String advancedQuery = processAdvancedQuery();
 		solrQuery = fieldsQuery + " AND " + advancedQuery;
-		
+
 		// Remove redundant queries
 		if(fieldsQuery.equals(advancedQuery)){
 			solrQuery = fieldsQuery;
 		}
-		
+
 		return solrQuery;
 	}
 
@@ -63,19 +63,22 @@ public class AnnotationParameters {
 		}
 		return solrQuery;
 	}
-	
+
 	/**
 	 * Process all the fields to build a Solr query
 	 * @return Solr query
 	 */
-	private String processFields() {		
+	private String processFields() {
 		String solrQuery = "*:*";
+
 		// List of queries
 		List<String> queries = new ArrayList<>();
+
 		// Iterate over all the parameters
 		Iterator<String> keys = parameters.keySet().iterator();
+
 		// If not, process all the fields
-		while (keys.hasNext()) {		
+		while (keys.hasNext()) {
 			String key = keys.next();
 			if(parameters.get(key).size() > 0){
 				AnnotationField annotationField = null;
@@ -85,6 +88,7 @@ public class AnnotationParameters {
 				} catch (Exception e) {
 					continue;
 				}
+
 				String query = annotationField.getValue() + ":(";
 				// Field values
 				String values = StringUtils.arrayToDelimitedString(parameters.get(key).toArray(), " OR ");
@@ -100,16 +104,16 @@ public class AnnotationParameters {
 		}
 		return solrQuery;
 	}
-	
+
 	/**
 	 * Add a field and values into the hash
 	 * @param key
 	 * @param values
 	 */
 	public void addParameter(String key, List<String> values) {
-		
+
 		// Convert GAnnotation web service fields into Solr ones
-		
+
 		if (key.equals(AnnotationWebServiceField.ASPECT.getValue())) {
 			key = AnnotationField.GOASPECT.name();
 			// Convert abbreviation to description
@@ -140,7 +144,7 @@ public class AnnotationParameters {
 			key = AnnotationField.DBOBJECTID.name();
 		}
 		if (key.equals(AnnotationWebServiceField.REF.getValue())) {
-			key = AnnotationField.DBXREF.name();
+			key = AnnotationField.REFERENCE.name();
 		}
 		if (key.equals(AnnotationWebServiceField.RELATION.getValue())) {//TODO Check this one
 			key = AnnotationField.ANCESTORSI.name();
@@ -152,15 +156,15 @@ public class AnnotationParameters {
 			}
 			if(values.contains("R")){
 				key = AnnotationField.ANCESTORSIPOR.name();
-			}			
-		}		
+			}
+		}
 		if (key.equals(AnnotationWebServiceField.ECOID.getValue())) {
 			key = AnnotationField.ECOID.name();
 		}
 		if (key.equals(AnnotationWebServiceField.TAX.getValue())) {
 			key = AnnotationField.TAXONOMYID.name();
 		}
-		
+
 		HashSet<String> newValues = new HashSet<>(values);
 		if(this.parameters.get(key) != null && !this.parameters.get(key).isEmpty()){
 			List<String> previousValues = this.parameters.get(key);
@@ -176,5 +180,12 @@ public class AnnotationParameters {
 
 	public void setParameters(Map<String, List<String>> parameters) {
 		this.parameters = parameters;
-	}	
+	}
+
+	@Override
+	public String toString() {
+		return "AnnotationParameters{" +
+				"parameters=" + parameters +
+				'}';
+	}
 }

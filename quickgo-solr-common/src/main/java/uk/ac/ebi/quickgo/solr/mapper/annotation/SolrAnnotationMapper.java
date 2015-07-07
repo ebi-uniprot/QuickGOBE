@@ -28,9 +28,9 @@ public class SolrAnnotationMapper implements SolrMapper<Annotation, SolrAnnotati
 	@Override
 	public Collection<SolrAnnotation> toSolrObject(Annotation annotation,
 			List<SolrDocumentType> solrDocumentTypes) {
-		
+
 		List<SolrAnnotation> solrAnnotations = new ArrayList<SolrAnnotation>();
-		
+
 		for (SolrDocumentType annotationDocumentType : solrDocumentTypes) {
 			SolrAnnotationDocumentType solrAnnotationDocumentType  = ((SolrAnnotationDocumentType) annotationDocumentType);
 
@@ -38,10 +38,10 @@ public class SolrAnnotationMapper implements SolrMapper<Annotation, SolrAnnotati
 
 			case ANNOTATION:
 				solrAnnotations.add(mapBasicInformation(annotation));
-				break;			
+				break;
 			}
 		}
-		return solrAnnotations;	
+		return solrAnnotations;
 	}
 
 	/**
@@ -59,16 +59,18 @@ public class SolrAnnotationMapper implements SolrMapper<Annotation, SolrAnnotati
 		solrAnnotation.setDbObjectSymbol(annotation.getDbObjectSymbol());
 		solrAnnotation.setDbObjectType(annotation.getDbObjectType());
 		solrAnnotation.setDbObjectSynonyms(annotation.getDbObjectSynonyms());
-		solrAnnotation.setQualifiers(annotation.getQualifiers());
+		solrAnnotation.setQualifier(annotation.getQualifier());
 		solrAnnotation.setGoID(annotation.getGoID());
 		solrAnnotation.setEcoID(annotation.getEcoID());
 		solrAnnotation.setTermName(annotation.getTermName());
 		solrAnnotation.setDate(annotation.getDate());
 		solrAnnotation.setAssignedBy(annotation.getAssignedBy());
-		solrAnnotation.setDbXrefs(annotation.getReferences());
+		solrAnnotation.setDbXref(annotation.getReference());
 		solrAnnotation.setWith(annotation.getWith());
+		solrAnnotation.setFullWith(annotation.getFullWith());
 		solrAnnotation.setGoAspect(annotation.getGoAspect());
 		solrAnnotation.setExtensions(annotation.getExtensions());
+		solrAnnotation.setFullExtension(annotation.getFullExtension());
 		solrAnnotation.setTaxonomyId(annotation.getTaxonomyId());
 		solrAnnotation.setTaxonomyName(annotation.getTaxonomyName());
 		solrAnnotation.setTaxonomyClosures(annotation.getTaxonomyClosure());
@@ -80,6 +82,8 @@ public class SolrAnnotationMapper implements SolrMapper<Annotation, SolrAnnotati
 		solrAnnotation.setSequenceLength(annotation.getSequenceLength());
 		solrAnnotation.setGp2proteinList(annotation.getGp2protein());
 		solrAnnotation.setSubSets(annotation.getSubset());
+
+
 		return solrAnnotation;
 	}
 }

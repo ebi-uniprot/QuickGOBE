@@ -170,8 +170,8 @@ public class GPAssociationFile extends GPDataFile {
 
 		// Create annotation
 		Annotation annotation = new Annotation(goEvidence, gpaFile.db, gpaFile.dbObjectID, gpaFile.goID, gpaFile.ecoID,
-				term.getName(), gpaFile.assignedBy, gpaFile.references, gpaFile.with, gpaFile.qualifiers,
-				gpaFile.interactingTaxID, gpaFile.date, extensionsList, gpaFile.properties);
+				term.getName(), gpaFile.assignedBy, gpaFile.reference, gpaFile.with, gpaFile.fullWith, gpaFile.qualifier,
+				gpaFile.interactingTaxID, gpaFile.date, extensionsList,  gpaFile.extensions, gpaFile.properties);
 
 		//GP2Protein identifiers
 		List<String> proteinIDs = gpCacheRetrieval.retrieveEntry(annotation.getDbObjectID(),GeneProduct.class).getXRefsAsString();
@@ -377,9 +377,10 @@ public class GPAssociationFile extends GPDataFile {
 		String goID;
 		String ecoID;
 		String assignedBy;
-		List<String> references;
+		String reference;
 		List<String> with;
-		List<String> qualifiers;
+		String fullWith;
+		String qualifier;
 		String interactingTaxID;
 		String date;
 		String extensions;
@@ -392,9 +393,10 @@ public class GPAssociationFile extends GPDataFile {
 			this.goID = columns[COLUMN_GO_ID];
 			this.ecoID = columns[COLUMN_EVIDENCE];
 			this.assignedBy = columns[COLUMN_ASSIGNED_BY];
-			this.references = parsePipeSeparatedValues(columns[COLUMN_REFERENCE]);
+			this.reference = columns[COLUMN_REFERENCE];
 			this.with = parsePipeSeparatedValues(columns[COLUMN_WITH]);
-			this.qualifiers = parsePipeSeparatedValues(columns[COLUMN_QUALIFIER]);
+			this.fullWith = columns[COLUMN_WITH];
+			this.qualifier = columns[COLUMN_QUALIFIER];
 			this.interactingTaxID = columns[COLUMN_INTERACTING_TAXID];
 			this.date = columns[COLUMN_DATE];
 			this.extensions = columns[COLUMN_EXTENSION];

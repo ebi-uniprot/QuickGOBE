@@ -1,15 +1,25 @@
 package uk.ac.ebi.quickgo.web.util.annotation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.StringWriter;
+import java.util.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.StringUtils;
 
 import uk.ac.ebi.quickgo.annotation.Annotation;
+import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
+import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
+import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm.EGOAspect;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
+import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.web.util.FileService;
+import uk.ac.ebi.quickgo.web.util.url.AnnotationTotal;
+import uk.ac.ebi.quickgo.webservice.model.ChildTermRelationJson;
+import uk.ac.ebi.quickgo.webservice.model.GoAnnotationJson;
+import uk.ac.ebi.quickgo.ontology.go.GOTerm;
+import uk.ac.ebi.quickgo.webservice.model.OntologyGraphJson;
+import uk.ac.ebi.quickgo.webservice.model.TermJson;
 
 /**
  * Enum with the annotation columns that can be displayed
@@ -17,7 +27,7 @@ import uk.ac.ebi.quickgo.web.util.FileService;
  *
  */
 public enum AnnotationColumn {
-	//Selected by default	
+	//Selected by default
 	PROTEIN("dbObjectID","Gene Product ID","protein",true,true),
 	SYMBOL("dbObjectSymbol","Symbol","symbol",true,false),
 	QUALIFIER("qualifiers","Qualifier","qualifier",true,false),
@@ -27,7 +37,7 @@ public enum AnnotationColumn {
 	EVIDENCE("goEvidence","Evidence","evidence",true,true),
 	REFERENCE("references","Reference","reference",true,true),
 	WITH("with","With","with",true,true),
-	TAXON("taxonomyId","Taxon","taxon",true,true),	
+	TAXON("taxonomyId","Taxon","taxon",true,true),
 	ASSIGNEDBY("assignedBy","Assigned By","assignedby",true,true),
 	EXTENSION("extension","Annotation Extension","extension",true,false),
 
@@ -40,14 +50,15 @@ public enum AnnotationColumn {
 	TAXONNAME("taxonomyName","Taxonomy name","taxonname",false,false),
 	SEQUENCE("sequenceLength","Sequence","sequence",false,false),
 	ORIGINALTERMID("goID","Original Term ID","originaltermid",false,true),
-	ORIGINALTERMNAME("termName","Original Term Name","originaltermname",false,false);
-	
+	ORIGINALTERMNAME("termName","Original Term Name","originaltermname",false,false),
+	ORIGINALWITH("with","With","with",true,true),
+	ORIGINALEXTENSION("extension","Annotation Extension","extension",true,false);
 	private String id;
 	private String description;
-	private String name;	
+	private String name;
 	private boolean checkedByDefault;
 	private boolean showURL;
-	
+
 	private AnnotationColumn(String id, String description, String name, boolean checkedByDefault, boolean showURL){
 		this.id= id;
 		this.description = description;
@@ -57,7 +68,7 @@ public enum AnnotationColumn {
 	}
 
 	public static AnnotationColumn[] getAnnotationHeaders(String[] values){
-		if(values.length == 1 && values[0].equals("")){//Return the ones checked by default			
+		if(values.length == 1 && values[0].equals("")){//Return the ones checked by default
 			List<AnnotationColumn> annotationHeadersList = new ArrayList<>();
 			for(AnnotationColumn annotationHeader : AnnotationColumn.values()){
 				if(annotationHeader.isCheckedByDefault()){
@@ -73,7 +84,7 @@ public enum AnnotationColumn {
 			return annotationHeaders.toArray(new AnnotationColumn[annotationHeaders.size()]);
 		}
 	}
-	
+
 	public static AnnotationColumn[] sort(AnnotationColumn[] list){
 		List<AnnotationColumn> result = new ArrayList<>();
 		result.addAll(Arrays.asList(list));
@@ -86,7 +97,7 @@ public enum AnnotationColumn {
 		result.addAll(unsorted);
 		return result.toArray(new AnnotationColumn[result.size()]);
 	}
-	
+
 	/**
 	 * Get annotation column from ID
 	 * @param id Annotation column ID
@@ -106,10 +117,10 @@ public enum AnnotationColumn {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Given an annotation and a list of columns, return all the annotation fields for those columns 
-	 * @throws Exception 
+	 * Given an annotation and a list of columns, return all the annotation fields for those columns
+	 * @throws Exception
 	 */
 	public static String getAnnotationColumns(FileService.FILE_FORMAT format, Annotation annotation, AnnotationColumn[] columns, String separator) throws Exception{
 		String annotationString = "";
@@ -123,8 +134,8 @@ public enum AnnotationColumn {
 					break;
 				case QUALIFIER:
 					String qualifierString = "";
-					if(annotation.getQualifiers() != null){
-						qualifierString = StringUtils.arrayToDelimitedString(annotation.getQualifiers().toArray(), "|");
+					if(annotation.getQualifier() != null){
+						qualifierString =annotation.getQualifier();
 					}
 					annotationString = annotationString + qualifierString + separator;
 					break;
@@ -146,8 +157,8 @@ public enum AnnotationColumn {
 					break;
 				case REFERENCE:
 					String referenceString = "";
-					if (annotation.getReferences() != null) {
-						referenceString = StringUtils.arrayToDelimitedString(annotation.getReferences().toArray(), "|");
+					if (annotation.getReference() != null) {
+						referenceString = annotation.getReference();
 					}
 					annotationString = annotationString + referenceString + separator;
 					break;
@@ -201,7 +212,108 @@ public enum AnnotationColumn {
 		}
 		return annotationString;
 	}
-	
+
+	public static String getAnnotationColumnsForJson(Annotation annotation, AnnotationColumn[] columns, GoAnnotationJson goAnnotationJson) throws Exception{
+
+
+		StringWriter writer = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writeValue(writer, goAnnotationJson);
+		return writer.toString();
+	}
+
+
+	public static String getAnnotationTotalInJson(long annotationTotal, AnnotationTotal totalObj) throws Exception{
+		StringWriter writer = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+		totalObj.setTotal(annotationTotal);
+		mapper.writeValue(writer, totalObj);
+		return writer.toString();
+	}
+
+	public static String getTermInJson(GOTerm term, List<TermRelation> childTermsRelations,
+									   List<COOccurrenceStatsTerm> allStats,
+									   List<COOccurrenceStatsTerm> nonIEAStats, TermJson termJson) throws Exception{
+
+		//Move in Term information
+		try {
+			termJson.setTermId(term.getId());
+			termJson.setName(term.getName());
+			termJson.setActive(term.active());
+			termJson.setIsGoTerm(term.isGOTerm());
+			termJson.setAspectDescription(term.getAspectDescription());
+			termJson.setgetDefinition(term.getDefinition());
+			termJson.setDefinitionXrefs(term.getDefinitionXrefs());
+			termJson.setUsage(term.getUsage());
+			termJson.setComment(term.getComment());
+			termJson.setAltIds(term.getAltIds());
+			termJson.setAltIdsString(term.getAltIdsString());
+			termJson.setCredits(term.getCredits());
+			termJson.setSynonyms(term.getSynonyms());
+			termJson.setTaxonConstraints(term.getTaxonConstraints());
+			termJson.setGuidelines(term.getGuidelines());
+			termJson.setCrossOntologyRelations(term.getCrossOntologyRelations());
+			termJson.setSubsets(term.getSubsets());
+			termJson.setXrefs(term.getXrefs());
+			termJson.setReplaces(term.getReplaces());
+			termJson.setReplacements(term.getReplacements());
+			termJson.setHistory(term.getHistory());
+
+			List<ChildTermRelationJson> childRelationsJson = new ArrayList<>();
+
+			//Move in child term relations
+		for (TermRelation childTermsRelation : childTermsRelations){
+			ChildTermRelationJson childTermRelationJson = new ChildTermRelationJson();
+
+			GenericTerm aChild = childTermsRelation.getChild();
+			childTermRelationJson.setId(aChild.getId());
+			childTermRelationJson.setName(aChild.getName());
+
+			childTermRelationJson.setTypeOf(childTermsRelation.getTypeof());
+			childRelationsJson.add(childTermRelationJson);
+		}
+//		termJson.setChildTermsRelations(childRelationsJson);
+
+			//Stats
+			termJson.setAllCoOccurrenceStatsTerms(allStats);
+			termJson.setNonIEACOOccurrenceStatistics(nonIEAStats);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
+		//Write out object
+		StringWriter writer = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+
+		mapper.writeValue(writer, termJson);
+		String result = writer.toString();
+		System.out.println(result);
+		return result;
+	}
+
+	public static String getOntologyGraphInJson(OntologyGraphJson ontologyGraphJson)
+			throws Exception{
+
+		StringWriter writer = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writeValue(writer, ontologyGraphJson);
+		String result = writer.toString();
+		System.out.println(result);
+		return result;
+	}
+
+
+	public static String toJson(Object target) throws Exception{
+
+		StringWriter writer = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writeValue(writer, target);
+		String result = writer.toString();
+		System.out.println(result);
+		return result;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -216,15 +328,15 @@ public enum AnnotationColumn {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}		
-	
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
-	}	
+	}
 
 	public boolean isCheckedByDefault() {
 		return checkedByDefault;
@@ -240,5 +352,7 @@ public enum AnnotationColumn {
 
 	public void setShowURL(boolean showURL) {
 		this.showURL = showURL;
-	}	
+	}
+
+
 }

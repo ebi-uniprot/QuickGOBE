@@ -9,9 +9,9 @@ import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
 
 /**
  * Class to represent Solr annotations
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 public class SolrAnnotation {
 
@@ -36,7 +36,7 @@ public class SolrAnnotation {
 	@Field
 	private String targetSet;
 	@Field("qualifier")
-	private List<String> qualifiers;
+	private String qualifier;
 	@Field
 	private String goID;
 	@Field
@@ -54,12 +54,16 @@ public class SolrAnnotation {
 	@Field("extension")
 	private List<String> extensions;
 	@Field
+	private String fullExtension;
+	@Field
 	private String properties;
 	@Field("dbXref")
-	private List<String> dbXrefs;
+	private String dbXref;
 	@Field
 	private List<String> with;
-	
+	@Field
+	private String fullWith;
+
 	// Ancestors
 	@Field
 	private List<String> ancestorsI;
@@ -67,11 +71,11 @@ public class SolrAnnotation {
 	private List<String> ancestorsIPO;
 	@Field
 	private List<String> ancestorsIPOR;
-	
+
 	// ECO Ancestors
 	@Field
 	private List<String> ecoAncestorsI;
-	
+
 	// Extra fields
 	@Field
 	private int taxonomyId;
@@ -85,7 +89,7 @@ public class SolrAnnotation {
 	private List<String> gp2proteinList;
 	@Field("subSet")
 	private List<String> subSets;
-	
+
 	public String getId() {
 		return id;
 	}
@@ -125,7 +129,7 @@ public class SolrAnnotation {
 	public void setDbObjectID(String dbObjectID) {
 		this.dbObjectID = dbObjectID;
 	}
-		
+
 	public String getDbObjectType() {
 		return dbObjectType;
 	}
@@ -134,12 +138,12 @@ public class SolrAnnotation {
 		this.dbObjectType = dbObjectType;
 	}
 
-	public List<String> getQualifiers() {
-		return qualifiers;
+	public String getQualifier() {
+		return qualifier;
 	}
 
-	public void setQualifiers(List<String> qualifiers) {
-		this.qualifiers = qualifiers;
+	public void setQualifier(String qualifier) {
+		this.qualifier = qualifier;
 	}
 
 	public String getGoID() {
@@ -186,6 +190,12 @@ public class SolrAnnotation {
 		return extensions;
 	}
 
+	public String getFullExtension() {
+		return fullExtension;
+	}
+
+	public void setFullExtension(String fullExtension) {this.fullExtension = fullExtension;	}
+
 	public void setExtensions(List<String> extensions) {
 		this.extensions = extensions;
 	}
@@ -214,12 +224,12 @@ public class SolrAnnotation {
 		this.goAspect = goAspect;
 	}
 
-	public List<String> getDbXrefs() {
-		return dbXrefs;
+	public String getDbXref() {
+		return dbXref;
 	}
 
-	public void setDbXrefs(List<String> dbXrefs) {
-		this.dbXrefs = dbXrefs;
+	public void setDbXref(String dbXref) {
+		this.dbXref = dbXref;
 	}
 
 	public List<String> getWith() {
@@ -228,6 +238,12 @@ public class SolrAnnotation {
 
 	public void setWith(List<String> with) {
 		this.with = with;
+	}
+
+	public String getFullWith(){return fullWith;}
+
+	public void setFullWith(String fullWith){
+		this.fullWith = fullWith;
 	}
 
 	public int getTaxonomyId() {
@@ -244,8 +260,8 @@ public class SolrAnnotation {
 
 	public void setTaxonomyClosures(List<Integer> taxonomyClosures) {
 		this.taxonomyClosures = taxonomyClosures;
-	}	
-	
+	}
+
 	public List<String> getAncestorsI() {
 		return ancestorsI;
 	}
@@ -269,15 +285,15 @@ public class SolrAnnotation {
 	public void setAncestorsIPOR(List<String> ancestorsIPOR) {
 		this.ancestorsIPOR = ancestorsIPOR;
 	}
-	
+
 	public String getTermName() {
 		return termName;
 	}
 
 	public void setTermName(String termName) {
 		this.termName = termName;
-	}	
-	
+	}
+
 	public String getDbObjectSymbol() {
 		return dbObjectSymbol;
 	}
@@ -300,7 +316,7 @@ public class SolrAnnotation {
 
 	public void setTaxonomyName(String taxonomyName) {
 		this.taxonomyName = taxonomyName;
-	}	
+	}
 
 	public List<String> getDbObjectSynonyms() {
 		return dbObjectSynonyms;
@@ -308,7 +324,7 @@ public class SolrAnnotation {
 
 	public void setDbObjectSynonyms(List<String> dbObjectSynonyms) {
 		this.dbObjectSynonyms = dbObjectSynonyms;
-	}		
+	}
 
 	public int getSequenceLength() {
 		return sequenceLength;
@@ -317,14 +333,14 @@ public class SolrAnnotation {
 	public void setSequenceLength(int sequenceLength) {
 		this.sequenceLength = sequenceLength;
 	}
-	
+
 	public List<String> getGp2proteinList() {
 		return gp2proteinList;
 	}
 
 	public void setGp2proteinList(List<String> gp2proteinList) {
 		this.gp2proteinList = gp2proteinList;
-	}	
+	}
 
 	public List<String> getSubSets() {
 		return subSets;
@@ -332,8 +348,8 @@ public class SolrAnnotation {
 
 	public void setSubSets(List<String> subSets) {
 		this.subSets = subSets;
-	}	
-	
+	}
+
 	public List<String> getEcoAncestorsI() {
 		return ecoAncestorsI;
 	}
@@ -341,6 +357,7 @@ public class SolrAnnotation {
 	public void setEcoAncestorsI(List<String> ecoAncestorsI) {
 		this.ecoAncestorsI = ecoAncestorsI;
 	}
+
 
 
 	public enum SolrAnnotationDocumentType implements SolrDocumentType {
@@ -363,7 +380,7 @@ public class SolrAnnotation {
 
 		/**
 		 * Get values as SolrDocumentType objects
-		 * 
+		 *
 		 * @return Enum values as SolrDocumentType objects
 		 */
 		public static List<SolrDocumentType> getAsInterfaces() {
@@ -376,7 +393,7 @@ public class SolrAnnotation {
 
 		/**
 		 * Get value as SolrDocumentType object
-		 * 
+		 *
 		 * @param solrAnnotationDocumentType
 		 *            Value to convert
 		 * @return Value as SolrDocumentType object
@@ -386,5 +403,45 @@ public class SolrAnnotation {
 			SolrDocumentType documentType = solrAnnotationDocumentType;
 			return documentType;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "SolrAnnotation{" +
+				"id='" + id + '\'' +
+				", goEvidence='" + goEvidence + '\'' +
+				", docType='" + docType + '\'' +
+				", db='" + db + '\'' +
+				", dbObjectID='" + dbObjectID + '\'' +
+				", dbObjectSymbol='" + dbObjectSymbol + '\'' +
+				", dbObjectName='" + dbObjectName + '\'' +
+				", dbObjectType='" + dbObjectType + '\'' +
+				", dbObjectSynonyms=" + dbObjectSynonyms +
+				", targetSet='" + targetSet + '\'' +
+				", qualifier='" + qualifier + '\'' +
+				", goID='" + goID + '\'' +
+				", goAspect='" + goAspect + '\'' +
+				", ecoID='" + ecoID + '\'' +
+				", termName='" + termName + '\'' +
+				", interactingTaxID='" + interactingTaxID + '\'' +
+				", date='" + date + '\'' +
+				", assignedBy='" + assignedBy + '\'' +
+				", extensions=" + extensions +
+				", fullExtension='" + fullExtension + '\'' +
+				", properties='" + properties + '\'' +
+				", dbXref='" + dbXref + '\'' +
+				", with=" + with +
+				", fullWith='" + fullWith + '\'' +
+				", ancestorsI=" + ancestorsI +
+				", ancestorsIPO=" + ancestorsIPO +
+				", ancestorsIPOR=" + ancestorsIPOR +
+				", ecoAncestorsI=" + ecoAncestorsI +
+				", taxonomyId=" + taxonomyId +
+				", taxonomyName='" + taxonomyName + '\'' +
+				", taxonomyClosures=" + taxonomyClosures +
+				", sequenceLength=" + sequenceLength +
+				", gp2proteinList=" + gp2proteinList +
+				", subSets=" + subSets +
+				'}';
 	}
 }

@@ -24,7 +24,7 @@ public class QueryProcessorImpl implements QueryProcessor{
 
 	// Field name for filtering by ECO name
 	private final String ECONAME = "ecoName";
-	
+
 	/**
 	 * Process query and calculate filter session parameters
 	 * @param query Query to run
@@ -32,21 +32,27 @@ public class QueryProcessorImpl implements QueryProcessor{
 	 * @param appliedFilterSet Session parameters
 	 */
 	public void processQuery(String query, AnnotationParameters annotationParameters, AppliedFilterSet appliedFilterSet, boolean advancedFilter){
-		if (query != null) {			
-			String[] filterValues = query.split("\",\"");
-						
+		if (query != null) {
+			String[] filterValues = query.split("\",\"");		//filter values are comma seperated
+
 			for (String filterValue : filterValues) {
+
+				//Strip out fluff
 				filterValue = filterValue.replaceAll("\"", "")
 						.replaceAll("\\{", "").replaceAll("\\}", "")
 						.replaceAll("\\[", "").replaceAll("\\]", "")
 						.replaceAll("=", ":");
+
+				//Seperate out id value
 				String[] idValue = filterValue.split(":",2);
+
 				if(idValue.length > 1){
+
 					if (advancedFilter && idValue[1].trim().length() == 0) {// No value specified, remove all of them
 						if (appliedFilterSet.getParameters().get(idValue[0]) != null) {
 							appliedFilterSet.getParameters().get(idValue[0]).clear();
 						}
-					} else if (idValue[1].trim().length() > 0) {						
+					} else if (idValue[1].trim().length() > 0) {
 						processFilterValue(idValue, annotationParameters, filterValues, appliedFilterSet);
 					}
 				}
@@ -68,35 +74,35 @@ public class QueryProcessorImpl implements QueryProcessor{
 			appliedFilterSet.addParameters(annotationParameters.getParameters());
 		}
 	}
-	
+
 	/**
 	 * Process a filter id and its values
 	 * @param idValue Filter id and values
 	 * @param annotationParameters Filters to apply
-	 * @param filterValues 
-	 * @param appliedFilterSet 
+	 * @param filterValues
+	 * @param appliedFilterSet
 	 */
 	private void processFilterValue(String[] idValue, AnnotationParameters annotationParameters, String[] filterValues, AppliedFilterSet appliedFilterSet){
 		List<String> formatedValuesList = new ArrayList<>();
-		
+
 		if(idValue[0].equals(ECONAME) || idValue[0].equals(AnnotationField.QUALIFIER.getValue())){// Comma separated values
 			formatedValuesList = new ArrayList<>(Arrays.asList(idValue[1].split(",")));
 		} else {
-			formatedValuesList = new ArrayList<String>(	WebUtils.processFilterValues(idValue[1]));
-		}		
-		
+			formatedValuesList = new ArrayList<String>(	WebUtils.parseAndFormatFilterValues(idValue[1]));
+		}
+
 		// Remove duplicated elements
 		HashSet<String> hs = new HashSet<String>();
 		hs.addAll(formatedValuesList);
 		formatedValuesList.clear();
 		formatedValuesList.addAll(hs);
 		String key = idValue[0];
-		
+
 		List<String> filters = Arrays.asList(filterValues);
 		String filtersString = filters.toString();
 		if(idValue[0].equals(AnnotationField.GOID.getValue())){//TODO Check if it's exact match or not. If so, we don't need to replace the key value
 			key = AnnotationField.ANCESTORSIPO.getValue();
-			
+
 			// Slimming
 			if(filtersString.contains(AnnotationField.ANCESTORSIPOR.getValue())){
 				key = AnnotationField.ANCESTORSIPOR.getValue();
@@ -127,15 +133,15 @@ public class QueryProcessorImpl implements QueryProcessor{
 			}
 			formatedValuesList = notFormattedList;
 		}
-		
+
 		// Special case: filtering by ECO name
 		if(idValue[0].equals(ECONAME)){
 			List<String> names = formatedValuesList;
-			List<String> ecoterms = TermUtil.getECOTermsByName(names);			
+			List<String> ecoterms = TermUtil.getECOTermsByName(names);
 			formatedValuesList = ecoterms;
 			key = processECOFilter(filtersString, appliedFilterSet);
 		}
-		
+
 		// Don't add filter values like ancestorsI:ancestorsI
 		if (!formatedValuesList.contains(AnnotationField.ANCESTORSI.getValue())
 				&& !formatedValuesList.contains(AnnotationField.ANCESTORSIPO
@@ -145,10 +151,9 @@ public class QueryProcessorImpl implements QueryProcessor{
 			annotationParameters.addParameter(key, formatedValuesList);
 		}
 	}
-	
+
 	/**
-	 * Change ECO filters depending on checked options 
-	 * @param key ECO field used for filtering
+	 * Change ECO filters depending on checked options
 	 * @param filtersString Filters to apply
 	 * @param appliedFilterSet Applied filters
 	 */

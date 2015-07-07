@@ -13,9 +13,9 @@ import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 
 /**
  * Applied filters
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 public class AppliedFilterSet {
 
@@ -28,7 +28,7 @@ public class AppliedFilterSet {
 	public void setParameters(Map<String, List<String>> parameters) {
 		this.parameters = parameters;
 	}
-	
+
 	public void setValues(String key, List<String> values) {
 		this.parameters.put(key, values);
 	}
@@ -49,7 +49,7 @@ public class AppliedFilterSet {
 			}
 		}
 	}
-	
+
 	/**
 	 * Check if a list contains a specific value (case insensitive)
 	 * @param appliedValues List of values
@@ -66,7 +66,7 @@ public class AppliedFilterSet {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * To check if a filter value is present
 	 */
@@ -78,7 +78,7 @@ public class AppliedFilterSet {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Given a field id, returns its corresponding name
 	 * @param key Field id
@@ -102,9 +102,9 @@ public class AppliedFilterSet {
 				key = AnnotationColumn.GOID.getName();
 			}
 			return key;
-		}		
+		}
 	}
-	
+
 	/**
 	 * Get number of applied filter values
 	 */
@@ -115,20 +115,27 @@ public class AppliedFilterSet {
 		}
 		return numValues;
 	}
-	
+
 	/**
 	 * Get URL for the applied filters
 	 * @return URL for the applied filters
-	 * @throws UnsupportedEncodingException 
+	 * @throws UnsupportedEncodingException
 	 */
 	public String getURL() throws UnsupportedEncodingException{
-		String url = "";		
+		String url = "";
 		for(String filterId : parameters.keySet()){
-			url = url + "\"{" + filterId + ":" + StringUtils.arrayToDelimitedString(parameters.get(filterId).toArray(), ",") + "}\",";  
+			url = url + "\"{" + filterId + ":" + StringUtils.arrayToDelimitedString(parameters.get(filterId).toArray(), ",") + "}\",";
 		}
 		if(url.length() > 0){
 			url = url.substring(0, url.length()-1);
-		}		
+		}
 		return URLEncoder.encode(url, "UTF-8");
+	}
+
+	@Override
+	public String toString() {
+		return "AppliedFilterSet{" +
+				"parameters=" + parameters +
+				'}';
 	}
 }

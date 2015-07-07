@@ -8,7 +8,9 @@ package uk.ac.ebi.quickgo.solr.query.model.annotation.enums;
 public enum AnnotationField {
 
 	ID("id"),
+	DBOBJECTTYPE("dbObjectType"),
 	DBOBJECTID("dbObjectID"),
+	DB("db"),
 	TARGETSET("targetSet"),
 	DOCTYPE("docType"),
 	GOASPECT("goAspect"),
@@ -26,9 +28,10 @@ public enum AnnotationField {
 	ANCESTORSIPOR("ancestorsIPOR"),
 	ECOANCESTORSI("ecoAncestorsI"),
 	GP2PROTEIN("gp2protein"),
-	SUBSET("subSet");
+	SUBSET("subSet"),
+	REFERENCE("dbXref");
 
-	
+
 	String value;
 
 	private AnnotationField(String value) {

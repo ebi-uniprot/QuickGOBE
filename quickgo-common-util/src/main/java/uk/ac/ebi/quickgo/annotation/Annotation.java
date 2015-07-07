@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package uk.ac.ebi.quickgo.annotation;
 
@@ -10,14 +10,14 @@ import java.util.List;
 /**
  * Class that holds the data for one row read from a gp_association (GPAD) file
  * (i.e., a single GO annotation)
- * 
+ *
  * @author tonys
- * 
+ *
  */
 public class Annotation implements Serializable{
-	
+
 	private static final long serialVersionUID = 2592634776573970012L;
-	
+
 	private String goEvidence;
 	private String db;
 	private String dbObjectID;
@@ -29,12 +29,14 @@ public class Annotation implements Serializable{
 	private String ecoID;
 	private String termName;
 	private String assignedBy;
-	private List<String> references;
+	private String reference;
 	private List<String> with;
-	private List<String> qualifiers;
+	private String fullWith;
+	private String qualifier;
 	private String interactingTaxID;
 	private String date;
 	private List<String> extensions;
+	private String fullExtension;
 	private String properties;
 
 	// Ancestors
@@ -44,7 +46,7 @@ public class Annotation implements Serializable{
 
 	// ECO Ancestors
 	private List<String> ecoAncestorsI;
-	
+
 	// Extra fields
 	private String targetSet;
 	private String goAspect;
@@ -54,15 +56,15 @@ public class Annotation implements Serializable{
 	private int sequenceLength;
 	private List<String> gp2protein;
 	private List<String> subset;
-	
+
 	public Annotation() {
 	}
 
 	public Annotation(String goEvidence, String db,
 			String dbObjectID, String goID, String ecoID, String termName, String assignedBy,
-			List<String> references, List<String> with,
-			List<String> qualifiers, String interactingTaxID, String date,
-			List<String> extensions, String properties) {
+			String reference, List<String> with, String fullWith,
+			String qualifier, String interactingTaxID, String date,
+			List<String> extensions, String fullExtension, String properties) {
 
 		this.goEvidence = goEvidence;
 		this.db = db;
@@ -71,12 +73,14 @@ public class Annotation implements Serializable{
 		this.ecoID = ecoID;
 		this.termName = termName;
 		this.assignedBy = assignedBy;
-		this.references = references;
+		this.reference = reference;
 		this.with = with;
-		this.qualifiers = qualifiers;
+		this.fullWith = fullWith;
+		this.qualifier = qualifier;
 		this.interactingTaxID = interactingTaxID;
 		this.date = date;
 		this.extensions = extensions;
+		this.fullExtension=fullExtension;
 		this.properties = properties;
 	}
 
@@ -128,20 +132,28 @@ public class Annotation implements Serializable{
 		this.with = with;
 	}
 
-	public List<String> getReferences() {
-		return references;
+	public String getFullWith() {
+		return fullWith;
 	}
 
-	public void setReferences(List<String> references) {
-		this.references = references;
+	public void setFullWith(String fullWith) {
+		this.fullWith = fullWith;
 	}
 
-	public List<String> getQualifiers() {
-		return qualifiers;
+	public String getReference() {
+		return reference;
 	}
 
-	public void setQualifiers(List<String> qualifiers) {
-		this.qualifiers = qualifiers;
+	public void setReference(String reference) {
+		this.reference = reference;
+	}
+
+	public  String getQualifier() {
+		return qualifier;
+	}
+
+	public void setQualifier( String qualifier) {
+		this.qualifier = qualifier;
 	}
 
 	public String getInteractingTaxID() {
@@ -168,6 +180,12 @@ public class Annotation implements Serializable{
 		this.extensions = extensions;
 	}
 
+	public String getFullExtension() {	return fullExtension;	}
+
+	public void setFullExtension(String fullExtension) {
+		this.fullExtension = fullExtension;
+	}
+
 	public String getProperties() {
 		return properties;
 	}
@@ -175,7 +193,7 @@ public class Annotation implements Serializable{
 	public void setProperties(String properties) {
 		this.properties = properties;
 	}
-	
+
 	public String getGoEvidence() {
 		return goEvidence;
 	}
@@ -319,8 +337,8 @@ public class Annotation implements Serializable{
 	public void setEcoAncestorsI(List<String> ecoAncestorsI) {
 		this.ecoAncestorsI = ecoAncestorsI;
 	}
-	
-	
+
+
 	/*public String getSequence() {
 		return sequence;
 	}

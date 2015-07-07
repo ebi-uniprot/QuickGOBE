@@ -136,7 +136,7 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 		public int size() {
 			return entities.size();
 		}
-		
+
 		public void add(Entity e) {
 			if (entities.indexOf(e) < 0) {
 				entities.add(e);
@@ -186,7 +186,7 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 
 			for (Entity e : entities) {
 				if (e.term != null && terms.indexOf(e.term) < 0) {
-					terms.add(e.term);					
+					terms.add(e.term);
 				}
 			}
 
@@ -343,8 +343,8 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 				parentsNames.add(annotationExtensionRelation.getName());
 			}
 			return parentsNames;
-		}		
-		
+		}
+
 		public List<AnnotationExtensionRelation> getParents() {
 			return parents;
 		}
@@ -363,7 +363,7 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 
 		public List<String> getSubsets() {
 			return subsets;
-		}		
+		}
 	}
 
 	public static class Relation {
@@ -451,7 +451,7 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 
 	public static class AnnExtRelException extends Exception {
 		private static final long serialVersionUID = 1L;
-		
+
 		public AnnExtRelException(String error) {
 	        super(error);
 	    }
@@ -573,7 +573,7 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 
 		public void setSubsets(List<String> subsets) {
 			this.subsets = subsets;
-		}		
+		}
 	}
 
 	public static class Edge {
@@ -724,7 +724,7 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 			map.put("subsets", sortedSubsets);
 		}
 
-	    return map;
+		return map;
 	}
 
 	public Map<String, AnnotationExtensionRelation> getAnnExtRelations() {

@@ -190,7 +190,6 @@ quickgo-solr-indexing/.settings/org.eclipse.core.resources.prefs -text svneol=un
 quickgo-solr-indexing/.settings/org.eclipse.jdt.core.prefs -text svneol=unset#text/plain
 quickgo-solr-indexing/.settings/org.eclipse.m2e.core.prefs -text svneol=unset#text/plain
 quickgo-solr-indexing/pom.xml -text svneol=unset#text/plain
-quickgo-solr-indexing/quickgo-solr-indexing.iml -text
 quickgo-solr-indexing/src/integration-test/resources/gp2protein.mim -text
 quickgo-solr-indexing/src/integration-test/resources/gp2protein.protein-sets -text
 quickgo-solr-indexing/src/main/config/indexing-beans.xml -text svneol=unset#text/plain
@@ -323,6 +322,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/configuration/Configuration.j
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/configuration/DatabaseConfiguration.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/configuration/GOXrfAbbs.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/configuration/StatisticsConfiguration.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/servlet/CorsFilter.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/servlet/QuickGOCookie.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/servlet/QuickGOServlet.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/staticcontent/annotation/AnnotationBlackListContent.java -text svneol=unset#text/plain
@@ -344,13 +344,48 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/annotation/SlimmingUtil.
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/annotation/SlimmingUtilImpl.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryProcessor.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryProcessorImpl.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryTo.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/Evidence.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/FilterRequestToSolr.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/FiltersContainer.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/MappingFactory.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/SolrFilter.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatisticsCalculation.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatisticsCalculationThread.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatsDownload.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/term/TermUtil.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/term/XRefBean.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/AnnotationTotal.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolver.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/url/URLsResolverImpl.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/FilterNameToSolrFieldMapper.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/FilterParameter.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/FilterRequest.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/WebServiceFilter.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/definitions/WebServiceFilterType.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/Evidence.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/FilterMapping.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/FilterMappingSimple.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/GeneProductId.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/GoTerm.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/mapping/QueryToSolrProcess.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationBlacklistJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationPostProcessingJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/AnnotationUpdatersJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/ChartJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/ChildTermRelationJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/DBJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/EvidenceTypeJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/FilterJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/FilterRequestJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoAnnotationJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoAnnotationsContainer.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoTermHistoryJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/OntologyGraphJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/OntologyListJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/SearchFullResultsJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/StatisticsJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/TermJson.java -text
 quickgo-webapp/src/main/webapp/WEB-INF/dispatcher-servlet.xml -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/advancedFilters.jsp -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/annotationList.jsp -text svneol=unset#text/plain
@@ -424,3 +459,4 @@ quickgo-webapp/src/main/webapp/templates/slimmingGraph.jsp -text svneol=unset#te
 quickgo-webapp/src/main/webapp/templates/slimmingProtein.jsp -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/templates/term-sidebar.jsp -text svneol=unset#text/plain
 quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/graphics/OntologyGraphTest.java -text svneol=unset#text/plain
+quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/web/util/query/QueryToTest.java -text
