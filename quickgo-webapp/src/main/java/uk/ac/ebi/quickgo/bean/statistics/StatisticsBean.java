@@ -158,7 +158,7 @@ public class StatisticsBean {
 				return this.getProteinsPerAspect();
 			case GOEVIDENCE:
 				return this.getProteinsPerEvidence();
-			case DBXREF:
+			case REFERENCE:
 				return this.getProteinsPerReference();
 			case TAXONOMYID:
 				return this.getProteinsPerTaxon();
@@ -180,7 +180,7 @@ public class StatisticsBean {
 				return this.getAnnotationsPerAspect();
 			case GOEVIDENCE:
 				return this.getAnnotationsPerEvidence();
-			case DBXREF:
+			case REFERENCE:
 				return this.getAnnotationsPerReference();
 			case TAXONOMYID:
 				return this.getAnnotationsPerTaxon();

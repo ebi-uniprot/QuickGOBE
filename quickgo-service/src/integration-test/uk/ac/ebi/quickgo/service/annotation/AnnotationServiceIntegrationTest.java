@@ -56,7 +56,7 @@ public class AnnotationServiceIntegrationTest {
 		// Gene product A0SDZ9 and GO_REF
 		annotationParameters = new AnnotationParameters();
 		annotationParameters.addParameter(AnnotationField.DBOBJECTID.name(), Arrays.asList("A0SDZ9"));
-		annotationParameters.addParameter(AnnotationField.DBXREF.name(), Arrays.asList("GO_REF*"));
+		annotationParameters.addParameter(AnnotationField.REFERENCE.name(), Arrays.asList("GO_REF*"));
 		fileteredAnnotations = annotationService.retrieveAnnotations(annotationParameters.toSolrQuery(),0,-1);
 		System.out.println("Annotations with gene product A0SDZ9 and GO_REFs: " + fileteredAnnotations.size());
 		 		

@@ -62,7 +62,7 @@ public class StatisticServiceIntegrationTest {
 			fw.write("*****************\n");
 			fw.write("REFERENCES STATISTICS BY ANNOTATION (ALL ANNOTATIONS)\n");
 			fw.write("*****************\n");			
-			generateByAnnotationStats("*:*", AnnotationField.DBXREF.getValue());
+			generateByAnnotationStats("*:*", AnnotationField.REFERENCE.getValue());
 			System.out.println("REFE// TODO Auto-generated catch blockRENCES done " + System.currentTimeMillis());
 			
 			fw.write("*****************\n");
@@ -119,7 +119,7 @@ public class StatisticServiceIntegrationTest {
 			fw.write("*****************\n");
 			fw.write("REFERENCES STATISTICS BY PROTEIN (ALL ANNOTATIONS)\n");
 			fw.write("*****************\n");			
-			generateByProteinStats("*:*", AnnotationField.DBXREF.getValue());
+			generateByProteinStats("*:*", AnnotationField.REFERENCE.getValue());
 			System.out.println("REFERENCES done " + System.currentTimeMillis());		
 			
 			fw.write("*****************\n");

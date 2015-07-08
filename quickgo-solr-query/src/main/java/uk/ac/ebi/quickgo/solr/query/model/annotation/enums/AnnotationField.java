@@ -22,14 +22,12 @@ public enum AnnotationField {
 	QUALIFIER("qualifier"),
 	TAXONOMYID("taxonomyId"),
 	TAXONOMYCLOSURE("taxonomyClosure"),
-	DBXREF("dbXref"),
 	ANCESTORSI("ancestorsI"),
 	ANCESTORSIPO("ancestorsIPO"),
 	ANCESTORSIPOR("ancestorsIPOR"),
 	ECOANCESTORSI("ecoAncestorsI"),
-	GP2PROTEIN("gp2protein"),
-	SUBSET("subSet"),
-	REFERENCE("dbXref");
+	XREFS("xrefs"),
+	REFERENCE("reference");
 
 
 	String value;

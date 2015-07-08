@@ -89,7 +89,7 @@ public class AppliedFilterSet {
 		if (annotationColumn != null) {
 			return annotationColumn.getName();
 		} else {
-			if(key.toLowerCase().equals(AnnotationField.GP2PROTEIN.getValue().toLowerCase())){
+			if(key.toLowerCase().equals(AnnotationField.XREFS.getValue().toLowerCase())){
 				key = AnnotationColumn.PROTEIN.getName();
 			}
 			if(key.toLowerCase().equals(AnnotationField.ANCESTORSI.getValue().toLowerCase())){

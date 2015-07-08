@@ -122,7 +122,7 @@ public class QueryProcessorImpl implements QueryProcessor{
 		} else if(idValue[0].equals(AnnotationField.TAXONOMYID.getValue())){
 			key = AnnotationField.TAXONOMYCLOSURE.getValue();
 		} else if(idValue[0].equals(AnnotationField.DBOBJECTID.getValue())){// Search in the gp2protein field as well
-			key = AnnotationField.GP2PROTEIN.getValue();
+			key = AnnotationField.XREFS.getValue();
 		} else if(idValue[0].equals(AnnotationField.ECOID.getValue())){
 			key = processECOFilter(filtersString, appliedFilterSet);
 		} else if(idValue[0].equals(AnnotationField.QUALIFIER.getValue())){

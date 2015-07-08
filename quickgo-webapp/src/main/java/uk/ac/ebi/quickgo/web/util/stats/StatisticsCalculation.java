@@ -40,7 +40,7 @@ public class StatisticsCalculation extends Thread {
 			ecoIDcalculationThread.start();
 			ecoIDcalculationThread.join();
 			
-			StatisticsCalculationThread dbXrefcalculationThread = createThread(AnnotationField.DBXREF.getValue(), query, statisticsBean.getAnnotationsPerReference(), statisticsBean.getProteinsPerReference());
+			StatisticsCalculationThread dbXrefcalculationThread = createThread(AnnotationField.REFERENCE.getValue(), query, statisticsBean.getAnnotationsPerReference(), statisticsBean.getProteinsPerReference());
 			dbXrefcalculationThread.start();
 			dbXrefcalculationThread.join();
 			

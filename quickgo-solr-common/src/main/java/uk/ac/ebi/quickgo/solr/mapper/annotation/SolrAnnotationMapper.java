@@ -29,7 +29,7 @@ public class SolrAnnotationMapper implements SolrMapper<Annotation, SolrAnnotati
 	public Collection<SolrAnnotation> toSolrObject(Annotation annotation,
 			List<SolrDocumentType> solrDocumentTypes) {
 
-		List<SolrAnnotation> solrAnnotations = new ArrayList<SolrAnnotation>();
+		List<SolrAnnotation> solrAnnotations = new ArrayList<>();
 
 		for (SolrDocumentType annotationDocumentType : solrDocumentTypes) {
 			SolrAnnotationDocumentType solrAnnotationDocumentType  = ((SolrAnnotationDocumentType) annotationDocumentType);

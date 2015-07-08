@@ -162,7 +162,7 @@ public class QueryTo {
 			key = AnnotationField.TAXONOMYCLOSURE.getValue();
 
 		} else if(key.equals(AnnotationField.DBOBJECTID.getValue())){// Search in the gp2protein field as well
-			key = AnnotationField.GP2PROTEIN.getValue();
+			key = AnnotationField.XREFS.getValue();
 
 		} else if(key.equals(AnnotationField.ECOID.getValue())){
 			key = processECOFilter(filtersString, appliedFilterSet);

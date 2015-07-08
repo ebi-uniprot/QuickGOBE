@@ -43,7 +43,7 @@ public enum FilterRequest {
 	GoRelations("gorelations", WebServiceFilter.GoTerm, WebServiceFilterType.ArgumentAsBehaviour, null),
 
 	// The name of a pre-defined GO slim set
-	GoSlim("goslim", WebServiceFilter.GoSlim, WebServiceFilterType.ArgumentsAsValues, AnnotationField.SUBSET),
+	GoSlim("goslim", WebServiceFilter.GoSlim, WebServiceFilterType.ArgumentsAsValues, null),
 
 	// Evidence
 	EcoId("ecoid", WebServiceFilter.EcoEvidence,  WebServiceFilterType.ArgumentsAsValues, AnnotationField.ECOANCESTORSI),

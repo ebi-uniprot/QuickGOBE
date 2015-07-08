@@ -63,59 +63,57 @@
             (int, float, boolean, string...)
      -->
 
-
 	<field name="goEvidence" type="string" indexed="true" stored="true" multiValued="false" />
 
 	<field name="docType" type="text_general" indexed="true" stored="true"/>
 	<field name="db" type="string" indexed="true" stored="true" multiValued="false"  />
 	<field name="dbObjectID" type="text_ignorecase" indexed="true" stored="true" multiValued="false"  />
-        <field name="dbObjectSymbol" type="string" indexed="false" stored="true" multiValued="false"  />
-        <field name="dbObjectName" type="string" indexed="false" stored="true" multiValued="false"  />
-        <field name="dbObjectType" type="string" indexed="false" stored="true" multiValued="false"  />
-        <field name="dbObjectSynonyms" type="string" indexed="false" stored="true" multiValued="true"  />
+    <field name="dbObjectSymbol" type="string" indexed="false" stored="true" multiValued="false"  />
+    <field name="dbObjectName" type="string" indexed="false" stored="true" multiValued="false"  />
+    <field name="dbObjectType" type="string" indexed="false" stored="true" multiValued="false"  />
+    <field name="dbObjectSynonyms" type="string" indexed="false" stored="true" multiValued="true"  />
 
 	<!-- the (protein) set(s) of which the annotation target is a member -->
-    	<field name="targetSet" type="string" indexed="true" stored="false" multiValued="true" />
+   	<field name="targetSet" type="string" indexed="true" stored="false" multiValued="true" />
 
 	<field name="qualifier" type="string" indexed="true" stored="true" multiValued="false"  />
 	<field name="goID" type="text_ignorecase" indexed="true" stored="true" multiValued="false"  />
 	<field name="goAspect" type="string" indexed="true" stored="true" multiValued="false" />
 	<field name="ecoID" type="string" indexed="true" stored="true" multiValued="false"  />
-        <field name="termName" type="string" indexed="true" stored="true" multiValued="false"  />
+    <field name="termName" type="string" indexed="true" stored="true" multiValued="false"  />
 	<field name="interactingTaxID" type="string" indexed="true" stored="true" multiValued="false"  />
 	<field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"  />
 	<field name="date" type="string" indexed="true" stored="true" multiValued="false"  />
 	<field name="extension" type="string" indexed="true" stored="true" multiValued="true"  />
+	<field name="fullExtension" type="string" indexed="false" stored="true" multiValued="false"  />
 	<field name="properties" type="string" indexed="true" stored="true" multiValued="false"  />
 
 	<!-- Ancestors -->
-	<field name="ancestorsI" type="string" indexed="true" stored="true" multiValued="true"  />
+	<field name="ancestorsI" type="string" indexed="true" stored="false" multiValued="true"  />	
 	<!-- We need to store ancestorsIPO to retrieve the term we are slimming to -->
 	<field name="ancestorsIPO" type="string" indexed="true" stored="true" multiValued="true"  />
-	<field name="ancestorsIPOR" type="string" indexed="true" stored="true" multiValued="true"  />
+	<field name="ancestorsIPOR" type="string" indexed="true" stored="false" multiValued="true"  />	
 
 	<!-- ECO ancestors -->
-        <field name="ecoAncestorsI" type="string" indexed="true" stored="false" multiValued="true"  />
+    <field name="ecoAncestorsI" type="string" indexed="true" stored="false" multiValued="true"  />
 
-	<!-- Cross references -->
-	<field name="dbXref" type="string" indexed="true" stored="true" multiValued="false"  />
+	<!-- Reference -->
+	<field name="reference" type="string" indexed="true" stored="true" multiValued="false"  />
 
-	<!-- Interacting With -->
+	<!-- With_string -->
 	<field name="with" type="string" indexed="true" stored="true" multiValued="true"  />
+	<field name="fullWith" type="string" indexed="false" stored="true" multiValued="false"  />
 
    	<!-- Identifier & closure (i.e., taxonomic hierarchy) of the gene product's taxon -->
 	<field name="taxonomyId" type="int" indexed="true" stored="true" multiValued="false" />
-        <field name="taxonomyName" type="string" indexed="false" stored="true" multiValued="false" />
+    <field name="taxonomyName" type="string" indexed="false" stored="true" multiValued="false" />
 	<field name="taxonomyClosure" type="int" indexed="true" stored="false" multiValued="true" />
 
 	<!-- Sequence length -->
-        <field name="sequenceLength" type="int" indexed="false" stored="true" multiValued="false" />
+    <field name="sequenceLength" type="int" indexed="false" stored="true" multiValued="false" />
 
-	<!-- GP2Protein ids -->
-        <field name="gp2protein" type="string" indexed="true" stored="true" multiValued="true" />
-
-	<!-- Sub set -->
-        <field name="subSet" type="string" indexed="true" stored="false" multiValued="true" />
+	<!-- Cross references to identifiers in other databases -->
+    <field name="xrefs" type="string" indexed="true" stored="true" multiValued="true" />
 
 	<!-- _version_ is required for some Solr 4.0 functionality, particularly if SolrCloud is being used -->
 	<field name="_version_" type="long" indexed="true" stored="true"/>

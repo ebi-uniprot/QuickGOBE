@@ -80,7 +80,7 @@ public class QueryToSolrProcess {
 		//Eg protein, rna, complex
 		filterMappings.put(WebServiceFilter.GeneProductType, new FilterMappingSimple(FilterRequest.GeneProductType, AnnotationField.DBOBJECTTYPE));
 
-		filterMappings.put(WebServiceFilter.Database, new FilterMappingSimple(FilterRequest.Database, AnnotationField.DBXREF));
+		filterMappings.put(WebServiceFilter.Database, new FilterMappingSimple(FilterRequest.Database, AnnotationField.DB));
 
 		//todo OK??
 		filterMappings.put(WebServiceFilter.GeneProductSet, new FilterMappingSimple(FilterRequest.GeneProductSet, AnnotationField.TARGETSET));
