@@ -74,7 +74,7 @@
     <field name="dbObjectSynonyms" type="string" indexed="false" stored="true" multiValued="true"  />
 
 	<!-- the (protein) set(s) of which the annotation target is a member -->
-   	<field name="targetSet" type="string" indexed="true" stored="false" multiValued="true" />
+   	<field name="targetSets" type="string" indexed="true" stored="false" multiValued="true" />
 
 	<field name="qualifier" type="string" indexed="true" stored="true" multiValued="false"  />
 	<field name="goID" type="text_ignorecase" indexed="true" stored="true" multiValued="false"  />
