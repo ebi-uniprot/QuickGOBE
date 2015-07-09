@@ -384,8 +384,10 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoTermHistoryJso
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/OntologyGraphJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/OntologyListJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/SearchFullResultsJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/SearchResultType.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/StatisticsJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/TermJson.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/TypeAheadResult.java -text
 quickgo-webapp/src/main/webapp/WEB-INF/dispatcher-servlet.xml -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/advancedFilters.jsp -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/annotationList.jsp -text svneol=unset#text/plain

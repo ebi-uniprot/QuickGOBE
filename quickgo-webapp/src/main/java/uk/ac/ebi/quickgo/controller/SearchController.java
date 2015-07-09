@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,10 +14,12 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,12 +40,16 @@ import uk.ac.ebi.quickgo.service.term.TermService;
 import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.solr.query.model.ontology.enums.TermField;
+import uk.ac.ebi.quickgo.util.KeyValuePair;
+import uk.ac.ebi.quickgo.web.util.FileService;
 import uk.ac.ebi.quickgo.web.util.View;
 import uk.ac.ebi.quickgo.web.util.annotation.AppliedFilterSet;
 import uk.ac.ebi.quickgo.web.util.query.QueryProcessor;
 import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 
 import com.google.gson.Gson;
+import uk.ac.ebi.quickgo.webservice.model.SearchResultType;
+import uk.ac.ebi.quickgo.webservice.model.TypeAheadResult;
 
 /**
  * Search controller
@@ -59,6 +67,9 @@ public class SearchController {
 	@Autowired
 	QueryProcessor queryProcessor;
 
+	@Autowired
+	FileService fileService;
+
 	private int selectedPage;
 
 	private long totalResults;
@@ -74,16 +85,17 @@ public class SearchController {
 			HttpServletResponse httpServletResponse) throws IOException,
 			SolrServerException {
 
-		List<Object> results = new ArrayList<>();
+		List<TypeAheadResult> results = new ArrayList<>();
+		final String regex = ".*" + query.toLowerCase().replaceAll("\\s+", ".*") + ".*";
 
 		List<GeneProduct> geneproducts = new ArrayList<>();
 		List<GenericTerm> terms = termService.autosuggest(query,null, 30);
 		if (!query.contains(":")) {
 			geneproducts = geneProductService.autosuggest(query, null, 30);
-			addTerms(query, results, terms);
-			addGeneProducts(query, results, geneproducts);
+			addTerms(results, terms, regex);
+			addGeneProducts(results, geneproducts,regex);
 		} else {// GO or ECO id
-			addTermsIds(query, results, terms);
+			addTermsIds(results, terms, regex);
 		}
 
 		// Sort results (shortest first)
@@ -100,6 +112,42 @@ public class SearchController {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.add("Content-Type", "text/html; charset=utf-8");
 		return new ResponseEntity<String>(json, responseHeaders, HttpStatus.CREATED);
+	}
+
+
+
+	@RequestMapping(value = "searchTypeAhead", method = { RequestMethod.POST, RequestMethod.GET })
+	public void searchTypeAhead(
+			@RequestParam(value = "query") String query,
+			HttpServletResponse httpServletResponse) throws IOException,
+			SolrServerException {
+
+		List<TypeAheadResult> results = new ArrayList<>();
+		final String regex = ".*" + query.toLowerCase().replaceAll("\\s+", ".*") + ".*";
+
+		List<GenericTerm> terms = termService.autosuggest(query,null, 30);
+
+		if (!query.contains(":")) {
+
+			addTerms(results, terms, regex);
+			addGeneProducts(results, geneProductService.autosuggest(query, null, 30), regex);
+
+		} else {// GO or ECO id
+			addTermsIds(results, terms, regex);
+		}
+
+		returnResultsJson(httpServletResponse, results);
+	}
+
+	private void returnResultsJson(HttpServletResponse httpServletResponse, List<TypeAheadResult> results) {
+		StringBuffer sb = null;
+		try {
+			sb = fileService.generateJsonFile(	results);
+
+			writeOutJsonResponse(httpServletResponse, sb);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 
@@ -426,50 +474,70 @@ public class SearchController {
 
 	/**
 	 * Check term/synonym contains query text before adding to results
-	 * @param query Auto complete query
 	 * @param results Results to be shown
 	 * @param terms Terms results
+	 * @param regex
 	 */
-	public void addTerms(String query, List<Object> results,
-			List<GenericTerm> terms) {
+	public void addTerms(List<TypeAheadResult> results, List<GenericTerm> terms, String regex) {
+
 		for (GenericTerm genericTerm : terms) {
-			if ((genericTerm.getName() != null && genericTerm.getName()
-					.toLowerCase().trim().matches(".*" + query.toLowerCase().replaceAll("\\s+",".*") + ".*"))
-					|| (!genericTerm.getSynonyms().isEmpty() && genericTerm
-							.getSynonyms().get(0).getName().toLowerCase()
-							.trim().matches(".*" + query.toLowerCase().replaceAll("\\s+",".*") + ".*"))) {
-				results.add(genericTerm);
+
+			if(results.size()>= NUMBER_SHOWN_HITS){
+				break;
 			}
+
+			if ((genericTerm.getName() != null && genericTerm.getName().toLowerCase().trim().matches(regex))
+				|| (!genericTerm.getSynonyms().isEmpty() && genericTerm.getSynonyms().get(0).getName().toLowerCase().trim().matches(regex))) {
+
+				KeyValuePair keyValuePair = new KeyValuePair(null, null);
+				//results.add(genericTerm);
+			}
+
 		}
 	}
 
 	/**
 	 * Check gene product contains query text before adding to results
-	 * @param query Auto complete query
 	 * @param results Results to be shown
-	 * @param terms Terms results
 	 */
-	public void addGeneProducts(String query, List<Object> results,
-			List<GeneProduct> geneProducts) {
+	public void addGeneProducts(List<TypeAheadResult> results, List<GeneProduct> geneProducts, final String regex) {
+
+		//final String regex = ".*" + query.toLowerCase().replaceAll("\\s+", ".*") + ".*";
+
 		for (GeneProduct geneProduct : geneProducts) {
-			if (geneProduct.getDbObjectName().toLowerCase().trim()
-					.matches(".*" + query.toLowerCase().replaceAll("\\s+",".*") + ".*")) {
-				results.add(geneProduct);
+
+			if(results.size()>= NUMBER_SHOWN_HITS){
+				break;
+			}
+
+			if (geneProduct.getDbObjectName().toLowerCase().trim().matches(regex)) {
+
+				TypeAheadResult typeAheadResult = new TypeAheadResult(geneProduct.getDbObjectId(), geneProduct.getDbObjectName(), SearchResultType.GENE_PRODUCT);
+				results.add(typeAheadResult);
 			}
 		}
 	}
 
 	/**
 	 * Add terms when specific ids are searched
-	 * @param query Query to search for
 	 * @param results Results to display
 	 * @param terms Candidate terms to be displayed
 	 */
-	private void addTermsIds(String query, List<Object> results, List<GenericTerm> terms) {
+	private void addTermsIds(List<TypeAheadResult> results, List<GenericTerm> terms, String regex) {
+
+
 		for (GenericTerm term : terms) {
-			if (term.getId() != null && (term.getId().toLowerCase().trim().matches(".*" + query.toLowerCase().replaceAll("\\s+",".*") + ".*") ||
-					(term.getId() + term.getName()).toLowerCase().trim().matches(".*" + query.toLowerCase().replaceAll("\\s+",".*") + ".*"))) {//Don't want to add synonyms to results when we are looking for specific ECO/GO ids
-				results.add(term);
+
+			if(results.size()>= NUMBER_SHOWN_HITS){
+				break;
+			}
+
+			//Don't want to add synonyms to results when we are looking for specific ECO/GO ids
+			if (term.getId() != null && (term.getId().toLowerCase().trim().matches(regex) ||
+					(term.getId() + term.getName()).toLowerCase().trim().matches(regex))) {
+
+				KeyValuePair keyValuePair = new KeyValuePair(null, null);
+				//results.add();
 			}
 		}
 	}
@@ -510,4 +578,17 @@ public class SearchController {
 		}
 
 	}
+
+	private void writeOutJsonResponse(HttpServletResponse httpServletResponse, StringBuffer sb) throws IOException {
+		InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+		IOUtils.copy(in, httpServletResponse.getOutputStream());
+
+		// Set response header and content
+		httpServletResponse.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+		httpServletResponse.setHeader("Content-Disposition", "attachment; filename=annotations." + "json");
+		httpServletResponse.setContentLength(sb.length());
+		httpServletResponse.flushBuffer();
+	}
+
+
 }
