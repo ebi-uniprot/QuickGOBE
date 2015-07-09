@@ -23,9 +23,9 @@ import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 
 /**
  * Class to generate Excel file for the statistics
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 public class StatsDownload {
 
@@ -33,30 +33,28 @@ public class StatsDownload {
 
 	/**
 	 * Generate a statistics file depending on the parameters
-	 * 
+	 *
 	 * @param summary
 	 *            Summary report
-	 * @param parameters
-	 *            Parameters to be exported
 	 * @throws IOException
 	 */
 	public ByteArrayOutputStream generateFile(StatisticsBean summary,
 			List<String> categories, long totalNumberAnnotations, long totalNumberProteins,
 			boolean byAnnotation, boolean byProtein) throws IOException {
-		
+
 		// create a new file
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		
+
 		// Sort the options like they appear in the pop-up
 		//Collections.sort(parameters, new CategoryComparator());
-		
+
 		// Create the sheets. The number of sheets will depend on the parameters
 		createSheets(categories, workBook, byProtein);
 
 		// Write values
 		writeSheets(summary, categories, totalNumberAnnotations, totalNumberProteins, byProtein, byAnnotation);
 
-		// write the workbook to the output stream 
+		// write the workbook to the output stream
 		workBook.write(out);
 		// close our file
 		out.close();
@@ -65,7 +63,7 @@ public class StatsDownload {
 
 	/**
 	 * Create sheets depending on the parameters
-	 * 
+	 *
 	 * @param categories
 	 *            List of parameters obtained from the form
 	 * @param workbook
@@ -78,7 +76,7 @@ public class StatsDownload {
 		workbook.createSheet();
 		workbook.setSheetName(index, "summary");
 		index++;
-		
+
 		if(byProtein){// Write protein sheet
 			workbook.createSheet();
 			workbook.setSheetName(index, sheetName(AnnotationField.DBOBJECTID));
@@ -100,8 +98,7 @@ public class StatsDownload {
 
 	/**
 	 * Write values is sheets
-	 * 
-	 * @param summary
+	 *
 	 *            Summary
 	 * @param categories
 	 *            Categories to write
@@ -116,7 +113,7 @@ public class StatsDownload {
 		if(byProtein){// Write protein sheet
 			writeSheet(proteinSheet, stats.getAnnotationsPerDBObjectID(), new HashSet<StatsTerm>(), AnnotationField.DBOBJECTID.getValue().trim(), true);// Write the values
 		}
-		
+
 		// Write the rest of the sheets
 		for (String category : categories) {
 			if(!category.trim().isEmpty()){
@@ -128,15 +125,15 @@ public class StatsDownload {
 				}
 				if(byProtein){
 					statsByProtein = stats.getStatsByProtein(AnnotationField.valueOf(category.trim().toUpperCase()));
-				}						
+				}
 				writeSheet(sheet, statsByAnnotation, statsByProtein, category.trim(), false);// Write the values
 			}
-		}		
+		}
 	}
 
 	/**
 	 * Write the "summary" sheet
-	 * 
+	 *
 	 * @param sheet
 	 *            Summary sheet
 	 * @param totalAnnotations
@@ -146,7 +143,7 @@ public class StatsDownload {
 	 */
 	private void writeSummarySheet(Sheet sheet, long totalAnnotations,
 			long totalProteins) {
-		
+
 		CellStyle cellStyle = boldFontStyle();
 		// Title
 		SXSSFRow r = (SXSSFRow) sheet.createRow(1);// Row 1
@@ -162,17 +159,15 @@ public class StatsDownload {
 		SXSSFCell.setCellValue("Number of distinct proteins: " + totalProteins);
 
 	}
-	
+
 	/**
 	 * Write values in a specific sheet
-	 * 
+	 *
 	 * @param sheet
 	 *            Sheet to be written
-	 * @param statsByProtein 
-	 * @param statsByAnnotation 
-	 * @param category 
-	 * @param counts
-	 *            Values to write
+	 * @param statsByProtein
+	 * @param statsByAnnotation
+	 * @param category
 	 */
 	private void writeSheet(Sheet sheet, Set<StatsTerm> statsByAnnotation, Set<StatsTerm> statsByProtein, String category, boolean proteinSheet) {
 
@@ -202,7 +197,7 @@ public class StatsDownload {
 			firstSetOfBuckets.addAll(statsByAnnotation);
 
 			if(!proteinSheet){// Not dbObjectID
-			
+
 				if (statsByProtein != null && !statsByProtein.isEmpty()) {
 					// Second
 					secondTitle = getDescription(AnnotationField.valueOf(category.trim().toUpperCase())) + " (by protein)";
@@ -212,7 +207,7 @@ public class StatsDownload {
 		} else {
 			// First
 			firstTitle = getDescription(AnnotationField.valueOf(category.trim().toUpperCase())) + " (by protein)";
-			firstSetOfBuckets.addAll(statsByProtein);			
+			firstSetOfBuckets.addAll(statsByProtein);
 		}
 
 		// Get the buckets and title for each one
@@ -257,7 +252,7 @@ public class StatsDownload {
 	/**
 	 * Write statistics values
 	 * @param firstBuckIterator First set of values to write
-	 * @param secondBuckIterator Second set of values to write (if any) 
+	 * @param secondBuckIterator Second set of values to write (if any)
 	 * @param r Row
 	 * @param c Column
 	 * @param rownum Row number
@@ -303,7 +298,7 @@ public class StatsDownload {
 
 	/**
 	 * Set the title (by annotation or by protein)
-	 * 
+	 *
 	 * @param index
 	 * @param r
 	 *            Row
@@ -324,7 +319,7 @@ public class StatsDownload {
 
 	/**
 	 * Write header values
-	 * 
+	 *
 	 * @param sheet
 	 *            Sheet
 	 * @param r
@@ -354,7 +349,7 @@ public class StatsDownload {
 
 	/**
 	 * Write bucket values
-	 * 
+	 *
 	 * @param sheet
 	 *            Sheet
 	 * @param r
@@ -378,8 +373,8 @@ public class StatsDownload {
 			c.setCellValue(bucket.getCount());
 		}
 	}
-	
-	
+
+
 	public String getDescription(AnnotationField annotationField){
 		switch (annotationField){
 			case GOID:
@@ -388,7 +383,7 @@ public class StatsDownload {
 				return "Aspects";
 			case GOEVIDENCE:
 				return "Evidence Codes";
-			case DBXREF:
+			case REFERENCE:
 				return "References";
 			case TAXONOMYID:
 				return "Taxon IDs";
@@ -397,7 +392,7 @@ public class StatsDownload {
 		}
 		return "";
 	}
-	
+
 	public String sheetName(AnnotationField annotationField){
 		switch (annotationField){
 			case DBOBJECTID:
@@ -408,7 +403,7 @@ public class StatsDownload {
 				return "aspect";
 			case GOEVIDENCE:
 				return "evidence";
-			case DBXREF:
+			case REFERENCE:
 				return "reference";
 			case TAXONOMYID:
 				return "taxon";
