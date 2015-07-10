@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 import uk.ac.ebi.quickgo.solr.indexing.service.geneproduct.GeneProductIndexer;
 import uk.ac.ebi.quickgo.solr.model.geneproduct.SolrGeneProduct.SolrGeneProductDocumentType;
+import uk.ac.ebi.quickgo.util.UniProtAccession;
 import uk.ac.ebi.quickgo.util.XRef;
 
 /**
@@ -24,9 +25,6 @@ import uk.ac.ebi.quickgo.util.XRef;
  */
 @Service("productIdMapping")
 public class GeneProductIdMapping {
-
-	private final String UNIPROTKB = "UniProtKB";
-	
 	/**
 	 * Gene products indexer
 	 */
@@ -34,44 +32,56 @@ public class GeneProductIdMapping {
 	GeneProductIndexer geneProductIndexer;
 	
 	/**
-	 * Reads a gp2protein file and returns a list of gene products objects containing the mappings
+	 * Reads a gp2protein file and extracts mappings between identifiers in a foreign namespace and UniProt accessions
+	 *
+	 * column 1 is the (fully-qualified) identifier (i.e., namespace:identifier) of a gene product
+	 * column 2 is a list (pipe- or semi-colon-separated) of identifiers to which the identifier in column 1 is mapped; we are only interested in mappings to UniProt accessions
+	 *
 	 * @param file gp2protein file
 	 * @throws IOException
 	 */
 	public void readAndIndexGPMappings(File file) throws IOException {
-		
-		List<GeneProduct> geneProducts = new ArrayList<>();
 		BufferedReader br = new BufferedReader(new FileReader(file));
+
+		List<GeneProduct> geneProducts = new ArrayList<>();
 		String line;
+
 		while ((line = br.readLine()) != null) {
-			if (line.startsWith("!")) {// Header lines
+			// skip over comment lines
+			if (line.startsWith("!")) {
 				continue;
 			}
-			// Get the 2 columns
-			String[] ids = line.split("\t");
 
-			// Get Xref DB and ID
-			String xref = ids[0];
-			String xrefDb = xref.split(":", 2)[0];
-			String xrefId = xref.split(":", 2)[1];
-			
-			// Get UniProt/s accessions
-			String sources = ids[1];
-			String[] sourceDbs = sources.split(";|\\|");// Source databases are ";" or "|" separated
-			for (String sourceDb : sourceDbs) {
-				if (sourceDb.contains(UNIPROTKB)) {// We just care about UniProt
-					XRef ref = new XRef(xrefDb, xrefId);
-					GeneProduct geneProduct = new GeneProduct();
-					geneProduct.setDbObjectId(sourceDb.split(":")[1]);// Gene product id
-					geneProduct.setXRefs(Collections.singletonList(ref));
-					geneProducts.add(geneProduct);
+			// if this line doesn't have (at least) two columns, skip it
+			String[] columns = line.split("\t", 2);
+			if (columns.length != 2) {
+				continue;
+			}
+
+			// parse the foreign identifier
+			XRef foreigner = XRef.parse(columns[0]);
+			if (foreigner != null) {
+				// does it map to any UniProt accessions?
+				for (String mapping : columns[1].split(";|\\|")) {
+					UniProtAccession accession = UniProtAccession.parse(mapping);
+					if (accession != null) {
+						GeneProduct geneProduct = new GeneProduct();
+						geneProduct.setDbObjectId(accession.canonical);
+						geneProduct.setXRefs(Collections.singletonList(foreigner));
+						geneProducts.add(geneProduct);
+					}
+				}
+
+				if (geneProducts.size() >= 200000) {
+					geneProductIndexer.index(geneProducts, Collections.singletonList(SolrGeneProductDocumentType.getAsInterface(SolrGeneProductDocumentType.XREF)));
+					geneProducts = new ArrayList<>();
 				}
 			}
-			if(geneProducts.size() % 200000 == 0){
-				geneProductIndexer.index(geneProducts, Collections.singletonList(SolrGeneProductDocumentType.getAsInterface(SolrGeneProductDocumentType.XREF)));
-				geneProducts = new ArrayList<>();
-			}
 		}
-		geneProductIndexer.index(geneProducts, Collections.singletonList(SolrGeneProductDocumentType.getAsInterface(SolrGeneProductDocumentType.XREF)));
+
+		// index the remainder
+		if (geneProducts.size() > 0) {
+			geneProductIndexer.index(geneProducts, Collections.singletonList(SolrGeneProductDocumentType.getAsInterface(SolrGeneProductDocumentType.XREF)));
+		}
 	}
 }
