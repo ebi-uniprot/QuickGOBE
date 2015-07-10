@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.solr.model.ontology;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -484,7 +485,6 @@ public class SolrTerm {
 	 *
 	 */
 	public enum SolrTermDocumentType implements SolrDocumentType {
-		
 		TERM("term"),
 		SYNONYM("synonym"),
 		RELATION("relation"),
@@ -515,10 +515,8 @@ public class SolrTerm {
 		 * @return Enum values as SolrDocumentType objects
 		 */
 		public static List<SolrDocumentType> getAsInterfaces() {
-			List<SolrDocumentType> documentTypes = new ArrayList<SolrDocumentType>();
-			for (SolrDocumentType solrDocumentType : values()) {
-				documentTypes.add(solrDocumentType);
-			}
+			List<SolrDocumentType> documentTypes = new ArrayList<>();
+			documentTypes.addAll(Arrays.asList(values()));
 			return documentTypes;
 		}
 		

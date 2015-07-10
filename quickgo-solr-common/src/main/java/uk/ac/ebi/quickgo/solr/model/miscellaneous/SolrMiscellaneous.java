@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.solr.model.miscellaneous;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.solr.client.solrj.beans.Field;
@@ -525,7 +526,6 @@ public class SolrMiscellaneous {
 	 * 
 	 */
 	public enum SolrMiscellaneousDocumentType implements SolrDocumentType {
-
 		TAXONOMY("taxonomy"),
 		STATS("stats"),
 		SEQUENCE("sequence"),
@@ -540,7 +540,7 @@ public class SolrMiscellaneous {
 
 		String value;
 
-		private SolrMiscellaneousDocumentType(String value) {
+		SolrMiscellaneousDocumentType(String value) {
 			this.value = value;
 		}
 
@@ -558,10 +558,8 @@ public class SolrMiscellaneous {
 		 * @return Enum values as SolrDocumentType objects
 		 */
 		public static List<SolrDocumentType> getAsInterfaces() {
-			List<SolrDocumentType> documentTypes = new ArrayList<SolrDocumentType>();
-			for (SolrDocumentType solrDocumentType : values()) {
-				documentTypes.add(solrDocumentType);
-			}
+			List<SolrDocumentType> documentTypes = new ArrayList<>();
+			documentTypes.addAll(Arrays.asList(values()));
 			return documentTypes;
 		}
 

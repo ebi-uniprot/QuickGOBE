@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.solr.model.annotation;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.apache.solr.client.solrj.beans.Field;
 import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
@@ -390,7 +389,7 @@ public class GOAnnotation implements Serializable {
 
    		String value;
 
-   		private SolrAnnotationDocumentType(String value) {
+   		SolrAnnotationDocumentType(String value) {
    			this.value = value;
    		}
 
@@ -408,11 +407,9 @@ public class GOAnnotation implements Serializable {
    		 * @return Enum values as SolrDocumentType objects
    		 */
    		public static List<SolrDocumentType> getAsInterfaces() {
-   			List<SolrDocumentType> documentTypes = new ArrayList<>();
-   			for (SolrDocumentType solrDocumentType : values()) {
-   				documentTypes.add(solrDocumentType);
-   			}
-   			return documentTypes;
+            List<SolrDocumentType> documentTypes = new ArrayList<>();
+            documentTypes.addAll(Arrays.asList(values()));
+            return documentTypes;
    		}
 
    		/**
