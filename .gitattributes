@@ -60,6 +60,7 @@ quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/StringUtils.java -text 
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/TSVRowReader.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/TimedStorage.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/URLUtils.java -text svneol=unset#text/plain
+quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/UniProtAccession.java -text
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/WeakValueMap.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/XRef.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/XrefAbbsUtil.java -text svneol=unset#text/plain
