@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.bean.annotation.AnnotationBean;
 import uk.ac.ebi.quickgo.service.term.TermService;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 
 /**
  * Implementation of {@link SlimmingUtil}
@@ -24,7 +24,7 @@ public class SlimmingUtilImpl implements SlimmingUtil{
 	/**
 	 * See {@link SlimmingUtil#calculateOriginalAndSlimmingTerm(Annotation, List, List)}
 	 */
-	public AnnotationBean calculateOriginalAndSlimmingTerm(Annotation annotation, List<String> filterGOIds, List<String> slimValue){
+	public AnnotationBean calculateOriginalAndSlimmingTerm(GOAnnotation annotation, List<String> filterGOIds, List<String> slimValue){
 		AnnotationBean annotationBean = new AnnotationBean(annotation);
 		annotationBean.setTermIDSlimmingToString(annotation.getGoID());
 		annotationBean.setTermNameSlimmingTo(annotation.getTermName());

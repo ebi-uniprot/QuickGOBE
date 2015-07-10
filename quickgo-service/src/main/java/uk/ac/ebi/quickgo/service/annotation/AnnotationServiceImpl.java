@@ -7,9 +7,9 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.cache.query.service.CacheRetrieval;
 import uk.ac.ebi.quickgo.solr.exception.NotFoundException;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.query.service.annotation.AnnotationRetrieval;
 
 /**
@@ -22,15 +22,15 @@ public class AnnotationServiceImpl implements AnnotationService {
 	// Log
 	private static final Logger logger = Logger.getLogger(AnnotationServiceImpl.class);
 	
-	CacheRetrieval<Annotation> annotationCacheRetrieval;
+	CacheRetrieval<GOAnnotation> annotationCacheRetrieval;
 	
 	AnnotationRetrieval annotationRetrieval;
 	
 	@Override
-	public Annotation retrieveAnnotation(String id) {
-		Annotation annotation = new Annotation();		
+	public GOAnnotation retrieveAnnotation(String id) {
+		GOAnnotation annotation = new GOAnnotation();
 		try {
-			annotation = annotationCacheRetrieval.retrieveEntry(id, Annotation.class);
+			annotation = annotationCacheRetrieval.retrieveEntry(id, GOAnnotation.class);
 		} catch (NotFoundException e) {			
 			logger.error(e.getMessage());
 		}
@@ -38,8 +38,8 @@ public class AnnotationServiceImpl implements AnnotationService {
 	}
 
 	@Override
-	public List<Annotation> retrieveAnnotations(String query, int start, int rows) {
-		List<Annotation> annotations = new ArrayList<>();
+	public List<GOAnnotation> retrieveAnnotations(String query, int start, int rows) {
+		List<GOAnnotation> annotations = new ArrayList<>();
 		try {
 			annotations = annotationRetrieval.findByQuery(query, start, rows);
 		} catch (SolrServerException e) {
@@ -49,8 +49,8 @@ public class AnnotationServiceImpl implements AnnotationService {
 	}
 
 	@Override
-	public List<Annotation> retrieveAll() {
-		List<Annotation> annotations = new ArrayList<>();
+	public List<GOAnnotation> retrieveAll() {
+		List<GOAnnotation> annotations = new ArrayList<>();
 		try {
 			annotations = annotationRetrieval.findAll();
 		} catch (SolrServerException e) {
@@ -98,12 +98,11 @@ public class AnnotationServiceImpl implements AnnotationService {
 		this.annotationRetrieval = annotationRetrieval;
 	}
 
-	public CacheRetrieval<Annotation> getAnnotationCacheRetrieval() {
+	public CacheRetrieval<GOAnnotation> getAnnotationCacheRetrieval() {
 		return annotationCacheRetrieval;
 	}
 
-	public void setAnnotationCacheRetrieval(
-			CacheRetrieval<Annotation> annotationCacheRetrieval) {
+	public void setAnnotationCacheRetrieval(CacheRetrieval<GOAnnotation> annotationCacheRetrieval) {
 		this.annotationCacheRetrieval = annotationCacheRetrieval;
 	}	
 }

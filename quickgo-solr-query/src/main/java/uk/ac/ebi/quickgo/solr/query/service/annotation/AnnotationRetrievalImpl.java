@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.solr.query.service.annotation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -11,10 +9,8 @@ import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.TermsResponse.Term;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.solr.mapper.EntityMapper;
-import uk.ac.ebi.quickgo.solr.model.annotation.SolrAnnotation;
-import uk.ac.ebi.quickgo.solr.model.annotation.SolrAnnotation.SolrAnnotationDocumentType;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 
@@ -28,39 +24,45 @@ public class AnnotationRetrievalImpl implements AnnotationRetrieval {
 
 	SolrServerProcessor annotationServerProcessor;
 
-	EntityMapper<SolrAnnotation, Annotation> annotationEntityMapper;
+	EntityMapper<GOAnnotation, GOAnnotation> annotationEntityMapper;
 
 	@Override
-	public Annotation findById(String id) throws SolrServerException {
+	public GOAnnotation findById(String id) throws SolrServerException {
+/*
 		String query = AnnotationField.ID.getValue() + ":" + id;
 		SolrQuery solrQuery = new SolrQuery().setQuery(query);
-		List<SolrAnnotation> results = (List<SolrAnnotation>) annotationServerProcessor.findByQuery(solrQuery,SolrAnnotation.class, -1);
-		return annotationEntityMapper.toEntityObject(results, SolrAnnotationDocumentType.getAsInterfaces());
+		List<GOAnnotation> results = (List<GOAnnotation>) annotationServerProcessor.findByQuery(solrQuery,GOAnnotation.class, -1);
+		return annotationEntityMapper.toEntityObject(results, GOAnnotation.SolrAnnotationDocumentType.getAsInterfaces());
+*/
+		List l = annotationServerProcessor.findByQuery(new SolrQuery().setQuery(AnnotationField.ID.getValue() + ":" + id), GOAnnotation.class, -1);
+		return (l.size() == 1) ? (GOAnnotation)l.get(0) : null;
 	}
 
 	@Override
-	public List<Annotation> findByName(String name) throws SolrServerException {
+	public List<GOAnnotation> findByName(String name) throws SolrServerException {
 		return null;
 	}
 
 	@Override
-	public List<Annotation> findAll() throws SolrServerException {
-		List<Annotation> annotations = new ArrayList<>();
-		List<SolrAnnotation> results = (List<SolrAnnotation>) annotationServerProcessor.findByQuery(new SolrQuery("*:*"), SolrAnnotation.class, -1);
-		for(SolrAnnotation solrAnnotation : results){
-			annotations.add(annotationEntityMapper.toEntityObject(Arrays.asList(solrAnnotation), SolrAnnotationDocumentType.getAsInterfaces()));
+	public List<GOAnnotation> findAll() throws SolrServerException {
+/*
+		List<GOAnnotation> annotations = new ArrayList<>();
+		List<GOAnnotation> results = (List<GOAnnotation>) annotationServerProcessor.findByQuery(new SolrQuery("*:*"), GOAnnotation.class, -1);
+		for(GOAnnotation annotation : results){
+			annotations.add(annotationEntityMapper.toEntityObject(Arrays.asList(annotation), GOAnnotation.SolrAnnotationDocumentType.getAsInterfaces()));
 		}
 		return annotations;
+*/
+		// this can now be replaced, I think, by...
+		return annotationServerProcessor.findByQuery(new SolrQuery("*:*"), GOAnnotation.class, -1);
 	}
 
 	@Override
-	public List<Annotation> findByQuery(String query, int numRows)
-			throws SolrServerException {
-		return annotationServerProcessor.findByQuery(new SolrQuery(query), Annotation.class, -1);
+	public List<GOAnnotation> findByQuery(String query, int numRows) throws SolrServerException {
+		return annotationServerProcessor.findByQuery(new SolrQuery(query), GOAnnotation.class, -1);
 	}
 
-	public void setAnnotationEntityMapper(
-			EntityMapper<SolrAnnotation, Annotation> annotationEntityMapper) {
+	public void setAnnotationEntityMapper(EntityMapper<GOAnnotation, GOAnnotation> annotationEntityMapper) {
 		this.annotationEntityMapper = annotationEntityMapper;
 	}
 
@@ -79,7 +81,6 @@ public class AnnotationRetrievalImpl implements AnnotationRetrieval {
 
 	@Override
 	public List<Count> getFacetFields(String query, String facetQuery, String facetFields, int numTerms) throws SolrServerException {
-
 		SolrQuery solrQuery = new SolrQuery(query);
 		solrQuery.setFacetMinCount(1);
 		if (facetQuery != null) {
@@ -116,26 +117,29 @@ public class AnnotationRetrievalImpl implements AnnotationRetrieval {
 	}
 
 	@Override
-	public QueryResponse query(String query, String fields, int numRows)
-			throws SolrServerException {
+	public QueryResponse query(String query, String fields, int numRows) throws SolrServerException {
 		SolrQuery solrQuery = new SolrQuery();
 		solrQuery.setQuery(query);
 		if (fields != null) {
 			solrQuery.setFields(fields);
 		}
 		solrQuery.setRows(numRows);
-		QueryResponse queryResponse = annotationServerProcessor.query(solrQuery);
-		return queryResponse;
+		return annotationServerProcessor.query(solrQuery);
 	}
 
 	@Override
-	public List<Annotation> findByQuery(String query, int start, int rows) throws SolrServerException {
-		List<Annotation> annotations = new ArrayList<>();
-		List<SolrAnnotation> results = (List<SolrAnnotation>) annotationServerProcessor.findByQuery(new SolrQuery(query).setStart(start).setRows(rows),	SolrAnnotation.class, rows);
-		for (SolrAnnotation solrAnnotation : results) {
-			annotations.add(annotationEntityMapper.toEntityObject(Arrays.asList(solrAnnotation), SolrAnnotationDocumentType.getAsInterfaces()));
+	public List<GOAnnotation> findByQuery(String query, int start, int rows) throws SolrServerException {
+/*
+		List<GOAnnotation> annotations = new ArrayList<>();
+		List<GOAnnotation> results = (List<GOAnnotation>) annotationServerProcessor.findByQuery(new SolrQuery(query).setStart(start).setRows(rows), GOAnnotation.class, rows);
+		for (GOAnnotation annotation : results) {
+			annotations.add(annotationEntityMapper.toEntityObject(Arrays.asList(annotation), GOAnnotation.SolrAnnotationDocumentType.getAsInterfaces()));
 		}
 		return annotations;
+*/
+		// I'm pretty sure this can now all be replaced by...
+		return annotationServerProcessor.findByQuery(new SolrQuery(query).setStart(start).setRows(rows), GOAnnotation.class, rows);
+
 	}
 
 	public void setAnnotationServerProcessor(SolrServerProcessor annotationServerProcessor) {

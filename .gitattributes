@@ -173,6 +173,7 @@ quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/eco/SolrECO
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/go/EntityGOTermMapper.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/go/SolrGOTermMapper.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/SolrDocumentType.java -text svneol=unset#text/plain
+quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/annotation/GOAnnotation.java -text
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/annotation/SolrAnnotation.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/geneproduct/SolrGeneProduct.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/miscellaneous/SolrMiscellaneous.java -text svneol=unset#text/plain

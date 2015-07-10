@@ -6,11 +6,10 @@ import java.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.StringUtils;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
-import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm.EGOAspect;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 import uk.ac.ebi.quickgo.web.util.FileService;
@@ -59,7 +58,7 @@ public enum AnnotationColumn {
 	private boolean checkedByDefault;
 	private boolean showURL;
 
-	private AnnotationColumn(String id, String description, String name, boolean checkedByDefault, boolean showURL){
+	AnnotationColumn(String id, String description, String name, boolean checkedByDefault, boolean showURL){
 		this.id= id;
 		this.description = description;
 		this.name = name;
@@ -122,7 +121,7 @@ public enum AnnotationColumn {
 	 * Given an annotation and a list of columns, return all the annotation fields for those columns
 	 * @throws Exception
 	 */
-	public static String getAnnotationColumns(FileService.FILE_FORMAT format, Annotation annotation, AnnotationColumn[] columns, String separator) throws Exception{
+	public static String getAnnotationColumns(FileService.FILE_FORMAT format, GOAnnotation annotation, AnnotationColumn[] columns, String separator) throws Exception{
 		String annotationString = "";
 		for(AnnotationColumn annotationColumn : columns){
 			switch(annotationColumn){
@@ -213,9 +212,7 @@ public enum AnnotationColumn {
 		return annotationString;
 	}
 
-	public static String getAnnotationColumnsForJson(Annotation annotation, AnnotationColumn[] columns, GoAnnotationJson goAnnotationJson) throws Exception{
-
-
+	public static String getAnnotationColumnsForJson(GoAnnotationJson goAnnotationJson) throws Exception{
 		StringWriter writer = new StringWriter();
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.writeValue(writer, goAnnotationJson);
@@ -259,6 +256,7 @@ public enum AnnotationColumn {
 			termJson.setReplacements(term.getReplacements());
 			termJson.setHistory(term.getHistory());
 
+/*
 			List<ChildTermRelationJson> childRelationsJson = new ArrayList<>();
 
 			//Move in child term relations
@@ -273,6 +271,7 @@ public enum AnnotationColumn {
 			childRelationsJson.add(childTermRelationJson);
 		}
 //		termJson.setChildTermsRelations(childRelationsJson);
+*/
 
 			//Stats
 			termJson.setAllCoOccurrenceStatsTerms(allStats);

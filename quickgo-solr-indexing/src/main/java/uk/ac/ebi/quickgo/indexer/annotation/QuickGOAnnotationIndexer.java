@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.indexer.file.GPAssociationFile;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
@@ -14,6 +13,7 @@ import uk.ac.ebi.quickgo.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.solr.indexing.Indexer;
 import uk.ac.ebi.quickgo.solr.indexing.service.annotation.AnnotationIndexer;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.util.MemoryMonitor;
 
 /**
@@ -69,8 +69,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 	 * @throws Exception
 	 */
 	private int readAndIndexGPDataFileByChunks(GPAssociationFile gpDataFile, Indexer solrIndexer, int chunkSize) throws Exception {
-
-		List<Annotation> rows = new ArrayList<>();
+		List<GOAnnotation> rows = new ArrayList<>();
 		MemoryMonitor mm = new MemoryMonitor(true);
 		logger.info("Load " + gpDataFile.getName());
 

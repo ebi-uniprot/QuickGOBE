@@ -1,9 +1,6 @@
 package uk.ac.ebi.quickgo.solr.query.service.geneproduct;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -34,20 +31,20 @@ public class GeneProductRetrievalImpl implements GeneProductRetrieval{
 	
 	@Override
 	public GeneProduct findById(String id) throws SolrServerException {		
-		String query = GeneProductField.DBOBJECTID.getValue() + ":" + ClientUtils.escapeQueryChars(id); // For escaping cases like "dbObjectId:O94813:PRO_0000007727"
-		SolrQuery solrQuery = new SolrQuery().setQuery(query);
-		List<SolrGeneProduct> results = (List<SolrGeneProduct>) serverProcessor.findByQuery(solrQuery,SolrGeneProduct.class, -1);
+		SolrQuery solrQuery = new SolrQuery().setQuery(GeneProductField.DBOBJECTID.getValue() + ":" + ClientUtils.escapeQueryChars(id)); // IDs can contain characters that must be escaped, e.g., "dbObjectId:O94813:PRO_0000007727"
+		List<SolrGeneProduct> results = serverProcessor.findByQuery(solrQuery,SolrGeneProduct.class, -1);
 		return geneProductEntityMapper.toEntityObject(results, SolrGeneProductDocumentType.getAsInterfaces());
 	}
 
 	@Override
 	public List<GeneProduct> findByName(String name) throws SolrServerException {
-		String query = GeneProductField.DBOBJECTNAME.getValue() + ":" + name;
-		SolrQuery solrQuery = new SolrQuery().setQuery(query);
-		List<SolrGeneProduct> results = (List<SolrGeneProduct>) serverProcessor.findByQuery(solrQuery, SolrGeneProduct.class, -1);
+		SolrQuery solrQuery = new SolrQuery().setQuery(GeneProductField.DBOBJECTNAME.getValue() + ":" + name);
+		List<SolrGeneProduct> results = serverProcessor.findByQuery(solrQuery, SolrGeneProduct.class, -1);
 		List<GeneProduct> geneProducts = new ArrayList<>();
-		for (SolrGeneProduct solrGeneProduct : results) {
-			geneProducts.add(geneProductEntityMapper.toEntityObject(Arrays.asList(solrGeneProduct)));
+		if (results != null) {
+			for (SolrGeneProduct solrGeneProduct : results) {
+				geneProducts.add(geneProductEntityMapper.toEntityObject(Collections.singletonList(solrGeneProduct)));
+			}
 		}
 		return geneProducts;
 	}
@@ -58,12 +55,15 @@ public class GeneProductRetrievalImpl implements GeneProductRetrieval{
 		List<SolrGeneProduct> results = null;
 		SolrQuery solrQuery = new SolrQuery().setQuery(GeneProductField.DOCTYPE.getValue() + ":" + SolrGeneProduct.SolrGeneProductDocumentType.GENEPRODUCT.getValue());
 		try {
-			results = (List<SolrGeneProduct>) serverProcessor.findByQuery(solrQuery, SolrGeneProduct.class, -1);
-		} catch (SolrServerException e) {
+			results = serverProcessor.findByQuery(solrQuery, SolrGeneProduct.class, -1);
+		}
+		catch (SolrServerException e) {
 			logger.error(e.getMessage());
 		}
-		for (SolrGeneProduct solrGeneProduct : results) {
-			geneProducts.add(geneProductEntityMapper.toEntityObject(Arrays.asList(solrGeneProduct)));
+		if (results != null) {
+			for (SolrGeneProduct solrGeneProduct : results) {
+				geneProducts.add(geneProductEntityMapper.toEntityObject(Collections.singletonList(solrGeneProduct)));
+			}
 		}
 		return geneProducts;
 	}
@@ -72,9 +72,11 @@ public class GeneProductRetrievalImpl implements GeneProductRetrieval{
 	public List<GeneProduct> findByQuery(String query, int numRows) throws SolrServerException {
 		List<GeneProduct> geneProducts = new ArrayList<>();		 
 		SolrQuery solrQuery = new SolrQuery().setQuery(query);
-		List<SolrGeneProduct> results = (List<SolrGeneProduct>) serverProcessor.findByQuery(solrQuery, SolrGeneProduct.class, numRows);
-		for (SolrGeneProduct solrTerm : results) {
-			geneProducts.add(geneProductEntityMapper.toEntityObject(Arrays.asList(solrTerm)));
+		List<SolrGeneProduct> results = serverProcessor.findByQuery(solrQuery, SolrGeneProduct.class, numRows);
+		if (results != null) {
+			for (SolrGeneProduct solrTerm : results) {
+				geneProducts.add(geneProductEntityMapper.toEntityObject(Collections.singletonList(solrTerm)));
+			}
 		}
 		return geneProducts;
 	}
@@ -89,23 +91,19 @@ public class GeneProductRetrievalImpl implements GeneProductRetrieval{
 	}
 
 	@Override
-	public List<Term> getTopTerms(String termFields, int numRows)
-			throws SolrServerException {
+	public List<Term> getTopTerms(String termFields, int numRows) throws SolrServerException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Map<String, Integer> getFacetFieldsWithPivots(String query,
-			String facetQuery, String facetFields, String pivotFields,
-			int numTerms) throws SolrServerException {
+	public Map<String, Integer> getFacetFieldsWithPivots(String query, String facetQuery, String facetFields, String pivotFields, int numTerms) throws SolrServerException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Count> getFacetFields(String query, String facetQuery,
-			String facetFields, int numTerms) throws SolrServerException {
+	public List<Count> getFacetFields(String query, String facetQuery, String facetFields, int numTerms) throws SolrServerException {
 		// TODO Auto-generated method stub
 		return null;
 	}	
@@ -116,13 +114,15 @@ public class GeneProductRetrievalImpl implements GeneProductRetrieval{
 		solrQuery.setRequestHandler("/spell");
 		solrQuery.setQuery("*" + text + "*");				
 		solrQuery.setFilterQueries(GeneProductField.DOCTYPE.getValue() + ":" + SolrGeneProductDocumentType.GENEPRODUCT.getValue());
-		if(filterQuery!=null && !filterQuery.trim().isEmpty()){
+		if(filterQuery != null && !filterQuery.trim().isEmpty()) {
 			solrQuery.addFilterQuery(filterQuery);	
 		}
-		List<GeneProduct> geneproducts = new ArrayList<GeneProduct>();
-		List<SolrGeneProduct> results = (List<SolrGeneProduct>)serverProcessor.findByQuery(solrQuery, SolrGeneProduct.class, numResults);
-		for (SolrGeneProduct solrGeneProduct : results) {			
-			geneproducts.add(geneProductEntityMapper.toEntityObject(Arrays.asList(solrGeneProduct)));			
+		List<GeneProduct> geneproducts = new ArrayList<>();
+		List<SolrGeneProduct> results = serverProcessor.findByQuery(solrQuery, SolrGeneProduct.class, numResults);
+		if (results != null) {
+			for (SolrGeneProduct solrGeneProduct : results) {
+				geneproducts.add(geneProductEntityMapper.toEntityObject(Collections.singletonList(solrGeneProduct)));
+			}
 		}
 		return geneproducts;
 	}
@@ -134,11 +134,13 @@ public class GeneProductRetrievalImpl implements GeneProductRetrieval{
 		query.setFilterQueries(fq);
 		query.setHighlight(true);
 		query.setParam("hl.fl", GeneProductField.DBOBJECTNAME.getValue());
-		List<GeneProduct> geneproducts = new ArrayList<GeneProduct>();
+		List<GeneProduct> geneproducts = new ArrayList<>();
 				
-		List<SolrGeneProduct> results = (List<SolrGeneProduct>)serverProcessor.findByQuery(query.setStart(start).setRows(rows), SolrGeneProduct.class, rows);
-		for (SolrGeneProduct solrGeneProduct : results) {
-			geneproducts.add(geneProductEntityMapper.toEntityObject(Arrays.asList(solrGeneProduct)));			
+		List<SolrGeneProduct> results = serverProcessor.findByQuery(query.setStart(start).setRows(rows), SolrGeneProduct.class, rows);
+		if (results != null) {
+			for (SolrGeneProduct solrGeneProduct : results) {
+				geneproducts.add(geneProductEntityMapper.toEntityObject(Collections.singletonList(solrGeneProduct)));
+			}
 		}
 		return geneproducts;
 	}

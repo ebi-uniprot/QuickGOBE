@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.solr.indexing.service.annotation;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -9,10 +8,8 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.stereotype.Service;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.solr.indexing.Indexer;
-import uk.ac.ebi.quickgo.solr.mapper.SolrMapper;
-import uk.ac.ebi.quickgo.solr.model.annotation.SolrAnnotation;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 
 /**
@@ -22,11 +19,9 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
  * 
  */
 @Service("annotationIndexer")
-public class AnnotationIndexer implements Indexer<Annotation> {
+public class AnnotationIndexer implements Indexer<GOAnnotation> {
 
 	private SolrServerProcessor solrServerProcessor;
-
-	private SolrMapper<Annotation, SolrAnnotation> solrMapper;
 
 	// Log
 	private static final Logger logger = Logger.getLogger(AnnotationIndexer.class);
@@ -34,8 +29,8 @@ public class AnnotationIndexer implements Indexer<Annotation> {
 	/**
 	 * See {@link Indexer#index(List)}
 	 */
-	public void index(List<Annotation> list) {
-		Collection<SolrAnnotation> annotationBeans = mapBeans(list);
+	public void index(List<GOAnnotation> list) {
+		Collection<GOAnnotation> annotationBeans = mapBeans(list);
 
 		try {
 			solrServerProcessor.indexBeansAutoCommit(annotationBeans);
@@ -46,18 +41,13 @@ public class AnnotationIndexer implements Indexer<Annotation> {
 
 	/**
 	 * Map Annotations to Solr objects
-	 * 
-	 * @throws SolrServerException
 	 */
-	private Collection<SolrAnnotation> mapBeans(List<Annotation> annotations) {
-
-		List<SolrAnnotation> beans = new ArrayList<>();
-
+	private Collection<GOAnnotation> mapBeans(List<GOAnnotation> annotations) {
 		// Iterate over all the annotations and convert them into Solr objects to be indexed
-		for (Annotation annotation : annotations) {
-			beans.addAll(solrMapper.toSolrObject(annotation));
+		for (GOAnnotation annotation : annotations) {
+			annotation.setDocType(GOAnnotation.SolrAnnotationDocumentType.ANNOTATION.getValue());
 		}
-		return beans;
+		return annotations;
 	}
 
 	/**
@@ -72,8 +62,4 @@ public class AnnotationIndexer implements Indexer<Annotation> {
 	public void setSolrServerProcessor(SolrServerProcessor solrServerProcessor) {
 		this.solrServerProcessor = solrServerProcessor;
 	}
-
-	public void setSolrMapper(SolrMapper<Annotation, SolrAnnotation> solrMapper) {
-		this.solrMapper = solrMapper;
-	}	
 }

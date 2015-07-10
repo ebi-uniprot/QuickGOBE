@@ -1,10 +1,7 @@
 package uk.ac.ebi.quickgo.solr.query.service.ontology;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -28,17 +25,18 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 
 @Service("termRetrieval")
 public class TermRetrievalImpl implements TermRetrieval,Serializable{
-
 	private static final long serialVersionUID = 2405824287000526742L;
 
 	// Log
 	private static final Logger logger = Logger.getLogger(TermRetrievalImpl.class);
-		
-	
+
 	SolrServerProcessor serverProcessor;
-		
+
+	//TODO: this all needs to be cleaned up - there appears to be some confusion about whether we're dealing with GenericTerm, GOTerm, or ECOTerm objects
 	EntityMapper<SolrTerm, GOTerm> termEntityMapper;
-	
+	private static final EntityGOTermMapper goTermMapper = new EntityGOTermMapper();
+	private static final EntityECOTermMapper ecoTermMapper = new EntityECOTermMapper();
+
 	/**
 	 * See {@link Retrieval#findById(String)}
 	 */
@@ -46,9 +44,9 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 		String idFormatted = ClientUtils.escapeQueryChars(id);
 		String query = TermField.ID.getValue() + ":" + idFormatted + 
 				" OR (" + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.RELATION.getValue() + " AND (" + TermField.CHILD.getValue() + ":" + idFormatted + " OR " + TermField.PARENT.getValue() + ":" + idFormatted + "))" +
-						" OR (" + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.REPLACE.getValue() +" AND " + TermField.OBSOLETE_ID.getValue() + ":" + idFormatted + ")";
+				" OR (" + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.REPLACE.getValue() + " AND " + TermField.OBSOLETE_ID.getValue() + ":" + idFormatted + ")";
 		SolrQuery solrQuery = new SolrQuery().setQuery(query);
-		List<SolrTerm> results = (List<SolrTerm>) serverProcessor.findByQuery(solrQuery, SolrTerm.class, -1);
+		List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, -1);
 		return termEntityMapper.toEntityObject(results, SolrTermDocumentType.getAsInterfaces());
 	}
 
@@ -59,9 +57,11 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 	public List<GOTerm> findByType(SolrTerm.SolrTermDocumentType type) throws SolrServerException {
 		List<GOTerm> terms = new ArrayList<>();
 		SolrQuery solrQuery = new SolrQuery().setQuery(TermField.TYPE.getValue() + ":" + type.getValue());
-		List<SolrTerm> results = (List<SolrTerm>) serverProcessor.findByQuery(solrQuery, SolrTerm.class, -1);
-		for (SolrTerm solrTerm : results) {
-			terms.add(termEntityMapper.toEntityObject(Arrays.asList(solrTerm)));
+		List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, -1);
+		if (results != null) {
+			for (SolrTerm solrTerm : results) {
+				terms.add(termEntityMapper.toEntityObject(Collections.singletonList(solrTerm)));
+			}
 		}
 		return terms;
 	}
@@ -72,9 +72,11 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 	public List<GOTerm> findByName(String name) throws SolrServerException {
 		List<GOTerm> terms = new ArrayList<>();
 		SolrQuery solrQuery = new SolrQuery().setQuery(TermField.NAME.getValue() + ":" + name);
-		List<SolrTerm> results = (List<SolrTerm>) serverProcessor.findByQuery(solrQuery, SolrTerm.class, -1);
-		for (SolrTerm solrTerm : results) {
-			terms.add(termEntityMapper.toEntityObject(Arrays.asList(solrTerm)));
+		List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, -1);
+		if (results != null) {
+			for (SolrTerm solrTerm : results) {
+				terms.add(termEntityMapper.toEntityObject(Collections.singletonList(solrTerm)));
+			}
 		}
 		return terms;
 	}
@@ -87,25 +89,30 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 		List<SolrTerm> results = null;
 		SolrQuery solrQuery = new SolrQuery().setQuery(TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue());
 		try {
-			results = (List<SolrTerm>) serverProcessor.findByQuery(solrQuery, SolrTerm.class, -1);
-		} catch (SolrServerException e) {
+			results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, -1);
+		}
+		catch (SolrServerException e) {
 			logger.error(e.getMessage());
 		}
-		for (SolrTerm solrTerm : results) {
-			terms.add(termEntityMapper.toEntityObject(Arrays.asList(solrTerm)));
+		if (results != null) {
+			for (SolrTerm solrTerm : results) {
+				terms.add(termEntityMapper.toEntityObject(Collections.singletonList(solrTerm)));
+			}
 		}
 		return terms;
 	}
 
 	/**
-	 * See {@link Retrieval#findByQuery(String)}
+	 * See {@link Retrieval#findByQuery(String, int)}
 	 */	
 	public List<GOTerm> findByQuery(String query, int numRows) throws SolrServerException {
 		List<GOTerm> terms = new ArrayList<>();		 
 		SolrQuery solrQuery = new SolrQuery().setQuery(query);
-		List<SolrTerm> results = (List<SolrTerm>) serverProcessor.findByQuery(solrQuery, SolrTerm.class, numRows);
-		for (SolrTerm solrTerm : results) {
-			terms.add(termEntityMapper.toEntityObject(Arrays.asList(solrTerm)));
+		List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, numRows);
+		if (results != null) {
+			for (SolrTerm solrTerm : results) {
+				terms.add(termEntityMapper.toEntityObject(Collections.singletonList(solrTerm)));
+			}
 		}
 		return terms;
 	}
@@ -119,23 +126,19 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 	}
 
 	@Override
-	public List<Term> getTopTerms(String termFields, int numRows)
-			throws SolrServerException {
+	public List<Term> getTopTerms(String termFields, int numRows)throws SolrServerException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Map<String, Integer> getFacetFieldsWithPivots(String query,
-			String facetQuery, String facetFields, String pivotFields,
-			int numTerms) throws SolrServerException {
+	public Map<String, Integer> getFacetFieldsWithPivots(String query, String facetQuery, String facetFields, String pivotFields, int numTerms) throws SolrServerException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Count> getFacetFields(String query, String facetQuery,
-			String facetFields, int numTerms) throws SolrServerException {
+	public List<Count> getFacetFields(String query, String facetQuery, String facetFields, int numTerms) throws SolrServerException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -162,13 +165,16 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 		solrQuery.setQuery(text);
 		
 		solrQuery.setFilterQueries(fQuery, filterQuery);
-		List<GenericTerm> terms = new ArrayList<GenericTerm>();
-		List<SolrTerm> results = (List<SolrTerm>)serverProcessor.findByQuery(solrQuery, SolrTerm.class, numResults);
-		for (SolrTerm solrTerm : results) {
-			if (solrTerm.getId().contains(ECOTerm.ECO.toString())) {
-				terms.add(new EntityECOTermMapper().toEntityObject(Arrays.asList(solrTerm)));
-			} else {
-				terms.add(new EntityGOTermMapper().toEntityObject(Arrays.asList(solrTerm)));
+		List<GenericTerm> terms = new ArrayList<>();
+		List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, numResults);
+		if (results != null) {
+			for (SolrTerm solrTerm : results) {
+				if (solrTerm.getId().startsWith(ECOTerm.ECO)) {
+					terms.add(ecoTermMapper.toEntityObject(Collections.singletonList(solrTerm)));
+				}
+				else {
+					terms.add(goTermMapper.toEntityObject(Collections.singletonList(solrTerm)));
+				}
 			}
 		}
 		return terms;
@@ -181,14 +187,17 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 		query.setFilterQueries(fq);
 		query.setHighlight(true);
 		query.setParam("hl.fl", TermField.NAME.getValue());
-		List<GenericTerm> terms = new ArrayList<GenericTerm>();
+		List<GenericTerm> terms = new ArrayList<>();
 				
-		List<SolrTerm> results = (List<SolrTerm>)serverProcessor.findByQuery(query.setStart(start).setRows(rows), SolrTerm.class, rows);
-		for (SolrTerm solrTerm : results) {
-			if (solrTerm.getId().contains(ECOTerm.ECO.toString())) {
-				terms.add(new EntityECOTermMapper().toEntityObject(Arrays.asList(solrTerm)));
-			} else {
-				terms.add(new EntityGOTermMapper().toEntityObject(Arrays.asList(solrTerm)));
+		List<SolrTerm> results = serverProcessor.findByQuery(query.setStart(start).setRows(rows), SolrTerm.class, rows);
+		if (results != null) {
+			for (SolrTerm solrTerm : results) {
+				if (solrTerm.getId().startsWith(ECOTerm.ECO)) {
+					terms.add(ecoTermMapper.toEntityObject(Collections.singletonList(solrTerm)));
+				}
+				else {
+					terms.add(goTermMapper.toEntityObject(Collections.singletonList(solrTerm)));
+				}
 			}
 		}
 		return terms;

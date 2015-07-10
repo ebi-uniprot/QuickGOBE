@@ -11,20 +11,19 @@ import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm;
 import uk.ac.ebi.quickgo.solr.query.service.Retrieval;
 
 public interface TermRetrieval extends Retrieval<GOTerm>{
-
 	/**
 	 * Get entries by type
 	 * @param type Type
 	 * @return Entries with the specified type
 	 */
-	public List<GOTerm> findByType(SolrTerm.SolrTermDocumentType type) throws SolrServerException;
+	List<GOTerm> findByType(SolrTerm.SolrTermDocumentType type) throws SolrServerException;
 
 	/**
 	 * Return term identifiers and the specified list of fields
 	 * @param fieldID Field id
 	 * @param fields Fields to retrieve
 	 */
-	public  Map<String, Map<String, String>> getFieldValues(String query, String fieldID, String fields) throws SolrServerException;
+	Map<String, Map<String, String>> getFieldValues(String query, String fieldID, String fields) throws SolrServerException;
 	
 	/**
 	 * Autosuggest term names/ids based on the inserted text
@@ -34,7 +33,7 @@ public interface TermRetrieval extends Retrieval<GOTerm>{
 	 * @return Suggestions
 	 * @throws SolrServerException
 	 */
-	public List<GenericTerm> autosuggest(String text, String fq,int numResults) throws SolrServerException;
+	List<GenericTerm> autosuggest(String text, String fq,int numResults) throws SolrServerException;
 
 	/**
 	 * Highlight functionality
@@ -44,7 +43,7 @@ public interface TermRetrieval extends Retrieval<GOTerm>{
 	 * @param rows Number of results to retrieve
 	 * @return Terms with highlighted text
 	 */
-	public List<GenericTerm> highlight(String text, String fq, int start, int rows) throws SolrServerException;
+	List<GenericTerm> highlight(String text, String fq, int start, int rows) throws SolrServerException;
 	
 	/**
 	 * Return total number highlight results
@@ -52,5 +51,5 @@ public interface TermRetrieval extends Retrieval<GOTerm>{
 	 * @param fq Filter query
 	 * @return total number highlight results
 	 */
-	public long getTotalNumberHighlightResults(String text, String fq) throws SolrServerException;
+	long getTotalNumberHighlightResults(String text, String fq) throws SolrServerException;
 }

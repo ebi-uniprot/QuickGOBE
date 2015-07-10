@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.springframework.util.StringUtils;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm.EGOAspect;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.web.util.NameURL;
 
 /**
@@ -19,7 +19,7 @@ public class AnnotationBean implements Serializable{
 
 	private static final long serialVersionUID = -4850838934084333982L;
 
-	Annotation annotation;
+	GOAnnotation annotation;
 
 	// Attributes that contain URL
 	NameURL db;
@@ -33,7 +33,7 @@ public class AnnotationBean implements Serializable{
 	NameURL termIDSlimmingTo;
 	String termNameSlimmingTo;
 
-	public AnnotationBean(Annotation annotation) {
+	public AnnotationBean(GOAnnotation annotation) {
 		this.annotation = annotation;
 	}
 
@@ -125,7 +125,7 @@ public class AnnotationBean implements Serializable{
 	}
 
 	public List<String> getExtensions() {
-		return annotation.getExtensions();
+		return annotation.getExtension();
 	}
 
 	public String getProperties() {
@@ -144,8 +144,8 @@ public class AnnotationBean implements Serializable{
 		return annotation.getAncestorsIPOR();
 	}
 
-	public String getTargetSet() {
-		return annotation.getTargetSet();
+	public List<String> getTargetSets() {
+		return annotation.getTargetSets();
 	}
 
 	public String getGoAspect() {
@@ -172,7 +172,7 @@ public class AnnotationBean implements Serializable{
 		return annotation.getSequenceLength();
 	}
 
-	public Annotation getAnnotation() {
+	public GOAnnotation getAnnotation() {
 		return annotation;
 	}
 
@@ -194,8 +194,8 @@ public class AnnotationBean implements Serializable{
 
 	public String getExtension() {
 		List<String> formattedExtensions = new ArrayList<>();
-		if (annotation.getExtensions() != null) {
-			for (String extension : annotation.getExtensions()) {
+		if (annotation.getExtension() != null) {
+			for (String extension : annotation.getExtension()) {
 				if (extension.contains(",")) {// Multiple extensions
 					String[] extensionsByComma = extension.split(",");
 					List<String> formatted = new ArrayList<>();
@@ -221,7 +221,6 @@ public class AnnotationBean implements Serializable{
 	private String formatExtension(String extension){
 		int parenthesis1 = extension.indexOf("(");
 		int parenthesis2 = extension.indexOf(")");
-		String formattedExtension = extension.substring(0,parenthesis1) + " " + extension.substring(parenthesis1 + 1,parenthesis2);
-		return formattedExtension;
+		return extension.substring(0,parenthesis1) + " " + extension.substring(parenthesis1 + 1,parenthesis2);
 	}
 }

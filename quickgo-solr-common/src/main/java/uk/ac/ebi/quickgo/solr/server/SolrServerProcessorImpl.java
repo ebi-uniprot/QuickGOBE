@@ -43,16 +43,11 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	private final int NUM_ROWS = 100000;
 	
 	/**
-	 * See {@link SolrServerProcessor#findByQuery(String, Class)}
+	 * See {@link SolrServerProcessor#findByQuery(SolrQuery, Class, int)}
 	 */
 	public <T> List<T> findByQuery(SolrQuery solRQuery, Class<T> type, int numRows) throws SolrServerException {		
-		if (numRows <= -1) {
-			solRQuery.setRows(NUM_ROWS);
-		} else {
-			solRQuery.setRows(numRows);
-		}
-		QueryResponse queryResponse = getSolrServer().query(solRQuery);
-		return queryResponse.getBeans(type);
+		solRQuery.setRows(numRows <= -1 ? NUM_ROWS : numRows);
+		return getSolrServer().query(solRQuery).getBeans(type);
 	}
 	
 	/**
@@ -66,8 +61,7 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	/**
 	 * See {@link SolrServerProcessor#indexBeansAutoCommit(Collection)}
 	 */
-	public <T> void indexBeansAutoCommit(Collection<T> beans)
-			throws SolrServerException, IOException {
+	public <T> void indexBeansAutoCommit(Collection<T> beans) throws SolrServerException, IOException {
 		getSolrServer().addBeans(beans);		
 	}	
 	
@@ -80,7 +74,7 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	}
 
 	/**
-	 * See {@link SolrServerProcessor#deleteByQuery()}
+	 * See {@link SolrServerProcessor#deleteByQuery(String)}
 	 */
 	public void deleteByQuery(String query) throws SolrServerException, IOException {
 		getSolrServer().deleteByQuery(query);// Deletes by query
@@ -88,7 +82,7 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	}
 	
 	/**
-	 * See {@link SolrServerProcessor#getTotalNumberDocuments()}
+	 * See {@link SolrServerProcessor#getTotalNumberDocuments(SolrQuery)}
 	 */
 	public long getTotalNumberDocuments(SolrQuery query) throws SolrServerException {
 		//SolrQuery q = new SolrQuery(query);

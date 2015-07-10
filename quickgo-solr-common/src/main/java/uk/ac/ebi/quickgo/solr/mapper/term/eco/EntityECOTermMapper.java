@@ -24,25 +24,19 @@ public class EntityECOTermMapper implements EntityMapper<SolrTerm, ECOTerm>{
 	
 	@Override
 	public ECOTerm toEntityObject(Collection<SolrTerm> solrObjects) {
-		return toEntityObject(solrObjects,
-				SolrTermDocumentType.getAsInterfaces());
+		return toEntityObject(solrObjects, SolrTermDocumentType.getAsInterfaces());
 	}
 
 	@Override
 	public ECOTerm toEntityObject(Collection<SolrTerm> solrObjects, List<SolrDocumentType> solrDocumentTypes) {
-
 		ECOTerm term = new ECOTerm();
 
 		for (SolrDocumentType termDocumentType : solrDocumentTypes) {
-			SolrTermDocumentType solrTermDocumentType = ((SolrTermDocumentType) termDocumentType);
-
-			switch (solrTermDocumentType) {
-
-			case TERM:
-				if(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.TERM).size() > 0){
-					mapBasicInformation(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.TERM).get(0), term);
+			if (termDocumentType == SolrTermDocumentType.TERM) {
+				List<SolrTerm> l = getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.TERM);
+				if (l.size() > 0) {
+					mapBasicInformation(l.get(0), term);
 				}
-				break;
 			}
 		}
 		
@@ -50,7 +44,6 @@ public class EntityECOTermMapper implements EntityMapper<SolrTerm, ECOTerm>{
 	}
 	
 	private void mapBasicInformation(SolrTerm solrTerm, ECOTerm term) {
-		
 		term.setId(solrTerm.getId());
 		term.setName(solrTerm.getName());
 		term.setObsolete(solrTerm.isObsolete());
@@ -69,7 +62,8 @@ public class EntityECOTermMapper implements EntityMapper<SolrTerm, ECOTerm>{
 				}
 				term.setDefinition(definitions);
 			}			
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
 		}
@@ -85,9 +79,7 @@ public class EntityECOTermMapper implements EntityMapper<SolrTerm, ECOTerm>{
 	 *            Type to check
 	 * @return Solr terms that match with the specified document type
 	 */
-	protected List<SolrTerm> getAssociatedSolrTerms(
-			Collection<SolrTerm> solrObjects,
-			SolrTermDocumentType solrTermDocumentType) {
+	protected List<SolrTerm> getAssociatedSolrTerms(Collection<SolrTerm> solrObjects, SolrTermDocumentType solrTermDocumentType) {
 		List<SolrTerm> solrTerms = new ArrayList<>();
 		for (SolrTerm solrTerm : solrObjects) {
 			if (SolrTermDocumentType.valueOf(solrTerm.getDocType().toUpperCase()) == solrTermDocumentType) {

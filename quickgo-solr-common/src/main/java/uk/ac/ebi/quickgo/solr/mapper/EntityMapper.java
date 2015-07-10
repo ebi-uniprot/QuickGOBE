@@ -13,14 +13,12 @@ import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
  * @param <T> Entity object (target) 
  */
 public interface EntityMapper<V,T> {
-
-
 	/**
 	 * Map all the Solr information from a Set of Solr terms into an Entity object 
 	 * @param solrObjects Solr objects to map
 	 * @return QuickGO entity object
 	 */
-	public T toEntityObject(Collection<V> solrObjects);	
+	T toEntityObject(Collection<V> solrObjects);
 		
 	/**
 	 * Map Solr information from a Set of Solr terms into an Entity object for the selected Solr fields 
@@ -28,5 +26,5 @@ public interface EntityMapper<V,T> {
 	 * @param solrDocumentTypes Document types to map
 	 * @return QuickGO entity object
 	 */
-	public T toEntityObject (Collection<V> solrObjects, List<SolrDocumentType> solrDocumentTypes);
+	T toEntityObject (Collection<V> solrObjects, List<SolrDocumentType> solrDocumentTypes);
 }

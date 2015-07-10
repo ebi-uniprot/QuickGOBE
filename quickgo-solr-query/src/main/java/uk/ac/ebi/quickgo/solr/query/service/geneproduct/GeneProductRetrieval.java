@@ -11,7 +11,6 @@ import uk.ac.ebi.quickgo.solr.query.service.Retrieval;
  * Interface for retrieving Gene Products from Solr
  */
 public interface GeneProductRetrieval extends Retrieval<GeneProduct>{
-
 	/**
 	 * Auto suggest proteins names/ids based on the inserted text
 	 * @param text Text to search for
@@ -20,7 +19,7 @@ public interface GeneProductRetrieval extends Retrieval<GeneProduct>{
 	 * @return Suggestions
 	 * @throws SolrServerException
 	 */
-	public List<GeneProduct> autosuggest(String text, String filterQuery, int numResults) throws SolrServerException;
+	List<GeneProduct> autosuggest(String text, String filterQuery, int numResults) throws SolrServerException;
 	
 	/**
 	 * Highlight functionality
@@ -30,7 +29,7 @@ public interface GeneProductRetrieval extends Retrieval<GeneProduct>{
 	 * @param rows Number of results to retrieve
 	 * @return Gene products with highlighted text
 	 */
-	public List<GeneProduct> highlight(String text, String fq, int start, int rows) throws SolrServerException;
+	List<GeneProduct> highlight(String text, String fq, int start, int rows) throws SolrServerException;
 	
-	public long getTotalNumberHighlightResults(String text, String fq) throws SolrServerException;
+	long getTotalNumberHighlightResults(String text, String fq) throws SolrServerException;
 }

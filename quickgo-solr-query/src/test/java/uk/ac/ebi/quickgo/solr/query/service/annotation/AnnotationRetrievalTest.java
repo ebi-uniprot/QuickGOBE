@@ -17,11 +17,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.solr.mapper.EntityMapper;
-import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
-import uk.ac.ebi.quickgo.solr.model.annotation.SolrAnnotation;
-import uk.ac.ebi.quickgo.solr.model.annotation.SolrAnnotation.SolrAnnotationDocumentType;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 
 /**
@@ -37,7 +34,7 @@ public class AnnotationRetrievalTest {
 	private Mockery context;
 	private AnnotationRetrieval annotationRetrieval;
 	private SolrServerProcessor solRServerProcessor;
-	private EntityMapper<SolrAnnotation, Annotation> gpEntityMapper;
+	private EntityMapper<GOAnnotation, GOAnnotation> gpEntityMapper;
 
 	@Before
 	public void before() throws NoSuchFieldException, SecurityException,

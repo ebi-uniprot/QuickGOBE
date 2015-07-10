@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.bean.annotation.AnnotationBean;
 import uk.ac.ebi.quickgo.bean.statistics.StatisticsBean;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
@@ -39,6 +38,7 @@ import uk.ac.ebi.quickgo.service.annotation.parameter.AnnotationParameters;
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousService;
 import uk.ac.ebi.quickgo.service.statistic.StatisticService;
 import uk.ac.ebi.quickgo.service.term.TermService;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
 import uk.ac.ebi.quickgo.web.util.TopTaxonomy;
@@ -162,10 +162,10 @@ public class AnnotationController{
 		// Calculate total number annotations
 		this.totalNumberAnnotations = annotationService.getTotalNumberAnnotations(solrQuery);
 		// Retrieve annotations
-		List<Annotation> annotations = annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
+		List<GOAnnotation> annotations = annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
 		// Create annotation wrappers
 		List<AnnotationBean> annotationBeans = new ArrayList<>();
-		for (Annotation annotation : annotations) {
+		for (GOAnnotation annotation : annotations) {
 			List<String> slimValue = appliedFilterSet.getParameters().get("slim");
 			List<String> filterGOIds = appliedFilterSet.getParameters().get(AnnotationField.ANCESTORSIPO.getValue());
 			AnnotationBean annotationBean = slimmingUtil.calculateOriginalAndSlimmingTerm(annotation, filterGOIds, slimValue);

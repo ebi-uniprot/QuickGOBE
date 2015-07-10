@@ -4,22 +4,25 @@
 package uk.ac.ebi.quickgo.indexer.file;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.cache.query.service.CacheRetrievalImpl;
 import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 import uk.ac.ebi.quickgo.indexer.IIndexer;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
+import uk.ac.ebi.quickgo.ontology.eco.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.RelationType;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.solr.exception.NotFoundException;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.model.geneproduct.SolrGeneProduct.SolrGeneProductDocumentType;
 import uk.ac.ebi.quickgo.solr.model.miscellaneous.SolrMiscellaneous.SolrMiscellaneousDocumentType;
 import uk.ac.ebi.quickgo.solr.query.model.geneproduct.enums.GeneProductField;
@@ -37,7 +40,7 @@ import uk.ac.ebi.quickgo.solr.query.service.miscellaneous.MiscellaneousRetrieval
 public class GPAssociationFile extends GPDataFile {
 
 	// Log
-	private static final Logger logger = Logger.getLogger(GPAssociationFile.class);
+	//private static final Logger logger = Logger.getLogger(GPAssociationFile.class);
 
 	// columns in GPAD 1.1 format files:
 	//
@@ -67,6 +70,10 @@ public class GPAssociationFile extends GPDataFile {
 	private static final int COLUMN_PROPERTIES = 11;
 
 	private static final int columnCount = 12;
+
+	// regexp used in the extraction of GO evidence codes from annotation properties
+	private final static Pattern goEvidencePropertyPattern = Pattern.compile("go_evidence=([A-Z]{2,3})");
+	private final static Matcher goEvidencePropertyMatcher = goEvidencePropertyPattern.matcher("");
 
 	/**
 	 * Gene Products cache retrieval
@@ -133,70 +140,46 @@ public class GPAssociationFile extends GPDataFile {
 	/**
 	 * Builds an annotation from the read row
 	 */
-	public Annotation calculateRow(String[] columns) throws Exception {
-
+	public GOAnnotation calculateRow(String[] columns) throws Exception {
 		//Populate data from file
 		GpaFile gpaFile = new GpaFile(columns);
 
 		// Get gene products chunk from Solr
 		getGeneProductsChunk(gpaFile.dbObjectID);
 
-		// Read properties and populate go Evidence
-		String goEvidence = "";
-		if (!"".equals(gpaFile.properties)) {
-			for (String property : gpaFile.properties.split("\\|")) {
-				String[] pv = property.split("=", 2);
-				switch (pv[0]) {
-					case "go_evidence":
-						goEvidence = pv[1];
-						break;
-				}
-			}
-		}
+		// extract the GO evidence code from the annotation properties
+		goEvidencePropertyMatcher.reset(gpaFile.properties);
+		String goEvidence = goEvidencePropertyMatcher.matches() ? goEvidencePropertyMatcher.group(1) : "";
 
 		// Parse annotation extensions column
 		List<String> extensionsList = new ArrayList<>();
-		if (!"".equals(gpaFile.extensions)) {
-			Collections.addAll(extensionsList, gpaFile.extensions.split("\\|"));
+		if (!"".equals(gpaFile.extension)) {
+			Collections.addAll(extensionsList, gpaFile.extension.split("\\|"));
 		}
 
 		//Get associated term to get its name
-		GOTerm term = (GOTerm)goTerms.get(gpaFile.goID);
-
-		if(term == null){//TODO Temp solution because annotation files are inconsistent with terms ones
-			term = new GOTerm();
-			term.setName("Undefined");
-		}
+		GOTerm goTerm = (GOTerm)goTerms.get(gpaFile.goID);
 
 		// Create annotation
-		Annotation annotation = new Annotation(goEvidence, gpaFile.db, gpaFile.dbObjectID, gpaFile.goID, gpaFile.ecoID,
-				term.getName(), gpaFile.assignedBy, gpaFile.reference, gpaFile.with, gpaFile.fullWith, gpaFile.qualifier,
-				gpaFile.interactingTaxID, gpaFile.date, extensionsList,  gpaFile.extensions, gpaFile.properties);
+		GOAnnotation annotation = new GOAnnotation(gpaFile.db, gpaFile.dbObjectID, gpaFile.qualifier, gpaFile.goID, goTerm.getName(), goTerm.getOntologyText(), gpaFile.ecoID, goEvidence,
+				gpaFile.reference, gpaFile.with, gpaFile.fullWith, gpaFile.interactingTaxID, gpaFile.date, gpaFile.assignedBy, extensionsList, gpaFile.extension, gpaFile.properties);
 
-		//GP2Protein identifiers
+		// cross-references to gene product identifiers in other databases
 		List<String> proteinIDs = gpCacheRetrieval.retrieveEntry(annotation.getDbObjectID(),GeneProduct.class).getXRefsAsString();
 		proteinIDs.add(gpaFile.dbObjectID);
-		annotation.setGp2protein(proteinIDs);
-
-		// GO Aspect
-		GOTerm goTerm = (GOTerm)this.goTerms.get(gpaFile.goID);
-		if (goTerm != null) {
-			annotation.setGoAspect(goTerm.getOntologyText());
-		} else {
-			logger.warn("No ontology with id : " + gpaFile.goID);
-		}
-
-		// Sub set
-		annotation.setSubset(term.getSubsetsNames());
+		annotation.setXrefs(proteinIDs);
 
 		// Get gene product and taxonomy information
 		calculateGeneProductTaxonomy(annotation);
 
-		// Ancestors
-		calculateAncestors(gpaFile.goID,annotation);
+		// GO Ancestors
+		annotation.setAncestorsI(goTerm.getAncestorIDs(EnumSet.of(RelationType.ISA, RelationType.IDENTITY)));
+		annotation.setAncestorsIPO(goTerm.getAncestorIDs(EnumSet.of(RelationType.ISA, RelationType.IDENTITY, RelationType.PARTOF, RelationType.OCCURSIN)));
+		annotation.setAncestorsIPOR(goTerm.getAncestorIDs(EnumSet.of(RelationType.ISA, RelationType.IDENTITY, RelationType.PARTOF, RelationType.OCCURSIN, RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES)));
 
 		// ECO Ancestors
-		calculateECOAncestors(annotation.getEcoID(), annotation);
+		ECOTerm ecoTerm = (ECOTerm)ecoTerms.get(gpaFile.ecoID);
+		annotation.setEcoAncestorsI(ecoTerm.getAncestorIDs(EnumSet.of(RelationType.ISA, RelationType.IDENTITY)));
 
 		return annotation;
 	}
@@ -207,7 +190,7 @@ public class GPAssociationFile extends GPDataFile {
 	 * @throws NotFoundException
 	 * @throws SolrServerException
 	 */
-	private void calculateGeneProductTaxonomy(Annotation annotation) throws NotFoundException, SolrServerException {
+	private void calculateGeneProductTaxonomy(GOAnnotation annotation) throws NotFoundException, SolrServerException {
 		GeneProduct geneProduct = gpCacheRetrieval.retrieveEntry(annotation.getDbObjectID(), GeneProduct.class);
 
 		// Set GP information
@@ -215,7 +198,7 @@ public class GPAssociationFile extends GPDataFile {
 		annotation.setDbObjectSymbol(geneProduct.getDbObjectSymbol());
 		annotation.setDbObjectType(geneProduct.getDbObjectType());
 		annotation.setDbObjectSynonyms(geneProduct.getDbObjectSynonyms());
-		annotation.setTargetSet(geneProduct.getTargetSet());
+		annotation.setTargetSets(geneProduct.getTargetSets());
 		annotation.setTaxonomyId(geneProduct.getTaxonId());
 
 		// Set sequence length
@@ -288,71 +271,6 @@ public class GPAssociationFile extends GPDataFile {
 		}
 	}
 
-	/**
-	 * Calculate ancestors
-	 * @param goID Gene Ontology id
-	 * @param annotation Annotation to index
-	 */
-	private void calculateAncestors(String goID, Annotation annotation){
-		GOTerm term = (GOTerm)goTerms.get(goID);
-
-		if (term == null) {
-			logger.warn("No ontology with id : " + goID);
-		} else {
-
-			// Ancestors I
-			List<String> annotationAncestorsI = getTermAncestry(term, EnumSet.of(RelationType.ISA, RelationType.IDENTITY));
-			annotation.setAncestorsI(annotationAncestorsI);
-
-			// Ancestors IPO
-			List<String> annotationAncestorsIPO = getTermAncestry(term, EnumSet.of(
-					RelationType.ISA, RelationType.IDENTITY,
-					RelationType.PARTOF, RelationType.OCCURSIN));
-			annotation.setAncestorsIPO(annotationAncestorsIPO);
-
-			// Ancestors IPOR
-			List<String> annotationAncestorsIPOR = getTermAncestry(term, EnumSet.of(
-					RelationType.ISA, RelationType.IDENTITY,
-					RelationType.PARTOF, RelationType.OCCURSIN,
-					RelationType.REGULATES, RelationType.POSITIVEREGULATES,
-					RelationType.NEGATIVEREGULATES));
-			annotation.setAncestorsIPOR(annotationAncestorsIPOR);
-		}
-	}
-
-	/**
-	 * Calcualte ECO ancestors for ISA relation
-	 * @param ecoID ECO id
-	 * @param annotation Annotation
-	 */
-	private void calculateECOAncestors(String ecoID, Annotation annotation) {
-		GenericTerm ecoTerm = this.ecoTerms.get(ecoID);
-		if (ecoTerm == null) {
-			logger.warn("No ECO term with id : " + ecoID);
-		} else {
-			// Ancestors I
-			List<String> ecoAnotationAncestorsI = getTermAncestry(ecoTerm, EnumSet.of(RelationType.ISA,RelationType.IDENTITY));
-			annotation.setEcoAncestorsI(ecoAnotationAncestorsI);
-		}
-	}
-
-	/**
-	 * Returns the ancestry term depending on the specified relation types
-	 * @param term Term
-	 * @param relationTypes Relations
-	 * @return List with ancestors ids
-	 */
-	private List<String> getTermAncestry(GenericTerm term, EnumSet<RelationType> relationTypes) {
-		List<GenericTerm> ancestors = term.getAncestry(relationTypes);
-		List<String> ancestorsString = new ArrayList<>();
-		for (GenericTerm genericTerm : ancestors) {
-			ancestorsString.add(genericTerm.getId());
-		}
-		return ancestorsString;
-	}
-
-
-
 	public void setFirstRowOfChunk(boolean firstRowOfChunk) {
 		this.firstRowOfChunk = firstRowOfChunk;
 	}
@@ -376,7 +294,7 @@ public class GPAssociationFile extends GPDataFile {
 		String qualifier;
 		String interactingTaxID;
 		String date;
-		String extensions;
+		String extension;
 		String properties;
 
 
@@ -392,7 +310,7 @@ public class GPAssociationFile extends GPDataFile {
 			this.qualifier = columns[COLUMN_QUALIFIER];
 			this.interactingTaxID = columns[COLUMN_INTERACTING_TAXID];
 			this.date = columns[COLUMN_DATE];
-			this.extensions = columns[COLUMN_EXTENSION];
+			this.extension = columns[COLUMN_EXTENSION];
 			this.properties = columns[COLUMN_PROPERTIES];
 		}
 
@@ -407,7 +325,5 @@ public class GPAssociationFile extends GPDataFile {
 			}
 			return new ArrayList<>();
 		}
-
 	}
-
 }

@@ -7,23 +7,20 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 import uk.ac.ebi.quickgo.graphics.*;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
-import uk.ac.ebi.quickgo.ontology.go.GOTermSet;
-import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 import uk.ac.ebi.quickgo.service.geneproduct.GeneProductService;
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousServiceImpl;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.solr.query.model.miscellaneous.enums.MiscellaneousField;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
@@ -68,7 +65,7 @@ public class FileService {
 
 		private String value;
 
-		private FILE_FORMAT(String value) {
+		FILE_FORMAT(String value) {
 			this.value = value;
 		}
 
@@ -210,8 +207,8 @@ public class FileService {
 		int start = 0;
 		writer.append(header + "\n");
 		while (start < numberAnnotations) {
-			List<Annotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
-			for (Annotation annotation : annotations) {
+			List<GOAnnotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
+			for (GOAnnotation annotation : annotations) {
 				try {
 					writer.append(AnnotationColumn.getAnnotationColumns(format,annotation,columns,"\t") + "\n");
 				} catch (Exception e) {
@@ -231,11 +228,13 @@ public class FileService {
 	 * @return GPAD file
 	 */
 	public StringBuffer generateJsonFile(String query, long numberAnnotations, int numResults) {
+/*
 		AnnotationColumn[] columns = {
 				AnnotationColumn.DATABASE, AnnotationColumn.PROTEIN, AnnotationColumn.SYMBOL, AnnotationColumn.QUALIFIER,
 				AnnotationColumn.GOID, AnnotationColumn.REFERENCE, AnnotationColumn.EVIDENCE, AnnotationColumn.WITH,
 				AnnotationColumn.DATE, AnnotationColumn.ASSIGNEDBY, AnnotationColumn.TERMNAME, AnnotationColumn.ASPECT,
 				AnnotationColumn.TAXON};
+*/
 
 
 		int rows = NUM_ROWS;
@@ -250,9 +249,9 @@ public class FileService {
 		StringBuffer writer = new StringBuffer();
 		writer.append("[");
 		while (start < numberAnnotations) {
-			List<Annotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
+			List<GOAnnotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
 			//annotationService.retrieveAnnotations(solrQuery, (page-1)*rows, rows);
-			for (Annotation annotation : annotations) {
+			for (GOAnnotation annotation : annotations) {
 
 				if(!firstIteration){
 					writer.append(",");
@@ -262,7 +261,7 @@ public class FileService {
 
 
 				try {
-					writer.append(AnnotationColumn.getAnnotationColumnsForJson(annotation,columns, targetClass));
+					writer.append(AnnotationColumn.getAnnotationColumnsForJson(targetClass));
 					firstIteration=false;
 				} catch (Exception e) {
 					logger.error(e.getMessage());
@@ -299,7 +298,7 @@ public class FileService {
 
 
 		//Get the annotations back
-		List<Annotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
+		List<GOAnnotation> annotations = annotationService.retrieveAnnotations(query, start, rows);
 
 
 		//Set up the term slimmer if slimming has been requested - i.e. with arrived here via the slimming pages,
@@ -317,7 +316,7 @@ public class FileService {
 		}
 
 			//Iterate through each annotation and populate json class
-		for (Annotation annotation : annotations) {
+		for (GOAnnotation annotation : annotations) {
 
 			GoAnnotationJson goAnnotationJson = new GoAnnotationJson();
 
@@ -409,7 +408,7 @@ public class FileService {
 						goAnnotationJson.setOriginalTermName(annotation.getTermName());
 						break;
 					case EXTENSION:
-						goAnnotationJson.setExtensionList(annotation.getExtensions());
+						goAnnotationJson.setExtensionList(annotation.getExtension());
 						break;
 					case ORIGINALEXTENSION:
 						goAnnotationJson.setFullExtension(annotation.getFullExtension());

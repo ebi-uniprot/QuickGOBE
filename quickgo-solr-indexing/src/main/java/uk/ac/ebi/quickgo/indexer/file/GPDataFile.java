@@ -29,7 +29,6 @@ import uk.ac.ebi.quickgo.util.MemoryMonitor;
 public abstract class GPDataFile {
 	protected NamedFile gpdf;
 	protected int columnCount;
-	protected String[] columns;
 	protected String versionDirective;
 	protected String versionSupported;
 	protected Map<String, String> directives;

@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.query.service.Retrieval;
 
 /**
@@ -13,7 +13,7 @@ import uk.ac.ebi.quickgo.solr.query.service.Retrieval;
  * @author cbonill
  *
  */
-public interface AnnotationRetrieval extends Retrieval<Annotation> {
+public interface AnnotationRetrieval extends Retrieval<GOAnnotation> {
 
 	/**
 	 * Allow pagination for annotations 
@@ -22,7 +22,7 @@ public interface AnnotationRetrieval extends Retrieval<Annotation> {
 	 * @param rows Number of annotations to retrieve
 	 * @return List of annotations
 	 */
-	List<Annotation> findByQuery(String query, int start, int rows) throws SolrServerException;
+	List<GOAnnotation> findByQuery(String query, int start, int rows) throws SolrServerException;
 	
 	/**
 	 * Return number of annotations for a query

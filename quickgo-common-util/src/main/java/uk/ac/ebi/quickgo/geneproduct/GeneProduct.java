@@ -15,11 +15,9 @@ import uk.ac.ebi.quickgo.util.XRef;
  * @author cbonill
  * 
  */
-public class GeneProduct implements JSONSerialise{
+public class GeneProduct implements JSONSerialise {
 
-	public static final String INTACT_COMPLEX_ID = "(EBI-|ebi-)"; 
-	
-	// Basic information		
+	// Basic information
 	private String db;
 	private String dbObjectId;
 	private String dbObjectSymbol;
@@ -143,17 +141,21 @@ public class GeneProduct implements JSONSerialise{
 	}
 
 	/**
-	 * Returns target_set property if any
+	 * Returns list of target_set properties, if any
 	 */
-	public String getTargetSet() {
+	public List<String> getTargetSets() {
+		List<String> sets = null;
 		if (!this.geneProductProperties.isEmpty()) {
 			for (KeyValuePair geneProductProperty : this.geneProductProperties) {
 				if ("target_set".equals(geneProductProperty.key)) {
-					return geneProductProperty.value;
+					if (sets == null) {
+						sets = new ArrayList<>();
+					}
+					sets.add(geneProductProperty.value);
 				}
 			}
 		}
-		return "";
+		return sets;
 	}
 
 	@Override

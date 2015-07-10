@@ -2,8 +2,8 @@ package uk.ac.ebi.quickgo.web.util.annotation;
 
 import java.util.List;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.bean.annotation.AnnotationBean;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 
 /**
  * Useful class for slimming functionality
@@ -20,6 +20,5 @@ public interface SlimmingUtil {
 	 * @param slimValue If slimming is enabled or not
 	 * @return
 	 */
-	public AnnotationBean calculateOriginalAndSlimmingTerm(Annotation annotation, List<String> filterIds, List<String> slimValue);
-
+	AnnotationBean calculateOriginalAndSlimmingTerm(GOAnnotation annotation, List<String> filterIds, List<String> slimValue);
 }

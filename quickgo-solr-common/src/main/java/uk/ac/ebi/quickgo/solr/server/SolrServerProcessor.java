@@ -26,13 +26,13 @@ public interface SolrServerProcessor {
 	 * @return Results of specified type
 	 * @throws SolrServerException SolR exception
 	 */
-	public <T> List<T> findByQuery(SolrQuery solRQuery, Class<T> type, int numRows) throws SolrServerException;
+	<T> List<T> findByQuery(SolrQuery solRQuery, Class<T> type, int numRows) throws SolrServerException;
 	
 	/**
 	 * Index a collection of beans in Solr
 	 * @param beans Collection of beans to index
 	 */
-	public <T> void indexBeans (Collection<T> beans) throws SolrServerException, IOException;
+	<T> void indexBeans (Collection<T> beans) throws SolrServerException, IOException;
 	
 	/**
 	 * Index a collection of beans in Solr using auto commit option. To use this
@@ -42,26 +42,26 @@ public interface SolrServerProcessor {
 	 * @param beans
 	 *            Collection of beans to index
 	 */
-	public <T> void indexBeansAutoCommit (Collection<T> beans) throws SolrServerException, IOException;	
+	<T> void indexBeansAutoCommit (Collection<T> beans) throws SolrServerException, IOException;
 	
 	/**
 	 * Deletes everything
 	 */
-	public void deleteAll() throws SolrServerException, IOException;
+	void deleteAll() throws SolrServerException, IOException;
 	
 	/**
 	 * Delete by query
 	 * @throws SolrServerException
 	 * @throws IOException
 	 */
-	public void deleteByQuery(String query) throws SolrServerException, IOException;		
+	void deleteByQuery(String query) throws SolrServerException, IOException;
 	
 	/**
 	 * Return total number of documents in the schema for a query
 	 * @param query Query
 	 * @return Number of documents in the schema
 	 */
-	public long getTotalNumberDocuments(SolrQuery query) throws SolrServerException;
+	long getTotalNumberDocuments(SolrQuery query) throws SolrServerException;
 	
 	/**
 	 * Return total number of distinct values of a field 
@@ -70,14 +70,14 @@ public interface SolrServerProcessor {
 	 * @return Total number of distinct values of the field
 	 * @throws SolrServerException
 	 */
-	public long getTotalNumberDistinctValues(String query, String field) throws SolrServerException;
+	long getTotalNumberDistinctValues(String query, String field) throws SolrServerException;
 	
 	/**
 	 * Return the specified list of fields using the field id as main key
 	 * The returned structure is like this: MAP <ID, MAP <FIELD1, VALUE_FIELD1> <FIELD2, VALUE_FIELD2> ...>
 	 * @param fields Fields to return
 	 */
-	public Map<String, Map<String, String>> getFields(String query, String fieldID, String fields) throws SolrServerException;	
+	Map<String, Map<String, String>> getFields(String query, String fieldID, String fields) throws SolrServerException;
 	
 	/**
 	 * Return the top terms of the whole index
@@ -85,21 +85,21 @@ public interface SolrServerProcessor {
 	 * @return Top terms
 	 * @throws SolrServerException 
 	 */
-	public List<Term> getTopTerms(SolrQuery solrQuery) throws SolrServerException;	
+	List<Term> getTopTerms(SolrQuery solrQuery) throws SolrServerException;
 	
 	/**
 	 * Return list of facet counts
 	 * @param solrQuery Query
 	 * @return Map of counts
 	 */
-	public List<Count> getFacetTerms(SolrQuery solrQuery) throws SolrServerException;
+	List<Count> getFacetTerms(SolrQuery solrQuery) throws SolrServerException;
 	
 	/**
 	 * Return map with id and total number of values for a specific query using pivot fields
 	 * @param solrQuery Query
 	 * @return Map of counts
 	 */
-	public Map<String, Integer> getFacetTermsWithPivot(SolrQuery solrQuery) throws SolrServerException;
+	Map<String, Integer> getFacetTermsWithPivot(SolrQuery solrQuery) throws SolrServerException;
 	
 	/**
 	 * Run Solr query
@@ -107,5 +107,5 @@ public interface SolrServerProcessor {
 	 * @return Query response
 	 * @throws SolrServerException 
 	 */
-	public QueryResponse query(SolrQuery query) throws SolrServerException;
+	QueryResponse query(SolrQuery query) throws SolrServerException;
 } 

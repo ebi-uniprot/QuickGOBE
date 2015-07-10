@@ -52,36 +52,25 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
 			switch (solrTermDocumentType) {
 
 			case TERM:
-				if(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.TERM).size() > 0){
-					mapBasicInformation(						
-								getAssociatedSolrTerms(solrObjects,
-										SolrTermDocumentType.TERM).get(0), term);
+				List<SolrTerm> l = getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.TERM);
+				if (l.size() > 0) {
+					mapBasicInformation(l.get(0), term);
 				}
 				break;
 			case HISTORY:
-				mapHistory(
-						getAssociatedSolrTerms(solrObjects,
-								SolrTermDocumentType.HISTORY), term);
+				mapHistory(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.HISTORY), term);
 				break;
 			case RELATION:
-				mapRelation(
-						getAssociatedSolrTerms(solrObjects,
-								SolrTermDocumentType.RELATION), term);
+				mapRelation(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.RELATION), term);
 				break;
 			case REPLACE:
-				mapReplaces(
-						getAssociatedSolrTerms(solrObjects,
-								SolrTermDocumentType.REPLACE), term);
+				mapReplaces(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.REPLACE), term);
 				break;			
 			case SYNONYM:
-				mapSynonyms(
-						getAssociatedSolrTerms(solrObjects,
-								SolrTermDocumentType.SYNONYM), term);
+				mapSynonyms(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.SYNONYM), term);
 				break;
 			case XREF:
-				mapCrossReferences(
-						getAssociatedSolrTerms(solrObjects,
-								SolrTermDocumentType.XREF), term);
+				mapCrossReferences(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.XREF), term);
 				break;
 			}
 		}
@@ -98,7 +87,7 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
 	 * 
 	 * @param solrTerm
 	 *            GO Term
-	 * @return Solr Term to be indexed
+	 * @param term Term to be indexed
 	 */
 	private void mapBasicInformation(SolrTerm solrTerm, GOTerm term) {
 		term.setId(solrTerm.getId());
@@ -135,7 +124,7 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
 				term.setUsage(ETermUsage.fromString(solrTerm.getUsage()));
 			}
 			// Credits
-			List<TermCredit> credits = new ArrayList<TermCredit>();
+			List<TermCredit> credits = new ArrayList<>();
 			if(solrTerm.getCredits() != null){
 				for(String credit : solrTerm.getCredits()){
 					String[] creditDbURL = credit.split("--");
@@ -299,8 +288,7 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
 	 * @param term
 	 *            Term with Cross References information mapped
 	 */
-	private void mapCrossReferences(List<SolrTerm> associatedSolrTerms,
-			GOTerm term) {
+	private void mapCrossReferences(List<SolrTerm> associatedSolrTerms,	GOTerm term) {
 		List<NamedXRef> xrefs = new ArrayList<>();
 		for (SolrTerm xref : associatedSolrTerms) {
 			NamedXRef ref = new NamedXRef(xref.getXrefDbCode(), xref.getXrefDbId(), xref.getXrefName());			
@@ -319,9 +307,7 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
 	 *            Type to check
 	 * @return Solr terms that match with the specified document type
 	 */
-	protected List<SolrTerm> getAssociatedSolrTerms(
-			Collection<SolrTerm> solrObjects,
-			SolrTermDocumentType solrTermDocumentType) {
+	protected List<SolrTerm> getAssociatedSolrTerms(Collection<SolrTerm> solrObjects, SolrTermDocumentType solrTermDocumentType) {
 		List<SolrTerm> solrTerms = new ArrayList<>();
 		for (SolrTerm solrTerm : solrObjects) {
 			if (SolrTermDocumentType.valueOf(solrTerm.getDocType().toUpperCase()) == solrTermDocumentType) {

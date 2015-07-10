@@ -498,7 +498,7 @@ public class SolrTerm {
 
 		String value;
 		
-		private SolrTermDocumentType(String value){
+		SolrTermDocumentType(String value){
 			this.value = value;
 		}
 
@@ -528,8 +528,7 @@ public class SolrTerm {
 		 * @return Value as SolrDocumentType object
 		 */
 		public static SolrDocumentType getAsInterface(SolrTermDocumentType solrTermDocumentType) {
-			SolrDocumentType documentType = solrTermDocumentType;			
-			return documentType;
+			return solrTermDocumentType;
 		}
 	}	
 }

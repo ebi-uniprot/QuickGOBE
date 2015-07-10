@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,6 @@ public class GeneProductIdMapping {
 	/**
 	 * Reads a gp2protein file and returns a list of gene products objects containing the mappings
 	 * @param file gp2protein file
-	 * @return List of gene products with the xrefs
 	 * @throws IOException
 	 */
 	public void readAndIndexGPMappings(File file) throws IOException {
@@ -64,15 +63,15 @@ public class GeneProductIdMapping {
 					XRef ref = new XRef(xrefDb, xrefId);
 					GeneProduct geneProduct = new GeneProduct();
 					geneProduct.setDbObjectId(sourceDb.split(":")[1]);// Gene product id
-					geneProduct.setXRefs(Arrays.asList(ref));
+					geneProduct.setXRefs(Collections.singletonList(ref));
 					geneProducts.add(geneProduct);
 				}
 			}
 			if(geneProducts.size() % 200000 == 0){
-				geneProductIndexer.index(geneProducts, Arrays.asList(SolrGeneProductDocumentType.getAsInterface(SolrGeneProductDocumentType.XREF)));
+				geneProductIndexer.index(geneProducts, Collections.singletonList(SolrGeneProductDocumentType.getAsInterface(SolrGeneProductDocumentType.XREF)));
 				geneProducts = new ArrayList<>();
 			}
 		}
-		geneProductIndexer.index(geneProducts, Arrays.asList(SolrGeneProductDocumentType.getAsInterface(SolrGeneProductDocumentType.XREF)));
+		geneProductIndexer.index(geneProducts, Collections.singletonList(SolrGeneProductDocumentType.getAsInterface(SolrGeneProductDocumentType.XREF)));
 	}
 }

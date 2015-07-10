@@ -28,23 +28,18 @@ public class SolrGeneProductMapper implements SolrMapper<GeneProduct, SolrGenePr
 	}
 
 	@Override
-	public Collection<SolrGeneProduct> toSolrObject(GeneProduct geneProduct,
-			List<SolrDocumentType> solrDocumentTypes) {
-		
+	public Collection<SolrGeneProduct> toSolrObject(GeneProduct geneProduct, List<SolrDocumentType> solrDocumentTypes) {
 		List<SolrGeneProduct> solrGeneProducts = new ArrayList<>();
 		
 		for (SolrDocumentType gpDocumentType : solrDocumentTypes) {
-			SolrGeneProductDocumentType solrGPDocumentType = ((SolrGeneProductDocumentType) gpDocumentType);
-
-			switch (solrGPDocumentType) {
-
+			switch ((SolrGeneProductDocumentType)gpDocumentType) {
 			case GENEPRODUCT:
 				solrGeneProducts.add(mapBasicInformation(geneProduct));
 				break;
-			case  PROPERTY:
+			case PROPERTY:
 				solrGeneProducts.addAll(mapProperties(geneProduct));
 				break;
-			case  XREF:
+			case XREF:
 				solrGeneProducts.addAll(mapXrefs(geneProduct));
 				break;
 			}

@@ -11,10 +11,10 @@ import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Test;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.cache.query.service.CacheRetrieval;
 import uk.ac.ebi.quickgo.service.annotation.parameter.AnnotationParameters;
 import uk.ac.ebi.quickgo.solr.exception.NotFoundException;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.solr.query.service.annotation.AnnotationRetrieval;
 
@@ -45,12 +45,12 @@ public class AnnotationServiceTest {
 		
 		context.checking(new Expectations() {
 			{
-				allowing(cacheRetrieval).retrieveEntry("1234567", Annotation.class);
+				allowing(cacheRetrieval).retrieveEntry("1234567", GOAnnotation.class);
 				will(throwException(new NotFoundException("Annotation not found")));	
 			}
 		});
 		
-		Annotation annotation = annotationService.retrieveAnnotation("1234567");
+		GOAnnotation annotation = annotationService.retrieveAnnotation("1234567");
 		assertTrue(annotation.getDb() == null);
 		context.assertIsSatisfied();
 	}	
@@ -65,16 +65,16 @@ public class AnnotationServiceTest {
 		final String db = "UniProt";
 		final CacheRetrieval cacheRetrieval = context.mock(CacheRetrieval.class);
 		annotationService.annotationCacheRetrieval = cacheRetrieval;
-		final Annotation annotation = new Annotation();
+		final GOAnnotation annotation = new GOAnnotation();
 		annotation.setDb(db);
 		context.checking(new Expectations() {
 			{
-				allowing(cacheRetrieval).retrieveEntry(db, Annotation.class);
+				allowing(cacheRetrieval).retrieveEntry(db, GOAnnotation.class);
 				will(returnValue(annotation));	
 			}
 		});
 		
-		Annotation resAnnotation = annotationService.retrieveAnnotation(db);
+		GOAnnotation resAnnotation = annotationService.retrieveAnnotation(db);
 		assertTrue(resAnnotation.getDb().equals(db));
 		context.assertIsSatisfied();
 	}
@@ -92,9 +92,9 @@ public class AnnotationServiceTest {
 		final AnnotationRetrieval annotationRetrieval = context.mock(AnnotationRetrieval.class);		
 		annotationService.annotationRetrieval = annotationRetrieval;
 		
-		Annotation annotation = new Annotation();
+		GOAnnotation annotation = new GOAnnotation();
 		annotation.setDbObjectID("A00001");
-		final List<Annotation> annotations = Arrays.asList(annotation);
+		final List<GOAnnotation> annotations = Arrays.asList(annotation);
 		
 		context.checking(new Expectations() {
 			{
@@ -103,7 +103,7 @@ public class AnnotationServiceTest {
 			}
 		});
 		
-		List<Annotation> resAnnotations = annotationService.retrieveAnnotations(annotationParameters.toSolrQuery(), 0, -1);		
+		List<GOAnnotation> resAnnotations = annotationService.retrieveAnnotations(annotationParameters.toSolrQuery(), 0, -1);
 		assertTrue(resAnnotations.equals(annotations));
 		context.assertIsSatisfied();
 	}
@@ -121,9 +121,9 @@ public class AnnotationServiceTest {
 		final AnnotationRetrieval annotationRetrieval = context.mock(AnnotationRetrieval.class);		
 		annotationService.annotationRetrieval = annotationRetrieval;
 		
-		Annotation annotation = new Annotation();
+		GOAnnotation annotation = new GOAnnotation();
 		annotation.setAssignedBy("InterPro");
-		final List<Annotation> annotations = Arrays.asList(annotation);
+		final List<GOAnnotation> annotations = Arrays.asList(annotation);
 		
 		context.checking(new Expectations() {
 			{
@@ -132,7 +132,7 @@ public class AnnotationServiceTest {
 			}
 		});
 		
-		List<Annotation> resAnnotations = annotationService.retrieveAnnotations(annotationParameters.toSolrQuery(), 0 ,-1);		
+		List<GOAnnotation> resAnnotations = annotationService.retrieveAnnotations(annotationParameters.toSolrQuery(), 0 ,-1);
 		assertTrue(resAnnotations.equals(annotations));
 		context.assertIsSatisfied();
 	}

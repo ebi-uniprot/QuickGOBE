@@ -20,26 +20,26 @@ public interface Retrieval<T> {
 	 * @param id Id
 	 * @return Entry with the specified id
 	 */
-	public T findById(String id) throws SolrServerException;
+	T findById(String id) throws SolrServerException;
 	
 	/**
 	 * Get entries by name
 	 * @param name Name
 	 * @return Entries with the specified name
 	 */
-	public List<T> findByName(String name) throws SolrServerException;
+	List<T> findByName(String name) throws SolrServerException;
 
 	/**
 	 * Get all the entries
 	 * @return All entries
 	 */
-	public List<T> findAll() throws SolrServerException;
+	List<T> findAll() throws SolrServerException;
 	
 	/**
 	 * Get Term entries for a specific query
 	 * @return All entries
 	 */
-	public List<T> findByQuery(String query, int numRows) throws SolrServerException;
+	List<T> findByQuery(String query, int numRows) throws SolrServerException;
 	
 	/**
 	 * Return the top terms of the whole index
@@ -48,7 +48,7 @@ public interface Retrieval<T> {
 	 * @return Top terms
 	 * @throws SolrServerException 
 	 */
-	public List<Term> getTopTerms(String termFields, int numRows) throws SolrServerException;
+	List<Term> getTopTerms(String termFields, int numRows) throws SolrServerException;
 			
 	/**
 	 * Return list of facet counts (Value , NumFound). This method is used for the annotations statistics
@@ -59,7 +59,7 @@ public interface Retrieval<T> {
 	 * @return Map with the facet fields and the corresponding values
 	 * @throws SolrServerException 
 	 */
-	public List<Count> getFacetFields(String query, String facetQuery, String facetFields, int numTerms) throws SolrServerException;
+	List<Count> getFacetFields(String query, String facetQuery, String facetFields, int numTerms) throws SolrServerException;
 	
 	/**
 	 * Return list of facet fields with the count of pivot results
@@ -71,5 +71,5 @@ public interface Retrieval<T> {
 	 * @return Map with the facet fields and the corresponding values
 	 * @throws SolrServerException 
 	 */
-	public Map<String, Integer> getFacetFieldsWithPivots(String query, String facetQuery, String facetFields, String pivotFields, int numTerms) throws SolrServerException;
+	Map<String, Integer> getFacetFieldsWithPivots(String query, String facetQuery, String facetFields, String pivotFields, int numTerms) throws SolrServerException;
 }

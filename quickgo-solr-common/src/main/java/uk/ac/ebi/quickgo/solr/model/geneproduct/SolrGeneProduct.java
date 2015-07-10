@@ -186,10 +186,8 @@ public class SolrGeneProduct {
 		 *            Value to convert
 		 * @return Value as SolrDocumentType object
 		 */
-		public static SolrDocumentType getAsInterface(
-				SolrGeneProductDocumentType solrGeneProductDocumentType) {
-			SolrDocumentType documentType = solrGeneProductDocumentType;
-			return documentType;
+		public static SolrDocumentType getAsInterface(SolrGeneProductDocumentType solrGeneProductDocumentType) {
+			return solrGeneProductDocumentType;
 		}
 	}
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.response.FacetField.Count;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
+import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 
 /**
  * Interface to define all the annotation operations
@@ -18,7 +18,7 @@ public interface AnnotationService {
 	 * @param id Annotation id
 	 * @return Annotation with the specified id
 	 */
-	public Annotation retrieveAnnotation(String id);
+	GOAnnotation retrieveAnnotation(String id);
 		
 	/**
 	 * Retrieve annotations filtered by annotation parameters
@@ -27,13 +27,13 @@ public interface AnnotationService {
 	 * @param rows Number of annotations to retrieve
 	 * @return List of annotations filtered
 	 */
-	public List<Annotation> retrieveAnnotations(String query, int start, int rows);
+	List<GOAnnotation> retrieveAnnotations(String query, int start, int rows);
 	
 	/**
 	 * Retrieve all the annotations
 	 * @return All the annotations
 	 */
-	public List<Annotation> retrieveAll();
+	List<GOAnnotation> retrieveAll();
 	
 	/**
 	 * Get term values using facet field/s  
@@ -43,19 +43,19 @@ public interface AnnotationService {
 	 * @param numTerms Number of values to retrieve
 	 * @return List containing the facet values
 	 */
-	public List<Count> getFacetFields(String query, String facetQuery, String facetFields, int numTerms);
+	List<Count> getFacetFields(String query, String facetQuery, String facetFields, int numTerms);
 	
 	/**
 	 * Return total number of annotations for the specified query
 	 * @param query Filtering query
 	 * @return Number of annotations
 	 */
-	public long getTotalNumberAnnotations(String query);
+	long getTotalNumberAnnotations(String query);
 
 	/**
 	 * Return total number of distinct proteins for a specific query
 	 * @param query Filtering query
 	 * @return Number of proteins
 	 */
-	public long getTotalNumberProteins(String query);
+	long getTotalNumberProteins(String query);
 }

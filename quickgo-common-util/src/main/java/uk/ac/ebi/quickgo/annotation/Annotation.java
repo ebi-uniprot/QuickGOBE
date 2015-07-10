@@ -14,6 +14,7 @@ import java.util.List;
  * @author tonys
  *
  */
+@Deprecated
 public class Annotation implements Serializable{
 
 	private static final long serialVersionUID = 2592634776573970012L;

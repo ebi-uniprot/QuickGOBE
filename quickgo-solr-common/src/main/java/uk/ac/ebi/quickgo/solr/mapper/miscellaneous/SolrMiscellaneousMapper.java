@@ -16,28 +16,18 @@ import uk.ac.ebi.quickgo.solr.model.miscellaneous.SolrMiscellaneous.SolrMiscella
  * To map Miscellaneous data into Solr objects
  */
 @Service("solrMiscellaneousMapper")
-public class SolrMiscellaneousMapper implements
-		SolrMapper<Miscellaneous, SolrMiscellaneous> {
-
+public class SolrMiscellaneousMapper implements SolrMapper<Miscellaneous, SolrMiscellaneous> {
 	@Override
-	public Collection<SolrMiscellaneous> toSolrObject(
-			Miscellaneous genericObject) {
-		return toSolrObject(genericObject,
-				SolrMiscellaneousDocumentType.getAsInterfaces());
+	public Collection<SolrMiscellaneous> toSolrObject(Miscellaneous genericObject) {
+		return toSolrObject(genericObject, SolrMiscellaneousDocumentType.getAsInterfaces());
 	}
 
 	@Override
-	public Collection<SolrMiscellaneous> toSolrObject(
-			Miscellaneous miscellaneousObject,
-			List<SolrDocumentType> solrDocumentTypes) {
-
-		List<SolrMiscellaneous> solrMiscellaneous = new ArrayList<SolrMiscellaneous>();
+	public Collection<SolrMiscellaneous> toSolrObject(Miscellaneous miscellaneousObject, List<SolrDocumentType> solrDocumentTypes) {
+		List<SolrMiscellaneous> solrMiscellaneous = new ArrayList<>();
 
 		for (SolrDocumentType miscellaneousDocumentType : solrDocumentTypes) {
-			SolrMiscellaneousDocumentType solrMiscellaneousDocumentType = ((SolrMiscellaneousDocumentType) miscellaneousDocumentType);
-
-			switch (solrMiscellaneousDocumentType) {
-
+			switch ((SolrMiscellaneousDocumentType)miscellaneousDocumentType) {
 			case TAXONOMY:
 				if (miscellaneousObject.getTaxonomyName() != null) {// Contains taxonomy information
 					solrMiscellaneous.add(mapTaxonomy(miscellaneousObject));

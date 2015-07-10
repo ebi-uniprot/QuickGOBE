@@ -18,40 +18,28 @@ import uk.ac.ebi.quickgo.util.XRef;
  *
  */
 public class EntityGeneProductMapper implements EntityMapper<SolrGeneProduct, GeneProduct> {
-
 	@Override
 	public GeneProduct toEntityObject(Collection<SolrGeneProduct> solrObjects) {
 		return toEntityObject(solrObjects, SolrGeneProductDocumentType.getAsInterfaces());
 	}
 
 	@Override
-	public GeneProduct toEntityObject(Collection<SolrGeneProduct> solrObjects,
-			List<SolrDocumentType> solrDocumentTypes) {
-		
+	public GeneProduct toEntityObject(Collection<SolrGeneProduct> solrObjects, List<SolrDocumentType> solrDocumentTypes) {
 		GeneProduct geneProduct = new GeneProduct();
 
 		for (SolrDocumentType gpDocumentType : solrDocumentTypes) {
-			SolrGeneProductDocumentType solrGeneProductDocumentType = ((SolrGeneProductDocumentType) gpDocumentType);
-
-			switch (solrGeneProductDocumentType) {
-
+			switch ((SolrGeneProductDocumentType)gpDocumentType) {
 			case GENEPRODUCT:
-				if(getAssociatedSolrTerms(solrObjects, SolrGeneProductDocumentType.GENEPRODUCT).size() > 0){
-					mapBasicInformation(
-							getAssociatedSolrTerms(solrObjects, SolrGeneProductDocumentType.GENEPRODUCT).get(0),
-							geneProduct);
+				List<SolrGeneProduct> l = getAssociatedSolrTerms(solrObjects, SolrGeneProductDocumentType.GENEPRODUCT);
+				if (l.size() > 0) {
+					mapBasicInformation(l.get(0), geneProduct);
 				}
 				break;
 			case PROPERTY:
-				mapProperty(
-						getAssociatedSolrTerms(solrObjects,
-								SolrGeneProductDocumentType.PROPERTY),
-						geneProduct);
+				mapProperty(getAssociatedSolrTerms(solrObjects, SolrGeneProductDocumentType.PROPERTY), geneProduct);
 				break;
 			case XREF:
-				mapXrefs(
-						getAssociatedSolrTerms(solrObjects,
-								SolrGeneProductDocumentType.XREF), geneProduct);
+				mapXrefs(getAssociatedSolrTerms(solrObjects, SolrGeneProductDocumentType.XREF), geneProduct);
 				break;
 			}
 		}
@@ -65,8 +53,7 @@ public class EntityGeneProductMapper implements EntityMapper<SolrGeneProduct, Ge
 	 * @param geneProduct Gene product to return
 	 */
 	
-	private void mapBasicInformation(SolrGeneProduct solrGeneProduct,
-			GeneProduct geneProduct) {
+	private void mapBasicInformation(SolrGeneProduct solrGeneProduct, GeneProduct geneProduct) {
 		geneProduct.setDb(solrGeneProduct.getDb());
 		geneProduct.setDbObjectId(solrGeneProduct.getDbObjectId());
 		geneProduct.setDbObjectSymbol(solrGeneProduct.getDbObjectSymbol());
@@ -98,12 +85,10 @@ public class EntityGeneProductMapper implements EntityMapper<SolrGeneProduct, Ge
 	 * @param associatedSolrTerms Solr gene product xrefs
 	 * @param geneProduct GeneProduct
 	 */
-	private void mapXrefs(List<SolrGeneProduct> associatedSolrTerms,
-			GeneProduct geneProduct) {
+	private void mapXrefs(List<SolrGeneProduct> associatedSolrTerms, GeneProduct geneProduct) {
 		List<XRef> xRefs = new ArrayList<>();
 		for (SolrGeneProduct gpXref : associatedSolrTerms) {
-			XRef ref = new XRef(gpXref.getXrefDb(), gpXref.getXrefId());
-			xRefs.add(ref);
+			xRefs.add(new XRef(gpXref.getXrefDb(), gpXref.getXrefId()));
 		}		
 		if(associatedSolrTerms.size() > 0){
 			geneProduct.setDbObjectId(associatedSolrTerms.get(0).getDbObjectId());
@@ -122,8 +107,7 @@ public class EntityGeneProductMapper implements EntityMapper<SolrGeneProduct, Ge
 	 *            Type to check
 	 * @return Solr gene products that match with the specified document type
 	 */
-	protected List<SolrGeneProduct> getAssociatedSolrTerms(Collection<SolrGeneProduct> solrObjects,
-			SolrGeneProductDocumentType solrGeneProductDocumentType) {
+	protected List<SolrGeneProduct> getAssociatedSolrTerms(Collection<SolrGeneProduct> solrObjects,	SolrGeneProductDocumentType solrGeneProductDocumentType) {
 		List<SolrGeneProduct> solrGeneProducts = new ArrayList<>();
 		for (SolrGeneProduct solrGeneProduct : solrObjects) {
 			if (SolrGeneProductDocumentType.valueOf(solrGeneProduct.getDocType().toUpperCase()) == solrGeneProductDocumentType) {
@@ -132,5 +116,4 @@ public class EntityGeneProductMapper implements EntityMapper<SolrGeneProduct, Ge
 		}
 		return solrGeneProducts;
 	}
-
 }

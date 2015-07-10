@@ -169,6 +169,26 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
     	return anc;
     }
 
+	/**
+	 * return the set of term IDs that feature somewhere in this term's ancestry, as traversed over a specified set of relation type
+	 *
+	 * @param relationCodes - a string containing codes that represent the relation types (cf {@link RelationType} for details)
+	 *                        examples:
+	 *                           relation types for is_a: "I="
+	 *                           relation types for is_a, part_of, occurs_in: "I=PO"
+	 *                           relation types for is_a, part_of, occurs_in & all regulates relations: "I=POR+-"
+	 *
+	 * @return the set of GenericTerm IDs that are part of this term's ancestry
+	*/
+	public List<String> getAncestorIDs(String relationCodes) {
+		List<GenericTerm> anc = getAncestry(relationCodes);
+		List<String> ancIDs = new ArrayList<>(anc.size());
+		for (GenericTerm term : anc) {
+			ancIDs.add(term.getId());
+		}
+		return ancIDs;
+	 }
+
     /**
      * getAncestry version using Set of RelationType
      * @param relationTypes List of relation types
@@ -177,6 +197,10 @@ public class GenericTerm implements JSONSerialise,Comparable<GenericTerm> {
     public List<GenericTerm> getAncestry(EnumSet<RelationType> relationTypes) {
     	return this.getAncestry(RelationType.toCodes(relationTypes));
     }
+
+	public List<String> getAncestorIDs(EnumSet<RelationType> relationTypes) {
+ 		return this.getAncestorIDs(RelationType.toCodes(relationTypes));
+	}
 
     public BitSet getAncestors(GenericTerm[] terms, EnumSet<RelationType> relations) {
         BitSet results = new BitSet();

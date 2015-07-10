@@ -28,23 +28,16 @@ public class EntityGOTermMapper extends EntityTermMapper {
 			List<SolrDocumentType> solrDocumentTypes) {
 
 		for (SolrDocumentType termDocumentType : solrDocumentTypes) {
-			SolrTermDocumentType solrTermDocumentType = ((SolrTermDocumentType) termDocumentType);
-
-			switch (solrTermDocumentType) {
-
+			switch ((SolrTermDocumentType)termDocumentType) {
 			case CONSTRAINT:
-				mapConstraints(
-						getAssociatedSolrTerms(solrObjects,
-								SolrTermDocumentType.CONSTRAINT), term);
+				mapConstraints(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.CONSTRAINT), term);
 				break;
 			case GUIDELINE:
-				mapAnnotationGuideline(
-						getAssociatedSolrTerms(solrObjects,
-								SolrTermDocumentType.GUIDELINE), term);
+				mapAnnotationGuideline(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.GUIDELINE), term);
 				break;
 			case ONTOLOGYRELATION:
-				mapOntologyRelations(getAssociatedSolrTerms(solrObjects,
-						SolrTermDocumentType.ONTOLOGYRELATION), term);
+				mapOntologyRelations(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.ONTOLOGYRELATION), term);
+				break;
 			}
 		}
 	}	
@@ -57,23 +50,11 @@ public class EntityGOTermMapper extends EntityTermMapper {
 	 */
 	private void mapConstraints(List<SolrTerm> associatedSolrTerms, GOTerm term) {
 		List<TaxonConstraint> taxonConstraints = new ArrayList<>();
-		for (SolrTerm taxonConstraintsolrTerm : associatedSolrTerms) {
-			List<String> pubMedIds = taxonConstraintsolrTerm.getPubMedIds();
-			String sources = "";
-			if (pubMedIds != null) {
-				sources = StringUtils.arrayToCommaDelimitedString(pubMedIds.toArray());
-			}
-			
-			TaxonConstraint taxonConstraint = new TaxonConstraint(
-					taxonConstraintsolrTerm.getTaxonConstraintRuleId(),
-					taxonConstraintsolrTerm.getTaxonConstraintAncestorId(),
-					taxonConstraintsolrTerm.getTaxonConstraintName(),
-					taxonConstraintsolrTerm.getTaxonConstraintRelationship(),
-					taxonConstraintsolrTerm.getTaxonConstraintTaxIdType(),
-					taxonConstraintsolrTerm.getTaxonConstraintTaxId(),
-					taxonConstraintsolrTerm.getTaxonConstraintTaxName(),
-					sources);
-			taxonConstraints.add(taxonConstraint);
+		for (SolrTerm tc : associatedSolrTerms) {
+			List<String> pubMedIds = tc.getPubMedIds();
+			String sources = (pubMedIds != null) ? StringUtils.arrayToCommaDelimitedString(pubMedIds.toArray()) : "";
+
+			taxonConstraints.add(new TaxonConstraint(tc.getTaxonConstraintRuleId(), tc.getTaxonConstraintAncestorId(), tc.getTaxonConstraintName(), tc.getTaxonConstraintRelationship(), tc.getTaxonConstraintTaxIdType(), tc.getTaxonConstraintTaxId(), tc.getTaxonConstraintTaxName(), sources));
 		}
 		term.setTaxonConstraints(taxonConstraints);
 	}
@@ -86,14 +67,10 @@ public class EntityGOTermMapper extends EntityTermMapper {
 	 * @param term
 	 *            Term with the Annotation Guidelines information mapped
 	 */
-	private void mapAnnotationGuideline(List<SolrTerm> associatedSolrTerms,
-			GOTerm term) {
+	private void mapAnnotationGuideline(List<SolrTerm> associatedSolrTerms, GOTerm term) {
 		List<NamedURL> annotationGuidelines = new ArrayList<>();
 		for (SolrTerm guideline : associatedSolrTerms) {
-			NamedURL namedURL = new NamedURL(
-					guideline.getAnnotationGuidelineTitle(),
-					guideline.getAnnotationGuidelineUrl());
-			annotationGuidelines.add(namedURL);
+			annotationGuidelines.add(new NamedURL(guideline.getAnnotationGuidelineTitle(), guideline.getAnnotationGuidelineUrl()));
 		}
 		term.setGuidelines(annotationGuidelines);
 	}
@@ -103,10 +80,9 @@ public class EntityGOTermMapper extends EntityTermMapper {
 	 * @param associatedSolrTerms Terms to map
 	 * @param term Term populated with cross ontology relations information 
 	 */
-	private void mapOntologyRelations(List<SolrTerm> associatedSolrTerms,
-			GOTerm term) {
-		List<CrossOntologyRelation> crossOntologyRelations = new ArrayList<>();
-		if(associatedSolrTerms != null){
+	private void mapOntologyRelations(List<SolrTerm> associatedSolrTerms, GOTerm term) {
+		if (associatedSolrTerms != null){
+			List<CrossOntologyRelation> crossOntologyRelations = new ArrayList<>();
 			for (SolrTerm ontologyRelation : associatedSolrTerms) {
 				CrossOntologyRelation crossOntologyRelation = new CrossOntologyRelation(
 						ontologyRelation.getCrossOntologyRelation(),

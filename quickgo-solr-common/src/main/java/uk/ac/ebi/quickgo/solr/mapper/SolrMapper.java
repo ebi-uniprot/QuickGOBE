@@ -19,7 +19,7 @@ public interface SolrMapper<T, V> {
 	 * @param genericObject Object to convert into Solr
 	 * @return Solr mapped objects
 	 */
-	public Collection<V> toSolrObject(T genericObject);	
+	Collection<V> toSolrObject(T genericObject);
 		
 	/**
 	 * Maps the selected document types to Solr entites
@@ -27,7 +27,5 @@ public interface SolrMapper<T, V> {
 	 * @param solrDocumentTypes Document types to map
 	 * @return Solr mapped objects
 	 */
-	public Collection<V> toSolrObject (T genericObject, List<SolrDocumentType> solrDocumentTypes);
-	
-	
+	Collection<V> toSolrObject (T genericObject, List<SolrDocumentType> solrDocumentTypes);
 }

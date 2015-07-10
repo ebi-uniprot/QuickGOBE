@@ -17,8 +17,8 @@ public interface MiscellaneousRetrieval extends Retrieval<Miscellaneous>{
 
 	/**
 	 * Find by id specifying the miscellaneous type to retrieve (stats, taxonomy, sequence, ...)
-	 * @param id Id to retrieve
-	 * @param type Type of miscellaneous object
+	 * @param idValue Id to retrieve
+	 * @param idField Type of miscellaneous object
 	 * @return Miscellaneous object 
 	 * @throws SolrServerException
 	 */
@@ -29,5 +29,5 @@ public interface MiscellaneousRetrieval extends Retrieval<Miscellaneous>{
 	 * @param fieldID Field id
 	 * @param fields Fields to retrieve
 	 */
-	public  Map<String, Map<String, String>> getFieldValues(String query, String fieldID, String fields) throws SolrServerException;
+	Map<String, Map<String, String>> getFieldValues(String query, String fieldID, String fields) throws SolrServerException;
 }

@@ -13,6 +13,7 @@ import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
  * @author cbonill
  *
  */
+@Deprecated
 public class SolrAnnotation {
 
 	@Field
@@ -398,10 +399,8 @@ public class SolrAnnotation {
 		 *            Value to convert
 		 * @return Value as SolrDocumentType object
 		 */
-		public static SolrDocumentType getAsInterface(
-				SolrAnnotationDocumentType solrAnnotationDocumentType) {
-			SolrDocumentType documentType = solrAnnotationDocumentType;
-			return documentType;
+		public static SolrDocumentType getAsInterface(SolrAnnotationDocumentType solrAnnotationDocumentType) {
+			return solrAnnotationDocumentType;
 		}
 	}
 

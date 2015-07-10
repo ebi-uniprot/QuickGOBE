@@ -13,109 +13,91 @@ import uk.ac.ebi.quickgo.solr.model.miscellaneous.SolrMiscellaneous.SolrMiscella
 /**
  * For converting Solr miscellaneous data into Java entities
  */
-public class EntityMiscellaneousMapper  implements EntityMapper<SolrMiscellaneous, Miscellaneous>{
+public class EntityMiscellaneousMapper implements EntityMapper<SolrMiscellaneous, Miscellaneous>{
 
 	@Override
-	public Miscellaneous toEntityObject(
-			Collection<SolrMiscellaneous> solrObjects) {
+	public Miscellaneous toEntityObject(Collection<SolrMiscellaneous> solrObjects) {
 		return toEntityObject(solrObjects, SolrMiscellaneousDocumentType.getAsInterfaces());
 	}
 
 	@Override
-	public Miscellaneous toEntityObject(
-			Collection<SolrMiscellaneous> solrObjects,
-			List<SolrDocumentType> solrDocumentTypes) {
-		
-		
+	public Miscellaneous toEntityObject(Collection<SolrMiscellaneous> solrObjects, List<SolrDocumentType> solrDocumentTypes) {
 		Miscellaneous miscellaneous = new Miscellaneous();
 
 		for (SolrDocumentType miscDocumentType : solrDocumentTypes) {
-			SolrMiscellaneousDocumentType solrMiscellaneousDocumentType = ((SolrMiscellaneousDocumentType) miscDocumentType);
-
-			switch (solrMiscellaneousDocumentType) {
+			List<SolrMiscellaneous> l;
+			switch ((SolrMiscellaneousDocumentType) miscDocumentType) {
 
 			case TAXONOMY:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.TAXONOMY).size() > 0){
-					mapTaxonomy(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.TAXONOMY).get(0),
-							miscellaneous);
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.TAXONOMY);
+				if (l.size() > 0) {
+					mapTaxonomy(l.get(0), miscellaneous);
 				}
 				break;
 			case STATS:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.STATS).size() > 0){
-					mapCoOccurrenceStats(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.STATS).get(0),
-							miscellaneous);
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.STATS);
+				if (l.size() > 0) {
+					mapCoOccurrenceStats(l.get(0), miscellaneous);
 				}
 				break;
 			case SEQUENCE:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.SEQUENCE).size() > 0){
-					mapSequence(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.SEQUENCE).get(0),
-							miscellaneous);
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.SEQUENCE);
+				if (l.size() > 0){
+					mapSequence(l.get(0), miscellaneous);
 				}
 				break;
 			case PUBLICATION:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.PUBLICATION).size() > 0){
-					mapPublication(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.PUBLICATION).get(0),
-							miscellaneous);
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.PUBLICATION);
+				if (l.size() > 0) {
+					mapPublication(l.get(0), miscellaneous);
 				}
 				break;
 			case GUIDELINE:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.GUIDELINE).size() > 0){
-					mapGuideline(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.GUIDELINE).get(0),
-							miscellaneous);
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.GUIDELINE);
+				if (l.size() > 0) {
+					mapGuideline(l.get(0), miscellaneous);
 				}
 				break;
 			case BLACKLIST:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.BLACKLIST).size() > 0){
-					mapBlacklist(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.BLACKLIST).get(0),
-							miscellaneous);
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.BLACKLIST);
+				if (l.size() > 0) {
+					mapBlacklist(l.get(0), miscellaneous);
 				}
 				break;
 			case EXTENSION:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.EXTENSION).size() > 0){
-					mapExtensionRelation(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.EXTENSION).get(0),
-							miscellaneous);
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.EXTENSION);
+				if (l.size() > 0) {
+					mapExtensionRelation(l.get(0), miscellaneous);
 				}
 				break;
-			case  XREFDB:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.XREFDB).size() > 0){
-					mapXrefDatabase(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.XREFDB).get(0),
-							miscellaneous);
+			case XREFDB:
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.XREFDB);
+				if (l.size() > 0){
+					mapXrefDatabase(l.get(0), miscellaneous);
 				}
 				break;
-			case  SUBSETCOUNT:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.SUBSETCOUNT).size() > 0){
-					mapSubset(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.SUBSETCOUNT).get(0),
-							miscellaneous);
+			case SUBSETCOUNT:
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.SUBSETCOUNT);
+				if (l.size() > 0) {
+					mapSubset(l.get(0), miscellaneous);
 				}
 				break;
-			case  EVIDENCE:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.EVIDENCE).size() > 0){
-					mapEvidence(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.EVIDENCE).get(0),
-							miscellaneous);
+			case EVIDENCE:
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.EVIDENCE);
+				if (l.size() > 0) {
+					mapEvidence(l.get(0), miscellaneous);
 				}
 				break;
 			case  POSTPROCESSINGRULE:
-				if(getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.POSTPROCESSINGRULE).size() > 0){
-					mapPostProcessingRule(
-							getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.POSTPROCESSINGRULE).get(0),
-							miscellaneous);
+				l = getAssociatedSolrTerms(solrObjects, SolrMiscellaneousDocumentType.POSTPROCESSINGRULE);
+				if (l.size() > 0) {
+					mapPostProcessingRule(l.get(0), miscellaneous);
 				}
 				break;
 			}
 		}
 		return miscellaneous;		
 	}
-
 
 	/**
 	 * Map taxonomy information
@@ -261,12 +243,11 @@ public class EntityMiscellaneousMapper  implements EntityMapper<SolrMiscellaneou
 	 * 
 	 * @param solrObjects
 	 *            Solr miscellaneous objects
-	 * @param solrGeneProductDocumentType
+	 * @param solrMiscellaneousDocumentType
 	 *            Type to check
 	 * @return Solr miscellaneous information that match with the specified document type
 	 */
-	protected List<SolrMiscellaneous> getAssociatedSolrTerms(Collection<SolrMiscellaneous> solrObjects,
-			SolrMiscellaneousDocumentType solrMiscellaneousDocumentType) {
+	protected List<SolrMiscellaneous> getAssociatedSolrTerms(Collection<SolrMiscellaneous> solrObjects, SolrMiscellaneousDocumentType solrMiscellaneousDocumentType) {
 		List<SolrMiscellaneous> solrMiscellaneousList = new ArrayList<>();
 		for (SolrMiscellaneous solrMiscellaneous : solrObjects) {
 			if (SolrMiscellaneousDocumentType.valueOf(solrMiscellaneous.getDocType().toUpperCase()) == solrMiscellaneousDocumentType) {
