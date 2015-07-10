@@ -562,16 +562,5 @@ public class SolrMiscellaneous {
 			documentTypes.addAll(Arrays.asList(values()));
 			return documentTypes;
 		}
-
-		/**
-		 * Get value as SolrDocumentType object
-		 * 
-		 * @param solrMiscellaneousDocumentType
-		 *            Value to convert
-		 * @return Value as SolrDocumentType object
-		 */
-		public static SolrDocumentType getAsInterface(SolrMiscellaneousDocumentType solrMiscellaneousDocumentType) {
-			return solrMiscellaneousDocumentType;
-		}
 	}
 }

@@ -2,10 +2,7 @@ package uk.ac.ebi.quickgo.solr.mapper.term;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -22,6 +19,7 @@ import uk.ac.ebi.quickgo.ontology.go.GOTerm.NamedURL;
 import uk.ac.ebi.quickgo.ontology.go.TaxonConstraint;
 import uk.ac.ebi.quickgo.solr.mapper.term.go.SolrGOTermMapper;
 import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm;
+import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
 import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm.SolrTermDocumentType;
 import uk.ac.ebi.quickgo.util.NamedXRef;
 
@@ -82,14 +80,14 @@ public class SolrTermMapperTest {
 			}
 		});
 		
-		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Arrays.asList(SolrTermDocumentType.getAsInterface(SolrTermDocumentType.TERM)));
+		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Collections.singletonList((SolrDocumentType)SolrTermDocumentType.TERM));
 		context.assertIsSatisfied();
 		List<SolrTerm> terms = new ArrayList<>(solrTerms);
 		assertTrue(terms.size() == 1);
 		assertTrue(terms.get(0).getId().equals("GO:00000001"));
 		assertTrue(terms.get(0).getName().equals("apoptotic process"));
 		assertTrue(terms.get(0).getOntology().equals("Process"));
-		assertTrue(terms.get(0).isObsolete() == true);
+		assertTrue(terms.get(0).isObsolete());
 	}
 	
 	/**
@@ -100,7 +98,7 @@ public class SolrTermMapperTest {
 		// Mock
 		final GOTerm term = context.mock(GOTerm.class);
 		TaxonConstraint taxonConstraint = new TaxonConstraint("rule001", "GO:0000002", "name", "Relation 1", "TaxId Types", "1234", "Taxon name", "");
-		term.taxonConstraints = Arrays.asList(taxonConstraint);
+		term.taxonConstraints = Collections.singletonList(taxonConstraint);
 		
 		context.checking(new Expectations() {
 			{
@@ -109,7 +107,7 @@ public class SolrTermMapperTest {
 			}
 		});
 		
-		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Arrays.asList(SolrTermDocumentType.getAsInterface(SolrTermDocumentType.CONSTRAINT)));
+		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Collections.singletonList((SolrDocumentType)SolrTermDocumentType.CONSTRAINT));
 		context.assertIsSatisfied();
 		List<SolrTerm> terms = new ArrayList<>(solrTerms);
 		assertTrue(terms.size() == 1);
@@ -133,7 +131,7 @@ public class SolrTermMapperTest {
 			}
 		});
 		
-		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Arrays.asList(SolrTermDocumentType.getAsInterface(SolrTermDocumentType.GUIDELINE)));
+		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Collections.singletonList((SolrDocumentType)SolrTermDocumentType.GUIDELINE));
 		context.assertIsSatisfied();
 		List<SolrTerm> terms = new ArrayList<>(solrTerms);
 		assertTrue(terms.size() == 2);
@@ -159,7 +157,7 @@ public class SolrTermMapperTest {
 			}
 		});
 		
-		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Arrays.asList(SolrTermDocumentType.getAsInterface(SolrTermDocumentType.HISTORY)));
+		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Collections.singletonList((SolrDocumentType)SolrTermDocumentType.HISTORY));
 		context.assertIsSatisfied();
 		List<SolrTerm> terms = new ArrayList<>(solrTerms);
 		assertTrue(terms.size() == 2);
@@ -183,7 +181,7 @@ public class SolrTermMapperTest {
 			}
 		});
 		
-		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Arrays.asList(SolrTermDocumentType.getAsInterface(SolrTermDocumentType.SYNONYM)));
+		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Collections.singletonList((SolrDocumentType)SolrTermDocumentType.SYNONYM));
 		context.assertIsSatisfied();
 		List<SolrTerm> terms = new ArrayList<>(solrTerms);
 		assertTrue(terms.size() == 2);
@@ -209,7 +207,7 @@ public class SolrTermMapperTest {
 			}
 		});
 		
-		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Arrays.asList(SolrTermDocumentType.getAsInterface(SolrTermDocumentType.XREF)));
+		Collection<SolrTerm> solrTerms = solrMapper.toSolrObject(term, Collections.singletonList((SolrDocumentType)SolrTermDocumentType.XREF));
 		context.assertIsSatisfied();
 		List<SolrTerm> terms = new ArrayList<>(solrTerms);
 		assertTrue(terms.size() == 3);

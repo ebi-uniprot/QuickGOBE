@@ -391,17 +391,6 @@ public class SolrAnnotation {
 			}
 			return documentTypes;
 		}
-
-		/**
-		 * Get value as SolrDocumentType object
-		 *
-		 * @param solrAnnotationDocumentType
-		 *            Value to convert
-		 * @return Value as SolrDocumentType object
-		 */
-		public static SolrDocumentType getAsInterface(SolrAnnotationDocumentType solrAnnotationDocumentType) {
-			return solrAnnotationDocumentType;
-		}
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -15,6 +16,7 @@ import uk.ac.ebi.quickgo.ontology.go.GOTerm.EGOAspect;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm.ETermUsage;
 import uk.ac.ebi.quickgo.solr.mapper.EntityMapper;
 import uk.ac.ebi.quickgo.solr.mapper.term.go.EntityGOTermMapper;
+import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
 import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm;
 import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm.SolrTermDocumentType;
 
@@ -81,14 +83,14 @@ public class EntityTermMapperTest {
 			}
 		});
 		
-		GOTerm goTerm = entityMapper.toEntityObject(Arrays.asList(solrTerm), Arrays.asList(SolrTermDocumentType.getAsInterface(SolrTermDocumentType.TERM)));
+		GOTerm goTerm = entityMapper.toEntityObject(Collections.singletonList(solrTerm), Collections.singletonList((SolrDocumentType)SolrTermDocumentType.TERM));
 		context.assertIsSatisfied();
 		assertTrue(goTerm.getId().equals("GO:00000001"));
 		assertTrue(goTerm.getName().equals("apoptotic process"));
 		assertTrue(goTerm.getOntologyText().equals(EGOAspect.P.text));
 		assertTrue(goTerm.getComment().contains("Comment"));
 		assertTrue(goTerm.getDefinition().contains("Definition"));
-		assertTrue(goTerm.isObsolete() == true);
+		assertTrue(goTerm.isObsolete());
 	}
 	
 	/**
@@ -113,7 +115,7 @@ public class EntityTermMapperTest {
 			}
 		});
 		
-		GOTerm goTerm = entityMapper.toEntityObject(Arrays.asList(solrTerm), Arrays.asList(SolrTermDocumentType.getAsInterface(SolrTermDocumentType.GUIDELINE)));
+		GOTerm goTerm = entityMapper.toEntityObject(Collections.singletonList(solrTerm), Collections.singletonList((SolrDocumentType)SolrTermDocumentType.GUIDELINE));
 		context.assertIsSatisfied();	
 		assertTrue(goTerm.getGuidelines().size() == 1);
 		assertTrue(goTerm.getGuidelines().get(0).title.equals("Annotation title"));
@@ -145,7 +147,7 @@ public class EntityTermMapperTest {
 			}
 		});
 		
-		GOTerm goTerm = entityMapper.toEntityObject(Arrays.asList(solrTerm), Arrays.asList(SolrTermDocumentType.getAsInterface(SolrTermDocumentType.SYNONYM)));
+		GOTerm goTerm = entityMapper.toEntityObject(Collections.singletonList(solrTerm), Collections.singletonList((SolrDocumentType)SolrTermDocumentType.SYNONYM));
 		context.assertIsSatisfied();	
 		assertTrue(goTerm.getSynonyms().size() == 1);
 		assertTrue(goTerm.getSynonyms().get(0).name.equals("GO:0003"));
@@ -176,7 +178,7 @@ public class EntityTermMapperTest {
 			}
 		});
 		
-		GOTerm goTerm = entityMapper.toEntityObject(Arrays.asList(solrTerm), Arrays.asList(SolrTermDocumentType.getAsInterface(SolrTermDocumentType.XREF)));
+		GOTerm goTerm = entityMapper.toEntityObject(Collections.singletonList(solrTerm), Collections.singletonList((SolrDocumentType)SolrTermDocumentType.XREF));
 		context.assertIsSatisfied();	
 		assertTrue(goTerm.getXrefs().size() == 1);
 		assertTrue(goTerm.getXrefs().get(0).getDb().equals("A01245"));

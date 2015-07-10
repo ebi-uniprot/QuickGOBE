@@ -519,14 +519,5 @@ public class SolrTerm {
 			documentTypes.addAll(Arrays.asList(values()));
 			return documentTypes;
 		}
-		
-		/**
-		 * Get value as SolrDocumentType object
-		 * @param solrTermDocumentType Value to convert
-		 * @return Value as SolrDocumentType object
-		 */
-		public static SolrDocumentType getAsInterface(SolrTermDocumentType solrTermDocumentType) {
-			return solrTermDocumentType;
-		}
-	}	
+	}
 }

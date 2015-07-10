@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 import uk.ac.ebi.quickgo.solr.indexing.service.geneproduct.GeneProductIndexer;
+import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
 import uk.ac.ebi.quickgo.solr.model.geneproduct.SolrGeneProduct.SolrGeneProductDocumentType;
 import uk.ac.ebi.quickgo.util.UniProtAccession;
 import uk.ac.ebi.quickgo.util.XRef;
@@ -73,7 +74,7 @@ public class GeneProductIdMapping {
 				}
 
 				if (geneProducts.size() >= 200000) {
-					geneProductIndexer.index(geneProducts, Collections.singletonList(SolrGeneProductDocumentType.getAsInterface(SolrGeneProductDocumentType.XREF)));
+					geneProductIndexer.index(geneProducts, Collections.singletonList((SolrDocumentType)SolrGeneProductDocumentType.XREF));
 					geneProducts = new ArrayList<>();
 				}
 			}
@@ -81,7 +82,7 @@ public class GeneProductIdMapping {
 
 		// index the remainder
 		if (geneProducts.size() > 0) {
-			geneProductIndexer.index(geneProducts, Collections.singletonList(SolrGeneProductDocumentType.getAsInterface(SolrGeneProductDocumentType.XREF)));
+			geneProductIndexer.index(geneProducts, Collections.singletonList((SolrDocumentType)SolrGeneProductDocumentType.XREF));
 		}
 	}
 }

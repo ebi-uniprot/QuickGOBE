@@ -177,16 +177,5 @@ public class SolrGeneProduct {
 			documentTypes.addAll(Arrays.asList(values()));
 			return documentTypes;
 		}
-
-		/**
-		 * Get value as SolrDocumentType object
-		 * 
-		 * @param solrGeneProductDocumentType
-		 *            Value to convert
-		 * @return Value as SolrDocumentType object
-		 */
-		public static SolrDocumentType getAsInterface(SolrGeneProductDocumentType solrGeneProductDocumentType) {
-			return solrGeneProductDocumentType;
-		}
 	}
 }
