@@ -27,7 +27,7 @@ public enum FilterRequest {
 	Proteome("proteome", WebServiceFilter.GeneProductId , WebServiceFilterType.ArgumentsAsValues , AnnotationField.DBOBJECTID ),
 
 	//A name of a set of gene products eg KRUK
-	GeneProductSet("gpset", WebServiceFilter.GeneProductSet , WebServiceFilterType.ArgumentsAsValues , AnnotationField.TARGETSET ),
+	GeneProductSet("gpset", WebServiceFilter.GeneProductSet , WebServiceFilterType.ArgumentsAsValues , AnnotationField.TARGETSETS ),
 
 	// GoTerm - The default behaviour is to match the goIds to the AncestorsIPO list
 	// If the exact goIds are to be matched, then goTermUse must be specified
