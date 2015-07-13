@@ -6,42 +6,41 @@ http://www.springframework.org/schema/context
 http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<!-- CONTAINS INDEXING BEANS FOR SOLR-INDEXING MODULE -->
-	
+
 	<!-- GO Terms indexer -->
 	<bean name="goTermIndexer"
 		class="uk.ac.ebi.quickgo.solr.indexing.service.ontology.TermIndexer">
 		<property name="solrMapper" ref="solrGOTermMapper"></property>
-		<property name="solrServerProcessor" ref="termServerProcessor"></property>		
-	</bean>	
-	
+		<property name="solrServerProcessor" ref="termServerProcessor"></property>
+	</bean>
+
 	<!-- ECO Terms indexer -->
 	<bean name="ecoTermIndexer"
 		class="uk.ac.ebi.quickgo.solr.indexing.service.ontology.TermIndexer">
 		<property name="solrMapper" ref="solrECOTermMapper"></property>
-		<property name="solrServerProcessor" ref="termServerProcessor"></property>		
+		<property name="solrServerProcessor" ref="termServerProcessor"></property>
 	</bean>
-	
+
 	<!-- Gene Products indexer -->
 	<bean name="geneProductIndexer"
 		class="uk.ac.ebi.quickgo.solr.indexing.service.geneproduct.GeneProductIndexer">
 		<property name="solrMapper" ref="solrGeneProductMapper"></property>
-		<property name="solrServerProcessor" ref="geneProductServerProcessor"></property>		
-	</bean>	
-	
+		<property name="solrServerProcessor" ref="geneProductServerProcessor"></property>
+	</bean>
+
 	<!-- Annotations indexer -->
 	<bean name="annotationIndexer"
 		class="uk.ac.ebi.quickgo.solr.indexing.service.annotation.AnnotationIndexer">
-		<property name="solrMapper" ref="solrAnnotationMapper"></property>
-		<property name="solrServerProcessor" ref="annotationServerProcessor"></property>		
-	</bean>	
-	
+		<property name="solrServerProcessor" ref="annotationServerProcessor"></property>
+	</bean>
+
 	<!-- Miscellaneous indexer -->
 	<bean name="miscellaneousIndexer"
 		class="uk.ac.ebi.quickgo.solr.indexing.service.miscellaneous.MiscellaneousIndexer">
 		<property name="solrMapper" ref="solrMiscellaneousMapper"></property>
-		<property name="solrServerProcessor" ref="miscellaneousServerProcessor"></property>		
-	</bean>	
-	
+		<property name="solrServerProcessor" ref="miscellaneousServerProcessor"></property>
+	</bean>
+
 	<!-- For indexing QuickGO files -->
 	<bean name="quickGOIndexer"
 		class="uk.ac.ebi.quickgo.indexer.QuickGOIndexer">
