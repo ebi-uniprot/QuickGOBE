@@ -37,19 +37,18 @@ public class QuickGOGeneProductIndexer {
 	 */
 	@Autowired
 	GeneProductIdMapping productIdMapping;
-	
+
 	// Log
-	private static final Logger logger = Logger
-			.getLogger(QuickGOGeneProductIndexer.class);
+	private static final Logger logger = LoggerFactory.getLogger(QuickGOGeneProductIndexer.class);
 
 	/**
 	 * index all gene products
-	 * 
+	 *
 	 * @param gpiList
 	 *            list of gp_information files that contain the metadata for the
 	 *            gene products to be indexed
 	 * @return number of gene products indexed
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void indexGeneProducts(List<NamedFile> gpiList) throws Exception {
 		int indexed = 0;
@@ -61,13 +60,13 @@ public class QuickGOGeneProductIndexer {
 			logger.info("Indexing " + f.getName());
 			GPInformationFile gpInformationFile = new GPInformationFile(f);
 			indexed = readAndIndexGPDataFileByChunks(gpInformationFile,	geneProductIndexer, 15000);
-		}	
+		}
 		logger.info("indexGeneProducts done: " + mm.end() + "  total indexed: "	+ indexed);
 	}
 
 	/**
 	 * index gene product cross-references
-	 * 
+	 *
 	 * @param gp2List
 	 *            list of gp2protein files
 	 * @return True if the indexing finished correctly, False otherwise
@@ -80,7 +79,7 @@ public class QuickGOGeneProductIndexer {
 			// gp2protein files
 			for (NamedFile gp2proteinFile : gp2proteinList) {
 				logger.info("Indexing " + gp2proteinFile.getName());
-				productIdMapping.readAndIndexGPMappings(gp2proteinFile.file());				
+				productIdMapping.readAndIndexGPMappings(gp2proteinFile.file());
 			}
 			bOK = true;
 		} catch (Exception e) {
@@ -90,10 +89,10 @@ public class QuickGOGeneProductIndexer {
 		logger.info("indexDBXRefs done: " + mm.end() + "  total indexed: " + count);
 		return bOK;
 	}
-	
+
 	/**
 	 * Given a GPData file, read it and index it by chunks of the specified size
-	 * 
+	 *
 	 * @param gpDataFile
 	 *            File to read
 	 * @param solrIndexer
@@ -135,7 +134,7 @@ public class QuickGOGeneProductIndexer {
 		solrIndexer.index(rows);
 		indexed = indexed + rows.size();
 		rows = new ArrayList<>();
-		
+
 		gpDataFile.reader.close();
 		logger.info("Load " + gpDataFile.getName() + " done - " + mm.end());
 
