@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 //import org.slf4j.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.context.ApplicationContext;
@@ -41,7 +42,7 @@ import uk.ac.ebi.quickgo.solr.query.service.miscellaneous.MiscellaneousRetrieval
 public class GPAssociationFile extends GPDataFile {
 
 	// Log
-	//private static final Logger logger = LoggerFactory.getLogger(GPAssociationFile.class);
+	final Logger logger = LoggerFactory.getLogger(GPAssociationFile.class);
 
 	// columns in GPAD 1.1 format files:
 	//
@@ -145,6 +146,8 @@ public class GPAssociationFile extends GPDataFile {
 		//Populate data from file
 		GpaFile gpaFile = new GpaFile(columns);
 
+		logger.debug("Created a new GpaFile {}", gpaFile);
+
 		// Get gene products chunk from Solr
 		getGeneProductsChunk(gpaFile.dbObjectID);
 
@@ -158,8 +161,11 @@ public class GPAssociationFile extends GPDataFile {
 			Collections.addAll(extensionsList, gpaFile.extension.split("\\|"));
 		}
 
+
 		//Get associated term to get its name
 		GOTerm goTerm = (GOTerm)goTerms.get(gpaFile.goID);
+
+		logger.debug("Created a new GOTerm {}", goTerm);
 
 		// Create annotation
 		GOAnnotation annotation = new GOAnnotation(gpaFile.db, gpaFile.dbObjectID, gpaFile.qualifier, gpaFile.goID, goTerm.getName(), goTerm.getOntologyText(), gpaFile.ecoID, goEvidence,
@@ -325,6 +331,25 @@ public class GPAssociationFile extends GPDataFile {
 				return Arrays.asList(values.split("\\|"));
 			}
 			return new ArrayList<>();
+		}
+
+		@Override
+		public String toString() {
+			return "GpaFile{" +
+					"db='" + db + '\'' +
+					", dbObjectID='" + dbObjectID + '\'' +
+					", goID='" + goID + '\'' +
+					", ecoID='" + ecoID + '\'' +
+					", assignedBy='" + assignedBy + '\'' +
+					", reference='" + reference + '\'' +
+					", with=" + with +
+					", fullWith='" + fullWith + '\'' +
+					", qualifier='" + qualifier + '\'' +
+					", interactingTaxID='" + interactingTaxID + '\'' +
+					", date='" + date + '\'' +
+					", extension='" + extension + '\'' +
+					", properties='" + properties + '\'' +
+					'}';
 		}
 	}
 }
