@@ -83,7 +83,7 @@ public class QueryToSolrProcess {
 		filterMappings.put(WebServiceFilter.Database, new FilterMappingSimple(FilterRequest.Database, AnnotationField.DB));
 
 		//todo OK??
-		filterMappings.put(WebServiceFilter.GeneProductSet, new FilterMappingSimple(FilterRequest.GeneProductSet, AnnotationField.TARGETSET));
+		filterMappings.put(WebServiceFilter.GeneProductSet, new FilterMappingSimple(FilterRequest.GeneProductSet, AnnotationField.TARGETSETS));
 
 		//todo does this exist??
 		//proteome --> something.
