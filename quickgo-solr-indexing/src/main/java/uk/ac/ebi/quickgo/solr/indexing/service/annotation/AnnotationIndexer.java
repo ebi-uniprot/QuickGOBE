@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class AnnotationIndexer implements Indexer<GOAnnotation> {
 	private SolrServerProcessor solrServerProcessor;
 
 	// Log
-	private static final Logger logger = Logger.getLogger(AnnotationIndexer.class);
+	private static final Logger logger = LoggerFactory.getLogger(AnnotationIndexer.class);
 
 	/**
 	 * See {@link Indexer#index(List)}

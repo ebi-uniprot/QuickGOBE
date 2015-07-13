@@ -5,7 +5,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class FileService {
 
 	private final int NUM_ROWS = 5000;
 
-	private static final Logger logger = Logger.getLogger(FileService.class);
+	private static final Logger logger = LoggerFactory.getLogger(FileService.class);
 
 
 	public enum FILE_FORMAT {

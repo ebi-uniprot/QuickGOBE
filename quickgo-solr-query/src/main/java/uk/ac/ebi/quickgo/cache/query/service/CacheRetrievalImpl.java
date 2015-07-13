@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.cache.query.service;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class CacheRetrievalImpl<T> implements CacheRetrieval<T> {
 	CacheBuilder<T> cacheBuilder;
 	
 	// Log
-	private static final Logger logger = Logger.getLogger(CacheRetrievalImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(CacheRetrievalImpl.class);
 	
 	/**
 	 * See {@link CacheRetrieval#retrieveEntry(String, Class)

@@ -8,7 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -37,7 +38,7 @@ public class DownloadController {
 	@Autowired
 	FileService fileService;
 
-	private static final Logger logger = Logger.getLogger(DownloadController.class);
+	private static final Logger logger = LoggerFactory.getLogger(DownloadController.class);
 
 	@RequestMapping(value = { "/", "annotation" }, method = {RequestMethod.POST, RequestMethod.GET }, params = { "format" })
 	public void download(

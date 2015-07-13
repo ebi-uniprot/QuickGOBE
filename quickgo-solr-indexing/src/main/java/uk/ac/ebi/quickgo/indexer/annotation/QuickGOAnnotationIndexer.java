@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.indexer.file.GPAssociationFile;
@@ -30,7 +31,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 	AnnotationIndexer annotationIndexer;
 
 	// Log
-	private static final Logger logger = Logger.getLogger(QuickGOAnnotationIndexer.class);
+	private static final Logger logger = LoggerFactory.getLogger(QuickGOAnnotationIndexer.class);
 
 
 	NamedFile file;
@@ -119,7 +120,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 		this.file = file;
 	}
 
-	public static Logger getLogger() {
+	public static LoggerFactory.getLogger() {
 		return logger;
 	}
 

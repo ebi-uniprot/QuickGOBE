@@ -7,7 +7,8 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,7 +28,7 @@ public class GeneProductServiceImpl implements GeneProductService{
 	GeneProductRetrieval geneProductRetrieval;
 	
 	// Log
-	private static final Logger logger = Logger.getLogger(GeneProductServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(GeneProductServiceImpl.class);
 	
 	EntityToStream<GeneProduct> gpEntityToStream;
 	

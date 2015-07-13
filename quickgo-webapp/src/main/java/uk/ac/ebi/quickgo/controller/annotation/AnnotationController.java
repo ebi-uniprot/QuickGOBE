@@ -14,7 +14,8 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,7 @@ import uk.ac.ebi.quickgo.web.util.url.URLsResolver;
 @Controller
 public class AnnotationController{
 
-	private static final Logger logger = Logger.getLogger(AnnotationController.class);
+	private static final Logger logger = LoggerFactory.getLogger(AnnotationController.class);
 	// Number top organisms to show
 	private final static int NUMBER_TOP_ORGANISMS = 17;
 	// Most used taxonomies for filtering

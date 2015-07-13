@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class QuickGOCOOccurrenceStatsIndexer {
 	private final String nonIEAQuery = "NOT " + AnnotationField.GOEVIDENCE.getValue() + ":" + "IEA";
 
 	// Log
-	private static final Logger logger = Logger.getLogger(QuickGOCOOccurrenceStatsIndexer.class);
+	private static final Logger logger = LoggerFactory.getLogger(QuickGOCOOccurrenceStatsIndexer.class);
 
 	/**
 	 * Main method for indexing co-occurrence stats

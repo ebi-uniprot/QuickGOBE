@@ -2,7 +2,8 @@ package uk.ac.ebi.quickgo.indexer.ontology;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class QuickGOOntologyIndexer {
 	TermIndexer ecoTermIndexer;
 	
 	// Log
-	private static final Logger logger = Logger.getLogger(QuickGOOntologyIndexer.class);
+	private static final Logger logger = LoggerFactory.getLogger(QuickGOOntologyIndexer.class);
 	
 	// cache of the GO data
 	GeneOntology ontology = new GeneOntology();

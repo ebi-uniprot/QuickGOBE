@@ -3,7 +3,8 @@ package uk.ac.ebi.quickgo.service.annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 
@@ -20,7 +21,7 @@ import uk.ac.ebi.quickgo.solr.query.service.annotation.AnnotationRetrieval;
 public class AnnotationServiceImpl implements AnnotationService {
 
 	// Log
-	private static final Logger logger = Logger.getLogger(AnnotationServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(AnnotationServiceImpl.class);
 	
 	CacheRetrieval<GOAnnotation> annotationCacheRetrieval;
 	

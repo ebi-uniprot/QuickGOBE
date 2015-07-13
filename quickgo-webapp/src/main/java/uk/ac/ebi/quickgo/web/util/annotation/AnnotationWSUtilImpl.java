@@ -16,7 +16,8 @@ import java.util.zip.GZIPOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +103,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	// All go terms
 	Map<String, GenericTerm> terms = uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTerms(); //todo this should be properly cached.
 
-	private static final Logger logger = Logger.getLogger(AnnotationWSUtilImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(AnnotationWSUtilImpl.class);
 
 	//Static members acting as a cache...
 	private static List<Miscellaneous> subsetsCounts;

@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.quickgo.ontology.generic.AuditRecord;
 import uk.ac.ebi.quickgo.ontology.generic.Synonym;
@@ -32,7 +33,7 @@ import uk.ac.ebi.quickgo.util.XRef;
 public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm> {
 
 	// Log
-	private static final Logger logger = Logger.getLogger(EntityTermMapper.class);
+	private static final Logger logger = LoggerFactory.getLogger(EntityTermMapper.class);
 
 	@Override
 	public GOTerm toEntityObject(Collection<SolrTerm> solrObjects) {

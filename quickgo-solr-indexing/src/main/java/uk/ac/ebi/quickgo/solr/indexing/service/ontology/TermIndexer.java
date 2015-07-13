@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ public class TermIndexer implements Indexer<GenericTerm> {
 	private SolrMapper<GenericTerm, SolrTerm> solrMapper;
 	
 	// Log
-	private static final Logger logger = Logger.getLogger(TermIndexer.class);
+	private static final Logger logger = LoggerFactory.getLogger(TermIndexer.class);
 
 	/**
 	 * See {@link Indexer#index(List)}

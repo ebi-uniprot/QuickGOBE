@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,7 +28,7 @@ import uk.ac.ebi.quickgo.solr.query.service.miscellaneous.MiscellaneousRetrieval
 public class MiscellaneousUtilImpl implements MiscellaneousUtil {
 
 	// Log
-	private static final Logger logger = Logger.getLogger(MiscellaneousUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(MiscellaneousUtil.class);
 
 	@Autowired
 	MiscellaneousRetrieval miscellaneousRetrieval;

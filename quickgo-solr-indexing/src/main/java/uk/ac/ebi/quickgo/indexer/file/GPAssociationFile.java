@@ -7,7 +7,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -40,7 +41,7 @@ import uk.ac.ebi.quickgo.solr.query.service.miscellaneous.MiscellaneousRetrieval
 public class GPAssociationFile extends GPDataFile {
 
 	// Log
-	//private static final Logger logger = Logger.getLogger(GPAssociationFile.class);
+	//private static final Logger logger = LoggerFactory.getLogger(GPAssociationFile.class);
 
 	// columns in GPAD 1.1 format files:
 	//

@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
 
@@ -25,7 +26,7 @@ import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 public class MiscellaneousServiceImpl implements MiscellaneousService{
 
 	// Log
-	private static final Logger logger = Logger.getLogger(MiscellaneousServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(MiscellaneousServiceImpl.class);
 		
 	MiscellaneousRetrieval miscellaneousRetrieval;
 	

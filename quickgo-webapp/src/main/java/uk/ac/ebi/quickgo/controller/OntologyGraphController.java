@@ -19,7 +19,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -57,7 +58,7 @@ public class OntologyGraphController {
 	FileService fileService;
 
 	// Log
-	private static final Logger logger = Logger.getLogger(OntologyGraphController.class);
+	private static final Logger logger = LoggerFactory.getLogger(OntologyGraphController.class);
 
 	// Ontology
 	GenericOntology genericOntology;

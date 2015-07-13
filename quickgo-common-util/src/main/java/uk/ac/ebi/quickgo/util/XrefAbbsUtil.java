@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Useful class to override xref databases URLs from file xrefs_urls.properties
@@ -15,7 +16,7 @@ import org.apache.log4j.Logger;
 public class XrefAbbsUtil {
 
 	// Log
-	private static final Logger logger = Logger.getLogger(XrefAbbsUtil.class);	
+	private static final Logger logger = LoggerFactory.getLogger(XrefAbbsUtil.class);	
 	
 	private static Properties properties = null;
 	

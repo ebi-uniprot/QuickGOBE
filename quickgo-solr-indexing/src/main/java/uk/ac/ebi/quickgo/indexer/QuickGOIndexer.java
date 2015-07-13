@@ -7,7 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -47,7 +48,7 @@ public class QuickGOIndexer implements IIndexer {
 	QuickGOCOOccurrenceStatsIndexer quickGOCOOccurrenceStatsIndexer;
 
 	// Log
-	private static final Logger logger = Logger.getLogger(QuickGOIndexer.class);
+	private static final Logger logger = LoggerFactory.getLogger(QuickGOIndexer.class);
 
 	// Path where data files required by the indexing process are located
 	private String sourceFilesPath;

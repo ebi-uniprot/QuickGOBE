@@ -2,7 +2,8 @@ package uk.ac.ebi.quickgo.solr.query.service.geneproduct;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField.Count;
@@ -23,7 +24,7 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 public class GeneProductRetrievalImpl implements GeneProductRetrieval{
 
 	// Log
-	private static final Logger logger = Logger.getLogger(GeneProductRetrievalImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(GeneProductRetrievalImpl.class);
 	
 	SolrServerProcessor serverProcessor;
 	

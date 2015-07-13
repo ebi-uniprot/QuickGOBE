@@ -3,7 +3,8 @@ package uk.ac.ebi.quickgo.solr.query.service.ontology;
 import java.io.Serializable;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField.Count;
@@ -28,7 +29,7 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 	private static final long serialVersionUID = 2405824287000526742L;
 
 	// Log
-	private static final Logger logger = Logger.getLogger(TermRetrievalImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(TermRetrievalImpl.class);
 
 	SolrServerProcessor serverProcessor;
 

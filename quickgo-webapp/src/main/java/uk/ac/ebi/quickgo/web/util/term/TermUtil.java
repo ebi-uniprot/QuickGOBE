@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.quickgo.data.SourceFiles;
 import uk.ac.ebi.quickgo.ontology.eco.ECOTerm;
@@ -28,7 +29,7 @@ import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
 public class TermUtil {
 	
 	// Log
-	private static final Logger logger = Logger.getLogger(TermUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(TermUtil.class);
 	
 	static SourceFiles sourceFiles = null;
 	

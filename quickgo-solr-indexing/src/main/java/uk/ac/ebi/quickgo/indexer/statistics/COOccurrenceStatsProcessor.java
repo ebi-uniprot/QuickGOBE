@@ -10,7 +10,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -31,7 +32,7 @@ import com.google.common.collect.Sets;
 public class COOccurrenceStatsProcessor extends Thread {
 
 	// Log
-	private static final Logger logger = Logger.getLogger(COOccurrenceStatsProcessor.class);
+	private static final Logger logger = LoggerFactory.getLogger(COOccurrenceStatsProcessor.class);
 	
 	// Annotation retrieval
 	AnnotationRetrieval annotationRetrieval;

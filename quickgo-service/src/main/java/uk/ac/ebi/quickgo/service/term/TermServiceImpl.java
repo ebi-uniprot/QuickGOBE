@@ -14,7 +14,8 @@ import java.util.TimeZone;
 
 import javax.xml.bind.JAXBException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.springframework.cache.annotation.Cacheable;
@@ -41,7 +42,7 @@ public class TermServiceImpl implements TermService,Serializable {
 	private static final long serialVersionUID = 4202735332039846712L;
 
 	// Log
-	private static final Logger logger = Logger.getLogger(TermServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(TermServiceImpl.class);
 
 	TermRetrieval goTermRetrieval;
 	

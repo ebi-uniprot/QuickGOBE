@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ public class MiscellaneousIndexer implements Indexer<Miscellaneous>{
 	private SolrMapper<Miscellaneous, SolrMiscellaneous> solrMapper;
 		
 	// Log
-	private static final Logger logger = Logger.getLogger(MiscellaneousIndexer.class);
+	private static final Logger logger = LoggerFactory.getLogger(MiscellaneousIndexer.class);
 	
 	@Override
 	public void index(List<Miscellaneous> list) {

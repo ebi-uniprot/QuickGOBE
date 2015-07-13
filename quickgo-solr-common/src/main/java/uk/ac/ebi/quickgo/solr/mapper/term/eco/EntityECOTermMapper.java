@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import uk.ac.ebi.quickgo.ontology.eco.ECOTerm;
@@ -20,7 +21,7 @@ import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm.SolrTermDocumentType;
 public class EntityECOTermMapper implements EntityMapper<SolrTerm, ECOTerm>{
 
 	// Log
-	private static final Logger logger = Logger.getLogger(EntityECOTermMapper.class);
+	private static final Logger logger = LoggerFactory.getLogger(EntityECOTermMapper.class);
 	
 	@Override
 	public ECOTerm toEntityObject(Collection<SolrTerm> solrObjects) {
