@@ -198,7 +198,7 @@ public class SlimmingController {
 		if(!proteinSets.trim().isEmpty()){
 			List<String> proteinsSets = WebUtils.parseAndFormatFilterValues(proteinSets);
 			Map<String, List<String>> sets = new HashMap<>();
-			sets.put(AnnotationField.TARGETSET.getValue(), proteinsSets);
+			sets.put(AnnotationField.TARGETSETS.getValue(), proteinsSets);
 			appliedFilterSet.addParameters(sets);
 		}
 
