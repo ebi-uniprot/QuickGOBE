@@ -120,10 +120,6 @@ public class QuickGOAnnotationIndexer extends Thread{
 		this.file = file;
 	}
 
-	public static LoggerFactory.getLogger() {
-		return logger;
-	}
-
 	public GeneOntology getOntology() {
 		return ontology;
 	}
