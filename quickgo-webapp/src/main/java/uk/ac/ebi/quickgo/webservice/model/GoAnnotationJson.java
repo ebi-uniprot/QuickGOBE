@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.webservice.model;
 
-import uk.ac.ebi.quickgo.annotation.Annotation;
 import uk.ac.ebi.quickgo.web.util.NameURL;
 
 import java.util.ArrayList;
