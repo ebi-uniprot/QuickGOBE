@@ -11,7 +11,7 @@ public enum AnnotationField {
 	DBOBJECTTYPE("dbObjectType"),
 	DBOBJECTID("dbObjectID"),
 	DB("db"),
-	TARGETSET("targetSets"),
+	TARGETSETS("targetSets"),
 	DOCTYPE("docType"),
 	GOASPECT("goAspect"),
 	ASSIGNEDBY("assignedBy"),
