@@ -31,7 +31,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 	AnnotationIndexer annotationIndexer;
 
 	// Log
-	private static final Logger logger = LoggerFactory.getLogger(QuickGOAnnotationIndexer.class);
+	private final Logger logger = LoggerFactory.getLogger(QuickGOAnnotationIndexer.class);
 
 
 	NamedFile file;
@@ -53,7 +53,6 @@ public class QuickGOAnnotationIndexer extends Thread{
 
 			logger.info("indexAnnotations of file: " + file.getName() + " done: " + mm.end() + "  total indexed: " + indexed);
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error(e.getMessage());
 		}
 	}
