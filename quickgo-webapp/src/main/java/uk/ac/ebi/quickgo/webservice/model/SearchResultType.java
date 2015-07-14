@@ -7,5 +7,5 @@ package uk.ac.ebi.quickgo.webservice.model;
  * Created with IntelliJ IDEA.
  */
 public enum SearchResultType {
-	GENE_PRODUCT, GO_TERM
+	GENE_PRODUCT, TERM, GO_TERM
 }
