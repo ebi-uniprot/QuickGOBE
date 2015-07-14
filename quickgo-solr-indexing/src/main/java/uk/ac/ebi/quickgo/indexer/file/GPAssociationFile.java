@@ -122,7 +122,8 @@ public class GPAssociationFile extends GPDataFile {
 	 */
 	boolean firstRowOfChunk;
 
-	public GPAssociationFile(NamedFile f, Map<String, GenericTerm> goTerms, Map<String, GenericTerm> ecoTerms, Map<Integer, Miscellaneous> taxonomies, int chunkSize) throws Exception {
+	public  GPAssociationFile(NamedFile f, Map<String, GenericTerm> goTerms, Map<String, GenericTerm> ecoTerms,
+							  Map<Integer, Miscellaneous> taxonomies, int chunkSize) throws Exception {
 		super(f, columnCount, "gpa-version", "1.1");
 
 		this.goTerms = goTerms;

@@ -30,26 +30,26 @@ public class QuickGOAnnotationIndexer extends Thread{
 	 */
 	AnnotationIndexer annotationIndexer;
 
-	// Log
 	private final Logger logger = LoggerFactory.getLogger(QuickGOAnnotationIndexer.class);
+	private NamedFile file;
+	private GeneOntology ontology;
+	private EvidenceCodeOntology evidenceCodeOntology;
+	private	Map<Integer, Miscellaneous> taxonomies;
 
-
-	NamedFile file;
-	GeneOntology ontology;
-	EvidenceCodeOntology evidenceCodeOntology;
-
-	Map<Integer, Miscellaneous> taxonomies;
+	//TODO Increase this value to speed up the indexing process
+	private static final int CHUNK_SIZE = 150000;
 
 	public void run() {
-		int chunkSize = 150000; //TODO Increase this value to speed up the indexing process
+
 		MemoryMonitor mm = new MemoryMonitor(true);
 		try {
+
 			// gp_association files
 			logger.info("Indexing " + file.getName());
 
 			//todo make gpAssociationFile of type GpaDataFile, once the later uses Generics
-			GPAssociationFile gpAssociationFile = new GPAssociationFile(file, ontology.terms, evidenceCodeOntology.terms, taxonomies, chunkSize);
-			int indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer, chunkSize);
+			GPAssociationFile gpAssociationFile = new GPAssociationFile(file, ontology.terms, evidenceCodeOntology.terms, taxonomies, CHUNK_SIZE);
+			int indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer, CHUNK_SIZE);
 
 			logger.info("indexAnnotations of file: " + file.getName() + " done: " + mm.end() + "  total indexed: " + indexed);
 		} catch (Exception e) {
@@ -103,9 +103,6 @@ public class QuickGOAnnotationIndexer extends Thread{
 		return indexed;
 	}
 
-	public AnnotationIndexer getAnnotationIndexer() {
-		return annotationIndexer;
-	}
 
 	public void setAnnotationIndexer(AnnotationIndexer annotationIndexer) {
 		this.annotationIndexer = annotationIndexer;
@@ -119,24 +116,12 @@ public class QuickGOAnnotationIndexer extends Thread{
 		this.file = file;
 	}
 
-	public GeneOntology getOntology() {
-		return ontology;
-	}
-
 	public void setOntology(GeneOntology ontology) {
 		this.ontology = ontology;
 	}
 
-	public EvidenceCodeOntology getEvidenceCodeOntology() {
-		return evidenceCodeOntology;
-	}
-
 	public void setEvidenceCodeOntology(EvidenceCodeOntology evidenceCodeOntology) {
 		this.evidenceCodeOntology = evidenceCodeOntology;
-	}
-
-	public Map<Integer, Miscellaneous> getTaxonomies() {
-		return taxonomies;
 	}
 
 	public void setTaxonomies(Map<Integer, Miscellaneous> taxonomies) {

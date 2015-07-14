@@ -54,6 +54,7 @@ public class QuickGOIndexer implements IIndexer {
 	private String sourceFilesPath;
 
 	// annotation data comes from gp_association files
+	//This is the list of files to be read.
 	private ArrayList<NamedFile> gpaList = new ArrayList<>();
 
 	// gene product data (which may include cross-references) comes from gp_information files
@@ -65,11 +66,13 @@ public class QuickGOIndexer implements IIndexer {
 	 * and annotations in Solr
 	 */
 	public boolean index() {
+
 		// Get data files
+		logger.info("Getting data from source path {}", sourceFilesPath);
 		sourceFiles = new SourceFiles(new File(sourceFilesPath));
 
 		// Index data files
-		boolean indexingResult = indexAll(sourceFiles);
+		boolean indexingResult = indexAll();
 		if (indexingResult) {
 			logger.info("Indexing completed successfully.");
 		} else {
@@ -82,34 +85,33 @@ public class QuickGOIndexer implements IIndexer {
 	/**
 	 * controller method to index everything that needs to be indexed
 	 *
-	 * @param sourceFiles
-	 *            object that contains references to all required source data
-	 *            files
 	 * @return flag indicating whether the indexing process was successful or
 	 *         not
 	 */
-	private boolean indexAll(SourceFiles sourceFiles) {
+	private boolean indexAll() {
+
 		// assume the worst
 		MemoryMonitor mm = new MemoryMonitor(true);
+
 		// Load GPI and GPA files
 		loadFiles();
 
 		try{
 			// first index the GO data - this will also build an in-memory representation of the ontology, which will be used
 			// later when indexing the annotation data
-//todo put back			quickGOOntologyIndexer.indexOntologies(sourceFiles);
+			quickGOOntologyIndexer.indexOntologies(sourceFiles);
 
 			// index miscellaneous data
-//todo put back 			quickGOMiscellaneousIndexer.index(sourceFiles, quickGOOntologyIndexer.getOntology());
+ 			quickGOMiscellaneousIndexer.index(sourceFiles, quickGOOntologyIndexer.getOntology());
 
 			// index the gene products - this will also build a cache that will be used when indexing the annotations
-//todo put back			quickGOGeneProductIndexer.indexGeneProducts(gpiList);
+			quickGOGeneProductIndexer.indexGeneProducts(gpiList);
 
 			// index any DB Xrefs - this augments the information indexed by indexGeneProducts
-//todo put back			quickGOGeneProductIndexer.indexDBXRefs(Arrays.asList(sourceFiles.getMappingFiles()));
+			quickGOGeneProductIndexer.indexDBXRefs(Arrays.asList(sourceFiles.getMappingFiles()));
 
 			//now we can index the annotations themselves
-			indexAnnotations(gpaList, quickGOOntologyIndexer.getOntology(), quickGOOntologyIndexer.getEvidenceCodeOntology(), quickGOMiscellaneousIndexer.getTaxonomiesMap());
+			indexAnnotations();
 
 			// Index Co-Occurrence stats
 //todo put back			quickGOCOOccurrenceStatsIndexer.index();
@@ -126,36 +128,37 @@ public class QuickGOIndexer implements IIndexer {
 
 	/**
 	 * Index annotations creating a thread for each file
-	 * @param gpaList List of files
-	 * @param ontology List of ontologies
-	 * @param taxonomiesMap Listo of taxonomies
 	 * @throws SolrServerException
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private void indexAnnotations(ArrayList<NamedFile> gpaList, GeneOntology ontology,
-								  EvidenceCodeOntology evidenceCodeOntology, Map<Integer, Miscellaneous> taxonomiesMap)
-			throws SolrServerException, IOException, InterruptedException {
+	private void indexAnnotations()	throws SolrServerException, IOException, InterruptedException {
 
-		List<QuickGOAnnotationIndexer> goAnnotationIndexers = new ArrayList<>();
+
 		annotationIndexer.deleteAll();
+
 		//Iterate over list of files and create a thread to process each of them
+		List<QuickGOAnnotationIndexer> goAnnotationIndexers = new ArrayList<>();
 		for(NamedFile file : gpaList){
-			QuickGOAnnotationIndexer quickGOAnnotationIndexer = new QuickGOAnnotationIndexer();
-			quickGOAnnotationIndexer.setFile(file);
-			quickGOAnnotationIndexer.setOntology(ontology);
-			quickGOAnnotationIndexer.setEvidenceCodeOntology(evidenceCodeOntology);
-			quickGOAnnotationIndexer.setTaxonomies(taxonomiesMap);
-			quickGOAnnotationIndexer.setAnnotationIndexer(annotationIndexer);
-			quickGOAnnotationIndexer.start();
-			goAnnotationIndexers.add(quickGOAnnotationIndexer);
+			goAnnotationIndexers.add(createAnnotationIndexer(file));
 		}
-		// Wait for all the threads to finish to continue with the indexing process
+
+		// This thread will wait for all the QuickGOAnnotationIndexer threads to finish to continue with the indexing process
 		for(QuickGOAnnotationIndexer goAnnotationIndexer : goAnnotationIndexers){
 			goAnnotationIndexer.join();
 		}
 	}
 
+	private QuickGOAnnotationIndexer createAnnotationIndexer(NamedFile file) {
+		QuickGOAnnotationIndexer quickGOAnnotationIndexer = new QuickGOAnnotationIndexer();
+		quickGOAnnotationIndexer.setFile(file);
+		quickGOAnnotationIndexer.setOntology(quickGOOntologyIndexer.getOntology());
+		quickGOAnnotationIndexer.setEvidenceCodeOntology(quickGOOntologyIndexer.getEvidenceCodeOntology());
+		quickGOAnnotationIndexer.setTaxonomies(quickGOMiscellaneousIndexer.getTaxonomiesMap());
+		quickGOAnnotationIndexer.setAnnotationIndexer(annotationIndexer);
+		quickGOAnnotationIndexer.start();
+		return quickGOAnnotationIndexer;
+	}
 
 
 	/**
@@ -172,15 +175,9 @@ public class QuickGOIndexer implements IIndexer {
 		}
 	}
 
-//	public String getSourceFilesPath() {
-//		return sourceFilesPath;
-//	}
 
 	public void setSourceFilesPath(String sourceFilesPath) {
 		this.sourceFilesPath = sourceFilesPath;
 	}
 
-	public SourceFiles getSourceFiles() {
-		return sourceFiles;
-	}
 }
