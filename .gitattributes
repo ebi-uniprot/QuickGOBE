@@ -346,7 +346,6 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/annotation/SlimmingUtilI
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryProcessor.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryProcessorImpl.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/QueryTo.java -text
-quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/Evidence.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/FilterRequestToSolr.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/FiltersContainer.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/MappingFactory.java -text
