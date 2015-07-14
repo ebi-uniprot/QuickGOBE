@@ -1,8 +1,14 @@
+quickgo-common-util/*.iml
 quickgo-common-util/target
+quickgo-main/*.iml
 quickgo-main/.settings/org.eclipse.core.resources.prefs
 quickgo-main/target
+quickgo-service/*.iml
 quickgo-solr-common/*.iml
 quickgo-solr-common/target
+quickgo-solr-indexing/*.iml
 quickgo-solr-indexing/target
+quickgo-solr-query/*.iml
 quickgo-solr/target
+quickgo-webapp/*.iml
 quickgo-webapp/src/main/webapp/js/uniprot.js
