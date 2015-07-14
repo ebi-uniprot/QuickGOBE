@@ -114,7 +114,7 @@ public class QuickGOIndexer implements IIndexer {
 			indexAnnotations();
 
 			// Index Co-Occurrence stats
-//todo put back			quickGOCOOccurrenceStatsIndexer.index();
+			quickGOCOOccurrenceStatsIndexer.index();
 
 		} catch (Exception e) {
 			logger.error(e.getMessage());
