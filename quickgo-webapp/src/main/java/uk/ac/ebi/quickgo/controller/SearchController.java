@@ -486,13 +486,19 @@ public class SearchController {
 				break;
 			}
 
-			if ((genericTerm.getName() != null && genericTerm.getName().toLowerCase().trim().matches(regex))
-				|| (!genericTerm.getSynonyms().isEmpty() && genericTerm.getSynonyms().get(0).getName().toLowerCase().trim().matches(regex))) {
+			if (genericTerm.getName() != null) {
 
-				KeyValuePair keyValuePair = new KeyValuePair(null, null);
-				//results.add(genericTerm);
+				if(genericTerm.getName().toLowerCase().trim().matches(regex)){
+					TypeAheadResult typeAheadResult = new TypeAheadResult(genericTerm.getId(), genericTerm.getName(), SearchResultType.TERM);
+					results.add(typeAheadResult);
+				}else {
+					if (!genericTerm.getSynonyms().isEmpty() && genericTerm.getSynonyms().get(0).getName().toLowerCase().trim().matches(regex)) {
+						TypeAheadResult typeAheadResult = new TypeAheadResult(genericTerm.getId(), genericTerm.getSynonyms().get(0).getName(), SearchResultType.TERM);
+						results.add(typeAheadResult);
+
+					}
+				}
 			}
-
 		}
 	}
 
@@ -526,18 +532,18 @@ public class SearchController {
 	private void addTermsIds(List<TypeAheadResult> results, List<GenericTerm> terms, String regex) {
 
 
-		for (GenericTerm term : terms) {
+		for (GenericTerm genericTerm : terms) {
 
 			if(results.size()>= NUMBER_SHOWN_HITS){
 				break;
 			}
 
 			//Don't want to add synonyms to results when we are looking for specific ECO/GO ids
-			if (term.getId() != null && (term.getId().toLowerCase().trim().matches(regex) ||
-					(term.getId() + term.getName()).toLowerCase().trim().matches(regex))) {
+			if (genericTerm.getId() != null && (genericTerm.getId().toLowerCase().trim().matches(regex) ||
+					(genericTerm.getId() + genericTerm.getName()).toLowerCase().trim().matches(regex))) {
 
-				KeyValuePair keyValuePair = new KeyValuePair(null, null);
-				//results.add();
+				TypeAheadResult typeAheadResult = new TypeAheadResult(genericTerm.getId(), genericTerm.getName(), SearchResultType.TERM);
+				results.add(typeAheadResult);
 			}
 		}
 	}
