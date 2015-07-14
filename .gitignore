@@ -1,3 +1,5 @@
+/*.idea
+/*.iml
 quickgo-common-util/*.iml
 quickgo-common-util/target
 quickgo-main/*.iml
