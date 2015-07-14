@@ -164,7 +164,8 @@ public class GPAssociationFile extends GPDataFile {
 
 		//Get associated term to get its name
 		GOTerm goTerm = (GOTerm)goTerms.get(gpaFile.goID);
-
+		logger.debug("Try and create GOTerm based on goId {}",gpaFile.goID );
+		logger.debug("Size of goTerms is {}", goTerms.size());
 		logger.debug("Created a new GOTerm {}", goTerm);
 
 		// Create annotation
