@@ -1,5 +1,8 @@
 package uk.ac.ebi.quickgo.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Progress {
     long time;
     int count;
@@ -7,6 +10,8 @@ public class Progress {
     private String name;
     Runtime rt = Runtime.getRuntime();
     RowReader.ProgressMonitor monitor;
+
+    private static final Logger logger = LoggerFactory.getLogger(Progress.class);
 
 
     public Progress(RowReader.ProgressMonitor monitor, String name) {
@@ -21,7 +26,7 @@ public class Progress {
 
     public void reset() {
         count = 0;
-        System.out.print(name + ":");
+        logger.info(name + ":");
         time = System.nanoTime();
 
         startMemory = memory();
@@ -34,10 +39,10 @@ public class Progress {
                 long now = System.nanoTime();
                 double pct = monitor.getFraction();
                 String estimate = (pct == 0) ? "" : (int)((now - time) / pct * (1 - pct) / Interval.SECOND_NS) + "s";
-                System.out.print("[" + (int)(pct * 100) + "%" + estimate + memory / 1048576 + "MB]");
+                logger.info("[" + (int)(pct * 100) + "%" + estimate + memory / 1048576 + "MB]");
             }
             else {
-                System.out.print("[" + count / 100000 + ":" + memory / 1048576 + "MB]");
+                logger.info("[" + count / 100000 + ":" + memory / 1048576 + "MB]");
             }
         }
     }
@@ -52,7 +57,7 @@ public class Progress {
     	time = System.nanoTime() - time;
         long usedMemory = memory() - startMemory;
         String message = ":" + time / Interval.SECOND_NS + "s " + count + " " + (count == 0 ? "" : time / count + " ns " + usedMemory / count + " bytes each");
-        System.out.println(message);
+        logger.info(message);
     }
 
 

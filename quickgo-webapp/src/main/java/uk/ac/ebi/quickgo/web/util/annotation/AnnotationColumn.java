@@ -4,6 +4,8 @@ import java.io.StringWriter;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
@@ -52,11 +54,14 @@ public enum AnnotationColumn {
 	ORIGINALTERMNAME("termName","Original Term Name","originaltermname",false,false),
 	ORIGINALWITH("with","With","with",true,true),
 	ORIGINALEXTENSION("extension","Annotation Extension","extension",true,false);
+
 	private String id;
 	private String description;
 	private String name;
 	private boolean checkedByDefault;
 	private boolean showURL;
+
+	private static final Logger logger = LoggerFactory.getLogger(AnnotationColumn.class);
 
 	AnnotationColumn(String id, String description, String name, boolean checkedByDefault, boolean showURL){
 		this.id= id;
@@ -287,7 +292,7 @@ public enum AnnotationColumn {
 
 		mapper.writeValue(writer, termJson);
 		String result = writer.toString();
-		System.out.println(result);
+		logger.debug("Created Json version of Term object in AnnotationColumn {}",result);
 		return result;
 	}
 
@@ -298,7 +303,7 @@ public enum AnnotationColumn {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.writeValue(writer, ontologyGraphJson);
 		String result = writer.toString();
-		System.out.println(result);
+		logger.debug("Created Json version of OntologyGraph object in AnnotationColumn {}",result);
 		return result;
 	}
 
@@ -309,7 +314,7 @@ public enum AnnotationColumn {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.writeValue(writer, target);
 		String result = writer.toString();
-		System.out.println(result);
+		logger.debug("Created Json version of Object in AnnotationColumn {}",result);
 		return result;
 	}
 

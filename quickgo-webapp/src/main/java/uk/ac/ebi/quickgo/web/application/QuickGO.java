@@ -5,12 +5,16 @@ import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.ebi.quickgo.web.configuration.Configuration;
 
 /**
  * singleton class that is in overall control of the execution of the web server
  */
 public class QuickGO {
+
+    private static final Logger logger = LoggerFactory.getLogger(QuickGO.class);
 //    final public QuickGOMonitor monitor;
 //    final public DataManager dataManager = new DataManager();
 //    final public UpdateSchedule updateSchedule = new UpdateSchedule(this);
@@ -26,7 +30,7 @@ public class QuickGO {
 
     public boolean down;
     public boolean quit;
-    
+
     public QuickGO(String initParameter) {
 //        dispatcher = new Dispatcher(this);
         configFile = initParameter;
@@ -34,7 +38,7 @@ public class QuickGO {
         hostName = getHostName();
         uniqueID = unique();
 //        monitor = new QuickGOMonitor(this);
-        System.out.println("Configuring");
+		logger.info("Configuring");
         setConfiguration(createConfiguration());
 //        updateSchedule.now();
     }
@@ -86,7 +90,7 @@ public class QuickGO {
     private void setConfiguration(Configuration cfg) {
         synchronized (this) {
             activeConfiguration = cfg;
-        }        
+        }
     }
 
     public void update() {

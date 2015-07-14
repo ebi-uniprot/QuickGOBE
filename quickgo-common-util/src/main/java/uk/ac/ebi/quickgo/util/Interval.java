@@ -1,10 +1,14 @@
 package uk.ac.ebi.quickgo.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Interval {
     private long nanos;
+    private static final Logger logger = LoggerFactory.getLogger(Interval.class);
 
     public Interval(String input) {
         nanos = getNanosFromString(input);
@@ -101,7 +105,7 @@ public class Interval {
     /**
      * Convert time interval from milliseconds to string, using compact format.
      *
-     * @param time milliseconds     
+     * @param time milliseconds
      * @return textual representation of time interval
      */
     public static String getTextFromMillis(long time) {
@@ -153,10 +157,10 @@ public class Interval {
 	            if (english && q > 1) {
 	            	sb.append("s");
 	            }
-	
+
 	            sb.append(" ");
 	        }
-	
+
 	        return sb.toString();
         }
     }
@@ -183,9 +187,9 @@ public class Interval {
     }
 
     public static void main(String[] args) {
-        System.out.println(getTextFromNanos(DAY_NS * 3 + MINUTE_NS, true, 2));
-        System.out.println(getTextFromNanos(DAY_NS * 3 + MINUTE_NS, true, 3));
-        System.out.println(getTextFromNanos(HOUR_NS * 3 +SECOND_NS * 88 + 44, false, -1));
-        System.out.println(getNanosFromString(".. 1 day 3 hours 77ms 8US"));
+       logger.info(getTextFromNanos(DAY_NS * 3 + MINUTE_NS, true, 2));
+       logger.info(getTextFromNanos(DAY_NS * 3 + MINUTE_NS, true, 3));
+       logger.info(getTextFromNanos(HOUR_NS * 3 +SECOND_NS * 88 + 44, false, -1));
+       logger.info(Long.toString(getNanosFromString(".. 1 day 3 hours 77ms 8US")));
     }
 }

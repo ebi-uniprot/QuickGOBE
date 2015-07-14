@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.indexer.IIndexer;
 import uk.ac.ebi.quickgo.util.MemoryMonitor;
@@ -37,6 +39,8 @@ public abstract class GPDataFile {
 
 	private final static Pattern directivePattern = Pattern.compile("^!\\s*([A-Za-z0-9_\\.-]+)\\s*:\\s*([A-Za-z0-9_\\.-]+)");
 	private final static Matcher directiveMatcher = directivePattern.matcher("");
+
+	private static final Logger logger = LoggerFactory.getLogger(GPDataFile.class);
 
 	public GPDataFile(NamedFile f, int columnCount, String versionDirective, String versionSupported) throws Exception {
 		this.gpdf = f;
@@ -142,7 +146,7 @@ public abstract class GPDataFile {
 
 	public int load(IIndexer indexer) throws Exception {
 		MemoryMonitor mm = new MemoryMonitor(true);
-		System.out.println("\nLoad " + getName());
+		logger.info("\nLoad " + getName());
 
 		// make sure we're dealing with a file that's in the expected format
 		checkVersion();
@@ -164,7 +168,7 @@ public abstract class GPDataFile {
 		}
 
 		reader.close();
-		System.out.println("Load " + getName() + " done - " + mm.end());
+		logger.info("Load " + getName() + " done - " + mm.end());
 		return count;
 	}
 

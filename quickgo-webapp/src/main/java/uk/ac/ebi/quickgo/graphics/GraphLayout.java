@@ -1,5 +1,8 @@
 package uk.ac.ebi.quickgo.graphics;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +42,8 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
         TOP, LEFT, BOTTOM, RIGHT
     }
 
+    final static Logger logger = LoggerFactory.getLogger(GraphLayout.class);
+
     /**
      * Prepare for layout
      *
@@ -60,7 +65,7 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
             HierarchicalNode child = nodeMap.get(e.getChild());
 
             if (parent == null || child == null) {
-            	System.out.println("Failed edge "+e.getParent()+(parent==null?":NOT FOUND ":" ")+e.getChild()+(child==null?":NOT FOUND ":" "));
+                logger.info("Failed edge " + e.getParent() + (parent == null ? ":NOT FOUND " : " ") + e.getChild() + (child == null ? ":NOT FOUND " : " "));
             }
             else {
             	originalEdges.add(new EdgeMapping(e,parent,child));

@@ -1,7 +1,10 @@
 /**
- * 
+ *
  */
 package uk.ac.ebi.quickgo.util;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -10,11 +13,14 @@ import java.util.Set;
 
 /**
  * Class that represents a Controlled Vocabulary
- * 
+ *
  * @author tonys
  *
  */
 public class CV {
+
+	final static Logger logger = LoggerFactory.getLogger(CV.class);
+
 	public static class Item {
 	    public String code;
 	    public String description;
@@ -113,7 +119,7 @@ public class CV {
 	}
 
 	public void dump(String tag) {
-		System.out.println("Dump of CV: " + tag);
+		logger.info("Dump of CV: " + tag);
 		for (String key : vocabulary.keySet()) {
 			Item item = vocabulary.get(key);
 			System.out.println(key + " => " + item);
