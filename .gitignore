@@ -12,6 +12,7 @@ quickgo-solr-common/target
 quickgo-solr-indexing/*.iml
 quickgo-solr-indexing/target
 quickgo-solr-query/*.iml
+quickgo-solr/*.iml
 quickgo-solr/target
 quickgo-webapp/*.iml
 quickgo-webapp/src/main/webapp/js/uniprot.js
