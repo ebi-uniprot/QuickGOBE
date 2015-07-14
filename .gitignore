@@ -4,6 +4,7 @@ quickgo-main/*.iml
 quickgo-main/.settings/org.eclipse.core.resources.prefs
 quickgo-main/target
 quickgo-service/*.iml
+quickgo-service/target/generated-test-sources
 quickgo-solr-common/*.iml
 quickgo-solr-common/target
 quickgo-solr-indexing/*.iml
