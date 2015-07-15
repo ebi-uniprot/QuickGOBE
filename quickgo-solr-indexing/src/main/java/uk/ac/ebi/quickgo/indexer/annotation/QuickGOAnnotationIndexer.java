@@ -53,7 +53,8 @@ public class QuickGOAnnotationIndexer extends Thread{
 
 			logger.info("indexAnnotations of file: " + file.getName() + " done: " + mm.end() + "  total indexed: " + indexed);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 	}
 
