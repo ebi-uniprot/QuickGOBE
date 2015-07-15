@@ -147,7 +147,7 @@ public class GPAssociationFile extends GPDataFile {
 		//Populate data from file
 		GpaFile gpaFile = new GpaFile(columns);
 
-		logger.debug("Created a new GpaFile {}", gpaFile);
+		logger.info("Created a new GpaFile {}", gpaFile);
 
 		// Get gene products chunk from Solr
 		getGeneProductsChunk(gpaFile.dbObjectID);
@@ -165,9 +165,9 @@ public class GPAssociationFile extends GPDataFile {
 
 		//Get associated term to get its name
 		GOTerm goTerm = (GOTerm)goTerms.get(gpaFile.goID);
-		logger.debug("Try and create GOTerm based on goId {}",gpaFile.goID );
-		logger.debug("Size of goTerms is {}", goTerms.size());
-		logger.debug("Created a new GOTerm {}", goTerm);
+		logger.info("Try and create GOTerm based on goId {}",gpaFile.goID );
+		logger.info("Size of goTerms is {}", goTerms.size());
+		logger.info("Created a new GOTerm {}", goTerm);
 
 		// Create annotation
 		GOAnnotation annotation = new GOAnnotation(gpaFile.db, gpaFile.dbObjectID, gpaFile.qualifier, gpaFile.goID, goTerm.getName(), goTerm.getOntologyText(), gpaFile.ecoID, goEvidence,
