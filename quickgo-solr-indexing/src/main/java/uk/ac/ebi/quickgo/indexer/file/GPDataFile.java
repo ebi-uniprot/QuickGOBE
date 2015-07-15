@@ -6,6 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -60,8 +64,10 @@ public abstract class GPDataFile {
 	    BufferedReader reader;
 
 		public void open() throws IOException {
-			reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(gpdf.getDirectory() + File.separator + gpdf.getName())), "UTF8"));
-	    }
+			//reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(gpdf.getDirectory() + File.separator + gpdf.getName())), "UTF8"));
+			Path path = FileSystems.getDefault().getPath(gpdf.getDirectory()+ File.separator, gpdf.getName());
+			reader = Files.newBufferedReader(path, Charset.defaultCharset());
+		}
 
 	    public void close() throws IOException {
 	        if (reader != null) {
