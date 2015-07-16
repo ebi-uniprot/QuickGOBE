@@ -187,7 +187,7 @@ public class GPAssociationFile extends GPDataFile {
 		annotation.setAncestorsIPOR(goTerm.getAncestorIDs(EnumSet.of(RelationType.ISA, RelationType.IDENTITY, RelationType.PARTOF, RelationType.OCCURSIN, RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES)));
 
 		// ECO Ancestors
-		ECOTerm ecoTerm = (ECOTerm)ecoTerms.get(gpaFile.ecoID);
+		GenericTerm ecoTerm = ecoTerms.get(gpaFile.ecoID);
 		annotation.setEcoAncestorsI(ecoTerm.getAncestorIDs(EnumSet.of(RelationType.ISA, RelationType.IDENTITY)));
 
 		return annotation;
