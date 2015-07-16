@@ -15,6 +15,7 @@ import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.solr.indexing.Indexer;
 import uk.ac.ebi.quickgo.solr.indexing.service.annotation.AnnotationIndexer;
 import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
+import uk.ac.ebi.quickgo.util.CPUUtils;
 import uk.ac.ebi.quickgo.util.MemoryMonitor;
 
 /**
@@ -38,6 +39,8 @@ public class QuickGOAnnotationIndexer extends Thread{
 
 	//TODO Increase this value to speed up the indexing process
 	private static final int CHUNK_SIZE = 150000;
+	private long rowCreationTime;
+	private long solrCallTime;
 
 	public void run() {
 
@@ -51,6 +54,9 @@ public class QuickGOAnnotationIndexer extends Thread{
 			GPAssociationFile gpAssociationFile = new GPAssociationFile(file, ontology.terms, evidenceCodeOntology.terms, taxonomies, CHUNK_SIZE);
 			int indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer, CHUNK_SIZE);
 
+			logger.info("Total row creation time was {}", rowCreationTime);
+			logger.info("Total cache creation time was {}", gpAssociationFile.cacheCreationTime);
+			logger.info("Total Solr indexing call time was {}", solrCallTime);
 			logger.info("indexAnnotations of file: " + file.getName() + " done: " + mm.end() + "  total indexed: " + indexed);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -79,16 +85,31 @@ public class QuickGOAnnotationIndexer extends Thread{
 		int indexed = 0;
 		int count = 0;
 		String[] columns;
+
+
+
 		while ((columns = gpDataFile.reader.readRecord()) != null) {
-			rows.add(gpDataFile.calculateRow(columns));// Calculate next row and add it to the chunk
+
+			// Calculate next row and add it to the chunk
+			long rowCreationStart = CPUUtils.getCpuTime();
+			GOAnnotation annotation = gpDataFile.calculateRow(columns);
+			annotation.setDocType(GOAnnotation.SolrAnnotationDocumentType.ANNOTATION.getValue());
+			rows.add(annotation);
+			rowCreationTime+=CPUUtils.getCpuTime()-rowCreationStart;
+
 			count++;
 			if (count == chunkSize) {// If the chunk size is reached, index it and reset the counters
+
+				long solrCallStart = CPUUtils.getCpuTime();
 				solrIndexer.index(rows);
+				solrCallTime += CPUUtils.getCpuTime()-solrCallStart;
+
 				indexed = indexed + count;
 				count = 0;
 				rows = new ArrayList<>();
+
 				// Set first row of chunk to true
-				gpDataFile.setFirstRowOfChunk(true);
+				gpDataFile.newChunk();
 			}
 		}
 

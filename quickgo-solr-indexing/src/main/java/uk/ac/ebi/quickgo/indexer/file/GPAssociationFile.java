@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//import org.slf4j.Logger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -19,7 +18,6 @@ import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 import uk.ac.ebi.quickgo.indexer.IIndexer;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
-import uk.ac.ebi.quickgo.ontology.eco.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.RelationType;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
@@ -31,6 +29,7 @@ import uk.ac.ebi.quickgo.solr.query.model.geneproduct.enums.GeneProductField;
 import uk.ac.ebi.quickgo.solr.query.model.miscellaneous.enums.MiscellaneousField;
 import uk.ac.ebi.quickgo.solr.query.service.geneproduct.GeneProductRetrieval;
 import uk.ac.ebi.quickgo.solr.query.service.miscellaneous.MiscellaneousRetrieval;
+import uk.ac.ebi.quickgo.util.CPUUtils;
 
 /**
  * class to represent (and read on a row-by-row basis) a gp_association (GPAD)
@@ -77,49 +76,24 @@ public class GPAssociationFile extends GPDataFile {
 	private final static Pattern goEvidencePropertyPattern = Pattern.compile("go_evidence=([A-Z]{2,3})");
 	private final static Matcher goEvidencePropertyMatcher = goEvidencePropertyPattern.matcher("");
 
-	/**
-	 * Gene Products cache retrieval
-	 */
+	//retrieval classes
 	CacheRetrievalImpl<GeneProduct> gpCacheRetrieval;
-
-	/**
-	 * Gene product retrieval
-	 */
 	GeneProductRetrieval geneProductRetrieval;
-
-	/**
-	 * Miscellaneous retrieval
-	 */
 	MiscellaneousRetrieval miscellaneousRetrieval;
-
-	/**
-	 * Miscellaneous cache retrieval
-	 */
 	CacheRetrievalImpl<Miscellaneous> miscellaneousCacheRetrieval;
 
-	/**
-	 * The complete set of gene ontology terms
-	 */
+	//Stores
 	Map<String, GenericTerm> goTerms;
-
-	/**
-	 * The complete set of eco terms
-	 */
 	Map<String, GenericTerm> ecoTerms;
-
-	/**
-	 * The complete set of taxonomies
-	 */
 	Map<Integer, Miscellaneous> taxonomies;
 
-	/**
-	 * Chunk size of gene products to read
-	 */
+	//Chunk size of gene products to read
 	int chunkSize = 0;
 
-	/**
-	 * Indicates if it's the first row of the chunk to index in order to read the next chunk of gene products
-	 */
+	//Performance monitoring
+	public long cacheCreationTime;
+
+	//Indicates if it's the first row of the chunk to index in order to read the next chunk of gene products
 	boolean firstRowOfChunk;
 
 	public  GPAssociationFile(NamedFile f, Map<String, GenericTerm> goTerms, Map<String, GenericTerm> ecoTerms,
@@ -140,16 +114,28 @@ public class GPAssociationFile extends GPDataFile {
 		firstRowOfChunk = true;
 	}
 
+
+	public void newChunk() {
+		this.firstRowOfChunk = true;
+	}
+
+	@Override
+	public boolean index(IIndexer indexer, String[] columns) throws Exception {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	/**
 	 * Builds an annotation from the read row
 	 */
 	public GOAnnotation calculateRow(String[] columns) throws Exception {
+
 		//Populate data from file
 		GpaFile gpaFile = new GpaFile(columns);
 
 		logger.info("Created a new GpaFile {}", gpaFile);
 
-		// Get gene products chunk from Solr
+		// Get gene products, properties and sequences chunk from Solr and add to cache
 		getGeneProductsChunk(gpaFile.dbObjectID);
 
 		// extract the GO evidence code from the annotation properties
@@ -193,6 +179,8 @@ public class GPAssociationFile extends GPDataFile {
 		return annotation;
 	}
 
+
+
 	/**
 	 * Given an annotation, calculates the taxonomy closure and target set of its gene product
 	 * @param annotation Annotation
@@ -231,64 +219,78 @@ public class GPAssociationFile extends GPDataFile {
 	 */
 	private void getGeneProductsChunk(String dbObjectID) throws SolrServerException {
 
-		// If it's the first row of the annotations chunk to index, then get the next chunk of gene products of this gene product and put them into the cache
+		// If it's the first row of the annotations chunk to index, then get the next chunk of gene products of this
+		// gene product and put them into the cache
 		if (firstRowOfChunk) {
+
+			long start = CPUUtils.getCpuTime();
+
 			// Clean gene products cache
 			gpCacheRetrieval.getCacheBuilder().clearCache();
 
 			firstRowOfChunk = false;
-			List<GeneProduct> geneProducts = geneProductRetrieval.findByQuery(
-							GeneProductField.DOCTYPE.getValue()
-							+ ":("
-							+ SolrGeneProductDocumentType.GENEPRODUCT
-									.getValue() + " OR " + SolrGeneProductDocumentType.XREF.getValue() +") AND "
-							+ GeneProductField.DBOBJECTID.getValue() + ":["
-							+ dbObjectID + " TO *]", chunkSize);
-			// Add them to the cache
-			for (GeneProduct geneProduct : geneProducts) {
-				gpCacheRetrieval.getCacheBuilder().addEntry(geneProduct.getDbObjectId(), geneProduct);
-			}
+			List<GeneProduct> geneProducts = lookupGeneProductsAndAddToCache(dbObjectID);
 
 			if(geneProducts.size() > 0){
 
-				// Get Properties
-				List<GeneProduct> properties = geneProductRetrieval.findByQuery(
-						GeneProductField.DOCTYPE.getValue()
-						+ ":"
-						+ SolrGeneProductDocumentType.PROPERTY
-								.getValue() + " AND "
-						+ GeneProductField.DBOBJECTID.getValue() + ":["
-						+ dbObjectID + " TO " + geneProducts.get(geneProducts.size()-1).getDbObjectId() + "]", -1);
-				// Set properties
-				for(GeneProduct property : properties){
-					gpCacheRetrieval.getCacheBuilder().cachedValue(property.getDbObjectId()).setGeneProductProperties(property.getGeneProductProperties());
-				}
-
-				// Get sequences
-				List<Miscellaneous> miscellaneousList = miscellaneousRetrieval.findByQuery(
-						MiscellaneousField.TYPE.getValue() + ":"
-								+ SolrMiscellaneousDocumentType.SEQUENCE.getValue()
-								+ " AND " + MiscellaneousField.DBOBJECTID.getValue() + ":["
-								+ dbObjectID + " TO " + geneProducts.get(geneProducts.size()-1).getDbObjectId() + "]", -1);
-				// Clear previous cached values
-				miscellaneousCacheRetrieval.getCacheBuilder().clearCache();
-				// Add new values to cache
-				for(Miscellaneous miscellaneous : miscellaneousList){
-					miscellaneousCacheRetrieval.getCacheBuilder().addEntry(miscellaneous.getDbObjectID(), miscellaneous);
-				}
+				lookupGenePropertiesAndAddToCache(dbObjectID, geneProducts);
+				lookupSequencesAndAddToCache(dbObjectID, geneProducts);
 			}
+
+			cacheCreationTime+=CPUUtils.getCpuTime()-start;
 		}
 	}
 
-	public void setFirstRowOfChunk(boolean firstRowOfChunk) {
-		this.firstRowOfChunk = firstRowOfChunk;
+	private void lookupSequencesAndAddToCache(String dbObjectID, List<GeneProduct> geneProducts) throws SolrServerException {
+		List<Miscellaneous> miscellaneousList = miscellaneousRetrieval.findByQuery(
+				MiscellaneousField.TYPE.getValue() + ":"
+						+ SolrMiscellaneousDocumentType.SEQUENCE.getValue()
+						+ " AND " + MiscellaneousField.DBOBJECTID.getValue() + ":["
+						+ dbObjectID + " TO " + geneProducts.get(geneProducts.size()-1).getDbObjectId() + "]", -1);
+
+		// Clear previous cached values
+		miscellaneousCacheRetrieval.getCacheBuilder().clearCache();
+
+		// Add new values to cache
+		for(Miscellaneous miscellaneous : miscellaneousList){
+			miscellaneousCacheRetrieval.getCacheBuilder().addEntry(miscellaneous.getDbObjectID(), miscellaneous);
+		}
 	}
 
-	@Override
-	public boolean index(IIndexer indexer, String[] columns) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+	private void lookupGenePropertiesAndAddToCache(String dbObjectID, List<GeneProduct> geneProducts) throws SolrServerException {
+		List<GeneProduct> properties = geneProductRetrieval.findByQuery(
+				GeneProductField.DOCTYPE.getValue()
+				+ ":"
+				+ SolrGeneProductDocumentType.PROPERTY
+						.getValue() + " AND "
+				+ GeneProductField.DBOBJECTID.getValue() + ":["
+				+ dbObjectID + " TO " + geneProducts.get(geneProducts.size()-1).getDbObjectId() + "]", -1);
+
+		// Set properties
+		for(GeneProduct property : properties){
+			gpCacheRetrieval.getCacheBuilder().cachedValue(property.getDbObjectId()).setGeneProductProperties(property.getGeneProductProperties());
+		}
 	}
+
+	private List<GeneProduct> lookupGeneProductsAndAddToCache(String dbObjectID) throws SolrServerException {
+		List<GeneProduct> geneProducts = geneProductRetrieval.findByQuery(GeneProductField.DOCTYPE.getValue()
+				+ ":("
+				+ SolrGeneProductDocumentType.GENEPRODUCT.getValue()
+				+ " OR "
+				+ SolrGeneProductDocumentType.XREF.getValue()
+				+") AND "
+				+ GeneProductField.DBOBJECTID.getValue()
+				+ ":["
+				+ dbObjectID
+				+ " TO *]", chunkSize);
+
+		// Add them to the cache
+		for (GeneProduct geneProduct : geneProducts) {
+			gpCacheRetrieval.getCacheBuilder().addEntry(geneProduct.getDbObjectId(), geneProduct);
+		}
+		return geneProducts;
+	}
+
 
 	private class GpaFile{
 
