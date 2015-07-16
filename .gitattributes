@@ -43,6 +43,7 @@ quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/render/Format.java -text svn
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/render/JSONSerialise.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/statistic/COOccurrenceStatsTerm.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/AbstractReferenceValueMap.java -text svneol=unset#text/plain
+quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/CPUUtils.java -text
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/CV.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/CollectionUtils.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/ColourList.java -text svneol=unset#text/plain
