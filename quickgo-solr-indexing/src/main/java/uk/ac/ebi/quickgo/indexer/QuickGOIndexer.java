@@ -82,6 +82,10 @@ public class QuickGOIndexer implements IIndexer {
 	}
 
 
+	public void setSourceFilesPath(String sourceFilesPath) {
+		this.sourceFilesPath = sourceFilesPath;
+	}
+
 	/**
 	 * controller method to index everything that needs to be indexed
 	 *
@@ -175,9 +179,5 @@ public class QuickGOIndexer implements IIndexer {
 		}
 	}
 
-
-	public void setSourceFilesPath(String sourceFilesPath) {
-		this.sourceFilesPath = sourceFilesPath;
-	}
 
 }
