@@ -45,22 +45,26 @@ public class QuickGOAnnotationIndexer extends Thread{
 	public void run() {
 
 		MemoryMonitor mm = new MemoryMonitor(true);
+		GPAssociationFile gpAssociationFile = null;
+		int indexed=0;
 		try {
 
 			// gp_association files
 			logger.info("Indexing " + file.getName());
 
 			//todo make gpAssociationFile of type GpaDataFile, once the later uses Generics
-			GPAssociationFile gpAssociationFile = new GPAssociationFile(file, ontology.terms, evidenceCodeOntology.terms, taxonomies, CHUNK_SIZE);
-			int indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer, CHUNK_SIZE);
+			 gpAssociationFile = new GPAssociationFile(file, ontology.terms, evidenceCodeOntology.terms, taxonomies, CHUNK_SIZE);
+			 indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer, CHUNK_SIZE);
 
-			logger.info("Total row creation time was {}", rowCreationTime);
-			logger.info("Total cache creation time was {}", gpAssociationFile.cacheCreationTime);
-			logger.info("Total Solr indexing call time was {}", solrCallTime);
-			logger.info("indexAnnotations of file: " + file.getName() + " done: " + mm.end() + "  total indexed: " + indexed);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage(),e);
+		}finally{
+
+			logger.info("Total row creation time was {}", rowCreationTime);
+			logger.info("Total cache creation time was {}", gpAssociationFile!=null?gpAssociationFile.cacheCreationTime:null);
+			logger.info("Total Solr indexing call time was {}", solrCallTime);
+			logger.info("indexAnnotations of file: " + file.getName() + " done: " + mm.end() + "  total indexed: " + indexed);
 		}
 	}
 
