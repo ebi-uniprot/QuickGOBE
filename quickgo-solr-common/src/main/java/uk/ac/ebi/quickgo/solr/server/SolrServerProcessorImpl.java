@@ -129,10 +129,8 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 		solrQuery.setRows(Integer.MAX_VALUE);
 		solrQuery.setFields(fieldID + "," + fields);// Fields to return
 		QueryResponse queryResponse = getSolrServer().query(solrQuery);
-		SolrDocumentList solrDocumentList = queryResponse.getResults();
-		Iterator<SolrDocument> iterator = solrDocumentList.iterator();
-		while (iterator.hasNext()) {
-			SolrDocument solrDocument = iterator.next();
+
+		for (SolrDocument solrDocument : queryResponse.getResults()) {
 			String id = String.valueOf(solrDocument.getFieldValue(fieldID));
 			Map<String, String> fieldValues = new HashMap<>();
 			for (String field : fields.split(",")) {
@@ -145,7 +143,7 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	
 	@Override
 	public Map<String, Integer> getFacetTermsWithPivot(SolrQuery solrQuery) throws SolrServerException {
-		Map<String, Integer> countsMap = new HashMap<String, Integer>();
+		Map<String, Integer> countsMap = new HashMap<>();
 		solrQuery.setRows(0);//Don't actually request any data
 		QueryResponse queryResponse = getSolrServer().query(solrQuery);
 		NamedList<List<PivotField>> pivots = queryResponse.getFacetPivot();
