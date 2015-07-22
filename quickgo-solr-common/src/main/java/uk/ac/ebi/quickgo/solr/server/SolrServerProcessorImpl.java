@@ -53,9 +53,10 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	/**
 	 * See {@link SolrServerProcessor#indexBeans(Collection)}
 	 */
-	public <T> void indexBeans (Collection<T> beans) throws SolrServerException, IOException {		
-		getSolrServer().addBeans(beans);
-		getSolrServer().commit();
+	public <T> void indexBeans (Collection<T> beans) throws SolrServerException, IOException {
+		SolrServer server = getSolrServer();
+		server.addBeans(beans);
+		server.commit();
 	}	
 	
 	/**
@@ -69,16 +70,18 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	 * See {@link SolrServerProcessor#deleteAll()}
 	 */
 	public void deleteAll() throws SolrServerException, IOException {
-		getSolrServer().deleteByQuery("*:*");// Deletes everything
-		getSolrServer().commit();
+		SolrServer server = getSolrServer();
+		server.deleteByQuery("*:*");// Deletes everything
+		server.commit();
 	}
 
 	/**
 	 * See {@link SolrServerProcessor#deleteByQuery(String)}
 	 */
 	public void deleteByQuery(String query) throws SolrServerException, IOException {
-		getSolrServer().deleteByQuery(query);// Deletes by query
-		getSolrServer().commit();
+		SolrServer server = getSolrServer();
+		server.deleteByQuery(query);// Deletes by query
+		server.commit();
 	}
 	
 	/**
