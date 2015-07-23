@@ -50,6 +50,10 @@ public class XRef {
 		this.id = id;
 	}
 
+	public String getXRef() {
+		return db + ":" + id;
+	}
+
 	@Override
 	public String toString() {
 		return "XRef{" + "db='" + db + '\'' + ", id='" + id + '\'' + '}';

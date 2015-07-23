@@ -97,7 +97,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 		List<String> definitionXrefs = new ArrayList<>();
 		for(XRef definitionXref : term.getDefinitionXrefs()){
 			if(definitionXref.getDb().equalsIgnoreCase("PMID")){//TODO Only taking into account PMID at the moment
-				definitionXrefs.add(definitionXref.getDb() + ":" + definitionXref.getId());
+				definitionXrefs.add(definitionXref.getXRef());
 			}
 		}
 		solrTerm.setDefinitionXref(definitionXrefs);

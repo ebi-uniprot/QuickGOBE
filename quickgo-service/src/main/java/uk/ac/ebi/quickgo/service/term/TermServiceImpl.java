@@ -70,7 +70,7 @@ public class TermServiceImpl implements TermService,Serializable {
 	
 
 	/**
-	 * {@link TermService#convertToStream(GOTerm, Format, OutputStream)}
+	 * {@link TermService#convertToStream(GenericTerm, Format, OutputStream)}
 	 */
 	@Override
 	public void convertToStream(GenericTerm genericTerm, Format format, OutputStream outputStream) {
@@ -86,7 +86,7 @@ public class TermServiceImpl implements TermService,Serializable {
 	}	
 	
 	/**
-	 * {@link TermService#convertToXML(GOTerm, Format, OutputStream)}
+	 * {@link TermService#convertToXML(GenericTerm, Format, OutputStream)}
 	 */
 	public void convertToXML(GenericTerm genericTerm, Format format, OutputStream outputStream) {
 		try {
@@ -101,7 +101,7 @@ public class TermServiceImpl implements TermService,Serializable {
 	}
 
 	/**
-	 * {@link TermService#convertToJSON(GOTerm, String, OutputStream)}
+	 * {@link TermService#convertToJSON(GenericTerm, OutputStream)}
 	 */
 	public void convertToJSON(GenericTerm genericTerm, OutputStream outputStream) {
 		try {
@@ -120,14 +120,16 @@ public class TermServiceImpl implements TermService,Serializable {
 		obo = obo + "id: " + genericTerm.getId() + "\n";
 		obo = obo + "name: " + genericTerm.getName() + "\n";
 		obo = obo + "def: " + genericTerm.getDefinition() + "\n";
-		if (genericTerm.getSynonyms() != null) {
-			for (Synonym synonym : genericTerm.getSynonyms()) {
+		List<Synonym> synonyms = genericTerm.getSynonyms();
+		if (synonyms != null) {
+			for (Synonym synonym : synonyms) {
 				obo = obo + "synonym: " + synonym.getName() + "\n";
 			}
 		}
-		if(genericTerm.getXrefs()!=null){
-			for (NamedXRef namedXRef : genericTerm.getXrefs()) {
-				obo = obo + "xref: " + namedXRef.getDb() + ":" + namedXRef.getId() + "\n";
+		List<NamedXRef> xrefs = genericTerm.getXrefs();
+		if (xrefs != null) {
+			for (NamedXRef namedXRef : xrefs) {
+				obo = obo + "xref: " + namedXRef.getXRef() + "\n";
 			}
 		}
 		return obo;
@@ -135,7 +137,7 @@ public class TermServiceImpl implements TermService,Serializable {
 	
 	@Override
 	public Map<String, Map<String, String>> retrieveNames() {
-		Map<String, Map<String, String>> values = new HashMap<String, Map<String,String>>();
+		Map<String, Map<String, String>> values = new HashMap<>();
 		try {
 			values = goTermRetrieval.getFieldValues(TermField.TYPE.getValue()
 					+ ":" + SolrTermDocumentType.TERM.getValue(),
@@ -166,8 +168,7 @@ public class TermServiceImpl implements TermService,Serializable {
 
 	@Override
 	public List<GenericTerm> autosuggest(String text, String filterQuery, int numResults) throws SolrServerException {
-		List<GenericTerm> terms = goTermRetrieval.autosuggest(text,filterQuery,numResults);
-		return terms;
+		return goTermRetrieval.autosuggest(text,filterQuery,numResults);
 	}
 	
 	@Override
