@@ -98,19 +98,13 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
 			if(solrTerm.getOntology() != null){
 				term.setAspect(EGOAspect.fromString(solrTerm.getOntology()));
 			}
-			String comments = "";
-			if (solrTerm.getComments() != null) {
-				for (String comment : solrTerm.getComments()) {
-					comments = comments + comment + "\n";
-				}
-				term.setComment(comments);
+			String comment = solrTerm.getComment();
+			if (!"".equals(comment)) {
+				term.setComment(comment);
 			}
-			String definitions = "";
-			if (solrTerm.getDefinitions() != null) {
-				for (String definition : solrTerm.getDefinitions()) {
-					definitions = definitions + definition + "\n";
-				}
-				term.setDefinition(definitions);
+			String definition = solrTerm.getDefinition();
+			if (!"".equals(definition)) {
+				term.setDefinition(definition);
 			}
 			List<XRef> definitionsXrefs = new ArrayList<>();
 			if(solrTerm.getDefinitionXref() != null){

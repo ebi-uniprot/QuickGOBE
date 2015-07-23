@@ -1,11 +1,8 @@
 package uk.ac.ebi.quickgo.indexer.file;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -15,11 +12,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/*
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+*/
 import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
-import uk.ac.ebi.quickgo.indexer.IIndexer;
-import uk.ac.ebi.quickgo.util.MemoryMonitor;
 
 /**
  * Class that represents a gene_association (gaf), gp_association (gpad) or gp_information (gpi) file.
@@ -44,7 +41,7 @@ public abstract class GPDataFile {
 	private final static Pattern directivePattern = Pattern.compile("^!\\s*([A-Za-z0-9_\\.-]+)\\s*:\\s*([A-Za-z0-9_\\.-]+)");
 	private final static Matcher directiveMatcher = directivePattern.matcher("");
 
-	private static final Logger logger = LoggerFactory.getLogger(GPDataFile.class);
+	//private static final Logger logger = LoggerFactory.getLogger(GPDataFile.class);
 
 	public GPDataFile(NamedFile f, int columnCount, String versionDirective, String versionSupported) throws Exception {
 		this.gpdf = f;
@@ -149,36 +146,6 @@ public abstract class GPDataFile {
 			throw new Exception(versionDirective + ": " + versionSupported + " directive not found");
 		}
 	}
-
-	public int load(IIndexer indexer) throws Exception {
-		MemoryMonitor mm = new MemoryMonitor(true);
-		logger.info("\nLoad " + getName());
-
-		// make sure we're dealing with a file that's in the expected format
-		checkVersion();
-
-		// read the records & index them
-		reader.open();
-		int count = 0;
-
-		while (true) {
-			String[] columns = reader.readRecord();
-			if (columns == null) {
-				break;
-			}
-			else {
-				if (index(indexer, columns)) {
-					count++;
-				}
-			}
-		}
-
-		reader.close();
-		logger.info("Load " + getName() + " done - " + mm.end());
-		return count;
-	}
-
-	public abstract boolean index(IIndexer indexer, String[] columns) throws Exception;
 
 	public abstract Object calculateRow (String[] columns) throws Exception;
 

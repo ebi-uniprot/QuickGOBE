@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
-import uk.ac.ebi.quickgo.indexer.IIndexer;
 import uk.ac.ebi.quickgo.util.KeyValuePair;
 
 /**
@@ -87,11 +86,5 @@ public class GPInformationFile extends GPDataFile {
 		else {
 			return null;
 		}
-	}
-
-	@Override
-	public boolean index(IIndexer indexer, String[] columns) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

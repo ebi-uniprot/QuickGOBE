@@ -51,12 +51,14 @@ public class EntityTermMapperTest {
 				allowing(solrTerm).getId();
 				will(returnValue("GO:00000001"));
 
-				allowing(solrTerm).getComments();
+/*
+				allowing(solrTerm).getComment();
 				will(returnValue(Arrays.asList("Comment")));
 				
-				allowing(solrTerm).getDefinitions();
+				allowing(solrTerm).getDefinition();
 				will(returnValue(Arrays.asList("Definition")));
-				
+*/
+
 				allowing(solrTerm).getSecondaryIds();
 				will(returnValue(Arrays.asList("GO:000034")));
 				

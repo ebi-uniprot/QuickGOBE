@@ -49,20 +49,14 @@ public class EntityECOTermMapper implements EntityMapper<SolrTerm, ECOTerm>{
 		term.setName(solrTerm.getName());
 		term.setObsolete(solrTerm.isObsolete());
 		try {					
-			String comments = "";
-			if (solrTerm.getComments() != null) {
-				for (String comment : solrTerm.getComments()) {
-					comments = comments + comment + "\n";
-				}
-				term.setComment(comments);
+			String comment = solrTerm.getComment();
+			if (!"".equals(comment)) {
+				term.setComment(comment);
 			}
-			String definitions = "";
-			if (solrTerm.getDefinitions() != null) {
-				for (String definition : solrTerm.getDefinitions()) {
-					definitions = definitions + definition + "\n";
-				}
-				term.setDefinition(definitions);
-			}			
+			String definition = solrTerm.getDefinition();
+			if (!"".equals(definition)) {
+				term.setDefinition(definition);
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();

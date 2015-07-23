@@ -30,12 +30,12 @@ public class SolrTerm {
 	String category;
 	@Field
 	boolean isObsolete;
-	@Field("definition")
-	List<String> definitions;
+	@Field
+	String definition;
 	@Field("definitionXref")
 	List<String> definitionXref;
-	@Field("comment")
-	List<String> comments;
+	@Field
+	String comment;
 	@Field("secondaryId")
 	List<String> secondaryIds;
 	
@@ -174,20 +174,20 @@ public class SolrTerm {
 		this.isObsolete = isObsolete;
 	}
 
-	public List<String> getDefinitions() {
-		return definitions;
+	public String getDefinition() {
+		return definition;
 	}
 
-	public void setDefinitions(List<String> definitions) {
-		this.definitions = definitions;
+	public void setDefinition(String definition) {
+		this.definition = definition;
 	}
 
-	public List<String> getComments() {
-		return comments;
+	public String getComment() {
+		return comment;
 	}
 
-	public void setComments(List<String> comments) {
-		this.comments = comments;
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	public List<String> getSecondaryIds() {

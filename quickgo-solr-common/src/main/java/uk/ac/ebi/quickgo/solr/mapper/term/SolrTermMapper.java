@@ -3,13 +3,7 @@ package uk.ac.ebi.quickgo.solr.mapper.term;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import uk.ac.ebi.quickgo.ontology.generic.AuditRecord;
 import uk.ac.ebi.quickgo.ontology.generic.CrossOntologyRelation;
@@ -45,7 +39,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 	 */
 	public Collection<SolrTerm> toSolrObject(GenericTerm term, List<SolrDocumentType> solrDocumentTypes) {
 
-		List<SolrTerm> solrTerms = new ArrayList<SolrTerm>();
+		List<SolrTerm> solrTerms = new ArrayList<>();
 		
 		for (SolrDocumentType termDocumentType : solrDocumentTypes) {
 			SolrTermDocumentType solrTermDocumentType = ((SolrTermDocumentType) termDocumentType);
@@ -96,8 +90,8 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 		solrTerm.setId(term.getId());		
 		solrTerm.setName(term.getName());		
 		solrTerm.setObsolete(term.isObsolete());
-		solrTerm.setComments(Arrays.asList(term.getComment()));
-		solrTerm.setDefinitions(Arrays.asList(term.getDefinition()));
+		solrTerm.setComment(term.getComment());
+		solrTerm.setDefinition(term.getDefinition());
 		solrTerm.setSubsets(term.getSubsetsNames());
 		
 		List<String> definitionXrefs = new ArrayList<>();

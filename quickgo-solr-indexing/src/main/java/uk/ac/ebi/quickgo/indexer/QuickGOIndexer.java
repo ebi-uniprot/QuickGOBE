@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +18,13 @@ import uk.ac.ebi.quickgo.indexer.geneproduct.QuickGOGeneProductIndexer;
 import uk.ac.ebi.quickgo.indexer.miscellaneous.QuickGOMiscellaneousIndexer;
 import uk.ac.ebi.quickgo.indexer.ontology.QuickGOOntologyIndexer;
 import uk.ac.ebi.quickgo.indexer.statistics.QuickGOCOOccurrenceStatsIndexer;
-import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
-import uk.ac.ebi.quickgo.ontology.eco.EvidenceCodeOntology;
-import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.solr.indexing.service.annotation.AnnotationIndexer;
 import uk.ac.ebi.quickgo.util.MemoryMonitor;
 
 /**
  * The main controlling class for the whole QuickGO indexing process
  */
-public class QuickGOIndexer implements IIndexer {
+public class QuickGOIndexer {
 
 	private SourceFiles sourceFiles;
 

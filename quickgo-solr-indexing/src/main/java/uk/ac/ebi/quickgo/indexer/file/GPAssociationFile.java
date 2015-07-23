@@ -16,7 +16,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import uk.ac.ebi.quickgo.cache.query.service.CacheRetrievalImpl;
 import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
-import uk.ac.ebi.quickgo.indexer.IIndexer;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.RelationType;
@@ -117,12 +116,6 @@ public class GPAssociationFile extends GPDataFile {
 
 	public void newChunk() {
 		this.firstRowOfChunk = true;
-	}
-
-	@Override
-	public boolean index(IIndexer indexer, String[] columns) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	/**

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import uk.ac.ebi.quickgo.data.SourceFiles;
 import uk.ac.ebi.quickgo.ontology.eco.EvidenceCodeOntology;
-import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.solr.indexing.service.ontology.TermIndexer;
 import uk.ac.ebi.quickgo.util.MemoryMonitor;
@@ -49,8 +48,7 @@ public class QuickGOOntologyIndexer {
 	 * @param sourceFiles
 	 *            object containing references to all of the source files needed
 	 *            by the indexing operation
-	 * @return flag indicating whether the indexing was carried out successfully
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void indexOntologies(SourceFiles sourceFiles) throws Exception {
 		MemoryMonitor mm = new MemoryMonitor(true);
@@ -75,7 +73,7 @@ public class QuickGOOntologyIndexer {
 	private void indexGO(SourceFiles sourceFiles) throws Exception {
 		MemoryMonitor mm = new MemoryMonitor(true);
 		ontology.load(sourceFiles.goSourceFiles);		
-		goTermIndexer.index(new ArrayList<GenericTerm>(ontology.terms.values()));
+		goTermIndexer.index(new ArrayList<>(ontology.terms.values()));
 		logger.info("indexGO done: " + mm.end() + "  total indexed: "	+ ontology.terms.size());
 	}
 
@@ -89,7 +87,7 @@ public class QuickGOOntologyIndexer {
 	private void indexECO(SourceFiles sourceFiles) throws Exception {
 		MemoryMonitor mm = new MemoryMonitor(true);
 		evidenceCodeOntology.load(sourceFiles.ecoSourceFiles, "root");
-		ecoTermIndexer.index(new ArrayList<GenericTerm>(evidenceCodeOntology.terms.values()));
+		ecoTermIndexer.index(new ArrayList<>(evidenceCodeOntology.terms.values()));
 		logger.info("indexECO done: " + mm.end() + "  total indexed: "	+ evidenceCodeOntology.terms.size());
 	}
 

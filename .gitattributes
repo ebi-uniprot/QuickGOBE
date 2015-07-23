@@ -179,7 +179,6 @@ quickgo-solr-indexing/pom.xml -text svneol=unset#text/plain
 quickgo-solr-indexing/src/integration-test/resources/gp2protein.mim -text
 quickgo-solr-indexing/src/integration-test/resources/gp2protein.protein-sets -text
 quickgo-solr-indexing/src/main/config/indexing-beans.xml -text svneol=unset#text/plain
-quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/IIndexer.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/QuickGOIndexer.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/QuickGOIndexerProcess.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/annotation/QuickGOAnnotationIndexer.java -text svneol=unset#text/plain
