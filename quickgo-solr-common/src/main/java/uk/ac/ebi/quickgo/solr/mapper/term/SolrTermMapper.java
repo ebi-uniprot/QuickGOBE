@@ -53,7 +53,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 				solrTerms.addAll(mapHistory(term));
 				break;
 			case RELATION:
-				solrTerms.addAll(mapRelation(term, term.children));
+				solrTerms.addAll(mapRelation(term.children));
 				break;
 			case REPLACE:
 				solrTerms.addAll(mapReplace(term));
@@ -81,7 +81,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 
 	/**
      * Map Solr Term for the basic information of a term
-     * @param term GO Term
+     * @param term Term
      * @return Solr Term to be indexed
      */
 	private SolrTerm mapBasicInformation(GenericTerm term) {
@@ -127,12 +127,12 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 	}
 	
 	/**
-     * Map Solr terms for external references of a GO term
-     * @param term GO Term
+     * Map Solr terms for external references of a term
+     * @param term Term
      * @return SolR terms to be indexed
      */
 	private Collection<SolrTerm> mapXref(GenericTerm term) {
-		Collection<SolrTerm> solrTermXrefs = new ArrayList<SolrTerm>();
+		Collection<SolrTerm> solrTermXrefs = new ArrayList<>();
 		for (NamedXRef goXref : term.xrefs) {
 			SolrTerm solrTermXref = new SolrTerm();
 			solrTermXref.setDocType(SolrTermDocumentType.XREF.getValue());
@@ -148,12 +148,12 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 	
 	
 	/**
-     * Map Solr terms for replaced GO terms
-     * @param term GO Term
+     * Map Solr terms for replaced terms
+     * @param term Term
      * @return Solr terms to be indexed
      */
 	private Collection<SolrTerm> mapReplace(GenericTerm term) {
-		Collection<SolrTerm> solrTermReplaces = new ArrayList<SolrTerm>();
+		Collection<SolrTerm> solrTermReplaces = new ArrayList<>();
 		for (TermRelation goReplaced : term.replaces) {	
 			SolrTerm solrTermReplace = new SolrTerm();
 			solrTermReplace.setDocType(SolrTermDocumentType.REPLACE.getValue());
@@ -167,14 +167,12 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 	}
 	
 	/**
-     * Map Solr terms for relations of a GO term
-     * @param term GO Term
+     * Map Solr terms for relations of a term
      * @param relations Type of relation (parents or children)
      * @return SolR terms to be indexed
      */
-	private Collection<SolrTerm> mapRelation(GenericTerm term,
-			List<TermRelation> relations) {
-		Set<SolrTerm> solrTermRelations = new TreeSet<SolrTerm>(new SolrTermComparator());
+	private Collection<SolrTerm> mapRelation(List<TermRelation> relations) {
+		Set<SolrTerm> solrTermRelations = new TreeSet<>(new SolrTermComparator());
 		for (TermRelation genericTermRelation : relations) {
 			SolrTerm solrTermRelation = new SolrTerm();
 			solrTermRelation.setDocType(SolrTermDocumentType.RELATION.getValue());
@@ -188,12 +186,12 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 	}
 	
 	/**
-     * Map Solr terms for synonyms of a GO term
+     * Map Solr terms for synonyms of a term
      * @param term GO Term
      * @return SolR terms to be indexed
      */
 	private Collection<SolrTerm> mapSynonym(GenericTerm term) {
-		Collection<SolrTerm> solrTermSynonyms = new ArrayList<SolrTerm>();		
+		Collection<SolrTerm> solrTermSynonyms = new ArrayList<>();
 		for (Synonym genericTermSynonym : term.synonyms) {
 			SolrTerm solrTermSynonym = new SolrTerm();
 			solrTermSynonym.setId(term.getId());
@@ -207,12 +205,12 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 	}
 
 	/**
-     * Map Solr terms for change logs of a GO term
+     * Map Solr terms for change logs of a term
      * @param term GO Term
      * @return SolR terms to be indexed
      */
 	private Collection<SolrTerm> mapHistory(GenericTerm term) {
-		Collection<SolrTerm> solrTermHistories = new ArrayList<SolrTerm>();
+		Collection<SolrTerm> solrTermHistories = new ArrayList<>();
 		for (AuditRecord genericTermHistory : term.history.auditRecords) {
 			SolrTerm solrTermHistory = new SolrTerm();
 			solrTermHistory.setDocType(SolrTermDocumentType.HISTORY.getValue());
@@ -241,7 +239,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 	 * @return Solr terms to be indexed
 	 */
 	private Collection<SolrTerm> mapOntologyRelation(GenericTerm term) {
-		Collection<SolrTerm> solrTermOntologyRelations = new ArrayList<SolrTerm>();
+		Collection<SolrTerm> solrTermOntologyRelations = new ArrayList<>();
 		for (CrossOntologyRelation crossOntologyRelation : term.getCrossOntologyRelations()) {
 			SolrTerm solrTerm = new SolrTerm();
 			solrTerm.setDocType(SolrTermDocumentType.ONTOLOGYRELATION.getValue());
