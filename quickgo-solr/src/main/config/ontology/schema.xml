@@ -71,9 +71,9 @@
    <field name="ontology" type="string" indexed="true" stored="true"/>
    <field name="category" type="string" indexed="true" stored="true"/>
    <field name="isObsolete" type="boolean" indexed="true" stored="true"/>
-   <field name="definition" type="string" indexed="true" stored="true" multiValued="false"/>
+   <field name="definition" type="string" indexed="true" stored="true"/>
    <field name="definitionXref" type="string" indexed="true" stored="true" multiValued="true"/>
-   <field name="comment" type="string" indexed="true" stored="true" multiValued="false"/>
+   <field name="comment" type="string" indexed="true" stored="true"/>
    <field name="secondaryId" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="version" type="string" indexed="true" stored="true"/>
    <field name="usage" type="string" indexed="false" stored="true"/>
@@ -155,6 +155,8 @@
 
    	<copyField source="id" dest="text"/>
 	<copyField source="name" dest="text"/>
+    <copyField source="definition" dest="text"/>
+    <copyField source="synonymName" dest="text"/>
 
    <!-- Above, multiple source fields are copied to the [text] field.
 	  Another way to map multiple source fields to the same
