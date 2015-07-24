@@ -50,7 +50,7 @@ public class QuickGOMiscellaneousIndexer {
 	/**
 	 * Contains all the taxonomies
 	 */
-	Map<Integer,Miscellaneous> taxonomiesMap = new HashMap<Integer,Miscellaneous>();	
+	Map<Integer,Miscellaneous> taxonomiesMap = new HashMap<>();
 	
 	/**
 	 * Miscellaneous indexer
@@ -74,7 +74,7 @@ public class QuickGOMiscellaneousIndexer {
 		this.indexPublications(sourceFiles.publications);
 		this.indexAnnotationGuidelines(sourceFiles.annotationGuidelines);
 		this.indexAnnotationBlacklists(sourceFiles.annotationBlacklist);
-		this.indexAnnotationExtensioRelations(sourceFiles.goSourceFiles, geneOntology);
+		this.indexAnnotationExtensionRelations(sourceFiles.goSourceFiles, geneOntology);
 		this.indexXrefDatabases(sourceFiles.xrfAbbsInfo);
 	}
 
@@ -87,28 +87,26 @@ public class QuickGOMiscellaneousIndexer {
 		//Delete all taxonomies previously indexed
 		miscellaneousIndexer.deleteByQuery(MiscellaneousField.TYPE.getValue() + ":" + SolrMiscellaneousDocumentType.TAXONOMY.getValue());
 		//Contains chunk of taxonomies indexed
-		Map<Integer,Miscellaneous> taxonomiesMapTemp = new HashMap<Integer,Miscellaneous>();
+		Map<Integer,Miscellaneous> taxonomiesMapTemp = new HashMap<>();
 		
 		MemoryMonitor mm = new MemoryMonitor(true);		
-		RowIterator rowIterator = null;		
-		rowIterator = taxonomies.reader(ETaxon.values());
+		RowIterator rowIterator = taxonomies.reader(ETaxon.values());
 		
 		Iterator<String[]> iterator = rowIterator.iterator();
 		TaxonomyFile taxonomyFile = new TaxonomyFile();
 		while (iterator.hasNext()) {
-			Miscellaneous miscellaneous = taxonomyFile.calculateRow((String[]) iterator.next());//Read line			
+			Miscellaneous miscellaneous = taxonomyFile.calculateRow(iterator.next());//Read line
 			taxonomiesMapTemp.put(miscellaneous.getTaxonomyId(), miscellaneous);
 			if (taxonomiesMapTemp.size() == CHUNK_SIZE) {
 				taxonomiesMap.putAll(taxonomiesMapTemp);
-				miscellaneousIndexer.index(new ArrayList<Miscellaneous>(taxonomiesMapTemp.values()));
-				taxonomiesMapTemp = new HashMap<Integer, Miscellaneous>();
+				miscellaneousIndexer.index(new ArrayList<>(taxonomiesMapTemp.values()));
+				taxonomiesMapTemp = new HashMap<>();
 			}
 		}
 		//Index the rest
 		if(taxonomiesMapTemp.size() > 0){			
-			miscellaneousIndexer.index(new ArrayList<Miscellaneous>(taxonomiesMapTemp.values()));
+			miscellaneousIndexer.index(new ArrayList<>(taxonomiesMapTemp.values()));
 			taxonomiesMap.putAll(taxonomiesMapTemp);
-			taxonomiesMapTemp = new HashMap<Integer, Miscellaneous>();
 		}
 		logger.info("indexTaxonomies done: " + mm.end());		
 	}
@@ -118,7 +116,7 @@ public class QuickGOMiscellaneousIndexer {
 	 * @param goSourceFiles Source files containing information
 	 * @param geneOntology Gene ontology information
 	 */
-	private void indexAnnotationExtensioRelations(GOSourceFiles goSourceFiles, GeneOntology geneOntology) {
+	private void indexAnnotationExtensionRelations(GOSourceFiles goSourceFiles, GeneOntology geneOntology) {
 		MemoryMonitor mm = new MemoryMonitor(true);	
 		
 		miscellaneousIndexer.deleteByQuery(MiscellaneousField.TYPE.getValue() + ":" + SolrMiscellaneousDocumentType.EXTENSION.getValue());
@@ -215,26 +213,25 @@ public class QuickGOMiscellaneousIndexer {
 	 * @throws Exception
 	 */
 	private void indexMiscellaneousData(TSVDataFile source, Enum[] columns, SolrMiscellaneousDocumentType type) throws Exception{	
-		Set<Miscellaneous> data = new HashSet<Miscellaneous>();
+		Set<Miscellaneous> data = new HashSet<>();
 		//Delete all data previously indexed
 		miscellaneousIndexer.deleteByQuery(MiscellaneousField.TYPE.getValue() + ":" + type.getValue());
 		
 		MemoryMonitor mm = new MemoryMonitor(true);		
-		RowIterator rowIterator = null;		
-		rowIterator = source.reader(columns);
+		RowIterator rowIterator = source.reader(columns);
 		
 		Iterator<String[]> iterator = rowIterator.iterator();		
 		while (iterator.hasNext()) {
-			String[] line = (String[])iterator.next();// Read line
+			String[] line = iterator.next();// Read line
 			data.add(buildElement(line, type));			
 			if (data.size() == CHUNK_SIZE) {
-				miscellaneousIndexer.index(new ArrayList<Miscellaneous>(data));
-				data = new HashSet<Miscellaneous>();
+				miscellaneousIndexer.index(new ArrayList<>(data));
+				data = new HashSet<>();
 			}
 		}
 		//Index the rest
 		if (data.size() > 0) {
-			miscellaneousIndexer.index(new ArrayList<Miscellaneous>(data));
+			miscellaneousIndexer.index(new ArrayList<>(data));
 		}
 		logger.info("index" + type.getValue() + " done: " + mm.end());
 	}
@@ -297,7 +294,6 @@ public class QuickGOMiscellaneousIndexer {
 	/**
 	 * Index subsets counts
 	 * @param terms Collection of terms
-	 * @param terms
 	 */
 	private void indexSubsetsCounts(Collection<GenericTerm> terms) {
 		// Calculate subsets counts
