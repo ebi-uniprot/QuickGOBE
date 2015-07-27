@@ -15,15 +15,15 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
-import uk.ac.ebi.quickgo.solr.mapper.term.go.SolrGOTermMapper;
+import uk.ac.ebi.quickgo.solr.mapper.term.go.GOTermToSolrMapper;
 import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm;
 import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 
 /**
  * Tests for the TermIndexer class
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 @RunWith(BlockJUnit4ClassRunner.class)
 public class TermIndexerTest {
@@ -33,32 +33,32 @@ public class TermIndexerTest {
 			setImposteriser(ClassImposteriser.INSTANCE);
 		}
 	};
-	
-	// Mock context	
+
+	// Mock context
 	private TermIndexer termIndexer;
 	private SolrServerProcessor solrServerProcessor;
-	private SolrGOTermMapper solrMapper;
-	
+	private GOTermToSolrMapper solrMapper;
+
 	@Before
 	public void before() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		termIndexer = new TermIndexer();
 
 		// Mock
 		solrServerProcessor = context.mock(SolrServerProcessor.class);
-		solrMapper = context.mock(SolrGOTermMapper.class);
-		
+		solrMapper = context.mock(GOTermToSolrMapper.class);
+
 		// Set cacheBuilder value in cacheRetrieval
 		Field fieldCurrencyServices = termIndexer.getClass().getDeclaredField("solrServerProcessor");
 		fieldCurrencyServices.setAccessible(true);
 		fieldCurrencyServices.set(termIndexer, solrServerProcessor);
-		
+
 		fieldCurrencyServices = termIndexer.getClass().getDeclaredField("solrMapper");
 		fieldCurrencyServices.setAccessible(true);
-		fieldCurrencyServices.set(termIndexer, solrMapper);	
+		fieldCurrencyServices.set(termIndexer, solrMapper);
 	}
-	
+
 	/**
-	 * Empty list 
+	 * Empty list
 	 * @throws Exception
 	 */
 	@Test
@@ -74,10 +74,10 @@ public class TermIndexerTest {
 		termIndexer.index(new ArrayList<GenericTerm>());
 		context.assertIsSatisfied();
 	}
-	
+
 
 	/**
-	 * Index 1 term 
+	 * Index 1 term
 	 * @throws Exception
 	 */
 	@Test
@@ -85,18 +85,18 @@ public class TermIndexerTest {
 
 		final GenericTerm term = new GOTerm("GO:00001234", "name","P","false");
 		final SolrTerm solrTerm = new SolrTerm();
-		
+
 		context.checking(new Expectations() {
 			{
 				allowing(solrMapper).toSolrObject(term);
 				will(returnValue(Arrays.asList(solrTerm)));
-				
-				allowing(solrServerProcessor).indexBeans(with(any(TreeSet.class)));			
+
+				allowing(solrServerProcessor).indexBeans(with(any(TreeSet.class)));
 			}
 		});
 
 		termIndexer.index(Arrays.asList(term));
 		context.assertIsSatisfied();
 	}
-	
+
 }
