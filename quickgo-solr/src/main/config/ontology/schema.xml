@@ -118,6 +118,13 @@
    <field name="historyCategory" type="string" indexed="true" stored="true"/>
    <field name="historyText" type="string" stored="true"/>
 
+    <!-- Cross-ontology relations -->
+    <field name="crossOntologyRelation" type="string" stored="true" />
+    <field name="crossOntologyOtherNamespace" type="string" stored="true" />
+    <field name="crossOntologyForeignId" type="string" stored="true" />
+    <field name="crossOntologyForeignTerm" type="string" stored="true" />
+    <field name="crossOntologyUrl" type="string" stored="true" />
+
    <!-- Fields appear in OBO especification http://www.geneontology.org/GO.format.obo-1_2.shtml#S.2.2 -->
    <field name="subset" type="string" stored="true" multiValued="true"/>
 
