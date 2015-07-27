@@ -24,11 +24,11 @@ import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm.SolrTermDocumentType;
 import uk.ac.ebi.quickgo.util.NamedXRef;
 
 /**
- * Tests for SolrTermMapper class
+ * Tests for TermToSolrMapper class
  * @author cbonill
  *
  */
-public class SolrTermMapperTest {
+public class TermToSolrMapperTest {
 
 	private Mockery context = new Mockery() {
 		{
@@ -178,6 +178,9 @@ public class SolrTermMapperTest {
 			{
 				allowing(term).getId();
 				will(returnValue("GO:0000002"));
+
+				allowing(term).getName();
+				will(returnValue("apoptotic process"));
 			}
 		});
 

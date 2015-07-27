@@ -168,7 +168,7 @@ quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/ontology/SolrTerm
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/server/SolrServerProcessor.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/server/SolrServerProcessorImpl.java -text svneol=unset#text/plain
 quickgo-solr-common/src/test/java/uk/ac/ebi/quickgo/solr/mapper/term/EntityTermMapperTest.java -text svneol=unset#text/plain
-quickgo-solr-common/src/test/java/uk/ac/ebi/quickgo/solr/mapper/term/SolrTermMapperTest.java -text svneol=unset#text/plain
+quickgo-solr-common/src/test/java/uk/ac/ebi/quickgo/solr/mapper/term/TermToSolrMapperTest.java -text svneol=unset#text/plain
 quickgo-solr-common/src/test/java/uk/ac/ebi/quickgo/solr/server/SolrServerProcessorTest.java -text svneol=unset#text/plain
 quickgo-solr-indexing/.classpath -text svneol=unset#text/plain
 quickgo-solr-indexing/.project -text svneol=unset#text/plain
