@@ -7,9 +7,9 @@ http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<!-- ########## PRODUCTION/DEV ENVIRONMENT PROPERTIES ########### -->
 	<!-- Add "-Dspring.profiles.active=PROFILE" in catalina.sh  where PROFILE can be "dev" or "prod"-->
-		
+
 	<context:property-placeholder location="classpath:quickgo-${spring.profiles.active}.properties" />
-	
+
 	<!-- CONTAINS COMMON BEANS FOR ALL THE SOLR MODULES -->
 
 	<!-- SolR server bean -->
@@ -33,10 +33,10 @@ http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<!-- Bean to map Terms into Solr terms -->
 
-	<bean name="solrECOTermMapper" class="uk.ac.ebi.quickgo.solr.mapper.term.eco.SolrECOTermMapper">
+	<bean name="solrECOTermMapper" class="uk.ac.ebi.quickgo.solr.mapper.term.eco.ECOTermToSolrMapper">
 	</bean>
-	
-	<bean name="solrGOTermMapper" class="uk.ac.ebi.quickgo.solr.mapper.term.go.SolrGOTermMapper">
+
+	<bean name="solrGOTermMapper" class="uk.ac.ebi.quickgo.solr.mapper.term.go.GOTermToSolrMapper">
 	</bean>
 
 	<!-- ############### GENE PRODUCTS ############# -->
@@ -62,19 +62,19 @@ http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 	<bean name="annotationServerProcessor" class="uk.ac.ebi.quickgo.solr.server.SolrServerProcessorImpl">
 		<property name="solrURL" value="${solr.url.annotation}" />
 	</bean>
-	
+
 	<!-- Bean to map Annotations into Solr annotations -->
 
 	<bean name="solrAnnotationMapper"
 		class="uk.ac.ebi.quickgo.solr.mapper.annotation.SolrAnnotationMapper">
 	</bean>
-	
+
 	<!-- Bean to map Solr annotations into QuickGO ones -->
 	<bean name="annotationEntityMapper" class="uk.ac.ebi.quickgo.solr.mapper.annotation.EntityAnnotationMapper">
 	</bean>
-	
+
 	<!-- ############## MISCELLANEOUS #################  -->
-	
+
 	<!-- Solr Miscellaneous server bean -->
 	<bean name="miscellaneousServerProcessor" class="uk.ac.ebi.quickgo.solr.server.SolrServerProcessorImpl">
 		<property name="solrURL" value="${solr.url.miscellaneous}" />
