@@ -143,6 +143,8 @@ public class EntityTermMapperTest {
 				allowing(solrTerm).getSynonymName();
 				will(returnValue("GO:0003"));
 
+				allowing(solrTerm).setName(null);
+
 				allowing(solrTerm).getSynonymType();
 				will(returnValue("Synonym type"));
 
