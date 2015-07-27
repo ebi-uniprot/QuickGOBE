@@ -43,7 +43,7 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 	 */
 	public GOTerm findById(String id) throws SolrServerException {
 		String idFormatted = ClientUtils.escapeQueryChars(id);
-		String query = TermField.ID.getValue() + ":" + idFormatted + 
+		String query = TermField.ID.getValue() + ":" + idFormatted +
 				" OR (" + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.RELATION.getValue() + " AND (" + TermField.CHILD.getValue() + ":" + idFormatted + " OR " + TermField.PARENT.getValue() + ":" + idFormatted + "))" +
 				" OR (" + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.REPLACE.getValue() + " AND " + TermField.OBSOLETE_ID.getValue() + ":" + idFormatted + ")";
 		SolrQuery solrQuery = new SolrQuery().setQuery(query);
@@ -105,9 +105,9 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 
 	/**
 	 * See {@link Retrieval#findByQuery(String, int)}
-	 */	
+	 */
 	public List<GOTerm> findByQuery(String query, int numRows) throws SolrServerException {
-		List<GOTerm> terms = new ArrayList<>();		 
+		List<GOTerm> terms = new ArrayList<>();
 		SolrQuery solrQuery = new SolrQuery().setQuery(query);
 		List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, numRows);
 		if (results != null) {
@@ -146,27 +146,47 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 
 	@Override
 	public  Map<String, Map<String, String>> getFieldValues(String query, String fieldID, String fields) throws SolrServerException {
-		return serverProcessor.getFields(query, fieldID, fields);		
+		return serverProcessor.getFields(query, fieldID, fields);
 	}
+
+//	@Override
+//	public List<GenericTerm> autosuggest(String text, String filterQuery, int numResults) throws SolrServerException {
+//		SolrQuery solrQuery = new SolrQuery();
+//		solrQuery.setRequestHandler("/spell");
+//		String fQuery = TermField.TYPE.getValue() + ":" //Search for terms and synonyms
+//				+ SolrTermDocumentType.TERM.getValue() + " OR "
+//				+ TermField.TYPE.getValue() + ":"
+//				+ SolrTermDocumentType.SYNONYM.getValue();
+//		if (text.contains(":")) {//Replace ':' character
+//			text = text.replaceAll(":", "\":\"");
+//			fQuery = TermField.TYPE.getValue() + ":" + SolrTermDocumentType.TERM.getValue();// Just search for terms results
+//			text = "*" + text + "*";
+//		}
+//		//solrQuery.setQuery("*" + text + "*");
+//		solrQuery.setQuery(text);
+//
+//		solrQuery.setFilterQueries(fQuery, filterQuery);
+//		List<GenericTerm> terms = new ArrayList<>();
+//		List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, numResults);
+//		if (results != null) {
+//			for (SolrTerm solrTerm : results) {
+//				if (solrTerm.getId().startsWith(ECOTerm.ECO)) {
+//					terms.add(ecoTermMapper.toEntityObject(Collections.singletonList(solrTerm)));
+//				}
+//				else {
+//					terms.add(goTermMapper.toEntityObject(Collections.singletonList(solrTerm)));
+//				}
+//			}
+//		}
+//		return terms;
+//	}
+
 
 	@Override
 	public List<GenericTerm> autosuggest(String text, String filterQuery, int numResults) throws SolrServerException {
-		SolrQuery solrQuery = new SolrQuery();		
-		solrQuery.setRequestHandler("/spell");
-		String fQuery = TermField.TYPE.getValue() + ":" //Search for terms and synonyms
-				+ SolrTermDocumentType.TERM.getValue() + " OR "
-				+ TermField.TYPE.getValue() + ":"
-				+ SolrTermDocumentType.SYNONYM.getValue();
-		if (text.contains(":")) {//Replace ':' character
-			text = text.replaceAll(":", "\":\"");
-			fQuery = TermField.TYPE.getValue() + ":" + SolrTermDocumentType.TERM.getValue();// Just search for terms results
-			text = "*" + text + "*";
-		}
-		//solrQuery.setQuery("*" + text + "*");
-		solrQuery.setQuery(text);
-		
-		solrQuery.setFilterQueries(fQuery, filterQuery);
+
 		List<GenericTerm> terms = new ArrayList<>();
+		SolrQuery solrQuery = new SolrQuery().setQuery("*" + text + "*");
 		List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, numResults);
 		if (results != null) {
 			for (SolrTerm solrTerm : results) {
@@ -181,6 +201,7 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 		return terms;
 	}
 
+
 	@Override
 	public List<GenericTerm> highlight(String text, String fq, int start, int rows) throws SolrServerException {
 		SolrQuery query = new SolrQuery();
@@ -189,7 +210,7 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 		query.setHighlight(true);
 		query.setParam("hl.fl", TermField.NAME.getValue());
 		List<GenericTerm> terms = new ArrayList<>();
-				
+
 		List<SolrTerm> results = serverProcessor.findByQuery(query.setStart(start).setRows(rows), SolrTerm.class, rows);
 		if (results != null) {
 			for (SolrTerm solrTerm : results) {
@@ -203,15 +224,15 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 		}
 		return terms;
 	}
-	
+
 
 	@Override
 	public long getTotalNumberHighlightResults(String text, String fq) throws SolrServerException {
-		SolrQuery query = new SolrQuery();		
+		SolrQuery query = new SolrQuery();
 		query.setQuery(text);
 		query.setHighlight(true);
 		query.setParam("hl.fl", TermField.NAME.getValue());
 		query.setFilterQueries(fq);
 		return serverProcessor.getTotalNumberDocuments(query);
-	}	
+	}
 }
