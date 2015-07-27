@@ -25,27 +25,27 @@ import uk.ac.ebi.quickgo.util.XRef;
  * @author cbonill
  *
  */
-public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm> {
-	
+public abstract class TermToSolrMapper implements SolrMapper<GenericTerm, SolrTerm> {
+
 	/**
 	 * See {@link SolrMapper#toSolrObject(Object))}
 	 */
 	public Collection<SolrTerm> toSolrObject(GenericTerm genericObject) {
 		return toSolrObject(genericObject, SolrTermDocumentType.getAsInterfaces());
 	}
-	
+
 	/**
 	 * See {@link SolrMapper#toSolrObject(Object, List)}
 	 */
 	public Collection<SolrTerm> toSolrObject(GenericTerm term, List<SolrDocumentType> solrDocumentTypes) {
 
 		List<SolrTerm> solrTerms = new ArrayList<>();
-		
+
 		for (SolrDocumentType termDocumentType : solrDocumentTypes) {
 			SolrTermDocumentType solrTermDocumentType = ((SolrTermDocumentType) termDocumentType);
 
 			switch (solrTermDocumentType) {
-			
+
 			case TERM:
 				solrTerms.add(mapBasicInformation(term));
 				break;
@@ -57,7 +57,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 				break;
 			case REPLACE:
 				solrTerms.addAll(mapReplace(term));
-				break;			
+				break;
 			case SYNONYM:
 				solrTerms.addAll(mapSynonym(term));
 				break;
@@ -67,15 +67,15 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 			case ONTOLOGYRELATION:
 				solrTerms.addAll(mapOntologyRelation(term));
 				break;
-			}			
+			}
 		}
 		mapSpecificFields(term, solrTerms, solrDocumentTypes);
 
 		return solrTerms;
 	}
-	
+
 	/**
-	 * Map fields specific to the term type 
+	 * Map fields specific to the term type
 	 */
 	public abstract void mapSpecificFields(GenericTerm term, List<SolrTerm> solrTerms, List<SolrDocumentType> solrDocumentTypes);
 
@@ -87,13 +87,13 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 	private SolrTerm mapBasicInformation(GenericTerm term) {
 		SolrTerm solrTerm = new SolrTerm();
 		solrTerm.setDocType(SolrTermDocumentType.TERM.getValue());
-		solrTerm.setId(term.getId());		
-		solrTerm.setName(term.getName());		
+		solrTerm.setId(term.getId());
+		solrTerm.setName(term.getName());
 		solrTerm.setObsolete(term.isObsolete());
 		solrTerm.setComment(term.getComment());
 		solrTerm.setDefinition(term.getDefinition());
 		solrTerm.setSubsets(term.getSubsetsNames());
-		
+
 		List<String> definitionXrefs = new ArrayList<>();
 		for(XRef definitionXref : term.getDefinitionXrefs()){
 			if(definitionXref.getDb().equalsIgnoreCase("PMID")){//TODO Only taking into account PMID at the moment
@@ -101,31 +101,31 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 			}
 		}
 		solrTerm.setDefinitionXref(definitionXrefs);
-		
+
 		List<String> secondaryIds = new ArrayList<>();
 		if (term.altIds != null) {
 			for(XRef secondaryId : term.altIds){
 				secondaryIds.add(secondaryId.getId());
 			}
 		}
-		solrTerm.setSecondaryIds(secondaryIds);		
-		
+		solrTerm.setSecondaryIds(secondaryIds);
+
 		// Extra fields for GO Terms
 		if (term instanceof GOTerm) {
 			solrTerm.setOntology(((GOTerm) term).getOntologyText());
 			solrTerm.setUsage(((GOTerm) term).getUsage().text);
 		}
-		
+
 		// Credits
 		List<String> credits = new ArrayList<>();
 		for(TermCredit termCredit : term.getCredits()){
 			credits.add(termCredit.getCode() + "--" + termCredit.getUrl());
 		}
 		solrTerm.setCredits(credits);
-		
+
 		return solrTerm;
 	}
-	
+
 	/**
      * Map Solr terms for external references of a term
      * @param term Term
@@ -145,8 +145,8 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 		}
 		return solrTermXrefs;
 	}
-	
-	
+
+
 	/**
      * Map Solr terms for replaced terms
      * @param term Term
@@ -154,7 +154,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
      */
 	private Collection<SolrTerm> mapReplace(GenericTerm term) {
 		Collection<SolrTerm> solrTermReplaces = new ArrayList<>();
-		for (TermRelation goReplaced : term.replaces) {	
+		for (TermRelation goReplaced : term.replaces) {
 			SolrTerm solrTermReplace = new SolrTerm();
 			solrTermReplace.setDocType(SolrTermDocumentType.REPLACE.getValue());
 			solrTermReplace.setId(term.getId());
@@ -165,7 +165,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 		}
 		return solrTermReplaces;
 	}
-	
+
 	/**
      * Map Solr terms for relations of a term
      * @param relations Type of relation (parents or children)
@@ -184,7 +184,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 		}
 		return solrTermRelations;
 	}
-	
+
 	/**
      * Map Solr terms for synonyms of a term
      * @param term GO Term
@@ -198,7 +198,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 			solrTermSynonym.setDocType(SolrTermDocumentType.SYNONYM.getValue());
 			solrTermSynonym.setSynonymName(genericTermSynonym.name);
 			solrTermSynonym.setSynonymType(genericTermSynonym.type);
-
+			solrTermSynonym.setName(term.getName());
 			solrTermSynonyms.add(solrTermSynonym);
 		}
 		return solrTermSynonyms;
@@ -220,7 +220,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 			Date date = null;
 			try {
 				date = formatter.parse(genericTermHistory.timestamp);
-			} catch (ParseException e) {				
+			} catch (ParseException e) {
 				e.printStackTrace();
 			}
 			solrTermHistory.setHistoryTimeStamp(date);
@@ -232,7 +232,7 @@ public abstract class SolrTermMapper implements SolrMapper<GenericTerm, SolrTerm
 		}
 		return solrTermHistories;
 	}
-	
+
 	/**
 	 * Maps cross ontology relations information
 	 * @param term Term to map the information from
