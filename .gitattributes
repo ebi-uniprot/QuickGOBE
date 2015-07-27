@@ -154,10 +154,10 @@ quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/miscellaneous/En
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/miscellaneous/SolrMiscellaneousMapper.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/EntityTermMapper.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/TermToSolrMapper.java -text svneol=unset#text/plain
+quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/eco/ECOTermToSolrMapper.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/eco/EntityECOTermMapper.java -text svneol=unset#text/plain
-quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/eco/SolrECOTermMapper.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/go/EntityGOTermMapper.java -text svneol=unset#text/plain
-quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/go/SolrGOTermMapper.java -text svneol=unset#text/plain
+quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/term/go/GOTermToSolrMapper.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/SolrDocumentType.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/annotation/GOAnnotation.java -text
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/annotation/SolrAnnotation.java -text svneol=unset#text/plain

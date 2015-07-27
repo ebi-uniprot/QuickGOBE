@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.ontology.go.TaxonConstraint;
-import uk.ac.ebi.quickgo.solr.mapper.term.SolrTermMapper;
+import uk.ac.ebi.quickgo.solr.mapper.term.TermToSolrMapper;
 import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
 import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm;
 import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm.SolrTermDocumentType;
@@ -18,18 +18,18 @@ import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm.SolrTermDocumentType;
  * Mapper for GO terms
  */
 @Service("solrGOTermMapper")
-public class SolrGOTermMapper extends SolrTermMapper{
+public class GOTermToSolrMapper extends TermToSolrMapper {
 
 	@Override
 	public void mapSpecificFields(GenericTerm term, List<SolrTerm> solrTerms, List<SolrDocumentType> solrDocumentTypes) {
-		
+
 		GOTerm goTerm = (GOTerm)term;
-		
+
 		for (SolrDocumentType termDocumentType : solrDocumentTypes) {
 			SolrTermDocumentType solrTermDocumentType = ((SolrTermDocumentType) termDocumentType);
 
 			switch (solrTermDocumentType) {
-		
+
 			case CONSTRAINT:
 				solrTerms.addAll(mapTaxonConstraint(goTerm));
 				break;
@@ -38,7 +38,7 @@ public class SolrGOTermMapper extends SolrTermMapper{
 				break;
 			}
 		}
-		
+
 	}
 
 
@@ -49,25 +49,25 @@ public class SolrGOTermMapper extends SolrTermMapper{
      */
 	private Collection<SolrTerm> mapTaxonConstraint(GOTerm term) {
 		Collection<SolrTerm> solrTermTaxonConstaints = new ArrayList<SolrTerm>();
-		
-		for (TaxonConstraint goTaxonConstraint : term.taxonConstraints) {			
+
+		for (TaxonConstraint goTaxonConstraint : term.taxonConstraints) {
 			SolrTerm solrTermTaxonConstraint = new SolrTerm();
 			solrTermTaxonConstraint.setDocType(SolrTermDocumentType.CONSTRAINT.getValue());
-			solrTermTaxonConstraint.setId(term.getId());			
+			solrTermTaxonConstraint.setId(term.getId());
 			solrTermTaxonConstraint.setTaxonConstraintRuleId(goTaxonConstraint.getRuleId());
-			solrTermTaxonConstraint.setTaxonConstraintAncestorId(goTaxonConstraint.getGoId());			
+			solrTermTaxonConstraint.setTaxonConstraintAncestorId(goTaxonConstraint.getGoId());
 			solrTermTaxonConstraint.setTaxonConstraintName(goTaxonConstraint.getName());
 			solrTermTaxonConstraint.setTaxonConstraintRelationship(goTaxonConstraint.relationship());
 			solrTermTaxonConstraint.setTaxonConstraintTaxIdType(goTaxonConstraint.taxIdType());
 			solrTermTaxonConstraint.setTaxonConstraintTaxId(goTaxonConstraint.getTaxId());
 			solrTermTaxonConstraint.setTaxonConstraintTaxName(goTaxonConstraint.getTaxonName());
 			solrTermTaxonConstraint.setPubMedIds(goTaxonConstraint.getSourcesIds());
-			
+
 			solrTermTaxonConstaints.add(solrTermTaxonConstraint);
 		}
 		return solrTermTaxonConstaints;
 	}
-	
+
 	/**
      * Map SolR terms for annotation guidelines of a GO term
      * @param term GO Term
