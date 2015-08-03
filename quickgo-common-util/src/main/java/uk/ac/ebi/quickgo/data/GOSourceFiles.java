@@ -61,32 +61,32 @@ public class GOSourceFiles extends OntologySourceFiles {
 	public GOSourceFiles(File directory) {
 		super(directory);
 		
-		goTerms = new TSVDataFile<EGOTerm>(directory, "TERMS");
-		definitions = new TSVDataFile<ETermDefinition>(directory, "DEFINITIONS");
-		synonyms = new TSVDataFile<ETermSynonym>(directory, "SYNONYMS");
-		comments = new TSVDataFile<ETermComment>(directory, "COMMENTS");
-		relations = new TSVDataFile<ETermRelation>(directory, "RELATIONS");
-		xrefs = new TSVDataFile<ETermXref>(directory, "GO_XREFS");
+		goTerms = new TSVDataFile<>(directory, "TERMS");
+		definitions = new TSVDataFile<>(directory, "DEFINITIONS");
+		synonyms = new TSVDataFile<>(directory, "SYNONYMS");
+		comments = new TSVDataFile<>(directory, "COMMENTS");
+		relations = new TSVDataFile<>(directory, "RELATIONS");
+		xrefs = new TSVDataFile<>(directory, "GO_XREFS");
 		definitionXrefs = new TSVDataFile<>(directory, "DEFINITION_XREFS");
 		crossOntologyRelations = new TSVDataFile<>(directory, "CROSS_ONTOLOGY_RELATIONS");
-		subsets = new TSVDataFile<ETermSubset>(directory, "SUBSETS");
-		history = new TSVDataFile<ETermHistory>(directory, "TERM_HISTORY");
-		credits = new TSVDataFile<ETermCredit>(directory, "TERM_CREDITS");
-		fundingBodies = new TSVDataFile<EFundingBody>(directory, "FUNDING_BODIES");
-		proteinComplexes = new TSVDataFile<EProteinComplex>(directory, "PROTEIN_COMPLEXES");
-		taxonUnions = new TSVDataFile<ETaxonUnion>(directory, "TAXON_UNIONS");
-		taxonConstraints = new TSVDataFile<ETaxonConstraint>(directory, "TAXON_CONSTRAINTS");
-		termTaxonConstraints = new TSVDataFile<ETermTaxonConstraint>(directory, "TERM_TAXON_CONSTRAINTS");
-		annotationGuidelines = new TSVDataFile<EAnnotationGuidelineInfo>(directory, "ANNOTATION_GUIDELINES");
-		plannedGOChanges = new TSVDataFile<EPlannedGOChangeInfo>(directory, "PLANNED_GO_CHANGES");
-		annExtRelations = new TSVDataFile<EAnnExtRelation>(directory, "ANNOTATION_EXTENSION_RELATIONS");
-		aerRelations = new TSVDataFile<EAnnExtRelRelation>(directory, "AER_RELATIONS");
-		aerSecondaries = new TSVDataFile<EAnnExtRelSecondary>(directory, "AER_SECONDARIES");
-		aerSubsets = new TSVDataFile<EAnnExtRelSubset>(directory, "AER_SUBSETS");
-		aerDomains = new TSVDataFile<EAnnExtRelDomain>(directory, "AER_DOMAINS");
-		aerRanges = new TSVDataFile<EAnnExtRelRange>(directory, "AER_RANGES");
-		aerRangeDefaults = new TSVDataFile<EAnnExtRelRangeDefault>(directory, "AER_RANGE_DEFAULTS");
-		aerEntitySyntax = new TSVDataFile<EAnnExtRelEntitySyntax>(directory, "AER_ENTITY_SYNTAX");
+		subsets = new TSVDataFile<>(directory, "SUBSETS");
+		history = new TSVDataFile<>(directory, "TERM_HISTORY");
+		credits = new TSVDataFile<>(directory, "TERM_CREDITS");
+		fundingBodies = new TSVDataFile<>(directory, "FUNDING_BODIES");
+		proteinComplexes = new TSVDataFile<>(directory, "PROTEIN_COMPLEXES");
+		taxonUnions = new TSVDataFile<>(directory, "TAXON_UNIONS");
+		taxonConstraints = new TSVDataFile<>(directory, "TAXON_CONSTRAINTS");
+		termTaxonConstraints = new TSVDataFile<>(directory, "TERM_TAXON_CONSTRAINTS");
+		annotationGuidelines = new TSVDataFile<>(directory, "ANNOTATION_GUIDELINES");
+		plannedGOChanges = new TSVDataFile<>(directory, "PLANNED_GO_CHANGES");
+		annExtRelations = new TSVDataFile<>(directory, "ANNOTATION_EXTENSION_RELATIONS");
+		aerRelations = new TSVDataFile<>(directory, "AER_RELATIONS");
+		aerSecondaries = new TSVDataFile<>(directory, "AER_SECONDARIES");
+		aerSubsets = new TSVDataFile<>(directory, "AER_SUBSETS");
+		aerDomains = new TSVDataFile<>(directory, "AER_DOMAINS");
+		aerRanges = new TSVDataFile<>(directory, "AER_RANGES");
+		aerRangeDefaults = new TSVDataFile<>(directory, "AER_RANGE_DEFAULTS");
+		aerEntitySyntax = new TSVDataFile<>(directory, "AER_ENTITY_SYNTAX");
 	}
 	
 	@Override
