@@ -13,6 +13,7 @@ import uk.ac.ebi.quickgo.util.RowIterator;
 import uk.ac.ebi.quickgo.util.RowReader;
 
 @SuppressWarnings("serial")
+@Deprecated
 public class TSVFile extends File {
 	int nCols;
 
