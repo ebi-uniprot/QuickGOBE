@@ -12,7 +12,6 @@ import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 import uk.ac.ebi.quickgo.indexer.file.GPDataFile;
 import uk.ac.ebi.quickgo.indexer.file.GPInformationFile;
-import uk.ac.ebi.quickgo.solr.indexing.Indexer;
 import uk.ac.ebi.quickgo.solr.indexing.service.geneproduct.GeneProductIndexer;
 import uk.ac.ebi.quickgo.solr.indexing.service.geneproduct.mapping.GeneProductIdMapping;
 import uk.ac.ebi.quickgo.util.MemoryMonitor;
@@ -47,7 +46,6 @@ public class QuickGOGeneProductIndexer {
 	 * @param gpiList
 	 *            list of gp_information files that contain the metadata for the
 	 *            gene products to be indexed
-	 * @return number of gene products indexed
 	 * @throws Exception
 	 */
 	public void indexGeneProducts(List<NamedFile> gpiList) throws Exception {
@@ -67,8 +65,7 @@ public class QuickGOGeneProductIndexer {
 	/**
 	 * index gene product cross-references
 	 *
-	 * @param gp2List
-	 *            list of gp2protein files
+	 * @param gp2proteinList list of gp2protein files
 	 * @return True if the indexing finished correctly, False otherwise
 	 */
 	public boolean indexDBXRefs(List<NamedFile> gp2proteinList) {
@@ -101,10 +98,8 @@ public class QuickGOGeneProductIndexer {
 	 *            Size of the chunk
 	 * @throws Exception
 	 */
-	private int readAndIndexGPDataFileByChunks(GPDataFile gpDataFile,
-			Indexer solrIndexer, int chunkSize) throws Exception {
-
-		List rows = new ArrayList();
+	private int readAndIndexGPDataFileByChunks(GPDataFile gpDataFile, GeneProductIndexer solrIndexer, int chunkSize) throws Exception {
+		List<GeneProduct> rows = new ArrayList<>();
 		MemoryMonitor mm = new MemoryMonitor(true);
 		logger.info("Load " + gpDataFile.getName());
 
@@ -117,7 +112,7 @@ public class QuickGOGeneProductIndexer {
 		int count = 0;
 		String[] columns;
 		while ((columns = gpDataFile.reader.readRecord()) != null) {
-			GeneProduct geneProduct = (GeneProduct) gpDataFile.calculateRow(columns);// Calculate next row
+			GeneProduct geneProduct = (GeneProduct)gpDataFile.calculateRow(columns);// Calculate next row
 			if (geneProduct != null){
 				rows.add(geneProduct);// Add it to the chunk
 				count++;
@@ -133,7 +128,6 @@ public class QuickGOGeneProductIndexer {
 		// Index the rest
 		solrIndexer.index(rows);
 		indexed = indexed + rows.size();
-		rows = new ArrayList<>();
 
 		gpDataFile.reader.close();
 		logger.info("Load " + gpDataFile.getName() + " done - " + mm.end());

@@ -12,7 +12,6 @@ import uk.ac.ebi.quickgo.indexer.file.GPAssociationFile;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
-import uk.ac.ebi.quickgo.solr.indexing.Indexer;
 import uk.ac.ebi.quickgo.solr.indexing.service.annotation.AnnotationIndexer;
 import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.util.CPUUtils;
@@ -79,7 +78,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 	 *            Size of the chunk
 	 * @throws Exception
 	 */
-	private int readAndIndexGPDataFileByChunks(GPAssociationFile gpDataFile, Indexer solrIndexer, int chunkSize) throws Exception {
+	private int readAndIndexGPDataFileByChunks(GPAssociationFile gpDataFile, AnnotationIndexer solrIndexer, int chunkSize) throws Exception {
 		List<GOAnnotation> rows = new ArrayList<>();
 		MemoryMonitor mm = new MemoryMonitor(true);
 		logger.info("Load " + gpDataFile.getName());
@@ -90,10 +89,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 		int count = 0;
 		String[] columns;
 
-
-
 		while ((columns = gpDataFile.reader.readRecord()) != null) {
-
 			// Calculate next row and add it to the chunk
 			long rowCreationStart = CPUUtils.getCpuTime();
 			GOAnnotation annotation = gpDataFile.calculateRow(columns);
@@ -103,7 +99,6 @@ public class QuickGOAnnotationIndexer extends Thread{
 
 			count++;
 			if (count == chunkSize) {// If the chunk size is reached, index it and reset the counters
-
 				long solrCallStart = CPUUtils.getCpuTime();
 				solrIndexer.index(rows);
 				solrCallTime += CPUUtils.getCpuTime()-solrCallStart;
