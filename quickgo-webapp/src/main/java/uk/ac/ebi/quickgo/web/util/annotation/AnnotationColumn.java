@@ -261,22 +261,22 @@ public enum AnnotationColumn {
 			termJson.setReplacements(term.getReplacements());
 			termJson.setHistory(term.getHistory());
 
-/*
+
 			List<ChildTermRelationJson> childRelationsJson = new ArrayList<>();
 
 			//Move in child term relations
-		for (TermRelation childTermsRelation : childTermsRelations){
-			ChildTermRelationJson childTermRelationJson = new ChildTermRelationJson();
+				for (TermRelation childTermsRelation : childTermsRelations){
+					ChildTermRelationJson childTermRelationJson = new ChildTermRelationJson();
 
-			GenericTerm aChild = childTermsRelation.getChild();
-			childTermRelationJson.setId(aChild.getId());
-			childTermRelationJson.setName(aChild.getName());
+					GenericTerm aChild = childTermsRelation.getChild();
+					childTermRelationJson.setId(aChild.getId());
+					childTermRelationJson.setName(aChild.getName());
 
-			childTermRelationJson.setTypeOf(childTermsRelation.getTypeof());
-			childRelationsJson.add(childTermRelationJson);
-		}
-//		termJson.setChildTermsRelations(childRelationsJson);
-*/
+					childTermRelationJson.setTypeOf(childTermsRelation.getTypeof());
+					childRelationsJson.add(childTermRelationJson);
+				}
+			termJson.setChildTermsRelations(childRelationsJson);
+
 
 			//Stats
 			termJson.setAllCoOccurrenceStatsTerms(allStats);
