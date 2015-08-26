@@ -51,7 +51,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 			// gp_association files
 			logger.info("Indexing " + file.getName());
 
-			//todo make gpAssociationFile of type GpaDataFile, once the later uses Generics
+			//todo make gpAssociationFile of type GpaDataFile, once the later uses Generics - What EXACTLY does this mean?
 			 gpAssociationFile = new GPAssociationFile(file, ontology.terms, evidenceCodeOntology.terms, taxonomies, CHUNK_SIZE);
 			 indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer, CHUNK_SIZE);
 
