@@ -680,7 +680,7 @@ public class FileService {
 	 * @return GAFF header
 	 */
 	public static String getGAFFHeader(){
-		return "!gaf-version: 2.0\n" +
+		return "!gaf-version: 2.1\n" +
 				"!Project_name: UniProt GO Annotation (UniProt-GOA)\n" +
 				"!URL: http://www.ebi.ac.uk/GOA\n" +
 				"!Contact Email: goa@ebi.ac.uk\n" +
