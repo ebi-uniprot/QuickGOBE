@@ -126,7 +126,7 @@ public class GPAssociationFile extends GPDataFile {
 		//Populate data from file
 		GpaFile gpaFile = new GpaFile(columns);
 
-		logger.info("Created a new GpaFile {}", gpaFile);
+		//logger.info("Created a new GpaFile {}", gpaFile);
 
 		// Get gene products, properties and sequences chunk from Solr and add to cache
 		getGeneProductsChunk(gpaFile.dbObjectID);
