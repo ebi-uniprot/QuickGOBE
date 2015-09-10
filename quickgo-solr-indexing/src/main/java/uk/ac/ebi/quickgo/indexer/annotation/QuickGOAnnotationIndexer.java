@@ -37,7 +37,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 	private	Map<Integer, Miscellaneous> taxonomies;
 
 	//TODO Increase this value to speed up the indexing process
-	private static final int CHUNK_SIZE = 150000;
+	private static final int CHUNK_SIZE = 75000;
 	private long rowCreationTime;
 	private long solrCallTime;
 
@@ -53,7 +53,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 
 			//todo make gpAssociationFile of type GpaDataFile, once the later uses Generics - What EXACTLY does this mean?
 			 gpAssociationFile = new GPAssociationFile(file, ontology.terms, evidenceCodeOntology.terms, taxonomies, CHUNK_SIZE);
-			 indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer, CHUNK_SIZE);
+			 indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -74,11 +74,9 @@ public class QuickGOAnnotationIndexer extends Thread{
 	 *            File to read
 	 * @param solrIndexer
 	 *            Indexer to use
-	 * @param chunkSize
-	 *            Size of the chunk
 	 * @throws Exception
 	 */
-	private int readAndIndexGPDataFileByChunks(GPAssociationFile gpDataFile, AnnotationIndexer solrIndexer, int chunkSize) throws Exception {
+	private int readAndIndexGPDataFileByChunks(GPAssociationFile gpDataFile, AnnotationIndexer solrIndexer) throws Exception {
 		List<GOAnnotation> rows = new ArrayList<>();
 		MemoryMonitor mm = new MemoryMonitor(true);
 		logger.info("Load " + gpDataFile.getName());
@@ -98,7 +96,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 			rowCreationTime+=CPUUtils.getCpuTime()-rowCreationStart;
 
 			count++;
-			if (count == chunkSize) {// If the chunk size is reached, index it and reset the counters
+			if (count == CHUNK_SIZE) {// If the chunk size is reached, index it and reset the counters
 				long solrCallStart = CPUUtils.getCpuTime();
 				solrIndexer.index(rows);
 				solrCallTime += CPUUtils.getCpuTime()-solrCallStart;

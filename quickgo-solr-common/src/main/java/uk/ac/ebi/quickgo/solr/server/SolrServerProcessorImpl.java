@@ -25,31 +25,31 @@ import org.apache.solr.common.util.NamedList;
 
 /**
  * Solr server processor implementation
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable {
 
 	private static final long serialVersionUID = -7846227382523035421L;
 
 	// Solr server
-	private HttpSolrServer solrServer;	
-	
+	private HttpSolrServer solrServer;
+
 	// Set via Spring
 	private String solrURL;
-	
+
 	// Max number of rows to be returned by Solr queries
 	private final int NUM_ROWS = 100000;
-	
+
 	/**
 	 * See {@link SolrServerProcessor#findByQuery(SolrQuery, Class, int)}
 	 */
-	public <T> List<T> findByQuery(SolrQuery solRQuery, Class<T> type, int numRows) throws SolrServerException {		
+	public <T> List<T> findByQuery(SolrQuery solRQuery, Class<T> type, int numRows) throws SolrServerException {
 		solRQuery.setRows(numRows <= -1 ? NUM_ROWS : numRows);
 		return getSolrServer().query(solRQuery).getBeans(type);
 	}
-	
+
 	/**
 	 * See {@link SolrServerProcessor#indexBeans(Collection)}
 	 */
@@ -57,15 +57,19 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 		SolrServer server = getSolrServer();
 		server.addBeans(beans);
 		server.commit();
-	}	
-	
+	}
+
 	/**
 	 * See {@link SolrServerProcessor#indexBeansAutoCommit(Collection)}
 	 */
 	public <T> void indexBeansAutoCommit(Collection<T> beans) throws SolrServerException, IOException {
-		getSolrServer().addBeans(beans);		
-	}	
-	
+
+		// If the beans length / size of entries is too large is creates a
+		// <code>java.lang.OutOfMemoryError: Requested array size exceeds VM limit</code>
+		// error here
+		getSolrServer().addBeans(beans);
+	}
+
 	/**
 	 * See {@link SolrServerProcessor#deleteAll()}
 	 */
@@ -83,7 +87,7 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 		server.deleteByQuery(query);// Deletes by query
 		server.commit();
 	}
-	
+
 	/**
 	 * See {@link SolrServerProcessor#getTotalNumberDocuments(SolrQuery)}
 	 */
@@ -92,7 +96,7 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	    query.setRows(0);  // Don't actually request any data
 	    return getSolrServer().query(query).getResults().getNumFound();
 	}
-	
+
 	/**
 	 * See {@link SolrServerProcessor#getTopTerms(SolrQuery)}
 	 */
@@ -106,7 +110,7 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 		}
 		return terms;
 	}
-	
+
 	/**
 	 * See {@link SolrServerProcessor#getFacetTerms(SolrQuery)}
 	 */
@@ -114,20 +118,20 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	public List<Count> getFacetTerms(SolrQuery solrQuery) throws SolrServerException {
 		List<Count> counts = new ArrayList<>();
 		solrQuery.setRows(0);//Don't actually request any data
-		QueryResponse queryResponse = getSolrServer().query(solrQuery);		
-		for (FacetField facetField : queryResponse.getFacetFields()) {			
+		QueryResponse queryResponse = getSolrServer().query(solrQuery);
+		for (FacetField facetField : queryResponse.getFacetFields()) {
 			String facetFieldName = facetField.getName();
 			counts = queryResponse.getFacetField(facetFieldName).getValues();
 		}
 		return counts;
 	}
-	
+
 	/**
 	 * See {@link SolrServerProcessor#getFields(String, String, String)}
 	 */
-	public Map<String, Map<String, String>> getFields(String query, String fieldID, String fields) throws SolrServerException{	
+	public Map<String, Map<String, String>> getFields(String query, String fieldID, String fields) throws SolrServerException{
 		Map<String, Map<String, String>> values = new HashMap<>();
-				
+
 		SolrQuery solrQuery = new SolrQuery(query);
 		solrQuery.setRows(Integer.MAX_VALUE);
 		solrQuery.setFields(fieldID + "," + fields);// Fields to return
@@ -143,7 +147,7 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 		}
 		return values;
 	}
-	
+
 	@Override
 	public Map<String, Integer> getFacetTermsWithPivot(SolrQuery solrQuery) throws SolrServerException {
 		Map<String, Integer> countsMap = new HashMap<>();
@@ -159,18 +163,18 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 				total = total + lastPivot.getCount();
 			}
 			countsMap.put((String)pivotField.getValue(), total);
-		}		
-		
+		}
+
 		return countsMap;
-	}		
-	
+	}
+
 	private SolrServer getSolrServer() {
 		if (solrServer == null) {
 			solrServer = new HttpSolrServer(solrURL);
 		}
 		return solrServer;
 	}
-	
+
 	public String getSolrURL() {
 		return solrURL;
 	}
@@ -192,9 +196,9 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	public long getTotalNumberDistinctValues(String query, String field) throws SolrServerException {
 		SolrQuery solrQuery = new SolrQuery(query);
 		solrQuery.add("group", "true");
-		solrQuery.add("group.field", field);// Group by the field		
+		solrQuery.add("group.field", field);// Group by the field
 		solrQuery.add("group.ngroups", "true");
 		solrQuery.setRows(0);
 		return getSolrServer().query(solrQuery).getGroupResponse().getValues().get(0).getNGroups();
-	}	
+	}
 }

@@ -32,6 +32,7 @@ public class AnnotationIndexer implements Indexer<GOAnnotation> {
 	 */
 	public void index(List<GOAnnotation> list) {
 		//Collection<GOAnnotation> annotationBeans = mapBeans(list);
+		logger.info("Sending " + list.size() + " annotation mapped beans for indexing");
 
 		try {
 			solrServerProcessor.indexBeansAutoCommit(list);
