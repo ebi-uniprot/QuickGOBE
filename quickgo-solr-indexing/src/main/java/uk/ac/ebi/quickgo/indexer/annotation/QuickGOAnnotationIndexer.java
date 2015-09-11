@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.indexer.annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +38,11 @@ public class QuickGOAnnotationIndexer extends Thread{
 	private	Map<Integer, Miscellaneous> taxonomies;
 
 	//TODO Increase this value to speed up the indexing process
-	private static final int CHUNK_SIZE = 75000;
 	private long rowCreationTime;
 	private long solrCallTime;
+	private Properties properties;
+	private int CHUNK_SIZE =  Integer.parseInt(properties.getProperty("quickgo.index.annotation.chunksize"));
+
 
 	public void run() {
 
@@ -145,5 +148,9 @@ public class QuickGOAnnotationIndexer extends Thread{
 
 	public void setTaxonomies(Map<Integer, Miscellaneous> taxonomies) {
 		this.taxonomies = taxonomies;
+	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 }

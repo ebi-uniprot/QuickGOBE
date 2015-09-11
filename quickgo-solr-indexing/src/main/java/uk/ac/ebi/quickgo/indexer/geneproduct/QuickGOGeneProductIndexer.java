@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.indexer.geneproduct;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ public class QuickGOGeneProductIndexer {
 
 	// Log
 	private static final Logger logger = LoggerFactory.getLogger(QuickGOGeneProductIndexer.class);
+	private Properties properties;
 
 	/**
 	 * index all gene products
@@ -133,5 +135,9 @@ public class QuickGOGeneProductIndexer {
 		logger.info("Load " + gpDataFile.getName() + " done - " + mm.end());
 
 		return indexed;
+	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 }

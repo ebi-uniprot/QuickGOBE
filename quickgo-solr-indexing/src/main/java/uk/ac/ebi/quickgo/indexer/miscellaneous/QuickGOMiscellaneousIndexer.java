@@ -1,13 +1,6 @@
 package uk.ac.ebi.quickgo.indexer.miscellaneous;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,22 +44,23 @@ public class QuickGOMiscellaneousIndexer {
 	 * Contains all the taxonomies
 	 */
 	Map<Integer,Miscellaneous> taxonomiesMap = new HashMap<>();
-	
+
 	/**
 	 * Miscellaneous indexer
 	 */
 	@Autowired
 	MiscellaneousIndexer miscellaneousIndexer;
-	
+
 	/**
 	 * Chunks size to index
 	 */
 	private final int CHUNK_SIZE = 200000;
-	
+
 	// Log
-	private static final Logger logger = LoggerFactory.getLogger(QuickGOMiscellaneousIndexer.class);		
-		
-	public void index(SourceFiles sourceFiles, GeneOntology geneOntology) throws Exception{				
+	private static final Logger logger = LoggerFactory.getLogger(QuickGOMiscellaneousIndexer.class);
+	private Properties properties;
+
+	public void index(SourceFiles sourceFiles, GeneOntology geneOntology) throws Exception{
 		this.indexTaxonomies(sourceFiles.taxonomy);
 		this.indexEvidences(sourceFiles.evidenceInfo);
 		this.indexSubsetsCounts(geneOntology.terms.values());
@@ -81,17 +75,17 @@ public class QuickGOMiscellaneousIndexer {
 
 	/**
 	 * Index taxonomies and their closures
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void indexTaxonomies(TSVDataFile<ETaxon> taxonomies) throws Exception {
 		//Delete all taxonomies previously indexed
 		miscellaneousIndexer.deleteByQuery(MiscellaneousField.TYPE.getValue() + ":" + SolrMiscellaneousDocumentType.TAXONOMY.getValue());
 		//Contains chunk of taxonomies indexed
 		Map<Integer,Miscellaneous> taxonomiesMapTemp = new HashMap<>();
-		
-		MemoryMonitor mm = new MemoryMonitor(true);		
+
+		MemoryMonitor mm = new MemoryMonitor(true);
 		RowIterator rowIterator = taxonomies.reader(ETaxon.values());
-		
+
 		Iterator<String[]> iterator = rowIterator.iterator();
 		TaxonomyFile taxonomyFile = new TaxonomyFile();
 		while (iterator.hasNext()) {
@@ -104,21 +98,21 @@ public class QuickGOMiscellaneousIndexer {
 			}
 		}
 		//Index the rest
-		if(taxonomiesMapTemp.size() > 0){			
+		if(taxonomiesMapTemp.size() > 0){
 			miscellaneousIndexer.index(new ArrayList<>(taxonomiesMapTemp.values()));
 			taxonomiesMap.putAll(taxonomiesMapTemp);
 		}
-		logger.info("indexTaxonomies done: " + mm.end());		
+		logger.info("indexTaxonomies done: " + mm.end());
 	}
-	
+
 	/**
 	 * Index annotation extension relations information
 	 * @param goSourceFiles Source files containing information
 	 * @param geneOntology Gene ontology information
 	 */
 	private void indexAnnotationExtensionRelations(GOSourceFiles goSourceFiles, GeneOntology geneOntology) {
-		MemoryMonitor mm = new MemoryMonitor(true);	
-		
+		MemoryMonitor mm = new MemoryMonitor(true);
+
 		miscellaneousIndexer.deleteByQuery(MiscellaneousField.TYPE.getValue() + ":" + SolrMiscellaneousDocumentType.EXTENSION.getValue());
 		AnnotationExtensionRelations annotationExtensionRelations = null;
 		try {
@@ -139,29 +133,29 @@ public class QuickGOMiscellaneousIndexer {
 			miscellaneousAERs.add(miscellaneous);
 			for(Entity entity : annotationExtensionRelation.getRanges().entities){
 				miscellaneous.setAerRange(entity.matchers.compositeRegExp);
-			}			
-			
+			}
+
 			if (miscellaneousAERs.size() == CHUNK_SIZE) {
 				miscellaneousIndexer.index(miscellaneousAERs);
 				miscellaneousAERs = new ArrayList<>();
 			}
 		}
-		
+
 		if (miscellaneousAERs.size() > 0) {
 			miscellaneousIndexer.index(miscellaneousAERs);
 		}
 		logger.info("indexAnnotationExtensionRelation done: " + mm.end());
 	}
-	
+
 	/**
 	 * Index protein sequences
 	 * @param sequenceSource File that contains sequences
 	 * @throws Exception
 	 */
-	private void indexSequences(TSVDataFile<ESequence> sequenceSource) throws Exception {		
+	private void indexSequences(TSVDataFile<ESequence> sequenceSource) throws Exception {
 		indexMiscellaneousData(sequenceSource, ESequence.values(), SolrMiscellaneousDocumentType.SEQUENCE);
 	}
-	
+
 	/**
 	 * Index publications
 	 * @param publicationSource File that contains publications
@@ -169,7 +163,7 @@ public class QuickGOMiscellaneousIndexer {
 	 */
 	private void indexPublications(TSVDataFile<EPublication> publicationSource) throws Exception {
 		indexMiscellaneousData(publicationSource, EPublication.values(), SolrMiscellaneousDocumentType.PUBLICATION);
-	}	
+	}
 
 	/**
 	 * Index annotation blacklist
@@ -177,9 +171,9 @@ public class QuickGOMiscellaneousIndexer {
 	 * @throws Exception
 	 */
 	private void indexAnnotationBlacklists(TSVDataFile<EAnnotationBlacklistEntry> annotationBlacklistSource) throws Exception {
-		indexMiscellaneousData(annotationBlacklistSource, EAnnotationBlacklistEntry.values(), SolrMiscellaneousDocumentType.BLACKLIST);		
+		indexMiscellaneousData(annotationBlacklistSource, EAnnotationBlacklistEntry.values(), SolrMiscellaneousDocumentType.BLACKLIST);
 	}
-	
+
 	/**
 	 * Index annotation guidelines
 	 * @param guidelineSource File that contains annotation guidelines
@@ -187,8 +181,8 @@ public class QuickGOMiscellaneousIndexer {
 	 */
 	private void indexAnnotationGuidelines(TSVDataFile<EAnnotationGuidelineEntry> guidelineSource) throws Exception {
 		indexMiscellaneousData(guidelineSource, EAnnotationGuidelineEntry.values(), SolrMiscellaneousDocumentType.GUIDELINE);
-	}	
-	
+	}
+
 	/**
 	 * Index Xref databases
 	 */
@@ -196,34 +190,34 @@ public class QuickGOMiscellaneousIndexer {
 		miscellaneousIndexer.deleteByQuery(MiscellaneousField.TYPE.getValue() + ":" + SolrMiscellaneousDocumentType.XREFDB.getValue());
 		indexMiscellaneousData(xrfAbbsInfo, EXrfAbbsEntry.values(), SolrMiscellaneousDocumentType.XREFDB);
 	}
-	
+
 	/**
 	 * Index evidence types
 	 */
 	private void indexEvidences(TSVDataFile<EEvidenceCode> evidenceInfo) throws Exception {
 		miscellaneousIndexer.deleteByQuery(MiscellaneousField.TYPE.getValue() + ":" + SolrMiscellaneousDocumentType.EVIDENCE.getValue());
-		indexMiscellaneousData(evidenceInfo, EEvidenceCode.values(), SolrMiscellaneousDocumentType.EVIDENCE);		
+		indexMiscellaneousData(evidenceInfo, EEvidenceCode.values(), SolrMiscellaneousDocumentType.EVIDENCE);
 	}
-	
+
 	/**
-	 * Index different types of miscellaneous data 
+	 * Index different types of miscellaneous data
 	 * @param source File contains information
 	 * @param columns File's columns
 	 * @param type TYpe of information to index (publications, sequences, ..)
 	 * @throws Exception
 	 */
-	private void indexMiscellaneousData(TSVDataFile source, Enum[] columns, SolrMiscellaneousDocumentType type) throws Exception{	
+	private void indexMiscellaneousData(TSVDataFile source, Enum[] columns, SolrMiscellaneousDocumentType type) throws Exception{
 		Set<Miscellaneous> data = new HashSet<>();
 		//Delete all data previously indexed
 		miscellaneousIndexer.deleteByQuery(MiscellaneousField.TYPE.getValue() + ":" + type.getValue());
-		
-		MemoryMonitor mm = new MemoryMonitor(true);		
+
+		MemoryMonitor mm = new MemoryMonitor(true);
 		RowIterator rowIterator = source.reader(columns);
-		
-		Iterator<String[]> iterator = rowIterator.iterator();		
+
+		Iterator<String[]> iterator = rowIterator.iterator();
 		while (iterator.hasNext()) {
 			String[] line = iterator.next();// Read line
-			data.add(buildElement(line, type));			
+			data.add(buildElement(line, type));
 			if (data.size() == CHUNK_SIZE) {
 				miscellaneousIndexer.index(new ArrayList<>(data));
 				data = new HashSet<>();
@@ -235,10 +229,10 @@ public class QuickGOMiscellaneousIndexer {
 		}
 		logger.info("index" + type.getValue() + " done: " + mm.end());
 	}
-	
+
 	/**
 	 * Build a Miscellaneous object from a read line from a file
-	 * @param line Read line 
+	 * @param line Read line
 	 * @param type Type of read line
 	 * @return Miscellaneous representation of the line
 	 */
@@ -270,7 +264,7 @@ public class QuickGOMiscellaneousIndexer {
 			miscellaneous.setBacklistEntryType(line[6]);
 			break;
 		case XREFDB:
-			String abbreviation = line[0];			
+			String abbreviation = line[0];
 			miscellaneous.setXrefAbbreviation(abbreviation);
 			miscellaneous.setXrefDatabase(line[1]);
 			if(XrefAbbsUtil.isOverriden(abbreviation)){
@@ -278,12 +272,12 @@ public class QuickGOMiscellaneousIndexer {
 				miscellaneous.setXrefUrlSyntax(XrefAbbsUtil.getUrlSyntax(abbreviation));
 			} else {
 				miscellaneous.setXrefGenericURL(line[2]);
-				miscellaneous.setXrefUrlSyntax(line[3]);	
+				miscellaneous.setXrefUrlSyntax(line[3]);
 			}
 			break;
 		case EVIDENCE:
 			miscellaneous.setEvidenceCode(line[0]);
-			miscellaneous.setEvidenceName(line[1]);			
+			miscellaneous.setEvidenceName(line[1]);
 			break;
 		default:
 			break;
@@ -320,11 +314,19 @@ public class QuickGOMiscellaneousIndexer {
 			miscSubset.setSubsetCount(subsetsCount.get(subset));
 			subsetsCounts.add(miscSubset);
 		}
-		
+
 		miscellaneousIndexer.index(subsetsCounts);
 	}
-	
+
 	public Map<Integer, Miscellaneous> getTaxonomiesMap() {
 		return taxonomiesMap;
+	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+
+	public Properties getProperties() {
+		return properties;
 	}
 }

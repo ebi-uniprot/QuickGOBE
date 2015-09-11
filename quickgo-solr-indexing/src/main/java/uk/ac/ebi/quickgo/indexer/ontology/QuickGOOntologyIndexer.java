@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.indexer.ontology;
 
 import java.util.ArrayList;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,25 +27,26 @@ public class QuickGOOntologyIndexer {
 	 */
 	@Autowired
 	TermIndexer goTermIndexer;
-	
+
 	/**
 	 * ECO Terms indexer service
 	 */
 	@Autowired
 	TermIndexer ecoTermIndexer;
-	
+
 	// Log
 	private static final Logger logger = LoggerFactory.getLogger(QuickGOOntologyIndexer.class);
-	
+
 	// cache of the GO data
 	GeneOntology ontology = new GeneOntology();
-	
+
 	// ECO
 	EvidenceCodeOntology evidenceCodeOntology = new EvidenceCodeOntology();
-	
+	private Properties properties;
+
 	/**
 	 * index all the GO terms
-	 * 
+	 *
 	 * @param sourceFiles
 	 *            object containing references to all of the source files needed
 	 *            by the indexing operation
@@ -52,34 +54,35 @@ public class QuickGOOntologyIndexer {
 	 */
 	public void indexOntologies(SourceFiles sourceFiles) throws Exception {
 		MemoryMonitor mm = new MemoryMonitor(true);
-	
+
 		// read the ontology data from file, build an in-memory
 		// representation and index data in Solr
+		goTermIndexer.setProperties(properties);
 		goTermIndexer.deleteAll();
 		// Index GO
 		indexGO(sourceFiles);
 		// Index ECO
-		indexECO(sourceFiles);	
-		logger.info("index Ontologies done: " + mm.end());		
+		indexECO(sourceFiles);
+		logger.info("index Ontologies done: " + mm.end());
 	}
 
 	/**
 	 * Index GO terms
-	 * 
+	 *
 	 * @param sourceFiles
 	 *            Source files
 	 * @throws Exception
 	 */
 	private void indexGO(SourceFiles sourceFiles) throws Exception {
 		MemoryMonitor mm = new MemoryMonitor(true);
-		ontology.load(sourceFiles.goSourceFiles);		
+		ontology.load(sourceFiles.goSourceFiles);
 		goTermIndexer.index(new ArrayList<>(ontology.terms.values()));
 		logger.info("indexGO done: " + mm.end() + "  total indexed: "	+ ontology.terms.size());
 	}
 
 	/**
 	 * Index ECO terms
-	 * 
+	 *
 	 * @param sourceFiles
 	 *            Source files
 	 * @throws Exception
@@ -97,5 +100,13 @@ public class QuickGOOntologyIndexer {
 
 	public EvidenceCodeOntology getEvidenceCodeOntology() {
 		return evidenceCodeOntology;
-	}	
+	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+
+	public Properties getProperties() {
+		return properties;
+	}
 }

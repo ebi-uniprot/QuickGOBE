@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,7 @@ public class QuickGOIndexer {
 
 	// gene product data (which may include cross-references) comes from gp_information files
 	private ArrayList<NamedFile> gpiList = new ArrayList<>();
+	private Properties properties;
 
 
 	/**
@@ -99,12 +101,15 @@ public class QuickGOIndexer {
 		try{
 			// first index the GO data - this will also build an in-memory representation of the ontology, which will be used
 			// later when indexing the annotation data
+			quickGOOntologyIndexer.setProperties(this.properties);
 			quickGOOntologyIndexer.indexOntologies(sourceFiles);
 
 			// index miscellaneous data
+			quickGOMiscellaneousIndexer.setProperties(this.properties);
  			quickGOMiscellaneousIndexer.index(sourceFiles, quickGOOntologyIndexer.getOntology());
 
 			// index the gene products - this will also build a cache that will be used when indexing the annotations
+			quickGOGeneProductIndexer.setProperties(this.properties);
 			quickGOGeneProductIndexer.indexGeneProducts(gpiList);
 
 			// index any DB Xrefs - this augments the information indexed by indexGeneProducts
@@ -114,6 +119,7 @@ public class QuickGOIndexer {
 			indexAnnotations();
 
 			// Index Co-Occurrence stats
+			quickGOCOOccurrenceStatsIndexer.setProperties(this.properties);
 			quickGOCOOccurrenceStatsIndexer.index();
 
 		} catch (Exception e) {
@@ -137,6 +143,7 @@ public class QuickGOIndexer {
 
 		annotationIndexer.deleteAll();
 
+
 		//Iterate over list of files and create a thread to process each of them
 		List<QuickGOAnnotationIndexer> goAnnotationIndexers = new ArrayList<>();
 		for(NamedFile file : gpaList){
@@ -156,6 +163,7 @@ public class QuickGOIndexer {
 		quickGOAnnotationIndexer.setEvidenceCodeOntology(quickGOOntologyIndexer.getEvidenceCodeOntology());
 		quickGOAnnotationIndexer.setTaxonomies(quickGOMiscellaneousIndexer.getTaxonomiesMap());
 		quickGOAnnotationIndexer.setAnnotationIndexer(annotationIndexer);
+		quickGOAnnotationIndexer.setProperties(this.properties);
 		quickGOAnnotationIndexer.start();
 		return quickGOAnnotationIndexer;
 	}
@@ -176,4 +184,7 @@ public class QuickGOIndexer {
 	}
 
 
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
 }

@@ -1,8 +1,12 @@
 package uk.ac.ebi.quickgo.indexer;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +35,28 @@ public class QuickGOIndexerProcess {
 	public static void main(String[] args) {
 
 		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "indexing-beans.xml", "query-beans.xml");
-		quickGOIndexer = (QuickGOIndexer) appContext.getBean("quickGOIndexer");
-		String start = DateFormat.getInstance().format(Calendar.getInstance().getTime());
-		logger.info("================================================================");
-		logger.info("STARTED: " + start);
-		logger.info("================================================================");
-		quickGOIndexer.index();
-		logger.info("================================================================");
-		logger.info("DONE: " + DateFormat.getInstance().format(Calendar.getInstance().getTime()));
-		logger.info("================================================================");
+
+		Properties defaultProps = new Properties();
+		try {
+			String configDir = System.getProperty("CONFIG");
+			File propsFile = new File(configDir, "quickgo-indexing.properties");
+			FileInputStream in = new FileInputStream(propsFile);
+			defaultProps.load(in);
+			in.close();
+			quickGOIndexer = (QuickGOIndexer) appContext.getBean("quickGOIndexer");
+			quickGOIndexer.setProperties(defaultProps);
+
+			String start = DateFormat.getInstance().format(Calendar.getInstance().getTime());
+			logger.info("================================================================");
+			logger.info("STARTED: " + start);
+			logger.info("================================================================");
+			quickGOIndexer.index();
+			logger.info("================================================================");
+			logger.info("DONE: " + DateFormat.getInstance().format(Calendar.getInstance().getTime()));
+			logger.info("================================================================");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 }
