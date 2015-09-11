@@ -2,12 +2,7 @@ package uk.ac.ebi.quickgo.solr.server;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -22,6 +17,8 @@ import org.apache.solr.client.solrj.response.TermsResponse.Term;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Solr server processor implementation
@@ -31,6 +28,7 @@ import org.apache.solr.common.util.NamedList;
  */
 public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable {
 
+	private static final Logger logger = LoggerFactory.getLogger(SolrServerProcessorImpl.class);
 	private static final long serialVersionUID = -7846227382523035421L;
 
 	// Solr server
@@ -41,6 +39,7 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 
 	// Max number of rows to be returned by Solr queries
 	private final int NUM_ROWS = 100000;
+	private Properties properties;
 
 	/**
 	 * See {@link SolrServerProcessor#findByQuery(SolrQuery, Class, int)}
@@ -64,9 +63,9 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	 */
 	public <T> void indexBeansAutoCommit(Collection<T> beans) throws SolrServerException, IOException {
 
-		// If the beans length / size of entries is too large is creates a
+		//If the beans length / size of entries is too large is creates a
 		// <code>java.lang.OutOfMemoryError: Requested array size exceeds VM limit</code>
-		// error here
+		// eer
 		getSolrServer().addBeans(beans);
 	}
 
@@ -171,6 +170,7 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	private SolrServer getSolrServer() {
 		if (solrServer == null) {
 			solrServer = new HttpSolrServer(solrURL);
+			logger.info("Solr url is " + solrURL);
 		}
 		return solrServer;
 	}
@@ -193,6 +193,11 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 	}
 
 	@Override
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+
+	@Override
 	public long getTotalNumberDistinctValues(String query, String field) throws SolrServerException {
 		SolrQuery solrQuery = new SolrQuery(query);
 		solrQuery.add("group", "true");
@@ -201,4 +206,5 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 		solrQuery.setRows(0);
 		return getSolrServer().query(solrQuery).getGroupResponse().getValues().get(0).getNGroups();
 	}
+
 }
