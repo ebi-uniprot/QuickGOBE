@@ -1,10 +1,7 @@
 package uk.ac.ebi.quickgo.solr.indexing.service.ontology;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,24 +24,25 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 public class TermIndexer implements Indexer<GenericTerm> {
 
 	private SolrServerProcessor solrServerProcessor;
-	
+
 	private SolrMapper<GenericTerm, SolrTerm> solrMapper;
-	
+
 	// Log
 	private static final Logger logger = LoggerFactory.getLogger(TermIndexer.class);
+	private Properties properties;
 
 	/**
 	 * See {@link Indexer#index(List)}
 	 */
 	public void index(List<GenericTerm> list) {
 		Collection<SolrTerm> termBeans = mapBeans(list);
-		try {			
+		try {
 			solrServerProcessor.indexBeans(termBeans);
 		} catch (SolrServerException | IOException e) {
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Deletes everything from the schema
 	 * @throws SolrServerException
@@ -53,7 +51,7 @@ public class TermIndexer implements Indexer<GenericTerm> {
 	public void deleteAll() throws SolrServerException, IOException{
 		solrServerProcessor.deleteAll();
 	}
-	
+
 
 	public void setSolrMapper(SolrMapper<GenericTerm, SolrTerm> solrMapper) {
 		this.solrMapper = solrMapper;
@@ -61,14 +59,14 @@ public class TermIndexer implements Indexer<GenericTerm> {
 
 	/**
      * Indexes GO Terms in SolR
-     * @throws SolrServerException 
+     * @throws SolrServerException
      */
 	private Collection<SolrTerm> mapBeans(List<GenericTerm> terms) {
 
 		// TreeSet to avoid duplicated Relations
 		Set<SolrTerm> beans = new TreeSet<SolrTerm>(new SolrTermComparator());
 		//  Iterate over all the GO terms and convert them into Solr objects to be indexed
-		for (GenericTerm term : terms) {			
+		for (GenericTerm term : terms) {
 			beans.addAll(solrMapper.toSolrObject(term));
     	}
 		return beans;
@@ -76,5 +74,10 @@ public class TermIndexer implements Indexer<GenericTerm> {
 
 	public void setSolrServerProcessor(SolrServerProcessor solRServerProcessor) {
 		this.solrServerProcessor = solRServerProcessor;
+	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+		solrServerProcessor.setProperties(properties);
 	}
 }
