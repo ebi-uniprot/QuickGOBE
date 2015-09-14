@@ -1,12 +1,6 @@
 package uk.ac.ebi.quickgo.indexer.statistics;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.Set;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +60,7 @@ public class QuickGOCOOccurrenceStatsIndexer {
 
 	// Log
 	private static final Logger logger = LoggerFactory.getLogger(QuickGOCOOccurrenceStatsIndexer.class);
+	private Properties properties;
 
 	/**
 	 * Main method for indexing co-occurrence stats
@@ -242,4 +237,9 @@ public class QuickGOCOOccurrenceStatsIndexer {
 		}
 		return termsIDs;
 	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+
 }
