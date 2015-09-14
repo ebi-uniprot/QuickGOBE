@@ -74,6 +74,7 @@ public class QuickGOOntologyIndexer {
 	 * @throws Exception
 	 */
 	private void indexGO(SourceFiles sourceFiles) throws Exception {
+		logger.info("Indexing GO Ontologies");
 		MemoryMonitor mm = new MemoryMonitor(true);
 		ontology.load(sourceFiles.goSourceFiles);
 		goTermIndexer.index(new ArrayList<>(ontology.terms.values()));
@@ -88,6 +89,7 @@ public class QuickGOOntologyIndexer {
 	 * @throws Exception
 	 */
 	private void indexECO(SourceFiles sourceFiles) throws Exception {
+		logger.info("Indexing ECO Ontologies");
 		MemoryMonitor mm = new MemoryMonitor(true);
 		evidenceCodeOntology.load(sourceFiles.ecoSourceFiles, "root");
 		ecoTermIndexer.index(new ArrayList<>(evidenceCodeOntology.terms.values()));
