@@ -41,8 +41,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 	private long rowCreationTime;
 	private long solrCallTime;
 	private Properties properties;
-	private int CHUNK_SIZE =  Integer.parseInt(properties.getProperty("quickgo.index.annotation.chunksize"));
-
+	private int CHUNK_SIZE;
 
 	public void run() {
 
@@ -152,5 +151,6 @@ public class QuickGOAnnotationIndexer extends Thread{
 
 	public void setProperties(Properties properties) {
 		this.properties = properties;
+		CHUNK_SIZE =  Integer.parseInt(properties.getProperty("quickgo.index.annotation.chunksize"));
 	}
 }
