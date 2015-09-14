@@ -101,24 +101,30 @@ public class QuickGOIndexer {
 		try{
 			// first index the GO data - this will also build an in-memory representation of the ontology, which will be used
 			// later when indexing the annotation data
+			logger.info("Indexing Ontologies");
 			quickGOOntologyIndexer.setProperties(this.properties);
 			quickGOOntologyIndexer.indexOntologies(sourceFiles);
 
 			// index miscellaneous data
+			logger.info("Indexing Miscellaneous");
 			quickGOMiscellaneousIndexer.setProperties(this.properties);
  			quickGOMiscellaneousIndexer.index(sourceFiles, quickGOOntologyIndexer.getOntology());
 
 			// index the gene products - this will also build a cache that will be used when indexing the annotations
+			logger.info("Indexing Gene Products");
 			quickGOGeneProductIndexer.setProperties(this.properties);
 			quickGOGeneProductIndexer.indexGeneProducts(gpiList);
 
 			// index any DB Xrefs - this augments the information indexed by indexGeneProducts
+			logger.info("Indexing Gene Products DB Xrefs");
 			quickGOGeneProductIndexer.indexDBXRefs(Arrays.asList(sourceFiles.getMappingFiles()));
 
 			//now we can index the annotations themselves
+			logger.info("Indexing Annotations");
 			indexAnnotations();
 
 			// Index Co-Occurrence stats
+			logger.info("Indexing Co-occurence Stats");
 			quickGOCOOccurrenceStatsIndexer.setProperties(this.properties);
 			quickGOCOOccurrenceStatsIndexer.index();
 
