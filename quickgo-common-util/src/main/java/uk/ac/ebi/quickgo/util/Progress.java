@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Progress {
+    public static final int BYTES_IN_MB = 1048576;
     long time;
     int count;
     long startMemory;
@@ -39,12 +40,16 @@ public class Progress {
                 long now = System.nanoTime();
                 double pct = monitor.getFraction();
                 String estimate = (pct == 0) ? "" : (int)((now - time) / pct * (1 - pct) / Interval.SECOND_NS) + "s";
-                logger.info("[" + (int)(pct * 100) + "%" + estimate + memory / 1048576 + "MB]");
+                logger.info("[" + (int) (pct * 100) + "%" + estimate + " Memory: " + toMegaBytes(memory) + "]");
             }
             else {
-                logger.info("[" + count / 100000 + ":" + memory / 1048576 + "MB]");
+                logger.info("[" + count / 100000 + ":" + " Memory: " + toMegaBytes(memory) + "]");
             }
         }
+    }
+
+    private String toMegaBytes(long memory) {
+        return memory / BYTES_IN_MB + "MB";
     }
 
     private long memory() {
@@ -56,7 +61,10 @@ public class Progress {
     public void end() {
     	time = System.nanoTime() - time;
         long usedMemory = memory() - startMemory;
-        String message = ":" + time / Interval.SECOND_NS + "s " + count + " " + (count == 0 ? "" : time / count + " ns " + usedMemory / count + " bytes each");
+        String message = "Total Time:" + time / Interval.SECOND_NS + "s "
+                + "records: " + count
+                + " " + (count == 0 ? "" : time / count + "ns per record; "
+                + usedMemory / count + " bytes each");
         logger.info(message);
     }
 
