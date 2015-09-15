@@ -24,7 +24,7 @@ public interface TermRetrieval extends Retrieval<GOTerm>{
 	 * @param fields Fields to retrieve
 	 */
 	Map<String, Map<String, String>> getFieldValues(String query, String fieldID, String fields) throws SolrServerException;
-	
+
 	/**
 	 * Autosuggest term names/ids based on the inserted text
 	 * @param text Text to search for
@@ -35,6 +35,8 @@ public interface TermRetrieval extends Retrieval<GOTerm>{
 	 */
 	List<GenericTerm> autosuggest(String text, String fq,int numResults) throws SolrServerException;
 
+	List<GenericTerm> autosuggestOnlyGoTerms(String text, String fq,int numResults) throws SolrServerException;
+
 	/**
 	 * Highlight functionality
 	 * @param text Text to highlight
@@ -44,7 +46,7 @@ public interface TermRetrieval extends Retrieval<GOTerm>{
 	 * @return Terms with highlighted text
 	 */
 	List<GenericTerm> highlight(String text, String fq, int start, int rows) throws SolrServerException;
-	
+
 	/**
 	 * Return total number highlight results
 	 * @param text Text to search for

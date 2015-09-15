@@ -202,6 +202,28 @@ public class TermRetrievalImpl implements TermRetrieval,Serializable{
 	}
 
 
+	public List<GenericTerm> autosuggestOnlyGoTerms(String text, String fq,int numResults) throws SolrServerException {
+
+		List<GenericTerm> terms = new ArrayList<>();
+		SolrQuery solrQuery = new SolrQuery().setQuery("*" + text + "*" + " AND docType:term");
+		List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, numResults);
+		if (results != null) {
+			for (SolrTerm solrTerm : results) {
+				if (solrTerm.getId().startsWith(ECOTerm.ECO)) {
+					terms.add(ecoTermMapper.toEntityObject(Collections.singletonList(solrTerm)));
+				}
+				else {
+					terms.add(goTermMapper.toEntityObject(Collections.singletonList(solrTerm)));
+				}
+			}
+		}
+		return terms;
+	}
+
+
+
+
+
 	@Override
 	public List<GenericTerm> highlight(String text, String fq, int start, int rows) throws SolrServerException {
 		SolrQuery query = new SolrQuery();
