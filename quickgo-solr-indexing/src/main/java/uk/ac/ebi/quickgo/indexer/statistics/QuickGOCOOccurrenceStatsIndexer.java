@@ -85,8 +85,10 @@ public class QuickGOCOOccurrenceStatsIndexer {
 			indexStats(true, totalNumberProteinsNonIEA);
 			nonIEAProteinsByTerm.clear();
 			logger.info("Non IEA co-occurrence statistics indexed");
+
 			// Reset number of threads
 			NUM_THREADS = 1;
+
 			// All annotations
 			logger.info("Indexing all co-occurrence statistics");
 			indexStats(false, totalNumberProteins);
@@ -104,16 +106,22 @@ public class QuickGOCOOccurrenceStatsIndexer {
 	 * @throws SolrServerException
 	 */
 	private void indexStats(boolean nonIEA, float totalNumberProteins) throws SolrServerException {
+
 		// Initialise counts
 		termsNumberProteins = new HashMap<String, Float>();
+
 		// Store stats values
 		List<Miscellaneous> stats = new ArrayList<>();
+
 		// Get annotated GO ids
 		List<String> goIDs = getAnnotatedTermIDS(nonIEA);
 		goIDs.remove("go");//Remove "go" term
+
+
 		int index = 0;
 
 		while (index < goIDs.size()) {
+
 			runStatsThreads(goIDs, index, totalNumberProteins, nonIEA, stats);
 			index = index + NUM_THREADS;
 			// Index when have more than STATS_SIZE
@@ -145,7 +153,9 @@ public class QuickGOCOOccurrenceStatsIndexer {
 	 * @param stats Calculated stats
 	 */
 	public void runStatsThreads(List<String> goIDs, int index, float totalNumberProteins, boolean nonIEA, List<Miscellaneous> stats){
+
 		Set<COOccurrenceStatsProcessor> statsProcessors = new HashSet<COOccurrenceStatsProcessor>(NUM_THREADS);
+
 		// Create the threads
 		for (int i = 0; i < NUM_THREADS; i++) {
 			if(index + i < goIDs.size()){
@@ -224,13 +234,16 @@ public class QuickGOCOOccurrenceStatsIndexer {
 	 * @return All the GO terms with annotations
 	 * @throws SolrServerException
 	 */
-	public List<String> getAnnotatedTermIDS(boolean nonIEA) throws SolrServerException{
+	private List<String> getAnnotatedTermIDS(boolean nonIEA) throws SolrServerException{
 		String query = "*:*";
 		if (nonIEA) {
 			query = query + " AND " + nonIEAQuery;
 		}
 		List<Count> terms = annotationRetrieval.getFacetFields(query, null, AnnotationField.GOID.getValue(), Integer.MAX_VALUE);
-		terms = terms.subList(1, terms.size());// Remove "go" term
+
+		//The following line is done in the calling code.
+		//terms = terms.subList(1, terms.size());// Remove "go" term
+
 		List<String> termsIDs = new ArrayList<>();
 		for (Count term : terms) {
 			termsIDs.add(term.getName());

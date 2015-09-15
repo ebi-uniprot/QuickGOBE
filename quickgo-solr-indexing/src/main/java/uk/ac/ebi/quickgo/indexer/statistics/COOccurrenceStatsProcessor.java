@@ -33,113 +33,137 @@ public class COOccurrenceStatsProcessor extends Thread {
 
 	// Log
 	private static final Logger logger = LoggerFactory.getLogger(COOccurrenceStatsProcessor.class);
-	
+
 	// Annotation retrieval
 	AnnotationRetrieval annotationRetrieval;
-	
+
 	// Term id to process
 	String ontologyTermID;
-	
+
 	// Stats terms
 	TreeSet<COOccurrenceStatsTerm> statsTerms = new TreeSet<COOccurrenceStatsTerm>();
-	
+
 	// Contains number of annotated proteins for each GO Term
-	Map<String,Float> termsNumberProteins = new HashMap<String, Float>(); 
+	Map<String,Float> termsNumberProteins = new HashMap<String, Float>();
 
 	// Indicates if we are taking into account electronic annotations or not
 	boolean nonIEA;
-	
+
 	// Total number of annotated proteins
 	float totalNumberProteins = 0;
-	
+
 	/**
 	 * List of proteins annotated to each term taking into account the entire set of annotations
 	 */
 	Map<String, Set<String>> allProteinsByTerm = new HashMap<String, Set<String>>();
-	
+
 	/**
 	 * List of proteins annotated to each term taking into account non electronic annotations
 	 */
 	Map<String, Set<String>> nonIEAProteinsByTerm = new HashMap<String, Set<String>>();
-	
+
 	// Non electronic annotations query (if necessary)
 	String nonIEAquery = "";
-	
+
 	// Type of the statistics to calculate ("all" or "nonIEA")
 	String type = MiscellaneousValue.ALL.getValue();
-	
+
 	// Size of proteins sublist query
 	private final int QUERY_SIZE = 500;
-	
+
 	public void run() {
-		try {			
+		try {
 			if (nonIEA) {// If non electronic annotations, add the restriction
 				nonIEAquery = " AND NOT " + AnnotationField.GOEVIDENCE.getValue() + ":" + "IEA";
 				type = MiscellaneousValue.NON_IEA.getValue();
 			}
-	
+
 			// Get proteins annotated with the specified GO term
 			List<String> proteins = getGOIDAnnotatedProteins();
 			Collections.sort(proteins);
 
+			//Get a list of GOTerms associated with proteins that also have the target Term
+			TreeSet<String> goTermIDs = populateTermIDs(proteins);
+			goTermIDs.remove("go");                                // Remove "go" term	todo why? whatfor?
+
+
+
+			Set<String> proteinSet = new HashSet<>(proteins);		//todo hmm - lots of copying - is this required?
+
 			// To store stats for each term
 			TreeMap<String, COOccurrenceStatsTerm> termsCount = new TreeMap<>();
-			
-			int start = 0;
-			int end = QUERY_SIZE;
 			float selected = 0;
-			// Split the proteins in chunks of 700 proteins (Solr by default doesn't allow "OR" queries bigger than 1024 values)
-			TreeSet<String> goTermIDS = new TreeSet<String>();
-			while (start < proteins.size()) {
-				if (end > proteins.size()) {
-					end = proteins.size();
-				}
-				// Create sub list of proteins to query
-				List<String> proteinsSubList = proteins.subList(start, end);
-				//Escape proteins identifiers
-				List<String> escapedProteins = new ArrayList<>();
-				for(String protein : proteinsSubList){
-					escapedProteins.add(ClientUtils.escapeQueryChars(protein));
-				}
-				String proteinValues = "(" + StringUtils.arrayToDelimitedString(escapedProteins.toArray(), " OR ") + ")";
 
-				// Get GO IDS annotated with the same proteins as the go term we are processing
-				goTermIDS.addAll(getTermsAnnotatedSameProteins(proteinValues));					
-				
-				start = end;
-				end = end + QUERY_SIZE;			
-			}
-	
 			// Calculate stats values for each GO Term
-			Set<String> proteinSet = new HashSet<>(proteins);
-			goTermIDS.remove("go");// Remove "go" term
-			for (String goTerm : goTermIDS) {
+			for (String goTerm : goTermIDs) {
+
 				float compared = calculateComparedValue(goTerm, termsCount);
-				float together = getTogether(goTerm, proteinSet);
-				if (goTerm.equals(ontologyTermID)) {					
+				float together = calculateTogether(goTerm, proteinSet);
+
+				//
+				if (goTerm.equals(ontologyTermID)) {
 					selected = together;
 				}
+
 				// Build the stats object
 				COOccurrenceStatsTerm coOccurrenceStatsTerm = buildCoOccurrenceStatsTerm(goTerm, termsCount, together, compared);
 				termsCount.put(goTerm, coOccurrenceStatsTerm);
 			}
-			
-			// Set "selected" value and sort the set
+
+			// Set "selected" value on every stat term
 			List<COOccurrenceStatsTerm> coOccurrenceStatsTermsList = new ArrayList<>(termsCount.values());
+
 			for (COOccurrenceStatsTerm coOccurrenceStatsTerm : coOccurrenceStatsTermsList) {
-				coOccurrenceStatsTerm.setSelected(selected);				
+				coOccurrenceStatsTerm.setSelected(selected);
 			}
+
+			// and sort the set
 			statsTerms = new TreeSet<COOccurrenceStatsTerm>(coOccurrenceStatsTermsList);
 			statsTerms.descendingSet();
+
+
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
 	}
 
+	private TreeSet<String> populateTermIDs(List<String> proteins) {
+		int start = 0;
+		int end = QUERY_SIZE;
+
+		// Split the proteins in chunks of 700 proteins (Solr by default doesn't allow "OR" queries bigger than 1024 values)
+		TreeSet<String> goTermIDs = new TreeSet<>();
+
+		while (start < proteins.size()) {
+
+			if (end > proteins.size()) {
+				end = proteins.size();
+			}
+
+
+			List<String> escapedProteins = new ArrayList<>();
+
+			//Get sublist of protein identifiers and create an escaped version of this list
+			for(String protein : proteins.subList(start, end)){
+				escapedProteins.add(ClientUtils.escapeQueryChars(protein));
+			}
+
+			//Create query string of escaped proteins
+			String proteinORList = "(" + StringUtils.arrayToDelimitedString(escapedProteins.toArray(), " OR ") + ")";
+
+			// Get GO IDs annotated with the same proteins as the go term we are processing
+			goTermIDs.addAll(getTermsAnnotatedSameProteins(proteinORList));
+
+			start = end;
+			end = end + QUERY_SIZE;
+		}
+		return goTermIDs;
+	}
+
 	/**
 	 * Calculate "compared" value
-	 * @param goTerm GO Term to 
+	 * @param goTerm GO Term to
 	 * @param termsCount
 	 * @return Count of proteins where compared term is annotated
 	 * @throws SolrServerException
@@ -164,7 +188,7 @@ public class COOccurrenceStatsProcessor extends Thread {
 	 * @throws SolrServerException
 	 */
 	private List<String> getTermsAnnotatedSameProteins(String proteinValues) {
-		List<String> goTermIDS = new ArrayList<>();		
+		List<String> goTermIDS = new ArrayList<>();
 		List<Count> goTerms = new ArrayList<>();
 		try {
 			goTerms.addAll(annotationRetrieval.getFacetFields(AnnotationField.DBOBJECTID.getValue() + ":" + proteinValues + nonIEAquery, null, AnnotationField.GOID.getValue(), Integer.MAX_VALUE));
@@ -187,19 +211,19 @@ public class COOccurrenceStatsProcessor extends Thread {
 	 * @return Count of proteins where both selected and compared terms are annotated
 	 * @throws SolrServerException
 	 */
-	private float getTogether(String goTerm, Set<String> proteins) throws SolrServerException{
+	private float calculateTogether(String goTerm, Set<String> proteins) throws SolrServerException{
 		if (goTerm.equals(ontologyTermID)) {
 			return proteins.size();
 		}
 		Set<String> comparedTermproteins = new HashSet<String>();
 		Map<String, Set<String>> proteinsByTerm = allProteinsByTerm;
-		
+
 		if (nonIEA) {
 			proteinsByTerm = nonIEAProteinsByTerm;
-		}		
+		}
 		if (proteinsByTerm.get(goTerm) != null) {// Previously calculated
 			comparedTermproteins = proteinsByTerm.get(goTerm);
-		} else {			
+		} else {
 				List<Count> counts = annotationRetrieval.getFacetFields(
 						AnnotationField.GOID.getValue() + ":"
 								+ ClientUtils.escapeQueryChars(goTerm)
@@ -207,7 +231,7 @@ public class COOccurrenceStatsProcessor extends Thread {
 						AnnotationField.DBOBJECTID.getValue(), Integer.MAX_VALUE);
 				for (Count count : counts) {
 					comparedTermproteins.add(count.getName());
-				}				
+				}
 			// Put into corresponding set
 			if (nonIEA) {
 				nonIEAProteinsByTerm.put(goTerm, comparedTermproteins);
@@ -216,13 +240,13 @@ public class COOccurrenceStatsProcessor extends Thread {
 			}
 		}
 		// Calculate proteins in common
-		if(proteins.size() > comparedTermproteins.size()){// The intersection method is faster when the smaller set is the first		
-			return Sets.intersection(comparedTermproteins, proteins).size();			
+		if(proteins.size() > comparedTermproteins.size()){// The intersection method is faster when the smaller set is the first
+			return Sets.intersection(comparedTermproteins, proteins).size();
 		} else {
 			return Sets.intersection(comparedTermproteins, proteins).size();
-		}		
+		}
 	}
-	
+
 	/**
 	 * Calculate count of proteins where compared term is annotated
 	 * @param goTerm GO Term to query
@@ -232,9 +256,9 @@ public class COOccurrenceStatsProcessor extends Thread {
 	private float getCompared(String goTerm) throws SolrServerException{
 		return annotationRetrieval.getTotalNumberProteins(AnnotationField.GOID.getValue() + ":" + ClientUtils.escapeQueryChars(goTerm) + nonIEAquery);
 	}
-	
+
 	/**
-	 * Build a {@link COOccurrenceStatsTerm} 
+	 * Build a {@link COOccurrenceStatsTerm}
 	 * @param goTerm GO Term stats to build
 	 * @param termsCount Map with the terms stats
 	 * @param together "Together" stats value
@@ -242,8 +266,8 @@ public class COOccurrenceStatsProcessor extends Thread {
 	 * @return {@link COOccurrenceStatsTerm} representation
 	 */
 	private COOccurrenceStatsTerm buildCoOccurrenceStatsTerm(String goTerm, TreeMap<String, COOccurrenceStatsTerm> termsCount, float together, float compared) {
-		
-		COOccurrenceStatsTerm coOccurrenceStatsTerm = new COOccurrenceStatsTerm();		
+
+		COOccurrenceStatsTerm coOccurrenceStatsTerm = new COOccurrenceStatsTerm();
 		coOccurrenceStatsTerm.setTogether((int)together);
 		coOccurrenceStatsTerm.setCompared((int)compared);
 		coOccurrenceStatsTerm.setComparedTerm(goTerm);
@@ -256,15 +280,15 @@ public class COOccurrenceStatsProcessor extends Thread {
 	/**
 	 * Calculate list of proteins annotated to a term
 	 * @return List of proteins annotated to a term
-	 * @throws SolrServerException 
+	 * @throws SolrServerException
 	 */
 	private List<String> getGOIDAnnotatedProteins() throws SolrServerException {
-		List<Count> counts = new ArrayList<>();		
+		List<Count> counts = new ArrayList<>();
 		counts = annotationRetrieval.getFacetFields(
 				AnnotationField.GOID.getValue() + ":"
 						+ ClientUtils.escapeQueryChars(ontologyTermID)
 						+ nonIEAquery, null,
-				AnnotationField.DBOBJECTID.getValue(), Integer.MAX_VALUE);		
+				AnnotationField.DBOBJECTID.getValue(), Integer.MAX_VALUE);
 		// Get protein accessions
 		List<String> proteins = new ArrayList<>();
 		for (Count count : counts) {
