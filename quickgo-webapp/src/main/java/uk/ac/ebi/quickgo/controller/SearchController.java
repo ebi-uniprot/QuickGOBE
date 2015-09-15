@@ -77,7 +77,7 @@ public class SearchController {
 	private List<Object> searchResults = new ArrayList<>();
 	Gson gson = new Gson();
 
-	private final int NUMBER_SHOWN_HITS = 10;
+	private final int NUMBER_SHOWN_HITS = 20;
 
 	@RequestMapping(value = "autoSuggestByName", method = { RequestMethod.POST, RequestMethod.GET })
 	public ResponseEntity<String> findByName(
@@ -115,7 +115,13 @@ public class SearchController {
 	}
 
 
-
+	/**
+	 * This is the one used for the typeahead
+	 * @param query
+	 * @param httpServletResponse
+	 * @throws IOException
+	 * @throws SolrServerException
+	 */
 	@RequestMapping(value = "searchTypeAhead", method = { RequestMethod.POST, RequestMethod.GET })
 	public void searchTypeAhead(
 			@RequestParam(value = "query") String query,
@@ -125,17 +131,20 @@ public class SearchController {
 		List<TypeAheadResult> results = new ArrayList<>();
 		final String regex = ".*" + query.toLowerCase().replaceAll("\\s+", ".*") + ".*";
 
-		List<GenericTerm> terms = termService.autosuggest(query,null, 30);
+		//List<GenericTerm> terms = termService.autosuggest(query,null, NUMBER_SHOWN_HITS);
+		List<GenericTerm> terms = termService.autosuggestOnlyGoTerms(query,null, NUMBER_SHOWN_HITS);
 
-		if (!query.contains(":")) {
+//		if (!query.contains(":")) {
+//
+//			addTerms(results, terms, regex);
+//			addGeneProducts(results, geneProductService.autosuggest(query, null, NUMBER_SHOWN_HITS), regex);
+//
+//		} else {// GO or ECO id
+//			addTermsIds(results, terms, regex);
+//		}
 
-			addTerms(results, terms, regex);
-			addGeneProducts(results, geneProductService.autosuggest(query, null, 30), regex);
-
-		} else {// GO or ECO id
-			addTermsIds(results, terms, regex);
-		}
-
+		addTerms(results, terms, regex);
+		//addTermsIds(results, terms, regex);
 		returnResultsJson(httpServletResponse, results);
 	}
 
@@ -491,12 +500,22 @@ public class SearchController {
 				if(genericTerm.getName().toLowerCase().trim().matches(regex)){
 					TypeAheadResult typeAheadResult = new TypeAheadResult(genericTerm.getId(), genericTerm.getName(), SearchResultType.TERM);
 					results.add(typeAheadResult);
-				}else {
-					if (!genericTerm.getSynonyms().isEmpty() && genericTerm.getSynonyms().get(0).getName().toLowerCase().trim().matches(regex)) {
-						TypeAheadResult typeAheadResult = new TypeAheadResult(genericTerm.getId(), genericTerm.getSynonyms().get(0).getName(), SearchResultType.TERM);
-						results.add(typeAheadResult);
-
-					}
+					continue;
+				}
+				if (!genericTerm.getSynonyms().isEmpty() && genericTerm.getSynonyms().get(0).getName().toLowerCase().trim().matches(regex)) {
+					TypeAheadResult typeAheadResult = new TypeAheadResult(genericTerm.getId(), genericTerm.getSynonyms().get(0).getName(), SearchResultType.TERM);
+					results.add(typeAheadResult);
+					continue;
+				}
+				if(genericTerm.getDefinition().toLowerCase().trim().matches(regex)) {
+					TypeAheadResult typeAheadResult = new TypeAheadResult(genericTerm.getId(), genericTerm.getDefinition(), SearchResultType.TERM);
+					results.add(typeAheadResult);
+					continue;
+				}
+				if(genericTerm.getId().toLowerCase().trim().matches(regex)) {
+					TypeAheadResult typeAheadResult = new TypeAheadResult(genericTerm.getId(), genericTerm.getName(), SearchResultType.TERM);
+					results.add(typeAheadResult);
+					continue;
 				}
 			}
 		}

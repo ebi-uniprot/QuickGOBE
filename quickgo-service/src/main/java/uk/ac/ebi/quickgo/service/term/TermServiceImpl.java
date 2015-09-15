@@ -33,21 +33,21 @@ import uk.ac.ebi.quickgo.util.NamedXRef;
 
 /**
  * Service responsible for the main operations over Terms
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 public class TermServiceImpl implements TermService,Serializable {
-	
+
 	private static final long serialVersionUID = 4202735332039846712L;
 
 	// Log
 	private static final Logger logger = LoggerFactory.getLogger(TermServiceImpl.class);
 
 	TermRetrieval goTermRetrieval;
-	
+
 	EntityToStream<GOTerm> goTermEntityToStream;
-	
+
 	EntityToStream<ECOTerm> ecoTermEntityToStream;
 
 	/**
@@ -55,7 +55,7 @@ public class TermServiceImpl implements TermService,Serializable {
 	 */
 	@Cacheable(value="term")
 	public GOTerm retrieveTerm(String id) {
-		
+
 		GOTerm goTerm = new GOTerm();
 		try {
 			goTerm = goTermRetrieval.findById(id);
@@ -67,7 +67,7 @@ public class TermServiceImpl implements TermService,Serializable {
 		}
 		return goTerm;
 	}
-	
+
 
 	/**
 	 * {@link TermService#convertToStream(GenericTerm, Format, OutputStream)}
@@ -83,8 +83,8 @@ public class TermServiceImpl implements TermService,Serializable {
 			convertToXML(genericTerm, format, outputStream);
 			break;
 		}
-	}	
-	
+	}
+
 	/**
 	 * {@link TermService#convertToXML(GenericTerm, Format, OutputStream)}
 	 */
@@ -92,8 +92,8 @@ public class TermServiceImpl implements TermService,Serializable {
 		try {
 			if(genericTerm.isGOTerm()){
 				goTermEntityToStream.convertToXMLStream((GOTerm)genericTerm, format, outputStream);
-			}else if(genericTerm.isECOTerm()){				
-				ecoTermEntityToStream.convertToXMLStream((ECOTerm)genericTerm, Format.XML, outputStream);			
+			}else if(genericTerm.isECOTerm()){
+				ecoTermEntityToStream.convertToXMLStream((ECOTerm)genericTerm, Format.XML, outputStream);
 			}
 		} catch (JAXBException e) {
 			logger.error(e.getMessage());
@@ -106,9 +106,9 @@ public class TermServiceImpl implements TermService,Serializable {
 	public void convertToJSON(GenericTerm genericTerm, OutputStream outputStream) {
 		try {
 			if(genericTerm.isGOTerm()){
-				goTermEntityToStream.convertToJSONStream((GOTerm)genericTerm, outputStream);
+				goTermEntityToStream.convertToJSONStream((GOTerm) genericTerm, outputStream);
 			}else if(genericTerm.isECOTerm()){
-				ecoTermEntityToStream.convertToJSONStream((ECOTerm)genericTerm, outputStream);
+				ecoTermEntityToStream.convertToJSONStream((ECOTerm) genericTerm, outputStream);
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage());
@@ -134,7 +134,7 @@ public class TermServiceImpl implements TermService,Serializable {
 		}
 		return obo;
 	}
-	
+
 	@Override
 	public Map<String, Map<String, String>> retrieveNames() {
 		Map<String, Map<String, String>> values = new HashMap<>();
@@ -154,23 +154,28 @@ public class TermServiceImpl implements TermService,Serializable {
 	 * @return Primary term
 	 * @throws SolrServerException
 	 */
-	private GOTerm retrievePrimaryTerm(String id) throws SolrServerException{		
+	private GOTerm retrievePrimaryTerm(String id) throws SolrServerException{
 		String query = TermField.SECONDARYID.getValue() + ":" + ClientUtils.escapeQueryChars(id);
 		List<GOTerm> goTerms = goTermRetrieval.findByQuery(query, -1);
 		if (goTerms != null && goTerms.size() > 0) {
 			GenericTerm term = goTerms.get(0);
 			return goTermRetrieval.findById(term.getId());
-		} 
-		
-		return new GOTerm();		
+		}
+
+		return new GOTerm();
 	}
-	
+
 
 	@Override
 	public List<GenericTerm> autosuggest(String text, String filterQuery, int numResults) throws SolrServerException {
 		return goTermRetrieval.autosuggest(text,filterQuery,numResults);
 	}
-	
+
+	@Override
+	public List<GenericTerm> autosuggestOnlyGoTerms(String text, String filterQuery, int numResults) throws SolrServerException {
+		return goTermRetrieval.autosuggestOnlyGoTerms(text,filterQuery,numResults);
+	}
+
 	@Override
 	public List<GenericTerm> highlight(String text, String fq, int start, int rows) {
 		List<GenericTerm> terms = new ArrayList<>();
@@ -181,21 +186,21 @@ public class TermServiceImpl implements TermService,Serializable {
 		}
 		return terms;
 	}
-	
+
 	public long getTotalNumberHighlightResults(String text, String fq) {
 		long results = 0;
 		try {
 			results = goTermRetrieval.getTotalNumberHighlightResults(text, fq);
 		} catch (SolrServerException e) {
 			logger.error(e.getMessage());
-		}		
+		}
 		return results;
 	}
-	
+
 	public List<GOTerm> retrieveByHistoryDate(Date from, Date to, int limit){
 		List<GOTerm> terms = new ArrayList<>();
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));		
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
 		String query = TermField.HISTORYTIMESTAMP.getValue() + ":[" + df.format(from) + " TO " + df.format(to) + "]";
 		try {
 			terms = goTermRetrieval.findByQuery(query, limit);
@@ -203,7 +208,7 @@ public class TermServiceImpl implements TermService,Serializable {
 			logger.error(e.getMessage());
 		}
 		return terms;
-	}	
+	}
 
 
 	public EntityToStream<GOTerm> getGoTermEntityToStream() {
