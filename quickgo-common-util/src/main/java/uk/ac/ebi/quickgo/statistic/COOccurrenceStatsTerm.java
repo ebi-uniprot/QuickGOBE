@@ -19,11 +19,11 @@ public class COOccurrenceStatsTerm implements Comparable<COOccurrenceStatsTerm>{
 	int compared;
 	float selected;
 	float all;
-	
+
 	// Extra fields for displaying in web
 	String aspect;
-	String name;	
-	
+	String name;
+
 	public COOccurrenceStatsTerm(){}
 
 	/**
@@ -39,23 +39,23 @@ public class COOccurrenceStatsTerm implements Comparable<COOccurrenceStatsTerm>{
 		this.selected = miscellaneous.getSelected();
 		this.all = miscellaneous.getAll();
 	}
-	
+
 	public float getProbabilityRatio(){
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
 		float probabilityRatio = (this.together/this.selected) / (this.compared/this.all);
 		return Float.valueOf(twoDForm.format(probabilityRatio));// Round it with 2 decimals
 	}
-	
+
 	public float getProbabilitySimilarityRatio() {
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
-		float similarityRatio = 100 * ((this.together) / (this.selected+this.compared-this.together));		
-		float psRatio = Float.valueOf(twoDForm.format(similarityRatio));// Round it with 2 decimals				
+		float similarityRatio = 100 * ((this.together) / (this.selected+this.compared-this.together));
+		float psRatio = Float.valueOf(twoDForm.format(similarityRatio));// Round it with 2 decimals
 		if(Math.round(psRatio) == 100){
 			return 100;
 		}
 		return psRatio;
 	}
-	
+
 	public String getTerm() {
 		return term;
 	}
@@ -102,8 +102,8 @@ public class COOccurrenceStatsTerm implements Comparable<COOccurrenceStatsTerm>{
 
 	public void setAll(float all) {
 		this.all = all;
-	}	
-	
+	}
+
 	public String getStatsType() {
 		return statsType;
 	}
@@ -111,7 +111,7 @@ public class COOccurrenceStatsTerm implements Comparable<COOccurrenceStatsTerm>{
 	public void setStatsType(String statsType) {
 		this.statsType = statsType;
 	}
-	
+
 	public String getAspect() {
 		return aspect;
 	}
@@ -130,7 +130,6 @@ public class COOccurrenceStatsTerm implements Comparable<COOccurrenceStatsTerm>{
 
 	/**
 	 * Convert the object into a {@link Miscellaneous} one
-	 * @param type 
 	 * @return {@link Miscellaneous} representation
 	 */
 	public Miscellaneous toMiscellaneousObject(){
@@ -141,11 +140,11 @@ public class COOccurrenceStatsTerm implements Comparable<COOccurrenceStatsTerm>{
 		miscellaneous.setSelected(this.selected);
 		miscellaneous.setStatsType(this.statsType);
 		miscellaneous.setTerm(this.term);
-		miscellaneous.setTogether(this.together);		
-		
+		miscellaneous.setTogether(this.together);
+
 		return miscellaneous;
 	}
-	
+
 	@Override
 	public int compareTo(COOccurrenceStatsTerm o) {
 		if (this.getProbabilitySimilarityRatio() > o.getProbabilitySimilarityRatio()) {
@@ -154,6 +153,6 @@ public class COOccurrenceStatsTerm implements Comparable<COOccurrenceStatsTerm>{
 			return -1;
 		} else {
 			return this.comparedTerm.compareTo(o.comparedTerm);
-		}	
+		}
 	}
 }
