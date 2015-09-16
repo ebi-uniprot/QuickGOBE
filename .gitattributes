@@ -176,6 +176,7 @@ quickgo-solr-indexing/.settings/org.eclipse.core.resources.prefs -text svneol=un
 quickgo-solr-indexing/.settings/org.eclipse.jdt.core.prefs -text svneol=unset#text/plain
 quickgo-solr-indexing/.settings/org.eclipse.m2e.core.prefs -text svneol=unset#text/plain
 quickgo-solr-indexing/pom.xml -text svneol=unset#text/plain
+quickgo-solr-indexing/src/integration-test/java/uk/ac/ebi/quickgo/indexer/statistics/CooccurenceStatsIndexIntegrationTest.java -text
 quickgo-solr-indexing/src/integration-test/resources/gp2protein.mim -text
 quickgo-solr-indexing/src/integration-test/resources/gp2protein.protein-sets -text
 quickgo-solr-indexing/src/main/config/indexing-beans.xml -text svneol=unset#text/plain
