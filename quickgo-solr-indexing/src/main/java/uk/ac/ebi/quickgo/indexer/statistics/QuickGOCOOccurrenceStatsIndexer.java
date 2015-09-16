@@ -77,7 +77,10 @@ public class QuickGOCOOccurrenceStatsIndexer {
 		float totalNumberProteinsNonIEA = 0;
 
 		try {
+			logger.info("Calculating total protein count {}", new Date().toString() );
 			totalNumberProteins = annotationRetrieval.getTotalNumberProteins("*:*");
+
+			logger.info("Calculating total protein count non-IEA {}", new Date().toString()  );
 			totalNumberProteinsNonIEA = annotationRetrieval.getTotalNumberProteins(nonIEAQuery);
 
 			// Non-IEA annotations
