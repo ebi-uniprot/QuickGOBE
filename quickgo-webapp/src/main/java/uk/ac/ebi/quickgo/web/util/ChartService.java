@@ -48,10 +48,12 @@ public class ChartService {
 		graphImage = null;
 		renderableImage = null;
 		termsToDisplay = "";
+		EnumSet targetSet = GO_SET;
 
 		boolean isGO = true;
 		if (scope != null && scope.trim().length() > 0) {
 			if(scope.equalsIgnoreCase(ECOTerm.ECO)){
+				targetSet = ECO_SET;
 				isGO = false;
 			}
 		}
@@ -75,7 +77,7 @@ public class ChartService {
 			genericOntology = TermUtil.getOntology(termsIdsList.get(0));
 
 			// Create graph image
-			graphImage = createRenderableImage(ids);
+			graphImage = createRenderableImage(ids, targetSet);
 			renderableImage = graphImage.render();
 
 			if(termsIdsList.size() == 1){//Just one term, set id as the graph title
@@ -91,7 +93,7 @@ public class ChartService {
 	 * @param termsIds List of terms to calculate the graph for
 	 * @return Graph image
 	 */
-	private GraphImage createRenderableImage(String termsIds){
+	private GraphImage createRenderableImage(String termsIds, EnumSet targetSet){
 		// Check if the selected terms exist
 		List<GenericTerm> terms = new ArrayList<GenericTerm>();
 		List<String> termsIdsList = Arrays.asList(termsIds.split(","));
@@ -109,7 +111,7 @@ public class ChartService {
 		}
 
 		// Create ontology graph
-		OntologyGraph ontologyGraph = OntologyGraph.makeGraph(termSet, GO_SET, 0, 0, new GraphPresentation());
+		OntologyGraph ontologyGraph = OntologyGraph.makeGraph(termSet, targetSet, 0, 0, new GraphPresentation());
 		return ontologyGraph.layout();
 	}
 
