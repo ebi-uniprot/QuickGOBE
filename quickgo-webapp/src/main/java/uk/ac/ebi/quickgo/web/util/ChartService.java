@@ -36,12 +36,11 @@ public class ChartService {
 
 	String termsToDisplay;
 
-	private static final EnumSet ECO_SET = EnumSet.of(RelationType.USEDIN, RelationType.ISA, RelationType.PARTOF,
-			RelationType.REGULATES, RelationType.OCCURSIN); /*RelationType.HASPART,*/
+	private static final EnumSet ECO_SET = EnumSet.of(RelationType.USEDIN, RelationType.ISA);
 
 	private static final EnumSet GO_SET = EnumSet.of(RelationType.ISA, RelationType.PARTOF,
 			RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES,
-			RelationType.OCCURSIN, RelationType.CAPABLEOF, RelationType.CAPABLEOFPARTOF); /*RelationType.HASPART,*/
+			RelationType.OCCURSIN, RelationType.CAPABLEOF, RelationType.CAPABLEOFPARTOF);
 
 	public void createChart(String ids, String scope) {
 		genericOntology = null;
