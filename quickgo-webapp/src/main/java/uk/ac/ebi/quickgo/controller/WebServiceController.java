@@ -1049,17 +1049,18 @@ public class WebServiceController {
 	}
 
 
-	@RequestMapping(value = { "/graphmulti"}, method = { RequestMethod.GET })
-	public void generateAnnotationOntologyGraph(
-			HttpServletResponse httpServletResponse,
-			@RequestParam(value = "ids", required = true) String termsIds,
-			@RequestParam(value = "relations",  required = false, defaultValue="ISA") String relations,
-			@RequestParam(value = "type", required = false, defaultValue = "allBasketTerms") String requestType,
-			HttpServletRequest request){
-
-		annotationWSUtil.downloadAnnotationOntologyGraph(httpServletResponse, termsIds, relations, requestType);
-
-	}
+//	@RequestMapping(value = { "/graphmulti"}, method = { RequestMethod.GET })
+//	public void generateAnnotationOntologyGraph(
+//			HttpServletResponse httpServletResponse,
+//			@RequestParam(value = "ids", required = true) String termsIds,
+//			@RequestParam(value = "relations",  required = false, defaultValue="ISA") String relations,
+//			@RequestParam(value = "type", required = false, defaultValue = "allBasketTerms") String requestType,
+//			@RequestParam(value = "scope", required = false, defaultValue = "") String scope,
+//			HttpServletRequest request){
+//
+//		annotationWSUtil.downloadAnnotationOntologyGraph(httpServletResponse, termsIds, relations, requestType, scope);
+//
+//	}
 
 
 	/**

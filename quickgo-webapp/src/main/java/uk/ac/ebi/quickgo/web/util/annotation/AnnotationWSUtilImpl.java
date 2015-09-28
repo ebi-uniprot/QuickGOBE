@@ -752,73 +752,55 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 		}
 	}
 
-	@Override
-	public void downloadAnnotationOntologyGraph(HttpServletResponse httpServletResponse, String termsIds, String relations, String requestType) {
-		// Basket terms
-		//Map<String, String> basketTerms = new HashMap<String, String>();
-		String[] basketTerms;
-
-		List<String> termsIdsList = new ArrayList<>();
-//		if(requestType.equals("allBasketTerms")){
-//			//Nothing to do - we already have our list with commas delimiting
+//	@Override
+//	public void downloadAnnotationOntologyGraph(HttpServletResponse httpServletResponse, String termsIds, String relations, String requestType, String scope) {
+//		String[] basketTerms;
 //
-//		}
-//		else if (requestType.equals("slimming")){
-//			Map<String, String> activeSlimmingGraphTerms = SlimmingUtil.getTermsFromSession(SlimmingUtil.ACTIVE_SLIMMING_GRAPH_TERMS_ATTRIBUTE, session);
-//			termsIdsList = new ArrayList<>(activeSlimmingGraphTerms.keySet());
-//			if(termsIdsList.isEmpty()){// No term selected
-//				model.addAttribute("graphImageSrc", null);
-//				return redirect(request);
+//		List<String> termsIdsList = new ArrayList<>();
+//		termsIdsList = Arrays.asList(termsIds.split(","));
+//
+//		// Get corresponding ontology
+//		GenericOntology genericOntology = uk.ac.ebi.quickgo.web.util.term.TermUtil.getOntology(termsIdsList.get(0));
+//
+//		// Create graph image
+//		GraphImage graphImage = createRenderableImage(genericOntology, termsIds);
+//
+//		ChartJson chartJson = new ChartJson();
+//
+//		if(termsIdsList.size() == 1){//Just one term, set id as the graph title
+//			String id = termsIdsList.get(0);
+//			String name = genericOntology.getTerm(id).getName();
+//			String title = id;
+//			if (id.contains(GOTerm.GO)) {// Add name for GO terms
+//				title = title + " " + name;
 //			}
-//			termsIds = StringUtils.arrayToDelimitedString(termsIdsList.toArray(), ",");
-//		} else {
-
-
-		termsIdsList = Arrays.asList(termsIds.split(","));
-
-		// Get corresponding ontology
-		GenericOntology genericOntology = uk.ac.ebi.quickgo.web.util.term.TermUtil.getOntology(termsIdsList.get(0));
-
-		// Create graph image
-		GraphImage graphImage = createRenderableImage(genericOntology, termsIds);
-
-		ChartJson chartJson = new ChartJson();
-
-		if(termsIdsList.size() == 1){//Just one term, set id as the graph title
-			String id = termsIdsList.get(0);
-			String name = genericOntology.getTerm(id).getName();
-			String title = id;
-			if (id.contains(GOTerm.GO)) {// Add name for GO terms
-				title = title + " " + name;
-			}
-			chartJson.setTermGraphTitle(title);
-		}
-
-		//model.addAttribute("termsNodes", graphImage.getOntologyTerms());
-		Collection<TermNode> ontTerms =  graphImage.getOntologyTerms();
-		for (Iterator<TermNode> iterator = ontTerms.iterator();iterator.hasNext();) {
-			TermNode next = iterator.next();
-			chartJson.addLayoutNode(chartJson.new LayoutNode(next.getId(),next.left(), next.right(), next.top(), next.bottom()));
-		}
-
-
-		chartJson.setLegendNodes(graphImage.legend);
-		chartJson.setGraphImageSrc(ImageArchive.store(graphImage));
-
-		RenderedImage renderableImage = graphImage.render();
-		chartJson.setGraphImageWidth(renderableImage.getWidth());
-		chartJson.setGraphImageHeight(renderableImage.getHeight());
-
-		StringBuffer sb = null;
-		try {
-			sb = fileService.generateJsonFile(chartJson);
-
-			writeOutJsonResponse(httpServletResponse, sb);
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-		}
-	}
+//			chartJson.setTermGraphTitle(title);
+//		}
+//
+//		Collection<TermNode> ontTerms =  graphImage.getOntologyTerms();
+//		for (Iterator<TermNode> iterator = ontTerms.iterator();iterator.hasNext();) {
+//			TermNode next = iterator.next();
+//			chartJson.addLayoutNode(chartJson.new LayoutNode(next.getId(),next.left(), next.right(), next.top(), next.bottom()));
+//		}
+//
+//
+//		chartJson.setLegendNodes(graphImage.legend);
+//		chartJson.setGraphImageSrc(ImageArchive.store(graphImage));
+//
+//		RenderedImage renderableImage = graphImage.render();
+//		chartJson.setGraphImageWidth(renderableImage.getWidth());
+//		chartJson.setGraphImageHeight(renderableImage.getHeight());
+//
+//		StringBuffer sb = null;
+//		try {
+//			sb = fileService.generateJsonFile(chartJson);
+//
+//			writeOutJsonResponse(httpServletResponse, sb);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			logger.error(e.getMessage());
+//		}
+//	}
 
 
 	/**

@@ -53,7 +53,7 @@ public interface AnnotationWSUtil {
 
 	void downloadChartFullModel(HttpServletResponse httpServletResponse, String ids, String scope);
 
-	void downloadAnnotationOntologyGraph(HttpServletResponse httpServletResponse, String termsIds, String relations, String requestType);
+//	void downloadAnnotationOntologyGraph(HttpServletResponse httpServletResponse, String termsIds, String relations, String requestType, String scope);
 
 	void downloadStatistics(HttpServletResponse httpServletResponse, String query, String advancedFilter, String solrQuery);
 
