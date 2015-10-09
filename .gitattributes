@@ -362,6 +362,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/ChildTermRelatio
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/DBJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/EvidenceTypeJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/Filter.java -text
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/FilterRequest.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/FilterRequestJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoAnnotationJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/GoAnnotationsContainer.java -text
