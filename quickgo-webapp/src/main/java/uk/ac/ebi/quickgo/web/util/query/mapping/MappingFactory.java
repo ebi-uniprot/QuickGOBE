@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.web.util.query.mapping;
 
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.webservice.definitions.*;
-import uk.ac.ebi.quickgo.webservice.model.FilterJson;
+import uk.ac.ebi.quickgo.webservice.model.Filter;
 
 /**
  * @Author Tony Wardell
@@ -21,7 +21,7 @@ import uk.ac.ebi.quickgo.webservice.model.FilterJson;
 public class MappingFactory {
 
 
-	public static void populateFiltersContainerWithSingleFilter(FilterJson requestedFilter, FiltersContainer container){
+	public static void populateFiltersContainerWithSingleFilter(Filter requestedFilter, FiltersContainer container){
 
 		//lookup definitions for parameters
 		FilterRequest filterRequest = FilterRequest.lookup(requestedFilter.getType().toLowerCase());
