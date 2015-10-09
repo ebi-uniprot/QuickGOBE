@@ -2,15 +2,10 @@ package uk.ac.ebi.quickgo.webservice.mapping;
 
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationWSUtil;
-import uk.ac.ebi.quickgo.web.util.query.mapping.MappingFactory;
 import uk.ac.ebi.quickgo.webservice.definitions.FilterRequest;
 import uk.ac.ebi.quickgo.webservice.definitions.WebServiceFilter;
-import uk.ac.ebi.quickgo.webservice.model.FilterJson;
-import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,10 +16,10 @@ import java.util.Map;
  */
 public class QueryToSolrProcess {
 
-	private final FilterRequestJson filterRequest;
+	private final uk.ac.ebi.quickgo.webservice.model.FilterRequest filterRequest;
 	private final Map<WebServiceFilter, FilterMapping> filterMappings;
 
-	public QueryToSolrProcess(FilterRequestJson filterRequest, AnnotationWSUtil annotationWSUtil) {
+	public QueryToSolrProcess(uk.ac.ebi.quickgo.webservice.model.FilterRequest filterRequest, AnnotationWSUtil annotationWSUtil) {
 
 		this.filterRequest = filterRequest;
 

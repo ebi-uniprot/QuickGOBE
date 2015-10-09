@@ -4,8 +4,7 @@ package uk.ac.ebi.quickgo.webservice.mapping;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.webservice.definitions.FilterParameter;
 import uk.ac.ebi.quickgo.webservice.definitions.FilterRequest;
-import uk.ac.ebi.quickgo.webservice.model.FilterJson;
-import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
+import uk.ac.ebi.quickgo.webservice.model.Filter;
 
 /**
  * @Author Tony Wardell
@@ -19,9 +18,9 @@ public class Evidence extends FilterMapping{
 		super(null);
 	}
 
-	public void processRequestObject(FilterRequestJson filterRequestJson){
+	public void processRequestObject(uk.ac.ebi.quickgo.webservice.model.FilterRequest filterRequest){
 
-		for( FilterJson aFilter : filterRequestJson.getList()){
+		for( Filter aFilter : filterRequest.getList()){
 
 			if(FilterRequest.EcoId.getLowerCase().equals(aFilter.getType().toLowerCase()) && solrField == null) {
 				solrField = AnnotationField.ECOANCESTORSI;

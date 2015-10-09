@@ -8,13 +8,16 @@ import java.util.List;
  * Time: 11:17
  * Created with IntelliJ IDEA.
  */
-public class FilterRequestJson {
+public class FilterRequestJson implements FilterRequest {
 
 	private int rows;
 	private int page;
 	private boolean isSlim;
-	private List<FilterJson> list;
+	private List<Filter> list;
+	private String format;
+	private int limit;
 
+	@Override
 	public int getRows() {
 		return rows;
 	}
@@ -23,14 +26,16 @@ public class FilterRequestJson {
 		this.rows = rows;
 	}
 
-	public List<FilterJson> getList() {
+	@Override
+	public List<Filter> getList() {
 		return list;
 	}
 
-	public void setList(List<FilterJson> list) {
+	public void setList(List<Filter> list) {
 		this.list = list;
 	}
 
+	@Override
 	public boolean isSlim() {
 		return isSlim;
 	}
@@ -39,6 +44,7 @@ public class FilterRequestJson {
 		this.isSlim = isSlim;
 	}
 
+	@Override
 	public int getPage() {
 		return page;
 	}
@@ -47,15 +53,20 @@ public class FilterRequestJson {
 		this.page = page;
 	}
 
-	@Override
-	public String toString() {
-		return "FilterData{" +
-				"rows=" + rows +
-				", page=" + page +
-				", isSlim=" + isSlim +
-				", filterList=" + list +
-				'}';
+	public String getFormat() {
+		return this.format;
 	}
 
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
+	public int getLimit() {
+		return limit;
+	}
+
+	public void setLimit(int limit) {
+		this.limit = limit;
+	}
 }
 

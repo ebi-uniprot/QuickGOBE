@@ -8,7 +8,7 @@ import java.util.List;
  * Time: 16:25
  * Created with IntelliJ IDEA.
  */
-public class FilterJson {
+public class Filter {
 
 	private String type;
 	private String value;

@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.webservice.mapping;
 
 import org.apache.commons.lang3.StringUtils;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
-import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
+import uk.ac.ebi.quickgo.webservice.model.FilterRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +32,6 @@ public abstract class FilterMapping {
 
 	}
 
-	public abstract void processRequestObject(FilterRequestJson filterRequestJson);
+	public abstract void processRequestObject(FilterRequest filterRequest);
 
 }
