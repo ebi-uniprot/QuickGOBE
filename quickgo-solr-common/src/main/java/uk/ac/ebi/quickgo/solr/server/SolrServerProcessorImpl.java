@@ -204,7 +204,6 @@ public class SolrServerProcessorImpl implements SolrServerProcessor,Serializable
 		solrQuery.add("group.field", field);// Group by the field
 		solrQuery.add("group.ngroups", "true");
 		solrQuery.setRows(0);
-		logger.info("getTotalNumberDistinctValues " + query);
 		return getSolrServer().query(solrQuery).getGroupResponse().getValues().get(0).getNGroups();
 	}
 
