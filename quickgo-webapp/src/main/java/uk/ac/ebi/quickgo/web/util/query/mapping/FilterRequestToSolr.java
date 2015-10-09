@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.web.util.query.mapping;
 
-import uk.ac.ebi.quickgo.webservice.model.FilterJson;
-import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
+import uk.ac.ebi.quickgo.webservice.model.Filter;
+import uk.ac.ebi.quickgo.webservice.model.FilterRequest;
 
 /**
  * @Author Tony Wardell
@@ -21,11 +21,11 @@ import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
  */
 public class FilterRequestToSolr {
 
-	public String toSolrQuery(FilterRequestJson filterRequest) {
+	public String toSolrQuery(FilterRequest filterRequest) {
 
 		FiltersContainer filtersContainer = new FiltersContainer();
 
-		for( FilterJson aFilter : filterRequest.getList()){
+		for( Filter aFilter : filterRequest.getList()){
 			MappingFactory.populateFiltersContainerWithSingleFilter(aFilter, filtersContainer);
 		}
 
