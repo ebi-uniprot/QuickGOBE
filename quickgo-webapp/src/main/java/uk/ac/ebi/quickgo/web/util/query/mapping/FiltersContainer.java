@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.web.util.query.mapping;
 
-import uk.ac.ebi.quickgo.webservice.definitions.FilterRequest;
+import uk.ac.ebi.quickgo.webservice.definitions.FilterRequestDefinition;
 import uk.ac.ebi.quickgo.webservice.definitions.WebServiceFilter;
 
 import java.util.HashMap;
@@ -24,8 +24,8 @@ public class FiltersContainer {
 		this.filters = new HashMap<>();
 	}
 
-	public SolrFilter lookupFilter(FilterRequest filterRequest){
-		return  filters.get(filterRequest.getWsFilter());
+	public SolrFilter lookupFilter(FilterRequestDefinition filterRequestDefinition){
+		return  filters.get(filterRequestDefinition.getWsFilter());
 	}
 
 	public void saveFilter(WebServiceFilter webServiceFilter, SolrFilter solrFilter) {

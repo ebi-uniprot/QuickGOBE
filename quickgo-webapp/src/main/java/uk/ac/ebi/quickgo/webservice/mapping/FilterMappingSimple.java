@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.webservice.mapping;
 
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
-import uk.ac.ebi.quickgo.webservice.definitions.FilterRequest;
+import uk.ac.ebi.quickgo.webservice.definitions.FilterRequestDefinition;
 import uk.ac.ebi.quickgo.webservice.model.Filter;
 
 /**
@@ -12,9 +12,9 @@ import uk.ac.ebi.quickgo.webservice.model.Filter;
  */
 public class FilterMappingSimple extends FilterMapping {
 
-	FilterRequest requestField;
+	FilterRequestDefinition requestField;
 
-	public FilterMappingSimple(FilterRequest requestField, AnnotationField solrField) {
+	public FilterMappingSimple(FilterRequestDefinition requestField, AnnotationField solrField) {
 		super(solrField);
 		this.requestField=requestField;
 	}

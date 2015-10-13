@@ -11,7 +11,8 @@ import java.util.Map;
  * Time: 15:15
  * A list of the filters that come in from via the web service front end.
  */
-public enum FilterRequest {
+
+public enum FilterRequestDefinition {
 
 	//Limits the scope to annotations where the target (annotated gene product) is of the specified type(s)
 	GeneProductType("gptype", WebServiceFilter.GeneProductType , WebServiceFilterType.ArgumentsAsValues , AnnotationField.DBOBJECTTYPE ),
@@ -64,11 +65,11 @@ public enum FilterRequest {
 
 
 	//Allow the enums to be looked up using their lowerCase value;
-	private static Map<String, FilterRequest> map = new HashMap<>();
+	private static Map<String, FilterRequestDefinition> map = new HashMap<>();
 
 	static {
 
-		for(FilterRequest name: FilterRequest.values()){
+		for(FilterRequestDefinition name: FilterRequestDefinition.values()){
 			map.put(name.getLowerCase(), name);
 
 		}
@@ -81,8 +82,8 @@ public enum FilterRequest {
 	private final WebServiceFilterType wsType;
 	private final AnnotationField solrField;
 
-	FilterRequest( String lowerCase, WebServiceFilter wsFilter, WebServiceFilterType wsType,
-				  AnnotationField defaultSolr)  {
+	FilterRequestDefinition(String lowerCase, WebServiceFilter wsFilter, WebServiceFilterType wsType,
+							AnnotationField defaultSolr)  {
 		this.lc = lowerCase;
 		this.wsFilter = wsFilter;
 		this.wsType = wsType;
@@ -105,7 +106,7 @@ public enum FilterRequest {
 		return map.get(requestedFilter.toLowerCase()).getWsFilter();
 	}
 
-	public static FilterRequest lookup(String filterLowerCase) {
+	public static FilterRequestDefinition lookup(String filterLowerCase) {
 		return map.get(filterLowerCase);
 	}
 

@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.webservice.mapping;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.web.util.annotation.AnnotationWSUtil;
 import uk.ac.ebi.quickgo.webservice.definitions.FilterParameter;
-import uk.ac.ebi.quickgo.webservice.definitions.FilterRequest;
+import uk.ac.ebi.quickgo.webservice.definitions.FilterRequestDefinition;
 import uk.ac.ebi.quickgo.webservice.model.Filter;
 
 import java.util.List;
@@ -14,13 +14,14 @@ import java.util.List;
  * Time: 13:57
  * Created with IntelliJ IDEA.
  */
-public class GoTerm extends FilterMapping {
+public class FilterMappingsGoTerm extends FilterMapping {
 
+	public static final String GO_ID_REG_EXP = "(go:|GO:|gO:|Go:)";
 	private final AnnotationWSUtil annotationWSUtil;
 	private boolean slimmingRequired=false;
 
-	public GoTerm(AnnotationWSUtil annotationWSUtil) {
-		super(AnnotationField.ANCESTORSIPOR);			//default
+	public FilterMappingsGoTerm(AnnotationWSUtil annotationWSUtil) {
+		super(AnnotationField.ANCESTORSIPO);			//default
 		this.annotationWSUtil = annotationWSUtil;
 	}
 
@@ -30,18 +31,18 @@ public class GoTerm extends FilterMapping {
 		for( Filter aFilter : filterRequest.getList()) {
 
 			//If there are GoIds add them to the list
-			if(FilterRequest.GoID.getLowerCase().equals(aFilter.getType().toLowerCase())){
+			if(FilterRequestDefinition.GoID.getLowerCase().equals(aFilter.getType().toLowerCase())){
 				args.add(aFilter.getValue());
 			}
 
 			//We need to get the go ids represented by this go slim set
-			if(FilterRequest.GoSlim.getLowerCase().equals(aFilter.getType().toLowerCase())){
+			if(FilterRequestDefinition.GoSlim.getLowerCase().equals(aFilter.getType().toLowerCase())){
 				List<String> idsForSlimSet = annotationWSUtil.goTermsForSlimSet(aFilter.getValue());
 				args.addAll(idsForSlimSet);
 			}
 
 			//Otherwise we modify the mapping to use for this list of ids
-			if(FilterRequest.GoTermUse.getLowerCase().equals(aFilter.getType().toLowerCase())){
+			if(FilterRequestDefinition.GoTermUse.getLowerCase().equals(aFilter.getType().toLowerCase())){
 
 
 				//The default to use for the solr field is AncestorIPO, so use this if the solr field hasn't already
@@ -62,6 +63,7 @@ public class GoTerm extends FilterMapping {
 			}
 		}
 	}
+
 
 
 	public boolean useTermsAsGoSlim() {

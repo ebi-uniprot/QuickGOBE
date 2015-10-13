@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.webservice.mapping;
 
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
-import uk.ac.ebi.quickgo.webservice.definitions.FilterRequest;
+import uk.ac.ebi.quickgo.webservice.definitions.FilterRequestDefinition;
 import uk.ac.ebi.quickgo.webservice.model.Filter;
 
 /**
@@ -10,10 +10,10 @@ import uk.ac.ebi.quickgo.webservice.model.Filter;
  * Time: 14:52
  * Created with IntelliJ IDEA.
  */
-public class GeneProductId extends FilterMapping{
+public class FilterMappingsGeneProductId extends FilterMapping{
 
 
-	public GeneProductId() {
+	public FilterMappingsGeneProductId() {
 		super(AnnotationField.DBOBJECTID);
 	}
 
@@ -24,7 +24,7 @@ public class GeneProductId extends FilterMapping{
 		for( Filter aFilter : filterRequest.getList()) {
 
 			//When the go ids are specified, as them as values to query against
-			if(FilterRequest.GeneProductID.getLowerCase().equals(aFilter.getType().toLowerCase())){
+			if(FilterRequestDefinition.GeneProductID.getLowerCase().equals(aFilter.getType().toLowerCase())){
 				args.add(aFilter.getValue());
 			}
 

@@ -24,39 +24,39 @@ public class MappingFactory {
 	public static void populateFiltersContainerWithSingleFilter(Filter requestedFilter, FiltersContainer container){
 
 		//lookup definitions for parameters
-		FilterRequest filterRequest = FilterRequest.lookup(requestedFilter.getType().toLowerCase());
+		FilterRequestDefinition filterRequestDefinition = FilterRequestDefinition.lookup(requestedFilter.getType().toLowerCase());
 		FilterParameter filterParameter = FilterParameter.lookup(requestedFilter.getValue().toLowerCase());
 
 		//Does this filter already exist in the container?
-		SolrFilter solrFilter = container.lookupFilter(filterRequest);
+		SolrFilter solrFilter = container.lookupFilter(filterRequestDefinition);
 
 		//No it doesn't so create it
 		if(solrFilter ==null){
 
-			if(filterRequest.getWsType() == WebServiceFilterType.ArgumentsAsValues){
-				solrFilter = new SolrFilter(filterRequest.getDefaultSolrField());
+			if(filterRequestDefinition.getWsType() == WebServiceFilterType.ArgumentsAsValues){
+				solrFilter = new SolrFilter(filterRequestDefinition.getDefaultSolrField());
 				solrFilter.addArg(requestedFilter.getValue());
 
 			}else{
 
 				//WebServiceFilterType.ArgumentAsBehaviour
-				AnnotationField field = FilterNameToSolrFieldMapper.lookup(filterRequest, filterParameter);
+				AnnotationField field = FilterNameToSolrFieldMapper.lookup(filterRequestDefinition, filterParameter);
 				if(field!=null) {
 					solrFilter = new SolrFilter(field);
 				}
 			}
 
-			container.saveFilter(filterRequest.getWsFilter(), solrFilter);
+			container.saveFilter(filterRequestDefinition.getWsFilter(), solrFilter);
 
 		}else{
 
 			//Filter already exists
-			if(filterRequest.getWsType() == WebServiceFilterType.ArgumentsAsValues){
+			if(filterRequestDefinition.getWsType() == WebServiceFilterType.ArgumentsAsValues){
 				solrFilter.addArg(requestedFilter.getValue());
 			}else{
 
 				//Lookup new mapping, use if its defined (some aren't deliberately)
-				AnnotationField field = FilterNameToSolrFieldMapper.lookup(filterRequest, filterParameter);
+				AnnotationField field = FilterNameToSolrFieldMapper.lookup(filterRequestDefinition, filterParameter);
 				if(field!=null) {
 					solrFilter.replace(field);
 				}
@@ -68,10 +68,10 @@ public class MappingFactory {
 		//Check to see if the filter contains a slimming request
 		//I hate to do  this as an exception
 		if(!container.isSlim()){
-			container.setSlim(filterRequest == FilterRequest.GoTermUse && filterParameter == FilterParameter.Slim);
+			container.setSlim(filterRequestDefinition == FilterRequestDefinition.GoTermUse && filterParameter == FilterParameter.Slim);
 		}
 
-		if(filterRequest == FilterRequest.GoSlim && filterParameter == FilterParameter.Slim){
+		if(filterRequestDefinition == FilterRequestDefinition.GoSlim && filterParameter == FilterParameter.Slim){
 			//Create a filter and populate for goids for slim set.
 		}
 	}
