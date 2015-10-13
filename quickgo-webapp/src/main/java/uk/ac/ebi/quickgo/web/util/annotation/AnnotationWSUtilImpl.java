@@ -804,18 +804,16 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 
 
 	/**
-	 *  @param query
-	 * @param advancedFilter
 	 * @param solrQuery
 	 */
 	@Override
-	public void downloadStatistics(HttpServletResponse httpServletResponse, String query, String advancedFilter, String solrQuery) {
+	public void downloadStatistics(String solrQuery, HttpServletResponse httpServletResponse) {
 
 		// Calculate stats
-		StatisticsBean 		statisticsBean = new StatisticsBean();
-		StatisticsCalculation statisticsCalculation = new StatisticsCalculation(statisticsBean, solrQuery);
-		statisticsCalculation.setStatisticService(statisticService);
-		statisticsCalculation.start();
+//		StatisticsBean statisticsBean = new StatisticsBean();
+//		StatisticsCalculation statisticsCalculation = new StatisticsCalculation(statisticsBean, solrQuery);
+//		statisticsCalculation.setStatisticService(statisticService);
+//		statisticsCalculation.start();
 
 //		if(statisticsCalculation != null && !statisticsCalculation.getQuery().equals(currentQuery)){
 //			statisticsCalculation.interrupt();
@@ -824,15 +822,15 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 //			createStatsThread(currentQuery);
 //		}
 
-		try {
-			statisticsCalculation.join();
-		} catch (InterruptedException e) {
-			System.out.println("Statistics calculation interrupted");
-			throw new RuntimeException(e);
-		}
-
+//		try {
+//			statisticsCalculation.join();
+//		} catch (InterruptedException e) {
+//			System.out.println("Statistics calculation interrupted");
+//			throw new RuntimeException(e);
+//		}
+//
 		StatisticsJson statisticsJson = new StatisticsJson();
-		statisticsJson.setStatsBean(statisticsBean);
+//		statisticsJson.setStatsBean(statisticsBean);
 
 		//todo get this from other methods
 		// Calculate total number annotations
