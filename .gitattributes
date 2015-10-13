@@ -449,3 +449,4 @@ quickgo-webapp/src/main/webapp/templates/term-sidebar.jsp -text svneol=unset#tex
 quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/graphics/OntologyGraphTest.java -text svneol=unset#text/plain
 quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/web/util/query/QueryToTest.java -text
 quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/webservice/mapping/QueryToSolrProcessTest.java -text
+quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/webservice/model/FilterTest.java -text
