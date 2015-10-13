@@ -61,7 +61,6 @@ import com.google.gson.reflect.TypeToken;
 import uk.ac.ebi.quickgo.web.util.url.URLsResolver;
 import uk.ac.ebi.quickgo.webservice.mapping.QueryToSolrProcess;
 import uk.ac.ebi.quickgo.webservice.model.Filter;
-import uk.ac.ebi.quickgo.webservice.model.FilterRequest;
 import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
 import uk.ac.ebi.quickgo.webservice.model.SearchFullResultsJson;
 
@@ -846,8 +845,6 @@ public class WebServiceController {
 	public void postQueryRequestNotSpring(HttpServletRequest request,
 										  HttpServletResponse response) {
 
-		FilterRequestJson filterRequest = null;
-
 		StringBuffer jb = new StringBuffer();
 		String line = null;
 		try {
@@ -860,7 +857,7 @@ public class WebServiceController {
 			ObjectMapper om = new ObjectMapper();
 			String result = jb.toString();
 			System.out.println("raw string is " + result);
-			filterRequest = om.readValue(result, FilterRequestJson.class);
+			FilterRequestJson filterRequest = om.readValue(result, FilterRequestJson.class);
 			System.out.println("Not Spring " + filterRequest);
 
 			//AnnotationParameters annotationParameters = filterRequestToSolr.queryToAnnotationParameters(filterRequest);
@@ -870,8 +867,8 @@ public class WebServiceController {
 			//FilterRequestToSolr filterRequestToSolr = new FilterRequestToSolr();
 			//String solrQuery = filterRequestToSolr.toSolrQuery(filterRequest);
 
-			QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(filterRequest, annotationWSUtil);
-			String solrQuery = queryToSolrProcess.toSolrQuery();
+			QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(annotationWSUtil);
+			String solrQuery = queryToSolrProcess.toSolrQuery(filterRequest);
 
 			System.out.println("Solr query is :" + solrQuery);
 
@@ -981,9 +978,10 @@ public class WebServiceController {
 		String[] queryTokens = query.split(",");
 		for(String aQueryToken: queryTokens){
 			String[] filterElements = aQueryToken.split(":");
-			Filter filter = new Filter();
-			filter.setType(filterElements[0]);
-			filter.setValues(filterElements[1]);
+//			Filter filter = new Filter();
+//			filter.setType(filterElements[0]);
+//			filter.setValues(filterElements[1]);
+			Filter filter = new Filter(filterElements[0], filterElements[1]);
 			filterList.add(filter);
 		}
 
@@ -992,8 +990,8 @@ public class WebServiceController {
 		filterRequest.setRows(Integer.parseInt(limit));
 		filterRequest.setFormat(format);
 
-		QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(filterRequest, annotationWSUtil);
-		String solrQuery = queryToSolrProcess.toSolrQuery();
+		QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(annotationWSUtil);
+		String solrQuery = queryToSolrProcess.toSolrQuery(filterRequest);
 
 		System.out.println("Solr query is :" + solrQuery);
 
@@ -1050,8 +1048,8 @@ public class WebServiceController {
 			//FilterRequestToSolr filterRequestToSolr = new FilterRequestToSolr();
 			//String solrQuery = filterRequestToSolr.toSolrQuery(filterRequest);
 
-			QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(filterRequest, annotationWSUtil);
-			String solrQuery = queryToSolrProcess.toSolrQuery();
+			QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(annotationWSUtil);
+			String solrQuery = queryToSolrProcess.toSolrQuery(filterRequest);
 
 			System.out.println("Solr query is :" + solrQuery);
 
@@ -1085,10 +1083,6 @@ public class WebServiceController {
 		}
 
 	}
-
-
-
-
 
 
 	@RequestMapping(value = "/term/{id}", method = RequestMethod.GET)
@@ -1227,20 +1221,59 @@ public class WebServiceController {
 
 
 
-	/**
-	 * Return stats information
-	 * @return
-	 */
-	@RequestMapping(value="/stats", method = {RequestMethod.POST,RequestMethod.GET})
-	public void calculateStatistics(
-			HttpServletResponse httpServletResponse,
-			@RequestParam(value = "q", required = false) String query,
-			@RequestParam(value = "advancedFilter",  required = false, defaultValue = "false") String advancedFilter)
-			throws UnsupportedEncodingException {
+//	/**
+//	 * Return stats information
+//	 * @return
+//	 */
+//	@RequestMapping(value="/stats", method = {RequestMethod.POST,RequestMethod.GET})
+//	public void calculateStatistics(
+//			HttpServletResponse httpServletResponse,
+//			@RequestParam(value = "q", required = false) String query,
+//			@RequestParam(value = "advancedFilter",  required = false, defaultValue = "false") String advancedFilter)
+//			throws UnsupportedEncodingException {
+//
+//		AnnotationParameters annotationParameters = createAnnotationParameters(query, advancedFilter);
+//		String solrQuery = annotationParameters.toSolrQuery();
+//		annotationWSUtil.downloadStatistics(httpServletResponse, query, advancedFilter, solrQuery);
+//	}
 
-		AnnotationParameters annotationParameters = createAnnotationParameters(query, advancedFilter);
-		String solrQuery = annotationParameters.toSolrQuery();
-		annotationWSUtil.downloadStatistics(httpServletResponse, query, advancedFilter, solrQuery);
+
+	@RequestMapping(value="/statsPostNewNamesNotSpring", method = {RequestMethod.POST})
+	public void postQueryStatsRequestNotSpring(HttpServletRequest request,
+										  HttpServletResponse response) {
+
+
+		StringBuffer jb = new StringBuffer();
+		String line = null;
+		try {
+			BufferedReader reader = request.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+		} catch (Exception e) {
+			System.out.println(e.getStackTrace());
+		}
+
+		try {
+			ObjectMapper om = new ObjectMapper();
+			String result = jb.toString();
+			System.out.println("raw string is " + result);
+			FilterRequestJson filterRequest = om.readValue(result, FilterRequestJson.class);
+			System.out.println("Not Spring " + filterRequest);
+
+			QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(annotationWSUtil);
+			String solrQuery = queryToSolrProcess.toSolrQuery(filterRequest);
+			System.out.println("Solr query is :" + solrQuery);
+
+			annotationWSUtil.downloadStatistics(solrQuery, response);
+
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 
