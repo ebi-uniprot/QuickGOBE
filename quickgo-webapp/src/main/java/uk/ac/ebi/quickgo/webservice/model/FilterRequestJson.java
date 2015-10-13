@@ -68,5 +68,17 @@ public class FilterRequestJson implements FilterRequest {
 	public void setLimit(int limit) {
 		this.limit = limit;
 	}
+
+	@Override
+	public String toString() {
+		return "FilterRequestJson{" +
+				"rows=" + rows +
+				", page=" + page +
+				", isSlim=" + isSlim +
+				", list=" + list +
+				", format='" + format + '\'' +
+				", limit=" + limit +
+				'}';
+	}
 }
 
