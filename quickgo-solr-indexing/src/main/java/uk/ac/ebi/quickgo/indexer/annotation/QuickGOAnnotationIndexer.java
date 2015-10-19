@@ -1,20 +1,23 @@
 package uk.ac.ebi.quickgo.indexer.annotation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.stereotype.Service;
 import uk.ac.ebi.quickgo.data.SourceFiles.NamedFile;
 import uk.ac.ebi.quickgo.indexer.file.GPAssociationFile;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
-import uk.ac.ebi.quickgo.solr.indexing.service.annotation.AnnotationIndexer;
 import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
+import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 import uk.ac.ebi.quickgo.util.CPUUtils;
 import uk.ac.ebi.quickgo.util.MemoryMonitor;
 
@@ -23,19 +26,22 @@ import uk.ac.ebi.quickgo.util.MemoryMonitor;
  * @author cbonill
  *
  */
-
-public class QuickGOAnnotationIndexer extends Thread{
+@Service("QuickGOAnnotationIndexer")
+public class QuickGOAnnotationIndexer {
 
 	/**
 	 * Annotation indexer
 	 */
-	AnnotationIndexer annotationIndexer;
+	//AnnotationIndexer annotationIndexer
+	//Set by spring
+	private SolrServerProcessor solrServerProcessor;	//replaces annotationIndexer
 
 	private final Logger logger = LoggerFactory.getLogger(QuickGOAnnotationIndexer.class);
 	private NamedFile file;
 	private GeneOntology ontology;
 	private EvidenceCodeOntology evidenceCodeOntology;
 	private	Map<Integer, Miscellaneous> taxonomies;
+	private StatisticsBucket annotationStatisticsCalculator;
 
 	//TODO Increase this value to speed up the indexing process
 	private long rowCreationTime;
@@ -43,7 +49,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 	private Properties properties;
 	private int CHUNK_SIZE;
 
-	public void run() {
+	public void start() {
 
 		MemoryMonitor mm = new MemoryMonitor(true);
 		GPAssociationFile gpAssociationFile = null;
@@ -55,7 +61,7 @@ public class QuickGOAnnotationIndexer extends Thread{
 
 			//todo make gpAssociationFile of type GpaDataFile, once the later uses Generics - What EXACTLY does this mean?
 			 gpAssociationFile = new GPAssociationFile(file, ontology.terms, evidenceCodeOntology.terms, taxonomies, CHUNK_SIZE);
-			 indexed = readAndIndexGPDataFileByChunks(gpAssociationFile, annotationIndexer);
+			 indexed = readAndIndexGPDataFileByChunks(gpAssociationFile);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -74,11 +80,10 @@ public class QuickGOAnnotationIndexer extends Thread{
 	 *
 	 * @param gpDataFile
 	 *            File to read
-	 * @param solrIndexer
 	 *            Indexer to use
 	 * @throws Exception
 	 */
-	private int readAndIndexGPDataFileByChunks(GPAssociationFile gpDataFile, AnnotationIndexer solrIndexer) throws Exception {
+	private int readAndIndexGPDataFileByChunks(GPAssociationFile gpDataFile) throws Exception {
 		List<GOAnnotation> rows = new ArrayList<>();
 		MemoryMonitor mm = new MemoryMonitor(true);
 		logger.info("Load " + gpDataFile.getName());
@@ -94,13 +99,19 @@ public class QuickGOAnnotationIndexer extends Thread{
 			long rowCreationStart = CPUUtils.getCpuTime();
 			GOAnnotation annotation = gpDataFile.calculateRow(columns);
 			annotation.setDocType(GOAnnotation.SolrAnnotationDocumentType.ANNOTATION.getValue());
+			annotationStatisticsCalculator.addAnnotationToStatistics(annotation);
 			rows.add(annotation);
 			rowCreationTime+=CPUUtils.getCpuTime()-rowCreationStart;
 
 			count++;
 			if (count == CHUNK_SIZE) {// If the chunk size is reached, index it and reset the counters
 				long solrCallStart = CPUUtils.getCpuTime();
-				solrIndexer.index(rows);
+				//solrIndexer.index(rows);
+				try {
+					solrServerProcessor.indexBeansAutoCommit(rows);
+				} catch (SolrServerException | IOException e) {
+					logger.error(e.getMessage());
+				}
 				solrCallTime += CPUUtils.getCpuTime()-solrCallStart;
 
 				indexed = indexed + count;
@@ -114,7 +125,12 @@ public class QuickGOAnnotationIndexer extends Thread{
 
 		// Index the rest
 		if (rows.size() > 0) {
-			solrIndexer.index(rows);
+			//solrIndexer.index(rows);
+			try {
+				solrServerProcessor.indexBeansAutoCommit(rows);
+			} catch (SolrServerException | IOException e) {
+				logger.error(e.getMessage());
+			}
 			indexed = indexed + rows.size();
 		}
 
@@ -125,8 +141,12 @@ public class QuickGOAnnotationIndexer extends Thread{
 	}
 
 
-	public void setAnnotationIndexer(AnnotationIndexer annotationIndexer) {
-		this.annotationIndexer = annotationIndexer;
+//	public void setAnnotationIndexer(AnnotationIndexer annotationIndexer) {
+//		this.annotationIndexer = annotationIndexer;
+//	}
+
+	public void setSolrServerProcessor(SolrServerProcessor solrServerProcessor) {
+		this.solrServerProcessor = solrServerProcessor;
 	}
 
 	public NamedFile getFile() {

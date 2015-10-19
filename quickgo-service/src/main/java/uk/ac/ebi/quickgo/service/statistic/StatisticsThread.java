@@ -16,7 +16,7 @@ import uk.ac.ebi.quickgo.service.statistic.type.StatsTerm;
  *
  */
 public class StatisticsThread extends Thread {
-	
+
 	// Query
 	String query;
 	// Total number proteins
@@ -29,7 +29,7 @@ public class StatisticsThread extends Thread {
 	// Counts to process
 	List<Count> counts = new ArrayList<>();
 	// Stats results
-	TreeSet<StatsTerm> statsTerms = new TreeSet<>();	
+	TreeSet<StatsTerm> statsTerms = new TreeSet<>();
 
 	/**
 	 * Main method of the thread
@@ -42,13 +42,13 @@ public class StatisticsThread extends Thread {
 		}
 		for (Count count : counts) {
 			long total = annotationService.getTotalNumberProteins(field + ":" + ClientUtils.escapeQueryChars(count.getName()) + filterQuery);
-			StatsTerm statsTerm = new StatsTerm(count.getName(), statsUtil.getName(count.getName(), field), statsUtil.calculatePercentage(total, numberProteins), total);
+			StatsTerm statsTerm = new StatsTerm(count.getName(), statsUtil.getName(count.getName(), field), StatisticsMath.calculatePercentage(total, numberProteins), total);
 			if(!count.getName().equalsIgnoreCase("go")){//TODO Don't add "go" term. This is because of faceting. Investigate why "go" id is returned
 				statsTerms.add(statsTerm);
 			}
-		}		
-	}	
-		
+		}
+	}
+
 	public void setQuery(String query) {
 		this.query = query;
 	}

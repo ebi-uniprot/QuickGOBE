@@ -352,29 +352,29 @@ public class AnnotationController{
 	 * To process annotations stats request
 	 * @return Annotations stats
 	 */
-	@RequestMapping(value="annotation/stats", method = {RequestMethod.POST,RequestMethod.GET})
-	public String calculateStatistics(Model model) {
-		// Calculate stats
-		if(statisticsCalculation != null && !statisticsCalculation.getQuery().equals(currentQuery)){
-			statisticsCalculation.interrupt();
-			createStatsThread(currentQuery);
-		} else if(statisticsCalculation == null){
-			createStatsThread(currentQuery);
-		}
-
-		while (statisticsCalculation.isAlive()){
-		}
-		model.addAttribute("statsBean", this.statisticsBean);
-
-		// Set total number annotations
-		model.addAttribute("totalNumberAnnotations", totalNumberAnnotations);
-		long totalNumberProteins = annotationService.getTotalNumberProteins(this.currentQuery);
-		// Set total number proteins
-		model.addAttribute("totalNumberProteins", totalNumberProteins);
-
-		return View.ANNOTATIONS_PATH + "/" + View.ANNOTATIONS_LIST;
-
-	}
+//	@RequestMapping(value="annotation/stats", method = {RequestMethod.POST,RequestMethod.GET})
+//	public String calculateStatistics(Model model) {
+//		// Calculate stats
+//		if(statisticsCalculation != null && !statisticsCalculation.getQuery().equals(currentQuery)){
+//			statisticsCalculation.interrupt();
+//			createStatsThread(currentQuery);
+//		} else if(statisticsCalculation == null){
+//			createStatsThread(currentQuery);
+//		}
+//
+//		while (statisticsCalculation.isAlive()){
+//		}
+//		model.addAttribute("statsBean", this.statisticsBean);
+//
+//		// Set total number annotations
+//		model.addAttribute("totalNumberAnnotations", totalNumberAnnotations);
+//		long totalNumberProteins = annotationService.getTotalNumberProteins(this.currentQuery);
+//		// Set total number proteins
+//		model.addAttribute("totalNumberProteins", totalNumberProteins);
+//
+//		return View.ANNOTATIONS_PATH + "/" + View.ANNOTATIONS_LIST;
+//
+//	}
 
 	/**
 	 * Download annotation statistics in excel format
@@ -424,10 +424,10 @@ public class AnnotationController{
 	 * Create threads to calculate stats
 	 * @param solrQuery
 	 */
-	private void createStatsThread(String solrQuery){
-		statisticsBean = new StatisticsBean();
-		statisticsCalculation = new StatisticsCalculation(statisticsBean, solrQuery);
-		statisticsCalculation.setStatisticService(statisticService);
-		statisticsCalculation.start();
-	}
+//	private void createStatsThread(String solrQuery){
+//		statisticsBean = new StatisticsBean();
+//		statisticsCalculation = new StatisticsCalculation(statisticsBean, solrQuery);
+//		statisticsCalculation.setStatisticService(statisticService);
+//		statisticsCalculation.start();
+//	}
 }

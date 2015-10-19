@@ -16,59 +16,27 @@ import uk.ac.ebi.quickgo.solr.query.model.miscellaneous.enums.MiscellaneousField
 import uk.ac.ebi.quickgo.solr.query.model.ontology.enums.TermField;
 
 /**
- * Useful class for the calculation of statistics 
+ * Useful class for the calculation of statistics
  * @author cbonill
  *
  */
 @Service("statisticsUtil")
 public class StatisticsUtil {
 
-	@Autowired
-	AnnotationService annotationService;
-	
+
 	@Autowired
 	TermService goTermService;
-	
+
 	@Autowired
 	MiscellaneousService miscellaneousService;
-	
+
 	// Ontology term names
 	private Map<String, Map<String, String>> ontologyTermsNames = new HashMap<String, Map<String,String>>();
-	
+
 	// Taxonomies names
 	private Map<String, Map<String, String>> taxonomiesNames = new HashMap<String, Map<String,String>>();
-	
-	/**
-	 * Calculates percentage
-	 * @param count Number of annotations
-	 * @return Percentage based on the total number of annotations
-	 */
-	public float calculatePercentage(long count, long total) {
-		DecimalFormat twoDForm = new DecimalFormat("#.##");
-		float percentage = ((float) count / (float) total) * 100;
-		return Float.valueOf(twoDForm.format(percentage));// Round it with 2 decimals
-	}
-	
-	/**
-	 * Return number annotations
-	 * @param query Filter query
-	 * @return Number annotations
-	 */
-	public long calculateNumberAnnotations(String query, long numberAnnotations) {
-		numberAnnotations = annotationService.getTotalNumberAnnotations(query);		
-		return numberAnnotations;
-	}
-	
-	/**
-	 * Return number proteins
-	 * @param query
-	 * @return
-	 */
-	public long calculateNumberProteins(String query, long numberProteins){
-		numberProteins = annotationService.getTotalNumberProteins(query);
-		return numberProteins;
-	}
-	
+
+
 	/**
 	 * Given a code returns the corresponding name
 	 * @param code Term/Taxonomy code
@@ -94,7 +62,7 @@ public class StatisticsUtil {
 		}
 		return name;
 	}
-	
+
 	/**
 	 * Load names in case of ontologies and taxonomies
 	 * @param field Ontology or Taxonomy
@@ -113,12 +81,5 @@ public class StatisticsUtil {
 			}
 		}
 	}
-	
-	public Map<String, Map<String, String>> getOntologyTermsNames() {
-		return ontologyTermsNames;
-	}
 
-	public Map<String, Map<String, String>> getTaxonomiesNames() {
-		return taxonomiesNames;
-	}
 }

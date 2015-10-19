@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.web.util.annotation;
 
-import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -810,10 +809,10 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 	public void downloadStatistics(String solrQuery, HttpServletResponse httpServletResponse) {
 
 		// Calculate stats
-//		StatisticsBean statisticsBean = new StatisticsBean();
-//		StatisticsCalculation statisticsCalculation = new StatisticsCalculation(statisticsBean, solrQuery);
-//		statisticsCalculation.setStatisticService(statisticService);
-//		statisticsCalculation.start();
+		StatisticsBean statisticsBean = new StatisticsBean();
+		StatisticsCalculation statisticsCalculation = new StatisticsCalculation(statisticsBean, solrQuery);
+		statisticsCalculation.setStatisticService(statisticService);
+		statisticsCalculation.run();
 
 //		if(statisticsCalculation != null && !statisticsCalculation.getQuery().equals(currentQuery)){
 //			statisticsCalculation.interrupt();
@@ -830,16 +829,15 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil{
 //		}
 //
 		StatisticsJson statisticsJson = new StatisticsJson();
-//		statisticsJson.setStatsBean(statisticsBean);
+		statisticsJson.setStatsBean(statisticsBean);
 
 		//todo get this from other methods
-		// Calculate total number annotations
+		// Calculate total number annotations, retrieve from cache if already calculated
 		long totalNumberAnnotations = annotationService.getTotalNumberAnnotations(solrQuery);
 		statisticsJson.setTotalNumberAnnotations(totalNumberAnnotations);
 
 		long totalNumberProteins = annotationService.getTotalNumberProteins(solrQuery);
 		statisticsJson.setTotalNumberProteins(totalNumberProteins);
-
 
 		StringBuffer sb = null;
 		try {

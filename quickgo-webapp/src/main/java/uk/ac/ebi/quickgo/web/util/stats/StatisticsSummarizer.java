@@ -11,7 +11,7 @@ import uk.ac.ebi.quickgo.service.statistic.type.StatsTerm;
  * @author cbonill
  *
  */
-public class StatisticsCalculationThread extends Thread {
+public class StatisticsSummarizer extends Thread {
 
 	private String query;
 	private String annotationField;
@@ -19,14 +19,14 @@ public class StatisticsCalculationThread extends Thread {
 
 	private Set<StatsTerm> byAnnotation = new TreeSet<>();
 	private Set<StatsTerm> byProtein = new TreeSet<>();
-	
-	public StatisticsCalculationThread(String query, String annotationField) {
+
+	public StatisticsSummarizer(String query, String annotationField) {
 		this.query = query;
 		this.annotationField = annotationField;
 	}
 
-	public void run() {		
-		byAnnotation.addAll(statisticService.statisticsByAnnotation(query, annotationField));		
+	public void run() {
+		byAnnotation.addAll(statisticService.statisticsByAnnotation(query, annotationField));
 		byProtein.addAll(statisticService.statisticsByProtein(query, annotationField));
 	}
 
@@ -57,7 +57,7 @@ public class StatisticsCalculationThread extends Thread {
 	public Set<StatsTerm> getByAnnotation() {
 		return byAnnotation;
 	}
-	
+
 	public Set<StatsTerm> getByProtein() {
 		return byProtein;
 	}
@@ -68,5 +68,5 @@ public class StatisticsCalculationThread extends Thread {
 
 	public void setByProtein(Set<StatsTerm> byProtein) {
 		this.byProtein = byProtein;
-	}	
+	}
 }

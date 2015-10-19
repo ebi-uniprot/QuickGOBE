@@ -12,15 +12,15 @@ import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
  * To calculate annotation stats
  * @author cbonill
  */
-public class StatisticsCalculation extends Thread {
+public class StatisticsCalculation {
 
 	StatisticService statisticService;
-	
+
 	StatisticsBean statisticsBean;
-	
-	String query;	
-		
-	public StatisticsCalculation(StatisticsBean statisticsBean, String query) {		
+
+	String query;
+
+	public StatisticsCalculation(StatisticsBean statisticsBean, String query) {
 		this.statisticsBean = statisticsBean;
 		this.query = query;
 	}
@@ -28,33 +28,26 @@ public class StatisticsCalculation extends Thread {
 	public void run() {
 		try{
 			// Create a thread for each type of stats and run all of them
-			StatisticsCalculationThread goIDcalculationThread = createThread(AnnotationField.GOID.getValue(), query, statisticsBean.getAnnotationsPerGOID(), statisticsBean.getProteinsPerGOID());		
-			goIDcalculationThread.start();		
-			goIDcalculationThread.join();
-			
-			StatisticsCalculationThread goAspectcalculationThread = createThread(AnnotationField.GOASPECT.getValue(), query, statisticsBean.getAnnotationsPerAspect(), statisticsBean.getProteinsPerAspect());
-			goAspectcalculationThread.start();
-			goAspectcalculationThread.join();
-			
-			StatisticsCalculationThread ecoIDcalculationThread = createThread(AnnotationField.ECOID.getValue(), query, statisticsBean.getAnnotationsPerEvidence(), statisticsBean.getProteinsPerEvidence());
-			ecoIDcalculationThread.start();
-			ecoIDcalculationThread.join();
-			
-			StatisticsCalculationThread dbXrefcalculationThread = createThread(AnnotationField.REFERENCE.getValue(), query, statisticsBean.getAnnotationsPerReference(), statisticsBean.getProteinsPerReference());
-			dbXrefcalculationThread.start();
-			dbXrefcalculationThread.join();
-			
-			StatisticsCalculationThread taxIDcalculationThread = createThread(AnnotationField.TAXONOMYID.getValue(), query, statisticsBean.getAnnotationsPerTaxon(), statisticsBean.getProteinsPerTaxon());
-			taxIDcalculationThread.start();
-			taxIDcalculationThread.join();
-			
-			StatisticsCalculationThread assignedBycalculationThread = createThread(AnnotationField.ASSIGNEDBY.getValue(), query, statisticsBean.getAnnotationsPerAssignedBy(), statisticsBean.getProteinsPerAssignedBy());
-			assignedBycalculationThread.start();
-			assignedBycalculationThread.join();
-			
-			StatisticsCalculationThread dbObjectIDcalculationThread = createThread(AnnotationField.DBOBJECTID.getValue(), query, statisticsBean.getAnnotationsPerDBObjectID(), new HashSet<StatsTerm>());
-			dbObjectIDcalculationThread.start();
-			dbObjectIDcalculationThread.join();
+			StatisticsSummarizer goIDcalculationSummarizer = createCalculator(AnnotationField.GOID.getValue(), query, statisticsBean.getAnnotationsPerGOID(), statisticsBean.getProteinsPerGOID());
+			goIDcalculationSummarizer.run();
+
+			StatisticsSummarizer goAspectcalculationSummarizer = createCalculator(AnnotationField.GOASPECT.getValue(), query, statisticsBean.getAnnotationsPerAspect(), statisticsBean.getProteinsPerAspect());
+			goAspectcalculationSummarizer.run();
+
+			StatisticsSummarizer ecoIDcalculationSummarizer = createCalculator(AnnotationField.ECOID.getValue(), query, statisticsBean.getAnnotationsPerEvidence(), statisticsBean.getProteinsPerEvidence());
+			ecoIDcalculationSummarizer.run();
+
+			StatisticsSummarizer dbXrefcalculationSummarizer = createCalculator(AnnotationField.REFERENCE.getValue(), query, statisticsBean.getAnnotationsPerReference(), statisticsBean.getProteinsPerReference());
+			dbXrefcalculationSummarizer.run();
+
+			StatisticsSummarizer taxIDcalculationSummarizer = createCalculator(AnnotationField.TAXONOMYID.getValue(), query, statisticsBean.getAnnotationsPerTaxon(), statisticsBean.getProteinsPerTaxon());
+			taxIDcalculationSummarizer.run();
+
+			StatisticsSummarizer assignedBycalculationSummarizer = createCalculator(AnnotationField.ASSIGNEDBY.getValue(), query, statisticsBean.getAnnotationsPerAssignedBy(), statisticsBean.getProteinsPerAssignedBy());
+			assignedBycalculationSummarizer.run();
+
+			StatisticsSummarizer dbObjectIDcalculationSummarizer = createCalculator(AnnotationField.DBOBJECTID.getValue(), query, statisticsBean.getAnnotationsPerDBObjectID(), new HashSet<StatsTerm>());
+			dbObjectIDcalculationSummarizer.run();
 
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -67,15 +60,15 @@ public class StatisticsCalculation extends Thread {
 	 * @param query Query
 	 * @return Thread to retrieve stats
 	 */
-	private StatisticsCalculationThread createThread(String fieldValue, String query, Set<StatsTerm> byAnnotation, Set<StatsTerm> byProtein){
-		StatisticsCalculationThread statsThread = new StatisticsCalculationThread(query, fieldValue);
-		statsThread.setStatisticService(statisticService);		
-		statsThread.setByAnnotation(byAnnotation);
-		statsThread.setByProtein(byProtein);
-		
-		return statsThread;
+	private StatisticsSummarizer createCalculator(String fieldValue, String query, Set<StatsTerm> byAnnotation, Set<StatsTerm> byProtein){
+		StatisticsSummarizer statsSummary = new StatisticsSummarizer(query, fieldValue);
+		statsSummary.setStatisticService(statisticService);
+		statsSummary.setByAnnotation(byAnnotation);
+		statsSummary.setByProtein(byProtein);
+
+		return statsSummary;
 	}
-	
+
 	public StatisticsBean getStatisticsBean() {
 		return this.statisticsBean;
 	}
@@ -98,5 +91,5 @@ public class StatisticsCalculation extends Thread {
 
 	public void setStatisticService(StatisticService statisticService) {
 		this.statisticService = statisticService;
-	}	
+	}
 }

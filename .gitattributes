@@ -336,7 +336,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/FiltersCon
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/MappingFactory.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/query/mapping/SolrFilter.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatisticsCalculation.java -text svneol=unset#text/plain
-quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatisticsCalculationThread.java -text svneol=unset#text/plain
+quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatisticsSummarizer.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/stats/StatsDownload.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/term/TermUtil.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/web/util/term/XRefBean.java -text svneol=unset#text/plain

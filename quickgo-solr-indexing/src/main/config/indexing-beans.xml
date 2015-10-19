@@ -46,4 +46,9 @@ http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 		class="uk.ac.ebi.quickgo.indexer.QuickGOIndexer">
 		<property name="sourceFilesPath" value="${sourcefiles.path}" />
 	</bean>
+
+	<bean name="QuickGOAnnotationIndexer"
+		  class="uk.ac.ebi.quickgo.indexer.annotation.QuickGOAnnotationIndexer">
+		<property name="solrServerProcessor" ref="annotationServerProcessor"></property>
+	</bean>
 </beans>

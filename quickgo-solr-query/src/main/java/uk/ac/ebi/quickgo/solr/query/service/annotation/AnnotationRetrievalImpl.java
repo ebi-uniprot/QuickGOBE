@@ -12,6 +12,7 @@ import org.apache.solr.client.solrj.response.TermsResponse.Term;
 import uk.ac.ebi.quickgo.solr.mapper.EntityMapper;
 import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
+import uk.ac.ebi.quickgo.solr.query.service.statistics.StatsCache;
 import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 
 /**
@@ -25,6 +26,8 @@ public class AnnotationRetrievalImpl implements AnnotationRetrieval {
 	SolrServerProcessor annotationServerProcessor;
 
 	EntityMapper<GOAnnotation, GOAnnotation> annotationEntityMapper;
+
+
 
 	@Override
 	public GOAnnotation findById(String id) throws SolrServerException {
@@ -108,12 +111,18 @@ public class AnnotationRetrievalImpl implements AnnotationRetrieval {
 
 	@Override
 	public long getTotalNumberAnnotations(String query) throws SolrServerException {
-		return annotationServerProcessor.getTotalNumberDocuments(new SolrQuery(query));
+		if(StatsCache.INSTANCE.getTotalAnnotations(query)==0){
+			StatsCache.INSTANCE.setTotalAnnotations(query,annotationServerProcessor.getTotalNumberDocuments(new SolrQuery(query)));
+		}
+		return StatsCache.INSTANCE.getTotalAnnotations(query);
 	}
 
 	@Override
 	public long getTotalNumberProteins(String query) throws SolrServerException {
-		return annotationServerProcessor.getTotalNumberDistinctValues(query, AnnotationField.DBOBJECTID.getValue());
+		if(StatsCache.INSTANCE.getTotalGeneProducts(query)==0){
+			StatsCache.INSTANCE.setTotalGeneProducts(query, annotationServerProcessor.getTotalNumberDistinctValues(query, AnnotationField.DBOBJECTID.getValue()));
+		}
+		return StatsCache.INSTANCE.getTotalGeneProducts(query);
 	}
 
 	@Override

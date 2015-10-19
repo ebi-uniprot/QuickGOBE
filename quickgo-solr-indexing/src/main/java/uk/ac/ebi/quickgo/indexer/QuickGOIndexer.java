@@ -151,26 +151,28 @@ public class QuickGOIndexer {
 
 
 		//Iterate over list of files and create a thread to process each of them
-		List<QuickGOAnnotationIndexer> goAnnotationIndexers = new ArrayList<>();
+//		List<QuickGOAnnotationIndexer> goAnnotationIndexers = new ArrayList<>();
 		for(NamedFile file : gpaList){
-			goAnnotationIndexers.add(createAnnotationIndexer(file));
+			//goAnnotationIndexers.add(createAnnotationIndexer(file));
+			QuickGOAnnotationIndexer quickGOAnnotationIndexer = createAnnotationIndexer(file);
+			quickGOAnnotationIndexer.start();
 		}
 
 		// This thread will wait for all the QuickGOAnnotationIndexer threads to finish to continue with the indexing process
-		for(QuickGOAnnotationIndexer goAnnotationIndexer : goAnnotationIndexers){
-			goAnnotationIndexer.join();
-		}
+//		for(QuickGOAnnotationIndexer goAnnotationIndexer : goAnnotationIndexers){
+//			goAnnotationIndexer.join();
+//		}
 	}
 
+	//No longer a thread
 	private QuickGOAnnotationIndexer createAnnotationIndexer(NamedFile file) {
 		QuickGOAnnotationIndexer quickGOAnnotationIndexer = new QuickGOAnnotationIndexer();
 		quickGOAnnotationIndexer.setFile(file);
 		quickGOAnnotationIndexer.setOntology(quickGOOntologyIndexer.getOntology());
 		quickGOAnnotationIndexer.setEvidenceCodeOntology(quickGOOntologyIndexer.getEvidenceCodeOntology());
 		quickGOAnnotationIndexer.setTaxonomies(quickGOMiscellaneousIndexer.getTaxonomiesMap());
-		quickGOAnnotationIndexer.setAnnotationIndexer(annotationIndexer);
+		//quickGOAnnotationIndexer.setAnnotationIndexer(annotationIndexer);
 		quickGOAnnotationIndexer.setProperties(this.properties);
-		quickGOAnnotationIndexer.start();
 		return quickGOAnnotationIndexer;
 	}
 
