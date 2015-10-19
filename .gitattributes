@@ -110,6 +110,8 @@ quickgo-service/src/main/java/uk/ac/ebi/quickgo/service/miscellaneous/Miscellane
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/service/miscellaneous/MiscellaneousServiceImpl.java -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/service/statistic/StatisticService.java -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/service/statistic/StatisticServiceImpl.java -text svneol=unset#text/plain
+quickgo-service/src/main/java/uk/ac/ebi/quickgo/service/statistic/StatisticsCalculator.java -text
+quickgo-service/src/main/java/uk/ac/ebi/quickgo/service/statistic/StatisticsMath.java -text
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/service/statistic/StatisticsThread.java -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/service/statistic/StatisticsUtil.java -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/service/statistic/type/StatsTerm.java -text svneol=unset#text/plain
@@ -238,6 +240,7 @@ quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/solr/query/service/miscellane
 quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/solr/query/service/miscellaneous/MiscellaneousRetrievalImpl.java -text svneol=unset#text/plain
 quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/solr/query/service/ontology/TermRetrieval.java -text svneol=unset#text/plain
 quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/solr/query/service/ontology/TermRetrievalImpl.java -text svneol=unset#text/plain
+quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/solr/query/service/statistics/StatsCache.java -text
 quickgo-solr-query/src/test/java/uk/ac/ebi/quickgo/cache/query/service/CacheBuilderTest.java -text svneol=unset#text/plain
 quickgo-solr-query/src/test/java/uk/ac/ebi/quickgo/cache/query/service/CacheRetrievalTest.java -text svneol=unset#text/plain
 quickgo-solr-query/src/test/java/uk/ac/ebi/quickgo/cache/query/service/miscellaneous/MiscellaneousRetrievalTest.java -text svneol=unset#text/plain
