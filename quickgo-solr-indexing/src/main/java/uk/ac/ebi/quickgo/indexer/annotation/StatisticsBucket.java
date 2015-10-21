@@ -38,115 +38,34 @@ public class StatisticsBucket {
 	private Map<String, StatisticTuple> summaryAnnotationBucket = new TreeMap<>();
 	private Map<String, StatisticTuple> summaryGeneProductBucket = new TreeMap<>();
 
-	private long annotationsCounter = 0;
-
 
 	public void addAnnotationToStatistics(GOAnnotation anno) {
 
-		//Add to total annotations counter
-		annotationsCounter++;
 
-		gotermAnnotationCalculation(anno);
+		genericAnnotationCalculation(gotermAnnotationBucket, anno.getGoID());
 		genericGeneProductCalculation(anno, gotermGeneProductBucket, anno.getGoID());
 
-		aspectAnnotationCalculation(anno);
+		genericAnnotationCalculation(aspectAnnotationBucket, anno.getGoAspect());
 		genericGeneProductCalculation(anno, aspectGeneProductBucket, anno.getGoAspect());
 
-		evidenceAnnotationCalculation(anno);
+		genericAnnotationCalculation(evidenceAnnotationBucket, anno.getGoEvidence());
 		genericGeneProductCalculation(anno, evidenceGeneProductBucket, anno.getGoEvidence());
 
 		//Reference
 		genericAnnotationCalculation(referenceAnnotationBucket, anno.getReference());
 		genericGeneProductCalculation(anno, referenceGeneProductBucket, anno.getReference());
-	}
 
+		//Taxon
+		genericAnnotationCalculation(taxonAnnotationBucket, Integer.toString(anno.getTaxonomyId()));
+		genericGeneProductCalculation(anno, taxonGeneProductBucket, Integer.toString(anno.getTaxonomyId()));
 
+		//AssignedBy
+		genericAnnotationCalculation(assignedByAnnotationBucket, anno.getAssignedBy());
+		genericGeneProductCalculation(anno, assignedByGeneProductBucket, anno.getAssignedBy());
 
-	private void gotermAnnotationCalculation(GOAnnotation anno) {
-		StatisticTuple statsTuple = gotermAnnotationBucket.get(anno.getGoID());
-		if(statsTuple == null ){
-			statsTuple = new StatisticTuple(anno.getGoID(), 1);
-			gotermAnnotationBucket.put(anno.getGoID(), statsTuple);
-		}else {
-			statsTuple.addHit();
-		}
-
-	}
-
-	/**
-	 * Add to the count of proteins for this go term, if the protein in this annotation is unique
-	 * to this go term, else fuggetaboutit.
-	 * @param anno
-	 */
-	private void gotermGeneProductCalculation(GOAnnotation anno) {
-		StatisticTuple statsTuple = gotermGeneProductBucket.get(anno.getGoID());
-		if(statsTuple == null ){
-			statsTuple = new StatisticTuple(anno.getGoID(), 0);
-			statsTuple.uniqueHit(anno.getDbObjectID());
-			gotermGeneProductBucket.put(anno.getGoID(), statsTuple);
-		} else {
-			statsTuple.uniqueHit(anno.getDbObjectID());
-		}
-	}
-
-
-	/**
-	 * Annotations by Aspect
-	 * @param anno
-	 */
-	private void aspectAnnotationCalculation(GOAnnotation anno){
-		StatisticTuple statsTuple = aspectAnnotationBucket.get(anno.getGoAspect());
-		if(statsTuple == null ){
-			statsTuple = new StatisticTuple(anno.getGoAspect(), 1);
-			aspectAnnotationBucket.put(anno.getGoAspect(), statsTuple);
-		}else {
-			statsTuple.addHit();
-		}
-	}
-
-	/**
-	 * Gene Products by Aspect
-	 * @param anno
-	 */
-	private void aspectGeneProductCalculation(GOAnnotation anno){
-		StatisticTuple statsTuple = aspectGeneProductBucket.get(anno.getGoAspect());
-		if(statsTuple == null ){
-			statsTuple = new StatisticTuple(anno.getGoAspect(), 0);
-			statsTuple.uniqueHit(anno.getDbObjectID());
-			aspectGeneProductBucket.put(anno.getGoAspect(), statsTuple);
-		} else {
-			statsTuple.uniqueHit(anno.getDbObjectID());
-		}
-	}
-
-
-	/**
-	 * Annotations by Evidence
-	 * @param anno
-	 */
-	private void evidenceAnnotationCalculation(GOAnnotation anno){
-		StatisticTuple statsTuple = evidenceAnnotationBucket.get(anno.getGoEvidence());
-		if(statsTuple == null ){
-			statsTuple = new StatisticTuple(anno.getGoEvidence(), 1);
-			evidenceAnnotationBucket.put(anno.getGoEvidence(), statsTuple);
-		}else {
-			statsTuple.addHit();
-		}
-	}
-
-	/**
-	 * Gene Products by Evidence
-	 * @param anno
-	 */
-	private void evidenceGeneProductCalculation(GOAnnotation anno){
-		StatisticTuple statsTuple = evidenceGeneProductBucket.get(anno.getGoEvidence());
-		if(statsTuple == null ){
-			statsTuple = new StatisticTuple(anno.getGoEvidence(), 0);
-			statsTuple.uniqueHit(anno.getDbObjectID());
-			evidenceGeneProductBucket.put(anno.getGoEvidence(), statsTuple);
-		} else {
-			statsTuple.uniqueHit(anno.getDbObjectID());
-		}
+		//summary
+		genericAnnotationCalculation(summaryAnnotationBucket, "total-annotations");
+		genericGeneProductCalculation(anno, summaryGeneProductBucket, "total-unique-geneproducts");
 	}
 
 
