@@ -72,8 +72,8 @@ public class TermIndexer implements Indexer<GenericTerm> {
 		return beans;
     }
 
-	public void setSolrServerProcessor(SolrServerProcessor solRServerProcessor) {
-		this.solrServerProcessor = solRServerProcessor;
+	public void setSolrServerProcessor(SolrServerProcessor solrServerProcessor) {
+		this.solrServerProcessor = solrServerProcessor;
 	}
 
 	public void setProperties(Properties properties) {
