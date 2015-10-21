@@ -14,12 +14,13 @@ public enum TermField {
 	PARENT("parent"),
 	OBSOLETE_ID("obsoleteId"),
 	SECONDARYID("secondaryId"),
-	HISTORYTIMESTAMP("historyTimeStamp");
+	HISTORYTIMESTAMP("historyTimeStamp"),
+	DOCTYPE("docType");
 	// TODO Add the rest
 
 	String value;
 
-	private TermField(String value) {
+	TermField(String value) {
 		this.value = value;
 	}
 
