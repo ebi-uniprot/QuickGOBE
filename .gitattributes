@@ -185,6 +185,8 @@ quickgo-solr-indexing/src/main/config/indexing-beans.xml -text svneol=unset#text
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/QuickGOIndexer.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/QuickGOIndexerProcess.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/annotation/QuickGOAnnotationIndexer.java -text svneol=unset#text/plain
+quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/annotation/StatisticTuple.java -text
+quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/annotation/StatisticsBucket.java -text
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/file/GPAssociationFile.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/file/GPDataFile.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/file/GPInformationFile.java -text svneol=unset#text/plain
@@ -201,6 +203,7 @@ quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/solr/indexing/service/gene
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/solr/indexing/service/geneproduct/mapping/GeneProductIdMapping.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/solr/indexing/service/miscellaneous/MiscellaneousIndexer.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/solr/indexing/service/ontology/TermIndexer.java -text svneol=unset#text/plain
+quickgo-solr-indexing/src/test/java/uk/ac/ebi/quickgo/indexer/annotation/StatisticsBucketTest.java -text
 quickgo-solr-indexing/src/test/java/uk/ac/ebi/quickgo/solr/indexing/service/annotation/AnnotationIndexerTest.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/test/java/uk/ac/ebi/quickgo/solr/indexing/service/geneproduct/GeneProductIndexerTest.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/test/java/uk/ac/ebi/quickgo/solr/indexing/service/ontology/TermIndexerTest.java -text svneol=unset#text/plain
