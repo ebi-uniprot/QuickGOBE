@@ -16,6 +16,23 @@ public class StatisticsBucket {
 
 	private static int STORED_HITS=80;
 
+	private static final String ANNOTATION_HITS_GOTERM  = "ANNOTATION_HITS_GOTERM";
+	private static final String GENEPRODUCT_HITS_GOTERM = "GENEPRODUCT_HITS_GOTERM";
+	private static final String ANNOTATION_HITS_ASPECT  = "ANNOTATION_HITS_ASPECT";
+	private static final String GENEPRODUCT_HITS_ASPECT_ = "GENEPRODUCT_HITS_ASPECT_";
+	private static final String ANNOTATION_HITS_EVIDENCE  = "ANNOTATION_HITS_EVIDENCE";
+	private static final String GENEPRODUCT_HITS_EVIDENCE = "GENEPRODUCT_HITS_EVIDENCE";
+	private static final String ANNOTATION_HITS_REFERENCE  = "ANNOTATION_HITS_REFERENCE";
+	private static final String GENEPRODUCT_HITS_REFERENCE = "GENEPRODUCT_HITS_REFERENCE";
+	private static final String ANNOTATION_HITS_TAXON = "ANNOTATION_HITS_TAXON";
+	private static final String GENEPRODUCT_HITS_TAXON = "GENEPRODUCT_HITS_TAXON";
+	private static final String ANNOTATION_HITS_ASSIGNEDBY  = "ANNOTATION_HITS_ASSIGNEDBY";
+	private static final String GENEPRODUCT_HITS_ASSIGNEDBY = "GENEPRODUCT_HITS_ASSIGNEDBY";
+	private static final String ANNOTATION_HITS_SUMMARY  = "ANNOTATION_HITS_SUMMARY";
+	private static final String GENEPRODUCT_HITS_SUMMARY = "GENEPRODUCT_HITS_SUMMARY";
+
+
+
 	//Go Terms
 	private Map<String, StatisticTuple> gotermAnnotationBucket = new TreeMap<>();
 	private Map<String, StatisticTuple> gotermGeneProductBucket = new TreeMap<>();		//goterm, number of geneproducts
@@ -39,45 +56,140 @@ public class StatisticsBucket {
 	private Map<String, StatisticTuple> summaryGeneProductBucket = new TreeMap<>();
 
 
+	//Sorted Results
+
+//	private StatisticTuple[] gotermAnnotationTopHits;
+//	private StatisticTuple[] gotermGeneProductTopHits;
+//	private StatisticTuple[] aspectAnnotationTopHits;
+//	private StatisticTuple[] aspectGeneProductTopHits;
+//	private StatisticTuple[] evidenceAnnotationTopHits;
+//	private StatisticTuple[] evidenceGeneProductTopHits;
+//	private StatisticTuple[] referenceAnnotationTopHits;
+//	private StatisticTuple[] referenceGeneProductTopHits;
+//	private StatisticTuple[] taxonAnnotationTopHits;
+//	private StatisticTuple[] taxonGeneProductTopHits;
+//	private StatisticTuple[] assignedByAnnotationTopHits;
+//	private StatisticTuple[] assignedByGeneProductTopHits;
+//	private StatisticTuple[] summaryAnnotationTopHits;
+//	private StatisticTuple[] summaryGeneProductTopHits;
+
+
+
 	public void addAnnotationToStatistics(GOAnnotation anno) {
 
 
-		genericAnnotationCalculation(gotermAnnotationBucket, anno.getGoID());
-		genericGeneProductCalculation(anno, gotermGeneProductBucket, anno.getGoID());
+		genericAnnotationCalculation(ANNOTATION_HITS_GOTERM, gotermAnnotationBucket, anno.getGoID());
+		genericGeneProductCalculation(GENEPRODUCT_HITS_GOTERM, anno, gotermGeneProductBucket, anno.getGoID());
 
-		genericAnnotationCalculation(aspectAnnotationBucket, anno.getGoAspect());
-		genericGeneProductCalculation(anno, aspectGeneProductBucket, anno.getGoAspect());
+		genericAnnotationCalculation(ANNOTATION_HITS_ASPECT, aspectAnnotationBucket, anno.getGoAspect());
+		genericGeneProductCalculation(GENEPRODUCT_HITS_ASPECT_, anno, aspectGeneProductBucket, anno.getGoAspect());
 
-		genericAnnotationCalculation(evidenceAnnotationBucket, anno.getGoEvidence());
-		genericGeneProductCalculation(anno, evidenceGeneProductBucket, anno.getGoEvidence());
+		genericAnnotationCalculation(ANNOTATION_HITS_EVIDENCE, evidenceAnnotationBucket, anno.getGoEvidence());
+		genericGeneProductCalculation(GENEPRODUCT_HITS_EVIDENCE, anno, evidenceGeneProductBucket, anno.getGoEvidence());
 
 		//Reference
-		genericAnnotationCalculation(referenceAnnotationBucket, anno.getReference());
-		genericGeneProductCalculation(anno, referenceGeneProductBucket, anno.getReference());
+		genericAnnotationCalculation(ANNOTATION_HITS_REFERENCE, referenceAnnotationBucket, anno.getReference());
+		genericGeneProductCalculation(GENEPRODUCT_HITS_REFERENCE, anno, referenceGeneProductBucket, anno.getReference());
 
 		//Taxon
-		genericAnnotationCalculation(taxonAnnotationBucket, Integer.toString(anno.getTaxonomyId()));
-		genericGeneProductCalculation(anno, taxonGeneProductBucket, Integer.toString(anno.getTaxonomyId()));
+		genericAnnotationCalculation(ANNOTATION_HITS_TAXON, taxonAnnotationBucket, Integer.toString(anno.getTaxonomyId()));
+		genericGeneProductCalculation(GENEPRODUCT_HITS_TAXON, anno, taxonGeneProductBucket, Integer.toString(anno.getTaxonomyId()));
 
 		//AssignedBy
-		genericAnnotationCalculation(assignedByAnnotationBucket, anno.getAssignedBy());
-		genericGeneProductCalculation(anno, assignedByGeneProductBucket, anno.getAssignedBy());
+		genericAnnotationCalculation(ANNOTATION_HITS_ASSIGNEDBY, assignedByAnnotationBucket, anno.getAssignedBy());
+		genericGeneProductCalculation(GENEPRODUCT_HITS_ASSIGNEDBY, anno, assignedByGeneProductBucket, anno.getAssignedBy());
 
 		//summary
-		genericAnnotationCalculation(summaryAnnotationBucket, "total-annotations");
-		genericGeneProductCalculation(anno, summaryGeneProductBucket, "total-unique-geneproducts");
+		genericAnnotationCalculation(ANNOTATION_HITS_SUMMARY, summaryAnnotationBucket, "total-annotations");
+		genericGeneProductCalculation(GENEPRODUCT_HITS_SUMMARY, anno, summaryGeneProductBucket, "total-unique-geneproducts");
 	}
 
+
+	/**
+	 *
+	 */
+//	public void calculateTopHits(){
+//		gotermAnnotationTopHits 	= topAnnotationsPerGOID();
+//		gotermGeneProductTopHits 	= topGeneProductsPerGOID();
+//		aspectAnnotationTopHits 	= topAnnotationsPerAspect();
+//		aspectGeneProductTopHits 	= topGeneProductsPerAspect();
+//		evidenceAnnotationTopHits 	= topAnnotationsPerEvidence();
+//		evidenceGeneProductTopHits 	= topGeneProductsPerEvidence();
+//		referenceAnnotationTopHits 	= topAnnotationsPerReference();
+//		referenceGeneProductTopHits = topGeneProductsPerReference();
+//		taxonAnnotationTopHits 		= topAnnotationsPerTaxon();
+//		taxonGeneProductTopHits 	= topGeneProductsPerTaxon();
+//		assignedByAnnotationTopHits = topAnnotationsPerAssignedBy();
+//		assignedByGeneProductTopHits = topGeneProductsPerAssignedBy();
+//		summaryAnnotationTopHits 	= topAnnotationsSummary();
+//		summaryGeneProductTopHits 	= topGeneProductsSummary();
+//	}
+
+//	public StatisticTuple[] getGotermAnnotationTopHits() {
+//		return gotermAnnotationTopHits;
+//	}
+//
+//	public StatisticTuple[] getGotermGeneProductTopHits() {
+//		return gotermGeneProductTopHits;
+//	}
+//
+//	public StatisticTuple[] getAspectAnnotationTopHits() {
+//		return aspectAnnotationTopHits;
+//	}
+//
+//	public StatisticTuple[] getAspectGeneProductTopHits() {
+//		return aspectGeneProductTopHits;
+//	}
+//
+//	public StatisticTuple[] getEvidenceAnnotationTopHits() {
+//		return evidenceAnnotationTopHits;
+//	}
+//
+//	public StatisticTuple[] getEvidenceGeneProductTopHits() {
+//		return evidenceGeneProductTopHits;
+//	}
+//
+//	public StatisticTuple[] getReferenceAnnotationTopHits() {
+//		return referenceAnnotationTopHits;
+//	}
+//
+//	public StatisticTuple[] getReferenceGeneProductTopHits() {
+//		return referenceGeneProductTopHits;
+//	}
+//
+//	public StatisticTuple[] getTaxonAnnotationTopHits() {
+//		return taxonAnnotationTopHits;
+//	}
+//
+//	public StatisticTuple[] getTaxonGeneProductTopHits() {
+//		return taxonGeneProductTopHits;
+//	}
+//
+//	public StatisticTuple[] getAssignedByAnnotationTopHits() {
+//		return assignedByAnnotationTopHits;
+//	}
+//
+//	public StatisticTuple[] getAssignedByGeneProductTopHits() {
+//		return assignedByGeneProductTopHits;
+//	}
+//
+//	public StatisticTuple[] getSummaryAnnotationTopHits() {
+//		return summaryAnnotationTopHits;
+//	}
+//
+//	public StatisticTuple[] getSummaryGeneProductTopHits() {
+//		return summaryGeneProductTopHits;
+//	}
 
 	/**
 	 * Generic processing of the requested element
 	 * @param bucket
 	 * @param key
 	 */
-	private void genericAnnotationCalculation(Map<String, StatisticTuple> bucket, String key){
+	private void genericAnnotationCalculation(String type, Map<String, StatisticTuple> bucket, String key){
 		StatisticTuple statsTuple = bucket.get(key);
 		if(statsTuple == null ){
-			statsTuple = new StatisticTuple(key, 1);
+			statsTuple = new StatisticTuple(type, key, 1);
 			bucket.put(key, statsTuple);
 		}else {
 			statsTuple.addHit();
@@ -85,10 +197,10 @@ public class StatisticsBucket {
 	}
 
 
-	private void genericGeneProductCalculation(GOAnnotation anno, Map<String, StatisticTuple> bucket, String key){
+	private void genericGeneProductCalculation(String type, GOAnnotation anno, Map<String, StatisticTuple> bucket, String key){
 		StatisticTuple statsTuple = bucket.get(key);
 		if(statsTuple == null ){
-			statsTuple = new StatisticTuple(key, 0);
+			statsTuple = new StatisticTuple(type, key, 0);
 			statsTuple.uniqueHit(anno.getDbObjectID());
 			bucket.put(key, statsTuple);
 		} else {
@@ -98,7 +210,7 @@ public class StatisticsBucket {
 
 
 	//##############################################################
-	// The following section is where we return the data
+	// The following section is where we sort the data
 
 	public StatisticTuple[] topAnnotationsPerGOID() {
 		Collection<StatisticTuple> values = gotermAnnotationBucket.values();
@@ -157,6 +269,41 @@ public class StatisticsBucket {
 	}
 
 
+	public StatisticTuple[] topAnnotationsPerTaxon() {
+		Collection<StatisticTuple> values = taxonAnnotationBucket.values();
+		return sortResults(values);
+	}
+
+
+	public StatisticTuple[] topGeneProductsPerTaxon() {
+		Collection<StatisticTuple> values = taxonGeneProductBucket.values();
+		return sortResults(values);
+	}
+
+	public StatisticTuple[] topAnnotationsPerAssignedBy() {
+		Collection<StatisticTuple> values = assignedByAnnotationBucket.values();
+		return sortResults(values);
+	}
+
+
+	public StatisticTuple[] topGeneProductsPerAssignedBy() {
+		Collection<StatisticTuple> values = assignedByGeneProductBucket.values();
+		return sortResults(values);
+	}
+
+
+	public StatisticTuple[] topAnnotationsSummary() {
+		Collection<StatisticTuple> values = assignedByAnnotationBucket.values();
+		return sortResults(values);
+	}
+
+
+	public StatisticTuple[] topGeneProductsSummary() {
+		Collection<StatisticTuple> values = assignedByGeneProductBucket.values();
+		return sortResults(values);
+	}
+
+
 	/**
 	 * sort the results
 	 * @param values
@@ -178,14 +325,14 @@ public class StatisticsBucket {
 
 		@Override
 		public int compare(StatisticTuple o1, StatisticTuple o2) {
-			if(o1.getHits()==o2.getHits()){
-				if(o1.getKey().equals(o2.getKey())){
-					throw new IllegalArgumentException("The id for the statistics tuple is being compared with itself " + o1.getKey());
+			if(o1.getStatisticTupleHits()==o2.getStatisticTupleHits()){
+				if(o1.getstatisticTupleKey().equals(o2.getstatisticTupleKey())){
+					throw new IllegalArgumentException("The id for the statistics tuple is being compared with itself " + o1.getstatisticTupleKey());
 				}else{
-					return o1.getKey().compareTo(o2.getKey());
+					return o1.getstatisticTupleKey().compareTo(o2.getstatisticTupleKey());
 				}
 			}
-			return o1.getHits()>o2.getHits()?-1:1;
+			return o1.getStatisticTupleHits()>o2.getStatisticTupleHits()?-1:1;
 		}
 	}
 }

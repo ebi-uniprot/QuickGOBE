@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.indexer.annotation;
 
+import org.apache.solr.client.solrj.beans.Field;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,30 +13,35 @@ import java.util.Set;
  */
 public class StatisticTuple {
 
-	private String key;
-	private long hits;
+	@Field
+	private String statisticTupleType;
+	@Field
+	private String statisticTupleKey;
+	@Field
+	private long statisticTupleHits;
 	private Set<String> hitKeys = new HashSet();
 
-	public StatisticTuple(String key, long hits) {
-		this.key = key;
-		this.hits = hits;
+	public StatisticTuple(String type, String key, long hits) {
+		this.statisticTupleType = type;
+		this.statisticTupleKey = key;
+		this.statisticTupleHits = hits;
 	}
 
 
-	public String getKey() {
-		return key;
+	public String getstatisticTupleKey() {
+		return statisticTupleKey;
 	}
 
-	public long getHits() {
-		return hits;
+	public long getStatisticTupleHits() {
+		return statisticTupleHits;
 	}
 
 	public void addHit(){
-		hits++;
+		statisticTupleHits++;
 	}
 
 	public void uniqueHit(String hitKey){
-		if(hitKeys.add(hitKey)) hits++;
+		if(hitKeys.add(hitKey)) statisticTupleHits++;
 	}
 
 	@Override
@@ -44,25 +51,17 @@ public class StatisticTuple {
 
 		StatisticTuple that = (StatisticTuple) o;
 
-		if (hits != that.hits) return false;
-		if (!key.equals(that.key)) return false;
+		if (statisticTupleHits != that.statisticTupleHits) return false;
+		if (!statisticTupleKey.equals(that.statisticTupleKey)) return false;
 		return hitKeys.equals(that.hitKeys);
 
 	}
 
 	@Override
 	public int hashCode() {
-		int result = key.hashCode();
-		result = 31 * result + (int) (hits ^ (hits >>> 32));
+		int result = statisticTupleKey.hashCode();
+		result = 31 * result + (int) (statisticTupleHits ^ (statisticTupleHits >>> 32));
 		result = 31 * result + hitKeys.hashCode();
 		return result;
-	}
-
-	@Override
-	public String toString() {
-		return "StatisticTuple{" +
-				"key='" + key + '\'' +
-				", hits=" + hits +
-				'}';
 	}
 }

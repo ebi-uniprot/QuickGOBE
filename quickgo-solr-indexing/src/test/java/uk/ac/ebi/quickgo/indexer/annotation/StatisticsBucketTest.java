@@ -30,84 +30,84 @@ public class StatisticsBucketTest {
 		//Annotations by Go Id
 		StatisticTuple[] topAnnotationsByGoTermHits = statisticsBucket.topAnnotationsPerGOID();
 
-		assertEquals("GO:0005524", topAnnotationsByGoTermHits[0].getKey());
-		assertEquals(5, topAnnotationsByGoTermHits[0].getHits());
+		assertEquals("GO:0005524", topAnnotationsByGoTermHits[0].getstatisticTupleKey()	);
+		assertEquals(5, topAnnotationsByGoTermHits[0].getStatisticTupleHits());
 
-		assertEquals("GO:0008152", topAnnotationsByGoTermHits[1].getKey());
-		assertEquals(4, topAnnotationsByGoTermHits[1].getHits());
+		assertEquals("GO:0008152", topAnnotationsByGoTermHits[1].getstatisticTupleKey());
+		assertEquals(4, topAnnotationsByGoTermHits[1].getStatisticTupleHits());
 
-		assertEquals("GO:0003824", topAnnotationsByGoTermHits[2].getKey());
-		assertEquals(3, topAnnotationsByGoTermHits[2].getHits());
+		assertEquals("GO:0003824", topAnnotationsByGoTermHits[2].getstatisticTupleKey());
+		assertEquals(3, topAnnotationsByGoTermHits[2].getStatisticTupleHits());
 
 
 		//GeneProducts by Go Id
 		StatisticTuple[] topGeneProductsByGoTermHits = statisticsBucket.topGeneProductsPerGOID();
 
-		assertEquals("GO:0008152", topGeneProductsByGoTermHits[0].getKey());
-		assertEquals(4, topGeneProductsByGoTermHits[0].getHits());
+		assertEquals("GO:0008152", topGeneProductsByGoTermHits[0].getstatisticTupleKey());
+		assertEquals(4, topGeneProductsByGoTermHits[0].getStatisticTupleHits());
 
-		assertEquals("GO:0005524", topGeneProductsByGoTermHits[1].getKey());
-		assertEquals(3, topGeneProductsByGoTermHits[1].getHits());
+		assertEquals("GO:0005524", topGeneProductsByGoTermHits[1].getstatisticTupleKey());
+		assertEquals(3, topGeneProductsByGoTermHits[1].getStatisticTupleHits());
 
-		assertEquals("GO:0003824", topGeneProductsByGoTermHits[2].getKey());
-		assertEquals(2, topGeneProductsByGoTermHits[2].getHits());
+		assertEquals("GO:0003824", topGeneProductsByGoTermHits[2].getstatisticTupleKey());
+		assertEquals(2, topGeneProductsByGoTermHits[2].getStatisticTupleHits());
 
 
 		//Annotations by aspect
 		StatisticTuple[] topAspectAnnotationHits = statisticsBucket.topAnnotationsPerAspect();
 
-		assertEquals("C", topAspectAnnotationHits[0].getKey());
-		assertEquals(6, topAspectAnnotationHits[0].getHits());
+		assertEquals("C", topAspectAnnotationHits[0].getstatisticTupleKey());
+		assertEquals(6, topAspectAnnotationHits[0].getStatisticTupleHits());
 
-		assertEquals("F", topAspectAnnotationHits[1].getKey());
-		assertEquals(4, topAspectAnnotationHits[1].getHits());
+		assertEquals("F", topAspectAnnotationHits[1].getstatisticTupleKey());
+		assertEquals(4, topAspectAnnotationHits[1].getStatisticTupleHits());
 
-		assertEquals("P", topAspectAnnotationHits[2].getKey());
-		assertEquals(2, topAspectAnnotationHits[2].getHits());
+		assertEquals("P", topAspectAnnotationHits[2].getstatisticTupleKey());
+		assertEquals(2, topAspectAnnotationHits[2].getStatisticTupleHits());
 
 
 		//Gene Products by aspect
 		StatisticTuple[] topAspectGeneProductHits = statisticsBucket.topGeneProductsPerAspect();
 
-		assertEquals("C", topAspectGeneProductHits[0].getKey());
-		assertEquals(4, topAspectGeneProductHits[0].getHits());
+		assertEquals("C", topAspectGeneProductHits[0].getstatisticTupleKey());
+		assertEquals(4, topAspectGeneProductHits[0].getStatisticTupleHits());
 
-		assertEquals("F", topAspectGeneProductHits[1].getKey());
-		assertEquals(4, topAspectGeneProductHits[1].getHits());
+		assertEquals("F", topAspectGeneProductHits[1].getstatisticTupleKey());
+		assertEquals(4, topAspectGeneProductHits[1].getStatisticTupleHits());
 
-		assertEquals("P", topAspectGeneProductHits[2].getKey());
-		assertEquals(2, topAspectGeneProductHits[2].getHits());
+		assertEquals("P", topAspectGeneProductHits[2].getstatisticTupleKey());
+		assertEquals(2, topAspectGeneProductHits[2].getStatisticTupleHits());
 
 
 		//Annotations by Evidences
 		StatisticTuple[] topEvidenceAnnotationHits = statisticsBucket.topAnnotationsPerEvidence();
-		assertEquals("ECO:0000323", topEvidenceAnnotationHits[0].getKey());
-		assertEquals(6,topEvidenceAnnotationHits[0].getHits());
+		assertEquals("ECO:0000323", topEvidenceAnnotationHits[0].getstatisticTupleKey());
+		assertEquals(6,topEvidenceAnnotationHits[0].getStatisticTupleHits());
 
-		assertEquals("ECO:0000501", topEvidenceAnnotationHits[1].getKey());
-		assertEquals(3,topEvidenceAnnotationHits[1].getHits());
+		assertEquals("ECO:0000501", topEvidenceAnnotationHits[1].getstatisticTupleKey());
+		assertEquals(3,topEvidenceAnnotationHits[1].getStatisticTupleHits());
 
-		assertEquals("ECO:0000256", topEvidenceAnnotationHits[2].getKey());
-		assertEquals(2,topEvidenceAnnotationHits[2].getHits());
+		assertEquals("ECO:0000256", topEvidenceAnnotationHits[2].getstatisticTupleKey());
+		assertEquals(2,topEvidenceAnnotationHits[2].getStatisticTupleHits());
 
-		assertEquals("ECO:0000999", topEvidenceAnnotationHits[3].getKey());
-		assertEquals(1,topEvidenceAnnotationHits[3].getHits());
+		assertEquals("ECO:0000999", topEvidenceAnnotationHits[3].getstatisticTupleKey());
+		assertEquals(1,topEvidenceAnnotationHits[3].getStatisticTupleHits());
 
 		//Gene Products by Evidences
 		StatisticTuple[] topEvidenceGeneProductHits = statisticsBucket.topGeneProductsPerEvidence();
 		assertEquals(80, topEvidenceGeneProductHits.length);
 
-		assertEquals("ECO:0000323", topEvidenceGeneProductHits[0].getKey());
-		assertEquals(4, topEvidenceGeneProductHits[0].getHits());
+		assertEquals("ECO:0000323", topEvidenceGeneProductHits[0].getstatisticTupleKey());
+		assertEquals(4, topEvidenceGeneProductHits[0].getStatisticTupleHits());
 
-		assertEquals("ECO:0000501", topEvidenceGeneProductHits[1].getKey());
-		assertEquals(2, topEvidenceGeneProductHits[1].getHits());
+		assertEquals("ECO:0000501", topEvidenceGeneProductHits[1].getstatisticTupleKey());
+		assertEquals(2, topEvidenceGeneProductHits[1].getStatisticTupleHits());
 
-		assertEquals("ECO:0000256", topEvidenceGeneProductHits[2].getKey());
-		assertEquals(1, topEvidenceGeneProductHits[2].getHits());
+		assertEquals("ECO:0000256", topEvidenceGeneProductHits[2].getstatisticTupleKey());
+		assertEquals(1, topEvidenceGeneProductHits[2].getStatisticTupleHits());
 
-		assertEquals("ECO:0000999", topEvidenceGeneProductHits[3].getKey());
-		assertEquals(1, topEvidenceGeneProductHits[3].getHits());
+		assertEquals("ECO:0000999", topEvidenceGeneProductHits[3].getstatisticTupleKey());
+		assertEquals(1, topEvidenceGeneProductHits[3].getStatisticTupleHits());
 
 		assertEquals(null, topEvidenceGeneProductHits[4]);
 
@@ -116,14 +116,14 @@ public class StatisticsBucketTest {
 		//References ordered by Annotations
 		StatisticTuple[] topReferenceAnnotationHits = statisticsBucket.topAnnotationsPerReference();
 
-		assertEquals("GO_REF:0000038", topReferenceAnnotationHits[0].getKey());
-		assertEquals(5, topReferenceAnnotationHits[0].getHits());
+		assertEquals("GO_REF:0000038", topReferenceAnnotationHits[0].getstatisticTupleKey());
+		assertEquals(5, topReferenceAnnotationHits[0].getStatisticTupleHits());
 
-		assertEquals("GO_REF:0000040", topReferenceAnnotationHits[1].getKey());
-		assertEquals(4, topReferenceAnnotationHits[1].getHits());
+		assertEquals("GO_REF:0000040", topReferenceAnnotationHits[1].getstatisticTupleKey());
+		assertEquals(4, topReferenceAnnotationHits[1].getStatisticTupleHits());
 
-		assertEquals("GO_REF:0000039", topReferenceAnnotationHits[2].getKey());
-		assertEquals(3, topReferenceAnnotationHits[2].getHits());
+		assertEquals("GO_REF:0000039", topReferenceAnnotationHits[2].getstatisticTupleKey());
+		assertEquals(3, topReferenceAnnotationHits[2].getStatisticTupleHits());
 
 	}
 
@@ -147,6 +147,7 @@ public class StatisticsBucketTest {
 		goAnnotation1.setGoAspect("C");
 		goAnnotation1.setGoEvidence("ECO:0000256");
 		goAnnotation1.setReference("GO_REF:0000038");
+		goAnnotation1.setAssignedBy("GOC");
 		list.add(goAnnotation1);
 
 		GOAnnotation goAnnotation2 = new GOAnnotation( );
@@ -155,6 +156,7 @@ public class StatisticsBucketTest {
 		goAnnotation2.setGoAspect("C");
 		goAnnotation2.setGoEvidence("ECO:0000256");
 		goAnnotation2.setReference("GO_REF:0000039");
+		goAnnotation2.setAssignedBy("GOC");
 		list.add(goAnnotation2);
 
 		GOAnnotation goAnnotation3 = new GOAnnotation( );
@@ -163,6 +165,7 @@ public class StatisticsBucketTest {
 		goAnnotation3.setGoAspect("F");
 		goAnnotation3.setGoEvidence("ECO:0000323");
 		goAnnotation3.setReference("GO_REF:0000040");
+		goAnnotation3.setAssignedBy("GOC");
 		list.add(goAnnotation3);
 
 
@@ -173,6 +176,7 @@ public class StatisticsBucketTest {
 		goAnnotation4.setGoAspect("C");
 		goAnnotation4.setGoEvidence("ECO:0000323");
 		goAnnotation4.setReference("GO_REF:0000038");
+		goAnnotation4.setAssignedBy("GOC");
 		list.add(goAnnotation4);
 
 		GOAnnotation goAnnotation5 = new GOAnnotation( );
@@ -181,6 +185,7 @@ public class StatisticsBucketTest {
 		goAnnotation5.setGoAspect("F");
 		goAnnotation5.setGoEvidence("ECO:0000501");
 		goAnnotation5.setReference("GO_REF:0000038");
+		goAnnotation5.setAssignedBy("GOC");
 		list.add(goAnnotation5);
 
 		GOAnnotation goAnnotation6 = new GOAnnotation( );
@@ -189,6 +194,7 @@ public class StatisticsBucketTest {
 		goAnnotation6.setGoAspect("P");
 		goAnnotation6.setGoEvidence("ECO:0000323");
 		goAnnotation6.setReference("GO_REF:0000039");
+		goAnnotation6.setAssignedBy("GOC");
 		list.add(goAnnotation6);
 
 		GOAnnotation goAnnotation7 = new GOAnnotation( );
@@ -197,6 +203,7 @@ public class StatisticsBucketTest {
 		goAnnotation7.setGoAspect("C");
 		goAnnotation7.setGoEvidence("ECO:0000323");
 		goAnnotation7.setReference("GO_REF:0000039");
+		goAnnotation7.setAssignedBy("GOC");
 		list.add(goAnnotation7);
 
 
@@ -207,6 +214,7 @@ public class StatisticsBucketTest {
 		goAnnotation8.setGoAspect("F");
 		goAnnotation8.setGoEvidence("ECO:0000323");
 		goAnnotation8.setReference("GO_REF:0000038");
+		goAnnotation8.setAssignedBy("GOC");
 		list.add(goAnnotation8);
 
 		GOAnnotation goAnnotation9 = new GOAnnotation( );
@@ -215,6 +223,7 @@ public class StatisticsBucketTest {
 		goAnnotation9.setGoAspect("C");
 		goAnnotation9.setGoEvidence("ECO:0000501");
 		goAnnotation9.setReference("GO_REF:0000038");
+		goAnnotation9.setAssignedBy("GOC");
 		list.add(goAnnotation9);
 
 		GOAnnotation goAnnotation10 = new GOAnnotation( );
@@ -223,6 +232,7 @@ public class StatisticsBucketTest {
 		goAnnotation10.setGoAspect("C");
 		goAnnotation10.setGoEvidence("ECO:0000501");
 		goAnnotation10.setReference("GO_REF:0000040");
+		goAnnotation10.setAssignedBy("GOC");
 		list.add(goAnnotation10);
 
 		GOAnnotation goAnnotation11 = new GOAnnotation( );
@@ -231,6 +241,7 @@ public class StatisticsBucketTest {
 		goAnnotation11.setGoAspect("P");
 		goAnnotation11.setGoEvidence("ECO:0000323");
 		goAnnotation11.setReference("GO_REF:0000040");
+		goAnnotation11.setAssignedBy("GOC");
 		list.add(goAnnotation11);
 
 		GOAnnotation goAnnotation12 = new GOAnnotation( );
@@ -239,6 +250,7 @@ public class StatisticsBucketTest {
 		goAnnotation12.setGoAspect("F");
 		goAnnotation12.setGoEvidence("ECO:0000999");
 		goAnnotation12.setReference("GO_REF:0000040");
+		goAnnotation12.setAssignedBy("GOC");
 		list.add(goAnnotation12);
 		return list;
 	}
