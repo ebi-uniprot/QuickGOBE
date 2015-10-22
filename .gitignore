@@ -3,7 +3,6 @@
 quickgo-common-util/*.iml
 quickgo-common-util/target
 quickgo-main/*.iml
-quickgo-main/.settings/org.eclipse.core.resources.prefs
 quickgo-main/target
 quickgo-service/*.iml
 quickgo-service/target/generated-test-sources
