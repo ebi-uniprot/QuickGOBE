@@ -148,6 +148,7 @@ quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/geneproduct/SolrG
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/miscellaneous/SolrMiscellaneous.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/ontology/SolrTerm.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/ontology/SolrTermComparator.java -text svneol=unset#text/plain
+quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/statistics/StatisticTuple.java -text
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/server/SolrServerProcessor.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/server/SolrServerProcessorImpl.java -text svneol=unset#text/plain
 quickgo-solr-common/src/test/java/uk/ac/ebi/quickgo/solr/mapper/term/EntityTermMapperTest.java -text svneol=unset#text/plain
