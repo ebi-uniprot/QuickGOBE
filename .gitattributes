@@ -334,77 +334,8 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/StatisticsJson.j
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/TermJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/TypeAheadResult.java -text
 quickgo-webapp/src/main/webapp/WEB-INF/dispatcher-servlet.xml -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/advancedFilters.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/annotationList.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/columnDisplay.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/extension.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/annotation/statistics.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/index.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/search.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/static/annotationBlacklist.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/static/annotationExtensionRelations.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/static/annotationPostProcessing.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/static/chart.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/static/dataset.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/static/goTermHistory.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/static/taxonConstraints.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/static/webservices.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/term/ancestorsgraph.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/term/childTerms.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/term/coOccurring.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/term/history.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/term/miniTermWS.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/term/ontologyTerms.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/term/term.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/WEB-INF/pages/term/termInformation.jsp -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/spring-ws-servlet.xml -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/web.xml -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/css/960_fluid_grid.css -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/css/boilerplate-style.css -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/css/ebi-global.css -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/css/ebi-visual.css -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/css/jquery-ui-1.10.0.custom.css -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/css/print.css -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/css/quickgo-colours.css -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/css/quickgo.css -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/css/simple-pagination.css -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/error.html -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/images/ajax-loader-80.gif -text
-quickgo-webapp/src/main/webapp/images/ajax-loader-old.gif -text
-quickgo-webapp/src/main/webapp/images/ajax-loader.gif -text
-quickgo-webapp/src/main/webapp/images/frontier/icon_floating_delete.png -text
-quickgo-webapp/src/main/webapp/images/frontier/overlay.png -text
-quickgo-webapp/src/main/webapp/images/homepageimage.png -text
-quickgo-webapp/src/main/webapp/images/logo/quickgo-logo.png -text
-quickgo-webapp/src/main/webapp/images/pale_grey_slight_texture.jpg -text
-quickgo-webapp/src/main/webapp/images/search-button.png -text
-quickgo-webapp/src/main/webapp/js/annExtRelations.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/js/annotations.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/js/common.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/js/cytoscape/min/AC_OETags.min.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/js/cytoscape/min/cytoscapeweb.min.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/js/cytoscape/min/json2.min.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/js/jquery.cookie.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/js/jquery.highlight-4.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/js/jquery.simplePagination.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/js/terms.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/js/tooltipsy.min.js -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/swf/CytoscapeWeb.swf -text
-quickgo-webapp/src/main/webapp/swf/playerProductInstall.swf -text
-quickgo-webapp/src/main/webapp/templates/annotation-sidebar.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/basket.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/download.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/downloadStats.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/footer.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/header.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/imports.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/ontologygraph.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/search-sidebar.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/sidebar.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/slimming.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/slimmingGraph.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/slimmingProtein.jsp -text svneol=unset#text/plain
-quickgo-webapp/src/main/webapp/templates/term-sidebar.jsp -text svneol=unset#text/plain
 quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/graphics/OntologyGraphTest.java -text svneol=unset#text/plain
 quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/web/util/query/QueryToTest.java -text
 quickgo-webapp/src/test/java/uk/ac/ebi/quickgo/webservice/mapping/QueryToSolrProcessTest.java -text

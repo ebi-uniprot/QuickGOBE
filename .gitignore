@@ -14,4 +14,3 @@ quickgo-solr-query/*.iml
 quickgo-solr/*.iml
 quickgo-solr/target
 quickgo-webapp/*.iml
-quickgo-webapp/src/main/webapp/js/uniprot.js
