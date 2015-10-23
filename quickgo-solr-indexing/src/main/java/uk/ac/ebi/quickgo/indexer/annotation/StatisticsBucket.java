@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.indexer.annotation;
 
 import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
+import uk.ac.ebi.quickgo.solr.model.statistics.StatisticTuple;
 
 import java.util.*;
 
@@ -19,7 +20,7 @@ public class StatisticsBucket {
 	private static final String ANNOTATION_HITS_GOTERM  = "ANNOTATION_HITS_GOTERM";
 	private static final String GENEPRODUCT_HITS_GOTERM = "GENEPRODUCT_HITS_GOTERM";
 	private static final String ANNOTATION_HITS_ASPECT  = "ANNOTATION_HITS_ASPECT";
-	private static final String GENEPRODUCT_HITS_ASPECT_ = "GENEPRODUCT_HITS_ASPECT_";
+	private static final String GENEPRODUCT_HITS_ASPECT_ = "GENEPRODUCT_HITS_ASPECT";
 	private static final String ANNOTATION_HITS_EVIDENCE  = "ANNOTATION_HITS_EVIDENCE";
 	private static final String GENEPRODUCT_HITS_EVIDENCE = "GENEPRODUCT_HITS_EVIDENCE";
 	private static final String ANNOTATION_HITS_REFERENCE  = "ANNOTATION_HITS_REFERENCE";
