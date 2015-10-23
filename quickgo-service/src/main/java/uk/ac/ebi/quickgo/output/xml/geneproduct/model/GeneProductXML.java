@@ -2,8 +2,8 @@ package uk.ac.ebi.quickgo.output.xml.geneproduct.model;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 import uk.ac.ebi.quickgo.output.xml.model.XMLEntity;
-import ebi.ac.uk.ws.quickgo.Lookupdeftype;
-import ebi.ac.uk.ws.quickgo.ObjectFactory;
+import uk.ac.ebi.quickgo.xml.term.Lookupdeftype;
+import uk.ac.ebi.quickgo.xml.term.ObjectFactory;
 
 /**
  * Gene Product XML representation

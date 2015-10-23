@@ -11,12 +11,7 @@ import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.output.xml.model.XMLEntity;
 import uk.ac.ebi.quickgo.util.XRef;
-import ebi.ac.uk.quickgo.Deftype;
-import ebi.ac.uk.quickgo.ObjectFactory;
-import ebi.ac.uk.quickgo.Relationshiptype;
-import ebi.ac.uk.quickgo.Synonymtype;
-import ebi.ac.uk.quickgo.Termdeftype;
-import ebi.ac.uk.quickgo.Xreftype;
+import uk.ac.ebi.quickgo.xml.term.*;
 
 /**
  * GO Term XML representation

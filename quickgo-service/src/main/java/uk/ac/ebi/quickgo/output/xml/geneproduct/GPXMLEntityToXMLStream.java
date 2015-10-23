@@ -10,8 +10,8 @@ import javax.xml.bind.Marshaller;
 import uk.ac.ebi.quickgo.output.xml.XMLEntityToStream;
 import uk.ac.ebi.quickgo.output.xml.geneproduct.model.GeneProductXML;
 import uk.ac.ebi.quickgo.render.Format;
-import ebi.ac.uk.ws.quickgo.Lookupdeftype;
-import ebi.ac.uk.ws.quickgo.ObjectFactory;
+import uk.ac.ebi.quickgo.xml.term.Lookupdeftype;
+import uk.ac.ebi.quickgo.xml.term.ObjectFactory;
 
 /**
  * Transform GP XML entities into a stream

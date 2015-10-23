@@ -8,8 +8,8 @@ import org.springframework.util.StringUtils;
 import uk.ac.ebi.quickgo.ontology.eco.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.output.xml.model.XMLEntity;
-import ebi.ac.uk.ws.quickgo.Lookupdeftype;
-import ebi.ac.uk.ws.quickgo.ObjectFactory;
+import uk.ac.ebi.quickgo.xml.term.Lookupdeftype;
+import uk.ac.ebi.quickgo.xml.term.ObjectFactory;
 
 /**
  * ECO XML representation
