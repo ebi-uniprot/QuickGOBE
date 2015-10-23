@@ -63,7 +63,6 @@ quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/XRef.java -text svneol=
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/util/XrefAbbsUtil.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/resources/xrefs_urls.properties -text svneol=unset#text/plain
 quickgo-common-util/src/test/java/uk/ac/ebi/quickgo/ontology/generic/TermSlimmerTest.java -text svneol=unset#text/plain
-quickgo-main/pom.xml -text svneol=unset#text/plain
 quickgo-service/pom.xml -text svneol=unset#text/plain
 quickgo-service/src/integration-test/uk/ac/ebi/quickgo/output/xml/XMLGenerationIntegrationTest.java -text svneol=unset#text/plain
 quickgo-service/src/integration-test/uk/ac/ebi/quickgo/service/annotation/AnnotationServiceIntegrationTest.java -text svneol=unset#text/plain
