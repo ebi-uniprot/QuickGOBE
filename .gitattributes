@@ -69,7 +69,6 @@ quickgo-service/src/integration-test/uk/ac/ebi/quickgo/service/annotation/Annota
 quickgo-service/src/integration-test/uk/ac/ebi/quickgo/service/miscellaneous/MiscellaneousServiceIntegrationTest.java -text svneol=unset#text/plain
 quickgo-service/src/integration-test/uk/ac/ebi/quickgo/service/statistic/StatisticServiceIntegrationTest.java -text svneol=unset#text/plain
 quickgo-service/src/integration-test/uk/ac/ebi/quickgo/service/term/GOTermServiceIntegrationTest.java -text svneol=unset#text/plain
-quickgo-service/src/main/config/service-beans.xml -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/output/EntityToStream.java -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/output/json/EntityToJSONStream.java -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/output/xml/EntityToXMLEntity.java -text svneol=unset#text/plain
