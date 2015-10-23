@@ -105,8 +105,6 @@ quickgo-service/src/main/java/uk/ac/ebi/quickgo/util/miscellaneous/Miscellaneous
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/util/miscellaneous/MiscellaneousUtilImpl.java -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/util/term/TermUtil.java -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/util/term/TermUtilImpl.java -text svneol=unset#text/plain
-quickgo-service/src/main/java/uk/ac/ebi/quickgo/webservice/LookUpEndPoint.java -text svneol=unset#text/plain
-quickgo-service/src/main/java/uk/ac/ebi/quickgo/webservice/WebServiceConfig.java -text svneol=unset#text/plain
 quickgo-service/src/main/resources/service-beans.xml -text svneol=unset#text/plain
 quickgo-service/src/main/resources/xsd/lookup.xsd -text svneol=unset#text/plain
 quickgo-service/src/main/resources/xsd/lookup_soap.xsd -text svneol=unset#text/plain
