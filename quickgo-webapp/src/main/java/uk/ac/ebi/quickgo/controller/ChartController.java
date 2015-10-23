@@ -15,13 +15,14 @@ import uk.ac.ebi.quickgo.web.util.ChartService;
 import uk.ac.ebi.quickgo.web.util.View;
 
 import com.google.gson.Gson;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * To generate terms charts
  * @author cbonill
  *
  */
-@Controller
+@RestController
 public class ChartController {
 
 	@Autowired

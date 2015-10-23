@@ -19,7 +19,8 @@ public class MiscellaneousServiceIntegrationTest {
 	
 	public static void main(String[] args) {
 
-		appContext = new ClassPathXmlApplicationContext("service-beans.xml", "common-beans.xml","query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("service-beans.xml", "common-beans.xml",
+				"query-beans.xml");
 		miscellaneousService = (MiscellaneousService) appContext.getBean("miscellaneousService");
 		
 		

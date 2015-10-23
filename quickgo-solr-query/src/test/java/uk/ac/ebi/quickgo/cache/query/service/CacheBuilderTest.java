@@ -6,11 +6,8 @@ import java.lang.reflect.Field;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
 
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.solr.exception.NotFoundException;
@@ -22,7 +19,6 @@ import uk.ac.ebi.quickgo.solr.query.service.ontology.TermRetrieval;
  * @author cbonill
  *
  */
-@RunWith(BlockJUnit4ClassRunner.class)
 public class CacheBuilderTest {
 
 	// Mock context
@@ -33,7 +29,7 @@ public class CacheBuilderTest {
 	@Before
 	public void before() throws NoSuchFieldException, SecurityException,
 			IllegalArgumentException, IllegalAccessException {
-		context = new JUnit4Mockery();
+		context = new Mockery();
 		cacheBuilder = new CacheBuilderImpl<GOTerm>();
 
 		// Mock

@@ -23,7 +23,7 @@ public class AnnotationCacheRetrievalIntegrationTest {
 	 * Miscellaneous data cache
 	 */
 	public static void main(String[] args) {
-		appContext = new ClassPathXmlApplicationContext("common-beans.xml","query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "query-beans.xml");
 		annotationCacheRetrieval = (CacheRetrieval<Annotation>) appContext.getBean("annotationCacheRetrieval");
 		annotationRetrieval = (AnnotationRetrieval) appContext.getBean("annotationRetrieval");
 		

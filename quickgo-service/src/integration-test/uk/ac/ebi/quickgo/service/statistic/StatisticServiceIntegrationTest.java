@@ -34,7 +34,8 @@ public class StatisticServiceIntegrationTest {
 		try {
 			fw = new FileWriter(statsFile.getAbsoluteFile());
 
-			appContext = new ClassPathXmlApplicationContext("service-beans.xml", "common-beans.xml", "query-beans.xml");
+			appContext = new ClassPathXmlApplicationContext("service-beans.xml", "common-beans.xml",
+					"query-beans.xml");
 			statisticService = (StatisticService) appContext.getBean("statisticService");
 			annotationService = (AnnotationService) appContext.getBean("annotationService");		
 			miscellaneousService = (MiscellaneousService) appContext.getBean("miscellaneousService");

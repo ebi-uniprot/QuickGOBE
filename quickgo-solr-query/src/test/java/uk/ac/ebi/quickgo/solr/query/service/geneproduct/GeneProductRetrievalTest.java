@@ -10,11 +10,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProduct;
 import uk.ac.ebi.quickgo.solr.mapper.EntityMapper;
@@ -28,7 +25,6 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
  * @author cbonill
  *
  */
-@RunWith(BlockJUnit4ClassRunner.class)
 public class GeneProductRetrievalTest {
 
 		// Mock context
@@ -40,7 +36,7 @@ public class GeneProductRetrievalTest {
 		@Before
 		public void before() throws NoSuchFieldException, SecurityException,
 				IllegalArgumentException, IllegalAccessException {
-			context = new JUnit4Mockery();
+			context = new Mockery();
 			geneProductRetrieval = new GeneProductRetrievalImpl();
 
 			// Mock

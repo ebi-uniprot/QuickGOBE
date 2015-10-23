@@ -28,7 +28,7 @@ public class GOTermCacheRetrievalIntegrationTest {
 	 * Miscellaneous data cache
 	 */
 	public static void main(String[] args) {
-		appContext = new ClassPathXmlApplicationContext("common-beans.xml","query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "src/main/resources/query-beans.xml");
 		cacheRetrieval = (CacheRetrieval<GOTerm>) appContext.getBean("goTermCacheRetrieval");
 		termRetrieval = (TermRetrieval) appContext.getBean("goTermRetrieval");
 		

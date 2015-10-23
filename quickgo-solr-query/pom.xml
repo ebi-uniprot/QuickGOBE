@@ -1,77 +1,32 @@
 <?xml version="1.0"?>
 <project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>uk.ac.ebi.quickgo.solr</groupId>
-		<artifactId>quickgo-solr</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../quickgo-solr</relativePath>
-	</parent>
-	<groupId>uk.ac.ebi.quickgo.solr</groupId>
-	<artifactId>quickgo-solr-query</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>QuickGO Solr Query</name>
-	<description>QuickGO module for Solr query</description>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>uk.ac.ebi.quickgo.solr</groupId>
-			<artifactId>quickgo-solr-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jmock</groupId>
-			<artifactId>jmock-junit4</artifactId>
-			<version>2.6.0</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>junit-dep</artifactId>
-					<groupId>junit</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-	</dependencies>
-	<build>
-		<resources>			
-			<resource>
-				<directory>src/main/config</directory>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.0</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>uk.ac.ebi.quickgo</groupId>
+        <artifactId>quickgo-solr</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../quickgo-solr</relativePath>
+    </parent>
 
-			<!-- GENERATE JAR WITH DEPENDENCIES --> 
-			<!--<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>create-my-bundle</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			 -->
-		</plugins>
-	</build>
+    <artifactId>quickgo-solr-query</artifactId>
+
+    <name>QuickGO Solr Query</name>
+
+    <description>QuickGO module for Solr query</description>
+
+    <packaging>jar</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>uk.ac.ebi.quickgo</groupId>
+            <artifactId>quickgo-solr-common</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
 </project>

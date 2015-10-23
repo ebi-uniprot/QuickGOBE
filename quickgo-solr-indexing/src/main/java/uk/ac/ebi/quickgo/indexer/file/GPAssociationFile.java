@@ -105,7 +105,8 @@ public class GPAssociationFile extends GPDataFile {
 		this.chunkSize = chunkSize;
 
 		//Go Terms cache retrieval
-		ApplicationContext appContext = new ClassPathXmlApplicationContext("common-beans.xml","query-beans.xml");
+		ApplicationContext appContext = new ClassPathXmlApplicationContext("common-beans.xml",
+				"query-beans.xml");
 		gpCacheRetrieval = (CacheRetrievalImpl<GeneProduct>) appContext.getBean("gpCacheRetrieval");
 		geneProductRetrieval = (GeneProductRetrieval) appContext.getBean("geneProductRetrieval");
 		miscellaneousRetrieval = (MiscellaneousRetrieval) appContext.getBean("miscellaneousRetrieval");

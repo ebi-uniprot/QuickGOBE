@@ -41,7 +41,7 @@ public class QuickGOAnnotationIndexer {
 	private GeneOntology ontology;
 	private EvidenceCodeOntology evidenceCodeOntology;
 	private	Map<Integer, Miscellaneous> taxonomies;
-	private StatisticsBucket annotationStatisticsCalculator;
+//	private StatisticsBucket annotationStatisticsCalculator;
 
 	//TODO Increase this value to speed up the indexing process
 	private long rowCreationTime;
@@ -99,7 +99,7 @@ public class QuickGOAnnotationIndexer {
 			long rowCreationStart = CPUUtils.getCpuTime();
 			GOAnnotation annotation = gpDataFile.calculateRow(columns);
 			annotation.setDocType(GOAnnotation.SolrAnnotationDocumentType.ANNOTATION.getValue());
-			annotationStatisticsCalculator.addAnnotationToStatistics(annotation);
+//			annotationStatisticsCalculator.addAnnotationToStatistics(annotation);
 			rows.add(annotation);
 			rowCreationTime+=CPUUtils.getCpuTime()-rowCreationStart;
 

@@ -25,7 +25,6 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
  * @author cbonill
  *
  */
-@RunWith(BlockJUnit4ClassRunner.class)
 public class TermIndexerTest {
 
 	private Mockery context = new Mockery() {

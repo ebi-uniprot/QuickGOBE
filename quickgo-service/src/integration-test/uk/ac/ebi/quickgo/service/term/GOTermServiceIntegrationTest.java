@@ -21,7 +21,8 @@ public class GOTermServiceIntegrationTest {
 	
 	public static void main(String[] args) {
 
-		appContext = new ClassPathXmlApplicationContext("service-beans.xml", "common-beans.xml","query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("service-beans.xml", "common-beans.xml",
+				"query-beans.xml");
 		goTermService = (TermService) appContext.getBean("termService");
 	
 		// Retrieve term

@@ -1,21 +1,14 @@
 package uk.ac.ebi.quickgo.solr.query.service.annotation;
 
-import static org.junit.Assert.assertTrue;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
 
 import uk.ac.ebi.quickgo.solr.mapper.EntityMapper;
 import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
@@ -27,7 +20,6 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
  * @author cbonill
  * 
  */
-@RunWith(BlockJUnit4ClassRunner.class)
 public class AnnotationRetrievalTest {
 
 	// Mock context
@@ -39,7 +31,7 @@ public class AnnotationRetrievalTest {
 	@Before
 	public void before() throws NoSuchFieldException, SecurityException,
 			IllegalArgumentException, IllegalAccessException {
-		context = new JUnit4Mockery();
+		context = new Mockery();
 		annotationRetrieval = new AnnotationRetrievalImpl();
 
 		// Mock

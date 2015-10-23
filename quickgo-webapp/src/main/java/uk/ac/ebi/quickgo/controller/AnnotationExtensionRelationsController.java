@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.controller;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -9,13 +8,14 @@ import uk.ac.ebi.quickgo.web.util.View;
 import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 
 import com.google.gson.Gson;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * To draw Annotation Extension Relations graph
  * @author cbonill
  *
  */
-@Controller
+@RestController
 public class AnnotationExtensionRelationsController {
 
 	@RequestMapping("/annotationExtensionRelations")

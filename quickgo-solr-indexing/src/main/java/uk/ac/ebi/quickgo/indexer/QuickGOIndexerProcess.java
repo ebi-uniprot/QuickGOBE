@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Properties;
 
@@ -34,7 +33,8 @@ public class QuickGOIndexerProcess {
 	 */
 	public static void main(String[] args) {
 
-		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "indexing-beans.xml", "query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "src/main/resources/indexing-beans.xml",
+				"query-beans.xml");
 
 		Properties defaultProps = new Properties();
 		try {

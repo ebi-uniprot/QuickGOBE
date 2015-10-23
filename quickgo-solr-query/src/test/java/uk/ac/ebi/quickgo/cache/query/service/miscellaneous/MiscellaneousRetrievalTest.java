@@ -11,11 +11,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
 
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.solr.mapper.EntityMapper;
@@ -33,7 +30,6 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
  * @author cbonill
  * 
  */
-@RunWith(BlockJUnit4ClassRunner.class)
 public class MiscellaneousRetrievalTest {
 
 	// Mock context
@@ -45,7 +41,7 @@ public class MiscellaneousRetrievalTest {
 	@Before
 	public void before() throws NoSuchFieldException, SecurityException,
 			IllegalArgumentException, IllegalAccessException {
-		context = new JUnit4Mockery();
+		context = new Mockery();
 		miscellaneousRetrieval = new MiscellaneousRetrievalImpl();
 
 		// Mock

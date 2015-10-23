@@ -28,7 +28,7 @@ public class MiscellaneousCacheRetrievalIntegrationTest {
 	 * Miscellaneous data cache
 	 */
 	public static void main(String[] args) {
-		appContext = new ClassPathXmlApplicationContext("common-beans.xml",	"query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "src/main/resources/query-beans.xml");
 		miscellaneousCacheRetrieval = (CacheRetrieval<Miscellaneous>) appContext.getBean("miscellaneousCacheRetrieval");
 		miscellaneousRetrieval = (MiscellaneousRetrieval) appContext.getBean("miscellaneousRetrieval");
 

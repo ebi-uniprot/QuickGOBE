@@ -26,7 +26,7 @@ public class AnnotationRetrievalIntegrationTest {
 	 * Miscellaneous data cache
 	 */
 	public static void main(String[] args) {
-		appContext = new ClassPathXmlApplicationContext("common-beans.xml","query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "src/main/resources/query-beans.xml");
 		annotationRetrieval = (AnnotationRetrieval) appContext.getBean("annotationRetrieval");	
 		
 		// Get 10 GO top terms

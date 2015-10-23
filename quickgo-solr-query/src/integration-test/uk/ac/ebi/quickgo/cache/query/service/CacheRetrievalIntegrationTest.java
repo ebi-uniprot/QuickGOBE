@@ -49,7 +49,7 @@ public class CacheRetrievalIntegrationTest {
 	 * GO terms cache
 	 */
 	private static void cacheGOTerms(){
-		appContext = new ClassPathXmlApplicationContext("common-beans.xml","query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "query-beans.xml");
 		cacheRetrieval = (CacheRetrieval<GOTerm>) appContext.getBean("goTermCacheRetrieval");
 		termRetrieval = (TermRetrieval) appContext.getBean("goTermRetrieval");
 		
@@ -74,7 +74,7 @@ public class CacheRetrievalIntegrationTest {
 	 * Miscellaneous data cache
 	 */
 	private static void cacheMiscellaneous(){
-		appContext = new ClassPathXmlApplicationContext("common-beans.xml","query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "src/main/resources/query-beans.xml");
 		miscellaneousCacheRetrieval = (CacheRetrieval<Miscellaneous>) appContext.getBean("miscellaneousCacheRetrieval");
 		miscellaneousRetrieval = (MiscellaneousRetrieval) appContext.getBean("miscellaneousRetrieval");
 		
@@ -88,7 +88,7 @@ public class CacheRetrievalIntegrationTest {
 	 * Annotations data cache
 	 */
 	private static void cacheAnnotation(){
-		appContext = new ClassPathXmlApplicationContext("common-beans.xml","query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "query-beans.xml");
 		annotationCacheRetrieval = (CacheRetrieval<Annotation>) appContext.getBean("annotationCacheRetrieval");
 		annotationRetrieval = (AnnotationRetrieval) appContext.getBean("annotationRetrieval");
 		

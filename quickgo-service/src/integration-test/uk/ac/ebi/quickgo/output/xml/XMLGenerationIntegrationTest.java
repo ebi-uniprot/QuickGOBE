@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.output.xml;
 
 import javax.xml.bind.JAXBException;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -23,11 +24,12 @@ public class XMLGenerationIntegrationTest {
 	static ApplicationContext appContext;
 	static CacheRetrieval<GOTerm> cacheRetrieval;
 	static TermRetrieval termRetrieval;
-	static final Logger logger = LoggerFactory.getLogger(XMLGenerationIntegrationTest.class)
+	static final Logger logger = LoggerFactory.getLogger(XMLGenerationIntegrationTest.class);
 
 	public static void main(String[] args) throws JAXBException{
 
-		appContext = new ClassPathXmlApplicationContext("service-beans.xml","common-beans.xml","query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("service-beans.xml", "common-beans.xml",
+				"query-beans.xml");
 
 		EntityToStream<GOTerm> termEntityToStream = (EntityToStream<GOTerm>) appContext.getBean("goTermEntityToStream");
 		cacheRetrieval = (CacheRetrieval<GOTerm>) appContext.getBean("goTermCacheRetrieval");
@@ -66,7 +68,7 @@ public class XMLGenerationIntegrationTest {
 			logger.info("====================");
 			return term;
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 		return null;
 	}

@@ -33,18 +33,18 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Search controller
  */
-@Controller
+@RestController
 @RequestMapping(value = {"/", "annotation", "/search"})
 public class SearchController {
     private static final int HITS_TO_RETURN = 20;
@@ -66,8 +66,8 @@ public class SearchController {
 
     private List<Object> searchResults = new ArrayList<>();
 
-    @RequestMapping(value = "autoSuggestByName", method = {RequestMethod.POST, RequestMethod.GET}, produces =
-            "application/json")
+    @RequestMapping(value = "autoSuggestByName", method = {RequestMethod.POST, RequestMethod.GET},
+            produces = "application/json")
     public ResponseEntity<String> findByName(@RequestParam(value = "q") String query,
             HttpServletResponse httpServletResponse) throws IOException, SolrServerException {
 
@@ -84,8 +84,7 @@ public class SearchController {
             List<GeneProduct> geneProducts = geneProductService.autosuggest(query, null, HITS_TO_RETURN);
 
             addTerms(results, terms, regex);
-            addGeneProducts(results, geneProducts, regex);
-
+//            addGeneProducts(results, geneProducts, regex);
         }
 
         //TODO: is this a valid requirement, should it always be the shortest, shouldn't it be the most relevant

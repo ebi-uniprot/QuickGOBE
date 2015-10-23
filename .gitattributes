@@ -1,4 +1,5 @@
 * text=auto !eol
+/pom.xml -text
 quickgo-common-util/pom.xml -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/annotation/Annotation.java -text svneol=unset#text/plain
 quickgo-common-util/src/main/java/uk/ac/ebi/quickgo/data/ECOSourceFiles.java -text svneol=unset#text/plain
@@ -107,6 +108,7 @@ quickgo-service/src/main/java/uk/ac/ebi/quickgo/util/term/TermUtil.java -text sv
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/util/term/TermUtilImpl.java -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/webservice/LookUpEndPoint.java -text svneol=unset#text/plain
 quickgo-service/src/main/java/uk/ac/ebi/quickgo/webservice/WebServiceConfig.java -text svneol=unset#text/plain
+quickgo-service/src/main/resources/service-beans.xml -text svneol=unset#text/plain
 quickgo-service/src/main/resources/xsd/lookup.xsd -text svneol=unset#text/plain
 quickgo-service/src/main/resources/xsd/lookup_soap.xsd -text svneol=unset#text/plain
 quickgo-service/src/main/resources/xsd/obo.xsd -text svneol=unset#text/plain
@@ -117,13 +119,6 @@ quickgo-service/src/test/java/uk/ac/ebi/quickgo/service/annotation/parameter/Ann
 quickgo-service/src/test/java/uk/ac/ebi/quickgo/service/statistic/StatisticServiceTest.java -text svneol=unset#text/plain
 quickgo-service/src/test/java/uk/ac/ebi/quickgo/service/term/GOTermServiceTest.java -text svneol=unset#text/plain
 quickgo-solr-common/pom.xml -text svneol=unset#text/plain
-quickgo-solr-common/src/main/config/common-beans.xml -text svneol=unset#text/plain
-quickgo-solr-common/src/main/config/quickgo-ves-hx-cd.properties -text svneol=unset#text/plain
-quickgo-solr-common/src/main/config/quickgo-ves-hx-cf.properties -text svneol=unset#text/plain
-quickgo-solr-common/src/main/config/quickgo-ves-oy-cc.properties -text svneol=unset#text/plain
-quickgo-solr-common/src/main/config/quickgo-ves-oy-cd.properties -text svneol=unset#text/plain
-quickgo-solr-common/src/main/config/quickgo-ves-pg-cc.properties -text svneol=unset#text/plain
-quickgo-solr-common/src/main/config/quickgo-ves-pg-cd.properties -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/exception/NotFoundException.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/EntityMapper.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/mapper/SolrMapper.java -text svneol=unset#text/plain
@@ -150,6 +145,13 @@ quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/ontology/SolrTerm
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/model/statistics/StatisticTuple.java -text
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/server/SolrServerProcessor.java -text svneol=unset#text/plain
 quickgo-solr-common/src/main/java/uk/ac/ebi/quickgo/solr/server/SolrServerProcessorImpl.java -text svneol=unset#text/plain
+quickgo-solr-common/src/main/resources/common-beans.xml -text svneol=unset#text/plain
+quickgo-solr-common/src/main/resources/quickgo-ves-hx-cd.properties -text svneol=unset#text/plain
+quickgo-solr-common/src/main/resources/quickgo-ves-hx-cf.properties -text svneol=unset#text/plain
+quickgo-solr-common/src/main/resources/quickgo-ves-oy-cc.properties -text svneol=unset#text/plain
+quickgo-solr-common/src/main/resources/quickgo-ves-oy-cd.properties -text svneol=unset#text/plain
+quickgo-solr-common/src/main/resources/quickgo-ves-pg-cc.properties -text svneol=unset#text/plain
+quickgo-solr-common/src/main/resources/quickgo-ves-pg-cd.properties -text svneol=unset#text/plain
 quickgo-solr-common/src/test/java/uk/ac/ebi/quickgo/solr/mapper/term/EntityTermMapperTest.java -text svneol=unset#text/plain
 quickgo-solr-common/src/test/java/uk/ac/ebi/quickgo/solr/mapper/term/TermToSolrMapperTest.java -text svneol=unset#text/plain
 quickgo-solr-common/src/test/java/uk/ac/ebi/quickgo/solr/server/SolrServerProcessorTest.java -text svneol=unset#text/plain
@@ -157,7 +159,6 @@ quickgo-solr-indexing/pom.xml -text svneol=unset#text/plain
 quickgo-solr-indexing/src/integration-test/java/uk/ac/ebi/quickgo/indexer/statistics/CooccurenceStatsIndexIntegrationTest.java -text
 quickgo-solr-indexing/src/integration-test/resources/gp2protein.mim -text
 quickgo-solr-indexing/src/integration-test/resources/gp2protein.protein-sets -text
-quickgo-solr-indexing/src/main/config/indexing-beans.xml -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/QuickGOIndexer.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/QuickGOIndexerProcess.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/annotation/QuickGOAnnotationIndexer.java -text svneol=unset#text/plain
@@ -179,6 +180,7 @@ quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/solr/indexing/service/gene
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/solr/indexing/service/geneproduct/mapping/GeneProductIdMapping.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/solr/indexing/service/miscellaneous/MiscellaneousIndexer.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/solr/indexing/service/ontology/TermIndexer.java -text svneol=unset#text/plain
+quickgo-solr-indexing/src/main/resources/indexing-beans.xml -text svneol=unset#text/plain
 quickgo-solr-indexing/src/test/java/uk/ac/ebi/quickgo/indexer/annotation/StatisticsBucketTest.java -text
 quickgo-solr-indexing/src/test/java/uk/ac/ebi/quickgo/solr/indexing/service/annotation/AnnotationIndexerTest.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/test/java/uk/ac/ebi/quickgo/solr/indexing/service/geneproduct/GeneProductIndexerTest.java -text svneol=unset#text/plain
@@ -191,7 +193,6 @@ quickgo-solr-query/src/integration-test/uk/ac/ebi/quickgo/cache/query/service/an
 quickgo-solr-query/src/integration-test/uk/ac/ebi/quickgo/cache/query/service/geneproduct/GeneProductRetrievalIntegrationTest.java -text svneol=unset#text/plain
 quickgo-solr-query/src/integration-test/uk/ac/ebi/quickgo/cache/query/service/miscellaneous/MiscellaneousCacheRetrievalIntegrationTest.java -text svneol=unset#text/plain
 quickgo-solr-query/src/integration-test/uk/ac/ebi/quickgo/cache/query/service/term/GOTermCacheRetrievalIntegrationTest.java -text svneol=unset#text/plain
-quickgo-solr-query/src/main/config/query-beans.xml -text svneol=unset#text/plain
 quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/cache/query/service/CacheBuilder.java -text svneol=unset#text/plain
 quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/cache/query/service/CacheBuilderImpl.java -text svneol=unset#text/plain
 quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/cache/query/service/CacheRetrieval.java -text svneol=unset#text/plain
@@ -211,6 +212,7 @@ quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/solr/query/service/miscellane
 quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/solr/query/service/ontology/TermRetrieval.java -text svneol=unset#text/plain
 quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/solr/query/service/ontology/TermRetrievalImpl.java -text svneol=unset#text/plain
 quickgo-solr-query/src/main/java/uk/ac/ebi/quickgo/solr/query/service/statistics/StatsCache.java -text
+quickgo-solr-query/src/main/resources/query-beans.xml -text svneol=unset#text/plain
 quickgo-solr-query/src/test/java/uk/ac/ebi/quickgo/cache/query/service/CacheBuilderTest.java -text svneol=unset#text/plain
 quickgo-solr-query/src/test/java/uk/ac/ebi/quickgo/cache/query/service/CacheRetrievalTest.java -text svneol=unset#text/plain
 quickgo-solr-query/src/test/java/uk/ac/ebi/quickgo/cache/query/service/miscellaneous/MiscellaneousRetrievalTest.java -text svneol=unset#text/plain
@@ -227,7 +229,6 @@ quickgo-solr/src/main/config/miscellaneous/solrconfig.xml -text svneol=unset#tex
 quickgo-solr/src/main/config/ontology/schema.xml -text svneol=unset#text/plain
 quickgo-solr/src/main/config/ontology/solrconfig.xml -text svneol=unset#text/plain
 quickgo-webapp/pom.xml -text svneol=unset#text/plain
-quickgo-webapp/src/main/config/web-beans.xml -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/bean/annotation/AnnotationBean.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/bean/statistics/StatisticsBean.java -text svneol=unset#text/plain
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/controller/AnnotationExtensionRelationsController.java -text svneol=unset#text/plain
@@ -332,6 +333,7 @@ quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/SearchResultType
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/StatisticsJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/TermJson.java -text
 quickgo-webapp/src/main/java/uk/ac/ebi/quickgo/webservice/model/TypeAheadResult.java -text
+quickgo-webapp/src/main/resources/web-beans.xml -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/dispatcher-servlet.xml -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/spring-ws-servlet.xml -text svneol=unset#text/plain
 quickgo-webapp/src/main/webapp/WEB-INF/web.xml -text svneol=unset#text/plain

@@ -22,7 +22,7 @@ public class GeneProductRetrievalIntegrationTest {
 
 	public static void main(String[] args) {
 
-		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "query-beans.xml");
+		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "src/main/resources/query-beans.xml");
 		geneProductRetrieval = (GeneProductRetrieval) appContext.getBean("geneProductRetrieval");
 
 		List<GeneProduct> allGPs = new ArrayList<>();
