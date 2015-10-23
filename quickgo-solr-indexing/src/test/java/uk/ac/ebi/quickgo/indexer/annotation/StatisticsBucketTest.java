@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.indexer.annotation;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
+import uk.ac.ebi.quickgo.solr.model.statistics.StatisticTuple;
 
 import java.util.*;
 
