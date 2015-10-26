@@ -10,9 +10,9 @@ import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
 
 /**
  * Solr representation of miscellaneous data
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 public class SolrMiscellaneous {
 
@@ -41,25 +41,25 @@ public class SolrMiscellaneous {
 	private float all;
 	@Field
 	private String statsType;//Non-IEA or All
-	
+
 	// Sequences
 	@Field
 	private String dbObjectID;
 	@Field
 	private String sequence;
-	
+
 	// Publications
 	@Field
 	private int publicationID;
 	@Field
 	private String publicationTitle;
-	
+
 	// Annotation guideline
 	@Field
 	private String guidelineTitle;
 	@Field
 	private String guidelineURL;
-	
+
 	// Annotation blacklist
 	@Field
 	private String backlistReason;
@@ -68,8 +68,8 @@ public class SolrMiscellaneous {
 	@Field
 	private String backlistCategory;
 	@Field
-	private String backlistEntryType;	
-	
+	private String backlistEntryType;
+
 	// Annotation Extension Relations
 	@Field
 	private String aerName;
@@ -86,7 +86,7 @@ public class SolrMiscellaneous {
 	private List<String> aerSecondaries;
 	@Field
 	private List<String> aerSubsets;
-	
+
 	// Xrefs Databases
 	@Field
 	private String xrefAbbreviation;
@@ -96,19 +96,19 @@ public class SolrMiscellaneous {
 	private String xrefGenericURL;
 	@Field
 	private String xrefUrlSyntax;
-		
+
 	// Subsets count
 	@Field
 	private String subset;
 	@Field
 	private int subsetCount;
-	
+
 	// Evidences
 	@Field
 	private String evidenceCode;
 	@Field
 	private String evidenceName;
-	
+
 	// Post processing rule
 	@Field
 	private String pprRuleId;
@@ -134,7 +134,15 @@ public class SolrMiscellaneous {
 	private String pprSubstitutedTerm;
 	@Field
 	private String pprCuratorNotes;
-	
+
+	//Pre-calculated stats (not co-ocurrence stats)
+	@Field
+	private String statisticTupleType;
+	@Field
+	private String statisticTupleKey;
+	@Field
+	private long statisticTupleHits;
+
 	public String getDocType() {
 		return docType;
 	}
@@ -166,7 +174,7 @@ public class SolrMiscellaneous {
 	public void setTaxonomyClosures(List<Integer> taxonomyClosures) {
 		this.taxonomyClosures = taxonomyClosures;
 	}
-		
+
 	public String getTerm() {
 		return term;
 	}
@@ -237,8 +245,8 @@ public class SolrMiscellaneous {
 
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
-	}	
-	
+	}
+
 	public int getPublicationID() {
 		return publicationID;
 	}
@@ -253,8 +261,8 @@ public class SolrMiscellaneous {
 
 	public void setPublicationTitle(String publicationTitle) {
 		this.publicationTitle = publicationTitle;
-	}	
-	
+	}
+
 	public String getGuidelineTitle() {
 		return guidelineTitle;
 	}
@@ -269,8 +277,8 @@ public class SolrMiscellaneous {
 
 	public void setGuidelineURL(String guidelineURL) {
 		this.guidelineURL = guidelineURL;
-	}	
-	
+	}
+
 	public String getBacklistReason() {
 		return backlistReason;
 	}
@@ -301,8 +309,8 @@ public class SolrMiscellaneous {
 
 	public void setBacklistEntryType(String backlistEntryType) {
 		this.backlistEntryType = backlistEntryType;
-	}	
-	
+	}
+
 	public String getAerName() {
 		return aerName;
 	}
@@ -349,7 +357,7 @@ public class SolrMiscellaneous {
 
 	public void setAerSubsets(List<String> aerSubsets) {
 		this.aerSubsets = aerSubsets;
-	}	
+	}
 
 	public String getAerRange() {
 		return aerRange;
@@ -357,7 +365,7 @@ public class SolrMiscellaneous {
 
 	public void setAerRange(String aerRange) {
 		this.aerRange = aerRange;
-	}	
+	}
 
 	public String getXrefAbbreviation() {
 		return xrefAbbreviation;
@@ -389,7 +397,7 @@ public class SolrMiscellaneous {
 
 	public void setXrefUrlSyntax(String xrefUrlSyntax) {
 		this.xrefUrlSyntax = xrefUrlSyntax;
-	}	
+	}
 
 	public String getSubset() {
 		return subset;
@@ -405,7 +413,7 @@ public class SolrMiscellaneous {
 
 	public void setSubsetCount(int subsetCount) {
 		this.subsetCount = subsetCount;
-	}	
+	}
 
 	public String getEvidenceCode() {
 		return evidenceCode;
@@ -422,7 +430,7 @@ public class SolrMiscellaneous {
 	public void setEvidenceName(String evidenceName) {
 		this.evidenceName = evidenceName;
 	}
-	
+
 	public String getPprRuleId() {
 		return pprRuleId;
 	}
@@ -519,11 +527,35 @@ public class SolrMiscellaneous {
 		this.pprCuratorNotes = pprCuratorNotes;
 	}
 
+	public String getStatisticTupleType() {
+		return statisticTupleType;
+	}
+
+	public void setStatisticTupleType(String statisticTupleType) {
+		this.statisticTupleType = statisticTupleType;
+	}
+
+	public String getStatisticTupleKey() {
+		return statisticTupleKey;
+	}
+
+	public void setStatisticTupleKey(String statisticTupleKey) {
+		this.statisticTupleKey = statisticTupleKey;
+	}
+
+	public long getStatisticTupleHits() {
+		return statisticTupleHits;
+	}
+
+	public void setStatisticTupleHits(long statisticTupleHits) {
+		this.statisticTupleHits = statisticTupleHits;
+	}
+
 	/**
 	 * Gene products documents types
-	 * 
+	 *
 	 * @author cbonill
-	 * 
+	 *
 	 */
 	public enum SolrMiscellaneousDocumentType implements SolrDocumentType {
 		TAXONOMY("taxonomy"),
@@ -536,7 +568,8 @@ public class SolrMiscellaneous {
 		XREFDB("xrefdb"),
 		SUBSETCOUNT("subsetcount"),
 		EVIDENCE("evidence"),
-		POSTPROCESSINGRULE("postprocessingrule");
+		POSTPROCESSINGRULE("postprocessingrule"),
+		PRECALCULATED_STATS("precalculated-stas");
 
 		String value;
 
@@ -554,7 +587,7 @@ public class SolrMiscellaneous {
 
 		/**
 		 * Get values as SolrDocumentType objects
-		 * 
+		 *
 		 * @return Enum values as SolrDocumentType objects
 		 */
 		public static List<SolrDocumentType> getAsInterfaces() {
