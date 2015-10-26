@@ -155,6 +155,8 @@ public class QuickGOIndexer {
 		for(NamedFile file : gpaList){
 			//goAnnotationIndexers.add(createAnnotationIndexer(file));
 			QuickGOAnnotationIndexer quickGOAnnotationIndexer = createAnnotationIndexer(file);
+			//todo horrible hack
+			quickGOAnnotationIndexer.setMiscellaneousIndexer(quickGOMiscellaneousIndexer.getMiscellaneousIndexer());
 			quickGOAnnotationIndexer.start();
 		}
 

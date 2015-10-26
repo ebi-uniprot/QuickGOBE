@@ -329,4 +329,8 @@ public class QuickGOMiscellaneousIndexer {
 	public Properties getProperties() {
 		return properties;
 	}
+
+	public MiscellaneousIndexer getMiscellaneousIndexer() {
+		return miscellaneousIndexer;
+	}
 }

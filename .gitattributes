@@ -159,7 +159,6 @@ quickgo-solr-indexing/src/integration-test/resources/gp2protein.protein-sets -te
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/QuickGOIndexer.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/QuickGOIndexerProcess.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/annotation/QuickGOAnnotationIndexer.java -text svneol=unset#text/plain
-quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/annotation/StatisticTuple.java -text
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/annotation/StatisticsBucket.java -text
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/file/GPAssociationFile.java -text svneol=unset#text/plain
 quickgo-solr-indexing/src/main/java/uk/ac/ebi/quickgo/indexer/file/GPDataFile.java -text svneol=unset#text/plain

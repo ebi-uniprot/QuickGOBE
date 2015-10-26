@@ -16,6 +16,9 @@ import uk.ac.ebi.quickgo.indexer.file.GPAssociationFile;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
+import uk.ac.ebi.quickgo.solr.indexing.service.annotation.AnnotationIndexer;
+import uk.ac.ebi.quickgo.solr.indexing.service.miscellaneous.MiscellaneousIndexer;
+import uk.ac.ebi.quickgo.solr.mapper.miscellaneous.StatisticTupleMapper;
 import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 import uk.ac.ebi.quickgo.util.CPUUtils;
@@ -36,12 +39,13 @@ public class QuickGOAnnotationIndexer {
 	//Set by spring
 	private SolrServerProcessor solrServerProcessor;	//replaces annotationIndexer
 
+	private MiscellaneousIndexer miscellaneousIndexer;
+
 	private final Logger logger = LoggerFactory.getLogger(QuickGOAnnotationIndexer.class);
 	private NamedFile file;
 	private GeneOntology ontology;
 	private EvidenceCodeOntology evidenceCodeOntology;
 	private	Map<Integer, Miscellaneous> taxonomies;
-//	private StatisticsBucket annotationStatisticsCalculator;
 
 	//TODO Increase this value to speed up the indexing process
 	private long rowCreationTime;
@@ -87,6 +91,7 @@ public class QuickGOAnnotationIndexer {
 		List<GOAnnotation> rows = new ArrayList<>();
 		MemoryMonitor mm = new MemoryMonitor(true);
 		logger.info("Load " + gpDataFile.getName());
+		StatisticsBucket statisticsBucket = new StatisticsBucket();
 
 		// read the records & index them
 		gpDataFile.reader.open();
@@ -99,7 +104,7 @@ public class QuickGOAnnotationIndexer {
 			long rowCreationStart = CPUUtils.getCpuTime();
 			GOAnnotation annotation = gpDataFile.calculateRow(columns);
 			annotation.setDocType(GOAnnotation.SolrAnnotationDocumentType.ANNOTATION.getValue());
-//			annotationStatisticsCalculator.addAnnotationToStatistics(annotation);
+			statisticsBucket.addAnnotationToStatistics(annotation);
 			rows.add(annotation);
 			rowCreationTime+=CPUUtils.getCpuTime()-rowCreationStart;
 
@@ -113,7 +118,6 @@ public class QuickGOAnnotationIndexer {
 					logger.error(e.getMessage());
 				}
 				solrCallTime += CPUUtils.getCpuTime()-solrCallStart;
-
 				indexed = indexed + count;
 				count = 0;
 				rows = new ArrayList<>();
@@ -136,6 +140,23 @@ public class QuickGOAnnotationIndexer {
 
 		gpDataFile.reader.close();
 		logger.info("Load " + gpDataFile.getName() + " done - " + mm.end());
+
+		//Index statistics bucket
+		StatisticTupleMapper statisticTupleMapper = new StatisticTupleMapper();
+		miscellaneousIndexer.index(statisticsBucket.topAnnotationsSummary(),		statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topGeneProductsSummary(), 		statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topAnnotationsPerAspect(), 		statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topGeneProductsPerAspect(), 	statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topAnnotationsPerAssignedBy(), 	statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topGeneProductsPerAssignedBy(), statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topAnnotationsPerEvidence(),	statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topGeneProductsPerEvidence(), 	statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topAnnotationsPerGOID(), 		statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topGeneProductsPerGOID(), 		statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topAnnotationsPerTaxon(), 		statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topGeneProductsPerTaxon(),		statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topAnnotationsPerReference(), 	statisticTupleMapper);
+		miscellaneousIndexer.index(statisticsBucket.topGeneProductsPerReference(), 	statisticTupleMapper);
 
 		return indexed;
 	}
@@ -172,5 +193,10 @@ public class QuickGOAnnotationIndexer {
 	public void setProperties(Properties properties) {
 		this.properties = properties;
 		CHUNK_SIZE =  Integer.parseInt(properties.getProperty("quickgo.index.annotation.chunksize"));
+	}
+
+
+	public void setMiscellaneousIndexer(MiscellaneousIndexer miscellaneousIndexer) {
+		this.miscellaneousIndexer = miscellaneousIndexer;
 	}
 }
