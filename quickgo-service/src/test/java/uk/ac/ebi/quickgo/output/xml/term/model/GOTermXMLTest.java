@@ -7,7 +7,7 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Test;
 
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
-import ebi.ac.uk.ws.quickgo.Lookupdeftype;
+import uk.ac.ebi.quickgo.xml.term.Lookupdeftype;
 
 /**
  * Tests for the GOTermXML class 
