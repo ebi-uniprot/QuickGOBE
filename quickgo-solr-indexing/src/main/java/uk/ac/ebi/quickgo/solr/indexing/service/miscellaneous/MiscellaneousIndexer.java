@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
 import uk.ac.ebi.quickgo.solr.indexing.Indexer;
 import uk.ac.ebi.quickgo.solr.mapper.SolrMapper;
+import uk.ac.ebi.quickgo.solr.mapper.miscellaneous.StatisticTupleMapper;
 import uk.ac.ebi.quickgo.solr.model.SolrDocumentType;
 import uk.ac.ebi.quickgo.solr.model.miscellaneous.SolrMiscellaneous;
 import uk.ac.ebi.quickgo.solr.model.miscellaneous.SolrMiscellaneous.SolrMiscellaneousDocumentType;
+import uk.ac.ebi.quickgo.solr.model.statistics.StatisticTuple;
 import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 
 /**
@@ -27,15 +29,15 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 public class MiscellaneousIndexer implements Indexer<Miscellaneous>{
 
 	private SolrServerProcessor solrServerProcessor;
-	
+
 	private SolrMapper<Miscellaneous, SolrMiscellaneous> solrMapper;
-		
+
 	// Log
 	private static final Logger logger = LoggerFactory.getLogger(MiscellaneousIndexer.class);
-	
+
 	@Override
 	public void index(List<Miscellaneous> list) {
-		index(list, SolrMiscellaneousDocumentType.getAsInterfaces());		
+		index(list, SolrMiscellaneousDocumentType.getAsInterfaces());
 	}
 
 	/**
@@ -49,21 +51,40 @@ public class MiscellaneousIndexer implements Indexer<Miscellaneous>{
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	/**
      * Indexes Miscellaneous data in Solr
-     * @throws SolrServerException 
+     * @throws SolrServerException
      */
 	private Collection<SolrMiscellaneous> mapBeans(List<Miscellaneous> miscellaneous, List<SolrDocumentType> solrMiscellaneousDocumentTypes) {
-		
+
 		List<SolrMiscellaneous> beans = new ArrayList<SolrMiscellaneous>();
-		
+
 		//  Iterate over all the miscellaneous data and convert it into Solr objects to be indexed
-		for (Miscellaneous misc : miscellaneous) {			
+		for (Miscellaneous misc : miscellaneous) {
 			beans.addAll(solrMapper.toSolrObject(misc, solrMiscellaneousDocumentTypes));
     	}
 		return beans;
     }
+
+
+	public void index(StatisticTuple[] statisticTuples, StatisticTupleMapper  statisticTupleMapper){
+
+		List<SolrMiscellaneous> beans = new ArrayList<SolrMiscellaneous>();
+
+		for (StatisticTuple statisticTuple : statisticTuples) {
+			if(statisticTuple==null){
+				break;						// We have go to the end of the populated elements
+			}
+			beans.add(statisticTupleMapper.mapPrecalculatedStats(statisticTuple));
+
+		}
+		try {
+			solrServerProcessor.indexBeans(beans);
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.getMessage());
+		}
+	}
 
 	/**
 	 * Deletes all the miscellaneous information
@@ -75,7 +96,7 @@ public class MiscellaneousIndexer implements Indexer<Miscellaneous>{
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Deletes by query
 	 */
@@ -86,12 +107,12 @@ public class MiscellaneousIndexer implements Indexer<Miscellaneous>{
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	public void setSolrServerProcessor(SolrServerProcessor solrServerProcessor) {
 		this.solrServerProcessor = solrServerProcessor;
 	}
 
 	public void setSolrMapper(SolrMapper<Miscellaneous, SolrMiscellaneous> solrMapper) {
 		this.solrMapper = solrMapper;
-	}	
+	}
 }
