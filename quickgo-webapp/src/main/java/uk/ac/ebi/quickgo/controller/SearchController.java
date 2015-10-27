@@ -66,9 +66,9 @@ public class SearchController {
 
     private List<Object> searchResults = new ArrayList<>();
 
-    @RequestMapping(value = "autoSuggestByName", method = {RequestMethod.POST, RequestMethod.GET},
+    @RequestMapping(value = "searchTypeAhead", method = {RequestMethod.POST, RequestMethod.GET},
             produces = "application/json")
-    public ResponseEntity<String> findByName(@RequestParam(value = "q") String query,
+    public ResponseEntity<String> findByName(@RequestParam(value = "query") String query,
             HttpServletResponse httpServletResponse) throws IOException, SolrServerException {
 
         List<TypeAheadResult> results = new ArrayList<>();
@@ -84,7 +84,7 @@ public class SearchController {
             List<GeneProduct> geneProducts = geneProductService.autosuggest(query, null, HITS_TO_RETURN);
 
             addTerms(results, terms, regex);
-//            addGeneProducts(results, geneProducts, regex);
+            //            addGeneProducts(results, geneProducts, regex);
         }
 
         //TODO: is this a valid requirement, should it always be the shortest, shouldn't it be the most relevant
@@ -114,21 +114,25 @@ public class SearchController {
                                                             SolrServerException {
 
         List<TypeAheadResult> results = new ArrayList<>();
+        //TODO: remove this as soon as possible
         final String regex = ".*" + query.toLowerCase().replaceAll("\\s+", ".*") + ".*";
 
-        //List<GenericTerm> terms = termService.autosuggest(query,null, HITS_TO_RETURN);
-        List<GenericTerm> terms = termService.autosuggestOnlyGoTerms(query, null, HITS_TO_RETURN);
+        //TODO: move GO and ECO ide prefixes to somewhere more centralized
+        if (query.toLowerCase().startsWith("go:") || query.toLowerCase().startsWith("eco:")) {
+            List<GenericTerm> terms = termService.autosuggestOnlyGoTerms(query, null, HITS_TO_RETURN);
+            addTermsIds(results, terms, regex);
+        } else {// GO or ECO id
+            List<GenericTerm> terms = termService.autosuggest(query, null, HITS_TO_RETURN);
+            List<GeneProduct> geneProducts = geneProductService.autosuggest(query, null, HITS_TO_RETURN);
 
-        //		if (!query.contains(":")) {
-        //
-        //			addTerms(results, terms, regex);
-        //			addGeneProducts(results, geneProductService.autosuggest(query, null, HITS_TO_RETURN), regex);
-        //
-        //		} else {// GO or ECO id
-        //			addTermsIds(results, terms, regex);
-        //		}
+            addTerms(results, terms, regex);
+            //            addGeneProducts(results, geneProducts, regex);
+        }
 
-        addTerms(results, terms, regex);
+        //TODO: is this a valid requirement, should it always be the shortest, shouldn't it be the most relevant
+        // Sort results (shortest first)
+        Collections.sort(results, new HitsComparator());
+
         //addTermsIds(results, terms, regex);
         returnResultsJson(httpServletResponse, results);
     }
@@ -637,5 +641,4 @@ public class SearchController {
         httpServletResponse.setContentLength(sb.length());
         httpServletResponse.flushBuffer();
     }
-
 }
