@@ -66,40 +66,6 @@ public class SearchController {
 
     private List<Object> searchResults = new ArrayList<>();
 
-    @RequestMapping(value = "searchTypeAhead", method = {RequestMethod.POST, RequestMethod.GET},
-            produces = "application/json")
-    public ResponseEntity<String> findByName(@RequestParam(value = "query") String query,
-            HttpServletResponse httpServletResponse) throws IOException, SolrServerException {
-
-        List<TypeAheadResult> results = new ArrayList<>();
-        //TODO: remove this as soon as possible
-        final String regex = ".*" + query.toLowerCase().replaceAll("\\s+", ".*") + ".*";
-
-        //TODO: move GO and ECO ide prefixes to somewhere more centralized
-        if (query.toLowerCase().startsWith("go:") || query.toLowerCase().startsWith("eco:")) {
-            List<GenericTerm> terms = termService.autosuggestOnlyGoTerms(query, null, HITS_TO_RETURN);
-            addTermsIds(results, terms, regex);
-        } else {// GO or ECO id
-            List<GenericTerm> terms = termService.autosuggest(query, null, HITS_TO_RETURN);
-            List<GeneProduct> geneProducts = geneProductService.autosuggest(query, null, HITS_TO_RETURN);
-
-            addTerms(results, terms, regex);
-            //            addGeneProducts(results, geneProducts, regex);
-        }
-
-        //TODO: is this a valid requirement, should it always be the shortest, shouldn't it be the most relevant
-        // Sort results (shortest first)
-        Collections.sort(results, new HitsComparator());
-
-        // JSON representation
-        String json = new Gson().toJson(results);
-
-        HttpHeaders responseHeaders = new HttpHeaders();
-        //TODO: we should be able to do this in a cleaner way see @ResponseBody
-        responseHeaders.add("Content-Type", "application/json; charset=utf-8");
-        return new ResponseEntity<>(json, responseHeaders, HttpStatus.OK);
-    }
-
     /**
      * This is the one used for the typeahead
      * @param query
