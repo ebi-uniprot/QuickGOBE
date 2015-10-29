@@ -33,7 +33,7 @@ public class QuickGOIndexerProcess {
 	 */
 	public static void main(String[] args) {
 
-		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "src/main/resources/indexing-beans.xml",
+		appContext = new ClassPathXmlApplicationContext("common-beans.xml", "indexing-beans.xml",
 				"query-beans.xml");
 
 		Properties defaultProps = new Properties();
