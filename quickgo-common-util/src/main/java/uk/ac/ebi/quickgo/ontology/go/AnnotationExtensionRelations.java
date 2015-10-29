@@ -1,19 +1,17 @@
 package uk.ac.ebi.quickgo.ontology.go;
 
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import uk.ac.ebi.quickgo.data.GOSourceFiles;
 import uk.ac.ebi.quickgo.data.GOSourceFiles.*;
 import uk.ac.ebi.quickgo.ontology.generic.RelationType;
 import uk.ac.ebi.quickgo.render.JSONSerialise;
 
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class AnnotationExtensionRelations implements JSONSerialise {
 	public enum ValidationStatus { GOOD, BAD, INDETERMINATE }
-
-	public static final String rootRelation = "_ROOT_AER_";
 
 	public static class EntityMatcher {
 		static Pattern rePattern = Pattern.compile("\\^?([^$]*)\\$?");
@@ -210,6 +208,8 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 		public String name;
 		public String usage;
 		public String domain;
+		public boolean validInExtension = false;
+		public boolean displayForCurators = false;
 
 		public List<AnnotationExtensionRelation> parents = new ArrayList<>();
 		public EntitySet domains = new EntitySet();
@@ -235,6 +235,10 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 			}
 		}
 
+		public boolean hasParents() {
+			return parents.size() > 0;
+		}
+
 		public boolean hasDomain() {
 			return domains.size() > 0;
 		}
@@ -255,13 +259,29 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 			subsets.add(subset);
 		}
 
+		public void setValidInExtension(boolean flag) {
+			this.validInExtension = flag;
+		}
+
+		public boolean getValidInExtension() {
+			return validInExtension;
+		}
+
+		public void setDisplayForCurators(boolean flag) {
+			this.displayForCurators = flag;
+		}
+
+		public boolean getDisplayForCurators() {
+			return displayForCurators;
+		}
+
 		public ValidationStatus isValidDomain(GOTerm term) {
 			if (domains.size() > 0) {
 				return domains.containsAncestorOf(term) ? ValidationStatus.GOOD : ValidationStatus.BAD;
 			}
 			else {
 				// this relation has no explicit domain options, so check its parents
-				if (parents.size() > 0) {
+				if (hasParents()) {
 					for (AnnotationExtensionRelation parent : parents) {
 						switch (parent.isValidDomain(term)) {
 							case GOOD:
@@ -288,15 +308,15 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 					if (ranges.containsAncestorOf(term)) {
 						return ValidationStatus.GOOD;
 					}
-                    return ValidationStatus.BAD;
+					return ValidationStatus.BAD;
 				}
-                else {
-                    return ranges.matches(candidate) ? ValidationStatus.GOOD : ValidationStatus.BAD;
-                }
+				else {
+					return ranges.matches(candidate) ? ValidationStatus.GOOD : ValidationStatus.BAD;
+				}
 			}
 			else {
 				// there are no explicit range options defined for this relation, so check against its parents
-				if (parents.size() > 0) {
+				if (hasParents()) {
 					for (AnnotationExtensionRelation parent : parents) {
 						switch (parent.isValidRange(candidate, term)) {
 							case GOOD:
@@ -398,7 +418,7 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 		this.ontology = ontology;
 
 		for (String[] row : sourceFiles.annExtRelations.reader(EAnnExtRelation.RELATION, EAnnExtRelation.USAGE, EAnnExtRelation.DOMAIN)) {
-		    annExtRelations.put(row[0], new AnnotationExtensionRelation(row[0], row[1], row[2]));
+			annExtRelations.put(row[0], new AnnotationExtensionRelation(row[0], row[1], row[2]));
 		}
 
 		for (String[] row : sourceFiles.aerRelations.reader(EAnnExtRelRelation.CHILD, EAnnExtRelRelation.PARENT, EAnnExtRelRelation.RELATION_TYPE)) {
@@ -420,7 +440,15 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 		for (String[] row : sourceFiles.aerSubsets.reader(EAnnExtRelSubset.SUBSET, EAnnExtRelSubset.RELATION)) {
 			AnnotationExtensionRelation rel = annExtRelations.get(row[1]);
 			if (rel != null) {
-				rel.addSubset(row[0]);
+				if ("_valid_relations_".equals(row[0])) {
+					rel.setValidInExtension(true);
+				}
+				else if ("_displayed_relations_".equals(row[0])) {
+					rel.setDisplayForCurators(true);
+				}
+				else {
+					rel.addSubset(row[0]);
+				}
 			}
 		}
 
@@ -453,8 +481,8 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 		private static final long serialVersionUID = 1L;
 
 		public AnnExtRelException(String error) {
-	        super(error);
-	    }
+			super(error);
+		}
 	}
 
 	// regExp to decompose a candidate string into relation, namespace and target
@@ -471,16 +499,21 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 						String relation = annExtRelMatcher.group(1);
 						AnnotationExtensionRelation aer = annExtRelations.get(relation);
 						if (aer != null) {
-							if (aer.isValidDomain(domain) != ValidationStatus.BAD) {
-								String range = annExtRelMatcher.group(2);
-								GOTerm term = (GOTerm)ontology.getTerm(range);
-								ValidationStatus status = aer.isValidRange(range, term);
-								if (status == ValidationStatus.BAD || (status == ValidationStatus.INDETERMINATE && !rangeDefaults.matchesComposite(range))) {
-									throw new AnnExtRelException("Invalid range for " + relation + ": " + range);
+							if (aer.getValidInExtension()) {
+								if (aer.isValidDomain(domain) != ValidationStatus.BAD) {
+									String range = annExtRelMatcher.group(2);
+									GOTerm term = (GOTerm)ontology.getTerm(range);
+									ValidationStatus status = aer.isValidRange(range, term);
+									if (status == ValidationStatus.BAD || (status == ValidationStatus.INDETERMINATE && !rangeDefaults.matchesComposite(range))) {
+										throw new AnnExtRelException("Invalid range for " + relation + ": " + range);
+									}
+								}
+								else {
+									throw new AnnExtRelException("Invalid domain for " + relation + ": " + go_id);
 								}
 							}
 							else {
-								throw new AnnExtRelException("Invalid domain for " + relation + ": " + go_id);
+								throw new AnnExtRelException("Relation not valid for use in annotation_extension: " + relation);
 							}
 						}
 						else {
@@ -596,19 +629,19 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 
 		for (String s : annExtRelations.keySet()) {
 			AnnotationExtensionRelation aer = annExtRelations.get(s);
-            // we only display relations that are in one or more subsets (plus the root relation)
-            if (aer.subsets.size() > 0 || rootRelation.equals(aer.name)) {
+			// we only display relations that are flagged are in the display_for_curators subset in gorel.obo (plus our synthesized root relation)
+			if (aer.getDisplayForCurators()) {
 				nodes.add(new Node(aer));
 				for (AnnotationExtensionRelation parent : aer.parents) {
 					edges.add(new Edge(aer.name, parent.name));
 				}
-            }
+			}
 		}
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("nodes", nodes);
 		map.put("edges", edges);
-	    return map;
+		return map;
 	}
 
 	public static class JSONCV implements Comparable<JSONCV> {
@@ -623,7 +656,7 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 		}
 
 		public int compareTo(JSONCV cv) {
-		    return code.compareTo(cv.code);
+			return code.compareTo(cv.code);
 		}
 	}
 
@@ -632,7 +665,7 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 
 		for (String s : annExtRelations.keySet()) {
 			AnnotationExtensionRelation aer = annExtRelations.get(s);
-			if (aer.parents.size() > 0) { // exclude relations with no parents (i.e., the root relation)
+			if (aer.hasParents()) { // exclude relations with no parents (i.e., the root relation)
 				relationNames.add(new JSONCV(s, null, null));
 			}
 		}
@@ -647,7 +680,7 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 		Map<String, Object> map = new HashMap<>();
 		map.put("relations", relationNames);
 		map.put("namespaces", namespaces);
-	    return map;
+		return map;
 	}
 
 	public static class DBRegExp {
@@ -703,17 +736,15 @@ public class AnnotationExtensionRelations implements JSONSerialise {
 
 			for (String s : annExtRelations.keySet()) {
 				AnnotationExtensionRelation aer = annExtRelations.get(s);
-				if (aer.parents.size() > 0 && aer.subsets.size() > 0 && aer.rangeOptions().size() > 0 && aer.isValidDomain(term)  != ValidationStatus.BAD) {
+				if (aer.validInExtension && aer.isValidDomain(term) != ValidationStatus.BAD && aer.rangeOptions().size() > 0) {
 					AER relation = new AER(aer);
 					allRelations.addRelation(relation);
 					for (String subsetName : aer.subsets) {
-						if (!"all_relations".equals(subsetName)) {
-							AERSubset subset = subsets.get(subsetName);
-							if (subset == null) {
-								subsets.put(subsetName, subset = new AERSubset(subsetName));
-							}
-							subset.addRelation(relation);
+						AERSubset subset = subsets.get(subsetName);
+						if (subset == null) {
+							subsets.put(subsetName, subset = new AERSubset(subsetName));
 						}
+						subset.addRelation(relation);
 					}
 				}
 			}
