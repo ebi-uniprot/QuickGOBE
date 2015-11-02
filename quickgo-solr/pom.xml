@@ -11,8 +11,6 @@
 
     <artifactId>quickgo-solr</artifactId>
 
-    <version>0.0.1-SNAPSHOT</version>
-
     <packaging>pom</packaging>
 
     <name>QuickGO Solr</name>
