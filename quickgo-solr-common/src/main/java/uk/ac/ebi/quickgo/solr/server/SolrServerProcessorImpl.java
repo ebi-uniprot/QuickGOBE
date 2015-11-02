@@ -6,12 +6,10 @@ import java.util.*;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.*;
 import org.apache.solr.client.solrj.response.FacetField.Count;
-import org.apache.solr.client.solrj.response.PivotField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.TermsResponse;
 import org.apache.solr.client.solrj.response.TermsResponse.Term;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.util.NamedList;
@@ -45,6 +43,43 @@ public class SolrServerProcessorImpl implements SolrServerProcessor, Serializabl
     public <T> List<T> findByQuery(SolrQuery solRQuery, Class<T> type, int numRows) throws SolrServerException {
         solRQuery.setRows(numRows <= -1 ? NUM_ROWS : numRows);
         return getSolrServer().query(solRQuery).getBeans(type);
+    }
+
+    private DocumentObjectBinder docBinder = new DocumentObjectBinder();
+
+    @Override
+    public <T> List<T> groupByQuery(SolrQuery solRQuery, Class<T> type, int numRows) throws SolrServerException {
+        solRQuery.setRows(numRows <= -1 ? NUM_ROWS : numRows);
+
+        GroupResponse groupResponse = getSolrServer().query(solRQuery).getGroupResponse();
+
+        return convertGroupsIntoResults(groupResponse, type);
+    }
+
+    /**
+     * Converts a grouped solr response into a collection of distinct documents. Each document will contain a distinct
+     * group.
+     *
+     * @param groupResponse solr result grouped by a given field
+     * @param type the solr document type to convert to
+     * @param <T> document type to convert to
+     * @return a collection of distinct documents
+     */
+    private <T> List<T> convertGroupsIntoResults(GroupResponse groupResponse, Class<T> type) {
+        List<T> results = new ArrayList<>();
+
+        List<GroupCommand> groupCommands = groupResponse.getValues();
+
+        for (GroupCommand groupCommand : groupCommands) {
+            List<Group> groups = groupCommand.getValues();
+
+            for (Group group : groups) {
+                SolrDocument doc = group.getResult().get(0);
+                results.add(docBinder.getBean(type, doc));
+            }
+        }
+
+        return results;
     }
 
     /**
