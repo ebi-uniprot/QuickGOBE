@@ -53,7 +53,8 @@ public class SolrServerProcessorImpl implements SolrServerProcessor, Serializabl
     public <T> void indexBeans(Collection<T> beans) throws SolrServerException, IOException {
         SolrServer server = getSolrServer();
         server.addBeans(beans);
-        server.commit();
+        //todo don't do this https://lucidworks.com/blog/2013/08/23/understanding-transaction-logs-softcommit-and-commit-in-sorlcloud/
+        //server.commit();
     }
 
     /**
@@ -73,7 +74,8 @@ public class SolrServerProcessorImpl implements SolrServerProcessor, Serializabl
     public void deleteAll() throws SolrServerException, IOException {
         SolrServer server = getSolrServer();
         server.deleteByQuery("*:*");// Deletes everything
-        server.commit();
+        //todo don't do this https://lucidworks.com/blog/2013/08/23/understanding-transaction-logs-softcommit-and-commit-in-sorlcloud/
+        //server.commit();
     }
 
     /**
@@ -82,7 +84,8 @@ public class SolrServerProcessorImpl implements SolrServerProcessor, Serializabl
     public void deleteByQuery(String query) throws SolrServerException, IOException {
         SolrServer server = getSolrServer();
         server.deleteByQuery(query);// Deletes by query
-        server.commit();
+        //todo don't do this https://lucidworks.com/blog/2013/08/23/understanding-transaction-logs-softcommit-and-commit-in-sorlcloud/
+        //server.commit();
     }
 
     /**
