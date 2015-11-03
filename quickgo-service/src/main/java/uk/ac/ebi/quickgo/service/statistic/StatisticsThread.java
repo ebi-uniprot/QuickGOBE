@@ -8,7 +8,7 @@ import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.util.ClientUtils;
 
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
-import uk.ac.ebi.quickgo.service.statistic.type.StatsTerm;
+import uk.ac.ebi.quickgo.statistic.StatsTerm;
 
 /**
  * Thread to calculate a chunk of statistics

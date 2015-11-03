@@ -17,7 +17,7 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Test;
 
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
-import uk.ac.ebi.quickgo.service.statistic.type.StatsTerm;
+import uk.ac.ebi.quickgo.statistic.StatsTerm;
 import uk.ac.ebi.quickgo.service.term.TermService;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.solr.query.model.ontology.enums.TermField;
