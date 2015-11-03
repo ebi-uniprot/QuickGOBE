@@ -140,7 +140,7 @@ public class GenericTerm implements JSONSerialise, Comparable<GenericTerm> {
      * relation type
      *
      * @param relationCodes - a string containing codes that represent the relation types (cf {@link RelationType}
-	 * for details)
+     * for details)
      *                        examples:
      *                           relation types for is_a: "I="
      *                           relation types for is_a, part_of, occurs_in: "I=PO"
@@ -164,10 +164,10 @@ public class GenericTerm implements JSONSerialise, Comparable<GenericTerm> {
 
     /**
      * return the set of term IDs that feature somewhere in this term's ancestry, as traversed over a specified set
-	 * of relation type
+     * of relation type
      *
      * @param relationCodes - a string containing codes that represent the relation types (cf {@link RelationType}
-	 * for details)
+     * for details)
      *                        examples:
      *                           relation types for is_a: "I="
      *                           relation types for is_a, part_of, occurs_in: "I=PO"
