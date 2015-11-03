@@ -63,22 +63,20 @@ public abstract class AbstractSearchEngine<D> extends ExternalResource {
         indexDocuments(Collections.singleton(document));
     }
 
-    public void removeDocument(String idQueryStr) {
-        String idQuery = identifierField() + " : " + idQueryStr;
-
-        QueryResponse queryResponse = getQueryResponse(idQuery);
+    public void removeDocument(String queryStr) {
+        QueryResponse queryResponse = getQueryResponse(queryStr);
         if (queryResponse.getResults() != null && !queryResponse.getResults().isEmpty()) {
             try {
-                server.deleteByQuery(idQuery);
+                server.deleteByQuery(queryStr);
                 server.commit();
             } catch (SolrServerException | IOException e) {
-                throw new IllegalStateException("Failed to remove entry with id: " + idQuery + " from index.", e);
+                throw new IllegalStateException("Failed to remove entry with id: " + queryStr + " from index.", e);
             }
         }
     }
 
     public void removeAllDocuments() {
-        removeDocument("*");
+        removeDocument("*:*");
     }
 
     public QueryResponse getQueryResponse(String query) {
