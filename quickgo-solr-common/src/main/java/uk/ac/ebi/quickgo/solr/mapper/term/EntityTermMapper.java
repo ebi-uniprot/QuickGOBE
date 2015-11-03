@@ -6,16 +6,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.ebi.quickgo.ontology.generic.AuditRecord;
-import uk.ac.ebi.quickgo.ontology.generic.Synonym;
-import uk.ac.ebi.quickgo.ontology.generic.TermCredit;
-import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
+import uk.ac.ebi.quickgo.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
-import uk.ac.ebi.quickgo.ontology.go.GOTerm.EGOAspect;
-import uk.ac.ebi.quickgo.ontology.go.GOTerm.ETermUsage;
 import uk.ac.ebi.quickgo.ontology.go.GOTermSet;
 import uk.ac.ebi.quickgo.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.solr.mapper.EntityMapper;
@@ -30,33 +26,24 @@ import uk.ac.ebi.quickgo.util.XRef;
  *
  * @author cbonill
  */
-public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm> {
-
-    // Log
+public abstract class EntityTermMapper<T extends GenericTerm> implements EntityMapper<SolrTerm, T> {
     private static final Logger logger = LoggerFactory.getLogger(EntityTermMapper.class);
 
     @Override
-    public GOTerm toEntityObject(Collection<SolrTerm> solrObjects) {
-        return toEntityObject(solrObjects,
-                SolrTermDocumentType.getAsInterfaces());
+    public T toEntityObject(Collection<SolrTerm> solrObjects) {
+        return toEntityObject(solrObjects, SolrTermDocumentType.getAsInterfaces());
     }
 
     @Override
-    public GOTerm toEntityObject(Collection<SolrTerm> solrObjects,
-                                 List<SolrDocumentType> solrDocumentTypes) {
-
-        GOTerm term = new GOTerm();
+    public T toEntityObject(Collection<SolrTerm> solrObjects, List<SolrDocumentType> solrDocumentTypes) {
+        T term = createEmptyTerm();
 
         for (SolrDocumentType termDocumentType : solrDocumentTypes) {
             SolrTermDocumentType solrTermDocumentType = ((SolrTermDocumentType) termDocumentType);
 
             switch (solrTermDocumentType) {
-
                 case TERM:
-                    List<SolrTerm> l = getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.TERM);
-                    if (l.size() > 0) {
-                        mapBasicInformation(l.get(0), term);
-                    }
+                    getTermDocument(solrObjects).ifPresent(doc -> mapBasicInformation(doc, term));
                     break;
                 case HISTORY:
                     mapHistory(getAssociatedSolrTerms(solrObjects, SolrTermDocumentType.HISTORY), term);
@@ -75,13 +62,16 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
                     break;
             }
         }
+
         mapSpecificFields(term, solrObjects, solrDocumentTypes);
 
         return term;
     }
 
-    public abstract void mapSpecificFields(GOTerm term, Collection<SolrTerm> solrObjects, List<SolrDocumentType> solrDocumentTypes);
+    public abstract void mapSpecificFields(T term, Collection<SolrTerm> solrObjects,
+            List<SolrDocumentType> solrDocumentTypes);
 
+    protected abstract T createEmptyTerm();
 
     /**
      * Map Solr Term for the basic information of a GO term
@@ -89,23 +79,25 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
      * @param solrTerm GO Term
      * @param term     Term to be indexed
      */
-    private void mapBasicInformation(SolrTerm solrTerm, GOTerm term) {
+    protected void mapBasicInformation(SolrTerm solrTerm, T term) {
         term.setId(solrTerm.getId());
         term.setName(solrTerm.getName());
         term.setObsolete(solrTerm.isObsolete());
         try {
-            if (solrTerm.getOntology() != null) {
-                term.setAspect(EGOAspect.fromString(solrTerm.getOntology()));
-            }
             String comment = solrTerm.getComment();
+
             if (!"".equals(comment)) {
                 term.setComment(comment);
             }
+
             String definition = solrTerm.getDefinition();
+
             if (!"".equals(definition)) {
                 term.setDefinition(definition);
             }
+
             List<XRef> definitionsXrefs = new ArrayList<>();
+
             if (solrTerm.getDefinitionXref() != null) {
                 for (String definitionXref : solrTerm.getDefinitionXref()) {
                     String[] xrefDef = definitionXref.split(":");
@@ -113,10 +105,9 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
                 }
                 term.setDefinitionXrefs(definitionsXrefs);
             }
+
             term.setAltIds(generateAltIds(solrTerm.getSecondaryIds()));
-            if (solrTerm.getUsage() != null) {
-                term.setUsage(ETermUsage.fromString(solrTerm.getUsage()));
-            }
+
             // Credits
             List<TermCredit> credits = new ArrayList<>();
             if (solrTerm.getCredits() != null) {
@@ -130,7 +121,6 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
             // Map subsets
             mapSubsets(solrTerm, term);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error(e.getMessage());
         }
     }
@@ -157,7 +147,7 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
      * @param associatedSolrTerms Change Logs information
      * @param term                Term with the Change Logs information mapped
      */
-    private void mapHistory(List<SolrTerm> associatedSolrTerms, GOTerm term) {
+    private void mapHistory(List<SolrTerm> associatedSolrTerms, T term) {
         List<AuditRecord> auditRecords = new ArrayList<>();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         for (SolrTerm log : associatedSolrTerms) {
@@ -176,7 +166,7 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
      * @param associatedSolrTerms Solr Relations terms
      * @param term                Term with Relations information mapped
      */
-    private void mapRelation(List<SolrTerm> associatedSolrTerms, GOTerm term) {
+    private void mapRelation(List<SolrTerm> associatedSolrTerms, T term) {
         List<TermRelation> children = new ArrayList<>();
         List<TermRelation> parents = new ArrayList<>();
         for (SolrTerm relation : associatedSolrTerms) {
@@ -204,7 +194,7 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
      * @param associatedSolrTerms Solr Replaces terms
      * @param term                Term with Replaces information mapped
      */
-    private void mapReplaces(List<SolrTerm> associatedSolrTerms, GOTerm term) {
+    private void mapReplaces(List<SolrTerm> associatedSolrTerms, T term) {
         List<TermRelation> replacedby = new ArrayList<>();
         List<TermRelation> replaces = new ArrayList<>();
         for (SolrTerm relation : associatedSolrTerms) {
@@ -233,7 +223,7 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
      * @param solrTerm Solr term
      * @param term     Term with Subsets information mapped
      */
-    private void mapSubsets(SolrTerm solrTerm, GOTerm term) {
+    private void mapSubsets(SolrTerm solrTerm, T term) {
         List<GOTermSet> terms = new ArrayList<>();
         if (solrTerm.getSubsets() != null) {
             for (String subset : solrTerm.getSubsets()) {
@@ -250,7 +240,7 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
      * @param associatedSolrTerms Solr Synonim terms
      * @param term                Term with the Synonyms information mapped
      */
-    private void mapSynonyms(List<SolrTerm> associatedSolrTerms, GOTerm term) {
+    private void mapSynonyms(List<SolrTerm> associatedSolrTerms, T term) {
         List<Synonym> synonyms = new ArrayList<>();
         for (SolrTerm synonym : associatedSolrTerms) {
             synonyms.add(new Synonym(synonym.getSynonymType(), synonym.getSynonymName()));
@@ -274,7 +264,7 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
      * @param associatedSolrTerms Solr Cross References terms
      * @param term                Term with Cross References information mapped
      */
-    private void mapCrossReferences(List<SolrTerm> associatedSolrTerms, GOTerm term) {
+    private void mapCrossReferences(List<SolrTerm> associatedSolrTerms, T term) {
         List<NamedXRef> xrefs = new ArrayList<>();
         for (SolrTerm xref : associatedSolrTerms) {
             NamedXRef ref = new NamedXRef(xref.getXrefDbCode(), xref.getXrefDbId(), xref.getXrefName());
@@ -284,14 +274,14 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
     }
 
     /**
-     * Given a list of Solr terms, returns the ones that match with the
-     * specified document type
+     * Given a list of Solr terms, returns the ones that match with the specified document type
      *
      * @param solrObjects          Solr term objects
      * @param solrTermDocumentType Type to check
      * @return Solr terms that match with the specified document type
      */
-    protected List<SolrTerm> getAssociatedSolrTerms(Collection<SolrTerm> solrObjects, SolrTermDocumentType solrTermDocumentType) {
+    protected List<SolrTerm> getAssociatedSolrTerms(Collection<SolrTerm> solrObjects,
+            SolrTermDocumentType solrTermDocumentType) {
         List<SolrTerm> solrTerms = new ArrayList<>();
         for (SolrTerm solrTerm : solrObjects) {
             if (SolrTermDocumentType.valueOf(solrTerm.getDocType().toUpperCase()) == solrTermDocumentType) {
@@ -299,5 +289,10 @@ public abstract class EntityTermMapper implements EntityMapper<SolrTerm, GOTerm>
             }
         }
         return solrTerms;
+    }
+
+    protected Optional<SolrTerm> getTermDocument(Collection<SolrTerm> solrDocs) {
+        return solrDocs.stream().filter(doc -> SolrTermDocumentType.valueOf(doc.getDocType().toUpperCase()) ==
+                SolrTermDocumentType.TERM).findFirst();
     }
 }
