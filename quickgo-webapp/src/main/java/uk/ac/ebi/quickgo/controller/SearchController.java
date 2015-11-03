@@ -87,12 +87,12 @@ public class SearchController {
         if (query.toLowerCase().startsWith("go:") || query.toLowerCase().startsWith("eco:")) {
             List<GenericTerm> terms = termService.autosuggestOnlyGoTerms(query, null, HITS_TO_RETURN);
             addTermsIds(results, terms, regex);
-        } else {// GO or ECO id
+        } else {
             List<GenericTerm> terms = termService.autosuggest(query, null, HITS_TO_RETURN);
             List<GeneProduct> geneProducts = geneProductService.autosuggest(query, null, HITS_TO_RETURN);
 
-            addTerms(results, terms, regex);
-            //            addGeneProducts(results, geneProducts, regex);
+            addTerms(results, terms);
+                        addGeneProducts(results, geneProducts, regex);
         }
 
         //TODO: is this a valid requirement, should it always be the shortest, shouldn't it be the most relevant
@@ -464,50 +464,15 @@ public class SearchController {
 
     /**
      * Check term/synonym contains query text before adding to results
+     *
      * @param results Results to be shown
      * @param terms Terms results
-     * @param regex
      */
-    //TODO: why would you want to check if the term exists? If its coming from the service then it should exist
-    public void addTerms(List<TypeAheadResult> results, List<GenericTerm> terms, String regex) {
-
+    public void addTerms(List<TypeAheadResult> results, List<GenericTerm> terms) {
         for (GenericTerm genericTerm : terms) {
-
-            //TODO: no terms are checked if result size is larger than number of shown hits?
-            if (results.size() >= HITS_TO_RETURN) {
-                break;
-            }
-
-            if (genericTerm.getName() != null) {
-
-                if (genericTerm.getName().toLowerCase().trim().matches(regex)) {
-                    TypeAheadResult typeAheadResult =
-                            new TypeAheadResult(genericTerm.getId(), genericTerm.getName(), SearchResultType.TERM);
-                    results.add(typeAheadResult);
-                    continue;
-                }
-                if (!genericTerm.getSynonyms().isEmpty() &&
-                        genericTerm.getSynonyms().get(0).getName().toLowerCase().trim().matches(regex)) {
-                    TypeAheadResult typeAheadResult =
-                            new TypeAheadResult(genericTerm.getId(), genericTerm.getSynonyms().get(0).getName(),
-                                    SearchResultType.TERM);
-                    results.add(typeAheadResult);
-                    continue;
-                }
-                if (genericTerm.getDefinition().toLowerCase().trim().matches(regex)) {
-                    TypeAheadResult typeAheadResult =
-                            new TypeAheadResult(genericTerm.getId(), genericTerm.getDefinition(),
-                                    SearchResultType.TERM);
-                    results.add(typeAheadResult);
-                    continue;
-                }
-                if (genericTerm.getId().toLowerCase().trim().matches(regex)) {
-                    TypeAheadResult typeAheadResult =
-                            new TypeAheadResult(genericTerm.getId(), genericTerm.getName(), SearchResultType.TERM);
-                    results.add(typeAheadResult);
-                    continue;
-                }
-            }
+                TypeAheadResult typeAheadResult = new TypeAheadResult(genericTerm.getId(), genericTerm.getName(),
+                        SearchResultType.TERM);
+                results.add(typeAheadResult);
         }
     }
 
