@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.indexer.annotation;
 
 import org.junit.Test;
+import uk.ac.ebi.quickgo.indexer.annotation.StatisticsBucket;
 import uk.ac.ebi.quickgo.solr.model.annotation.GOAnnotation;
 import uk.ac.ebi.quickgo.solr.model.statistics.StatisticTuple;
 

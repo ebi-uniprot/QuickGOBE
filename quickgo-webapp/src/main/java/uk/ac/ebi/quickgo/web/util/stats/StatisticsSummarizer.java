@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import uk.ac.ebi.quickgo.service.statistic.StatisticService;
-import uk.ac.ebi.quickgo.service.statistic.type.StatsTerm;
+import uk.ac.ebi.quickgo.statistic.StatsTerm;
 
 /**
  * To retrieve stats for a specific annotation field type
