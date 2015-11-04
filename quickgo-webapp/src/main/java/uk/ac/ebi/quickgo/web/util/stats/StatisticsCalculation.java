@@ -5,7 +5,7 @@ import java.util.Set;
 
 import uk.ac.ebi.quickgo.bean.statistics.StatisticsBean;
 import uk.ac.ebi.quickgo.service.statistic.StatisticService;
-import uk.ac.ebi.quickgo.service.statistic.type.StatsTerm;
+import uk.ac.ebi.quickgo.statistic.StatsTerm;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 
 /**
