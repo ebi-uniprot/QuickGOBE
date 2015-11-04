@@ -1,0 +1,15 @@
+1218c1218
+<     <!--
+---
+>    
+1220d1219
+<          <str name="replicateAfter">commit</str>
+1222c1221,1222
+<          <str name="confFiles">schema.xml,stopwords.txt</str>
+---
+>          <str name="backupAfter">optimize</str>
+>          <str name="confFiles">schema.xml</str>
+1224c1224
+<     -->
+---
+>    

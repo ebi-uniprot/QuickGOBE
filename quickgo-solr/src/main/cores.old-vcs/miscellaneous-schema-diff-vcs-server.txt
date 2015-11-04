@@ -1,0 +1,16 @@
+125a126,140
+>                 <!-- Post Processing Rules -->
+>                 <field name="pprRuleId" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprAncestorGoId" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprAncestorTerm" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprRelationship" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprTaxonName" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprOriginalGoId" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprOriginalTerm" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprCleanupAction" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprAffectedTaxGroup" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprSubstitutedGoId" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprSubstitutedTerm" type="string" indexed="false" stored="true" multiValued="false" />
+>                 <field name="pprCuratorNotes" type="string" indexed="false" stored="true" multiValued="false" />
+> 
+> 
