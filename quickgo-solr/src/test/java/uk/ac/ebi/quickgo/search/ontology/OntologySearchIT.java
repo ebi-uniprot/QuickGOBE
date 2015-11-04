@@ -13,10 +13,17 @@ import static uk.ac.ebi.quickgo.search.ontology.DocumentMocker.Relation.createRe
 
 /**
  * This class is used to show which queries are necessary to successfully search the index, e.g.,
- * how to search for an ECO term.
- *
+ * how to search for a GO term.
+ * <p/>
  * Changes made to the ontology core's schema.xml are instantly reflected by the tests
  * defined in this class.
+ * <p/>
+ * Example tests: queries sent by {@link TermRetrieval} can be tested here first, before needing
+ * to move libraries/configurations re-indexing, then testing server-side.
+ * <p/>
+ * Please use {@link DocumentMocker} to add documents to the search engine, before trying to search for them.
+ *
+ * @see DocumentMocker
  *
  * Created 02/11/15
  * @author Edd
@@ -45,6 +52,10 @@ public class OntologySearchIT {
         assertThat(queryResponse.getResults().size(), is(1));
     }
 
+    /**
+     * Should be able to find a child relationship based on its ID only.
+     * (remove this test if it is not a requirement)
+     */
     @Test
     public void shouldFindRelationParentWithIDOnly() {
         SolrTerm relation = createRelation();
@@ -67,6 +78,10 @@ public class OntologySearchIT {
         assertThat(queryResponse.getResults().size(), is(1));
     }
 
+    /**
+     * Should be able to find a child relationship based on its ID only.
+     * * (remove this test if it is not a requirement)
+     */
     @Test
     public void shouldFindRelationChildWithIDOnly() {
         SolrTerm relation = createRelation();
@@ -77,4 +92,5 @@ public class OntologySearchIT {
         QueryResponse queryResponse = searchEngine.getQueryResponse("child:0006601");
         assertThat(queryResponse.getResults().size(), is(1));
     }
+
 }

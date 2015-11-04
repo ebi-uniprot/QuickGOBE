@@ -8,6 +8,9 @@ import java.util.Date;
 /**
  * Class to create mocked objects of different {@code docType}s, which are valid according to {@link SolrTerm}.
  *
+ * Used in {@link OntologySearchIT} to add documents to the ontology index, so that it is possible to test
+ * the behaviour of searching the index (i.e., testing the effect of the index's schema's field definitions).
+ *
  * Created 03/11/15
  * @author Edd
  */
