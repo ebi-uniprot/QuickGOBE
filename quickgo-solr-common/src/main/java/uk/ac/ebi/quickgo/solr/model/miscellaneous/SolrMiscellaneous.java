@@ -569,7 +569,7 @@ public class SolrMiscellaneous {
 		SUBSETCOUNT("subsetcount"),
 		EVIDENCE("evidence"),
 		POSTPROCESSINGRULE("postprocessingrule"),
-		PRECALCULATED_STATS("precalculated-stas");
+		PRECALCULATED_STATS("precalculated-stats");
 
 		String value;
 
