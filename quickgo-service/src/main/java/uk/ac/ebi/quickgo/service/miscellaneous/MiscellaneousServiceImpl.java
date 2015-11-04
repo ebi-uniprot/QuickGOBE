@@ -90,7 +90,7 @@ public class MiscellaneousServiceImpl implements MiscellaneousService{
 	public StatisticsCalculation getPrecalculatedStatsNoFilters() {
 		List<Miscellaneous> precalculatedStats = null;
 		try {
-			precalculatedStats = miscellaneousRetrieval.findByQuery(MiscellaneousField.TYPE.getValue() + ":" + SolrMiscellaneousDocumentType.XREFDB.getValue(), 1000);
+			precalculatedStats = miscellaneousRetrieval.findByQuery(MiscellaneousField.TYPE.getValue() + ":" + SolrMiscellaneousDocumentType.PRECALCULATED_STATS.getValue(), 1000);
 			return new StatisticsCalculation(precalculatedStats);
 
 
