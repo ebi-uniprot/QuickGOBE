@@ -30,6 +30,24 @@ public interface SolrServerProcessor {
 	<T> List<T> findByQuery(SolrQuery solRQuery, Class<T> type, int numRows) throws SolrServerException;
 
 	/**
+	 * Runs a grouping query in SolR server.
+	 *
+	 * Groups documents with a common field value into groups and returns the top documents of each group.
+	 *
+	 * This would be equivalent to running a SELECT DISTINCT(core.field) FROM solr.core.
+	 *
+	 * See <a href="https://cwiki.apache.org/confluence/display/solr/Result+Grouping">Result Grouping</a>
+     * for more information.
+	 *
+	 * @param solRQuery Query to run
+	 * @param type Type of the results (ontology, annotation, gene product, ...)
+	 * @param numRows Number of rows to retrieve (-1 to set the default value)
+	 * @return Results of specified type
+	 * @throws SolrServerException SolR exception
+	 */
+	<T> List<T> groupByQuery(SolrQuery solRQuery, Class<T> type, int numRows) throws SolrServerException;
+
+	/**
 	 * Index a collection of beans in Solr
 	 * @param beans Collection of beans to index
 	 */

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField.Count;
@@ -45,7 +46,7 @@ public class TermRetrievalImpl implements TermRetrieval, Serializable {
      * See {@link Retrieval#findById(String)}
      */
     public GOTerm findById(String id) throws SolrServerException {
-        String idFormatted = ClientUtils.escapeQueryChars(id);
+        String idFormatted = convertToSolrCompatibleText(id);
         String query = TermField.ID.getValue() + ":" + idFormatted +
                 " OR (" + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.RELATION.getValue() +
                 " AND (" + TermField.CHILD.getValue() + ":" + idFormatted + " OR " + TermField.PARENT.getValue() + ":" +
@@ -140,7 +141,7 @@ public class TermRetrievalImpl implements TermRetrieval, Serializable {
 
     @Override
     public Map<String, Integer> getFacetFieldsWithPivots(String query, String facetQuery, String facetFields,
-            String pivotFields, int numTerms) throws SolrServerException {
+                                                         String pivotFields, int numTerms) throws SolrServerException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -158,46 +159,14 @@ public class TermRetrievalImpl implements TermRetrieval, Serializable {
         return serverProcessor.getFields(query, fieldID, fields);
     }
 
-    //	@Override
-    //	public List<GenericTerm> autosuggest(String text, String filterQuery, int numResults) throws
-    // SolrServerException {
-    //		SolrQuery solrQuery = new SolrQuery();
-    //		solrQuery.setRequestHandler("/spell");
-    //		String fQuery = TermField.TYPE.getValue() + ":" //Search for terms and synonyms
-    //				+ SolrTermDocumentType.TERM.getValue() + " OR "
-    //				+ TermField.TYPE.getValue() + ":"
-    //				+ SolrTermDocumentType.SYNONYM.getValue();
-    //		if (text.contains(":")) {//Replace ':' character
-    //			text = text.replaceAll(":", "\":\"");
-    //			fQuery = TermField.TYPE.getValue() + ":" + SolrTermDocumentType.TERM.getValue();// Just search for
-    // terms results
-    //			text = "*" + text + "*";
-    //		}
-    //		//solrQuery.setQuery("*" + text + "*");
-    //		solrQuery.setQuery(text);
-    //
-    //		solrQuery.setFilterQueries(fQuery, filterQuery);
-    //		List<GenericTerm> terms = new ArrayList<>();
-    //		List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, numResults);
-    //		if (results != null) {
-    //			for (SolrTerm solrTerm : results) {
-    //				if (solrTerm.getId().startsWith(ECOTerm.ECO)) {
-    //					terms.add(ecoTermMapper.toEntityObject(Collections.singletonList(solrTerm)));
-    //				}
-    //				else {
-    //					terms.add(goTermMapper.toEntityObject(Collections.singletonList(solrTerm)));
-    //				}
-    //			}
-    //		}
-    //		return terms;
-    //	}
-
     @Override
     public List<GenericTerm> autosuggest(String text, String filterQuery, int numResults) throws SolrServerException {
-
         List<GenericTerm> terms = new ArrayList<>();
-        SolrQuery solrQuery = new SolrQuery().setQuery("*" + text + "*");
-        List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, numResults);
+        SolrQuery solrQuery = new SolrQuery(convertToSolrCompatibleText(text));
+        solrQuery.setParam("group", true);
+        solrQuery.add("group.field", "id");
+
+        List<SolrTerm> results = serverProcessor.groupByQuery(solrQuery, SolrTerm.class, numResults);
         if (results != null) {
             for (SolrTerm solrTerm : results) {
                 if (solrTerm.getId().startsWith(ECOTerm.ECO)) {
@@ -207,14 +176,14 @@ public class TermRetrievalImpl implements TermRetrieval, Serializable {
                 }
             }
         }
+
         return terms;
     }
 
     public List<GenericTerm> autosuggestOnlyGoTerms(String text, String fq, int numResults) throws SolrServerException {
-        //TODO: Not the nicest way to write up queries, should be more controlled, maybe fluent API?
-        String queryText = ClientUtils.escapeQueryChars(text) + " AND " + TermField.DOCTYPE.getValue() + ":" + "term";
+        String queryText = convertToSolrCompatibleText(text) + " AND " + TermField.DOCTYPE.getValue() + ":" + "term";
 
-        SolrQuery solrQuery = new SolrQuery().setQuery(queryText);
+        SolrQuery solrQuery = new SolrQuery(queryText);
         solrQuery.addSort(TermField.ID.getValue(), SolrQuery.ORDER.asc);
 
         List<SolrTerm> results = serverProcessor.findByQuery(solrQuery, SolrTerm.class, numResults);
@@ -263,5 +232,9 @@ public class TermRetrievalImpl implements TermRetrieval, Serializable {
         query.setParam("hl.fl", TermField.NAME.getValue());
         query.setFilterQueries(fq);
         return serverProcessor.getTotalNumberDocuments(query);
+    }
+
+    private String convertToSolrCompatibleText(String search) {
+        return ClientUtils.escapeQueryChars(search);
     }
 }
