@@ -19,7 +19,7 @@ public class DocumentMocker {
     public static class Relation extends SolrTerm {
         public static SolrTerm createRelation() {
             SolrTerm relation = new SolrTerm();
-            relation.setDocType("relation");
+            relation.setDocType(SolrTermDocumentType.RELATION.getValue());
             relation.setObsolete(false);
             relation.setChild("GO:0006601");
             relation.setParent("GO:0006601");
@@ -32,7 +32,7 @@ public class DocumentMocker {
 
         protected static SolrTerm createTerm() {
             SolrTerm term = new SolrTerm();
-            term.setDocType("term");
+            term.setDocType(SolrTermDocumentType.TERM.getValue());
             term.setId("GO:0006600");
             term.setName("creatine metabolic process");
             term.setComment("Note that protein targeting encompasses the transport of the protein to " +
@@ -53,7 +53,7 @@ public class DocumentMocker {
 
         public static SolrTerm createSynonym() {
             SolrTerm synonym = new SolrTerm();
-            synonym.setDocType("synonym");
+            synonym.setDocType(SolrTermDocumentType.SYNONYM.getValue());
             synonym.setSynonymName("creatine anabolism");
             synonym.setSynonymType("exact");
             return synonym;
@@ -81,7 +81,7 @@ public class DocumentMocker {
     public static class XRef extends SolrTerm {
         public static SolrTerm createXref() {
             SolrTerm xref = new SolrTerm();
-            xref.setDocType("xref");
+            xref.setDocType(SolrTermDocumentType.XREF.getValue());
             xref.setXrefDbCode("InterPro");
             xref.setXrefDbId("IPR031034");
             xref.setXrefName("Creatinine amidohydrolase");
@@ -92,7 +92,7 @@ public class DocumentMocker {
     public static class Replaces extends SolrTerm {
         public static SolrTerm createReplaces() {
             SolrTerm replaces = new SolrTerm();
-            replaces.setDocType("replace");
+            replaces.setDocType(SolrTermDocumentType.REPLACE.getValue());
             replaces.setObsoleteId("GO:0003929");
             replaces.setReason("Consider");
             return replaces;
@@ -102,7 +102,7 @@ public class DocumentMocker {
     public static class AnnotationGuideLines extends SolrTerm {
         public static SolrTerm createAnnotationGuideLines() {
             SolrTerm agl = new SolrTerm();
-            agl.setDocType("ontologyrelation");
+            agl.setDocType(SolrTermDocumentType.ONTOLOGYRELATION.getValue());
             agl.setCrossOntologyRelation("has_participant");
             agl.setCrossOntologyForeignTerm("creatine");
             agl.setCrossOntologyForeignId("CHEBI:16919");
@@ -115,7 +115,7 @@ public class DocumentMocker {
     public static class ChangeLog extends SolrTerm {
         public static SolrTerm createChangeLog() {
             SolrTerm cl = new SolrTerm();
-            cl.setDocType("history");
+            cl.setDocType(SolrTermDocumentType.HISTORY.getValue());
             cl.setHistoryAction("A");
             cl.setHistoryCategory("RELATION");
             cl.setHistoryName("creatine metabolic process");
@@ -128,7 +128,7 @@ public class DocumentMocker {
     public static class OBOTerms extends SolrTerm {
         public static SolrTerm createOBOTerms() {
             SolrTerm obo = new SolrTerm();
-            obo.setDocType("term");
+            obo.setDocType(SolrTermDocumentType.TERM.getValue());
             obo.setSubsets(Arrays.asList("goslim_pombe",
                     "goslim_generic",
                     "goslim_yeast",
