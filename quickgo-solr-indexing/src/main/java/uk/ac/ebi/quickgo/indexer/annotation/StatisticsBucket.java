@@ -207,6 +207,7 @@ public class StatisticsBucket {
 
 		//Calculate percentages
 		for(StatisticTuple aTuple:topHits){
+			if(aTuple==null)break;
 			aTuple.calculateStatisticTuplePercentage(summaryAnnotationBucket);
 		}
 
