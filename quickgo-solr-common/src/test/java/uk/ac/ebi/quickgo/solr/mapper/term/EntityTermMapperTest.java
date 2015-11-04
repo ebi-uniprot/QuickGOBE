@@ -148,6 +148,9 @@ public class EntityTermMapperTest {
 				allowing(solrTerm).getSynonymType();
 				will(returnValue("Synonym type"));
 
+				allowing(solrTerm).getName();
+				will(returnValue("Synonym Name"));
+
 			}
 		});
 
