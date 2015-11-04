@@ -496,9 +496,9 @@ public class FileService {
 	}
 
 
-	public StringBuffer generateJsonFileForTerm(GOTerm term, List<TermRelation> childTermsRelations,
-												List<COOccurrenceStatsTerm> allStats,
-												List<COOccurrenceStatsTerm> nonIEAStats) {
+	public StringBuffer generateJsonForTerm(GOTerm term, List<TermRelation> childTermsRelations,
+			List<COOccurrenceStatsTerm> allStats,
+			List<COOccurrenceStatsTerm> nonIEAStats) {
 		StringBuffer buffer = new StringBuffer();
 		try {
 			TermJson termJson = new TermJson();
