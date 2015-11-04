@@ -127,8 +127,10 @@
   <field name="statisticTupleType" type="string" indexed="true" stored="true" />
   <field name="statisticTupleKey"  type="string" indexed="false" stored="true" multiValued="false"/>
   <field name="statisticTupleHits" type="float" indexed="false" stored="true" multiValued="false"/>
+  <field name="statisticTuplePercent" type="float" indexed="false" stored="true" multiValued="false"/>
 
-		<!-- _version_ is required for some Solr 4.0 functionality, particularly if SolrCloud is being used -->
+
+  <!-- _version_ is required for some Solr 4.0 functionality, particularly if SolrCloud is being used -->
 		<field name="_version_" type="long" indexed="true" stored="true" multiValued="false" />
 		<!-- computed field that contains most of the gene product information -->
 		<field name="text" type="string" indexed="true" stored="false" multiValued="true"/>

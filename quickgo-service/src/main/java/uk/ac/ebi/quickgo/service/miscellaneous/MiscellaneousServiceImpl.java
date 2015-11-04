@@ -17,6 +17,7 @@ import uk.ac.ebi.quickgo.solr.query.model.miscellaneous.enums.MiscellaneousField
 import uk.ac.ebi.quickgo.solr.query.model.miscellaneous.enums.MiscellaneousValue;
 import uk.ac.ebi.quickgo.solr.query.service.miscellaneous.MiscellaneousRetrieval;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
+import uk.ac.ebi.quickgo.statistic.StatisticsCalculation;
 
 /**
  * Miscellaneous service implementation
@@ -27,9 +28,9 @@ public class MiscellaneousServiceImpl implements MiscellaneousService{
 
 	// Log
 	private static final Logger logger = LoggerFactory.getLogger(MiscellaneousServiceImpl.class);
-		
+
 	MiscellaneousRetrieval miscellaneousRetrieval;
-	
+
 	@Override
 	public Map<String, Map<String, String>> retrieveTaxonomiesNames() {
 		Map<String, Map<String, String>> values = new HashMap<String, Map<String,String>>();
@@ -42,7 +43,7 @@ public class MiscellaneousServiceImpl implements MiscellaneousService{
 		}
 		return values;
 	}
-	
+
 	public List<Miscellaneous> getWithDBs(){
 		List<Miscellaneous> withDbs = null;
 		try {
@@ -52,7 +53,7 @@ public class MiscellaneousServiceImpl implements MiscellaneousService{
 		}
 		return withDbs;
 	}
-	
+
 
 	@Override
 	public List<Miscellaneous> getBlacklist() {
@@ -63,8 +64,8 @@ public class MiscellaneousServiceImpl implements MiscellaneousService{
 			logger.error(e.getMessage());
 		}
 		return blacklist;
-	}	
-	
+	}
+
 	public List<Miscellaneous> getPostProcessingRules(){
 		List<Miscellaneous> ppr = null;
 		try {
@@ -74,7 +75,7 @@ public class MiscellaneousServiceImpl implements MiscellaneousService{
 		}
 		return ppr;
 	}
-	
+
 	@Override
 	public Set<COOccurrenceStatsTerm> allCOOccurrenceStatistics(String ontologyTermID) {
 		return getCOOccurrenceStatistics(ontologyTermID, MiscellaneousValue.ALL.getValue());
@@ -84,7 +85,23 @@ public class MiscellaneousServiceImpl implements MiscellaneousService{
 	public Set<COOccurrenceStatsTerm> nonIEACOOccurrenceStatistics(	String ontologyTermID) {
 		return getCOOccurrenceStatistics(ontologyTermID, MiscellaneousValue.NON_IEA.getValue());
 	}
-	
+
+	@Override
+	public StatisticsCalculation getPrecalculatedStatsNoFilters() {
+		List<Miscellaneous> precalculatedStats = null;
+		try {
+			precalculatedStats = miscellaneousRetrieval.findByQuery(MiscellaneousField.TYPE.getValue() + ":" + SolrMiscellaneousDocumentType.XREFDB.getValue(), 1000);
+			return new StatisticsCalculation(precalculatedStats);
+
+
+		} catch (SolrServerException e) {
+			logger.error(e.getMessage());
+		}
+
+		//If there's been an error send back an empty class.
+		return new StatisticsCalculation();
+	}
+
 	private Set<COOccurrenceStatsTerm> getCOOccurrenceStatistics(String ontologyTermID, String type){
 		TreeSet<COOccurrenceStatsTerm> coOccurrenceStatsTerms = new TreeSet<COOccurrenceStatsTerm>();
 		List<Miscellaneous> allStats = null;

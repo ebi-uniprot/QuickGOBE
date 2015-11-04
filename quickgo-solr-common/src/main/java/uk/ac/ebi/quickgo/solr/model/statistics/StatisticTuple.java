@@ -15,6 +15,7 @@ public class StatisticTuple {
 	private String statisticTupleKey;
 	private long statisticTupleHits;
 	private Set<String> hitKeys = new HashSet();
+	private float statisticTuplePercentage;
 
 	public StatisticTuple(String type, String key, long hits) {
 		this.statisticTupleType = type;
@@ -37,6 +38,15 @@ public class StatisticTuple {
 
 	public void uniqueHit(String hitKey){
 		if(hitKeys.add(hitKey)) statisticTupleHits++;
+	}
+
+	public void calculateStatisticTuplePercentage(long totalHits){
+		float pc = (this.statisticTupleHits/totalHits);
+		statisticTuplePercentage = pc *100;
+	}
+
+	public float getStatisticTuplePercentage() {
+		return statisticTuplePercentage;
 	}
 
 	@Override
