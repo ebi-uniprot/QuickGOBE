@@ -8,14 +8,23 @@ import java.util.Set;
  * Date: 20/10/2015
  * Time: 10:20
  * Created with IntelliJ IDEA.
+ *
+ * This class represents a single data point for a statistic
+ * The hit keys are used to store
  */
 public class StatisticTuple {
 
 	private String statisticTupleType;
 	private String statisticTupleKey;
 	private long statisticTupleHits;
-	private Set<String> hitKeys = new HashSet();
 	private float statisticTuplePercentage;
+
+	//Optional value. Since some data has the same key that appears multiple times
+	//Eg annotations can have the same goId but different gene product ids (could have the same
+	//gpId multiple times), we use the secondary key to ensure the uniqueness of the hit count.
+	//Ie we get the number of distinct gene products per go term.
+	private Set<String> secondaryKeys = new HashSet();
+
 
 	public StatisticTuple(String type, String key, long hits) {
 		this.statisticTupleType = type;
@@ -36,13 +45,13 @@ public class StatisticTuple {
 		statisticTupleHits++;
 	}
 
-	public void uniqueHit(String hitKey){
-		if(hitKeys.add(hitKey)) statisticTupleHits++;
+	public void uniqueHit(String secondaryKey){
+		if(secondaryKeys.add(secondaryKey)) statisticTupleHits++;
 	}
 
 	public void calculateStatisticTuplePercentage(long totalHits){
-		float pc = (this.statisticTupleHits/totalHits);
-		statisticTuplePercentage = pc *100;
+		float pc = ((float) this.statisticTupleHits/(float)totalHits);
+		statisticTuplePercentage = pc*100;
 	}
 
 	public float getStatisticTuplePercentage() {
@@ -58,7 +67,7 @@ public class StatisticTuple {
 
 		if (statisticTupleHits != that.statisticTupleHits) return false;
 		if (!statisticTupleKey.equals(that.statisticTupleKey)) return false;
-		return hitKeys.equals(that.hitKeys);
+		return secondaryKeys.equals(that.secondaryKeys);
 
 	}
 
@@ -66,7 +75,7 @@ public class StatisticTuple {
 	public int hashCode() {
 		int result = statisticTupleKey.hashCode();
 		result = 31 * result + (int) (statisticTupleHits ^ (statisticTupleHits >>> 32));
-		result = 31 * result + hitKeys.hashCode();
+		result = 31 * result + secondaryKeys.hashCode();
 		return result;
 	}
 
