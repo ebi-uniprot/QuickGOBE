@@ -28,7 +28,7 @@ public class DocumentMocker {
         }
     }
 
-    protected static class Term extends SolrTerm {
+    public static class Term extends SolrTerm {
 
         protected static SolrTerm createTerm() {
             SolrTerm term = new SolrTerm();
