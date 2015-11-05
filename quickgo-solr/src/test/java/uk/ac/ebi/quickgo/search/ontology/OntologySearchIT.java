@@ -1,6 +1,9 @@
 package uk.ac.ebi.quickgo.search.ontology;
 
+import uk.ac.ebi.quickgo.search.AbstractSearchEngine;
 import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm;
+import uk.ac.ebi.quickgo.solr.query.model.ontology.enums.TermField;
+import uk.ac.ebi.quickgo.solr.query.service.ontology.TermRetrievalImpl;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.junit.Before;
@@ -9,7 +12,11 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.contains;
+import static uk.ac.ebi.quickgo.search.AbstractSearchEngine.filterResultsTo;
 import static uk.ac.ebi.quickgo.search.ontology.DocumentMocker.Relation.createRelation;
+import static uk.ac.ebi.quickgo.search.ontology.DocumentMocker.Replaces.createReplaces;
+import static uk.ac.ebi.quickgo.search.ontology.DocumentMocker.Term.createTerm;
 
 /**
  * This class is used to show which queries are necessary to successfully search the index, e.g.,
@@ -40,57 +47,78 @@ public class OntologySearchIT {
         searchEngine.removeAllDocuments();
     }
 
-
+    /**
+     * Testing {@link TermRetrievalImpl#findById(String)} when id matches.
+     *
+     * Example query: "id:X
+     *          OR (docType:relation AND (child:X OR parent:X))
+     *          OR (docType:replace AND obsoleteId:X)"
+     */
     @Test
-    public void shouldFindRelationParentWithExactQuery() {
-        SolrTerm relation = createRelation();
-        relation.setChild("GO:0006601");
-        relation.setParent("GO:0006600");
-        searchEngine.indexDocument(relation);
+    public void findByIDWhenExactIDSupplied() {
+        SolrTerm term = createTerm();
+        term.setId("GO:0000001");
+        searchEngine.indexDocument(term);
 
-        QueryResponse queryResponse = searchEngine.getQueryResponse("parent:GO\\:0006600");
-        assertThat(queryResponse.getResults().size(), is(1));
+        QueryResponse queryResponse = searchEngine.getQueryResponse(TermField.ID.getValue() + ":GO\\:0000001");
+
+        assertThat(filterResultsTo(queryResponse, TermField.ID.getValue()), contains("GO:0000001"));
     }
 
     /**
-     * Should be able to find a child relationship based on its ID only.
-     * (remove this test if it is not a requirement)
+     * Testing {@link TermRetrievalImpl#findById(String)} when child matches.
+     *
+     * Example query: "id:X
+     *          OR (docType:relation AND (child:X OR parent:X))
+     *          OR (docType:replace AND obsoleteId:X)"
      */
     @Test
-    public void shouldFindRelationParentWithIDOnly() {
-        SolrTerm relation = createRelation();
-        relation.setChild("GO:0006601");
-        relation.setParent("GO:0006600");
-        searchEngine.indexDocument(relation);
+    public void findByIDWhenExactChildSupplied() {
+        SolrTerm term = createRelation();
+        term.setChild("GO:0000002");
+        searchEngine.indexDocument(term);
 
-        QueryResponse queryResponse = searchEngine.getQueryResponse("parent:0006600");
-        assertThat(queryResponse.getResults().size(), is(1));
-    }
+        QueryResponse queryResponse = searchEngine.getQueryResponse(TermField.CHILD.getValue() + ":GO\\:0000002");
 
-    @Test
-    public void shouldFindRelationChildWithExactQuery() {
-        SolrTerm relation = createRelation();
-        relation.setChild("GO:0006601");
-        relation.setParent("GO:0006600");
-        searchEngine.indexDocument(relation);
-
-        QueryResponse queryResponse = searchEngine.getQueryResponse("child:GO\\:0006601");
-        assertThat(queryResponse.getResults().size(), is(1));
+        assertThat(filterResultsTo(queryResponse, TermField.CHILD.getValue()), contains("GO:0000002"));
     }
 
     /**
-     * Should be able to find a child relationship based on its ID only.
-     * * (remove this test if it is not a requirement)
+     * Testing {@link TermRetrievalImpl#findById(String)} when parent matches.
+     *
+     * Example query: "id:X
+     *          OR (docType:relation AND (child:X OR parent:X))
+     *          OR (docType:replace AND obsoleteId:X)"
      */
     @Test
-    public void shouldFindRelationChildWithIDOnly() {
-        SolrTerm relation = createRelation();
-        relation.setChild("GO:0006601");
-        relation.setParent("GO:0006600");
-        searchEngine.indexDocument(relation);
+    public void findByIDWhenExactParentSupplied() {
+        SolrTerm term = createRelation();
+        term.setParent("GO:0000002");
+        searchEngine.indexDocument(term);
 
-        QueryResponse queryResponse = searchEngine.getQueryResponse("child:0006601");
-        assertThat(queryResponse.getResults().size(), is(1));
+        QueryResponse queryResponse = searchEngine.getQueryResponse(TermField.PARENT.getValue() + ":GO\\:0000002");
+
+        assertThat(filterResultsTo(queryResponse, TermField.PARENT.getValue()), contains("GO:0000002"));
     }
+
+    /**
+     * Testing {@link TermRetrievalImpl#findById(String)} when obsolete matches.
+     *
+     * Example query: "id:X
+     *          OR (docType:relation AND (child:X OR parent:X))
+     *          OR (docType:replace AND obsoleteId:X)"
+     */
+    @Test
+    public void findByIDWhenExactObsoleteIdSupplied() {
+        SolrTerm term = createReplaces();
+        term.setObsoleteId("GO:0000003");
+        searchEngine.indexDocument(term);
+
+        QueryResponse queryResponse = searchEngine.getQueryResponse(TermField.OBSOLETE_ID.getValue() + ":GO\\:0000003");
+
+        assertThat(filterResultsTo(queryResponse, TermField.OBSOLETE_ID.getValue()), contains("GO:0000003"));
+    }
+
+
 
 }

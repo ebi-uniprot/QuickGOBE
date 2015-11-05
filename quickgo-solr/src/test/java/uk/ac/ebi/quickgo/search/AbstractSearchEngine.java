@@ -4,10 +4,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -90,20 +90,6 @@ public abstract class AbstractSearchEngine<D> extends ExternalResource {
         }
     }
 
-    public List<String> getIdentifiers(QueryResponse response) {
-        List<String> accessions = new ArrayList<>();
-
-        SolrDocumentList documents = response.getResults();
-
-        for (SolrDocument document : documents) {
-            String accession = (String) document.get(identifierField());
-
-            accessions.add(accession);
-        }
-
-        return accessions;
-    }
-
     public void printIndexContents() {
         // show all results
         SolrQuery allQuery = new SolrQuery("*:*");
@@ -128,8 +114,6 @@ public abstract class AbstractSearchEngine<D> extends ExternalResource {
 
         LOGGER.debug("Index contents end ---------");
     }
-
-    protected abstract String identifierField();
 
     @Override
     protected void before() throws Throwable {
@@ -161,5 +145,18 @@ public abstract class AbstractSearchEngine<D> extends ExternalResource {
     protected void setMaxRetrievableRows(int rows) {
         Preconditions.checkArgument(rows > 0, "Provided row value is negative: " + rows);
         retrievableRows = rows;
+    }
+
+    /**
+     * Given a {@code queryResponse}, select from the results it contains, the terms
+     * associated with the specified {@code field}.
+     *
+     * @param queryResponse
+     * @param field
+     * @return
+     */
+    public static List<String> filterResultsTo(QueryResponse queryResponse, String field) {
+        return queryResponse.getResults().stream().map(result -> (String) result.get(field))
+                .collect(Collectors.toList());
     }
 }

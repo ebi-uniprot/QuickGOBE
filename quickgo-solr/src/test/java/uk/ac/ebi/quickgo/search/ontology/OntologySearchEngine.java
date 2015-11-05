@@ -17,13 +17,4 @@ public class OntologySearchEngine extends AbstractSearchEngine<SolrTerm> {
     public OntologySearchEngine() {
         super(CORE_NAME);
     }
-
-    /**
-     * Note, that the identifier field, {@code id}, is not used by
-     * all {@code docType}s!
-     * @return
-     */
-    @Override protected String identifierField() {
-        return ID;
-    }
 }
