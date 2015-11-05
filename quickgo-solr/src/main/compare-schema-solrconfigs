@@ -1,0 +1,12 @@
+#! /bin/bash
+# compare the contents of the two solr configs:
+# "cores" comes from ves-hx-cf:/srv/goa/solr-4.8.1/goa/solr
+# "config" is, and was, in VCS
+
+for d in `ls -1d cores/*/`;
+    do echo "----- $d VS config/$(basename $d) -----";
+    echo " -- comparing schema.xml";
+    diff $d/conf/schema.xml config/$(basename $d)/schema.xml;
+    echo " -- comparing solrconfig.xml";
+    diff $d/conf/solrconfig.xml config/$(basename $d)/solrconfig.xml;
+done

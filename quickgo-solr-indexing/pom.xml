@@ -6,9 +6,9 @@
 
     <parent>
         <groupId>uk.ac.ebi.quickgo</groupId>
-        <artifactId>quickgo-solr</artifactId>
+        <artifactId>quickgo-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../quickgo-solr</relativePath>
+        <relativePath>../</relativePath>
     </parent>
 
     <artifactId>quickgo-solr-indexing</artifactId>
@@ -27,17 +27,21 @@
         <dependency>
             <groupId>uk.ac.ebi.quickgo</groupId>
             <artifactId>quickgo-solr-query</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.quickgo</groupId>
             <artifactId>quickgo-solr-common</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
         </dependency>
     </dependencies>
 

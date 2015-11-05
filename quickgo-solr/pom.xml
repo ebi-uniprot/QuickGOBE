@@ -11,34 +11,45 @@
 
     <artifactId>quickgo-solr</artifactId>
 
-    <packaging>pom</packaging>
-
     <name>QuickGO Solr</name>
 
-    <description>QuickGO Solr parent project</description>
-
-    <modules>
-        <module>../quickgo-solr-common</module>
-        <module>../quickgo-solr-query</module>
-        <module>../quickgo-solr-indexing</module>
-    </modules>
+    <description>QuickGO Solr Configuration project</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <solr.version>4.8.1</solr.version>
     </properties>
 
     <dependencies>
         <dependency>
             <artifactId>solr-solrj</artifactId>
             <groupId>org.apache.solr</groupId>
-            <version>${solr.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <version>${solr.version}</version>
+        </dependency>
+
+        <!-- testing -->
+        <dependency>
+            <groupId>uk.ac.ebi.quickgo</groupId>
+            <artifactId>quickgo-solr-common</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.quickgo</groupId>
+            <artifactId>quickgo-solr-query</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.quickgo</groupId>
+            <artifactId>quickgo-service</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

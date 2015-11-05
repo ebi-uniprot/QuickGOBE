@@ -26,17 +26,17 @@
         <dependency>
             <groupId>uk.ac.ebi.quickgo</groupId>
             <artifactId>quickgo-common-util</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.quickgo</groupId>
             <artifactId>quickgo-service</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.quickgo</groupId>
             <artifactId>quickgo-solr-query</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
