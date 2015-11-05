@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import uk.ac.ebi.quickgo.service.annotation.AnnotationService;
 import uk.ac.ebi.quickgo.service.miscellaneous.MiscellaneousService;
-import uk.ac.ebi.quickgo.service.statistic.type.StatsTerm;
+import uk.ac.ebi.quickgo.statistic.StatsTerm;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 import uk.ac.ebi.quickgo.statistic.COOccurrenceStatsTerm;
 

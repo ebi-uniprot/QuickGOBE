@@ -7,20 +7,20 @@ import java.util.List;
 /**
  * To represent the information that doesn't fit in gene products, annotations
  * or terms
- * 
+ *
  * @author cbonill
- * 
+ *
  */
 public class Miscellaneous implements Serializable{
-	
+
 	private static final long serialVersionUID = -1002395703333033189L;
-	
+
 	// Taxonomies
 	private int taxonomyId;
 	private String taxonomyName;
 	private List<Integer> taxonomyClosure;
 
-	// Co-Occurrence stats	
+	// Co-Occurrence stats
 	private String term;
 	private String comparedTerm;
 	private float together;
@@ -28,30 +28,30 @@ public class Miscellaneous implements Serializable{
 	private float selected;
 	private float all;
 	private String statsType;//Non-IEA or All
-	
+
 	// Sequences
 	private String dbObjectID;
 	private String sequence;
-	
+
 	// Publications
-	private int publicationID;	
+	private int publicationID;
 	private String publicationTitle;
-	
-	// Annotation Guidelines	
-	private String guidelineTitle;	
+
+	// Annotation Guidelines
+	private String guidelineTitle;
 	private String guidelineURL;
-	
-	// Annotation Blacklist	
-	private String backlistReason;	
-	private String blacklistMethodID;	
-	private String backlistCategory;	
-	private String backlistEntryType;	
-	
+
+	// Annotation Blacklist
+	private String backlistReason;
+	private String blacklistMethodID;
+	private String backlistCategory;
+	private String backlistEntryType;
+
 	// Annotation Extension Relations
 	private String aerName;
 	private String aerUsage;
 	private String aerDomain;
-	
+
 	private List<String> aerParents = new ArrayList<>();
 	private String aerRange;
 	private List<String> aerSecondaries = new ArrayList<>();
@@ -62,29 +62,36 @@ public class Miscellaneous implements Serializable{
 	private String xrefDatabase;
 	private String xrefGenericURL;
 	private String xrefUrlSyntax;
-	
+
 	// Subsets count
 	private String subset;
 	private int subsetCount;
-	
+
 	//Evidence
 	private String evidenceCode;
 	private String evidenceName;
-	
-	// Post processing rule	
-	private String pprRuleId;	
-	private String pprAncestorGoId;	
-	private String pprAncestorTerm;	
-	private String pprRelationship;	
-	private String pprTaxonName;	
-	private String pprOriginalGoId;	
-	private String pprOriginalTerm;	
-	private String pprCleanupAction;	
-	private String pprAffectedTaxGroup;	
-	private String pprSubstitutedGoId;	
-	private String pprSubstitutedTerm;	
+
+	// Post processing rule
+	private String pprRuleId;
+	private String pprAncestorGoId;
+	private String pprAncestorTerm;
+	private String pprRelationship;
+	private String pprTaxonName;
+	private String pprOriginalGoId;
+	private String pprOriginalTerm;
+	private String pprCleanupAction;
+	private String pprAffectedTaxGroup;
+	private String pprSubstitutedGoId;
+	private String pprSubstitutedTerm;
 	private String pprCuratorNotes;
-	
+
+	//Precalculated Stats
+	private String statisticTupleType;
+	private String statisticTupleKey;
+	private long statisticTupleHits;
+	private String statisticTupleName;
+	private float statisticTuplePercentage;
+
 	public int getTaxonomyId() {
 		return taxonomyId;
 	}
@@ -463,5 +470,45 @@ public class Miscellaneous implements Serializable{
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
-	}	
+	}
+
+	public String getStatisticTupleType() {
+		return statisticTupleType;
+	}
+
+	public void setStatisticTupleType(String statisticTupleType) {
+		this.statisticTupleType = statisticTupleType;
+	}
+
+	public String getStatisticTupleKey() {
+		return statisticTupleKey;
+	}
+
+	public void setStatisticTupleKey(String statisticTupleKey) {
+		this.statisticTupleKey = statisticTupleKey;
+	}
+
+	public long getStatisticTupleHits() {
+		return statisticTupleHits;
+	}
+
+	public void setStatisticTupleHits(long statisticTupleHits) {
+		this.statisticTupleHits = statisticTupleHits;
+	}
+
+	public String getStatisticTupleName() {
+		return statisticTupleName;
+	}
+
+	public void setStatisticTupleName(String statisticTupleName) {
+		this.statisticTupleName = statisticTupleName;
+	}
+
+	public float getStatisticTuplePercentage() {
+		return statisticTuplePercentage;
+	}
+
+	public void setStatisticTuplePercentage(float statisticTuplePercentage) {
+		this.statisticTuplePercentage = statisticTuplePercentage;
+	}
 }

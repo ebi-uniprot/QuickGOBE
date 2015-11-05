@@ -57,6 +57,8 @@ public interface AnnotationWSUtil {
 
 	void downloadStatistics(String solrQuery, HttpServletResponse httpServletResponse);
 
+	void downloadStatisticsNoFilters(HttpServletResponse httpServletResponse);
+
 	void downloadOntologyList(HttpServletResponse httpServletResponse, String ontology);
 
 	List<String> goTermsForSlimSet(String slimSet);

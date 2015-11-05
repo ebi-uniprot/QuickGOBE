@@ -50,6 +50,10 @@ public class CooccurenceStatsIndexIntegrationTest {
 		statsIndexer.miscellaneousIndexer = miscellaneousIndexer;
 
 
-		statsIndexer.index();
+		try {
+			statsIndexer.index();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.bean.statistics;
 import java.util.Set;
 import java.util.TreeSet;
 
-import uk.ac.ebi.quickgo.service.statistic.type.StatsTerm;
+import uk.ac.ebi.quickgo.statistic.StatsTerm;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
 
 /**
@@ -39,7 +39,7 @@ public class StatisticsBean {
 
 	// Db Object ID
 	Set<StatsTerm> annotationsPerDBObjectID = new TreeSet<StatsTerm>();
-	
+
 	public Set<StatsTerm> getAnnotationsPerGOID() {
 		return annotationsPerGOID;
 	}
@@ -136,8 +136,8 @@ public class StatisticsBean {
 
 	public void setProteinsPerAssignedBy(Set<StatsTerm> proteinsPerAssignedBy) {
 		this.proteinsPerAssignedBy = proteinsPerAssignedBy;
-	}	
-	
+	}
+
 	public Set<StatsTerm> getAnnotationsPerDBObjectID() {
 		return annotationsPerDBObjectID;
 	}
@@ -150,10 +150,10 @@ public class StatisticsBean {
 		switch (annotationField){
 			case GOID:
 				for(StatsTerm statsTerm : this.getProteinsPerGOID()){
-					String code = statsTerm.getCode(); 
+					String code = statsTerm.getCode();
 					statsTerm.setCode("GO:" + code);
 				}
-				return this.getProteinsPerGOID();				
+				return this.getProteinsPerGOID();
 			case GOASPECT:
 				return this.getProteinsPerAspect();
 			case GOEVIDENCE:
@@ -167,12 +167,12 @@ public class StatisticsBean {
 		}
 		return null;
 	}
-	
+
 	public Set<StatsTerm> getStatsByAnnotation(AnnotationField annotationField){
 		switch (annotationField){
 			case GOID:
 				for(StatsTerm statsTerm : this.getAnnotationsPerGOID()){
-					String code = statsTerm.getCode(); 
+					String code = statsTerm.getCode();
 					statsTerm.setCode("GO:" + code);
 				}
 				return this.getAnnotationsPerGOID();
@@ -188,7 +188,7 @@ public class StatisticsBean {
 				return this.getAnnotationsPerAssignedBy();
 			case DBOBJECTID:
 				for(StatsTerm statsTerm : this.getAnnotationsPerDBObjectID()){
-					String code = statsTerm.getCode(); 
+					String code = statsTerm.getCode();
 					statsTerm.setCode(code.toUpperCase());
 				}
 				return this.getAnnotationsPerDBObjectID();

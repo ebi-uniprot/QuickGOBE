@@ -1,9 +1,9 @@
-package uk.ac.ebi.quickgo.service.statistic.type;
+package uk.ac.ebi.quickgo.statistic;
 
 /**
- * Type to represent the stats values 
+ * Type to represent the stats values
  * @author cbonill
- * 
+ *
  */
 public class StatsTerm implements Comparable<StatsTerm> {
 

@@ -24,15 +24,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,35 +77,25 @@ public class SearchController {
             HttpServletResponse httpServletResponse) throws IOException,
                                                             SolrServerException {
 
-        List<TypeAheadResult> results = new ArrayList<>();
-        //TODO: remove this as soon as possible
-        final String regex = ".*" + query.toLowerCase().replaceAll("\\s+", ".*") + ".*";
+        List<TypeAheadResult> results;
 
         //TODO: move GO and ECO ide prefixes to somewhere more centralized
         if (query.toLowerCase().startsWith("go:") || query.toLowerCase().startsWith("eco:")) {
             List<GenericTerm> terms = termService.autosuggestOnlyGoTerms(query, null, HITS_TO_RETURN);
-            addTermsIds(results, terms, regex);
-        } else {// GO or ECO id
+            results = convertTermsToTypeAhead(terms);
+        } else {
             List<GenericTerm> terms = termService.autosuggest(query, null, HITS_TO_RETURN);
-            List<GeneProduct> geneProducts = geneProductService.autosuggest(query, null, HITS_TO_RETURN);
-
-            addTerms(results, terms, regex);
-            //            addGeneProducts(results, geneProducts, regex);
+            results = convertTermsToTypeAhead(terms);
         }
 
-        //TODO: is this a valid requirement, should it always be the shortest, shouldn't it be the most relevant
-        // Sort results (shortest first)
-        Collections.sort(results, new HitsComparator());
-
-        //addTermsIds(results, terms, regex);
         returnResultsJson(httpServletResponse, results);
     }
 
     private void returnResultsJson(HttpServletResponse httpServletResponse, List<TypeAheadResult> results) {
-        StringBuffer sb = null;
+        StringBuffer sb;
+
         try {
             sb = fileService.generateJsonFile(results);
-
             writeOutJsonResponse(httpServletResponse, sb);
         } catch (IOException e) {
             e.printStackTrace();
@@ -386,7 +374,7 @@ public class SearchController {
 
         String value;
 
-        private ViewBy(String value) {
+        ViewBy(String value) {
             this.value = value;
         }
 
@@ -413,7 +401,7 @@ public class SearchController {
                 }
             }
             if (!emptyIntersection(ancestorsNoRoot,
-                    Arrays.asList("ECO:0000352"))) {
+                    Collections.singletonList("ECO:0000352"))) {
                 if (!allExperimentalECOCodes.contains(ecoTerm.getId())) {
                     allExperimentalECOCodes.add(ecoTerm.getId());
                 }
@@ -440,7 +428,7 @@ public class SearchController {
                 }
             }
             if (!emptyIntersection(ancestorsNoRoot,
-                    Arrays.asList("ECO:0000501"))) {
+                    Collections.singletonList("ECO:0000501"))) {
                 if (!allAutomaticECOCodes.contains(ecoTerm.getId())) {
                     allAutomaticECOCodes.add(ecoTerm.getId());
                 }
@@ -463,139 +451,55 @@ public class SearchController {
     }
 
     /**
-     * Check term/synonym contains query text before adding to results
-     * @param results Results to be shown
-     * @param terms Terms results
-     * @param regex
-     */
-    //TODO: why would you want to check if the term exists? If its coming from the service then it should exist
-    public void addTerms(List<TypeAheadResult> results, List<GenericTerm> terms, String regex) {
-
-        for (GenericTerm genericTerm : terms) {
-
-            //TODO: no terms are checked if result size is larger than number of shown hits?
-            if (results.size() >= HITS_TO_RETURN) {
-                break;
-            }
-
-            if (genericTerm.getName() != null) {
-
-                if (genericTerm.getName().toLowerCase().trim().matches(regex)) {
-                    TypeAheadResult typeAheadResult =
-                            new TypeAheadResult(genericTerm.getId(), genericTerm.getName(), SearchResultType.TERM);
-                    results.add(typeAheadResult);
-                    continue;
-                }
-                if (!genericTerm.getSynonyms().isEmpty() &&
-                        genericTerm.getSynonyms().get(0).getName().toLowerCase().trim().matches(regex)) {
-                    TypeAheadResult typeAheadResult =
-                            new TypeAheadResult(genericTerm.getId(), genericTerm.getSynonyms().get(0).getName(),
-                                    SearchResultType.TERM);
-                    results.add(typeAheadResult);
-                    continue;
-                }
-                if (genericTerm.getDefinition().toLowerCase().trim().matches(regex)) {
-                    TypeAheadResult typeAheadResult =
-                            new TypeAheadResult(genericTerm.getId(), genericTerm.getDefinition(),
-                                    SearchResultType.TERM);
-                    results.add(typeAheadResult);
-                    continue;
-                }
-                if (genericTerm.getId().toLowerCase().trim().matches(regex)) {
-                    TypeAheadResult typeAheadResult =
-                            new TypeAheadResult(genericTerm.getId(), genericTerm.getName(), SearchResultType.TERM);
-                    results.add(typeAheadResult);
-                    continue;
-                }
-            }
-        }
-    }
-
-    /**
-     * Check gene product contains query text before adding to results
-     * @param results Results to be shown
-     */
-    public void addGeneProducts(List<TypeAheadResult> results, List<GeneProduct> geneProducts, final String regex) {
-
-        //final String regex = ".*" + query.toLowerCase().replaceAll("\\s+", ".*") + ".*";
-
-        for (GeneProduct geneProduct : geneProducts) {
-
-            if (results.size() >= HITS_TO_RETURN) {
-                break;
-            }
-
-            if (geneProduct.getDbObjectName().toLowerCase().trim().matches(regex)) {
-
-                TypeAheadResult typeAheadResult =
-                        new TypeAheadResult(geneProduct.getDbObjectId(), geneProduct.getDbObjectName(),
-                                SearchResultType.GENE_PRODUCT);
-                results.add(typeAheadResult);
-            }
-        }
-    }
-
-    /**
-     * Add terms when specific ids are searched
-     * @param results Results to display
-     * @param terms Candidate terms to be displayed
-     */
-    private void addTermsIds(List<TypeAheadResult> results, List<GenericTerm> terms, String regex) {
-        for (GenericTerm genericTerm : terms) {
-            if (results.size() >= HITS_TO_RETURN) {
-                break;
-            }
-
-            //Don't want to add synonyms to results when we are looking for specific ECO/GO ids
-            if (genericTerm.getId() != null && (genericTerm.getId().toLowerCase().trim().matches(regex) ||
-                                                        (genericTerm.getId() + genericTerm.getName()).toLowerCase()
-                                                                .trim().matches(regex))) {
-
-                TypeAheadResult typeAheadResult =
-                        new TypeAheadResult(genericTerm.getId(), genericTerm.getName(), SearchResultType.TERM);
-                results.add(typeAheadResult);
-            }
-        }
-    }
-
-    /**
-     * Shortest hits are displayed first
-     * @author cbonill
+     * Converts a list of {@link GenericTerm} to a list of {@link TypeAheadResult}.
      *
+     * @param terms The terms to convert
+     * @return a List of TypeAheadResult elements that result from the conversion
      */
-    //TODO: This needs to be refactored if it is to continued to be used
-    private class HitsComparator implements Comparator<Object> {
+    public List<TypeAheadResult> convertTermsToTypeAhead(List<GenericTerm> terms) {
+        return  terms.stream()
+                .map(t -> new TypeAheadResult(t.getId(), t.getName(), SearchResultType.TERM))
+                .collect(Collectors.toList());
+    }
 
-        @Override
-        public int compare(Object o1, Object o2) {
-            String text1 = getText(o1);
-            String text2 = getText(o2);
-            if (text1.length() < text2.length()) {
-                return -1;
-            } else if (text1.length() > text2.length()) {
-                return 1;
-            }
-            return 0;
+/**
+ * Shortest hits are displayed first
+ * @author cbonill
+ *
+ */
+//TODO: This needs to be refactored if it is to continued to be used
+private class HitsComparator implements Comparator<Object> {
+
+    @Override
+    public int compare(Object o1, Object o2) {
+        String text1 = getText(o1);
+        String text2 = getText(o2);
+        if (text1.length() < text2.length()) {
+            return -1;
+        } else if (text1.length() > text2.length()) {
+            return 1;
         }
+        return 0;
+    }
 
-        private String getText(Object o) {
-            if (o instanceof GeneProduct) {
-                return ((GeneProduct) o).getDbObjectName();
-            } else if (o instanceof GenericTerm) {
-                if (((GenericTerm) o).getName() != null) {
-                    return ((GenericTerm) o).getName();
-                } else {// Synonym
-                    if (!(((GenericTerm) o).getSynonyms()).isEmpty()) {
-                        ((GenericTerm) o).setName(((GenericTerm) o).getSynonyms().get(0)
-                                .getName());// Set synonym name as term result name
-                        return ((GenericTerm) o).getSynonyms().get(0).getName();
-                    }
+    private String getText(Object o) {
+        if (o instanceof GeneProduct) {
+            return ((GeneProduct) o).getDbObjectName();
+        } else if (o instanceof GenericTerm) {
+            if (((GenericTerm) o).getName() != null) {
+                return ((GenericTerm) o).getName();
+            } else {// Synonym
+                if (!(((GenericTerm) o).getSynonyms()).isEmpty()) {
+                    ((GenericTerm) o).setName(((GenericTerm) o).getSynonyms().get(0)
+                            .getName());// Set synonym name as term result name
+                    return ((GenericTerm) o).getSynonyms().get(0).getName();
                 }
             }
-            return "";
         }
-
+        return "";
     }
+
+}
 
     private void writeOutJsonResponse(HttpServletResponse httpServletResponse, StringBuffer sb) throws IOException {
         InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
