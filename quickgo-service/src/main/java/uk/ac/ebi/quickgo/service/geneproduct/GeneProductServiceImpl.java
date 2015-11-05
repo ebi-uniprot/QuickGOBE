@@ -22,112 +22,111 @@ import uk.ac.ebi.quickgo.solr.query.service.geneproduct.GeneProductRetrieval;
  * @author cbonill
  *
  */
-public class GeneProductServiceImpl implements GeneProductService{
+public class GeneProductServiceImpl implements GeneProductService {
 
-	@Autowired
-	GeneProductRetrieval geneProductRetrieval;
-	
-	// Log
-	private static final Logger logger = LoggerFactory.getLogger(GeneProductServiceImpl.class);
-	
-	EntityToStream<GeneProduct> gpEntityToStream;
-	
+    @Autowired
+    GeneProductRetrieval geneProductRetrieval;
 
-	@Override
-	public void convertToStream(GeneProduct geneProduct, Format format,
-			OutputStream outputStream) {
-		switch (format) {
-		case JSON:
-			convertToJSON(geneProduct, outputStream);
-			break;
-		case XML:
-			convertToXML(geneProduct, outputStream);
-			break;
-		}		
-	}	
-	
-	@Override
-	public void convertToXML(GeneProduct geneProduct, OutputStream outputStream) {
-		try {
-			gpEntityToStream.convertToXMLStream(geneProduct, Format.XML, outputStream);
-		} catch (JAXBException e) {
-			logger.error(e.getMessage());
-		}		
-	}
+    // Log
+    private static final Logger logger = LoggerFactory.getLogger(GeneProductServiceImpl.class);
 
-	@Override
-	public void convertToJSON(GeneProduct geneProduct, OutputStream outputStream) {
-		try {
-			gpEntityToStream.convertToJSONStream(geneProduct, outputStream);
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-		}		
-	}
+    EntityToStream<GeneProduct> gpEntityToStream;
 
-	@Override
-	public GeneProduct findById(String id) {
-		try {
-			return geneProductRetrieval.findById(id);
-		} catch (SolrServerException e) {
-			logger.error(e.getMessage());
-		}
-		return new GeneProduct();
-	}
-	
-	@Override
-	public List<GeneProduct> findByQuery(String query) {
-		try {
-			return geneProductRetrieval.findByQuery(query, -1);
-		} catch (SolrServerException e) {
-			logger.error(e.getMessage());
-		}
-		return new ArrayList<>();
-	}
+    @Override
+    public void convertToStream(GeneProduct geneProduct, Format format,
+            OutputStream outputStream) {
+        switch (format) {
+            case JSON:
+                convertToJSON(geneProduct, outputStream);
+                break;
+            case XML:
+                convertToXML(geneProduct, outputStream);
+                break;
+        }
+    }
 
-	public GeneProductRetrieval getGeneProductRetrieval() {
-		return geneProductRetrieval;
-	}
+    @Override
+    public void convertToXML(GeneProduct geneProduct, OutputStream outputStream) {
+        try {
+            gpEntityToStream.convertToXMLStream(geneProduct, Format.XML, outputStream);
+        } catch (JAXBException e) {
+            logger.error(e.getMessage());
+        }
+    }
 
-	public void setGeneProductRetrieval(GeneProductRetrieval geneProductRetrieval) {
-		this.geneProductRetrieval = geneProductRetrieval;
-	}
+    @Override
+    public void convertToJSON(GeneProduct geneProduct, OutputStream outputStream) {
+        try {
+            gpEntityToStream.convertToJSONStream(geneProduct, outputStream);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
 
-	public EntityToStream<GeneProduct> getGpEntityToStream() {
-		return gpEntityToStream;
-	}
+    @Override
+    public GeneProduct findById(String id) {
+        try {
+            return geneProductRetrieval.findById(id);
+        } catch (SolrServerException e) {
+            logger.error(e.getMessage());
+        }
+        return new GeneProduct();
+    }
 
-	public void setGpEntityToStream(EntityToStream<GeneProduct> gpEntityToStream) {
-		this.gpEntityToStream = gpEntityToStream;
-	}
+    @Override
+    public List<GeneProduct> findByQuery(String query) {
+        try {
+            return geneProductRetrieval.findByQuery(query, -1);
+        } catch (SolrServerException e) {
+            logger.error(e.getMessage());
+        }
+        return new ArrayList<>();
+    }
 
-	@Override
-	public List<GeneProduct> autosuggest(String query, String filterQuery, int numResults) {
-		try {
-			return geneProductRetrieval.autosuggest(query, filterQuery, numResults);
-		} catch (SolrServerException e) {
-			logger.error(e.getMessage());
-		}
-		return null;
-	}
-	
-	@Override
-	public List<GeneProduct> highlight(String text, String fq, int start, int rows) {
-		List<GeneProduct> geneproducts = new ArrayList<>();
-		try {
-			geneproducts = geneProductRetrieval.highlight(text, fq, start, rows);
-		} catch (SolrServerException e) {
-			logger.error(e.getMessage());
-		}
-		return geneproducts;
-	}
-	
-	public long getTotalNumberHighlightResults(String text, String fq) {
-		long results = 0;
-		try {
-			results = geneProductRetrieval.getTotalNumberHighlightResults(text, fq);
-		} catch (SolrServerException e) {
-			logger.error(e.getMessage());
-		}		
-		return results;
-	}
+    public GeneProductRetrieval getGeneProductRetrieval() {
+        return geneProductRetrieval;
+    }
+
+    public void setGeneProductRetrieval(GeneProductRetrieval geneProductRetrieval) {
+        this.geneProductRetrieval = geneProductRetrieval;
+    }
+
+    public EntityToStream<GeneProduct> getGpEntityToStream() {
+        return gpEntityToStream;
+    }
+
+    public void setGpEntityToStream(EntityToStream<GeneProduct> gpEntityToStream) {
+        this.gpEntityToStream = gpEntityToStream;
+    }
+
+    @Override
+    public List<GeneProduct> autosuggest(String query, String filterQuery, int numResults) {
+        try {
+            return geneProductRetrieval.autosuggest(query, filterQuery, numResults);
+        } catch (SolrServerException e) {
+            logger.error(e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public List<GeneProduct> highlight(String text, String fq, int start, int rows) {
+        List<GeneProduct> geneproducts = new ArrayList<>();
+        try {
+            geneproducts = geneProductRetrieval.highlight(text, fq, start, rows);
+        } catch (SolrServerException e) {
+            logger.error(e.getMessage());
+        }
+        return geneproducts;
+    }
+
+    public long getTotalNumberHighlightResults(String text, String fq) {
+        long results = 0;
+        try {
+            results = geneProductRetrieval.getTotalNumberHighlightResults(text, fq);
+        } catch (SolrServerException e) {
+            logger.error(e.getMessage());
+        }
+        return results;
+    }
 }

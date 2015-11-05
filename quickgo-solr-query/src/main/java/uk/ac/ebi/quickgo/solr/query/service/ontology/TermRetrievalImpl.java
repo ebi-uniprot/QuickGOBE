@@ -204,8 +204,7 @@ public class TermRetrievalImpl implements TermRetrieval, Serializable {
 
     @Override
     public List<GenericTerm> highlight(String text, String fq, int start, int rows) throws SolrServerException {
-        SolrQuery query = new SolrQuery();
-        query.setQuery(text);
+        SolrQuery query = new SolrQuery(convertToSolrCompatibleText(text));
         query.setFilterQueries(fq);
         query.setHighlight(true);
         query.setParam("hl.fl", TermField.NAME.getValue());
@@ -226,8 +225,7 @@ public class TermRetrievalImpl implements TermRetrieval, Serializable {
 
     @Override
     public long getTotalNumberHighlightResults(String text, String fq) throws SolrServerException {
-        SolrQuery query = new SolrQuery();
-        query.setQuery(text);
+        SolrQuery query = new SolrQuery(convertToSolrCompatibleText(text));
         query.setHighlight(true);
         query.setParam("hl.fl", TermField.NAME.getValue());
         query.setFilterQueries(fq);
