@@ -47,6 +47,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
@@ -57,6 +58,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -72,6 +75,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/ws")
 public class WebServiceController {
+    private static final Logger logger = LoggerFactory.getLogger(WebServiceController.class);
 
     @Autowired
     TermService termService;
@@ -153,7 +157,7 @@ public class WebServiceController {
      *
      * @param format              Response format
      * @param query               Text to search
-     * @param scope               Type of data searching for
+     * @param scopesText               Type of data searching for
      * @param limit               Max number of results of each type of data to return
      * @param httpServletResponse Servlet response
      * @throws IOException
@@ -162,58 +166,45 @@ public class WebServiceController {
     @RequestMapping("/search")
     public void search(
             @RequestParam(value = "format", required = false, defaultValue = "json") String format,
-            @RequestParam(value = "query", required = true, defaultValue = "apoptotic") String query,
-            @RequestParam(value = "scope", required = false, defaultValue = "go") String scope,
+            @RequestParam(value = "query", required = true) String query,
+            @RequestParam(value = "scope", required = false, defaultValue = "go") List<String> scopesText,
             @RequestParam(value = "limit", required = false, defaultValue = "10") String limit,
             HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException, SolrServerException {
 
-        String callback = httpServletRequest
-                .getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
-        List<Scope> scopes = new ArrayList<>();
-        if (scope.contains(",")) {
-            String[] scopesString = scope.split(",");
-            for (String scopeString : scopesString) {
-                Scope enumScope = Scope.valueOf(scopeString.trim().toUpperCase());
-                scopes.add(enumScope);
-            }
-        } else {// Just 1
-            scopes.add(Scope.valueOf(scope.trim().toUpperCase()));
-        }
+        // Protein2GO and other internal tools make requests using this parameter
+        String callback = httpServletRequest.getParameter("callback");
 
-        Format enumFormat = Format.valueOf(format.trim().toUpperCase());
+        Collection<Scope> scopes = convertTextToScope(scopesText);
+
+        Format enumFormat = Format.typeOf(format);
         int limitValue = Integer.valueOf(limit);
 
         Map<String, List<Map<String, Object>>> serialised = new HashMap<>();
 
-        for (Scope enumScope : scopes) {
-            switch (enumScope) {
+        for (Scope scope : scopes) {
+            switch (scope) {
                 case COMPLEX:
                 case PROTEIN:
-                    Map<String, List<Map<String, Object>>> proteins = new HashMap<>();
                     List<Map<String, Object>> proteinsSerialised =
-                            searchProtein(query, enumScope, limitValue, enumFormat, httpServletResponse);
-                    proteins.put(enumScope.value, proteinsSerialised);
-                    serialised.putAll(proteins);
+                            searchProtein(query, scope, limitValue, enumFormat, httpServletResponse);
+                    serialised.put(scope.value, proteinsSerialised);
                     break;
                 case ECO:
-                    Map<String, List<Map<String, Object>>> ecoTerms = new HashMap<>();
                     List<Map<String, Object>> ecoTermsSerialised =
-                            searchTerm(query, TermField.ID.getValue() + ":" + "ECO*", limitValue, enumScope, enumFormat,
+                            searchTerm(query, TermField.ID.getValue() + ":" + "ECO", limitValue, scope, enumFormat,
                                     httpServletResponse, callback);
-                    ecoTerms.put("eco", ecoTermsSerialised);
-                    serialised.putAll(ecoTerms);
+                    serialised.put(scope.value, ecoTermsSerialised);
                     break;
                 case GO:
-                    Map<String, List<Map<String, Object>>> goTerms = new HashMap<>();
                     List<Map<String, Object>> goTermsSerialised =
-                            searchTerm(query, TermField.ID.getValue() + ":" + "GO*", limitValue, enumScope, enumFormat,
+                            searchTerm(query, TermField.ID.getValue() + ":" + "GO", limitValue, scope, enumFormat,
                                     httpServletResponse, callback);
-                    goTerms.put("go", goTermsSerialised);
-                    serialised.putAll(goTerms);
+                    serialised.put(scope.value, goTermsSerialised);
                     break;
                 default:
-                    break;
+                    throw new IllegalArgumentException("Provided scope: " + scope.value + " does not have a " +
+                            "search function");
             }
         }
         Gson gson = new Gson();
@@ -225,273 +216,199 @@ public class WebServiceController {
         httpServletResponse.getWriter().write(generateContentResponse(callback, json));
     }
 
+    private Collection<Scope> convertTextToScope(List<String> scopesText) {
+        return scopesText.stream()
+                .map(Scope::typeOf)
+                .collect(Collectors.toSet());
+    }
+
     @RequestMapping(value = "/searchfull", method = {RequestMethod.POST, RequestMethod.GET})
     public void searchfull(
-            //			@RequestParam(value = "query", defaultValue="", required=false) String query,
             @RequestParam(value = "text", defaultValue = "", required = false) String text,
             @RequestParam(value = "isProtein", defaultValue = "false", required = false) String isProtein,
             @RequestParam(value = "viewBy", defaultValue = "", required = false) String viewBy,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "rows", defaultValue = "25") int rows,
-            HttpServletRequest httpServletRequest,
-            HttpServletResponse httpServletResponse) throws IOException,
-                                                            SolrServerException {
-
-        String query = "\"text\":" + "\"" + text + "\"";
-        System.out.println("Search Full from WebService Controller " + "query:" + query + "<<isProtein:" + isProtein +
-                "<<viewBy " + viewBy);
+            HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+            throws IOException, SolrServerException {
 
         List<Object> searchResults = new ArrayList<>();
-
         SearchFullResultsJson resultsJson = new SearchFullResultsJson();
 
-        if (!query.isEmpty()) {
-            AppliedFilterSet appliedFilterSet = new AppliedFilterSet();
-            queryProcessor.processQuery(query, new AnnotationParameters(), appliedFilterSet, false);
+        if (isProtein.equals("true")) {
+            logger.warn("Protein based query was made, and there is no implementation for it!!!");
+        } else {
+            // Gene Products
+            long gpNumberResults = geneProductService.getTotalNumberHighlightResults(text, null);
+            resultsJson.setGpNumberResults(gpNumberResults);
 
-            if (isProtein.equals("true")) {
-                //				session.setAttribute("searchedText", appliedFilterSet.getParameters().get
-                // (AnnotationField.DBOBJECTID.getValue()));
-                //				session.setAttribute("appliedFilters", appliedFilterSet);
-                //				return new ModelAndView("redirect:" + View.ANNOTATIONS_PATH);
+            // GO terms
+            String goFilterQuery = TermField.ID.getValue() + ":" + GOTerm.GO + "* AND " +
+                    TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
 
-            } else {
+            long goTotalResults = termService.getTotalNumberHighlightResults(text, goFilterQuery);
+            resultsJson.setGoNumberResults(goTotalResults);
 
-                // Text
-                //				Properties data = gson.fromJson(query, Properties.class);
-                //				String text = data.getProperty("text");
+            // BP GO terms
+            long bpGoNumberResults =
+                    calculateAspectsTotalResults(text, GOTerm.EGOAspect.P.text, "bpGoNumberResults");
+            resultsJson.setBiologicalProcessNumberResults(bpGoNumberResults);
 
-                // Remove leading and trailing white spaces from query
-                //				text = StringUtils.trimLeadingWhitespace(text);
-                //				text = StringUtils.trimTrailingWhitespace(text);
+            // MF GO terms
+            long mfGoNumberResults =
+                    calculateAspectsTotalResults(text, GOTerm.EGOAspect.F.text, "mfGoNumberResults");
+            resultsJson.setMolecularFunctionNumberResults(mfGoNumberResults);
 
-                //				String previousQuery = (String)session.getAttribute("searchedText");
-                //				if(text.equals(previousQuery)){// Query hasn't changed. No need to recalculate all the
-                // counts and search results
-                //					sameQuery = true;
-                //				}
+            // CC GO terms
+            long ccGoNumberResults =
+                    calculateAspectsTotalResults(text, GOTerm.EGOAspect.C.text, "ccGoNumberResults");
+            resultsJson.setCellularComponentNumberResults(ccGoNumberResults);
 
-                //				session.setAttribute("searchedText", text);
+            // ECO terms
+            String ecoFilterQuery = TermField.ID.getValue() + ":" + ECOTerm.ECO + "* AND " +
+                    TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
 
-                long gpNumberResults = 0, goTotalResults = 0,
-                        bpGoNumberResults = 0, mfGoNumberResults = 0,
-                        ccGoNumberResults = 0, ecoTotalResults = 0,
-                        expEcoTotalResults = 0, automaticEcoTotalResults = 0,
-                        evidenceEcoResults = 0;
+            long ecoTotalResults = termService.getTotalNumberHighlightResults(text,
+                    ecoFilterQuery + " AND " + TermField.TYPE.getValue() + ":" +
+                            SolrTerm.SolrTermDocumentType.TERM.getValue());
+            resultsJson.setEcoTermsNumberResults(ecoTotalResults);
 
-                String expEcofilterQuery = "", automaticEcofilterQuery = "";
-                String ecoFilterQuery = TermField.ID.getValue() + ":" + ECOTerm.ECO.toString() + "*" + " AND " +
-                        TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
+            // Retrieve values
+            List<GenericTerm> ecoTerms = highlightedTerms(text, ecoFilterQuery, 1, 60000);
 
-                //				if(!sameQuery){
-
-                // Calculate counts
-
-                // Calculate number of results of each type
-
-                // #Gene Products
-                gpNumberResults = geneProductService.getTotalNumberHighlightResults("*" + text + "*", null);
-                resultsJson.setGpNumberResults(gpNumberResults);
-
-                // #GO terms
-                goTotalResults = termService.getTotalNumberHighlightResults("*" + text + "*",
-                        TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "*" + " AND " +
-                                TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue());
-                resultsJson.setGoNumberResults(goTotalResults);
-
-                String textToSearch = "*" + text + "*";
-
-                // #BP GO terms
-                bpGoNumberResults =
-                        calculateAspectsTotalResults(textToSearch, GOTerm.EGOAspect.P.text, "bpGoNumberResults");
-                resultsJson.setBiologicalProcessNumberResults(bpGoNumberResults);
-
-                // #MF GO terms
-                mfGoNumberResults =
-                        calculateAspectsTotalResults(textToSearch, GOTerm.EGOAspect.F.text, "mfGoNumberResults");
-                resultsJson.setMolecularFunctionNumberResults(mfGoNumberResults);
-
-                // #CC GO terms
-                ccGoNumberResults =
-                        calculateAspectsTotalResults(textToSearch, GOTerm.EGOAspect.C.text, "ccGoNumberResults");
-                resultsJson.setCellularComponentNumberResults(ccGoNumberResults);
-
-                // #ECO terms
-                ecoTotalResults = termService.getTotalNumberHighlightResults("*" + text + "*",
-                        ecoFilterQuery + " AND " + TermField.TYPE.getValue() + ":" +
-                                SolrTerm.SolrTermDocumentType.TERM.getValue());
-                resultsJson.setEcoTermsNumberResults(ecoTotalResults);
-
-                // Retrieve values
-                List<GenericTerm> ecoTerms = highlightedTerms("*" + text + "*", ecoFilterQuery, 1, 60000);
-
-                // Remove null elements
-                List<GenericTerm> noNullTerms = new ArrayList<>();
-                for (GenericTerm genericTerm : ecoTerms) {
-                    if (genericTerm != null && genericTerm.getId() != null) {
-                        noNullTerms.add(genericTerm);
-                    }
+            // Remove null elements
+            List<GenericTerm> noNullTerms = new ArrayList<>();
+            for (GenericTerm genericTerm : ecoTerms) {
+                if (genericTerm != null && genericTerm.getId() != null) {
+                    noNullTerms.add(genericTerm);
                 }
-
-                ecoTerms = noNullTerms;
-
-                // #Experimental ECO terms
-                String expEcoValues =
-                        StringUtils.arrayToDelimitedString(getAllManualECOCodes(ecoTerms).toArray(), " OR ");
-
-                if (!expEcoValues.isEmpty()) {
-                    expEcofilterQuery =
-                            TermField.ID.getValue() + ":(" + expEcoValues.replaceAll(":", "*") + ")" + " AND " +
-                                    TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
-                    ;
-                    //session.setAttribute("expEcofilterQuery", expEcofilterQuery);
-                    expEcoTotalResults =
-                            termService.getTotalNumberHighlightResults("*" + text + "*", expEcofilterQuery);
-                }
-                resultsJson.setManualEcoTotalResults(expEcoTotalResults);
-
-                // #Automatic ECO terms
-                String automaticEcoValues =
-                        StringUtils.arrayToDelimitedString(getAllAutomaticECOCodes(ecoTerms).toArray(), " OR ");
-                if (!automaticEcoValues.isEmpty()) {
-                    automaticEcofilterQuery =
-                            TermField.ID.getValue() + ":(" + automaticEcoValues.replaceAll(":", "*") + ")" + " AND " +
-                                    TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
-                    ;
-                    //session.setAttribute("automaticEcofilterQuery", automaticEcofilterQuery);
-                    automaticEcoTotalResults =
-                            termService.getTotalNumberHighlightResults("*" + text + "*", automaticEcofilterQuery);
-
-                }
-                resultsJson.setAutomaticEcoTotalResults(automaticEcoTotalResults);
-
-                // #Evidence ECO Terms
-                evidenceEcoResults = ecoTotalResults - (expEcoTotalResults + automaticEcoTotalResults);
-                resultsJson.setEvidenceEcoTotalResults(evidenceEcoResults);
-                //				} else {
-                // Same query. Get counts from session
-                //					gpNumberResults = (long)session.getAttribute("gpNumberResults");
-                //					goTotalResults = (long)session.getAttribute("goNumberResults");
-                //					bpGoNumberResults = (long)session.getAttribute("bpGoNumberResults");
-                //					mfGoNumberResults = (long)session.getAttribute("mfGoNumberResults");
-                //					ccGoNumberResults = (long)session.getAttribute("ccGoNumberResults");
-                //					ecoTotalResults = (long)session.getAttribute("ecoNumberResults");
-                //					expEcoTotalResults = (long)session.getAttribute("expEcoTotalResults");
-                //					automaticEcoTotalResults = (long)session.getAttribute("automaticEcoTotalResults");
-                //					evidenceEcoResults = (long)session.getAttribute("evidenceEcoTotalResults");
-                //				}
-
-                // Set default view
-                if (viewBy.isEmpty()) {
-                    viewBy = ViewBy.ENTITY.getValue();
-                    if (gpNumberResults > 0) {
-                        viewBy = ViewBy.ENTITY.getValue();
-                    } else if (goTotalResults > 0) {
-                        viewBy = ViewBy.GOID.getValue();
-                    } else if (ecoTotalResults > 0) {
-                        viewBy = ViewBy.ECOID.getValue();
-                    }
-                }
-
-                long totalResults = 0;
-
-                if (viewBy.equalsIgnoreCase(ViewBy.ENTITY.getValue())) {
-                    totalResults = gpNumberResults;
-                    List<GeneProduct> gpResults =
-                            geneProductService.highlight("*" + text + "*", null, (page - 1) * rows, rows);
-                    searchResults.addAll(gpResults);
-
-                } else if (viewBy.equalsIgnoreCase(ViewBy.GOID.getValue())
-                        || viewBy.equalsIgnoreCase(ViewBy.ECOID.getValue())
-                        || viewBy.equalsIgnoreCase(ViewBy.BP.getValue())
-                        || viewBy.equalsIgnoreCase(ViewBy.MF.getValue())
-                        || viewBy.equalsIgnoreCase(ViewBy.CC.getValue())
-                        || viewBy.equalsIgnoreCase(ViewBy.ECOAUTOMATIC.getValue())
-                        || viewBy.equalsIgnoreCase(ViewBy.ECOMANUAL.getValue())
-                        || viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())) {
-
-                    String filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "*" + " AND " +
-                            TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
-                    totalResults = goTotalResults;
-                    if (viewBy.equalsIgnoreCase(ViewBy.BP.getValue())) {
-                        filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "* AND "
-                                + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue() +
-                                " AND "
-                                + SolrTerm.SolrTermDocumentType.ONTOLOGY
-                                .getValue() + ":"
-                                + GOTerm.EGOAspect.P.text;
-                        totalResults = bpGoNumberResults;
-                    } else if (viewBy.equalsIgnoreCase(ViewBy.MF.getValue())) {
-                        filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "* AND "
-                                + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue() +
-                                " AND "
-                                + SolrTerm.SolrTermDocumentType.ONTOLOGY
-                                .getValue() + ":"
-                                + GOTerm.EGOAspect.F.text;
-                        totalResults = mfGoNumberResults;
-                    } else if (viewBy.equalsIgnoreCase(ViewBy.CC.getValue())) {
-                        filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "*  AND "
-                                + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue() +
-                                " AND "
-                                + SolrTerm.SolrTermDocumentType.ONTOLOGY
-                                .getValue() + ":"
-                                + GOTerm.EGOAspect.C.text;
-                        totalResults = ccGoNumberResults;
-                    } else if (viewBy.equalsIgnoreCase(ViewBy.ECOID.getValue())) {
-                        filterQuery = ecoFilterQuery;
-                        totalResults = ecoTotalResults;
-                    } else if (viewBy.equalsIgnoreCase(ViewBy.ECOMANUAL.getValue())) {
-                        //filterQuery = (String)session.getAttribute("expEcofilterQuery");
-                        totalResults = expEcoTotalResults;
-                    } else if (viewBy.equalsIgnoreCase(ViewBy.ECOAUTOMATIC.getValue())) {
-                        //filterQuery = (String)session.getAttribute("automaticEcofilterQuery");
-                        totalResults = automaticEcoTotalResults;
-                    } else if (viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())) {
-                        String evidencefilterQuery = ecoFilterQuery;
-
-                        //						if(session.getAttribute("expEcofilterQuery") != null && !((String)
-                        // session.getAttribute("expEcofilterQuery")).isEmpty()){
-                        //							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)
-                        // session.getAttribute("expEcofilterQuery");
-                        //						}
-                        //
-                        //						if(session.getAttribute("automaticEcofilterQuery") != null && !(
-                        // (String)session.getAttribute("automaticEcofilterQuery")).isEmpty()){
-                        //							evidencefilterQuery = evidencefilterQuery + " AND NOT " + (String)
-                        // session.getAttribute("automaticEcofilterQuery");
-                        //						}
-
-                        filterQuery = evidencefilterQuery;
-                        totalResults = evidenceEcoResults;
-                    }
-                    List<GenericTerm> termsResults = highlightedTerms("*" + text + "*", filterQuery, page, rows);
-                    searchResults.addAll(termsResults);
-                }
-
-                // Set results in session
-                resultsJson.setSearchResults(searchResults);
-
-                // Set total number results
-                resultsJson.setTotalNumberResults(totalResults);
-
-                // Set current page
-                resultsJson.setPage(page);
-
-                // View by
-                resultsJson.setViewBy(viewBy);
-
             }
+
+            ecoTerms = noNullTerms;
+
+            // #Experimental ECO terms
+            String expEcoValues = getAllManualECOCodes(ecoTerms).stream().collect(Collectors.joining(" OR "));
+
+            long expEcoTotalResults;
+            if (!expEcoValues.isEmpty()) {
+                String expEcofilterQuery = TermField.ID.getValue() + ":(" + expEcoValues.replaceAll(":", "*") + ")" + " AND " +
+                                TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
+
+                expEcoTotalResults =
+                        termService.getTotalNumberHighlightResults(text, expEcofilterQuery);
+            } else {
+                expEcoTotalResults = 0;
+            }
+
+            resultsJson.setManualEcoTotalResults(expEcoTotalResults);
+
+            // #Automatic ECO terms
+            String automaticEcoValues =
+                    StringUtils.arrayToDelimitedString(getAllAutomaticECOCodes(ecoTerms).toArray(), " OR ");
+
+            long automaticEcoTotalResults;
+            if (!automaticEcoValues.isEmpty()) {
+                String automaticEcofilterQuery =
+                        TermField.ID.getValue() + ":(" + automaticEcoValues.replaceAll(":", "*") + ")" + " AND " +
+                                TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
+
+                automaticEcoTotalResults =
+                        termService.getTotalNumberHighlightResults("*" + text + "*", automaticEcofilterQuery);
+            } else {
+                automaticEcoTotalResults = 0;
+            }
+
+            resultsJson.setAutomaticEcoTotalResults(automaticEcoTotalResults);
+
+            // Evidence ECO Terms
+            long evidenceEcoResults = ecoTotalResults - (expEcoTotalResults + automaticEcoTotalResults);
+            resultsJson.setEvidenceEcoTotalResults(evidenceEcoResults);
+
+            // Set default view
+            if (viewBy.isEmpty()) {
+                viewBy = ViewBy.ENTITY.getValue();
+                if (gpNumberResults > 0) {
+                    viewBy = ViewBy.ENTITY.getValue();
+                } else if (goTotalResults > 0) {
+                    viewBy = ViewBy.GOID.getValue();
+                } else if (ecoTotalResults > 0) {
+                    viewBy = ViewBy.ECOID.getValue();
+                }
+            }
+
+            long totalResults = 0;
+
+            if (viewBy.equalsIgnoreCase(ViewBy.ENTITY.getValue())) {
+                totalResults = gpNumberResults;
+                List<GeneProduct> gpResults = geneProductService.highlight(text, null, (page - 1) * rows, rows);
+                searchResults.addAll(gpResults);
+            } else if (viewBy.equalsIgnoreCase(ViewBy.GOID.getValue())
+                    || viewBy.equalsIgnoreCase(ViewBy.ECOID.getValue())
+                    || viewBy.equalsIgnoreCase(ViewBy.BP.getValue())
+                    || viewBy.equalsIgnoreCase(ViewBy.MF.getValue())
+                    || viewBy.equalsIgnoreCase(ViewBy.CC.getValue())
+                    || viewBy.equalsIgnoreCase(ViewBy.ECOAUTOMATIC.getValue())
+                    || viewBy.equalsIgnoreCase(ViewBy.ECOMANUAL.getValue())
+                    || viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())) {
+
+                String filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO + "* AND " +
+                        TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
+                totalResults = goTotalResults;
+
+                if (viewBy.equalsIgnoreCase(ViewBy.BP.getValue())) {
+                    filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO + "* AND "
+                            + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue() +
+                            " AND " + SolrTerm.SolrTermDocumentType.ONTOLOGY.getValue() + ":"
+                            + GOTerm.EGOAspect.P.text;
+
+                    totalResults = bpGoNumberResults;
+                } else if (viewBy.equalsIgnoreCase(ViewBy.MF.getValue())) {
+                    filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO + " AND "
+                            + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue() +
+                            " AND " + SolrTerm.SolrTermDocumentType.ONTOLOGY.getValue() + ":"
+                            + GOTerm.EGOAspect.F.text;
+
+                    totalResults = mfGoNumberResults;
+                } else if (viewBy.equalsIgnoreCase(ViewBy.CC.getValue())) {
+                    filterQuery = TermField.ID.getValue() + ":" + GOTerm.GO + "* AND "
+                            + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue() +
+                            " AND " + SolrTerm.SolrTermDocumentType.ONTOLOGY.getValue() + ":"
+                            + GOTerm.EGOAspect.C.text;
+                    totalResults = ccGoNumberResults;
+                } else if (viewBy.equalsIgnoreCase(ViewBy.ECOID.getValue())) {
+                    filterQuery = ecoFilterQuery;
+                    totalResults = ecoTotalResults;
+                } else if (viewBy.equalsIgnoreCase(ViewBy.ECOMANUAL.getValue())) {
+                    totalResults = expEcoTotalResults;
+                } else if (viewBy.equalsIgnoreCase(ViewBy.ECOAUTOMATIC.getValue())) {
+                    totalResults = automaticEcoTotalResults;
+                } else if (viewBy.equalsIgnoreCase(ViewBy.EVIDENCEECO.getValue())) {
+                    filterQuery = ecoFilterQuery;
+                    totalResults = evidenceEcoResults;
+                }
+                List<GenericTerm> termsResults = highlightedTerms(text, filterQuery, page, rows);
+                searchResults.addAll(termsResults);
+            }
+
+            // Set results in session
+            resultsJson.setSearchResults(searchResults);
+
+            // Set total number results
+            resultsJson.setTotalNumberResults(totalResults);
+
+            // Set current page
+            resultsJson.setPage(page);
+
+            // View by
+            resultsJson.setViewBy(viewBy);
         }
 
-        StringBuffer sb = null;
         try {
-            sb = fileService.generateJsonFile(resultsJson);
-            //sb.append(new Gson().toJson(annotationExtensionRelations.toGraph().toString()));
+            StringBuffer sb = fileService.generateJsonFile(resultsJson);
 
             writeOutJsonResponse(httpServletResponse, sb);
         } catch (IOException e) {
-            e.printStackTrace();
-            //logger.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -781,13 +698,13 @@ public class WebServiceController {
             @RequestParam(value = "slim", required = false, defaultValue = "false") String slim)
             throws UnsupportedEncodingException {
 
-        System.out.println("The query passed to the Webservice controller is " + query);
-        System.out.println("The value of slim passed to the Webservice controller is " + slim);
+        logger.debug("The query passed to the Webservice controller is " + query);
+        logger.debug("The value of slim passed to the Webservice controller is " + slim);
         //query = "\"goID\":\"GO:0033014\",\"ancestorsIPO\":\"ancestorsIPO\",";
-        //System.out.println("The query hardcoded is " + query);
+        //logger.debug("The query hardcoded is " + query);
         AnnotationParameters annotationParameters = createAnnotationParameters(query, advancedFilter);
         String solrQuery = annotationParameters.toSolrQuery();
-        System.out.println("Solr query is :" + solrQuery);
+        logger.debug("Solr query is :" + solrQuery);
 
         //Do slimming if required
         ITermContainer slimTermSet = null;
@@ -821,22 +738,22 @@ public class WebServiceController {
         //			@RequestParam(value = "myList", required = false) List myList)
         //			throws UnsupportedEncodingException {
 
-        //		System.out.println("Request::" +  request);
-        //		System.out.println("filterRequest::" +  filterRequest);
-        //		System.out.println("myObject::" + myObject);
-        //		System.out.println("myList::" + myList);
-        //		System.out.println("myString::" + myString);
+        //		logger.debug("Request::" +  request);
+        //		logger.debug("filterRequest::" +  filterRequest);
+        //		logger.debug("myObject::" + myObject);
+        //		logger.debug("myList::" + myList);
+        //		logger.debug("myString::" + myString);
 
-        System.out.println(formData.myString);
+        logger.debug(formData.myString);
 
         //		ObjectMapper mapper = new ObjectMapper();
         //		try {
-        //			System.out.println("write myjson as json string" + mapper.writeValueAsString(myjson));
+        //			logger.debug("write myjson as json string" + mapper.writeValueAsString(myjson));
         //		} catch (JsonProcessingException e) {
         //			e.printStackTrace();
         //		}
         //		try {
-        //			System.out.println("write myString as json string" + mapper.writeValueAsString(myString));
+        //			logger.debug("write myString as json string" + mapper.writeValueAsString(myString));
         //		} catch (JsonProcessingException e) {
         //			e.printStackTrace();
         //		}
@@ -892,9 +809,9 @@ public class WebServiceController {
         try {
             ObjectMapper om = new ObjectMapper();
             String result = jb.toString();
-            System.out.println("raw string is " + result);
+            logger.debug("raw string is " + result);
             FilterRequestJson filterRequest = om.readValue(result, FilterRequestJson.class);
-            System.out.println("Not Spring " + filterRequest);
+            logger.debug("Not Spring " + filterRequest);
 
             //AnnotationParameters annotationParameters = filterRequestToSolr.queryToAnnotationParameters
             // (filterRequest);
@@ -907,7 +824,7 @@ public class WebServiceController {
             QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(annotationWSUtil);
             String solrQuery = queryToSolrProcess.toSolrQuery(filterRequest);
 
-            System.out.println("Solr query is :" + solrQuery);
+            logger.debug("Solr query is :" + solrQuery);
 
             //Do slimming if required
             ITermContainer slimTermSet = null;
@@ -950,14 +867,14 @@ public class WebServiceController {
             @RequestParam(value = "slim", required = false, defaultValue = "false") String slim)
             throws UnsupportedEncodingException {
 
-        System.out.println("The query passed to the Webservice controller is " + query);
-        System.out.println("The value of slim passed to the Webservice controller is " + slim);
+        logger.debug("The query passed to the Webservice controller is " + query);
+        logger.debug("The value of slim passed to the Webservice controller is " + slim);
         //query = "\"goID\":\"GO:0033014\",\"ancestorsIPO\":\"ancestorsIPO\",";
-        //System.out.println("The query hardcoded is " + query);
+        //logger.debug("The query hardcoded is " + query);
 
         AnnotationParameters annotationParameters = createAnnotationParameters(query, null);
         String solrQuery = annotationParameters.toSolrQuery();
-        System.out.println("Solr query is :" + solrQuery);
+        logger.debug("Solr query is :" + solrQuery);
 
         //Do slimming if required
         ITermContainer slimTermSet = null;
@@ -990,9 +907,9 @@ public class WebServiceController {
 
         //			ObjectMapper om = new ObjectMapper();
         //			String result = jb.toString();
-        //			System.out.println("raw string is " + result);
+        //			logger.debug("raw string is " + result);
         //			filterRequest = om.readValue(result, FilterRequestJson.class);
-        //			System.out.println("Not Spring " + filterRequest);
+        //			logger.debug("Not Spring " + filterRequest);
 
         //AnnotationParameters annotationParameters = filterRequestToSolr.queryToAnnotationParameters(filterRequest);
         //AnnotationParameters annotationParameters = null;
@@ -1022,7 +939,7 @@ public class WebServiceController {
         QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(annotationWSUtil);
         String solrQuery = queryToSolrProcess.toSolrQuery(filterRequest);
 
-        System.out.println("Solr query is :" + solrQuery);
+        logger.debug("Solr query is :" + solrQuery);
 
         //Do slimming if required
         ITermContainer slimTermSet = null;
@@ -1061,9 +978,9 @@ public class WebServiceController {
         try {
             ObjectMapper om = new ObjectMapper();
             String result = jb.toString();
-            System.out.println("raw string is " + result);
+            logger.debug("raw string is " + result);
             filterRequest = om.readValue(result, FilterRequestJson.class);
-            System.out.println("Not Spring " + filterRequest);
+            logger.debug("Not Spring " + filterRequest);
 
             //AnnotationParameters annotationParameters = filterRequestToSolr.queryToAnnotationParameters
             // (filterRequest);
@@ -1076,7 +993,7 @@ public class WebServiceController {
             QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(annotationWSUtil);
             String solrQuery = queryToSolrProcess.toSolrQuery(filterRequest);
 
-            System.out.println("Solr query is :" + solrQuery);
+            logger.debug("Solr query is :" + solrQuery);
 
             //Do slimming if required
             ITermContainer slimTermSet = null;
@@ -1263,26 +1180,27 @@ public class WebServiceController {
             HttpServletResponse response) {
 
         StringBuffer jb = new StringBuffer();
-        String line = null;
+        String line;
+
         try {
             BufferedReader reader = request.getReader();
             while ((line = reader.readLine()) != null) {
                 jb.append(line);
             }
         } catch (Exception e) {
-            System.out.println(e.getStackTrace());
+            logger.error("Error:", e);
         }
 
         try {
             ObjectMapper om = new ObjectMapper();
             String result = jb.toString();
-            System.out.println("raw string is " + result);
+            logger.debug("raw string is " + result);
             FilterRequestJson filterRequest = om.readValue(result, FilterRequestJson.class);
-            System.out.println("Not Spring " + filterRequest);
+            logger.debug("Not Spring " + filterRequest);
 
             QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(annotationWSUtil);
             String solrQuery = queryToSolrProcess.toSolrQuery(filterRequest);
-            System.out.println("Solr query is :" + solrQuery);
+            logger.debug("Solr query is :" + solrQuery);
 
             annotationWSUtil.downloadStatistics(solrQuery, response);
 
@@ -1343,18 +1261,17 @@ public class WebServiceController {
             Format enumFormat, HttpServletResponse httpServletResponse, String callback)
             throws IOException, SolrServerException {
 
-        if ((query.length() == 10 && query //Check if query is GO or ECO term. In that case, retrieve term
-                .matches(AnnotationParameters.GO_ID_REG_EXP + "\\d{7}"))
-                || (query.length() == 11 && query
-                .matches(AnnotationParameters.ECO_ID_REG_EXP + "\\d{7}"))) {
+        //Check if query is GO or ECO term. In that case, retrieve term
+        if ((query.length() == 10 && query.matches(AnnotationParameters.GO_ID_REG_EXP + "\\d{7}"))
+                || (query.length() == 11 && query.matches(AnnotationParameters.ECO_ID_REG_EXP + "\\d{7}"))) {
 
             GenericTerm genericTerm = TermUtil.getTerm(query);
-            return Arrays.asList(genericTerm.serialise());
-
+            return Collections.singletonList(genericTerm.serialise());
         } else {
-
             List<GenericTerm> genericTerms = termService.autosuggest(query, filterQuery, limit);
+
             List<Map<String, Object>> termsSerialised = new ArrayList<>();
+
             for (GenericTerm genericTerm : genericTerms) {
                 GenericTerm term = TermUtil.getTerm(genericTerm.getId());//to get ancestors and other info
                 termsSerialised.add(term.serialise());
@@ -1366,15 +1283,21 @@ public class WebServiceController {
 
     private List<Map<String, Object>> searchProtein(String query, Scope enumScope, int limit, Format enumFormat,
             HttpServletResponse httpServletResponse) throws IOException {
-        List<GeneProduct> geneProducts = geneProductService
-                .autosuggest(query, GeneProductField.DBOBJECTTYPE.getValue() + ":" + enumScope.value, limit);
+        List<GeneProduct> geneProducts =
+                geneProductService.autosuggest(query, GeneProductField.DBOBJECTTYPE.getValue() + ":" + enumScope.value,
+                        limit);
         List<Map<String, Object>> gpSerialised = new ArrayList<>();
+
         Map<String, String> taxName = new HashMap<>();
+
         for (GeneProduct geneProduct : geneProducts) {
-            if (taxName.get(String.valueOf(geneProduct.getTaxonId())) == null) {
-                taxName = miscellaneousUtil.getTaxonomiesNames(Arrays.asList(String.valueOf(geneProduct.getTaxonId())));
+            String taxonText = String.valueOf(geneProduct.getTaxonId());
+
+            if (taxName.get(taxonText) == null) {
+                taxName = miscellaneousUtil.getTaxonomiesNames(Collections.singletonList(taxonText));
             }
-            geneProduct.setTaxonName(taxName.get(String.valueOf(geneProduct.getTaxonId())));
+
+            geneProduct.setTaxonName(taxName.get(taxonText));
             gpSerialised.add(geneProduct.serialise());
         }
 
@@ -1400,7 +1323,7 @@ public class WebServiceController {
 
         switch (enumFormat) {
             case XML:
-                httpServletResponse.setContentType("text/xml");
+                httpServletResponse.setContentType("application/xml");
                 break;
             case JSON:
                 httpServletResponse.setContentType("application/json");
@@ -1476,8 +1399,18 @@ public class WebServiceController {
 
         String value;
 
-        private Scope(String value) {
+        Scope(String value) {
             this.value = value;
+        }
+
+        public static Scope typeOf(String scopeText) {
+            for (Scope scope : Scope.values()) {
+                if (scope.value.equalsIgnoreCase(scopeText)) {
+                    return scope;
+                }
+            }
+
+            throw new IllegalArgumentException("Scope: " + scopeText + ", does not exist");
         }
     }
 
@@ -1582,15 +1515,15 @@ public class WebServiceController {
         QueryTo queryTo = new QueryTo();
         AnnotationParameters annotationParameters =
                 queryTo.queryToAnnotationParameters(query, Boolean.valueOf(advancedFilter));
-        System.out.println("Annotation Parameters: " + annotationParameters);
+        logger.debug("Annotation Parameters: " + annotationParameters);
 
         // Calculate Applied Filter from Query parameter
         //AppliedFilterSet appliedFilterSet = queryTo.queryToAppliedFilterSet(query, Boolean.valueOf(advancedFilter));
-        //System.out.println("Applied Filter Set: " + appliedFilterSet);
+        //logger.debug("Applied Filter Set: " + appliedFilterSet);
 
         // Create query from filter values
         //String solrQuery = annotationParameters.toSolrQuery();
-        //System.out.println("Solr Query: " + solrQuery);
+        //logger.debug("Solr Query: " + solrQuery);
         //return solrQuery;
         return annotationParameters;
     }
@@ -1620,14 +1553,11 @@ public class WebServiceController {
         return slimTerms;
     }
 
-    private long calculateAspectsTotalResults(String query, String aspect, String attibute) {
-        long numberResults = termService.getTotalNumberHighlightResults(query,
-                TermField.ID.getValue() + ":" + GOTerm.GO.toString() + "* AND "
+    private long calculateAspectsTotalResults(String query, String aspect, String attribute) {
+        return termService.getTotalNumberHighlightResults(query,
+                TermField.ID.getValue() + ":" + GOTerm.GO + "* AND "
                         + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue() + " AND "
-                        + SolrTerm.SolrTermDocumentType.ONTOLOGY.getValue()
-                        + ":" + aspect);
-        //		session.setAttribute(attibute, numberResults);
-        return numberResults;
+                        + SolrTerm.SolrTermDocumentType.ONTOLOGY.getValue() + ":" + aspect);
     }
 
     /**
@@ -1700,7 +1630,7 @@ public class WebServiceController {
     }
 
     private List<GenericTerm> highlightedTerms(String text, String filterQuery, int page, int rows) {
-        return termService.highlight("*" + text + "*", filterQuery, (page - 1) * rows, rows);
+        return termService.highlight(text, filterQuery, (page - 1) * rows, rows);
     }
 
     public enum ViewBy {
