@@ -99,7 +99,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
 
     // All go terms
     Map<String, GenericTerm> terms = uk.ac.ebi.quickgo.web.util.term.TermUtil.getGOTerms();
-            //todo this should be properly cached.
+    //todo this should be properly cached.
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotationWSUtilImpl.class);
 
@@ -358,7 +358,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
     @Override
     public void downloadTerm(String termId, HttpServletResponse httpServletResponse) {
         try {
-            StringBuffer sb = processTerm(termId);
+            StringBuffer sb = convertToText(goTermService.retrieveTerm(termId));
 
             writeOutJsonResponse(httpServletResponse, sb);
         } catch (IOException e) {
@@ -367,12 +367,16 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
         }
     }
 
-    @Override public void downloadTerms(String[] termIds, HttpServletResponse httpServletResponse) {
+    @Override public void downloadTerms(List<String> termIds, HttpServletResponse httpServletResponse) {
         StringBuffer jsonTerms = new StringBuffer();
 
         try {
-            for (String termId : termIds) {
-                jsonTerms.append(processTerm(termId)).append(", ");
+            if (!termIds.isEmpty()) {
+                for (String termId : termIds) {
+                    jsonTerms.append(convertToText(goTermService.retrieveTerm(termId))).append(", ");
+                }
+
+                jsonTerms.replace(jsonTerms.length() - 2, jsonTerms.length(), ""); //remove last ", "
             }
 
             addJsonArrayMarkers(jsonTerms);
@@ -383,31 +387,37 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
         }
     }
 
-    private StringBuffer processTerm(String termId) {
-        GOTerm term = goTermService.retrieveTerm(termId);
+    private StringBuffer convertToText(GOTerm term) {
+        return fileService.generateJsonForTerm(term, term.getChildren(), Collections.emptyList(),
+                Collections.emptyList());
+    }
 
-        // Calculate extra information
-        List<TermRelation> childTermsRelations = termUtil.calculateChildTerms(termId);
+    @Override public void termStats(String termId, HttpServletResponse httpServletResponse) {
+        //        co-occurring
+        Set<COOccurrenceStatsTerm> allCoOccurrenceStatsTerms =
+                miscellaneousService.allCOOccurrenceStatistics(termId.replaceAll("GO:", ""));
+        Set<COOccurrenceStatsTerm> nonIEACOOccurrenceStatistics =
+                miscellaneousService.nonIEACOOccurrenceStatistics(termId.replaceAll("GO:", ""));
 
-        //co-occurring
-        TreeSet<COOccurrenceStatsTerm> allCoOccurrenceStatsTerms =
-                (TreeSet) miscellaneousService.allCOOccurrenceStatistics(termId.replaceAll("GO:", ""));
-        TreeSet<COOccurrenceStatsTerm> nonIEACOOccurrenceStatistics =
-                (TreeSet) miscellaneousService.nonIEACOOccurrenceStatistics(termId.replaceAll("GO:", ""));
-
-        // All stats
+        //         All stats
         List<COOccurrenceStatsTerm> allStats = new ArrayList<>();
         allStats.addAll(allCoOccurrenceStatsTerms);
         allStats = getFirstOnes(allStats);
         processStats(allStats);
 
-        // Non-IEA stats
+        //         Non-IEA stats
         List<COOccurrenceStatsTerm> nonIEAStats = new ArrayList<>();
         nonIEAStats.addAll(nonIEACOOccurrenceStatistics);
         nonIEAStats = getFirstOnes(nonIEAStats);
         processStats(nonIEAStats);
 
-        return fileService.generateJsonForTerm(term, childTermsRelations, allStats, nonIEAStats);
+        StringBuffer stats = fileService.generateJsonForCOOccurrenceStats(termId, allStats, nonIEAStats);
+
+        try {
+            writeOutJsonResponse(httpServletResponse, stats);
+        } catch (IOException e) {
+            logger.error("Unable to write out terms result", e);
+        }
     }
 
     /**
@@ -417,8 +427,8 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
      * @return a StringBuffer representing an array of terms in json format
      */
     private void addJsonArrayMarkers(StringBuffer jsonTerms) {
-        jsonTerms.insert(0, "{");
-        jsonTerms.append("}");
+        jsonTerms.insert(0, "[");
+        jsonTerms.append("]");
     }
 
     public void downloadOntologyGraph(String termId, HttpServletResponse httpServletResponse) {
@@ -457,7 +467,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
         int NUM_VALUES = 100;
         int end = NUM_VALUES;
         if (size < NUM_VALUES) {
-            end = size - 1;
+            end = size;
         }
         return end;
     }
@@ -770,7 +780,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
     //
     //		// Get corresponding ontology
     //		GenericOntology genericOntology = uk.ac.ebi.quickgo.web.util.term.TermUtil.getOntology(termsIdsList.get
-	// (0));
+    // (0));
     //
     //		// Create graph image
     //		GraphImage graphImage = createRenderableImage(genericOntology, termsIds);
@@ -791,7 +801,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
     //		for (Iterator<TermNode> iterator = ontTerms.iterator();iterator.hasNext();) {
     //			TermNode next = iterator.next();
     //			chartJson.addLayoutNode(chartJson.new LayoutNode(next.getId(),next.left(), next.right(), next.top(),
-	// next.bottom()));
+    // next.bottom()));
     //		}
     //
     //
@@ -928,7 +938,8 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
 
         // Create ontology graph
         OntologyGraph ontologyGraph = OntologyGraph.makeGraph(termSet,
-                EnumSet.of(RelationType.USEDIN, RelationType.ISA, RelationType.PARTOF, RelationType.REGULATES, /*RelationType.HASPART,*/
+                EnumSet.of(RelationType.USEDIN, RelationType.ISA, RelationType.PARTOF, RelationType.REGULATES,
+                        /*RelationType.HASPART,*/
                         RelationType.OCCURSIN), 0, 0, new GraphPresentation());
         return ontologyGraph.layout();
     }

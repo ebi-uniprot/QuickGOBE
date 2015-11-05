@@ -5,7 +5,6 @@ import uk.ac.ebi.quickgo.ontology.eco.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.ontology.generic.ITermContainer;
 import uk.ac.ebi.quickgo.ontology.generic.RelationType;
-import uk.ac.ebi.quickgo.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationBlacklist.BlacklistEntryMinimal;
 import uk.ac.ebi.quickgo.ontology.go.AnnotationExtensionRelations;
 import uk.ac.ebi.quickgo.ontology.go.GOTerm;
@@ -149,55 +148,6 @@ public class WebServiceController {
         }
     }
 
-//    /**
-//     * Lookup web service
-//     *
-//     * @param format              Response format
-//     * @param ids                  Id to lookup
-//     * @param scope               Scope of the searched term
-//     * @param httpServletResponse
-//     * @throws IOException
-//     */
-//    @RequestMapping("/lookup")
-//    public void lookup(
-//            @RequestParam(value = "format", required = false, defaultValue = "json") String format,
-//            @RequestParam(value = "ids", required = true) String[] ids,
-//            @RequestParam(value = "scope", required = false, defaultValue = "go") String scope,
-//            HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-//
-//        String callback = httpServletRequest
-//                .getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
-//        Scope enumScope = Scope.valueOf(scope.trim().toUpperCase());
-//        Format enumFormat = Format.valueOf(format.trim().toUpperCase());
-//
-//        List<GenericTerm> terms = lookupTerms(ids);
-//
-//        String callback = httpServletRequest
-//                .getParameter("callback");// Protein2GO and other internal tools make requests using this parameter
-//        id = id.toUpperCase();
-//        Scope enumScope = Scope.valueOf(scope.trim().toUpperCase());
-//        Format enumFormat = Format.valueOf(format.trim().toUpperCase());
-//
-//        switch (enumScope) {
-//            case COMPLEX:
-//                id = "\"" + id + "\""; //Put id between " " to escape '-' character
-//            case PROTEIN:
-//                lookupProtein(id, enumScope, enumFormat, httpServletResponse, callback);
-//                break;
-//            case ECO:
-//            case GO:
-//                lookupTerm(id, enumScope, enumFormat, httpServletResponse, callback);
-//                break;
-//            default:
-//                break;
-//        }
-//    }
-
-    private void getLookupResults() {
-
-    }
-
-
     /**
      * Search web service
      *
@@ -285,7 +235,7 @@ public class WebServiceController {
             @RequestParam(value = "rows", defaultValue = "25") int rows,
             HttpServletRequest httpServletRequest,
             HttpServletResponse httpServletResponse) throws IOException,
-            SolrServerException {
+                                                            SolrServerException {
 
         String query = "\"text\":" + "\"" + text + "\"";
         System.out.println("Search Full from WebService Controller " + "query:" + query + "<<isProtein:" + isProtein +
@@ -700,22 +650,22 @@ public class WebServiceController {
      */
     @RequestMapping("/annotation")
     public void annotation(@RequestParam(value = "format", required = false, defaultValue = "gpad") String format,
-                           @RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
-                           @RequestParam(value = "gz", required = false, defaultValue = "") String gz,
-                           @RequestParam(value = "go_id", required = false, defaultValue = "") String goid,
-                           @RequestParam(value = "aspect", required = false, defaultValue = "") String aspect,
-                           @RequestParam(value = "enable_slim", required = false, defaultValue = "false") String enableSlim,
-                           @RequestParam(value = "go_relations", required = false, defaultValue = "") String goRelations,
-                           @RequestParam(value = "evidence", required = false, defaultValue = "") String evidence,
-                           @RequestParam(value = "source", required = false, defaultValue = "") String source,
-                           @RequestParam(value = "reference", required = false, defaultValue = "") String ref,
-                           @RequestParam(value = "with", required = false, defaultValue = "") String with,
-                           @RequestParam(value = "taxonomy_id", required = false, defaultValue = "") String tax,
-                           @RequestParam(value = "protein", required = false, defaultValue = "") String protein,
-                           @RequestParam(value = "qualifier", required = false, defaultValue = "") String qualifier,
-                           @RequestParam(value = "database", required = false, defaultValue = "") String db,
-                           @RequestParam(value = "columns", required = false, defaultValue = "") String cols,
-                           HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
+            @RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
+            @RequestParam(value = "gz", required = false, defaultValue = "") String gz,
+            @RequestParam(value = "go_id", required = false, defaultValue = "") String goid,
+            @RequestParam(value = "aspect", required = false, defaultValue = "") String aspect,
+            @RequestParam(value = "enable_slim", required = false, defaultValue = "false") String enableSlim,
+            @RequestParam(value = "go_relations", required = false, defaultValue = "") String goRelations,
+            @RequestParam(value = "evidence", required = false, defaultValue = "") String evidence,
+            @RequestParam(value = "source", required = false, defaultValue = "") String source,
+            @RequestParam(value = "reference", required = false, defaultValue = "") String ref,
+            @RequestParam(value = "with", required = false, defaultValue = "") String with,
+            @RequestParam(value = "taxonomy_id", required = false, defaultValue = "") String tax,
+            @RequestParam(value = "protein", required = false, defaultValue = "") String protein,
+            @RequestParam(value = "qualifier", required = false, defaultValue = "") String qualifier,
+            @RequestParam(value = "database", required = false, defaultValue = "") String db,
+            @RequestParam(value = "columns", required = false, defaultValue = "") String cols,
+            HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
 
         String query = "";
         boolean gzip = false;
@@ -928,7 +878,7 @@ public class WebServiceController {
 
     @RequestMapping(value = "/annotationPostNewNamesNotSpring", method = {RequestMethod.POST})
     public void postQueryRequestNotSpring(HttpServletRequest request,
-                                          HttpServletResponse response) {
+            HttpServletResponse response) {
 
         StringBuffer jb = new StringBuffer();
         String line = null;
@@ -1023,11 +973,11 @@ public class WebServiceController {
 
     @RequestMapping(value = "/downloadGetNewNamesNotSpring", method = {RequestMethod.GET})
     public void postDownloadRequestNotSpring(HttpServletRequest request,
-                                             HttpServletResponse response,
-                                             @RequestParam(value = "format", required = false, defaultValue = "json") String format,
-                                             @RequestParam(value = "q", required = false) String query,
-                                             @RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
-                                             @RequestParam(value = "slim", required = false, defaultValue = "false") String slim)
+            HttpServletResponse response,
+            @RequestParam(value = "format", required = false, defaultValue = "json") String format,
+            @RequestParam(value = "q", required = false) String query,
+            @RequestParam(value = "limit", required = false, defaultValue = "1000") String limit,
+            @RequestParam(value = "slim", required = false, defaultValue = "false") String slim)
             throws UnsupportedEncodingException {
 
         //		StringBuffer jb = new StringBuffer();
@@ -1095,7 +1045,7 @@ public class WebServiceController {
 
     @RequestMapping(value = "/downloadPostNewNamesNotSpring", method = {RequestMethod.POST})
     public void postDownloadRequestNotSpring(HttpServletRequest request,
-                                             HttpServletResponse response) {
+            HttpServletResponse response) {
 
         FilterRequestJson filterRequest = null;
 
@@ -1158,28 +1108,31 @@ public class WebServiceController {
     }
 
     @RequestMapping(value = "/term/{id}", method = RequestMethod.GET)
-    public void termInformation(@PathVariable(value = "id") String id,
-                                HttpServletResponse httpServletResponse,
-                                HttpServletRequest httpServletRequest)
-            throws UnsupportedEncodingException {
+    public void termInformation(@PathVariable(value = "id") String id, HttpServletResponse httpServletResponse,
+            HttpServletRequest httpServletRequest) throws UnsupportedEncodingException {
 
         annotationWSUtil.downloadTerm(id, httpServletResponse);
+    }
 
+    @RequestMapping(value = "/term/{id}/stats", method = RequestMethod.GET)
+    public void termCoOccurringStats(@PathVariable(value = "id") String id, HttpServletResponse httpServletResponse,
+            HttpServletRequest httpServletRequest) throws UnsupportedEncodingException {
+
+        annotationWSUtil.termStats(id, httpServletResponse);
     }
 
     @RequestMapping(value = "/terms", method = RequestMethod.GET)
-    public void termsInformation(@RequestParam(value = "ids") String[] ids, HttpServletResponse httpServletResponse,
-            HttpServletRequest httpServletRequest) throws UnsupportedEncodingException {
+    public void termsInformation(@RequestParam(value = "ids", required = true) List<String> ids,
+            HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest)
+            throws UnsupportedEncodingException {
 
         annotationWSUtil.downloadTerms(ids, httpServletResponse);
-
     }
-
 
     @RequestMapping(value = "/ontologyGraph/{id}", method = RequestMethod.GET)
     public void ontologyGraph(@PathVariable(value = "id") String id,
-                              HttpServletResponse httpServletResponse,
-                              HttpServletRequest httpServletRequest)
+            HttpServletResponse httpServletResponse,
+            HttpServletRequest httpServletRequest)
             throws UnsupportedEncodingException {
 
         annotationWSUtil.downloadOntologyGraph(id, httpServletResponse);
@@ -1194,7 +1147,7 @@ public class WebServiceController {
 
     @RequestMapping(value = {"/predefinedSetTerms/{id}"}, method = {RequestMethod.GET})
     public void addPredefinedSetTerms(@PathVariable(value = "id") String id,
-                                      HttpServletResponse httpServletResponse) {
+            HttpServletResponse httpServletResponse) {
 
         annotationWSUtil.downloadPredefinedSetTerms(httpServletResponse, id);
 
@@ -1226,9 +1179,9 @@ public class WebServiceController {
 
     @RequestMapping(value = {"/dataset/goTermHistory"}, method = {RequestMethod.GET})
     public void getGoTermsHistory(HttpServletResponse httpServletResponse,
-                                  @RequestParam(value = "from", defaultValue = "2013-01-01", required = false) String from,
-                                  @RequestParam(value = "to", defaultValue = "NOW", required = false) String to,
-                                  @RequestParam(value = "limit", defaultValue = "500", required = false) String limit) {
+            @RequestParam(value = "from", defaultValue = "2013-01-01", required = false) String from,
+            @RequestParam(value = "to", defaultValue = "NOW", required = false) String to,
+            @RequestParam(value = "limit", defaultValue = "500", required = false) String limit) {
 
         annotationWSUtil.downloadGoTermHistory(httpServletResponse, from, to, limit);
 
@@ -1254,8 +1207,8 @@ public class WebServiceController {
 
     @RequestMapping("/chartfull")
     public void generateChart(HttpServletResponse httpServletResponse,
-                              @RequestParam(value = "ids", required = true, defaultValue = "") String ids,
-                              @RequestParam(value = "scope", required = false, defaultValue = "") String scope) {
+            @RequestParam(value = "ids", required = true, defaultValue = "") String ids,
+            @RequestParam(value = "scope", required = false, defaultValue = "") String scope) {
 
         annotationWSUtil.downloadChartFullModel(httpServletResponse, ids, scope);
     }
@@ -1282,7 +1235,7 @@ public class WebServiceController {
      */
     @RequestMapping(value = "terms/{ontology}", method = RequestMethod.GET)
     public void ontologyTerms(HttpServletResponse httpServletResponse,
-                              @PathVariable(value = "ontology") String ontology) throws UnsupportedEncodingException {
+            @PathVariable(value = "ontology") String ontology) throws UnsupportedEncodingException {
 
         annotationWSUtil.downloadOntologyList(httpServletResponse, ontology);
 
@@ -1307,7 +1260,7 @@ public class WebServiceController {
 
     @RequestMapping(value = "/statsPostNewNamesNotSpring", method = {RequestMethod.POST})
     public void postQueryStatsRequestNotSpring(HttpServletRequest request,
-                                               HttpServletResponse response) {
+            HttpServletResponse response) {
 
         StringBuffer jb = new StringBuffer();
         String line = null;
@@ -1387,7 +1340,7 @@ public class WebServiceController {
     }
 
     private List<Map<String, Object>> searchTerm(String query, String filterQuery, int limit, Scope enumScope,
-                                                 Format enumFormat, HttpServletResponse httpServletResponse, String callback)
+            Format enumFormat, HttpServletResponse httpServletResponse, String callback)
             throws IOException, SolrServerException {
 
         if ((query.length() == 10 && query //Check if query is GO or ECO term. In that case, retrieve term
@@ -1412,7 +1365,7 @@ public class WebServiceController {
     }
 
     private List<Map<String, Object>> searchProtein(String query, Scope enumScope, int limit, Format enumFormat,
-                                                    HttpServletResponse httpServletResponse) throws IOException {
+            HttpServletResponse httpServletResponse) throws IOException {
         List<GeneProduct> geneProducts = geneProductService
                 .autosuggest(query, GeneProductField.DBOBJECTTYPE.getValue() + ":" + enumScope.value, limit);
         List<Map<String, Object>> gpSerialised = new ArrayList<>();
@@ -1429,7 +1382,7 @@ public class WebServiceController {
     }
 
     private void lookupProtein(String id, Scope enumScope, Format enumFormat, HttpServletResponse httpServletResponse,
-                               String callback) throws IOException {
+            String callback) throws IOException {
         List<GeneProduct> geneProducts = geneProductService
                 .findByQuery(GeneProductField.DBOBJECTID.getValue() + ":"
                         + id + " AND "
@@ -1476,7 +1429,7 @@ public class WebServiceController {
     }
 
     private void lookupTerm(String id, Format enumFormat, HttpServletResponse httpServletResponse,
-                            String callback) throws IOException {
+            String callback) throws IOException {
         GenericTerm genericTerm = TermUtil.getTerm(id);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -1624,7 +1577,7 @@ public class WebServiceController {
     }
 
     private AnnotationParameters createAnnotationParameters(@RequestParam(value = "q", required = false) String query,
-                                                            @RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter) {
+            @RequestParam(value = "advancedFilter", defaultValue = "false") String advancedFilter) {
         // Calculate Annotations Parameters from Query parameter
         QueryTo queryTo = new QueryTo();
         AnnotationParameters annotationParameters =
