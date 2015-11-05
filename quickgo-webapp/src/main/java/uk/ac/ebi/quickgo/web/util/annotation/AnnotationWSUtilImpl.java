@@ -869,7 +869,32 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
             e.printStackTrace();
             logger.error(e.getMessage());
         }
+    }
 
+    /**
+     * Get the statistics  when there are no filter parameters in place.
+     * In this case we can use the filters saved to solr (pre-calculated at index time) rather than calculating them
+     * during this call.
+     * @param httpServletResponse
+     */
+    @Override
+    public void downloadStatisticsNoFilters(HttpServletResponse httpServletResponse) {
+
+        uk.ac.ebi.quickgo.statistic.StatisticsCalculation statisticsCalculation =
+                miscellaneousService.getPrecalculatedStatsNoFilters();
+
+        //		StatisticsJson statisticsJson = new StatisticsJson();
+        //		statisticsJson.setStatsBean(statisticsBean);
+
+        StringBuffer sb = null;
+        try {
+            sb = fileService.generateJsonFile(statisticsCalculation);
+
+            writeOutJsonResponse(httpServletResponse, sb);
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
     }
 
     @Override
