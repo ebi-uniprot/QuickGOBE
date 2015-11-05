@@ -123,6 +123,13 @@
 
         <!-- Testing -->
         <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.jmock</groupId>
             <artifactId>jmock</artifactId>
             <version>${jmock.version}</version>
@@ -133,13 +140,6 @@
             <groupId>org.jmock</groupId>
             <artifactId>jmock-legacy</artifactId>
             <version>${jmock.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
-            <version>${hamcrest.version}</version>
             <scope>test</scope>
         </dependency>
 

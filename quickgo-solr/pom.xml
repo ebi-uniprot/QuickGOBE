@@ -11,8 +11,6 @@
 
     <artifactId>quickgo-solr</artifactId>
 
-    <packaging>pom</packaging>
-
     <name>QuickGO Solr</name>
 
     <description>QuickGO Solr Configuration project</description>
@@ -41,24 +39,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>uk.ac.ebi.quickgo</groupId>
             <artifactId>quickgo-solr-query</artifactId>
             <version>${project.version}</version>
@@ -68,13 +48,6 @@
         <dependency>
             <groupId>uk.ac.ebi.quickgo</groupId>
             <artifactId>quickgo-service</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>uk.ac.ebi.quickgo</groupId>
-            <artifactId>webapp</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

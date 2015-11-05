@@ -1,11 +1,8 @@
 package uk.ac.ebi.quickgo.search.miscellaneous;
 
 import uk.ac.ebi.quickgo.search.ontology.DocumentMocker;
-import uk.ac.ebi.quickgo.search.ontology.OntologySearchEngine;
 import uk.ac.ebi.quickgo.solr.model.miscellaneous.SolrMiscellaneous;
-import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm;
 import uk.ac.ebi.quickgo.solr.query.model.miscellaneous.enums.MiscellaneousField;
-import uk.ac.ebi.quickgo.solr.query.model.ontology.enums.TermField;
 import uk.ac.ebi.quickgo.util.miscellaneous.MiscellaneousUtil;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -15,11 +12,8 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.core.Is.is;
 import static uk.ac.ebi.quickgo.search.AbstractSearchEngine.filterResultsTo;
-import static uk.ac.ebi.quickgo.search.miscellaneous.DocumentMocker.Stats.createStats;
 import static uk.ac.ebi.quickgo.search.miscellaneous.DocumentMocker.XRefDB.createXRefDB;
-import static uk.ac.ebi.quickgo.search.ontology.DocumentMocker.Relation.createRelation;
 
 /**
  * This class is used to show which queries are necessary to successfully search the index, e.g.,

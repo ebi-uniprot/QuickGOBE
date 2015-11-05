@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.search.ontology;
 
-import uk.ac.ebi.quickgo.search.AbstractSearchEngine;
 import uk.ac.ebi.quickgo.solr.model.ontology.SolrTerm;
 import uk.ac.ebi.quickgo.solr.query.model.ontology.enums.TermField;
 import uk.ac.ebi.quickgo.solr.query.service.ontology.TermRetrievalImpl;
@@ -11,7 +10,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.hamcrest.Matchers.contains;
 import static uk.ac.ebi.quickgo.search.AbstractSearchEngine.filterResultsTo;
 import static uk.ac.ebi.quickgo.search.ontology.DocumentMocker.Relation.createRelation;
@@ -118,7 +116,5 @@ public class OntologySearchIT {
 
         assertThat(filterResultsTo(queryResponse, TermField.OBSOLETE_ID.getValue()), contains("GO:0000003"));
     }
-
-
 
 }
