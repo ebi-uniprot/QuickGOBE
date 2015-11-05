@@ -4,6 +4,8 @@ import uk.ac.ebi.quickgo.search.AbstractSearchEngine;
 import uk.ac.ebi.quickgo.solr.model.miscellaneous.SolrMiscellaneous;
 
 /**
+ * A search engine based on the miscellaneous Solr core.
+ *
  * Created 02/11/15
  * @author Edd
  */
