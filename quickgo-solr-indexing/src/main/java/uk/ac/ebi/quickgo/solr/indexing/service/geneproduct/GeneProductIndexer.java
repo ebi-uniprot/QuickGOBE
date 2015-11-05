@@ -27,9 +27,9 @@ import uk.ac.ebi.quickgo.solr.server.SolrServerProcessor;
 public class GeneProductIndexer  implements Indexer<GeneProduct>{
 
 	private SolrServerProcessor solrServerProcessor;
-		
+
 	private SolrMapper<GeneProduct, SolrGeneProduct> solrMapper;
-	
+
 	// Log
 	private static final Logger logger = LoggerFactory.getLogger(GeneProductIndexer.class);
 
@@ -37,7 +37,7 @@ public class GeneProductIndexer  implements Indexer<GeneProduct>{
 	 * See {@link Indexer#index(List)}
 	 */
 	public void index(List<GeneProduct> list) {
-		index(list, SolrGeneProductDocumentType.getAsInterfaces());		
+		index(list, SolrGeneProductDocumentType.getAsInterfaces());
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class GeneProductIndexer  implements Indexer<GeneProduct>{
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Deletes everything from the schema
 	 * @throws SolrServerException
@@ -60,21 +60,32 @@ public class GeneProductIndexer  implements Indexer<GeneProduct>{
 	public void deleteAll() throws SolrServerException, IOException{
 		solrServerProcessor.deleteAll();
 	}
-	
+
+	/**
+	 * Deletes by query
+	 */
+	public void deleteByQuery(String query){
+		try {
+			solrServerProcessor.deleteByQuery(query);
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.getMessage());
+		}
+	}
+
 	public void setSolrMapper(SolrMapper<GeneProduct, SolrGeneProduct> solrMapper) {
 		this.solrMapper = solrMapper;
 	}
 
 	/**
      * Indexes Gene Products in Solr
-     * @throws SolrServerException 
+     * @throws SolrServerException
      */
 	private Collection<SolrGeneProduct> mapBeans(List<GeneProduct> geneProducts, List<SolrDocumentType> solrDocumentTypes) {
-		
+
 		List<SolrGeneProduct> beans = new ArrayList<SolrGeneProduct>();
-		
+
 		// Iterate over all the gene products and convert them into Solr objects to be indexed
-		for (GeneProduct geneProduct : geneProducts) {			
+		for (GeneProduct geneProduct : geneProducts) {
 			beans.addAll(solrMapper.toSolrObject(geneProduct, solrDocumentTypes));
     	}
 		return beans;

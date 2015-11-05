@@ -61,6 +61,17 @@ public class AnnotationIndexer implements Indexer<GOAnnotation> {
 		solrServerProcessor.deleteAll();
 	}
 
+	/**
+	 * Deletes by query
+	 */
+	public void deleteByQuery(String query){
+		try {
+			solrServerProcessor.deleteByQuery(query);
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.getMessage());
+		}
+	}
+
 	public void setSolrServerProcessor(SolrServerProcessor solrServerProcessor) {
 		this.solrServerProcessor = solrServerProcessor;
 	}

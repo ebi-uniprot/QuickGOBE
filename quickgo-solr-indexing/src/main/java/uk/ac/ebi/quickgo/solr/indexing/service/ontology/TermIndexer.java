@@ -53,6 +53,17 @@ public class TermIndexer implements Indexer<GenericTerm> {
 	}
 
 
+	/**
+	 * Deletes by query
+	 */
+	public void deleteByQuery(String query){
+		try {
+			solrServerProcessor.deleteByQuery(query);
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.getMessage());
+		}
+	}
+
 	public void setSolrMapper(SolrMapper<GenericTerm, SolrTerm> solrMapper) {
 		this.solrMapper = solrMapper;
 	}
