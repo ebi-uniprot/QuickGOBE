@@ -6,9 +6,9 @@
 
     <parent>
         <groupId>uk.ac.ebi.quickgo</groupId>
-        <artifactId>quickgo-solr</artifactId>
+        <artifactId>quickgo-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../quickgo-solr</relativePath>
+        <relativePath>../</relativePath>
     </parent>
 
     <artifactId>quickgo-solr-indexing</artifactId>
