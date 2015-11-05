@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import uk.ac.ebi.quickgo.miscellaneous.Miscellaneous;
+import uk.ac.ebi.quickgo.solr.indexing.Indexer;
 import uk.ac.ebi.quickgo.solr.indexing.service.miscellaneous.MiscellaneousIndexer;
 import uk.ac.ebi.quickgo.solr.model.miscellaneous.SolrMiscellaneous.SolrMiscellaneousDocumentType;
 import uk.ac.ebi.quickgo.solr.query.model.annotation.enums.AnnotationField;
@@ -32,7 +33,7 @@ public class QuickGOCOOccurrenceStatsIndexer {
 	 * Miscellaneous indexer
 	 */
 	@Autowired
-	MiscellaneousIndexer miscellaneousIndexer;
+	Indexer<Miscellaneous> miscellaneousIndexer;
 
 	/**
 	 * Contains number of proteins that each term is annotated to
@@ -234,6 +235,8 @@ public class QuickGOCOOccurrenceStatsIndexer {
 
 	/**
 	 * Return all the annotated GO terms
+	 * Is has been the case that the terms list has come back empty, despite indexing for annotation should have
+	 * completed before this point. Was causing
 	 * @return All the GO terms with annotations
 	 * @throws SolrServerException
 	 */
@@ -242,14 +245,18 @@ public class QuickGOCOOccurrenceStatsIndexer {
 		if (nonIEA) {
 			query = query + " AND " + nonIEAQuery;
 		}
-		List<Count> terms = annotationRetrieval.getFacetFields(query, null, AnnotationField.GOID.getValue(), Integer.MAX_VALUE);
 
-		//The following line is done in the calling code.
-		//terms = terms.subList(1, terms.size());// Remove "go" term
+		//Get a list of all goterms, and their annotation counts
+		String facetQuery = null;
+		String facetField = AnnotationField.GOID.getValue();
+
+		List<Count> terms = annotationRetrieval.getFacetFields(query, facetQuery, facetField, Integer.MAX_VALUE);
+		terms = terms.subList(1, terms.size());// Remove "go" term
+
 
 		List<String> termsIDs = new ArrayList<>();
 		for (Count term : terms) {
-			termsIDs.add(term.getName());
+			termsIDs.add(term.getName());			//The getName method actually retrieves the goId - AND THROWS THE COUNT AWAY
 		}
 		return termsIDs;
 	}
