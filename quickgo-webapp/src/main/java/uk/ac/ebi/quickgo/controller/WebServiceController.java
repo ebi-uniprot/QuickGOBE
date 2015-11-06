@@ -35,6 +35,7 @@ import uk.ac.ebi.quickgo.web.util.term.TermUtil;
 import uk.ac.ebi.quickgo.web.util.url.URLsResolver;
 import uk.ac.ebi.quickgo.webservice.mapping.QueryToSolrProcess;
 import uk.ac.ebi.quickgo.webservice.model.Filter;
+import uk.ac.ebi.quickgo.webservice.model.FilterRequest;
 import uk.ac.ebi.quickgo.webservice.model.FilterRequestJson;
 import uk.ac.ebi.quickgo.webservice.model.SearchFullResultsJson;
 
@@ -291,7 +292,8 @@ public class WebServiceController {
 
             long expEcoTotalResults;
             if (!expEcoValues.isEmpty()) {
-                String expEcofilterQuery = TermField.ID.getValue() + ":(" + expEcoValues.replaceAll(":", "*") + ")" + " AND " +
+                String expEcofilterQuery =
+                        TermField.ID.getValue() + ":(" + expEcoValues.replaceAll(":", "*") + ")" + " AND " +
                                 TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.TERM.getValue();
 
                 expEcoTotalResults =
@@ -719,135 +721,103 @@ public class WebServiceController {
                 (page - 1) * rows, rows, httpServletResponse, slimmingRequired, slimTermSet);
     }
 
-    static class FormData {
-        public String myString;
+    @RequestMapping(value = "/annotationPostNewNamesNotSpring", method = {RequestMethod.POST})
+    public void postQueryRequestNotSpring(HttpServletRequest request, HttpServletResponse response) {
+        FilterRequest filter = convertInputToFilter(request);
+
+        QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(annotationWSUtil);
+        String solrQuery = queryToSolrProcess.toSolrQuery(filter);
+
+        logger.debug("Solr query is: " + solrQuery);
+
+        ITermContainer slimTermSet = null;
+
+        if (isSlim(filter)) {
+            AnnotationParameters annotationParameters = new AnnotationParameters();
+            annotationParameters.addParameter("ancestorsIPO", extractAncestors(filter));
+
+            slimTermSet = createSlimTermSet(annotationParameters);
+        }
+
+        //todo should we be using the annotation service?
+        AnnotationColumn[] columns = new AnnotationColumn[0];    //ignored
+        annotationWSUtil.downloadAnnotationsInternal(solrQuery, columns, LIMIT,
+                (filter.getPage() - 1) * filter.getRows(), filter.getRows(), response,
+                queryToSolrProcess.isSlimmingRequired(), slimTermSet);
+    }
+
+    //TODO: this operation should be done in filter request object
+    private boolean isSlim(FilterRequest filter) {
+        boolean isSlim;
+
+        if(filter != null) {
+            isSlim = filter.getList().stream()
+                    .filter(param -> "goTermUse".equalsIgnoreCase(param.getType()))
+                    .anyMatch(goTermUse -> "slim".equalsIgnoreCase(goTermUse.getValue()));
+        } else {
+            isSlim = false;
+        }
+
+        return isSlim;
+    }
+
+    //TODO: this operation should be done in filter request object
+    private List<String> extractAncestors(FilterRequest filter) {
+        List<String> ancestorTerms;
+
+        if (filter != null) {
+            List<Filter> filterParams = filter.getList();
+
+            ancestorTerms = filterParams.stream()
+                    .filter(param -> "goID".equalsIgnoreCase(param.getType()))
+                    .map(Filter::getValue)
+                    .distinct()
+                    .collect(Collectors.toList());
+        } else {
+            ancestorTerms = Collections.emptyList();
+        }
+
+        return ancestorTerms;
     }
 
     /**
+     * Converts the client request into a {@link FilterRequestJson} object.
+     *
+     * @param request the client request
+     * @return a container with the client specific parameters necessary to process the request
      */
-    @RequestMapping(value = "/annotationPostNewNames", method = {RequestMethod.POST})
-    @ResponseBody
-    public void postQueryRequest(@RequestBody FormData formData) {
+    private FilterRequest convertInputToFilter(HttpServletRequest request) {
+        String requestParameters = "";
 
-        //			HttpServletRequest request,
-        //			HttpServletResponse httpServletResponse,
-        //			@RequestParam(value = "filterRequest", required = false) Map filterRequest,
-        //			@RequestParam(value = "myObject", required = false) Object myObject,
-        //			@RequestParam(value = "myString", required = false) String myString,
-        //			//@RequestParam(value = "myjson", required = false) Object myjson,
-        //			@RequestParam(value = "myList", required = false) List myList)
-        //			throws UnsupportedEncodingException {
-
-        //		logger.debug("Request::" +  request);
-        //		logger.debug("filterRequest::" +  filterRequest);
-        //		logger.debug("myObject::" + myObject);
-        //		logger.debug("myList::" + myList);
-        //		logger.debug("myString::" + myString);
-
-        logger.debug(formData.myString);
-
-        //		ObjectMapper mapper = new ObjectMapper();
-        //		try {
-        //			logger.debug("write myjson as json string" + mapper.writeValueAsString(myjson));
-        //		} catch (JsonProcessingException e) {
-        //			e.printStackTrace();
-        //		}
-        //		try {
-        //			logger.debug("write myString as json string" + mapper.writeValueAsString(myString));
-        //		} catch (JsonProcessingException e) {
-        //			e.printStackTrace();
-        //		}
-
-        //FilterParametersToSolr filterParametersToSr = new FilterParametersToSolr();ol
-        //filterParametersToSolr.queryToAnnotationParameters(filterRequest, false);
-
-    }
-
-    //	static class FilterData{
-    //		public int rows;
-    //		public int page;
-    //		public boolean isSlim;
-    //		public List<Filter> list;
-    //
-    //		@Override
-    //		public String toString() {
-    //			return "FilterData{" +
-    //					"rows=" + rows +
-    //					", page=" + page +
-    //					", isSlim=" + isSlim +
-    //					", filterList=" + list +
-    //					'}';
-    //		}
-    //	}
-    //
-    //	static class Filter {
-    //		public String type;
-    //		public String value;
-    //
-    //		@Override
-    //		public String toString() {
-    //			return "Filter{" +
-    //					"type='" + type + '\'' +
-    //					", value='" + value + '\'' +
-    //					'}';
-    //		}
-    //	}
-
-    @RequestMapping(value = "/annotationPostNewNamesNotSpring", method = {RequestMethod.POST})
-    public void postQueryRequestNotSpring(HttpServletRequest request,
-            HttpServletResponse response) {
-
-        StringBuffer jb = new StringBuffer();
-        String line = null;
         try {
             BufferedReader reader = request.getReader();
+
+            StringBuilder builder = new StringBuilder();
+
+            String line;
             while ((line = reader.readLine()) != null) {
-                jb.append(line);
+                builder.append(line);
             }
-        } catch (Exception e) { /*report an error*/ }
+
+            requestParameters = builder.toString();
+
+            logger.debug("Request parameters are: " + requestParameters);
+        } catch (IOException e) {
+            logger.error("Unable to read request parameters", e);
+        }
 
         try {
             ObjectMapper om = new ObjectMapper();
-            String result = jb.toString();
-            logger.debug("raw string is " + result);
-            FilterRequestJson filterRequest = om.readValue(result, FilterRequestJson.class);
-            logger.debug("Not Spring " + filterRequest);
 
-            //AnnotationParameters annotationParameters = filterRequestToSolr.queryToAnnotationParameters
-            // (filterRequest);
-            AnnotationParameters annotationParameters = null;
+            FilterRequest filterRequest = om.readValue(requestParameters, FilterRequestJson.class);
+            logger.debug("Filter request: " + filterRequest);
 
-            //Old new way to do it
-            //FilterRequestToSolr filterRequestToSolr = new FilterRequestToSolr();
-            //String solrQuery = filterRequestToSolr.toSolrQuery(filterRequest);
-
-            QueryToSolrProcess queryToSolrProcess = new QueryToSolrProcess(annotationWSUtil);
-            String solrQuery = queryToSolrProcess.toSolrQuery(filterRequest);
-
-            logger.debug("Solr query is :" + solrQuery);
-
-            //Do slimming if required
-            ITermContainer slimTermSet = null;
-            //Boolean slimmingRequired = filterRequest.isSlim();
-
-            //			if(slimmingRequired) {
-            //				slimTermSet = createSlimTermSet(annotationParameters);
-            //			}
-
-            //todo should we be using the annotation service?
-            AnnotationColumn[] columns = new AnnotationColumn[0];    //ignored
-            annotationWSUtil.downloadAnnotationsInternal(solrQuery, columns, Integer.valueOf(LIMIT),
-                    (filterRequest.getPage() - 1) * filterRequest.getRows(), filterRequest.getRows(), response,
-                    queryToSolrProcess.isSlimmingRequired(), slimTermSet);
-
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
+            return filterRequest;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Unable to map request to filter object", e);
         }
 
+        return new FilterRequestJson();
     }
 
     /**

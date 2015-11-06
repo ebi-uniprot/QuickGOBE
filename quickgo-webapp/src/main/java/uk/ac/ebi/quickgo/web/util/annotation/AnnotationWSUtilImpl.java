@@ -274,7 +274,7 @@ public class AnnotationWSUtilImpl implements AnnotationWSUtil {
         long totalAnnotations = annotationService.getTotalNumberAnnotations(query);
 
         // Check file format
-        StringBuffer sb = null;
+        StringBuffer sb;
         try {
             sb = fileService.generateJsonFileWithPageAndRow(query, totalAnnotations, start, rows, isSlim, slimTermSet);
 
