@@ -48,9 +48,6 @@ public class TermRetrievalImpl implements TermRetrieval, Serializable {
     public GOTerm findById(String id) throws SolrServerException {
         String idFormatted = convertToSolrCompatibleText(id);
         String query = TermField.ID.getValue() + ":" + idFormatted +
-                " OR (" + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.RELATION.getValue() +
-                " AND (" + TermField.CHILD.getValue() + ":" + idFormatted + " OR " + TermField.PARENT.getValue() + ":" +
-                idFormatted + "))" +
                 " OR (" + TermField.TYPE.getValue() + ":" + SolrTerm.SolrTermDocumentType.REPLACE.getValue() + " AND " +
                 TermField.OBSOLETE_ID.getValue() + ":" + idFormatted + ")";
         SolrQuery solrQuery = new SolrQuery().setQuery(query);
