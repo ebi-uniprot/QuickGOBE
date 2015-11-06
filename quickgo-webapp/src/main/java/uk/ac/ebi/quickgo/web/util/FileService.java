@@ -428,22 +428,24 @@ public class FileService {
                 //annotation
                 List<GenericTerm> slimTerms = termSlimmer.map(goAnnotationJson.getGoId());
 
-                for (int i = 0; i < slimTerms.size(); i++) {
-                    GenericTerm genericTerm = slimTerms.get(i);
+                if (slimTerms != null) {
+                    for (int i = 0; i < slimTerms.size(); i++) {
+                        GenericTerm genericTerm = slimTerms.get(i);
 
-                    //Create a json annotation object for each annotation returned in the map
-                    GoAnnotationJson clonedAnnotation = (GoAnnotationJson) goAnnotationJson.copy();
+                        //Create a json annotation object for each annotation returned in the map
+                        GoAnnotationJson clonedAnnotation = (GoAnnotationJson) goAnnotationJson.copy();
 
-                    //Set the termId and name to the slim term requested
-                    clonedAnnotation.setGoId(genericTerm.getId());
-                    clonedAnnotation.setTermName(genericTerm.getName());
+                        //Set the termId and name to the slim term requested
+                        clonedAnnotation.setGoId(genericTerm.getId());
+                        clonedAnnotation.setTermName(genericTerm.getName());
 
-                    //Set the original term id and name to the pre-mapped version
-                    //it should be these values already
-                    clonedAnnotation.setOriginalTermId(goAnnotationJson.getGoId());
-                    clonedAnnotation.setOriginalTermName(goAnnotationJson.getTermName());
+                        //Set the original term id and name to the pre-mapped version
+                        //it should be these values already
+                        clonedAnnotation.setOriginalTermId(goAnnotationJson.getGoId());
+                        clonedAnnotation.setOriginalTermName(goAnnotationJson.getTermName());
 
-                    goAnnotationJsonList.add(clonedAnnotation);
+                        goAnnotationJsonList.add(clonedAnnotation);
+                    }
                 }
 
             } else {
@@ -668,7 +670,8 @@ public class FileService {
 
         // Create ontology graph
         OntologyGraph ontologyGraph = OntologyGraph.makeGraph(termSet,
-                EnumSet.of(RelationType.USEDIN, RelationType.ISA, RelationType.PARTOF, RelationType.REGULATES, /*RelationType.HASPART,*/
+                EnumSet.of(RelationType.USEDIN, RelationType.ISA, RelationType.PARTOF, RelationType.REGULATES,
+                        /*RelationType.HASPART,*/
                         RelationType.OCCURSIN), 0, 0, new GraphPresentation());
         return ontologyGraph.layout();
     }
