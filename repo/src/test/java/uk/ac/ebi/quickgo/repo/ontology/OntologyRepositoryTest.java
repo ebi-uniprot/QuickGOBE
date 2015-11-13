@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.repo.ontology;
 
 import uk.ac.ebi.quickgo.config.AppContext;
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 
 import java.util.Collections;
 import org.junit.After;

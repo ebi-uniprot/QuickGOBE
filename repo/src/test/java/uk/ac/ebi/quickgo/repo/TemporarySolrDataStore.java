@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.repo.ontology;
+package uk.ac.ebi.quickgo.repo;
 
 import java.io.IOException;
 import org.junit.Rule;
