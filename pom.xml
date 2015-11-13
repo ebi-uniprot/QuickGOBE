@@ -22,6 +22,7 @@
         <module>quickgo-solr-indexing</module>
         <module>quickgo-solr-query</module>
         <module>quickgo-webapp</module>
+        <module>repo</module>
     </modules>
 
     <properties>
@@ -43,7 +44,10 @@
         <jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</jacoco.itReportPath>
 
         <!-- dependency version numbers -->
-        <spring.version>4.2.2.RELEASE</spring.version>
+        <!--<spring.framework.version>4.2.2.RELEASE</spring.framework.version>-->
+        <!-- required by spring boot 1.2.7-RELEASE -->
+        <spring.framework.version>4.1.8.RELEASE</spring.framework.version>
+        <spring.boot.starter>1.2.7.RELEASE</spring.boot.starter>
         <slf4j.version>1.7.12</slf4j.version>
         <logback.version>1.1.3</logback.version>
         <jackson.version>2.5.2</jackson.version>
@@ -52,7 +56,7 @@
         <hamcrest.version>1.3</hamcrest.version>
         <jmock.version>2.6.0</jmock.version>
         <mockito-version>1.9.5</mockito-version>
-        <solr.version>4.8.1</solr.version>
+        <solr.version>4.10.1</solr.version>
 
         <!-- plugin version numbers -->
         <compiler.version>3.3</compiler.version>
@@ -75,7 +79,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>${spring.version}</version>
+                <version>${spring.framework.version}</version>
             </dependency>
 
             <dependency>
@@ -87,19 +91,32 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
-                <version>${spring.version}</version>
+                <version>${spring.framework.version}</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
-                <artifactId>solr-solrj</artifactId>
                 <groupId>org.apache.solr</groupId>
+                <artifactId>solr-solrj</artifactId>
                 <version>${solr.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-core</artifactId>
                 <version>${solr.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${spring.boot.starter}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring.boot.starter}</version>
+                <scope>test</scope>
             </dependency>
 
 
@@ -161,6 +178,12 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.starter}</version>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>

@@ -1,0 +1,22 @@
+Reference list:
+
+-----
+Spring's official reference
+http://docs.spring.io/spring-data/solr/docs/1.5.0.RELEASE/reference/html/
+
+-----
+An author of Spring Data Solr's example
+https://github.com/christophstrobl/spring-data-solr-showcase/ (there's an associated YouTube video, but shows no more
+ than this example)
+
+-----
+DZone article
+https://dzone.com/articles/getting-started-spring-data
+
+-----
+Another example, nice to see its tests
+https://github.com/mscharhag/Spring-data-solr-example/blob/master/src/test/java/com/mscharhag/solr/repository/BookRepositoryTests.java
+
+-----
+Relatively old, but quite comprehensive example of getting started
+http://www.petrikainulainen.net/programming/solr/spring-data-solr-tutorial-configuration/
