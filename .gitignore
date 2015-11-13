@@ -1,14 +1,3 @@
-/*.idea
-/*.iml
-quickgo-common-util/*.iml
-quickgo-common-util/target
-quickgo-service/*.iml
-quickgo-service/target/generated-test-sources
-quickgo-solr-common/*.iml
-quickgo-solr-common/target
-quickgo-solr-indexing/*.iml
-quickgo-solr-indexing/target
-quickgo-solr-query/*.iml
-quickgo-solr/*.iml
-quickgo-solr/target
-quickgo-webapp/*.iml
+**/*.idea
+**/*.iml
+*/target
