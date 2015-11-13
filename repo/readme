@@ -20,3 +20,7 @@ https://github.com/mscharhag/Spring-data-solr-example/blob/master/src/test/java/
 -----
 Relatively old, but quite comprehensive example of getting started
 http://www.petrikainulainen.net/programming/solr/spring-data-solr-tutorial-configuration/
+
+-----
+Custom REST message converters:
+http://stackoverflow.com/questions/30757981/rest-custom-http-message-converter-spring-boot-1-2-3

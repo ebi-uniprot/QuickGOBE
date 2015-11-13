@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.repo;
 
 import java.io.IOException;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 
@@ -16,7 +16,7 @@ public class TemporarySolrDataStore extends ExternalResource {
     // the property defining the solr data store, used in solr core's solrconfig.xml files
     private static final String SOLR_DATA_DIR = "solr.data.dir";
 
-    @Rule
+    @ClassRule
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Override

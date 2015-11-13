@@ -39,11 +39,41 @@ import org.apache.solr.client.solrj.beans.Field;
  * @author Edd
  */
 public class OntologyDocument {
-    // Basic information
+    // TODO: modelling multiple types in the same Solr core makes this enum necessary ...
+    public enum Type {
+        TERM("term"),
+        SYNONYM("synonym"),
+        RELATION("relation"),
+        CONSTRAINT("constraint"),
+        HISTORY("history"),
+        XREF("xref"),
+        GUIDELINE("guideline"),
+        REPLACE("replace"),
+        ONTOLOGY("ontology"),
+        ONTOLOGYRELATION("ontologyrelation");
+
+        String value;
+
+        Type(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    // Fields common to all documents
     @Field
-    public String docType;
+    public String docType;      // e.g.,    term    (for GO:0000001)
+    //                                      synonym (for a synonym)
+
+    // --------------------------------------------------------------------------
+    // Terms
     @Field
-    public String id;
+    public String id;           // e.g., 0000001 (for GO:0000001)
+    @Field
+    public String idType;       // e.g., go      (for GO:0000001)
     @Field
     public String name;
     @Field
@@ -55,33 +85,35 @@ public class OntologyDocument {
     @Field
     public String definition;
     @Field("definitionXref")
-    List<String> definitionXref;
+    public List<String> definitionXref;
     @Field
     public String comment;
     @Field("secondaryId")
-    List<String> secondaryIds;
+    public List<String> secondaryIds;
 
     @Field
     public String version;
     @Field
     public String usage;
     @Field("credit")
-    List<String> credits;
+    public List<String> credits;
 
     // Relations
-//    @Field
-//    public String child;
-//    @Field
-//    public String parent;
-//    @Field
-//    public String relationType;
+    //    @Field
+    //    public String child;
+    //    @Field
+    //    public String parent;
+    //    @Field
+    //    public String relationType;
 
+    // --------------------------------------------------------------------------
     // Synonyms
     @Field
     public String synonymName;
     @Field
     public String synonymType;
 
+    // --------------------------------------------------------------------------
     // Taxonomy Constraints
     @Field
     public String taxonConstraintRuleId;
@@ -98,8 +130,9 @@ public class OntologyDocument {
     @Field
     public String taxonConstraintTaxName;
     @Field("pubMedId")
-    List<String> pubMedIds;
+    public List<String> pubMedIds;
 
+    // --------------------------------------------------------------------------
     // Cross References
     @Field
     public String xrefDbCode;
@@ -108,18 +141,21 @@ public class OntologyDocument {
     @Field
     public String xrefName;
 
+    // --------------------------------------------------------------------------
     // Replaces
     @Field
     public String obsoleteId;
     @Field
     public String reason;
 
+    // --------------------------------------------------------------------------
     // Annotation Guidelines
     @Field
     public String annotationGuidelineTitle;
     @Field
     public String annotationGuidelineUrl;
 
+    // --------------------------------------------------------------------------
     // Cross-ontology relations
     @Field
     public String crossOntologyRelation;
@@ -132,6 +168,7 @@ public class OntologyDocument {
     @Field
     public String crossOntologyUrl;
 
+    // --------------------------------------------------------------------------
     // Change log
     @Field
     public String historyName;
@@ -144,7 +181,8 @@ public class OntologyDocument {
     @Field
     public String historyText;
 
+    // --------------------------------------------------------------------------
     // OBO Fields
     @Field("subset")
-    List<String> subsets;
+    public List<String> subsets;
 }

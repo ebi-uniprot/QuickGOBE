@@ -4,20 +4,21 @@ import uk.ac.ebi.quickgo.config.AppContext;
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 
-import java.util.Collections;
-import org.junit.After;
+import java.util.List;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static uk.ac.ebi.quickgo.repo.ontology.OntologyDocumentMocker.Term.createGOTerm;
+import static uk.ac.ebi.quickgo.repo.ontology.OntologyDocumentMocker.createSimpleOntologyDocument;
 
 /**
  * Test that the ontology repository can be accessed as expected.
@@ -35,8 +36,8 @@ public class OntologyRepositoryTest {
     @Autowired
     private OntologyRepository ontologyRepository;
 
-    @After
-    public void after() {
+    @Before
+    public void before() {
         ontologyRepository.deleteAll();
     }
 
@@ -44,56 +45,46 @@ public class OntologyRepositoryTest {
     public void add1DocumentThenFind1Documents() {
         OntologyDocument od = new OntologyDocument();
         od.id = "hello";
+
         ontologyRepository.save(od);
-        int size = 0;
-        for (OntologyDocument doc : ontologyRepository.findAll()) {
-            size++;
-        }
-        assertThat(size, is(1));
-        //        ontologyRepository.findAll().forEach(doc -> System.out.println("[DOC INFO] "+doc.id+", "+doc.name));
+
+        assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(1L));
     }
 
     @Test
     public void add3DocumentsThenFind3Documents() {
-        ontologyRepository.save(createOntologyDocument("A", "Alice Cooper"));
-        ontologyRepository.save(createOntologyDocument("B", "Bob The Builder"));
-        ontologyRepository.save(createOntologyDocument("C", "Clint Eastwood"));
-        int size = 0;
-        for (OntologyDocument od : ontologyRepository.findAll()) {
-            size++;
-        }
-        assertThat(size, is(3));
+        ontologyRepository.save(createSimpleOntologyDocument("A", "Alice Cooper"));
+        ontologyRepository.save(createSimpleOntologyDocument("B", "Bob The Builder"));
+        ontologyRepository.save(createSimpleOntologyDocument("C", "Clint Eastwood"));
+
+        assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(3L));
     }
 
     @Test
-    public void findOneDocByName() {
-        OntologyDocument ontologyDocument = new OntologyDocument();
-        ontologyDocument.id = "1";
-        ontologyDocument.name = "Bill";
-        ontologyRepository.save(ontologyDocument);
-        Page<OntologyDocument> results =
-                ontologyRepository.findByNameIn(Collections.singletonList("Bill"), new PageRequest(0, 1));
-        assertThat(results.getTotalPages(), is(1));
-        assertThat(results.getTotalElements(), is(1L));
+    public void findByDocTypeAndIdTypeAndId() {
+        OntologyDocument goTerm = createGOTerm();
+        goTerm.id = "0000001";
+
+        ontologyRepository.save(goTerm);
+
+        List<OntologyDocument> results =
+                ontologyRepository.findByTermId("term", "go", "0000001", new PageRequest(0, 1));
+
+        assertThat(results.size(), is(1));
+        assertThat(results.get(0).id, is("0000001"));
+        assertThat(results.get(0).idType, is("go"));
     }
 
     @Test
-    public void doNotFindOneDocByWrongName() {
-        OntologyDocument ontologyDocument = new OntologyDocument();
-        ontologyDocument.id = "1";
-        ontologyDocument.name = "Bill";
-        ontologyRepository.save(ontologyDocument);
-        Page<OntologyDocument> results =
-                ontologyRepository.findByNameIn(Collections.singletonList("Bil"), new PageRequest(0, 1));
-        assertThat(results.getTotalPages(), is(0));
-        assertThat(results.getTotalElements(), is(0L));
-    }
+    public void doNotFindByDocTypeAndIdTypeAndId() {
+        OntologyDocument goTerm = createGOTerm();
+        goTerm.id = "0000001";
 
-    private static OntologyDocument createOntologyDocument(String id, String name) {
-        OntologyDocument ontologyDocument = new OntologyDocument();
-        ontologyDocument.id = id;
-        ontologyDocument.name = name;
-        return ontologyDocument;
-    }
+        ontologyRepository.save(goTerm);
 
+        List<OntologyDocument> results =
+                ontologyRepository.findByTermId("term", "go", "0000002", new PageRequest(0, 1));
+
+        assertThat(results.size(), is(0));
+    }
 }

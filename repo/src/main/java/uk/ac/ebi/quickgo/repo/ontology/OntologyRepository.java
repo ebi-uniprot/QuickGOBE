@@ -2,9 +2,9 @@ package uk.ac.ebi.quickgo.repo.ontology;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 
-import java.util.Collection;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.solr.core.query.result.HighlightPage;
+import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
 /**
@@ -15,7 +15,29 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
  */
 public interface OntologyRepository extends SolrCrudRepository<OntologyDocument, String> {
 
-    HighlightPage<OntologyDocument> findByNameIn(Collection<String> name, Pageable pageable);
+    /**
+     * Search by:
+     *      docType:?0 AND idType:?1 AND id:?2
+     * @param docType
+     * @param idType
+     * @param id
+     * @param pageable
+     * @return
+     */
+    @Query("docType:?0 AND idType:?1 AND id:?2")
+    List<OntologyDocument> findByTermId(String docType, String idType, String id, Pageable
+            pageable);
+
+    List<OntologyDocument> findByTextOrScopeOrAspect(String searchableText, String scope, String aspect,
+            Pageable pageable);
+
+    /**
+     * Search by:
+     *      docType:?0 AND idType:?1 AND id:?2 AND subsets:?3
+     * @return
+     */
+    @Query("docType:?0 AND idType:?1 AND id:?2 AND subsets:?3")
+    List<OntologyDocument> findByTermIdAndSubsets();
 
     /**
      * Useful methods would be:
