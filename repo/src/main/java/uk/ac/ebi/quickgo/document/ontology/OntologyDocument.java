@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.document.ontology;
 
+import java.util.Date;
 import java.util.List;
 import org.apache.solr.client.solrj.beans.Field;
 
@@ -38,10 +39,11 @@ import org.apache.solr.client.solrj.beans.Field;
  * @author Edd
  */
 public class OntologyDocument {
-    @Field
-    public String id;
+    // Basic information
     @Field
     public String docType;
+    @Field
+    public String id;
     @Field
     public String name;
     @Field
@@ -53,9 +55,96 @@ public class OntologyDocument {
     @Field
     public String definition;
     @Field("definitionXref")
-    public List<String> definitionXrefs;
+    List<String> definitionXref;
     @Field
     public String comment;
     @Field("secondaryId")
-    public List<String> secondaryIds;
+    List<String> secondaryIds;
+
+    @Field
+    public String version;
+    @Field
+    public String usage;
+    @Field("credit")
+    List<String> credits;
+
+    // Relations
+//    @Field
+//    public String child;
+//    @Field
+//    public String parent;
+//    @Field
+//    public String relationType;
+
+    // Synonyms
+    @Field
+    public String synonymName;
+    @Field
+    public String synonymType;
+
+    // Taxonomy Constraints
+    @Field
+    public String taxonConstraintRuleId;
+    @Field
+    public String taxonConstraintAncestorId;
+    @Field
+    public String taxonConstraintName;
+    @Field
+    public String taxonConstraintRelationship;
+    @Field
+    public String taxonConstraintTaxIdType;
+    @Field
+    public String taxonConstraintTaxId;
+    @Field
+    public String taxonConstraintTaxName;
+    @Field("pubMedId")
+    List<String> pubMedIds;
+
+    // Cross References
+    @Field
+    public String xrefDbCode;
+    @Field
+    public String xrefDbId;
+    @Field
+    public String xrefName;
+
+    // Replaces
+    @Field
+    public String obsoleteId;
+    @Field
+    public String reason;
+
+    // Annotation Guidelines
+    @Field
+    public String annotationGuidelineTitle;
+    @Field
+    public String annotationGuidelineUrl;
+
+    // Cross-ontology relations
+    @Field
+    public String crossOntologyRelation;
+    @Field
+    public String crossOntologyOtherNamespace;
+    @Field
+    public String crossOntologyForeignId;
+    @Field
+    public String crossOntologyForeignTerm;
+    @Field
+    public String crossOntologyUrl;
+
+    // Change log
+    @Field
+    public String historyName;
+    @Field
+    public Date historyTimeStamp;
+    @Field
+    public String historyAction;
+    @Field
+    public String historyCategory;
+    @Field
+    public String historyText;
+
+    // OBO Fields
+    @Field("subset")
+    List<String> subsets;
 }
