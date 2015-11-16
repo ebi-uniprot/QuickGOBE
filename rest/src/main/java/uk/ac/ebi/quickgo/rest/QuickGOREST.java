@@ -7,6 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
+ * Runnable class to start an embedded Jetty server to host the defined RESTful components.
+ *
  * Created 16/11/15
  * @author Edd
  */

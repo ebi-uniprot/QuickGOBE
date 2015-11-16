@@ -34,7 +34,6 @@ public class SolrServerProvider {
 
     @Bean
     public SolrServer solrServer() throws IOException, SAXException, ParserConfigurationException {
-        System.out.println("hello world!");
         return new HttpSolrServer(this.solrProperties.getSolrHost());
     }
 
