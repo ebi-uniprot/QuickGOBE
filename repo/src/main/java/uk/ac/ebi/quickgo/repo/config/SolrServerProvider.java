@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -20,6 +21,7 @@ import org.xml.sax.SAXException;
  * @author Edd
  */
 @Component
+@Profile("prod")
 @EnableSolrRepositories(basePackages = {"uk.ac.ebi.quickgo.repo"}, multicoreSupport = true)
 public class SolrServerProvider {
 
@@ -32,6 +34,7 @@ public class SolrServerProvider {
 
     @Bean
     public SolrServer solrServer() throws IOException, SAXException, ParserConfigurationException {
+        System.out.println("hello world!");
         return new HttpSolrServer(this.solrProperties.getSolrHost());
     }
 

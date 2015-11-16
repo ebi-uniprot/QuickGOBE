@@ -5,6 +5,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.solr.client.solrj.SolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 import org.springframework.data.solr.server.support.EmbeddedSolrServerFactory;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import org.xml.sax.SAXException;
  * @author Edd
  */
 @Component
+@Profile("dev")
 @EnableSolrRepositories(basePackages = {"uk.ac.ebi.quickgo.repo"}, multicoreSupport = true)
 public class EmbeddedSolrServerProvider {
 
