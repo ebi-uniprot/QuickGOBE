@@ -32,7 +32,7 @@ public class EmbeddedSolrServerProvider {
 
     @Bean
     public SolrServer solrServer() throws IOException, SAXException, ParserConfigurationException {
-        EmbeddedSolrServerFactory factory = new EmbeddedSolrServerFactory(solrProperties.getSolrHome());
+        EmbeddedSolrServerFactory factory = new EmbeddedSolrServerFactory(this.solrProperties.getSolrHome());
         return factory.getSolrServer();
     }
 

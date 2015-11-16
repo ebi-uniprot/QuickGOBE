@@ -32,6 +32,9 @@ import org.springframework.util.StringUtils;
 public class OntologyServiceImpl implements OntologyService {
 
     private static final Pattern IGNORED_CHARS_PATTERN = Pattern.compile("\\p{Punct}");
+    private static final String TERM = "term";
+    private static final String GO = "go";
+    private static final String ECO = "eco";
 
     @Autowired
     private OntologyRepository ontologyRepository;
@@ -42,12 +45,12 @@ public class OntologyServiceImpl implements OntologyService {
                 .collect(Collectors.toList());
     }
 
-    @Override public List<OntologyDocument> findByGoId(String searchTerm, Pageable pageable) {
-        if (StringUtils.isEmpty(searchTerm)) {
+    @Override public List<OntologyDocument> findByGoId(String goId, Pageable pageable) {
+        if (StringUtils.isEmpty(goId)) {
             return findAll(pageable);
         }
 
-        return ontologyRepository.findByTermId("term", "go", searchTerm, pageable);
+        return ontologyRepository.findByTermId(TERM, GO, goId, pageable);
     }
 
     @Override public List<OntologyDocument> findByEcoId(String ecoId, Pageable pageable) {
@@ -55,7 +58,7 @@ public class OntologyServiceImpl implements OntologyService {
             return findAll(pageable);
         }
 
-        return ontologyRepository.findByTermId("term", "eco", ecoId, pageable);
+        return ontologyRepository.findByTermId(TERM, ECO, ecoId, pageable);
     }
 
     private Collection<String> splitSearchTermAndRemoveIgnoredCharacters(String searchTerm) {
