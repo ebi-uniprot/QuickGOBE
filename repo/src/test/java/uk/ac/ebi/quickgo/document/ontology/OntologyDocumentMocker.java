@@ -1,6 +1,6 @@
-package uk.ac.ebi.quickgo.repo.ontology;
+package uk.ac.ebi.quickgo.document.ontology;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.repo.ontology.OntologyRepositoryTest;
 
 import java.util.Arrays;
 import java.util.Date;

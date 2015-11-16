@@ -19,6 +19,12 @@ import org.springframework.util.StringUtils;
  * Service to query information from the {@link OntologyRepository}
  * and return OntologyDocuments.
  *
+ * TODO:
+ *  I think it'd be cleaner if the service retrieved Documents from Solr, and converted
+ *  them into domain relevant objects (simple DTOs); which, if annotated correctly (and
+ *  even without annotations!) can be serialized by the REST end into json/xml accordingly.
+ *
+ *
  * Created 11/11/15
  * @author Edd
  */

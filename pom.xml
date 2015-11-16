@@ -23,6 +23,9 @@
         <module>quickgo-solr-query</module>
         <module>quickgo-webapp</module>
         <module>repo</module>
+        <module>rest</module>
+        <module>repo-writer</module>
+        <module>service</module>
     </modules>
 
     <properties>

@@ -18,8 +18,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static uk.ac.ebi.quickgo.repo.ontology.OntologyDocumentMocker.Term.createECOTerm;
-import static uk.ac.ebi.quickgo.repo.ontology.OntologyDocumentMocker.Term.createGOTerm;
+import static uk.ac.ebi.quickgo.document.ontology.OntologyDocumentMocker.Term.createECOTerm;
+import static uk.ac.ebi.quickgo.document.ontology.OntologyDocumentMocker.Term.createGOTerm;
 
 /**
  * Not yet implemented -- concentrating first on the actual repository

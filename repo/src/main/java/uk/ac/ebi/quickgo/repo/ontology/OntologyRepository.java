@@ -28,6 +28,7 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
     List<OntologyDocument> findByTermId(String docType, String idType, String id, Pageable
             pageable);
 
+    @Query("text:?0 AND idType:?1 AND id:?2 AND subsets:?3")
     List<OntologyDocument> findByTextOrScopeOrAspect(String searchableText, String scope, String aspect,
             Pageable pageable);
 

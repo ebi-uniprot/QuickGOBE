@@ -17,8 +17,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static uk.ac.ebi.quickgo.repo.ontology.OntologyDocumentMocker.Term.createGOTerm;
-import static uk.ac.ebi.quickgo.repo.ontology.OntologyDocumentMocker.createSimpleOntologyDocument;
+import static uk.ac.ebi.quickgo.document.ontology.OntologyDocumentMocker.Term.createGOTerm;
+import static uk.ac.ebi.quickgo.document.ontology.OntologyDocumentMocker.createSimpleOntologyDocument;
 
 /**
  * Test that the ontology repository can be accessed as expected.
