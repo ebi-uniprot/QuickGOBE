@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * REST controller for accessing Ontology related information.
  *
+ * For complete list of necessary endpoints, and their behaviour:
+ *  refer to https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=32180537
+ *
  * Created 16/11/15
  * @author Edd
  */
@@ -32,7 +35,7 @@ public class OntologyCtrl {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/go/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/go/term/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<GOTerm> findSingleGOTerm(
             @PathVariable(value = "id") String id) {
 
@@ -58,7 +61,7 @@ public class OntologyCtrl {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/eco/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/eco/term/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ECOTerm> findSingleECOTerm(
             @PathVariable(value = "id") String id) {
 

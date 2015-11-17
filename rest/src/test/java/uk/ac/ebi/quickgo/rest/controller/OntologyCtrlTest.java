@@ -62,7 +62,7 @@ public class OntologyCtrlTest {
         goTerm.name = "apoptosis";
         ontologyRepository.save(goTerm);
 
-        mockMvc.perform(get("/go/0000001"))
+        mockMvc.perform(get("/go/term/0000001"))
                 .andExpect(
                         content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -80,7 +80,7 @@ public class OntologyCtrlTest {
         goTerm.name = "apoptosis";
         ontologyRepository.save(goTerm);
 
-        mockMvc.perform(get("/go/0000002")).andExpect(status().is4xxClientError());
+        mockMvc.perform(get("/go/term/0000002")).andExpect(status().is4xxClientError());
     }
 
 }
