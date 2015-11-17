@@ -22,7 +22,8 @@ import static uk.ac.ebi.quickgo.document.ontology.OntologyDocumentMocker.Term.cr
 import static uk.ac.ebi.quickgo.document.ontology.OntologyDocumentMocker.Term.createGOTerm;
 
 /**
- * Not yet implemented -- concentrating first on the actual repository
+ * Testing the {@link OntologyServiceImpl} class.
+ *
  * Created 11/11/15
  * @author Edd
  */
