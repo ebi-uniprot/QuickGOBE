@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.config;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @Configuration
 @ComponentScan({
-        "uk.ac.ebi.quickgo"
+        "uk.ac.ebi.quickgo.repo"
 })
 @PropertySource("classpath:application.properties")
 public class AppContext {
