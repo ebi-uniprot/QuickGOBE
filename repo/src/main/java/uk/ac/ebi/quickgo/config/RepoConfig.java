@@ -7,8 +7,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
- * A Solr application configuration class, responsible for loading
- * properties from the standard, application.properties file.
+ * Spring configuration for Solr repositories, responsible for scanning
+ * and making accessible components defined in the specified {@link ComponentScan}
+ * packages, and loading properties from the application.properties file.
  *
  * These values are subsequently used by other configuration classes, such as
  * {@link SolrServerProperties}.
@@ -21,7 +22,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
         "uk.ac.ebi.quickgo.repo"
 })
 @PropertySource("classpath:application.properties")
-public class AppContext {
+public class RepoConfig {
 
     /**
      * Ensures that placeholders are replaced with property values

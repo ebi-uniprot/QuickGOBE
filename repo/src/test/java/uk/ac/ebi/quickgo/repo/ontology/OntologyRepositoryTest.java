@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.repo.ontology;
 
-import uk.ac.ebi.quickgo.config.AppContext;
+import uk.ac.ebi.quickgo.config.RepoConfig;
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 
@@ -26,7 +26,7 @@ import static uk.ac.ebi.quickgo.document.ontology.OntologyDocumentMocker.createS
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppContext.class, loader = SpringApplicationContextLoader.class)
+@ContextConfiguration(classes = RepoConfig.class, loader = SpringApplicationContextLoader.class)
 public class OntologyRepositoryTest {
 
     // temporary data store for solr's data, which is automatically cleaned on exit

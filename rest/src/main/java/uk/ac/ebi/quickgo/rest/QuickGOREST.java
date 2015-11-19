@@ -1,9 +1,12 @@
 package uk.ac.ebi.quickgo.rest;
 
+import uk.ac.ebi.quickgo.config.ServiceConfig;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
@@ -13,8 +16,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  * @author Edd
  */
 @SpringBootApplication
+@Import({ServiceConfig.class})
 @ComponentScan({
-        "uk.ac.ebi.quickgo"
+        "uk.ac.ebi.quickgo.rest"
 })
 public class QuickGOREST {
 
