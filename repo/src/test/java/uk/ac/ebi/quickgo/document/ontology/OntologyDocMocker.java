@@ -1,26 +1,54 @@
 package uk.ac.ebi.quickgo.document.ontology;
 
-import uk.ac.ebi.quickgo.repo.ontology.OntologyRepositoryTest;
-
 import java.util.Arrays;
 import java.util.Date;
 
 /**
  * Class to create mocked objects of different {@code docType}s, which are valid according to {@link OntologyDocument}.
  *
- * Used in {@link OntologyRepositoryTest} to add documents to the ontology index, so that it is possible to test
- * the behaviour of searching the index (i.e., testing the effect of the index's schema's field definitions).
- *
  * Created 03/11/15
  * @author Edd
  */
-public class OntologyDocumentMocker {
+public class OntologyDocMocker {
 
-    public static OntologyDocument createSimpleOntologyDocument(String id, String name) {
-        OntologyDocument ontologyDocument = new OntologyDocument();
-        ontologyDocument.id = id;
-        ontologyDocument.name = name;
-        return ontologyDocument;
+    public static OntologyDocument createGODoc(String id, String name) {
+        OntologyDocument od = createOBODoc(id, name);
+        od.ontologyType = OntologyType.GO.name();
+        od.usage = "some usage";
+        od.aspect = Arrays.asList("aspect1", "aspect2");
+
+        return od;
+    }
+
+    public static OntologyDocument createECODoc(String id, String name) {
+        OntologyDocument od = createOBODoc(id, name);
+        od.ontologyType = OntologyType.ECO.name();
+
+        return od;
+    }
+
+    public static OntologyDocument createOBODoc(String id, String name) {
+        OntologyDocument od = new OntologyDocument();
+        od.id = id;
+        od.name = name;
+        od.definition = "The chemical reactions and pathways involving creatine (N-(aminoiminomethyl)" +
+                "-N-methylglycine), a compound synthesized from the amino acids arginine, glycine, and methionine " +
+                "that occurs in muscle.";
+        od.subsets = Arrays.asList("goslim_pombe",
+                "goslim_generic",
+                "goslim_yeast",
+                "goslim_chembl");
+        od.isObsolete = true;
+        od.replacedBy = "GO:0000002";
+        od.considers = Arrays.asList("GO:0000003", "GO:0000004");
+        od.comment = "Note that protein targeting encompasses the transport of the protein to " +
+                "the specified location, and may also include additional steps such as protein processing.";
+        od.children = Arrays.asList("GO:0000011", "GO:0000012");
+        od.synonymNames = Arrays.asList("creatine anabolism", "another synonym");
+        od.synonyms = Arrays.asList("creatine anabolism|exact", "another synonym|inexact");
+        od.secondaryIds = Arrays.asList("GO:0000003", "GO:0000004");
+
+        return od;
     }
 
     public static class Term extends OntologyDocument {
@@ -29,7 +57,7 @@ public class OntologyDocumentMocker {
             OntologyDocument term = new OntologyDocument();
             term.docType = OntologyDocument.Type.TERM.getValue();
             term.id = "0006600";
-            term.idType = "go";
+            term.ontologyType = "go";
             term.name = "creatine metabolic process";
             term.comment = "Note that protein targeting encompasses the transport of the protein to " +
                     "the specified location, and may also include additional steps such as protein processing.";
@@ -49,7 +77,7 @@ public class OntologyDocumentMocker {
             OntologyDocument term = new OntologyDocument();
             term.docType = OntologyDocument.Type.TERM.getValue();
             term.id = "0006600";
-            term.idType = "eco";
+            term.ontologyType = "eco";
             term.name = "creatine metabolic process";
             term.comment = "Note that protein targeting encompasses the transport of the protein to " +
                     "the specified location, and may also include additional steps such as protein processing.";
@@ -66,16 +94,16 @@ public class OntologyDocumentMocker {
         }
     }
 
-    public static class Synonym extends OntologyDocument {
-
-        public static OntologyDocument createSynonym() {
-            OntologyDocument synonym = new OntologyDocument();
-            synonym.docType = OntologyDocument.Type.SYNONYM.getValue();
-            synonym.synonymName = "creatine anabolism";
-            synonym.synonymType = "exact";
-            return synonym;
-        }
-    }
+//    public static class Synonym extends OntologyDocument {
+//
+//        public static OntologyDocument createSynonym() {
+//            OntologyDocument synonym = new OntologyDocument();
+//            synonym.docType = OntologyDocument.Type.SYNONYM.getValue();
+//            synonym.synonymName = "creatine anabolism";
+//            synonym.synonymType = "exact";
+//            return synonym;
+//        }
+//    }
 
     public static class TaxonConstraint extends OntologyDocument {
 

@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.repo.ontology;
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SolrCrudRepository;
@@ -17,27 +18,26 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
 
     /**
      * Search by:
-     *      docType:?0 AND idType:?1 AND id:?2
+     *      docType:?0 AND ontologyType:?1 AND id:?2
      * @param docType
      * @param idType
      * @param id
      * @param pageable
      * @return
      */
-    @Query("docType:?0 AND idType:?1 AND id:?2")
-    List<OntologyDocument> findByTermId(String docType, String idType, String id, Pageable
-            pageable);
+    @Query("ontologyType:?0 AND id:?1")
+    Optional<OntologyDocument> findByTermId(String idType, String id);
 
-    @Query("text:?0 AND idType:?1 AND id:?2 AND subsets:?3")
+    @Query("text:?0 AND ontologyType:?1 AND id:?2 AND subsets:?3")
     List<OntologyDocument> findByTextOrScopeOrAspect(String searchableText, String scope, String aspect,
             Pageable pageable);
 
     /**
      * Search by:
-     *      docType:?0 AND idType:?1 AND id:?2 AND subsets:?3
+     *      docType:?0 AND ontologyType:?1 AND id:?2 AND subsets:?3
      * @return
      */
-    @Query("docType:?0 AND idType:?1 AND id:?2 AND subsets:?3")
+    @Query("docType:?0 AND ontologyType:?1 AND id:?2 AND subsets:?3")
     List<OntologyDocument> findByTermIdAndSubsets();
 
     /**

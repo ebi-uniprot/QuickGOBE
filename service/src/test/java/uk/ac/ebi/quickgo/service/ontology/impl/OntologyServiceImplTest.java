@@ -1,25 +1,28 @@
 package uk.ac.ebi.quickgo.service.ontology.impl;
 
-import uk.ac.ebi.quickgo.config.ServiceConfig;
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.model.ontology.ECOTerm;
+import uk.ac.ebi.quickgo.model.ontology.GOTerm;
+import uk.ac.ebi.quickgo.model.ontology.converter.ECODocConverter;
+import uk.ac.ebi.quickgo.model.ontology.converter.GODocConverter;
 import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.service.ontology.OntologyService;
+import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 
-import java.util.List;
-import org.junit.ClassRule;
+import java.util.Optional;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static uk.ac.ebi.quickgo.document.ontology.OntologyDocumentMocker.Term.createECOTerm;
-import static uk.ac.ebi.quickgo.document.ontology.OntologyDocumentMocker.Term.createGOTerm;
+import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createECODoc;
+import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
 
 /**
  * Testing the {@link OntologyServiceImpl} class.
@@ -27,65 +30,144 @@ import static uk.ac.ebi.quickgo.document.ontology.OntologyDocumentMocker.Term.cr
  * Created 11/11/15
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ServiceConfig.class, loader = SpringApplicationContextLoader.class)
+@RunWith(MockitoJUnitRunner.class)
 public class OntologyServiceImplTest {
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+    private OntologyService<GOTerm> goOntologyService;
+    private OntologyService<ECOTerm> ecoOntologyService;
 
-    @Autowired
-    private OntologyRepository ontologyRepository;
+    @Mock
+    private OntologyRepository repositoryMock;
 
-    @Autowired
-    private OntologyService ontologyService;
+    @Mock
+    private GODocConverter goDocumentConverterMock;
 
-    @Test
-    public void findByGoId() {
-        OntologyDocument goTerm = createGOTerm();
-        goTerm.id = "0000001";
+    @Mock
+    private ECODocConverter ecoDocumentConverterMock;
 
-        ontologyRepository.save(goTerm);
-
-        List<OntologyDocument> results = ontologyService.findByGoId("0000001", new PageRequest(0, 1));
-        assertThat(results.size(), is(1));
-        assertThat(results.get(0).id, is("0000001"));
-        assertThat(results.get(0).idType, is("go"));
+    @Before
+    public void setUp() throws Exception {
+        goOntologyService = new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO);
+        ecoOntologyService = new OntologyServiceImpl<>(repositoryMock, ecoDocumentConverterMock, OntologyType.ECO);
     }
 
     @Test
-    public void doNotfindByWrongGoId() {
-        OntologyDocument goTerm = createGOTerm();
-        goTerm.id = "0000001";
+    public void findsGoTermByIdentifier() throws Exception {
+        String goId = "GO:0000001";
 
-        ontologyRepository.save(goTerm);
+        OntologyDocument doc = createGODoc(goId, "name1");
+        //TODO: create utility class for escape (you decide)
+        when(repositoryMock.findByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(goId))).thenReturn
+                (Optional.of(doc));
 
-        List<OntologyDocument> results = ontologyService.findByGoId("0000002", new PageRequest(0, 1));
-        assertThat(results.size(), is(0));
+        when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(goId));
+
+        Optional<GOTerm> optionalGoTerm = goOntologyService.findByOntologyId(goId);
+        assertThat(optionalGoTerm.isPresent(), is(true));
+
+        GOTerm expectedGoTerm = optionalGoTerm.get();
+        assertThat(expectedGoTerm.id, is(equalTo(goId)));
     }
 
     @Test
-    public void findByEcoId() {
-        OntologyDocument ecoTerm = createECOTerm();
-        ecoTerm.id = "0000001";
+    public void findsEmptyOptionalForMissingGoIdentifier() {
+        String ecoId = "GO:0000001";
 
-        ontologyRepository.save(ecoTerm);
+        //TODO: create utility class for escape (you decide)
+        when(repositoryMock.findByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
+                (Optional.empty());
 
-        List<OntologyDocument> results = ontologyService.findByEcoId("0000001", new PageRequest(0, 1));
-        assertThat(results.size(), is(1));
-        assertThat(results.get(0).id, is("0000001"));
-        assertThat(results.get(0).idType, is("eco"));
+        Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findByOntologyId(ecoId);
+        assertThat(optionalEcoTerm.isPresent(), is(false));
     }
 
     @Test
-    public void doNotfindByWrongEcoId() {
-        OntologyDocument ecoTerm = createECOTerm();
-        ecoTerm.id = "0000001";
+    public void findsEcoTermByIdentifier() {
+        String ecoId = "ECO:0000001";
 
-        ontologyRepository.save(ecoTerm);
+        OntologyDocument doc = createECODoc(ecoId, "name1");
+        //TODO: create utility class for escape (you decide)
+        when(repositoryMock.findByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
+                (Optional.of(doc));
 
-        List<OntologyDocument> results = ontologyService.findByEcoId("0000002", new PageRequest(0, 1));
-        assertThat(results.size(), is(0));
+        when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(ecoId));
+
+        Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findByOntologyId(ecoId);
+        assertThat(optionalEcoTerm.isPresent(), is(true));
+
+        ECOTerm expectedEcoTerm = optionalEcoTerm.get();
+        assertThat(expectedEcoTerm.id, is(equalTo(ecoId)));
     }
+
+    @Test
+    public void findsEmptyOptionalForMissingEcoIdentifier() {
+        String ecoId = "ECO:0000001";
+
+        //TODO: create utility class for escape (you decide)
+        when(repositoryMock.findByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
+                (Optional.empty());
+
+        Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findByOntologyId(ecoId);
+        assertThat(optionalEcoTerm.isPresent(), is(false));
+    }
+
+    private GOTerm createGOTerm(String id) {
+        GOTerm term = new GOTerm();
+        term.id = id;
+        return term;
+    }
+
+    private ECOTerm createECOTerm(String id) {
+        ECOTerm term = new ECOTerm();
+        term.id = id;
+        return term;
+    }
+
+    //    @Test
+//    public void findByOntologyId() {
+//        OntologyDocument goTerm = createGOTerm();
+//        goTerm.id = "0000001";
+//
+//        ontologyRepository.save(goTerm);
+//
+//        List<OntologyDocument> results = ontologyService.findByOntologyId("0000001", new PageRequest(0, 1));
+//        assertThat(results.size(), is(1));
+//        assertThat(results.get(0).id, is("0000001"));
+//        assertThat(results.get(0).ontologyType, is("go"));
+//    }
+//
+//    @Test
+//    public void doNotfindByWrongGoId() {
+//        OntologyDocument goTerm = createGOTerm();
+//        goTerm.id = "0000001";
+//
+//        ontologyRepository.save(goTerm);
+//
+//        List<OntologyDocument> results = ontologyService.findByOntologyId("0000002", new PageRequest(0, 1));
+//        assertThat(results.size(), is(0));
+//    }
+
+//    @Test
+//    public void findByEcoId() {
+//        OntologyDocument ecoTerm = createECOTerm();
+//        ecoTerm.id = "0000001";
+//
+//        ontologyRepository.save(ecoTerm);
+//
+//        List<OntologyDocument> results = ontologyService.findByEcoId("0000001", new PageRequest(0, 1));
+//        assertThat(results.size(), is(1));
+//        assertThat(results.get(0).id, is("0000001"));
+//        assertThat(results.get(0).ontologyType, is("eco"));
+//    }
+//
+//    @Test
+//    public void doNotfindByWrongEcoId() {
+//        OntologyDocument ecoTerm = createECOTerm();
+//        ecoTerm.id = "0000001";
+//
+//        ontologyRepository.save(ecoTerm);
+//
+//        List<OntologyDocument> results = ontologyService.findByEcoId("0000002", new PageRequest(0, 1));
+//        assertThat(results.size(), is(0));
+//    }
 
 }

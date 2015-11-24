@@ -68,33 +68,58 @@ public class OntologyDocument {
     public String docType;      // e.g.,    term    (for GO:0000001)
     //                                      synonym (for a synonym)
 
-    // --------------------------------------------------------------------------
-    // Terms
+    // schema 2.0 -- flattened and cleaned
     @Field
     public String id;           // e.g., 0000001 (for GO:0000001)
     @Field
-    public String idType;       // e.g., go      (for GO:0000001)
+    public String ontologyType;       // e.g., go      (for GO:0000001)
     @Field
     public String name;
-    @Field
-    public String ontology;
-    @Field
-    public String category;
     @Field
     public boolean isObsolete;
     @Field
     public String definition;
-    @Field("definitionXref")
-    public List<String> definitionXref;
     @Field
     public String comment;
     @Field("secondaryId")
     public List<String> secondaryIds;
+    @Field
+    public String usage;
+    // the stored synonym field, which can be reconstructed
+    // e.g., [ "syn1|type1", "syn2|type2" ]
+    @Field
+    public List<String> synonyms;
+    // the indexed synonym names
+    @Field("synonymName")
+    public List<String> synonymNames;
+    @Field("subset")
+    public List<String> subsets;
+    @Field
+    public String replacedBy;
+    @Field("consider")
+    public List<String> considers;
+    @Field
+    public List<String> children;
+    @Field("ancestor")
+    public List<String> ancestors;
+    @Field
+    public List<String> aspect;
+
+
+
+    // --------------------------------------------------------------------------
+    // Terms
+    @Field
+    public String ontology;
+    @Field
+    public String category;
+    @Field("definitionXref")
+    public List<String> definitionXref;
+
 
     @Field
     public String version;
-    @Field
-    public String usage;
+
     @Field("credit")
     public List<String> credits;
 
@@ -108,10 +133,10 @@ public class OntologyDocument {
 
     // --------------------------------------------------------------------------
     // Synonyms
-    @Field
-    public String synonymName;
-    @Field
-    public String synonymType;
+//    @Field
+//    public String synonymName;
+//    @Field
+//    public String synonymType;
 
     // --------------------------------------------------------------------------
     // Taxonomy Constraints
@@ -183,6 +208,5 @@ public class OntologyDocument {
 
     // --------------------------------------------------------------------------
     // OBO Fields
-    @Field("subset")
-    public List<String> subsets;
+
 }
