@@ -50,7 +50,6 @@ public class AbstractOntologyDocConverterTest {
      */
     @Test
     public void converts0FlattenedSynonymsToSynonymsDTO() {
-
         List<String> rawSynonyms = Collections.emptyList();
         List<OBOTerm.Synonym> synonyms = converter.retrieveSynonyms(rawSynonyms);
         assertThat(synonyms.size(), is(0));
@@ -62,7 +61,6 @@ public class AbstractOntologyDocConverterTest {
      */
     @Test
     public void converts1FlattenedSynonymToSynonymsDTO() {
-
         List<String> rawSynonyms = Collections.singletonList("syn name 0|syn type 0");
         List<OBOTerm.Synonym> synonyms = converter.retrieveSynonyms(rawSynonyms);
         assertThat(synonyms.size(), is(1));
@@ -76,7 +74,6 @@ public class AbstractOntologyDocConverterTest {
      */
     @Test
     public void converts2FlattenedSynonymsToSynonymsDTO() {
-
         List<String> rawSynonyms = Arrays.asList("syn name 0|syn type 0", "syn name 1|syn type 1");
         List<OBOTerm.Synonym> synonyms = converter.retrieveSynonyms(rawSynonyms);
         assertThat(synonyms.size(), is(2));

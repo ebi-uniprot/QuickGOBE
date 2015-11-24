@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import static uk.ac.ebi.quickgo.rest.controller.GOOntologyController.PathValidator.isValidGOId;
 
 /**
- * REST controller for accessing Ontology related information.
+ * REST controller for accessing GO related information.
  *
  * For complete list of necessary endpoints, and their behaviour:
- *  refer to https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=32180537
+ *  refer to https://www.ebi.ac.uk/seqdb/confluence/display/GOA/REST+API
  *
  * Created 16/11/15
  * @author Edd
