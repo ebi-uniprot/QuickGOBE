@@ -11,7 +11,7 @@ public class GODocConverter extends AbstractOntologyDocConverter<GOTerm> {
     @Override public GOTerm convert(OntologyDocument ontologyDocument) {
         GOTerm goTerm = new GOTerm();
         addCommonFields(ontologyDocument, goTerm);
-        //goTerm.aspect = ontologyDocument.aspect;
+        goTerm.aspect = ontologyDocument.aspect;
         goTerm.usage = ontologyDocument.usage;
         return goTerm;
     }

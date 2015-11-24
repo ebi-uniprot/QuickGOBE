@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.rest.QuickGOREST;
-import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -26,20 +26,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Tests the {@link GOOntologyController} class using an embedded server.
+ * Tests the {@link ECOOntologyController} class using an embedded server.
  *
- * Created 16/11/15
+ * Created 24/11/15
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {QuickGOREST.class})
 @WebAppConfiguration
-public class GOOntologyControllerTest {
+public class ECOOntologyControllerTest {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
-    private static final String RESOURCE_URL = "/QuickGO/services/go";
+    private static final String RESOURCE_URL = "/QuickGO/services/eco";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -59,23 +59,23 @@ public class GOOntologyControllerTest {
 
     @Test
     public void canRetrieveById() throws Exception {
-        saveTerm("GO:0000001");
+        saveTerm("ECO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/GO:0000001"))
+        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001"))
                 .andDo(print())
                 .andExpect(
                         content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(
-                        jsonPath("$.id").value("GO:0000001")
+                        jsonPath("$.id").value("ECO:0000001")
                 )
                 .andExpect(status().isOk());
     }
 
     @Test
     public void finds404IfIdDoesNotExist() throws Exception {
-        saveTerm("GO:0000001");
+        saveTerm("ECO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/GO:0000002"))
+        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000002"))
                 .andExpect(status().isNotFound());
     }
 
@@ -89,14 +89,14 @@ public class GOOntologyControllerTest {
     public void finds400OnInvalidGOId() throws Exception {
         saveTerm("GO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/GO;0000002"))
+        mockMvc.perform(get(RESOURCE_URL + "/ECO;0000002"))
                 .andExpect(status().isBadRequest());
     }
 
-    private void saveTerm(String goId) {
-        OntologyDocument goTerm = new OntologyDocument();
-        goTerm.id = goId;
-        goTerm.ontologyType = OntologyType.GO.name();
-        ontologyRepository.save(goTerm);
+    private void saveTerm(String ecoId) {
+        OntologyDocument ecoTerm = new OntologyDocument();
+        ecoTerm.id = ecoId;
+        ecoTerm.ontologyType = OntologyType.ECO.name();
+        ontologyRepository.save(ecoTerm);
     }
 }

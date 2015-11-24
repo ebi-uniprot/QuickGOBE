@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
-import uk.ac.ebi.quickgo.model.ontology.GOTerm;
+import uk.ac.ebi.quickgo.model.ontology.ECOTerm;
 import uk.ac.ebi.quickgo.service.ontology.OntologyService;
 
 import java.util.Optional;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static uk.ac.ebi.quickgo.rest.controller.ECOOntologyController.PathValidator.isValidECOId;
 import static uk.ac.ebi.quickgo.rest.controller.GOOntologyController.PathValidator.isValidGOId;
 
 /**
@@ -25,12 +26,12 @@ import static uk.ac.ebi.quickgo.rest.controller.GOOntologyController.PathValidat
  * @author Edd
  */
 @RestController
-public class GOOntologyController {
+public class ECOOntologyController {
 
-    private static final String GO_REQUEST_MAPPING_BASE = "/QuickGO/services/go";
+    private static final String GO_REQUEST_MAPPING_BASE = "/QuickGO/services/eco";
 
     @Autowired
-    private OntologyService<GOTerm> goOntologyService;
+    private OntologyService<ECOTerm> ecoOntologyService;
 
     /**
      * An empty path should result in a bad request
@@ -38,7 +39,7 @@ public class GOOntologyController {
      * @return
      */
     @RequestMapping(value = GO_REQUEST_MAPPING_BASE, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<GOTerm> emptyId() {
+    public ResponseEntity<ECOTerm> emptyId() {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -49,18 +50,18 @@ public class GOOntologyController {
      */
     @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}", produces = {MediaType
             .APPLICATION_JSON_VALUE})
-    public ResponseEntity<GOTerm> findSingleGOTerm(
+    public ResponseEntity<ECOTerm> findSingleGOTerm(
             @PathVariable(value = "id") String id) {
 
-        if (!isValidGOId(id)) {
+        if (!isValidECOId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         // use the service to retrieve what user requested
-        Optional<GOTerm> optionalGODoc = goOntologyService.findByOntologyId(id);
+        Optional<ECOTerm> optionalECODoc = ecoOntologyService.findByOntologyId(id);
 
-        if (optionalGODoc.isPresent()) {
-            return new ResponseEntity<>(optionalGODoc.get(), HttpStatus.OK);
+        if (optionalECODoc.isPresent()) {
+            return new ResponseEntity<>(optionalECODoc.get(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -70,10 +71,10 @@ public class GOOntologyController {
      * Contains validation logic of GO path components
      */
     protected static class PathValidator {
-        static Pattern validGOFormat = Pattern.compile("^GO:[0-9]{7}$");
+        static Pattern validECOFormat = Pattern.compile("^ECO:[0-9]{7}$");
 
-        static boolean isValidGOId(String id) {
-            return validGOFormat.matcher(id).matches();
+        static boolean isValidECOId(String id) {
+            return validECOFormat.matcher(id).matches();
         }
     }
 

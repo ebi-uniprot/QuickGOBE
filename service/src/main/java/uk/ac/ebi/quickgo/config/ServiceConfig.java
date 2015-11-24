@@ -1,6 +1,9 @@
 package uk.ac.ebi.quickgo.config;
 
+import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.model.ontology.ECOTerm;
 import uk.ac.ebi.quickgo.model.ontology.GOTerm;
+import uk.ac.ebi.quickgo.model.ontology.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.model.ontology.converter.GODocConverter;
 import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.service.ontology.OntologyService;
@@ -33,5 +36,14 @@ public class ServiceConfig {
     @Bean
     public GODocConverter goDocumentConverter() {
         return new GODocConverter();
+    }
+
+    @Bean
+    public OntologyService<ECOTerm> ecoOntologyService(OntologyRepository ontologyRepository) {
+        return new OntologyServiceImpl<>(ontologyRepository, ecoDocConverter(), OntologyType.ECO);
+    }
+    @Bean
+    public ECODocConverter ecoDocConverter() {
+        return new ECODocConverter();
     }
 }

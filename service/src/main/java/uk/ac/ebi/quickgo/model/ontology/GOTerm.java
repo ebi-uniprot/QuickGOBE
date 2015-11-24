@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.model.ontology;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
 
 /**
  * GO term DTO used by the service layer.
@@ -11,13 +12,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GOTerm extends OBOTerm {
 
-    public String aspect;
+    public List<String> aspect;
 
     public String usage;
 
     // accessors ----------------------------------------------------------------
 
-    public void setAspect(String aspect) {
+    public void setAspect(List<String> aspect) {
         this.aspect = aspect;
     }
 
