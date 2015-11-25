@@ -33,8 +33,34 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
         term.ancestors = ontologyDocument.ancestors;
         term.secondaryIds = ontologyDocument.secondaryIds;
         term.history = retrieveHistory(ontologyDocument.history);
+        term.xrefs = retrieveXRefs(ontologyDocument.xrefs);
 
         return term;
+    }
+
+    private List<OBOTerm.XRef> retrieveXRefs(List<String> xrefs) {
+        if (xrefs != null) {
+            List<OBOTerm.XRef> oboXrefs = new ArrayList<>();
+            xrefs.stream().forEach(
+                    h -> {
+                        // format: code|id|name
+                        OBOTerm.XRef xref = new OBOTerm.XRef();
+
+                        List<String> fields = newFlatField(h).getFields();
+                        if (fields.size() == 5) {
+                            xref.dbCode = fields.get(0);
+                            xref.dbId = fields.get(1);
+                            xref.name = fields.get(2);
+                            oboXrefs.add(xref);
+                        } else {
+                            LOGGER.warn("Could not parse flattened xref: {}", h);
+                        }
+                    }
+            );
+            return oboXrefs;
+        } else {
+            return null;
+        }
     }
 
     protected List<OBOTerm.History> retrieveHistory(List<String> docHistory) {

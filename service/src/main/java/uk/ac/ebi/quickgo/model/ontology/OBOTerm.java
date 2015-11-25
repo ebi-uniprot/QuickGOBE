@@ -48,6 +48,10 @@ public class OBOTerm {
 
     public List<History> history;
 
+    public List<XRef> xrefs;
+
+    public List<AnnotationGuideLine> annotationGuidelines;
+
     public static class Synonym {
         public String synonymName;
         public String synonymType;
@@ -60,5 +64,16 @@ public class OBOTerm {
         public String action;
         public String category;
         public String text;
+    }
+
+    public static class XRef {
+        public String dbCode;
+        public String dbId;
+        public String name;
+    }
+
+    public static class AnnotationGuideLine {
+        public String title;
+        public String url;
     }
 }
