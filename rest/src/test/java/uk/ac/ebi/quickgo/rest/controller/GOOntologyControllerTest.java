@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
+import uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker;
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.rest.QuickGOREST;
-import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -58,7 +58,7 @@ public class GOOntologyControllerTest {
     }
 
     @Test
-    public void canRetrieveById() throws Exception {
+    public void canRetrieveCoreById() throws Exception {
         saveTerm("GO:0000001");
 
         mockMvc.perform(get(RESOURCE_URL + "/GO:0000001"))
@@ -67,6 +67,43 @@ public class GOOntologyControllerTest {
                         content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(
                         jsonPath("$.id").value("GO:0000001")
+                )
+                .andExpect(
+                        jsonPath("$.history").doesNotExist()
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveCompleteById() throws Exception {
+        saveTerm("GO:0000001");
+
+        mockMvc.perform(get(RESOURCE_URL + "/GO:0000001/complete"))
+                .andDo(print())
+                .andExpect(
+                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.id").value("GO:0000001")
+                )
+                .andExpect(
+                        jsonPath("$.history").isArray()
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveHistoryById() throws Exception {
+        saveTerm("GO:0000001");
+
+        mockMvc.perform(get(RESOURCE_URL + "/GO:0000001/history"))
+                .andDo(print())
+                .andExpect(
+                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.id").value("GO:0000001")
+                )
+                .andExpect(
+                        jsonPath("$.history").isArray()
                 )
                 .andExpect(status().isOk());
     }
@@ -94,9 +131,7 @@ public class GOOntologyControllerTest {
     }
 
     private void saveTerm(String goId) {
-        OntologyDocument goTerm = new OntologyDocument();
-        goTerm.id = goId;
-        goTerm.ontologyType = OntologyType.GO.name();
+        OntologyDocument goTerm = OntologyDocMocker.createGODoc(goId, "go name");
         ontologyRepository.save(goTerm);
     }
 }

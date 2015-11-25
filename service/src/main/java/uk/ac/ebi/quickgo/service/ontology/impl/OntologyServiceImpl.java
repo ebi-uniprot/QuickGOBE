@@ -1,11 +1,11 @@
 package uk.ac.ebi.quickgo.service.ontology.impl;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
 import uk.ac.ebi.quickgo.model.ontology.converter.OntologyDocConverter;
 import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.service.ontology.OntologyService;
-import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,9 +29,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
 
     private String ontologyType;
 
-    public OntologyServiceImpl() {
-
-    }
+    public OntologyServiceImpl() {}
 
     public OntologyServiceImpl(OntologyRepository repository, OntologyDocConverter<T> converter,
             OntologyType type) {
@@ -41,12 +39,24 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         this.converter = converter;
     }
 
-    @Override public Optional<T> findByOntologyId(String id) {
-        Optional<OntologyDocument> document = ontologyRepository.findCompleteByTermId(ontologyType,
-                ClientUtils.escapeQueryChars(id));
+    @Override public Optional<T> findCompleteInfoByOntologyId(String id) {
+        return convertOptionalDoc(ontologyRepository.findCompleteByTermId(ontologyType,
+                ClientUtils.escapeQueryChars(id)));
+    }
 
-        if (document.isPresent()) {
-            return Optional.of(converter.convert(document.get()));
+    @Override public Optional<T> findCoreInfoByOntologyId(String id) {
+        return convertOptionalDoc(ontologyRepository.findCoreByTermId(ontologyType,
+                ClientUtils.escapeQueryChars(id)));
+    }
+
+    @Override public Optional<T> findHistoryInfoByOntologyId(String id) {
+        return convertOptionalDoc(ontologyRepository.findHistoryByTermId(ontologyType,
+                ClientUtils.escapeQueryChars(id)));
+    }
+
+    private Optional<T> convertOptionalDoc(Optional<OntologyDocument> optionalDoc) {
+        if (optionalDoc.isPresent()) {
+            return Optional.of(converter.convert(optionalDoc.get()));
         } else {
             return Optional.empty();
         }

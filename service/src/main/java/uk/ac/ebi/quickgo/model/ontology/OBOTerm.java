@@ -46,9 +46,19 @@ public class OBOTerm {
 
     public List<String> secondaryIds;
 
+    public List<History> history;
+
     public static class Synonym {
         public String synonymName;
         public String synonymType;
 
+    }
+
+    public static class History {
+        public String name;
+        public String timestamp;
+        public String action;
+        public String category;
+        public String text;
     }
 }

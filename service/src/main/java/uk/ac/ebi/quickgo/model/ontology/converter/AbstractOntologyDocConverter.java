@@ -16,8 +16,6 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOntologyDocConverter.class);
 
-    private static final String INTRA_ITEM_FIELD_SEPARATOR= "\\|";
-
     public abstract T convert(OntologyDocument ontologyDocument);
 
     protected T addCommonFields(OntologyDocument ontologyDocument, T term) {
@@ -32,17 +30,42 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
         term.synonyms = retrieveSynonyms(ontologyDocument.synonyms);
         term.ancestors = ontologyDocument.ancestors;
         term.secondaryIds = ontologyDocument.secondaryIds;
+        term.history = retrieveHistory(ontologyDocument.history);
 
         return term;
     }
 
+    protected List<OBOTerm.History> retrieveHistory(List<String> docHistory) {
+        if (docHistory != null) {
+            List<OBOTerm.History> history = new ArrayList<>();
+            docHistory.stream().forEach(
+                    h -> {
+                        // format: name|timestamp|action|category|text
+                        OBOTerm.History historicalInfo = new OBOTerm.History();
+                        String[] parts = h.split(OntologyDocument.INTRA_ITEM_FIELD_REGEX);
+                        historicalInfo.name = parts[0];
+                        historicalInfo.timestamp = parts[1];
+                        historicalInfo.action = parts[2];
+                        historicalInfo.category = parts[3];
+                        historicalInfo.text = parts[4];
+                        history.add(historicalInfo);
+                    }
+            );
+            return history;
+        } else {
+            return null;
+        }
+    }
+
+
     protected List<OBOTerm.Synonym> retrieveSynonyms(List<String> docSynonyms) {
-        List<OBOTerm.Synonym> synonyms = new ArrayList<>();
         if (docSynonyms != null) {
+            List<OBOTerm.Synonym> synonyms = new ArrayList<>();
             docSynonyms.stream().forEach(
                     s -> {
+                        // format: name|type
                         OBOTerm.Synonym synonym = new OBOTerm.Synonym();
-                        String[] parts = s.split(INTRA_ITEM_FIELD_SEPARATOR);
+                        String[] parts = s.split(OntologyDocument.INTRA_ITEM_FIELD_REGEX);
                         if (parts.length == 2) {
                             synonym.synonymName = parts[0].trim();
                             synonym.synonymType = parts[1].trim();
@@ -52,8 +75,10 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         }
                     }
             );
+            return synonyms;
+        } else {
+            return null;
         }
-        return synonyms;
     }
 
 }

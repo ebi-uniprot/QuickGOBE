@@ -61,7 +61,7 @@ public class OntologyServiceImplTest {
 
         when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(goId));
 
-        Optional<GOTerm> optionalGoTerm = goOntologyService.findByOntologyId(goId);
+        Optional<GOTerm> optionalGoTerm = goOntologyService.findCompleteInfoByOntologyId(goId);
         assertThat(optionalGoTerm.isPresent(), is(true));
 
         GOTerm expectedGoTerm = optionalGoTerm.get();
@@ -76,7 +76,7 @@ public class OntologyServiceImplTest {
         when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
                 (Optional.empty());
 
-        Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findByOntologyId(ecoId);
+        Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findCompleteInfoByOntologyId(ecoId);
         assertThat(optionalEcoTerm.isPresent(), is(false));
     }
 
@@ -91,7 +91,7 @@ public class OntologyServiceImplTest {
 
         when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(ecoId));
 
-        Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findByOntologyId(ecoId);
+        Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findCompleteInfoByOntologyId(ecoId);
         assertThat(optionalEcoTerm.isPresent(), is(true));
 
         ECOTerm expectedEcoTerm = optionalEcoTerm.get();
@@ -106,8 +106,80 @@ public class OntologyServiceImplTest {
         when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
                 (Optional.empty());
 
-        Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findByOntologyId(ecoId);
+        Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findCompleteInfoByOntologyId(ecoId);
         assertThat(optionalEcoTerm.isPresent(), is(false));
+    }
+
+    @Test
+    public void findsCoreInfoForEcoIdentifier() {
+        String ecoId = "ECO:0000001";
+
+        OntologyDocument doc = createECODoc(ecoId, "name1");
+
+        //TODO: create utility class for escape (you decide)
+        when(repositoryMock.findCoreByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
+                (Optional.of(doc));
+        when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(ecoId));
+
+        Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findCoreInfoByOntologyId(ecoId);
+        assertThat(optionalEcoTerm.isPresent(), is(true));
+
+        ECOTerm expectedEcoTerm = optionalEcoTerm.get();
+        assertThat(expectedEcoTerm.id, is(equalTo(ecoId)));
+    }
+
+    @Test
+    public void findsCoreInfoForGoIdentifier() {
+        String id = "GO:0000001";
+
+        OntologyDocument doc = createGODoc(id, "name1");
+
+        //TODO: create utility class for escape (you decide)
+        when(repositoryMock.findCoreByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
+                (Optional.of(doc));
+        when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
+
+        Optional<GOTerm> optionalGoTerm = goOntologyService.findCoreInfoByOntologyId(id);
+        assertThat(optionalGoTerm.isPresent(), is(true));
+
+        GOTerm expectedGoTerm = optionalGoTerm.get();
+        assertThat(expectedGoTerm.id, is(equalTo(id)));
+    }
+
+    @Test
+    public void findsHistoryInfoForGoIdentifier() {
+        String id = "GO:0000001";
+
+        OntologyDocument doc = createGODoc(id, "name1");
+
+        //TODO: create utility class for escape (you decide)
+        when(repositoryMock.findHistoryByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
+                (Optional.of(doc));
+        when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
+
+        Optional<GOTerm> optionalGoTerm = goOntologyService.findHistoryInfoByOntologyId(id);
+        assertThat(optionalGoTerm.isPresent(), is(true));
+
+        GOTerm expectedGoTerm = optionalGoTerm.get();
+        assertThat(expectedGoTerm.id, is(equalTo(id)));
+    }
+
+    @Test
+    public void findsHistoryInfoForEcoIdentifier() {
+        String id = "ECO:0000001";
+
+        OntologyDocument doc = createECODoc(id, "name1");
+
+        //TODO: create utility class for escape (you decide)
+        when(repositoryMock.findHistoryByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
+                (Optional.of(doc));
+        when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
+
+        Optional<ECOTerm> optionalTerm = ecoOntologyService.findHistoryInfoByOntologyId(id);
+        assertThat(optionalTerm.isPresent(), is(true));
+
+        ECOTerm expectedTerm = optionalTerm.get();
+        assertThat(expectedTerm.id, is(equalTo(id)));
     }
 
     private GOTerm createGOTerm(String id) {
@@ -123,13 +195,13 @@ public class OntologyServiceImplTest {
     }
 
     //    @Test
-//    public void findByOntologyId() {
+//    public void findCompleteInfoByOntologyId() {
 //        OntologyDocument goTerm = createGOTerm();
 //        goTerm.id = "0000001";
 //
 //        ontologyRepository.save(goTerm);
 //
-//        List<OntologyDocument> results = ontologyService.findByOntologyId("0000001", new PageRequest(0, 1));
+//        List<OntologyDocument> results = ontologyService.findCompleteInfoByOntologyId("0000001", new PageRequest(0, 1));
 //        assertThat(results.size(), is(1));
 //        assertThat(results.get(0).id, is("0000001"));
 //        assertThat(results.get(0).ontologyType, is("go"));
@@ -142,7 +214,7 @@ public class OntologyServiceImplTest {
 //
 //        ontologyRepository.save(goTerm);
 //
-//        List<OntologyDocument> results = ontologyService.findByOntologyId("0000002", new PageRequest(0, 1));
+//        List<OntologyDocument> results = ontologyService.findCompleteInfoByOntologyId("0000002", new PageRequest(0, 1));
 //        assertThat(results.size(), is(0));
 //    }
 

@@ -72,6 +72,7 @@ public class OntologyRepositoryTest {
         OntologyDocument ontologyDocument = optionalDoc.get();
         assertThat(ontologyDocument.name, is(notNullValue()));
         assertThat(ontologyDocument.considers, is(nullValue())); // not a core field
+        assertThat(ontologyDocument.history, is(nullValue())); // not a core field
     }
 
     @Test
@@ -93,5 +94,14 @@ public class OntologyRepositoryTest {
 
         assertThat(ontologyRepository.findCoreByTermId(OntologyType.GO.name(), "B").isPresent(), is(false));
         assertThat(ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), "B").isPresent(), is(false));
+    }
+
+    @Test
+    public void add1GoDocumentAndFindItById() {
+        ontologyRepository.save(createGODoc("A", "Alice Cooper"));
+
+        assertThat(ontologyRepository.findCoreByTermId(OntologyType.GO.name(), "A").isPresent(), is(true));
+        assertThat(ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), "A").isPresent(), is(true));
+        assertThat(ontologyRepository.findHistoryByTermId(OntologyType.GO.name(), "A").isPresent(), is(true));
     }
 }

@@ -32,12 +32,28 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
     public static final String CHILDREN = "children";
     public static final String ANCESTOR = "ancestor";
     public static final String SYNONYMS = "synonyms";
+    public static final String HISTORY = "history";
 
+    // complete
     @Query("ontologyType:?0 AND id:?1")
     Optional<OntologyDocument> findCompleteByTermId(String idType, String id);
 
-    @Query(value = "ontologyType:?0 AND id:?1", fields = {ID, NAME, IS_OBSOLETE, COMMENT, ASPECT, USAGE, SYNONYMS, DEFINITION})
+    // core
+    @Query(value = "ontologyType:?0 AND id:?1",
+            fields = {ID, NAME, IS_OBSOLETE, COMMENT, ASPECT, ANCESTOR,
+                    USAGE, SYNONYMS, DEFINITION})
     Optional<OntologyDocument> findCoreByTermId(String idType, String id);
+
+    // history
+    @Query(value = "ontologyType:?0 AND id:?1",
+            fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, HISTORY})
+    Optional<OntologyDocument> findHistoryByTermId(String idType, String id);
+
+    // cross-references
+
+    // annotation guidelines
+
+
 
     /**
      * Useful methods would be:

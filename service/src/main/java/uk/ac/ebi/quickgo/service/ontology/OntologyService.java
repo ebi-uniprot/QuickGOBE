@@ -17,7 +17,7 @@ import org.springframework.data.domain.Pageable;
  */
 public interface OntologyService<T> {
     // default page size if required by a query
-    int DEFAULT_PAGE_SIZE = 2;
+    int DEFAULT_PAGE_SIZE = 10;
 
     /**
      * Search over everything and return a list, which fulfils
@@ -34,7 +34,18 @@ public interface OntologyService<T> {
      * @param pageable
      * @return
      */
-    Optional<T> findByOntologyId(String id);
+    Optional<T> findCompleteInfoByOntologyId(String id);
+
+    /**
+     * Search by a given GO id and return a list, which fulfils
+     * the requested page of results.
+     * @param id
+     * @param pageable
+     * @return
+     */
+    Optional<T> findCoreInfoByOntologyId(String id);
+
+    Optional<T> findHistoryInfoByOntologyId(String id);
 
     /**
      * Search by a given ECO id and return a list, which fulfils

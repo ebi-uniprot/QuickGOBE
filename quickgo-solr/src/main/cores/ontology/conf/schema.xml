@@ -83,6 +83,8 @@
     <field name="synonyms" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="synonymName" type="string" indexed="true" stored="false" multiValued="true"/>
 
+    <field name="history" type="string" indexed="false" stored="true" multiValued="true"/>
+
     <!--                     End of QuickGO Ontology fields                         -->
     <!-- ========================================================================== -->
 

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static uk.ac.ebi.quickgo.rest.controller.ECOOntologyController.PathValidator.isValidECOId;
-import static uk.ac.ebi.quickgo.rest.controller.GOOntologyController.PathValidator.isValidGOId;
 
 /**
  * REST controller for accessing ECO related information.
@@ -50,16 +49,51 @@ public class ECOOntologyController {
      */
     @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}", produces = {MediaType
             .APPLICATION_JSON_VALUE})
-    public ResponseEntity<ECOTerm> findSingleGOTerm(
-            @PathVariable(value = "id") String id) {
+    public ResponseEntity<ECOTerm> findCoreGOTerm(@PathVariable(value = "id") String id) {
 
         if (!isValidECOId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         // use the service to retrieve what user requested
-        Optional<ECOTerm> optionalECODoc = ecoOntologyService.findByOntologyId(id);
+        return getEcoTermResponse(ecoOntologyService.findCoreInfoByOntologyId(id));
+    }
 
+    /**
+     * Get a GO term based on its id
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}/complete", produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<ECOTerm> findCompleteGOTerm(@PathVariable(value = "id") String id) {
+
+        if (!isValidECOId(id)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // use the service to retrieve what user requested
+        return getEcoTermResponse(ecoOntologyService.findCompleteInfoByOntologyId(id));
+    }
+
+    /**
+     * Get a GO term based on its id
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}/history", produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<ECOTerm> findGOTermHistory(@PathVariable(value = "id") String id) {
+
+        if (!isValidECOId(id)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // use the service to retrieve what user requested
+        return getEcoTermResponse(ecoOntologyService.findHistoryInfoByOntologyId(id));
+    }
+
+    private ResponseEntity<ECOTerm> getEcoTermResponse(Optional<ECOTerm> optionalECODoc) {
         if (optionalECODoc.isPresent()) {
             return new ResponseEntity<>(optionalECODoc.get(), HttpStatus.OK);
         } else {
@@ -71,7 +105,7 @@ public class ECOOntologyController {
      * Contains validation logic of GO path components
      */
     protected static class PathValidator {
-        static Pattern validECOFormat = Pattern.compile("^ECO:[0-9]{7}$");
+        final static Pattern validECOFormat = Pattern.compile("^ECO:[0-9]{7}$");
 
         static boolean isValidECOId(String id) {
             return validECOFormat.matcher(id).matches();

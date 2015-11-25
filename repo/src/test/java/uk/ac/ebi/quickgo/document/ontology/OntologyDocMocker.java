@@ -45,8 +45,18 @@ public class OntologyDocMocker {
                 "the specified location, and may also include additional steps such as protein processing.";
         od.children = Arrays.asList("GO:0000011", "GO:0000012");
         od.synonymNames = Arrays.asList("creatine anabolism", "another synonym");
-        od.synonyms = Arrays.asList("creatine anabolism|exact", "another synonym|inexact");
         od.secondaryIds = Arrays.asList("GO:0000003", "GO:0000004");
+
+        // nested, stored fields, which require reconstructing
+        od.synonyms = Arrays.asList("creatine anabolism" + OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR + "exact",
+                "another synonym" + OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR + "inexact");
+        od.history = Arrays.asList(
+                "Gonna do something like it's ... "+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"11:59, 31 Dec, " +
+                        "1999"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"PARTY!"+ OntologyDocument
+                        .INTRA_ITEM_FIELD_SEPARATOR +"Must be done"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"Textual description",
+                "Gonna do something like it's ... "+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"11:59, 31 Dec, " +
+                        "2001"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"SPACE ODYSSEY!"+ OntologyDocument
+                        .INTRA_ITEM_FIELD_SEPARATOR +"Must be done"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"Neeeooor");
 
         return od;
     }
@@ -94,16 +104,16 @@ public class OntologyDocMocker {
         }
     }
 
-//    public static class Synonym extends OntologyDocument {
-//
-//        public static OntologyDocument createSynonym() {
-//            OntologyDocument synonym = new OntologyDocument();
-//            synonym.docType = OntologyDocument.Type.SYNONYM.getValue();
-//            synonym.synonymName = "creatine anabolism";
-//            synonym.synonymType = "exact";
-//            return synonym;
-//        }
-//    }
+    //    public static class Synonym extends OntologyDocument {
+    //
+    //        public static OntologyDocument createSynonym() {
+    //            OntologyDocument synonym = new OntologyDocument();
+    //            synonym.docType = OntologyDocument.Type.SYNONYM.getValue();
+    //            synonym.synonymName = "creatine anabolism";
+    //            synonym.synonymType = "exact";
+    //            return synonym;
+    //        }
+    //    }
 
     public static class TaxonConstraint extends OntologyDocument {
 

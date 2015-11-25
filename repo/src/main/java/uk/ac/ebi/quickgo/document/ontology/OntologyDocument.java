@@ -39,6 +39,9 @@ import org.apache.solr.client.solrj.beans.Field;
  * @author Edd
  */
 public class OntologyDocument {
+    public static final String INTRA_ITEM_FIELD_SEPARATOR= "|";
+    public static final String INTRA_ITEM_FIELD_REGEX= "\\|";
+
     // TODO: modelling multiple types in the same Solr core makes this enum necessary ...
     public enum Type {
         TERM("term"),
@@ -104,6 +107,8 @@ public class OntologyDocument {
     public List<String> ancestors;
     @Field
     public List<String> aspect;
+    @Field
+    public List<String> history;
 
 
 

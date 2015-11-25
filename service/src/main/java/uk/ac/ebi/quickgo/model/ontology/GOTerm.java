@@ -11,18 +11,6 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GOTerm extends OBOTerm {
-
     public List<String> aspect;
-
     public String usage;
-
-    // accessors ----------------------------------------------------------------
-
-    public void setAspect(List<String> aspect) {
-        this.aspect = aspect;
-    }
-
-    public void setUsage(String usage) {
-        this.usage = usage;
-    }
 }

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
+import uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker;
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.rest.QuickGOREST;
@@ -58,7 +58,7 @@ public class ECOOntologyControllerTest {
     }
 
     @Test
-    public void canRetrieveById() throws Exception {
+    public void canRetrieveCoreById() throws Exception {
         saveTerm("ECO:0000001");
 
         mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001"))
@@ -67,6 +67,43 @@ public class ECOOntologyControllerTest {
                         content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(
                         jsonPath("$.id").value("ECO:0000001")
+                )
+                .andExpect(
+                        jsonPath("$.history").doesNotExist()
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveCompleteById() throws Exception {
+        saveTerm("ECO:0000001");
+
+        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/complete"))
+                .andDo(print())
+                .andExpect(
+                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.id").value("ECO:0000001")
+                )
+                .andExpect(
+                        jsonPath("$.history").isArray()
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveHistoryById() throws Exception {
+        saveTerm("ECO:0000001");
+
+        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/history"))
+                .andDo(print())
+                .andExpect(
+                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.id").value("ECO:0000001")
+                )
+                .andExpect(
+                        jsonPath("$.history").isArray()
                 )
                 .andExpect(status().isOk());
     }
@@ -94,9 +131,7 @@ public class ECOOntologyControllerTest {
     }
 
     private void saveTerm(String ecoId) {
-        OntologyDocument ecoTerm = new OntologyDocument();
-        ecoTerm.id = ecoId;
-        ecoTerm.ontologyType = OntologyType.ECO.name();
+        OntologyDocument ecoTerm = OntologyDocMocker.createECODoc(ecoId, "eco doc name");;
         ontologyRepository.save(ecoTerm);
     }
 }

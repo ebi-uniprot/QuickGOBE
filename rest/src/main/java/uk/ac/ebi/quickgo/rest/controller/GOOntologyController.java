@@ -49,16 +49,51 @@ public class GOOntologyController {
      */
     @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}", produces = {MediaType
             .APPLICATION_JSON_VALUE})
-    public ResponseEntity<GOTerm> findSingleGOTerm(
-            @PathVariable(value = "id") String id) {
+    public ResponseEntity<GOTerm> findCoreGOTerm(@PathVariable(value = "id") String id) {
 
         if (!isValidGOId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         // use the service to retrieve what user requested
-        Optional<GOTerm> optionalGODoc = goOntologyService.findByOntologyId(id);
+        return getGoTermResponse(goOntologyService.findCoreInfoByOntologyId(id));
+    }
 
+    /**
+     * Get a GO term based on its id
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}/complete", produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<GOTerm> findCompleteGOTerm(@PathVariable(value = "id") String id) {
+
+        if (!isValidGOId(id)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // use the service to retrieve what user requested
+        return getGoTermResponse(goOntologyService.findCompleteInfoByOntologyId(id));
+    }
+
+    /**
+     * Get a GO term based on its id
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}/history", produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<GOTerm> findHistoryGOTerm(@PathVariable(value = "id") String id) {
+
+        if (!isValidGOId(id)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // use the service to retrieve what user requested
+        return getGoTermResponse(goOntologyService.findHistoryInfoByOntologyId(id));
+    }
+
+    private ResponseEntity<GOTerm> getGoTermResponse(Optional<GOTerm> optionalGODoc) {
         if (optionalGODoc.isPresent()) {
             return new ResponseEntity<>(optionalGODoc.get(), HttpStatus.OK);
         } else {
@@ -70,7 +105,7 @@ public class GOOntologyController {
      * Contains validation logic of GO path components
      */
     protected static class PathValidator {
-        static Pattern validGOFormat = Pattern.compile("^GO:[0-9]{7}$");
+        final static Pattern validGOFormat = Pattern.compile("^GO:[0-9]{7}$");
 
         static boolean isValidGOId(String id) {
             return validGOFormat.matcher(id).matches();

@@ -122,4 +122,19 @@ public class AbstractOntologyDocConverterTest {
         assertThat(term.name, is(nullValue()));
     }
 
+    @Test
+    public void convertsHistory() {
+        List<String> rawHistory = Arrays.asList(
+                "Gonna do something like it's ... "+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"11:59, 31 Dec, " +
+                        "1999"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"PARTY!"+ OntologyDocument
+                        .INTRA_ITEM_FIELD_SEPARATOR +"Must be done"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"Textual description",
+                "Gonna do something like it's ... "+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"11:59, 31 Dec, " +
+                        "2001"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"SPACE ODYSSEY!"+ OntologyDocument
+                        .INTRA_ITEM_FIELD_SEPARATOR +"Must be done"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"Neeeooor");
+        List<OBOTerm.History> history = converter.retrieveHistory(rawHistory);
+        assertThat(history.size(), is(2));
+        assertThat(history.get(0).name, is("Gonna do something like it's ... "));
+        assertThat(history.get(1).text, is("Neeeooor"));
+    }
+
 }
