@@ -56,7 +56,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createGODoc(goId, "name1");
         //TODO: create utility class for escape (you decide)
-        when(repositoryMock.findByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(goId))).thenReturn
+        when(repositoryMock.findCompleteByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(goId))).thenReturn
                 (Optional.of(doc));
 
         when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(goId));
@@ -73,7 +73,7 @@ public class OntologyServiceImplTest {
         String ecoId = "GO:0000001";
 
         //TODO: create utility class for escape (you decide)
-        when(repositoryMock.findByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
+        when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
                 (Optional.empty());
 
         Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findByOntologyId(ecoId);
@@ -86,7 +86,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createECODoc(ecoId, "name1");
         //TODO: create utility class for escape (you decide)
-        when(repositoryMock.findByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
+        when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
                 (Optional.of(doc));
 
         when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(ecoId));
@@ -103,7 +103,7 @@ public class OntologyServiceImplTest {
         String ecoId = "ECO:0000001";
 
         //TODO: create utility class for escape (you decide)
-        when(repositoryMock.findByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
+        when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
                 (Optional.empty());
 
         Optional<ECOTerm> optionalEcoTerm = ecoOntologyService.findByOntologyId(ecoId);

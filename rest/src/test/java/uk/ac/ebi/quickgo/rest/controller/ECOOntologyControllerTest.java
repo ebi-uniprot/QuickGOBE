@@ -87,7 +87,7 @@ public class ECOOntologyControllerTest {
 
     @Test
     public void finds400OnInvalidGOId() throws Exception {
-        saveTerm("GO:0000001");
+        saveTerm("ECO:0000001");
 
         mockMvc.perform(get(RESOURCE_URL + "/ECO;0000002"))
                 .andExpect(status().isBadRequest());

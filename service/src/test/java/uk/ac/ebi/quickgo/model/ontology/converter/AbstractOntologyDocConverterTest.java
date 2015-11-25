@@ -11,8 +11,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.nullValue;
 
 /**
  * Created 24/11/15
@@ -102,6 +104,22 @@ public class AbstractOntologyDocConverterTest {
         assertThat(oboTerm.isObsolete, is(goOntologyDoc.isObsolete));
         assertThat(oboTerm.subsets, is(goOntologyDoc.subsets));
         assertThat(oboTerm.synonyms.size(), is(equalTo(2)));
+    }
+
+    /**
+     * Check that a partially populated document can be successfully converted in
+     * to a corresponding OBOTerm
+     */
+    @Test
+    public void documentWithNullFieldsCanBeConverted() {
+        OntologyDocument doc = new OntologyDocument();
+        doc.id = "id field";
+        doc.ancestors = Arrays.asList("ancestor 0", "ancestor 1");
+        OBOTerm term = new OBOTerm();
+        converter.addCommonFields(doc, term);
+        assertThat(term.id, is("id field"));
+        assertThat(term.ancestors, containsInAnyOrder("ancestor 0", "ancestor 1"));
+        assertThat(term.name, is(nullValue()));
     }
 
 }

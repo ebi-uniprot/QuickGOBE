@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements OntologyDocConverter<T> {
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOntologyDocConverter.class);
+
     private static final String INTRA_ITEM_FIELD_SEPARATOR= "\\|";
 
     public abstract T convert(OntologyDocument ontologyDocument);

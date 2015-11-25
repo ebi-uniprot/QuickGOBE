@@ -42,7 +42,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override public Optional<T> findByOntologyId(String id) {
-        Optional<OntologyDocument> document = ontologyRepository.findByTermId(ontologyType,
+        Optional<OntologyDocument> document = ontologyRepository.findCompleteByTermId(ontologyType,
                 ClientUtils.escapeQueryChars(id));
 
         if (document.isPresent()) {

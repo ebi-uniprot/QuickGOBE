@@ -1,8 +1,12 @@
 package uk.ac.ebi.quickgo.repo.ontology;
 
 import uk.ac.ebi.quickgo.config.RepoConfig;
+import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 
+import java.util.Optional;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -14,7 +18,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
 
 /**
@@ -55,6 +61,37 @@ public class OntologyRepositoryTest {
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(3L));
     }
 
-    // test cannot find document behaviour
+    @Test
+    public void retrievesCoreFieldsOnly() {
+        String id = "GO:0000001";
+        ontologyRepository.save(createGODoc(id, "GO name 1"));
 
+        Optional<OntologyDocument> optionalDoc =
+                ontologyRepository.findCoreByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
+        assertThat(optionalDoc.isPresent(), is(true));
+        OntologyDocument ontologyDocument = optionalDoc.get();
+        assertThat(ontologyDocument.name, is(notNullValue()));
+        assertThat(ontologyDocument.considers, is(nullValue())); // not a core field
+    }
+
+    @Test
+    public void retrievesAllFields() {
+        String id = "GO:0000001";
+        ontologyRepository.save(createGODoc(id, "GO name 1"));
+
+        Optional<OntologyDocument> optionalDoc =
+                ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
+        assertThat(optionalDoc.isPresent(), is(true));
+        OntologyDocument ontologyDocument = optionalDoc.get();
+        assertThat(ontologyDocument.name, is(notNullValue()));
+        assertThat(ontologyDocument.considers, is(notNullValue()));
+    }
+
+    @Test
+    public void add1DocumentAndFailToFindForWrongId() {
+        ontologyRepository.save(createGODoc("A", "Alice Cooper"));
+
+        assertThat(ontologyRepository.findCoreByTermId(OntologyType.GO.name(), "B").isPresent(), is(false));
+        assertThat(ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), "B").isPresent(), is(false));
+    }
 }
