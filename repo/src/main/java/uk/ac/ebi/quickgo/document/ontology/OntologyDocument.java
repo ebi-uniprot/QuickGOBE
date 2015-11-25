@@ -109,8 +109,10 @@ public class OntologyDocument {
     public List<String> aspect;
     @Field
     public List<String> history;
-
-
+    @Field("xref")
+    public List<String> xrefs;
+    @Field("annotationGuideline")
+    public List<String> annotationGuidelines;
 
     // --------------------------------------------------------------------------
     // Terms

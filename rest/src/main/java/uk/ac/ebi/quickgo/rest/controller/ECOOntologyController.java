@@ -27,7 +27,7 @@ import static uk.ac.ebi.quickgo.rest.controller.ECOOntologyController.PathValida
 @RestController
 public class ECOOntologyController {
 
-    private static final String GO_REQUEST_MAPPING_BASE = "/QuickGO/services/eco";
+    private static final String ECO_REQUEST_MAPPING_BASE = "/QuickGO/services/eco";
 
     @Autowired
     private OntologyService<ECOTerm> ecoOntologyService;
@@ -37,7 +37,7 @@ public class ECOOntologyController {
      * @param id
      * @return
      */
-    @RequestMapping(value = GO_REQUEST_MAPPING_BASE, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = ECO_REQUEST_MAPPING_BASE, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ECOTerm> emptyId() {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -47,7 +47,7 @@ public class ECOOntologyController {
      * @param id
      * @return
      */
-    @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}", produces = {MediaType
+    @RequestMapping(value = ECO_REQUEST_MAPPING_BASE + "/{id}", produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<ECOTerm> findCoreGOTerm(@PathVariable(value = "id") String id) {
 
@@ -64,7 +64,7 @@ public class ECOOntologyController {
      * @param id
      * @return
      */
-    @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}/complete", produces = {MediaType
+    @RequestMapping(value = ECO_REQUEST_MAPPING_BASE + "/{id}/complete", produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<ECOTerm> findCompleteGOTerm(@PathVariable(value = "id") String id) {
 
@@ -81,7 +81,7 @@ public class ECOOntologyController {
      * @param id
      * @return
      */
-    @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}/history", produces = {MediaType
+    @RequestMapping(value = ECO_REQUEST_MAPPING_BASE + "/{id}/history", produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<ECOTerm> findGOTermHistory(@PathVariable(value = "id") String id) {
 

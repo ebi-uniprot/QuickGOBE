@@ -22,7 +22,7 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
     public static final String NAME = "name";
     public static final String SECONDARY_ID = "secondaryId";
     public static final String IS_OBSOLETE = "obsolete";
-    public static final String CONSIDER = "CONSIDER";
+    public static final String CONSIDER = "consider";
     public static final String REPLACED_BY = "replacedBy";
     public static final String DEFINITION = "definition";
     public static final String COMMENT = "comment";
@@ -33,6 +33,8 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
     public static final String ANCESTOR = "ancestor";
     public static final String SYNONYMS = "synonyms";
     public static final String HISTORY = "history";
+    public static final String XREF = "";
+    public static final String ANNOTATION_GUIDELINE = "";
 
     // complete
     @Query("ontologyType:?0 AND id:?1")
@@ -50,8 +52,15 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
     Optional<OntologyDocument> findHistoryByTermId(String idType, String id);
 
     // cross-references
+    @Query(value = "ontologyType:?0 AND id:?1",
+            fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, XREF})
+    Optional<OntologyDocument> findXRefsByTermId(String idType, String id);
 
     // annotation guidelines
+    @Query(value = "ontologyType:?0 AND id:?1",
+            fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, ANNOTATION_GUIDELINE})
+    Optional<OntologyDocument> findAnnotationGuidelinesByTermId(String idType, String id);
+
 
 
 

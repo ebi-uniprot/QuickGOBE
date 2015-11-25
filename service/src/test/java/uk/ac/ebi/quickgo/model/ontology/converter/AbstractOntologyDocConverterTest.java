@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker;
 import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +16,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
 
 /**
  * Created 24/11/15
@@ -36,7 +38,8 @@ public class AbstractOntologyDocConverterTest {
     }
 
     /**
-     * Check the flatted document synonyms are converted correctly to a {@link uk.ac.ebi.quickgo.model.ontology.OBOTerm.Synonym}
+     * Check the flatted document synonyms are converted correctly to a
+     * {@link uk.ac.ebi.quickgo.model.ontology.OBOTerm.Synonym}
      * DTO.
      */
     @Test
@@ -47,7 +50,8 @@ public class AbstractOntologyDocConverterTest {
     }
 
     /**
-     * Check the flatted document synonyms are converted correctly to a {@link uk.ac.ebi.quickgo.model.ontology.OBOTerm.Synonym}
+     * Check the flatted document synonyms are converted correctly to a
+     * {@link uk.ac.ebi.quickgo.model.ontology.OBOTerm.Synonym}
      * DTO.
      */
     @Test
@@ -58,12 +62,16 @@ public class AbstractOntologyDocConverterTest {
     }
 
     /**
-     * Check the flatted document synonyms are converted correctly to a {@link uk.ac.ebi.quickgo.model.ontology.OBOTerm.Synonym}
+     * Check the flatted document synonyms are converted correctly to a
+     * {@link uk.ac.ebi.quickgo.model.ontology.OBOTerm.Synonym}
      * DTO.
      */
     @Test
     public void converts1FlattenedSynonymToSynonymsDTO() {
-        List<String> rawSynonyms = Collections.singletonList("syn name 0|syn type 0");
+        List<String> rawSynonyms = Collections.singletonList(newFlatField()
+                .addField("syn name 0")
+                .addField("syn type 0")
+                .buildString());
         List<OBOTerm.Synonym> synonyms = converter.retrieveSynonyms(rawSynonyms);
         assertThat(synonyms.size(), is(1));
         assertThat(synonyms.get(0).synonymName, is(equalTo("syn name 0")));
@@ -71,12 +79,22 @@ public class AbstractOntologyDocConverterTest {
     }
 
     /**
-     * Check the flatted document synonyms are converted correctly to a {@link uk.ac.ebi.quickgo.model.ontology.OBOTerm.Synonym}
+     * Check the flatted document synonyms are converted correctly to a
+     * {@link uk.ac.ebi.quickgo.model.ontology.OBOTerm.Synonym}
      * DTO.
      */
     @Test
     public void converts2FlattenedSynonymsToSynonymsDTO() {
-        List<String> rawSynonyms = Arrays.asList("syn name 0|syn type 0", "syn name 1|syn type 1");
+        List<String> rawSynonyms = Arrays.asList(
+                newFlatField()
+                        .addField("syn name 0")
+                        .addField("syn type 0")
+                        .buildString(),
+                newFlatField()
+                        .addField("syn name 1")
+                        .addField("syn type 1")
+                        .buildString()
+                );
         List<OBOTerm.Synonym> synonyms = converter.retrieveSynonyms(rawSynonyms);
         assertThat(synonyms.size(), is(2));
         assertThat(synonyms.get(0).synonymName, is(equalTo("syn name 0")));
@@ -124,17 +142,30 @@ public class AbstractOntologyDocConverterTest {
 
     @Test
     public void convertsHistory() {
-        List<String> rawHistory = Arrays.asList(
-                "Gonna do something like it's ... "+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"11:59, 31 Dec, " +
-                        "1999"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"PARTY!"+ OntologyDocument
-                        .INTRA_ITEM_FIELD_SEPARATOR +"Must be done"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"Textual description",
-                "Gonna do something like it's ... "+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"11:59, 31 Dec, " +
-                        "2001"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"SPACE ODYSSEY!"+ OntologyDocument
-                        .INTRA_ITEM_FIELD_SEPARATOR +"Must be done"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"Neeeooor");
+        List<String> rawHistory = new ArrayList<>();
+        rawHistory.add(
+                newFlatField()
+                        .addField("Gonna do something like it's ... ")
+                        .addField("11:59, 31 Dec, 1999")
+                        .addField("PARTY!")
+                        .addField("Must be done")
+                        .addField("Textual description")
+                        .buildString()
+        );
+        rawHistory.add(
+                newFlatField()
+                        .addField("History name")
+                        .addField("Tuesday next week")
+                        .addField("PARTY!")
+                        .addField("Must be done")
+                        .addField("Okay")
+                        .buildString()
+        );
+
         List<OBOTerm.History> history = converter.retrieveHistory(rawHistory);
         assertThat(history.size(), is(2));
         assertThat(history.get(0).name, is("Gonna do something like it's ... "));
-        assertThat(history.get(1).text, is("Neeeooor"));
+        assertThat(history.get(1).text, is("Okay"));
     }
 
 }

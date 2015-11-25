@@ -1,7 +1,10 @@
 package uk.ac.ebi.quickgo.document.ontology;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+
+import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
 
 /**
  * Class to create mocked objects of different {@code docType}s, which are valid according to {@link OntologyDocument}.
@@ -44,19 +47,58 @@ public class OntologyDocMocker {
         od.comment = "Note that protein targeting encompasses the transport of the protein to " +
                 "the specified location, and may also include additional steps such as protein processing.";
         od.children = Arrays.asList("GO:0000011", "GO:0000012");
-        od.synonymNames = Arrays.asList("creatine anabolism", "another synonym");
+        od.synonymNames = Arrays.asList("creatine anabolism", "crayola testarossa");
         od.secondaryIds = Arrays.asList("GO:0000003", "GO:0000004");
 
-        // nested, stored fields, which require reconstructing
-        od.synonyms = Arrays.asList("creatine anabolism" + OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR + "exact",
-                "another synonym" + OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR + "inexact");
-        od.history = Arrays.asList(
-                "Gonna do something like it's ... "+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"11:59, 31 Dec, " +
-                        "1999"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"PARTY!"+ OntologyDocument
-                        .INTRA_ITEM_FIELD_SEPARATOR +"Must be done"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"Textual description",
-                "Gonna do something like it's ... "+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"11:59, 31 Dec, " +
-                        "2001"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"SPACE ODYSSEY!"+ OntologyDocument
-                        .INTRA_ITEM_FIELD_SEPARATOR +"Must be done"+ OntologyDocument.INTRA_ITEM_FIELD_SEPARATOR +"Neeeooor");
+        // ------ nested, stored fields, which require reconstructing -------
+        // example synonyms
+        od.synonyms = new ArrayList<>();
+        od.synonyms.add(
+                newFlatField()
+                        .addField("creatine anabolism")
+                        .addField("exact")
+                        .buildString()
+        );
+        od.synonyms.add(
+                newFlatField()
+                        .addField("crayola testarossa")
+                        .addField("inprecise")
+                        .buildString()
+        );
+
+        // example history
+        od.history = new ArrayList<>();
+        od.history.add(
+                newFlatField()
+                        .addField("Gonna do something like it's ... ")
+                        .addField("11:59, 31 Dec, 1999")
+                        .addField("PARTY!")
+                        .addField("Must be done")
+                        .addField("Textual description")
+                        .buildString()
+        );
+        od.history.add(
+                newFlatField()
+                        .addField("History name")
+                        .addField("Tuesday next week")
+                        .addField("PARTY!")
+                        .addField("Must be done")
+                        .addField("Okay")
+                        .buildString()
+        );
+
+        // example xrefs
+        od.xrefs = new ArrayList<>();
+        od.xrefs.add(newFlatField()
+                .addField("InterPro")
+                .addField("IPR031034")
+                .addField("Creatinine amidohydrolase")
+                .buildString());
+        od.xrefs.add(newFlatField()
+                .addField("AnotherXref")
+                .addField("IPR031035")
+                .addField("Pickled Onions")
+                .buildString());
 
         return od;
     }

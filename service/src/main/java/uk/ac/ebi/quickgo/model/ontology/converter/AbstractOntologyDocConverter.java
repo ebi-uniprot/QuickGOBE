@@ -8,6 +8,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
+
 /**
  * Created 24/11/15
  * @author Edd
@@ -42,13 +44,18 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                     h -> {
                         // format: name|timestamp|action|category|text
                         OBOTerm.History historicalInfo = new OBOTerm.History();
-                        String[] parts = h.split(OntologyDocument.INTRA_ITEM_FIELD_REGEX);
-                        historicalInfo.name = parts[0];
-                        historicalInfo.timestamp = parts[1];
-                        historicalInfo.action = parts[2];
-                        historicalInfo.category = parts[3];
-                        historicalInfo.text = parts[4];
-                        history.add(historicalInfo);
+
+                        List<String> fields = newFlatField(h).getFields();
+                        if (fields.size() == 5) {
+                            historicalInfo.name = fields.get(0);
+                            historicalInfo.timestamp = fields.get(1);
+                            historicalInfo.action = fields.get(2);
+                            historicalInfo.category = fields.get(3);
+                            historicalInfo.text = fields.get(4);
+                            history.add(historicalInfo);
+                        } else {
+                            LOGGER.warn("Could not parse flattened history: {}", h);
+                        }
                     }
             );
             return history;
@@ -65,10 +72,10 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                     s -> {
                         // format: name|type
                         OBOTerm.Synonym synonym = new OBOTerm.Synonym();
-                        String[] parts = s.split(OntologyDocument.INTRA_ITEM_FIELD_REGEX);
-                        if (parts.length == 2) {
-                            synonym.synonymName = parts[0].trim();
-                            synonym.synonymType = parts[1].trim();
+                        List<String> fields = newFlatField(s).getFields();
+                        if (fields.size() == 2) {
+                            synonym.synonymName = fields.get(0).trim();
+                            synonym.synonymType = fields.get(1).trim();
                             synonyms.add(synonym);
                         } else {
                             LOGGER.warn("Could not parse flattened synonym: {}", s);
