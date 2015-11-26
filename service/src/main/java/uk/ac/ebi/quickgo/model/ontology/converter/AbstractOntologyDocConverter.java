@@ -40,7 +40,7 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
         return term;
     }
 
-    private List<OBOTerm.TaxonConstraint> retrieveTaxonConstraints(List<String> taxonConstraints) {
+    protected List<OBOTerm.TaxonConstraint> retrieveTaxonConstraints(List<String> taxonConstraints) {
         if (taxonConstraints != null) {
             List<OBOTerm.TaxonConstraint> oboXrefs = new ArrayList<>();
             taxonConstraints.stream().forEach(
