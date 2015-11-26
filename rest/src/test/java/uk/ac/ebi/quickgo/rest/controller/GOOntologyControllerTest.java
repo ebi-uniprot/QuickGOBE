@@ -109,6 +109,23 @@ public class GOOntologyControllerTest {
     }
 
     @Test
+    public void canRetrieveXRefsById() throws Exception {
+        saveTerm("GO:0000001");
+
+        mockMvc.perform(get(RESOURCE_URL + "/GO:0000001/xrefs"))
+                .andDo(print())
+                .andExpect(
+                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.id").value("GO:0000001")
+                )
+                .andExpect(
+                        jsonPath("$.xrefs").isArray()
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void finds404IfIdDoesNotExist() throws Exception {
         saveTerm("GO:0000001");
 

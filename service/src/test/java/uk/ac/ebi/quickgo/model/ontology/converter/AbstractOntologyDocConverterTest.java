@@ -94,7 +94,7 @@ public class AbstractOntologyDocConverterTest {
                         .addField("syn name 1")
                         .addField("syn type 1")
                         .buildString()
-                );
+        );
         List<OBOTerm.Synonym> synonyms = converter.retrieveSynonyms(rawSynonyms);
         assertThat(synonyms.size(), is(2));
         assertThat(synonyms.get(0).synonymName, is(equalTo("syn name 0")));
@@ -166,6 +166,40 @@ public class AbstractOntologyDocConverterTest {
         assertThat(history.size(), is(2));
         assertThat(history.get(0).name, is("Gonna do something like it's ... "));
         assertThat(history.get(1).text, is("Okay"));
+    }
+
+    @Test
+    public void convertsXrefs() {
+        String dbCode0 = "db code 0";
+        String dbId0 = "db id 0";
+        String dbName0 = "db name 0";
+
+        String dbCode1 = "db code 1";
+        String dbId1 ="db id 1";
+        String dbName1 = "db name 1";
+
+        List<String> rawXrefs = new ArrayList<>();
+        rawXrefs.add(
+                newFlatField()
+                        .addField(dbCode0)
+                        .addField(dbId0)
+                        .addField(dbName0)
+                        .buildString()
+        );
+        rawXrefs.add(
+                newFlatField()
+                        .addField(dbCode1)
+                        .addField(dbId1)
+                        .addField(dbName1)
+                        .buildString()
+        );
+
+        List<OBOTerm.XRef> xRefs = converter.retrieveXRefs(rawXrefs);
+        assertThat(xRefs.size(), is(2));
+        assertThat(xRefs.get(0).dbCode, is(dbCode0));
+        assertThat(xRefs.get(0).name, is(dbName0));
+        assertThat(xRefs.get(1).dbCode, is(dbCode1));
+        assertThat(xRefs.get(1).name, is(dbName1));
     }
 
 }

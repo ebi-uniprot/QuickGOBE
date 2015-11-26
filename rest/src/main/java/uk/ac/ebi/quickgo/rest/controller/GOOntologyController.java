@@ -93,6 +93,23 @@ public class GOOntologyController {
         return getGoTermResponse(goOntologyService.findHistoryInfoByOntologyId(id));
     }
 
+    /**
+     * Get a GO term based on its id
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}/xrefs", produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<GOTerm> findXRefsGOTerm(@PathVariable(value = "id") String id) {
+
+        if (!isValidGOId(id)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // use the service to retrieve what user requested
+        return getGoTermResponse(goOntologyService.findXRefsInfoByOntologyId(id));
+    }
+
     private ResponseEntity<GOTerm> getGoTermResponse(Optional<GOTerm> optionalGODoc) {
         if (optionalGODoc.isPresent()) {
             return new ResponseEntity<>(optionalGODoc.get(), HttpStatus.OK);

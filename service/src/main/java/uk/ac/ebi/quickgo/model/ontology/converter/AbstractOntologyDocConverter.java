@@ -38,7 +38,7 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
         return term;
     }
 
-    private List<OBOTerm.XRef> retrieveXRefs(List<String> xrefs) {
+    protected List<OBOTerm.XRef> retrieveXRefs(List<String> xrefs) {
         if (xrefs != null) {
             List<OBOTerm.XRef> oboXrefs = new ArrayList<>();
             xrefs.stream().forEach(
@@ -47,7 +47,7 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         OBOTerm.XRef xref = new OBOTerm.XRef();
 
                         List<String> fields = newFlatField(h).getFields();
-                        if (fields.size() == 5) {
+                        if (fields.size() == 3) {
                             xref.dbCode = fields.get(0);
                             xref.dbId = fields.get(1);
                             xref.name = fields.get(2);
