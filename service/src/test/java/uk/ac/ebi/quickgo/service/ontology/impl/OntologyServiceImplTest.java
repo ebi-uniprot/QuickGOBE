@@ -218,6 +218,42 @@ public class OntologyServiceImplTest {
         assertThat(expectedTerm.id, is(equalTo(id)));
     }
 
+    @Test
+    public void findsTaxonConstraintsInfoForGoIdentifier() {
+        String id = "GO:0000001";
+
+        OntologyDocument doc = createGODoc(id, "name1");
+
+        //TODO: create utility class for escape (you decide)
+        when(repositoryMock.findTaxonConstraintsByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
+                (Optional.of(doc));
+        when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
+
+        Optional<GOTerm> optionalGoTerm = goOntologyService.findTaxonConstraintsInfoByOntologyId(id);
+        assertThat(optionalGoTerm.isPresent(), is(true));
+
+        GOTerm expectedGoTerm = optionalGoTerm.get();
+        assertThat(expectedGoTerm.id, is(equalTo(id)));
+    }
+
+    @Test
+    public void findsTaxonConstraintsInfoForEcoIdentifier() {
+        String id = "ECO:0000001";
+
+        OntologyDocument doc = createECODoc(id, "name1");
+
+        //TODO: create utility class for escape (you decide)
+        when(repositoryMock.findTaxonConstraintsByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
+                (Optional.of(doc));
+        when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
+
+        Optional<ECOTerm> optionalTerm = ecoOntologyService.findTaxonConstraintsInfoByOntologyId(id);
+        assertThat(optionalTerm.isPresent(), is(true));
+
+        ECOTerm expectedTerm = optionalTerm.get();
+        assertThat(expectedTerm.id, is(equalTo(id)));
+    }
+
     private GOTerm createGOTerm(String id) {
         GOTerm term = new GOTerm();
         term.id = id;

@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Created 24/11/15
@@ -69,8 +70,8 @@ public class AbstractOntologyDocConverterTest {
     @Test
     public void converts1FlattenedSynonymToSynonymsDTO() {
         List<String> rawSynonyms = Collections.singletonList(newFlatField()
-                .addField("syn name 0")
-                .addField("syn type 0")
+                .addField(newFlatFieldLeaf("syn name 0"))
+                .addField(newFlatFieldLeaf("syn type 0"))
                 .buildString());
         List<OBOTerm.Synonym> synonyms = converter.retrieveSynonyms(rawSynonyms);
         assertThat(synonyms.size(), is(1));
@@ -87,12 +88,12 @@ public class AbstractOntologyDocConverterTest {
     public void converts2FlattenedSynonymsToSynonymsDTO() {
         List<String> rawSynonyms = Arrays.asList(
                 newFlatField()
-                        .addField("syn name 0")
-                        .addField("syn type 0")
+                        .addField(newFlatFieldLeaf("syn name 0"))
+                        .addField(newFlatFieldLeaf("syn type 0"))
                         .buildString(),
                 newFlatField()
-                        .addField("syn name 1")
-                        .addField("syn type 1")
+                        .addField(newFlatFieldLeaf("syn name 1"))
+                        .addField(newFlatFieldLeaf("syn type 1"))
                         .buildString()
         );
         List<OBOTerm.Synonym> synonyms = converter.retrieveSynonyms(rawSynonyms);
@@ -145,26 +146,26 @@ public class AbstractOntologyDocConverterTest {
         List<String> rawHistory = new ArrayList<>();
         rawHistory.add(
                 newFlatField()
-                        .addField("Gonna do something like it's ... ")
-                        .addField("11:59, 31 Dec, 1999")
-                        .addField("PARTY!")
-                        .addField("Must be done")
-                        .addField("Textual description")
+                        .addField(newFlatFieldLeaf("Gonna do something like it's ..."))
+                        .addField(newFlatFieldLeaf("11:59, 31 Dec, 1999"))
+                        .addField(newFlatFieldLeaf("PARTY!"))
+                        .addField(newFlatFieldLeaf("Must be done"))
+                        .addField(newFlatFieldLeaf("Textual description"))
                         .buildString()
         );
         rawHistory.add(
                 newFlatField()
-                        .addField("History name")
-                        .addField("Tuesday next week")
-                        .addField("PARTY!")
-                        .addField("Must be done")
-                        .addField("Okay")
+                        .addField(newFlatFieldLeaf("History name"))
+                        .addField(newFlatFieldLeaf("Tuesday next week"))
+                        .addField(newFlatFieldLeaf("PARTY!"))
+                        .addField(newFlatFieldLeaf("Must be done"))
+                        .addField(newFlatFieldLeaf("Okay"))
                         .buildString()
         );
 
         List<OBOTerm.History> history = converter.retrieveHistory(rawHistory);
         assertThat(history.size(), is(2));
-        assertThat(history.get(0).name, is("Gonna do something like it's ... "));
+        assertThat(history.get(0).name, is("Gonna do something like it's ..."));
         assertThat(history.get(1).text, is("Okay"));
     }
 
@@ -175,22 +176,22 @@ public class AbstractOntologyDocConverterTest {
         String dbName0 = "db name 0";
 
         String dbCode1 = "db code 1";
-        String dbId1 ="db id 1";
+        String dbId1 = "db id 1";
         String dbName1 = "db name 1";
 
         List<String> rawXrefs = new ArrayList<>();
         rawXrefs.add(
                 newFlatField()
-                        .addField(dbCode0)
-                        .addField(dbId0)
-                        .addField(dbName0)
+                        .addField(newFlatFieldLeaf(dbCode0))
+                        .addField(newFlatFieldLeaf(dbId0))
+                        .addField(newFlatFieldLeaf(dbName0))
                         .buildString()
         );
         rawXrefs.add(
                 newFlatField()
-                        .addField(dbCode1)
-                        .addField(dbId1)
-                        .addField(dbName1)
+                        .addField(newFlatFieldLeaf(dbCode1))
+                        .addField(newFlatFieldLeaf(dbId1))
+                        .addField(newFlatFieldLeaf(dbName1))
                         .buildString()
         );
 

@@ -51,11 +51,11 @@ public class OBOTerm {
     public List<XRef> xrefs;
 
     public List<AnnotationGuideLine> annotationGuidelines;
+    public List<TaxonConstraint> taxonConstraints;
 
     public static class Synonym {
         public String synonymName;
         public String synonymType;
-
     }
 
     public static class History {
@@ -75,5 +75,19 @@ public class OBOTerm {
     public static class AnnotationGuideLine {
         public String title;
         public String url;
+    }
+
+    public static class TaxonConstraint {
+        public String ancestorId;
+        public String ancestorName;
+        public String relationship;
+        public String taxId;
+        public String taxIdType;
+        public String taxName;
+        public List<Lit> citations;
+    }
+
+    public static class Lit {
+        public String id;
     }
 }

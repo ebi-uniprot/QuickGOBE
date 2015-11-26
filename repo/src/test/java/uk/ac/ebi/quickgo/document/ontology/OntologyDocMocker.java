@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Class to create mocked objects of different {@code docType}s, which are valid according to {@link OntologyDocument}.
@@ -55,14 +56,14 @@ public class OntologyDocMocker {
         od.synonyms = new ArrayList<>();
         od.synonyms.add(
                 newFlatField()
-                        .addField("creatine anabolism")
-                        .addField("exact")
+                        .addField(newFlatFieldLeaf("creatine anabolism"))
+                        .addField(newFlatFieldLeaf("exact"))
                         .buildString()
         );
         od.synonyms.add(
                 newFlatField()
-                        .addField("crayola testarossa")
-                        .addField("inprecise")
+                        .addField(newFlatFieldLeaf("crayola testarossa"))
+                        .addField(newFlatFieldLeaf("inprecise"))
                         .buildString()
         );
 
@@ -70,34 +71,60 @@ public class OntologyDocMocker {
         od.history = new ArrayList<>();
         od.history.add(
                 newFlatField()
-                        .addField("Gonna do something like it's ... ")
-                        .addField("11:59, 31 Dec, 1999")
-                        .addField("PARTY!")
-                        .addField("Must be done")
-                        .addField("Textual description")
+                        .addField(newFlatFieldLeaf("Gonna do something like it's ... "))
+                        .addField(newFlatFieldLeaf("11:59, 31 Dec, 1999"))
+                        .addField(newFlatFieldLeaf("PARTY!"))
+                        .addField(newFlatFieldLeaf("Must be done"))
+                        .addField(newFlatFieldLeaf("Textual description"))
                         .buildString()
         );
         od.history.add(
                 newFlatField()
-                        .addField("History name")
-                        .addField("Tuesday next week")
-                        .addField("PARTY!")
-                        .addField("Must be done")
-                        .addField("Okay")
+                        .addField(newFlatFieldLeaf("History name"))
+                        .addField(newFlatFieldLeaf("Tuesday next week"))
+                        .addField(newFlatFieldLeaf("PARTY!"))
+                        .addField(newFlatFieldLeaf("Must be done"))
+                        .addField(newFlatFieldLeaf("Okay"))
                         .buildString()
         );
 
         // example xrefs
         od.xrefs = new ArrayList<>();
         od.xrefs.add(newFlatField()
-                .addField("InterPro")
-                .addField("IPR031034")
-                .addField("Creatinine amidohydrolase")
+                .addField(newFlatFieldLeaf("InterPro"))
+                .addField(newFlatFieldLeaf("IPR031034"))
+                .addField(newFlatFieldLeaf("Creatinine amidohydrolase"))
                 .buildString());
         od.xrefs.add(newFlatField()
-                .addField("AnotherXref")
-                .addField("IPR031035")
-                .addField("Pickled Onions")
+                .addField(newFlatFieldLeaf("AnotherXref"))
+                .addField(newFlatFieldLeaf("IPR031035"))
+                .addField(newFlatFieldLeaf("Pickled Onions"))
+                .buildString());
+
+        // example taxonomy constraints
+        // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2..
+        od.taxonConstraints = new ArrayList<>();
+        od.taxonConstraints.add(newFlatField()
+                .addField(newFlatFieldLeaf("GO:0005623"))
+                .addField(newFlatFieldLeaf("cell"))
+                .addField(newFlatFieldLeaf("only_in_taxon"))
+                .addField(newFlatFieldLeaf("131567"))
+                .addField(newFlatFieldLeaf("NCBITaxon"))
+                .addField(newFlatFieldLeaf("cellular organisms"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("PMID:00000001"))
+                        .addField(newFlatFieldLeaf("PMID:00000002")))
+                .buildString());
+        od.taxonConstraints.add(newFlatField()
+                .addField(newFlatFieldLeaf("GO:0005624"))
+                .addField(newFlatFieldLeaf("cell"))
+                .addField(newFlatFieldLeaf("only_in_taxon"))
+                .addField(newFlatFieldLeaf("131568"))
+                .addField(newFlatFieldLeaf("NCBITaxon"))
+                .addField(newFlatFieldLeaf("cellular organisms"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("PMID:00000003"))
+                        .addField(newFlatFieldLeaf("PMID:00000004")))
                 .buildString());
 
         return od;

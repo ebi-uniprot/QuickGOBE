@@ -1,55 +1,84 @@
 package uk.ac.ebi.quickgo.document;
 
-import java.util.List;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.parseFlatFieldTree;
+import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
- * Created 25/11/15
+ * Created 26/11/15
  * @author Edd
  */
 public class FlatFieldBuilderTest {
-    /**
-     * Check you can create a flattened field object programmatically,
-     * and that the resulting fields are as expected.
-     */
     @Test
-    public void createFlatFieldProgrammatically() {
-        List<String> fields = newFlatField()
-                .addField("first field")
-                .addField("second field")
-                .getFields();
+    public void createFlatFieldTree() {
 
-        assertThat(fields.size(), is(2));
-        assertThat(fields.get(0), is("first field"));
-        assertThat(fields.get(1), is("second field"));
+        String flatField = newFlatField()
+                .addField(newFlatFieldLeaf("1"))
+                .addField(newFlatFieldLeaf("2"))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("a"))
+                                .addField(newFlatFieldLeaf("b")))
+                .addField(newFlatFieldLeaf("3")).buildString();
+        assertThat(flatField, is(notNullValue()));
+        assertThat(flatField.contains("1"), is(true));
+        assertThat(flatField.contains("2"), is(true));
+        assertThat(flatField.contains("a"), is(true));
+        assertThat(flatField.contains("b"), is(true));
+        assertThat(flatField.contains("3"), is(true));
     }
 
-    /**
-     * Create a flattened field object programmatically, then store its
-     * string representation. Check that this representation can be used
-     * to create another flattened field object, whose fields are as expected.
-     *
-     * i.e., do a round-trip test.
+    /** Check one can create a flat field object, write itself as a String A, then parse
+     * this written value into a new flat field object, and write it again as String B. A and B
+     * must be equal.
      */
     @Test
-    public void createFlatFieldFromString() {
-        // the flattened field as a single string
-        String flattenedField = newFlatField()
-                .addField("first field")
-                .addField("second field")
-                .buildString();
+    public void parseFlatFieldTreeString2NestingLevels() {
+        FlatFieldBuilder flatFieldBuilderOrig = newFlatField()
+                .addField(newFlatFieldLeaf("1"))
+                .addField(newFlatFieldLeaf("2"))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("a"))
+                                .addField(newFlatFieldLeaf("b")))
+                .addField(newFlatFieldLeaf("3"));
+        String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
-        // use it to create the field list
-        List<String> fields = newFlatField(flattenedField).getFields();
+        FlatFieldBuilder flatFieldBuilderParsed = parseFlatFieldTree(origStr);
+        String parsedStr = flatFieldBuilderParsed.buildString();
 
-        // .. and check it contains what it should
-        assertThat(fields.size(), is(2));
-        assertThat(fields.get(0), is("first field"));
-        assertThat(fields.get(1), is("second field"));
+        assertThat(parsedStr, is(equalTo(parsedStr)));
+
+        System.out.println(parsedStr);
     }
 
+    @Test
+    public void parseFlatFieldTreeString3NestingLevels() {
+        FlatFieldBuilder flatFieldBuilderOrig = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:A"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:A"))
+                                        .addField(newFlatFieldLeaf("level3:B"))
+                                        .addField(newFlatFieldLeaf("level3:C")))
+                                .addField(newFlatFieldLeaf("level2:B")))
+                .addField(newFlatFieldLeaf("level1:C"));
+        String origStr = flatFieldBuilderOrig.buildString(); // serialise
+
+        FlatFieldBuilder flatFieldBuilderParsed = parseFlatFieldTree(origStr);
+        String parsedStr = flatFieldBuilderParsed.buildString();
+
+        assertThat(parsedStr, is(equalTo(parsedStr)));
+
+        System.out.println(parsedStr);
+    }
 }

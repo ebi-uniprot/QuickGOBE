@@ -59,6 +59,11 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 ClientUtils.escapeQueryChars(id)));
     }
 
+    @Override public Optional<T> findTaxonConstraintsInfoByOntologyId(String id) {
+        return convertOptionalDoc(ontologyRepository.findTaxonConstraintsByTermId(ontologyType,
+                ClientUtils.escapeQueryChars(id)));
+    }
+
     private Optional<T> convertOptionalDoc(Optional<OntologyDocument> optionalDoc) {
         if (optionalDoc.isPresent()) {
             return Optional.of(converter.convert(optionalDoc.get()));

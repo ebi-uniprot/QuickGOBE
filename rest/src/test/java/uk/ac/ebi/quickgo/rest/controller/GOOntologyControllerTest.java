@@ -126,6 +126,23 @@ public class GOOntologyControllerTest {
     }
 
     @Test
+    public void canRetrieveTaxonConstraintsById() throws Exception {
+        saveTerm("GO:0000001");
+
+        mockMvc.perform(get(RESOURCE_URL + "/GO:0000001/constraints"))
+                .andDo(print())
+                .andExpect(
+                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.id").value("GO:0000001")
+                )
+                .andExpect(
+                        jsonPath("$.taxonConstraints").isArray()
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void finds404IfIdDoesNotExist() throws Exception {
         saveTerm("GO:0000001");
 

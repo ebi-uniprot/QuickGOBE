@@ -110,6 +110,23 @@ public class GOOntologyController {
         return getGoTermResponse(goOntologyService.findXRefsInfoByOntologyId(id));
     }
 
+    /**
+     * Get a GO term based on its id
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = GO_REQUEST_MAPPING_BASE + "/{id}/constraints", produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<GOTerm> findTaxonConstraintsGOTerm(@PathVariable(value = "id") String id) {
+
+        if (!isValidGOId(id)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // use the service to retrieve what user requested
+        return getGoTermResponse(goOntologyService.findTaxonConstraintsInfoByOntologyId(id));
+    }
+
     private ResponseEntity<GOTerm> getGoTermResponse(Optional<GOTerm> optionalGODoc) {
         if (optionalGODoc.isPresent()) {
             return new ResponseEntity<>(optionalGODoc.get(), HttpStatus.OK);

@@ -111,6 +111,8 @@ public class OntologyDocument {
     public List<String> history;
     @Field("xref")
     public List<String> xrefs;
+    @Field("taxonConstraint")
+    public List<String> taxonConstraints;
     @Field("annotationGuideline")
     public List<String> annotationGuidelines;
 
