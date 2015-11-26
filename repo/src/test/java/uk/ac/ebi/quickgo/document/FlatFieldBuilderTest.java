@@ -16,7 +16,7 @@ import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
  */
 public class FlatFieldBuilderTest {
     @Test
-    public void createFlatFieldTree() {
+    public void createFlatFieldBuilder() {
 
         String flatField = newFlatField()
                 .addField(newFlatFieldLeaf("1"))
@@ -39,7 +39,7 @@ public class FlatFieldBuilderTest {
      * must be equal.
      */
     @Test
-    public void parseFlatFieldTreeString2NestingLevels() {
+    public void parseFlatFieldBuilderString2NestingLevels() {
         FlatFieldBuilder flatFieldBuilderOrig = newFlatField()
                 .addField(newFlatFieldLeaf("1"))
                 .addField(newFlatFieldLeaf("2"))
@@ -59,7 +59,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void parseFlatFieldTreeString3NestingLevels() {
+    public void parseFlatFieldBuilderString3NestingLevels() {
         FlatFieldBuilder flatFieldBuilderOrig = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
                 .addField(newFlatFieldLeaf("level1:B"))
@@ -83,7 +83,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void parseFlatFieldTreeString4NestingLevels() {
+    public void parseFlatFieldBuilderString4NestingLevels() {
         FlatFieldBuilder flatFieldBuilderOrig = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
                 .addField(newFlatFieldLeaf("level1:B"))
