@@ -81,4 +81,38 @@ public class FlatFieldBuilderTest {
 
         System.out.println(parsedStr);
     }
+
+    @Test
+    public void parseFlatFieldTreeString4NestingLevels() {
+        FlatFieldBuilder flatFieldBuilderOrig = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:A"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:A"))
+                                        .addField(newFlatFieldLeaf("level3:B"))
+                                        .addField(newFlatFieldLeaf("level3:C")))
+                                .addField(newFlatFieldLeaf("level2:B")))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:C"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:D"))
+                                        .addField(newFlatField()
+                                                .addField(newFlatFieldLeaf("level4:A"))
+                                                .addField(newFlatFieldLeaf("level4:B")))
+                                        .addField(newFlatFieldLeaf("level3:E")))
+                                .addField(newFlatFieldLeaf("level2:C")))
+                .addField(newFlatFieldLeaf("level1:C"));
+        String origStr = flatFieldBuilderOrig.buildString(); // serialise
+
+        FlatFieldBuilder flatFieldBuilderParsed = parseFlatFieldTree(origStr);
+        String parsedStr = flatFieldBuilderParsed.buildString();
+
+        assertThat(parsedStr, is(equalTo(parsedStr)));
+
+        System.out.println(parsedStr);
+    }
 }

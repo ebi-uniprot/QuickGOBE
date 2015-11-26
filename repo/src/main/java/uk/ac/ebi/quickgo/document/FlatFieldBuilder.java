@@ -16,14 +16,16 @@ public class FlatFieldBuilder extends FlatField {
     private static final String[] SEPARATORS = new String[]{
             "|||",
             "%%%",
-            "^^^"
+            "^^^",
+            ":::"
 
     };
     // regexes for elements of SEPARATORS
     private static final String[] SEPARATOR_REGEXES = new String[]{
             "\\|\\|\\|",
             "%%%",
-            "\\^\\^\\^"
+            "\\^\\^\\^",
+            ":::"
     };
 
     private List<FlatField> fields;
