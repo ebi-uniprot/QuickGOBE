@@ -127,6 +127,23 @@ public class ECOOntologyController {
         return getEcoTermResponse(ecoOntologyService.findTaxonConstraintsInfoByOntologyId(id));
     }
 
+    /**
+     * Get a GO term based on its id
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = ECO_REQUEST_MAPPING_BASE + "/{id}/xorels", produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<ECOTerm> findGOTermXOntologyRelations(@PathVariable(value = "id") String id) {
+
+        if (!isValidECOId(id)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // use the service to retrieve what user requested
+        return getEcoTermResponse(ecoOntologyService.findXORelationsInfoByOntologyId(id));
+    }
+
     private ResponseEntity<ECOTerm> getEcoTermResponse(Optional<ECOTerm> optionalECODoc) {
         if (optionalECODoc.isPresent()) {
             return new ResponseEntity<>(optionalECODoc.get(), HttpStatus.OK);

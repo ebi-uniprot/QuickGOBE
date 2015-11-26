@@ -86,6 +86,7 @@
     <field name="history" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="xref" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="annotationGuideline" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="xRelation" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="taxonConstraint" type="string" indexed="false" stored="true" multiValued="true"/>
 
     <!--                     End of QuickGO Ontology fields                         -->

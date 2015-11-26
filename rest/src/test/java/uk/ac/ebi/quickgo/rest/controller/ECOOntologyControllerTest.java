@@ -143,6 +143,23 @@ public class ECOOntologyControllerTest {
     }
 
     @Test
+    public void canRetrieveXORelsById() throws Exception {
+        saveTerm("ECO:0000001");
+
+        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/xorels"))
+                .andDo(print())
+                .andExpect(
+                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.id").value("ECO:0000001")
+                )
+                .andExpect(
+                        jsonPath("$.xRelations").isArray()
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void finds404IfIdDoesNotExist() throws Exception {
         saveTerm("ECO:0000001");
 

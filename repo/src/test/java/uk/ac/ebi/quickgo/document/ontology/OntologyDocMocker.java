@@ -127,6 +127,24 @@ public class OntologyDocMocker {
                         .addField(newFlatFieldLeaf("PMID:00000004")))
                 .buildString());
 
+        // example xontology relations
+        // format: xId|xTerm|xNamespace|xUrl|xRelation
+        od.xRelations = new ArrayList<>();
+        od.xRelations.add(newFlatField()
+                .addField(newFlatFieldLeaf("CHEBI:16919"))
+                .addField(newFlatFieldLeaf("creatine"))
+                .addField(newFlatFieldLeaf("CHEBI"))
+                .addField(newFlatFieldLeaf("http://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:16919"))
+                .addField(newFlatFieldLeaf("has_participant"))
+                .buildString());
+        od.xRelations.add(newFlatField()
+                .addField(newFlatFieldLeaf("CHEBI:16920"))
+                .addField(newFlatFieldLeaf("creatiney"))
+                .addField(newFlatFieldLeaf("CHEBI"))
+                .addField(newFlatFieldLeaf("http://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:16920"))
+                .addField(newFlatFieldLeaf("has_participant"))
+                .buildString());
+
         return od;
     }
 

@@ -115,6 +115,8 @@ public class OntologyDocument {
     public List<String> taxonConstraints;
     @Field("annotationGuideline")
     public List<String> annotationGuidelines;
+    @Field("xRelation")
+    public List<String> xRelations;
 
     // --------------------------------------------------------------------------
     // Terms

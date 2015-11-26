@@ -122,6 +122,17 @@ public class OntologyRepositoryTest {
     }
 
     @Test
+    public void retrievesXOntologyRelationsField() {
+        String id = "GO:0000001";
+        ontologyRepository.save(createGODoc(id, "GO name 1"));
+
+        Optional<OntologyDocument> optionalDoc =
+                ontologyRepository.findXOntologyRelationsByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
+        assertThat(optionalDoc.isPresent(), is(true));
+        assertThat(optionalDoc.get().xRelations, is(notNullValue()));
+    }
+
+    @Test
     public void add1DocumentAndFailToFindForWrongId() {
         ontologyRepository.save(createGODoc("A", "Alice Cooper"));
 

@@ -36,8 +36,36 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
         term.history = retrieveHistory(ontologyDocument.history);
         term.xrefs = retrieveXRefs(ontologyDocument.xrefs);
         term.taxonConstraints = retrieveTaxonConstraints(ontologyDocument.taxonConstraints);
+        term.xRelations = retrieveXOntologyRelations(ontologyDocument.xRelations);
 
         return term;
+    }
+
+    protected List<OBOTerm.XORelation> retrieveXOntologyRelations(List<String> xrels) {
+        if (xrels != null) {
+            List<OBOTerm.XORelation> oboXORels = new ArrayList<>();
+            xrels.stream().forEach(
+                    x -> {
+                        // format: id|term|namespace|url|relation
+                        OBOTerm.XORelation xORel = new OBOTerm.XORelation();
+
+                        List<FlatField> fields = parseFlatFieldTree(x).getFields();
+                        if (fields.size() == 5) {
+                            xORel.id = fields.get(0).buildString().trim();
+                            xORel.term = fields.get(1).buildString().trim();
+                            xORel.namespace = fields.get(2).buildString().trim();
+                            xORel.url = fields.get(3).buildString().trim();
+                            xORel.relation = fields.get(4).buildString().trim();
+                            oboXORels.add(xORel);
+                        } else {
+                            LOGGER.warn("Could not parse flattened xORel: {}", x);
+                        }
+                    }
+            );
+            return oboXORels;
+        } else {
+            return null;
+        }
     }
 
     protected List<OBOTerm.TaxonConstraint> retrieveTaxonConstraints(List<String> taxonConstraints) {

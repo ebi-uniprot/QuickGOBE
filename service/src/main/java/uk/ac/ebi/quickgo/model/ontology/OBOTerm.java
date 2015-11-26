@@ -50,6 +50,8 @@ public class OBOTerm {
 
     public List<XRef> xrefs;
 
+    public List<XORelation> xRelations;
+
     public List<AnnotationGuideLine> annotationGuidelines;
     public List<TaxonConstraint> taxonConstraints;
 
@@ -89,5 +91,13 @@ public class OBOTerm {
 
     public static class Lit {
         public String id;
+    }
+
+    public static class XORelation {
+        public String id;
+        public String term;
+        public String namespace;
+        public String url;
+        public String relation;
     }
 }
