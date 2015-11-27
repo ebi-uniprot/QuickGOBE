@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
-import uk.ac.ebi.quickgo.model.ontology.ECOTerm;
+import uk.ac.ebi.quickgo.model.ontology.GOTerm;
 import uk.ac.ebi.quickgo.service.ontology.OntologyService;
 
 import java.util.regex.Pattern;
@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static uk.ac.ebi.quickgo.rest.controller.ECOOntologyController.PathValidator.isValidECOId;
+import static uk.ac.ebi.quickgo.rest.controller.GOController.PathValidator.isValidGOId;
 
 /**
- * REST controller for accessing ECO related information.
+ * REST controller for accessing GO related information.
  *
  * For complete list of necessary endpoints, and their behaviour:
  *  refer to https://www.ebi.ac.uk/seqdb/confluence/display/GOA/REST+API
@@ -20,31 +20,31 @@ import static uk.ac.ebi.quickgo.rest.controller.ECOOntologyController.PathValida
  * @author Edd
  */
 @RestController
-@RequestMapping(value = "/QuickGO/services/eco")
-public class ECOOntologyController extends OBOController<ECOTerm> {
+@RequestMapping(value = "/QuickGO/services/go")
+public class GOController extends OBOController<GOTerm> {
 
     // retained for use with specialised end-points
-    private OntologyService<ECOTerm> ecoOntologyService;
+    private OntologyService<GOTerm> goOntologyService;
 
     @Autowired
-    public ECOOntologyController(OntologyService<ECOTerm> ecoOntologyService) {
-        super(ecoOntologyService);
-        this.ecoOntologyService = ecoOntologyService;
+    public GOController(OntologyService<GOTerm> goOntologyService) {
+        super(goOntologyService);
+        this.goOntologyService = goOntologyService;
     }
 
     @Override
     public boolean isValidId(String id) {
-        return isValidECOId(id);
+        return isValidGOId(id);
     }
 
     /**
      * Contains validation logic of GO path components
      */
     protected static class PathValidator {
-        final static Pattern validECOFormat = Pattern.compile("^ECO:[0-9]{7}$");
+        final static Pattern validGOFormat = Pattern.compile("^GO:[0-9]{7}$");
 
-        static boolean isValidECOId(String id) {
-            return validECOFormat.matcher(id).matches();
+        static boolean isValidGOId(String id) {
+            return validGOFormat.matcher(id).matches();
         }
     }
 

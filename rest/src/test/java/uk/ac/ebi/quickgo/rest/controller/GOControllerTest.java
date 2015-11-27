@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Tests the {@link GOOntologyController} class using an embedded server.
+ * Tests the {@link GOController} class using an embedded server.
  *
  * Created 16/11/15
  * @author Edd
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {QuickGOREST.class})
 @WebAppConfiguration
-public class GOOntologyControllerTest {
+public class GOControllerTest {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
