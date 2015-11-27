@@ -8,6 +8,13 @@ import java.util.StringJoiner;
 import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
+ * Used to build a {@link String} representation of field that has nested sub-fields.
+ * For example, a name field could be made up of two sub-fields first and second name.
+ *
+ * This class is used when constructing nested structures that need serialising as a {@link String}
+ * so they can be stored in a Solr document. Methods are also provided to reconstruct
+ * the original model from the serialised string.
+ *
  * Created 26/11/15
  * @author Edd
  */
@@ -38,11 +45,11 @@ public class FlatFieldBuilder extends FlatField {
         return new FlatFieldBuilder();
     }
 
-    public static FlatFieldBuilder parseFlatFieldTree(String flatStr) {
-        return parseFlatFieldTree(flatStr, 0);
+    public static FlatFieldBuilder parseFlatField(String flatStr) {
+        return parseFlatField(flatStr, 0);
     }
 
-    private static FlatFieldBuilder parseFlatFieldTree(String flatStr, int level) {
+    private static FlatFieldBuilder parseFlatField(String flatStr, int level) {
         ArrayList<String> components = new ArrayList<>();
         if (flatStr.startsWith(SEPARATORS[level])) {
             components.add("");
@@ -52,17 +59,15 @@ public class FlatFieldBuilder extends FlatField {
             components.add("");
         }
 
-//        String[] parts = flatStr.split(SEPARATOR_REGEXES[level]);
-        FlatFieldBuilder flatFieldTree = new FlatFieldBuilder();
-//        Arrays.asList(parts).stream().forEach(f -> {
+        FlatFieldBuilder flatField = new FlatFieldBuilder();
         components.stream().forEach(f -> {
             if (level+1<SEPARATORS.length && f.contains(SEPARATORS[level + 1])) {
-                flatFieldTree.addField(parseFlatFieldTree(f, level + 1));
+                flatField.addField(parseFlatField(f, level + 1));
             } else {
-                flatFieldTree.addField(newFlatFieldLeaf(f));
+                flatField.addField(newFlatFieldLeaf(f));
             }
         });
-        return flatFieldTree;
+        return flatField;
     }
 
     public FlatFieldBuilder addField(FlatField field) {
@@ -81,8 +86,7 @@ public class FlatFieldBuilder extends FlatField {
     public String buildString(int level) {
         StringJoiner sj = new StringJoiner(SEPARATORS[level]);
         fields.stream().forEach( f->
-                {
-                    sj.add(f.buildString(level + 1));}
+                sj.add(f.buildString(level + 1))
         );
         return sj.toString();
     }

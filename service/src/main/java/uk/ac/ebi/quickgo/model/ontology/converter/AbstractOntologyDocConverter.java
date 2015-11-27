@@ -9,7 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.parseFlatFieldTree;
+import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.parseFlatField;
 
 /**
  * Created 24/11/15
@@ -51,7 +51,7 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         // format: geneProductId|geneProductDB|reason|category|method
                         OBOTerm.AnnotationGuideLine ag = new OBOTerm.AnnotationGuideLine();
 
-                        List<FlatField> fields = parseFlatFieldTree(g).getFields();
+                        List<FlatField> fields = parseFlatField(g).getFields();
                         if (fields.size() == 2) {
                             ag.description = nullOrString(fields.get(0).buildString());
                             ag.url = nullOrString(fields.get(1).buildString());
@@ -75,7 +75,8 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         // format: geneProductId|geneProductDB|reason|category|method
                         OBOTerm.BlacklistItem blacklistItem = new OBOTerm.BlacklistItem();
 
-                        List<FlatField> fields = parseFlatFieldTree(b).getFields();
+                        List<FlatField> fields = parseFlatField(b).getFields();
+
                         if (fields.size() == 5) {
                             blacklistItem.geneProductId = nullOrString(fields.get(0).buildString());
                             blacklistItem.geneProductDb = nullOrString(fields.get(1).buildString());
@@ -107,7 +108,7 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         // format: id|term|namespace|url|relation
                         OBOTerm.XORelation xORel = new OBOTerm.XORelation();
 
-                        List<FlatField> fields = parseFlatFieldTree(x).getFields();
+                        List<FlatField> fields = parseFlatField(x).getFields();
                         if (fields.size() == 5) {
                             xORel.id = nullOrString(fields.get(0).buildString());
                             xORel.term = nullOrString(fields.get(1).buildString());
@@ -135,9 +136,9 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         // |blacklist
                         OBOTerm.TaxonConstraint taxonConstraint = new OBOTerm.TaxonConstraint();
 
-                        List<FlatField> fields = parseFlatFieldTree(t).getFields();
+                        List<FlatField> fields = parseFlatField(t).getFields();
                         if (fields.size() == 7) {
-                            taxonConstraint.ancestorId = nullOrString(fields.get(0).buildString()).trim();
+                            taxonConstraint.ancestorId = nullOrString(fields.get(0).buildString());
                             taxonConstraint.ancestorName = nullOrString(fields.get(1).buildString());
                             taxonConstraint.relationship = nullOrString(fields.get(2).buildString());
                             taxonConstraint.taxId = nullOrString(fields.get(3).buildString());
@@ -172,7 +173,7 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         // format: code|id|name
                         OBOTerm.XRef xref = new OBOTerm.XRef();
 
-                        List<FlatField> fields = parseFlatFieldTree(x).getFields();
+                        List<FlatField> fields = parseFlatField(x).getFields();
                         if (fields.size() == 3) {
                             xref.dbCode = nullOrString(fields.get(0).buildString());
                             xref.dbId = nullOrString(fields.get(1).buildString());
@@ -197,7 +198,7 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         // format: name|timestamp|action|category|text
                         OBOTerm.History historicalInfo = new OBOTerm.History();
 
-                        List<FlatField> fields = parseFlatFieldTree(h).getFields();
+                        List<FlatField> fields = parseFlatField(h).getFields();
                         if (fields.size() == 5) {
                             historicalInfo.name = nullOrString(fields.get(0).buildString());
                             historicalInfo.timestamp = nullOrString(fields.get(1).buildString());
@@ -224,7 +225,7 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                     s -> {
                         // format: name|type
                         OBOTerm.Synonym synonym = new OBOTerm.Synonym();
-                        List<FlatField> fields = parseFlatFieldTree(s).getFields();
+                        List<FlatField> fields = parseFlatField(s).getFields();
                         if (fields.size() == 2) {
                             synonym.synonymName = nullOrString(fields.get(0).buildString());
                             synonym.synonymType = nullOrString(fields.get(1).buildString());
