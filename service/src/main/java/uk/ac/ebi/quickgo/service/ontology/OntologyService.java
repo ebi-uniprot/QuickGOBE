@@ -49,6 +49,7 @@ public interface OntologyService<T> {
     Optional<T> findXRefsInfoByOntologyId(String id);
     Optional<T> findTaxonConstraintsInfoByOntologyId(String id);
     Optional<T> findXORelationsInfoByOntologyId(String id);
+    Optional<T> findAnnotationGuideLinesInfoByOntologyId(String id);
 
     /**
      * Search by a given ECO id and return a list, which fulfils

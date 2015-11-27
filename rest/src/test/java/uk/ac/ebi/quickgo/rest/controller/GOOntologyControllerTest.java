@@ -125,6 +125,10 @@ public class GOOntologyControllerTest {
                 .andExpect(status().isOk());
     }
 
+    /**
+     * Shows taxon constraints and blacklist for term
+     * @throws Exception
+     */
     @Test
     public void canRetrieveTaxonConstraintsById() throws Exception {
         saveTerm("GO:0000001");
@@ -141,6 +145,23 @@ public class GOOntologyControllerTest {
                 )
                 .andExpect(
                         jsonPath("$.blacklist").isArray()
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveAnnotationGuideLinesById() throws Exception {
+        saveTerm("GO:0000001");
+
+        mockMvc.perform(get(RESOURCE_URL + "/GO:0000001/guidelines"))
+                .andDo(print())
+                .andExpect(
+                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.id").value("GO:0000001")
+                )
+                .andExpect(
+                        jsonPath("$.annotationGuidelines").isArray()
                 )
                 .andExpect(status().isOk());
     }

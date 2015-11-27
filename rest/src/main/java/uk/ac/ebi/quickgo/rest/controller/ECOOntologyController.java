@@ -144,6 +144,24 @@ public class ECOOntologyController {
         return getEcoTermResponse(ecoOntologyService.findXORelationsInfoByOntologyId(id));
     }
 
+    /**
+     * Get a GO term based on its id
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = ECO_REQUEST_MAPPING_BASE + "/{id}/guidelines", produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<ECOTerm> findGOTermAnnotationGuideLines(@PathVariable(value = "id") String
+            id) {
+
+        if (!isValidECOId(id)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // use the service to retrieve what user requested
+        return getEcoTermResponse(ecoOntologyService.findAnnotationGuideLinesInfoByOntologyId(id));
+    }
+
     private ResponseEntity<ECOTerm> getEcoTermResponse(Optional<ECOTerm> optionalECODoc) {
         if (optionalECODoc.isPresent()) {
             return new ResponseEntity<>(optionalECODoc.get(), HttpStatus.OK);
