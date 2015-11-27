@@ -114,9 +114,6 @@ public class OntologyDocMocker {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf("PMID:00000001"))
                         .addField(newFlatFieldLeaf("PMID:00000002")))
-                .addField(newFlatField()
-                        .addField(newFlatFieldLeaf("blacklist item 0"))
-                        .addField(newFlatFieldLeaf("blacklist item 1")))
                 .buildString());
         od.taxonConstraints.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0005624"))
@@ -128,6 +125,24 @@ public class OntologyDocMocker {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf("PMID:00000003"))
                         .addField(newFlatFieldLeaf("PMID:00000004")))
+                .buildString());
+
+        // example blacklist
+        // format: geneProductId|geneProductDB|reason|category|method
+        od.blacklist = new ArrayList<>();
+        od.blacklist.add(newFlatField()
+                .addField(newFlatFieldLeaf("GP:00001"))
+                .addField(newFlatFieldLeaf("GP"))
+                .addField(newFlatFieldLeaf("because it's bad"))
+                .addField(newFlatFieldLeaf("category 1"))
+                .addField(newFlatFieldLeaf("automatic"))
+                .buildString());
+        od.blacklist.add(newFlatField()
+                .addField(newFlatFieldLeaf("XX:00002"))
+                .addField(newFlatFieldLeaf("XX"))
+                .addField(newFlatFieldLeaf("because it's also bad"))
+                .addField(newFlatFieldLeaf("category 2"))
+                .addField(newFlatFieldLeaf()) // no parameter means it's got no value
                 .buildString());
 
         // example xontology relations

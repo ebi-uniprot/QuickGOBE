@@ -17,6 +17,10 @@ public class FlatFieldLeaf extends FlatField {
         return new FlatFieldLeaf(value);
     }
 
+    public static FlatFieldLeaf newFlatFieldLeaf() {
+        return new FlatFieldLeaf("");
+    }
+
     @Override protected String buildString(int level) {
         return buildString();
     }

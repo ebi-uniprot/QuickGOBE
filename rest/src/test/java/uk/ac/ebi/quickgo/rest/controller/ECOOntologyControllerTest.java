@@ -139,6 +139,9 @@ public class ECOOntologyControllerTest {
                 .andExpect(
                         jsonPath("$.taxonConstraints").isArray()
                 )
+                .andExpect(
+                        jsonPath("$.blacklist").isArray()
+                )
                 .andExpect(status().isOk());
     }
 

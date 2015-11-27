@@ -54,6 +54,7 @@ public class OBOTerm {
 
     public List<AnnotationGuideLine> annotationGuidelines;
     public List<TaxonConstraint> taxonConstraints;
+    public List<BlacklistItem> blacklist;
 
     public static class Synonym {
         public String synonymName;
@@ -87,11 +88,14 @@ public class OBOTerm {
         public String taxIdType;
         public String taxName;
         public List<Lit> citations;
-        public List<BlackListItem> blacklist;
     }
 
-    public static class BlackListItem {
-        public String id;
+    public static class BlacklistItem {
+        public String geneProductId;
+        public String geneProductDb;
+        public String reason;
+        public String category;
+        public String method;
     }
 
     public static class Lit {

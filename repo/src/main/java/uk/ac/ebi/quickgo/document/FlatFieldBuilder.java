@@ -43,9 +43,19 @@ public class FlatFieldBuilder extends FlatField {
     }
 
     private static FlatFieldBuilder parseFlatFieldTree(String flatStr, int level) {
-        String[] parts = flatStr.split(SEPARATOR_REGEXES[level]);
+        ArrayList<String> components = new ArrayList<>();
+        if (flatStr.startsWith(SEPARATORS[level])) {
+            components.add("");
+        }
+        components.addAll(Arrays.asList(flatStr.split(SEPARATOR_REGEXES[level])));
+        if (flatStr.endsWith(SEPARATORS[level])) {
+            components.add("");
+        }
+
+//        String[] parts = flatStr.split(SEPARATOR_REGEXES[level]);
         FlatFieldBuilder flatFieldTree = new FlatFieldBuilder();
-        Arrays.asList(parts).stream().forEach(f -> {
+//        Arrays.asList(parts).stream().forEach(f -> {
+        components.stream().forEach(f -> {
             if (level+1<SEPARATORS.length && f.contains(SEPARATORS[level + 1])) {
                 flatFieldTree.addField(parseFlatFieldTree(f, level + 1));
             } else {

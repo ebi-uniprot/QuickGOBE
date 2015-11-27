@@ -50,6 +50,24 @@ public class FlatFieldBuilderTest {
         assertThat(origStr, is(equalTo(parsedStr)));
     }
 
+    @Test
+    public void handleEmptyFieldsConsistentlyAtEnd() {
+        FlatFieldBuilder origFlatFieldBuilder = newFlatField()
+                .addField(newFlatFieldLeaf("XX:00001"))
+                .addField(newFlatFieldLeaf("XX"))
+                .addField(newFlatFieldLeaf("because it's also bad"))
+                .addField(newFlatFieldLeaf())
+                .addField(newFlatFieldLeaf("something else"))
+                .addField(newFlatFieldLeaf());
+        String origStr = origFlatFieldBuilder // no parameter means it's got no value
+                .buildString();
+        System.out.println(origStr);
+
+        FlatFieldBuilder flatFieldBuilder = parseFlatFieldTree(origStr);
+        assertThat(origFlatFieldBuilder.getFields().size(), is(equalTo(flatFieldBuilder.getFields().size())));
+        assertThat(origFlatFieldBuilder.getFields().size(), is(6));
+    }
+
     /** Check one can create a flat field object, write itself as a String A, then parse
      * this written value into a new flat field object, and write it again as String B. A and B
      * must be equal.

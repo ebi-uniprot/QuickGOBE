@@ -113,6 +113,8 @@ public class OntologyDocument {
     public List<String> xrefs;
     @Field("taxonConstraint")
     public List<String> taxonConstraints;
+    @Field("blacklist")
+    public List<String> blacklist;
     @Field("annotationGuideline")
     public List<String> annotationGuidelines;
     @Field("xRelation")

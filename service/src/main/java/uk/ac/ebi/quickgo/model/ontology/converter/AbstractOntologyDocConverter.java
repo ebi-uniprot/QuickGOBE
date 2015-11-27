@@ -37,8 +37,41 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
         term.xrefs = retrieveXRefs(ontologyDocument.xrefs);
         term.taxonConstraints = retrieveTaxonConstraints(ontologyDocument.taxonConstraints);
         term.xRelations = retrieveXOntologyRelations(ontologyDocument.xRelations);
+        term.blacklist = retrieveBlackListedItems(ontologyDocument.blacklist);
 
         return term;
+    }
+
+    protected List<OBOTerm.BlacklistItem> retrieveBlackListedItems(List<String> blacklist) {
+        if (blacklist != null) {
+            List<OBOTerm.BlacklistItem> blacklistItems = new ArrayList<>();
+            blacklist.stream().forEach(
+                    b -> {
+                        // format: geneProductId|geneProductDB|reason|category|method
+                        OBOTerm.BlacklistItem blacklistItem = new OBOTerm.BlacklistItem();
+
+                        List<FlatField> fields = parseFlatFieldTree(b).getFields();
+                        if (fields.size() == 5) {
+                            blacklistItem.geneProductId = nullOrString(fields.get(0).buildString());
+                            blacklistItem.geneProductDb = nullOrString(fields.get(1).buildString());
+                            blacklistItem.reason = nullOrString(fields.get(2).buildString());
+                            blacklistItem.category = nullOrString(fields.get(3).buildString());
+                            blacklistItem.method = nullOrString(fields.get(4).buildString());
+                            blacklistItems.add(blacklistItem);
+                        } else {
+                            LOGGER.warn("Could not parse flattened blacklist: {}", b);
+                        }
+                    }
+            );
+            return blacklistItems;
+        } else {
+            return null;
+        }
+    }
+
+    protected static String nullOrString(String convertedField) {
+        String trimmed = convertedField.trim();
+        return (trimmed.equals("")) ? null : trimmed;
     }
 
     protected List<OBOTerm.XORelation> retrieveXOntologyRelations(List<String> xrels) {
@@ -51,11 +84,11 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
 
                         List<FlatField> fields = parseFlatFieldTree(x).getFields();
                         if (fields.size() == 5) {
-                            xORel.id = fields.get(0).buildString().trim();
-                            xORel.term = fields.get(1).buildString().trim();
-                            xORel.namespace = fields.get(2).buildString().trim();
-                            xORel.url = fields.get(3).buildString().trim();
-                            xORel.relation = fields.get(4).buildString().trim();
+                            xORel.id = nullOrString(fields.get(0).buildString());
+                            xORel.term = nullOrString(fields.get(1).buildString());
+                            xORel.namespace = nullOrString(fields.get(2).buildString());
+                            xORel.url = nullOrString(fields.get(3).buildString());
+                            xORel.relation = nullOrString(fields.get(4).buildString());
                             oboXORels.add(xORel);
                         } else {
                             LOGGER.warn("Could not parse flattened xORel: {}", x);
@@ -78,27 +111,19 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         OBOTerm.TaxonConstraint taxonConstraint = new OBOTerm.TaxonConstraint();
 
                         List<FlatField> fields = parseFlatFieldTree(t).getFields();
-                        if (fields.size() == 8) {
-                            taxonConstraint.ancestorId = fields.get(0).buildString().trim();
-                            taxonConstraint.ancestorName = fields.get(1).buildString().trim();
-                            taxonConstraint.relationship = fields.get(2).buildString().trim();
-                            taxonConstraint.taxId = fields.get(3).buildString().trim();
-                            taxonConstraint.taxIdType = fields.get(4).buildString().trim();
-                            taxonConstraint.taxName = fields.get(5).buildString().trim();
+                        if (fields.size() == 7) {
+                            taxonConstraint.ancestorId = nullOrString(fields.get(0).buildString()).trim();
+                            taxonConstraint.ancestorName = nullOrString(fields.get(1).buildString());
+                            taxonConstraint.relationship = nullOrString(fields.get(2).buildString());
+                            taxonConstraint.taxId = nullOrString(fields.get(3).buildString());
+                            taxonConstraint.taxIdType = nullOrString(fields.get(4).buildString());
+                            taxonConstraint.taxName = nullOrString(fields.get(5).buildString());
                             taxonConstraint.citations = new ArrayList<>();
                             fields.get(6).getFields().stream().forEach(
                                     rawLit -> {
                                         OBOTerm.Lit lit = new OBOTerm.Lit();
                                         lit.id = rawLit.buildString();
                                         taxonConstraint.citations.add(lit);
-                                    }
-                            );
-                            taxonConstraint.blacklist = new ArrayList<>();
-                            fields.get(7).getFields().stream().forEach(
-                                    blacklisted -> {
-                                        OBOTerm.BlackListItem blackListItem = new OBOTerm.BlackListItem();
-                                        blackListItem.id = blacklisted.buildString();
-                                        taxonConstraint.blacklist.add(blackListItem);
                                     }
                             );
 
@@ -124,9 +149,9 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
 
                         List<FlatField> fields = parseFlatFieldTree(x).getFields();
                         if (fields.size() == 3) {
-                            xref.dbCode = fields.get(0).buildString().trim();
-                            xref.dbId = fields.get(1).buildString().trim();
-                            xref.name = fields.get(2).buildString().trim();
+                            xref.dbCode = nullOrString(fields.get(0).buildString());
+                            xref.dbId = nullOrString(fields.get(1).buildString());
+                            xref.name = nullOrString(fields.get(2).buildString());
                             oboXrefs.add(xref);
                         } else {
                             LOGGER.warn("Could not parse flattened xref: {}", x);
@@ -149,11 +174,11 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
 
                         List<FlatField> fields = parseFlatFieldTree(h).getFields();
                         if (fields.size() == 5) {
-                            historicalInfo.name = fields.get(0).buildString().trim();
-                            historicalInfo.timestamp = fields.get(1).buildString().trim();
-                            historicalInfo.action = fields.get(2).buildString().trim();
-                            historicalInfo.category = fields.get(3).buildString().trim();
-                            historicalInfo.text = fields.get(4).buildString().trim();
+                            historicalInfo.name = nullOrString(fields.get(0).buildString());
+                            historicalInfo.timestamp = nullOrString(fields.get(1).buildString());
+                            historicalInfo.action = nullOrString(fields.get(2).buildString());
+                            historicalInfo.category = nullOrString(fields.get(3).buildString());
+                            historicalInfo.text = nullOrString(fields.get(4).buildString());
                             history.add(historicalInfo);
                         } else {
                             LOGGER.warn("Could not parse flattened history: {}", h);
@@ -176,8 +201,8 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         OBOTerm.Synonym synonym = new OBOTerm.Synonym();
                         List<FlatField> fields = parseFlatFieldTree(s).getFields();
                         if (fields.size() == 2) {
-                            synonym.synonymName = fields.get(0).buildString().trim();
-                            synonym.synonymType = fields.get(1).buildString().trim();
+                            synonym.synonymName = nullOrString(fields.get(0).buildString());
+                            synonym.synonymType = nullOrString(fields.get(1).buildString());
                             synonyms.add(synonym);
                         } else {
                             LOGGER.warn("Could not parse flattened synonym: {}", s);

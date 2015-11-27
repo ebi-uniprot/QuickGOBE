@@ -119,6 +119,7 @@ public class OntologyRepositoryTest {
                 ontologyRepository.findTaxonConstraintsByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
         assertThat(optionalDoc.isPresent(), is(true));
         assertThat(optionalDoc.get().taxonConstraints, is(notNullValue()));
+        assertThat(optionalDoc.get().blacklist, is(notNullValue()));
     }
 
     @Test

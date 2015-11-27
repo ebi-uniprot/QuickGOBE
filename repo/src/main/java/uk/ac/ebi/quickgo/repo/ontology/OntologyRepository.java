@@ -37,6 +37,7 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
     public static final String ANNOTATION_GUIDELINE = "";
     public static final String TAXON_CONSTRAINT = "taxonConstraint";
     public static final String XRELATIONS = "xRelation";
+    public static final String BLACKLIST = "blacklist";
 
     // complete
     @Query("ontologyType:?0 AND id:?1")
@@ -58,9 +59,9 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
             fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, XREF})
     Optional<OntologyDocument> findXRefsByTermId(String idType, String id);
 
-    // taxonomy constraints
+    // taxonomy constraints and blacklist
     @Query(value = "ontologyType:?0 AND id:?1",
-            fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, TAXON_CONSTRAINT})
+            fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, TAXON_CONSTRAINT, BLACKLIST})
     Optional<OntologyDocument> findTaxonConstraintsByTermId(String idType, String id);
 
     // cross-ontology relations
