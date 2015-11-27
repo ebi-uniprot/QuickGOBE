@@ -102,7 +102,7 @@ public class OntologyDocMocker {
                 .buildString());
 
         // example taxonomy constraints
-        // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2..
+        // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2|blacklist
         od.taxonConstraints = new ArrayList<>();
         od.taxonConstraints.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0005623"))
@@ -114,6 +114,9 @@ public class OntologyDocMocker {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf("PMID:00000001"))
                         .addField(newFlatFieldLeaf("PMID:00000002")))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("blacklist item 0"))
+                        .addField(newFlatFieldLeaf("blacklist item 1")))
                 .buildString());
         od.taxonConstraints.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0005624"))

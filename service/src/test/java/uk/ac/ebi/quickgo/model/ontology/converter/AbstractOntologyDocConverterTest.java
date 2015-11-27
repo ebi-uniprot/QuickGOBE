@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
@@ -222,6 +223,9 @@ public class AbstractOntologyDocConverterTest {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf("PMID:00000001"))
                         .addField(newFlatFieldLeaf("PMID:00000002")))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("blacklist item 0"))
+                        .addField(newFlatFieldLeaf("blacklist item 1")))
                 .buildString());
         rawTaxonConstraints.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0005624"))
@@ -233,14 +237,20 @@ public class AbstractOntologyDocConverterTest {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf(citationId))
                         .addField(newFlatFieldLeaf("PMID:00000004")))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf(""))
+                        .addField(newFlatFieldLeaf("")))
                 .buildString());
 
         List<OBOTerm.TaxonConstraint> taxonConstraints = converter.retrieveTaxonConstraints(rawTaxonConstraints);
         assertThat(taxonConstraints.size(), is(2));
         assertThat(taxonConstraints.get(0).ancestorId, is(ancestorId));
         assertThat(taxonConstraints.get(0).taxIdType, is(taxIdType));
+        assertThat(taxonConstraints.get(0).blacklist, is(notNullValue()));
+        assertThat(taxonConstraints.get(0).blacklist.get(0).id, is(equalTo("blacklist item 0")));
         assertThat(taxonConstraints.get(1).taxId, is(taxId));
         assertThat(taxonConstraints.get(1).citations.get(0).id, is(citationId));
+        assertThat(taxonConstraints.get(1).blacklist, is(Collections.emptyList()));
     }
 
     @Test

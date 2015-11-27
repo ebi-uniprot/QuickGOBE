@@ -73,11 +73,12 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
             List<OBOTerm.TaxonConstraint> oboXrefs = new ArrayList<>();
             taxonConstraints.stream().forEach(
                     t -> {
-                        // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2..
+                        // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2
+                        // |blacklist
                         OBOTerm.TaxonConstraint taxonConstraint = new OBOTerm.TaxonConstraint();
 
                         List<FlatField> fields = parseFlatFieldTree(t).getFields();
-                        if (fields.size() == 7) {
+                        if (fields.size() == 8) {
                             taxonConstraint.ancestorId = fields.get(0).buildString().trim();
                             taxonConstraint.ancestorName = fields.get(1).buildString().trim();
                             taxonConstraint.relationship = fields.get(2).buildString().trim();
@@ -90,6 +91,14 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                                         OBOTerm.Lit lit = new OBOTerm.Lit();
                                         lit.id = rawLit.buildString();
                                         taxonConstraint.citations.add(lit);
+                                    }
+                            );
+                            taxonConstraint.blacklist = new ArrayList<>();
+                            fields.get(7).getFields().stream().forEach(
+                                    blacklisted -> {
+                                        OBOTerm.BlackListItem blackListItem = new OBOTerm.BlackListItem();
+                                        blackListItem.id = blacklisted.buildString();
+                                        taxonConstraint.blacklist.add(blackListItem);
                                     }
                             );
 

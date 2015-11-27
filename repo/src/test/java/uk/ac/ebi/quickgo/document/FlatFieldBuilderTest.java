@@ -32,6 +32,22 @@ public class FlatFieldBuilderTest {
         assertThat(flatField.contains("a"), is(true));
         assertThat(flatField.contains("b"), is(true));
         assertThat(flatField.contains("3"), is(true));
+        System.out.println(flatField);
+    }
+
+    @Test
+    public void handleEmptyFieldsConsistently() {
+        String origStr = newFlatField()
+                .addField(newFlatFieldLeaf("1"))
+                .addField(newFlatFieldLeaf(""))
+                .addField(newFlatFieldLeaf("3")).buildString();
+        System.out.println(origStr);
+
+        FlatFieldBuilder flatFieldBuilderParsed = parseFlatFieldTree(origStr);
+        String parsedStr = flatFieldBuilderParsed.buildString();
+        System.out.println(parsedStr);
+
+        assertThat(origStr, is(equalTo(parsedStr)));
     }
 
     /** Check one can create a flat field object, write itself as a String A, then parse
