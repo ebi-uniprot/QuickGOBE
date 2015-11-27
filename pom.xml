@@ -15,13 +15,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>quickgo-common-util</module>
-        <module>quickgo-service</module>
-        <module>quickgo-solr</module>
-        <module>quickgo-solr-common</module>
-        <module>quickgo-solr-indexing</module>
-        <module>quickgo-solr-query</module>
-        <module>quickgo-webapp</module>
         <module>repo</module>
         <module>rest</module>
         <module>repo-writer</module>
@@ -215,6 +208,8 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${surefire-version}</version>
                     <configuration>
+                        <forkCount>1</forkCount>
+                        <reuseForks>false</reuseForks>
                         <!-- Exclude integration tests from unit test run-->
                         <excludes>
                             <skipITs>${skipUTs}</skipITs>

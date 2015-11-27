@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <description>Source Files to Repository Writers</description>
-    <name>Source File to Repository Writers</name>
+    <name>Writers of Source to Repository</name>
     <artifactId>repo-writer</artifactId>
 
 

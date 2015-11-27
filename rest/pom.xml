@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rest</artifactId>
-    <name>QuickGO RESTful services</name>
+    <name>RESTful services</name>
 
     <dependencies>
         <dependency>
