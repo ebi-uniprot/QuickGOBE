@@ -38,8 +38,33 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
         term.taxonConstraints = retrieveTaxonConstraints(ontologyDocument.taxonConstraints);
         term.xRelations = retrieveXOntologyRelations(ontologyDocument.xRelations);
         term.blacklist = retrieveBlackListedItems(ontologyDocument.blacklist);
+        term.annotationGuidelines = retrieveAnnotationGuideLines(ontologyDocument.annotationGuidelines);
 
         return term;
+    }
+
+    protected List<OBOTerm.AnnotationGuideLine> retrieveAnnotationGuideLines(List<String> annotationGuidelines) {
+        if (annotationGuidelines != null) {
+            List<OBOTerm.AnnotationGuideLine> ags = new ArrayList<>();
+            annotationGuidelines.stream().forEach(
+                    g -> {
+                        // format: geneProductId|geneProductDB|reason|category|method
+                        OBOTerm.AnnotationGuideLine ag = new OBOTerm.AnnotationGuideLine();
+
+                        List<FlatField> fields = parseFlatFieldTree(g).getFields();
+                        if (fields.size() == 2) {
+                            ag.description = nullOrString(fields.get(0).buildString());
+                            ag.url = nullOrString(fields.get(1).buildString());
+                            ags.add(ag);
+                        } else {
+                            LOGGER.warn("Could not parse flattened annotationGuidelines: {}", g);
+                        }
+                    }
+            );
+            return ags;
+        } else {
+            return null;
+        }
     }
 
     protected List<OBOTerm.BlacklistItem> retrieveBlackListedItems(List<String> blacklist) {

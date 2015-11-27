@@ -163,6 +163,20 @@ public class OntologyDocMocker {
                 .addField(newFlatFieldLeaf("has_participant"))
                 .buildString());
 
+        // annotation guidelines
+        // format: description|url
+        od.annotationGuidelines = new ArrayList<>();
+        od.annotationGuidelines.add(newFlatField()
+                .addField(newFlatFieldLeaf("description 0"))
+                .addField(newFlatFieldLeaf("http://www.guardian.co.uk"))
+                .buildString()
+        );
+        od.annotationGuidelines.add(newFlatField()
+                .addField(newFlatFieldLeaf("description 1"))
+                .addField(newFlatFieldLeaf("http://www.pinkun.com"))
+                .buildString()
+        );
+
         return od;
     }
 

@@ -34,7 +34,7 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
     public static final String SYNONYMS = "synonyms";
     public static final String HISTORY = "history";
     public static final String XREF = "xref";
-    public static final String ANNOTATION_GUIDELINE = "";
+    public static final String ANNOTATION_GUIDELINE = "annotationGuideline";
     public static final String TAXON_CONSTRAINT = "taxonConstraint";
     public static final String XRELATIONS = "xRelation";
     public static final String BLACKLIST = "blacklist";

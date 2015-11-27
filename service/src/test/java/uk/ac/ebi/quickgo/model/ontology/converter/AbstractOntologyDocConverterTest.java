@@ -272,6 +272,28 @@ public class AbstractOntologyDocConverterTest {
     }
 
     @Test
+    public void convertsAnnotationGuideLines() {
+        List<String> rawAnnotationGuideLines = new ArrayList<>();
+        String description0 = "description 0";
+        rawAnnotationGuideLines.add(newFlatField()
+                .addField(newFlatFieldLeaf(description0))
+                .addField(newFlatFieldLeaf("http://www.guardian.co.uk"))
+                .buildString()
+        );
+        String url1 = "http://www.pinkun.com";
+        rawAnnotationGuideLines.add(newFlatField()
+                .addField(newFlatFieldLeaf("description 1"))
+                .addField(newFlatFieldLeaf(url1))
+                .buildString()
+        );
+
+        List<OBOTerm.AnnotationGuideLine> annotationGuideLines = converter.retrieveAnnotationGuideLines(rawAnnotationGuideLines);
+        assertThat(annotationGuideLines.size(), is(2));
+        assertThat(annotationGuideLines.get(0).description, is(description0));
+        assertThat(annotationGuideLines.get(1).url, is(url1));
+    }
+
+    @Test
     public void convertsXOntologyRelations() {
         String id0 = "id0";
         String term0 = "term0";

@@ -111,6 +111,17 @@ public class OntologyRepositoryTest {
     }
 
     @Test
+    public void retrievesAnnotationGuidelinesField() {
+        String id = "GO:0000001";
+        ontologyRepository.save(createGODoc(id, "GO name 1"));
+
+        Optional<OntologyDocument> optionalDoc =
+                ontologyRepository.findAnnotationGuidelinesByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
+        assertThat(optionalDoc.isPresent(), is(true));
+        assertThat(optionalDoc.get().annotationGuidelines, is(notNullValue()));
+    }
+
+    @Test
     public void retrievesTaxonConstraintsField() {
         String id = "GO:0000001";
         ontologyRepository.save(createGODoc(id, "GO name 1"));

@@ -76,7 +76,7 @@ public class OBOTerm {
     }
 
     public static class AnnotationGuideLine {
-        public String title;
+        public String description;
         public String url;
     }
 
