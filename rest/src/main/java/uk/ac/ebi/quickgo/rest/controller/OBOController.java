@@ -23,7 +23,7 @@ public abstract class OBOController<T> {
     }
 
     /**
-     * An empty path should result in a bad request
+     * An empty or unknown path should result in a bad request
      * @param id
      * @return
      */
@@ -33,7 +33,7 @@ public abstract class OBOController<T> {
     }
 
     /**
-     * Get a GO term based on its id
+     * Get core information about a term based on its id
      * @param id
      * @return
      */
@@ -50,7 +50,7 @@ public abstract class OBOController<T> {
     }
 
     /**
-     * Get a GO term based on its id
+     * Get complete information about a term based on its id
      * @param id
      * @return
      */
@@ -67,7 +67,7 @@ public abstract class OBOController<T> {
     }
 
     /**
-     * Get a GO term based on its id
+     * Get history information about a term based on its id
      * @param id
      * @return
      */
@@ -84,7 +84,7 @@ public abstract class OBOController<T> {
     }
 
     /**
-     * Get a GO term based on its id
+     * Get cross-reference information about a term based on its id
      * @param id
      * @return
      */
@@ -101,7 +101,7 @@ public abstract class OBOController<T> {
     }
 
     /**
-     * Get a GO term based on its id
+     * Get taxonomy constraint and blacklist information about a term based on its id
      * @param id
      * @return
      */
@@ -118,7 +118,7 @@ public abstract class OBOController<T> {
     }
 
     /**
-     * Get a GO term based on its id
+     * Get cross-ontology relationship information about a term based on its id
      * @param id
      * @return
      */
@@ -135,7 +135,7 @@ public abstract class OBOController<T> {
     }
 
     /**
-     * Get a GO term based on its id
+     * Get annotation guideline information about a term based on its id
      * @param id
      * @return
      */
