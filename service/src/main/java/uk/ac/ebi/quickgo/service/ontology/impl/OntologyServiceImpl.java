@@ -31,7 +31,9 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
 
     public OntologyServiceImpl() {}
 
-    public OntologyServiceImpl(OntologyRepository repository, OntologyDocConverter<T> converter,
+    public OntologyServiceImpl(
+            OntologyRepository repository,
+            OntologyDocConverter<T> converter,
             OntologyType type) {
         ontologyType = type.name();
 
