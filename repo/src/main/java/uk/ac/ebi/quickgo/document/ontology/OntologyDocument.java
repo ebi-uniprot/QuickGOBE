@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.document.ontology;
 
-import java.util.Date;
 import java.util.List;
 import org.apache.solr.client.solrj.beans.Field;
 
@@ -39,37 +38,6 @@ import org.apache.solr.client.solrj.beans.Field;
  * @author Edd
  */
 public class OntologyDocument {
-    public static final String INTRA_ITEM_FIELD_SEPARATOR= "|";
-    public static final String INTRA_ITEM_FIELD_REGEX= "\\|";
-
-    // TODO: modelling multiple types in the same Solr core makes this enum necessary ...
-    public enum Type {
-        TERM("term"),
-        SYNONYM("synonym"),
-        RELATION("relation"),
-        CONSTRAINT("constraint"),
-        HISTORY("history"),
-        XREF("xref"),
-        GUIDELINE("guideline"),
-        REPLACE("replace"),
-        ONTOLOGY("ontology"),
-        ONTOLOGYRELATION("ontologyrelation");
-
-        String value;
-
-        Type(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-    // Fields common to all documents
-    @Field
-    public String docType;      // e.g.,    term    (for GO:0000001)
-    //                                      synonym (for a synonym)
 
     // schema 2.0 -- flattened and cleaned
     @Field
@@ -119,107 +87,5 @@ public class OntologyDocument {
     public List<String> annotationGuidelines;
     @Field("xRelation")
     public List<String> xRelations;
-
-    // --------------------------------------------------------------------------
-    // Terms
-    @Field
-    public String ontology;
-    @Field
-    public String category;
-    @Field("definitionXref")
-    public List<String> definitionXref;
-
-
-    @Field
-    public String version;
-
-    @Field("credit")
-    public List<String> credits;
-
-    // Relations
-    //    @Field
-    //    public String child;
-    //    @Field
-    //    public String parent;
-    //    @Field
-    //    public String relationType;
-
-    // --------------------------------------------------------------------------
-    // Synonyms
-//    @Field
-//    public String synonymName;
-//    @Field
-//    public String synonymType;
-
-    // --------------------------------------------------------------------------
-    // Taxonomy Constraints
-    @Field
-    public String taxonConstraintRuleId;
-    @Field
-    public String taxonConstraintAncestorId;
-    @Field
-    public String taxonConstraintName;
-    @Field
-    public String taxonConstraintRelationship;
-    @Field
-    public String taxonConstraintTaxIdType;
-    @Field
-    public String taxonConstraintTaxId;
-    @Field
-    public String taxonConstraintTaxName;
-    @Field("pubMedId")
-    public List<String> pubMedIds;
-
-    // --------------------------------------------------------------------------
-    // Cross References
-    @Field
-    public String xrefDbCode;
-    @Field
-    public String xrefDbId;
-    @Field
-    public String xrefName;
-
-    // --------------------------------------------------------------------------
-    // Replaces
-    @Field
-    public String obsoleteId;
-    @Field
-    public String reason;
-
-    // --------------------------------------------------------------------------
-    // Annotation Guidelines
-    @Field
-    public String annotationGuidelineTitle;
-    @Field
-    public String annotationGuidelineUrl;
-
-    // --------------------------------------------------------------------------
-    // Cross-ontology relations
-    @Field
-    public String crossOntologyRelation;
-    @Field
-    public String crossOntologyOtherNamespace;
-    @Field
-    public String crossOntologyForeignId;
-    @Field
-    public String crossOntologyForeignTerm;
-    @Field
-    public String crossOntologyUrl;
-
-    // --------------------------------------------------------------------------
-    // Change log
-    @Field
-    public String historyName;
-    @Field
-    public Date historyTimeStamp;
-    @Field
-    public String historyAction;
-    @Field
-    public String historyCategory;
-    @Field
-    public String historyText;
-
-    // --------------------------------------------------------------------------
-    // OBO Fields
 
 }
