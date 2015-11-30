@@ -29,7 +29,7 @@
         <skipUTs>false</skipUTs>
 
         <!-- Test coverage -->
-        <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
+        <jacoco.outputDir>${project.build.directory}/../../target</jacoco.outputDir>
 
         <!-- Unit test report path -->
         <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
@@ -253,6 +253,7 @@
                             <configuration>
                                 <destFile>${jacoco.reportPath}</destFile>
                                 <propertyName>jacoco.agent.ut.arg</propertyName>
+                                <append>true</append>
                             </configuration>
                         </execution>
                         <!-- Sets up jacaco for integration test coverage analysis (jacoco.agent.it.arg) -->
@@ -265,6 +266,7 @@
                             <configuration>
                                 <destFile>${jacoco.itReportPath}</destFile>
                                 <propertyName>jacoco.agent.it.arg</propertyName>
+                                <append>true</append>
                             </configuration>
                         </execution>
                     </executions>
