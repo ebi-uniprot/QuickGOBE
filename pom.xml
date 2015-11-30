@@ -208,8 +208,6 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${surefire-version}</version>
                     <configuration>
-                        <forkCount>1</forkCount>
-                        <reuseForks>false</reuseForks>
                         <!-- Exclude integration tests from unit test run-->
                         <excludes>
                             <skipITs>${skipUTs}</skipITs>
@@ -225,6 +223,8 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${failsafe-version}</version>
                     <configuration>
+                        <forkCount>1</forkCount>
+                        <reuseForks>false</reuseForks>
                         <skipITs>${skipITs}</skipITs>
                         <argLine>${jacoco.agent.it.arg}</argLine>
                     </configuration>
