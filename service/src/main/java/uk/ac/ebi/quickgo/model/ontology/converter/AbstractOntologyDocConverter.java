@@ -96,8 +96,11 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
     }
 
     protected static String nullOrString(String convertedField) {
-        String trimmed = convertedField.trim();
-        return (trimmed.equals("")) ? null : trimmed;
+        if (convertedField != null) {
+            return (convertedField.trim().equals("")) ? null : convertedField.trim();
+        } else {
+            return null;
+        }
     }
 
     protected List<OBOTerm.XORelation> retrieveXOntologyRelations(List<String> xrels) {
