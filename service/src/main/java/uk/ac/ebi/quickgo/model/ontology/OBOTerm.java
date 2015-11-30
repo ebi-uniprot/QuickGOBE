@@ -11,7 +11,7 @@ import java.util.List;
  * Created 19/11/15
  * @author Edd
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class OBOTerm {
     // term ID
     public String id;

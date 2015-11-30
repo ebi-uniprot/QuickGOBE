@@ -44,8 +44,8 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
     }
 
     protected List<OBOTerm.AnnotationGuideLine> retrieveAnnotationGuideLines(List<String> annotationGuidelines) {
+        List<OBOTerm.AnnotationGuideLine> ags = new ArrayList<>();
         if (annotationGuidelines != null) {
-            List<OBOTerm.AnnotationGuideLine> ags = new ArrayList<>();
             annotationGuidelines.stream().forEach(
                     g -> {
                         // format: geneProductId|geneProductDB|reason|category|method
@@ -61,15 +61,13 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         }
                     }
             );
-            return ags;
-        } else {
-            return null;
         }
+        return ags;
     }
 
     protected List<OBOTerm.BlacklistItem> retrieveBlackListedItems(List<String> blacklist) {
+        List<OBOTerm.BlacklistItem> blacklistItems = new ArrayList<>();
         if (blacklist != null) {
-            List<OBOTerm.BlacklistItem> blacklistItems = new ArrayList<>();
             blacklist.stream().forEach(
                     b -> {
                         // format: geneProductId|geneProductDB|reason|category|method
@@ -89,10 +87,8 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         }
                     }
             );
-            return blacklistItems;
-        } else {
-            return null;
         }
+        return blacklistItems;
     }
 
     protected static String nullOrString(String convertedField) {
@@ -104,8 +100,8 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
     }
 
     protected List<OBOTerm.XORelation> retrieveXOntologyRelations(List<String> xrels) {
+        List<OBOTerm.XORelation> oboXORels = new ArrayList<>();
         if (xrels != null) {
-            List<OBOTerm.XORelation> oboXORels = new ArrayList<>();
             xrels.stream().forEach(
                     x -> {
                         // format: id|term|namespace|url|relation
@@ -124,15 +120,13 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         }
                     }
             );
-            return oboXORels;
-        } else {
-            return null;
         }
+        return oboXORels;
     }
 
     protected List<OBOTerm.TaxonConstraint> retrieveTaxonConstraints(List<String> taxonConstraints) {
+        List<OBOTerm.TaxonConstraint> oboXrefs = new ArrayList<>();
         if (taxonConstraints != null) {
-            List<OBOTerm.TaxonConstraint> oboXrefs = new ArrayList<>();
             taxonConstraints.stream().forEach(
                     t -> {
                         // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2
@@ -162,15 +156,13 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         }
                     }
             );
-            return oboXrefs;
-        } else {
-            return null;
         }
+        return oboXrefs;
     }
 
     protected List<OBOTerm.XRef> retrieveXRefs(List<String> xrefs) {
+        List<OBOTerm.XRef> oboXrefs = new ArrayList<>();
         if (xrefs != null) {
-            List<OBOTerm.XRef> oboXrefs = new ArrayList<>();
             xrefs.stream().forEach(
                     x -> {
                         // format: code|id|name
@@ -187,15 +179,13 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         }
                     }
             );
-            return oboXrefs;
-        } else {
-            return null;
         }
+        return oboXrefs;
     }
 
     protected List<OBOTerm.History> retrieveHistory(List<String> docHistory) {
+        List<OBOTerm.History> history = new ArrayList<>();
         if (docHistory != null) {
-            List<OBOTerm.History> history = new ArrayList<>();
             docHistory.stream().forEach(
                     h -> {
                         // format: name|timestamp|action|category|text
@@ -214,16 +204,13 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         }
                     }
             );
-            return history;
-        } else {
-            return null;
         }
+        return history;
     }
 
-
     protected List<OBOTerm.Synonym> retrieveSynonyms(List<String> docSynonyms) {
+        List<OBOTerm.Synonym> synonyms = new ArrayList<>();
         if (docSynonyms != null) {
-            List<OBOTerm.Synonym> synonyms = new ArrayList<>();
             docSynonyms.stream().forEach(
                     s -> {
                         // format: name|type
@@ -238,10 +225,8 @@ public abstract class AbstractOntologyDocConverter<T extends OBOTerm> implements
                         }
                     }
             );
-            return synonyms;
-        } else {
-            return null;
         }
+        return synonyms;
     }
 
 }
