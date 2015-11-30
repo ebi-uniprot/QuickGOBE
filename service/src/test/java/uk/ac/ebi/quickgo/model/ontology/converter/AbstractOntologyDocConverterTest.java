@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
+import static uk.ac.ebi.quickgo.model.ontology.converter.AbstractOntologyDocConverter.nullOrString;
 
 /**
  * Created 24/11/15
@@ -333,6 +334,21 @@ public class AbstractOntologyDocConverterTest {
         assertThat(xORefs.get(0).url, is(url0));
         assertThat(xORefs.get(1).namespace, is(namespace1));
         assertThat(xORefs.get(1).url, is(url1));
+    }
+
+    @Test
+    public void helperReturnsNullforEmptyString() {
+        assertThat(nullOrString(""), is(nullValue()));
+    }
+
+    @Test
+    public void helperReturnsStringForNonEmptyString() {
+        assertThat(nullOrString("hello"), is(equalTo("hello")));
+    }
+
+    @Test
+    public void helperReturnsNullForNullString() {
+        assertThat(nullOrString(null), is(nullValue()));
     }
 
 }
