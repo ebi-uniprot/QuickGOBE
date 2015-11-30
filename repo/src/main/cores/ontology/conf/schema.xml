@@ -93,60 +93,6 @@
     <!--                     End of QuickGO Ontology fields                         -->
     <!-- ========================================================================== -->
 
-    <!-- Basic information -->
-    <!--<field name="docType" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="ontology" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="category" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="definitionXref" type="string" indexed="true" stored="true" multiValued="true"/>-->
-    <!--<field name="version" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="credit" type="string" indexed="false" stored="true" multiValued="true"/>-->
-
-    <!-- Relations -->
-    <!--<field name="child" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="parent" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="relationType" type="string" indexed="true" stored="true"/>-->
-
-    <!-- Synonyms -->
-    <!--<field name="synonymName" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="synonymType" type="string" indexed="true" stored="true"/>-->
-
-    <!-- Taxon Constraints -->
-    <!--<field name="taxonConstraintRuleId" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="taxonConstraintAncestorId" type="string" indexed="false" stored="true" />-->
-    <!--<field name="taxonConstraintName" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="taxonConstraintRelationship" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="taxonConstraintTaxIdType" type="string" indexed="false" stored="true"/>-->
-    <!--<field name="taxonConstraintTaxId" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="taxonConstraintTaxName" type="string" indexed="false" stored="true"/>-->
-    <!--<field name="pubMedId" type="string" indexed="true" stored="true" multiValued="true"/>-->
-
-    <!-- Cross References -->
-    <!--<field name="xrefDbCode" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="xrefDbId" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="xrefName" type="string" indexed="false" stored="true"/>-->
-
-    <!-- Replaces -->
-    <!--<field name="obsoleteId" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="reason" type="string" indexed="true" stored="true"/>-->
-
-    <!-- Annotation Guidelines -->
-    <!--<field name="annotationGuidelineTitle" type="string" stored="true" />-->
-    <!--<field name="annotationGuidelineUrl" type="string" stored="true" />-->
-
-    <!-- History -->
-    <!--<field name="historyName" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="historyTimeStamp" type="date" indexed="true" stored="true"/>-->
-    <!--<field name="historyAction" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="historyCategory" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="historyText" type="string" stored="true"/>-->
-
-    <!-- Cross-ontology relations -->
-    <!--<field name="crossOntologyRelation" type="string" stored="true" />-->
-    <!--<field name="crossOntologyOtherNamespace" type="string" stored="true" />-->
-    <!--<field name="crossOntologyForeignId" type="string" stored="true" />-->
-    <!--<field name="crossOntologyForeignTerm" type="string" stored="true" />-->
-    <!--<field name="crossOntologyUrl" type="string" stored="true" />-->
-
     <!-- Internal/Aux fields -->
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="text" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
