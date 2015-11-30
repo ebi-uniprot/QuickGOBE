@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {QuickGOREST.class})
 @WebAppConfiguration
-public class GOControllerTest {
+public class GOControllerIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();

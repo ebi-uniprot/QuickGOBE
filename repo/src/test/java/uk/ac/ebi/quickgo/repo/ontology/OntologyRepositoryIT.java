@@ -31,7 +31,7 @@ import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = RepoConfig.class, loader = SpringApplicationContextLoader.class)
-public class OntologyRepositoryTest {
+public class OntologyRepositoryIT {
 
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
