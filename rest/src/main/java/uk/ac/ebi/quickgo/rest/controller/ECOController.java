@@ -41,7 +41,9 @@ public class ECOController extends OBOController<ECOTerm> {
      * Contains validation logic of GO path components
      */
     protected static class PathValidator {
-        final static Pattern validECOFormat = Pattern.compile("^ECO:[0-9]{7}$");
+        private PathValidator(){}
+
+        static final Pattern validECOFormat = Pattern.compile("^ECO:[0-9]{7}$");
 
         static boolean isValidECOId(String id) {
             return validECOFormat.matcher(id).matches();

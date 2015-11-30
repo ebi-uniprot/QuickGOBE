@@ -41,7 +41,9 @@ public class GOController extends OBOController<GOTerm> {
      * Contains validation logic of GO path components
      */
     protected static class PathValidator {
-        final static Pattern validGOFormat = Pattern.compile("^GO:[0-9]{7}$");
+        private PathValidator(){}
+
+        static final Pattern validGOFormat = Pattern.compile("^GO:[0-9]{7}$");
 
         static boolean isValidGOId(String id) {
             return validGOFormat.matcher(id).matches();
