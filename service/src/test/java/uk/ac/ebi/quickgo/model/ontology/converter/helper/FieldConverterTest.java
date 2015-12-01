@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.model.ontology.converter.helper;
 
 import uk.ac.ebi.quickgo.model.FieldConverter;
-import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
+import uk.ac.ebi.quickgo.model.FieldType;
 
 import java.util.Optional;
 import org.junit.Before;
@@ -20,9 +20,12 @@ import static org.hamcrest.core.IsNull.nullValue;
 public class FieldConverterTest {
     private FieldConverterImpl converter;
 
-    static class FieldConverterImpl implements FieldConverter<OBOTerm> {
+    static class MockFieldType implements FieldType {
+    }
 
-        @Override public Optional<OBOTerm> apply(String s) {
+    static class FieldConverterImpl implements FieldConverter<MockFieldType> {
+
+        @Override public Optional<MockFieldType> apply(String s) {
             return null;
         }
     }
