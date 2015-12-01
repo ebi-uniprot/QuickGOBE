@@ -6,7 +6,9 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- *
+ * Converts a Solr document's field String value into the corresponding
+ * field DTO. Used when converting Solr results to an object model which
+ * gets serialised by Jackson libraries, at the RESTful layer.
  *
  * Created 01/12/15
  * @author Edd
