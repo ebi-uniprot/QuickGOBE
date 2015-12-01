@@ -7,7 +7,7 @@ import uk.ac.ebi.quickgo.model.ontology.GOTerm;
  * Created 23/11/15
  * @author Edd
  */
-public class GODocConverter extends AbstractOntologyDocConverter<GOTerm> {
+public class GODocConverter extends AbstractODocConverter<GOTerm> {
     @Override public GOTerm convert(OntologyDocument ontologyDocument) {
         GOTerm goTerm = new GOTerm();
         addCommonFields(ontologyDocument, goTerm);

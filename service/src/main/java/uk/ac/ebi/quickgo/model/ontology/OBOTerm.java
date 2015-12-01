@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.model.ontology;
 
+import uk.ac.ebi.quickgo.model.FieldType;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
@@ -56,12 +58,12 @@ public class OBOTerm {
     public List<TaxonConstraint> taxonConstraints;
     public List<BlacklistItem> blacklist;
 
-    public static class Synonym {
+    public static class Synonym implements FieldType {
         public String synonymName;
         public String synonymType;
     }
 
-    public static class History {
+    public static class History implements FieldType {
         public String name;
         public String timestamp;
         public String action;
@@ -69,18 +71,18 @@ public class OBOTerm {
         public String text;
     }
 
-    public static class XRef {
+    public static class XRef implements FieldType {
         public String dbCode;
         public String dbId;
         public String name;
     }
 
-    public static class AnnotationGuideLine {
+    public static class AnnotationGuideLine implements FieldType {
         public String description;
         public String url;
     }
 
-    public static class TaxonConstraint {
+    public static class TaxonConstraint implements FieldType {
         public String ancestorId;
         public String ancestorName;
         public String relationship;
@@ -90,7 +92,11 @@ public class OBOTerm {
         public List<Lit> citations;
     }
 
-    public static class BlacklistItem {
+    public static class Lit implements FieldType {
+        public String id;
+    }
+
+    public static class BlacklistItem implements FieldType {
         public String geneProductId;
         public String geneProductDb;
         public String reason;
@@ -98,11 +104,7 @@ public class OBOTerm {
         public String method;
     }
 
-    public static class Lit {
-        public String id;
-    }
-
-    public static class XORelation {
+    public static class XORelation implements FieldType {
         public String id;
         public String term;
         public String namespace;
