@@ -17,27 +17,27 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
  */
 public interface OntologyRepository extends SolrCrudRepository<OntologyDocument, String> {
 
-    public static final String ID = "id";
-    public static final String ONTOLOGY_TYPE = "ontologyType";
-    public static final String NAME = "name";
-    public static final String SECONDARY_ID = "secondaryId";
-    public static final String IS_OBSOLETE = "obsolete";
-    public static final String CONSIDER = "consider";
-    public static final String REPLACED_BY = "replacedBy";
-    public static final String DEFINITION = "definition";
-    public static final String COMMENT = "comment";
-    public static final String ASPECT = "aspect";
-    public static final String USAGE = "usage";
-    public static final String SUBSET = "subset";
-    public static final String CHILDREN = "children";
-    public static final String ANCESTOR = "ancestor";
-    public static final String SYNONYMS = "synonyms";
-    public static final String HISTORY = "history";
-    public static final String XREF = "xref";
-    public static final String ANNOTATION_GUIDELINE = "annotationGuideline";
-    public static final String TAXON_CONSTRAINT = "taxonConstraint";
-    public static final String XRELATIONS = "xRelation";
-    public static final String BLACKLIST = "blacklist";
+    String ID = "id";
+    String ONTOLOGY_TYPE = "ontologyType";
+    String NAME = "name";
+    String SECONDARY_ID = "secondaryId";
+    String IS_OBSOLETE = "obsolete";
+    String CONSIDER = "consider";
+    String REPLACED_BY = "replacedBy";
+    String DEFINITION = "definition";
+    String COMMENT = "comment";
+    String ASPECT = "aspect";
+    String USAGE = "usage";
+    String SUBSET = "subset";
+    String CHILDREN = "children";
+    String ANCESTOR = "ancestor";
+    String SYNONYMS = "synonyms";
+    String HISTORY = "history";
+    String XREF = "xref";
+    String ANNOTATION_GUIDELINE = "annotationGuideline";
+    String TAXON_CONSTRAINT = "taxonConstraint";
+    String XRELATIONS = "xRelation";
+    String BLACKLIST = "blacklist";
 
     // complete
     @Query("ontologyType:?0 AND id:?1")
