@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.model.ontology.converter.helper;
+package uk.ac.ebi.quickgo.model.ontology.converter.field;
 
 import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
 
