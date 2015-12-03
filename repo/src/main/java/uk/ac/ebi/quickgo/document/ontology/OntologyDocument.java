@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.document.ontology;
 
+import uk.ac.ebi.quickgo.document.QuickGODocument;
+
 import java.util.List;
 import org.apache.solr.client.solrj.beans.Field;
 
@@ -37,7 +39,7 @@ import org.apache.solr.client.solrj.beans.Field;
  * Created 11/11/15
  * @author Edd
  */
-public class OntologyDocument {
+public class OntologyDocument implements QuickGODocument {
 
     // schema 2.0 -- flattened and cleaned
     @Field
@@ -87,5 +89,10 @@ public class OntologyDocument {
     public List<String> annotationGuidelines;
     @Field("xRelation")
     public List<String> xRelations;
+
+    @Override
+    public String getUniqueName() {
+        return this.id;
+    }
 
 }
