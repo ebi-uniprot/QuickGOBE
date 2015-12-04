@@ -21,17 +21,18 @@ import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 public class FlatFieldBuilder extends FlatField {
     // add more separators to allow handling deeper nesting
     private static final String[] SEPARATORS = new String[]{
+            "\t",
             "|||",
-            "%%%",
             "^^^",
+            "%%%",
             ":::"
-
     };
     // regexes for elements of SEPARATORS
     private static final String[] SEPARATOR_REGEXES = new String[]{
+            "\t",
             "\\|\\|\\|",
-            "%%%",
             "\\^\\^\\^",
+            "%%%",
             ":::"
     };
 
@@ -61,7 +62,7 @@ public class FlatFieldBuilder extends FlatField {
 
         FlatFieldBuilder flatField = new FlatFieldBuilder();
         components.stream().forEach(f -> {
-            if (level+1<SEPARATORS.length && f.contains(SEPARATORS[level + 1])) {
+            if (level + 1 < SEPARATORS.length && f.contains(SEPARATORS[level + 1])) {
                 flatField.addField(parseFlatField(f, level + 1));
             } else {
                 flatField.addField(newFlatFieldLeaf(f));
@@ -85,7 +86,7 @@ public class FlatFieldBuilder extends FlatField {
 
     public String buildString(int level) {
         StringJoiner sj = new StringJoiner(SEPARATORS[level]);
-        fields.stream().forEach( f->
+        fields.stream().forEach(f ->
                 sj.add(f.buildString(level + 1))
         );
         return sj.toString();
