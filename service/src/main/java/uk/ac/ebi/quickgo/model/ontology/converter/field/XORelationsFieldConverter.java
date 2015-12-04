@@ -25,11 +25,11 @@ public class XORelationsFieldConverter implements FieldConverter<OBOTerm.XORelat
 
         List<FlatField> fields = parseFlatField(s).getFields();
         if (fields.size() == 5) {
-            xORel.id = nullOrString(fields.get(0).buildString());
-            xORel.term = nullOrString(fields.get(1).buildString());
-            xORel.namespace = nullOrString(fields.get(2).buildString());
-            xORel.url = nullOrString(fields.get(3).buildString());
-            xORel.relation = nullOrString(fields.get(4).buildString());
+            xORel.id = nullOrString(fields.get(0).buildStringFromLevel(1));
+            xORel.term = nullOrString(fields.get(1).buildStringFromLevel(1));
+            xORel.namespace = nullOrString(fields.get(2).buildStringFromLevel(1));
+            xORel.url = nullOrString(fields.get(3).buildStringFromLevel(1));
+            xORel.relation = nullOrString(fields.get(4).buildStringFromLevel(1));
             return Optional.of(xORel);
         } else {
             LOGGER.warn("Could not parse flattened xORel: {}", s);

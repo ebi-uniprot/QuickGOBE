@@ -1,11 +1,14 @@
 package uk.ac.ebi.quickgo.repo.reader.line;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.ff.delim.FlatField;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatFieldToLevel;
 
 /**
  * Converts an ontology record/line from a delimited file to an {@link OntologyDocument} instance.
@@ -18,9 +21,8 @@ import java.util.stream.Collectors;
 public class OSourceLineConverter implements Function<String, OntologyDocument> {
 
     private static final String SEPARATOR0 = "\t";
-    private static final String SEPARATOR1 = "^^^";
-    private static final String SEPARATOR1_REGEX = "\\^\\^\\^";
-    private static final String SEPARATOR2 = "|||";
+    private static final String SEPARATOR1_REGEX = "\\|\\|\\|";
+    private static final String SEPARATOR2 = "\\^\\^\\^";
 
     private final static int ID_INDEX = 0;
     private final static int NAME_INDEX = 1;
@@ -48,35 +50,35 @@ public class OSourceLineConverter implements Function<String, OntologyDocument> 
     }
 
     @Override public OntologyDocument apply(String s) {
-        String[] fields = s.split(SEPARATOR0);
+        List<FlatField> flatFields = parseFlatFieldToLevel(s, 0).getFields();
 
-        if (fields.length == 20) {
+        if (flatFields.size() == 20) {
             OntologyDocument doc = new OntologyDocument();
-            doc.id = fields[ID_INDEX];
+            doc.id = flatFields.get(ID_INDEX).buildString();
             doc.ontologyType = doc.id.substring(0, doc.id.indexOf(":"));
-            doc.name = fields[NAME_INDEX];
-            doc.isObsolete = Boolean.valueOf(fields[IS_OBSOLETE_INDEX]);
-            doc.definition = fields[DEFINITION_INDEX];
-            doc.comment = fields[COMMENT_INDEX];
-            doc.secondaryIds = fieldAsStrList(fields[SECONDARIES_INDEX]);
-            doc.usage = fields[USAGE_INDEX];
-            doc.synonyms = fieldAsStrList(fields[SYNONYMS_INDEX]);
+            doc.name = flatFields.get(NAME_INDEX).buildString();
+            doc.isObsolete = Boolean.valueOf(flatFields.get(IS_OBSOLETE_INDEX).buildString());
+            doc.definition = flatFields.get(DEFINITION_INDEX).buildString();
+            doc.comment = flatFields.get(COMMENT_INDEX).buildString();
+            doc.secondaryIds = fieldAsStrList(flatFields.get(SECONDARIES_INDEX).buildString());
+            doc.usage = flatFields.get(USAGE_INDEX).buildString();
+            doc.synonyms = fieldAsStrList(flatFields.get(SYNONYMS_INDEX).buildString());
             doc.synonymNames = doc.synonyms == null? null : doc.synonyms.stream()
                     .map(synField ->
                             synField.substring(0, synField.indexOf(SEPARATOR2)))
                     .collect(Collectors.toList());
-            doc.subsets = fieldAsStrList(fields[SUBSETS_INDEX]);
-            doc.replacedBy = fields[REPLACED_BY_INDEX];
-            doc.considers = fieldAsStrList(fields[CONSIDERS_INDEX]);
-            doc.children = fieldAsStrList(fields[CHILDREN_INDEX]);
-            doc.ancestors = fieldAsStrList(fields[ANCESTORS_INDEX]);
-            doc.aspect = fieldAsStrList(fields[ASPECT_INDEX]);
-            doc.history = fieldAsStrList(fields[HISTORY_INDEX]);
-            doc.xrefs = fieldAsStrList(fields[XREFS_INDEX]);
-            doc.taxonConstraints = fieldAsStrList(fields[TAXON_CONSTRAINTS_INDEX]);
-            doc.blacklist = fieldAsStrList(fields[BLACKLIST_INDEX]);
-            doc.annotationGuidelines = fieldAsStrList(fields[ANNOTATION_GUIDELINES_INDEX]);
-            doc.xRelations = fieldAsStrList(fields[XRELATIONS_INDEX]);
+            doc.subsets = fieldAsStrList(flatFields.get(SUBSETS_INDEX).buildString());
+            doc.replacedBy = flatFields.get(REPLACED_BY_INDEX).buildString();
+            doc.considers = fieldAsStrList(flatFields.get(CONSIDERS_INDEX).buildString());
+            doc.children = fieldAsStrList(flatFields.get(CHILDREN_INDEX).buildString());
+            doc.ancestors = fieldAsStrList(flatFields.get(ANCESTORS_INDEX).buildString());
+            doc.aspect = fieldAsStrList(flatFields.get(ASPECT_INDEX).buildString());
+            doc.history = fieldAsStrList(flatFields.get(HISTORY_INDEX).buildString());
+            doc.xrefs = fieldAsStrList(flatFields.get(XREFS_INDEX).buildString());
+            doc.taxonConstraints = fieldAsStrList(flatFields.get(TAXON_CONSTRAINTS_INDEX).buildString());
+            doc.blacklist = fieldAsStrList(flatFields.get(BLACKLIST_INDEX).buildString());
+            doc.annotationGuidelines = fieldAsStrList(flatFields.get(ANNOTATION_GUIDELINES_INDEX).buildString());
+            doc.xRelations = fieldAsStrList(flatFields.get(XRELATIONS_INDEX).buildString());
 
             return doc;
         } else {

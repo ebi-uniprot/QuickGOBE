@@ -9,5 +9,5 @@ import java.util.List;
 public abstract class FlatField {
     public abstract List<FlatField> getFields();
     public abstract String buildString();
-    protected abstract String buildString(int level);
+    public abstract String buildStringFromLevel(int level);
 }
