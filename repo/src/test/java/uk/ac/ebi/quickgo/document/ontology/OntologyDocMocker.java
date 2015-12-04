@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.document.ontology;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
@@ -177,6 +179,41 @@ public class OntologyDocMocker {
         );
 
         return od;
+    }
+
+    public static String createOBODelimitedStr(OntologyDocument document) {
+        String sep1 = "^^^";
+        String sep0 = "\t";
+
+        return emptyOrString(document.id) + sep0 +
+                emptyOrString(document.name) + sep0 +
+                document.isObsolete + sep0 +
+                emptyOrString(document.definition) + sep0 +
+                emptyOrString(document.comment) + sep0 +
+                emptyOrString(document.secondaryIds, sep1) + sep0 +
+                emptyOrString(document.usage) + sep0 +
+                emptyOrString(document.synonyms, sep1) + sep0 +
+                //emptyOrString(document.synonymNames, sep1) + sep0 +
+                emptyOrString(document.subsets, sep1) + sep0 +
+                emptyOrString(document.replacedBy) + sep0 +
+                emptyOrString(document.considers, sep1) + sep0 +
+                emptyOrString(document.children, sep1) + sep0 +
+                emptyOrString(document.ancestors, sep1) + sep0 +
+                emptyOrString(document.aspect, sep1) + sep0 +
+                emptyOrString(document.history, sep1) + sep0 +
+                emptyOrString(document.xrefs, sep1) + sep0 +
+                emptyOrString(document.taxonConstraints, sep1) + sep0 +
+                emptyOrString(document.blacklist, sep1) + sep0 +
+                emptyOrString(document.annotationGuidelines, sep1) + sep0 +
+                emptyOrString(document.xRelations, sep1);
+    }
+
+    private static String emptyOrString(String value) {
+        return value == null ? "" : value;
+    }
+
+    private static String emptyOrString(List<String> values, String separator) {
+        return values == null ? "" : values.stream().collect(Collectors.joining(separator));
     }
 
 }

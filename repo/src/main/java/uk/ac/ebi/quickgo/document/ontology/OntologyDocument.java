@@ -95,4 +95,108 @@ public class OntologyDocument implements QuickGODocument {
         return this.id;
     }
 
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        OntologyDocument that = (OntologyDocument) o;
+
+        if (isObsolete != that.isObsolete) {
+            return false;
+        }
+        if (!id.equals(that.id)) {
+            return false;
+        }
+        if (ontologyType != null ? !ontologyType.equals(that.ontologyType) : that.ontologyType != null) {
+            return false;
+        }
+        if (name != null ? !name.equals(that.name) : that.name != null) {
+            return false;
+        }
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) {
+            return false;
+        }
+        if (comment != null ? !comment.equals(that.comment) : that.comment != null) {
+            return false;
+        }
+        if (secondaryIds != null ? !secondaryIds.equals(that.secondaryIds) : that.secondaryIds != null) {
+            return false;
+        }
+        if (usage != null ? !usage.equals(that.usage) : that.usage != null) {
+            return false;
+        }
+        if (synonyms != null ? !synonyms.equals(that.synonyms) : that.synonyms != null) {
+            return false;
+        }
+        if (synonymNames != null ? !synonymNames.equals(that.synonymNames) : that.synonymNames != null) {
+            return false;
+        }
+        if (subsets != null ? !subsets.equals(that.subsets) : that.subsets != null) {
+            return false;
+        }
+        if (replacedBy != null ? !replacedBy.equals(that.replacedBy) : that.replacedBy != null) {
+            return false;
+        }
+        if (considers != null ? !considers.equals(that.considers) : that.considers != null) {
+            return false;
+        }
+        if (children != null ? !children.equals(that.children) : that.children != null) {
+            return false;
+        }
+        if (ancestors != null ? !ancestors.equals(that.ancestors) : that.ancestors != null) {
+            return false;
+        }
+        if (aspect != null ? !aspect.equals(that.aspect) : that.aspect != null) {
+            return false;
+        }
+        if (history != null ? !history.equals(that.history) : that.history != null) {
+            return false;
+        }
+        if (xrefs != null ? !xrefs.equals(that.xrefs) : that.xrefs != null) {
+            return false;
+        }
+        if (taxonConstraints != null ? !taxonConstraints.equals(that.taxonConstraints) :
+                that.taxonConstraints != null) {
+            return false;
+        }
+        if (blacklist != null ? !blacklist.equals(that.blacklist) : that.blacklist != null) {
+            return false;
+        }
+        if (annotationGuidelines != null ? !annotationGuidelines.equals(that.annotationGuidelines) :
+                that.annotationGuidelines != null) {
+            return false;
+        }
+        return !(xRelations != null ? !xRelations.equals(that.xRelations) : that.xRelations != null);
+
+    }
+
+    @Override public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + (ontologyType != null ? ontologyType.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (isObsolete ? 1 : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (comment != null ? comment.hashCode() : 0);
+        result = 31 * result + (secondaryIds != null ? secondaryIds.hashCode() : 0);
+        result = 31 * result + (usage != null ? usage.hashCode() : 0);
+        result = 31 * result + (synonyms != null ? synonyms.hashCode() : 0);
+        result = 31 * result + (synonymNames != null ? synonymNames.hashCode() : 0);
+        result = 31 * result + (subsets != null ? subsets.hashCode() : 0);
+        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
+        result = 31 * result + (considers != null ? considers.hashCode() : 0);
+        result = 31 * result + (children != null ? children.hashCode() : 0);
+        result = 31 * result + (ancestors != null ? ancestors.hashCode() : 0);
+        result = 31 * result + (aspect != null ? aspect.hashCode() : 0);
+        result = 31 * result + (history != null ? history.hashCode() : 0);
+        result = 31 * result + (xrefs != null ? xrefs.hashCode() : 0);
+        result = 31 * result + (taxonConstraints != null ? taxonConstraints.hashCode() : 0);
+        result = 31 * result + (blacklist != null ? blacklist.hashCode() : 0);
+        result = 31 * result + (annotationGuidelines != null ? annotationGuidelines.hashCode() : 0);
+        result = 31 * result + (xRelations != null ? xRelations.hashCode() : 0);
+        return result;
+    }
 }

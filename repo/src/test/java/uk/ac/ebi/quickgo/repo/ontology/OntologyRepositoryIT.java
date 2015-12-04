@@ -5,7 +5,10 @@ import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 
+import java.io.IOException;
 import java.util.Optional;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -40,14 +43,19 @@ public class OntologyRepositoryIT {
     @Autowired
     private OntologyRepository ontologyRepository;
 
+    @Autowired
+    private SolrServer server;
+
     @Before
     public void before() {
         ontologyRepository.deleteAll();
     }
 
     @Test
-    public void add1DocumentThenFind1Documents() {
-        ontologyRepository.save(createGODoc("A", "Alice Cooper"));
+    public void add1DocumentThenFind1Documents() throws IOException, SolrServerException {
+        server.addBean(createGODoc("A", "Alice Cooper"));
+        server.commit();
+//        ontologyRepository.save(createGODoc("A", "Alice Cooper"));
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(1L));
     }
