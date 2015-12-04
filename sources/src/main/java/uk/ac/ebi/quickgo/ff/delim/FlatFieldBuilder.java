@@ -1,11 +1,11 @@
-package uk.ac.ebi.quickgo.document;
+package uk.ac.ebi.quickgo.ff.delim;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 
-import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Used to build a {@link String} representation of field that has nested sub-fields.
@@ -49,7 +49,7 @@ public class FlatFieldBuilder extends FlatField {
         return parseFlatField(flatStr, 0);
     }
 
-    private static FlatFieldBuilder parseFlatField(String flatStr, int level) {
+    public static FlatFieldBuilder parseFlatField(String flatStr, int level) {
         ArrayList<String> components = new ArrayList<>();
         if (flatStr.startsWith(SEPARATORS[level])) {
             components.add("");

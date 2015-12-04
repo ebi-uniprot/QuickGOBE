@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.model.ontology.converter.field;
 
-import uk.ac.ebi.quickgo.document.FlatField;
+import uk.ac.ebi.quickgo.ff.delim.FlatField;
 import uk.ac.ebi.quickgo.model.FieldConverter;
 import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
 
@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.parseFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatField;
 
 /**
  * Created 01/12/15

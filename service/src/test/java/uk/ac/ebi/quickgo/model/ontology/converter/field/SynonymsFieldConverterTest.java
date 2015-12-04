@@ -11,8 +11,8 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
-import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Created 01/12/15

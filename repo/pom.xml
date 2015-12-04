@@ -31,6 +31,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>uk.ac.ebi.quickgo</groupId>
+            <artifactId>sources</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Required by embedded solr server -->
         <dependency>
             <groupId>org.apache.solr</groupId>

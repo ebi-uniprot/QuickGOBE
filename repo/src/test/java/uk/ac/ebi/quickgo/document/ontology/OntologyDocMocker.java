@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
-import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Class to create mocked objects of different {@code docType}s, which are valid according to {@link OntologyDocument}.

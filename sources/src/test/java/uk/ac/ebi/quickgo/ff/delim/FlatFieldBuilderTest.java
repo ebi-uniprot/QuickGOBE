@@ -1,14 +1,15 @@
-package uk.ac.ebi.quickgo.document;
+package uk.ac.ebi.quickgo.ff.delim;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.newFlatField;
-import static uk.ac.ebi.quickgo.document.FlatFieldBuilder.parseFlatField;
-import static uk.ac.ebi.quickgo.document.FlatFieldLeaf.newFlatFieldLeaf;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Created 26/11/15
@@ -64,8 +65,8 @@ public class FlatFieldBuilderTest {
         System.out.println(origStr);
 
         FlatFieldBuilder flatFieldBuilder = parseFlatField(origStr);
-        assertThat(origFlatFieldBuilder.getFields().size(), is(equalTo(flatFieldBuilder.getFields().size())));
-        assertThat(origFlatFieldBuilder.getFields().size(), is(6));
+        assertThat(origFlatFieldBuilder.getFields().size(), Is.is(equalTo(flatFieldBuilder.getFields().size())));
+        assertThat(origFlatFieldBuilder.getFields().size(), Is.is(6));
     }
 
     /** Check one can create a flat field object, write itself as a String A, then parse
@@ -87,7 +88,7 @@ public class FlatFieldBuilderTest {
         FlatFieldBuilder flatFieldBuilderParsed = parseFlatField(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
-        assertThat(parsedStr, is(equalTo(parsedStr)));
+        assertThat(parsedStr, Is.is(equalTo(parsedStr)));
 
         System.out.println(parsedStr);
     }
@@ -111,7 +112,7 @@ public class FlatFieldBuilderTest {
         FlatFieldBuilder flatFieldBuilderParsed = parseFlatField(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
-        assertThat(parsedStr, is(equalTo(parsedStr)));
+        assertThat(parsedStr, Is.is(equalTo(parsedStr)));
 
         System.out.println(parsedStr);
     }
@@ -145,7 +146,7 @@ public class FlatFieldBuilderTest {
         FlatFieldBuilder flatFieldBuilderParsed = parseFlatField(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
-        assertThat(parsedStr, is(equalTo(parsedStr)));
+        assertThat(parsedStr, Is.is(equalTo(parsedStr)));
 
         System.out.println(parsedStr);
     }

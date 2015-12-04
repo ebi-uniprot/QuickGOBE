@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.document;
+package uk.ac.ebi.quickgo.ff.delim;
 
 import java.util.List;
 
