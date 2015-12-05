@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -58,10 +59,11 @@ public class SynonymsFieldConverterTest {
      */
     @Test
     public void converts1FlattenedSynonymToSynonymsDTO() {
-        List<String> rawSynonyms = Collections.singletonList(newFlatField()
+        List<String> rawSynonyms = Collections.singletonList(
+                newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("syn name 0"))
                 .addField(newFlatFieldLeaf("syn type 0"))
-                .buildStringFromLevel(2));
+                .buildString());
         List<OBOTerm.Synonym> synonyms = converter.convertField(rawSynonyms);
         assertThat(synonyms.size(), is(1));
         assertThat(synonyms.get(0).synonymName, is(equalTo("syn name 0")));
@@ -76,14 +78,14 @@ public class SynonymsFieldConverterTest {
     @Test
     public void converts2FlattenedSynonymsToSynonymsDTO() {
         List<String> rawSynonyms = Arrays.asList(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf("syn name 0"))
                         .addField(newFlatFieldLeaf("syn type 0"))
-                        .buildStringFromLevel(2),
-                newFlatField()
+                        .buildString(),
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf("syn name 1"))
                         .addField(newFlatFieldLeaf("syn type 1"))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
         List<OBOTerm.Synonym> synonyms = converter.convertField(rawSynonyms);
         assertThat(synonyms.size(), is(2));

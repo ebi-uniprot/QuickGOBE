@@ -4,11 +4,10 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatField;
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatFieldToLevel;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.*;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -44,7 +43,7 @@ public class FlatFieldBuilderTest {
                 .addField(newFlatFieldLeaf("3")).buildString();
         System.out.println(origStr);
 
-        FlatFieldBuilder flatFieldBuilderParsed = parseFlatField(origStr);
+        FlatFieldBuilder flatFieldBuilderParsed = newFlatField().parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
         System.out.println(parsedStr);
 
@@ -64,7 +63,7 @@ public class FlatFieldBuilderTest {
                 .buildString();
         System.out.println(origStr);
 
-        FlatFieldBuilder flatFieldBuilder = parseFlatField(origStr);
+        FlatFieldBuilder flatFieldBuilder = newFlatField().parse(origStr);
         assertThat(origFlatFieldBuilder.getFields().size(), is(equalTo(flatFieldBuilder.getFields().size())));
         assertThat(origFlatFieldBuilder.getFields().size(), is(6));
     }
@@ -85,7 +84,7 @@ public class FlatFieldBuilderTest {
                 .addField(newFlatFieldLeaf("3"));
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
-        FlatFieldBuilder flatFieldBuilderParsed = parseFlatField(origStr);
+        FlatFieldBuilder flatFieldBuilderParsed = newFlatField().parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
         assertThat(parsedStr, is(equalTo(parsedStr)));
@@ -109,7 +108,7 @@ public class FlatFieldBuilderTest {
                 .addField(newFlatFieldLeaf("level1:C"));
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
-        FlatFieldBuilder flatFieldBuilderParsed = parseFlatField(origStr);
+        FlatFieldBuilder flatFieldBuilderParsed = newFlatField().parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
         assertThat(parsedStr, is(equalTo(parsedStr)));
@@ -143,7 +142,7 @@ public class FlatFieldBuilderTest {
                 .addField(newFlatFieldLeaf("level1:C"));
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
-        FlatFieldBuilder flatFieldBuilderParsed = parseFlatField(origStr);
+        FlatFieldBuilder flatFieldBuilderParsed = newFlatField().parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
         assertThat(parsedStr, is(equalTo(parsedStr)));
@@ -178,9 +177,11 @@ public class FlatFieldBuilderTest {
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
         System.out.println(origStr);
 
-        FlatFieldBuilder shallowVersion = parseFlatFieldToLevel(origStr, 0);
+        FlatFieldBuilder shallowVersion = newFlatField().parseToDepth(origStr, 0);
 
         String shallowVersionAsStr = shallowVersion.buildString();
+        System.out.println(shallowVersionAsStr);
+
         assertThat(origStr, is(equalTo(shallowVersionAsStr)));
     }
 
@@ -211,11 +212,143 @@ public class FlatFieldBuilderTest {
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
         System.out.println(origStr);
 
-        FlatFieldBuilder shallowVersion = parseFlatFieldToLevel(origStr, 0);
+        FlatFieldBuilder shallowVersion = newFlatField().parseToDepth(origStr, 0);
 
         String shallowVersionAsStr = shallowVersion.buildString();
-        FlatFieldBuilder flatFieldBuilderFromShallow = parseFlatField(shallowVersionAsStr);
+        FlatFieldBuilder flatFieldBuilderFromShallow = newFlatField().parse(shallowVersionAsStr);
 
         assertThat(flatFieldBuilderOrig, is(equalTo(flatFieldBuilderFromShallow)));
+    }
+
+    @Test
+    public void flatFieldsFromDifferentDepthsAreDifferent() {
+        String fromDepth0 = newFlatField()
+                .addField(newFlatFieldLeaf("1"))
+                .addField(newFlatFieldLeaf(""))
+                .addField(newFlatFieldLeaf("3")).buildString();
+        String fromDepth1 = newFlatFieldFromDepth(1)
+                .addField(newFlatFieldLeaf("1"))
+                .addField(newFlatFieldLeaf(""))
+                .addField(newFlatFieldLeaf("3")).buildString();
+        System.out.println(fromDepth0);
+        System.out.println(fromDepth1);
+        assertThat(fromDepth0, is(not(equalTo(fromDepth1))));
+    }
+
+    @Test
+    public void nestedFlatFieldsFromDifferentDepthsAreDifferent() {
+        String fromDepth0 = newFlatFieldFromDepth(1)
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:A"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:A"))
+                                        .addField(newFlatFieldLeaf("level3:B"))
+                                        .addField(newFlatFieldLeaf("level3:C")))
+                                .addField(newFlatFieldLeaf("level2:B")))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:C"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:D"))
+                                        .addField(newFlatField()
+                                                .addField(newFlatFieldLeaf("level4:A"))
+                                                .addField(newFlatFieldLeaf("level4:B")))
+                                        .addField(newFlatFieldLeaf("level3:E")))
+                                .addField(newFlatFieldLeaf("level2:C")))
+                .addField(newFlatFieldLeaf("level1:C")).buildString();
+        String fromDepth1 = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:A"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:A"))
+                                        .addField(newFlatFieldLeaf("level3:B"))
+                                        .addField(newFlatFieldLeaf("level3:C")))
+                                .addField(newFlatFieldLeaf("level2:B")))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:C"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:D"))
+                                        .addField(newFlatField()
+                                                .addField(newFlatFieldLeaf("level4:A"))
+                                                .addField(newFlatFieldLeaf("level4:B")))
+                                        .addField(newFlatFieldLeaf("level3:E")))
+                                .addField(newFlatFieldLeaf("level2:C")))
+                .addField(newFlatFieldLeaf("level1:C")).buildString();
+        System.out.println(fromDepth0);
+        System.out.println(fromDepth1);
+        assertThat(fromDepth0, is(not(equalTo(fromDepth1))));
+    }
+
+    @Test
+    public void flatFieldsFromSameNonZeroDepthAreEqual() {
+        String fromDepth0 = newFlatFieldFromDepth(2)
+                .addField(newFlatFieldLeaf("1"))
+                .addField(newFlatFieldLeaf(""))
+                .addField(newFlatFieldLeaf("3")).buildString();
+        String fromDepth1 = newFlatFieldFromDepth(2)
+                .addField(newFlatFieldLeaf("1"))
+                .addField(newFlatFieldLeaf(""))
+                .addField(newFlatFieldLeaf("3")).buildString();
+        System.out.println(fromDepth0);
+        System.out.println(fromDepth1);
+        assertThat(fromDepth0, is(equalTo(fromDepth1)));
+    }
+
+    @Test
+    public void nestedFlatFieldsFromSameDepthsAreEqual() {
+        String fromDepth0 = newFlatFieldFromDepth(1)
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:A"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:A"))
+                                        .addField(newFlatFieldLeaf("level3:B"))
+                                        .addField(newFlatFieldLeaf("level3:C")))
+                                .addField(newFlatFieldLeaf("level2:B")))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:C"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:D"))
+                                        .addField(newFlatField()
+                                                .addField(newFlatFieldLeaf("level4:A"))
+                                                .addField(newFlatFieldLeaf("level4:B")))
+                                        .addField(newFlatFieldLeaf("level3:E")))
+                                .addField(newFlatFieldLeaf("level2:C")))
+                .addField(newFlatFieldLeaf("level1:C")).buildString();
+        String fromDepth1 = newFlatFieldFromDepth(1)
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:A"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:A"))
+                                        .addField(newFlatFieldLeaf("level3:B"))
+                                        .addField(newFlatFieldLeaf("level3:C")))
+                                .addField(newFlatFieldLeaf("level2:B")))
+                .addField(
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:C"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:D"))
+                                        .addField(newFlatField()
+                                                .addField(newFlatFieldLeaf("level4:A"))
+                                                .addField(newFlatFieldLeaf("level4:B")))
+                                        .addField(newFlatFieldLeaf("level3:E")))
+                                .addField(newFlatFieldLeaf("level2:C")))
+                .addField(newFlatFieldLeaf("level1:C")).buildString();
+        System.out.println(fromDepth0);
+        System.out.println(fromDepth1);
+        assertThat(fromDepth0, is(equalTo(fromDepth1)));
     }
 }

@@ -10,6 +10,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -33,7 +34,7 @@ public class TaxonConstraintsFieldConverterTest {
         String taxId = "131568";
         String citationId = "PMID:00000003";
 
-        rawTaxonConstraints.add(newFlatField()
+        rawTaxonConstraints.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf(ancestorId))
                 .addField(newFlatFieldLeaf("cell"))
                 .addField(newFlatFieldLeaf("only_in_taxon"))
@@ -43,8 +44,8 @@ public class TaxonConstraintsFieldConverterTest {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf("PMID:00000001"))
                         .addField(newFlatFieldLeaf("PMID:00000002")))
-                .buildStringFromLevel(2));
-        rawTaxonConstraints.add(newFlatField()
+                .buildString());
+        rawTaxonConstraints.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("GO:0005624"))
                 .addField(newFlatFieldLeaf("cell"))
                 .addField(newFlatFieldLeaf("only_in_taxon"))
@@ -54,7 +55,7 @@ public class TaxonConstraintsFieldConverterTest {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf(citationId))
                         .addField(newFlatFieldLeaf("PMID:00000004")))
-                .buildStringFromLevel(2));
+                .buildString());
 
         List<OBOTerm.TaxonConstraint> taxonConstraints = converter.convertField(rawTaxonConstraints);
         assertThat(taxonConstraints.size(), is(2));

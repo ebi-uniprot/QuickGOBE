@@ -10,6 +10,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -29,16 +30,16 @@ public class AnnotationGuideLineFieldConverterTest {
     public void convertsAnnotationGuideLines() {
         List<String> rawAnnotationGuideLines = new ArrayList<>();
         String description0 = "description 0";
-        rawAnnotationGuideLines.add(newFlatField()
+        rawAnnotationGuideLines.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf(description0))
                 .addField(newFlatFieldLeaf("http://www.guardian.co.uk"))
-                .buildStringFromLevel(2)
+                .buildString()
         );
         String url1 = "http://www.pinkun.com";
-        rawAnnotationGuideLines.add(newFlatField()
+        rawAnnotationGuideLines.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("description 1"))
                 .addField(newFlatFieldLeaf(url1))
-                .buildStringFromLevel(2)
+                .buildString()
         );
 
         List<OBOTerm.AnnotationGuideLine> annotationGuideLines = converter.convertField(rawAnnotationGuideLines);

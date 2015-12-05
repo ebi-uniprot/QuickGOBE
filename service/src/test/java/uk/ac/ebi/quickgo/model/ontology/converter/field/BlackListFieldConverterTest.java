@@ -11,6 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -31,21 +32,21 @@ public class BlackListFieldConverterTest {
         List<String> rawBlacklist = new ArrayList<>();
 
         String gp0 = "GP:00000";
-        rawBlacklist.add(newFlatField()
+        rawBlacklist.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf(gp0))
                 .addField(newFlatFieldLeaf("GP"))
                 .addField(newFlatFieldLeaf("because it's bad"))
                 .addField(newFlatFieldLeaf("category 0"))
                 .addField(newFlatFieldLeaf("automatic"))
-                .buildStringFromLevel(2));
+                .buildString());
         String cat1 = "category 1";
-        rawBlacklist.add(newFlatField()
+        rawBlacklist.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("XX:00001"))
                 .addField(newFlatFieldLeaf("XX"))
                 .addField(newFlatFieldLeaf("because it's also bad"))
                 .addField(newFlatFieldLeaf(cat1))
                 .addField(newFlatFieldLeaf()) // no parameter means it's got no value
-                .buildStringFromLevel(2));
+                .buildString());
 
         List<OBOTerm.BlacklistItem> blacklistItems = converter.convertField(rawBlacklist);
         assertThat(blacklistItems.size(), is(2));

@@ -10,6 +10,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -28,22 +29,22 @@ public class HistoryFieldConverterTest {
     public void convertsHistory() {
         List<String> rawHistory = new ArrayList<>();
         rawHistory.add(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf("Gonna do something like it's ..."))
                         .addField(newFlatFieldLeaf("11:59, 31 Dec, 1999"))
                         .addField(newFlatFieldLeaf("PARTY!"))
                         .addField(newFlatFieldLeaf("Must be done"))
                         .addField(newFlatFieldLeaf("Textual description"))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
         rawHistory.add(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf("History name"))
                         .addField(newFlatFieldLeaf("Tuesday next week"))
                         .addField(newFlatFieldLeaf("PARTY!"))
                         .addField(newFlatFieldLeaf("Must be done"))
                         .addField(newFlatFieldLeaf("Okay"))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
 
         List<OBOTerm.History> history = converter.convertField(rawHistory);

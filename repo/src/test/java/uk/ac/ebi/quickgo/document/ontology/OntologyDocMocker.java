@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -56,126 +57,126 @@ public class OntologyDocMocker {
         // example synonyms
         od.synonyms = new ArrayList<>();
         od.synonyms.add(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf("creatine anabolism"))
                         .addField(newFlatFieldLeaf("exact"))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
         od.synonyms.add(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf("crayola testarossa"))
                         .addField(newFlatFieldLeaf("inprecise"))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
 
         // example history
         od.history = new ArrayList<>();
         od.history.add(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf("Gonna do something like it's ... "))
                         .addField(newFlatFieldLeaf("11:59, 31 Dec, 1999"))
                         .addField(newFlatFieldLeaf("PARTY!"))
                         .addField(newFlatFieldLeaf("Must be done"))
                         .addField(newFlatFieldLeaf("Textual description"))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
         od.history.add(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf("History name"))
                         .addField(newFlatFieldLeaf("Tuesday next week"))
                         .addField(newFlatFieldLeaf("PARTY!"))
                         .addField(newFlatFieldLeaf("Must be done"))
                         .addField(newFlatFieldLeaf("Okay"))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
 
         // example xrefs
         od.xrefs = new ArrayList<>();
-        od.xrefs.add(newFlatField()
+        od.xrefs.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("InterPro"))
                 .addField(newFlatFieldLeaf("IPR031034"))
                 .addField(newFlatFieldLeaf("Creatinine amidohydrolase"))
-                .buildStringFromLevel(2));
-        od.xrefs.add(newFlatField()
+                .buildString());
+        od.xrefs.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("AnotherXref"))
                 .addField(newFlatFieldLeaf("IPR031035"))
                 .addField(newFlatFieldLeaf("Pickled Onions"))
-                .buildStringFromLevel(2));
+                .buildString());
 
         // example taxonomy constraints
         // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2|blacklist
         od.taxonConstraints = new ArrayList<>();
-        od.taxonConstraints.add(newFlatField()
+        od.taxonConstraints.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("GO:0005623"))
                 .addField(newFlatFieldLeaf("cell"))
                 .addField(newFlatFieldLeaf("only_in_taxon"))
                 .addField(newFlatFieldLeaf("131567"))
                 .addField(newFlatFieldLeaf("NCBITaxon"))
                 .addField(newFlatFieldLeaf("cellular organisms"))
-                .addField(newFlatField()
+                .addField(newFlatFieldFromDepth(3)
                         .addField(newFlatFieldLeaf("PMID:00000001"))
                         .addField(newFlatFieldLeaf("PMID:00000002")))
-                .buildStringFromLevel(2));
-        od.taxonConstraints.add(newFlatField()
+                .buildString());
+        od.taxonConstraints.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("GO:0005624"))
                 .addField(newFlatFieldLeaf("cell"))
                 .addField(newFlatFieldLeaf("only_in_taxon"))
                 .addField(newFlatFieldLeaf("131568"))
                 .addField(newFlatFieldLeaf("NCBITaxon"))
                 .addField(newFlatFieldLeaf("cellular organisms"))
-                .addField(newFlatField()
+                .addField(newFlatFieldFromDepth(3)
                         .addField(newFlatFieldLeaf("PMID:00000003"))
                         .addField(newFlatFieldLeaf("PMID:00000004")))
-                .buildStringFromLevel(2));
+                .buildString());
 
         // example blacklist
         // format: geneProductId|geneProductDB|reason|category|method
         od.blacklist = new ArrayList<>();
-        od.blacklist.add(newFlatField()
+        od.blacklist.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("GP:00001"))
                 .addField(newFlatFieldLeaf("GP"))
                 .addField(newFlatFieldLeaf("because it's bad"))
                 .addField(newFlatFieldLeaf("category 1"))
                 .addField(newFlatFieldLeaf("automatic"))
-                .buildStringFromLevel(2));
-        od.blacklist.add(newFlatField()
+                .buildString());
+        od.blacklist.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("XX:00002"))
                 .addField(newFlatFieldLeaf("XX"))
                 .addField(newFlatFieldLeaf("because it's also bad"))
                 .addField(newFlatFieldLeaf("category 2"))
                 .addField(newFlatFieldLeaf()) // no parameter means it's got no value
-                .buildStringFromLevel(2));
+                .buildString());
 
         // example xontology relations
         // format: xId|xTerm|xNamespace|xUrl|xRelation
         od.xRelations = new ArrayList<>();
-        od.xRelations.add(newFlatField()
+        od.xRelations.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("CHEBI:16919"))
                 .addField(newFlatFieldLeaf("creatine"))
                 .addField(newFlatFieldLeaf("CHEBI"))
                 .addField(newFlatFieldLeaf("http://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:16919"))
                 .addField(newFlatFieldLeaf("has_participant"))
-                .buildStringFromLevel(2));
-        od.xRelations.add(newFlatField()
+                .buildString());
+        od.xRelations.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("CHEBI:16920"))
                 .addField(newFlatFieldLeaf("creatiney"))
                 .addField(newFlatFieldLeaf("CHEBI"))
                 .addField(newFlatFieldLeaf("http://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:16920"))
                 .addField(newFlatFieldLeaf("has_participant"))
-                .buildStringFromLevel(2));
+                .buildString());
 
         // annotation guidelines
         // format: description|url
         od.annotationGuidelines = new ArrayList<>();
-        od.annotationGuidelines.add(newFlatField()
+        od.annotationGuidelines.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("description 0"))
                 .addField(newFlatFieldLeaf("http://www.guardian.co.uk"))
-                .buildStringFromLevel(2)
+                .buildString()
         );
-        od.annotationGuidelines.add(newFlatField()
+        od.annotationGuidelines.add(newFlatFieldFromDepth(2)
                 .addField(newFlatFieldLeaf("description 1"))
                 .addField(newFlatFieldLeaf("http://www.pinkun.com"))
-                .buildStringFromLevel(2)
+                .buildString()
         );
 
         return od;

@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatFieldFromLevel;
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatFieldToLevel;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.*;
 
 /**
  * Converts an ontology record/line from a delimited file to an {@link OntologyDocument} instance.
@@ -51,7 +50,7 @@ public class OSourceLineConverter implements Function<String, OntologyDocument> 
     }
 
     @Override public OntologyDocument apply(String s) {
-        List<FlatField> flatFields = parseFlatFieldToLevel(s, 0).getFields();
+        List<FlatField> flatFields = newFlatField().parseToDepth(s, 0).getFields();
 
         if (flatFields.size() == 20) {
             OntologyDocument doc = new OntologyDocument();
@@ -67,7 +66,7 @@ public class OSourceLineConverter implements Function<String, OntologyDocument> 
             doc.synonymNames = doc.synonyms == null? null : doc.synonyms.stream()
                     .map(synField ->
                         {
-                            String syn = parseFlatFieldFromLevel(synField, 2).getFields().get(0).buildString();
+                            String syn = newFlatFieldFromDepth(2).parse(synField).getFields().get(0).buildString();
                             System.out.println(syn);
                             return syn;
                         })

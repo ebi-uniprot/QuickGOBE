@@ -1,16 +1,15 @@
 package uk.ac.ebi.quickgo.model.ontology.converter.field;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.ebi.quickgo.ff.delim.FlatField;
 import uk.ac.ebi.quickgo.model.FieldConverter;
 import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
 
 import java.util.List;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatField;
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatFieldFromLevel;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
 
 /**
  * Created 01/12/15
@@ -24,13 +23,13 @@ public class XORelationsFieldConverter implements FieldConverter<OBOTerm.XORelat
         // format: id|term|namespace|url|relation
         OBOTerm.XORelation xORel = new OBOTerm.XORelation();
 
-        List<FlatField> fields = parseFlatFieldFromLevel(s, 2).getFields();
+        List<FlatField> fields = newFlatFieldFromDepth(2).parse(s).getFields();
         if (fields.size() == 5) {
-            xORel.id = nullOrString(fields.get(0).buildStringFromLevel(2));
-            xORel.term = nullOrString(fields.get(1).buildStringFromLevel(2));
-            xORel.namespace = nullOrString(fields.get(2).buildStringFromLevel(2));
-            xORel.url = nullOrString(fields.get(3).buildStringFromLevel(2));
-            xORel.relation = nullOrString(fields.get(4).buildStringFromLevel(2));
+            xORel.id = nullOrString(fields.get(0).buildString());
+            xORel.term = nullOrString(fields.get(1).buildString());
+            xORel.namespace = nullOrString(fields.get(2).buildString());
+            xORel.url = nullOrString(fields.get(3).buildString());
+            xORel.relation = nullOrString(fields.get(4).buildString());
             return Optional.of(xORel);
         } else {
             LOGGER.warn("Could not parse flattened xORel: {}", s);

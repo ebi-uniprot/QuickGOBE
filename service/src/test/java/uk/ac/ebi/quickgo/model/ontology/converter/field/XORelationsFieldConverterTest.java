@@ -10,6 +10,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -40,22 +41,22 @@ public class XORelationsFieldConverterTest {
 
         List<String> rawXORels = new ArrayList<>();
         rawXORels.add(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf(id0))
                         .addField(newFlatFieldLeaf(term0))
                         .addField(newFlatFieldLeaf(namespace0))
                         .addField(newFlatFieldLeaf(url0))
                         .addField(newFlatFieldLeaf(relation0))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
         rawXORels.add(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf(id1))
                         .addField(newFlatFieldLeaf(term1))
                         .addField(newFlatFieldLeaf(namespace1))
                         .addField(newFlatFieldLeaf(url1))
                         .addField(newFlatFieldLeaf(relation1))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
 
         List<OBOTerm.XORelation> xORefs = converter.convertField(rawXORels);

@@ -10,6 +10,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -36,18 +37,18 @@ public class XRefsFieldConverterTest {
 
         List<String> rawXrefs = new ArrayList<>();
         rawXrefs.add(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf(dbCode0))
                         .addField(newFlatFieldLeaf(dbId0))
                         .addField(newFlatFieldLeaf(dbName0))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
         rawXrefs.add(
-                newFlatField()
+                newFlatFieldFromDepth(2)
                         .addField(newFlatFieldLeaf(dbCode1))
                         .addField(newFlatFieldLeaf(dbId1))
                         .addField(newFlatFieldLeaf(dbName1))
-                        .buildStringFromLevel(2)
+                        .buildString()
         );
 
         List<OBOTerm.XRef> xRefs = converter.convertField(rawXrefs);
