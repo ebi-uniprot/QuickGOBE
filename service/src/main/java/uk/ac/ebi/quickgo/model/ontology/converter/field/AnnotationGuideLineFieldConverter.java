@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatFieldFromLevel;
 
 /**
  * Created 01/12/15
@@ -23,10 +24,10 @@ public class AnnotationGuideLineFieldConverter implements FieldConverter<OBOTerm
         // format: geneProductId|geneProductDB|reason|category|method
         OBOTerm.AnnotationGuideLine ag = new OBOTerm.AnnotationGuideLine();
 
-        List<FlatField> fields = parseFlatField(g).getFields();
+        List<FlatField> fields = parseFlatFieldFromLevel(g, 2).getFields();
         if (fields.size() == 2) {
-            ag.description = nullOrString(fields.get(0).buildString());
-            ag.url = nullOrString(fields.get(1).buildString());
+            ag.description = nullOrString(fields.get(0).buildStringFromLevel(2));
+            ag.url = nullOrString(fields.get(1).buildStringFromLevel(2));
             return Optional.of(ag);
         } else {
             LOGGER.warn("Could not parse flattened annotationGuidelines: {}", g);

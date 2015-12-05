@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatFieldFromLevel;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatFieldToLevel;
 
 /**
@@ -65,7 +66,11 @@ public class OSourceLineConverter implements Function<String, OntologyDocument> 
             doc.synonyms = fieldAsStrList(flatFields.get(SYNONYMS_INDEX).buildString());
             doc.synonymNames = doc.synonyms == null? null : doc.synonyms.stream()
                     .map(synField ->
-                            synField.substring(0, synField.indexOf(SEPARATOR2)))
+                        {
+                            String syn = parseFlatFieldFromLevel(synField, 2).getFields().get(0).buildString();
+                            System.out.println(syn);
+                            return syn;
+                        })
                     .collect(Collectors.toList());
             doc.subsets = fieldAsStrList(flatFields.get(SUBSETS_INDEX).buildString());
             doc.replacedBy = flatFields.get(REPLACED_BY_INDEX).buildString();

@@ -55,8 +55,12 @@ public class FlatFieldBuilder extends FlatField {
         return parseFlatField(flatStr, 0);
     }
 
-    public static FlatFieldBuilder parseFlatFieldToLevel(String flatStr, int level) {
-        return parseFlatField(flatStr, 0, level);
+    public static FlatFieldBuilder parseFlatFieldToLevel(String flatStr, int maxLevel) {
+        return parseFlatField(flatStr, 0, maxLevel);
+    }
+
+    public static FlatFieldBuilder parseFlatFieldFromLevel(String flatStr, int fromLevel) {
+        return parseFlatField(flatStr, fromLevel, SEPARATORS.length-1);
     }
 
     private static FlatFieldBuilder parseFlatField(String flatStr, int startLevel, int maxLevel) {

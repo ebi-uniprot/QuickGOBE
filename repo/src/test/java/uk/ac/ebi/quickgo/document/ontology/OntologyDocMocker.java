@@ -59,13 +59,13 @@ public class OntologyDocMocker {
                 newFlatField()
                         .addField(newFlatFieldLeaf("creatine anabolism"))
                         .addField(newFlatFieldLeaf("exact"))
-                        .buildStringFromLevel(1)
+                        .buildStringFromLevel(2)
         );
         od.synonyms.add(
                 newFlatField()
                         .addField(newFlatFieldLeaf("crayola testarossa"))
                         .addField(newFlatFieldLeaf("inprecise"))
-                        .buildStringFromLevel(1)
+                        .buildStringFromLevel(2)
         );
 
         // example history
@@ -77,7 +77,7 @@ public class OntologyDocMocker {
                         .addField(newFlatFieldLeaf("PARTY!"))
                         .addField(newFlatFieldLeaf("Must be done"))
                         .addField(newFlatFieldLeaf("Textual description"))
-                        .buildStringFromLevel(1)
+                        .buildStringFromLevel(2)
         );
         od.history.add(
                 newFlatField()
@@ -86,7 +86,7 @@ public class OntologyDocMocker {
                         .addField(newFlatFieldLeaf("PARTY!"))
                         .addField(newFlatFieldLeaf("Must be done"))
                         .addField(newFlatFieldLeaf("Okay"))
-                        .buildStringFromLevel(1)
+                        .buildStringFromLevel(2)
         );
 
         // example xrefs
@@ -95,12 +95,12 @@ public class OntologyDocMocker {
                 .addField(newFlatFieldLeaf("InterPro"))
                 .addField(newFlatFieldLeaf("IPR031034"))
                 .addField(newFlatFieldLeaf("Creatinine amidohydrolase"))
-                .buildString());
+                .buildStringFromLevel(2));
         od.xrefs.add(newFlatField()
                 .addField(newFlatFieldLeaf("AnotherXref"))
                 .addField(newFlatFieldLeaf("IPR031035"))
                 .addField(newFlatFieldLeaf("Pickled Onions"))
-                .buildStringFromLevel(1));
+                .buildStringFromLevel(2));
 
         // example taxonomy constraints
         // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2|blacklist
@@ -115,7 +115,7 @@ public class OntologyDocMocker {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf("PMID:00000001"))
                         .addField(newFlatFieldLeaf("PMID:00000002")))
-                .buildStringFromLevel(1));
+                .buildStringFromLevel(2));
         od.taxonConstraints.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0005624"))
                 .addField(newFlatFieldLeaf("cell"))
@@ -126,7 +126,7 @@ public class OntologyDocMocker {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf("PMID:00000003"))
                         .addField(newFlatFieldLeaf("PMID:00000004")))
-                .buildStringFromLevel(1));
+                .buildStringFromLevel(2));
 
         // example blacklist
         // format: geneProductId|geneProductDB|reason|category|method
@@ -137,14 +137,14 @@ public class OntologyDocMocker {
                 .addField(newFlatFieldLeaf("because it's bad"))
                 .addField(newFlatFieldLeaf("category 1"))
                 .addField(newFlatFieldLeaf("automatic"))
-                .buildStringFromLevel(1));
+                .buildStringFromLevel(2));
         od.blacklist.add(newFlatField()
                 .addField(newFlatFieldLeaf("XX:00002"))
                 .addField(newFlatFieldLeaf("XX"))
                 .addField(newFlatFieldLeaf("because it's also bad"))
                 .addField(newFlatFieldLeaf("category 2"))
                 .addField(newFlatFieldLeaf()) // no parameter means it's got no value
-                .buildStringFromLevel(1));
+                .buildStringFromLevel(2));
 
         // example xontology relations
         // format: xId|xTerm|xNamespace|xUrl|xRelation
@@ -155,14 +155,14 @@ public class OntologyDocMocker {
                 .addField(newFlatFieldLeaf("CHEBI"))
                 .addField(newFlatFieldLeaf("http://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:16919"))
                 .addField(newFlatFieldLeaf("has_participant"))
-                .buildStringFromLevel(1));
+                .buildStringFromLevel(2));
         od.xRelations.add(newFlatField()
                 .addField(newFlatFieldLeaf("CHEBI:16920"))
                 .addField(newFlatFieldLeaf("creatiney"))
                 .addField(newFlatFieldLeaf("CHEBI"))
                 .addField(newFlatFieldLeaf("http://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:16920"))
                 .addField(newFlatFieldLeaf("has_participant"))
-                .buildStringFromLevel(1));
+                .buildStringFromLevel(2));
 
         // annotation guidelines
         // format: description|url
@@ -170,12 +170,12 @@ public class OntologyDocMocker {
         od.annotationGuidelines.add(newFlatField()
                 .addField(newFlatFieldLeaf("description 0"))
                 .addField(newFlatFieldLeaf("http://www.guardian.co.uk"))
-                .buildStringFromLevel(1)
+                .buildStringFromLevel(2)
         );
         od.annotationGuidelines.add(newFlatField()
                 .addField(newFlatFieldLeaf("description 1"))
                 .addField(newFlatFieldLeaf("http://www.pinkun.com"))
-                .buildStringFromLevel(1)
+                .buildStringFromLevel(2)
         );
 
         return od;

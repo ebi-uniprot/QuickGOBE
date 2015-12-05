@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatFieldFromLevel;
 
 /**
  * Created 01/12/15
@@ -23,13 +24,13 @@ public class XORelationsFieldConverter implements FieldConverter<OBOTerm.XORelat
         // format: id|term|namespace|url|relation
         OBOTerm.XORelation xORel = new OBOTerm.XORelation();
 
-        List<FlatField> fields = parseFlatField(s).getFields();
+        List<FlatField> fields = parseFlatFieldFromLevel(s, 2).getFields();
         if (fields.size() == 5) {
-            xORel.id = nullOrString(fields.get(0).buildStringFromLevel(1));
-            xORel.term = nullOrString(fields.get(1).buildStringFromLevel(1));
-            xORel.namespace = nullOrString(fields.get(2).buildStringFromLevel(1));
-            xORel.url = nullOrString(fields.get(3).buildStringFromLevel(1));
-            xORel.relation = nullOrString(fields.get(4).buildStringFromLevel(1));
+            xORel.id = nullOrString(fields.get(0).buildStringFromLevel(2));
+            xORel.term = nullOrString(fields.get(1).buildStringFromLevel(2));
+            xORel.namespace = nullOrString(fields.get(2).buildStringFromLevel(2));
+            xORel.url = nullOrString(fields.get(3).buildStringFromLevel(2));
+            xORel.relation = nullOrString(fields.get(4).buildStringFromLevel(2));
             return Optional.of(xORel);
         } else {
             LOGGER.warn("Could not parse flattened xORel: {}", s);

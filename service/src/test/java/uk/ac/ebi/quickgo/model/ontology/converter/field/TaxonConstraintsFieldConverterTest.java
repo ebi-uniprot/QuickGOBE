@@ -43,7 +43,7 @@ public class TaxonConstraintsFieldConverterTest {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf("PMID:00000001"))
                         .addField(newFlatFieldLeaf("PMID:00000002")))
-                .buildString());
+                .buildStringFromLevel(2));
         rawTaxonConstraints.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0005624"))
                 .addField(newFlatFieldLeaf("cell"))
@@ -54,7 +54,7 @@ public class TaxonConstraintsFieldConverterTest {
                 .addField(newFlatField()
                         .addField(newFlatFieldLeaf(citationId))
                         .addField(newFlatFieldLeaf("PMID:00000004")))
-                .buildString());
+                .buildStringFromLevel(2));
 
         List<OBOTerm.TaxonConstraint> taxonConstraints = converter.convertField(rawTaxonConstraints);
         assertThat(taxonConstraints.size(), is(2));

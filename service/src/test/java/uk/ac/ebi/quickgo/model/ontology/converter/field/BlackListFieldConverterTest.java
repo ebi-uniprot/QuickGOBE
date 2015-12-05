@@ -37,7 +37,7 @@ public class BlackListFieldConverterTest {
                 .addField(newFlatFieldLeaf("because it's bad"))
                 .addField(newFlatFieldLeaf("category 0"))
                 .addField(newFlatFieldLeaf("automatic"))
-                .buildString());
+                .buildStringFromLevel(2));
         String cat1 = "category 1";
         rawBlacklist.add(newFlatField()
                 .addField(newFlatFieldLeaf("XX:00001"))
@@ -45,7 +45,7 @@ public class BlackListFieldConverterTest {
                 .addField(newFlatFieldLeaf("because it's also bad"))
                 .addField(newFlatFieldLeaf(cat1))
                 .addField(newFlatFieldLeaf()) // no parameter means it's got no value
-                .buildString());
+                .buildStringFromLevel(2));
 
         List<OBOTerm.BlacklistItem> blacklistItems = converter.convertField(rawBlacklist);
         assertThat(blacklistItems.size(), is(2));

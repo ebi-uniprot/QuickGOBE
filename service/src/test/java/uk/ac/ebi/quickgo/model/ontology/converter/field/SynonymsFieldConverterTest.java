@@ -61,7 +61,7 @@ public class SynonymsFieldConverterTest {
         List<String> rawSynonyms = Collections.singletonList(newFlatField()
                 .addField(newFlatFieldLeaf("syn name 0"))
                 .addField(newFlatFieldLeaf("syn type 0"))
-                .buildString());
+                .buildStringFromLevel(2));
         List<OBOTerm.Synonym> synonyms = converter.convertField(rawSynonyms);
         assertThat(synonyms.size(), is(1));
         assertThat(synonyms.get(0).synonymName, is(equalTo("syn name 0")));
@@ -79,11 +79,11 @@ public class SynonymsFieldConverterTest {
                 newFlatField()
                         .addField(newFlatFieldLeaf("syn name 0"))
                         .addField(newFlatFieldLeaf("syn type 0"))
-                        .buildString(),
+                        .buildStringFromLevel(2),
                 newFlatField()
                         .addField(newFlatFieldLeaf("syn name 1"))
                         .addField(newFlatFieldLeaf("syn type 1"))
-                        .buildString()
+                        .buildStringFromLevel(2)
         );
         List<OBOTerm.Synonym> synonyms = converter.convertField(rawSynonyms);
         assertThat(synonyms.size(), is(2));

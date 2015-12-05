@@ -34,7 +34,7 @@ public class HistoryFieldConverterTest {
                         .addField(newFlatFieldLeaf("PARTY!"))
                         .addField(newFlatFieldLeaf("Must be done"))
                         .addField(newFlatFieldLeaf("Textual description"))
-                        .buildString()
+                        .buildStringFromLevel(2)
         );
         rawHistory.add(
                 newFlatField()
@@ -43,7 +43,7 @@ public class HistoryFieldConverterTest {
                         .addField(newFlatFieldLeaf("PARTY!"))
                         .addField(newFlatFieldLeaf("Must be done"))
                         .addField(newFlatFieldLeaf("Okay"))
-                        .buildString()
+                        .buildStringFromLevel(2)
         );
 
         List<OBOTerm.History> history = converter.convertField(rawHistory);

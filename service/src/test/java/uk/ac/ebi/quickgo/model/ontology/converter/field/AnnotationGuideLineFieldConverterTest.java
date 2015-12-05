@@ -32,13 +32,13 @@ public class AnnotationGuideLineFieldConverterTest {
         rawAnnotationGuideLines.add(newFlatField()
                 .addField(newFlatFieldLeaf(description0))
                 .addField(newFlatFieldLeaf("http://www.guardian.co.uk"))
-                .buildString()
+                .buildStringFromLevel(2)
         );
         String url1 = "http://www.pinkun.com";
         rawAnnotationGuideLines.add(newFlatField()
                 .addField(newFlatFieldLeaf("description 1"))
                 .addField(newFlatFieldLeaf(url1))
-                .buildString()
+                .buildStringFromLevel(2)
         );
 
         List<OBOTerm.AnnotationGuideLine> annotationGuideLines = converter.convertField(rawAnnotationGuideLines);

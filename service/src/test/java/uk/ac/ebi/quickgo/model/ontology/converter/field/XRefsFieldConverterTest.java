@@ -40,14 +40,14 @@ public class XRefsFieldConverterTest {
                         .addField(newFlatFieldLeaf(dbCode0))
                         .addField(newFlatFieldLeaf(dbId0))
                         .addField(newFlatFieldLeaf(dbName0))
-                        .buildString()
+                        .buildStringFromLevel(2)
         );
         rawXrefs.add(
                 newFlatField()
                         .addField(newFlatFieldLeaf(dbCode1))
                         .addField(newFlatFieldLeaf(dbId1))
                         .addField(newFlatFieldLeaf(dbName1))
-                        .buildString()
+                        .buildStringFromLevel(2)
         );
 
         List<OBOTerm.XRef> xRefs = converter.convertField(rawXrefs);

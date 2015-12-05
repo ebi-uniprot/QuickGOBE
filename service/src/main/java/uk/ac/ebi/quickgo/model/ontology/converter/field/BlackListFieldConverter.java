@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatField;
+import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.parseFlatFieldFromLevel;
 
 /**
  * Created 01/12/15
@@ -23,14 +24,14 @@ public class BlackListFieldConverter implements FieldConverter<OBOTerm.Blacklist
         // format: geneProductId|geneProductDB|reason|category|method
         OBOTerm.BlacklistItem blacklistItem = new OBOTerm.BlacklistItem();
 
-        List<FlatField> fields = parseFlatField(s).getFields();
+        List<FlatField> fields = parseFlatFieldFromLevel(s, 2).getFields();
 
         if (fields.size() == 5) {
-            blacklistItem.geneProductId = nullOrString(fields.get(0).buildString());
-            blacklistItem.geneProductDb = nullOrString(fields.get(1).buildString());
-            blacklistItem.reason = nullOrString(fields.get(2).buildString());
-            blacklistItem.category = nullOrString(fields.get(3).buildString());
-            blacklistItem.method = nullOrString(fields.get(4).buildString());
+            blacklistItem.geneProductId = nullOrString(fields.get(0).buildStringFromLevel(2));
+            blacklistItem.geneProductDb = nullOrString(fields.get(1).buildStringFromLevel(2));
+            blacklistItem.reason = nullOrString(fields.get(2).buildStringFromLevel(2));
+            blacklistItem.category = nullOrString(fields.get(3).buildStringFromLevel(2));
+            blacklistItem.method = nullOrString(fields.get(4).buildStringFromLevel(2));
             return Optional.of(blacklistItem);
         } else {
             LOGGER.warn("Could not parse flattened blacklist: {}", s);

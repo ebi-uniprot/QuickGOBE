@@ -46,7 +46,7 @@ public class XORelationsFieldConverterTest {
                         .addField(newFlatFieldLeaf(namespace0))
                         .addField(newFlatFieldLeaf(url0))
                         .addField(newFlatFieldLeaf(relation0))
-                        .buildString()
+                        .buildStringFromLevel(2)
         );
         rawXORels.add(
                 newFlatField()
@@ -55,7 +55,7 @@ public class XORelationsFieldConverterTest {
                         .addField(newFlatFieldLeaf(namespace1))
                         .addField(newFlatFieldLeaf(url1))
                         .addField(newFlatFieldLeaf(relation1))
-                        .buildString()
+                        .buildStringFromLevel(2)
         );
 
         List<OBOTerm.XORelation> xORefs = converter.convertField(rawXORels);
