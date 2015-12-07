@@ -106,10 +106,10 @@ public class FlatFieldBuilder extends FlatField {
         return fields;
     }
 
-    protected String buildStringFromLevel(int level) {
+    protected String buildStringFromDepth(int level) {
         StringJoiner sj = new StringJoiner(SEPARATORS[level]);
         fields.stream().forEach(f ->
-                sj.add(f.buildStringFromLevel(level + 1))
+                sj.add(f.buildStringFromDepth(level + 1))
         );
         return sj.toString();
     }
@@ -117,7 +117,7 @@ public class FlatFieldBuilder extends FlatField {
     public String buildString() {
         StringJoiner sj = new StringJoiner(SEPARATORS[depth]);
         fields.stream().forEach(f ->
-                sj.add(f.buildStringFromLevel(depth + 1))
+                sj.add(f.buildStringFromDepth(depth + 1))
         );
         return sj.toString();
     }

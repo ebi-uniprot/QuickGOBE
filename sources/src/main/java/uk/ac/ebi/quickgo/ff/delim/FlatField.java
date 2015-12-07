@@ -12,5 +12,5 @@ import java.util.List;
 public abstract class FlatField {
     public abstract List<FlatField> getFields();
     public abstract String buildString();
-    protected abstract String buildStringFromLevel(int level);
+    protected abstract String buildStringFromDepth(int level);
 }

@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -53,9 +54,7 @@ public class OntologyRepositoryIT {
 
     @Test
     public void add1DocumentThenFind1Documents() throws IOException, SolrServerException {
-        server.addBean(createGODoc("A", "Alice Cooper"));
-        server.commit();
-//        ontologyRepository.save(createGODoc("A", "Alice Cooper"));
+        ontologyRepository.save(createGODoc("A", "Alice Cooper"));
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(1L));
     }
@@ -167,5 +166,29 @@ public class OntologyRepositoryIT {
         assertThat(ontologyRepository.findCoreByTermId(OntologyType.GO.name(), "A").isPresent(), is(true));
         assertThat(ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), "A").isPresent(), is(true));
         assertThat(ontologyRepository.findHistoryByTermId(OntologyType.GO.name(), "A").isPresent(), is(true));
+    }
+
+    /**
+     * Shows how to save directly to a solr server, bypassing transactional
+     * operations that are managed by Spring.
+     *
+     * @throws IOException
+     * @throws SolrServerException
+     */
+    @Test
+    public void saveDirectlyToSolrServer() throws IOException, SolrServerException {
+        server.addBean(createGODoc("A", "Alice Cooper"));
+        server.addBean(createGODoc("B", "Alice Cooper"));
+        server.addBean(createGODoc("C", "Alice Cooper"));
+        server.addBeans(
+                Arrays.asList(
+                        createGODoc("D", "Alice Cooper"),
+                        createGODoc("E", "Alice Cooper")));
+
+        assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(0L));
+
+        server.commit();
+
+        assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(5L));
     }
 }

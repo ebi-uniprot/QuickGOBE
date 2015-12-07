@@ -21,7 +21,7 @@ public class FlatFieldLeaf extends FlatField {
         return new FlatFieldLeaf("");
     }
 
-    @Override protected String buildStringFromLevel(int level) {
+    @Override protected String buildStringFromDepth(int level) {
         return buildString();
     }
 
