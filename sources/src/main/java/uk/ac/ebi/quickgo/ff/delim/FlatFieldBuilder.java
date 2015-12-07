@@ -25,7 +25,7 @@ public class FlatFieldBuilder extends FlatField {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlatFieldBuilder.class);
 
     // add more separators to allow handling deeper nesting
-    private static final String[] SEPARATORS = new String[]{
+    public static final String[] SEPARATORS = new String[]{
             "\t",
             "|||",
             "^^^",
@@ -34,7 +34,7 @@ public class FlatFieldBuilder extends FlatField {
             "£££"
     };
     // regexes for elements of SEPARATORS
-    private static final String[] SEPARATOR_REGEXES = new String[]{
+    public static final String[] SEPARATOR_REGEXES = new String[]{
             "\t",
             "\\|\\|\\|",
             "\\^\\^\\^",
