@@ -63,11 +63,7 @@ public class OSourceLineConverter implements Function<String, OntologyDocument> 
             doc.synonyms = level1FieldAsStrList(flatFields.get(SYNONYMS_INDEX).buildString());
             doc.synonymNames = doc.synonyms == null? null : doc.synonyms.stream()
                     .map(synField ->
-                        {
-                            String syn = newFlatFieldFromDepth(2).parse(synField).getFields().get(0).buildString();
-                            System.out.println(syn);
-                            return syn;
-                        })
+                            newFlatFieldFromDepth(2).parse(synField).getFields().get(0).buildString())
                     .collect(Collectors.toList());
             doc.subsets = level1FieldAsStrList(flatFields.get(SUBSETS_INDEX).buildString());
             doc.replacedBy = flatFields.get(REPLACED_BY_INDEX).buildString();
