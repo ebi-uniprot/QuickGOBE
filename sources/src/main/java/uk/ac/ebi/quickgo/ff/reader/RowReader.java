@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ff;
+package uk.ac.ebi.quickgo.ff.reader;
 
 public interface RowReader {
     boolean read(String[] data) throws Exception;

@@ -37,7 +37,7 @@ public abstract class GenericOntology implements ITermContainer {
     	this.namespace = namespace;
     }
 
-//    public void load(OntologySourceFiles sourceFiles, String rootId) throws Exception {
+//    public void loader(OntologySourceFiles sourceFiles, String rootId) throws Exception {
 //    	if (sourceFiles.terms != null) {
 //            for (String[] row : sourceFiles.terms.reader(OntologySourceFiles.ETerm.TERM_ID, OntologySourceFiles.ETerm.NAME, OntologySourceFiles.ETerm.IS_OBSOLETE)) {
 //                addTerm(new GenericTerm(row[0], row[1], row[2]));

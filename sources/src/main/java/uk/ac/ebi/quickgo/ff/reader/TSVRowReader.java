@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ff;
+package uk.ac.ebi.quickgo.ff.reader;
 
 import java.io.*;
 import java.util.ArrayList;

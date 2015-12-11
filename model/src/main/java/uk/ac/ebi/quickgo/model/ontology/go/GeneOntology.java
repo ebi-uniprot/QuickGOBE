@@ -19,12 +19,12 @@ public class GeneOntology extends GenericOntology {
     	super(NAME_SPACE);
     }
     
-//    public void load(GOSourceFiles sourceFiles) throws Exception {
+//    public void loader(GOSourceFiles sourceFiles) throws Exception {
 //        for (String[] row : sourceFiles.goTerms.reader(EGOTerm.GO_ID, EGOTerm.NAME, EGOTerm.CATEGORY, EGOTerm.IS_OBSOLETE)) {
 //            addTerm(new GOTerm(row[0], row[1], row[2], row[3]));
 //        }
 //
-//        super.load(sourceFiles, root);
+//        super.loader(sourceFiles, root);
 //
 //	    for (String[] row : sourceFiles.proteinComplexes.reader(EProteinComplex.GO_ID, EProteinComplex.DB, EProteinComplex.DB_OBJECT_ID, EProteinComplex.DB_OBJECT_SYMBOL, EProteinComplex.DB_OBJECT_NAME)) {
 //		    GOTerm term = (GOTerm)getTerm(row[0]);

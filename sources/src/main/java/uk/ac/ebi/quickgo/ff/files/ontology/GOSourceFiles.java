@@ -1,9 +1,11 @@
-package uk.ac.ebi.quickgo.ff.ontology;
+package uk.ac.ebi.quickgo.ff.files.ontology;
+
+import uk.ac.ebi.quickgo.ff.files.SourceFiles;
 
 import java.io.File;
 
-import static uk.ac.ebi.quickgo.ff.ontology.SourceFiles.NamedFile;
-import static uk.ac.ebi.quickgo.ff.ontology.SourceFiles.TSVDataFile;
+import static uk.ac.ebi.quickgo.ff.files.SourceFiles.NamedFile;
+import static uk.ac.ebi.quickgo.ff.files.SourceFiles.TSVDataFile;
 
 /**
  * class that defines the set of GO-specific source files

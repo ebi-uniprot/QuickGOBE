@@ -1,8 +1,12 @@
-package uk.ac.ebi.quickgo.ff.delim;
+package uk.ac.ebi.quickgo.ff.flatfield;
 
 import java.util.List;
 
 /**
+ * A flat field representing a {@link String} value. These are stored
+ * within a (possibly nested) list of {@link FlatField}s inside the
+ * {@FlatFieldBuilder} class.
+ *
  * Created 26/11/15
  * @author Edd
  */

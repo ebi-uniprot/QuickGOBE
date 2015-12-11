@@ -1,13 +1,12 @@
-package uk.ac.ebi.quickgo.ff.delim;
+package uk.ac.ebi.quickgo.ff.flatfield;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Used to build a {@link String} representation of a field that has nested sub-fields.
@@ -91,7 +90,7 @@ public class FlatFieldBuilder extends FlatField {
             if (startLevel + 1 < SEPARATORS.length && startLevel < maxLevel && f.contains(SEPARATORS[startLevel + 1])) {
                 flatField.addField(parse(f, startLevel + 1, SEPARATORS.length - 1));
             } else {
-                flatField.addField(newFlatFieldLeaf(f));
+                flatField.addField(FlatFieldLeaf.newFlatFieldLeaf(f));
             }
         });
         return flatField;

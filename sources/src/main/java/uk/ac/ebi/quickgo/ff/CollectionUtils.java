@@ -268,7 +268,7 @@ public class CollectionUtils {
 
     public static Properties loadProperties(Properties props, URL from) throws IOException {
         InputStream is = new BufferedInputStream(from.openStream());
-        props.load(is);
+        props.loader(is);
         is.close();
         return props;
     }

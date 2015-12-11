@@ -1,11 +1,14 @@
-package uk.ac.ebi.quickgo.ff.load;
+package uk.ac.ebi.quickgo.ff.loader.ontology;
 
-import uk.ac.ebi.quickgo.model.ontology.generic.CV;
 import uk.ac.ebi.quickgo.ff.ColourList;
-import uk.ac.ebi.quickgo.ff.ontology.OntologySourceFiles;
+import uk.ac.ebi.quickgo.ff.files.ontology.OntologySourceFiles;
+import uk.ac.ebi.quickgo.ff.loader.SourceInfoLoader;
 import uk.ac.ebi.quickgo.model.ontology.generic.*;
 
 /**
+ * This class specialises {@link SourceInfoLoader} to one resposible for loading ontology information
+ * and creating new instances of ontology models.
+ *
  * Created 10/12/15
  * @author Edd
  */

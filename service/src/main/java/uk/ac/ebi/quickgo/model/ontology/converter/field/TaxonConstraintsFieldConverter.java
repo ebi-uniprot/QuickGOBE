@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.model.ontology.converter.field;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.ebi.quickgo.ff.delim.FlatField;
+import uk.ac.ebi.quickgo.ff.flatfield.FlatField;
 import uk.ac.ebi.quickgo.model.FieldConverter;
 import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
 
 /**
  * Created 01/12/15

@@ -1,14 +1,15 @@
 package uk.ac.ebi.quickgo.repo.reader.line;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.ff.delim.FlatField;
+import uk.ac.ebi.quickgo.ff.flatfield.FlatField;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.*;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
 
 /**
  * Converts an ontology record/line from a delimited file to an {@link OntologyDocument} instance.

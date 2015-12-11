@@ -1,8 +1,10 @@
-package uk.ac.ebi.quickgo.ff.ontology;
+package uk.ac.ebi.quickgo.ff.files;
 
-import uk.ac.ebi.quickgo.ff.Progress;
-import uk.ac.ebi.quickgo.ff.RowIterator;
-import uk.ac.ebi.quickgo.ff.TSVRowReader;
+import uk.ac.ebi.quickgo.ff.files.ontology.ECOSourceFiles;
+import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
+import uk.ac.ebi.quickgo.ff.reader.Progress;
+import uk.ac.ebi.quickgo.ff.reader.RowIterator;
+import uk.ac.ebi.quickgo.ff.reader.TSVRowReader;
 
 import java.io.BufferedReader;
 import java.io.File;

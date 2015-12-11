@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ff.delim;
+package uk.ac.ebi.quickgo.ff.flatfield;
 
 import java.util.List;
 

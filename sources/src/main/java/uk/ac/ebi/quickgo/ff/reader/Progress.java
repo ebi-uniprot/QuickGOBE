@@ -1,7 +1,8 @@
-package uk.ac.ebi.quickgo.ff;
+package uk.ac.ebi.quickgo.ff.reader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.ebi.quickgo.ff.Interval;
 
 public class Progress {
     public static final int BYTES_IN_MB = 1048576;
