@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.repo.config;
 
-import java.io.IOException;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.solr.client.solrj.SolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,8 +9,11 @@ import org.springframework.data.solr.server.support.EmbeddedSolrServerFactory;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+
 /**
- * Context to newInstance an {@link EmbeddedSolrServer}, which is useful for testing purposes.
+ * Context to create an {@link EmbeddedSolrServer}, which is useful for testing purposes.
  *
  * Note: {@link EnableSolrRepositories}'s {@code basePackages} values define the
  * packages in which to look for Spring Data Repositories.
