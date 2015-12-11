@@ -55,7 +55,7 @@ public class OntologyServiceImplTest {
         String goId = "GO:0000001";
 
         OntologyDocument doc = createGODoc(goId, "name1");
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findCompleteByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(goId))).thenReturn
                 (Optional.of(doc));
 
@@ -72,7 +72,7 @@ public class OntologyServiceImplTest {
     public void findsEmptyOptionalForMissingGoIdentifier() {
         String ecoId = "GO:0000001";
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
                 (Optional.empty());
 
@@ -85,7 +85,7 @@ public class OntologyServiceImplTest {
         String ecoId = "ECO:0000001";
 
         OntologyDocument doc = createECODoc(ecoId, "name1");
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
                 (Optional.of(doc));
 
@@ -102,7 +102,7 @@ public class OntologyServiceImplTest {
     public void findsEmptyOptionalForMissingEcoIdentifier() {
         String ecoId = "ECO:0000001";
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
                 (Optional.empty());
 
@@ -116,7 +116,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createECODoc(ecoId, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findCoreByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(ecoId))).thenReturn
                 (Optional.of(doc));
         when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(ecoId));
@@ -134,7 +134,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createGODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findCoreByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
@@ -152,7 +152,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createGODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findHistoryByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
@@ -170,7 +170,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createECODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findHistoryByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
@@ -188,7 +188,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createGODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findXRefsByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
@@ -206,7 +206,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createECODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findXRefsByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
@@ -224,7 +224,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createGODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findTaxonConstraintsByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
@@ -242,7 +242,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createECODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findTaxonConstraintsByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
@@ -260,7 +260,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createGODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findXOntologyRelationsByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
@@ -278,7 +278,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createECODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findXOntologyRelationsByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
@@ -296,7 +296,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createGODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findAnnotationGuidelinesByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
@@ -314,7 +314,7 @@ public class OntologyServiceImplTest {
 
         OntologyDocument doc = createECODoc(id, "name1");
 
-        //TODO: create utility class for escape (you decide)
+        //TODO: newInstance utility class for escape (you decide)
         when(repositoryMock.findAnnotationGuidelinesByTermId(OntologyType.ECO.name(), ClientUtils.escapeQueryChars(id))).thenReturn
                 (Optional.of(doc));
         when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
 /**
- * Context to create an {@link HttpSolrServer}, suitable for production purposes.
+ * Context to newInstance an {@link HttpSolrServer}, suitable for production purposes.
  *
  * Note: {@link EnableSolrRepositories}'s {@code basePackages} values define the
  * packages in which to look for Spring Data Repositories.

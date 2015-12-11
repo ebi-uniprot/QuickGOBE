@@ -10,7 +10,7 @@ import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
- * Class to create mocked objects of different {@code docType}s, which are valid according to {@link OntologyDocument}.
+ * Class to newInstance mocked objects of different {@code docType}s, which are valid according to {@link OntologyDocument}.
  *
  * Created 03/11/15
  * @author Edd

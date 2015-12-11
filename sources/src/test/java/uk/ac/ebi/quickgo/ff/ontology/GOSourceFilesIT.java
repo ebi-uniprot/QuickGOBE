@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.ff.ontology;
 
-import uk.ac.ebi.quickgo.ff.load.GeneOntology;
+import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 
 import java.io.File;
 import org.junit.Test;

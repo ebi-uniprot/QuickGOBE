@@ -1,7 +1,7 @@
 /**
  *
  */
-package uk.ac.ebi.quickgo.ff;
+package uk.ac.ebi.quickgo.model.ontology.generic;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

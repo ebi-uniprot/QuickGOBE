@@ -68,7 +68,7 @@ public class FlatFieldBuilderTest {
         assertThat(origFlatFieldBuilder.getFields().size(), is(6));
     }
 
-    /** Check one can create a flat field object, write itself as a String A, then parse
+    /** Check one can newInstance a flat field object, write itself as a String A, then parse
      * this written value into a new flat field object, and write it again as String B. A and B
      * must be equal.
      */

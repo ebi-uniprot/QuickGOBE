@@ -72,7 +72,7 @@ public class FlatFieldBuilder extends FlatField {
             IllegalArgumentException exception = new IllegalArgumentException(
                     "FlatFieldBuilder maximum depth specified is greater than known number" +
                             " of delimiters (" + SEPARATORS.length + ")");
-            LOGGER.error("Cannot create FlatFieldBuilder: ", exception);
+            LOGGER.error("Cannot newInstance FlatFieldBuilder: ", exception);
             throw exception;
         }
 
