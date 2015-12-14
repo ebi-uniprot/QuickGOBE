@@ -24,7 +24,5 @@ public class RepoWriter implements ItemWriter<OntologyDocument> {
     @Override public void write(List<? extends OntologyDocument> list) throws Exception {
         LOGGER.info("Writing to the repository.");
         repository.save(list);
-//        LOGGER.info("*****");
-//        repository.findAll().forEach(doc -> System.out.println("   "+doc.id));
     }
 }

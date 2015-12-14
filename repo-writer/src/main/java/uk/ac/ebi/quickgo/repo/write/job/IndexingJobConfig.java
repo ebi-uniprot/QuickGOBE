@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.repo.write.listener.LogJobListener;
 import uk.ac.ebi.quickgo.repo.write.listener.LogStepListener;
 import uk.ac.ebi.quickgo.repo.write.writer.RepoWriter;
 
+import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * Created 02/12/15
@@ -83,7 +83,7 @@ public class IndexingJobConfig {
 
     @Bean
     public ODocReader reader() {
-        return new ODocReader(new ClassPathResource(indexerProperties.getOntologySourceFile()));
+        return new ODocReader(new File(indexerProperties.getOntologySourceFile()));
     }
 
 }
