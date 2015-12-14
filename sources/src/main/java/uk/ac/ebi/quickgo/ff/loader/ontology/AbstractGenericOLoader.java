@@ -186,6 +186,6 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
                 }
             }
         }
-        return null;
+        return genericOntology;
     }
 }
