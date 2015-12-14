@@ -1,15 +1,17 @@
 package uk.ac.ebi.quickgo.ff.loader.ontology;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Created by edd on 11/12/2015.
+ * Loads a complete GO ontology from a suite of source files.
+ *
+ * Created by Edd on 11/12/2015.
  */
 public class GOLoader extends AbstractGenericOLoader<GOSourceFiles, GeneOntology> {
     private final static Logger LOGGER = LoggerFactory.getLogger(GOLoader.class);
@@ -19,19 +21,24 @@ public class GOLoader extends AbstractGenericOLoader<GOSourceFiles, GeneOntology
     }
 
     @Override
-    public GeneOntology newInstance() {
+    protected GeneOntology newInstance() {
         return new GeneOntology();
     }
 
     @Override
     public Optional<GeneOntology> load() {
         try {
-            GeneOntology go = createWithGenericOInfo(GeneOntology.NAME_SPACE, GeneOntology.root);
+            GeneOntology go = getInstance();
 
+            // first add all GO terms to the ontology (additional information will be added to each term later)
             for (String[] row : sourceFiles.goTerms.reader(GOSourceFiles.EGOTerm.GO_ID, GOSourceFiles.EGOTerm.NAME, GOSourceFiles.EGOTerm.CATEGORY, GOSourceFiles.EGOTerm.IS_OBSOLETE)) {
                 go.addTerm(new GOTerm(row[0], row[1], row[2], row[3]));
             }
 
+            // add generic ontology info
+            createWithGenericOInfo(GeneOntology.NAME_SPACE, Optional.of(GeneOntology.root));
+
+            // add GO specific info
             for (String[] row : sourceFiles.proteinComplexes.reader(GOSourceFiles.EProteinComplex.GO_ID, GOSourceFiles.EProteinComplex.DB, GOSourceFiles.EProteinComplex.DB_OBJECT_ID, GOSourceFiles.EProteinComplex.DB_OBJECT_SYMBOL, GOSourceFiles.EProteinComplex.DB_OBJECT_NAME)) {
                 GOTerm term = (GOTerm) go.getTerm(row[0]);
                 if (term != null) {

@@ -5,8 +5,10 @@ import uk.ac.ebi.quickgo.ff.files.ontology.OntologySourceFiles;
 import uk.ac.ebi.quickgo.ff.loader.SourceInfoLoader;
 import uk.ac.ebi.quickgo.model.ontology.generic.*;
 
+import java.util.Optional;
+
 /**
- * This class specialises {@link SourceInfoLoader} to one resposible for loading ontology information
+ * This class specialises {@link SourceInfoLoader} to one responsible for loading ontology information
  * and creating new instances of ontology models.
  *
  * Created 10/12/15
@@ -18,10 +20,10 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
         super(sources);
     }
 
-    public abstract T newInstance();
+    protected abstract T newInstance();
 
-    protected T createWithGenericOInfo(String nameSpace, String rootTermId) throws Exception {
-        T genericOntology = newInstance();
+    protected T createWithGenericOInfo(String nameSpace, Optional<String> optionalRootTermId) throws Exception {
+        T genericOntology = getInstance();
         genericOntology.namespace = nameSpace;
 
         if (sourceFiles.terms != null) {
@@ -32,7 +34,7 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
 
         if (sourceFiles.relations != null) {
             for (String[] row : sourceFiles.relations.reader(OntologySourceFiles.ETermRelation.CHILD_ID, OntologySourceFiles.ETermRelation.PARENT_ID, OntologySourceFiles.ETermRelation.RELATION_TYPE)) {
-                if (rootTermId.equals(row[1])) {
+                if (optionalRootTermId.isPresent() && optionalRootTermId.get().equals(row[1])) {
                     continue;
                 }
                 GenericTerm child = genericOntology.getTerm(row[0]);

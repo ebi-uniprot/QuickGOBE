@@ -21,4 +21,14 @@ public abstract class SourceInfoLoader<S extends OntologySourceFiles, T> {
 
     protected abstract T newInstance();
     public abstract Optional<T> load();
+
+    private T instance;
+
+    protected T getInstance() {
+        if (this.instance == null) {
+            return this.instance = newInstance();
+        } else {
+            return this.instance;
+        }
+    }
 }

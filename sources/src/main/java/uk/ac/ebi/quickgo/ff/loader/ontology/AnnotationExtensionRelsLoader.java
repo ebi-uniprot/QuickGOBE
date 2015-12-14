@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.ff.loader.ontology;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles.*;
 import uk.ac.ebi.quickgo.ff.loader.SourceInfoLoader;
@@ -11,9 +9,13 @@ import uk.ac.ebi.quickgo.model.ontology.go.AnnotationExtensionRelations.Entity;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Created by edd on 11/12/2015.
+ * Loads annotation extension relations for a GO ontology.
+ *
+ * Created by Edd on 11/12/2015.
  */
 public class AnnotationExtensionRelsLoader extends SourceInfoLoader<GOSourceFiles, AnnotationExtensionRelations> {
     private final static Logger LOGGER = LoggerFactory.getLogger(AnnotationExtensionRelsLoader.class);
@@ -32,7 +34,7 @@ public class AnnotationExtensionRelsLoader extends SourceInfoLoader<GOSourceFile
 
     @Override
     public Optional<AnnotationExtensionRelations> load()  {
-        AnnotationExtensionRelations aer = newInstance();
+        AnnotationExtensionRelations aer = getInstance();
 
         try {
             for (String[] row : sourceFiles.annExtRelations.reader(EAnnExtRelation.RELATION, EAnnExtRelation.USAGE, EAnnExtRelation.DOMAIN)) {
