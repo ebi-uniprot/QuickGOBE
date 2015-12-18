@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ff;
+package uk.ac.ebi.quickgo.ff.phaseout;
 
 // TODO What is the point of this? If it's not important, remove it.
 public class ColourList {

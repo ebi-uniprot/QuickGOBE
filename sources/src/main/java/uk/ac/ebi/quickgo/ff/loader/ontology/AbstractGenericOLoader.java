@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.ff.loader.ontology;
 
-import uk.ac.ebi.quickgo.ff.ColourList;
 import uk.ac.ebi.quickgo.ff.files.ontology.OntologySourceFiles;
 import uk.ac.ebi.quickgo.ff.loader.SourceInfoLoader;
+import uk.ac.ebi.quickgo.ff.phaseout.ColourList;
 import uk.ac.ebi.quickgo.model.ontology.generic.*;
 
 import java.util.Optional;

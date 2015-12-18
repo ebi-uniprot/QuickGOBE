@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ff;
+package uk.ac.ebi.quickgo.ff.phaseout;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;

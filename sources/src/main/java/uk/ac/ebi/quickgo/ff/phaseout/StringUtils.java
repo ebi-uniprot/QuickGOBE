@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ff;
+package uk.ac.ebi.quickgo.ff.phaseout;
 
 public class StringUtils {
     static char[] hex = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
