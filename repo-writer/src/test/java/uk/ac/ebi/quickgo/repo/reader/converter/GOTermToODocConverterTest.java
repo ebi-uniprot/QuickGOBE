@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
  * Created 14/12/15
  * @author Edd
  */
-public class GOTermToDocConverterTest {
+public class GOTermToODocConverterTest {
     @Test
     public void converts1Term() {
         GOSourceFiles sourceFiles = new GOSourceFiles(new File("/home/eddturner/working/quickgo-local/quickgo-data/ff"));
@@ -27,7 +27,7 @@ public class GOTermToDocConverterTest {
         assertThat(geneOntologyOptional.isPresent(), is(true));
 
         GeneOntology geneOntology = geneOntologyOptional.get();
-        GOTermToDocConverter docConverter = new GOTermToDocConverter();
+        GOTermToODocConverter docConverter = new GOTermToODocConverter();
 
         List<GenericTerm> terms = geneOntology.getTerms();
         int max = 100;

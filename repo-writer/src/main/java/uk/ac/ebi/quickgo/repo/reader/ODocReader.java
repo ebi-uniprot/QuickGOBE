@@ -9,8 +9,8 @@ import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
-import uk.ac.ebi.quickgo.repo.reader.converter.GOTermToDocConverter;
-import uk.ac.ebi.quickgo.repo.reader.converter.GenericTermToDocConverter;
+import uk.ac.ebi.quickgo.repo.reader.converter.GOTermToODocConverter;
+import uk.ac.ebi.quickgo.repo.reader.converter.GenericTermToODocConverter;
 
 import java.io.File;
 import java.util.Iterator;
@@ -32,8 +32,8 @@ public class ODocReader extends AbstractItemStreamItemReader<OntologyDocument> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ODocReader.class);
 
     private File sourceFileDir;
-    private static final GOTermToDocConverter GO_TERM_TO_DOC_CONVERTER = new GOTermToDocConverter();
-    private static final GenericTermToDocConverter GENERIC_TERM_TO_DOC_CONVERTER = new GenericTermToDocConverter();
+    private static final GOTermToODocConverter GO_TERM_TO_DOC_CONVERTER = new GOTermToODocConverter();
+    private static final GenericTermToODocConverter GENERIC_TERM_TO_DOC_CONVERTER = new GenericTermToODocConverter();
     private Iterator<GenericTerm> goTermIterator;
     private Iterator<GenericTerm> ecoTermIterator;
 
