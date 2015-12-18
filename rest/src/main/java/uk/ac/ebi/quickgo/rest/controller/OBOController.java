@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
+ * Abstract controller defining common end-points of an OBO related
+ * REST API.
+ *
  * Created 27/11/15
  * @author Edd
  */
