@@ -34,10 +34,12 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
 
             doc.annotationGuidelines = extractAnnGuidelines(goTerm);
             // TODO: change doc aspect to singleton
-            doc.aspect = Collections.singletonList(goTerm.getAspect().text);
+            doc.aspect = goTerm.getAspect() == null?
+                    null : Collections.singletonList(goTerm.getAspect().text);
             doc.children = extractChildren(goTerm);
             doc.taxonConstraints = extractTaxonConstraints(goTerm);
-            doc.usage = goTerm.getUsage().getText();
+            doc.usage = goTerm.getUsage() == null?
+                    null : goTerm.getUsage().getText();
 
             return Optional.of(doc);
         } else {
@@ -47,45 +49,51 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
     }
 
     protected List<String> extractChildren(GOTerm goTerm) {
-        return goTerm.getChildren().stream()
-                .map(
-                        t -> t.getChild().getId())
-                .collect(Collectors.toList());
+        if (goTerm.getChildren() != null) {
+            return goTerm.getChildren().stream()
+                    .map(
+                            t -> t.getChild().getId())
+                    .collect(Collectors.toList());
+        } else return null;
     }
 
     /*
      * format: description|url
      */
     protected List<String> extractAnnGuidelines(GOTerm goTerm) {
-        return goTerm.getGuidelines().stream()
-                .map(
-                        t -> newFlatFieldFromDepth(2)
-                                .addField(newFlatFieldLeaf(t.getTitle()))
-                                .addField(newFlatFieldLeaf(t.getUrl()))
-                                .buildString())
-                .collect(Collectors.toList());
+        if (goTerm.getGuidelines() != null) {
+            return goTerm.getGuidelines().stream()
+                    .map(
+                            t -> newFlatFieldFromDepth(2)
+                                    .addField(newFlatFieldLeaf(t.getTitle()))
+                                    .addField(newFlatFieldLeaf(t.getUrl()))
+                                    .buildString())
+                    .collect(Collectors.toList());
+        } else return null;
     }
 
     /*
      * format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2
      */
     protected List<String> extractTaxonConstraints(GOTerm goTerm) {
-        return goTerm.getTaxonConstraints().stream()
-                .map(t -> {
-                            FlatFieldBuilder pubmedsAsFlatField = newFlatField();
-                            t.getSourcesIds().stream().forEach(
-                                    s -> pubmedsAsFlatField.addField(newFlatFieldLeaf(s))
-                            );
+        if (goTerm.getTaxonConstraints() != null) {
+            return goTerm.getTaxonConstraints().stream()
+                    .map(t -> {
+                        FlatFieldBuilder pubmedsAsFlatField = newFlatField();
+                        t.getSourcesIds().stream().forEach(
+                                s -> pubmedsAsFlatField.addField(newFlatFieldLeaf(s))
+                        );
 
-                            return newFlatFieldFromDepth(2)
-                                    .addField(newFlatFieldLeaf(t.getGoId()))
-                                    .addField(newFlatFieldLeaf(t.getName()))
-                                    .addField(newFlatFieldLeaf(t.relationship()))
-                                    .addField(newFlatFieldLeaf(t.getTaxId()))
-                                    .addField(newFlatFieldLeaf(t.getTaxonName()))
-                                    .addField(pubmedsAsFlatField)
-                                    .buildString();
-                        })
-                .collect(Collectors.toList());
+                        return newFlatFieldFromDepth(2)
+                                .addField(newFlatFieldLeaf(t.getGoId()))
+                                .addField(newFlatFieldLeaf(t.getName()))
+                                .addField(newFlatFieldLeaf(t.relationship()))
+                                .addField(newFlatFieldLeaf(t.getTaxId()))
+                                .addField(newFlatFieldLeaf(t.getTaxonName()))
+                                .addField(pubmedsAsFlatField)
+                                .buildString();
+                    })
+                    .collect(Collectors.toList());
+        } else return null;
     }
 }

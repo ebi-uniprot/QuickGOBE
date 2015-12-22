@@ -1,24 +1,30 @@
 package uk.ac.ebi.quickgo.repo.reader.converter;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
 import uk.ac.ebi.quickgo.ff.loader.ontology.GOLoader;
-import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 
 import java.io.File;
-import java.util.List;
 import java.util.Optional;
-import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 /**
  * Created 14/12/15
  * @author Edd
  */
+@RunWith(MockitoJUnitRunner.class)
 public class GOTermToODocConverterTest {
+    @Ignore
     @Test
     public void converts1Term() {
         GOSourceFiles sourceFiles = new GOSourceFiles(new File("/home/eddturner/working/quickgo-local/quickgo-data/ff"));
@@ -29,21 +35,23 @@ public class GOTermToODocConverterTest {
         GeneOntology geneOntology = geneOntologyOptional.get();
         GOTermToODocConverter docConverter = new GOTermToODocConverter();
 
-        List<GenericTerm> terms = geneOntology.getTerms();
-        int max = 100;
-        int count = 0;
-
-//        for (GenericTerm term : terms) {
-//            if (count++ >= max) {
-//                break;
-//            }
-//
-//            GOTerm goTerm = (GOTerm) term;
-//            System.out.println(docConverter.apply(Optional.of(goTerm)));
-//        }
-
-//        System.out.println(docConverter.apply(Optional.of((GOTerm) geneOntology.getTerm("GO:0000215"))));
-//        System.out.println(docConverter.apply(Optional.of((GOTerm) geneOntology.getTerm("GO:0003146"))));
         System.out.println(docConverter.apply(Optional.of((GOTerm) geneOntology.getTerm("GO:0000003"))));
     }
+
+    private static final String TERM_ID = "id1";
+
+    @Mock
+    public GOTerm term;
+
+    private GOTermToODocConverter converter = new GOTermToODocConverter();
+
+    @Before
+    public void setup() {
+        when(term.getId()).thenReturn(TERM_ID);
+    }
+
+    // annotation guidelines
+    // children
+    // taxon constraints
+    // simple fields
 }
