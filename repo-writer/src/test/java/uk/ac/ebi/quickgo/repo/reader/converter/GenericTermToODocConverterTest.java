@@ -241,4 +241,11 @@ public class GenericTermToODocConverterTest {
         assertThat(document.secondaryIds, is(nullValue()));
         assertThat(document.replacedBy, is(nullValue()));
     }
+
+    // empty optional conversion
+    @Test
+    public void convertsEmptyOptional() {
+        Optional<OntologyDocument> documentOptional = converter.apply(Optional.empty());
+        assertThat(documentOptional.isPresent(), is(false));
+    }
 }
