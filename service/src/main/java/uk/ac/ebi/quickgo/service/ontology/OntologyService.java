@@ -46,17 +46,12 @@ public interface OntologyService<T> {
     Optional<T> findCoreInfoByOntologyId(String id);
 
     Optional<T> findHistoryInfoByOntologyId(String id);
-    Optional<T> findXRefsInfoByOntologyId(String id);
-    Optional<T> findTaxonConstraintsInfoByOntologyId(String id);
-    Optional<T> findXORelationsInfoByOntologyId(String id);
-    Optional<T> findAnnotationGuideLinesInfoByOntologyId(String id);
 
-    /**
-     * Search by a given ECO id and return a list, which fulfils
-     * the requested page of results.
-     * @param ecoId
-     * @param pageable
-     * @return
-     */
-//    List<OntologyDocument> findByEcoId(String ecoId, Pageable pageable);
+    Optional<T> findXRefsInfoByOntologyId(String id);
+
+    Optional<T> findTaxonConstraintsInfoByOntologyId(String id);
+
+    Optional<T> findXORelationsInfoByOntologyId(String id);
+
+    Optional<T> findAnnotationGuideLinesInfoByOntologyId(String id);
 }
