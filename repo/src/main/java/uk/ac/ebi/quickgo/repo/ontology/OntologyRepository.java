@@ -16,7 +16,6 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
  * @author Edd
  */
 public interface OntologyRepository extends SolrCrudRepository<OntologyDocument, String> {
-
     String ID = "id";
     String ONTOLOGY_TYPE = "ontologyType";
     String NAME = "name";
@@ -39,37 +38,30 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
     String XRELATIONS = "xRelation";
     String BLACKLIST = "blacklist";
 
-    // complete
     @Query("ontologyType:?0 AND id:?1")
     Optional<OntologyDocument> findCompleteByTermId(String idType, String id);
 
-    // core
     @Query(value = "ontologyType:?0 AND id:?1",
             fields = {ID, NAME, IS_OBSOLETE, COMMENT, ASPECT, ANCESTOR,
                     USAGE, SYNONYMS, DEFINITION})
     Optional<OntologyDocument> findCoreByTermId(String idType, String id);
 
-    // history
     @Query(value = "ontologyType:?0 AND id:?1",
             fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, HISTORY})
     Optional<OntologyDocument> findHistoryByTermId(String idType, String id);
 
-    // cross-references
     @Query(value = "ontologyType:?0 AND id:?1",
             fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, XREF})
     Optional<OntologyDocument> findXRefsByTermId(String idType, String id);
 
-    // taxonomy constraints and blacklist
     @Query(value = "ontologyType:?0 AND id:?1",
             fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, TAXON_CONSTRAINT, BLACKLIST})
     Optional<OntologyDocument> findTaxonConstraintsByTermId(String idType, String id);
 
-    // cross-ontology relations
     @Query(value = "ontologyType:?0 AND id:?1",
             fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, XRELATIONS})
     Optional<OntologyDocument> findXOntologyRelationsByTermId(String idType, String id);
 
-    // annotation guidelines
     @Query(value = "ontologyType:?0 AND id:?1",
             fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, ANNOTATION_GUIDELINE})
     Optional<OntologyDocument> findAnnotationGuidelinesByTermId(String idType, String id);
