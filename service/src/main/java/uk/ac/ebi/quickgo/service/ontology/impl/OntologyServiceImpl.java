@@ -88,5 +88,4 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 ontologyRepository.findAll(pageable).spliterator(), false)
                 .collect(Collectors.toList());
     }
-
 }
