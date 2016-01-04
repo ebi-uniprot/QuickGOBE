@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
@@ -61,7 +62,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
      * format: description|url
      */
     protected List<String> extractAnnGuidelines(GOTerm goTerm) {
-        if (goTerm.getGuidelines() != null) {
+        if (!isEmpty(goTerm.getGuidelines())) {
             return goTerm.getGuidelines().stream()
                     .map(
                             t -> newFlatFieldFromDepth(GenericTermToODocConverter.DEPTH_OF_NESTED_DOC_FIELD)
@@ -76,7 +77,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
      * format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2
      */
     protected List<String> extractTaxonConstraints(GOTerm goTerm) {
-        if (goTerm.getTaxonConstraints() != null) {
+        if (!isEmpty(goTerm.getTaxonConstraints())) {
             return goTerm.getTaxonConstraints().stream()
                     .map(t -> {
                         FlatFieldBuilder pubmedsAsFlatField = newFlatField();
