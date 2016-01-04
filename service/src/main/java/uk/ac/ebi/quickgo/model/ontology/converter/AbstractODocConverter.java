@@ -53,5 +53,4 @@ public abstract class AbstractODocConverter<T extends OBOTerm> implements Ontolo
 
         return term;
     }
-
 }
