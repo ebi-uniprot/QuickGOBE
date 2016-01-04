@@ -26,7 +26,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         Optional<OntologyDocument>> {
 
     // the base depth of a field in a document
-    private static final int DEPTH_OF_NESTED_DOC_FIELD = 2;
+    static final int DEPTH_OF_NESTED_DOC_FIELD = 2;
 
     @Override public Optional<OntologyDocument> apply(Optional<? extends GenericTerm> termOptional) {
         if (termOptional.isPresent()) {

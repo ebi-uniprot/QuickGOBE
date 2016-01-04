@@ -64,7 +64,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
         if (goTerm.getGuidelines() != null) {
             return goTerm.getGuidelines().stream()
                     .map(
-                            t -> newFlatFieldFromDepth(2)
+                            t -> newFlatFieldFromDepth(GenericTermToODocConverter.DEPTH_OF_NESTED_DOC_FIELD)
                                     .addField(newFlatFieldLeaf(t.getTitle()))
                                     .addField(newFlatFieldLeaf(t.getUrl()))
                                     .buildString())
@@ -84,7 +84,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
                                 s -> pubmedsAsFlatField.addField(newFlatFieldLeaf(s))
                         );
 
-                        return newFlatFieldFromDepth(2)
+                        return newFlatFieldFromDepth(GenericTermToODocConverter.DEPTH_OF_NESTED_DOC_FIELD)
                                 .addField(newFlatFieldLeaf(t.getGoId()))
                                 .addField(newFlatFieldLeaf(t.getName()))
                                 .addField(newFlatFieldLeaf(t.relationship()))
