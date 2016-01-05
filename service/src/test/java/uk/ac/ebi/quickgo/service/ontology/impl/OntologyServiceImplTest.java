@@ -1,14 +1,16 @@
 package uk.ac.ebi.quickgo.service.ontology.impl;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.model.ontology.ECOTerm;
 import uk.ac.ebi.quickgo.model.ontology.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.model.ontology.converter.GODocConverter;
 import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.service.ontology.OntologyService;
-import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.junit.Before;
@@ -16,10 +18,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createECODoc;
 import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
@@ -48,6 +55,24 @@ public class OntologyServiceImplTest {
     public void setUp() throws Exception {
         goOntologyService = new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO);
         ecoOntologyService = new OntologyServiceImpl<>(repositoryMock, ecoDocumentConverterMock, OntologyType.ECO);
+    }
+
+    @Test
+    public void findsAllTerms() {
+        List<OntologyDocument> allDocs = new ArrayList<>();
+        for(int i = 0; i < 23; i++) {
+            allDocs.add(createGODoc("id" + i, "name" + i));
+        }
+        Page<OntologyDocument> allDocsPage = new PageImpl<>(allDocs);
+
+        when(repositoryMock.findAll(any(Pageable.class))).thenReturn(allDocsPage);
+
+        when(goDocumentConverterMock.convert(any(OntologyDocument.class))).thenReturn(createGOTerm("stub"));
+
+        int fakePageNumber = 1;
+        int fakePageSize = 10;
+        List<GOTerm> page = goOntologyService.findAll(new PageRequest(fakePageNumber, fakePageSize));
+        assertThat(page.size(), is(23));
     }
 
     @Test
@@ -337,53 +362,5 @@ public class OntologyServiceImplTest {
         term.id = id;
         return term;
     }
-
-    //    @Test
-//    public void findCompleteInfoByOntologyId() {
-//        OntologyDocument goTerm = createGOTerm();
-//        goTerm.id = "0000001";
-//
-//        ontologyRepository.save(goTerm);
-//
-//        List<OntologyDocument> results = ontologyService.findCompleteInfoByOntologyId("0000001", new PageRequest(0, 1));
-//        assertThat(results.size(), is(1));
-//        assertThat(results.get(0).id, is("0000001"));
-//        assertThat(results.get(0).ontologyType, is("go"));
-//    }
-//
-//    @Test
-//    public void doNotfindByWrongGoId() {
-//        OntologyDocument goTerm = createGOTerm();
-//        goTerm.id = "0000001";
-//
-//        ontologyRepository.save(goTerm);
-//
-//        List<OntologyDocument> results = ontologyService.findCompleteInfoByOntologyId("0000002", new PageRequest(0, 1));
-//        assertThat(results.size(), is(0));
-//    }
-
-//    @Test
-//    public void findByEcoId() {
-//        OntologyDocument ecoTerm = createECOTerm();
-//        ecoTerm.id = "0000001";
-//
-//        ontologyRepository.save(ecoTerm);
-//
-//        List<OntologyDocument> results = ontologyService.findByEcoId("0000001", new PageRequest(0, 1));
-//        assertThat(results.size(), is(1));
-//        assertThat(results.get(0).id, is("0000001"));
-//        assertThat(results.get(0).ontologyType, is("eco"));
-//    }
-//
-//    @Test
-//    public void doNotfindByWrongEcoId() {
-//        OntologyDocument ecoTerm = createECOTerm();
-//        ecoTerm.id = "0000001";
-//
-//        ontologyRepository.save(ecoTerm);
-//
-//        List<OntologyDocument> results = ontologyService.findByEcoId("0000002", new PageRequest(0, 1));
-//        assertThat(results.size(), is(0));
-//    }
 
 }

@@ -15,6 +15,8 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Service to query information from the {@link OntologyRepository}
  * and return {@link OBOTerm} subclasses.
@@ -24,21 +26,20 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T> {
+
     private OntologyRepository ontologyRepository;
     private OntologyDocConverter<T> converter;
-
     private String ontologyType;
 
-    public OntologyServiceImpl() {}
+    private OntologyServiceImpl() {}
 
     public OntologyServiceImpl(
             OntologyRepository repository,
             OntologyDocConverter<T> converter,
             OntologyType type) {
-        ontologyType = type.name();
-
-        this.ontologyRepository = repository;
-        this.converter = converter;
+        this.ontologyType = requireNonNull(type.name());
+        this.ontologyRepository = requireNonNull(repository);
+        this.converter = requireNonNull(converter);
     }
 
     @Override public Optional<T> findCompleteInfoByOntologyId(String id) {
@@ -70,6 +71,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return convertOptionalDoc(ontologyRepository.findXOntologyRelationsByTermId(ontologyType,
                 ClientUtils.escapeQueryChars(id)));
     }
+
     @Override public Optional<T> findAnnotationGuideLinesInfoByOntologyId(String id) {
         return convertOptionalDoc(ontologyRepository.findAnnotationGuidelinesByTermId(ontologyType,
                 ClientUtils.escapeQueryChars(id)));
@@ -83,9 +85,11 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         }
     }
 
-    @Override public List<OntologyDocument> findAll(Pageable pageable) {
+    @Override public List<T> findAll(Pageable pageable) {
         return StreamSupport.stream(
-                ontologyRepository.findAll(pageable).spliterator(), false)
+                ontologyRepository.findAll(pageable)
+                        .map(converter::convert)
+                        .spliterator(), false)
                 .collect(Collectors.toList());
     }
 
