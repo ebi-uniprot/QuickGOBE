@@ -6,10 +6,12 @@ import java.util.Optional;
 import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
+import static uk.ac.ebi.quickgo.repo.ontology.OntologyField.*;
+
 /**
  * Ontology repository interface exposing methods for performing searches over its contents.
- *
- * see here how to change
+ * <p>
+ * See here how to change:
  * https://github.com/spring-projects/spring-data-solr/blob/master/README.md
  *
  * Created 11/11/15
@@ -17,65 +19,45 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
  */
 public interface OntologyRepository extends SolrCrudRepository<OntologyDocument, String> {
 
-    String ID = "id";
-    String ONTOLOGY_TYPE = "ontologyType";
-    String NAME = "name";
-    String SECONDARY_ID = "secondaryId";
-    String IS_OBSOLETE = "obsolete";
-    String CONSIDER = "consider";
-    String REPLACED_BY = "replacedBy";
-    String DEFINITION = "definition";
-    String COMMENT = "comment";
-    String ASPECT = "aspect";
-    String USAGE = "usage";
-    String SUBSET = "subset";
-    String CHILDREN = "children";
-    String ANCESTOR = "ancestor";
-    String SYNONYMS = "synonyms";
-    String HISTORY = "history";
-    String XREF = "xref";
-    String ANNOTATION_GUIDELINE = "annotationGuideline";
-    String TAXON_CONSTRAINT = "taxonConstraint";
-    String XRELATIONS = "xRelation";
-    String BLACKLIST = "blacklist";
+    String QUERY_ONTOLOGY_TYPE_AND_ID = ONTOLOGY_TYPE + ":?0 AND " + ID + ":?1";
 
     // complete
-    @Query("ontologyType:?0 AND id:?1")
-    Optional<OntologyDocument> findCompleteByTermId(String idType, String id);
+    @Query(QUERY_ONTOLOGY_TYPE_AND_ID) Optional<OntologyDocument> findCompleteByTermId(String idType, String id);
 
     // core
-    @Query(value = "ontologyType:?0 AND id:?1",
+    @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
             fields = {ID, NAME, IS_OBSOLETE, COMMENT, ASPECT, ANCESTOR,
-                    USAGE, SYNONYMS, DEFINITION})
-    Optional<OntologyDocument> findCoreByTermId(String idType, String id);
+                    USAGE, SYNONYMS, DEFINITION}) Optional<OntologyDocument> findCoreByTermId(String idType, String id);
 
     // history
-    @Query(value = "ontologyType:?0 AND id:?1",
-            fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, HISTORY})
+    @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
+            fields = {
+                    ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, HISTORY})
     Optional<OntologyDocument> findHistoryByTermId(String idType, String id);
 
     // cross-references
-    @Query(value = "ontologyType:?0 AND id:?1",
-            fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, XREF})
-    Optional<OntologyDocument> findXRefsByTermId(String idType, String id);
+    @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
+            fields = {
+                    ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, XREF}) Optional<OntologyDocument> findXRefsByTermId(
+            String idType, String id);
 
     // taxonomy constraints and blacklist
-    @Query(value = "ontologyType:?0 AND id:?1",
-            fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, TAXON_CONSTRAINT, BLACKLIST})
+    @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
+            fields = {
+                    ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, TAXON_CONSTRAINT, BLACKLIST})
     Optional<OntologyDocument> findTaxonConstraintsByTermId(String idType, String id);
 
     // cross-ontology relations
-    @Query(value = "ontologyType:?0 AND id:?1",
-            fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, XRELATIONS})
+    @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
+            fields = {
+                    ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, XRELATIONS})
     Optional<OntologyDocument> findXOntologyRelationsByTermId(String idType, String id);
 
     // annotation guidelines
-    @Query(value = "ontologyType:?0 AND id:?1",
-            fields = {ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, ANNOTATION_GUIDELINE})
+    @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
+            fields = {
+                    ID, NAME, IS_OBSOLETE, COMMENT, DEFINITION, ANNOTATION_GUIDELINE})
     Optional<OntologyDocument> findAnnotationGuidelinesByTermId(String idType, String id);
-
-
-
 
     /**
      * Useful methods would be:
