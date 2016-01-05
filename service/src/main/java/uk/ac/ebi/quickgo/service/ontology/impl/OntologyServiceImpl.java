@@ -92,5 +92,4 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                         .spliterator(), false)
                 .collect(Collectors.toList());
     }
-
 }
