@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.repo.main;
 import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -17,6 +18,7 @@ public class QuickGOIndexOntologyMainIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
+    @Ignore
     @Test
     public void testIndexingRuns() {
         QuickGOIndexOntologyMain.main(new String[]{});
