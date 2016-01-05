@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
+import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
 import uk.ac.ebi.quickgo.service.ontology.OntologyService;
 
 import java.util.Optional;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * Created 27/11/15
  * @author Edd
  */
-public abstract class OBOController<T> {
+public abstract class OBOController<T extends OBOTerm> {
     private final OntologyService<T> ontologyService;
 
     public abstract boolean isValidId(String id);
