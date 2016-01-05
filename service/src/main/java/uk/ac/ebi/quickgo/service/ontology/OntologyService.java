@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.service.ontology;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.model.ontology.GOTerm;
+import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,48 +14,62 @@ import org.springframework.data.domain.Pageable;
  * Created 11/11/15
  * @author Edd
  */
-public interface OntologyService<T> {
-    // default page size if required by a query
-    int DEFAULT_PAGE_SIZE = 10;
-
+public interface OntologyService<T extends OBOTerm> {
     /**
-     * Search over everything and return a list, which fulfils
-     * the requested page of results.
-     * @param pageable
-     * @return
+     * Search over everything and return a list of results,
+     * which fulfil the specification of the {@code pageable} instance.
+     * @param pageable the requested page of results
+     * @return the page of results
      */
-    List<OntologyDocument> findAll(Pageable pageable);
+    List<T> findAll(Pageable pageable);
 
     /**
-     * Search by a given GO id and return a list, which fulfils
-     * the requested page of results.
-     * @param id
-     * @param pageable
-     * @return
+     * Find the complete data set stored about a specified ontology ID.
+     * @param id the ontology ID
+     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
      */
     Optional<T> findCompleteInfoByOntologyId(String id);
 
     /**
-     * Search by a given GO id and return a list, which fulfils
-     * the requested page of results.
-     * @param id
-     * @param pageable
-     * @return
+     * Find the core data set stored about a specified ontology ID.
+     * @param id the ontology ID
+     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
      */
     Optional<T> findCoreInfoByOntologyId(String id);
 
+    /**
+     * Find historical changes related to this specified ontology ID.
+     * @param id the ontology ID
+     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     */
     Optional<T> findHistoryInfoByOntologyId(String id);
-    Optional<T> findXRefsInfoByOntologyId(String id);
-    Optional<T> findTaxonConstraintsInfoByOntologyId(String id);
-    Optional<T> findXORelationsInfoByOntologyId(String id);
-    Optional<T> findAnnotationGuideLinesInfoByOntologyId(String id);
 
     /**
-     * Search by a given ECO id and return a list, which fulfils
-     * the requested page of results.
-     * @param ecoId
-     * @param pageable
-     * @return
+     * Find the cross-references stored for a specified ontology ID.
+     * @param id the ontology ID
+     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
      */
-//    List<OntologyDocument> findByEcoId(String ecoId, Pageable pageable);
+    Optional<T> findXRefsInfoByOntologyId(String id);
+
+    /**
+     * Find the taxonomy constraints stored for a specified ontology ID.
+     * @param id the ontology ID
+     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     */
+    Optional<T> findTaxonConstraintsInfoByOntologyId(String id);
+
+    /**
+     * Find information about cross-ontology relations, for a specified ontology ID.
+     * @param id the ontology ID
+     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     */
+    Optional<T> findXORelationsInfoByOntologyId(String id);
+
+    /**
+     * Find the annotation guidelines for a specified ontology ID.
+     * @param id the ontology ID
+     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     */
+    Optional<T> findAnnotationGuideLinesInfoByOntologyId(String id);
+
 }
