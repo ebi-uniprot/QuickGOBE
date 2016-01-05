@@ -27,7 +27,8 @@ public abstract class OBOController<T> {
 
     /**
      * An empty or unknown path should result in a bad request
-     * @return
+     *
+     * @return a 400 response
      */
     @RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> emptyId() {
@@ -36,8 +37,15 @@ public abstract class OBOController<T> {
 
     /**
      * Get core information about a term based on its id
-     * @param id
+     *
+     * @param id ontology identifier
+     *
      * @return
+     * <ul>
+     * <li>id is found: response consists of a 200 with the core information of the ontology term</li>
+     * <li>id is not found: response returns 404</li>
+     * <li>id is not in correct format: response returns 400</li>
+     * </ul>
      */
     @RequestMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findCoreTerm(@PathVariable(value = "id") String id) {
@@ -45,14 +53,18 @@ public abstract class OBOController<T> {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // use the service to retrieve what user requested
         return getTermResponse(ontologyService.findCoreInfoByOntologyId(id));
     }
 
     /**
      * Get complete information about a term based on its id
-     * @param id
+     * @param id ontology identifier
      * @return
+     * <ul>
+     * <li>id is found: response consists of a 200 with all of the information the ontology term has</li>
+     * <li>id is not found: response returns 404</li>
+     * <li>id is not in correct format: response returns 400</li>
+     * </ul>
      */
     @RequestMapping(value = "/{id}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findCompleteTerm(@PathVariable(value = "id") String id) {
@@ -60,14 +72,19 @@ public abstract class OBOController<T> {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // use the service to retrieve what user requested
         return getTermResponse(ontologyService.findCompleteInfoByOntologyId(id));
     }
 
     /**
      * Get history information about a term based on its id
-     * @param id
+     *
+     * @param id ontology identifier
      * @return
+     * <ul>
+     * <li>id is found: response consists of a 200 with the history of the ontology term</li>
+     * <li>id is not found: response returns 404</li>
+     * <li>id is not in correct format: response returns 400</li>
+     * </ul>
      */
     @RequestMapping(value = "/{id}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermHistory(@PathVariable(value = "id") String id) {
@@ -75,14 +92,18 @@ public abstract class OBOController<T> {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // use the service to retrieve what user requested
         return getTermResponse(ontologyService.findHistoryInfoByOntologyId(id));
     }
 
     /**
      * Get cross-reference information about a term based on its id
-     * @param id
+     * @param id ontology identifier
      * @return
+     * <ul>
+     * <li>id is found: response consists of a 200 with the cross-references of the ontology term</li>
+     * <li>id is not found: response returns 404</li>
+     * <li>id is not in correct format: response returns 400</li>
+     * </ul>
      */
     @RequestMapping(value = "/{id}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermXRefs(@PathVariable(value = "id") String id) {
@@ -90,14 +111,18 @@ public abstract class OBOController<T> {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // use the service to retrieve what user requested
         return getTermResponse(ontologyService.findXRefsInfoByOntologyId(id));
     }
 
     /**
      * Get taxonomy constraint and blacklist information about a term based on its id
-     * @param id
+     * @param id ontology identifier
      * @return
+     * <ul>
+     * <li>id is found: response consists of a 200 with the constraint and blacklist of an ontology term</li>
+     * <li>id is not found: response returns 404</li>
+     * <li>id is not in correct format: response returns 400</li>
+     * </ul>
      */
     @RequestMapping(value = "/{id}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermTaxonConstraints(@PathVariable(value = "id") String id) {
@@ -105,14 +130,18 @@ public abstract class OBOController<T> {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // use the service to retrieve what user requested
         return getTermResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(id));
     }
 
     /**
      * Get cross-ontology relationship information about a term based on its id
-     * @param id
+     * @param id ontology identifier
      * @return
+     * <ul>
+     * <li>id is found: response consists of a 200 with cross-ontology relations of the ontology term</li>
+     * <li>id is not found: response returns 404</li>
+     * <li>id is not in correct format: response returns 400</li>
+     * </ul>
      */
     @RequestMapping(value = "/{id}/xorels", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermXOntologyRelations(@PathVariable(value = "id") String id) {
@@ -120,14 +149,18 @@ public abstract class OBOController<T> {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // use the service to retrieve what user requested
         return getTermResponse(ontologyService.findXORelationsInfoByOntologyId(id));
     }
 
     /**
      * Get annotation guideline information about a term based on its id
-     * @param id
+     * @param id ontology identifier
      * @return
+     * <ul>
+     * <li>id is found: response consists of a 200 with annotation guidelines of the ontology term</li>
+     * <li>id is not found: response returns 404</li>
+     * <li>id is not in correct format: response returns 400</li>
+     * </ul>
      */
     @RequestMapping(value = "/{id}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermAnnotationGuideLines(@PathVariable(value = "id") String id) {
@@ -135,15 +168,11 @@ public abstract class OBOController<T> {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // use the service to retrieve what user requested
         return getTermResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(id));
     }
 
     private ResponseEntity<T> getTermResponse(Optional<T> optionalECODoc) {
-        if (optionalECODoc.isPresent()) {
-            return new ResponseEntity<>(optionalECODoc.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return optionalECODoc.map(ontology -> new ResponseEntity<>(ontology, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }
