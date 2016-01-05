@@ -19,10 +19,10 @@ import static org.hamcrest.core.IsNull.nullValue;
  * @author Edd
  */
 public class AbstractOntologyDocConverterTest {
-    private GeneralODocConverter converter;
+    private MockODocConverter converter;
 
     // basic implementation that makes available protected methods which are to be tested
-    private static class GeneralODocConverter extends AbstractODocConverter<OBOTerm> {
+    private static class MockODocConverter extends AbstractODocConverter<OBOTerm> {
         @Override public OBOTerm convert(OntologyDocument ontologyDocument) {
             return null;
         }
@@ -30,7 +30,7 @@ public class AbstractOntologyDocConverterTest {
 
     @Before
     public void setup() {
-        this.converter = new GeneralODocConverter();
+        this.converter = new MockODocConverter();
     }
 
     /**
