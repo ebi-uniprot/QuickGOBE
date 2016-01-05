@@ -27,7 +27,6 @@ public abstract class OBOController<T> {
 
     /**
      * An empty or unknown path should result in a bad request
-     * @param id
      * @return
      */
     @RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -40,10 +39,8 @@ public abstract class OBOController<T> {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/{id}", produces = {MediaType
-            .APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findCoreTerm(@PathVariable(value = "id") String id) {
-
         if (!isValidId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -57,10 +54,8 @@ public abstract class OBOController<T> {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/{id}/complete", produces = {MediaType
-            .APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/{id}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findCompleteTerm(@PathVariable(value = "id") String id) {
-
         if (!isValidId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -74,10 +69,8 @@ public abstract class OBOController<T> {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/{id}/history", produces = {MediaType
-            .APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/{id}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermHistory(@PathVariable(value = "id") String id) {
-
         if (!isValidId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -91,10 +84,8 @@ public abstract class OBOController<T> {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/{id}/xrefs", produces = {MediaType
-            .APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/{id}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermXRefs(@PathVariable(value = "id") String id) {
-
         if (!isValidId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -108,10 +99,8 @@ public abstract class OBOController<T> {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/{id}/constraints", produces = {MediaType
-            .APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/{id}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermTaxonConstraints(@PathVariable(value = "id") String id) {
-
         if (!isValidId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -125,10 +114,8 @@ public abstract class OBOController<T> {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/{id}/xorels", produces = {MediaType
-            .APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/{id}/xorels", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermXOntologyRelations(@PathVariable(value = "id") String id) {
-
         if (!isValidId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -142,11 +129,8 @@ public abstract class OBOController<T> {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/{id}/guidelines", produces = {MediaType
-            .APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermAnnotationGuideLines(@PathVariable(value = "id") String
-            id) {
-
+    @RequestMapping(value = "/{id}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<T> findTermAnnotationGuideLines(@PathVariable(value = "id") String id) {
         if (!isValidId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
