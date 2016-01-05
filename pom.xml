@@ -20,6 +20,7 @@
         <module>repo-writer</module>
         <module>service</module>
         <module>sources</module>
+        <module>model</module>
     </modules>
 
     <properties>

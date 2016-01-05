@@ -199,4 +199,31 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (xRelations != null ? xRelations.hashCode() : 0);
         return result;
     }
+
+    @Override public String toString() {
+        return "OntologyDocument{" +
+                "id='" + id + '\'' +
+                ", ontologyType='" + ontologyType + '\'' +
+                ", name='" + name + '\'' +
+                ", isObsolete=" + isObsolete +
+                ", definition='" + definition + '\'' +
+                ", comment='" + comment + '\'' +
+                ", secondaryIds=" + secondaryIds +
+                ", usage='" + usage + '\'' +
+                ", synonyms=" + synonyms +
+                ", synonymNames=" + synonymNames +
+                ", subsets=" + subsets +
+                ", replacedBy='" + replacedBy + '\'' +
+                ", considers=" + considers +
+                ", children=" + children +
+                ", ancestors=" + ancestors +
+                ", aspect=" + aspect +
+                ", history=" + history +
+                ", xrefs=" + xrefs +
+                ", taxonConstraints=" + taxonConstraints +
+                ", blacklist=" + blacklist +
+                ", annotationGuidelines=" + annotationGuidelines +
+                ", xRelations=" + xRelations +
+                '}';
+    }
 }

@@ -1,14 +1,16 @@
 package uk.ac.ebi.quickgo.ff.delim;
 
 import org.junit.Test;
+import uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.*;
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Created 26/11/15
@@ -68,7 +70,7 @@ public class FlatFieldBuilderTest {
         assertThat(origFlatFieldBuilder.getFields().size(), is(6));
     }
 
-    /** Check one can create a flat field object, write itself as a String A, then parse
+    /** Check one can newInstance a flat field object, write itself as a String A, then parse
      * this written value into a new flat field object, and write it again as String B. A and B
      * must be equal.
      */
