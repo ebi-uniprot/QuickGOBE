@@ -21,9 +21,9 @@ public class SolrServerProperties {
 
     @Autowired
     public SolrServerProperties(
-            @Value("${solr.host}") String solrHost,
-            @Value("${solr.solr.home}") String solrHome,
-            @Value("${solr.data.dir}") String solrDataDir) {
+            @Value("${solr.host:@null}") String solrHost,
+            @Value("${solr.solr.home:@null}") String solrHome,
+            @Value("${solr.data.dir:@null}") String solrDataDir) {
         this.solrHost = solrHost;
         this.solrHome = solrHome;
         this.solrDataDir = solrDataDir;

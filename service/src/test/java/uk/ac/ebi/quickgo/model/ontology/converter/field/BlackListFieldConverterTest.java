@@ -1,18 +1,17 @@
 package uk.ac.ebi.quickgo.model.ontology.converter.field;
 
+import org.junit.Before;
+import org.junit.Test;
 import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatField;
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldLeaf.newFlatFieldLeaf;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Created 01/12/15

@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.repo.config;
 
-import java.io.IOException;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +8,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
 /**
  * Context to create an {@link HttpSolrServer}, suitable for production purposes.

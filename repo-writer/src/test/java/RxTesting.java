@@ -7,6 +7,8 @@ import rx.Subscriber;
 import rx.observables.ConnectableObservable;
 
 /**
+ * Checking to see how some reactive programming paradigm works. Could it be useful?
+ *
  * Created 01/12/15
  * @author Edd
  */

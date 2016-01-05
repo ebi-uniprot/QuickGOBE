@@ -1,16 +1,16 @@
 package uk.ac.ebi.quickgo.model.ontology.converter.field;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.ebi.quickgo.ff.delim.FlatField;
+import uk.ac.ebi.quickgo.ff.flatfield.FlatField;
 import uk.ac.ebi.quickgo.model.FieldConverter;
 import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static uk.ac.ebi.quickgo.ff.delim.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
 
 /**
  * Created 01/12/15
@@ -22,7 +22,6 @@ public class TaxonConstraintsFieldConverter implements FieldConverter<OBOTerm.Ta
 
     @Override public Optional<OBOTerm.TaxonConstraint> apply(String s) {
         // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2
-        // |blacklist
         OBOTerm.TaxonConstraint taxonConstraint = new OBOTerm.TaxonConstraint();
 
         List<FlatField> fields = newFlatFieldFromDepth(2).parse(s).getFields();
