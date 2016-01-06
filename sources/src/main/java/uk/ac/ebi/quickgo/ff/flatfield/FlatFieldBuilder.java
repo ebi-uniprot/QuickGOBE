@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.ff.flatfield;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to build a {@link String} representation of a field that has nested sub-fields.
@@ -101,10 +100,12 @@ public class FlatFieldBuilder extends FlatField {
         return this;
     }
 
+    @Override
     public List<FlatField> getFields() {
         return fields;
     }
 
+    @Override
     protected String buildStringFromDepth(int level) {
         StringJoiner sj = new StringJoiner(SEPARATORS[level]);
         fields.stream().forEach(f ->
@@ -113,6 +114,7 @@ public class FlatFieldBuilder extends FlatField {
         return sj.toString();
     }
 
+    @Override
     public String buildString() {
         StringJoiner sj = new StringJoiner(SEPARATORS[depth]);
         fields.stream().forEach(f ->

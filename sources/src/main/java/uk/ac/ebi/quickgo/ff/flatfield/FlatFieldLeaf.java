@@ -48,7 +48,6 @@ public class FlatFieldLeaf extends FlatField {
         FlatFieldLeaf that = (FlatFieldLeaf) o;
 
         return !(value != null ? !value.equals(that.value) : that.value != null);
-
     }
 
     @Override public int hashCode() {
