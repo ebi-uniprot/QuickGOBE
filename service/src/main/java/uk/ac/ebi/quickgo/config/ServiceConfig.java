@@ -1,13 +1,12 @@
 package uk.ac.ebi.quickgo.config;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.model.ontology.ECOTerm;
 import uk.ac.ebi.quickgo.model.ontology.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.model.ontology.converter.GODocConverter;
 import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.service.ontology.OntologyService;
-import uk.ac.ebi.quickgo.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.service.ontology.impl.OntologyServiceImpl;
 
 import org.springframework.context.annotation.Bean;
