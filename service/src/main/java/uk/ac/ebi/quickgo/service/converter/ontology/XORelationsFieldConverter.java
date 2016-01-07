@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.service.converter.ontology.field;
+package uk.ac.ebi.quickgo.service.converter.ontology;
 
 import uk.ac.ebi.quickgo.ff.flatfield.FlatField;
 import uk.ac.ebi.quickgo.service.model.FieldConverter;
@@ -15,7 +15,7 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDe
  * Created 01/12/15
  * @author Edd
  */
-public class XORelationsFieldConverter implements FieldConverter<OBOTerm.XORelation> {
+class XORelationsFieldConverter implements FieldConverter<OBOTerm.XORelation> {
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(XORelationsFieldConverter.class);
 

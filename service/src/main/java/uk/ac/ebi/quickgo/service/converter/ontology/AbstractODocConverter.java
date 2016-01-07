@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.service.converter.ontology;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.service.converter.ontology.field.*;
 import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.service.converter.ontology.field;
+package uk.ac.ebi.quickgo.service.converter.ontology;
 
 import uk.ac.ebi.quickgo.service.model.FieldConverter;
 import uk.ac.ebi.quickgo.service.model.FieldType;
