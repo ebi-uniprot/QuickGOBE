@@ -71,6 +71,9 @@ public class GOControllerIT {
                 .andExpect(
                         jsonPath("$.history").doesNotExist()
                 )
+                .andExpect(
+                        jsonPath("$.aspect").value("Biological Process")
+                )
                 .andExpect(status().isOk());
     }
 

@@ -18,7 +18,7 @@ public class OntologyDocMocker {
         OntologyDocument od = createOBODoc(id, name);
         od.ontologyType = OntologyType.GO.name();
         od.usage = "some usage";
-        od.aspect = "aspect1";
+        od.aspect = "P";
 
         return od;
     }
