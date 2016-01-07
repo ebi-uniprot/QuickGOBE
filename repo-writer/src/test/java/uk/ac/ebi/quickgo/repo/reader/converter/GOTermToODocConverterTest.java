@@ -1,11 +1,5 @@
 package uk.ac.ebi.quickgo.repo.reader.converter;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
 import uk.ac.ebi.quickgo.ff.loader.ontology.GOLoader;
@@ -21,10 +15,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -144,7 +143,7 @@ public class GOTermToODocConverterTest {
         Optional<OntologyDocument> result = converter.apply(Optional.of(term));
         assertThat(result.isPresent(), is(true));
         OntologyDocument document = result.get();
-        assertThat(document.aspect, contains(GOTerm.EGOAspect.C.text));
+        assertThat(document.aspect, is(GOTerm.EGOAspect.C.text));
         assertThat(document.usage, is(GOTerm.ETermUsage.E.text));
     }
 

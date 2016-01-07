@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -36,7 +35,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
             doc.annotationGuidelines = extractAnnGuidelines(goTerm);
             // TODO: change doc aspect to singleton
             doc.aspect = goTerm.getAspect() == null?
-                    null : Collections.singletonList(goTerm.getAspect().text);
+                    null : goTerm.getAspect().text;
             doc.children = extractChildren(goTerm);
             doc.taxonConstraints = extractTaxonConstraints(goTerm);
             doc.usage = goTerm.getUsage() == null?

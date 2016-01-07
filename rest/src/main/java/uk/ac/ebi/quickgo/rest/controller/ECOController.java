@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
-import uk.ac.ebi.quickgo.model.ontology.ECOTerm;
-import uk.ac.ebi.quickgo.service.ontology.OntologyService;
+import uk.ac.ebi.quickgo.service.OntologyService;
+import uk.ac.ebi.quickgo.service.model.ontology.ECOTerm;
 
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;

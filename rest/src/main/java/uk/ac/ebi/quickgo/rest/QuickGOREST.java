@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest;
 
-import uk.ac.ebi.quickgo.config.ServiceConfig;
+import uk.ac.ebi.quickgo.service.config.ServiceConfig;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
