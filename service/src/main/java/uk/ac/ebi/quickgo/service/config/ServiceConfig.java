@@ -10,10 +10,12 @@ import uk.ac.ebi.quickgo.service.converter.ontology.GODocConverter;
 import uk.ac.ebi.quickgo.service.model.ontology.ECOTerm;
 import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 
 /**
  * Spring configuration for the service layer, which depends on the repositories
@@ -27,14 +29,12 @@ import org.springframework.context.annotation.Import;
 @Import({RepoConfig.class})
 @ComponentScan({"uk.ac.ebi.quickgo.service"})
 public class ServiceConfig {
-
     @Bean
     public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository) {
         return new OntologyServiceImpl<>(ontologyRepository, goDocumentConverter(), OntologyType.GO);
     }
 
-    @Bean
-    public GODocConverter goDocumentConverter() {
+    private GODocConverter goDocumentConverter() {
         return new GODocConverter();
     }
 
@@ -42,8 +42,8 @@ public class ServiceConfig {
     public OntologyService<ECOTerm> ecoOntologyService(OntologyRepository ontologyRepository) {
         return new OntologyServiceImpl<>(ontologyRepository, ecoDocConverter(), OntologyType.ECO);
     }
-    @Bean
-    public ECODocConverter ecoDocConverter() {
+
+    private ECODocConverter ecoDocConverter() {
         return new ECODocConverter();
     }
 }
