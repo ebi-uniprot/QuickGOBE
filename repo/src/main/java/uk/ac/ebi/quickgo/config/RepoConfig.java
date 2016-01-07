@@ -5,6 +5,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 
 /**
  * Spring configuration for Solr repositories, responsible for scanning
@@ -12,7 +13,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  * packages, and loading properties from the application.properties file.
  *
  * These values are subsequently used by other configuration classes, such as
- * {@link SolrServerProperties}.
+ * {@link uk.ac.ebi.quickgo.repo.config.SolrServerProperties}.
  *
  * Created 12/11/15
  * @author Edd
@@ -22,6 +23,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
         "uk.ac.ebi.quickgo.repo"
 })
 @PropertySource("classpath:application.properties")
+@EnableSolrRepositories(basePackages = {"uk.ac.ebi.quickgo.repo"}, multicoreSupport = true)
 public class RepoConfig {
 
     /**
