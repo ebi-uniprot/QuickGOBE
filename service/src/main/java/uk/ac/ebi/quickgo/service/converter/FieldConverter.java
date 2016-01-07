@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.service.model;
+package uk.ac.ebi.quickgo.service.converter;
+
+import uk.ac.ebi.quickgo.service.model.FieldType;
 
 import java.util.ArrayList;
 import java.util.List;

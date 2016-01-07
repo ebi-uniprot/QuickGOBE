@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.service.converter.ontology;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.service.converter.FieldConverter;
 import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import org.slf4j.Logger;
@@ -8,8 +9,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class provides template behaviour for converting an {@link OntologyDocument}
- * to an {@link OBOTerm}, using {@link uk.ac.ebi.quickgo.service.model.FieldConverter}
- * instances to convert fields into {@link OBOTerm}s.
+ * to an {@link OBOTerm}, using {@link FieldConverter} instances to convert fields into {@link OBOTerm}s.
  *
  * Created 24/11/15
  * @author Edd

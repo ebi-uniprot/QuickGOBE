@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.service.model;
 
+import uk.ac.ebi.quickgo.service.converter.FieldConverter;
+
 /**
  * Simple marker to restrict {@link FieldConverter} behaviour to only classes
  * that implement this interface. Alternative is to use annotations, but this

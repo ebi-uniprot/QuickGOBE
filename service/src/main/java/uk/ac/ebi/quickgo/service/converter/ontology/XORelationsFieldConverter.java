@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.service.converter.ontology;
 
 import uk.ac.ebi.quickgo.ff.flatfield.FlatField;
-import uk.ac.ebi.quickgo.service.model.FieldConverter;
+import uk.ac.ebi.quickgo.service.converter.FieldConverter;
 import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import java.util.List;
