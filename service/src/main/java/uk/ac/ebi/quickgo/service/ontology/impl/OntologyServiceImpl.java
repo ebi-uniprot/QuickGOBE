@@ -26,11 +26,11 @@ import static java.util.Objects.requireNonNull;
  */
 @Service
 public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T> {
-
     private OntologyRepository ontologyRepository;
     private OntologyDocConverter<T> converter;
     private String ontologyType;
 
+    //Necessary for Spring to create a proxy class
     private OntologyServiceImpl() {}
 
     public OntologyServiceImpl(
@@ -78,11 +78,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     private Optional<T> convertOptionalDoc(Optional<OntologyDocument> optionalDoc) {
-        if (optionalDoc.isPresent()) {
-            return Optional.of(converter.convert(optionalDoc.get()));
-        } else {
-            return Optional.empty();
-        }
+        return optionalDoc.map(doc -> converter.convert(doc));
     }
 
     @Override public List<T> findAll(Pageable pageable) {
