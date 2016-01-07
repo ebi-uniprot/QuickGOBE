@@ -35,9 +35,9 @@ public class TaxonConstraintsFieldConverter implements FieldConverter<OBOTerm.Ta
             taxonConstraint.citations = new ArrayList<>();
             fields.get(6).getFields().stream().forEach(
                     rawLit -> {
-                        OBOTerm.Lit lit = new OBOTerm.Lit();
-                        lit.id = rawLit.buildString();
-                        taxonConstraint.citations.add(lit);
+                        OBOTerm.Literature literature = new OBOTerm.Literature();
+                        literature.id = rawLit.buildString();
+                        taxonConstraint.citations.add(literature);
                     }
             );
 

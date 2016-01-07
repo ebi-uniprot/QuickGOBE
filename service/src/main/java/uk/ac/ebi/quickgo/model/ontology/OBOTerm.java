@@ -9,32 +9,28 @@ import java.util.List;
  * This is a general term DTO, which should typically contain
  * the general information specified by the Open Biomedical Ontology (OBO) foundry:
  *  http://www.obofoundry.org/
+ * <p>
+ * All instance variables are not initialised, including lists, and are therefore null
+ * by default.
  *
  * Created 19/11/15
  * @author Edd
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class OBOTerm {
-    // term ID
     public String id;
 
-    // true => obsolete; false otherwise
     public boolean isObsolete;
 
-    // term name
     public String name;
 
-    // term official definition
     public String definition;
 
-    // additional term comment
     public String comment;
 
     // list of term IDs that are ancestors of this term
-    // i.e., IS-A + PART-OF closure of this term
     public List<String> ancestors;
 
-    // synonyms
     public List<Synonym> synonyms;
 
     // what this term replacedBy
@@ -44,6 +40,7 @@ public class OBOTerm {
     // Slim subsets have names of the form "goslim_xxx", while usage constraint subsets have names like "gocheck_xxx".
     public List<String> subsets;
 
+    // list of term IDs that are children of this term
     public List<String> children;
 
     public List<String> secondaryIds;
@@ -89,10 +86,10 @@ public class OBOTerm {
         public String taxId;
         public String taxIdType;
         public String taxName;
-        public List<Lit> citations;
+        public List<Literature> citations;
     }
 
-    public static class Lit implements FieldType {
+    public static class Literature implements FieldType {
         public String id;
     }
 
