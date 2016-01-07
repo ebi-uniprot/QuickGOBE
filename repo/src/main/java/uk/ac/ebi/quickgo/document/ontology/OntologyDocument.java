@@ -76,7 +76,7 @@ public class OntologyDocument implements QuickGODocument {
     @Field("ancestor")
     public List<String> ancestors;
     @Field
-    public List<String> aspect;
+    public String aspect;
     @Field
     public List<String> history;
     @Field("xref")
