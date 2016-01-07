@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 /**
  * Service layer for retrieving results from an underlying searchable data store.
  *
- * See also {@link OntologyRepository}
+ * See also {@link uk.ac.ebi.quickgo.repo.ontology.OntologyRepository}
  *
  * Created 11/11/15
  * @author Edd
@@ -71,5 +71,4 @@ public interface OntologyService<T extends OBOTerm> {
      * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
      */
     Optional<T> findAnnotationGuideLinesInfoByOntologyId(String id);
-
 }
