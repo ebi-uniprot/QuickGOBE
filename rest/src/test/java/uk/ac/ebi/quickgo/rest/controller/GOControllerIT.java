@@ -74,6 +74,9 @@ public class GOControllerIT {
                 .andExpect(
                         jsonPath("$.aspect").value("Biological Process")
                 )
+                .andExpect(
+                        jsonPath("$.usage").value("Unrestricted")
+                )
                 .andExpect(status().isOk());
     }
 

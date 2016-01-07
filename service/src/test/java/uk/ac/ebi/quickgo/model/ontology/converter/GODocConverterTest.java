@@ -29,8 +29,8 @@ public class GODocConverterTest {
         OntologyDocument goDoc = createGODoc("GO:0000001", "name1");
         GOTerm goTerm = converter.convert(goDoc);
         assertThat(goTerm.usage, is(notNullValue()));
-        assertThat(goTerm.usage, is(equalTo(goDoc.usage)));
+        assertThat(goTerm.usage.getFullName(), is(equalTo(goDoc.usage)));
         assertThat(goTerm.aspect, is(notNullValue()));
-        assertThat(goTerm.aspect, is(equalTo(goDoc.aspect)));
+        assertThat(goTerm.aspect.getShortName(), is(equalTo(goDoc.aspect)));
     }
 }
