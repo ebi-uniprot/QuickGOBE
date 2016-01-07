@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
-import uk.ac.ebi.quickgo.model.ontology.OBOTerm;
-import uk.ac.ebi.quickgo.service.ontology.OntologyService;
+import uk.ac.ebi.quickgo.service.OntologyService;
+import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
