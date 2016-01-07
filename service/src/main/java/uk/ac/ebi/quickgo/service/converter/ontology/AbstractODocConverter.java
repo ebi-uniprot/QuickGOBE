@@ -8,11 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This class provides template behaviour for converting an {@link OntologyDocument}
+ * to an {@link OBOTerm}, using {@link uk.ac.ebi.quickgo.service.model.FieldConverter}
+ * instances to convert fields into {@link OBOTerm}s.
+ *
  * Created 24/11/15
  * @author Edd
  */
 public abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocConverter<T> {
-    // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractODocConverter.class);
 
     private final static AnnotationGuideLineFieldConverter AG_FIELD_CONVERTER =
@@ -32,7 +35,7 @@ public abstract class AbstractODocConverter<T extends OBOTerm> implements Ontolo
 
     public abstract T convert(OntologyDocument ontologyDocument);
 
-    protected T addCommonFields(OntologyDocument ontologyDocument, T term) {
+    protected void addCommonFields(OntologyDocument ontologyDocument, T term) {
         term.id = ontologyDocument.id;
         term.name = ontologyDocument.name;
         term.definition = ontologyDocument.definition;
@@ -50,7 +53,5 @@ public abstract class AbstractODocConverter<T extends OBOTerm> implements Ontolo
         term.xRelations = XORELATIONS_FIELD_CONVERTER.convertField(ontologyDocument.xRelations);
         term.blacklist = BLACKLIST_FIELD_CONVERTER.convertField(ontologyDocument.blacklist);
         term.annotationGuidelines = AG_FIELD_CONVERTER.convertField(ontologyDocument.annotationGuidelines);
-
-        return term;
     }
 }
