@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 
 /**
+ * Defines the conversion of a {@link String} representing information about a taxonomy constraint, to a
+ * corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.OBOTerm.TaxonConstraint} instance.
+ *
  * Created 01/12/15
  * @author Edd
  */

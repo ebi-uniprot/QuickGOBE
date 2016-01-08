@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 
 /**
+ * Defines the conversion of a {@link String} representing information about a synonym, to a
+ * corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.OBOTerm.Synonym} instance.
+ *
  * Created 01/12/15
  * @author Edd
  */

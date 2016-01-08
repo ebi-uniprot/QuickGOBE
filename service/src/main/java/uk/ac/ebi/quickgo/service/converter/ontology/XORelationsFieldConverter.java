@@ -12,6 +12,10 @@ import org.slf4j.LoggerFactory;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 
 /**
+ * Defines the conversion of a {@link String} representing information about a cross-ontology
+ * relation, to a corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.OBOTerm.XORelation}
+ * instance.
+ *
  * Created 01/12/15
  * @author Edd
  */
