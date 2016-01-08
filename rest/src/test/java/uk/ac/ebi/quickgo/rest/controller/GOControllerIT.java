@@ -176,7 +176,7 @@ public class GOControllerIT {
     public void canRetrieveXORelsById() throws Exception {
         saveTerm("GO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/GO:0000001/xorels"))
+        mockMvc.perform(get(RESOURCE_URL + "/GO:0000001/xontologyrelations"))
                 .andDo(print())
                 .andExpect(
                         content().contentType(MediaType.APPLICATION_JSON_VALUE))

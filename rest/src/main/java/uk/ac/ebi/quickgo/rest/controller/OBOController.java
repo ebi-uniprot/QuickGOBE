@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Abstract controller defining common end-points of an OBO related
  * REST API.
@@ -23,7 +25,7 @@ public abstract class OBOController<T extends OBOTerm> {
     public abstract boolean isValidId(String id);
 
     public OBOController(OntologyService<T> ontologyService) {
-        this.ontologyService = ontologyService;
+        this.ontologyService = requireNonNull(ontologyService);
     }
 
     /**
@@ -144,7 +146,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * <li>id is not in correct format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/xorels", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/{id}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermXOntologyRelations(@PathVariable(value = "id") String id) {
         if (!isValidId(id)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

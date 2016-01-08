@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static uk.ac.ebi.quickgo.rest.controller.ECOController.PathValidator.isValidECOId;
-
 /**
  * REST controller for accessing ECO related information.
  *
@@ -23,31 +21,15 @@ import static uk.ac.ebi.quickgo.rest.controller.ECOController.PathValidator.isVa
 @RequestMapping(value = "/QuickGO/services/eco")
 public class ECOController extends OBOController<ECOTerm> {
 
-    // retained for use with specialised end-points
-    private OntologyService<ECOTerm> ecoOntologyService;
+    private static final Pattern ECO_ID_FORMAT = Pattern.compile("^ECO:[0-9]{7}$");
 
     @Autowired
     public ECOController(OntologyService<ECOTerm> ecoOntologyService) {
         super(ecoOntologyService);
-        this.ecoOntologyService = ecoOntologyService;
     }
 
     @Override
     public boolean isValidId(String id) {
-        return isValidECOId(id);
+        return ECO_ID_FORMAT.matcher(id).matches();
     }
-
-    /**
-     * Contains validation logic of GO path components
-     */
-    protected static class PathValidator {
-        private PathValidator(){}
-
-        static final Pattern validECOFormat = Pattern.compile("^ECO:[0-9]{7}$");
-
-        static boolean isValidECOId(String id) {
-            return validECOFormat.matcher(id).matches();
-        }
-    }
-
 }

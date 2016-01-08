@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static uk.ac.ebi.quickgo.rest.controller.GOController.PathValidator.isValidGOId;
-
 /**
  * REST controller for accessing GO related information.
  *
@@ -23,31 +21,15 @@ import static uk.ac.ebi.quickgo.rest.controller.GOController.PathValidator.isVal
 @RequestMapping(value = "/QuickGO/services/go")
 public class GOController extends OBOController<GOTerm> {
 
-    // retained for use with specialised end-points
-    private OntologyService<GOTerm> goOntologyService;
+    private static final Pattern GO_ID_FORMAT = Pattern.compile("^GO:[0-9]{7}$");
 
     @Autowired
     public GOController(OntologyService<GOTerm> goOntologyService) {
         super(goOntologyService);
-        this.goOntologyService = goOntologyService;
     }
 
     @Override
     public boolean isValidId(String id) {
-        return isValidGOId(id);
+        return GO_ID_FORMAT.matcher(id).matches();
     }
-
-    /**
-     * Contains validation logic of GO path components
-     */
-    protected static class PathValidator {
-        private PathValidator(){}
-
-        static final Pattern validGOFormat = Pattern.compile("^GO:[0-9]{7}$");
-
-        static boolean isValidGOId(String id) {
-            return validGOFormat.matcher(id).matches();
-        }
-    }
-
 }
