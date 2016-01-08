@@ -33,7 +33,6 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
             OntologyDocument doc = ontologyDocument.get();
 
             doc.annotationGuidelines = extractAnnGuidelines(goTerm);
-            // TODO: change doc aspect to singleton
             doc.aspect = goTerm.getAspect() == null?
                     null : goTerm.getAspect().text;
             doc.children = extractChildren(goTerm);
