@@ -16,18 +16,19 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDe
  * @author Edd
  */
 class XRefsFieldConverter implements FieldConverter<OBOTerm.XRef> {
-    // logger
+
     private static final Logger LOGGER = LoggerFactory.getLogger(XRefsFieldConverter.class);
+    private static final int FIELD_COMPONENT_COUNT = 3;
 
     @Override public Optional<OBOTerm.XRef> apply(String s) {
         // format: code|id|name
-        OBOTerm.XRef xref = new OBOTerm.XRef();
 
         List<FlatField> fields = newFlatFieldFromDepth(2).parse(s).getFields();
-        if (fields.size() == 3) {
-            xref.dbCode = nullOrString(fields.get(0).buildString());
-            xref.dbId = nullOrString(fields.get(1).buildString());
-            xref.name = nullOrString(fields.get(2).buildString());
+        if (fields.size() == FIELD_COMPONENT_COUNT) {
+            OBOTerm.XRef xref = new OBOTerm.XRef();
+            xref.dbCode = cleanFieldValue(fields.get(0).buildString());
+            xref.dbId = cleanFieldValue(fields.get(1).buildString());
+            xref.name = cleanFieldValue(fields.get(2).buildString());
             return Optional.of(xref);
         } else {
             LOGGER.warn("Could not parse flattened xref: {}", s);

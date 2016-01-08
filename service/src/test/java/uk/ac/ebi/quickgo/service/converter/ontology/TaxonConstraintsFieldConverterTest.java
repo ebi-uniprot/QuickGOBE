@@ -57,7 +57,7 @@ public class TaxonConstraintsFieldConverterTest {
                         .addField(newFlatFieldLeaf("PMID:00000004")))
                 .buildString());
 
-        List<OBOTerm.TaxonConstraint> taxonConstraints = converter.convertField(rawTaxonConstraints);
+        List<OBOTerm.TaxonConstraint> taxonConstraints = converter.convertFieldList(rawTaxonConstraints);
         assertThat(taxonConstraints.size(), is(2));
         assertThat(taxonConstraints.get(0).ancestorId, is(ancestorId));
         assertThat(taxonConstraints.get(0).taxIdType, is(taxIdType));

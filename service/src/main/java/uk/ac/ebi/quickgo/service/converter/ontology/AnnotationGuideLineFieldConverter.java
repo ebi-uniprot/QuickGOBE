@@ -16,17 +16,18 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDe
  * @author Edd
  */
 class AnnotationGuideLineFieldConverter implements FieldConverter<OBOTerm.AnnotationGuideLine> {
-    // logger
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationGuideLineFieldConverter.class);
+    private static final int FIELD_COMPONENT_COUNT = 2;
 
     @Override public Optional<OBOTerm.AnnotationGuideLine> apply(String g) {
         // format: description|url
-        OBOTerm.AnnotationGuideLine ag = new OBOTerm.AnnotationGuideLine();
 
         List<FlatField> fields = newFlatFieldFromDepth(2).parse(g).getFields();
-        if (fields.size() == 2) {
-            ag.description = nullOrString(fields.get(0).buildString());
-            ag.url = nullOrString(fields.get(1).buildString());
+        if (fields.size() == FIELD_COMPONENT_COUNT) {
+            OBOTerm.AnnotationGuideLine ag = new OBOTerm.AnnotationGuideLine();
+            ag.description = cleanFieldValue(fields.get(0).buildString());
+            ag.url = cleanFieldValue(fields.get(1).buildString());
             return Optional.of(ag);
         } else {
             LOGGER.warn("Could not parse flattened annotationGuidelines: {}", g);

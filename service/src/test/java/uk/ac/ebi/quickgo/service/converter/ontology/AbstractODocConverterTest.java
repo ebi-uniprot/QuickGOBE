@@ -18,7 +18,7 @@ import static org.hamcrest.core.IsNull.nullValue;
  * Created 24/11/15
  * @author Edd
  */
-public class AbstractOntologyDocConverterTest {
+public class AbstractODocConverterTest {
     private MockODocConverter converter;
 
     // basic implementation that makes available protected methods which are to be tested

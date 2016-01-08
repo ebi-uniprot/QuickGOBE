@@ -17,21 +17,23 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDe
  * @author Edd
  */
 class TaxonConstraintsFieldConverter implements FieldConverter<OBOTerm.TaxonConstraint> {
-    // logger
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TaxonConstraintsFieldConverter.class);
+    private static final int FIELD_COMPONENT_COUNT = 7;
 
     @Override public Optional<OBOTerm.TaxonConstraint> apply(String s) {
         // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2
-        OBOTerm.TaxonConstraint taxonConstraint = new OBOTerm.TaxonConstraint();
 
         List<FlatField> fields = newFlatFieldFromDepth(2).parse(s).getFields();
-        if (fields.size() == 7) {
-            taxonConstraint.ancestorId = nullOrString(fields.get(0).buildString());
-            taxonConstraint.ancestorName = nullOrString(fields.get(1).buildString());
-            taxonConstraint.relationship = nullOrString(fields.get(2).buildString());
-            taxonConstraint.taxId = nullOrString(fields.get(3).buildString());
-            taxonConstraint.taxIdType = nullOrString(fields.get(4).buildString());
-            taxonConstraint.taxName = nullOrString(fields.get(5).buildString());
+        if (fields.size() == FIELD_COMPONENT_COUNT) {
+            OBOTerm.TaxonConstraint taxonConstraint = new OBOTerm.TaxonConstraint();
+            taxonConstraint.ancestorId = cleanFieldValue(fields.get(0).buildString());
+            taxonConstraint.ancestorName = cleanFieldValue(fields.get(1).buildString());
+            taxonConstraint.relationship = cleanFieldValue(fields.get(2).buildString());
+            taxonConstraint.taxId = cleanFieldValue(fields.get(3).buildString());
+            taxonConstraint.taxIdType = cleanFieldValue(fields.get(4).buildString());
+            taxonConstraint.taxName = cleanFieldValue(fields.get(5).buildString());
+
             taxonConstraint.citations = new ArrayList<>();
             fields.get(6).getFields().stream().forEach(
                     rawLit -> {

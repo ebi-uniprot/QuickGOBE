@@ -16,21 +16,22 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDe
  * @author Edd
  */
 class BlackListFieldConverter implements FieldConverter<OBOTerm.BlacklistItem> {
-    // logger
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BlackListFieldConverter.class);
+    private static final int FIELD_COMPONENT_COUNT = 5;
 
     @Override public Optional<OBOTerm.BlacklistItem> apply(String s) {
         // format: geneProductId|geneProductDB|reason|category|method
-        OBOTerm.BlacklistItem blacklistItem = new OBOTerm.BlacklistItem();
 
         List<FlatField> fields = newFlatFieldFromDepth(2).parse(s).getFields();
 
-        if (fields.size() == 5) {
-            blacklistItem.geneProductId = nullOrString(fields.get(0).buildString());
-            blacklistItem.geneProductDb = nullOrString(fields.get(1).buildString());
-            blacklistItem.reason = nullOrString(fields.get(2).buildString());
-            blacklistItem.category = nullOrString(fields.get(3).buildString());
-            blacklistItem.method = nullOrString(fields.get(4).buildString());
+        if (fields.size() == FIELD_COMPONENT_COUNT) {
+            OBOTerm.BlacklistItem blacklistItem = new OBOTerm.BlacklistItem();
+            blacklistItem.geneProductId = cleanFieldValue(fields.get(0).buildString());
+            blacklistItem.geneProductDb = cleanFieldValue(fields.get(1).buildString());
+            blacklistItem.reason = cleanFieldValue(fields.get(2).buildString());
+            blacklistItem.category = cleanFieldValue(fields.get(3).buildString());
+            blacklistItem.method = cleanFieldValue(fields.get(4).buildString());
             return Optional.of(blacklistItem);
         } else {
             LOGGER.warn("Could not parse flattened blacklist: {}", s);

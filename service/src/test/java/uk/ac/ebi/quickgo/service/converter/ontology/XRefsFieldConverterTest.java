@@ -50,7 +50,7 @@ public class XRefsFieldConverterTest {
                         .buildString()
         );
 
-        List<OBOTerm.XRef> xRefs = converter.convertField(rawXrefs);
+        List<OBOTerm.XRef> xRefs = converter.convertFieldList(rawXrefs);
         assertThat(xRefs.size(), is(2));
         assertThat(xRefs.get(0).dbCode, is(dbCode0));
         assertThat(xRefs.get(0).name, is(dbName0));

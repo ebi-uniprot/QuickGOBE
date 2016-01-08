@@ -37,17 +37,17 @@ public class FieldConverterTest {
 
     @Test
     public void helperReturnsNullforEmptyString() {
-        assertThat(converter.nullOrString(""), is(nullValue()));
+        assertThat(converter.cleanFieldValue(""), is(nullValue()));
     }
 
     @Test
     public void helperReturnsStringForNonEmptyString() {
-        assertThat(converter.nullOrString("hello"), is(equalTo("hello")));
+        assertThat(converter.cleanFieldValue("hello"), is(equalTo("hello")));
     }
 
     @Test
     public void helperReturnsNullForNullString() {
-        assertThat(converter.nullOrString(null), is(nullValue()));
+        assertThat(converter.cleanFieldValue(null), is(nullValue()));
     }
 
 }

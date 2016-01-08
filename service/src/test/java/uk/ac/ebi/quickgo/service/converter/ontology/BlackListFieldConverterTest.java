@@ -47,7 +47,7 @@ public class BlackListFieldConverterTest {
                 .addField(newFlatFieldLeaf()) // no parameter means it's got no value
                 .buildString());
 
-        List<OBOTerm.BlacklistItem> blacklistItems = converter.convertField(rawBlacklist);
+        List<OBOTerm.BlacklistItem> blacklistItems = converter.convertFieldList(rawBlacklist);
         assertThat(blacklistItems.size(), is(2));
         assertThat(blacklistItems.get(0).geneProductId, is(gp0));
         assertThat(blacklistItems.get(1).category, is(cat1));

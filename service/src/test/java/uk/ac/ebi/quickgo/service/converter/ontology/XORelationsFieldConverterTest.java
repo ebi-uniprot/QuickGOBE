@@ -58,7 +58,7 @@ public class XORelationsFieldConverterTest {
                         .buildString()
         );
 
-        List<OBOTerm.XORelation> xORefs = converter.convertField(rawXORels);
+        List<OBOTerm.XORelation> xORefs = converter.convertFieldList(rawXORels);
         assertThat(xORefs.size(), is(2));
         assertThat(xORefs.get(0).id, is(id0));
         assertThat(xORefs.get(0).url, is(url0));

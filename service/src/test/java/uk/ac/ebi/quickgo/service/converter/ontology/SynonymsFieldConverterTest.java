@@ -35,7 +35,7 @@ public class SynonymsFieldConverterTest {
     @Test
     public void convertingBadlyFlattenedSynonymsFailsWithoutError() {
         List<String> rawSynonyms = Arrays.asList("syn name 0-syn type 0", "syn name 1-syn type 1");
-        List<OBOTerm.Synonym> synonyms = converter.convertField(rawSynonyms);
+        List<OBOTerm.Synonym> synonyms = converter.convertFieldList(rawSynonyms);
         assertThat(synonyms.size(), is(0));
     }
 
@@ -47,7 +47,7 @@ public class SynonymsFieldConverterTest {
     @Test
     public void converts0FlattenedSynonymsToSynonymsDTO() {
         List<String> rawSynonyms = Collections.emptyList();
-        List<OBOTerm.Synonym> synonyms = converter.convertField(rawSynonyms);
+        List<OBOTerm.Synonym> synonyms = converter.convertFieldList(rawSynonyms);
         assertThat(synonyms.size(), is(0));
     }
 
@@ -63,7 +63,7 @@ public class SynonymsFieldConverterTest {
                 .addField(newFlatFieldLeaf("syn name 0"))
                 .addField(newFlatFieldLeaf("syn type 0"))
                 .buildString());
-        List<OBOTerm.Synonym> synonyms = converter.convertField(rawSynonyms);
+        List<OBOTerm.Synonym> synonyms = converter.convertFieldList(rawSynonyms);
         assertThat(synonyms.size(), is(1));
         assertThat(synonyms.get(0).synonymName, is(equalTo("syn name 0")));
         assertThat(synonyms.get(0).synonymType, is(equalTo("syn type 0")));
@@ -86,7 +86,7 @@ public class SynonymsFieldConverterTest {
                         .addField(newFlatFieldLeaf("syn type 1"))
                         .buildString()
         );
-        List<OBOTerm.Synonym> synonyms = converter.convertField(rawSynonyms);
+        List<OBOTerm.Synonym> synonyms = converter.convertFieldList(rawSynonyms);
         assertThat(synonyms.size(), is(2));
         assertThat(synonyms.get(0).synonymName, is(equalTo("syn name 0")));
         assertThat(synonyms.get(0).synonymType, is(equalTo("syn type 0")));

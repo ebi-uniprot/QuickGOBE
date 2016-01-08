@@ -46,7 +46,7 @@ public class HistoryFieldConverterTest {
                         .buildString()
         );
 
-        List<OBOTerm.History> history = converter.convertField(rawHistory);
+        List<OBOTerm.History> history = converter.convertFieldList(rawHistory);
         assertThat(history.size(), is(2));
         assertThat(history.get(0).name, is("Gonna do something like it's ..."));
         assertThat(history.get(1).text, is("Okay"));
