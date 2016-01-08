@@ -38,9 +38,11 @@ public class AbstractODocConverterTest {
         converter.addCommonFields(validGODoc, oboTermFromValidGODoc);
     }
 
-    /**
-     * ------------- Check common fields are common OBO fields are converted -------------
+    /*
+     * Check common OBO fields are converted, which are not covered by other *Converter test
+     * classes
      */
+
     @Test
     public void convertsIdWithoutError() {
         assertThat(oboTermFromValidGODoc.id, is(equalTo("id1")));
@@ -62,7 +64,7 @@ public class AbstractODocConverterTest {
     }
 
     @Test
-    public void convertsCommentnWithoutError() {
+    public void convertsCommentWithoutError() {
         assertThat(oboTermFromValidGODoc.comment, is(validGODoc.comment));
     }
 

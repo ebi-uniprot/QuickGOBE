@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -63,7 +62,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
         if (!isEmpty(goTerm.getGuidelines())) {
             return goTerm.getGuidelines().stream()
                     .map(
-                            t -> newFlatFieldFromDepth(GenericTermToODocConverter.DEPTH_OF_NESTED_DOC_FIELD)
+                            t -> newFlatField()
                                     .addField(newFlatFieldLeaf(t.getTitle()))
                                     .addField(newFlatFieldLeaf(t.getUrl()))
                                     .buildString())
@@ -83,7 +82,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
                                 s -> pubmedsAsFlatField.addField(newFlatFieldLeaf(s))
                         );
 
-                        return newFlatFieldFromDepth(GenericTermToODocConverter.DEPTH_OF_NESTED_DOC_FIELD)
+                        return newFlatField()
                                 .addField(newFlatFieldLeaf(t.getGoId()))
                                 .addField(newFlatFieldLeaf(t.getName()))
                                 .addField(newFlatFieldLeaf(t.relationship()))

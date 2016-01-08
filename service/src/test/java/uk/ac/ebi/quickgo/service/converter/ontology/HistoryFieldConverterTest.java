@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -28,7 +28,7 @@ public class HistoryFieldConverterTest {
     public void convertsHistory() {
         List<String> rawHistory = new ArrayList<>();
         rawHistory.add(
-                newFlatFieldFromDepth(2)
+                newFlatField()
                         .addField(newFlatFieldLeaf("Gonna do something like it's ..."))
                         .addField(newFlatFieldLeaf("11:59, 31 Dec, 1999"))
                         .addField(newFlatFieldLeaf("PARTY!"))
@@ -37,7 +37,7 @@ public class HistoryFieldConverterTest {
                         .buildString()
         );
         rawHistory.add(
-                newFlatFieldFromDepth(2)
+                newFlatField()
                         .addField(newFlatFieldLeaf("History name"))
                         .addField(newFlatFieldLeaf("Tuesday next week"))
                         .addField(newFlatFieldLeaf("PARTY!"))

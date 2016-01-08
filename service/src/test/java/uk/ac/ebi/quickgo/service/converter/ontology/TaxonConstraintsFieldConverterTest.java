@@ -10,7 +10,6 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -34,7 +33,7 @@ public class TaxonConstraintsFieldConverterTest {
         String taxId = "131568";
         String citationId = "PMID:00000003";
 
-        rawTaxonConstraints.add(newFlatFieldFromDepth(2)
+        rawTaxonConstraints.add(newFlatField()
                 .addField(newFlatFieldLeaf(ancestorId))
                 .addField(newFlatFieldLeaf("cell"))
                 .addField(newFlatFieldLeaf("only_in_taxon"))
@@ -45,7 +44,7 @@ public class TaxonConstraintsFieldConverterTest {
                         .addField(newFlatFieldLeaf("PMID:00000001"))
                         .addField(newFlatFieldLeaf("PMID:00000002")))
                 .buildString());
-        rawTaxonConstraints.add(newFlatFieldFromDepth(2)
+        rawTaxonConstraints.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0005624"))
                 .addField(newFlatFieldLeaf("cell"))
                 .addField(newFlatFieldLeaf("only_in_taxon"))

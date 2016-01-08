@@ -11,7 +11,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -59,7 +59,7 @@ public class SynonymsFieldConverterTest {
     @Test
     public void converts1FlattenedSynonymToSynonymsDTO() {
         List<String> rawSynonyms = Collections.singletonList(
-                newFlatFieldFromDepth(2)
+                newFlatField()
                 .addField(newFlatFieldLeaf("syn name 0"))
                 .addField(newFlatFieldLeaf("syn type 0"))
                 .buildString());
@@ -77,11 +77,11 @@ public class SynonymsFieldConverterTest {
     @Test
     public void converts2FlattenedSynonymsToSynonymsDTO() {
         List<String> rawSynonyms = Arrays.asList(
-                newFlatFieldFromDepth(2)
+                newFlatField()
                         .addField(newFlatFieldLeaf("syn name 0"))
                         .addField(newFlatFieldLeaf("syn type 0"))
                         .buildString(),
-                newFlatFieldFromDepth(2)
+                newFlatField()
                         .addField(newFlatFieldLeaf("syn name 1"))
                         .addField(newFlatFieldLeaf("syn type 1"))
                         .buildString()

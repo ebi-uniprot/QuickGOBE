@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 
 /**
  * Created 01/12/15
@@ -19,13 +19,14 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDe
 class TaxonConstraintsFieldConverter implements FieldConverter<OBOTerm.TaxonConstraint> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaxonConstraintsFieldConverter.class);
-    private static final int FIELD_COMPONENT_COUNT = 7;
+    private static final int FIELD_COUNT = 7;
 
-    @Override public Optional<OBOTerm.TaxonConstraint> apply(String s) {
+    @Override public Optional<OBOTerm.TaxonConstraint> apply(String fieldsStr) {
         // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2
 
-        List<FlatField> fields = newFlatFieldFromDepth(2).parse(s).getFields();
-        if (fields.size() == FIELD_COMPONENT_COUNT) {
+        List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
+        if (fields.size() == FIELD_COUNT) {
+
             OBOTerm.TaxonConstraint taxonConstraint = new OBOTerm.TaxonConstraint();
             taxonConstraint.ancestorId = cleanFieldValue(fields.get(0).buildString());
             taxonConstraint.ancestorName = cleanFieldValue(fields.get(1).buildString());
@@ -45,7 +46,7 @@ class TaxonConstraintsFieldConverter implements FieldConverter<OBOTerm.TaxonCons
 
             return Optional.of(taxonConstraint);
         } else {
-            LOGGER.warn("Could not parse flattened taxonConstraint: {}", s);
+            LOGGER.warn("Could not parse flattened taxonConstraint: {}", fieldsStr);
         }
         return Optional.empty();
     }

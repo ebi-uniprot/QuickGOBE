@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 
 /**
  * Created 01/12/15
@@ -18,13 +18,13 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDe
 class HistoryFieldConverter implements FieldConverter<OBOTerm.History> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HistoryFieldConverter.class);
-    private static final int FIELD_COMPONENT_COUNT = 5;
+    private static final int FIELD_COUNT = 5;
 
-    @Override public Optional<OBOTerm.History> apply(String s) {
+    @Override public Optional<OBOTerm.History> apply(String fieldsStr) {
         // format: name|timestamp|action|category|text
 
-        List<FlatField> fields = newFlatFieldFromDepth(2).parse(s).getFields();
-        if (fields.size() == FIELD_COMPONENT_COUNT) {
+        List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
+        if (fields.size() == FIELD_COUNT) {
             OBOTerm.History historicalInfo = new OBOTerm.History();
             historicalInfo.name = cleanFieldValue(fields.get(0).buildString());
             historicalInfo.timestamp = cleanFieldValue(fields.get(1).buildString());
@@ -33,7 +33,7 @@ class HistoryFieldConverter implements FieldConverter<OBOTerm.History> {
             historicalInfo.text = cleanFieldValue(fields.get(4).buildString());
             return Optional.of(historicalInfo);
         } else {
-            LOGGER.warn("Could not parse flattened history: {}", s);
+            LOGGER.warn("Could not parse flattened history: {}", fieldsStr);
         }
         return Optional.empty();
     }

@@ -10,7 +10,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -31,7 +31,7 @@ public class BlackListFieldConverterTest {
         List<String> rawBlacklist = new ArrayList<>();
 
         String gp0 = "GP:00000";
-        rawBlacklist.add(newFlatFieldFromDepth(2)
+        rawBlacklist.add(newFlatField()
                 .addField(newFlatFieldLeaf(gp0))
                 .addField(newFlatFieldLeaf("GP"))
                 .addField(newFlatFieldLeaf("because it's bad"))
@@ -39,7 +39,7 @@ public class BlackListFieldConverterTest {
                 .addField(newFlatFieldLeaf("automatic"))
                 .buildString());
         String cat1 = "category 1";
-        rawBlacklist.add(newFlatFieldFromDepth(2)
+        rawBlacklist.add(newFlatField()
                 .addField(newFlatFieldLeaf("XX:00001"))
                 .addField(newFlatFieldLeaf("XX"))
                 .addField(newFlatFieldLeaf("because it's also bad"))

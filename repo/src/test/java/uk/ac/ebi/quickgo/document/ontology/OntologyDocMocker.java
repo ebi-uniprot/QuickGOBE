@@ -14,6 +14,8 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
  */
 public class OntologyDocMocker {
 
+    public static final int FLAT_FIELD_DEPTH = 0;
+
     public static OntologyDocument createGODoc(String id, String name) {
         OntologyDocument od = createOBODoc(id, name);
         od.ontologyType = OntologyType.GO.name();
@@ -54,13 +56,13 @@ public class OntologyDocMocker {
         // example synonyms
         od.synonyms = new ArrayList<>();
         od.synonyms.add(
-                newFlatFieldFromDepth(2)
+                newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                         .addField(newFlatFieldLeaf("creatine anabolism"))
                         .addField(newFlatFieldLeaf("exact"))
                         .buildString()
         );
         od.synonyms.add(
-                newFlatFieldFromDepth(2)
+                newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                         .addField(newFlatFieldLeaf("crayola testarossa"))
                         .addField(newFlatFieldLeaf("inprecise"))
                         .buildString()
@@ -69,7 +71,7 @@ public class OntologyDocMocker {
         // example history
         od.history = new ArrayList<>();
         od.history.add(
-                newFlatFieldFromDepth(2)
+                newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                         .addField(newFlatFieldLeaf("Gonna do something like it's ... "))
                         .addField(newFlatFieldLeaf("11:59, 31 Dec, 1999"))
                         .addField(newFlatFieldLeaf("PARTY!"))
@@ -78,7 +80,7 @@ public class OntologyDocMocker {
                         .buildString()
         );
         od.history.add(
-                newFlatFieldFromDepth(2)
+                newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                         .addField(newFlatFieldLeaf("History name"))
                         .addField(newFlatFieldLeaf("Tuesday next week"))
                         .addField(newFlatFieldLeaf("PARTY!"))
@@ -89,12 +91,12 @@ public class OntologyDocMocker {
 
         // example xrefs
         od.xrefs = new ArrayList<>();
-        od.xrefs.add(newFlatFieldFromDepth(2)
+        od.xrefs.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("InterPro"))
                 .addField(newFlatFieldLeaf("IPR031034"))
                 .addField(newFlatFieldLeaf("Creatinine amidohydrolase"))
                 .buildString());
-        od.xrefs.add(newFlatFieldFromDepth(2)
+        od.xrefs.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("AnotherXref"))
                 .addField(newFlatFieldLeaf("IPR031035"))
                 .addField(newFlatFieldLeaf("Pickled Onions"))
@@ -103,7 +105,7 @@ public class OntologyDocMocker {
         // example taxonomy constraints
         // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2|blacklist
         od.taxonConstraints = new ArrayList<>();
-        od.taxonConstraints.add(newFlatFieldFromDepth(2)
+        od.taxonConstraints.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("GO:0005623"))
                 .addField(newFlatFieldLeaf("cell"))
                 .addField(newFlatFieldLeaf("only_in_taxon"))
@@ -114,7 +116,7 @@ public class OntologyDocMocker {
                         .addField(newFlatFieldLeaf("PMID:00000001"))
                         .addField(newFlatFieldLeaf("PMID:00000002")))
                 .buildString());
-        od.taxonConstraints.add(newFlatFieldFromDepth(2)
+        od.taxonConstraints.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("GO:0005624"))
                 .addField(newFlatFieldLeaf("cell"))
                 .addField(newFlatFieldLeaf("only_in_taxon"))
@@ -129,14 +131,14 @@ public class OntologyDocMocker {
         // example blacklist
         // format: geneProductId|geneProductDB|reason|category|method
         od.blacklist = new ArrayList<>();
-        od.blacklist.add(newFlatFieldFromDepth(2)
+        od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("GP:00001"))
                 .addField(newFlatFieldLeaf("GP"))
                 .addField(newFlatFieldLeaf("because it's bad"))
                 .addField(newFlatFieldLeaf("category 1"))
                 .addField(newFlatFieldLeaf("automatic"))
                 .buildString());
-        od.blacklist.add(newFlatFieldFromDepth(2)
+        od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("XX:00002"))
                 .addField(newFlatFieldLeaf("XX"))
                 .addField(newFlatFieldLeaf("because it's also bad"))
@@ -147,14 +149,14 @@ public class OntologyDocMocker {
         // example xontology relations
         // format: xId|xTerm|xNamespace|xUrl|xRelation
         od.xRelations = new ArrayList<>();
-        od.xRelations.add(newFlatFieldFromDepth(2)
+        od.xRelations.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("CHEBI:16919"))
                 .addField(newFlatFieldLeaf("creatine"))
                 .addField(newFlatFieldLeaf("CHEBI"))
                 .addField(newFlatFieldLeaf("http://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:16919"))
                 .addField(newFlatFieldLeaf("has_participant"))
                 .buildString());
-        od.xRelations.add(newFlatFieldFromDepth(2)
+        od.xRelations.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("CHEBI:16920"))
                 .addField(newFlatFieldLeaf("creatiney"))
                 .addField(newFlatFieldLeaf("CHEBI"))
@@ -165,12 +167,12 @@ public class OntologyDocMocker {
         // annotation guidelines
         // format: description|url
         od.annotationGuidelines = new ArrayList<>();
-        od.annotationGuidelines.add(newFlatFieldFromDepth(2)
+        od.annotationGuidelines.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("description 0"))
                 .addField(newFlatFieldLeaf("http://www.guardian.co.uk"))
                 .buildString()
         );
-        od.annotationGuidelines.add(newFlatFieldFromDepth(2)
+        od.annotationGuidelines.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("description 1"))
                 .addField(newFlatFieldLeaf("http://www.pinkun.com"))
                 .buildString()

@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -29,13 +29,13 @@ public class AnnotationGuideLineFieldConverterTest {
     public void convertsAnnotationGuideLines() {
         List<String> rawAnnotationGuideLines = new ArrayList<>();
         String description0 = "description 0";
-        rawAnnotationGuideLines.add(newFlatFieldFromDepth(2)
+        rawAnnotationGuideLines.add(newFlatField()
                 .addField(newFlatFieldLeaf(description0))
                 .addField(newFlatFieldLeaf("http://www.guardian.co.uk"))
                 .buildString()
         );
         String url1 = "http://www.pinkun.com";
-        rawAnnotationGuideLines.add(newFlatFieldFromDepth(2)
+        rawAnnotationGuideLines.add(newFlatField()
                 .addField(newFlatFieldLeaf("description 1"))
                 .addField(newFlatFieldLeaf(url1))
                 .buildString()

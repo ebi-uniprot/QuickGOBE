@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -40,7 +40,7 @@ public class XORelationsFieldConverterTest {
 
         List<String> rawXORels = new ArrayList<>();
         rawXORels.add(
-                newFlatFieldFromDepth(2)
+                newFlatField()
                         .addField(newFlatFieldLeaf(id0))
                         .addField(newFlatFieldLeaf(term0))
                         .addField(newFlatFieldLeaf(namespace0))
@@ -49,7 +49,7 @@ public class XORelationsFieldConverterTest {
                         .buildString()
         );
         rawXORels.add(
-                newFlatFieldFromDepth(2)
+                newFlatField()
                         .addField(newFlatFieldLeaf(id1))
                         .addField(newFlatFieldLeaf(term1))
                         .addField(newFlatFieldLeaf(namespace1))

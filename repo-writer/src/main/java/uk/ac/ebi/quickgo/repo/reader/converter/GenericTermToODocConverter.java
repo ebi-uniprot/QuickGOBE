@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -25,9 +25,6 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
  */
 public class GenericTermToODocConverter implements Function<Optional<? extends GenericTerm>,
         Optional<OntologyDocument>> {
-
-    // the base depth of a field in a document
-    static final int DEPTH_OF_NESTED_DOC_FIELD = 2;
 
     @Override public Optional<OntologyDocument> apply(Optional<? extends GenericTerm> termOptional) {
         if (termOptional.isPresent()) {
@@ -91,7 +88,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         if (!isEmpty(goTerm.getCrossOntologyRelations())) {
             return goTerm.getCrossOntologyRelations().stream()
                     .map(
-                            c -> newFlatFieldFromDepth(DEPTH_OF_NESTED_DOC_FIELD)
+                            c -> newFlatField()
                                     .addField(newFlatFieldLeaf(c.getForeignID()))
                                     .addField(newFlatFieldLeaf(c.getForeignTerm()))
                                     .addField(newFlatFieldLeaf(c.getOtherNamespace()))
@@ -111,7 +108,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         if (!isEmpty(goTerm.getXrefs())) {
             return goTerm.getXrefs().stream()
                     .map(
-                            g -> newFlatFieldFromDepth(DEPTH_OF_NESTED_DOC_FIELD)
+                            g -> newFlatField()
                                     .addField(newFlatFieldLeaf(g.getDb()))
                                     .addField(newFlatFieldLeaf(g.getId()))
                                     .addField(newFlatFieldLeaf(g.getName()))
@@ -141,7 +138,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         if (goTerm.getHistory() != null && !isEmpty(goTerm.getHistory().getHistoryAll())) {
             return goTerm.getHistory().getHistoryAll().stream()
                     .map(
-                            h -> newFlatFieldFromDepth(DEPTH_OF_NESTED_DOC_FIELD)
+                            h -> newFlatField()
                                     .addField(newFlatFieldLeaf(h.getTermName()))
                                     .addField(newFlatFieldLeaf(h.getTimestamp()))
                                     .addField(newFlatFieldLeaf(h.getAction().description))
@@ -171,7 +168,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         if (!isEmpty(goTerm.getSynonyms())) {
             return goTerm.getSynonyms().stream()
                     .map(
-                            s -> newFlatFieldFromDepth(DEPTH_OF_NESTED_DOC_FIELD)
+                            s -> newFlatField()
                                     .addField(newFlatFieldLeaf(s.getName()))
                                     .addField(newFlatFieldLeaf(s.getType()))
                                     .buildString())
