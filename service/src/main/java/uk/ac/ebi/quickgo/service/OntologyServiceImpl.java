@@ -76,8 +76,8 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 ClientUtils.escapeQueryChars(id)));
     }
 
-    private Optional<T> convertOptionalDoc(Optional<OntologyDocument> optionalDoc) {
-        return optionalDoc.map(doc -> converter.convert(doc));
+    protected Optional<T> convertOptionalDoc(Optional<OntologyDocument> optionalDoc) {
+        return optionalDoc.map(converter::convert);
     }
 
     @Override public List<T> findAll(Pageable pageable) {
