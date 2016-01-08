@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,5 +53,13 @@ public class BlackListFieldConverterTest {
         assertThat(blacklistItems.get(0).geneProductId, is(gp0));
         assertThat(blacklistItems.get(1).category, is(cat1));
         assertThat(blacklistItems.get(1).method, is(nullValue()));
+    }
+
+    @Test
+    public void gracefullyHandleWrongFieldCount() {
+        Optional<OBOTerm.BlacklistItem> result = converter.apply(newFlatField().addField(newFlatFieldLeaf("wrong " +
+                "format"))
+                .buildString());
+        assertThat(result.isPresent(), is(false));
     }
 }

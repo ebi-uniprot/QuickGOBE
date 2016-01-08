@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,6 +51,14 @@ public class HistoryFieldConverterTest {
         assertThat(history.size(), is(2));
         assertThat(history.get(0).name, is("Gonna do something like it's ..."));
         assertThat(history.get(1).text, is("Okay"));
+    }
+
+    @Test
+    public void gracefullyHandleWrongFieldCount() {
+        Optional<OBOTerm.History> result = converter.apply(newFlatField().addField(newFlatFieldLeaf("wrong " +
+                "format"))
+                .buildString());
+        assertThat(result.isPresent(), is(false));
     }
 
 }

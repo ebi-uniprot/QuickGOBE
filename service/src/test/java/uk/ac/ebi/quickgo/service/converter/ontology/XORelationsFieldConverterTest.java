@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,5 +65,12 @@ public class XORelationsFieldConverterTest {
         assertThat(xORefs.get(0).url, is(url0));
         assertThat(xORefs.get(1).namespace, is(namespace1));
         assertThat(xORefs.get(1).url, is(url1));
+    }
+
+    @Test
+    public void gracefullyHandleWrongFieldCount() {
+        Optional<OBOTerm.XORelation> result = converter.apply(newFlatField().addField(newFlatFieldLeaf("wrong format"))
+                .buildString());
+        assertThat(result.isPresent(), is(false));
     }
 }

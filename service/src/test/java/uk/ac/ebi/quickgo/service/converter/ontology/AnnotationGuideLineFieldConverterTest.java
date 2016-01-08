@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,5 +46,13 @@ public class AnnotationGuideLineFieldConverterTest {
         assertThat(annotationGuideLines.size(), is(2));
         assertThat(annotationGuideLines.get(0).description, is(description0));
         assertThat(annotationGuideLines.get(1).url, is(url1));
+    }
+
+    @Test
+    public void gracefullyHandleWrongFieldCount() {
+        Optional<OBOTerm.AnnotationGuideLine> result = converter.apply(newFlatField().addField(newFlatFieldLeaf("wrong " +
+                "format"))
+                .buildString());
+        assertThat(result.isPresent(), is(false));
     }
 }

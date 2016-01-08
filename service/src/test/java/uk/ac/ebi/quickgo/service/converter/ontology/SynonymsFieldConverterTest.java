@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -93,5 +94,13 @@ public class SynonymsFieldConverterTest {
 
         assertThat(synonyms.get(1).synonymName, is(equalTo("syn name 1")));
         assertThat(synonyms.get(1).synonymType, is(equalTo("syn type 1")));
+    }
+
+    @Test
+    public void gracefullyHandleWrongFieldCount() {
+        Optional<OBOTerm.Synonym> result = converter.apply(newFlatField().addField(newFlatFieldLeaf("wrong " +
+                "format"))
+                .buildString());
+        assertThat(result.isPresent(), is(false));
     }
 }

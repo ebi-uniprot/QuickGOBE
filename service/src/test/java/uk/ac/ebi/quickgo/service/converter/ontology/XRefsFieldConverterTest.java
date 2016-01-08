@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,5 +57,12 @@ public class XRefsFieldConverterTest {
         assertThat(xRefs.get(0).name, is(dbName0));
         assertThat(xRefs.get(1).dbCode, is(dbCode1));
         assertThat(xRefs.get(1).name, is(dbName1));
+    }
+
+    @Test
+    public void gracefullyHandleWrongFieldCount() {
+        Optional<OBOTerm.XRef> result = converter.apply(newFlatField().addField(newFlatFieldLeaf("wrong format"))
+                .buildString());
+        assertThat(result.isPresent(), is(false));
     }
 }

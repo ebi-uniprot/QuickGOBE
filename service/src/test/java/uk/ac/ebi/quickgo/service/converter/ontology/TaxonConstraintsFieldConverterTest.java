@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,6 +63,14 @@ public class TaxonConstraintsFieldConverterTest {
         assertThat(taxonConstraints.get(0).taxIdType, is(taxIdType));
         assertThat(taxonConstraints.get(1).taxId, is(taxId));
         assertThat(taxonConstraints.get(1).citations.get(0).id, is(citationId));
+    }
+
+    @Test
+    public void gracefullyHandleWrongFieldCount() {
+        Optional<OBOTerm.TaxonConstraint> result = converter.apply(newFlatField().addField(newFlatFieldLeaf("wrong " +
+                "format"))
+                .buildString());
+        assertThat(result.isPresent(), is(false));
     }
 
 }
