@@ -15,6 +15,12 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 /**
  * Defines the conversion of a {@link String} representing information about a taxonomy constraint, to a
  * corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.OBOTerm.TaxonConstraint} instance.
+ * <p>
+ * A {@link String} representation is of the form:
+ * <ul>
+ *     <li>ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2</li>
+ * </ul>
+ * <p>
  *
  * Created 01/12/15
  * @author Edd
@@ -25,7 +31,6 @@ class TaxonConstraintsFieldConverter implements FieldConverter<OBOTerm.TaxonCons
     private static final int FIELD_COUNT = 7;
 
     @Override public Optional<OBOTerm.TaxonConstraint> apply(String fieldsStr) {
-        // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2
 
         List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {

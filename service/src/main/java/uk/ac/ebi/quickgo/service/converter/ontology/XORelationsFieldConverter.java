@@ -15,7 +15,12 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
  * Defines the conversion of a {@link String} representing information about a cross-ontology
  * relation, to a corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.OBOTerm.XORelation}
  * instance.
- *
+ * <p>
+ * A {@link String} representation is of the form:
+ * <ul>
+ *     <li>id|term|namespace|url|relation</li>
+ * </ul>
+ * <p>
  * Created 01/12/15
  * @author Edd
  */
@@ -25,7 +30,6 @@ class XORelationsFieldConverter implements FieldConverter<OBOTerm.XORelation> {
     private static final int FIELD_COUNT = 5;
 
     @Override public Optional<OBOTerm.XORelation> apply(String fieldsStr) {
-        // format: id|term|namespace|url|relation
 
         List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {

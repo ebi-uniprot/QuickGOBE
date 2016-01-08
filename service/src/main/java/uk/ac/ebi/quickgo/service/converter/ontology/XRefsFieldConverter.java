@@ -14,7 +14,12 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 /**
  * Defines the conversion of a {@link String} representing information about a cross-reference,
  * to a corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.OBOTerm.XRef} instance.
- *
+ * <p>
+ * A {@link String} representation is of the form:
+ * <ul>
+ *     <li>code|id|name</li>
+ * </ul>
+ * <p>
  * Created 01/12/15
  * @author Edd
  */
@@ -24,7 +29,6 @@ class XRefsFieldConverter implements FieldConverter<OBOTerm.XRef> {
     private static final int FIELD_COUNT = 3;
 
     @Override public Optional<OBOTerm.XRef> apply(String fieldsStr) {
-        // format: code|id|name
 
         List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {

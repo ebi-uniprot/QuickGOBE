@@ -14,7 +14,12 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 /**
  * Defines the conversion of a {@link String} representing black list information, to a
  * corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.OBOTerm.BlacklistItem} instance.
- *
+ * <p>
+ * A {@link String} representation is of the form:
+ * <ul>
+ *     <li>geneProductId|geneProductDB|reason|category|method</li>
+ * </ul>
+ * <p>
  * Created 01/12/15
  * @author Edd
  */
@@ -24,7 +29,6 @@ class BlackListFieldConverter implements FieldConverter<OBOTerm.BlacklistItem> {
     private static final int FIELD_COUNT = 5;
 
     @Override public Optional<OBOTerm.BlacklistItem> apply(String fieldsStr) {
-        // format: geneProductId|geneProductDB|reason|category|method
 
         List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
 

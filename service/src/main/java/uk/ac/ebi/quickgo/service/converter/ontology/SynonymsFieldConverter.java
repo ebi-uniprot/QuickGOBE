@@ -14,7 +14,12 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 /**
  * Defines the conversion of a {@link String} representing information about a synonym, to a
  * corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.OBOTerm.Synonym} instance.
- *
+ * <p>
+ * A {@link String} representation is of the form:
+ * <ul>
+ *     <li>name|type</li>
+ * </ul>
+ * <p>
  * Created 01/12/15
  * @author Edd
  */
@@ -24,7 +29,7 @@ class SynonymsFieldConverter implements FieldConverter<OBOTerm.Synonym> {
     private static final int FIELD_COUNT = 2;
 
     @Override public Optional<OBOTerm.Synonym> apply(String fieldsStr) {
-        // format: name|type
+
         List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.Synonym synonym = new OBOTerm.Synonym();

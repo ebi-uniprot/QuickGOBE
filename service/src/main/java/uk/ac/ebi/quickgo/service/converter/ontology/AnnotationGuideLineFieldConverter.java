@@ -14,7 +14,12 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 /**
  * Defines the conversion of a {@link String} representing an annotation guideline, to a
  * corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.OBOTerm.AnnotationGuideLine} instance.
- *
+ * <p>
+ * A {@link String} representation is of the form:
+ * <ul>
+ *     <li>description|url</li>
+ * </ul>
+ * <p>
  * Created 01/12/15
  * @author Edd
  */
@@ -24,7 +29,6 @@ class AnnotationGuideLineFieldConverter implements FieldConverter<OBOTerm.Annota
     private static final int FIELD_COUNT = 2;
 
     @Override public Optional<OBOTerm.AnnotationGuideLine> apply(String fieldsStr) {
-        // format: description|url
 
         List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {

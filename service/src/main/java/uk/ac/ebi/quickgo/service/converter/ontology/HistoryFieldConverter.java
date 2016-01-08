@@ -14,7 +14,12 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 /**
  * Defines the conversion of a {@link String} representing an audit record, to a
  * corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.OBOTerm.History} instance.
- *
+ * <p>
+ * A {@link String} representation is of the form:
+ * <ul>
+ *     <li>name|timestamp|action|category|text</li>
+ * </ul>
+ * <p>
  * Created 01/12/15
  * @author Edd
  */
@@ -24,7 +29,6 @@ class HistoryFieldConverter implements FieldConverter<OBOTerm.History> {
     private static final int FIELD_COUNT = 5;
 
     @Override public Optional<OBOTerm.History> apply(String fieldsStr) {
-        // format: name|timestamp|action|category|text
 
         List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {
