@@ -43,9 +43,9 @@ public abstract class AbstractODocConverter<T extends OBOTerm> implements Ontolo
         term.replacedBy = ontologyDocument.replacedBy;
         term.comment = ontologyDocument.comment;
         term.children = ontologyDocument.children;
-        term.synonyms = SYNONYMS_FIELD_CONVERTER.convertFieldList(ontologyDocument.synonyms);
         term.ancestors = ontologyDocument.ancestors;
         term.secondaryIds = ontologyDocument.secondaryIds;
+        term.synonyms = SYNONYMS_FIELD_CONVERTER.convertFieldList(ontologyDocument.synonyms);
         term.history = HISTORY_FIELD_CONVERTER.convertFieldList(ontologyDocument.history);
         term.xrefs = XREFS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xrefs);
         term.taxonConstraints = TAXON_CONSTRAINTS_FIELD_CONVERTER.convertFieldList(ontologyDocument.taxonConstraints);
