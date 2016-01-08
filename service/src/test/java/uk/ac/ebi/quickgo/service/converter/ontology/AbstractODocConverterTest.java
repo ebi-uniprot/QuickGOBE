@@ -20,6 +20,8 @@ import static org.hamcrest.core.IsNull.nullValue;
  */
 public class AbstractODocConverterTest {
     private MockODocConverter converter;
+    private OntologyDocument validGODoc;
+    private OBOTerm oboTermFromValidGODoc;
 
     // basic implementation that makes available protected methods which are to be tested
     private static class MockODocConverter extends AbstractODocConverter<OBOTerm> {
@@ -31,26 +33,62 @@ public class AbstractODocConverterTest {
     @Before
     public void setup() {
         this.converter = new MockODocConverter();
+        this.validGODoc = OntologyDocMocker.createGODoc("id1", "name1");
+        this.oboTermFromValidGODoc = new OBOTerm();
+        converter.addCommonFields(validGODoc, oboTermFromValidGODoc);
     }
 
     /**
-     * Check that all common OBO fields are converted
+     * ------------- Check common fields are common OBO fields are converted -------------
      */
     @Test
-    public void convertsCommonFieldsWithoutError() {
-        OntologyDocument goOntologyDoc = OntologyDocMocker.createGODoc("id1", "name1");
-        OBOTerm oboTerm = new OBOTerm();
-        converter.addCommonFields(goOntologyDoc, oboTerm);
-        assertThat(oboTerm.id, is(equalTo("id1")));
-        assertThat(oboTerm.name, is(equalTo("name1")));
-        assertThat(oboTerm.ancestors, is(goOntologyDoc.ancestors));
-        assertThat(oboTerm.children, is(goOntologyDoc.children));
-        assertThat(oboTerm.comment, is(goOntologyDoc.comment));
-        assertThat(oboTerm.definition, is(goOntologyDoc.definition));
-        assertThat(oboTerm.replacedBy, is(goOntologyDoc.replacedBy));
-        assertThat(oboTerm.isObsolete, is(goOntologyDoc.isObsolete));
-        assertThat(oboTerm.subsets, is(goOntologyDoc.subsets));
-        assertThat(oboTerm.synonyms.size(), is(equalTo(2)));
+    public void convertsIdWithoutError() {
+        assertThat(oboTermFromValidGODoc.id, is(equalTo("id1")));
+    }
+
+    @Test
+    public void convertsNameWithoutError() {
+        assertThat(oboTermFromValidGODoc.name, is(equalTo("name1")));
+    }
+
+    @Test
+    public void convertsAncestorsWithoutError() {
+        assertThat(oboTermFromValidGODoc.ancestors, is(validGODoc.ancestors));
+    }
+
+    @Test
+    public void convertsChildrenWithoutError() {
+        assertThat(oboTermFromValidGODoc.children, is(validGODoc.children));
+    }
+
+    @Test
+    public void convertsCommentnWithoutError() {
+        assertThat(oboTermFromValidGODoc.comment, is(validGODoc.comment));
+    }
+
+    @Test
+    public void convertsDefinitionWithoutError() {
+        assertThat(oboTermFromValidGODoc.definition, is(validGODoc.definition));
+    }
+
+    @Test
+    public void convertsReplacedByWithoutError() {
+        assertThat(oboTermFromValidGODoc.replacedBy, is(validGODoc.replacedBy));
+    }
+
+    @Test
+    public void convertsIsObsoleteWithoutError() {
+        assertThat(oboTermFromValidGODoc.isObsolete, is(validGODoc.isObsolete));
+    }
+
+    @Test
+    public void convertsSubsetsWithoutError() {
+        assertThat(oboTermFromValidGODoc.subsets, is(validGODoc.subsets));
+    }
+
+    @Test
+    public void convertsSynonymsWithoutError() {
+        assertThat(oboTermFromValidGODoc.synonyms.size(), is(equalTo(2)));
     }
 
     /**
