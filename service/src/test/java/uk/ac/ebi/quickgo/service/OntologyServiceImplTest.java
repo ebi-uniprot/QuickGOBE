@@ -38,6 +38,7 @@ import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
  */
 @RunWith(HierarchicalContextRunner.class)
 public class OntologyServiceImplTest {
+
     private OntologyService<GOTerm> goOntologyService;
     private OntologyService<ECOTerm> ecoOntologyService;
 
@@ -53,6 +54,16 @@ public class OntologyServiceImplTest {
 
         goOntologyService = new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO);
         ecoOntologyService = new OntologyServiceImpl<>(repositoryMock, ecoDocumentConverterMock, OntologyType.ECO);
+    }
+
+    @Test
+    public void convertsEmptyOptionalDoc() {
+        // create any OntologyServiceImpl to test its convertOptionalDoc method
+        OntologyServiceImpl<GOTerm> ontologyServiceSpy =
+                new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO);
+
+        Optional<GOTerm> goTermOptional = ontologyServiceSpy.convertOptionalDoc(Optional.empty());
+        assertThat(goTermOptional.isPresent(), is(false));
     }
 
     public class GOServiceTests {
