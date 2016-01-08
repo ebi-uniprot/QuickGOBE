@@ -18,12 +18,12 @@ import static org.hamcrest.core.IsNull.nullValue;
  * @author Edd
  */
 public class FieldConverterTest {
-    private FieldConverterImpl converter;
+    private FakeFieldConverter converter;
 
     static class MockFieldType implements FieldType {
     }
 
-    static class FieldConverterImpl implements FieldConverter<MockFieldType> {
+    static class FakeFieldConverter implements FieldConverter<MockFieldType> {
 
         @Override public Optional<MockFieldType> apply(String s) {
             return null;
@@ -32,7 +32,7 @@ public class FieldConverterTest {
 
     @Before
     public void setup() {
-        this.converter = new FieldConverterImpl();
+        this.converter = new FakeFieldConverter();
     }
 
     @Test
