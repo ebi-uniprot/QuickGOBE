@@ -4,6 +4,9 @@ import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.service.model.ontology.ECOTerm;
 
 /**
+ * Converts an {@link OntologyDocument} representing an ECO term,
+ * to a {@link ECOTerm} instance.
+ *
  * Created 23/11/15
  * @author Edd
  */

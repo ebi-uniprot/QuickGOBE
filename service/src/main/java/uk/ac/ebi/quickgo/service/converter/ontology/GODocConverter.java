@@ -4,6 +4,9 @@ import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
 
 /**
+ * Converts an {@link OntologyDocument} representing a GO term,
+ * to a {@link GOTerm} instance.
+ *
  * Created 23/11/15
  * @author Edd
  */
