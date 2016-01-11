@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * Created 24/11/15
  * @author Edd
  */
-public abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocConverter<T> {
+abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocConverter<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractODocConverter.class);
 
     private final static AnnotationGuideLineFieldConverter AG_FIELD_CONVERTER =
