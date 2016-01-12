@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.StepExecution;
 
 /**
  * Log statistics of the indexing job.
@@ -41,6 +42,21 @@ public class LogJobListener implements JobExecutionListener {
         LOGGER.info("Start time    : {}", jobExecution.getStartTime());
         LOGGER.info("End time      : {}", jobExecution.getEndTime());
         LOGGER.info("Duration      : {}", duration);
+        long skipCount = 0L;
+        long readSkips = 0L;
+        long writeSkips = 0L;
+        long readCount = 0L;
+        long writeCount = 0L;
+        for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+            readSkips += stepExecution.getReadSkipCount();
+            writeSkips += stepExecution.getWriteSkipCount();
+            readCount += stepExecution.getReadCount();
+            writeCount += stepExecution.getWriteCount();
+            skipCount += stepExecution.getSkipCount();
+        }
+        LOGGER.info("Read count    : {}", readCount);
+        LOGGER.info("Write count   : {}", writeCount);
+        LOGGER.info("Skip count    : {} ({} read / {} write)", skipCount, readSkips, writeSkips);
         LOGGER.info("=====================================================");
         jobExecution.getExitStatus();
     }

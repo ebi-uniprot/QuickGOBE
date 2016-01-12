@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.repowriter.write.listener;
 
-import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
@@ -14,18 +13,21 @@ import org.springframework.batch.core.StepExecutionListener;
 public class LogStepListener implements StepExecutionListener {
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(LogStepListener.class);
-    private final static AtomicLong readCount = new AtomicLong();
-    private final static AtomicLong writeCount = new AtomicLong();
-
 
     @Override public void beforeStep(StepExecution stepExecution) {
         LOGGER.info("QuickGO indexing STEP '{}' starting.", stepExecution.getStepName());
     }
 
     @Override public ExitStatus afterStep(StepExecution stepExecution) {
-        LOGGER.info("QuickGO indexing STEP '{}' finished.", stepExecution.getStepName());
-        LOGGER.info("QuickGO: read count: {}", stepExecution.getReadCount());
-        LOGGER.info("QuickGO: write count: {}", stepExecution.getWriteCount());
+        LOGGER.info("=====================================================");
+        LOGGER.info("              QuickGO Step Statistics                 ");
+        LOGGER.info("Step name     : {}", stepExecution.getStepName());
+        LOGGER.info("Exit status   : {}", stepExecution.getExitStatus().getExitCode());
+        LOGGER.info("Read count    : {}", stepExecution.getReadCount());
+        LOGGER.info("Write count   : {}", stepExecution.getWriteCount());
+        LOGGER.info("Skip count    : {} ({} read / {} write)", stepExecution.getSkipCount(), stepExecution
+                .getReadSkipCount(), stepExecution.getWriteSkipCount());
+        LOGGER.info("=====================================================");
         return stepExecution.getExitStatus();
     }
 }
