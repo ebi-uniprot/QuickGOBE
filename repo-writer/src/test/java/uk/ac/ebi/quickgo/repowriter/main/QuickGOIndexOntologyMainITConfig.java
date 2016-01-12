@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created 12/01/16
@@ -17,6 +18,9 @@ import static org.mockito.Mockito.mock;
 @Profile("QuickGOIndexOntologyMainIT")
 @Configuration
 public class QuickGOIndexOntologyMainITConfig {
+
+    static final int STEP_SKIP_LIMIT = 2;
+
     @Bean
     @Primary
     public ODocReader reader() {
@@ -26,6 +30,8 @@ public class QuickGOIndexOntologyMainITConfig {
     @Bean
     @Primary
     public IndexerProperties indexerProperties() {
-        return mock(IndexerProperties.class);
+        IndexerProperties mockIndexerProperties = mock(IndexerProperties.class);
+        when(mockIndexerProperties.getOntologySkipLimit()).thenReturn(STEP_SKIP_LIMIT);
+        return mockIndexerProperties;
     }
 }

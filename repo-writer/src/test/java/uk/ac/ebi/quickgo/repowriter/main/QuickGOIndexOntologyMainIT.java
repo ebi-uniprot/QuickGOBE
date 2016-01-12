@@ -26,6 +26,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createECODoc;
 import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
+import static uk.ac.ebi.quickgo.repowriter.main.QuickGOIndexOntologyMainITConfig.STEP_SKIP_LIMIT;
 
 /**
  * Test specific behaviour of the job executed by {@link QuickGOIndexOntologyMain}.
@@ -88,8 +89,6 @@ public class QuickGOIndexOntologyMainIT {
                 .thenReturn(createGODoc("eco1", "eco1-name"))
                 .thenReturn(null);
 
-        when(indexerProperties.getOntologySkipLimit()).thenReturn(2);
-
         JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
         assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
 
@@ -103,8 +102,7 @@ public class QuickGOIndexOntologyMainIT {
     public void skipsEntireStepWhenSkipLimitExceeded() throws Exception {
         int validDocCount = 1;
 
-        int skipLimit = 2;
-        when(indexerProperties.getOntologySkipLimit()).thenReturn(skipLimit);
+        when(indexerProperties.getOntologySkipLimit()).thenReturn(STEP_SKIP_LIMIT);
 
         when(reader.read())
                 .thenReturn(createGODoc("go1", "go1-name"))
@@ -120,6 +118,6 @@ public class QuickGOIndexOntologyMainIT {
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
         assertThat(step.getReadCount(), is(validDocCount));
         assertThat(step.getWriteCount(), is(validDocCount));
-        assertThat(step.getSkipCount(), is(skipLimit));
+        assertThat(step.getSkipCount(), is(STEP_SKIP_LIMIT));
     }
 }
