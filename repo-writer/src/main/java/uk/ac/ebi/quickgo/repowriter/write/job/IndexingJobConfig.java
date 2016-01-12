@@ -66,7 +66,7 @@ public class IndexingJobConfig {
                 .reader(reader())
                 .faultTolerant()
                 .skip(DocumentReaderException.class)
-                .skipLimit(2)
+                .skipLimit(indexerProperties.getOntologySkipLimit())
                 .writer(writer())
                 .listener(logStepListener())
                 .build();
