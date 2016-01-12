@@ -28,17 +28,27 @@ import org.springframework.batch.item.support.AbstractItemStreamItemReader;
  * @author Edd
  */
 public class ODocReader extends AbstractItemStreamItemReader<OntologyDocument> {
-    // logger
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ODocReader.class);
 
-    private File sourceFileDir;
     private static final GOTermToODocConverter GO_TERM_TO_DOC_CONVERTER = new GOTermToODocConverter();
     private static final GenericTermToODocConverter GENERIC_TERM_TO_DOC_CONVERTER = new GenericTermToODocConverter();
+
+    private final Optional<GeneOntology> goOptional;
+    private final Optional<EvidenceCodeOntology> ecoOptional;
+
     private Iterator<GenericTerm> goTermIterator;
     private Iterator<GenericTerm> ecoTermIterator;
 
     public ODocReader(File sourceFileDir) {
-        this.sourceFileDir = sourceFileDir;
+        this(new GOLoader(new GOSourceFiles(sourceFileDir)).load(),
+                new ECOLoader(new ECOSourceFiles(sourceFileDir)).load());
+    }
+
+    ODocReader(Optional<GeneOntology> goOptional, Optional<EvidenceCodeOntology>
+            ecoOptional) {
+        this.goOptional = goOptional;
+        this.ecoOptional = ecoOptional;
     }
 
     /**
@@ -50,11 +60,24 @@ public class ODocReader extends AbstractItemStreamItemReader<OntologyDocument> {
      */
     @Override public OntologyDocument read() throws Exception {
         if (goTermIterator.hasNext()) {
-            return GO_TERM_TO_DOC_CONVERTER.apply(Optional.of((GOTerm) goTermIterator.next())).get();
+            Optional<OntologyDocument> optionalDoc =
+                    GO_TERM_TO_DOC_CONVERTER.apply(Optional.of((GOTerm) goTermIterator.next()));
+            return extractOntologyDocument(optionalDoc);
         } else if (ecoTermIterator.hasNext()) {
-            return GENERIC_TERM_TO_DOC_CONVERTER.apply(Optional.of(ecoTermIterator.next())).get();
+            Optional<OntologyDocument> optionalDoc =
+                    GENERIC_TERM_TO_DOC_CONVERTER.apply(Optional.of(ecoTermIterator.next()));
+            return extractOntologyDocument(optionalDoc);
         } else {
             return null;
+        }
+    }
+
+    protected OntologyDocument extractOntologyDocument(Optional<OntologyDocument> optionalDoc)
+            throws DocumentReaderException {
+        if (optionalDoc.isPresent()) {
+            return optionalDoc.get();
+        } else {
+            throw new DocumentReaderException("The converted Optional<OntologyDocument> should never be empty");
         }
     }
 
@@ -70,29 +93,20 @@ public class ODocReader extends AbstractItemStreamItemReader<OntologyDocument> {
     @Override public void open(ExecutionContext executionContext) {
         super.open(executionContext);
 
-        try {
-            GOLoader goLoader = new GOLoader(new GOSourceFiles(this.sourceFileDir));
-            ECOLoader ecoLoader = new ECOLoader(new ECOSourceFiles(this.sourceFileDir));
+        if (goOptional.isPresent()) {
+            this.goTermIterator = goOptional.get().getTerms().iterator();
+            LOGGER.info("Loaded Gene Ontology successfully");
+        } else {
+            LOGGER.error("Could not load Gene Ontology from source files.");
+            throw new DocumentReaderException("Could not load Gene Ontology from source files.");
+        }
 
-            Optional<GeneOntology> geneOntologyOptional = goLoader.load();
-            Optional<EvidenceCodeOntology> ecoOptional = ecoLoader.load();
-
-            if (geneOntologyOptional.isPresent()) {
-                this.goTermIterator = geneOntologyOptional.get().getTerms().iterator();
-                LOGGER.info("Loaded Gene Ontology successfully");
-            } else {
-                LOGGER.error("Problem during indexing: could not load Gene Ontology from source files.");
-            }
-
-            if (ecoOptional.isPresent()) {
-                this.ecoTermIterator = ecoOptional.get().getTerms().iterator();
-                LOGGER.info("Loaded Evidence Code Ontology successfully");
-            } else {
-                LOGGER.error("Problem during indexing: could not load Evidence Code Ontology from source files.");
-            }
-
-        } catch (Exception e) {
-            LOGGER.error("Problem during indexing: could not open ontology input files", e);
+        if (ecoOptional.isPresent()) {
+            this.ecoTermIterator = ecoOptional.get().getTerms().iterator();
+            LOGGER.info("Loaded Evidence Code Ontology successfully");
+        } else {
+            LOGGER.error("Could not load Evidence Code Ontology from source files.");
+            throw new DocumentReaderException("Could not load Gene Ontology from source files.");
         }
     }
 }

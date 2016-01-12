@@ -43,16 +43,17 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
         } else {
             return Optional.empty();
         }
-
     }
 
     protected List<String> extractChildren(GOTerm goTerm) {
-        if (goTerm.getChildren() != null) {
+        if (!isEmpty(goTerm.getChildren())) {
             return goTerm.getChildren().stream()
                     .map(
                             t -> t.getChild().getId())
                     .collect(Collectors.toList());
-        } else return null;
+        } else {
+            return null;
+        }
     }
 
     /*
