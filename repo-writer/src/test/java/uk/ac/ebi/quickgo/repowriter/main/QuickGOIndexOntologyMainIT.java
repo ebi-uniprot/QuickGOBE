@@ -7,7 +7,6 @@ import uk.ac.ebi.quickgo.repowriter.reader.ODocReader;
 import uk.ac.ebi.quickgo.repowriter.write.IndexerProperties;
 import uk.ac.ebi.quickgo.repowriter.write.job.IndexingJobConfig;
 
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +29,11 @@ import static uk.ac.ebi.quickgo.repowriter.main.QuickGOIndexOntologyMainITConfig
 
 /**
  * Test specific behaviour of the job executed by {@link QuickGOIndexOntologyMain}.
+ * <p>
+ * To see how to steps are configured, refer to:
+ * <ul>
+ *     <li>https://docs.spring.io/spring-batch/reference/html/configureStep.html</li>
+ * </ul>
  *
  * Created 18/12/15
  * @author Edd
@@ -51,12 +55,6 @@ public class QuickGOIndexOntologyMainIT {
 
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
-    @Before
-    public void setUp() {
-        when(indexerProperties.getOntologyChunkSize()).thenReturn(10);
-        when(indexerProperties.getOntologySkipLimit()).thenReturn(5);
-    }
 
     @Test
     public void stepSucceedsWhenNoSkips() throws Exception {
@@ -80,13 +78,13 @@ public class QuickGOIndexOntologyMainIT {
     }
 
     @Test
-    public void stepSkipsWhenReaderFindsEmptyOptionalDocument() throws Exception {
+    public void stepSkipsOnceWhenReaderFindsOneEmptyOptionalDocument() throws Exception {
         int docCount = 2;
 
         when(reader.read())
                 .thenReturn(createGODoc("go1", "go1-name"))
                 .thenThrow(new DocumentReaderException("Error!"))
-                .thenReturn(createGODoc("eco1", "eco1-name"))
+                .thenReturn(createECODoc("eco1", "eco1-name"))
                 .thenReturn(null);
 
         JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
@@ -99,25 +97,66 @@ public class QuickGOIndexOntologyMainIT {
     }
 
     @Test
-    public void skipsEntireStepWhenSkipLimitExceeded() throws Exception {
-        int validDocCount = 1;
-
-        when(indexerProperties.getOntologySkipLimit()).thenReturn(STEP_SKIP_LIMIT);
-
+    public void tooManySkipsCausesStepToFail() throws Exception {
         when(reader.read())
                 .thenReturn(createGODoc("go1", "go1-name"))
                 .thenThrow(new DocumentReaderException("Error!"))
+                .thenReturn(createGODoc("go2", "go2-name"))
                 .thenThrow(new DocumentReaderException("Error!"))
+                .thenReturn(createECODoc("eco1", "eco1-name"))
+                .thenReturn(createECODoc("eco2", "eco2-name"))
+                // full chunk of documents now created, and should
+                // be written
+
                 .thenThrow(new DocumentReaderException("Error!"))
-                .thenReturn(createGODoc("eco1", "eco1-name"))
+                .thenReturn(createECODoc("eco3", "eco3-name"))
                 .thenReturn(null);
 
         JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
-        assertThat(step.getReadCount(), is(validDocCount));
-        assertThat(step.getWriteCount(), is(validDocCount));
+        assertThat(step.getReadCount(), is(4));
+        assertThat(step.getWriteCount(), is(4));
+        assertThat(step.getSkipCount(), is(STEP_SKIP_LIMIT));
+    }
+
+    @Test
+    public void succeedsOn2ChunksButSkips1ChunkWhenSkipLimitExceeded() throws Exception {
+        int goDocIdHelper = 1;
+        int ecoDocIdHelper = 1;
+        when(reader.read())
+                .thenReturn(createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper++ + "-name"))
+                .thenReturn(createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper++ + "-name"))
+                .thenThrow(new DocumentReaderException("Error!"))
+                .thenReturn(createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
+                .thenReturn(createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
+                // a full chunk of documents to write has now been created, so
+                // chunk 1 should be written
+
+                .thenThrow(new DocumentReaderException("Error!"))
+                .thenReturn(createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
+                .thenReturn(createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
+                .thenReturn(createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper++ + "-name"))
+                .thenReturn(createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper++ + "-name"))
+                // now chunk 2 should be written
+
+                .thenReturn(createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
+                .thenReturn(createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper + "-name"))
+                .thenThrow(new DocumentReaderException("Error!"))
+                // ------ BOOM! Skip Limit exceeded now
+
+                .thenReturn(createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper + "-name"))
+
+                // null indicates reading is done
+                .thenReturn(null);
+
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
+
+        StepExecution step = jobExecution.getStepExecutions().iterator().next();
+        assertThat(step.getReadCount(), is(10));
+        assertThat(step.getWriteCount(), is(8));
         assertThat(step.getSkipCount(), is(STEP_SKIP_LIMIT));
     }
 }

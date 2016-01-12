@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 public class QuickGOIndexOntologyMainITConfig {
 
     static final int STEP_SKIP_LIMIT = 2;
+    static final int STEP_CHUNK_SIZE = 4;
 
     @Bean
     @Primary
@@ -32,6 +33,7 @@ public class QuickGOIndexOntologyMainITConfig {
     public IndexerProperties indexerProperties() {
         IndexerProperties mockIndexerProperties = mock(IndexerProperties.class);
         when(mockIndexerProperties.getOntologySkipLimit()).thenReturn(STEP_SKIP_LIMIT);
+        when(mockIndexerProperties.getOntologyChunkSize()).thenReturn(STEP_CHUNK_SIZE);
         return mockIndexerProperties;
     }
 }
