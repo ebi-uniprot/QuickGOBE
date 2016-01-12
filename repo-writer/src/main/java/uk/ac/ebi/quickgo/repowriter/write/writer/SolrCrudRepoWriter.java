@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.repo.write.writer;
+package uk.ac.ebi.quickgo.repowriter.write.writer;
 
 import uk.ac.ebi.quickgo.document.QuickGODocument;
 

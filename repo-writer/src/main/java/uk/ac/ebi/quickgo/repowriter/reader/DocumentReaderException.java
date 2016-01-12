@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.repo.reader;
+package uk.ac.ebi.quickgo.repowriter.reader;
 
 /**
  * Instances of this class are thrown to indicate a problem during the reading of a

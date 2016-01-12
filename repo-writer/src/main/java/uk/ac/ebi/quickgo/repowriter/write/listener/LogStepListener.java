@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.repo.write.listener;
+package uk.ac.ebi.quickgo.repowriter.write.listener;
 
 import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;

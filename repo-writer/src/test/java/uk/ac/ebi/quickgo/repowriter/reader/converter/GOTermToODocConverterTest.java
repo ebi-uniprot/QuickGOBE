@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.repo.reader.converter;
+package uk.ac.ebi.quickgo.repowriter.reader.converter;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;

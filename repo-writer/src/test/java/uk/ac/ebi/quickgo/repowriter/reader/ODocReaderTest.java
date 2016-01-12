@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.repo.reader;
+package uk.ac.ebi.quickgo.repowriter.reader;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.model.ontology.eco.ECOTerm;

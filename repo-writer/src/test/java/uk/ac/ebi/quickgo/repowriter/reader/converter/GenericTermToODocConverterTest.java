@@ -1,16 +1,18 @@
-package uk.ac.ebi.quickgo.repo.reader.converter;
+package uk.ac.ebi.quickgo.repowriter.reader.converter;
 
+import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.model.ontology.generic.*;
+
+import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.model.ontology.generic.*;
 
-import java.util.*;
-
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;

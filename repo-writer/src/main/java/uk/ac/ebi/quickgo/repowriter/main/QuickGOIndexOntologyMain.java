@@ -1,6 +1,6 @@
-package uk.ac.ebi.quickgo.repo.main;
+package uk.ac.ebi.quickgo.repowriter.main;
 
-import uk.ac.ebi.quickgo.repo.write.job.IndexingJobConfig;
+import uk.ac.ebi.quickgo.repowriter.write.job.IndexingJobConfig;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

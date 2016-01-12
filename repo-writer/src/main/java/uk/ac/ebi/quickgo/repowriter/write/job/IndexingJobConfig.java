@@ -1,13 +1,14 @@
-package uk.ac.ebi.quickgo.repo.write.job;
+package uk.ac.ebi.quickgo.repowriter.write.job;
 
 import uk.ac.ebi.quickgo.config.RepoConfig;
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
-import uk.ac.ebi.quickgo.repo.reader.ODocReader;
-import uk.ac.ebi.quickgo.repo.write.IndexerProperties;
-import uk.ac.ebi.quickgo.repo.write.listener.LogJobListener;
-import uk.ac.ebi.quickgo.repo.write.listener.LogStepListener;
-import uk.ac.ebi.quickgo.repo.write.writer.SolrCrudRepoWriter;
+import uk.ac.ebi.quickgo.repowriter.reader.DocumentReaderException;
+import uk.ac.ebi.quickgo.repowriter.reader.ODocReader;
+import uk.ac.ebi.quickgo.repowriter.write.IndexerProperties;
+import uk.ac.ebi.quickgo.repowriter.write.listener.LogJobListener;
+import uk.ac.ebi.quickgo.repowriter.write.listener.LogStepListener;
+import uk.ac.ebi.quickgo.repowriter.write.writer.SolrCrudRepoWriter;
 
 import java.io.File;
 import org.slf4j.Logger;
@@ -63,6 +64,9 @@ public class IndexingJobConfig {
                 // read and process items in chunks of the following size
                 .<OntologyDocument, OntologyDocument>chunk(indexerProperties.getOntologyChunkSize())
                 .reader(reader())
+                .faultTolerant()
+                .skip(DocumentReaderException.class)
+                .skipLimit(2)
                 .writer(writer())
                 .listener(logStepListener())
                 .build();

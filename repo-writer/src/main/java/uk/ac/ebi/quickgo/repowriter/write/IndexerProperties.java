@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.repo.write;
+package uk.ac.ebi.quickgo.repowriter.write;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,16 +10,23 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class IndexerProperties {
-    private final String ontologySourceFile;
 
+    private final String ontologySourceFile;
     private final int ontologyChunkSize;
+    private final int ontologySkipLimit;
 
     @Autowired
     public IndexerProperties(
             @Value("${indexing.ontology.source}") String ontologySourceFile,
-            @Value("${indexing.ontology.chunk.size}") int ontologyChunkSize) {
+            @Value("${indexing.ontology.chunk.size:500}") int ontologyChunkSize,
+            @Value("${indexing.ontology.skip.limit:100}") int ontologySkipLimit) {
         this.ontologySourceFile = ontologySourceFile;
         this.ontologyChunkSize = ontologyChunkSize;
+        this.ontologySkipLimit = ontologySkipLimit;
+    }
+
+    public int getOntologySkipLimit() {
+        return ontologySkipLimit;
     }
 
     public String getOntologySourceFile() {

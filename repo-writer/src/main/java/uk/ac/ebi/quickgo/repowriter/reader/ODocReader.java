@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.repo.reader;
+package uk.ac.ebi.quickgo.repowriter.reader;
 
 import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.ff.files.ontology.ECOSourceFiles;
@@ -9,8 +9,8 @@ import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
-import uk.ac.ebi.quickgo.repo.reader.converter.GOTermToODocConverter;
-import uk.ac.ebi.quickgo.repo.reader.converter.GenericTermToODocConverter;
+import uk.ac.ebi.quickgo.repowriter.reader.converter.GOTermToODocConverter;
+import uk.ac.ebi.quickgo.repowriter.reader.converter.GenericTermToODocConverter;
 
 import java.io.File;
 import java.util.Iterator;
