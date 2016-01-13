@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.repowriter.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.repowriter.reader.DocumentReaderException;
 import uk.ac.ebi.quickgo.repowriter.reader.ODocReader;
-import uk.ac.ebi.quickgo.repowriter.write.IndexerProperties;
 import uk.ac.ebi.quickgo.repowriter.write.job.IndexingJobConfig;
 
 import org.junit.ClassRule;
@@ -13,15 +12,19 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createECODoc;
 import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
@@ -43,6 +46,7 @@ import static uk.ac.ebi.quickgo.repowriter.main.QuickGOIndexOntologyMainITConfig
 @ContextConfiguration(
         classes = {IndexingJobConfig.class, JobTestRunnerConfig.class, QuickGOIndexOntologyMainITConfig.class},
         loader = SpringApplicationContextLoader.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class QuickGOIndexOntologyMainIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -50,11 +54,16 @@ public class QuickGOIndexOntologyMainIT {
     @Autowired
     private ODocReader reader;
 
-    @Autowired
-    private IndexerProperties indexerProperties;
-
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+
+    @Test
+    public void documentReaderExceptionThrownWhenReaderIsOpenedCausesStepFailure() {
+        doThrow(new DocumentReaderException("Error!")).when(reader).open(any(ExecutionContext.class));
+
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
+    }
 
     @Test
     public void stepSucceedsWhenNoSkips() throws Exception {
@@ -144,7 +153,7 @@ public class QuickGOIndexOntologyMainIT {
                 .thenReturn(createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
                 .thenReturn(createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper + "-name"))
                 .thenThrow(new DocumentReaderException("Error!"))
-                // ------ BOOM! Skip Limit exceeded now
+                // ------ BOOM! Skip Limit exceeded now and entire step fails (throwing away latest chunk)
 
                 .thenReturn(createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper + "-name"))
 
