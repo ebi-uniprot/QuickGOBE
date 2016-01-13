@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This provides standard reading of an ontology core source file, which can be
  * hooked into a Spring Batch step, see {@link IndexingJobConfig}.
@@ -41,8 +43,9 @@ public class ODocReader extends AbstractItemStreamItemReader<OntologyDocument> {
     private Iterator<GenericTerm> ecoTermIterator;
 
     public ODocReader(File sourceFileDir) {
-        this(new GOLoader(new GOSourceFiles(sourceFileDir)).load(),
-                new ECOLoader(new ECOSourceFiles(sourceFileDir)).load());
+        this(
+                new GOLoader(new GOSourceFiles(requireNonNull(sourceFileDir))).load(),
+                new ECOLoader(new ECOSourceFiles(requireNonNull(sourceFileDir))).load());
     }
 
     ODocReader(Optional<GeneOntology> goOptional, Optional<EvidenceCodeOntology>
