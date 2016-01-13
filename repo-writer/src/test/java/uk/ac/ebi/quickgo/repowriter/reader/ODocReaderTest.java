@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 public class ODocReaderTest {
 
     private ODocReader oDocReader;
+    private int docCount;
 
     public class DocReaderAccessingValidOntologies {
 
@@ -44,6 +45,9 @@ public class ODocReaderTest {
             when(go.getTerms()).thenReturn(createGOTerms());
             when(eco.getTerms()).thenReturn(createECOTerms());
 
+            // set document count
+            docCount += go.getTerms().size() + eco.getTerms().size();
+
             Optional<GeneOntology> goOptional = Optional.of(go);
             Optional<EvidenceCodeOntology> ecoOptional = Optional.of(eco);
             oDocReader = new ODocReader(goOptional, ecoOptional);
@@ -53,11 +57,11 @@ public class ODocReaderTest {
 
         @Test
         public void readsAllDocsWithoutError() throws Exception {
-            int docCount = 0;
+            int count = 0;
             while (oDocReader.read() != null) {
-                docCount++;
+                count++;
             }
-            assertThat(docCount, is(3));
+            assertThat(count, is(docCount));
         }
 
         @Test(expected = DocumentReaderException.class)
