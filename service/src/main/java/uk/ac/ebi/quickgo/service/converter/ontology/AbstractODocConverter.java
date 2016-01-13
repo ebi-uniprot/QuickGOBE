@@ -37,6 +37,7 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
     protected void addCommonFields(OntologyDocument ontologyDocument, T term) {
         term.id = ontologyDocument.id;
         term.name = ontologyDocument.name;
+        term.consider = ontologyDocument.considers;
         term.definition = ontologyDocument.definition;
         term.subsets = ontologyDocument.subsets;
         term.isObsolete = ontologyDocument.isObsolete;
@@ -47,7 +48,7 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
         term.secondaryIds = ontologyDocument.secondaryIds;
         term.synonyms = SYNONYMS_FIELD_CONVERTER.convertFieldList(ontologyDocument.synonyms);
         term.history = HISTORY_FIELD_CONVERTER.convertFieldList(ontologyDocument.history);
-        term.xrefs = XREFS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xrefs);
+        term.xRefs = XREFS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xrefs);
         term.taxonConstraints = TAXON_CONSTRAINTS_FIELD_CONVERTER.convertFieldList(ontologyDocument.taxonConstraints);
         term.xRelations = XORELATIONS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xRelations);
         term.blacklist = BLACKLIST_FIELD_CONVERTER.convertFieldList(ontologyDocument.blacklist);

@@ -28,12 +28,16 @@ public class OBOTerm {
 
     public String comment;
 
+    // list of term IDs to consider when replacing
+    // TODO confirm with Tony S
+    public List<String> consider;
+
     // list of term IDs that are ancestors of this term
     public List<String> ancestors;
 
     public List<Synonym> synonyms;
 
-    // what this term replacedBy
+    // a term ID that replaces this one
     public String replacedBy;
 
     // each term can be in one or more subsets; these are used for two purposes: slims and term usage constraints.
@@ -47,7 +51,7 @@ public class OBOTerm {
 
     public List<History> history;
 
-    public List<XRef> xrefs;
+    public List<XRef> xRefs;
 
     public List<XORelation> xRelations;
 

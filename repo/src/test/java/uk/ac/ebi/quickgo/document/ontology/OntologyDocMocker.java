@@ -36,6 +36,7 @@ public class OntologyDocMocker {
         OntologyDocument od = new OntologyDocument();
         od.id = id;
         od.name = name;
+        od.ancestors = Arrays.asList("GO:0000100", "GO:0000200");
         od.definition = "The chemical reactions and pathways involving creatine (N-(aminoiminomethyl)" +
                 "-N-methylglycine), a compound synthesized from the amino acids arginine, glycine, and methionine " +
                 "that occurs in muscle.";

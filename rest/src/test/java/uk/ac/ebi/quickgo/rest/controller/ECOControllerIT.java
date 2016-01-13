@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -61,16 +62,11 @@ public class ECOControllerIT {
     public void canRetrieveCoreById() throws Exception {
         saveTerm("ECO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001"))
-                .andDo(print())
-                .andExpect(
-                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath("$.id").value("ECO:0000001")
-                )
-                .andExpect(
-                        jsonPath("$.history").doesNotExist()
-                )
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001"));
+
+        expectCoreFields(response, "ECO:0000001")
+                .andExpect(jsonPath("$.history").doesNotExist())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -78,16 +74,10 @@ public class ECOControllerIT {
     public void canRetrieveCompleteById() throws Exception {
         saveTerm("ECO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/complete"))
-                .andDo(print())
-                .andExpect(
-                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath("$.id").value("ECO:0000001")
-                )
-                .andExpect(
-                        jsonPath("$.history").isArray()
-                )
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/complete"));
+
+        expectCompleteFields(response, "ECO:0000001")
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -95,16 +85,11 @@ public class ECOControllerIT {
     public void canRetrieveHistoryById() throws Exception {
         saveTerm("ECO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/history"))
-                .andDo(print())
-                .andExpect(
-                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath("$.id").value("ECO:0000001")
-                )
-                .andExpect(
-                        jsonPath("$.history").isArray()
-                )
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/history"));
+
+        expectBasicFields(response, "ECO:0000001")
+                .andExpect(jsonPath("$.history").isArray())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -112,16 +97,11 @@ public class ECOControllerIT {
     public void canRetrieveXRefsById() throws Exception {
         saveTerm("ECO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/xrefs"))
-                .andDo(print())
-                .andExpect(
-                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath("$.id").value("ECO:0000001")
-                )
-                .andExpect(
-                        jsonPath("$.xrefs").isArray()
-                )
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/xrefs"));
+
+        expectBasicFields(response, "ECO:0000001")
+                .andExpect(jsonPath("$.xRefs").isArray())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -133,19 +113,12 @@ public class ECOControllerIT {
     public void canRetrieveTaxonConstraintsById() throws Exception {
         saveTerm("ECO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/constraints"))
-                .andDo(print())
-                .andExpect(
-                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath("$.id").value("ECO:0000001")
-                )
-                .andExpect(
-                        jsonPath("$.taxonConstraints").isArray()
-                )
-                .andExpect(
-                        jsonPath("$.blacklist").isArray()
-                )
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/constraints"));
+
+        expectBasicFields(response, "ECO:0000001")
+                .andExpect(jsonPath("$.taxonConstraints").isArray())
+                .andExpect(jsonPath("$.blacklist").isArray())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -153,16 +126,11 @@ public class ECOControllerIT {
     public void canRetrieveAnnotationGuideLinesById() throws Exception {
         saveTerm("ECO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/guidelines"))
-                .andDo(print())
-                .andExpect(
-                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath("$.id").value("ECO:0000001")
-                )
-                .andExpect(
-                        jsonPath("$.annotationGuidelines").isArray()
-                )
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/guidelines"));
+
+        expectBasicFields(response, "ECO:0000001")
+                .andExpect(jsonPath("$.annotationGuidelines").isArray())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -170,16 +138,11 @@ public class ECOControllerIT {
     public void canRetrieveXORelsById() throws Exception {
         saveTerm("ECO:0000001");
 
-        mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/xontologyrelations"))
-                .andDo(print())
-                .andExpect(
-                        content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath("$.id").value("ECO:0000001")
-                )
-                .andExpect(
-                        jsonPath("$.xRelations").isArray()
-                )
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/ECO:0000001/xontologyrelations"));
+
+        expectBasicFields(response, "ECO:0000001")
+                .andExpect(jsonPath("$.xRelations").isArray())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -206,7 +169,38 @@ public class ECOControllerIT {
     }
 
     private void saveTerm(String ecoId) {
-        OntologyDocument ecoTerm = OntologyDocMocker.createECODoc(ecoId, "eco doc name");;
+        OntologyDocument ecoTerm = OntologyDocMocker.createECODoc(ecoId, "eco doc name");
         ontologyRepository.save(ecoTerm);
+    }
+
+    private ResultActions expectCompleteFields(ResultActions result, String id) throws Exception {
+        return expectCoreFields(result, id)
+                .andExpect(jsonPath("$.children").exists())
+                .andExpect(jsonPath("$.secondaryIds").exists())
+                .andExpect(jsonPath("$.subsets").exists())
+                .andExpect(jsonPath("$.history").exists())
+                .andExpect(jsonPath("$.xRefs").exists())
+                .andExpect(jsonPath("$.xRelations").exists())
+                .andExpect(jsonPath("$.annotationGuidelines").exists())
+                .andExpect(jsonPath("$.taxonConstraints").exists())
+                .andExpect(jsonPath("$.blacklist").exists())
+                .andExpect(jsonPath("$.consider").exists())
+                .andExpect(jsonPath("$.replacedBy").exists());
+    }
+
+    private ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
+        return expectBasicFields(result, id)
+                .andExpect(jsonPath("$.synonyms").exists())
+                .andExpect(jsonPath("$.ancestors").exists());
+    }
+
+    private ResultActions expectBasicFields(ResultActions result, String id) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.isObsolete").exists())
+                .andExpect(jsonPath("$.comment").exists())
+                .andExpect(jsonPath("$.definition").exists());
     }
 }

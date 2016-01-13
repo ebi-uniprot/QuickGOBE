@@ -26,7 +26,7 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
 
     // core
     @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
-            fields = {ID, NAME, IS_OBSOLETE, COMMENT, ASPECT, ANCESTOR,
+            fields = {ID, NAME, IS_OBSOLETE, COMMENT, ASPECT, ANCESTORS,
                     USAGE, SYNONYMS, DEFINITION}) Optional<OntologyDocument> findCoreByTermId(String idType, String id);
 
     // history

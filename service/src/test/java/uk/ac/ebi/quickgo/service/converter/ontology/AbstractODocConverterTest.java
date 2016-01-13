@@ -42,7 +42,6 @@ public class AbstractODocConverterTest {
      * Check common OBO fields are converted, which are not covered by other *Converter test
      * classes
      */
-
     @Test
     public void convertsIdWithoutError() {
         assertThat(oboTermFromValidGODoc.id, is(equalTo("id1")));
@@ -56,6 +55,16 @@ public class AbstractODocConverterTest {
     @Test
     public void convertsAncestorsWithoutError() {
         assertThat(oboTermFromValidGODoc.ancestors, is(validGODoc.ancestors));
+    }
+
+    @Test
+    public void convertsSecondaryIdsWithoutError() {
+        assertThat(oboTermFromValidGODoc.secondaryIds, is(validGODoc.secondaryIds));
+    }
+
+    @Test
+    public void convertsConsidersWithoutError() {
+        assertThat(oboTermFromValidGODoc.consider, is(validGODoc.considers));
     }
 
     @Test

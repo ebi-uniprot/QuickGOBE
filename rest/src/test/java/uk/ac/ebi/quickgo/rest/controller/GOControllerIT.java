@@ -126,7 +126,7 @@ public class GOControllerIT {
                         jsonPath("$.id").value("GO:0000001")
                 )
                 .andExpect(
-                        jsonPath("$.xrefs").isArray()
+                        jsonPath("$.xRefs").isArray()
                 )
                 .andExpect(status().isOk());
     }

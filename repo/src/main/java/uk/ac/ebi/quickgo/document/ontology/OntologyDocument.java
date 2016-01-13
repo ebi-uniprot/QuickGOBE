@@ -60,7 +60,7 @@ public class OntologyDocument implements QuickGODocument {
     public String usage;
     // the stored synonym field, which can be reconstructed
     // e.g., [ "syn1|type1", "syn2|type2" ]
-    @Field
+    @Field("synonym")
     public List<String> synonyms;
     // the indexed synonym names
     @Field("synonymName")
