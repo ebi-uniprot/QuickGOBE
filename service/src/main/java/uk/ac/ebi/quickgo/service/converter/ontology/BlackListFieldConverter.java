@@ -26,19 +26,35 @@ import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
 class BlackListFieldConverter implements FieldConverter<OBOTerm.BlacklistItem> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlackListFieldConverter.class);
-    private static final int FIELD_COUNT = 5;
+    private static final int FIELD_COUNT = 9;
 
     @Override public Optional<OBOTerm.BlacklistItem> apply(String fieldsStr) {
+
+//        t -> newFlatField()
+//                .addField(newFlatFieldLeaf(t.getGoId()))
+//                .addField(newFlatFieldLeaf(t.getCategory()))
+//                .addField(newFlatFieldLeaf(t.getEntityType()))
+//                .addField(newFlatFieldLeaf(t.getProteinAc()))       //entityID
+//                .addField(newFlatFieldLeaf(Integer.toString(t.getTaxonId())))
+//                .addField(newFlatFieldLeaf(t.getEntityName()))
+//                .addField(newFlatFieldLeaf(t.getAncestorGOID()))
+//                .addField(newFlatFieldLeaf(t.getReason()))
+//                .addField(newFlatFieldLeaf(t.getMethodId()))
+//                .buildString())
 
         List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
 
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.BlacklistItem blacklistItem = new OBOTerm.BlacklistItem();
             blacklistItem.geneProductId = cleanFieldValue(fields.get(0).buildString());
-            blacklistItem.geneProductDb = cleanFieldValue(fields.get(1).buildString());
-            blacklistItem.reason = cleanFieldValue(fields.get(2).buildString());
-            blacklistItem.category = cleanFieldValue(fields.get(3).buildString());
-            blacklistItem.method = cleanFieldValue(fields.get(4).buildString());
+            blacklistItem.category = cleanFieldValue(fields.get(1).buildString());
+            blacklistItem.entityType = cleanFieldValue(fields.get(2).buildString());
+            blacklistItem.entityId = cleanFieldValue(fields.get(3).buildString());
+            blacklistItem.taxonId = cleanFieldValue(fields.get(4).buildString());
+            blacklistItem.entityName = cleanFieldValue(fields.get(5).buildString());
+            blacklistItem.ancestorGoId = cleanFieldValue(fields.get(6).buildString());
+            blacklistItem.reason = cleanFieldValue(fields.get(7).buildString());
+            blacklistItem.method = cleanFieldValue(fields.get(8).buildString());
             return Optional.of(blacklistItem);
         } else {
             LOGGER.warn("Could not parse flattened blacklist: {}", fieldsStr);

@@ -99,10 +99,16 @@ public class OBOTerm {
 
     public static class BlacklistItem implements FieldType {
         public String geneProductId;
-        public String geneProductDb;
+        //public String geneProductDb;
         public String reason;
         public String category;
         public String method;
+
+        public String entityType;
+        public String entityId;
+        public String taxonId;
+        public String entityName;
+        public String ancestorGoId;
     }
 
     public static class XORelation implements FieldType {
