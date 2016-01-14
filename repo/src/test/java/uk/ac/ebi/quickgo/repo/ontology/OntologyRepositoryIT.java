@@ -21,10 +21,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertTrue;
 import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
 
 /**
@@ -138,6 +140,8 @@ public class OntologyRepositoryIT {
         assertThat(optionalDoc.isPresent(), is(true));
         assertThat(optionalDoc.get().taxonConstraints, is(notNullValue()));
         assertThat(optionalDoc.get().blacklist, is(notNullValue()));
+        assertTrue(optionalDoc.get().blacklist.get(0).contains("IER12345"));
+        assertTrue(optionalDoc.get().blacklist.get(1).contains("IER12346"));
     }
 
     @Test

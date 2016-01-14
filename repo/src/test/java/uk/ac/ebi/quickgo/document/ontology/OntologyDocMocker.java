@@ -133,18 +133,26 @@ public class OntologyDocMocker {
         // format: geneProductId|geneProductDB|reason|category|method
         od.blacklist = new ArrayList<>();
         od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
-                .addField(newFlatFieldLeaf("GP:00001"))
-                .addField(newFlatFieldLeaf("GP"))
-                .addField(newFlatFieldLeaf("because it's bad"))
-                .addField(newFlatFieldLeaf("category 1"))
-                .addField(newFlatFieldLeaf("automatic"))
+                .addField(newFlatFieldLeaf("GO:0000001"))                   //id
+                .addField(newFlatFieldLeaf("NOT-qualified manual"))         //category
+                .addField(newFlatFieldLeaf("protein"))                      //entity type
+                .addField(newFlatFieldLeaf("A5I1R9"))                       //entity id
+                .addField(newFlatFieldLeaf("441771"))                       //taxon id
+                .addField(newFlatFieldLeaf("A5I1R9_CLOBH"))                 //entity name
+                .addField(newFlatFieldLeaf("GO:0007005"))                   //ancestor go id
+                .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))   //reason
+                .addField(newFlatFieldLeaf("IER12345"))
                 .buildString());
         od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
-                .addField(newFlatFieldLeaf("XX:00002"))
-                .addField(newFlatFieldLeaf("XX"))
-                .addField(newFlatFieldLeaf("because it's also bad"))
-                .addField(newFlatFieldLeaf("category 2"))
-                .addField(newFlatFieldLeaf()) // no parameter means it's got no value
+                .addField(newFlatFieldLeaf("GO:0000001"))                   //id
+                .addField(newFlatFieldLeaf("IS-qualified manual"))         //category
+                .addField(newFlatFieldLeaf("protein"))                      //entity type
+                .addField(newFlatFieldLeaf("B5I1R9"))                       //entity id
+                .addField(newFlatFieldLeaf("441771"))                       //taxon id
+                .addField(newFlatFieldLeaf("B5I1R9_CLOBH"))                 //entity name
+                .addField(newFlatFieldLeaf("GO:0007006"))                   //ancestor go id
+                .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))   //reason
+                .addField(newFlatFieldLeaf("IER12346"))
                 .buildString());
 
         // example xontology relations
