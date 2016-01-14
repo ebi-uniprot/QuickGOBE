@@ -38,6 +38,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
             doc.taxonConstraints = extractTaxonConstraints(goTerm);
             doc.usage = goTerm.getUsage() == null?
                     null : goTerm.getUsage().getText();
+            doc.blacklist = extractBlacklist(goTerm);
 
             return Optional.of(doc);
         } else {
@@ -92,6 +93,25 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
                                 .addField(pubmedsAsFlatField)
                                 .buildString();
                     })
+                    .collect(Collectors.toList());
+        } else return null;
+    }
+
+    protected List<String> extractBlacklist(GOTerm goTerm){
+        if (!isEmpty(goTerm.getBlacklist())) {
+            return goTerm.getBlacklist().stream()
+                    .map(
+                            t -> newFlatField()
+                                    .addField(newFlatFieldLeaf(t.getGoId()))
+                                    .addField(newFlatFieldLeaf(t.getCategory()))
+                                    .addField(newFlatFieldLeaf(t.getEntityType()))
+                                    .addField(newFlatFieldLeaf(t.getProteinAc()))       //entityID
+                                    .addField(newFlatFieldLeaf(Integer.toString(t.getTaxonId())))
+                                    .addField(newFlatFieldLeaf(t.getEntityName()))
+                                    .addField(newFlatFieldLeaf(t.getAncestorGOID()))
+                                    .addField(newFlatFieldLeaf(t.getReason()))
+                                    .addField(newFlatFieldLeaf(t.getMethodId()))
+                                    .buildString())
                     .collect(Collectors.toList());
         } else return null;
     }

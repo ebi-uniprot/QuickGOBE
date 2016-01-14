@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.generic.RelationType;
 import uk.ac.ebi.quickgo.model.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
+import uk.ac.ebi.quickgo.model.ontology.go.GOTermBlacklist;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.model.ontology.go.TaxonConstraint;
 
@@ -35,10 +36,13 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class GOTermToODocConverterTest {
+
     @Ignore
     @Test
     public void converts1Term() {
-        GOSourceFiles sourceFiles = new GOSourceFiles(new File("/home/eddturner/working/quickgo-local/quickgo-data/ff"));
+        //GOSourceFiles sourceFiles = new GOSourceFiles(new File("/home/eddturner/working/quickgo-local/quickgo-data/ff"));
+        GOSourceFiles sourceFiles = new GOSourceFiles(new File("C:\\Users\\twardell\\Projects\\QuickGo\\data_ontology"));
+
         GOLoader goLoader = new GOLoader(sourceFiles);
         Optional<GeneOntology> geneOntologyOptional = goLoader.load();
         assertThat(geneOntologyOptional.isPresent(), is(true));
@@ -164,5 +168,42 @@ public class GOTermToODocConverterTest {
     public void convertsEmptyOptional() {
         Optional<OntologyDocument> documentOptional = converter.apply(Optional.empty());
         assertThat(documentOptional.isPresent(), is(false));
+    }
+
+    // blacklist
+    @Test
+    public void extractsBlacklistWhenExists() {
+        GOTermBlacklist goTermBlacklist = mock(GOTermBlacklist.class);
+        when(goTermBlacklist.getAncestorGOID()).thenReturn("GO:0007005");
+        when(goTermBlacklist.getGoId()).thenReturn("GO:0000001");
+        when(goTermBlacklist.getCategory()).thenReturn("NOT-qualified manual");
+        when(goTermBlacklist.getEntityName()).thenReturn("A5I1R9_CLOBH");
+        when(goTermBlacklist.getEntityType()).thenReturn("protein");
+        when(goTermBlacklist.getTaxonId()).thenReturn(441771);
+        when(goTermBlacklist.getProteinAc()).thenReturn("A5I1R9");
+        when(goTermBlacklist.getReason()).thenReturn("1 NOT-qualified manual annotation exists with evidence code ECO:0000318 from this reference: GO_REF:0000033");
+        when(goTermBlacklist.getMethodId()).thenReturn("IPR1234567");
+
+        when(term.getBlacklist()).thenReturn(Collections.singletonList(goTermBlacklist));
+
+        List<String> blacklistConStrList = converter.extractBlacklist(term);
+        assertThat(blacklistConStrList, is(not(nullValue())));
+        assertThat(blacklistConStrList.size(), is(1));
+        assertThat(blacklistConStrList.get(0).contains("GO:0007005"), is(true));
+        assertThat(blacklistConStrList.get(0).contains("GO:0000001"), is(true));
+        assertThat(blacklistConStrList.get(0).contains("NOT-qualified manual"), is(true));
+        assertThat(blacklistConStrList.get(0).contains("A5I1R9_CLOBH"), is(true));
+        assertThat(blacklistConStrList.get(0).contains("protein"), is(true));
+        assertThat(blacklistConStrList.get(0).contains("441771"), is(true));
+        assertThat(blacklistConStrList.get(0).contains("A5I1R9"), is(true));
+        assertThat(blacklistConStrList.get(0).contains("1 NOT-qualified manual annotation exists with evidence code ECO:0000318 from this reference: GO_REF:0000033"), is(true));
+        assertThat(blacklistConStrList.get(0).contains("IPR1234567"), is(true));
+
+    }
+
+    @Test
+    public void extractsBlacklistWhenNotExists() {
+        when(term.getBlacklist()).thenReturn(null);
+        assertThat(converter.extractTaxonConstraints(term), is(nullValue()));
     }
 }
