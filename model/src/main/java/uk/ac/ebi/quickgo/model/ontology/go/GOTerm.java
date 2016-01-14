@@ -167,6 +167,7 @@ public class GOTerm extends GenericTerm {
     public List<NamedURL> plannedChanges = new ArrayList<>();
     public EGOAspect aspect;
     public ETermUsage usage = ETermUsage.X;
+    public List<GOTermBlacklist> blacklist = new ArrayList<>();
 
     public GOTerm(String id, String name, String aspect, String isObsolete) {
         super(id, name, isObsolete);
@@ -194,6 +195,15 @@ public class GOTerm extends GenericTerm {
 
     public void addPlannedChange(String title, String url) {
         plannedChanges.add(new NamedURL(title, url));
+    }
+
+    public void addBlacklist(String goId, String category, String entityType, String entityID, String taxonID, String entityName,
+                             String ancestorGoID, String reason, String methodID ){
+        blacklist.add(new GOTermBlacklist(goId, category, entityType, entityID, taxonID, entityName, ancestorGoID, reason, methodID));
+    }
+
+    public List<GOTermBlacklist> getBlacklist() {
+        return blacklist;
     }
 
     public String ontology() {
