@@ -35,8 +35,7 @@ public abstract class OBOControllerIT {
 
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
+    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();remove
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
@@ -56,7 +55,6 @@ public abstract class OBOControllerIT {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .build();
-
 
         RESOURCE_URL = getResourceURL();
 
