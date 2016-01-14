@@ -75,6 +75,14 @@ public class GOLoader extends AbstractGenericOLoader<GOSourceFiles, GeneOntology
                 }
             }
 
+
+            for (String[] row : sourceFiles.blacklistForGoTerm.reader(GOSourceFiles.EAnnBlacklistEntry.GO_ID, GOSourceFiles.EAnnBlacklistEntry.CATEGORY, GOSourceFiles.EAnnBlacklistEntry.ENTITY_TYPE, GOSourceFiles.EAnnBlacklistEntry.ENTITY_ID, GOSourceFiles.EAnnBlacklistEntry.TAXON_ID, GOSourceFiles.EAnnBlacklistEntry.ENTITY_NAME, GOSourceFiles.EAnnBlacklistEntry.ANCESTOR_GO_ID, GOSourceFiles.EAnnBlacklistEntry.REASON,  GOSourceFiles.EAnnBlacklistEntry.METHOD_ID)) {
+                GOTerm term = (GOTerm) go.getTerm(row[0]);
+                if (term != null) {
+                    term.addBlacklist(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
+                }
+            }
+
             return Optional.of(go);
         } catch (Exception e) {
             LOGGER.error("Problem loading GO information from source files: ", e);

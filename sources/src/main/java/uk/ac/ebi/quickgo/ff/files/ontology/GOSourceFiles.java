@@ -9,7 +9,7 @@ import static uk.ac.ebi.quickgo.ff.files.SourceFiles.TSVDataFile;
 
 /**
  * class that defines the set of GO-specific source files
- * 
+ *
  * @author tonys
  *
  */
@@ -58,10 +58,13 @@ public class GOSourceFiles extends OntologySourceFiles {
 
 	public enum EAnnExtRelEntitySyntax { ENTITY, ENTITY_TYPE, NAMESPACE, ID_SYNTAX }
 	public TSVDataFile<EAnnExtRelEntitySyntax> aerEntitySyntax;
-	
+
+	public enum EAnnBlacklistEntry { GO_ID, CATEGORY, ENTITY_TYPE, ENTITY_ID, TAXON_ID, ENTITY_NAME, ANCESTOR_GO_ID, REASON,  METHOD_ID }
+	public TSVDataFile<EAnnBlacklistEntry> blacklistForGoTerm;
+
 	public GOSourceFiles(File directory) {
 		super(directory);
-		
+
 		goTerms = new TSVDataFile<>(directory, "TERMS");
 		definitions = new TSVDataFile<>(directory, "DEFINITIONS");
 		synonyms = new TSVDataFile<>(directory, "SYNONYMS");
@@ -88,8 +91,10 @@ public class GOSourceFiles extends OntologySourceFiles {
 		aerRanges = new TSVDataFile<>(directory, "AER_RANGES");
 		aerRangeDefaults = new TSVDataFile<>(directory, "AER_RANGE_DEFAULTS");
 		aerEntitySyntax = new TSVDataFile<>(directory, "AER_ENTITY_SYNTAX");
+		blacklistForGoTerm = new TSVDataFile<>(directory, "TERM_BLACKLIST_ENTRIES");
+
 	}
-	
+
 	@Override
 	public NamedFile[] requiredFiles() {
 		return SourceFiles.holder(
