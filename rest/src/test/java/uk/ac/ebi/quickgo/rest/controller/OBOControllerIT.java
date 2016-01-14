@@ -35,7 +35,7 @@ public abstract class OBOControllerIT {
 
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();remove
+    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
