@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.repo.config;
+package uk.ac.ebi.quickgo.repo.solr.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

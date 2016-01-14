@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker;
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 
 /**
  * Tests the {@link ECOController} class. All tests for ECO

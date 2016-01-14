@@ -1,11 +1,10 @@
 package uk.ac.ebi.quickgo.service.converter.ontology;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.service.converter.FieldConverter;
-import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.service.converter.FieldConverter;
+import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 /**
  * This class provides template behaviour for converting an {@link OntologyDocument}

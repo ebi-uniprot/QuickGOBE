@@ -1,9 +1,9 @@
-package uk.ac.ebi.quickgo.document.ontology;
+package uk.ac.ebi.quickgo.repo.solr.document.ontology;
 
-import uk.ac.ebi.quickgo.document.QuickGODocument;
+import org.apache.solr.client.solrj.beans.Field;
+import uk.ac.ebi.quickgo.repo.solr.document.QuickGODocument;
 
 import java.util.List;
-import org.apache.solr.client.solrj.beans.Field;
 
 /**
  * Solr document class defining all fields within the ontology core.

@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.document.ontology;
+package uk.ac.ebi.quickgo.repo.solr.document.ontology;
 
 import java.util.ArrayList;
 import java.util.Arrays;

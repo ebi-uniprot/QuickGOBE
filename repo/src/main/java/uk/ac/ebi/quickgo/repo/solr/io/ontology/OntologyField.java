@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.repo.ontology;
+package uk.ac.ebi.quickgo.repo.solr.io.ontology;
 
 /**
  * The fields of an ontology document.

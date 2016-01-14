@@ -1,12 +1,12 @@
 package uk.ac.ebi.quickgo.repowriter.write.writer;
 
-import uk.ac.ebi.quickgo.document.QuickGODocument;
-
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.data.solr.repository.SolrCrudRepository;
+import uk.ac.ebi.quickgo.repo.solr.document.QuickGODocument;
+
+import java.util.List;
 
 /**
  * Generic {@link ItemWriter} for a {@link SolrCrudRepository}. Its is used

@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.repowriter.reader.converter;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 
 import java.util.List;
 import java.util.Optional;

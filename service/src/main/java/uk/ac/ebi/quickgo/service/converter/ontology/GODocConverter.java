@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.service.converter.ontology;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
 
 /**

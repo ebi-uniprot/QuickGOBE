@@ -13,9 +13,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
+import uk.ac.ebi.quickgo.repo.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.repo.solr.io.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.rest.QuickGOREST;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

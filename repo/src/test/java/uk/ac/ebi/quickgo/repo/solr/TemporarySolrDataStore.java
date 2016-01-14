@@ -1,9 +1,10 @@
-package uk.ac.ebi.quickgo.repo;
+package uk.ac.ebi.quickgo.repo.solr;
 
-import java.io.IOException;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.IOException;
 
 /**
  * Creates a temporary solr data store, which is deleted on exit. Use this class with

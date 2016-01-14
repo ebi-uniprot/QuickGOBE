@@ -1,21 +1,18 @@
 package uk.ac.ebi.quickgo.service.config;
 
-import uk.ac.ebi.quickgo.config.RepoConfig;
-import uk.ac.ebi.quickgo.document.ontology.OntologyType;
-import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import uk.ac.ebi.quickgo.repo.solr.config.RepoConfig;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyType;
+import uk.ac.ebi.quickgo.repo.solr.io.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.service.OntologyService;
 import uk.ac.ebi.quickgo.service.OntologyServiceImpl;
 import uk.ac.ebi.quickgo.service.converter.ontology.ECODocConverter;
 import uk.ac.ebi.quickgo.service.converter.ontology.GODocConverter;
 import uk.ac.ebi.quickgo.service.model.ontology.ECOTerm;
 import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 
 /**
  * Spring configuration for the service layer, which depends on the repositories

@@ -1,11 +1,5 @@
 package uk.ac.ebi.quickgo.repowriter.main;
 
-import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.repowriter.JobTestRunnerConfig;
-import uk.ac.ebi.quickgo.repowriter.reader.DocumentReaderException;
-import uk.ac.ebi.quickgo.repowriter.reader.ODocReader;
-import uk.ac.ebi.quickgo.repowriter.write.job.IndexingJobConfig;
-
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,14 +14,19 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.repo.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.repowriter.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.repowriter.reader.DocumentReaderException;
+import uk.ac.ebi.quickgo.repowriter.reader.ODocReader;
+import uk.ac.ebi.quickgo.repowriter.write.job.IndexingJobConfig;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createECODoc;
-import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
+import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker.createECODoc;
+import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker.createGODoc;
 import static uk.ac.ebi.quickgo.repowriter.main.QuickGOIndexOntologyMainITConfig.STEP_SKIP_LIMIT;
 
 /**
