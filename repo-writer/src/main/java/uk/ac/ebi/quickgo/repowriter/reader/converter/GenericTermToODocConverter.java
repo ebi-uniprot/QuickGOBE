@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.repowriter.reader.converter;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.generic.Synonym;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 
 import java.util.ArrayList;
 import java.util.Arrays;

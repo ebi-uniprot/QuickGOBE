@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.ff.flatfield;
 
 import java.util.List;
 
+import static java.util.Objects.nonNull;
+
 /**
  * A flat field representing a {@link String} value. These are stored
  * within a (possibly nested) list of {@link FlatField}s inside the
@@ -11,10 +13,15 @@ import java.util.List;
  * @author Edd
  */
 public class FlatFieldLeaf extends FlatField {
+    private static final String PRINTED_NULL_STRING = "";
     private String value;
 
     private FlatFieldLeaf(String value) {
-        this.value = value;
+        if (nonNull(value)) {
+            this.value = value;
+        } else {
+            this.value = PRINTED_NULL_STRING;
+        }
     }
 
     public static FlatFieldLeaf newFlatFieldLeaf(String value) {

@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.service.converter;
 
+import com.google.common.base.Strings;
 import uk.ac.ebi.quickgo.service.model.FieldType;
 
-import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Converts a {@link uk.ac.ebi.quickgo.document.QuickGODocument}'s field String value into the
+ * Converts a {@link uk.ac.ebi.quickgo.repo.solr.document.QuickGODocument}'s field String value into the
  * corresponding field DTO. Used when converting repository search results
  * to an object model which is serialised at the RESTful layer.
  *

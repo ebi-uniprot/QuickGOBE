@@ -1,15 +1,15 @@
 package uk.ac.ebi.quickgo.service;
 
+import org.springframework.data.domain.Pageable;
 import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.domain.Pageable;
 
 /**
  * Service layer for retrieving results from an underlying searchable data store.
  *
- * See also {@link uk.ac.ebi.quickgo.repo.ontology.OntologyRepository}
+ * See also {@link uk.ac.ebi.quickgo.repo.solr.io.ontology.OntologyRepository}
  *
  * Created 11/11/15
  * @author Edd

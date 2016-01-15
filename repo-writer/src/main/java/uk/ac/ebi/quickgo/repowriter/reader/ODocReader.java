@@ -1,6 +1,9 @@
 package uk.ac.ebi.quickgo.repowriter.reader;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import uk.ac.ebi.quickgo.ff.files.ontology.ECOSourceFiles;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
 import uk.ac.ebi.quickgo.ff.loader.ontology.ECOLoader;
@@ -9,16 +12,13 @@ import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.repowriter.reader.converter.GOTermToODocConverter;
 import uk.ac.ebi.quickgo.repowriter.reader.converter.GenericTermToODocConverter;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 
 import static java.util.Objects.requireNonNull;
 

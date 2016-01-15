@@ -1,9 +1,9 @@
-package uk.ac.ebi.quickgo.document.ontology;
+package uk.ac.ebi.quickgo.repo.solr.document.ontology;
 
-import uk.ac.ebi.quickgo.document.QuickGODocument;
+import org.apache.solr.client.solrj.beans.Field;
+import uk.ac.ebi.quickgo.repo.solr.document.QuickGODocument;
 
 import java.util.List;
-import org.apache.solr.client.solrj.beans.Field;
 
 /**
  * Solr document class defining all fields within the ontology core.
@@ -60,7 +60,7 @@ public class OntologyDocument implements QuickGODocument {
     public String usage;
     // the stored synonym field, which can be reconstructed
     // e.g., [ "syn1|type1", "syn2|type2" ]
-    @Field
+    @Field("synonym")
     public List<String> synonyms;
     // the indexed synonym names
     @Field("synonymName")

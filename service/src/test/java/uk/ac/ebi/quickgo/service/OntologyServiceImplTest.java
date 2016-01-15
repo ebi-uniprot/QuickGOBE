@@ -1,17 +1,6 @@
 package uk.ac.ebi.quickgo.service;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.document.ontology.OntologyType;
-import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
-import uk.ac.ebi.quickgo.service.converter.ontology.ECODocConverter;
-import uk.ac.ebi.quickgo.service.converter.ontology.GODocConverter;
-import uk.ac.ebi.quickgo.service.model.ontology.ECOTerm;
-import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
-
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +9,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyType;
+import uk.ac.ebi.quickgo.repo.solr.io.ontology.OntologyRepository;
+import uk.ac.ebi.quickgo.service.converter.ontology.ECODocConverter;
+import uk.ac.ebi.quickgo.service.converter.ontology.GODocConverter;
+import uk.ac.ebi.quickgo.service.model.ontology.ECOTerm;
+import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -27,8 +27,8 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createECODoc;
-import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
+import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker.createECODoc;
+import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker.createGODoc;
 
 /**
  * Testing the {@link OntologyServiceImpl} class.

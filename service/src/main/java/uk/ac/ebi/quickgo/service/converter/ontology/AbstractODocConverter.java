@@ -1,11 +1,10 @@
 package uk.ac.ebi.quickgo.service.converter.ontology;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.service.converter.FieldConverter;
-import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.service.converter.FieldConverter;
+import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 /**
  * This class provides template behaviour for converting an {@link OntologyDocument}
@@ -37,6 +36,7 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
     protected void addCommonFields(OntologyDocument ontologyDocument, T term) {
         term.id = ontologyDocument.id;
         term.name = ontologyDocument.name;
+        term.consider = ontologyDocument.considers;
         term.definition = ontologyDocument.definition;
         term.subsets = ontologyDocument.subsets;
         term.isObsolete = ontologyDocument.isObsolete;
@@ -47,7 +47,7 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
         term.secondaryIds = ontologyDocument.secondaryIds;
         term.synonyms = SYNONYMS_FIELD_CONVERTER.convertFieldList(ontologyDocument.synonyms);
         term.history = HISTORY_FIELD_CONVERTER.convertFieldList(ontologyDocument.history);
-        term.xrefs = XREFS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xrefs);
+        term.xRefs = XREFS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xrefs);
         term.taxonConstraints = TAXON_CONSTRAINTS_FIELD_CONVERTER.convertFieldList(ontologyDocument.taxonConstraints);
         term.xRelations = XORELATIONS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xRelations);
         term.blacklist = BLACKLIST_FIELD_CONVERTER.convertFieldList(ontologyDocument.blacklist);

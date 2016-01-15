@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.config;
+package uk.ac.ebi.quickgo.repo.solr.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,17 +13,17 @@ import org.springframework.data.solr.repository.config.EnableSolrRepositories;
  * packages, and loading properties from the application.properties file.
  *
  * These values are subsequently used by other configuration classes, such as
- * {@link uk.ac.ebi.quickgo.repo.config.SolrServerProperties}.
+ * {@link uk.ac.ebi.quickgo.repo.solr.config.SolrServerProperties}.
  *
  * Created 12/11/15
  * @author Edd
  */
 @Configuration
 @ComponentScan({
-        "uk.ac.ebi.quickgo.repo"
+        "uk.ac.ebi.quickgo.repo.solr"
 })
 @PropertySource("classpath:application.properties")
-@EnableSolrRepositories(basePackages = {"uk.ac.ebi.quickgo.repo"}, multicoreSupport = true)
+@EnableSolrRepositories(basePackages = {"uk.ac.ebi.quickgo.repo.solr"}, multicoreSupport = true)
 public class RepoConfig {
 
     /**

@@ -1,16 +1,5 @@
 package uk.ac.ebi.quickgo.repowriter.write.job;
 
-import uk.ac.ebi.quickgo.config.RepoConfig;
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.repo.ontology.OntologyRepository;
-import uk.ac.ebi.quickgo.repowriter.reader.DocumentReaderException;
-import uk.ac.ebi.quickgo.repowriter.reader.ODocReader;
-import uk.ac.ebi.quickgo.repowriter.write.IndexerProperties;
-import uk.ac.ebi.quickgo.repowriter.write.listener.LogJobListener;
-import uk.ac.ebi.quickgo.repowriter.write.listener.LogStepListener;
-import uk.ac.ebi.quickgo.repowriter.write.writer.SolrCrudRepoWriter;
-
-import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -23,6 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import uk.ac.ebi.quickgo.repo.solr.config.RepoConfig;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.repo.solr.io.ontology.OntologyRepository;
+import uk.ac.ebi.quickgo.repowriter.reader.DocumentReaderException;
+import uk.ac.ebi.quickgo.repowriter.reader.ODocReader;
+import uk.ac.ebi.quickgo.repowriter.write.IndexerProperties;
+import uk.ac.ebi.quickgo.repowriter.write.listener.LogJobListener;
+import uk.ac.ebi.quickgo.repowriter.write.listener.LogStepListener;
+import uk.ac.ebi.quickgo.repowriter.write.writer.SolrCrudRepoWriter;
+
+import java.io.File;
 
 /**
  *

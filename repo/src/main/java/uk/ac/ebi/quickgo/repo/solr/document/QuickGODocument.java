@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.document;
+package uk.ac.ebi.quickgo.repo.solr.document;
 
 /**
  * Created 02/12/15

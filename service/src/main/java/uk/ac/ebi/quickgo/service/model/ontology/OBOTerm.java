@@ -28,12 +28,16 @@ public class OBOTerm {
 
     public String comment;
 
+    // list of term IDs to consider when replacing
+    // TODO confirm with Tony S
+    public List<String> consider;
+
     // list of term IDs that are ancestors of this term
     public List<String> ancestors;
 
     public List<Synonym> synonyms;
 
-    // what this term replacedBy
+    // a term ID that replaces this one
     public String replacedBy;
 
     // each term can be in one or more subsets; these are used for two purposes: slims and term usage constraints.
@@ -47,7 +51,7 @@ public class OBOTerm {
 
     public List<History> history;
 
-    public List<XRef> xrefs;
+    public List<XRef> xRefs;
 
     public List<XORelation> xRelations;
 
@@ -55,11 +59,13 @@ public class OBOTerm {
     public List<TaxonConstraint> taxonConstraints;
     public List<BlacklistItem> blacklist;
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Synonym implements FieldType {
         public String synonymName;
         public String synonymType;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class History implements FieldType {
         public String name;
         public String timestamp;
@@ -68,17 +74,20 @@ public class OBOTerm {
         public String text;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class XRef implements FieldType {
         public String dbCode;
         public String dbId;
         public String name;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class AnnotationGuideLine implements FieldType {
         public String description;
         public String url;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class TaxonConstraint implements FieldType {
         public String ancestorId;
         public String ancestorName;
@@ -93,14 +102,20 @@ public class OBOTerm {
         public String id;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class BlacklistItem implements FieldType {
         public String geneProductId;
-        public String geneProductDb;
         public String reason;
         public String category;
         public String method;
+        public String entityType;
+        public String entityId;
+        public String taxonId;
+        public String entityName;
+        public String ancestorGoId;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class XORelation implements FieldType {
         public String id;
         public String term;

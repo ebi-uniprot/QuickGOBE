@@ -1,22 +1,22 @@
 package uk.ac.ebi.quickgo.repowriter.reader;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.model.ontology.eco.ECOTerm;
-import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
-import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
-import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
-import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
-
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
+import uk.ac.ebi.quickgo.model.ontology.eco.ECOTerm;
+import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
+import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
+import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
+import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;

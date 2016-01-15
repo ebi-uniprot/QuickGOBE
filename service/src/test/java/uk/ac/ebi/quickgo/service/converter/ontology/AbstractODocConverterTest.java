@@ -1,17 +1,15 @@
 package uk.ac.ebi.quickgo.service.converter.ontology;
 
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker;
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
+import org.junit.Before;
+import org.junit.Test;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 
 import java.util.Arrays;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNull.nullValue;
 
 /**
@@ -42,7 +40,6 @@ public class AbstractODocConverterTest {
      * Check common OBO fields are converted, which are not covered by other *Converter test
      * classes
      */
-
     @Test
     public void convertsIdWithoutError() {
         assertThat(oboTermFromValidGODoc.id, is(equalTo("id1")));
@@ -56,6 +53,16 @@ public class AbstractODocConverterTest {
     @Test
     public void convertsAncestorsWithoutError() {
         assertThat(oboTermFromValidGODoc.ancestors, is(validGODoc.ancestors));
+    }
+
+    @Test
+    public void convertsSecondaryIdsWithoutError() {
+        assertThat(oboTermFromValidGODoc.secondaryIds, is(validGODoc.secondaryIds));
+    }
+
+    @Test
+    public void convertsConsidersWithoutError() {
+        assertThat(oboTermFromValidGODoc.consider, is(validGODoc.considers));
     }
 
     @Test

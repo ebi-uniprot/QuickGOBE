@@ -1,13 +1,5 @@
-package uk.ac.ebi.quickgo.repo.ontology;
+package uk.ac.ebi.quickgo.repo.solr.io.ontology;
 
-import uk.ac.ebi.quickgo.config.RepoConfig;
-import uk.ac.ebi.quickgo.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.document.ontology.OntologyType;
-import uk.ac.ebi.quickgo.repo.TemporarySolrDataStore;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -20,12 +12,21 @@ import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.repo.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.repo.solr.config.RepoConfig;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyType;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static uk.ac.ebi.quickgo.document.ontology.OntologyDocMocker.createGODoc;
+import static org.junit.Assert.assertTrue;
+import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker.createGODoc;
 
 /**
  * Test that the ontology repository can be accessed as expected.
@@ -138,6 +139,8 @@ public class OntologyRepositoryIT {
         assertThat(optionalDoc.isPresent(), is(true));
         assertThat(optionalDoc.get().taxonConstraints, is(notNullValue()));
         assertThat(optionalDoc.get().blacklist, is(notNullValue()));
+        assertTrue(optionalDoc.get().blacklist.get(0).contains("IER12345"));
+        assertTrue(optionalDoc.get().blacklist.get(1).contains("IER12346"));
     }
 
     @Test
