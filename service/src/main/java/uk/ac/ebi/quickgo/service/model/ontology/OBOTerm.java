@@ -59,11 +59,13 @@ public class OBOTerm {
     public List<TaxonConstraint> taxonConstraints;
     public List<BlacklistItem> blacklist;
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Synonym implements FieldType {
         public String synonymName;
         public String synonymType;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class History implements FieldType {
         public String name;
         public String timestamp;
@@ -72,17 +74,20 @@ public class OBOTerm {
         public String text;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class XRef implements FieldType {
         public String dbCode;
         public String dbId;
         public String name;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class AnnotationGuideLine implements FieldType {
         public String description;
         public String url;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class TaxonConstraint implements FieldType {
         public String ancestorId;
         public String ancestorName;
@@ -97,13 +102,12 @@ public class OBOTerm {
         public String id;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class BlacklistItem implements FieldType {
         public String geneProductId;
-        //public String geneProductDb;
         public String reason;
         public String category;
         public String method;
-
         public String entityType;
         public String entityId;
         public String taxonId;
@@ -111,6 +115,7 @@ public class OBOTerm {
         public String ancestorGoId;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class XORelation implements FieldType {
         public String id;
         public String term;

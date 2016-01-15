@@ -1,7 +1,8 @@
 package uk.ac.ebi.quickgo.ff.delim;
 
-import org.junit.Test;
 import uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder;
+
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -352,5 +353,43 @@ public class FlatFieldBuilderTest {
         System.out.println(fromDepth0);
         System.out.println(fromDepth1);
         assertThat(fromDepth0, is(equalTo(fromDepth1)));
+    }
+
+    @Test
+    public void canConvertTerminatingNullFlatFieldLeaf() {
+        FlatFieldBuilder ff1Model = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"))
+                .addField(newFlatFieldLeaf("level1:C"))
+                .addField(newFlatFieldLeaf(null));
+        String ff1Str = ff1Model
+                .buildString();
+        System.out.println(ff1Str);
+
+        FlatFieldBuilder ff2FromFf1Model = newFlatField().parse(ff1Str);
+        String ff2FromFf1Str = ff2FromFf1Model.buildString();
+        System.out.println(ff2FromFf1Str);
+
+        assertThat(ff2FromFf1Model, is(ff1Model));
+        assertThat(ff2FromFf1Str, is(ff1Str));
+    }
+
+    @Test
+    public void canConvertTerminatingEmptyFlatFieldLeaf() {
+        FlatFieldBuilder ff1Model = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"))
+                .addField(newFlatFieldLeaf("level1:C"))
+                .addField(newFlatFieldLeaf(""));
+        String ff1Str = ff1Model
+                .buildString();
+        System.out.println(ff1Str);
+
+        FlatFieldBuilder ff2FromFf1Model = newFlatField().parse(ff1Str);
+        String ff2FromFf1Str = ff2FromFf1Model.buildString();
+        System.out.println(ff2FromFf1Str);
+
+        assertThat(ff2FromFf1Model, is(ff1Model));
+        assertThat(ff2FromFf1Str, is(ff1Str));
     }
 }
