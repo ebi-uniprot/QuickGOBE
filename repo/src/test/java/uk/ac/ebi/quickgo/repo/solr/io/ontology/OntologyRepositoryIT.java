@@ -2,10 +2,8 @@ package uk.ac.ebi.quickgo.repo.solr.io.ontology;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.core.CoreContainer;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -14,12 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.data.solr.repository.support.SolrRepositoryFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.repo.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.repo.solr.config.RepoConfig;
+import uk.ac.ebi.quickgo.repo.solr.document.geneproduct.GeneProductDocument;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyType;
+import uk.ac.ebi.quickgo.repo.solr.io.geneproduct.GeneProductRepository;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -34,8 +35,9 @@ import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker.cr
 
 /**
  * Test that the ontology repository can be accessed as expected.
- *
+ * <p>
  * Created 11/11/15
+ *
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -46,11 +48,9 @@ public class OntologyRepositoryIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
-    @Autowired
     private OntologyRepository ontologyRepository;
 
-    @Autowired
-    private CoreContainer coreContainer;
+    private GeneProductRepository geneProductRepository;
 
     @Autowired
     private SolrTemplate ontologyTemplate;
@@ -60,6 +60,11 @@ public class OntologyRepositoryIT {
 
     @Before
     public void before() {
+        ontologyRepository = new SolrRepositoryFactory(ontologyTemplate)
+                .getRepository(OntologyRepository.class);
+        geneProductRepository = new SolrRepositoryFactory(geneProductTemplate)
+                .getRepository(GeneProductRepository.class);
+
         ontologyRepository.deleteAll();
     }
 
@@ -207,19 +212,27 @@ public class OntologyRepositoryIT {
 
     @Test
     public void canAddGeneProductDocumentDirectlyToServer() throws IOException, SolrServerException {
-        GPDoc doc = new GPDoc();
+        GeneProductDocument doc = new GeneProductDocument();
         doc.dbObjectId = "thing";
+        doc.id = "1";
+
         geneProductTemplate.getSolrServer().addBean(doc);
         geneProductTemplate.commit();
 
         QueryResponse response = geneProductTemplate.getSolrServer().query(new SolrQuery("*:*"));
         System.out.println("-----> " + response);
-
     }
 
-    class GPDoc {
-        @Field
-        public String dbObjectId;
+    @Test
+    public void canAddGeneProductDocumentViaRepository() {
+        GeneProductDocument doc = new GeneProductDocument();
+        doc.dbObjectId = "thing";
+        doc.id = "1";
+
+        geneProductRepository.save(doc);
+
+        Iterable<GeneProductDocument> geneProductDocuments = geneProductRepository.findAll();
+        geneProductDocuments.forEach(foundDoc -> System.out.println("FOUND " + foundDoc + "!"));
     }
 
 }
