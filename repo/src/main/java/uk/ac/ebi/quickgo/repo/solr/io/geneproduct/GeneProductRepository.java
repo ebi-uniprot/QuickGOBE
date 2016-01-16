@@ -10,6 +10,7 @@ import uk.ac.ebi.quickgo.repo.solr.document.geneproduct.GeneProductDocument;
  * Created 16/1/16
  * @author Edd
  */
+//@NoRepositoryBean
 public interface GeneProductRepository extends SolrCrudRepository<GeneProductDocument, String> {
 
 

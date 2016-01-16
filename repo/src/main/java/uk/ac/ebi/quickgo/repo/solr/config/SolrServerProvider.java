@@ -5,6 +5,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
@@ -19,6 +20,7 @@ import java.io.IOException;
  */
 @Component
 @Profile("prod")
+@EnableSolrRepositories(basePackages = {"uk.ac.ebi.quickgo.repo.solr"}, multicoreSupport = true)
 public class SolrServerProvider {
     private final SolrServerProperties solrProperties;
 

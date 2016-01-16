@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.repository.support.SolrRepositoryFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.repo.solr.TemporarySolrDataStore;
@@ -48,8 +47,10 @@ public class OntologyRepositoryIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
+    @Autowired
     private OntologyRepository ontologyRepository;
 
+    @Autowired
     private GeneProductRepository geneProductRepository;
 
     @Autowired
@@ -60,11 +61,6 @@ public class OntologyRepositoryIT {
 
     @Before
     public void before() {
-        ontologyRepository = new SolrRepositoryFactory(ontologyTemplate)
-                .getRepository(OntologyRepository.class);
-        geneProductRepository = new SolrRepositoryFactory(geneProductTemplate)
-                .getRepository(GeneProductRepository.class);
-
         ontologyRepository.deleteAll();
     }
 
