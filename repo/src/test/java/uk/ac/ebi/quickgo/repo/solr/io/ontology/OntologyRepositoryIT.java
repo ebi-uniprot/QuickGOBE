@@ -1,8 +1,11 @@
 package uk.ac.ebi.quickgo.repo.solr.io.ontology;
 
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.beans.Field;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.core.CoreContainer;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -10,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.repo.solr.TemporarySolrDataStore;
@@ -46,7 +50,13 @@ public class OntologyRepositoryIT {
     private OntologyRepository ontologyRepository;
 
     @Autowired
-    private SolrServer server;
+    private CoreContainer coreContainer;
+
+    @Autowired
+    private SolrTemplate ontologyTemplate;
+
+    @Autowired
+    private SolrTemplate geneProductTemplate;
 
     @Before
     public void before() {
@@ -180,18 +190,36 @@ public class OntologyRepositoryIT {
      */
     @Test
     public void saveDirectlyToSolrServer() throws IOException, SolrServerException {
-        server.addBean(createGODoc("A", "Alice Cooper"));
-        server.addBean(createGODoc("B", "Alice Cooper"));
-        server.addBean(createGODoc("C", "Alice Cooper"));
-        server.addBeans(
+        ontologyTemplate.getSolrServer().addBean(createGODoc("A", "Alice Cooper"));
+        ontologyTemplate.getSolrServer().addBean(createGODoc("B", "Alice Cooper"));
+        ontologyTemplate.getSolrServer().addBean(createGODoc("C", "Alice Cooper"));
+        ontologyTemplate.getSolrServer().addBeans(
                 Arrays.asList(
                         createGODoc("D", "Alice Cooper"),
                         createGODoc("E", "Alice Cooper")));
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(0L));
 
-        server.commit();
+        ontologyTemplate.getSolrServer().commit();
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(5L));
     }
+
+    @Test
+    public void canAddGeneProductDocumentDirectlyToServer() throws IOException, SolrServerException {
+        GPDoc doc = new GPDoc();
+        doc.dbObjectId = "thing";
+        geneProductTemplate.getSolrServer().addBean(doc);
+        geneProductTemplate.commit();
+
+        QueryResponse response = geneProductTemplate.getSolrServer().query(new SolrQuery("*:*"));
+        System.out.println("-----> " + response);
+
+    }
+
+    class GPDoc {
+        @Field
+        public String dbObjectId;
+    }
+
 }
