@@ -70,6 +70,7 @@
 		<!-- basic gene product information -->
                 <field name="db" type="text_ignorecase" indexed="true" stored="true" />		
                 <field name="dbObjectId" type="text_ignorecase" indexed="true" stored="true" />
+                <field name="id" type="string" indexed="true" stored="true" />
 		<field name="dbObjectSymbol" type="string" indexed="true" stored="true" />
 		<field name="dbObjectName" type="string" indexed="true" stored="true" />
 		<field name="dbObjectSynonym" type="string" indexed="true" stored="true" multiValued="true" />
