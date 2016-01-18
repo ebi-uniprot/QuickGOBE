@@ -1,8 +1,5 @@
 package uk.ac.ebi.quickgo.service;
 
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.repo.solr.io.ontology.OntologyRepository;
@@ -13,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import static java.util.Objects.requireNonNull;
 
@@ -29,7 +29,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     private OntologyDocConverter<T> converter;
     private String ontologyType;
 
-    //Necessary for Spring to create a proxy class
+    // necessary for Spring to create a proxy class
     private OntologyServiceImpl() {}
 
     public OntologyServiceImpl(

@@ -1,14 +1,17 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
+import uk.ac.ebi.quickgo.repo.solr.query.QueryRequest;
 import uk.ac.ebi.quickgo.service.OntologyService;
 import uk.ac.ebi.quickgo.service.model.ontology.ECOTerm;
 import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static java.util.Objects.requireNonNull;
+import static uk.ac.ebi.quickgo.repo.solr.query.QueryRequest.Builder;
 
 /**
  * Search controller responsible for providing consistent search
@@ -23,12 +26,17 @@ public class SearchController {
 
     private final OntologyService<GOTerm> goOntologyService;
     private final OntologyService<ECOTerm> ecoOntologyService;
+    private final StringToGoQueryConverter ontologyQueryConverter;
 
     @Autowired
-    public SearchController(OntologyService<GOTerm> goOntologyService,
-            OntologyService<ECOTerm> ecoOntologyService) {
+    public SearchController(
+            OntologyService<GOTerm> goOntologyService,
+            OntologyService<ECOTerm> ecoOntologyService,
+            StringToGoQueryConverter ontologyQueryConverter) {
+
         this.goOntologyService = requireNonNull(goOntologyService);
         this.ecoOntologyService = requireNonNull(ecoOntologyService);
+        this.ontologyQueryConverter = requireNonNull(ontologyQueryConverter);
     }
 
 //    /**
@@ -39,7 +47,7 @@ public class SearchController {
 //     * @param limit the amount of queries to return
 //     */
 //    @RequestMapping(value = "/ontology", method = {RequestMethod.GET})
-//    public ResponseEntity<QueryResult<GenericTerm>> ontologySearch(
+//    public ResponseEntity<QueryResult<GOTerm>> ontologySearch(
 //            @RequestParam(value = "query") String query,
 //            @RequestParam(value = "limit", defaultValue = "25") int limit,
 //            @RequestParam(value = "page", defaultValue = "1") int page,
@@ -49,7 +57,7 @@ public class SearchController {
 //        QueryRequest request = buildRequest(query, limit, page, filterQueries, facets, ontologyQueryConverter);
 //        return search(request, termService);
 //    }
-//
+
 //    private <T> ResponseEntity<QueryResult<T>> search(QueryRequest request, SearchService<T> searchService) {
 //        ResponseEntity<QueryResult<T>> response;
 //
@@ -68,46 +76,46 @@ public class SearchController {
 //
 //        return response;
 //    }
-//
-//    private boolean isValidQuery(String query) {
-//        return query != null && query.trim().length() > 0;
-//    }
-//
-//    private boolean isValidNumRows(int rows) {
-//        return rows >= 0;
-//    }
-//
-//    private boolean isValidPage(int page) {
-//        return page >= 0;
-//    }
-//
-//    private QueryRequest buildRequest(String query, int limit, int page, List<String> filterQueries,
-//            List<String> facets, StringToGoQueryConverter converter) {
-//
-//        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page)) {
-//            return null;
-//        } else {
-//            Builder builder = new Builder(converter.convert(query));
-//
-//            if (limit > 0 && page > 0) {
-//                builder.setPageParameters(page, limit);
-//            }
-//
-//            if (facets != null) {
-//                facets.forEach(builder::addFacetField);
-//            }
-//
-//            if (filterQueries != null) {
-//                filterQueries.stream()
-//                        .map(converter::convert)
-//                        .forEach(builder::addQueryFilter);
-//            }
-//
-//            return builder.build();
-//        }
-//    }
-//
-//    private String createErrorMessage(QueryRequest request) {
-//        return "Unable to process search: [" + request + "]";
-//    }
+
+    private boolean isValidQuery(String query) {
+        return query != null && query.trim().length() > 0;
+    }
+
+    private boolean isValidNumRows(int rows) {
+        return rows >= 0;
+    }
+
+    private boolean isValidPage(int page) {
+        return page >= 0;
+    }
+
+    private QueryRequest buildRequest(String query, int limit, int page, List<String> filterQueries,
+            List<String> facets, StringToGoQueryConverter converter) {
+
+        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page)) {
+            return null;
+        } else {
+            Builder builder = new Builder(converter.convert(query));
+
+            if (limit > 0 && page > 0) {
+                builder.setPageParameters(page, limit);
+            }
+
+            if (facets != null) {
+                facets.forEach(builder::addFacetField);
+            }
+
+            if (filterQueries != null) {
+                filterQueries.stream()
+                        .map(converter::convert)
+                        .forEach(builder::addQueryFilter);
+            }
+
+            return builder.build();
+        }
+    }
+
+    private String createErrorMessage(QueryRequest request) {
+        return "Unable to process search: [" + request + "]";
+    }
 }
