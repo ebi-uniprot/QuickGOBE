@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ff.flatfield;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
@@ -15,6 +16,7 @@ import static java.util.Objects.nonNull;
 public class FlatFieldLeaf extends FlatField {
     private static final String PRINTED_NULL_STRING = "";
     private String value;
+    private final static List<FlatField> EMPTY_LIST = Collections.unmodifiableList(Collections.emptyList());
 
     private FlatFieldLeaf(String value) {
         if (nonNull(value)) {
@@ -37,7 +39,7 @@ public class FlatFieldLeaf extends FlatField {
     }
 
     @Override public List<FlatField> getFields() {
-        return null;
+        return EMPTY_LIST;
     }
 
     @Override public String buildString() {

@@ -89,6 +89,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
                                 .addField(newFlatFieldLeaf(t.getName()))
                                 .addField(newFlatFieldLeaf(t.relationship()))
                                 .addField(newFlatFieldLeaf(t.getTaxId()))
+                                .addField(newFlatFieldLeaf(t.taxIdType()))
                                 .addField(newFlatFieldLeaf(t.getTaxonName()))
                                 .addField(pubmedsAsFlatField)
                                 .buildString();

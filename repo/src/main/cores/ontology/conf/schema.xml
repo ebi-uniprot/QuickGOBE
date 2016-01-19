@@ -67,7 +67,7 @@
     <!--                   Start of QuickGO Ontology fields                         -->
 
     <field name="id" type="string" indexed="true" stored="true"/>
-    <field name="ontologyType" type="string" indexed="true" stored="false"/>
+    <field name="ontologyType" type="string" indexed="true" stored="true"/>
     <field name="name" type="string" indexed="false" stored="true"/>
     <field name="secondaryId" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="isObsolete" type="boolean" indexed="false" stored="true"/>

@@ -22,7 +22,6 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
         "uk.ac.ebi.quickgo.repo.solr"
 })
 @PropertySource("classpath:application.properties")
-//@EnableSolrRepositories(basePackages = {"uk.ac.ebi.quickgo.repo.solr"}, multicoreSupport = true)
 public class RepoConfig {
 
     /**
