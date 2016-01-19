@@ -20,7 +20,7 @@
     <!-- ========================================================================== -->
     <!--                   Start of QuickGO Ontology fields                         -->
 
-    <field name="id" type="string" indexed="true" stored="true"/>
+    <field name="id" type="lowercase" indexed="true" stored="true"/>
     <field name="ontologyType" type="string" indexed="true" stored="false"/>
     <field name="name" type="string" indexed="false" stored="true"/>
     <field name="secondaryId" type="string" indexed="false" stored="true" multiValued="true"/>
@@ -29,7 +29,7 @@
     <field name="replacedBy" type="string" indexed="false" stored="true"/>
     <field name="definition" type="string" indexed="false" stored="true"/>
     <field name="comment" type="string" indexed="false" stored="true"/>
-    <field name="aspect" type="string" indexed="false" stored="true"/>
+    <field name="aspect" type="string" indexed="true" stored="true"/>
     <field name="usage" type="string" indexed="false" stored="true"/>
     <field name="subset" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="children" type="string" indexed="false" stored="true" multiValued="true"/>
@@ -44,13 +44,22 @@
     <field name="taxonConstraint" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="blacklist" type="string" indexed="false" stored="true" multiValued="true"/>
 
+    <!-- autocomplete search fields -->
+    <field name="edge_name" type="text_edge" indexed="true" stored="false" multiValued="false"/>
+    <field name="edge_synonym" type="text_edge" indexed="true" stored="false" multiValued="true"/>
+
+    <field name="exact_name" type="exact_lower" indexed="true" stored="false" multiValued="false"/>
+    <field name="exact_synonym" type="exact_lower" indexed="true" stored="false" multiValued="true"/>
+
+    <!-- generic search field -->
+    <field name="text" type="text_ws" indexed="true" stored="false" multiValued="true"/>
+
     <!--                     End of QuickGO Ontology fields                         -->
     <!-- ========================================================================== -->
 
     <!-- Internal/Aux fields -->
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="text" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
-
 
     <!-- Field to use to determine and enforce document uniqueness.
          Unless this field is marked with required="false", it will be a required field-->
@@ -61,10 +70,44 @@
           is added to the index.  It's used either to index the same field differently,
           or to add multiple fields to the same field for easier/faster searching.  -->
 
+    <!-- Copy fields for generic search -->
     <copyField source="id" dest="text"/>
     <copyField source="name" dest="text"/>
-    <copyField source="definition" dest="text"/>
     <copyField source="synonymName" dest="text"/>
+
+    <!-- Copy fields for autocomplete search-->
+    <copyField source="name" dest="edge_name"/>
+    <copyField source="synonymName" dest="edge_synonym"/>
+
+    <copyField source="name" dest="exact_name"/>
+    <copyField source="synonymName" dest="exact_synonym"/>
+
+    <!--Use this for autocomplete searches-->
+    <fieldType name="text_edge" class="solr.TextField" sortMissingLast="true" omitNorms="false"
+               positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.EdgeNGramFilterFactory" minGramSize="1" maxGramSize="15"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
+    <fieldType name="exact_lower" class="solr.TextField" sortMissingLast="true" omitNorms="true"
+               positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
 
     <!-- Ignore lower/upper cases -->
     <fieldType name="text_ignorecase" class="solr.TextField" positionIncrementGap="100">
