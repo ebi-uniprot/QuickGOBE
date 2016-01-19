@@ -51,9 +51,6 @@
     <field name="exact_name" type="exact_lower" indexed="true" stored="false" multiValued="false"/>
     <field name="exact_synonym" type="exact_lower" indexed="true" stored="false" multiValued="true"/>
 
-    <!-- generic search field -->
-    <field name="text" type="text_ws" indexed="true" stored="false" multiValued="true"/>
-
     <!--                     End of QuickGO Ontology fields                         -->
     <!-- ========================================================================== -->
 
