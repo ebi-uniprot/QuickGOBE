@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Defines beans and configuration related to queries, which can
+ * be used to access the underlying data store.
+ *
  * Created 19/01/16
  * @author Edd
  */
