@@ -91,6 +91,7 @@
     <!--
        <lib path="../a-jar-that-does-not-exist.jar" />
     -->
+    <lib path="${solr.similarity.plugin}"/>
 
     <!-- Data Directory
 
