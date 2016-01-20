@@ -35,9 +35,10 @@ import org.springframework.data.solr.core.SolrTemplate;
  * @author Edd
  */
 @Configuration
-@Import({RepoConfig.class, QueryConfig.class})
+@Import({RepoConfig.class, QueryConfig.class, ServiceProperties.class})
 @ComponentScan({"uk.ac.ebi.quickgo.service"})
 public class ServiceConfig {
+
     @Bean
     public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository) {
         return new OntologyServiceImpl<>(ontologyRepository, goDocumentConverter(), OntologyType.GO);
@@ -65,13 +66,19 @@ public class ServiceConfig {
     @Bean
     public RequestRetrieval<OBOTerm> solrRequestRetrieval(
             SolrTemplate ontologyTemplate,
-            QueryRequestConverter<SolrQuery> solrQueryRequestConverter) {
+            QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter,
+            ServiceProperties serviceProperties) {
+
         OntologySolrQueryResultConverter resultConverter = new OntologySolrQueryResultConverter(
                 new DocumentObjectBinder(),
                 new GODocConverter(),
                 new ECODocConverter()
         );
 
-        return new SolrRequestRetrieval<>(ontologyTemplate, solrQueryRequestConverter, resultConverter);
+        return new SolrRequestRetrieval<>(
+                ontologyTemplate,
+                solrSelectQueryRequestConverter,
+                resultConverter,
+                serviceProperties.getOntologySearchSolrReturnedFields());
     }
 }

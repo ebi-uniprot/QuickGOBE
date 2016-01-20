@@ -18,7 +18,7 @@ class FieldQuery extends QuickGOQuery {
     }
 
     private void checkArgumentNullOrEmpty(String input, String inputType) {
-        Preconditions.checkArgument(input != null && input.length() > 0, inputType + " type can not be null");
+        Preconditions.checkArgument(input != null && input.length() > 0, inputType + " type cannot be null");
     }
 
     @Override public <T> T accept(QueryVisitor<T> visitor) {

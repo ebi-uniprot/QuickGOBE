@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.rest.controller.search;
 
 import uk.ac.ebi.quickgo.repo.solr.query.model.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.controller.QueryableField;
 
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Component;
@@ -15,26 +14,26 @@ public class StringToQuickGOQueryConverter {
 
     private static final int SEPARATOR_PRESENT = -1;
 
-    private QueryableField queryableField;
+    private SearchableField searchableField;
     private String defaultSearchField;
 
     private StringToQuickGOQueryConverter() {}
 
-    public StringToQuickGOQueryConverter(QueryableField queryableField) {
-        Preconditions.checkArgument(queryableField != null, "Queryable field checker can not be null");
+    public StringToQuickGOQueryConverter(SearchableField searchableField) {
+        Preconditions.checkArgument(searchableField != null, "Searchable field checker cannot be null");
 
-        this.queryableField = queryableField;
+        this.searchableField = searchableField;
     }
 
-    public StringToQuickGOQueryConverter(String defaultSearchField, QueryableField queryableField) {
-        this(queryableField);
+    public StringToQuickGOQueryConverter(String defaultSearchField, SearchableField searchableField) {
+        this(searchableField);
 
-        Preconditions.checkArgument(defaultSearchField != null, "Default search field can not be null");
+        Preconditions.checkArgument(defaultSearchField != null, "Default search field cannot be null");
         this.defaultSearchField = defaultSearchField;
     }
 
     public QuickGOQuery convert(String queryText) {
-        Preconditions.checkArgument(queryText != null && queryText.trim().length() > 0, "Query can not be null");
+        Preconditions.checkArgument(queryText != null && queryText.trim().length() > 0, "Query cannot be null");
 
         return convertToQuery(queryText);
     }
@@ -48,7 +47,7 @@ public class StringToQuickGOQueryConverter {
         String value;
 
         if (fieldSeparatorPos != SEPARATOR_PRESENT
-                && queryableField.isQueryableField(field = query.substring(0, fieldSeparatorPos))) {
+                && searchableField.isSearchable(field = query.substring(0, fieldSeparatorPos))) {
             value = query.substring(fieldSeparatorPos + 1, query.length());
 
             quickGoQuery = QuickGOQuery.createQuery(field, value);

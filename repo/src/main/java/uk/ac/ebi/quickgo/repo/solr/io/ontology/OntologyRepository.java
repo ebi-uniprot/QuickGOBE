@@ -1,12 +1,12 @@
 package uk.ac.ebi.quickgo.repo.solr.io.ontology;
 
-import org.springframework.data.solr.repository.Query;
-import org.springframework.data.solr.repository.SolrCrudRepository;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 
 import java.util.Optional;
+import org.springframework.data.solr.repository.Query;
+import org.springframework.data.solr.repository.SolrCrudRepository;
 
-import static uk.ac.ebi.quickgo.repo.solr.io.ontology.OntologyField.*;
+import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyField.*;
 
 /**
  * Ontology repository interface exposing methods for performing searches over its contents.

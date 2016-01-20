@@ -16,8 +16,8 @@ public class Page {
     private int pageSize;
 
     public Page(int pageNumber, int pageSize) {
-        Preconditions.checkArgument(pageNumber >= 0, "Page number can not be less than 0");
-        Preconditions.checkArgument(pageSize > 0, "Page result size can not be less than 1");
+        Preconditions.checkArgument(pageNumber >= 0, "Page number cannot be less than 0");
+        Preconditions.checkArgument(pageSize > 0, "Page result size cannot be less than 1");
 
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;

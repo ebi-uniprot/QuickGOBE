@@ -19,7 +19,7 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
 
     public SolrQueryConverter(String requestHandler) {
         Preconditions.checkArgument(requestHandler != null && !requestHandler.trim().isEmpty(),
-                "Request handler name can not be null or empty");
+                "Request handler name cannot be null or empty");
         this.requestHandler = requestHandler;
     }
 
@@ -43,7 +43,7 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
     }
 
     @Override public SolrQuery convert(QueryRequest request) {
-        Preconditions.checkArgument(request != null, "Can not convert null query request");
+        Preconditions.checkArgument(request != null, "Cannot convert null query request");
 
         final SolrQuery solrQuery = new SolrQuery();
 

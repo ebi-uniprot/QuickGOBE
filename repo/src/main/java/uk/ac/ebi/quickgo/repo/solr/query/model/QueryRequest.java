@@ -49,7 +49,7 @@ public class QueryRequest {
         private List<QuickGOQuery> filters;
 
         public Builder(QuickGOQuery query) {
-            Preconditions.checkArgument(query != null, "Query can not be null");
+            Preconditions.checkArgument(query != null, "Query cannot be null");
 
             this.query = query;
             facets = new ArrayList<>();

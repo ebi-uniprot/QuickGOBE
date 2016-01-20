@@ -22,24 +22,35 @@ public class SolrRequestRetrieval<T> implements RequestRetrieval<T> {
     private SolrTemplate solrTemplate;
     private QueryResultConverter<T, QueryResponse> resultConverter;
     private QueryRequestConverter<SolrQuery> queryRequestConverter;
+    private final String[] retrievedSolrFields;
 
     public SolrRequestRetrieval(
             SolrTemplate solrTemplate,
             QueryRequestConverter<SolrQuery> queryRequestConverter,
-            QueryResultConverter<T, QueryResponse> resultConverter) {
+            QueryResultConverter<T, QueryResponse> resultConverter,
+            String[] solrFieldsToRetrieve) {
         this.solrTemplate = requireNonNull(solrTemplate);
         this.resultConverter = requireNonNull(resultConverter);
         this.queryRequestConverter = requireNonNull(queryRequestConverter);
+        this.retrievedSolrFields = requireNonNull(solrFieldsToRetrieve);
     }
 
     @Override public QueryResult<T> findByQuery(QueryRequest request) {
         SolrQuery query = queryRequestConverter.convert(request);
+
+        configureQuery(query);
 
         try {
             QueryResponse response = solrTemplate.getSolrServer().query(query);
             return resultConverter.convert(response, request);
         } catch (SolrServerException e) {
             throw new RetrievalException(e);
+        }
+    }
+
+    protected void configureQuery(SolrQuery query) {
+        if (retrievedSolrFields.length > 0) {
+            query.setFields(retrievedSolrFields);
         }
     }
 }
