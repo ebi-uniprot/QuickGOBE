@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.repo.solr.io.ontology;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -16,10 +14,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.repo.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.repo.solr.config.RepoConfig;
-import uk.ac.ebi.quickgo.repo.solr.document.geneproduct.GeneProductDocument;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyType;
-import uk.ac.ebi.quickgo.repo.solr.io.geneproduct.GeneProductRepository;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -51,13 +47,7 @@ public class OntologyRepositoryIT {
     private OntologyRepository ontologyRepository;
 
     @Autowired
-    private GeneProductRepository geneProductRepository;
-
-    @Autowired
     private SolrTemplate ontologyTemplate;
-
-    @Autowired
-    private SolrTemplate geneProductTemplate;
 
     @Before
     public void before() {
