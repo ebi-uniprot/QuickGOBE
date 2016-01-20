@@ -20,7 +20,7 @@ public class QueryConfig {
     public static final String SOLR_QUERY_REQUEST_HANDLER = "/select";
 
     @Bean
-    public QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter() {
-        return new SolrQueryConverter(SOLR_QUERY_REQUEST_HANDLER);
+    public QueryRequestConverter<SolrQuery> ontologySolrQueryRequestConverter() {
+        return new SolrQueryConverter("/search");
     }
 }

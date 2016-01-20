@@ -59,12 +59,12 @@ public class ServiceConfig {
 
     // search beans
     @Bean
-    public SearchService<OBOTerm> ontologySearchService(RequestRetrieval<OBOTerm> solrRequestRetrieval) {
-        return new OntologySearchServiceImpl(solrRequestRetrieval);
+    public SearchService<OBOTerm> ontologySearchService(RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval) {
+        return new OntologySearchServiceImpl(ontologySolrRequestRetrieval);
     }
 
     @Bean
-    public RequestRetrieval<OBOTerm> solrRequestRetrieval(
+    public RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval(
             SolrTemplate ontologyTemplate,
             QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter,
             ServiceProperties serviceProperties) {

@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.repo.solr.io.ontology;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -16,10 +14,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.repo.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.repo.solr.config.RepoConfig;
-import uk.ac.ebi.quickgo.repo.solr.document.geneproduct.GeneProductDocument;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyType;
-import uk.ac.ebi.quickgo.repo.solr.io.geneproduct.GeneProductRepository;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -51,13 +47,7 @@ public class OntologyRepositoryIT {
     private OntologyRepository ontologyRepository;
 
     @Autowired
-    private GeneProductRepository geneProductRepository;
-
-    @Autowired
     private SolrTemplate ontologyTemplate;
-
-    @Autowired
-    private SolrTemplate geneProductTemplate;
 
     @Before
     public void before() {
@@ -205,30 +195,4 @@ public class OntologyRepositoryIT {
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(5L));
     }
-
-    @Test
-    public void canAddGeneProductDocumentDirectlyToServer() throws IOException, SolrServerException {
-        GeneProductDocument doc = new GeneProductDocument();
-        doc.dbObjectId = "thing";
-        doc.id = "1";
-
-        geneProductTemplate.getSolrServer().addBean(doc);
-        geneProductTemplate.commit();
-
-        QueryResponse response = geneProductTemplate.getSolrServer().query(new SolrQuery("*:*"));
-        System.out.println("-----> " + response);
-    }
-
-    @Test
-    public void canAddGeneProductDocumentViaRepository() {
-        GeneProductDocument doc = new GeneProductDocument();
-        doc.dbObjectId = "thing";
-        doc.id = "1";
-
-        geneProductRepository.save(doc);
-
-        Iterable<GeneProductDocument> geneProductDocuments = geneProductRepository.findAll();
-        geneProductDocuments.forEach(foundDoc -> System.out.println("FOUND " + foundDoc + "!"));
-    }
-
 }
