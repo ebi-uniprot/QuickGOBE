@@ -397,4 +397,5 @@
          the default is fine for most applications.
          For more info: http://wiki.apache.org/solr/SchemaXml#Similarity
       -->
+    <similarity class="uk.ac.ebi.quickgo.repo.solr.similarity.GoSimilarity"/>
 </schema>
