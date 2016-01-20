@@ -205,30 +205,4 @@ public class OntologyRepositoryIT {
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(5L));
     }
-
-    @Test
-    public void canAddGeneProductDocumentDirectlyToServer() throws IOException, SolrServerException {
-        GeneProductDocument doc = new GeneProductDocument();
-        doc.dbObjectId = "thing";
-        doc.id = "1";
-
-        geneProductTemplate.getSolrServer().addBean(doc);
-        geneProductTemplate.commit();
-
-        QueryResponse response = geneProductTemplate.getSolrServer().query(new SolrQuery("*:*"));
-        System.out.println("-----> " + response);
-    }
-
-    @Test
-    public void canAddGeneProductDocumentViaRepository() {
-        GeneProductDocument doc = new GeneProductDocument();
-        doc.dbObjectId = "thing";
-        doc.id = "1";
-
-        geneProductRepository.save(doc);
-
-        Iterable<GeneProductDocument> geneProductDocuments = geneProductRepository.findAll();
-        geneProductDocuments.forEach(foundDoc -> System.out.println("FOUND " + foundDoc + "!"));
-    }
-
 }
