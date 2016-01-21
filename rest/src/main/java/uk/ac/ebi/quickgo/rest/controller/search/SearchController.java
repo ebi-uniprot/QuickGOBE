@@ -40,11 +40,10 @@ public class SearchController {
     @Autowired
     public SearchController(
             SearchService<OBOTerm> ontologySearchService,
-            OntologyFieldSpec ontologyFieldSpec,
-            StringToQuickGOQueryConverter ontologyQueryConverter) {
+            OntologyFieldSpec ontologyFieldSpec) {
         this.ontologySearchService = requireNonNull(ontologySearchService);
         this.ontologyFieldSpec = ontologyFieldSpec;
-        this.ontologyQueryConverter = requireNonNull(ontologyQueryConverter);
+        this.ontologyQueryConverter = new StringToQuickGOQueryConverter(ontologyFieldSpec);
     }
 
     /**
