@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.rest.controller.search;
 /**
  * Checks if a given value is a searchable field
  */
-public class OntologySearchableField implements SearchableField {
+public class OntologyField implements SearchableField {
     public enum Search {
         synonymName,
         id,
