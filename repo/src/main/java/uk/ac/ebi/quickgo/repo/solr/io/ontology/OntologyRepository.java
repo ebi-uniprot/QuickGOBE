@@ -17,7 +17,6 @@ import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyField.*;
  * Created 11/11/15
  * @author Edd
  */
-//@NoRepositoryBean -- use in conjunction with @
 public interface OntologyRepository extends SolrCrudRepository<OntologyDocument, String> {
 
     String QUERY_ONTOLOGY_TYPE_AND_ID = ONTOLOGY_TYPE + ":?0 AND " + ID + ":?1";
