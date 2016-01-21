@@ -76,7 +76,7 @@ public class ServiceConfig {
         );
 
         return new SolrRequestRetrieval<>(
-                ontologyTemplate,
+                ontologyTemplate.getSolrServer(),
                 solrSelectQueryRequestConverter,
                 resultConverter,
                 serviceProperties.getOntologySearchSolrReturnedFields());
