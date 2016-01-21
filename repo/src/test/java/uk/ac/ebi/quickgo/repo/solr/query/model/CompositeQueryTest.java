@@ -34,7 +34,7 @@ public class CompositeQueryTest {
             new CompositeQuery(queries, queryOp);
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is("Queries to compose can not be null or empty"));
+            assertThat(e.getMessage(), is("Queries to compose cannot be null or empty"));
         }
     }
 
@@ -47,7 +47,7 @@ public class CompositeQueryTest {
             new CompositeQuery(queries, queryOp);
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is("Queries to compose can not be null or empty"));
+            assertThat(e.getMessage(), is("Queries to compose cannot be null or empty"));
         }
     }
 
@@ -62,7 +62,7 @@ public class CompositeQueryTest {
             new CompositeQuery(queries, queryOp);
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is("Logical query operator can not be null"));
+            assertThat(e.getMessage(), is("Logical query operator cannot be null"));
         }
     }
 

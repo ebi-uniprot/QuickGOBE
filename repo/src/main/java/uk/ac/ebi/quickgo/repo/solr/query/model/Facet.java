@@ -14,7 +14,7 @@ public class Facet {
     private String field;
 
     public Facet(String field) {
-        Preconditions.checkArgument(field != null && field.length() > 0, "Facet field can not be null or empty");
+        Preconditions.checkArgument(field != null && field.length() > 0, "Facet field cannot be null or empty");
 
         this.field = field;
     }

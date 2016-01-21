@@ -16,8 +16,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class QueryConfig {
+
+    public static final String SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER = "/search";
+
     @Bean
     public QueryRequestConverter<SolrQuery> ontologySolrQueryRequestConverter() {
-        return new SolrQueryConverter("/search");
+        return new SolrQueryConverter(SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER);
     }
 }

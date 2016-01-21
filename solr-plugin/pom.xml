@@ -2,14 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-    <groupId>uk.ac.ebi.quickgo</groupId>
+    <parent>
+        <artifactId>quickgo-parent</artifactId>
+        <groupId>uk.ac.ebi.quickgo</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>0.0.1-SNAPSHOT</version>
 
     <artifactId>solr-plugin</artifactId>
-    <name>GO Solr plugins</name>
-    <description>Contains all of the QuickGo specific plugins for Solr</description>
+    <name>QuickGO Solr plugins</name>
+    <description>Contains all of the QuickGO specific plugins for Solr</description>
 
     <dependencies>
         <!-- Required by embedded solr server -->

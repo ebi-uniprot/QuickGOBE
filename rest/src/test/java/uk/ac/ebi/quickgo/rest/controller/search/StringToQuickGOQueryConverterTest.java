@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.rest.controller.search;
 
 import uk.ac.ebi.quickgo.repo.solr.query.model.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.controller.QueryableField;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,40 +24,40 @@ public class StringToQuickGOQueryConverterTest {
     private StringToQuickGOQueryConverter converter;
 
     @Mock
-    private QueryableField queryableFieldMock;
+    private SearchableField searchableFieldMock;
 
     @Before
     public void setUp() throws Exception {
-        converter = new StringToQuickGOQueryConverter(DEFAULT_FIELD, queryableFieldMock);
+        converter = new StringToQuickGOQueryConverter(DEFAULT_FIELD, searchableFieldMock);
     }
 
     @Test
     public void nullDefaultFieldInTwoParamConstructorThrowsException() throws Exception {
         try {
-            new StringToQuickGOQueryConverter(null, queryableFieldMock);
+            new StringToQuickGOQueryConverter(null, searchableFieldMock);
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is("Default search field can not be null"));
+            assertThat(e.getMessage(), is("Default search field cannot be null"));
         }
     }
 
     @Test
-    public void nullQueryableFieldInTwoParamConstructorThrowsException() throws Exception {
+    public void nullSearchableFieldInTwoParamConstructorThrowsException() throws Exception {
         try {
             new StringToQuickGOQueryConverter(DEFAULT_FIELD, null);
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is("Queryable field checker can not be null"));
+            assertThat(e.getMessage(), is("Searchable field checker cannot be null"));
         }
     }
 
     @Test
-    public void nullQueryableFieldInSingleParamConstructorThrowsException() throws Exception {
+    public void nullSearchableFieldInSingleParamConstructorThrowsException() throws Exception {
         try {
             new StringToQuickGOQueryConverter(null);
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is("Queryable field checker can not be null"));
+            assertThat(e.getMessage(), is("Searchable field checker cannot be null"));
         }
     }
 
@@ -68,7 +67,7 @@ public class StringToQuickGOQueryConverterTest {
         String value = "value1";
         String queryText = concatFieldValueIntoQuery(field, value);
 
-        when(queryableFieldMock.isQueryableField(field)).thenReturn(true);
+        when(searchableFieldMock.isSearchable(field)).thenReturn(true);
 
         QuickGOQuery query = converter.convert(queryText);
 
@@ -81,7 +80,7 @@ public class StringToQuickGOQueryConverterTest {
     public void converterWithDefaultFieldConvertsValueIntoFieldAndValueQuery() throws Exception {
         String value = "value1";
 
-        when(queryableFieldMock.isQueryableField(value)).thenReturn(false);
+        when(searchableFieldMock.isSearchable(value)).thenReturn(false);
 
         QuickGOQuery query = converter.convert(value);
 
@@ -92,11 +91,11 @@ public class StringToQuickGOQueryConverterTest {
 
     @Test
     public void converterWithoutDefaultFieldConvertsValueIntoValueOnlyQuery() throws Exception {
-        converter = new StringToQuickGOQueryConverter(queryableFieldMock);
+        converter = new StringToQuickGOQueryConverter(searchableFieldMock);
 
         String value = "value1";
 
-        when(queryableFieldMock.isQueryableField(value)).thenReturn(false);
+        when(searchableFieldMock.isSearchable(value)).thenReturn(false);
 
         QuickGOQuery query = converter.convert(value);
 
@@ -110,7 +109,7 @@ public class StringToQuickGOQueryConverterTest {
                                                                                                        Exception {
         String value = "va:lue1";
 
-        when(queryableFieldMock.isQueryableField("va")).thenReturn(false);
+        when(searchableFieldMock.isSearchable("va")).thenReturn(false);
 
         QuickGOQuery query = converter.convert(value);
 
@@ -122,11 +121,11 @@ public class StringToQuickGOQueryConverterTest {
     @Test
     public void converterWithoutDefaultFieldConvertsValueContainingFieldDelimiterIntoValueOnlyQuery() throws
                                                                                                        Exception {
-        converter = new StringToQuickGOQueryConverter(queryableFieldMock);
+        converter = new StringToQuickGOQueryConverter(searchableFieldMock);
 
         String value = "va:lue1";
 
-        when(queryableFieldMock.isQueryableField("va")).thenReturn(false);
+        when(searchableFieldMock.isSearchable("va")).thenReturn(false);
 
         QuickGOQuery query = converter.convert(value);
 

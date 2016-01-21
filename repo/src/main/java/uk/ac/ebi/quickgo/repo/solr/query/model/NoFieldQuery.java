@@ -11,7 +11,7 @@ class NoFieldQuery extends QuickGOQuery {
     private final String value;
 
     public NoFieldQuery(String value) {
-        Preconditions.checkArgument(value != null && !value.trim().isEmpty(), "Value can not be null or empty");
+        Preconditions.checkArgument(value != null && !value.trim().isEmpty(), "Value cannot be null or empty");
         this.value = value;
     }
 

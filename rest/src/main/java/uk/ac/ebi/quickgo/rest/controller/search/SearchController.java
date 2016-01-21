@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.ac.ebi.quickgo.repo.solr.query.model.QueryRequest.Builder;
 
@@ -34,13 +35,15 @@ public class SearchController {
 
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchService<OBOTerm> ontologySearchService;
+    private final OntologyFieldSpec ontologyFieldSpec;
 
     @Autowired
     public SearchController(
-            StringToQuickGOQueryConverter ontologyQueryConverter,
-            SearchService<OBOTerm> ontologySearchService) {
+            SearchService<OBOTerm> ontologySearchService,
+            OntologyFieldSpec ontologyFieldSpec) {
         this.ontologySearchService = requireNonNull(ontologySearchService);
-        this.ontologyQueryConverter = requireNonNull(ontologyQueryConverter);
+        this.ontologyFieldSpec = ontologyFieldSpec;
+        this.ontologyQueryConverter = new StringToQuickGOQueryConverter(ontologyFieldSpec);
     }
 
     /**
@@ -64,7 +67,8 @@ public class SearchController {
                 page,
                 filterQueries,
                 facets,
-                ontologyQueryConverter);
+                ontologyQueryConverter,
+                ontologyFieldSpec);
         return search(request, ontologySearchService);
     }
 
@@ -99,10 +103,22 @@ public class SearchController {
         return page >= 0;
     }
 
-    private QueryRequest buildRequest(String query, int limit, int page, List<String> filterQueries,
-            List<String> facets, StringToQuickGOQueryConverter converter) {
+    private boolean isValidFacets(SearchableField searchableField, List<String> facets) {
+        if (nonNull(facets)) {
+            for (String facet : facets) {
+                if (!searchableField.isSearchable(facet)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
-        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page)) {
+    private QueryRequest buildRequest(String query, int limit, int page, List<String> filterQueries,
+            List<String> facets, StringToQuickGOQueryConverter converter, SearchableField fieldSpec) {
+
+        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page) || !isValidFacets
+                (fieldSpec, facets)) {
             return null;
         } else {
             Builder builder = new Builder(converter.convert(query));

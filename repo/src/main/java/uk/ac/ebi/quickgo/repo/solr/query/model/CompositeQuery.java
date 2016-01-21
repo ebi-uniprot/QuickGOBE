@@ -15,8 +15,8 @@ class CompositeQuery extends QuickGOQuery {
 
     public CompositeQuery(Set<QuickGOQuery> queries, QueryOp operator) {
         Preconditions.checkArgument(queries != null && !queries.isEmpty(),
-                "Queries to compose can not be null or empty");
-        Preconditions.checkArgument(operator != null, "Logical query operator can not be null");
+                "Queries to compose cannot be null or empty");
+        Preconditions.checkArgument(operator != null, "Logical query operator cannot be null");
 
         this.queryOperator = operator;
         this.queries = Collections.unmodifiableSet(queries);
