@@ -47,18 +47,17 @@ public class OntologySearchResultsIT {
 
     @Before
     public void setup() {
+        repository.deleteAll();
+
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .build();
     }
 
-    //goIdMatches exactly
-    //partial id match returns some results
-
     @Test
-    public void idThatMatchesNoStoredEntriesReturnsEmptyResult() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:0000001", "mitochondrion inheritance");
-        OntologyDocument doc2 = createDoc("GO:0000002", "mitochondrial genome maintenance");
-        OntologyDocument doc3 = createDoc("GO:0000003", "reproduction");
+    public void nonMatchingIdInQueryReturnsNoEntries() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go2");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go3");
 
         repository.save(doc1);
         repository.save(doc2);
@@ -69,40 +68,195 @@ public class OntologySearchResultsIT {
                 .andExpect(jsonPath("$.results.*", hasSize(0)));
     }
 
-
-
-//    @Test
-//    public void partialMatchInNAmeTakesPrecedenceOverPartialMatchInName() throws Exception {
-//        OntologyDocument doc1 = createDoc("GO:1900119", "positive regulation of execution phase of apoptosis",
-//                "upregulation of execution phase of apoptosis");
-//        OntologyDocument doc2 = createDoc("GO:0097194", "execution phase of apoptosis",
-//                "execution phase of apoptotic process");
-//        OntologyDocument doc3 = createDoc("GO:0006915", "apoptotic process", "apoptosis");
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//        repository.save(doc3);
-//
-//        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "apoptosis"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.results[0].id").value("GO:0006915"));
-//    }
-
     @Test
-    public void exactMatchInSynonymTakesPrecedenceOverPartialMatchInName() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:1900119", "positive regulation of execution phase of apoptosis",
-                "upregulation of execution phase of apoptosis");
-        OntologyDocument doc2 = createDoc("GO:0097194", "execution phase of apoptosis",
-                "execution phase of apoptotic process");
-        OntologyDocument doc3 = createDoc("GO:0006915", "apoptotic process", "apoptosis");
+    public void idInQueryMatchesExactlyOneEntryReturnsThatEntry() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go2");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go3");
 
         repository.save(doc1);
         repository.save(doc2);
         repository.save(doc3);
 
-        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "apoptosis"))
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "GO:0000002"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].id").value("GO:0006915"));
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"));
+    }
+
+    @Test
+    public void partiallyMatchingIdInQueryReturnsNoEntries() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go2");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go3");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "GO:000000"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(0)));
+    }
+
+    @Test
+    public void nonMatchingNameInQueryReturnsNoEntries() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go2");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go3");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go4"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(0)));
+    }
+
+    @Test
+    public void substringQueryPartiallyMatchesNameInEntry2ReturnsEntry2() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "substring1");
+        OntologyDocument doc2 = createDoc("GO:0000002", "substitute2");
+        OntologyDocument doc3 = createDoc("GO:0000003", "subsistence3");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "substi"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"));
+    }
+
+    @Test
+    public void substringQueryPartiallyMatchesSynonymInEntry2ReturnsEntry2() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1", "substring1");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go2", "substitute2");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go3", "subsistence3");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "substi"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"));
+    }
+
+    @Test
+    public void queryPartiallyMatchesNameInEntry1AndPartiallyMatchesSynonymInEntry2ReturnsEntry1FirstAndEntry2Second()
+            throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1 with something");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go2", "synonym of go1");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go3", "another synonym");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(2)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))
+                .andExpect(jsonPath("$.results[1].id").value("GO:0000002"));
+    }
+
+    @Test
+    public void queryPartiallyMatchesNameInEntry1AndExactMatchesNameInEntry2ReturnsEntry2FirstAndEntry1Second()
+            throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1 with something");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go1");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go3");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(2)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"))
+                .andExpect(jsonPath("$.results[1].id").value("GO:0000001"));
+    }
+
+    @Test
+    public void queryPartiallyMatchesNameInEntry1AndExactMatchesSynonymInEntry2ReturnsEntry2FirstAndEntry1Second()
+            throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1 with something");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go2", "go1");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go3", "another synonym");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(2)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"))
+                .andExpect(jsonPath("$.results[1].id").value("GO:0000001"));
+    }
+
+    @Test
+    public void namesInEntriesDoNotCompletelyMatchMultiWordQueryReturnsNoEntries() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1 with something");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go1 do something else");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go1 up then down");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1 and"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(0)));
+    }
+
+    @Test
+    public void namesInEntryMatchAllWordsInMultiWordQueryReturnsMatchingEntry() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1 up and down");
+
+        repository.save(doc1);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1 and"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"));
+    }
+
+    @Test
+    public void multiWordQueryMatchesPartiallyNameInEntry1AndExactMatchesNameInEntry2ReturnsEntry2ThenEntry1()
+            throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1 up and down");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go1 and ");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1 and"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(2)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"))
+                .andExpect(jsonPath("$.results[1].id").value("GO:0000001"));
+    }
+
+    @Test
+    public void multiWordQueryMatchesPartiallyNameInEntry1AndExactMatchesSynonymInEntry2ReturnsEntry2ThenEntry1()
+            throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1 up and down");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go2", "go1 and");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1 and"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(2)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"))
+                .andExpect(jsonPath("$.results[1].id").value("GO:0000001"));
     }
 
     private static OntologyDocument createDoc(String id, String name, String... synonyms) {
