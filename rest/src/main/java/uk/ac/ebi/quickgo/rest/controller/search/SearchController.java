@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.ac.ebi.quickgo.repo.solr.query.model.QueryRequest.Builder;
 
@@ -34,12 +35,15 @@ public class SearchController {
 
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchService<OBOTerm> ontologySearchService;
+    private final OntologyField ontologyField;
 
     @Autowired
     public SearchController(
-            StringToQuickGOQueryConverter ontologyQueryConverter,
-            SearchService<OBOTerm> ontologySearchService) {
+            SearchService<OBOTerm> ontologySearchService,
+            OntologyField ontologyField,
+            StringToQuickGOQueryConverter ontologyQueryConverter) {
         this.ontologySearchService = requireNonNull(ontologySearchService);
+        this.ontologyField = ontologyField;
         this.ontologyQueryConverter = requireNonNull(ontologyQueryConverter);
     }
 
@@ -99,10 +103,21 @@ public class SearchController {
         return page >= 0;
     }
 
+    private boolean isValidFacets(List<String> facets) {
+        if (nonNull(facets)) {
+            for (String facet : facets) {
+                if (!ontologyField.isSearchable(facet)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private QueryRequest buildRequest(String query, int limit, int page, List<String> filterQueries,
             List<String> facets, StringToQuickGOQueryConverter converter) {
 
-        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page)) {
+        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page) || !isValidFacets(facets)) {
             return null;
         } else {
             Builder builder = new Builder(converter.convert(query));
