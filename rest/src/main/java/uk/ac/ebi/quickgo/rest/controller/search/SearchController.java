@@ -35,15 +35,15 @@ public class SearchController {
 
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchService<OBOTerm> ontologySearchService;
-    private final OntologyField ontologyField;
+    private final OntologyFieldSpec ontologyFieldSpec;
 
     @Autowired
     public SearchController(
             SearchService<OBOTerm> ontologySearchService,
-            OntologyField ontologyField,
+            OntologyFieldSpec ontologyFieldSpec,
             StringToQuickGOQueryConverter ontologyQueryConverter) {
         this.ontologySearchService = requireNonNull(ontologySearchService);
-        this.ontologyField = ontologyField;
+        this.ontologyFieldSpec = ontologyFieldSpec;
         this.ontologyQueryConverter = requireNonNull(ontologyQueryConverter);
     }
 
@@ -68,7 +68,8 @@ public class SearchController {
                 page,
                 filterQueries,
                 facets,
-                ontologyQueryConverter);
+                ontologyQueryConverter,
+                ontologyFieldSpec);
         return search(request, ontologySearchService);
     }
 
@@ -103,10 +104,10 @@ public class SearchController {
         return page >= 0;
     }
 
-    private boolean isValidFacets(List<String> facets) {
+    private boolean isValidFacets(SearchableField searchableField, List<String> facets) {
         if (nonNull(facets)) {
             for (String facet : facets) {
-                if (!ontologyField.isSearchable(facet)) {
+                if (!searchableField.isSearchable(facet)) {
                     return false;
                 }
             }
@@ -115,9 +116,10 @@ public class SearchController {
     }
 
     private QueryRequest buildRequest(String query, int limit, int page, List<String> filterQueries,
-            List<String> facets, StringToQuickGOQueryConverter converter) {
+            List<String> facets, StringToQuickGOQueryConverter converter, SearchableField fieldSpec) {
 
-        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page) || !isValidFacets(facets)) {
+        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page) || !isValidFacets
+                (fieldSpec, facets)) {
             return null;
         } else {
             Builder builder = new Builder(converter.convert(query));
