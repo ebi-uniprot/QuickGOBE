@@ -1,8 +1,6 @@
-package uk.ac.ebi.quickgo.repo.solr.similarity;
+package uk.ac.ebi.quickgo.solr.similarity;
 
 import org.apache.lucene.search.similarities.DefaultSimilarity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Similarity scorer that ignores term frequencies. This effectively means that the amount of time a given term

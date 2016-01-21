@@ -1,6 +1,6 @@
-package uk.ac.ebi.quickgo.repo.solr;
+package uk.ac.ebi.quickgo.solr.similairty;
 
-import uk.ac.ebi.quickgo.repo.solr.similarity.GoSimilarity;
+import uk.ac.ebi.quickgo.solr.similarity.GoSimilarity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,5 +35,4 @@ public class GoSimilarityTest {
         assertThat(similarity.tf(7), is(1F));
         assertThat(similarity.tf(11), is(1F));
     }
-
 }
