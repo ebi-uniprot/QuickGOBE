@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.repo.solr;
 
+import java.io.File;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
@@ -14,8 +15,9 @@ import java.io.IOException;
  * @author Edd
  */
 public class TemporarySolrDataStore extends ExternalResource {
-    // the property defining the solr data store, used in solr core's solrconfig.xml files
+    // the following properties are defined in the solrconfig.xml files
     private static final String SOLR_DATA_DIR = "solr.data.dir";
+    private static final String SOLR_PLUGIN_JAR = "solr.similarity.plugin";
 
     @ClassRule
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -24,6 +26,18 @@ public class TemporarySolrDataStore extends ExternalResource {
     public void before() throws IOException {
         temporaryFolder.create();
         System.setProperty(SOLR_DATA_DIR, temporaryFolder.getRoot().getAbsolutePath());
+        System.setProperty(SOLR_PLUGIN_JAR, pathToSimilarityPlugin());
+    }
+
+    private String pathToSimilarityPlugin() {
+        File file = new File("../solr-plugin/target/similarity_plugin.jar");
+
+        if(!file.exists()) {
+            throw new IllegalStateException("similarity_plugin.jar does not exist. Please generated the jar before " +
+                    "running the tests");
+        }
+
+        return file.getAbsolutePath();
     }
 
     @Override
