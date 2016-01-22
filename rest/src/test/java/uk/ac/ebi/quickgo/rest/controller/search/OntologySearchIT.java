@@ -22,6 +22,22 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
+    public void requestWhichFindsNothingReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = OntologyDocMocker.createGODoc("GO:0000001", "go1");
+        saveToRepository(doc1);
+
+        checkValidEmptyResultsResponse("doesn't exist");
+    }
+
+    @Test
+    public void requestWhichAsksForPage0WithLimit0Returns400Response() throws Exception {
+        OntologyDocument doc1 = OntologyDocMocker.createGODoc("GO:0000001", "go1");
+        saveToRepository(doc1);
+
+        checkInvalidPageResponse("aaaa", 0, 0, HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
     public void requestWithNegativePageNumberReturns400Response() throws Exception {
         OntologyDocument doc1 = OntologyDocMocker.createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = OntologyDocMocker.createGODoc("GO:0000002", "go2");

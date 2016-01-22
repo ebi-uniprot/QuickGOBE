@@ -18,6 +18,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,17 +81,43 @@ public abstract class SearchControllerSetup {
      * @param limit the maximum number of entries that response holds
      * @throws Exception
      */
-    protected void checkValidPageResponse(String query, int pageNum, int limit) throws Exception {
+    protected void checkValidPageResponse(String query, int pageNum, int limit)
+            throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         clientRequest.param(PAGE_PARAM, String.valueOf(pageNum));
         clientRequest.param(LIMIT_PARAM, String.valueOf(limit));
 
         mockMvc.perform(clientRequest)
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pageInfo.resultsPerPage").value(limit))
                 .andExpect(jsonPath("$.pageInfo.current").value(pageNum))
                 .andExpect(jsonPath("$.pageInfo.total").value(new GreaterOrEqual<>(pageNum)));
+    }
+
+    /**
+     * Checks that a query returns a valid response, representing zero results. That is:
+     *
+     * <ul>
+     *     <li>0 as the current page</li>
+     *     <li>0 total results</li>
+     *     <li>the default number of entries per page</li>
+     * </ul>
+     *
+     * @param query the query that should return a response that contains no results.
+     * @throws Exception
+     */
+    protected void checkValidEmptyResultsResponse(String query) throws Exception {
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
+
+        mockMvc.perform(clientRequest)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pageInfo.resultsPerPage")
+                        .value(Integer.parseInt(SearchController.DEFAULT_ENTRIES_PER_PAGE)))
+                .andExpect(jsonPath("$.pageInfo.current").value(0))
+                .andExpect(jsonPath("$.pageInfo.total").value(0));
     }
 
     protected void checkInvalidFacetResponse(String query, String facet) throws Exception {

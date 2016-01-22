@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,6 +33,8 @@ import static uk.ac.ebi.quickgo.repo.solr.query.model.QueryRequest.Builder;
 @RequestMapping(value = "/QuickGO/internal/search")
 public class SearchController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchController.class);
+    protected static final String DEFAULT_ENTRIES_PER_PAGE = "25";
+    protected static final String DEFAULT_PAGE_NUMBER = "1";
 
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchService<OBOTerm> ontologySearchService;
@@ -53,11 +56,11 @@ public class SearchController {
      * @param query the query to search against
      * @param limit the amount of queries to return
      */
-    @RequestMapping(value = "/ontology", method = {RequestMethod.GET})
+    @RequestMapping(value = "/ontology", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(
             @RequestParam(value = "query") String query,
-            @RequestParam(value = "limit", defaultValue = "25") int limit,
-            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
+            @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "filterQuery", required = false) List<String> filterQueries,
             @RequestParam(value = "facet", required = false) List<String> facets) {
 
@@ -96,11 +99,11 @@ public class SearchController {
     }
 
     private boolean isValidNumRows(int rows) {
-        return rows >= 0;
+        return rows > 0;
     }
 
     private boolean isValidPage(int page) {
-        return page >= 0;
+        return page > 0;
     }
 
     private boolean isValidFacets(SearchableField searchableField, List<String> facets) {
