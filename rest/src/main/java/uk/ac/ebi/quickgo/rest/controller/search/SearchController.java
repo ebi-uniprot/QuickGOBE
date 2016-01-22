@@ -117,8 +117,7 @@ public class SearchController {
     private QueryRequest buildRequest(String query, int limit, int page, List<String> filterQueries,
             List<String> facets, StringToQuickGOQueryConverter converter, SearchableField fieldSpec) {
 
-        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page) || !isValidFacets
-                (fieldSpec, facets)) {
+        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page) || !isValidFacets(fieldSpec, facets)) {
             return null;
         } else {
             Builder builder = new Builder(converter.convert(query));
