@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.rest.QuickGOREST;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
+import org.mockito.internal.matchers.GreaterOrEqual;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,6 +36,8 @@ public abstract class SearchControllerSetup {
 
     private static final String QUERY_PARAM = "query";
     private static final String FACET_PARAM = "facet";
+    private static final String PAGE_PARAM = "page";
+    private static final String LIMIT_PARAM = "limit";
 
     protected String resourceUrl;
 
@@ -49,9 +52,49 @@ public abstract class SearchControllerSetup {
                 .build();
     }
 
+    /**
+     * Verifies that a request with an invalid page related parameter will received a 400 response.
+     *
+     * @param query a query in order to get a valid response
+     * @param pageNum the page to return
+     * @param limit the maximum number of entries that response holds
+     * @param errorStatus the expectedErrorStatus code returned from the server
+     * @throws Exception
+     */
+    protected void checkInvalidPageResponse(String query, int pageNum, int limit, int errorStatus) throws Exception {
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
+
+        clientRequest.param(PAGE_PARAM, String.valueOf(pageNum));
+        clientRequest.param(LIMIT_PARAM, String.valueOf(limit));
+
+        mockMvc.perform(clientRequest)
+                .andExpect(status().is(errorStatus));
+    }
+
+    /**
+     * Checks whether the page object in the JSON response contains the expected values for: number of entries per
+     * page, the number of the current page being displayed, and the total amount of pages.
+     *
+     * @param query a query in order to get a valid response
+     * @param pageNum the page to return
+     * @param limit the maximum number of entries that response holds
+     * @throws Exception
+     */
+    protected void checkValidPageResponse(String query, int pageNum, int limit) throws Exception {
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
+
+        clientRequest.param(PAGE_PARAM, String.valueOf(pageNum));
+        clientRequest.param(LIMIT_PARAM, String.valueOf(limit));
+
+        mockMvc.perform(clientRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pageInfo.resultsPerPage").value(limit))
+                .andExpect(jsonPath("$.pageInfo.current").value(pageNum))
+                .andExpect(jsonPath("$.pageInfo.total").value(new GreaterOrEqual<>(pageNum)));
+    }
+
     protected void checkInvalidFacetResponse(String query, String facet) throws Exception {
-        MockHttpServletRequestBuilder clientRequest = get(resourceUrl)
-                .param(QUERY_PARAM, query);
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         addFacetsToRequest(clientRequest, facet);
 
@@ -60,14 +103,17 @@ public abstract class SearchControllerSetup {
     }
 
     protected void checkValidFacetResponse(String query, String... facets) throws Exception {
-        MockHttpServletRequestBuilder clientRequest = get(resourceUrl)
-                .param(QUERY_PARAM, query);
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         addFacetsToRequest(clientRequest, facets);
 
         mockMvc.perform(clientRequest)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.facet.facetFields.*", hasSize(facets.length)));
+    }
+
+    private MockHttpServletRequestBuilder createRequest(String query) {
+        return get(resourceUrl).param(QUERY_PARAM, query);
     }
 
     private void addFacetsToRequest(MockHttpServletRequestBuilder clientRequest, String... facets) {
