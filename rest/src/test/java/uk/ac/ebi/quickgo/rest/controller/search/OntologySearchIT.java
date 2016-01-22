@@ -39,7 +39,7 @@ public class OntologySearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("go", "aspect");
+        checkValidFacetResponse("go", OntologyFieldSpec.Search.aspect.name());
     }
 
     @Test
@@ -50,11 +50,12 @@ public class OntologySearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("go", "aspect", "ontologyType");
+        checkValidFacetResponse("go", OntologyFieldSpec.Search.aspect.name(),
+                OntologyFieldSpec.Search.ontologyType.name());
     }
 
     private void saveToRepository(OntologyDocument... documents) {
-        for(OntologyDocument doc : documents) {
+        for (OntologyDocument doc : documents) {
             repository.save(doc);
         }
     }
