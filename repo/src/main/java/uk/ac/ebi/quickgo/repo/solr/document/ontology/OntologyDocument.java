@@ -13,70 +13,70 @@ import org.apache.solr.client.solrj.beans.Field;
  */
 public class OntologyDocument implements QuickGODocument {
 
-    @Field(OntologyField.ID)
+    @Field(OntologyFields.ID)
     public String id;
 
-    @Field(OntologyField.ONTOLOGY_TYPE)
+    @Field(OntologyFields.ONTOLOGY_TYPE)
     public String ontologyType;
 
-    @Field(OntologyField.NAME)
+    @Field(OntologyFields.NAME)
     public String name;
 
-    @Field(OntologyField.IS_OBSOLETE)
+    @Field(OntologyFields.IS_OBSOLETE)
     public boolean isObsolete;
 
-    @Field(OntologyField.DEFINITION)
+    @Field(OntologyFields.DEFINITION)
     public String definition;
 
-    @Field(OntologyField.COMMENT)
+    @Field(OntologyFields.COMMENT)
     public String comment;
 
-    @Field(OntologyField.SECONDARY_ID)
+    @Field(OntologyFields.SECONDARY_ID)
     public List<String> secondaryIds;
 
-    @Field(OntologyField.USAGE)
+    @Field(OntologyFields.USAGE)
     public String usage;
 
-    @Field(OntologyField.SYNONYM)
+    @Field(OntologyFields.SYNONYM)
     public List<String> synonyms;
 
-    @Field(OntologyField.SYNONYM_NAME)
+    @Field(OntologyFields.SYNONYM_NAME)
     public List<String> synonymNames;
 
-    @Field(OntologyField.SUBSET)
+    @Field(OntologyFields.SUBSET)
     public List<String> subsets;
 
-    @Field(OntologyField.REPLACED_BY)
+    @Field(OntologyFields.REPLACED_BY)
     public String replacedBy;
 
-    @Field(OntologyField.CONSIDER)
+    @Field(OntologyFields.CONSIDER)
     public List<String> considers;
 
-    @Field(OntologyField.CHILDREN)
+    @Field(OntologyFields.CHILDREN)
     public List<String> children;
 
-    @Field(OntologyField.ANCESTOR)
+    @Field(OntologyFields.ANCESTOR)
     public List<String> ancestors;
 
-    @Field(OntologyField.ASPECT)
+    @Field(OntologyFields.ASPECT)
     public String aspect;
 
-    @Field(OntologyField.HISTORY)
+    @Field(OntologyFields.HISTORY)
     public List<String> history;
 
-    @Field(OntologyField.XREF)
+    @Field(OntologyFields.XREF)
     public List<String> xrefs;
 
-    @Field(OntologyField.TAXON_CONSTRAINT)
+    @Field(OntologyFields.TAXON_CONSTRAINT)
     public List<String> taxonConstraints;
 
-    @Field(OntologyField.BLACKLIST)
+    @Field(OntologyFields.BLACKLIST)
     public List<String> blacklist;
 
-    @Field(OntologyField.ANNOTATION_GUIDELINE)
+    @Field(OntologyFields.ANNOTATION_GUIDELINE)
     public List<String> annotationGuidelines;
 
-    @Field(OntologyField.XRELATION)
+    @Field(OntologyFields.XRELATION)
     public List<String> xRelations;
 
     @Override

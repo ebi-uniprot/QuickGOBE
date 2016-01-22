@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
-import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyField.*;
+import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyFields.*;
 
 /**
  * Ontology repository interface exposing methods for performing searches over its contents.
