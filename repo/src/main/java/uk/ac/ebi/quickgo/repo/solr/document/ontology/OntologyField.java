@@ -10,7 +10,6 @@ import java.util.Set;
  * @author Edd
  */
 public class OntologyField {
-    static final Set<String> VALUES = new HashSet<>();
 
     // all fields from ontology's schema.xml
     public final static String ID = "id";
@@ -46,31 +45,27 @@ public class OntologyField {
     public static final class Retrievable extends OntologyField {
         public static final Set<String> VALUES = new HashSet<>();
 
-        public static final String ID = storeAndGet(OntologyField.ID);
-        public static final String ONTOLOGY_TYPE = storeAndGet(OntologyField.ONTOLOGY_TYPE);
-        public static final String NAME = storeAndGet(OntologyField.NAME);
-        public static final String IS_OBSOLETE = storeAndGet(OntologyField.IS_OBSOLETE);
-        public static final String CONSIDER = storeAndGet(OntologyField.CONSIDER);
-        public static final String REPLACED_BY = storeAndGet(OntologyField.REPLACED_BY);
-        public static final String DEFINITION = storeAndGet(OntologyField.DEFINITION);
-        public static final String COMMENT = storeAndGet(OntologyField.COMMENT);
-        public static final String ASPECT = storeAndGet(OntologyField.ASPECT);
-        public static final String USAGE = storeAndGet(OntologyField.USAGE);
-        public static final String SUBSET = storeAndGet(OntologyField.SUBSET);
-        public static final String CHILDREN = storeAndGet(OntologyField.CHILDREN);
-        public static final String ANCESTOR = storeAndGet(OntologyField.ANCESTOR);
-        public static final String SYNONYM = storeAndGet(OntologyField.SYNONYM);
-        public static final String HISTORY = storeAndGet(OntologyField.HISTORY);
-        public static final String XREF = storeAndGet(OntologyField.XREF);
-        public static final String ANNOTATION_GUIDELINE = storeAndGet(OntologyField.ANNOTATION_GUIDELINE);
-        public static final String TAXON_CONSTRAINT = storeAndGet(OntologyField.TAXON_CONSTRAINT);
-        public static final String XRELATION = storeAndGet(OntologyField.XRELATION);
-        public static final String BLACKLIST = storeAndGet(OntologyField.BLACKLIST);
-        public static final String SECONDARY_ID = storeAndGet(OntologyField.SECONDARY_ID);
-
-        public static String storeAndGet(String value) {
-            return OntologyField.setAndGet(VALUES, value);
-        }
+        public static final String ID = storeAndGet(VALUES, OntologyField.ID);
+        public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, OntologyField.ONTOLOGY_TYPE);
+        public static final String NAME = storeAndGet(VALUES, OntologyField.NAME);
+        public static final String IS_OBSOLETE = storeAndGet(VALUES, OntologyField.IS_OBSOLETE);
+        public static final String CONSIDER = storeAndGet(VALUES, OntologyField.CONSIDER);
+        public static final String REPLACED_BY = storeAndGet(VALUES, OntologyField.REPLACED_BY);
+        public static final String DEFINITION = storeAndGet(VALUES, OntologyField.DEFINITION);
+        public static final String COMMENT = storeAndGet(VALUES, OntologyField.COMMENT);
+        public static final String ASPECT = storeAndGet(VALUES, OntologyField.ASPECT);
+        public static final String USAGE = storeAndGet(VALUES, OntologyField.USAGE);
+        public static final String SUBSET = storeAndGet(VALUES, OntologyField.SUBSET);
+        public static final String CHILDREN = storeAndGet(VALUES, OntologyField.CHILDREN);
+        public static final String ANCESTOR = storeAndGet(VALUES, OntologyField.ANCESTOR);
+        public static final String SYNONYM = storeAndGet(VALUES, OntologyField.SYNONYM);
+        public static final String HISTORY = storeAndGet(VALUES, OntologyField.HISTORY);
+        public static final String XREF = storeAndGet(VALUES, OntologyField.XREF);
+        public static final String ANNOTATION_GUIDELINE = storeAndGet(VALUES, OntologyField.ANNOTATION_GUIDELINE);
+        public static final String TAXON_CONSTRAINT = storeAndGet(VALUES, OntologyField.TAXON_CONSTRAINT);
+        public static final String XRELATION = storeAndGet(VALUES, OntologyField.XRELATION);
+        public static final String BLACKLIST = storeAndGet(VALUES, OntologyField.BLACKLIST);
+        public static final String SECONDARY_ID = storeAndGet(VALUES, OntologyField.SECONDARY_ID);
     }
 
     /**
@@ -79,21 +74,13 @@ public class OntologyField {
     public static final class Searchable {
         public static final Set<String> VALUES = new HashSet<>();
 
-        public static final String ID = storeAndGet(OntologyField.ID);
-        public static final String NAME = storeAndGet(OntologyField.NAME);
-        public static final String DEFINITION = storeAndGet(OntologyField.DEFINITION);
-        public static final String SYNONYM_NAME = storeAndGet(OntologyField.SYNONYM_NAME);
-
-        public static String storeAndGet(String value) {
-            return OntologyField.setAndGet(VALUES, value);
-        }
+        public static final String ID = storeAndGet(VALUES, OntologyField.ID);
+        public static final String NAME = storeAndGet(VALUES, OntologyField.NAME);
+        public static final String DEFINITION = storeAndGet(VALUES, OntologyField.DEFINITION);
+        public static final String SYNONYM_NAME = storeAndGet(VALUES, OntologyField.SYNONYM_NAME);
     }
-
-    public static String setAndGet(String value) {
-        return OntologyField.setAndGet(VALUES, value);
-    }
-
-    private static String setAndGet(Set<String> values, String value) {
+    
+    private static String storeAndGet(Set<String> values, String value) {
         values.add(value);
         return value;
     }
