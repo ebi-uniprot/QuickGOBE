@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller.search;
 
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyField;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -7,16 +9,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class OntologyFieldSpec implements SearchableField {
-    public enum Search {
-        synonymName,
-        id,
-        name,
-        definition
-    }
-
     @Override public boolean isSearchable(String field) {
-        for (Search searchableField : Search.values()) {
-            if (searchableField.name().equals(field)) {
+        for (String searchableField : OntologyField.Searchable.VALUES) {
+            if (searchableField.equals(field)) {
                 return true;
             }
         }

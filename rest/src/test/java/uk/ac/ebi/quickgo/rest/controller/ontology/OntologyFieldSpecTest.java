@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.controller.ontology;
 
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyField;
 import uk.ac.ebi.quickgo.rest.controller.search.OntologyFieldSpec;
 
 import org.junit.BeforeClass;
@@ -22,8 +23,8 @@ public class OntologyFieldSpecTest {
 
     @Test
     public void allSearchableFieldsAreSearchable() {
-        for (OntologyFieldSpec.Search field : OntologyFieldSpec.Search.values()) {
-            assertThat(ontologyQueryableField.isSearchable(field.name()), is(true));
+        for (String field : OntologyField.Searchable.VALUES) {
+            assertThat(ontologyQueryableField.isSearchable(field), is(true));
         }
     }
 
