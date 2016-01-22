@@ -11,7 +11,9 @@ public class OntologyFieldSpec implements SearchableField {
         synonymName,
         id,
         name,
-        definition
+        definition,
+        aspect,
+        ontologyType
     }
 
     @Override public boolean isSearchable(String field) {
