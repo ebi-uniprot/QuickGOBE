@@ -55,7 +55,7 @@ public class OntologySearchResultsIT {
 
     @Test
     public void nonMatchingIdInQueryReturnsNoEntries() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:0000001", "go1", "s1");
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1");
         OntologyDocument doc2 = createDoc("GO:0000002", "go2");
         OntologyDocument doc3 = createDoc("GO:0000003", "go3");
 
@@ -275,7 +275,7 @@ public class OntologySearchResultsIT {
     }
 
     @Test
-    public void whenQueryMatchesDocumentsEquallyResultsAreOrderedByShortestToLongest() throws Exception{
+    public void whenQueryMatchesDocumentsEquallyResultsAreOrderedByShortestToLongest() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 has a particularly long function");
         OntologyDocument doc2 = createDoc("GO:0000002", "go1 has a long function");
         OntologyDocument doc3 = createDoc("GO:0000003", "go1 a function");
@@ -290,6 +290,24 @@ public class OntologySearchResultsIT {
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000003"))
                 .andExpect(jsonPath("$.results[1].id").value("GO:0000002"))
                 .andExpect(jsonPath("$.results[2].id").value("GO:0000001"));
+    }
+
+    @Test
+    public void whenQueryMatches2FieldsInFirstDocAnd1FieldInSecondDocResultsAreOrderedByNumOfMatches() throws
+                                                                                                       Exception {
+        OntologyDocument doc2 = createDoc("GO:0000001", "name one", "some synonym");
+        OntologyDocument doc1 = createDoc("GO:0000002", "name one", "synonym one");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go1 a function");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "name one"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(2)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"))
+                .andExpect(jsonPath("$.results[1].id").value("GO:0000001"));
     }
 
     private static OntologyDocument createDoc(String id, String name, String... synonyms) {
