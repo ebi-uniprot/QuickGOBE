@@ -55,7 +55,7 @@ public class OntologySearchResultsIT {
 
     @Test
     public void nonMatchingIdInQueryReturnsNoEntries() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:0000001", "go1", "s1");
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1");
         OntologyDocument doc2 = createDoc("GO:0000002", "go2");
         OntologyDocument doc3 = createDoc("GO:0000003", "go3");
 
