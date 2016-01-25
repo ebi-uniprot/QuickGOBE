@@ -33,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class OntologySearchResultsIT {
     private static final String RESOURCE_URL = "/QuickGO/internal/search/ontology";
     private static final String QUERY_PARAM = "query";
+    private static final String FILTER_QUERY_PARAM = "filterQuery";
 
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
@@ -308,6 +309,79 @@ public class OntologySearchResultsIT {
                 .andExpect(jsonPath("$.results.*", hasSize(2)))
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000002"))
                 .andExpect(jsonPath("$.results[1].id").value("GO:0000001"));
+    }
+
+    // filter queries ------------------------------------------------
+    @Test
+    public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go function 1");
+        doc1.aspect = "Process";
+        OntologyDocument doc2 = createDoc("GO:0000002", "go function 2");
+        doc2.aspect = "Function";
+        OntologyDocument doc3 = createDoc("GO:0000003", "go function 3");
+        doc3.aspect = "Process";
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL)
+                .param(QUERY_PARAM, "go function")
+                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.aspect.name() + ":Process"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(2)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))
+                .andExpect(jsonPath("$.results[1].id").value("GO:0000003"));
+    }
+
+    @Test
+    public void requestWith2ValidFilterQueryReturnsFilteredResponse() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go function 1");
+        doc1.aspect = "Process";
+        doc1.definition = "definition Klose";
+        OntologyDocument doc2 = createDoc("GO:0000002", "go function 2");
+        doc2.aspect = "Function";
+        doc2.definition = "definition Jerome";
+        OntologyDocument doc3 = createDoc("GO:0000003", "go function 3");
+        doc3.aspect = "Process";
+        doc3.definition = "definition Jerome";
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL)
+                .param(QUERY_PARAM, "go function")
+                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.aspect.name() + ":Process")
+                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.definition.name() + ":Klose"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"));
+    }
+
+    @Test
+    public void requestWith3ValidFilterQueryThatFindNothingZeroResultsAnd200Response() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go function 1");
+        doc1.aspect = "Process";
+        doc1.definition = "definition Klose";
+        OntologyDocument doc2 = createDoc("GO:0000002", "go function 2");
+        doc2.aspect = "Function";
+        doc2.definition = "definition Jerome";
+        OntologyDocument doc3 = createDoc("GO:0000003", "go function 3");
+        doc3.aspect = "Process";
+        doc3.definition = "definition Jerome";
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL)
+                .param(QUERY_PARAM, "go function")
+                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.aspect.name() + ":Process")
+                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.definition.name() + ":Klose")
+                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.definition.name() + ":Ibrahimovic"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(0)));
     }
 
     private static OntologyDocument createDoc(String id, String name, String... synonyms) {

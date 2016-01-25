@@ -12,6 +12,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -39,6 +40,7 @@ public abstract class SearchControllerSetup {
     private static final String FACET_PARAM = "facet";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
+    private static final String FILTER_QUERY_PARAM = "filterQuery";
 
     protected String resourceUrl;
 
@@ -62,11 +64,17 @@ public abstract class SearchControllerSetup {
      * @param errorStatus the expectedErrorStatus code returned from the server
      * @throws Exception
      */
-    protected void checkInvalidPageResponse(String query, int pageNum, int limit, int errorStatus) throws Exception {
+    protected void checkInvalidPageResponse(String query,
+            int pageNum,
+            int limit,
+            int errorStatus,
+            String... filterQueries) throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         clientRequest.param(PAGE_PARAM, String.valueOf(pageNum));
         clientRequest.param(LIMIT_PARAM, String.valueOf(limit));
+
+        addFiltersToRequest(clientRequest, filterQueries);
 
         mockMvc.perform(clientRequest)
                 .andExpect(status().is(errorStatus));
@@ -81,12 +89,16 @@ public abstract class SearchControllerSetup {
      * @param limit the maximum number of entries that response holds
      * @throws Exception
      */
-    protected void checkValidPageResponse(String query, int pageNum, int limit)
-            throws Exception {
+    protected void checkValidPageResponse(String query,
+            int pageNum,
+            int limit,
+            String... filterQueries) throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         clientRequest.param(PAGE_PARAM, String.valueOf(pageNum));
         clientRequest.param(LIMIT_PARAM, String.valueOf(limit));
+
+        addFiltersToRequest(clientRequest, filterQueries);
 
         mockMvc.perform(clientRequest)
                 .andDo(print())
@@ -120,6 +132,7 @@ public abstract class SearchControllerSetup {
                 .andExpect(jsonPath("$.pageInfo.total").value(0));
     }
 
+    // facets ---------------------------------------------------------
     protected void checkInvalidFacetResponse(String query, String facet) throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
@@ -139,13 +152,43 @@ public abstract class SearchControllerSetup {
                 .andExpect(jsonPath("$.facet.facetFields.*", hasSize(facets.length)));
     }
 
+    private void addFacetsToRequest(MockHttpServletRequestBuilder clientRequest, String... facets) {
+        addParamsToRequest(clientRequest, FACET_PARAM, facets);
+    }
+
+    // filter queries ---------------------------------------------------------
+    protected void checkInvalidFilterQueryResponse(String query, String... filterQuery) throws Exception {
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
+
+        addFiltersToRequest(clientRequest, filterQuery);
+
+        mockMvc.perform(clientRequest)
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    protected ResultActions checkValidFilterQueryResponse(String query, String... filterQuery)
+            throws Exception {
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
+
+        addFiltersToRequest(clientRequest, filterQuery);
+
+        return mockMvc.perform(clientRequest)
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    private void addFiltersToRequest(MockHttpServletRequestBuilder clientRequest, String... filters) {
+        addParamsToRequest(clientRequest, FILTER_QUERY_PARAM, filters);
+    }
+
     private MockHttpServletRequestBuilder createRequest(String query) {
         return get(resourceUrl).param(QUERY_PARAM, query);
     }
 
-    private void addFacetsToRequest(MockHttpServletRequestBuilder clientRequest, String... facets) {
-        for (String facet : facets) {
-            clientRequest = clientRequest.param(FACET_PARAM, facet);
+    private void addParamsToRequest(MockHttpServletRequestBuilder clientRequest, String paramName, String... params) {
+        for (String param : params) {
+            clientRequest = clientRequest.param(paramName, param);
         }
     }
 }

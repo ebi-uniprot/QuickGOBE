@@ -8,6 +8,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -43,7 +44,7 @@ public class SolrRequestRetrieval<T> implements RequestRetrieval<T> {
         try {
             QueryResponse response = solrServer.query(query);
             return resultConverter.convert(response, request);
-        } catch (SolrServerException | IllegalArgumentException e) {
+        } catch (SolrServerException | SolrException | IllegalArgumentException e) {
             throw new RetrievalException(e);
         }
     }

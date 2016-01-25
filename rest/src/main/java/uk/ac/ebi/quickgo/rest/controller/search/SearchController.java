@@ -7,6 +7,8 @@ import uk.ac.ebi.quickgo.service.search.RetrievalException;
 import uk.ac.ebi.quickgo.service.search.SearchService;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,7 @@ public class SearchController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchController.class);
     protected static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     protected static final String DEFAULT_PAGE_NUMBER = "1";
+    protected static final Pattern VALID_FILTER_QUERY_FORMAT = Pattern.compile("(\\w+):\\w+");
 
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchService<OBOTerm> ontologySearchService;
@@ -94,19 +97,19 @@ public class SearchController {
         return response;
     }
 
-    private boolean isValidQuery(String query) {
+    protected boolean isValidQuery(String query) {
         return query != null && query.trim().length() > 0;
     }
 
-    private boolean isValidNumRows(int rows) {
+    protected boolean isValidNumRows(int rows) {
         return rows > 0;
     }
 
-    private boolean isValidPage(int page) {
+    protected boolean isValidPage(int page) {
         return page > 0;
     }
 
-    private boolean isValidFacets(SearchableField searchableField, List<String> facets) {
+    protected boolean isValidFacets(SearchableField searchableField, List<String> facets) {
         if (nonNull(facets)) {
             for (String facet : facets) {
                 if (!searchableField.isSearchable(facet)) {
@@ -117,10 +120,27 @@ public class SearchController {
         return true;
     }
 
+    protected boolean isValidFilterQueries(SearchableField searchableField, List<String> filterQueries) {
+        if (nonNull(filterQueries)) {
+            for (String filterQuery : filterQueries) {
+                Matcher filterQueryMatcher = VALID_FILTER_QUERY_FORMAT.matcher(filterQuery);
+                if (!filterQueryMatcher.matches()
+                        || !searchableField.isSearchable(filterQueryMatcher.group(1))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private QueryRequest buildRequest(String query, int limit, int page, List<String> filterQueries,
             List<String> facets, StringToQuickGOQueryConverter converter, SearchableField fieldSpec) {
 
-        if (!isValidQuery(query) || !isValidNumRows(limit) || !isValidPage(page) || !isValidFacets(fieldSpec, facets)) {
+        if (!isValidQuery(query)
+                || !isValidNumRows(limit)
+                || !isValidPage(page)
+                || !isValidFacets(fieldSpec, facets)
+                || !isValidFilterQueries(fieldSpec, filterQueries)) {
             return null;
         } else {
             Builder builder = new Builder(converter.convert(query));

@@ -21,6 +21,7 @@ public class OntologySearchIT extends SearchControllerSetup {
         resourceUrl = ONTOLOGY_RESOURCE_URL;
     }
 
+    // response format ---------------------------------------------------------
     @Test
     public void requestWhichFindsNothingReturnsValidResponse() throws Exception {
         OntologyDocument doc1 = OntologyDocMocker.createGODoc("GO:0000001", "go1");
@@ -107,6 +108,7 @@ public class OntologySearchIT extends SearchControllerSetup {
         checkInvalidPageResponse("go", pageNum, entriesPerPage, HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
+    // facets ---------------------------------------------------------
     @Test
     public void requestWithInValidFacetFieldReturns400Response() throws Exception {
         OntologyDocument doc1 = OntologyDocMocker.createGODoc("GO:0000001", "go1");
@@ -140,6 +142,40 @@ public class OntologySearchIT extends SearchControllerSetup {
         checkValidFacetResponse("go", OntologyFieldSpec.Search.aspect.name(),
                 OntologyFieldSpec.Search.ontologyType.name());
     }
+
+    // filter queries ---------------------------------------------------------
+    @Test
+    public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
+        OntologyDocument doc1 = OntologyDocMocker.createGODoc("GO:0000001", "go1");
+        OntologyDocument doc2 = OntologyDocMocker.createGODoc("GO:0000002", "go2");
+        OntologyDocument doc3 = OntologyDocMocker.createGODoc("GO:0000003", "go3");
+
+
+        saveToRepository(doc1, doc2, doc3);
+
+        String[] filterQueries = new String[]{
+                OntologyFieldSpec.Search.aspect.name()+":Process"
+        };
+
+        checkValidPageResponse("go", 1, 10, filterQueries);
+    }
+
+    @Test
+    public void requestWithInvalidFilterQueryReturns400Response() throws Exception {
+        OntologyDocument doc1 = OntologyDocMocker.createGODoc("GO:0000001", "go1");
+        OntologyDocument doc2 = OntologyDocMocker.createGODoc("GO:0000002", "go2");
+        OntologyDocument doc3 = OntologyDocMocker.createGODoc("GO:0000003", "go3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        String[] filterQueries = new String[]{
+                "thisFieldDoesNotExist:Process"
+        };
+
+        checkInvalidPageResponse("go", 1, 10, HttpStatus.SC_BAD_REQUEST, filterQueries);
+    }
+
+
 
     private void saveToRepository(OntologyDocument... documents) {
         for (OntologyDocument doc : documents) {
