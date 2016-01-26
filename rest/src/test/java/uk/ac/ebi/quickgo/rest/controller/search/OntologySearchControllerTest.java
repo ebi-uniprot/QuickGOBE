@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.rest.controller.search;
 
-import uk.ac.ebi.quickgo.repo.solr.query.model.QueryRequest;
-import uk.ac.ebi.quickgo.repo.solr.query.results.QueryResult;
 import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
 import uk.ac.ebi.quickgo.service.search.SearchService;
 
@@ -9,10 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.mock;
 
 /**
  * Unit tests for the {@link SearchController}. Primarily tests
@@ -22,14 +22,18 @@ import static org.mockito.Mockito.mock;
  * Created 25/01/16
  * @author Edd
  */
+@RunWith(MockitoJUnitRunner.class)
 public class OntologySearchControllerTest {
     private SearchController searchController;
     private OntologyFieldSpec ontologyFieldSpec;
 
+    @Mock
+    private SearchService<OBOTerm> ontologyServiceMock;
+
     @Before
     public void setUp() {
         this.ontologyFieldSpec = new OntologyFieldSpec();
-        this.searchController = new SearchController(mock(FakeSearchService.class), ontologyFieldSpec);
+        this.searchController = new SearchController(ontologyServiceMock, ontologyFieldSpec);
     }
 
     // validate query ----------------------------------------------
@@ -136,12 +140,5 @@ public class OntologySearchControllerTest {
 
         filterQueries.add("aFieldThatDoesntExist:value"); // then add a non-searchable field
         assertThat(searchController.isValidFilterQueries(ontologyFieldSpec, filterQueries), is(false));
-    }
-
-    // a mock implementation of a class that requires a generic type parameter, SearchService<OBOTerm>
-    private static class FakeSearchService implements SearchService<OBOTerm> {
-        @Override public QueryResult<OBOTerm> findByQuery(QueryRequest request) {
-            return null;
-        }
     }
 }
