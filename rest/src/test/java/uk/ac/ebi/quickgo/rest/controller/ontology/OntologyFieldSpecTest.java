@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.controller.ontology;
 
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyFields;
 import uk.ac.ebi.quickgo.rest.controller.search.OntologyFieldSpec;
 
 import org.junit.BeforeClass;
@@ -13,22 +14,22 @@ import static org.hamcrest.core.Is.is;
  * @author Edd
  */
 public class OntologyFieldSpecTest {
-    private static OntologyFieldSpec ontologyQueryableField;
+    private static OntologyFieldSpec ontologyFieldSpec;
 
     @BeforeClass
     public static void setUpClass() {
-        ontologyQueryableField = new OntologyFieldSpec();
+        ontologyFieldSpec = new OntologyFieldSpec();
     }
 
     @Test
     public void allSearchableFieldsAreSearchable() {
-        for (OntologyFieldSpec.Search field : OntologyFieldSpec.Search.values()) {
-            assertThat(ontologyQueryableField.isSearchable(field.name()), is(true));
+        for (String field : OntologyFields.Searchable.VALUES) {
+            assertThat(ontologyFieldSpec.isSearchable(field), is(true));
         }
     }
 
     @Test
     public void unknownFieldsAreNotSearchable() {
-        assertThat(ontologyQueryableField.isSearchable("barbie"), is(false));
+        assertThat(ontologyFieldSpec.isSearchable("barbie"), is(false));
     }
 }
