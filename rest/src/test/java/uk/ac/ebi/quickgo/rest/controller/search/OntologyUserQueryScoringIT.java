@@ -25,12 +25,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Does several functional tests to verify if the user queries sent to the server return the expected results.
+ * Runs several functional tests to check if the user query, expressed in the client request, obtains a correct
+ * response from the server.
+ *
+ * The tests check if the query should return something, and if so in which order.
+ *
+ * The search order requirements are expressed in: https://www.ebi.ac.uk/panda/jira/browse/GOA-1708
+ *
+ * <b>Note: This class should be used solely for functional tests on the user query, and no other section of the user
+ * request.</b>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {QuickGOREST.class})
 @WebAppConfiguration
-public class OntologySearchResultsIT {
+public class OntologyUserQueryScoringIT {
     private static final String RESOURCE_URL = "/QuickGO/internal/search/ontology";
     private static final String QUERY_PARAM = "query";
     private static final String FILTER_QUERY_PARAM = "filterQuery";
@@ -332,56 +340,6 @@ public class OntologySearchResultsIT {
                 .andExpect(jsonPath("$.results.*", hasSize(2)))
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))
                 .andExpect(jsonPath("$.results[1].id").value("GO:0000003"));
-    }
-
-    @Test
-    public void requestWith2ValidFilterQueryReturnsFilteredResponse() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:0000001", "go function 1");
-        doc1.aspect = "Process";
-        doc1.definition = "definition Klose";
-        OntologyDocument doc2 = createDoc("GO:0000002", "go function 2");
-        doc2.aspect = "Function";
-        doc2.definition = "definition Jerome";
-        OntologyDocument doc3 = createDoc("GO:0000003", "go function 3");
-        doc3.aspect = "Process";
-        doc3.definition = "definition Jerome";
-
-        repository.save(doc1);
-        repository.save(doc2);
-        repository.save(doc3);
-
-        mockMvc.perform(get(RESOURCE_URL)
-                .param(QUERY_PARAM, "go function")
-                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.aspect.name() + ":Process")
-                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.definition.name() + ":Klose"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results.*", hasSize(1)))
-                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"));
-    }
-
-    @Test
-    public void requestWith3ValidFilterQueryThatFindNothingZeroResultsAnd200Response() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:0000001", "go function 1");
-        doc1.aspect = "Process";
-        doc1.definition = "definition Klose";
-        OntologyDocument doc2 = createDoc("GO:0000002", "go function 2");
-        doc2.aspect = "Function";
-        doc2.definition = "definition Jerome";
-        OntologyDocument doc3 = createDoc("GO:0000003", "go function 3");
-        doc3.aspect = "Process";
-        doc3.definition = "definition Jerome";
-
-        repository.save(doc1);
-        repository.save(doc2);
-        repository.save(doc3);
-
-        mockMvc.perform(get(RESOURCE_URL)
-                .param(QUERY_PARAM, "go function")
-                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.aspect.name() + ":Process")
-                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.definition.name() + ":Klose")
-                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.definition.name() + ":Ibrahimovic"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results.*", hasSize(0)));
     }
 
     private static OntologyDocument createDoc(String id, String name, String... synonyms) {

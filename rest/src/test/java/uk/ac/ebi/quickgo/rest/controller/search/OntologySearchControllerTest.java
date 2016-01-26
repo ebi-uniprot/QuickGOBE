@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 /**
  * Unit tests for the {@link SearchController}. Primarily tests
  * user request validation logic. Functional / integration tests are covered by
- * {@link OntologySearchIT} and {@link OntologySearchResultsIT}.
+ * {@link OntologySearchIT} and {@link OntologyUserQueryScoringIT}.
  *
  * Created 25/01/16
  * @author Edd
