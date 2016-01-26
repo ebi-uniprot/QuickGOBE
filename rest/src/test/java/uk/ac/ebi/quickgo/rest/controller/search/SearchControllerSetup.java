@@ -64,17 +64,14 @@ public abstract class SearchControllerSetup {
      * @param errorStatus the expectedErrorStatus code returned from the server
      * @throws Exception
      */
-    protected void checkInvalidPageResponse(String query,
+    protected void checkInvalidPageInfoInResponse(String query,
             int pageNum,
             int limit,
-            int errorStatus,
-            String... filterQueries) throws Exception {
+            int errorStatus) throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         clientRequest.param(PAGE_PARAM, String.valueOf(pageNum));
         clientRequest.param(LIMIT_PARAM, String.valueOf(limit));
-
-        addFiltersToRequest(clientRequest, filterQueries);
 
         mockMvc.perform(clientRequest)
                 .andExpect(status().is(errorStatus));
@@ -89,16 +86,13 @@ public abstract class SearchControllerSetup {
      * @param limit the maximum number of entries that response holds
      * @throws Exception
      */
-    protected void checkValidPageResponse(String query,
+    protected void checkValidPageInfoInResponse(String query,
             int pageNum,
-            int limit,
-            String... filterQueries) throws Exception {
+            int limit ) throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         clientRequest.param(PAGE_PARAM, String.valueOf(pageNum));
         clientRequest.param(LIMIT_PARAM, String.valueOf(limit));
-
-        addFiltersToRequest(clientRequest, filterQueries);
 
         mockMvc.perform(clientRequest)
                 .andDo(print())
@@ -167,7 +161,7 @@ public abstract class SearchControllerSetup {
                 .andExpect(status().isBadRequest());
     }
 
-    protected ResultActions checkValidFilterQueryResponse(String query, String... filterQuery)
+    protected ResultActions checkValidFilterQueryResponse(String query, int expectedResponseSize, String... filterQuery)
             throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
@@ -175,7 +169,8 @@ public abstract class SearchControllerSetup {
 
         return mockMvc.perform(clientRequest)
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(expectedResponseSize)));
     }
 
     private void addFiltersToRequest(MockHttpServletRequestBuilder clientRequest, String... filters) {
