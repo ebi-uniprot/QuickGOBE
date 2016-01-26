@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.rest.controller.search;
 
 import uk.ac.ebi.quickgo.repo.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyFields;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.repo.solr.io.ontology.OntologyRepository;
 import uk.ac.ebi.quickgo.rest.QuickGOREST;
@@ -335,7 +336,7 @@ public class OntologyUserQueryScoringIT {
 
         mockMvc.perform(get(RESOURCE_URL)
                 .param(QUERY_PARAM, "go function")
-                .param(FILTER_QUERY_PARAM, OntologyFieldSpec.Search.aspect.name() + ":Process"))
+                .param(FILTER_QUERY_PARAM, OntologyFields.Searchable.ASPECT + ":Process"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.*", hasSize(2)))
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))

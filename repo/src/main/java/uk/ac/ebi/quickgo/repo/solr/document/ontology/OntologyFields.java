@@ -74,9 +74,11 @@ public class OntologyFields {
     public static final class Searchable {
         public static final Set<String> VALUES = new HashSet<>();
 
+        public static final String ASPECT = storeAndGet(VALUES, OntologyFields.ASPECT);
         public static final String ID = storeAndGet(VALUES, OntologyFields.ID);
-        public static final String NAME = storeAndGet(VALUES, OntologyFields.NAME);
         public static final String DEFINITION = storeAndGet(VALUES, OntologyFields.DEFINITION);
+        public static final String NAME = storeAndGet(VALUES, OntologyFields.NAME);
+        public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, OntologyFields.ONTOLOGY_TYPE);
         public static final String SYNONYM_NAME = storeAndGet(VALUES, OntologyFields.SYNONYM_NAME);
     }
     

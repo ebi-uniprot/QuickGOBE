@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller.search;
 
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyFields;
 import uk.ac.ebi.quickgo.repo.solr.io.ontology.OntologyRepository;
 
 import org.apache.http.HttpStatus;
@@ -129,7 +130,7 @@ public class OntologySearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("go", OntologyFieldSpec.Search.aspect.name());
+        checkValidFacetResponse("go", OntologyFields.Searchable.ASPECT);
     }
 
     @Test
@@ -140,8 +141,8 @@ public class OntologySearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("go", OntologyFieldSpec.Search.aspect.name(),
-                OntologyFieldSpec.Search.ontologyType.name());
+        checkValidFacetResponse("go", OntologyFields.Searchable.ASPECT,
+                OntologyFields.Searchable.NAME);
     }
 
     // filter queries ---------------------------------------------------------
@@ -171,7 +172,7 @@ public class OntologySearchIT extends SearchControllerSetup {
         repository.save(doc2);
         repository.save(doc3);
 
-        String fq = buildFilterQuery(OntologyFieldSpec.Search.aspect.name(), "Process");
+        String fq = buildFilterQuery(OntologyFields.Searchable.ASPECT, "Process");
 
         checkValidFilterQueryResponse("go function", 2, fq);
     }
@@ -192,9 +193,9 @@ public class OntologySearchIT extends SearchControllerSetup {
         repository.save(doc2);
         repository.save(doc3);
 
-        String fq1 = buildFilterQuery(OntologyFieldSpec.Search.aspect.name(), "Process");
-        String fq2 = buildFilterQuery(OntologyFieldSpec.Search.definition.name(), "Klose");
-        String fq3 = buildFilterQuery(OntologyFieldSpec.Search.definition.name(), "Ibrahimovic");
+        String fq1 = buildFilterQuery(OntologyFields.Searchable.ASPECT, "Process");
+        String fq2 = buildFilterQuery(OntologyFields.Searchable.DEFINITION, "Klose");
+        String fq3 = buildFilterQuery(OntologyFields.Searchable.DEFINITION, "Ibrahimovic");
 
         checkValidFilterQueryResponse("go function", 0, fq1, fq2, fq3);
     }
@@ -212,7 +213,7 @@ public class OntologySearchIT extends SearchControllerSetup {
         repository.save(doc2);
         repository.save(doc3);
 
-        String fq = buildFilterQuery(OntologyFieldSpec.Search.aspect.name(), "Process");
+        String fq = buildFilterQuery(OntologyFields.Searchable.ASPECT, "Process");
 
         checkValidFilterQueryResponse("go function", 3, fq);
     }
