@@ -1,8 +1,9 @@
-package uk.ac.ebi.quickgo.rest.controller;
+package uk.ac.ebi.quickgo.rest.controller.ontology;
 
-import org.springframework.test.web.servlet.ResultActions;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 

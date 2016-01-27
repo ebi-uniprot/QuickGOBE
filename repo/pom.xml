@@ -63,15 +63,37 @@
                 <version>2.6</version>
                 <executions>
                     <execution>
+                        <id>test-jar</id>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>solr-similarity-plugin</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>similarity_plugin</finalName>
+                            <includes>
+                                <include>**/similarity/*</include>
+                            </includes>
+                            <outputDirectory>${project.build.directory}/solr/plugin</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>repo-jar</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/similarity/*</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
-
     </build>
-
-
 </project>

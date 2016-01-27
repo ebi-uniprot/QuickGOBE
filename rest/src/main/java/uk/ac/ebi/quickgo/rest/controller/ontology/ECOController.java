@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.rest.controller;
+package uk.ac.ebi.quickgo.rest.controller.ontology;
 
 import uk.ac.ebi.quickgo.service.OntologyService;
 import uk.ac.ebi.quickgo.service.model.ontology.ECOTerm;

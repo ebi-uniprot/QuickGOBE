@@ -1,11 +1,5 @@
 package uk.ac.ebi.quickgo.repowriter.reader.converter;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
 import uk.ac.ebi.quickgo.ff.loader.ontology.GOLoader;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
@@ -22,6 +16,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -119,6 +119,7 @@ public class GOTermToODocConverterTest {
         when(taxonConstraint.getName()).thenReturn("name1");
         when(taxonConstraint.relationship()).thenReturn("rel1");
         when(taxonConstraint.getTaxId()).thenReturn("taxId1");
+        when(taxonConstraint.taxIdType()).thenReturn("taxIdType1");
         when(taxonConstraint.getTaxonName()).thenReturn("taxName1");
 
         when(term.getTaxonConstraints()).thenReturn(Collections.singletonList(taxonConstraint));
@@ -127,9 +128,14 @@ public class GOTermToODocConverterTest {
         assertThat(taxConsStrList, is(not(nullValue())));
         assertThat(taxConsStrList.size(), is(1));
         assertThat(taxConsStrList.get(0).contains("goId1"), is(true));
-        assertThat(taxConsStrList.get(0).contains("rel1"), is(true));
-        assertThat(taxConsStrList.get(0).contains("taxName1"), is(true));
         assertThat(taxConsStrList.get(0).contains("name1"), is(true));
+        assertThat(taxConsStrList.get(0).contains("rel1"), is(true));
+        assertThat(taxConsStrList.get(0).contains("taxId1"), is(true));
+        assertThat(taxConsStrList.get(0).contains("taxIdType1"), is(true));
+        assertThat(taxConsStrList.get(0).contains("taxName1"), is(true));
+        assertThat(taxConsStrList.get(0).contains("taxName1"), is(true));
+        assertThat(taxConsStrList.get(0).contains("pubmed1"), is(true));
+        assertThat(taxConsStrList.get(0).contains("pubmed2"), is(true));
     }
 
     @Test

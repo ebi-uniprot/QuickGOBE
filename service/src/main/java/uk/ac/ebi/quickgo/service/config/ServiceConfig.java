@@ -1,18 +1,30 @@
 package uk.ac.ebi.quickgo.service.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import uk.ac.ebi.quickgo.repo.solr.config.QueryConfig;
 import uk.ac.ebi.quickgo.repo.solr.config.RepoConfig;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyType;
 import uk.ac.ebi.quickgo.repo.solr.io.ontology.OntologyRepository;
+import uk.ac.ebi.quickgo.repo.solr.query.model.QueryRequestConverter;
 import uk.ac.ebi.quickgo.service.OntologyService;
 import uk.ac.ebi.quickgo.service.OntologyServiceImpl;
 import uk.ac.ebi.quickgo.service.converter.ontology.ECODocConverter;
 import uk.ac.ebi.quickgo.service.converter.ontology.GODocConverter;
 import uk.ac.ebi.quickgo.service.model.ontology.ECOTerm;
 import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
+import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
+import uk.ac.ebi.quickgo.service.search.RequestRetrieval;
+import uk.ac.ebi.quickgo.service.search.SearchService;
+import uk.ac.ebi.quickgo.service.search.SolrRequestRetrieval;
+import uk.ac.ebi.quickgo.service.search.ontology.OntologySearchServiceImpl;
+import uk.ac.ebi.quickgo.service.search.ontology.OntologySolrQueryResultConverter;
+
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.solr.core.SolrTemplate;
 
 /**
  * Spring configuration for the service layer, which depends on the repositories
@@ -23,9 +35,10 @@ import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
  * @author Edd
  */
 @Configuration
-@Import({RepoConfig.class})
+@Import({RepoConfig.class, QueryConfig.class, ServiceProperties.class})
 @ComponentScan({"uk.ac.ebi.quickgo.service"})
 public class ServiceConfig {
+
     @Bean
     public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository) {
         return new OntologyServiceImpl<>(ontologyRepository, goDocumentConverter(), OntologyType.GO);
@@ -42,5 +55,30 @@ public class ServiceConfig {
 
     private ECODocConverter ecoDocConverter() {
         return new ECODocConverter();
+    }
+
+    // search beans
+    @Bean
+    public SearchService<OBOTerm> ontologySearchService(RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval) {
+        return new OntologySearchServiceImpl(ontologySolrRequestRetrieval);
+    }
+
+    @Bean
+    public RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval(
+            SolrTemplate ontologyTemplate,
+            QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter,
+            ServiceProperties serviceProperties) {
+
+        OntologySolrQueryResultConverter resultConverter = new OntologySolrQueryResultConverter(
+                new DocumentObjectBinder(),
+                new GODocConverter(),
+                new ECODocConverter()
+        );
+
+        return new SolrRequestRetrieval<>(
+                ontologyTemplate.getSolrServer(),
+                solrSelectQueryRequestConverter,
+                resultConverter,
+                serviceProperties.getOntologySearchSolrReturnedFields());
     }
 }

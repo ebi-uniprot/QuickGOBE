@@ -21,13 +21,13 @@
     <!--                   Start of QuickGO Ontology fields                         -->
 
     <field name="id" type="lowercase" indexed="true" stored="true"/>
-    <field name="ontologyType" type="string" indexed="true" stored="false"/>
-    <field name="name" type="string" indexed="false" stored="true"/>
+    <field name="ontologyType" type="string" indexed="true" stored="true"/>
+    <field name="name" type="text_ignorecase" indexed="true" stored="true"/>
     <field name="secondaryId" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="isObsolete" type="boolean" indexed="false" stored="true"/>
     <field name="consider" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="replacedBy" type="string" indexed="false" stored="true"/>
-    <field name="definition" type="string" indexed="false" stored="true"/>
+    <field name="definition" type="text_ignorecase" indexed="true" stored="true"/>
     <field name="comment" type="string" indexed="false" stored="true"/>
     <field name="aspect" type="string" indexed="true" stored="true"/>
     <field name="usage" type="string" indexed="false" stored="true"/>
@@ -35,7 +35,7 @@
     <field name="children" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="ancestor" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="synonym" type="string" indexed="false" stored="true" multiValued="true"/>
-    <field name="synonymName" type="string" indexed="false" stored="false" multiValued="true"/>
+    <field name="synonymName" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
 
     <field name="history" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="xref" type="string" indexed="false" stored="true" multiValued="true"/>
@@ -437,4 +437,5 @@
          the default is fine for most applications.
          For more info: http://wiki.apache.org/solr/SchemaXml#Similarity
       -->
+    <java.uk.ac.ebi.quickgo.solr.similarity class="uk.ac.ebi.quickgo.solr.similarity.GoSimilarity"/>
 </schema>

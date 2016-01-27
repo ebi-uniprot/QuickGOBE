@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.repo.solr.io.ontology;
 
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.junit.Before;
@@ -10,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.repo.solr.TemporarySolrDataStore;
@@ -30,8 +30,9 @@ import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker.cr
 
 /**
  * Test that the ontology repository can be accessed as expected.
- *
+ * <p>
  * Created 11/11/15
+ *
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -46,7 +47,7 @@ public class OntologyRepositoryIT {
     private OntologyRepository ontologyRepository;
 
     @Autowired
-    private SolrServer server;
+    private SolrTemplate ontologyTemplate;
 
     @Before
     public void before() {
@@ -180,17 +181,17 @@ public class OntologyRepositoryIT {
      */
     @Test
     public void saveDirectlyToSolrServer() throws IOException, SolrServerException {
-        server.addBean(createGODoc("A", "Alice Cooper"));
-        server.addBean(createGODoc("B", "Alice Cooper"));
-        server.addBean(createGODoc("C", "Alice Cooper"));
-        server.addBeans(
+        ontologyTemplate.getSolrServer().addBean(createGODoc("A", "Alice Cooper"));
+        ontologyTemplate.getSolrServer().addBean(createGODoc("B", "Alice Cooper"));
+        ontologyTemplate.getSolrServer().addBean(createGODoc("C", "Alice Cooper"));
+        ontologyTemplate.getSolrServer().addBeans(
                 Arrays.asList(
                         createGODoc("D", "Alice Cooper"),
                         createGODoc("E", "Alice Cooper")));
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(0L));
 
-        server.commit();
+        ontologyTemplate.getSolrServer().commit();
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(5L));
     }
