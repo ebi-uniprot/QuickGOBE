@@ -28,17 +28,17 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
 
         if (termOptional.isPresent() && ontologyDocument.isPresent()) {
 
-            GOTerm goTerm = termOptional.get();
+            GOTerm term = termOptional.get();
             OntologyDocument doc = ontologyDocument.get();
 
-            doc.annotationGuidelines = extractAnnGuidelines(goTerm);
-            doc.aspect = goTerm.getAspect() == null?
-                    null : goTerm.getAspect().text;
-            doc.children = extractChildren(goTerm);
-            doc.taxonConstraints = extractTaxonConstraints(goTerm);
-            doc.usage = goTerm.getUsage() == null?
-                    null : goTerm.getUsage().getText();
-            doc.blacklist = extractBlacklist(goTerm);
+            doc.annotationGuidelines = extractAnnGuidelines(term);
+            doc.aspect = term.getAspect() == null?
+                    null : term.getAspect().text;
+            doc.children = extractChildren(term);
+            doc.taxonConstraints = extractTaxonConstraints(term);
+            doc.usage = term.getUsage() == null?
+                    null : term.getUsage().getText();
+            doc.blacklist = extractBlacklist(term);
 
             return Optional.of(doc);
         } else {

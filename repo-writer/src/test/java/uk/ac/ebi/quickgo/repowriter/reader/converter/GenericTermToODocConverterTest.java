@@ -1,16 +1,18 @@
 package uk.ac.ebi.quickgo.repowriter.reader.converter;
 
+import uk.ac.ebi.quickgo.model.ontology.generic.*;
+import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+
+import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import uk.ac.ebi.quickgo.model.ontology.generic.*;
-import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 
-import java.util.*;
-
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -209,12 +211,14 @@ public class GenericTermToODocConverterTest {
         when(term.getName()).thenReturn("name1");
         when(term.getOntologyType()).thenReturn("GO");
         when(term.secondaries()).thenReturn("sec1,sec2");
-        ArrayList<GenericTerm> replacedBy = new ArrayList<>();
+        when(term.getSubsetsNames()).thenReturn(Arrays.asList("goslim_generic", "goslim_yeast"));
 
+        ArrayList<GenericTerm> replacedBy = new ArrayList<>();
         GenericTerm replacementTerm = mock(GenericTerm.class);
         when(replacementTerm.getId()).thenReturn("replacement1");
         replacedBy.add(replacementTerm);
         when(term.replacedBy()).thenReturn(replacedBy);
+
 
         Optional<OntologyDocument> result = converter.apply(Optional.of(term));
         assertThat(result.isPresent(), is(true));
@@ -225,6 +229,7 @@ public class GenericTermToODocConverterTest {
         assertThat(document.name, is("name1"));
         assertThat(document.ontologyType, is("GO"));
         assertThat(document.secondaryIds, contains("sec1", "sec2"));
+        assertThat(document.subsets, contains("goslim_generic", "goslim_yeast"));
         assertThat(document.replacedBy, is("replacement1"));
     }
 

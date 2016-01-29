@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.service.converter.ontology;
 
-import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
+import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class BlackListFieldConverterTest {
                 .addField(newFlatFieldLeaf()) // no parameter means it's got no value
                 .buildString());
 
-        List<OBOTerm.BlacklistItem> blacklistItems = converter.convertFieldList(rawBlacklist);
+        List<GOTerm.BlacklistItem> blacklistItems = converter.convertFieldList(rawBlacklist);
         assertThat(blacklistItems.size(), is(2));
         assertThat(blacklistItems.get(0).goId, is("GO:0000001"));
         assertThat(blacklistItems.get(1).category, is("IS-qualified manual"));
@@ -66,7 +66,7 @@ public class BlackListFieldConverterTest {
 
     @Test
     public void gracefullyHandleWrongFieldCount() {
-        Optional<OBOTerm.BlacklistItem> result = converter.apply(newFlatField().addField(newFlatFieldLeaf("wrong " +
+        Optional<GOTerm.BlacklistItem> result = converter.apply(newFlatField().addField(newFlatFieldLeaf("wrong " +
                 "format"))
                 .buildString());
         assertThat(result.isPresent(), is(false));

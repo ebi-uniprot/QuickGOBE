@@ -158,13 +158,13 @@ public abstract class OBOControllerIT {
         return expectCoreFields(result, id)
                 .andExpect(jsonPath("$.children").exists())
                 .andExpect(jsonPath("$.secondaryIds").exists())
-                .andExpect(jsonPath("$.subsets").exists())
                 .andExpect(jsonPath("$.history").exists())
                 .andExpect(jsonPath("$.xRefs").exists())
                 .andExpect(jsonPath("$.xRelations").exists())
                 .andExpect(jsonPath("$.annotationGuidelines").exists())
                 .andExpect(jsonPath("$.taxonConstraints").exists())
                 .andExpect(jsonPath("$.consider").exists())
+                .andExpect(jsonPath("$.subsets").exists())
                 .andExpect(jsonPath("$.replacedBy").exists());
     }
 

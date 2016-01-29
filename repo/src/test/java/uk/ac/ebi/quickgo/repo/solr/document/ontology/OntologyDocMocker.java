@@ -22,6 +22,32 @@ public class OntologyDocMocker {
         od.usage = "Unrestricted";
         od.aspect = "Process";
 
+        // example blacklist
+        // format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|predictedBy
+        od.blacklist = new ArrayList<>();
+        od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("GO:0000001"))
+                .addField(newFlatFieldLeaf("NOT-qualified manual"))
+                .addField(newFlatFieldLeaf("protein"))
+                .addField(newFlatFieldLeaf("A5I1R9"))
+                .addField(newFlatFieldLeaf("441771"))
+                .addField(newFlatFieldLeaf("A5I1R9_CLOBH"))
+                .addField(newFlatFieldLeaf("GO:0007005"))
+                .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))
+                .addField(newFlatFieldLeaf("IER12345"))
+                .buildString());
+        od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("GO:0000001"))
+                .addField(newFlatFieldLeaf("IS-qualified manual"))
+                .addField(newFlatFieldLeaf("protein"))
+                .addField(newFlatFieldLeaf("B5I1R9"))
+                .addField(newFlatFieldLeaf("441771"))
+                .addField(newFlatFieldLeaf("B5I1R9_CLOBH"))
+                .addField(newFlatFieldLeaf("GO:0007006"))
+                .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))
+                .addField(newFlatFieldLeaf("IER12346"))
+                .buildString());
+
         return od;
     }
 
@@ -40,10 +66,6 @@ public class OntologyDocMocker {
         od.definition = "The chemical reactions and pathways involving creatine (N-(aminoiminomethyl)" +
                 "-N-methylglycine), a compound synthesized from the amino acids arginine, glycine, and methionine " +
                 "that occurs in muscle.";
-        od.subsets = Arrays.asList("goslim_pombe",
-                "goslim_generic",
-                "goslim_yeast",
-                "goslim_chembl");
         od.isObsolete = true;
         od.replacedBy = "GO:0000002";
         od.considers = Arrays.asList("GO:0000003", "GO:0000004");
@@ -52,6 +74,10 @@ public class OntologyDocMocker {
         od.children = Arrays.asList("GO:0000011", "GO:0000012");
         od.synonymNames = Arrays.asList("creatine anabolism", "crayola testarossa");
         od.secondaryIds = Arrays.asList("GO:0000003", "GO:0000004");
+        od.subsets = Arrays.asList("goslim_pombe",
+                "goslim_generic",
+                "goslim_yeast",
+                "goslim_chembl");
 
         // ------ nested, stored fields, which require reconstructing -------
         // example synonyms
@@ -127,32 +153,6 @@ public class OntologyDocMocker {
                 .addField(newFlatFieldFromDepth(3)
                         .addField(newFlatFieldLeaf("PMID:00000003"))
                         .addField(newFlatFieldLeaf("PMID:00000004")))
-                .buildString());
-
-        // example blacklist
-        // format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|predictedBy
-        od.blacklist = new ArrayList<>();
-        od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
-                .addField(newFlatFieldLeaf("GO:0000001"))
-                .addField(newFlatFieldLeaf("NOT-qualified manual"))
-                .addField(newFlatFieldLeaf("protein"))
-                .addField(newFlatFieldLeaf("A5I1R9"))
-                .addField(newFlatFieldLeaf("441771"))
-                .addField(newFlatFieldLeaf("A5I1R9_CLOBH"))
-                .addField(newFlatFieldLeaf("GO:0007005"))
-                .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))
-                .addField(newFlatFieldLeaf("IER12345"))
-                .buildString());
-        od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
-                .addField(newFlatFieldLeaf("GO:0000001"))
-                .addField(newFlatFieldLeaf("IS-qualified manual"))
-                .addField(newFlatFieldLeaf("protein"))
-                .addField(newFlatFieldLeaf("B5I1R9"))
-                .addField(newFlatFieldLeaf("441771"))
-                .addField(newFlatFieldLeaf("B5I1R9_CLOBH"))
-                .addField(newFlatFieldLeaf("GO:0007006"))
-                .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))
-                .addField(newFlatFieldLeaf("IER12346"))
                 .buildString());
 
         // example xontology relations

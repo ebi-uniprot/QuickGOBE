@@ -1,6 +1,10 @@
 package uk.ac.ebi.quickgo.service.model.ontology;
 
+import uk.ac.ebi.quickgo.service.model.FieldType;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.List;
 
 /**
  * GO term DTO used by the service layer.
@@ -14,6 +18,8 @@ public class GOTerm extends OBOTerm {
 
     // describes where this term can be used
     public Usage usage;
+
+    public List<BlacklistItem> blacklist;
 
     public enum Aspect {
         BIOLOGICAL_PROCESS("Biological Process", "Process", "P"),
@@ -92,4 +98,18 @@ public class GOTerm extends OBOTerm {
             return getFullName();
         }
     }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class BlacklistItem implements FieldType {
+        public String goId;
+        public String reason;
+        public String category;
+        public String predictedBy;
+        public String entityType;
+        public String entityId;
+        public String taxonId;
+        public String entityName;
+        public String ancestorGoId;
+    }
+
 }

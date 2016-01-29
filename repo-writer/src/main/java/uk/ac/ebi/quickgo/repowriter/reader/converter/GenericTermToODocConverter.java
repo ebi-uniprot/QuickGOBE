@@ -29,24 +29,24 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     @Override public Optional<OntologyDocument> apply(Optional<? extends GenericTerm> termOptional) {
         if (termOptional.isPresent()) {
             OntologyDocument doc = new OntologyDocument();
-            GenericTerm goTerm = termOptional.get();
+            GenericTerm term = termOptional.get();
+            doc.ancestors = extractAncestors(term);
+            doc.considers = extractConsidersAsList(term);
+            doc.id = term.getId();
+            doc.isObsolete = term.isObsolete();
+            doc.comment = term.getComment();
+            doc.definition = term.getDefinition();
+            doc.history = extractHistory(term);
+            doc.name = term.getName();
+            doc.ontologyType = term.getOntologyType();
+            doc.secondaryIds = extractSecondaries(term);
+            doc.subsets = extractSubsets(term);
+            doc.synonyms = extractSynonyms(term);
+            doc.synonymNames = extractSynonymNames(term);
+            doc.xrefs = extractXRefs(term);
+            doc.xRelations = extractXRelationsAsList(term);
 
-            doc.ancestors = extractAncestors(goTerm);
-            doc.considers = extractConsidersAsList(goTerm);
-            doc.id = goTerm.getId();
-            doc.isObsolete = goTerm.isObsolete();
-            doc.comment = goTerm.getComment();
-            doc.definition = goTerm.getDefinition();
-            doc.history = extractHistory(goTerm);
-            doc.name = goTerm.getName();
-            doc.ontologyType = goTerm.getOntologyType();
-            doc.secondaryIds = extractSecondaries(goTerm);
-            doc.synonyms = extractSynonyms(goTerm);
-            doc.synonymNames = extractSynonymNames(goTerm);
-            doc.xrefs = extractXRefs(goTerm);
-            doc.xRelations = extractXRelationsAsList(goTerm);
-
-            ArrayList<GenericTerm> replacedBy = goTerm.replacedBy();
+            ArrayList<GenericTerm> replacedBy = term.replacedBy();
             if (replacedBy != null && replacedBy.size() > 0) {
                 doc.replacedBy = replacedBy.get(0).getId();
             }
@@ -58,8 +58,16 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
 
     }
 
-    private List<String> extractSecondaries(GenericTerm goTerm) {
-        String secondaries = goTerm.secondaries();
+    private List<String> extractSubsets(GenericTerm term) {
+        if (!isEmpty(term.getSubsetsNames())) {
+            return term.getSubsetsNames();
+        } else {
+            return null;
+        }
+    }
+
+    private List<String> extractSecondaries(GenericTerm term) {
+        String secondaries = term.secondaries();
         if (secondaries != null && secondaries.trim().length() != 0) {
             String[] secondariesArr = secondaries.split(",");
             if (secondariesArr.length > 0) {
@@ -70,9 +78,9 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         return null;
     }
 
-    protected List<String> extractConsidersAsList(GenericTerm goTerm) {
-        if (!isEmpty(goTerm.consider())) {
-            return goTerm.consider().stream()
+    protected List<String> extractConsidersAsList(GenericTerm term) {
+        if (!isEmpty(term.consider())) {
+            return term.consider().stream()
                     .map(GenericTerm::getId)
                     .collect(Collectors.toList());
         } else {
@@ -83,9 +91,9 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: id|term|namespace|url|relation
      */
-    protected List<String> extractXRelationsAsList(GenericTerm goTerm) {
-        if (!isEmpty(goTerm.getCrossOntologyRelations())) {
-            return goTerm.getCrossOntologyRelations().stream()
+    protected List<String> extractXRelationsAsList(GenericTerm term) {
+        if (!isEmpty(term.getCrossOntologyRelations())) {
+            return term.getCrossOntologyRelations().stream()
                     .map(
                             c -> newFlatField()
                                     .addField(newFlatFieldLeaf(c.getForeignID()))
@@ -103,9 +111,9 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: code|id|name
      */
-    protected List<String> extractXRefs(GenericTerm goTerm) {
-        if (!isEmpty(goTerm.getXrefs())) {
-            return goTerm.getXrefs().stream()
+    protected List<String> extractXRefs(GenericTerm term) {
+        if (!isEmpty(term.getXrefs())) {
+            return term.getXrefs().stream()
                     .map(
                             g -> newFlatField()
                                     .addField(newFlatFieldLeaf(g.getDb()))
@@ -118,9 +126,9 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         }
     }
 
-    protected List<String> extractAncestors(GenericTerm goTerm) {
-        if (!isEmpty(goTerm.getAncestors())) {
-            return goTerm.getAncestors()
+    protected List<String> extractAncestors(GenericTerm term) {
+        if (!isEmpty(term.getAncestors())) {
+            return term.getAncestors()
                     .stream() // ancestors is a list of parent ids for this term?
                     .map(
                             a -> a.getParent().getId())
@@ -133,9 +141,9 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: name|timestamp|action|category|text
      */
-    protected List<String> extractHistory(GenericTerm goTerm) {
-        if (goTerm.getHistory() != null && !isEmpty(goTerm.getHistory().getHistoryAll())) {
-            return goTerm.getHistory().getHistoryAll().stream()
+    protected List<String> extractHistory(GenericTerm term) {
+        if (term.getHistory() != null && !isEmpty(term.getHistory().getHistoryAll())) {
+            return term.getHistory().getHistoryAll().stream()
                     .map(
                             h -> newFlatField()
                                     .addField(newFlatFieldLeaf(h.getTermName()))
@@ -150,9 +158,9 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         }
     }
 
-    protected List<String> extractSynonymNames(GenericTerm goTerm) {
-        if (!isEmpty(goTerm.getSynonyms())) {
-            return goTerm.getSynonyms().stream()
+    protected List<String> extractSynonymNames(GenericTerm term) {
+        if (!isEmpty(term.getSynonyms())) {
+            return term.getSynonyms().stream()
 
                     .map(Synonym::getName).collect(Collectors.toList());
         } else {
@@ -163,9 +171,9 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: synonymName|synonymType
      */
-    protected List<String> extractSynonyms(GenericTerm goTerm) {
-        if (!isEmpty(goTerm.getSynonyms())) {
-            return goTerm.getSynonyms().stream()
+    protected List<String> extractSynonyms(GenericTerm term) {
+        if (!isEmpty(term.getSynonyms())) {
+            return term.getSynonyms().stream()
                     .map(
                             s -> newFlatField()
                                     .addField(newFlatFieldLeaf(s.getName()))

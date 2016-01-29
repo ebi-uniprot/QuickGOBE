@@ -21,6 +21,7 @@ public class GODocConverter extends AbstractODocConverter<GOTerm> {
                 GOTerm.Aspect.fromShortName(ontologyDocument.aspect) : null;
         goTerm.usage = ontologyDocument.usage != null ?
                 GOTerm.Usage.fromFullName(ontologyDocument.usage): null;
+        goTerm.subsets = ontologyDocument.subsets;
 
         goTerm.blacklist = BLACKLIST_FIELD_CONVERTER.convertFieldList(ontologyDocument.blacklist);
         return goTerm;
