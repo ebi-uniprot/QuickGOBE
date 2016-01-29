@@ -130,28 +130,28 @@ public class OntologyDocMocker {
                 .buildString());
 
         // example blacklist
-        // format: geneProductId|geneProductDB|reason|category|method
+        // format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|predictedBy
         od.blacklist = new ArrayList<>();
         od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
-                .addField(newFlatFieldLeaf("GO:0000001"))                   //id
-                .addField(newFlatFieldLeaf("NOT-qualified manual"))         //category
-                .addField(newFlatFieldLeaf("protein"))                      //entity type
-                .addField(newFlatFieldLeaf("A5I1R9"))                       //entity id
-                .addField(newFlatFieldLeaf("441771"))                       //taxon id
-                .addField(newFlatFieldLeaf("A5I1R9_CLOBH"))                 //entity name
-                .addField(newFlatFieldLeaf("GO:0007005"))                   //ancestor go id
-                .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))   //reason
+                .addField(newFlatFieldLeaf("GO:0000001"))
+                .addField(newFlatFieldLeaf("NOT-qualified manual"))
+                .addField(newFlatFieldLeaf("protein"))
+                .addField(newFlatFieldLeaf("A5I1R9"))
+                .addField(newFlatFieldLeaf("441771"))
+                .addField(newFlatFieldLeaf("A5I1R9_CLOBH"))
+                .addField(newFlatFieldLeaf("GO:0007005"))
+                .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))
                 .addField(newFlatFieldLeaf("IER12345"))
                 .buildString());
         od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
-                .addField(newFlatFieldLeaf("GO:0000001"))                   //id
-                .addField(newFlatFieldLeaf("IS-qualified manual"))         //category
-                .addField(newFlatFieldLeaf("protein"))                      //entity type
-                .addField(newFlatFieldLeaf("B5I1R9"))                       //entity id
-                .addField(newFlatFieldLeaf("441771"))                       //taxon id
-                .addField(newFlatFieldLeaf("B5I1R9_CLOBH"))                 //entity name
-                .addField(newFlatFieldLeaf("GO:0007006"))                   //ancestor go id
-                .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))   //reason
+                .addField(newFlatFieldLeaf("GO:0000001"))
+                .addField(newFlatFieldLeaf("IS-qualified manual"))
+                .addField(newFlatFieldLeaf("protein"))
+                .addField(newFlatFieldLeaf("B5I1R9"))
+                .addField(newFlatFieldLeaf("441771"))
+                .addField(newFlatFieldLeaf("B5I1R9_CLOBH"))
+                .addField(newFlatFieldLeaf("GO:0007006"))
+                .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))
                 .addField(newFlatFieldLeaf("IER12346"))
                 .buildString());
 

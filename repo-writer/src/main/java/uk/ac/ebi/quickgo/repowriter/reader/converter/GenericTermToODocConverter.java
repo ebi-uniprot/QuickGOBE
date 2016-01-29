@@ -32,7 +32,6 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
             GenericTerm goTerm = termOptional.get();
 
             doc.ancestors = extractAncestors(goTerm);
-            // TODO: blacklist -- where is this info?
             doc.considers = extractConsidersAsList(goTerm);
             doc.id = goTerm.getId();
             doc.isObsolete = goTerm.isObsolete();

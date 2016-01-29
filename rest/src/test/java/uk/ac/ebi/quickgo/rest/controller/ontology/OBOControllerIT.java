@@ -49,7 +49,7 @@ public abstract class OBOControllerIT {
     protected MockMvc mockMvc;
 
     private String RESOURCE_URL;
-    private String validId;
+    protected String validId;
 
 
     @Before
@@ -106,18 +106,12 @@ public abstract class OBOControllerIT {
                 .andExpect(status().isOk());
     }
 
-    /**
-     * Shows taxon constraints and blacklist for term
-     *
-     * @throws Exception
-     */
     @Test
     public void canRetrieveTaxonConstraintsById() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + validId + "/constraints"));
 
         expectBasicFields(response, validId)
                 .andExpect(jsonPath("$.taxonConstraints").isArray())
-                .andExpect(jsonPath("$.blacklist").isArray())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
@@ -170,7 +164,6 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.xRelations").exists())
                 .andExpect(jsonPath("$.annotationGuidelines").exists())
                 .andExpect(jsonPath("$.taxonConstraints").exists())
-                .andExpect(jsonPath("$.blacklist").exists())
                 .andExpect(jsonPath("$.consider").exists())
                 .andExpect(jsonPath("$.replacedBy").exists());
     }

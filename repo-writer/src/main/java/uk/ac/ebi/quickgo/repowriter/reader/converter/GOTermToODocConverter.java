@@ -98,6 +98,9 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
         } else return null;
     }
 
+    /*
+     * format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|predictedBy
+     */
     protected List<String> extractBlacklist(GOTerm goTerm){
         if (!isEmpty(goTerm.getBlacklist())) {
             return goTerm.getBlacklist().stream()
@@ -106,7 +109,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
                                     .addField(newFlatFieldLeaf(t.getGoId()))
                                     .addField(newFlatFieldLeaf(t.getCategory()))
                                     .addField(newFlatFieldLeaf(t.getEntityType()))
-                                    .addField(newFlatFieldLeaf(t.getProteinAc()))       //entityID
+                                    .addField(newFlatFieldLeaf(t.getProteinAc()))
                                     .addField(newFlatFieldLeaf(Integer.toString(t.getTaxonId())))
                                     .addField(newFlatFieldLeaf(t.getEntityName()))
                                     .addField(newFlatFieldLeaf(t.getAncestorGOID()))

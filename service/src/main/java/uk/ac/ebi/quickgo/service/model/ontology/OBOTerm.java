@@ -104,10 +104,10 @@ public class OBOTerm {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class BlacklistItem implements FieldType {
-        public String geneProductId;
+        public String goId;
         public String reason;
         public String category;
-        public String method;
+        public String predictedBy;
         public String entityType;
         public String entityId;
         public String taxonId;

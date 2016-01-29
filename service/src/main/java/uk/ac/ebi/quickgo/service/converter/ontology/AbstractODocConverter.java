@@ -1,10 +1,11 @@
 package uk.ac.ebi.quickgo.service.converter.ontology;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
 import uk.ac.ebi.quickgo.service.converter.FieldConverter;
 import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides template behaviour for converting an {@link OntologyDocument}
@@ -18,8 +19,6 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
 
     private final static AnnotationGuideLineFieldConverter AG_FIELD_CONVERTER =
             new AnnotationGuideLineFieldConverter();
-    private final static BlackListFieldConverter BLACKLIST_FIELD_CONVERTER =
-            new BlackListFieldConverter();
     private final static XORelationsFieldConverter XORELATIONS_FIELD_CONVERTER =
             new XORelationsFieldConverter();
     private final static TaxonConstraintsFieldConverter TAXON_CONSTRAINTS_FIELD_CONVERTER =
@@ -50,7 +49,6 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
         term.xRefs = XREFS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xrefs);
         term.taxonConstraints = TAXON_CONSTRAINTS_FIELD_CONVERTER.convertFieldList(ontologyDocument.taxonConstraints);
         term.xRelations = XORELATIONS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xRelations);
-        term.blacklist = BLACKLIST_FIELD_CONVERTER.convertFieldList(ontologyDocument.blacklist);
         term.annotationGuidelines = AG_FIELD_CONVERTER.convertFieldList(ontologyDocument.annotationGuidelines);
     }
 }
