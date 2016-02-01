@@ -63,6 +63,9 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <finalName>ontology-common-test</finalName>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

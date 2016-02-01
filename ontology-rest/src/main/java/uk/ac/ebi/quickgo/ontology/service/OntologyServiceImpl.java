@@ -23,7 +23,6 @@ import static java.util.Objects.requireNonNull;
  * Created 11/11/15
  * @author Edd
  */
-@Service
 public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T> {
     private OntologyRepository ontologyRepository;
     private OntologyDocConverter<T> converter;

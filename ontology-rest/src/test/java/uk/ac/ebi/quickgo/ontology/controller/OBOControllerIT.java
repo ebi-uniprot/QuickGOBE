@@ -1,9 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.ontology.QuickGOTestREST;
+import uk.ac.ebi.quickgo.ontology.QuickGOREST;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.config.RepoTestConfig;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import org.junit.Before;
@@ -12,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -32,8 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by edd on 14/01/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-//@Import(RepoTestConfig.class)
-@SpringApplicationConfiguration(classes = {QuickGOTestREST.class})
+@SpringApplicationConfiguration(classes = {QuickGOREST.class})
 @WebAppConfiguration
 public abstract class OBOControllerIT {
     // temporary data store for solr's data, which is automatically cleaned on exit

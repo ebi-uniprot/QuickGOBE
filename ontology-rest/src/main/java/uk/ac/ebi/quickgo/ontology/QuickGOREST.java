@@ -20,7 +20,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @SpringBootApplication
 @ComponentScan({"uk.ac.ebi.quickgo.ontology.controller"})
-@Import({ServiceConfig.class, RepoConfig.class})
+@Import({ServiceConfig.class})
 public class QuickGOREST {
     /**
      * Ensures that placeholders are replaced with property values
