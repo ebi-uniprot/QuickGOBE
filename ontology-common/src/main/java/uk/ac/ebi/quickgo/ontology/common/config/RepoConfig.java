@@ -30,13 +30,13 @@ public class RepoConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-//    @Bean
-//    @Profile("httpServer")
-//    public SolrServer httpSolrServer(@Value("${solr.host}") String solrUrl)  {
-//        return new HttpSolrServer(solrUrl);
-//    }
+    @Bean(name = "solrServer")
+    @Profile("httpServer")
+    public SolrServer httpSolrServer(@Value("${solr.host}") String solrUrl)  {
+        return new HttpSolrServer(solrUrl);
+    }
 
-    @Bean
+    @Bean(name = "solrServer")
     @Profile("embeddedServer")
     public SolrServer embeddedSolrServer(SolrServerFactory solrServerFactory) {
         return solrServerFactory.getSolrServer();
@@ -59,8 +59,8 @@ public class RepoConfig {
     }
 
     @Bean
-    public SolrTemplate ontologyTemplate(SolrServer server)  {
-        return new SolrTemplate(server, "ontology");
+    public SolrTemplate ontologyTemplate(SolrServer solrServer)  {
+        return new SolrTemplate(solrServer, "ontology");
     }
 
     @Bean
