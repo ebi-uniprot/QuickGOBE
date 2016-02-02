@@ -7,6 +7,8 @@ import uk.ac.ebi.quickgo.model.ontology.generic.*;
 
 import java.util.Optional;
 
+import static uk.ac.ebi.quickgo.ff.files.ontology.OntologySourceFiles.*;
+
 /**
  * This class specialises {@link SourceInfoLoader} to one responsible for loading ontology information
  * and creating new instances of ontology models.
@@ -14,7 +16,8 @@ import java.util.Optional;
  * Created 10/12/15
  * @author Edd
  */
-public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T extends GenericOntology> extends SourceInfoLoader<S, T> {
+public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T extends GenericOntology>
+        extends SourceInfoLoader<S, T> {
 
     public AbstractGenericOLoader(S sources) {
         super(sources);
@@ -27,35 +30,48 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
         genericOntology.namespace = nameSpace;
 
         if (sourceFiles.terms != null) {
-            for (String[] row : sourceFiles.terms.reader(OntologySourceFiles.ETerm.TERM_ID, OntologySourceFiles.ETerm.NAME, OntologySourceFiles.ETerm.IS_OBSOLETE)) {
+            for (String[] row : sourceFiles.terms.reader(
+                    ETerm.TERM_ID,
+                    ETerm.NAME,
+                    ETerm.IS_OBSOLETE)) {
                 genericOntology.addTerm(new GenericTerm(row[0], row[1], row[2]));
             }
         }
 
         if (sourceFiles.relations != null) {
-            for (String[] row : sourceFiles.relations.reader(OntologySourceFiles.ETermRelation.CHILD_ID, OntologySourceFiles.ETermRelation.PARENT_ID, OntologySourceFiles.ETermRelation.RELATION_TYPE)) {
+            for (String[] row : sourceFiles.relations.reader(
+                    ETermRelation.CHILD_ID,
+                    ETermRelation.PARENT_ID,
+                    ETermRelation.RELATION_TYPE)) {
+
                 if (optionalRootTermId.isPresent() && optionalRootTermId.get().equals(row[1])) {
                     continue;
                 }
+
                 GenericTerm child = genericOntology.getTerm(row[0]);
                 GenericTerm parent = genericOntology.getTerm(row[1]);
+
                 if (child == null || parent == null) {
                     continue;
                 }
+
                 TermRelation tr = new TermRelation(child, parent, row[2].intern());
                 child.parents.add(tr);
                 parent.children.add(tr);
             }
 
-            for (String id  : genericOntology.terms.keySet()) {
+            for (String id : genericOntology.terms.keySet()) {
                 genericOntology.terms.get(id).getAncestors();
             }
         }
 
         if (sourceFiles.synonyms != null) {
-            for (String[] row :sourceFiles.synonyms.reader(
-                    OntologySourceFiles.ETermSynonym.TERM_ID, OntologySourceFiles.ETermSynonym.NAME, OntologySourceFiles.ETermSynonym.TYPE)) {
+            for (String[] row : sourceFiles.synonyms.reader(
+                    ETermSynonym.TERM_ID,
+                    ETermSynonym.NAME,
+                    ETermSynonym.TYPE)) {
                 GenericTerm term = genericOntology.getTerm(row[0]);
+
                 if (term != null) {
                     term.synonyms.add(new Synonym(row[2], row[1]));
                 }
@@ -63,8 +79,9 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
         }
 
         if (sourceFiles.definitions != null) {
-            for (String[] row : sourceFiles.definitions.reader(OntologySourceFiles.ETermDefinition.TERM_ID, OntologySourceFiles.ETermDefinition.DEFINITION)) {
+            for (String[] row : sourceFiles.definitions.reader(ETermDefinition.TERM_ID, ETermDefinition.DEFINITION)) {
                 GenericTerm term = genericOntology.getTerm(row[0]);
+
                 if (term != null) {
                     term.setDefinition(row[1]);
                 }
@@ -72,8 +89,9 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
         }
 
         if (sourceFiles.comments != null) {
-            for (String[] row : sourceFiles.comments.reader(OntologySourceFiles.ETermComment.TERM_ID, OntologySourceFiles.ETermComment.COMMENT_TEXT)) {
+            for (String[] row : sourceFiles.comments.reader(ETermComment.TERM_ID, ETermComment.COMMENT_TEXT)) {
                 GenericTerm term = genericOntology.getTerm(row[0]);
+
                 if (term != null) {
                     term.setComment(row[1]);
                 }
@@ -83,22 +101,26 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
         if (sourceFiles.subsets != null) {
             ColourList colour = new ColourList(0x00000000);
 
-            for (String[] row :sourceFiles.subsets.reader(
-                    OntologySourceFiles.ETermSubset.TERM_ID, OntologySourceFiles.ETermSubset.SUBSET, OntologySourceFiles.ETermSubset.TYPE)) {
+            for (String[] row : sourceFiles.subsets.reader(
+                    ETermSubset.TERM_ID,
+                    ETermSubset.SUBSET,
+                    ETermSubset.TYPE)) {
                 GenericTerm term = genericOntology.getTerm(row[0]);
+
                 if (term == null) {
                     continue;
                 }
+
                 if ("SLIM".equals(row[2])) {
                     GenericTermSet subset = genericOntology.subsets.get(row[1]);
                     if (subset == null) {
-                        genericOntology.subsets.put(row[1], subset = new GenericTermSet(genericOntology, row[1], colour.getColourCode(genericOntology.subsets.size())));
+                        genericOntology.subsets.put(row[1], subset = new GenericTermSet(genericOntology, row[1],
+                                colour.getColourCode(genericOntology.subsets.size())));
                     }
 
                     term.subsets.add(subset);
                     subset.add(term);
-                }
-                else if ("QCCK".equals(row[2])) {
+                } else if ("QCCK".equals(row[2])) {
                     term.addQCCheck(row[1]);
                 }
             }
@@ -106,13 +128,18 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
 
         if (sourceFiles.xrefs != null) {
             for (String[] row : sourceFiles.xrefs.reader(
-                    OntologySourceFiles.ETermXref.TERM_ID, OntologySourceFiles.ETermXref.DB_CODE, OntologySourceFiles.ETermXref.DB_ID, OntologySourceFiles.ETermXref.NAME)) {
+                    ETermXref.TERM_ID,
+                    ETermXref.DB_CODE,
+                    ETermXref.DB_ID,
+                    ETermXref.NAME)) {
                 GenericTerm term = genericOntology.getTerm(row[0]);
+
                 if (term == null) {
                     continue;
                 }
 
                 NamedXRef ref = new NamedXRef(row[1], row[2], row[3]);
+
                 if (GenericTerm.REPLACED_BY.equals(row[1]) || GenericTerm.CONSIDER.equals(row[1])) {
                     GenericTerm obsolete = genericOntology.getTerm(row[2]);
                     if (obsolete != null) {
@@ -120,24 +147,24 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
                         obsolete.replacements.add(tr);
                         term.replaces.add(tr);
                     }
-                }
-                else if (genericOntology.namespace.equals(row[1])) {
+                } else if (genericOntology.namespace.equals(row[1])) {
                     // ignore self-referential cross-references
-                }
-                else if (GenericTerm.ALT_ID.equals(row[1])) {
+                } else if (GenericTerm.ALT_ID.equals(row[1])) {
                     term.altIds.add(ref);
                     genericOntology.xrefFind.put(row[2], term);
-                }
-                else {
+                } else {
                     term.xrefs.add(ref);
                 }
             }
         }
 
         if (sourceFiles.definitionXrefs != null) {
-            for (String[] row : sourceFiles.definitionXrefs.reader(OntologySourceFiles.ETermDefinitionXref.TERM_ID,
-                    OntologySourceFiles.ETermDefinitionXref.DB_CODE, OntologySourceFiles.ETermDefinitionXref.DB_ID)) {
+            for (String[] row : sourceFiles.definitionXrefs.reader(
+                    ETermDefinitionXref.TERM_ID,
+                    ETermDefinitionXref.DB_CODE,
+                    ETermDefinitionXref.DB_ID)) {
                 GenericTerm term = genericOntology.getTerm(row[0]);
+
                 if (term != null) {
                     term.definitionXrefs.add(new XRef(row[1], row[2]));
                 }
@@ -145,10 +172,15 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
         }
 
         if (sourceFiles.crossOntologyRelations != null) {
-            for (String[] row : sourceFiles.crossOntologyRelations.reader(OntologySourceFiles.ECrossOntologyRelation
-                    .TERM_ID, OntologySourceFiles.ECrossOntologyRelation.RELATION, OntologySourceFiles
-                    .ECrossOntologyRelation.FOREIGN_NAMESPACE, OntologySourceFiles.ECrossOntologyRelation.FOREIGN_ID, OntologySourceFiles.ECrossOntologyRelation.FOREIGN_TERM, OntologySourceFiles.ECrossOntologyRelation.URL)) {
+            for (String[] row : sourceFiles.crossOntologyRelations.reader(
+                    ECrossOntologyRelation.TERM_ID,
+                    ECrossOntologyRelation.RELATION,
+                    ECrossOntologyRelation.FOREIGN_NAMESPACE,
+                    ECrossOntologyRelation.FOREIGN_ID,
+                    ECrossOntologyRelation.FOREIGN_TERM,
+                    ECrossOntologyRelation.URL)) {
                 GenericTerm term = genericOntology.getTerm(row[0]);
+
                 if (term != null) {
                     term.addCrossOntologyRelation(row[1], row[2], row[3], row[4], row[5]);
                 }
@@ -156,15 +188,18 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
         }
 
         if (sourceFiles.fundingBodies != null) {
-            genericOntology.fundingBodies = new CV(sourceFiles.fundingBodies.reader(OntologySourceFiles.EFundingBody.CODE, OntologySourceFiles.EFundingBody.URL));
+            genericOntology.fundingBodies = new CV(sourceFiles.fundingBodies
+                    .reader(EFundingBody.CODE, EFundingBody.URL));
         }
 
         if (sourceFiles.credits != null) {
             for (String[] row : sourceFiles.credits.reader(
-                    OntologySourceFiles.ETermCredit.TERM_ID, OntologySourceFiles.ETermCredit.CREDIT_CODE)) {
+                    ETermCredit.TERM_ID, ETermCredit.CREDIT_CODE)) {
                 GenericTerm term = genericOntology.getTerm(row[0]);
+
                 if (term != null) {
                     TermCredit credit = genericOntology.termCredits.get(row[1]);
+
                     if (credit == null) {
                         CV.Item fundingBody = genericOntology.fundingBodies.get(row[1]);
                         credit = new TermCredit(row[1], (fundingBody != null ? fundingBody.description : null));
@@ -176,7 +211,13 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
         }
 
         if (sourceFiles.history != null) {
-            for (String[] row : sourceFiles.history.reader(OntologySourceFiles.ETermHistory.TERM_ID,  OntologySourceFiles.ETermHistory.NAME, OntologySourceFiles.ETermHistory.TIMESTAMP, OntologySourceFiles.ETermHistory.ACTION, OntologySourceFiles.ETermHistory.CATEGORY, OntologySourceFiles.ETermHistory.TEXT)) {
+            for (String[] row : sourceFiles.history
+                    .reader(ETermHistory.TERM_ID,
+                            ETermHistory.NAME,
+                            ETermHistory.TIMESTAMP,
+                            ETermHistory.ACTION,
+                            ETermHistory.CATEGORY,
+                            ETermHistory.TEXT)) {
                 AuditRecord ar = new AuditRecord(row[0], row[1], row[2], row[3], row[4], row[5]);
                 genericOntology.history.add(ar);
 
