@@ -19,6 +19,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -26,16 +27,13 @@ import org.springframework.context.annotation.Import;
 import java.io.File;
 
 /**
- *
- *
  * Created 02/12/15
  * @author Edd
  */
 @Configuration
 @EnableBatchProcessing
-@Import({IndexerProperties.class, RepoConfig.class})
+@Import({RepoConfig.class})
 public class IndexingJobConfig {
-    // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexingJobConfig.class);
 
     @Autowired
@@ -47,8 +45,14 @@ public class IndexingJobConfig {
     @Autowired
     private OntologyRepository ontologyRepository;
 
-    @Autowired
-    private IndexerProperties indexerProperties;
+    @Value("${indexing.ontology.chunk.size:500}")
+    private int chunkSize;
+
+    @Value("${indexing.ontology.skip.limit:100}")
+    private int skipLimit;
+
+    @Value("${indexing.ontology.source}")
+    private String sourceFile;
 
     @Bean
     public Job job() {
@@ -63,11 +67,11 @@ public class IndexingJobConfig {
         return stepBuilders
                 .get("readThenWriteToRepoStep")
                 // read and process items in chunks of the following size
-                .<OntologyDocument, OntologyDocument>chunk(indexerProperties.getOntologyChunkSize())
+                .<OntologyDocument, OntologyDocument>chunk(chunkSize)
                 .reader(reader())
                 .faultTolerant()
                 .skip(DocumentReaderException.class)
-                .skipLimit(indexerProperties.getOntologySkipLimit())
+                .skipLimit(skipLimit)
                 .writer(writer())
                 .listener(logStepListener())
                 .build();
@@ -90,7 +94,6 @@ public class IndexingJobConfig {
 
     @Bean
     public ODocReader reader() {
-        return new ODocReader(new File(indexerProperties.getOntologySourceFile()));
+        return new ODocReader(new File(sourceFile));
     }
-
 }
