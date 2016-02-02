@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.index.write.job;
 
 import uk.ac.ebi.quickgo.index.reader.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.reader.ODocReader;
-import uk.ac.ebi.quickgo.index.write.IndexerProperties;
 import uk.ac.ebi.quickgo.index.write.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.write.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.write.writer.SolrCrudRepoWriter;
