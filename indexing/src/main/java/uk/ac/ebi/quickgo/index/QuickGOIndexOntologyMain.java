@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.main;
+package uk.ac.ebi.quickgo.index;
 
 import uk.ac.ebi.quickgo.index.write.job.IndexingJobConfig;
 

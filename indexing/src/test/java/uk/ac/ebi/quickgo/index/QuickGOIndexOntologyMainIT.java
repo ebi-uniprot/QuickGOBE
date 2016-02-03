@@ -1,7 +1,6 @@
-package uk.ac.ebi.quickgo.index.main;
+package uk.ac.ebi.quickgo.index;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.index.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.index.reader.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.reader.ODocReader;
 import uk.ac.ebi.quickgo.index.write.job.IndexingJobConfig;
@@ -18,6 +17,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,7 +27,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -41,21 +40,24 @@ import static org.mockito.Mockito.when;
  * Created 18/12/15
  * @author Edd
  */
-@ActiveProfiles(profiles = {"QuickGOIndexOntologyMainIT", "dev"})
+@ActiveProfiles(profiles = {"QuickGOIndexOntologyMainIT", "embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
         classes = {IndexingJobConfig.class, JobTestRunnerConfig.class, QuickGOIndexOntologyMainITConfig.class},
         loader = SpringApplicationContextLoader.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class QuickGOIndexOntologyMainIT {
+    @ClassRule
+    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
     private ODocReader reader;
 
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+    @Value("${indexing.ontology.skip.limit}")
+    private int skipLimit;
 
     @Test
     public void documentReaderExceptionThrownWhenReaderIsOpenedCausesStepFailure() {
@@ -127,7 +129,7 @@ public class QuickGOIndexOntologyMainIT {
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
         assertThat(step.getReadCount(), is(4));
         assertThat(step.getWriteCount(), is(4));
-        assertThat(step.getSkipCount(), Is.is(QuickGOIndexOntologyMainITConfig.STEP_SKIP_LIMIT));
+        assertThat(step.getSkipCount(), Is.is(skipLimit));
     }
 
     @Test
@@ -166,6 +168,6 @@ public class QuickGOIndexOntologyMainIT {
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
         assertThat(step.getReadCount(), is(10));
         assertThat(step.getWriteCount(), is(8));
-        assertThat(step.getSkipCount(), Is.is(QuickGOIndexOntologyMainITConfig.STEP_SKIP_LIMIT));
+        assertThat(step.getSkipCount(), Is.is(skipLimit));
     }
 }
