@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.ontology;
 
 
 
-import uk.ac.ebi.quickgo.ontology.common.config.RepoConfig;
 import uk.ac.ebi.quickgo.ontology.config.ServiceConfig;
 
 import org.springframework.boot.SpringApplication;
@@ -21,7 +20,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @SpringBootApplication
 @ComponentScan({"uk.ac.ebi.quickgo.ontology.controller"})
 @Import({ServiceConfig.class})
-public class QuickGOREST {
+public class OntologyREST {
     /**
      * Ensures that placeholders are replaced with property values
      */
@@ -31,6 +30,6 @@ public class QuickGOREST {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(QuickGOREST.class, args);
+        SpringApplication.run(OntologyREST.class, args);
     }
 }

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.ontology.QuickGOREST;
+import uk.ac.ebi.quickgo.ontology.OntologyREST;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by edd on 14/01/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {QuickGOREST.class})
+@SpringApplicationConfiguration(classes = {OntologyREST.class})
 @WebAppConfiguration
 public abstract class OBOControllerIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
