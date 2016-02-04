@@ -6,7 +6,7 @@ import uk.ac.ebi.quickgo.ff.loader.ontology.ECOLoader;
 import uk.ac.ebi.quickgo.ff.loader.ontology.GOLoader;
 import uk.ac.ebi.quickgo.index.reader.converter.GOTermToODocConverter;
 import uk.ac.ebi.quickgo.index.reader.converter.GenericTermToODocConverter;
-import uk.ac.ebi.quickgo.index.write.job.IndexingJobConfig;
+import uk.ac.ebi.quickgo.index.write.IndexingJobConfig;
 import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;

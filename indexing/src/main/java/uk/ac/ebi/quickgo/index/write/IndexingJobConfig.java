@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.write.job;
+package uk.ac.ebi.quickgo.index.write;
 
 import uk.ac.ebi.quickgo.index.reader.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.reader.ODocReader;
@@ -6,7 +6,7 @@ import uk.ac.ebi.quickgo.index.write.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.write.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.write.writer.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.config.RepoConfig;
+import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import org.slf4j.Logger;

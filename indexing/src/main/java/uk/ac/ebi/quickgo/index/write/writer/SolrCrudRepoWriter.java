@@ -6,7 +6,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
 import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.index.write.job.IndexingJobConfig;
+import uk.ac.ebi.quickgo.index.write.IndexingJobConfig;
 
 import java.util.List;
 

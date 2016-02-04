@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.index;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.index.reader.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.reader.ODocReader;
-import uk.ac.ebi.quickgo.index.write.job.IndexingJobConfig;
+import uk.ac.ebi.quickgo.index.write.IndexingJobConfig;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 
 import org.hamcrest.core.Is;
