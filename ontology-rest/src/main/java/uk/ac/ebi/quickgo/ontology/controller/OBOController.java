@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import uk.ac.ebi.quickgo.common.search.RetrievalException;
 import uk.ac.ebi.quickgo.common.search.SearchService;
 import uk.ac.ebi.quickgo.common.search.SearchableField;
 import uk.ac.ebi.quickgo.common.search.StringToQuickGOQueryConverter;
@@ -12,6 +13,8 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +24,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static java.util.Objects.requireNonNull;
-import static uk.ac.ebi.quickgo.ontology.service.search.SearchDispatcher.*;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidPage;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidQuery;
 
 /**
  * Abstract controller defining common end-points of an OBO related
@@ -31,7 +36,13 @@ import static uk.ac.ebi.quickgo.ontology.service.search.SearchDispatcher.*;
  * @author Edd
  */
 public abstract class OBOController<T extends OBOTerm> {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private static final String COLON = ":";
+
+    private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
+    private static final String DEFAULT_PAGE_NUMBER = "1";
+
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
@@ -215,7 +226,22 @@ public abstract class OBOController<T extends OBOTerm> {
                 limit,
                 page,
                 ontologyQueryConverter);
-        return search(request, ontologySearchService);
+
+        ResponseEntity<QueryResult<OBOTerm>> response;
+
+        if (request == null) {
+            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            try {
+                QueryResult<OBOTerm> queryResult = ontologySearchService.findByQuery(request);
+                response = new ResponseEntity<>(queryResult, HttpStatus.OK);
+            } catch (RetrievalException e) {
+                logger.error(createErrorMessage(request), e);
+                response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return response;
     }
 
     private QueryRequest buildRequest(String query,
@@ -258,4 +284,8 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return the ontology type corresponding to this controller's behaviour.
      */
     protected abstract OntologyType getOntologyType();
+
+    private static String createErrorMessage(QueryRequest request) {
+        return "Unable to process search query request: [" + request + "]";
+    }
 }
