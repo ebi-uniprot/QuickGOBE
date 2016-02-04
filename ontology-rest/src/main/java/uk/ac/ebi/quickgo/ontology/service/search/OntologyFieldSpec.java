@@ -1,5 +1,6 @@
-package uk.ac.ebi.quickgo.client.search;
+package uk.ac.ebi.quickgo.ontology.service.search;
 
+import uk.ac.ebi.quickgo.common.search.SearchableField;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 
 import org.springframework.stereotype.Component;

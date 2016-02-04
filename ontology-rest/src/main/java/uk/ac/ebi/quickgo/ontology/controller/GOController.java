@@ -1,6 +1,10 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import uk.ac.ebi.quickgo.common.search.SearchService;
+import uk.ac.ebi.quickgo.common.search.SearchableField;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
+import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 
 import java.util.regex.Pattern;
@@ -24,12 +28,18 @@ public class GOController extends OBOController<GOTerm> {
     private static final Pattern GO_ID_FORMAT = Pattern.compile("^GO:[0-9]{7}$");
 
     @Autowired
-    public GOController(OntologyService<GOTerm> goOntologyService) {
-        super(goOntologyService);
+    public GOController(OntologyService<GOTerm> goOntologyService,
+            SearchService<OBOTerm> ontologySearchService,
+            SearchableField searchableField) {
+        super(goOntologyService, ontologySearchService, searchableField);
     }
 
     @Override
     public boolean isValidId(String id) {
         return GO_ID_FORMAT.matcher(id).matches();
+    }
+
+    @Override protected OntologyType getOntologyType() {
+        return OntologyType.GO;
     }
 }

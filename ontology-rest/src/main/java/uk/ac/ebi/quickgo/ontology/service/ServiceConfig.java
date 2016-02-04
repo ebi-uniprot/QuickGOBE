@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
+import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,7 +24,7 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.ontology.service"})
-@Import(RepoConfig.class)
+@Import({RepoConfig.class, SearchServiceConfig.class})
 public class ServiceConfig {
     @Bean
     public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository) {

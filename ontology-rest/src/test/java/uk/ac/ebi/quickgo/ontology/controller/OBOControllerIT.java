@@ -37,6 +37,9 @@ public abstract class OBOControllerIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
+    private static final String SEARCH_ENDPOINT = "search";
+    private static final String QUERY_PARAM = "query";
+
     @Autowired
     protected WebApplicationContext webApplicationContext;
 
@@ -154,6 +157,60 @@ public abstract class OBOControllerIT {
     public void finds400OnInvalidGOId() throws Exception {
         mockMvc.perform(get(RESOURCE_URL + "/" + invalidId()))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void searchesForTermSuccessfullyAndReceivesValidResults() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/" + SEARCH_ENDPOINT)
+                        .param(QUERY_PARAM, validId));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results.*").exists());
+    }
+
+    @Test
+    public void searchesForInvalidIdAndReceivesZeroValidResults() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/" + SEARCH_ENDPOINT)
+                        .param(QUERY_PARAM, invalidId()));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void searchesForMissingIdAndReceivesZeroValidResults() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/" + SEARCH_ENDPOINT)
+                        .param(QUERY_PARAM, idMissingInRepository()));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void searchesForFieldThatDoesNotExistAndReceivesZeroValidResults() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/" + SEARCH_ENDPOINT)
+                        .param(QUERY_PARAM, "fieldDoesNotExist:sandwiches"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    protected ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pageInfo").exists())
+                .andExpect(jsonPath("$.pageInfo.resultsPerPage").exists())
+                .andExpect(jsonPath("$.pageInfo.total").exists())
+                .andExpect(jsonPath("$.pageInfo.current").exists());
     }
 
     protected ResultActions expectCompleteFields(ResultActions result, String id) throws Exception {

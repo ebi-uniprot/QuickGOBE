@@ -1,5 +1,13 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import uk.ac.ebi.quickgo.common.search.SearchService;
+import uk.ac.ebi.quickgo.common.search.SearchableField;
+import uk.ac.ebi.quickgo.common.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.common.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.common.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.common.search.results.QueryResult;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 
@@ -9,8 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import static java.util.Objects.requireNonNull;
+import static uk.ac.ebi.quickgo.ontology.service.search.SearchDispatcher.*;
 
 /**
  * Abstract controller defining common end-points of an OBO related
@@ -20,12 +31,17 @@ import static java.util.Objects.requireNonNull;
  * @author Edd
  */
 public abstract class OBOController<T extends OBOTerm> {
+    private static final String COLON = ":";
     private final OntologyService<T> ontologyService;
+    private final SearchService<OBOTerm> ontologySearchService;
+    private final StringToQuickGOQueryConverter ontologyQueryConverter;
 
-    public abstract boolean isValidId(String id);
-
-    public OBOController(OntologyService<T> ontologyService) {
+    public OBOController(OntologyService<T> ontologyService,
+            SearchService<OBOTerm> ontologySearchService,
+            SearchableField searchableField) {
         this.ontologyService = requireNonNull(ontologyService);
+        this.ontologySearchService = requireNonNull(ontologySearchService);
+        this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
     }
 
     /**
@@ -57,6 +73,13 @@ public abstract class OBOController<T extends OBOTerm> {
         }
 
         return getTermResponse(ontologyService.findCoreInfoByOntologyId(id));
+    }
+
+    public abstract boolean isValidId(String id);
+
+    private ResponseEntity<T> getTermResponse(Optional<T> optionalECODoc) {
+        return optionalECODoc.map(ontology -> new ResponseEntity<>(ontology, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     /**
@@ -174,8 +197,65 @@ public abstract class OBOController<T extends OBOTerm> {
         return getTermResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(id));
     }
 
-    private ResponseEntity<T> getTermResponse(Optional<T> optionalECODoc) {
-        return optionalECODoc.map(ontology -> new ResponseEntity<>(ontology, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    /**
+     * Method is invoked when a client wants to search for an ontology term via its identifier, or a generic query
+     * search
+     *
+     * @param query the query to search against
+     * @param limit the amount of queries to return
+     */
+    @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(
+            @RequestParam(value = "query") String query,
+            @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
+            @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
+
+        QueryRequest request = buildRequest(
+                query,
+                limit,
+                page,
+                ontologyQueryConverter);
+        return search(request, ontologySearchService);
     }
+
+    private QueryRequest buildRequest(String query,
+            int limit,
+            int page,
+            StringToQuickGOQueryConverter converter) {
+
+        if (!isValidQuery(query)
+                || !isValidNumRows(limit)
+                || !isValidPage(page)) {
+            return null;
+        } else {
+            QuickGOQuery userQuery = converter.convert(query);
+            QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
+
+            return new QueryRequest
+                    .Builder(restrictedUserQuery)
+                    .setPageParameters(page, limit)
+                    .build();
+        }
+    }
+
+    /**
+     * Given a {@link QuickGOQuery}, create a composite {@link QuickGOQuery} by
+     * performing a conjunction with another query, which restricts all results
+     * to be of a type corresponding to that provided by {@link #getOntologyType()}.
+     *
+     * @param query the query that is constrained
+     * @return the new constrained query
+     */
+    private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
+        return query.and(
+                ontologyQueryConverter.convert(
+                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + getOntologyType().name()));
+    }
+
+    /**
+     * Returns the {@link OntologyType} that corresponds to this controller.
+     *
+     * @return the ontology type corresponding to this controller's behaviour.
+     */
+    protected abstract OntologyType getOntologyType();
 }
