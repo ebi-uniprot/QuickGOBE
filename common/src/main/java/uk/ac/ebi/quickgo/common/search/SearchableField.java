@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.client.search;
+package uk.ac.ebi.quickgo.common.search;
 
 /**
  * Interface used on the Field enumerations. It checks whether a string is one of
