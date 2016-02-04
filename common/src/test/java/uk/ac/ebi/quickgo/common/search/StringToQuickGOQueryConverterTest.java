@@ -1,7 +1,5 @@
-package uk.ac.ebi.quickgo.client.controller.search;
+package uk.ac.ebi.quickgo.common.search;
 
-import uk.ac.ebi.quickgo.client.search.SearchableField;
-import uk.ac.ebi.quickgo.client.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.common.search.query.QuickGOQuery;
 
 import org.junit.Before;

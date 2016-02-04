@@ -1,14 +1,12 @@
-package uk.ac.ebi.quickgo.client.search;
+package uk.ac.ebi.quickgo.common.search;
 
 import uk.ac.ebi.quickgo.common.search.query.QuickGOQuery;
 
 import com.google.common.base.Preconditions;
-import org.springframework.stereotype.Component;
 
 /**
  * Utility class to help with the processing of a client request
  */
-@Component
 public class StringToQuickGOQueryConverter {
     public static final String FIELD_SEPARATOR = ":";
 
