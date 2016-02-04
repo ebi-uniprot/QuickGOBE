@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.ontology;
 
 
 
-import uk.ac.ebi.quickgo.ontology.config.ServiceConfig;
+import uk.ac.ebi.quickgo.ontology.service.ServiceConfig;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

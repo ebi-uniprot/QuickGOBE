@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common.config;
-
-import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
+package uk.ac.ebi.quickgo.ontology.common;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,12 +1,10 @@
-package uk.ac.ebi.quickgo.ontology.config;
+package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.config.RepoConfig;
+import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
-import uk.ac.ebi.quickgo.ontology.service.OntologyService;
-import uk.ac.ebi.quickgo.ontology.service.OntologyServiceImpl;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 
@@ -44,29 +42,4 @@ public class ServiceConfig {
     private ECODocConverter ecoDocConverter() {
         return new ECODocConverter();
     }
-
-    // search beans
-//    @Bean
-//    public SearchService<OBOTerm> ontologySearchService(RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval) {
-//        return new OntologySearchServiceImpl(ontologySolrRequestRetrieval);
-//    }
-//
-//    @Bean
-//    public RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval(
-//            SolrTemplate ontologyTemplate,
-//            QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter,
-//            ServiceProperties serviceProperties) {
-//
-//        OntologySolrQueryResultConverter resultConverter = new OntologySolrQueryResultConverter(
-//                new DocumentObjectBinder(),
-//                new GODocConverter(),
-//                new ECODocConverter()
-//        );
-//
-//        return new SolrRequestRetrieval<>(
-//                ontologyTemplate.getSolrServer(),
-//                solrSelectQueryRequestConverter,
-//                resultConverter,
-//                serviceProperties.getOntologySearchSolrReturnedFields());
-//    }
 }
