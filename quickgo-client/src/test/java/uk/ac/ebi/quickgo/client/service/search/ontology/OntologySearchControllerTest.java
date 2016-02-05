@@ -1,7 +1,6 @@
-package uk.ac.ebi.quickgo.client.controller.search;
+package uk.ac.ebi.quickgo.client.service.search.ontology;
 
-import uk.ac.ebi.quickgo.client.search.OntologyFieldSpec;
-import uk.ac.ebi.quickgo.client.search.SearchController;
+import uk.ac.ebi.quickgo.client.controller.SearchController;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 
 import java.util.ArrayList;
@@ -14,11 +13,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static uk.ac.ebi.quickgo.client.search.SearchDispatcher.isValidFacets;
-import static uk.ac.ebi.quickgo.client.search.SearchDispatcher.isValidFilterQueries;
-import static uk.ac.ebi.quickgo.client.search.SearchDispatcher.isValidNumRows;
-import static uk.ac.ebi.quickgo.client.search.SearchDispatcher.isValidPage;
-import static uk.ac.ebi.quickgo.client.search.SearchDispatcher.isValidQuery;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFacets;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFilterQueries;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidPage;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidQuery;
 
 /**
  * Unit tests for the {@link SearchController}. Primarily tests
@@ -30,11 +29,11 @@ import static uk.ac.ebi.quickgo.client.search.SearchDispatcher.isValidQuery;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class OntologySearchControllerTest {
-    private OntologyFieldSpec ontologyFieldSpec;
+    private OntologySearchableField ontologySearchableField;
 
     @Before
     public void setUp() {
-        this.ontologyFieldSpec = new OntologyFieldSpec();
+        this.ontologySearchableField = new OntologySearchableField();
     }
 
     // validate query ----------------------------------------------
@@ -89,14 +88,14 @@ public class OntologySearchControllerTest {
     @Test
     public void allSearchableFieldsColonValueAreValidForFacets() {
         List<String> facets = OntologyFields.Searchable.VALUES.stream().collect(Collectors.toList());
-        assertThat(isValidFacets(ontologyFieldSpec, facets), is(true));
+        assertThat(isValidFacets(ontologySearchableField, facets), is(true));
     }
 
     @Test
     public void aNonSearchableFieldsCannotBeInFacets() {
         List<String> facets = new ArrayList<>();
         facets.add("aFieldThatDoesntExist");
-        assertThat(isValidFacets(ontologyFieldSpec, facets), is(false));
+        assertThat(isValidFacets(ontologySearchableField, facets), is(false));
     }
 
     @Test
@@ -105,10 +104,10 @@ public class OntologySearchControllerTest {
 
         // add a searchable, valid filter query
         facets.add(OntologyFields.Searchable.ID);
-        assertThat(isValidFacets(ontologyFieldSpec, facets), is(true));
+        assertThat(isValidFacets(ontologySearchableField, facets), is(true));
 
         facets.add("aFieldThatDoesntExist"); // then add a non-searchable field
-        assertThat(isValidFacets(ontologyFieldSpec, facets), is(false));
+        assertThat(isValidFacets(ontologySearchableField, facets), is(false));
     }
 
     // validate filter queries ----------------------------------------------
@@ -118,14 +117,14 @@ public class OntologySearchControllerTest {
                 .map(field -> field +":pretendValue")
                 .collect(Collectors.toList());
 
-        assertThat(isValidFilterQueries(ontologyFieldSpec, filterQueries), is(true));
+        assertThat(isValidFilterQueries(ontologySearchableField, filterQueries), is(true));
     }
 
     @Test
     public void aNonSearchableFieldsCannotBeInAFilterQuery() {
         List<String> filterQueries = new ArrayList<>();
         filterQueries.add("aFieldThatDoesntExist:value");
-        assertThat(isValidFilterQueries(ontologyFieldSpec, filterQueries), is(false));
+        assertThat(isValidFilterQueries(ontologySearchableField, filterQueries), is(false));
     }
 
     @Test
@@ -134,9 +133,9 @@ public class OntologySearchControllerTest {
 
         // add a searchable, valid filter query
         filterQueries.add(OntologyFields.Searchable.ID + ":value");
-        assertThat(isValidFilterQueries(ontologyFieldSpec, filterQueries), is(true));
+        assertThat(isValidFilterQueries(ontologySearchableField, filterQueries), is(true));
 
         filterQueries.add("aFieldThatDoesntExist:value"); // then add a non-searchable field
-        assertThat(isValidFilterQueries(ontologyFieldSpec, filterQueries), is(false));
+        assertThat(isValidFilterQueries(ontologySearchableField, filterQueries), is(false));
     }
 }

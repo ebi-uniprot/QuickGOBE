@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.client.controller.search;
+package uk.ac.ebi.quickgo.client.service.search.ontology;
 
 import uk.ac.ebi.quickgo.client.QuickGOREST;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;

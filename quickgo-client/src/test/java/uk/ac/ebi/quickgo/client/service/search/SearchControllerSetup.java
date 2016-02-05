@@ -1,7 +1,6 @@
-package uk.ac.ebi.quickgo.client.controller.search;
+package uk.ac.ebi.quickgo.client.service.search;
 
 import uk.ac.ebi.quickgo.client.QuickGOREST;
-import uk.ac.ebi.quickgo.client.search.SearchDispatcher;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import org.junit.Before;
@@ -34,6 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public abstract class SearchControllerSetup {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+
+    private static final int DEFAULT_ENTRIES_PER_PAGE = 25;
 
     protected static final String SEARCH_RESOURCE_URL = "/QuickGO/internal/search";
 
@@ -122,7 +123,7 @@ public abstract class SearchControllerSetup {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pageInfo.resultsPerPage")
-                        .value(Integer.parseInt(SearchDispatcher.DEFAULT_ENTRIES_PER_PAGE)))
+                        .value(DEFAULT_ENTRIES_PER_PAGE))
                 .andExpect(jsonPath("$.pageInfo.current").value(0))
                 .andExpect(jsonPath("$.pageInfo.total").value(0));
     }
