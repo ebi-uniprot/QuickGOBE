@@ -16,8 +16,8 @@ import org.springframework.context.annotation.Import;
 
 /**
  * Spring configuration for the service layer, which depends on the repositories
- * made available by {@link RepoConfig}. Services to additionally make accessible
- * are defined in specified the {@link ComponentScan} packages.
+ * made available by {@link RepoConfig} and {@link SearchServiceConfig}. Services
+ * to additionally make accessible are defined in specified the {@link ComponentScan} packages.
  *
  * Created 19/11/15
  * @author Edd
