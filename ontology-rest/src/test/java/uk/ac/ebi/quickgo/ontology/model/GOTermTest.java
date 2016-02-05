@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.model;
 
+import uk.ac.ebi.quickgo.ontology.common.document.Aspect;
+
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,19 +18,19 @@ import static org.hamcrest.core.Is.is;
 public class GOTermTest {
     @Test
     public void stringToAspectFindsSuccessfully() {
-        GOTerm.Aspect aspect = GOTerm.Aspect.fromShortName("Process");
+        Aspect aspect = Aspect.fromShortName("Process");
         assertThat(aspect, is(not(nullValue())));
 
-        aspect = GOTerm.Aspect.fromShortName("Function");
+        aspect = Aspect.fromShortName("Function");
         assertThat(aspect, is(not(nullValue())));
 
-        aspect = GOTerm.Aspect.fromShortName("Component");
+        aspect = Aspect.fromShortName("Component");
         assertThat(aspect, is(not(nullValue())));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void stringToAspectProducesIllegalArgumentException() {
-        GOTerm.Aspect.fromShortName("SAUSAGES");
+        Aspect.fromShortName("SAUSAGES");
     }
 
     @Test
