@@ -11,16 +11,13 @@
     <description>QuickGO parent project</description>
 
     <modules>
-        <!--<module>solr-plugin</module>-->
-        <!--<module>repo</module>-->
-        <!--<module>rest</module>-->
-        <!--<module>repo-writer</module>-->
-        <!--<module>service</module>-->
-        <!--<module>sources</module>-->
-        <!--<module>model</module>-->
         <module>common</module>
         <module>ontology-common</module>
         <module>ontology-rest</module>
+        <module>quickgo-client</module>
+        <module>indexing</module>
+        <module>sources</module>
+        <module>model</module>
     </modules>
 
     <properties>
@@ -44,7 +41,7 @@
         <!-- dependency version numbers -->
         <spring.framework.version>4.1.8.RELEASE</spring.framework.version>
         <spring.boot.starter>1.2.7.RELEASE</spring.boot.starter>
-        <spring-batch-test.version>3.0.5.RELEASE</spring-batch-test.version>
+
         <spring-data-solr.version>1.5.0.RELEASE</spring-data-solr.version>
         <json-path.version>1.2.0</json-path.version>
         <slf4j.version>1.7.12</slf4j.version>
@@ -120,12 +117,6 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>${spring.boot.starter}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-batch</artifactId>
                 <version>${spring.boot.starter}</version>
             </dependency>
 
