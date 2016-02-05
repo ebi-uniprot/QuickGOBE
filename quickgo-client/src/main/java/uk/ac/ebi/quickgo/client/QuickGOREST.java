@@ -1,9 +1,12 @@
 package uk.ac.ebi.quickgo.client;
 
+import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
@@ -14,8 +17,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @SpringBootApplication
 @ComponentScan({
-        "uk.ac.ebi.quickgo.client"
+        "uk.ac.ebi.quickgo.client.controller"
 })
+@Import(SearchServiceConfig.class)
 public class QuickGOREST {
 
     /**
