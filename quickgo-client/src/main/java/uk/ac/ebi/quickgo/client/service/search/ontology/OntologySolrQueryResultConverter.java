@@ -1,10 +1,10 @@
-package uk.ac.ebi.quickgo.ontology.service.search;
+package uk.ac.ebi.quickgo.client.service.search.ontology;
 
+import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
+import uk.ac.ebi.quickgo.client.service.converter.ontology.ECODocConverter;
+import uk.ac.ebi.quickgo.client.service.converter.ontology.GODocConverter;
 import uk.ac.ebi.quickgo.common.search.solr.AbstractSolrQueryResultConverter;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
-import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
-import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
-import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Converts the Solr results into {@link OBOTerm} instances.
+ * Converts the Solr results into {@link OntologyTerm} instances.
  */
-public class OntologySolrQueryResultConverter extends AbstractSolrQueryResultConverter<OBOTerm> {
+public class OntologySolrQueryResultConverter extends AbstractSolrQueryResultConverter<OntologyTerm> {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     private GODocConverter goDocConverter;
@@ -33,12 +33,12 @@ public class OntologySolrQueryResultConverter extends AbstractSolrQueryResultCon
         this.ecoDocConverter = requireNonNull(ecoDocConverter);
     }
 
-    @Override protected List<OBOTerm> convertResults(SolrDocumentList results) {
+    protected List<OntologyTerm> convertResults(SolrDocumentList results) {
         assert results != null : "Results list cannot be null";
 
         List<OntologyDocument> solrTermDocs = documentObjectBinder.getBeans(OntologyDocument.class, results);
 
-        List<OBOTerm> domainTerms = new ArrayList<>(solrTermDocs.size());
+        List<OntologyTerm> domainTerms = new ArrayList<>(solrTermDocs.size());
 
         for (OntologyDocument ontologyDoc : solrTermDocs) {
             switch (ontologyDoc.ontologyType) {
