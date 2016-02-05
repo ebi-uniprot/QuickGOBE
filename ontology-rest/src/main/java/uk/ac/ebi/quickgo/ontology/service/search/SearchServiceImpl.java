@@ -14,10 +14,10 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
  * Created 18/01/16
  * @author Edd
  */
-public class OntologySearchServiceImpl implements SearchService<OBOTerm> {
+public class SearchServiceImpl implements SearchService<OBOTerm> {
     private final RequestRetrieval<OBOTerm> requestRetrieval;
 
-    public OntologySearchServiceImpl(RequestRetrieval<OBOTerm> requestRetrieval) {
+    public SearchServiceImpl(RequestRetrieval<OBOTerm> requestRetrieval) {
         this.requestRetrieval = requestRetrieval;
     }
 

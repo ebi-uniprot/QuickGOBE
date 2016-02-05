@@ -30,7 +30,7 @@ public class SearchServiceConfig {
 
     @Bean
     public SearchService<OBOTerm> ontologySearchService(RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval) {
-        return new OntologySearchServiceImpl(ontologySolrRequestRetrieval);
+        return new SearchServiceImpl(ontologySolrRequestRetrieval);
     }
 
     @Bean
@@ -39,7 +39,7 @@ public class SearchServiceConfig {
             QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter,
             @Value("${search.return.fields}") String solrReturnFieldsInText) {
 
-        OntologySolrQueryResultConverter resultConverter = new OntologySolrQueryResultConverter(
+        SolrQueryResultConverter resultConverter = new SolrQueryResultConverter(
                 new DocumentObjectBinder(),
                 new GODocConverter(),
                 new ECODocConverter()
