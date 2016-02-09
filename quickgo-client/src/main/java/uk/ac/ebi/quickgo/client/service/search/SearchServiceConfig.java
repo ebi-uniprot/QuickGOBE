@@ -61,7 +61,7 @@ public class SearchServiceConfig {
                 new DocumentObjectBinder(),
                 new GODocConverter(),
                 new ECODocConverter(),
-                ontologySolrConfig.searchRepo2DomainFieldMap()
+                ontologySolrConfig.repo2DomainFieldMap()
         );
 
 
@@ -85,7 +85,7 @@ public class SearchServiceConfig {
 
         return new OntologyCompositeRetrievalConfig() {
 
-            @Override public Map<String, String> searchRepo2DomainFieldMap() {
+            @Override public Map<String, String> repo2DomainFieldMap() {
                 return extractFieldMappings(ontologySearchRepo2DomainFieldMap, COMMA);
             }
 

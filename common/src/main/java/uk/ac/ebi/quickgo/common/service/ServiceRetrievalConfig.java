@@ -21,5 +21,5 @@ public interface ServiceRetrievalConfig {
      *
      * @return a map of associations between field names at the data-store and service layers
      */
-    Map<String, String> searchRepo2DomainFieldMap();
+    Map<String, String> repo2DomainFieldMap();
 }
