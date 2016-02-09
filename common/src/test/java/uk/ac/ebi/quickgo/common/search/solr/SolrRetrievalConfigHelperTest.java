@@ -31,7 +31,7 @@ public class SolrRetrievalConfigHelperTest {
     public void settingExplicitValidHighlightFieldsResultsInTheseFieldsBeingUsed() {
         String highlightDelimStart = "<b>";
         String highlightDelimEnd = "</b>";
-        String highlightDelims = highlightDelimStart + "," + highlightDelimEnd;
+        String highlightDelims = highlightDelimStart + COMMA + highlightDelimEnd;
 
         String[] convertedHighlightDelims = convertHighlightDelims(highlightDelims, COMMA);
 
