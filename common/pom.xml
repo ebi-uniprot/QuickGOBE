@@ -8,21 +8,27 @@
         <artifactId>quickgo-parent</artifactId>
         <groupId>uk.ac.ebi.quickgo</groupId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>common</artifactId>
-    <name>QuickGo Common components</name>
+    <name>QuickGo Shared Components</name>
+    <description>Module contains the common components shared by most of the top level projects</description>
+    <packaging>jar</packaging>
 
+    <properties>
+        <guava.version>18.0</guava.version>
+    </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
+            <version>${guava.version}</version>
         </dependency>
     </dependencies>
 
