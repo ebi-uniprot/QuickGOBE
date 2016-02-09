@@ -40,6 +40,8 @@ public class SolrRequestRetrieval<T> implements RequestRetrieval<T> {
         this.retrievedSolrFields = serviceProperties.getSearchReturnedFields();
         this.highlightStartDelim = serviceProperties.getHighlightStartDelim();
         this.highlightEndDelim = serviceProperties.getHighlightEndDelim();
+
+        checkArguments(solrServer, queryRequestConverter, resultConverter, serviceProperties);
     }
 
     private void checkArguments(SolrServer solrServer,
