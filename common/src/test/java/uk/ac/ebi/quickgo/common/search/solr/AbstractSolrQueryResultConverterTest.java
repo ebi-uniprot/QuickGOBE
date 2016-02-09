@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractSolrQueryResultConverterTest {
-    private static final QuickGOQuery DEFAULT_QUERY = QuickGOQuery.createQuery("field1", "field2");
+    private static final QuickGOQuery DEFAULT_QUERY = QuickGOQuery.createQuery("field1", "value1");
 
     private AbstractSolrQueryResultConverter<String> converter;
 
