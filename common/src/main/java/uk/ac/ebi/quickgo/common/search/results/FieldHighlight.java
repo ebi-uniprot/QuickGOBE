@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.common.search.results;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
@@ -22,7 +23,7 @@ public class FieldHighlight {
     }
 
     public List<String> getValues() {
-        return values;
+        return Collections.unmodifiableList(values);
     }
 
     public String getField() {
