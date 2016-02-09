@@ -68,4 +68,9 @@ public class ServiceRetrievalConfigHelperTest {
         assertThat(mappings, hasEntry("a", "b"));
         assertThat(mappings, hasEntry("x", "b"));
     }
+
+    @Test(expected = ServiceConfigException.class)
+    public void expectsServiceConfigExceptionWhenFieldMappingsAreOneToManyNotManyToOne() {
+        extractFieldMappings("a->b, a ->b", COMMA);
+    }
 }

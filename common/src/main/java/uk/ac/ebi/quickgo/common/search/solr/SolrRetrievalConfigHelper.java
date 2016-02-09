@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Helper functions associated with {@link SolrRetrievalConfig}.
+ *
  * Created 08/02/16
  * @author Edd
  */
