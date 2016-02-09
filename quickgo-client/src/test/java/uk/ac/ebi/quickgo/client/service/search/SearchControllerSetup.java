@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -43,6 +44,7 @@ public abstract class SearchControllerSetup {
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String FILTER_QUERY_PARAM = "filterQuery";
+    private static final String HIGHLIGHTING_PARAM = "highlighting";
 
     protected String resourceUrl;
 
@@ -173,6 +175,35 @@ public abstract class SearchControllerSetup {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.*", hasSize(expectedResponseSize)));
+    }
+
+    // highlighting ---------------------------------------------------------
+    protected ResultActions checkValidHighlightOnQueryResponse(String query, String... idHits)
+            throws Exception {
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
+        addParamsToRequest(clientRequest, HIGHLIGHTING_PARAM, "true");
+
+        int expectedResponseSize = idHits.length;
+
+        return mockMvc.perform(clientRequest)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder(idHits)))
+                .andExpect(jsonPath("$.results.*", hasSize(expectedResponseSize)))
+                .andExpect(jsonPath("$.highlighting.*.id", containsInAnyOrder(idHits)))
+                .andExpect(jsonPath("$.highlighting.*", hasSize(expectedResponseSize)));
+    }
+
+    protected ResultActions checkValidHighlightOffQueryResponse(String query, int expectedResponseSize)
+            throws Exception {
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
+        addParamsToRequest(clientRequest, "highlighting", "false");
+
+        return mockMvc.perform(clientRequest)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(expectedResponseSize)))
+                .andExpect(jsonPath("$.highlighting.*").doesNotExist());
     }
 
     private void addFiltersToRequest(MockHttpServletRequestBuilder clientRequest, String... filters) {

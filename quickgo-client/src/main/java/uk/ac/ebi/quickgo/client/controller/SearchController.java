@@ -69,7 +69,8 @@ public class SearchController {
             @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "filterQuery", required = false) List<String> filterQueries,
-            @RequestParam(value = "facet", required = false) List<String> facets) {
+            @RequestParam(value = "facet", required = false) List<String> facets,
+            @RequestParam(value = "highlighting", required = false) boolean highlighting) {
 
         QueryRequest request = buildRequest(
                 query,
@@ -77,6 +78,7 @@ public class SearchController {
                 page,
                 filterQueries,
                 facets,
+                highlighting,
                 ontologyQueryConverter,
                 ontologySearchableField);
 
@@ -102,6 +104,7 @@ public class SearchController {
             int page,
             List<String> filterQueries,
             List<String> facets,
+            boolean highlighting,
             StringToQuickGOQueryConverter converter,
             SearchableField fieldSpec) {
 
@@ -124,6 +127,8 @@ public class SearchController {
                         .map(converter::convert)
                         .forEach(builder::addQueryFilter);
             }
+
+            builder.useHighlighting(highlighting);
 
             return builder.build();
         }

@@ -22,20 +22,26 @@ import static java.util.Objects.requireNonNull;
  * @author Edd
  */
 public class SolrRequestRetrieval<T> implements RequestRetrieval<T> {
+    private final String highlightStartDelim;
+    private final String highlightEndDelim;
     private SolrServer solrServer;
     private QueryResultConverter<T, QueryResponse> resultConverter;
     private QueryRequestConverter<SolrQuery> queryRequestConverter;
     private final String[] retrievedSolrFields;
 
+
     public SolrRequestRetrieval(
             SolrServer solrServer,
             QueryRequestConverter<SolrQuery> queryRequestConverter,
             QueryResultConverter<T, QueryResponse> resultConverter,
-            String[] solrFieldsToRetrieve) {
+            SolrRetrievalConfig serviceProperties) {
         this.solrServer = requireNonNull(solrServer);
         this.resultConverter = requireNonNull(resultConverter);
         this.queryRequestConverter = requireNonNull(queryRequestConverter);
-        this.retrievedSolrFields = requireNonNull(solrFieldsToRetrieve);
+        requireNonNull(serviceProperties);
+        this.retrievedSolrFields = requireNonNull(serviceProperties.getSearchReturnedFields());
+        this.highlightStartDelim = requireNonNull(serviceProperties.getHighlightStartDelim());
+        this.highlightEndDelim = requireNonNull(serviceProperties.getHighlightEndDelim());
     }
 
     @Override public QueryResult<T> findByQuery(QueryRequest request) {
@@ -55,5 +61,8 @@ public class SolrRequestRetrieval<T> implements RequestRetrieval<T> {
         if (retrievedSolrFields.length > 0) {
             query.setFields(retrievedSolrFields);
         }
+
+        query.setHighlightSimplePre(highlightStartDelim);
+        query.setHighlightSimplePost(highlightEndDelim);
     }
 }

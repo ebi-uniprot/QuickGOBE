@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -27,7 +28,9 @@ public class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<O
 
     public SolrQueryResultConverter(DocumentObjectBinder documentObjectBinder,
             GODocConverter goDocConverter,
-            ECODocConverter ecoDocConverter) {
+            ECODocConverter ecoDocConverter,
+            Map<String, String> fieldNameMap) {
+        super(fieldNameMap);
         this.documentObjectBinder = requireNonNull(documentObjectBinder);
         this.goDocConverter = requireNonNull(goDocConverter);
         this.ecoDocConverter = requireNonNull(ecoDocConverter);

@@ -20,8 +20,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,6 +46,7 @@ public class OntologyUserQueryScoringIT {
     private static final String RESOURCE_URL = "/QuickGO/internal/search/ontology";
     private static final String QUERY_PARAM = "query";
     private static final String FILTER_QUERY_PARAM = "filterQuery";
+    private static final String HIGHLIGHTING_PARAM = "highlighting";
 
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
@@ -342,6 +346,30 @@ public class OntologyUserQueryScoringIT {
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))
                 .andExpect(jsonPath("$.results[1].id").value("GO:0000003"));
     }
+
+    // highlighting ------------------------------------------------
+    @Test
+    public void requestWithHighlightingOnReturnsTwoHighlightedValuesInResponse() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createDoc("GO:0000002", "go anotherFunction 2");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go anotherFunction 3");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL)
+                .param(QUERY_PARAM, "anotherFunction")
+                .param(HIGHLIGHTING_PARAM, "true"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder("GO:0000002", "GO:0000003")))
+                .andExpect(jsonPath("$.highlighting.*.id", containsInAnyOrder("GO:0000002", "GO:0000003")))
+                .andExpect(jsonPath("$.highlighting.*.matches.*.field", containsInAnyOrder("name", "name")))
+                .andExpect(jsonPath("$.highlighting[0].matches[0].values[0]", containsString("anotherFunction")))
+                .andExpect(jsonPath("$.highlighting[1].matches[0].values[0]", containsString("anotherFunction")));
+    }
+
 
     private static OntologyDocument createDoc(String id, String name, String... synonyms) {
         OntologyDocument document = new OntologyDocument();

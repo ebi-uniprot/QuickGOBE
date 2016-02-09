@@ -15,8 +15,8 @@ public class GODocConverter extends AbstractDocConverter<GOTerm> {
     }
 
     @Override protected void addOntologySpecificFields(OntologyDocument doc, GOTerm term) {
-        assert doc != null : "Ontology document can not be null";
-        assert term != null : "GoTerm can not be null";
+        assert doc != null : "Ontology document cannot be null";
+        assert term != null : "GoTerm cannot be null";
 
         term.aspect = doc.aspect != null ? Aspect.fromShortName(doc.aspect).getName() : null;
     }

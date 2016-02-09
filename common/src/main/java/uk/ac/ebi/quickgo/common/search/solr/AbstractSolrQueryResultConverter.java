@@ -3,17 +3,18 @@ package uk.ac.ebi.quickgo.common.search.solr;
 import uk.ac.ebi.quickgo.common.search.QueryResultConverter;
 import uk.ac.ebi.quickgo.common.search.query.Page;
 import uk.ac.ebi.quickgo.common.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.common.search.results.Facet;
-import uk.ac.ebi.quickgo.common.search.results.FieldFacet;
-import uk.ac.ebi.quickgo.common.search.results.PageInfo;
-import uk.ac.ebi.quickgo.common.search.results.QueryResult;
+import uk.ac.ebi.quickgo.common.search.results.*;
 
 import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Abstract class that deals with the conversion of the non type specific aspects of a {@link QueryResult}.
@@ -21,6 +22,13 @@ import org.apache.solr.common.SolrDocumentList;
  * @author Ricardo Antunes
  */
 public abstract class AbstractSolrQueryResultConverter<T> implements QueryResultConverter<T, QueryResponse> {
+    private static final String DOC_ID = "id";
+    protected final Map<String, String> fieldNameMap;
+
+    public AbstractSolrQueryResultConverter(Map<String, String> fieldNameMap) {
+        this.fieldNameMap = requireNonNull(fieldNameMap);
+    }
+
     @Override public QueryResult<T> convert(QueryResponse toConvert, QueryRequest request) {
         Preconditions.checkArgument(toConvert != null, "Query response cannot be null");
         Preconditions.checkArgument(request != null, "Query request cannot be null");
@@ -28,12 +36,13 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
         SolrDocumentList solrResults = toConvert.getResults();
         Page page = request.getPage();
         List<FacetField> facetFieldResults = toConvert.getFacetFields();
+        Map<String, Map<String, List<String>>> resultHighlights = toConvert.getHighlighting();
 
         long totalNumberOfResults = 0;
 
         List<T> results;
 
-        if(solrResults != null) {
+        if (solrResults != null) {
             totalNumberOfResults = solrResults.getNumFound();
             results = convertResults(solrResults);
         } else {
@@ -52,7 +61,67 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
             facet = convertFacet(facetFieldResults);
         }
 
-        return new QueryResult<>(totalNumberOfResults, results, pageInfo, facet);
+        List<DocHighlight> highlights = null;
+
+        if (resultHighlights != null && solrResults != null) {
+            highlights = convertResultHighlighting(solrResults, resultHighlights);
+        }
+
+        return new QueryResult<>(totalNumberOfResults, results, pageInfo, facet, highlights);
+    }
+
+    /**
+     * Converts a {@link SolrDocumentList} of results, together with an associated list
+     * of highlighted fields into a list of domain {@link DocHighlight} instances.
+     *
+     * @param solrResults the Solr results
+     * @param resultHighlights the Solr highlighting information
+     * @return the domain highlighting information
+     */
+    protected List<DocHighlight> convertResultHighlighting(
+            SolrDocumentList solrResults,
+            Map<String, Map<String, List<String>>> resultHighlights) {
+
+        return solrResults.stream()
+                .map(doc ->
+                {
+                    if (doc.containsKey(DOC_ID)) {
+                        return convertToDocHighlight(
+                                doc.getFieldValue(DOC_ID).toString(),
+                                resultHighlights);
+                    } else {
+                        return null;
+                    }
+                })
+                .filter(fieldHighlight -> fieldHighlight != null)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Creates a {@link DocHighlight} instance for a particular document id. This requires use of
+     * the original map of highlighting information returned from Solr.
+     *
+     * @param id the document identifier
+     * @param resultHighlights the original map of highlighting information returned from Solr
+     * @return domain level highlighting information for the document corresponding to {@code id}
+     */
+    private DocHighlight convertToDocHighlight(String id, Map<String, Map<String, List<String>>>
+            resultHighlights) {
+        List<FieldHighlight> fieldHighlights = resultHighlights
+                .get(id)
+                .entrySet().stream()
+                .map(entry -> {
+                    // by default, field name is that given by Solr
+                    String fieldName = entry.getKey();
+
+                    // if user specified mapping exists, use this as the field name
+                    if (fieldNameMap.containsKey(fieldName)) {
+                        fieldName = fieldNameMap.get(fieldName);
+                    }
+                    return new FieldHighlight(fieldName, entry.getValue());
+                })
+                .collect(Collectors.toList());
+        return new DocHighlight(id, fieldHighlights);
     }
 
     /**

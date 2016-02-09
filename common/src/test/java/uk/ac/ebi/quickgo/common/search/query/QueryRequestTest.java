@@ -1,10 +1,5 @@
 package uk.ac.ebi.quickgo.common.search.query;
 
-import uk.ac.ebi.quickgo.common.search.query.Facet;
-import uk.ac.ebi.quickgo.common.search.query.Page;
-import uk.ac.ebi.quickgo.common.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.common.search.query.QuickGOQuery;
-
 import java.util.Collection;
 import java.util.stream.Collectors;
 import org.junit.Test;
@@ -26,7 +21,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryRequestOnlyWithgetQuery() throws Exception {
+    public void buildsQueryRequestOnlyWithQuery() throws Exception {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
 
         QueryRequest request = new QueryRequest.Builder(query).build();
@@ -100,7 +95,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryRequestWithQueryAndFiltergetQuery() throws Exception {
+    public void buildsQueryRequestWithQueryAndFilterQuery() throws Exception {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
 
         QuickGOQuery filterQuery1 = QuickGOQuery.createQuery("field1", "value1");
@@ -130,5 +125,25 @@ public class QueryRequestTest {
 
         assertThat(request.getFilters(), hasSize(1));
         assertThat(request.getFilters().get(0), is(filterQuery));
+    }
+
+    @Test
+    public void buildsQueryWithHighlightingOff() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        QueryRequest request = new QueryRequest.Builder(query)
+                .useHighlighting(false)
+                .build();
+
+        assertThat(request.usesHighlighting(), is(false));
+    }
+
+    @Test
+    public void buildsQueryWithHighlightingOn() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        QueryRequest request = new QueryRequest.Builder(query)
+                .useHighlighting(true)
+                .build();
+
+        assertThat(request.usesHighlighting(), is(true));
     }
 }
