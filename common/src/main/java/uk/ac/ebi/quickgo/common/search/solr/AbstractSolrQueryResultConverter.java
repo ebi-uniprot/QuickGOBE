@@ -83,17 +83,10 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
             Map<String, Map<String, List<String>>> resultHighlights) {
 
         return solrResults.stream()
-                .map(doc ->
-                {
-                    if (doc.containsKey(DOC_ID)) {
-                        return convertToDocHighlight(
-                                doc.getFieldValue(DOC_ID).toString(),
-                                resultHighlights);
-                    } else {
-                        return null;
-                    }
-                })
-                .filter(fieldHighlight -> fieldHighlight != null)
+                .filter(doc -> doc.containsKey(DOC_ID))
+                .map(doc -> convertToDocHighlight(
+                        doc.getFieldValue(DOC_ID).toString(),
+                        resultHighlights))
                 .collect(Collectors.toList());
     }
 
