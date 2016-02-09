@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>build</artifactId>
+    <groupId>uk.ac.ebi.quickgo</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Builds the QuickGO project</name>
+    <description>Aggregator pom configured to build certain parts, or all of the QuickGO project</description>
+
+    <profiles>
+        <profile>
+            <id>all</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>../common</module>
+                <module>../ontology-common</module>
+                <module>../ontology-rest</module>
+                <module>../quickgo-client</module>
+                <module>../indexing</module>
+                <module>../sources</module>
+                <module>../model</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>indexing</id>
+            <modules>
+                <module>../sources</module>
+                <module>../model</module>
+                <module>../common</module>
+                <module>../ontology-common</module>
+                <module>../indexing</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>ontology_web_service</id>
+            <modules>
+                <module>../common</module>
+                <module>../ontology-common</module>
+                <module>../ontology-rest</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>client_web_service</id>
+            <modules>
+                <module>../common</module>
+                <module>../ontology-common</module>
+                <module>../quickgo-client</module>
+            </modules>
+        </profile>
+
+    </profiles>
+
+</project>
