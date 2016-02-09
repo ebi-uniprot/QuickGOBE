@@ -6,15 +6,13 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Service to query information from the {@link OntologyRepository}
@@ -35,9 +33,14 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
             OntologyRepository repository,
             OntologyDocConverter<T> converter,
             OntologyType type) {
-        this.ontologyType = requireNonNull(type.name());
-        this.ontologyRepository = requireNonNull(repository);
-        this.converter = requireNonNull(converter);
+
+        Preconditions.checkArgument(repository != null, "Ontology repository can not be null");
+        Preconditions.checkArgument(type != null, "Ontology type can not be null");
+        Preconditions.checkArgument(converter != null, "Ontology converter can not be null");
+
+        this.ontologyType = type.name();
+        this.ontologyRepository = repository;
+        this.converter = converter;
     }
 
     @Override public Optional<T> findCompleteInfoByOntologyId(String id) {

@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.client.service.converter.ontology.GODocConverter;
 import uk.ac.ebi.quickgo.common.search.solr.AbstractSolrQueryResultConverter;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +14,6 @@ import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Converts the Solr results into {@link OntologyTerm} instances.
@@ -31,9 +30,14 @@ public class OntologySolrQueryResultConverter extends AbstractSolrQueryResultCon
             ECODocConverter ecoDocConverter,
             Map<String, String> fieldNameMap) {
         super(fieldNameMap);
-        this.documentObjectBinder = requireNonNull(documentObjectBinder);
-        this.goDocConverter = requireNonNull(goDocConverter);
-        this.ecoDocConverter = requireNonNull(ecoDocConverter);
+
+        Preconditions.checkArgument(documentObjectBinder != null, "Document Object Binder can not be null");
+        Preconditions.checkArgument(goDocConverter != null, "Go document converter can not be null");
+        Preconditions.checkArgument(ecoDocConverter != null, "ECO document converter can not be null");
+
+        this.documentObjectBinder = documentObjectBinder;
+        this.goDocConverter = goDocConverter;
+        this.ecoDocConverter = ecoDocConverter;
     }
 
     protected List<OntologyTerm> convertResults(SolrDocumentList results) {

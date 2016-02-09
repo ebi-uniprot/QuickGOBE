@@ -12,6 +12,7 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 
+import com.google.common.base.Preconditions;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static java.util.Objects.requireNonNull;
 import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
 import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidPage;
 import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidQuery;
@@ -50,8 +50,11 @@ public abstract class OBOController<T extends OBOTerm> {
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField) {
-        this.ontologyService = requireNonNull(ontologyService);
-        this.ontologySearchService = requireNonNull(ontologySearchService);
+        Preconditions.checkArgument(ontologyService != null, "Ontology service can not be null");
+        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service can not be null");
+
+        this.ontologyService = ontologyService;
+        this.ontologySearchService = ontologySearchService;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
     }
 

@@ -14,8 +14,6 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * Abstract class that deals with the conversion of the non type specific aspects of a {@link QueryResult}.
  *
@@ -26,7 +24,9 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
     protected final Map<String, String> fieldNameMap;
 
     public AbstractSolrQueryResultConverter(Map<String, String> fieldNameMap) {
-        this.fieldNameMap = requireNonNull(fieldNameMap);
+        Preconditions.checkArgument(fieldNameMap != null, "Map of fields can not be null");
+
+        this.fieldNameMap = fieldNameMap;
     }
 
     @Override public QueryResult<T> convert(QueryResponse toConvert, QueryRequest request) {

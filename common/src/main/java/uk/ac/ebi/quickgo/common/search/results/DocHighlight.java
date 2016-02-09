@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.common.search.results;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Represents the highlights related to a document. It comprises a document identifier,
@@ -16,8 +15,11 @@ public class DocHighlight {
     private final List<FieldHighlight> matches;
 
     public DocHighlight(String id, List<FieldHighlight> matches) {
-        this.id = requireNonNull(id);
-        this.matches = requireNonNull(matches);
+        Preconditions.checkArgument(id != null, "Document identifier can not be null");
+        Preconditions.checkArgument(matches != null, "Highlighted matches can not be null");
+
+        this.id = id;
+        this.matches = matches;
     }
 
     public List<FieldHighlight> getMatches() {

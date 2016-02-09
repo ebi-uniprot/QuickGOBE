@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.common.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.common.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.common.search.results.QueryResult;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.util.Objects.requireNonNull;
 import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFacets;
 import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFilterQueries;
 import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
@@ -51,7 +51,10 @@ public class SearchController {
     public SearchController(
             SearchService<OntologyTerm> ontologySearchService,
             SearchableField ontologySearchableField) {
-        this.ontologySearchService = requireNonNull(ontologySearchService);
+
+        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service can not be null");
+
+        this.ontologySearchService = ontologySearchService;
         this.ontologySearchableField = ontologySearchableField;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(ontologySearchableField);
     }

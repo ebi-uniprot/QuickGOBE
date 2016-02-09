@@ -1,9 +1,8 @@
 package uk.ac.ebi.quickgo.common.search.results;
 
+import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.List;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Represents a highlighted field within a {@link DocHighlight}. The field
@@ -18,8 +17,11 @@ public class FieldHighlight {
     private final String field;
 
     public FieldHighlight(String field, List<String> values) {
-        this.field = requireNonNull(field);
-        this.values = requireNonNull(values);
+        Preconditions.checkArgument(field != null, "Highlighted field can not be null");
+        Preconditions.checkArgument(values != null, "Highlighted values can not be null");
+
+        this.field = field;
+        this.values = values;
     }
 
     public List<String> getValues() {
