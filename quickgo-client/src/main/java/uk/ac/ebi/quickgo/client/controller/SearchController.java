@@ -1,10 +1,7 @@
 package uk.ac.ebi.quickgo.client.controller;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
-import uk.ac.ebi.quickgo.rest.search.RetrievalException;
-import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
-import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.*;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -13,7 +10,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,21 +81,7 @@ public class SearchController {
                 ontologyQueryConverter,
                 ontologySearchableField);
 
-        ResponseEntity<QueryResult<OntologyTerm>> response;
-
-        if (request == null) {
-            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else {
-            try {
-                QueryResult<OntologyTerm> queryResult = ontologySearchService.findByQuery(request);
-                response = new ResponseEntity<>(queryResult, HttpStatus.OK);
-            } catch (RetrievalException e) {
-                logger.error(createErrorMessage(request), e);
-                response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return response;
+        return SearchDispatcher.search(request, ontologySearchService);
     }
 
     private QueryRequest buildRequest(String query,
@@ -135,9 +117,5 @@ public class SearchController {
 
             return builder.build();
         }
-    }
-
-    private static String createErrorMessage(QueryRequest request) {
-        return "Unable to process search query request: [" + request + "]";
     }
 }

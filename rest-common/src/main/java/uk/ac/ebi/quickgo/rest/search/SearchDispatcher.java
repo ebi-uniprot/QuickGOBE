@@ -9,6 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 /**
  * Helper class that dispatches search requests, in the form of
@@ -30,13 +32,36 @@ public final class SearchDispatcher {
     /**
      * Dispatch a {@link QueryRequest} to a {@link SearchService} and handle its responses
      * appropriately.
+     * <ul>
+     *      <li>If the request is {@code null} a {@link ResponseEntity} denoting an HTTP
+     *          {@code BAD REQUEST (400)}, is returned</li>
+     *     <li>If the service responds successfully, a {@link ResponseEntity} is returned
+     *         containing the {@link QueryResult}.</li>
+     *     <li>If an error occurs when processing the response, a
+     *     {@link ResponseEntity}, denoting an HTTP {@code INTERNAL SERVER ERROR (500)}, is
+     *      returned</li>
+     * </ul>
      * @param request the request
      * @param searchService the service in which to search
      * @param <T> the type of object being returned
      * @return the response
      */
-    public static <T> QueryResult<T> search(QueryRequest request, SearchService<T> searchService) {
-        return searchService.findByQuery(request);
+    public static <T> ResponseEntity<QueryResult<T>> search(QueryRequest request, SearchService<T> searchService) {
+        ResponseEntity<QueryResult<T>> response;
+
+        if (request == null) {
+            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            try {
+                QueryResult<T> queryResult = searchService.findByQuery(request);
+                response = new ResponseEntity<>(queryResult, HttpStatus.OK);
+            } catch (RetrievalException e) {
+                LOGGER.error(createErrorMessage(request), e);
+                throw e;
+            }
+        }
+
+        return response;
     }
 
     /**
@@ -107,5 +132,9 @@ public final class SearchDispatcher {
             }
         }
         return true;
+    }
+
+    private static String createErrorMessage(QueryRequest request) {
+        return "Unable to process search query request: [" + request + "]";
     }
 }

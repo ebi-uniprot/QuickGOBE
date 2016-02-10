@@ -1,9 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import uk.ac.ebi.quickgo.rest.search.RetrievalException;
-import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
-import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.*;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -230,21 +227,7 @@ public abstract class OBOController<T extends OBOTerm> {
                 page,
                 ontologyQueryConverter);
 
-        ResponseEntity<QueryResult<OBOTerm>> response;
-
-        if (request == null) {
-            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else {
-            try {
-                QueryResult<OBOTerm> queryResult = ontologySearchService.findByQuery(request);
-                response = new ResponseEntity<>(queryResult, HttpStatus.OK);
-            } catch (RetrievalException e) {
-                logger.error(createErrorMessage(request), e);
-                response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return response;
+        return SearchDispatcher.search(request, ontologySearchService);
     }
 
     private QueryRequest buildRequest(String query,
@@ -287,8 +270,4 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return the ontology type corresponding to this controller's behaviour.
      */
     protected abstract OntologyType getOntologyType();
-
-    private static String createErrorMessage(QueryRequest request) {
-        return "Unable to process search query request: [" + request + "]";
-    }
 }
