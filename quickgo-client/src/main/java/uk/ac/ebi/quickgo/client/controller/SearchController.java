@@ -23,9 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFacets;
 import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFilterQueries;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidPage;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidQuery;
 import static uk.ac.ebi.quickgo.common.search.query.QueryRequest.*;
 
 /**
@@ -111,33 +108,41 @@ public class SearchController {
             StringToQuickGOQueryConverter converter,
             SearchableField fieldSpec) {
 
-        if (!isValidQuery(query)
-                || !isValidNumRows(limit)
-                || !isValidPage(page)
-                || !isValidFacets(fieldSpec, facets)
-                || !isValidFilterQueries(fieldSpec, filterQueries)) {
-            return null;
-        } else {
-            Builder builder = new Builder(converter.convert(query));
-            builder.setPageParameters(page, limit);
+        checkFacets(fieldSpec, facets);
+        checkFilters(fieldSpec, filterQueries);
 
-            if (facets != null) {
-                facets.forEach(builder::addFacetField);
-            }
+        Builder builder = new Builder(converter.convert(query));
+        builder.setPageParameters(page, limit);
 
-            if (filterQueries != null) {
-                filterQueries.stream()
-                        .map(converter::convert)
-                        .forEach(builder::addQueryFilter);
-            }
-
-            builder.useHighlighting(highlighting);
-
-            return builder.build();
+        if (facets != null) {
+            facets.forEach(builder::addFacetField);
         }
+
+        if (filterQueries != null) {
+            filterQueries.stream()
+                    .map(converter::convert)
+                    .forEach(builder::addQueryFilter);
+        }
+
+        builder.useHighlighting(highlighting);
+
+        return builder.build();
     }
 
     private static String createErrorMessage(QueryRequest request) {
         return "Unable to process search query request: [" + request + "]";
+    }
+
+    private void checkFacets(SearchableField fieldSpec, List<String> facets) {
+        if (!isValidFacets(fieldSpec, facets)) {
+            throw new IllegalArgumentException("At least one of the provided facets is not searchable: " + facets);
+        }
+    }
+
+    private void checkFilters(SearchableField fieldSpec, List<String> filterQueries) {
+        if (!isValidFilterQueries(fieldSpec, filterQueries)) {
+            throw new IllegalArgumentException("At least one of the provided filter queries is not filterable: " +
+                    filterQueries);
+        }
     }
 }
