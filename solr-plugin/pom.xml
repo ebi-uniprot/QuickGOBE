@@ -7,42 +7,13 @@
         <groupId>uk.ac.ebi.quickgo</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
+    <modelVersion>4.0.0</modelVersion>
+    <version>0.0.1-SNAPSHOT</version>
     <artifactId>solr-plugin</artifactId>
     <name>QuickGO Solr plugins</name>
     <description>Contains all of the QuickGO specific plugins for Solr</description>
-
-    <dependencies>
-        <!-- Required by embedded solr server -->
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
-            <version>4.10.1</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-jdk14</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hamcrest</groupId>
-                    <artifactId>hamcrest-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>1.3</version>
-        </dependency>
-    </dependencies>
+    <packaging>jar</packaging>
 
     <build>
         <finalName>similarity_plugin</finalName>
