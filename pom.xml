@@ -26,6 +26,7 @@
                 <module>indexing</module>
                 <module>sources</module>
                 <module>model</module>
+                <module>rest-common</module>
             </modules>
         </profile>
         <profile>
@@ -43,6 +44,7 @@
             <modules>
                 <module>common</module>
                 <module>ontology-common</module>
+                <module>rest-common</module>
                 <module>ontology-rest</module>
             </modules>
         </profile>
@@ -51,6 +53,7 @@
             <modules>
                 <module>common</module>
                 <module>ontology-common</module>
+                <module>rest-common</module>
                 <module>quickgo-client</module>
             </modules>
         </profile>
