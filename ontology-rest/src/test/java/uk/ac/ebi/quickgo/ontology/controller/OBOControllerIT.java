@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -48,7 +50,7 @@ public abstract class OBOControllerIT {
 
     protected MockMvc mockMvc;
 
-    private String RESOURCE_URL;
+    private String resourceUrl;
     private String validId;
 
     @Before
@@ -58,7 +60,7 @@ public abstract class OBOControllerIT {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .build();
 
-        RESOURCE_URL = getResourceURL();
+        resourceUrl = getResourceURL();
 
         OntologyDocument basicDoc = createBasicDoc();
         validId = basicDoc.id;
@@ -67,7 +69,7 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveCoreById() throws Exception {
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + validId));
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId));
 
         expectCoreFields(response, validId)
                 .andExpect(jsonPath("$.history").doesNotExist())
@@ -77,7 +79,7 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveCompleteById() throws Exception {
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + validId +
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId +
                 "/complete"));
 
         expectCompleteFields(response, validId)
@@ -87,7 +89,7 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveHistoryById() throws Exception {
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + validId + "/history"));
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId + "/history"));
 
         expectBasicFields(response, validId)
                 .andExpect(jsonPath("$.history").isArray())
@@ -97,7 +99,7 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveXRefsById() throws Exception {
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + validId + "/xrefs"));
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId + "/xrefs"));
 
         expectBasicFields(response, validId)
                 .andExpect(jsonPath("$.xRefs").isArray())
@@ -112,7 +114,7 @@ public abstract class OBOControllerIT {
      */
     @Test
     public void canRetrieveTaxonConstraintsById() throws Exception {
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + validId + "/constraints"));
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId + "/constraints"));
 
         expectBasicFields(response, validId)
                 .andExpect(jsonPath("$.taxonConstraints").isArray())
@@ -123,7 +125,7 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveAnnotationGuideLinesById() throws Exception {
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + validId + "/guidelines"));
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId + "/guidelines"));
 
         expectBasicFields(response, validId)
                 .andExpect(jsonPath("$.annotationGuidelines").isArray())
@@ -133,7 +135,7 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveXORelsById() throws Exception {
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + validId + "/xontologyrelations"));
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId + "/xontologyrelations"));
 
         expectBasicFields(response, validId)
                 .andExpect(jsonPath("$.xRelations").isArray())
@@ -143,26 +145,31 @@ public abstract class OBOControllerIT {
 
     @Test
     public void finds400IfIdIsEmpty() throws Exception {
-        mockMvc.perform(get(RESOURCE_URL + "/"))
+        mockMvc.perform(get(resourceUrl + "/"))
+                .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void finds404IfIdDoesNotExist() throws Exception {
-        mockMvc.perform(get(RESOURCE_URL + "/" + idMissingInRepository()))
+        mockMvc.perform(get(resourceUrl + "/" + idMissingInRepository()))
+                .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void finds400OnInvalidGOId() throws Exception {
-        mockMvc.perform(get(RESOURCE_URL + "/" + invalidId()))
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + invalidId()))
+                .andDo(print())
                 .andExpect(status().isBadRequest());
+
+        expectInvalidIdError(response, "GO");
     }
 
     @Test
     public void searchesForTermSuccessfullyAndReceivesValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/" + SEARCH_ENDPOINT)
+                get(resourceUrl + "/" + SEARCH_ENDPOINT)
                         .param(QUERY_PARAM, validId));
 
         expectResultsInfoExists(response)
@@ -173,7 +180,7 @@ public abstract class OBOControllerIT {
     @Test
     public void searchesForInvalidIdAndReceivesZeroValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/" + SEARCH_ENDPOINT)
+                get(resourceUrl + "/" + SEARCH_ENDPOINT)
                         .param(QUERY_PARAM, invalidId()));
 
         expectResultsInfoExists(response)
@@ -184,7 +191,7 @@ public abstract class OBOControllerIT {
     @Test
     public void searchesForMissingIdAndReceivesZeroValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/" + SEARCH_ENDPOINT)
+                get(resourceUrl + "/" + SEARCH_ENDPOINT)
                         .param(QUERY_PARAM, idMissingInRepository()));
 
         expectResultsInfoExists(response)
@@ -195,7 +202,7 @@ public abstract class OBOControllerIT {
     @Test
     public void searchesForFieldThatDoesNotExistAndReceivesZeroValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/" + SEARCH_ENDPOINT)
+                get(resourceUrl + "/" + SEARCH_ENDPOINT)
                         .param(QUERY_PARAM, "fieldDoesNotExist:sandwiches"));
 
         expectResultsInfoExists(response)
@@ -244,6 +251,13 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.definition").exists());
     }
 
+    protected ResultActions expectInvalidIdError(ResultActions result, String id) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.url", is(requestUrl(result))))
+                .andExpect(jsonPath("$.message", containsString("Provided id: " + id)));
+    }
+
     /**
      * Create a basic document to be stored in the repository.
      * It must be a valid document, with a valid document ID.
@@ -259,4 +273,8 @@ public abstract class OBOControllerIT {
     protected abstract String invalidId();
 
     protected abstract String getResourceURL();
+
+    private String requestUrl(ResultActions resultActions) {
+        return resultActions.andReturn().getRequest().getRequestURL().toString();
+    }
 }
