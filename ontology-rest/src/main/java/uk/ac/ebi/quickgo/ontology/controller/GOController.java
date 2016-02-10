@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
+import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,9 @@ public class GOController extends OBOController<GOTerm> {
     @Autowired
     public GOController(OntologyService<GOTerm> goOntologyService,
             SearchService<OBOTerm> ontologySearchService,
-            SearchableField searchableField) {
-        super(goOntologyService, ontologySearchService, searchableField);
+            SearchableField searchableField,
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
+        super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig);
     }
 
     @Override

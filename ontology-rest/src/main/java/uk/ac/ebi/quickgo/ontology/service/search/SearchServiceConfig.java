@@ -12,6 +12,8 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
@@ -49,20 +51,20 @@ public class SearchServiceConfig {
     public RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval(
             SolrTemplate ontologyTemplate,
             QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter,
-            OntologyCompositeRetrievalConfig ontologySolrConfig) {
+            OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
 
         SolrQueryResultConverter resultConverter = new SolrQueryResultConverter(
                 new DocumentObjectBinder(),
                 new GODocConverter(),
                 new ECODocConverter(),
-                ontologySolrConfig.repo2DomainFieldMap()
+                ontologyRetrievalConfig.repo2DomainFieldMap()
         );
 
         return new SolrRequestRetrieval<>(
                 ontologyTemplate.getSolrServer(),
                 solrSelectQueryRequestConverter,
                 resultConverter,
-                ontologySolrConfig);
+                ontologyRetrievalConfig);
     }
 
     @Bean
@@ -71,7 +73,7 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public OntologyCompositeRetrievalConfig ontologySolrConfig(
+    public OntologyCompositeRetrievalConfig ontologyRetrievalConfig(
             @Value("${search.return.fields:" + DEFAULT_ONTOLOGY_SEARCH_RETURN_FIELDS + "}") String ontologySearchSolrReturnedFields,
             @Value("${search.field.repo2domain.map:}") String ontologySearchRepo2DomainFieldMap,
             @Value("${search.highlight.delims:" + DEFAULT_HIGHLIGHT_DELIMS + "}") String highlightDelims) {
@@ -83,8 +85,8 @@ public class SearchServiceConfig {
                 return extractFieldMappings(ontologySearchRepo2DomainFieldMap, COMMA);
             }
 
-            @Override public String[] getSearchReturnedFields() {
-                return ontologySearchSolrReturnedFields.split(COMMA);
+            @Override public List<String> getSearchReturnedFields() {
+                return Arrays.asList(ontologySearchSolrReturnedFields.split(COMMA));
             }
 
             @Override public String getHighlightStartDelim() {
@@ -97,7 +99,7 @@ public class SearchServiceConfig {
         };
     }
 
-    private interface OntologyCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {
+    public interface OntologyCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {
     }
 
 

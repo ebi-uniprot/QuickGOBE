@@ -11,6 +11,7 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
+import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
@@ -46,16 +47,19 @@ public abstract class OBOController<T extends OBOTerm> {
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
+    private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
-            SearchableField searchableField) {
+            SearchableField searchableField,
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
         Preconditions.checkArgument(ontologyService != null, "Ontology service can not be null");
         Preconditions.checkArgument(ontologySearchService != null, "Ontology search service can not be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
+        this.ontologyRetrievalConfig = ontologyRetrievalConfig;
     }
 
     /**
@@ -260,9 +264,17 @@ public abstract class OBOController<T extends OBOTerm> {
             QuickGOQuery userQuery = converter.convert(query);
             QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
 
-            return new QueryRequest
+
+            QueryRequest.Builder builder = new QueryRequest
                     .Builder(restrictedUserQuery)
-                    .setPageParameters(page, limit)
+                    .setPageParameters(page, limit);
+
+            if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
+                ontologyRetrievalConfig.getSearchReturnedFields().stream()
+                        .forEach(builder::addProjectedField);
+            }
+
+            return builder
                     .build();
         }
     }

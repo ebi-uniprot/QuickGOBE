@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.common.search.solr;
 
+import java.util.List;
+
 /**
  * Configuration information relating to Solr data retrieval.
  *
@@ -9,9 +11,9 @@ package uk.ac.ebi.quickgo.common.search.solr;
 public interface SolrRetrievalConfig {
     /**
      * Retrieves the fields to be returned from Solr.
-     * @return an array of field names
+     * @return a list of field names
      */
-    String[] getSearchReturnedFields();
+    List<String> getSearchReturnedFields();
 
     /**
      * The start delimiter used in highlighting.

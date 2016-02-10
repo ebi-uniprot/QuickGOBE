@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.common.search.results;
 
 import com.google.common.base.Preconditions;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,10 +24,40 @@ public class DocHighlight {
     }
 
     public List<FieldHighlight> getMatches() {
-        return matches;
+        return Collections.unmodifiableList(matches);
     }
 
     public String getId() {
         return id;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DocHighlight that = (DocHighlight) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) {
+            return false;
+        }
+        return matches != null ? matches.equals(that.matches) : that.matches == null;
+
+    }
+
+    @Override public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (matches != null ? matches.hashCode() : 0);
+        return result;
+    }
+
+    @Override public String toString() {
+        return "DocHighlight{" +
+                "id='" + id + '\'' +
+                ", matches=" + matches +
+                '}';
     }
 }

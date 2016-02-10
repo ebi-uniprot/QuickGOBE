@@ -14,18 +14,27 @@ public class QueryRequest {
     private final Page page;
     private final List<Facet> facets;
     private final List<QuickGOQuery> filters;
-    private final boolean highlighting;
+    private final List<FieldProjection> projectedFields;
+    private final List<FieldHighlight> highlightedFields;
+    private final String highlightStartDelim;
+    private final String highlightEndDelim;
 
     private QueryRequest(QuickGOQuery query,
             Page page,
             List<Facet> facets,
             List<QuickGOQuery> filters,
-            boolean highlighting) {
+            List<FieldProjection> projectedFields,
+            List<FieldHighlight> highlightedFields,
+            String highlightStartDelim,
+            String highlightEndDelim) {
         this.query = query;
         this.page = page;
         this.facets = Collections.unmodifiableList(facets);
         this.filters = filters;
-        this.highlighting = highlighting;
+        this.projectedFields = projectedFields;
+        this.highlightedFields = highlightedFields;
+        this.highlightStartDelim = highlightStartDelim;
+        this.highlightEndDelim = highlightEndDelim;
     }
 
     public QuickGOQuery getQuery() {
@@ -48,8 +57,20 @@ public class QueryRequest {
         filters.add(filterQuery);
     }
 
-    public boolean usesHighlighting() {
-        return highlighting;
+    public List<FieldHighlight> getHighlightedFields() {
+        return highlightedFields;
+    }
+
+    public List<FieldProjection> getProjectedFields() {
+        return projectedFields;
+    }
+
+    public String getHighlightStartDelim() {
+        return highlightStartDelim;
+    }
+
+    public String getHighlightEndDelim() {
+        return highlightEndDelim;
     }
 
     public static class Builder {
@@ -57,7 +78,10 @@ public class QueryRequest {
         private Page page;
         private List<Facet> facets;
         private List<QuickGOQuery> filters;
-        private boolean highlighting;
+        private List<FieldProjection> projectedFields;
+        private List<FieldHighlight> highlightedFields;
+        private String highlightStartDelim;
+        private String highlightEndDelim;
 
         public Builder(QuickGOQuery query) {
             Preconditions.checkArgument(query != null, "Query cannot be null");
@@ -65,7 +89,8 @@ public class QueryRequest {
             this.query = query;
             facets = new ArrayList<>();
             filters = new ArrayList<>();
-            highlighting = false;
+            projectedFields = new ArrayList<>();
+            highlightedFields = new ArrayList<>();
         }
 
         public Builder setPageParameters(int currentPage, int pageSize) {
@@ -86,14 +111,37 @@ public class QueryRequest {
             return this;
         }
 
-        public Builder useHighlighting(boolean useHighlighting) {
-            this.highlighting = useHighlighting;
+        public Builder addHighlightedField(String field) {
+            this.highlightedFields.add(new FieldHighlight(field));
 
             return this;
         }
 
+        public Builder addProjectedField(String field) {
+            this.projectedFields.add(new FieldProjection(field));
+            return this;
+        }
+
+        public Builder setHighlightStartDelim(String highlightStartDelim) {
+            this.highlightStartDelim = highlightStartDelim;
+            return this;
+        }
+
+        public Builder setHighlightEndDelim(String highlightEndDelim) {
+            this.highlightEndDelim = highlightEndDelim;
+            return this;
+        }
+
         public QueryRequest build() {
-            return new QueryRequest(query, page, facets, filters, highlighting);
+            return new QueryRequest(
+                    query,
+                    page,
+                    facets,
+                    filters,
+                    projectedFields,
+                    highlightedFields,
+                    highlightStartDelim,
+                    highlightEndDelim);
         }
     }
 
@@ -107,9 +155,6 @@ public class QueryRequest {
 
         QueryRequest that = (QueryRequest) o;
 
-        if (highlighting != that.highlighting) {
-            return false;
-        }
         if (query != null ? !query.equals(that.query) : that.query != null) {
             return false;
         }
@@ -119,7 +164,22 @@ public class QueryRequest {
         if (facets != null ? !facets.equals(that.facets) : that.facets != null) {
             return false;
         }
-        return filters != null ? filters.equals(that.filters) : that.filters == null;
+        if (filters != null ? !filters.equals(that.filters) : that.filters != null) {
+            return false;
+        }
+        if (projectedFields != null ? !projectedFields.equals(that.projectedFields) : that.projectedFields != null) {
+            return false;
+        }
+        if (highlightedFields != null ? !highlightedFields.equals(that.highlightedFields) :
+                that.highlightedFields != null) {
+            return false;
+        }
+        if (highlightStartDelim != null ? !highlightStartDelim.equals(that.highlightStartDelim) :
+                that.highlightStartDelim != null) {
+            return false;
+        }
+        return highlightEndDelim != null ? highlightEndDelim.equals(that.highlightEndDelim) :
+                that.highlightEndDelim == null;
 
     }
 
@@ -128,7 +188,10 @@ public class QueryRequest {
         result = 31 * result + (page != null ? page.hashCode() : 0);
         result = 31 * result + (facets != null ? facets.hashCode() : 0);
         result = 31 * result + (filters != null ? filters.hashCode() : 0);
-        result = 31 * result + (highlighting ? 1 : 0);
+        result = 31 * result + (projectedFields != null ? projectedFields.hashCode() : 0);
+        result = 31 * result + (highlightedFields != null ? highlightedFields.hashCode() : 0);
+        result = 31 * result + (highlightStartDelim != null ? highlightStartDelim.hashCode() : 0);
+        result = 31 * result + (highlightEndDelim != null ? highlightEndDelim.hashCode() : 0);
         return result;
     }
 
@@ -138,7 +201,10 @@ public class QueryRequest {
                 ", page=" + page +
                 ", facets=" + facets +
                 ", filters=" + filters +
-                ", highlighting=" + highlighting +
+                ", projectedFields=" + projectedFields +
+                ", highlightedFields=" + highlightedFields +
+                ", highlightStartDelim='" + highlightStartDelim + '\'' +
+                ", highlightEndDelim='" + highlightEndDelim + '\'' +
                 '}';
     }
 }

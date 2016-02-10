@@ -17,11 +17,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
@@ -41,11 +37,11 @@ public class AbstractSolrQueryResultConverterTest {
     private QueryResponse responseMock;
 
     @Mock
-    private Map<String, String> fieldNameMap;
+    private Map<String, String> highlightedFieldNameMap;
 
     @Before
     public void setUp() throws Exception {
-        converter = new AbstractSolrQueryResultConverter<String>(fieldNameMap) {
+        converter = new AbstractSolrQueryResultConverter<String>(highlightedFieldNameMap) {
             @Override protected List<String> convertResults(SolrDocumentList results) {
                 return results.stream()
                         .map(SolrDocument::toString)
@@ -243,6 +239,10 @@ public class AbstractSolrQueryResultConverterTest {
         return facetField;
     }
 
+    private void checkResultFields(List<SolrDocument> queryResult, int expectedResultCount, String... fields) {
+
+    }
+
     private void checkPageInfo(PageInfo pageInfo, int expectedTotalPages, int expectedCurrentPage, int
             expectedResultsPerPage) {
         assertThat(pageInfo.getResultsPerPage(), is(expectedResultsPerPage));
@@ -252,6 +252,15 @@ public class AbstractSolrQueryResultConverterTest {
 
     private QueryRequest createDefaultRequest(QuickGOQuery query) {
         return new QueryRequest.Builder(query).build();
+    }
+
+    private QueryRequest createRequestWithFieldProjections(QuickGOQuery query, String... fields) {
+        QueryRequest.Builder builder = new QueryRequest.Builder(query);
+        for (String field : fields) {
+            builder.addProjectedField(field);
+        }
+
+        return builder.build();
     }
 
     private QueryRequest createRequestWithPaging(QuickGOQuery query, int currentPage, int resultsPerPage) {

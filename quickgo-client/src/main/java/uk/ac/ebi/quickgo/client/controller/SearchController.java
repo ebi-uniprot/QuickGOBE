@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.controller;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
+import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.search.RetrievalException;
 import uk.ac.ebi.quickgo.common.search.SearchService;
 import uk.ac.ebi.quickgo.common.search.SearchableField;
@@ -21,12 +22,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFacets;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFilterQueries;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidPage;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidQuery;
-import static uk.ac.ebi.quickgo.common.search.query.QueryRequest.*;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.*;
+import static uk.ac.ebi.quickgo.common.search.query.QueryRequest.Builder;
 
 /**
  * Search controller responsible for providing consistent search
@@ -46,17 +43,21 @@ public class SearchController {
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchService<OntologyTerm> ontologySearchService;
     private final SearchableField ontologySearchableField;
+    private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
 
     @Autowired
     public SearchController(
             SearchService<OntologyTerm> ontologySearchService,
-            SearchableField ontologySearchableField) {
+            SearchableField ontologySearchableField,
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
 
-        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service can not be null");
+        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
+        Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
 
         this.ontologySearchService = ontologySearchService;
         this.ontologySearchableField = ontologySearchableField;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(ontologySearchableField);
+        this.ontologyRetrievalConfig = ontologyRetrievalConfig;
     }
 
     /**
@@ -131,7 +132,15 @@ public class SearchController {
                         .forEach(builder::addQueryFilter);
             }
 
-            builder.useHighlighting(highlighting);
+            if (highlighting) {
+                ontologyRetrievalConfig.repo2DomainFieldMap().keySet().stream()
+                        .forEach(builder::addHighlightedField);
+                builder.setHighlightStartDelim(ontologyRetrievalConfig.getHighlightStartDelim());
+                builder.setHighlightEndDelim(ontologyRetrievalConfig.getHighlightEndDelim());
+            }
+
+            ontologyRetrievalConfig.getSearchReturnedFields().stream()
+                    .forEach(builder::addProjectedField);
 
             return builder.build();
         }
