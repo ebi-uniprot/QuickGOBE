@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.model.ontology.generic;
 import java.util.EnumSet;
 import java.util.List;
 
-
 public class TermOntologyHistory extends AuditTrail {
 	public List<AuditRecord> getHistoryAll() {
 		return getFilteredHistory(EnumSet.allOf(AuditRecord.AuditCategory.class));

@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.model.ontology.generic.GenericTermSet;
 import java.io.IOException;
 import java.io.Writer;
 
-
 public class GOTermSet extends GenericTermSet {
 	public GOTermSet(GeneOntology ontology, String name, int colour) {
 		super(ontology, name, colour);
