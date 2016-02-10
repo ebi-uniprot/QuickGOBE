@@ -5,12 +5,12 @@ import uk.ac.ebi.quickgo.client.service.converter.ontology.ECODocConverter;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.GODocConverter;
 import uk.ac.ebi.quickgo.client.service.search.ontology.OntologySearchServiceImpl;
 import uk.ac.ebi.quickgo.client.service.search.ontology.OntologySolrQueryResultConverter;
-import uk.ac.ebi.quickgo.common.search.RequestRetrieval;
-import uk.ac.ebi.quickgo.common.search.SearchService;
-import uk.ac.ebi.quickgo.common.search.query.QueryRequestConverter;
-import uk.ac.ebi.quickgo.common.search.query.SolrQueryConverter;
-import uk.ac.ebi.quickgo.common.search.solr.SolrRequestRetrieval;
-import uk.ac.ebi.quickgo.common.search.solr.SolrRetrievalConfig;
+import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
+import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
+import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.common.service.ServiceRetrievalConfig;
 import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
 
@@ -24,10 +24,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.solr.core.SolrTemplate;
 
-import static uk.ac.ebi.quickgo.common.search.solr.SolrRetrievalConfigHelper.DEFAULT_HIGHLIGHT_DELIMS;
-import static uk.ac.ebi.quickgo.common.search.solr.SolrRetrievalConfigHelper.HIGHLIGHT_END_DELIM_INDEX;
-import static uk.ac.ebi.quickgo.common.search.solr.SolrRetrievalConfigHelper.HIGHLIGHT_START_DELIM_INDEX;
-import static uk.ac.ebi.quickgo.common.search.solr.SolrRetrievalConfigHelper.convertHighlightDelims;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.DEFAULT_HIGHLIGHT_DELIMS;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.HIGHLIGHT_END_DELIM_INDEX;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.HIGHLIGHT_START_DELIM_INDEX;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.convertHighlightDelims;
 import static uk.ac.ebi.quickgo.common.service.ServiceRetrievalConfigHelper.extractFieldMappings;
 
 /**
