@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.common.service;
+package uk.ac.ebi.quickgo.rest.service;
+
+import uk.ac.ebi.quickgo.rest.service.ServiceConfigException;
 
 import java.util.Map;
 import org.junit.Test;
@@ -7,7 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static uk.ac.ebi.quickgo.common.service.ServiceRetrievalConfigHelper.extractFieldMappings;
+import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extractFieldMappings;
 
 /**
  * Created 08/02/16

@@ -11,7 +11,7 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
 import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
-import uk.ac.ebi.quickgo.common.service.ServiceRetrievalConfig;
+import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
 
 import java.util.Map;
@@ -28,7 +28,7 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.DEFAU
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.HIGHLIGHT_END_DELIM_INDEX;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.HIGHLIGHT_START_DELIM_INDEX;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.convertHighlightDelims;
-import static uk.ac.ebi.quickgo.common.service.ServiceRetrievalConfigHelper.extractFieldMappings;
+import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extractFieldMappings;
 
 /**
  * Spring configuration for the service layer, which depends on the repositories

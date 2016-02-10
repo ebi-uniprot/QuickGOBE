@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.common.service;
+package uk.ac.ebi.quickgo.rest.service;
 
 import java.util.HashMap;
 import java.util.Map;

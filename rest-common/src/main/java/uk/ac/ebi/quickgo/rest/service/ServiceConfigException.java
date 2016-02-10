@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.common.service;
+package uk.ac.ebi.quickgo.rest.service;
 
 /**
  * Represents a {@link RuntimeException} that is thrown whenever there
