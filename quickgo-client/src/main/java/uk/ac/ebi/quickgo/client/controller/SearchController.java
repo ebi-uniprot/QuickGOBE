@@ -1,19 +1,17 @@
 package uk.ac.ebi.quickgo.client.controller;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
-import uk.ac.ebi.quickgo.common.search.RetrievalException;
-import uk.ac.ebi.quickgo.common.search.SearchService;
-import uk.ac.ebi.quickgo.common.search.SearchableField;
-import uk.ac.ebi.quickgo.common.search.StringToQuickGOQueryConverter;
-import uk.ac.ebi.quickgo.common.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.common.search.results.QueryResult;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,12 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFacets;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFilterQueries;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidPage;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidQuery;
-import static uk.ac.ebi.quickgo.common.search.query.QueryRequest.*;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
+import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.*;
 
 /**
  * Search controller responsible for providing consistent search
@@ -85,7 +79,7 @@ public class SearchController {
                 ontologyQueryConverter,
                 ontologySearchableField);
 
-        return SearchDispatcher.search(request, ontologySearchService);
+        return search(request, ontologySearchService);
     }
 
     private QueryRequest buildRequest(String query,
@@ -116,10 +110,6 @@ public class SearchController {
         builder.useHighlighting(highlighting);
 
         return builder.build();
-    }
-
-    private static String createErrorMessage(QueryRequest request) {
-        return "Unable to process search query request: [" + request + "]";
     }
 
     private void checkFacets(SearchableField fieldSpec, List<String> facets) {

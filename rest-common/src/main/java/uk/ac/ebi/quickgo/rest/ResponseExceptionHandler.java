@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest;
 
-import uk.ac.ebi.quickgo.common.search.RetrievalException;
-import uk.ac.ebi.quickgo.common.service.ServiceConfigException;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
+import uk.ac.ebi.quickgo.rest.service.ServiceConfigException;
 
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;

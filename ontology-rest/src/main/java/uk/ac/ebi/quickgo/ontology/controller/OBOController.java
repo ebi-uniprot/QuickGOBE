@@ -1,16 +1,13 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import uk.ac.ebi.quickgo.common.search.RetrievalException;
-import uk.ac.ebi.quickgo.common.search.SearchService;
-import uk.ac.ebi.quickgo.common.search.SearchableField;
-import uk.ac.ebi.quickgo.common.search.StringToQuickGOQueryConverter;
-import uk.ac.ebi.quickgo.common.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.common.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.common.search.results.QueryResult;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
+import uk.ac.ebi.quickgo.rest.search.*;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
@@ -212,21 +209,7 @@ public abstract class OBOController<T extends OBOTerm> {
                 page,
                 ontologyQueryConverter);
 
-        ResponseEntity<QueryResult<OBOTerm>> response;
-
-        if (request == null) {
-            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else {
-            try {
-                QueryResult<OBOTerm> queryResult = ontologySearchService.findByQuery(request);
-                response = new ResponseEntity<>(queryResult, HttpStatus.OK);
-            } catch (RetrievalException e) {
-                logger.error(createErrorMessage(request), e);
-                response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return response;
+        return SearchDispatcher.search(request, ontologySearchService);
     }
 
     private QueryRequest buildRequest(String query,
@@ -234,19 +217,13 @@ public abstract class OBOController<T extends OBOTerm> {
             int page,
             StringToQuickGOQueryConverter converter) {
 
-        if (!isValidQuery(query)
-                || !isValidNumRows(limit)
-                || !isValidPage(page)) {
-            return null;
-        } else {
-            QuickGOQuery userQuery = converter.convert(query);
-            QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
+        QuickGOQuery userQuery = converter.convert(query);
+        QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
 
-            return new QueryRequest
-                    .Builder(restrictedUserQuery)
-                    .setPageParameters(page, limit)
-                    .build();
-        }
+        return new QueryRequest
+                .Builder(restrictedUserQuery)
+                .setPageParameters(page, limit)
+                .build();
     }
 
     /**
@@ -269,10 +246,6 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return the ontology type corresponding to this controller's behaviour.
      */
     protected abstract OntologyType getOntologyType();
-
-    private static String createErrorMessage(QueryRequest request) {
-        return "Unable to process search query request: [" + request + "]";
-    }
 
     /**
      * Checks the validity of a term id.
