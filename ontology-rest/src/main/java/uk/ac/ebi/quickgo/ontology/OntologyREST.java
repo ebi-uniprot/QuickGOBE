@@ -18,7 +18,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  * @author Edd
  */
 @SpringBootApplication
-@ComponentScan({"uk.ac.ebi.quickgo.ontology.controller"})
+@ComponentScan({"uk.ac.ebi.quickgo.ontology.controller", "uk.ac.ebi.quickgo.rest"})
 @Import({ServiceConfig.class})
 public class OntologyREST {
     /**

@@ -12,6 +12,7 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 
+import com.google.common.base.Preconditions;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import static java.util.Objects.requireNonNull;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidPage;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidQuery;
 
 /**
  * Abstract controller defining common end-points of an OBO related
@@ -50,8 +46,11 @@ public abstract class OBOController<T extends OBOTerm> {
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField) {
-        this.ontologyService = requireNonNull(ontologyService);
-        this.ontologySearchService = requireNonNull(ontologySearchService);
+        Preconditions.checkArgument(ontologyService != null, "Ontology service can not be null");
+        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service can not be null");
+
+        this.ontologyService = ontologyService;
+        this.ontologySearchService = ontologySearchService;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
     }
 
@@ -79,9 +78,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findCoreTerm(@PathVariable(value = "id") String id) {
-        if (!isValidId(id)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        checkValidId(id);
 
         return getTermResponse(ontologyService.findCoreInfoByOntologyId(id));
     }
@@ -105,9 +102,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = "/{id}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findCompleteTerm(@PathVariable(value = "id") String id) {
-        if (!isValidId(id)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        checkValidId(id);
 
         return getTermResponse(ontologyService.findCompleteInfoByOntologyId(id));
     }
@@ -125,9 +120,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = "/{id}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermHistory(@PathVariable(value = "id") String id) {
-        if (!isValidId(id)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        checkValidId(id);
 
         return getTermResponse(ontologyService.findHistoryInfoByOntologyId(id));
     }
@@ -144,9 +137,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = "/{id}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermXRefs(@PathVariable(value = "id") String id) {
-        if (!isValidId(id)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        checkValidId(id);
 
         return getTermResponse(ontologyService.findXRefsInfoByOntologyId(id));
     }
@@ -163,9 +154,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = "/{id}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermTaxonConstraints(@PathVariable(value = "id") String id) {
-        if (!isValidId(id)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        checkValidId(id);
 
         return getTermResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(id));
     }
@@ -182,9 +171,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = "/{id}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermXOntologyRelations(@PathVariable(value = "id") String id) {
-        if (!isValidId(id)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        checkValidId(id);
 
         return getTermResponse(ontologyService.findXORelationsInfoByOntologyId(id));
     }
@@ -201,9 +188,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = "/{id}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermAnnotationGuideLines(@PathVariable(value = "id") String id) {
-        if (!isValidId(id)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        checkValidId(id);
 
         return getTermResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(id));
     }
@@ -249,19 +234,13 @@ public abstract class OBOController<T extends OBOTerm> {
             int page,
             StringToQuickGOQueryConverter converter) {
 
-        if (!isValidQuery(query)
-                || !isValidNumRows(limit)
-                || !isValidPage(page)) {
-            return null;
-        } else {
-            QuickGOQuery userQuery = converter.convert(query);
-            QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
+        QuickGOQuery userQuery = converter.convert(query);
+        QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
 
-            return new QueryRequest
-                    .Builder(restrictedUserQuery)
-                    .setPageParameters(page, limit)
-                    .build();
-        }
+        return new QueryRequest
+                .Builder(restrictedUserQuery)
+                .setPageParameters(page, limit)
+                .build();
     }
 
     /**
@@ -287,5 +266,17 @@ public abstract class OBOController<T extends OBOTerm> {
 
     private static String createErrorMessage(QueryRequest request) {
         return "Unable to process search query request: [" + request + "]";
+    }
+
+    /**
+     * Checks the validity of a term id.
+     *
+     * @param id the term id to check
+     * @throws IllegalArgumentException is thrown if the id is not valid
+     */
+    private void checkValidId(String id) {
+        if (!isValidId(id)) {
+            throw new IllegalArgumentException("Provided id: " + id + " is invalid");
+        }
     }
 }

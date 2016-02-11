@@ -7,19 +7,25 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Contains all of the information necessary to put in a search request to a queryable data source.
+ * Contains all of the information necessary to put in a search request to a searchable data source.
  */
 public class QueryRequest {
     private final QuickGOQuery query;
     private final Page page;
     private final List<Facet> facets;
     private final List<QuickGOQuery> filters;
+    private final boolean highlighting;
 
-    private QueryRequest(QuickGOQuery query, Page page, List<Facet> facets, List<QuickGOQuery> filters) {
+    private QueryRequest(QuickGOQuery query,
+            Page page,
+            List<Facet> facets,
+            List<QuickGOQuery> filters,
+            boolean highlighting) {
         this.query = query;
         this.page = page;
         this.facets = Collections.unmodifiableList(facets);
         this.filters = filters;
+        this.highlighting = highlighting;
     }
 
     public QuickGOQuery getQuery() {
@@ -42,11 +48,16 @@ public class QueryRequest {
         filters.add(filterQuery);
     }
 
+    public boolean usesHighlighting() {
+        return highlighting;
+    }
+
     public static class Builder {
         private QuickGOQuery query;
         private Page page;
         private List<Facet> facets;
         private List<QuickGOQuery> filters;
+        private boolean highlighting;
 
         public Builder(QuickGOQuery query) {
             Preconditions.checkArgument(query != null, "Query cannot be null");
@@ -54,6 +65,7 @@ public class QueryRequest {
             this.query = query;
             facets = new ArrayList<>();
             filters = new ArrayList<>();
+            highlighting = false;
         }
 
         public Builder setPageParameters(int currentPage, int pageSize) {
@@ -74,8 +86,14 @@ public class QueryRequest {
             return this;
         }
 
+        public Builder useHighlighting(boolean useHighlighting) {
+            this.highlighting = useHighlighting;
+
+            return this;
+        }
+
         public QueryRequest build() {
-            return new QueryRequest(query, page, facets, filters);
+            return new QueryRequest(query, page, facets, filters, highlighting);
         }
     }
 
@@ -87,26 +105,30 @@ public class QueryRequest {
             return false;
         }
 
-        QueryRequest request = (QueryRequest) o;
+        QueryRequest that = (QueryRequest) o;
 
-        if (!query.equals(request.query)) {
+        if (highlighting != that.highlighting) {
             return false;
         }
-        if (page != null ? !page.equals(request.page) : request.page != null) {
+        if (query != null ? !query.equals(that.query) : that.query != null) {
             return false;
         }
-        if (facets != null ? !facets.equals(request.facets) : request.facets != null) {
+        if (page != null ? !page.equals(that.page) : that.page != null) {
             return false;
         }
-        return !(filters != null ? !filters.equals(request.filters) : request.filters != null);
+        if (facets != null ? !facets.equals(that.facets) : that.facets != null) {
+            return false;
+        }
+        return filters != null ? filters.equals(that.filters) : that.filters == null;
 
     }
 
     @Override public int hashCode() {
-        int result = query.hashCode();
+        int result = query != null ? query.hashCode() : 0;
         result = 31 * result + (page != null ? page.hashCode() : 0);
         result = 31 * result + (facets != null ? facets.hashCode() : 0);
         result = 31 * result + (filters != null ? filters.hashCode() : 0);
+        result = 31 * result + (highlighting ? 1 : 0);
         return result;
     }
 
@@ -116,6 +138,7 @@ public class QueryRequest {
                 ", page=" + page +
                 ", facets=" + facets +
                 ", filters=" + filters +
+                ", highlighting=" + highlighting +
                 '}';
     }
 }

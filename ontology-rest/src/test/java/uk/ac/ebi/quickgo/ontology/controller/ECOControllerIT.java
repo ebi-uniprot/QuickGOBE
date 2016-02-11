@@ -31,7 +31,7 @@ public class ECOControllerIT extends OBOControllerIT {
 
     @Override
     protected String invalidId() {
-        return "ECO;0000001";
+        return "ECO|0000001";
     }
 
 }

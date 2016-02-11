@@ -1,10 +1,5 @@
 package uk.ac.ebi.quickgo.common.search.query;
 
-import uk.ac.ebi.quickgo.common.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.common.search.query.QueryRequestConverter;
-import uk.ac.ebi.quickgo.common.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.common.search.query.SolrQueryConverter;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.junit.Before;
 import org.junit.Test;
@@ -174,6 +169,51 @@ public class SolrQueryConverterTest {
         SolrQuery query = converter.convert(request);
 
         assertThat(query.getFilterQueries(), arrayContaining(buildFieldQuery(filterField, filterValue)));
+    }
+
+    @Test
+    public void defaultConvertQueryRequestDoesNotUseHighlighting() {
+        String field = "field1";
+        String value = "value1";
+        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+
+        QueryRequest request = new QueryRequest.Builder(fieldQuery).build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.getHighlight(), is(false));
+    }
+
+    @Test
+    public void convertQueryRequestWithHighlightingFalseWillNotUseHighlighting() {
+        String field = "field1";
+        String value = "value1";
+        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+
+        QueryRequest request = new QueryRequest
+                .Builder(fieldQuery)
+                .useHighlighting(false)
+                .build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.getHighlight(), is(false));
+    }
+
+    @Test
+    public void convertQueryRequestWithHighlightingTrueWillUseHighlighting() {
+        String field = "field1";
+        String value = "value1";
+        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+
+        QueryRequest request = new QueryRequest
+                .Builder(fieldQuery)
+                .useHighlighting(true)
+                .build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.getHighlight(), is(true));
     }
 
     private String buildFieldQuery(String field, String value) {

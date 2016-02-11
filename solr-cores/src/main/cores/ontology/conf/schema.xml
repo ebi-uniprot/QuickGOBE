@@ -45,11 +45,11 @@
     <field name="blacklist" type="string" indexed="false" stored="true" multiValued="true"/>
 
     <!-- autocomplete search fields -->
-    <field name="edge_name" type="text_edge" indexed="true" stored="false" multiValued="false"/>
-    <field name="edge_synonym" type="text_edge" indexed="true" stored="false" multiValued="true"/>
+    <field name="edge_name" type="text_edge" indexed="true" stored="true" multiValued="false"/>
+    <field name="edge_synonym" type="text_edge" indexed="true" stored="true" multiValued="true"/>
 
-    <field name="exact_name" type="exact_lower" indexed="true" stored="false" multiValued="false"/>
-    <field name="exact_synonym" type="exact_lower" indexed="true" stored="false" multiValued="true"/>
+    <field name="exact_name" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
+    <field name="exact_synonym" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
 
     <!--                     End of QuickGO Ontology fields                         -->
     <!-- ========================================================================== -->

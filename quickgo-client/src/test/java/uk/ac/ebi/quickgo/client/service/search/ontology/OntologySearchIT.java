@@ -218,6 +218,64 @@ public class OntologySearchIT extends SearchControllerSetup {
         checkValidFilterQueryResponse("go function", 3, fq);
     }
 
+    // highlighting ------------------------------------------------
+    @Test
+    public void requestWithHighlightingOnAndOneHitReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        checkValidHighlightOnQueryResponse("function 2", "GO:0000002");
+    }
+
+    @Test
+    public void requestWithHighlightingOnAndTwoHitsReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go anotherFunction 2");
+        OntologyDocument doc3 = createGODoc("GO:0000003", "go anotherFunction 3");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        checkValidHighlightOnQueryResponse("anotherFunction", "GO:0000002", "GO:0000003");
+    }
+
+    @Test
+    public void requestWithHighlightingOnAndZeroHitsReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        checkValidHighlightOnQueryResponse("Southampton");
+    }
+
+    @Test
+    public void requestWithHighlightingOffAndOneHitReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        checkValidHighlightOffQueryResponse("function 2", 1);
+    }
+
+    @Test
+    public void requestWithHighlightingOffAndOnZeroHitsReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        checkValidHighlightOffQueryResponse("Southampton", 0);
+    }
+
     private void saveToRepository(OntologyDocument... documents) {
         for (OntologyDocument doc : documents) {
             repository.save(doc);

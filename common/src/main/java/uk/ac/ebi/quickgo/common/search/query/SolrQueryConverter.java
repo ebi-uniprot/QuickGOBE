@@ -72,6 +72,8 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
             solrQuery.setFacetMinCount(MIN_COUNT_TO_DISPLAY_FACET);
         }
 
+        solrQuery.setHighlight(request.usesHighlighting());
+
         return solrQuery;
     }
 
