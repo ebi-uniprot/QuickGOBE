@@ -158,12 +158,12 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void finds400OnInvalidGOId() throws Exception {
+    public void finds400OnInvalidId() throws Exception {
         ResultActions response = mockMvc.perform(get(resourceUrl + "/" + invalidId()))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
-        expectInvalidIdError(response, "GO");
+        expectInvalidIdError(response, invalidId());
     }
 
     @Test
