@@ -20,10 +20,8 @@ import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import static uk.ac.ebi.quickgo.common.search.solr.SolrRetrievalConfigHelper.DEFAULT_HIGHLIGHT_DELIMS;
@@ -35,6 +33,7 @@ import static uk.ac.ebi.quickgo.common.service.ServiceRetrievalConfigHelper.extr
 @Configuration
 @Import({RepoConfig.class})
 @ComponentScan({"uk.ac.ebi.quickgo.service.search"})
+@PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
     public static final String SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER = "/search";
 
@@ -99,8 +98,10 @@ public class SearchServiceConfig {
         };
     }
 
-    public interface OntologyCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 
-
+    public interface OntologyCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 }
