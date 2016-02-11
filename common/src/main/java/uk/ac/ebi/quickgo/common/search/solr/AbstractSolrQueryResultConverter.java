@@ -21,6 +21,10 @@ import org.apache.solr.common.SolrDocumentList;
 public abstract class AbstractSolrQueryResultConverter<T> implements QueryResultConverter<T, QueryResponse> {
     private final SolrQueryResultHighlightingConverter solrQueryResultHighlightingConverter;
 
+    public AbstractSolrQueryResultConverter() {
+        solrQueryResultHighlightingConverter = null;
+    }
+
     public AbstractSolrQueryResultConverter(Map<String, String> highlightedFieldsNameMap) {
         Preconditions.checkArgument(highlightedFieldsNameMap != null, "Map of highlighted fields cannot be null");
 
@@ -61,7 +65,7 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
 
         List<DocHighlight> highlights = null;
 
-        if (resultHighlights != null && solrResults != null) {
+        if (resultHighlights != null && solrResults != null && solrQueryResultHighlightingConverter != null) {
             highlights = solrQueryResultHighlightingConverter.convertResultHighlighting(solrResults, resultHighlights);
         }
 
