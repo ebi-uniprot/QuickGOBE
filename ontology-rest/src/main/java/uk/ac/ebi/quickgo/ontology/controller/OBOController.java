@@ -234,13 +234,19 @@ public abstract class OBOController<T extends OBOTerm> {
             int page,
             StringToQuickGOQueryConverter converter) {
 
-        QuickGOQuery userQuery = converter.convert(query);
-        QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
+        if (!isValidQuery(query)
+                || !isValidNumRows(limit)
+                || !isValidPage(page)) {
+            return null;
+        } else {
+            QuickGOQuery userQuery = converter.convert(query);
+            QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
 
-        return new QueryRequest
-                .Builder(restrictedUserQuery)
-                .setPageParameters(page, limit)
-                .build();
+            return new QueryRequest
+                    .Builder(restrictedUserQuery)
+                    .setPageParameters(page, limit)
+                    .build();
+        }
     }
 
     /**

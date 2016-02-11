@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.service.search;
 
-import uk.ac.ebi.quickgo.common.search.solr.AbstractSolrQueryResultConverter;
+import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;

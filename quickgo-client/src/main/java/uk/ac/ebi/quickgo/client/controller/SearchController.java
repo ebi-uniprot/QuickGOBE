@@ -23,6 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFacets;
 import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFilterQueries;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidPage;
+import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidQuery;
 import static uk.ac.ebi.quickgo.common.search.query.QueryRequest.*;
 
 /**
@@ -82,21 +85,7 @@ public class SearchController {
                 ontologyQueryConverter,
                 ontologySearchableField);
 
-        ResponseEntity<QueryResult<OntologyTerm>> response;
-
-        if (request == null) {
-            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else {
-            try {
-                QueryResult<OntologyTerm> queryResult = ontologySearchService.findByQuery(request);
-                response = new ResponseEntity<>(queryResult, HttpStatus.OK);
-            } catch (RetrievalException e) {
-                logger.error(createErrorMessage(request), e);
-                response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return response;
+        return SearchDispatcher.search(request, ontologySearchService);
     }
 
     private QueryRequest buildRequest(String query,
