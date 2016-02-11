@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.common.search.results.DocHighlight;
 import uk.ac.ebi.quickgo.common.search.results.FieldHighlight;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,12 +44,16 @@ public class SolrQueryResultHighlightingConverter implements QueryResultHighligh
             SolrDocumentList solrResults,
             Map<String, Map<String, List<String>>> resultHighlights) {
 
-        return solrResults.stream()
-                .filter(doc -> doc.containsKey(DOC_ID))
-                .map(doc -> convertToDocHighlight(
-                        doc.getFieldValue(DOC_ID).toString(),
-                        resultHighlights))
-                .collect(Collectors.toList());
+        if (resultHighlights != null && !resultHighlights.isEmpty()) {
+            return solrResults.stream()
+                    .filter(doc -> doc.containsKey(DOC_ID))
+                    .map(doc -> convertToDocHighlight(
+                            doc.getFieldValue(DOC_ID).toString(),
+                            resultHighlights))
+                    .collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -59,7 +64,7 @@ public class SolrQueryResultHighlightingConverter implements QueryResultHighligh
      * @param resultHighlights the original map of highlighting information returned from Solr
      * @return domain level highlighting information for the document corresponding to {@code id}
      */
-    protected DocHighlight convertToDocHighlight(String id, Map<String, Map<String, List<String>>>
+    private DocHighlight convertToDocHighlight(String id, Map<String, Map<String, List<String>>>
             resultHighlights) {
         List<FieldHighlight> fieldHighlights = resultHighlights
                 .get(id)

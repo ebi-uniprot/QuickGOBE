@@ -1,31 +1,31 @@
 package uk.ac.ebi.quickgo.common.search.query;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.core.Is.is;
 
 /**
- * Tests the {@link Facet} implementation.
+ * Created 11/02/16
+ * @author Edd
  */
-public class FacetTest {
-
+public class FieldHighlightTest {
     @Test(expected = IllegalArgumentException.class)
     public void nullFieldThrowsException() throws Exception {
-        new Facet(null);
+        new FieldHighlight(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyFieldThrowsException() throws Exception {
-        new Facet("");
+        new FieldHighlight("");
     }
 
     @Test
-    public void createFacet() throws Exception {
-        String facetField = "field";
-        Facet facet = new Facet(facetField);
+    public void createFieldHighlight() throws Exception {
+        String field = "field";
+        FieldHighlight fieldHighlight = new FieldHighlight(field);
 
-        assertThat(facet.getField(), is(equalTo(facetField)));
+        assertThat(fieldHighlight.getField(), Is.is(equalTo(field)));
     }
 }
