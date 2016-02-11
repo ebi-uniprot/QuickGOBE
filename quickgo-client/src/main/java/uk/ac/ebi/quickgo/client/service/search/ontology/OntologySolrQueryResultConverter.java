@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.ECODocConverter;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.GODocConverter;
 import uk.ac.ebi.quickgo.common.search.solr.AbstractSolrQueryResultConverter;
+import uk.ac.ebi.quickgo.common.search.solr.SolrQueryResultHighlightingConverter;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import com.google.common.base.Preconditions;
@@ -29,7 +30,7 @@ public class OntologySolrQueryResultConverter extends AbstractSolrQueryResultCon
             GODocConverter goDocConverter,
             ECODocConverter ecoDocConverter,
             Map<String, String> fieldNameMap) {
-        super(fieldNameMap);
+        super(new SolrQueryResultHighlightingConverter(fieldNameMap));
 
         Preconditions.checkArgument(documentObjectBinder != null, "Document Object Binder can not be null");
         Preconditions.checkArgument(goDocConverter != null, "Go document converter can not be null");

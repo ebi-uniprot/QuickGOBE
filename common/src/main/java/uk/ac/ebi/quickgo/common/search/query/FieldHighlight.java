@@ -11,4 +11,10 @@ public class FieldHighlight extends AbstractField {
     public FieldHighlight(String field) {
         super(field);
     }
+
+    @Override public String toString() {
+        return "FieldHighlight{" +
+                "field='" + field + '\'' +
+                '}';
+    }
 }

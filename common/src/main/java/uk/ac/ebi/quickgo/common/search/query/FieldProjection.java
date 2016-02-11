@@ -11,4 +11,10 @@ public class FieldProjection extends AbstractField {
     public FieldProjection(String field) {
         super(field);
     }
+
+    @Override public String toString() {
+        return "FieldProjection{" +
+                "field='" + field + '\'' +
+                '}';
+    }
 }

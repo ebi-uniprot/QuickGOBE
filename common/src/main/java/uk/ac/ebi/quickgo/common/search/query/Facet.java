@@ -9,7 +9,13 @@ package uk.ac.ebi.quickgo.common.search.query;
  * Think of a facet, as a field in a SQL group by clause.
  */
 public class Facet extends AbstractField {
-        public Facet(String field) {
-            super(field);
-        }
+    public Facet(String field) {
+        super(field);
+    }
+
+    @Override public String toString() {
+        return "Facet{" +
+                "field='" + field + '\'' +
+                '}';
+    }
 }

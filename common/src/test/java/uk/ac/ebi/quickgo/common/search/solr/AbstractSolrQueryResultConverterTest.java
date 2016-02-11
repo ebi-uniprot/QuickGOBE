@@ -41,7 +41,8 @@ public class AbstractSolrQueryResultConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        converter = new AbstractSolrQueryResultConverter<String>(highlightedFieldNameMap) {
+        converter = new AbstractSolrQueryResultConverter<String>(new SolrQueryResultHighlightingConverter(
+                highlightedFieldNameMap)) {
             @Override protected List<String> convertResults(SolrDocumentList results) {
                 return results.stream()
                         .map(SolrDocument::toString)
@@ -239,10 +240,6 @@ public class AbstractSolrQueryResultConverterTest {
         return facetField;
     }
 
-    private void checkResultFields(List<SolrDocument> queryResult, int expectedResultCount, String... fields) {
-
-    }
-
     private void checkPageInfo(PageInfo pageInfo, int expectedTotalPages, int expectedCurrentPage, int
             expectedResultsPerPage) {
         assertThat(pageInfo.getResultsPerPage(), is(expectedResultsPerPage));
@@ -252,15 +249,6 @@ public class AbstractSolrQueryResultConverterTest {
 
     private QueryRequest createDefaultRequest(QuickGOQuery query) {
         return new QueryRequest.Builder(query).build();
-    }
-
-    private QueryRequest createRequestWithFieldProjections(QuickGOQuery query, String... fields) {
-        QueryRequest.Builder builder = new QueryRequest.Builder(query);
-        for (String field : fields) {
-            builder.addProjectedField(field);
-        }
-
-        return builder.build();
     }
 
     private QueryRequest createRequestWithPaging(QuickGOQuery query, int currentPage, int resultsPerPage) {

@@ -19,16 +19,16 @@ import org.apache.solr.common.SolrDocumentList;
  * @author Ricardo Antunes
  */
 public abstract class AbstractSolrQueryResultConverter<T> implements QueryResultConverter<T, QueryResponse> {
-    private final SolrQueryResultHighlightingConverter solrQueryResultHighlightingConverter;
+    private final QueryResultHighlightingConverter queryResultHighlightingConverter;
 
     public AbstractSolrQueryResultConverter() {
-        solrQueryResultHighlightingConverter = null;
+        queryResultHighlightingConverter = null;
     }
 
-    public AbstractSolrQueryResultConverter(Map<String, String> highlightedFieldsNameMap) {
-        Preconditions.checkArgument(highlightedFieldsNameMap != null, "Map of highlighted fields cannot be null");
+    public AbstractSolrQueryResultConverter(QueryResultHighlightingConverter queryResultHighlightingConverter){
+        Preconditions.checkArgument(queryResultHighlightingConverter != null, "Field map converter cannot be null");
 
-        this.solrQueryResultHighlightingConverter = new SolrQueryResultHighlightingConverter(highlightedFieldsNameMap);
+        this.queryResultHighlightingConverter = queryResultHighlightingConverter;
     }
 
     @Override public QueryResult<T> convert(QueryResponse toConvert, QueryRequest request) {
@@ -65,8 +65,8 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
 
         List<DocHighlight> highlights = null;
 
-        if (resultHighlights != null && solrResults != null && solrQueryResultHighlightingConverter != null) {
-            highlights = solrQueryResultHighlightingConverter.convertResultHighlighting(solrResults, resultHighlights);
+        if (resultHighlights != null && solrResults != null && queryResultHighlightingConverter != null) {
+            highlights = queryResultHighlightingConverter.convertResultHighlighting(solrResults, resultHighlights);
         }
 
         return new QueryResult<>(totalNumberOfResults, results, pageInfo, facet, highlights);
