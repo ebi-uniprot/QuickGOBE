@@ -18,7 +18,6 @@
 
     <properties>
         <spring-batch-test.version>3.0.5.RELEASE</spring-batch-test.version>
-        <quickgo-model.version>1.0</quickgo-model.version>
         <quickgo-sources.version>1.0</quickgo-sources.version>
     </properties>
 
@@ -37,11 +36,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>sources</artifactId>
             <version>${quickgo-sources.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>model</artifactId>
-            <version>${quickgo-model.version}</version>
         </dependency>
 
         <dependency>
