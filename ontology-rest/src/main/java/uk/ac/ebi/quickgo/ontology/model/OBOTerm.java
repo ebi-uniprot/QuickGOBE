@@ -57,7 +57,6 @@ public class OBOTerm {
 
     public List<AnnotationGuideLine> annotationGuidelines;
     public List<TaxonConstraint> taxonConstraints;
-    public List<BlacklistItem> blacklist;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Synonym implements FieldType {
@@ -100,19 +99,6 @@ public class OBOTerm {
 
     public static class Literature implements FieldType {
         public String id;
-    }
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class BlacklistItem implements FieldType {
-        public String geneProductId;
-        public String reason;
-        public String category;
-        public String method;
-        public String entityType;
-        public String entityId;
-        public String taxonId;
-        public String entityName;
-        public String ancestorGoId;
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)

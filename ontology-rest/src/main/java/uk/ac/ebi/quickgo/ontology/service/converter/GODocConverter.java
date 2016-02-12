@@ -12,6 +12,9 @@ import uk.ac.ebi.quickgo.ontology.model.GOTerm;
  * @author Edd
  */
 public class GODocConverter extends AbstractODocConverter<GOTerm> {
+    private final static BlackListFieldConverter BLACKLIST_FIELD_CONVERTER =
+            new BlackListFieldConverter();
+
     @Override public GOTerm convert(OntologyDocument ontologyDocument) {
         GOTerm goTerm = new GOTerm();
         addCommonFields(ontologyDocument, goTerm);
@@ -19,6 +22,9 @@ public class GODocConverter extends AbstractODocConverter<GOTerm> {
                 Aspect.fromShortName(ontologyDocument.aspect) : null;
         goTerm.usage = ontologyDocument.usage != null ?
                 GOTerm.Usage.fromFullName(ontologyDocument.usage): null;
+        goTerm.subsets = ontologyDocument.subsets;
+
+        goTerm.blacklist = BLACKLIST_FIELD_CONVERTER.convertFieldList(ontologyDocument.blacklist);
         return goTerm;
     }
 }

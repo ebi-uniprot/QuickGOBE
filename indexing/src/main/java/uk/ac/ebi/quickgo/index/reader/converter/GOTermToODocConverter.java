@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.index.reader.converter;
 
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
-import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
@@ -10,7 +9,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.springframework.util.StringUtils.isEmpty;
+import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Converts a {@link GOTerm} instance into an {@link OntologyDocument} instance.
@@ -27,17 +28,17 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
 
         if (termOptional.isPresent() && ontologyDocument.isPresent()) {
 
-            GOTerm goTerm = termOptional.get();
+            GOTerm term = termOptional.get();
             OntologyDocument doc = ontologyDocument.get();
 
-            doc.annotationGuidelines = extractAnnGuidelines(goTerm);
-            doc.aspect = goTerm.getAspect() == null ?
-                    null : goTerm.getAspect().text;
-            doc.children = extractChildren(goTerm);
-            doc.taxonConstraints = extractTaxonConstraints(goTerm);
-            doc.usage = goTerm.getUsage() == null ?
-                    null : goTerm.getUsage().getText();
-            doc.blacklist = extractBlacklist(goTerm);
+            doc.annotationGuidelines = extractAnnGuidelines(term);
+            doc.aspect = term.getAspect() == null?
+                    null : term.getAspect().text;
+            doc.children = extractChildren(term);
+            doc.taxonConstraints = extractTaxonConstraints(term);
+            doc.usage = term.getUsage() == null?
+                    null : term.getUsage().getText();
+            doc.blacklist = extractBlacklist(term);
 
             return Optional.of(doc);
         } else {
@@ -63,14 +64,12 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
         if (!isEmpty(goTerm.getGuidelines())) {
             return goTerm.getGuidelines().stream()
                     .map(
-                            t -> FlatFieldBuilder.newFlatField()
-                                    .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getTitle()))
-                                    .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getUrl()))
+                            t -> newFlatField()
+                                    .addField(newFlatFieldLeaf(t.getTitle()))
+                                    .addField(newFlatFieldLeaf(t.getUrl()))
                                     .buildString())
                     .collect(Collectors.toList());
-        } else {
-            return null;
-        }
+        } else return null;
     }
 
     /*
@@ -80,44 +79,44 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
         if (!isEmpty(goTerm.getTaxonConstraints())) {
             return goTerm.getTaxonConstraints().stream()
                     .map(t -> {
-                        FlatFieldBuilder pubmedsAsFlatField = FlatFieldBuilder.newFlatField();
+                        FlatFieldBuilder pubmedsAsFlatField = newFlatField();
                         t.getSourcesIds().stream().forEach(
-                                s -> pubmedsAsFlatField.addField(FlatFieldLeaf.newFlatFieldLeaf(s))
+                                s -> pubmedsAsFlatField.addField(newFlatFieldLeaf(s))
                         );
 
-                        return FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getGoId()))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getName()))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf(t.relationship()))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getTaxId()))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf(t.taxIdType()))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getTaxonName()))
+                        return newFlatField()
+                                .addField(newFlatFieldLeaf(t.getGoId()))
+                                .addField(newFlatFieldLeaf(t.getName()))
+                                .addField(newFlatFieldLeaf(t.relationship()))
+                                .addField(newFlatFieldLeaf(t.getTaxId()))
+                                .addField(newFlatFieldLeaf(t.taxIdType()))
+                                .addField(newFlatFieldLeaf(t.getTaxonName()))
                                 .addField(pubmedsAsFlatField)
                                 .buildString();
                     })
                     .collect(Collectors.toList());
-        } else {
-            return null;
-        }
+        } else return null;
     }
 
-    protected List<String> extractBlacklist(GOTerm goTerm) {
+    /*
+     * format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|predictedBy
+     */
+    protected List<String> extractBlacklist(GOTerm goTerm){
         if (!isEmpty(goTerm.getBlacklist())) {
             return goTerm.getBlacklist().stream()
-                    .map(t -> FlatFieldBuilder.newFlatField()
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getGoId()))
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getCategory()))
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getEntityType()))
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getProteinAc()))       //entityID
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(Integer.toString(t.getTaxonId())))
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getEntityName()))
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getAncestorGOID()))
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getReason()))
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(t.getMethodId()))
-                            .buildString())
+                    .map(
+                            t -> newFlatField()
+                                    .addField(newFlatFieldLeaf(t.getGoId()))
+                                    .addField(newFlatFieldLeaf(t.getCategory()))
+                                    .addField(newFlatFieldLeaf(t.getEntityType()))
+                                    .addField(newFlatFieldLeaf(t.getProteinAc()))
+                                    .addField(newFlatFieldLeaf(Integer.toString(t.getTaxonId())))
+                                    .addField(newFlatFieldLeaf(t.getEntityName()))
+                                    .addField(newFlatFieldLeaf(t.getAncestorGOID()))
+                                    .addField(newFlatFieldLeaf(t.getReason()))
+                                    .addField(newFlatFieldLeaf(t.getMethodId()))
+                                    .buildString())
                     .collect(Collectors.toList());
-        } else {
-            return null;
-        }
+        } else return null;
     }
 }

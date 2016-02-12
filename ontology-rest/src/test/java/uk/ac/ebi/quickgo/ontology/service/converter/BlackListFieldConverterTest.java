@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
 
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
-import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
+import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,39 +33,39 @@ public class BlackListFieldConverterTest {
         List<String> rawBlacklist = new ArrayList<>();
 
         rawBlacklist.add(FlatFieldBuilder.newFlatField()
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0000001"))                   //id
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("NOT-qualified manual"))         //category
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("protein"))                      //entity type
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("A5I1R9"))                       //entity id
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("441771"))                       //taxon id
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("A5I1R9_CLOBH"))                 //entity name
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0007005"))                   //ancestor go id
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("1 NOT-qualified manual etc"))   //reason
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("IER12345"))                     //method
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0000001"))                   // id
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("NOT-qualified manual"))         // category
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("protein"))                      // entity type
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("A5I1R9"))                       // entity id
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("441771"))                       // taxon id
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("A5I1R9_CLOBH"))                 // entity name
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0007005"))                   // ancestor go id
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("1 NOT-qualified manual etc"))   // reason
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("IER12345"))                     // predictedBy
                 .buildString());
 
         rawBlacklist.add(FlatFieldBuilder.newFlatField()
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0000001"))                   //id
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("IS-qualified manual"))         //category
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("protein"))                      //entity type
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("B5I1R9"))                       //entity id
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("441771"))                       //taxon id
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("B5I1R9_CLOBH"))                 //entity name
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0007006"))                   //ancestor go id
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("1 NOT-qualified manual etc"))   //reason
-                .addField(FlatFieldLeaf.newFlatFieldLeaf()) // no parameter means it's got no value
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0000001"))                   // id
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("IS-qualified manual"))          // category
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("protein"))                      // entity type
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("B5I1R9"))                       // entity id
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("441771"))                       // taxon id
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("B5I1R9_CLOBH"))                 // entity name
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0007006"))                   // ancestor go id
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("1 NOT-qualified manual etc"))   // predictedBy
+                .addField(FlatFieldLeaf.newFlatFieldLeaf())                               // no parameter means it's got no value
                 .buildString());
 
-        List<OBOTerm.BlacklistItem> blacklistItems = converter.convertFieldList(rawBlacklist);
+        List<GOTerm.BlacklistItem> blacklistItems = converter.convertFieldList(rawBlacklist);
         assertThat(blacklistItems.size(), is(2));
-        assertThat(blacklistItems.get(0).geneProductId, is("GO:0000001"));
+        assertThat(blacklistItems.get(0).goId, is("GO:0000001"));
         assertThat(blacklistItems.get(1).category, is("IS-qualified manual"));
-        assertThat(blacklistItems.get(1).method, is(nullValue()));
+        assertThat(blacklistItems.get(1).predictedBy, is(nullValue()));
     }
 
     @Test
     public void gracefullyHandleWrongFieldCount() {
-        Optional<OBOTerm.BlacklistItem> result = converter.apply(
+        Optional<GOTerm.BlacklistItem> result = converter.apply(
                 FlatFieldBuilder.newFlatField().addField(FlatFieldLeaf.newFlatFieldLeaf("wrong " +
                 "format"))
                 .buildString());

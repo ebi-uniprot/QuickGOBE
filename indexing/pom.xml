@@ -37,7 +37,6 @@
             <artifactId>sources</artifactId>
             <version>${quickgo-sources.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-batch</artifactId>

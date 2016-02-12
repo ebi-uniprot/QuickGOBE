@@ -19,8 +19,6 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
 
     private final static AnnotationGuideLineFieldConverter AG_FIELD_CONVERTER =
             new AnnotationGuideLineFieldConverter();
-    private final static BlackListFieldConverter BLACKLIST_FIELD_CONVERTER =
-            new BlackListFieldConverter();
     private final static XORelationsFieldConverter XORELATIONS_FIELD_CONVERTER =
             new XORelationsFieldConverter();
     private final static TaxonConstraintsFieldConverter TAXON_CONSTRAINTS_FIELD_CONVERTER =
@@ -39,19 +37,18 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
         term.name = ontologyDocument.name;
         term.consider = ontologyDocument.considers;
         term.definition = ontologyDocument.definition;
-        term.subsets = ontologyDocument.subsets;
         term.isObsolete = ontologyDocument.isObsolete;
         term.replacedBy = ontologyDocument.replacedBy;
         term.comment = ontologyDocument.comment;
         term.children = ontologyDocument.children;
         term.ancestors = ontologyDocument.ancestors;
         term.secondaryIds = ontologyDocument.secondaryIds;
+        term.subsets = ontologyDocument.subsets;
         term.synonyms = SYNONYMS_FIELD_CONVERTER.convertFieldList(ontologyDocument.synonyms);
         term.history = HISTORY_FIELD_CONVERTER.convertFieldList(ontologyDocument.history);
         term.xRefs = XREFS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xrefs);
         term.taxonConstraints = TAXON_CONSTRAINTS_FIELD_CONVERTER.convertFieldList(ontologyDocument.taxonConstraints);
         term.xRelations = XORELATIONS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xRelations);
-        term.blacklist = BLACKLIST_FIELD_CONVERTER.convertFieldList(ontologyDocument.blacklist);
         term.annotationGuidelines = AG_FIELD_CONVERTER.convertFieldList(ontologyDocument.annotationGuidelines);
     }
 }

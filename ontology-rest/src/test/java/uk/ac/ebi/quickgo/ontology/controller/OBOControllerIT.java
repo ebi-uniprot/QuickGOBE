@@ -21,9 +21,11 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Performs common tests on REST controllers that derive from {@link OBOController}.
@@ -52,6 +54,7 @@ public abstract class OBOControllerIT {
 
     private String resourceUrl;
     private String validId;
+
 
     @Before
     public void setup() {
@@ -118,7 +121,6 @@ public abstract class OBOControllerIT {
 
         expectBasicFields(response, validId)
                 .andExpect(jsonPath("$.taxonConstraints").isArray())
-                .andExpect(jsonPath("$.blacklist").isArray())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
@@ -224,14 +226,13 @@ public abstract class OBOControllerIT {
         return expectCoreFields(result, id)
                 .andExpect(jsonPath("$.children").exists())
                 .andExpect(jsonPath("$.secondaryIds").exists())
-                .andExpect(jsonPath("$.subsets").exists())
                 .andExpect(jsonPath("$.history").exists())
                 .andExpect(jsonPath("$.xRefs").exists())
                 .andExpect(jsonPath("$.xRelations").exists())
                 .andExpect(jsonPath("$.annotationGuidelines").exists())
                 .andExpect(jsonPath("$.taxonConstraints").exists())
-                .andExpect(jsonPath("$.blacklist").exists())
                 .andExpect(jsonPath("$.consider").exists())
+                .andExpect(jsonPath("$.subsets").exists())
                 .andExpect(jsonPath("$.replacedBy").exists());
     }
 

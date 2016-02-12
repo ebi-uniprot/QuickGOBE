@@ -210,6 +210,6 @@ public class GOTermToODocConverterTest {
     @Test
     public void extractsBlacklistWhenNotExists() {
         when(term.getBlacklist()).thenReturn(null);
-        assertThat(converter.extractTaxonConstraints(term), is(nullValue()));
+        assertThat(converter.extractBlacklist(term), is(nullValue()));
     }
 }
