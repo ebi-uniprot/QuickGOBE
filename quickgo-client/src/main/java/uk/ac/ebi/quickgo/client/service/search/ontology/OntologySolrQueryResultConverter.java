@@ -29,7 +29,7 @@ public class OntologySolrQueryResultConverter extends AbstractSolrQueryResultCon
             GODocConverter goDocConverter,
             ECODocConverter ecoDocConverter,
             Map<String, String> fieldNameMap) {
-        super(fieldNameMap);
+        super(new SolrQueryResultHighlightingConverter(fieldNameMap));
 
         Preconditions.checkArgument(documentObjectBinder != null, "Document Object Binder can not be null");
         Preconditions.checkArgument(goDocConverter != null, "Go document converter can not be null");

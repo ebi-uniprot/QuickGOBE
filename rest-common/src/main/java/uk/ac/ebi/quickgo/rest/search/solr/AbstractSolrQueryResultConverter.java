@@ -9,7 +9,6 @@ import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -20,13 +19,16 @@ import org.apache.solr.common.SolrDocumentList;
  * @author Ricardo Antunes
  */
 public abstract class AbstractSolrQueryResultConverter<T> implements QueryResultConverter<T, QueryResponse> {
-    private static final String DOC_ID = "id";
-    protected final Map<String, String> fieldNameMap;
+    private final QueryResultHighlightingConverter queryResultHighlightingConverter;
 
-    public AbstractSolrQueryResultConverter(Map<String, String> fieldNameMap) {
-        Preconditions.checkArgument(fieldNameMap != null, "Map of fields can not be null");
+    public AbstractSolrQueryResultConverter() {
+        queryResultHighlightingConverter = null;
+    }
 
-        this.fieldNameMap = fieldNameMap;
+    public AbstractSolrQueryResultConverter(QueryResultHighlightingConverter queryResultHighlightingConverter){
+        Preconditions.checkArgument(queryResultHighlightingConverter != null, "Field map converter cannot be null");
+
+        this.queryResultHighlightingConverter = queryResultHighlightingConverter;
     }
 
     @Override public QueryResult<T> convert(QueryResponse toConvert, QueryRequest request) {
@@ -63,58 +65,11 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
 
         List<DocHighlight> highlights = null;
 
-        if (resultHighlights != null && solrResults != null) {
-            highlights = convertResultHighlighting(solrResults, resultHighlights);
+        if (resultHighlights != null && solrResults != null && queryResultHighlightingConverter != null) {
+            highlights = queryResultHighlightingConverter.convertResultHighlighting(solrResults, resultHighlights);
         }
 
         return new QueryResult<>(totalNumberOfResults, results, pageInfo, facet, highlights);
-    }
-
-    /**
-     * Converts a {@link SolrDocumentList} of results, together with an associated list
-     * of highlighted fields into a list of domain {@link DocHighlight} instances.
-     *
-     * @param solrResults the Solr results
-     * @param resultHighlights the Solr highlighting information
-     * @return the domain highlighting information
-     */
-    protected List<DocHighlight> convertResultHighlighting(
-            SolrDocumentList solrResults,
-            Map<String, Map<String, List<String>>> resultHighlights) {
-
-        return solrResults.stream()
-                .filter(doc -> doc.containsKey(DOC_ID))
-                .map(doc -> convertToDocHighlight(
-                        doc.getFieldValue(DOC_ID).toString(),
-                        resultHighlights))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Creates a {@link DocHighlight} instance for a particular document id. This requires use of
-     * the original map of highlighting information returned from Solr.
-     *
-     * @param id the document identifier
-     * @param resultHighlights the original map of highlighting information returned from Solr
-     * @return domain level highlighting information for the document corresponding to {@code id}
-     */
-    private DocHighlight convertToDocHighlight(String id, Map<String, Map<String, List<String>>>
-            resultHighlights) {
-        List<FieldHighlight> fieldHighlights = resultHighlights
-                .get(id)
-                .entrySet().stream()
-                .map(entry -> {
-                    // by default, field name is that given by Solr
-                    String fieldName = entry.getKey();
-
-                    // if user specified mapping exists, use this as the field name
-                    if (fieldNameMap.containsKey(fieldName)) {
-                        fieldName = fieldNameMap.get(fieldName);
-                    }
-                    return new FieldHighlight(fieldName, entry.getValue());
-                })
-                .collect(Collectors.toList());
-        return new DocHighlight(id, fieldHighlights);
     }
 
     /**

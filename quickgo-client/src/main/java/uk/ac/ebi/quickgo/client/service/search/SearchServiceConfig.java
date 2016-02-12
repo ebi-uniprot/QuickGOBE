@@ -14,14 +14,14 @@ import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.DEFAULT_HIGHLIGHT_DELIMS;
@@ -41,9 +41,12 @@ import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extrac
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.client.service.search"})
 @Import({RepoConfig.class})
+@PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
     public static final String SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER = "/search";
+
     private static final String COMMA = ",";
+    private static final String DEFAULT_ONTOLOGY_SEARCH_RETURN_FIELDS = "id,name,ontologyType";
 
     @Bean
     public SearchService<OntologyTerm> ontologySearchService(
@@ -55,13 +58,13 @@ public class SearchServiceConfig {
     public RequestRetrieval<OntologyTerm> ontologySolrRequestRetrieval(
             SolrTemplate ontologyTemplate,
             QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter,
-            OntologyCompositeRetrievalConfig ontologySolrConfig) {
+            OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
 
         OntologySolrQueryResultConverter resultConverter = new OntologySolrQueryResultConverter(
                 new DocumentObjectBinder(),
                 new GODocConverter(),
                 new ECODocConverter(),
-                ontologySolrConfig.repo2DomainFieldMap()
+                ontologyRetrievalConfig.repo2DomainFieldMap()
         );
 
 
@@ -69,7 +72,7 @@ public class SearchServiceConfig {
                 ontologyTemplate.getSolrServer(),
                 solrSelectQueryRequestConverter,
                 resultConverter,
-                ontologySolrConfig);
+                ontologyRetrievalConfig);
     }
 
     @Bean
@@ -78,8 +81,9 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public OntologyCompositeRetrievalConfig ontologySolrConfig(
-            @Value("${ontology.search.field.repo2domain.map:}") String ontologySearchRepo2DomainFieldMap,
+    public OntologyCompositeRetrievalConfig ontologyRetrievalConfig(
+            @Value("${search.return.fields:" + DEFAULT_ONTOLOGY_SEARCH_RETURN_FIELDS + "}") String ontologySearchSolrReturnedFields,
+            @Value("${search.field.repo2domain.map:}") String ontologySearchRepo2DomainFieldMap,
             @Value("${search.highlight.delims:" + DEFAULT_HIGHLIGHT_DELIMS + "}") String highlightDelims) {
         String[] highlightDelimsArr = convertHighlightDelims(highlightDelims, COMMA);
 
@@ -89,8 +93,8 @@ public class SearchServiceConfig {
                 return extractFieldMappings(ontologySearchRepo2DomainFieldMap, COMMA);
             }
 
-            @Override public String[] getSearchReturnedFields() {
-                return new String[] {};
+            @Override public List<String> getSearchReturnedFields() {
+                return Arrays.asList(ontologySearchSolrReturnedFields.split(COMMA));
             }
 
             @Override public String getHighlightStartDelim() {
@@ -103,6 +107,10 @@ public class SearchServiceConfig {
         };
     }
 
-    private interface OntologyCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
+
+    public interface OntologyCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 }

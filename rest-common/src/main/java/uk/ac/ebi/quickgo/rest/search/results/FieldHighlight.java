@@ -31,4 +31,34 @@ public class FieldHighlight {
     public String getField() {
         return field;
     }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        FieldHighlight that = (FieldHighlight) o;
+
+        if (values != null ? !values.equals(that.values) : that.values != null) {
+            return false;
+        }
+        return field != null ? field.equals(that.field) : that.field == null;
+
+    }
+
+    @Override public int hashCode() {
+        int result = values != null ? values.hashCode() : 0;
+        result = 31 * result + (field != null ? field.hashCode() : 0);
+        return result;
+    }
+
+    @Override public String toString() {
+        return "FieldHighlight{" +
+                "values=" + values +
+                ", field='" + field + '\'' +
+                '}';
+    }
 }

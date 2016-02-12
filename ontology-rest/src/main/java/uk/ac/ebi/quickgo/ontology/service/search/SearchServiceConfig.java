@@ -12,16 +12,16 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.DEFAULT_HIGHLIGHT_DELIMS;
@@ -33,6 +33,7 @@ import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extrac
 @Configuration
 @Import({RepoConfig.class})
 @ComponentScan({"uk.ac.ebi.quickgo.service.search"})
+@PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
     public static final String SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER = "/search";
 
@@ -49,20 +50,20 @@ public class SearchServiceConfig {
     public RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval(
             SolrTemplate ontologyTemplate,
             QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter,
-            OntologyCompositeRetrievalConfig ontologySolrConfig) {
+            OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
 
         SolrQueryResultConverter resultConverter = new SolrQueryResultConverter(
                 new DocumentObjectBinder(),
                 new GODocConverter(),
                 new ECODocConverter(),
-                ontologySolrConfig.repo2DomainFieldMap()
+                ontologyRetrievalConfig.repo2DomainFieldMap()
         );
 
         return new SolrRequestRetrieval<>(
                 ontologyTemplate.getSolrServer(),
                 solrSelectQueryRequestConverter,
                 resultConverter,
-                ontologySolrConfig);
+                ontologyRetrievalConfig);
     }
 
     @Bean
@@ -71,7 +72,7 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public OntologyCompositeRetrievalConfig ontologySolrConfig(
+    public OntologyCompositeRetrievalConfig ontologyRetrievalConfig(
             @Value("${search.return.fields:" + DEFAULT_ONTOLOGY_SEARCH_RETURN_FIELDS + "}") String ontologySearchSolrReturnedFields,
             @Value("${search.field.repo2domain.map:}") String ontologySearchRepo2DomainFieldMap,
             @Value("${search.highlight.delims:" + DEFAULT_HIGHLIGHT_DELIMS + "}") String highlightDelims) {
@@ -83,8 +84,8 @@ public class SearchServiceConfig {
                 return extractFieldMappings(ontologySearchRepo2DomainFieldMap, COMMA);
             }
 
-            @Override public String[] getSearchReturnedFields() {
-                return ontologySearchSolrReturnedFields.split(COMMA);
+            @Override public List<String> getSearchReturnedFields() {
+                return Arrays.asList(ontologySearchSolrReturnedFields.split(COMMA));
             }
 
             @Override public String getHighlightStartDelim() {
@@ -97,8 +98,10 @@ public class SearchServiceConfig {
         };
     }
 
-    private interface OntologyCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 
-
+    public interface OntologyCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 }

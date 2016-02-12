@@ -26,7 +26,8 @@ public class QueryResult<T> {
         this.results = Collections.unmodifiableList(results);
         this.pageInfo = pageInfo;
         this.facet = facet;
-        this.highlighting = highlighting;
+        this.highlighting = (highlighting != null)?
+                Collections.unmodifiableList(highlighting) : null;
     }
 
     public List<DocHighlight> getHighlighting() {

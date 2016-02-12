@@ -38,11 +38,12 @@ public class AbstractSolrQueryResultConverterTest {
     private QueryResponse responseMock;
 
     @Mock
-    private Map<String, String> fieldNameMap;
+    private Map<String, String> highlightedFieldNameMap;
 
     @Before
     public void setUp() throws Exception {
-        converter = new AbstractSolrQueryResultConverter<String>(fieldNameMap) {
+        converter = new AbstractSolrQueryResultConverter<String>(new SolrQueryResultHighlightingConverter(
+                highlightedFieldNameMap)) {
             @Override protected List<String> convertResults(SolrDocumentList results) {
                 return results.stream()
                         .map(SolrDocument::toString)

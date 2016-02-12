@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
@@ -190,14 +191,13 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithHighlightingFalseWillNotUseHighlighting() {
+    public void convertQueryRequestWithHighlightingOffWillNotUseHighlighting() {
         String field = "field1";
         String value = "value1";
         QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
 
         QueryRequest request = new QueryRequest
                 .Builder(fieldQuery)
-                .useHighlighting(false)
                 .build();
 
         SolrQuery query = converter.convert(request);
@@ -206,19 +206,75 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithHighlightingTrueWillUseHighlighting() {
+    public void convertQueryRequestWithHighlightingWillUseHighlighting() {
+        String field = "field1";
+        String value = "value1";
+        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+
+        String highlightedField = "highlightedField";
+
+        QueryRequest request = new QueryRequest
+                .Builder(fieldQuery)
+                .addHighlightedField(highlightedField)
+                .build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.getHighlight(), is(true));
+        assertThat(query.getHighlightFields(), arrayContainingInAnyOrder(highlightedField));
+    }
+
+    @Test
+    public void convertQueryRequestWithProjectedFieldWillProjectThatField() {
+        String field = "field1";
+        String value = "value1";
+        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+
+        String projectedField = "projectedField";
+
+        QueryRequest request = new QueryRequest
+                .Builder(fieldQuery)
+                .addProjectedField(projectedField)
+                .build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.getFields(), is(projectedField));
+    }
+
+    @Test
+    public void convertQueryRequestWithTwoProjectedFieldsWillProjectTwoFields() {
+        String field = "field1";
+        String value = "value1";
+        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+
+        String projectedField1 = "projectedField1";
+        String projectedField2 = "projectedField2";
+
+        QueryRequest request = new QueryRequest
+                .Builder(fieldQuery)
+                .addProjectedField(projectedField1)
+                .addProjectedField(projectedField2)
+                .build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.getFields(), is(projectedField1 + "," + projectedField2));
+    }
+
+    @Test
+    public void convertQueryRequestWithNoProjectedFieldWillProjectNoFields() {
         String field = "field1";
         String value = "value1";
         QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
 
         QueryRequest request = new QueryRequest
                 .Builder(fieldQuery)
-                .useHighlighting(true)
                 .build();
 
         SolrQuery query = converter.convert(request);
 
-        assertThat(query.getHighlight(), is(true));
+        assertThat(query.getFields(), is(nullValue()));
     }
 
     private String buildFieldQuery(String field, String value) {

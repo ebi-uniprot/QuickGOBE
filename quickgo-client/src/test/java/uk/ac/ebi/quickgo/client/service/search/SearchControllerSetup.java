@@ -204,7 +204,7 @@ public abstract class SearchControllerSetup {
     protected ResultActions checkValidHighlightOffQueryResponse(String query, int expectedResponseSize)
             throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
-        addParamsToRequest(clientRequest, "highlighting", "false");
+        addParamsToRequest(clientRequest, HIGHLIGHTING_PARAM, "false");
 
         return mockMvc.perform(clientRequest)
                 .andDo(print())

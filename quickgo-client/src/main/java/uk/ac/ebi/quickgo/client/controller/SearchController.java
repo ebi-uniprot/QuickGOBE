@@ -40,17 +40,21 @@ public class SearchController {
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchService<OntologyTerm> ontologySearchService;
     private final SearchableField ontologySearchableField;
+    private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
 
     @Autowired
     public SearchController(
             SearchService<OntologyTerm> ontologySearchService,
-            SearchableField ontologySearchableField) {
+            SearchableField ontologySearchableField,
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
 
-        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service can not be null");
+        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
+        Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
 
         this.ontologySearchService = ontologySearchService;
         this.ontologySearchableField = ontologySearchableField;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(ontologySearchableField);
+        this.ontologyRetrievalConfig = ontologyRetrievalConfig;
     }
 
     /**
@@ -107,7 +111,15 @@ public class SearchController {
                     .forEach(builder::addQueryFilter);
         }
 
-        builder.useHighlighting(highlighting);
+            if (highlighting) {
+                ontologyRetrievalConfig.repo2DomainFieldMap().keySet().stream()
+                        .forEach(builder::addHighlightedField);
+                builder.setHighlightStartDelim(ontologyRetrievalConfig.getHighlightStartDelim());
+                builder.setHighlightEndDelim(ontologyRetrievalConfig.getHighlightEndDelim());
+            }
+
+            ontologyRetrievalConfig.getSearchReturnedFields().stream()
+                    .forEach(builder::addProjectedField);
 
         return builder.build();
     }

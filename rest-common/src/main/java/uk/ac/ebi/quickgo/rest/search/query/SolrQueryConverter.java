@@ -72,7 +72,16 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
             solrQuery.setFacetMinCount(MIN_COUNT_TO_DISPLAY_FACET);
         }
 
-        solrQuery.setHighlight(request.usesHighlighting());
+        if (!request.getHighlightedFields().isEmpty()) {
+            solrQuery.setHighlight(true);
+            request.getHighlightedFields().stream().forEach(field -> solrQuery.addHighlightField(field.getField()));
+            solrQuery.setHighlightSimplePre(request.getHighlightStartDelim());
+            solrQuery.setHighlightSimplePost(request.getHighlightEndDelim());
+        }
+
+        if (!request.getProjectedFields().isEmpty()) {
+            request.getProjectedFields().forEach(field -> solrQuery.addField(field.getField()));
+        }
 
         return solrQuery;
     }

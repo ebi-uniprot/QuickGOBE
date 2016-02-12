@@ -39,16 +39,19 @@ public abstract class OBOController<T extends OBOTerm> {
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
+    private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
-            SearchableField searchableField) {
+            SearchableField searchableField,
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
         Preconditions.checkArgument(ontologyService != null, "Ontology service can not be null");
         Preconditions.checkArgument(ontologySearchService != null, "Ontology search service can not be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
+        this.ontologyRetrievalConfig = ontologyRetrievalConfig;
     }
 
     /**

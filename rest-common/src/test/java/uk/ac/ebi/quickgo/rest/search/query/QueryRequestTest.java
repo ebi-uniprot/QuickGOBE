@@ -12,9 +12,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Tests the {@link QueryRequest} implementation
@@ -133,22 +131,42 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithHighlightingOff() {
+    public void buildsQueryWithHighlightingOn() {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        String highlightField = "highlightField";
         QueryRequest request = new QueryRequest.Builder(query)
-                .useHighlighting(false)
+                .addHighlightedField(highlightField)
                 .build();
 
-        assertThat(request.usesHighlighting(), is(false));
+        assertThat(request.getHighlightedFields(), contains(new FieldHighlight(highlightField)));
     }
 
     @Test
-    public void buildsQueryWithHighlightingOn() {
+    public void buildsQueryWithHighlightingOff() {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
         QueryRequest request = new QueryRequest.Builder(query)
-                .useHighlighting(true)
                 .build();
 
-        assertThat(request.usesHighlighting(), is(true));
+        assertThat(request.getHighlightedFields(), is(empty()));
+    }
+
+    @Test
+    public void buildsQueryWithProjectedField() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        String projectedField = "projectedField";
+        QueryRequest request = new QueryRequest.Builder(query)
+                .addProjectedField(projectedField)
+                .build();
+
+        assertThat(request.getProjectedFields(), contains(new FieldProjection(projectedField)));
+    }
+
+    @Test
+    public void buildsQueryWithNoProjectedField() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        QueryRequest request = new QueryRequest.Builder(query)
+                .build();
+
+        assertThat(request.getHighlightedFields(), is(empty()));
     }
 }
