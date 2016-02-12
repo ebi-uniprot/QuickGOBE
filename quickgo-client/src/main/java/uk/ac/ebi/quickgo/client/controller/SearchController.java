@@ -1,18 +1,18 @@
 package uk.ac.ebi.quickgo.client.controller;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
-import uk.ac.ebi.quickgo.common.search.RetrievalException;
-import uk.ac.ebi.quickgo.common.search.SearchService;
-import uk.ac.ebi.quickgo.common.search.SearchableField;
-import uk.ac.ebi.quickgo.common.search.StringToQuickGOQueryConverter;
-import uk.ac.ebi.quickgo.common.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.common.search.results.QueryResult;
+import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,13 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.util.Objects.requireNonNull;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFacets;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFilterQueries;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidPage;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidQuery;
-import static uk.ac.ebi.quickgo.common.search.query.QueryRequest.*;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
+import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.*;
 
 /**
  * Search controller responsible for providing consistent search
@@ -46,14 +41,21 @@ public class SearchController {
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchService<OntologyTerm> ontologySearchService;
     private final SearchableField ontologySearchableField;
+    private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
 
     @Autowired
     public SearchController(
             SearchService<OntologyTerm> ontologySearchService,
-            SearchableField ontologySearchableField) {
-        this.ontologySearchService = requireNonNull(ontologySearchService);
+            SearchableField ontologySearchableField,
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
+
+        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
+        Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
+
+        this.ontologySearchService = ontologySearchService;
         this.ontologySearchableField = ontologySearchableField;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(ontologySearchableField);
+        this.ontologyRetrievalConfig = ontologyRetrievalConfig;
     }
 
     /**
@@ -69,7 +71,8 @@ public class SearchController {
             @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "filterQuery", required = false) List<String> filterQueries,
-            @RequestParam(value = "facet", required = false) List<String> facets) {
+            @RequestParam(value = "facet", required = false) List<String> facets,
+            @RequestParam(value = "highlighting", required = false) boolean highlighting) {
 
         QueryRequest request = buildRequest(
                 query,
@@ -77,24 +80,11 @@ public class SearchController {
                 page,
                 filterQueries,
                 facets,
+                highlighting,
                 ontologyQueryConverter,
                 ontologySearchableField);
 
-        ResponseEntity<QueryResult<OntologyTerm>> response;
-
-        if (request == null) {
-            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else {
-            try {
-                QueryResult<OntologyTerm> queryResult = ontologySearchService.findByQuery(request);
-                response = new ResponseEntity<>(queryResult, HttpStatus.OK);
-            } catch (RetrievalException e) {
-                logger.error(createErrorMessage(request), e);
-                response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return response;
+        return search(request, ontologySearchService);
     }
 
     private QueryRequest buildRequest(String query,
@@ -102,34 +92,49 @@ public class SearchController {
             int page,
             List<String> filterQueries,
             List<String> facets,
+            boolean highlighting,
             StringToQuickGOQueryConverter converter,
             SearchableField fieldSpec) {
 
-        if (!isValidQuery(query)
-                || !isValidNumRows(limit)
-                || !isValidPage(page)
-                || !isValidFacets(fieldSpec, facets)
-                || !isValidFilterQueries(fieldSpec, filterQueries)) {
-            return null;
-        } else {
-            Builder builder = new Builder(converter.convert(query));
-            builder.setPageParameters(page, limit);
+        checkFacets(fieldSpec, facets);
+        checkFilters(fieldSpec, filterQueries);
 
-            if (facets != null) {
-                facets.forEach(builder::addFacetField);
+        Builder builder = new Builder(converter.convert(query));
+        builder.setPageParameters(page, limit);
+
+        if (facets != null) {
+            facets.forEach(builder::addFacetField);
+        }
+
+        if (filterQueries != null) {
+            filterQueries.stream()
+                    .map(converter::convert)
+                    .forEach(builder::addQueryFilter);
+        }
+
+            if (highlighting) {
+                ontologyRetrievalConfig.repo2DomainFieldMap().keySet().stream()
+                        .forEach(builder::addHighlightedField);
+                builder.setHighlightStartDelim(ontologyRetrievalConfig.getHighlightStartDelim());
+                builder.setHighlightEndDelim(ontologyRetrievalConfig.getHighlightEndDelim());
             }
 
-            if (filterQueries != null) {
-                filterQueries.stream()
-                        .map(converter::convert)
-                        .forEach(builder::addQueryFilter);
-            }
+            ontologyRetrievalConfig.getSearchReturnedFields().stream()
+                    .forEach(builder::addProjectedField);
 
-            return builder.build();
+        return builder.build();
+    }
+
+    private void checkFacets(SearchableField fieldSpec, List<String> facets) {
+        if (!isValidFacets(fieldSpec, facets)) {
+            throw new IllegalArgumentException("At least one of the provided facets is not searchable: " + facets);
         }
     }
 
-    private static String createErrorMessage(QueryRequest request) {
-        return "Unable to process search query request: [" + request + "]";
+    private void checkFilters(SearchableField fieldSpec, List<String> filterQueries) {
+        if (!isValidFilterQueries(fieldSpec, filterQueries)) {
+            throw new IllegalArgumentException("At least one of the provided filter queries is not filterable: " +
+                    filterQueries);
+        }
     }
 }

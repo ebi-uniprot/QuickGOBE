@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.client.QuickGOREST;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 
 import java.util.Arrays;
@@ -43,6 +42,7 @@ public class OntologyUserQueryScoringIT {
     private static final String RESOURCE_URL = "/QuickGO/internal/search/ontology";
     private static final String QUERY_PARAM = "query";
     private static final String FILTER_QUERY_PARAM = "filterQuery";
+    private static final String HIGHLIGHTING_PARAM = "highlighting";
 
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
@@ -318,29 +318,6 @@ public class OntologyUserQueryScoringIT {
                 .andExpect(jsonPath("$.results.*", hasSize(2)))
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000002"))
                 .andExpect(jsonPath("$.results[1].id").value("GO:0000001"));
-    }
-
-    // filter queries ------------------------------------------------
-    @Test
-    public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:0000001", "go function 1");
-        doc1.aspect = "Process";
-        OntologyDocument doc2 = createDoc("GO:0000002", "go function 2");
-        doc2.aspect = "Function";
-        OntologyDocument doc3 = createDoc("GO:0000003", "go function 3");
-        doc3.aspect = "Process";
-
-        repository.save(doc1);
-        repository.save(doc2);
-        repository.save(doc3);
-
-        mockMvc.perform(get(RESOURCE_URL)
-                .param(QUERY_PARAM, "go function")
-                .param(FILTER_QUERY_PARAM, OntologyFields.Searchable.ASPECT + ":Process"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results.*", hasSize(2)))
-                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))
-                .andExpect(jsonPath("$.results[1].id").value("GO:0000003"));
     }
 
     private static OntologyDocument createDoc(String id, String name, String... synonyms) {

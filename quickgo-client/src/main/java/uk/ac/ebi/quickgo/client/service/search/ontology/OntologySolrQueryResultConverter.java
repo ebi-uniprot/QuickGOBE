@@ -3,17 +3,18 @@ package uk.ac.ebi.quickgo.client.service.search.ontology;
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.ECODocConverter;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.GODocConverter;
-import uk.ac.ebi.quickgo.common.search.solr.AbstractSolrQueryResultConverter;
+import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryResultHighlightingConverter;
 
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Converts the Solr results into {@link OntologyTerm} instances.
@@ -27,10 +28,17 @@ public class OntologySolrQueryResultConverter extends AbstractSolrQueryResultCon
 
     public OntologySolrQueryResultConverter(DocumentObjectBinder documentObjectBinder,
             GODocConverter goDocConverter,
-            ECODocConverter ecoDocConverter) {
-        this.documentObjectBinder = requireNonNull(documentObjectBinder);
-        this.goDocConverter = requireNonNull(goDocConverter);
-        this.ecoDocConverter = requireNonNull(ecoDocConverter);
+            ECODocConverter ecoDocConverter,
+            Map<String, String> fieldNameMap) {
+        super(new SolrQueryResultHighlightingConverter(fieldNameMap));
+
+        Preconditions.checkArgument(documentObjectBinder != null, "Document Object Binder can not be null");
+        Preconditions.checkArgument(goDocConverter != null, "Go document converter can not be null");
+        Preconditions.checkArgument(ecoDocConverter != null, "ECO document converter can not be null");
+
+        this.documentObjectBinder = documentObjectBinder;
+        this.goDocConverter = goDocConverter;
+        this.ecoDocConverter = ecoDocConverter;
     }
 
     protected List<OntologyTerm> convertResults(SolrDocumentList results) {

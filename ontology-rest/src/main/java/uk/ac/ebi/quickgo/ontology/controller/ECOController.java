@@ -1,11 +1,12 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import uk.ac.ebi.quickgo.common.search.SearchService;
-import uk.ac.ebi.quickgo.common.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
+import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,9 @@ public class ECOController extends OBOController<ECOTerm> {
     @Autowired
     public ECOController(OntologyService<ECOTerm> ecoOntologyService,
             SearchService<OBOTerm> ontologySearchService,
-            SearchableField searchableField) {
-        super(ecoOntologyService, ontologySearchService, searchableField);
+            SearchableField searchableField,
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
+        super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig);
     }
 
     @Override

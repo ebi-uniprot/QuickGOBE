@@ -11,6 +11,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 public class OntologySearchIT extends SearchControllerSetup {
     @Autowired
     private OntologyRepository repository;
@@ -216,6 +220,100 @@ public class OntologySearchIT extends SearchControllerSetup {
         String fq = buildFilterQuery(OntologyFields.Searchable.ASPECT, "Process");
 
         checkValidFilterQueryResponse("go function", 3, fq);
+    }
+
+    @Test
+    public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        doc1.aspect = "Process";
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
+        doc2.aspect = "Function";
+        OntologyDocument doc3 = createGODoc("GO:0000003", "go function 3");
+        doc3.aspect = "Process";
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        checkValidFilterQueryResponse("go function", 2, OntologyFields.Searchable.ASPECT + ":Process")
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))
+                .andExpect(jsonPath("$.results[1].id").value("GO:0000003"));
+    }
+
+    // highlighting ------------------------------------------------
+    @Test
+    public void requestWithHighlightingOnAndOneHitReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        checkValidHighlightOnQueryResponse("function 2", "GO:0000002");
+    }
+
+    @Test
+    public void requestWithHighlightingOnAndTwoHitsReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go anotherFunction 2");
+        OntologyDocument doc3 = createGODoc("GO:0000003", "go anotherFunction 3");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        checkValidHighlightOnQueryResponse("anotherFunction", "GO:0000002", "GO:0000003");
+    }
+
+    @Test
+    public void requestWithHighlightingOnAndZeroHitsReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        checkValidHighlightOnQueryResponse("Southampton");
+    }
+
+    @Test
+    public void requestWithHighlightingOffAndOneHitReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        checkValidHighlightOffQueryResponse("function 2", 1);
+    }
+
+    @Test
+    public void requestWithHighlightingOffAndOnZeroHitsReturnsValidResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        checkValidHighlightOffQueryResponse("Southampton", 0);
+    }
+
+    @Test
+    public void requestWithHighlightingOnReturnsTwoHighlightedValuesInResponse() throws Exception {
+        OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
+        OntologyDocument doc2 = createGODoc("GO:0000002", "go anotherFunction 2");
+        OntologyDocument doc3 = createGODoc("GO:0000003", "go anotherFunction 3");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        checkValidHighlightOnQueryResponse("anotherFunction", "GO:0000002", "GO:0000003")
+                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder("GO:0000002", "GO:0000003")))
+                .andExpect(jsonPath("$.highlighting.*.id", containsInAnyOrder("GO:0000002", "GO:0000003")))
+                .andExpect(jsonPath("$.highlighting.*.matches.*.field", containsInAnyOrder("name", "name")))
+                .andExpect(jsonPath("$.highlighting[0].matches[0].values[0]", containsString("anotherFunction")))
+                .andExpect(jsonPath("$.highlighting[1].matches[0].values[0]", containsString("anotherFunction")));
     }
 
     private void saveToRepository(OntologyDocument... documents) {

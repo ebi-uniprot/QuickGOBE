@@ -17,7 +17,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @SpringBootApplication
 @ComponentScan({
-        "uk.ac.ebi.quickgo.client.controller"
+        "uk.ac.ebi.quickgo.client.controller",
+        "uk.ac.ebi.quickgo.rest"
 })
 @Import(SearchServiceConfig.class)
 public class QuickGOREST {

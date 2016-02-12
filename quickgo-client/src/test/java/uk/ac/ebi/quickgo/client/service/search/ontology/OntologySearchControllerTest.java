@@ -13,11 +13,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFacets;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidFilterQueries;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidNumRows;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidPage;
-import static uk.ac.ebi.quickgo.common.search.SearchDispatcher.isValidQuery;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidNumRows;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidPage;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidQuery;
 
 /**
  * Unit tests for the {@link SearchController}. Primarily tests

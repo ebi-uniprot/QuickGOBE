@@ -43,7 +43,7 @@ public class GOControllerIT extends OBOControllerIT {
 
     @Override
     protected String invalidId() {
-        return "GO;0000001";
+        return "GO|0000001";
     }
 
     @Override

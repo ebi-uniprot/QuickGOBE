@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.client.service.search.ontology;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
-import uk.ac.ebi.quickgo.common.search.RequestRetrieval;
-import uk.ac.ebi.quickgo.common.search.SearchService;
-import uk.ac.ebi.quickgo.common.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.common.search.results.QueryResult;
+import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 /**
  * The search service implementation for ontologies. This class implements the

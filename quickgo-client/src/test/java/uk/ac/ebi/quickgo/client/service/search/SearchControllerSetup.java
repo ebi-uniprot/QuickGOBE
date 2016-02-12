@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -43,6 +45,7 @@ public abstract class SearchControllerSetup {
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String FILTER_QUERY_PARAM = "filterQuery";
+    private static final String HIGHLIGHTING_PARAM = "highlighting";
 
     protected String resourceUrl;
 
@@ -75,8 +78,10 @@ public abstract class SearchControllerSetup {
         clientRequest.param(PAGE_PARAM, String.valueOf(pageNum));
         clientRequest.param(LIMIT_PARAM, String.valueOf(limit));
 
-        mockMvc.perform(clientRequest)
+        ResultActions result = mockMvc.perform(clientRequest)
                 .andExpect(status().is(errorStatus));
+
+
     }
 
     /**
@@ -134,8 +139,10 @@ public abstract class SearchControllerSetup {
 
         addFacetsToRequest(clientRequest, facet);
 
-        mockMvc.perform(clientRequest)
+        ResultActions result = mockMvc.perform(clientRequest)
                 .andExpect(status().isBadRequest());
+
+        checkErrorMessage(result);
     }
 
     protected void checkValidFacetResponse(String query, String... facets) throws Exception {
@@ -158,9 +165,11 @@ public abstract class SearchControllerSetup {
 
         addFiltersToRequest(clientRequest, filterQuery);
 
-        mockMvc.perform(clientRequest)
+        ResultActions result = mockMvc.perform(clientRequest)
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+
+        checkErrorMessage(result);
     }
 
     protected ResultActions checkValidFilterQueryResponse(String query, int expectedResponseSize, String... filterQuery)
@@ -175,6 +184,35 @@ public abstract class SearchControllerSetup {
                 .andExpect(jsonPath("$.results.*", hasSize(expectedResponseSize)));
     }
 
+    // highlighting ---------------------------------------------------------
+    protected ResultActions checkValidHighlightOnQueryResponse(String query, String... idHits)
+            throws Exception {
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
+        addParamsToRequest(clientRequest, HIGHLIGHTING_PARAM, "true");
+
+        int expectedResponseSize = idHits.length;
+
+        return mockMvc.perform(clientRequest)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder(idHits)))
+                .andExpect(jsonPath("$.results.*", hasSize(expectedResponseSize)))
+                .andExpect(jsonPath("$.highlighting.*.id", containsInAnyOrder(idHits)))
+                .andExpect(jsonPath("$.highlighting.*", hasSize(expectedResponseSize)));
+    }
+
+    protected ResultActions checkValidHighlightOffQueryResponse(String query, int expectedResponseSize)
+            throws Exception {
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
+        addParamsToRequest(clientRequest, HIGHLIGHTING_PARAM, "false");
+
+        return mockMvc.perform(clientRequest)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(expectedResponseSize)))
+                .andExpect(jsonPath("$.highlighting.*").doesNotExist());
+    }
+
     private void addFiltersToRequest(MockHttpServletRequestBuilder clientRequest, String... filters) {
         addParamsToRequest(clientRequest, FILTER_QUERY_PARAM, filters);
     }
@@ -187,5 +225,14 @@ public abstract class SearchControllerSetup {
         for (String param : params) {
             clientRequest = clientRequest.param(paramName, param);
         }
+    }
+
+    private String getRequestUrl(ResultActions result) {
+        return result.andReturn().getRequest().getRequestURL().toString();
+    }
+
+    private void checkErrorMessage(ResultActions result) throws Exception {
+        result.andExpect(jsonPath("$.url", is(getRequestUrl(result))));
+        result.andExpect(jsonPath("$.message").exists());
     }
 }
