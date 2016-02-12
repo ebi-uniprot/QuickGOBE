@@ -16,12 +16,4 @@
 
     <name>Legacy Source Data Files</name>
     <description>Holds the information for the location and parsing of QuickGO data files</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>model</artifactId>
-            <version>1.0</version>
-        </dependency>
-    </dependencies>
 </project>

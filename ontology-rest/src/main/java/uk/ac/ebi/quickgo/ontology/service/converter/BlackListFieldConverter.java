@@ -1,15 +1,15 @@
-package uk.ac.ebi.quickgo.service.converter.ontology;
+package uk.ac.ebi.quickgo.ontology.service.converter;
 
-import uk.ac.ebi.quickgo.ff.flatfield.FlatField;
-import uk.ac.ebi.quickgo.service.converter.FieldConverter;
-import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
+import uk.ac.ebi.quickgo.common.converter.FieldConverter;
+import uk.ac.ebi.quickgo.common.converter.FlatField;
+import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
 
 /**
  * Defines the conversion of a {@link String} representing black list information, to a

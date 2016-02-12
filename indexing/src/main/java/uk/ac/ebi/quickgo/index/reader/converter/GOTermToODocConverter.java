@@ -1,17 +1,17 @@
-package uk.ac.ebi.quickgo.repowriter.reader.converter;
+package uk.ac.ebi.quickgo.index.reader.converter;
 
-import uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder;
+import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
-import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldBuilder.newFlatField;
-import static uk.ac.ebi.quickgo.ff.flatfield.FlatFieldLeaf.newFlatFieldLeaf;
+import static org.springframework.util.StringUtils.isEmpty;
+import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Converts a {@link GOTerm} instance into an {@link OntologyDocument} instance.

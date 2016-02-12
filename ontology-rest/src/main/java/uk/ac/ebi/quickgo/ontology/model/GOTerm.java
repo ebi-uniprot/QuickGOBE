@@ -1,8 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.model;
 
+import uk.ac.ebi.quickgo.common.FieldType;
 import uk.ac.ebi.quickgo.ontology.common.document.Aspect;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.List;
 
 /**
  * GO term DTO used by the service layer.
@@ -16,6 +19,8 @@ public class GOTerm extends OBOTerm {
 
     // describes where this term can be used
     public Usage usage;
+
+    public List<BlacklistItem> blacklist;
 
     public enum Usage {
         UNRESTRICTED("Unrestricted", "U"),
@@ -51,5 +56,18 @@ public class GOTerm extends OBOTerm {
         public String getName() {
             return getFullName();
         }
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class BlacklistItem implements FieldType {
+        public String goId;
+        public String reason;
+        public String category;
+        public String predictedBy;
+        public String entityType;
+        public String entityId;
+        public String taxonId;
+        public String entityName;
+        public String ancestorGoId;
     }
 }

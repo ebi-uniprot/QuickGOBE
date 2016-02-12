@@ -1,8 +1,8 @@
-package uk.ac.ebi.quickgo.service.converter.ontology;
+package uk.ac.ebi.quickgo.ontology.service.converter;
 
-import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.service.converter.FieldConverter;
-import uk.ac.ebi.quickgo.service.model.ontology.OBOTerm;
+import uk.ac.ebi.quickgo.common.converter.FieldConverter;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

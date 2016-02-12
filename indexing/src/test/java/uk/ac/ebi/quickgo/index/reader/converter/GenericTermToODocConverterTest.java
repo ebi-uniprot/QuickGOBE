@@ -1,7 +1,7 @@
-package uk.ac.ebi.quickgo.repowriter.reader.converter;
+package uk.ac.ebi.quickgo.index.reader.converter;
 
 import uk.ac.ebi.quickgo.model.ontology.generic.*;
-import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.*;
 import org.junit.Before;

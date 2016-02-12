@@ -26,9 +26,9 @@ public class GOControllerIT extends OBOControllerIT {
 
     @Test
     public void canRetrieveBlacklistById() throws Exception {
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + validId + "/constraints"));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + GO_0000001 + "/constraints"));
 
-        expectBasicFields(response, validId)
+        expectBasicFields(response, GO_0000001)
                 .andExpect(jsonPath("$.blacklist").isArray())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());

@@ -1,7 +1,7 @@
-package uk.ac.ebi.quickgo.service.converter.ontology;
+package uk.ac.ebi.quickgo.ontology.service.converter;
 
-import uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocument;
-import uk.ac.ebi.quickgo.service.model.ontology.GOTerm;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
-import static uk.ac.ebi.quickgo.repo.solr.document.ontology.OntologyDocMocker.createGODoc;
+import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createGODoc;
 
 /**
  * Created 24/11/15
