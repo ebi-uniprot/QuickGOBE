@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.common.search.query;
+package uk.ac.ebi.quickgo.rest.search.query;
 
 /**
  * Expresses a field component of a query result.

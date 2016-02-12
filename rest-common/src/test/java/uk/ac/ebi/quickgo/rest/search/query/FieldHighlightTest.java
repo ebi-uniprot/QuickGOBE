@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.common.search.query;
+package uk.ac.ebi.quickgo.rest.search.query;
 
 import org.hamcrest.core.Is;
 import org.junit.Test;
@@ -10,22 +10,22 @@ import static org.hamcrest.Matchers.equalTo;
  * Created 11/02/16
  * @author Edd
  */
-public class FieldProjectionTest {
+public class FieldHighlightTest {
     @Test(expected = IllegalArgumentException.class)
     public void nullFieldThrowsException() throws Exception {
-        new FieldProjection(null);
+        new FieldHighlight(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyFieldThrowsException() throws Exception {
-        new FieldProjection("");
+        new FieldHighlight("");
     }
 
     @Test
-    public void createFieldProjection() throws Exception {
+    public void createFieldHighlight() throws Exception {
         String field = "field";
-        FieldProjection fieldProjection = new FieldProjection(field);
+        FieldHighlight fieldHighlight = new FieldHighlight(field);
 
-        assertThat(fieldProjection.getField(), Is.is(equalTo(field)));
+        assertThat(fieldHighlight.getField(), Is.is(equalTo(field)));
     }
 }

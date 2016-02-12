@@ -1,6 +1,7 @@
-package uk.ac.ebi.quickgo.common.search.solr;
+package uk.ac.ebi.quickgo.rest.search.solr;
 
-import uk.ac.ebi.quickgo.common.search.results.DocHighlight;
+
+import uk.ac.ebi.quickgo.rest.search.results.DocHighlight;
 
 import java.util.List;
 

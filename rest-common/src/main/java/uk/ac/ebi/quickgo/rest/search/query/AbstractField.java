@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.common.search.query;
+package uk.ac.ebi.quickgo.rest.search.query;
 
 import com.google.common.base.Preconditions;
 

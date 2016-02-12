@@ -1,7 +1,7 @@
-package uk.ac.ebi.quickgo.common.search.solr;
+package uk.ac.ebi.quickgo.rest.search.solr;
 
-import uk.ac.ebi.quickgo.common.search.results.DocHighlight;
-import uk.ac.ebi.quickgo.common.search.results.FieldHighlight;
+import uk.ac.ebi.quickgo.rest.search.results.DocHighlight;
+import uk.ac.ebi.quickgo.rest.search.results.FieldHighlight;
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
@@ -20,7 +20,8 @@ import org.apache.solr.common.SolrDocumentList;
  * Created 10/02/16
  * @author Edd
  */
-public class SolrQueryResultHighlightingConverter implements QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>> {
+public class SolrQueryResultHighlightingConverter implements
+                                                  QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>> {
 
     private static final String DOC_ID = "id";
 

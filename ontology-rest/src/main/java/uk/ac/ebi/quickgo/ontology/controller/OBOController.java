@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
+import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.*;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -223,10 +224,16 @@ public abstract class OBOController<T extends OBOTerm> {
         QuickGOQuery userQuery = converter.convert(query);
         QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
 
-        return new QueryRequest
+        QueryRequest.Builder builder = new QueryRequest
                 .Builder(restrictedUserQuery)
-                .setPageParameters(page, limit)
-                .build();
+                .setPageParameters(page, limit);
+
+        if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
+            ontologyRetrievalConfig.getSearchReturnedFields().stream()
+                    .forEach(builder::addProjectedField);
+        }
+
+        return builder.build();
     }
 
     /**

@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
+import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryResultHighlightingConverter;
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
