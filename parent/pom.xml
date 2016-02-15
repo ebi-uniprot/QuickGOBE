@@ -28,7 +28,7 @@
         <skipUTs>false</skipUTs>
 
         <!-- Test coverage -->
-        <jacoco.outputDir>${project.build.directory}/../../target</jacoco.outputDir>
+        <jacoco.outputDir>${project.build.directory}/../../coverage-reports</jacoco.outputDir>
 
         <!-- Unit test report path -->
         <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
@@ -276,6 +276,20 @@
                             </configuration>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>${jacoco.outputDir}</directory>
+                                <includes>
+                                    <include>**/*</include>
+                                </includes>
+                            </fileset>
+                        </filesets>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
