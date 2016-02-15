@@ -20,26 +20,22 @@
     <!-- ========================================================================== -->
     <!--                   Start of QuickGO Gene Product fields                         -->
 
-    <!-- type of document (basic information, cross-reference or properties, for example) -->
-    <field name="docType" type="string" indexed="true" stored="true"/>
-
     <!-- basic gene product information -->
-    <field name="db" type="text_ignorecase" indexed="true" stored="true"/>
-    <field name="dbObjectId" type="text_ignorecase" indexed="true" stored="true"/>
-    <field name="id" type="string" indexed="true" stored="true"/>
-    <field name="dbObjectSymbol" type="string" indexed="true" stored="true"/>
-    <field name="dbObjectName" type="string" indexed="true" stored="true"/>
-    <field name="dbObjectSynonym" type="string" indexed="true" stored="true" multiValued="true"/>
-    <field name="dbObjectType" type="string" indexed="true" stored="true"/>
-    <field name="taxonId" type="int" indexed="true" stored="true"/>
+    <field name="id" type="string" indexed="false" stored="true"/>
+    <field name="database" type="string" indexed="false" stored="true"/>
+    <field name="symbol" type="string" indexed="false" stored="true"/>
+    <field name="name" type="string" indexed="false" stored="true"/>
+    <field name="synonym" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="type" type="string" indexed="false" stored="true"/>
+    <field name="taxonId" type="int" indexed="false" stored="true"/>
+    <field name="taxonName" type="string" indexed="false" stored="true"/>
+    <field name="dbSubset" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="completeProteome" type="boolean" indexed="false" stored="true"/>
+    <field name="referenceProteome" type="boolean" indexed="false" stored="true"/>
 
     <!-- cross-references -->
-    <field name="xrefDb" type="string" indexed="true" stored="true"/>
-    <field name="xrefId" type="string" indexed="true" stored="true"/>
-
-    <!-- miscellaneous properties -->
-    <field name="propertyName" type="string" indexed="true" stored="true"/>
-    <field name="propertyValue" type="string" indexed="true" stored="true"/>
+    <!--<field name="xrefDb" type="string" indexed="true" stored="true"/>-->
+    <!--<field name="xrefId" type="string" indexed="true" stored="true"/>-->
 
     <!-- computed field that contains most of the gene product information -->
     <field name="text" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
