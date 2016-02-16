@@ -7,7 +7,7 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatFieldFr
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
- * Class to create mocked objects of different {@code docType}s, which are valid according to {@link OntologyDocument}.
+ * Class to create stubbed {@link OntologyDocument} instances.
  *
  * Created 03/11/15
  * @author Edd
