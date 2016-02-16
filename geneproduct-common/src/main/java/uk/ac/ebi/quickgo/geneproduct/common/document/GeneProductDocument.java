@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.common.document;
 
+import uk.ac.ebi.quickgo.common.QuickGODocument;
+
 import java.util.List;
 import org.apache.solr.client.solrj.beans.Field;
 
@@ -8,7 +10,8 @@ import org.apache.solr.client.solrj.beans.Field;
  *
  * @author Ricardo antunes
  */
-public class GeneProductDocument {
+public class GeneProductDocument implements QuickGODocument {
+
     @Field(GeneProductFields.ID)
     public String id;
 
@@ -40,7 +43,11 @@ public class GeneProductDocument {
     public boolean completeProteome;
 
     @Field(GeneProductFields.REFERENCE_POTEOME)
-    public boolean referenceProteome;
+    public boolean referenceProteome = false;
+
+    @Override public String getUniqueName() {
+        return id;
+    }
 
     @Override public boolean equals(Object o) {
         if (this == o) {
