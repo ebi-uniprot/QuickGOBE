@@ -6,8 +6,9 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.List;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.junit.Before;
@@ -21,6 +22,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -69,17 +71,49 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrievesCoreFieldsOnly() {
+    public void retrieves1DocCoreFieldsOnly() {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
-        Optional<OntologyDocument> optionalDoc =
-                ontologyRepository.findCoreByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
-        assertThat(optionalDoc.isPresent(), is(true));
-        OntologyDocument ontologyDocument = optionalDoc.get();
+        List<OntologyDocument> optionalDoc =
+                ontologyRepository.findCoreByTermId(OntologyType.GO.name(), buildIdList(id));
+        assertThat(optionalDoc.size(), is(1));
+
+        OntologyDocument ontologyDocument = optionalDoc.get(0);
         assertThat(ontologyDocument.name, is(notNullValue()));
-        assertThat(ontologyDocument.considers, is(nullValue())); // not a core field
-        assertThat(ontologyDocument.history, is(nullValue())); // not a core field
+        assertThat(ontologyDocument.considers, is(nullValue()));    // not a core field
+        assertThat(ontologyDocument.history, is(nullValue()));      // not a core field
+    }
+
+    @Test
+    public void retrieves2DocsCoreFieldsOnly() {
+        String id1 = "GO:0000001";
+        String id2 = "GO:0000002";
+        ontologyRepository.save(OntologyDocMocker.createGODoc(id1, "GO name 1"));
+        ontologyRepository.save(OntologyDocMocker.createGODoc(id2, "GO name 2"));
+        ontologyRepository.save(OntologyDocMocker.createGODoc("GO:0000003", "GO name 3"));
+
+        List<OntologyDocument> results =
+                ontologyRepository.findCoreByTermId(OntologyType.GO.name(), buildIdList(id1, id2));
+        assertThat(results.size(), is(2));
+
+        results.forEach(ontologyDocument -> {
+            assertThat(ontologyDocument.name, is(notNullValue()));
+            assertThat(ontologyDocument.considers, is(nullValue()));    // not a core field
+            assertThat(ontologyDocument.history, is(nullValue()));      // not a core field
+        });
+    }
+
+    private List<String> buildIdList(String... ids) {
+        if (ids.length == 1) {
+            return singletonList(ClientUtils.escapeQueryChars(ids[0]));
+        } else {
+            List<String> escapedList = new ArrayList<>();
+            for (String id : ids) {
+                escapedList.add(ClientUtils.escapeQueryChars(id));
+            }
+            return escapedList;
+        }
     }
 
     @Test
@@ -87,10 +121,13 @@ public class OntologyRepositoryIT {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
-        Optional<OntologyDocument> optionalDoc =
-                ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
-        assertThat(optionalDoc.isPresent(), is(true));
-        OntologyDocument ontologyDocument = optionalDoc.get();
+        List<OntologyDocument> resultList =
+                ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), buildIdList(id));
+
+        assertThat(resultList, is(notNullValue()));
+        assertThat(resultList.size(), is(1));
+
+        OntologyDocument ontologyDocument = resultList.get(0);
         assertThat(ontologyDocument.name, is(notNullValue()));
         assertThat(ontologyDocument.considers, is(notNullValue()));
     }
@@ -100,10 +137,12 @@ public class OntologyRepositoryIT {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
-        Optional<OntologyDocument> optionalDoc =
-                ontologyRepository.findHistoryByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
-        assertThat(optionalDoc.isPresent(), is(true));
-        assertThat(optionalDoc.get().history, is(notNullValue()));
+        List<OntologyDocument> resultList =
+                ontologyRepository.findHistoryByTermId(OntologyType.GO.name(), buildIdList(id));
+
+        assertThat(resultList, is(notNullValue()));
+        assertThat(resultList.size(), is(1));
+        assertThat(resultList.get(0).history, is(notNullValue()));
     }
 
     @Test
@@ -111,10 +150,12 @@ public class OntologyRepositoryIT {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
-        Optional<OntologyDocument> optionalDoc =
-                ontologyRepository.findXRefsByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
-        assertThat(optionalDoc.isPresent(), is(true));
-        assertThat(optionalDoc.get().xrefs, is(notNullValue()));
+        List<OntologyDocument> resultList =
+                ontologyRepository.findXRefsByTermId(OntologyType.GO.name(), buildIdList(id));
+
+        assertThat(resultList, is(notNullValue()));
+        assertThat(resultList.size(), is(1));
+        assertThat(resultList.get(0).xrefs, is(notNullValue()));
     }
 
     @Test
@@ -122,11 +163,13 @@ public class OntologyRepositoryIT {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
-        Optional<OntologyDocument> optionalDoc =
+        List<OntologyDocument> resultList =
                 ontologyRepository
-                        .findAnnotationGuidelinesByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
-        assertThat(optionalDoc.isPresent(), is(true));
-        assertThat(optionalDoc.get().annotationGuidelines, is(notNullValue()));
+                        .findAnnotationGuidelinesByTermId(OntologyType.GO.name(), buildIdList(id));
+
+        assertThat(resultList, is(notNullValue()));
+        assertThat(resultList.size(), is(1));
+        assertThat(resultList.get(0).annotationGuidelines, is(notNullValue()));
     }
 
     @Test
@@ -134,14 +177,16 @@ public class OntologyRepositoryIT {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
-        Optional<OntologyDocument> optionalDoc =
+        List<OntologyDocument> resultList =
                 ontologyRepository
-                        .findTaxonConstraintsByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
-        assertThat(optionalDoc.isPresent(), is(true));
-        assertThat(optionalDoc.get().taxonConstraints, is(notNullValue()));
-        assertThat(optionalDoc.get().blacklist, is(notNullValue()));
-        assertTrue(optionalDoc.get().blacklist.get(0).contains("IER12345"));
-        assertTrue(optionalDoc.get().blacklist.get(1).contains("IER12346"));
+                        .findTaxonConstraintsByTermId(OntologyType.GO.name(), buildIdList(id));
+
+        assertThat(resultList, is(notNullValue()));
+        assertThat(resultList.size(), is(1));
+        assertThat(resultList.get(0).taxonConstraints, is(notNullValue()));
+        assertThat(resultList.get(0).blacklist, is(notNullValue()));
+        assertTrue(resultList.get(0).blacklist.get(0).contains("IER12345"));
+        assertTrue(resultList.get(0).blacklist.get(1).contains("IER12346"));
     }
 
     @Test
@@ -149,28 +194,31 @@ public class OntologyRepositoryIT {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
-        Optional<OntologyDocument> optionalDoc =
+        List<OntologyDocument> resultList =
                 ontologyRepository
-                        .findXOntologyRelationsByTermId(OntologyType.GO.name(), ClientUtils.escapeQueryChars(id));
-        assertThat(optionalDoc.isPresent(), is(true));
-        assertThat(optionalDoc.get().xRelations, is(notNullValue()));
+                        .findXOntologyRelationsByTermId(OntologyType.GO.name(), buildIdList(id));
+
+        assertThat(resultList, is(notNullValue()));
+        assertThat(resultList.size(), is(1));
+        assertThat(resultList.get(0).xRelations, is(notNullValue()));
     }
 
     @Test
     public void add1DocumentAndFailToFindForWrongId() {
         ontologyRepository.save(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
 
-        assertThat(ontologyRepository.findCoreByTermId(OntologyType.GO.name(), "B").isPresent(), is(false));
-        assertThat(ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), "B").isPresent(), is(false));
+        assertThat(ontologyRepository.findCoreByTermId(OntologyType.GO.name(), buildIdList("B")).size(), is(0));
+        assertThat(ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), buildIdList("B")).size(),
+                is(0));
     }
 
     @Test
     public void add1GoDocumentAndFindItById() {
         ontologyRepository.save(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
 
-        assertThat(ontologyRepository.findCoreByTermId(OntologyType.GO.name(), "A").isPresent(), is(true));
-        assertThat(ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), "A").isPresent(), is(true));
-        assertThat(ontologyRepository.findHistoryByTermId(OntologyType.GO.name(), "A").isPresent(), is(true));
+        assertThat(ontologyRepository.findCoreByTermId(OntologyType.GO.name(), buildIdList("A")).size(), is(1));
+        assertThat(ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), buildIdList("A")).size(), is(1));
+        assertThat(ontologyRepository.findHistoryByTermId(OntologyType.GO.name(), buildIdList("A")).size(), is(1));
     }
 
     /**

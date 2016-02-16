@@ -3,10 +3,13 @@ package uk.ac.ebi.quickgo.ontology.controller;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,13 +26,24 @@ public class GOControllerIT extends OBOControllerIT {
 
     private static final String RESOURCE_URL = "/QuickGO/services/go";
     private static final String GO_0000001 = "GO:0000001";
+    private static final String GO_0000002 = "GO:0000002";
 
     @Test
     public void canRetrieveBlacklistById() throws Exception {
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/" + GO_0000001 + "/constraints"));
+        ResultActions response = mockMvc.perform(get(buildTermURL(GO_0000001) + "/constraints"));
 
         expectBasicFields(response, GO_0000001)
                 .andExpect(jsonPath("$.blacklist").isArray())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveBlacklistByIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(GO_0000001+COMMA+GO_0000002) + "/constraints"));
+
+        expectBasicFieldsInResults(response, Arrays.asList(GO_0000001, GO_0000002))
+                .andExpect(jsonPath("$.results.*.blacklist", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
@@ -56,13 +70,15 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Override
-    protected OntologyDocument createBasicDoc() {
-        return OntologyDocMocker.createGODoc(GO_0000001, "go name");
+    protected List<OntologyDocument> createBasicDocs() {
+        return Arrays.asList(
+                OntologyDocMocker.createGODoc(GO_0000001, "go name 1"),
+                OntologyDocMocker.createGODoc(GO_0000002, "go name 2"));
     }
 
     @Override
     protected String idMissingInRepository() {
-        return "GO:0000002";
+        return "GO:0000003";
     }
 
     @Override

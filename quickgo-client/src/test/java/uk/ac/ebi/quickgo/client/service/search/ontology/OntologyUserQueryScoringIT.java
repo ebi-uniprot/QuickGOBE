@@ -41,8 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class OntologyUserQueryScoringIT {
     private static final String RESOURCE_URL = "/QuickGO/internal/search/ontology";
     private static final String QUERY_PARAM = "query";
-    private static final String FILTER_QUERY_PARAM = "filterQuery";
-    private static final String HIGHLIGHTING_PARAM = "highlighting";
 
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();

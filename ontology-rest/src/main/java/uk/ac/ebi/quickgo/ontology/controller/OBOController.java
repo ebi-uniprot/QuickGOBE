@@ -5,13 +5,17 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.search.*;
+import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import static java.util.Collections.singletonList;
+
 /**
  * Abstract controller defining common end-points of an OBO related
  * REST API.
@@ -30,12 +36,16 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author Edd
  */
 public abstract class OBOController<T extends OBOTerm> {
+    private static final String COMMA = ",";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static final String COLON = ":";
 
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
+
+    private static final String TERM = "term";
+    private static final String TERMS = "terms";
 
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
@@ -77,18 +87,40 @@ public abstract class OBOController<T extends OBOTerm> {
      * <li>id is not in correct format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERM + "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findCoreTerm(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findCoreInfoByOntologyId(id));
+        return getTermResponse(ontologyService.findCoreInfoByOntologyId(singletonList(id)));
+    }
+
+    @RequestMapping(value = TERMS + "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findCoreTerms(@PathVariable(value = "ids") String ids) {
+        Arrays.asList(ids.split(COMMA))
+                .stream()
+                .forEach(this::checkValidId);
+
+        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
     }
 
     public abstract boolean isValidId(String id);
 
-    private ResponseEntity<T> getTermResponse(Optional<T> optionalECODoc) {
-        return optionalECODoc.map(ontology -> new ResponseEntity<>(ontology, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    private ResponseEntity<T> getTermResponse(List<T> docList) {
+        // 1 result => success
+        // 0 => not found
+        // null or 1+ => something went wrong
+        if (docList == null || docList.size() > 1) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else if (docList.size() == 0) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(docList.get(0), HttpStatus.OK);
+        }
+    }
+
+    private ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
+        QueryResult<T> queryResult = new QueryResult<>(docList.size(), docList, null, null, null);
+        return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 
     /**
@@ -101,11 +133,20 @@ public abstract class OBOController<T extends OBOTerm> {
      * <li>id is not in correct format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERM + "/{id}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findCompleteTerm(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findCompleteInfoByOntologyId(id));
+        return getTermResponse(ontologyService.findCompleteInfoByOntologyId(singletonList(id)));
+    }
+
+    @RequestMapping(value = TERMS + "/{ids}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findCompleteTerms(@PathVariable(value = "ids") String ids) {
+        Arrays.asList(ids.split(COMMA))
+                .stream()
+                .forEach(this::checkValidId);
+
+        return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
     }
 
     /**
@@ -119,11 +160,20 @@ public abstract class OBOController<T extends OBOTerm> {
      * <li>id is not in correct format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERM + "/{id}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermHistory(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findHistoryInfoByOntologyId(id));
+        return getTermResponse(ontologyService.findHistoryInfoByOntologyId(singletonList(id)));
+    }
+
+    @RequestMapping(value = TERMS + "/{ids}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
+        Arrays.asList(ids.split(COMMA))
+                .stream()
+                .forEach(this::checkValidId);
+
+        return getTermsResponse(ontologyService.findHistoryInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
     }
 
     /**
@@ -136,11 +186,20 @@ public abstract class OBOController<T extends OBOTerm> {
      * <li>id is not in correct format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERM + "/{id}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermXRefs(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findXRefsInfoByOntologyId(id));
+        return getTermResponse(ontologyService.findXRefsInfoByOntologyId(singletonList(id)));
+    }
+
+    @RequestMapping(value = TERMS + "/{ids}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
+        Arrays.asList(ids.split(COMMA))
+                .stream()
+                .forEach(this::checkValidId);
+
+        return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
     }
 
     /**
@@ -153,11 +212,20 @@ public abstract class OBOController<T extends OBOTerm> {
      * <li>id is not in correct format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERM + "/{id}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermTaxonConstraints(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(id));
+        return getTermResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(singletonList(id)));
+    }
+
+    @RequestMapping(value = TERMS + "/{ids}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
+        Arrays.asList(ids.split(COMMA))
+                .stream()
+                .forEach(this::checkValidId);
+
+        return getTermsResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
     }
 
     /**
@@ -170,11 +238,20 @@ public abstract class OBOController<T extends OBOTerm> {
      * <li>id is not in correct format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERM + "/{id}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermXOntologyRelations(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findXORelationsInfoByOntologyId(id));
+        return getTermResponse(ontologyService.findXORelationsInfoByOntologyId(singletonList(id)));
+    }
+
+    @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
+        Arrays.asList(ids.split(COMMA))
+                .stream()
+                .forEach(this::checkValidId);
+
+        return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
     }
 
     /**
@@ -187,11 +264,20 @@ public abstract class OBOController<T extends OBOTerm> {
      * <li>id is not in correct format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERM + "/{id}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermAnnotationGuideLines(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(id));
+        return getTermResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(singletonList(id)));
+    }
+
+    @RequestMapping(value = TERMS + "/{ids}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
+        Arrays.asList(ids.split(COMMA))
+                .stream()
+                .forEach(this::checkValidId);
+
+        return getTermsResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
     }
 
     /**

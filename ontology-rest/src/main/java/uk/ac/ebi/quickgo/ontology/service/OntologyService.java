@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -25,51 +24,58 @@ public interface OntologyService<T extends OBOTerm> {
     List<T> findAll(Pageable pageable);
 
     /**
-     * Find the complete data set stored about a specified ontology ID.
-     * @param id the ontology ID
-     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     * Find the complete data set stored for a specified list of ontology IDs.
+     * @param ids the ontology IDs
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
      */
-    Optional<T> findCompleteInfoByOntologyId(String id);
+    List<T> findCompleteInfoByOntologyId(List<String> ids);
 
     /**
-     * Find the core data set stored about a specified ontology ID.
-     * @param id the ontology ID
-     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     * Find the core data set stored for a specified list of ontology IDs.
+     * @param ids the ontology IDs
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
      */
-    Optional<T> findCoreInfoByOntologyId(String id);
+    List<T> findCoreInfoByOntologyId(List<String> ids);
 
     /**
-     * Find historical changes related to this specified ontology ID.
-     * @param id the ontology ID
-     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     * Find historical changes related to specified list of ontology IDs.
+     * @param ids the ontology IDs
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
      */
-    Optional<T> findHistoryInfoByOntologyId(String id);
+    List<T> findHistoryInfoByOntologyId(List<String> ids);
 
     /**
-     * Find the cross-references stored for a specified ontology ID.
-     * @param id the ontology ID
-     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     * Find the cross-references stored for a specified list of ontology IDs.
+     * @param ids the ontology IDs
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
      */
-    Optional<T> findXRefsInfoByOntologyId(String id);
+    List<T> findXRefsInfoByOntologyId(List<String> ids);
 
     /**
-     * Find the taxonomy constraints stored for a specified ontology ID.
-     * @param id the ontology ID
-     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     * Find the taxonomy constraints stored for a specified list of ontology IDs.
+     * @param ids the ontology IDs
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
      */
-    Optional<T> findTaxonConstraintsInfoByOntologyId(String id);
+    List<T> findTaxonConstraintsInfoByOntologyId(List<String> ids);
 
     /**
-     * Find information about cross-ontology relations, for a specified ontology ID.
-     * @param id the ontology ID
-     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     * Find information about cross-ontology relations, for a specified list of ontology IDs.
+     * @param ids the ontology IDs
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
      */
-    Optional<T> findXORelationsInfoByOntologyId(String id);
+    List<T> findXORelationsInfoByOntologyId(List<String> ids);
 
     /**
-     * Find the annotation guidelines for a specified ontology ID.
-     * @param id the ontology ID
-     * @return an {@link Optional} {@link OBOTerm} instance for this ontology term
+     * Find the annotation guidelines for a specified list of ontology IDs.
+     * @param ids the ontology IDs
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
      */
-    Optional<T> findAnnotationGuideLinesInfoByOntologyId(String id);
+    List<T> findAnnotationGuideLinesInfoByOntologyId(List<String> ids);
 }

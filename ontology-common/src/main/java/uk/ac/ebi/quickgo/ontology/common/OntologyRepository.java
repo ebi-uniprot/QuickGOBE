@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.ontology.common;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 
-import java.util.Optional;
+import java.util.List;
 import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
@@ -17,44 +17,50 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
  * @author Edd
  */
 public interface OntologyRepository extends SolrCrudRepository<OntologyDocument, String> {
-    String QUERY_ONTOLOGY_TYPE_AND_ID = OntologyFields.ONTOLOGY_TYPE + ":?0 AND " + OntologyFields.ID + ":?1";
+    String QUERY_ONTOLOGY_TYPE_AND_ID = OntologyFields.ONTOLOGY_TYPE + ":?0 AND " + OntologyFields.ID + ":(?1)";
 
     // complete
-    @Query(QUERY_ONTOLOGY_TYPE_AND_ID) Optional<OntologyDocument> findCompleteByTermId(String idType, String id);
+    @Query(QUERY_ONTOLOGY_TYPE_AND_ID) List<OntologyDocument> findCompleteByTermId(String idType, List<String> ids);
 
     // core
     @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
             fields = {OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT,
                     OntologyFields.ASPECT, OntologyFields.ANCESTOR,
-                    OntologyFields.USAGE, OntologyFields.SYNONYM, OntologyFields.DEFINITION}) Optional<OntologyDocument> findCoreByTermId(String idType, String id);
+                    OntologyFields.USAGE, OntologyFields.SYNONYM, OntologyFields.DEFINITION})
+    List<OntologyDocument> findCoreByTermId(String idType, List<String> ids);
 
     // history
     @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
             fields = {
-                    OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT, OntologyFields.DEFINITION, OntologyFields.HISTORY})
-    Optional<OntologyDocument> findHistoryByTermId(String idType, String id);
+                    OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT,
+                    OntologyFields.DEFINITION, OntologyFields.HISTORY}) List<OntologyDocument> findHistoryByTermId(
+            String idType, List<String> ids);
 
     // cross-references
     @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
             fields = {
-                    OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT, OntologyFields.DEFINITION, OntologyFields.XREF}) Optional<OntologyDocument> findXRefsByTermId(
-            String idType, String id);
+                    OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT,
+                    OntologyFields.DEFINITION, OntologyFields.XREF}) List<OntologyDocument> findXRefsByTermId(
+            String idType, List<String> ids);
 
     // taxonomy constraints and blacklist
     @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
             fields = {
-                    OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT, OntologyFields.DEFINITION, OntologyFields.TAXON_CONSTRAINT, OntologyFields.BLACKLIST})
-    Optional<OntologyDocument> findTaxonConstraintsByTermId(String idType, String id);
+                    OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT,
+                    OntologyFields.DEFINITION, OntologyFields.TAXON_CONSTRAINT, OntologyFields.BLACKLIST})
+    List<OntologyDocument> findTaxonConstraintsByTermId(String idType, List<String> ids);
 
     // cross-ontology relations
     @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
             fields = {
-                    OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT, OntologyFields.DEFINITION, OntologyFields.XRELATION})
-    Optional<OntologyDocument> findXOntologyRelationsByTermId(String idType, String id);
+                    OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT,
+                    OntologyFields.DEFINITION, OntologyFields.XRELATION})
+    List<OntologyDocument> findXOntologyRelationsByTermId(String idType, List<String> ids);
 
     // annotation guidelines
     @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
             fields = {
-                    OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT, OntologyFields.DEFINITION, OntologyFields.ANNOTATION_GUIDELINE})
-    Optional<OntologyDocument> findAnnotationGuidelinesByTermId(String idType, String id);
+                    OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT,
+                    OntologyFields.DEFINITION, OntologyFields.ANNOTATION_GUIDELINE})
+    List<OntologyDocument> findAnnotationGuidelinesByTermId(String idType, List<String> ids);
 }
