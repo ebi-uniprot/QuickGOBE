@@ -12,8 +12,10 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
  * Created 03/11/15
  * @author Edd
  */
-public class OntologyDocMocker {
+public final class OntologyDocMocker {
     public static final int FLAT_FIELD_DEPTH = 0;
+
+    private OntologyDocMocker(){}
 
     public static OntologyDocument createGODoc(String id, String name) {
         OntologyDocument od = createOBODoc(id, name);
