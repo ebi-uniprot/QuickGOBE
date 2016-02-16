@@ -35,6 +35,7 @@ import static java.util.Collections.singletonList;
  * @author Edd
  */
 public abstract class OBOController<T extends OBOTerm> {
+    static final int MAX_PAGE_RESULTS = 100;
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COMMA = ",";
     private static final String COLON = ":";
@@ -42,7 +43,6 @@ public abstract class OBOController<T extends OBOTerm> {
     private static final String DEFAULT_PAGE_NUMBER = "1";
     private static final String TERM = "term";
     private static final String TERMS = "terms";
-    static final int MAX_PAGE_RESULTS = 100;
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
@@ -90,6 +90,17 @@ public abstract class OBOController<T extends OBOTerm> {
         return getTermResponse(id, ontologyService.findCoreInfoByOntologyId(singletonList(id)));
     }
 
+    /**
+     * Get core information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
+     * @return
+     * <ul>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
+     * </ul>
+     */
     @RequestMapping(value = TERMS + "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findCoreTerms(@PathVariable(value = "ids") String ids) {
         checkValidIds(ids);
@@ -114,6 +125,17 @@ public abstract class OBOController<T extends OBOTerm> {
         return getTermResponse(id, ontologyService.findCompleteInfoByOntologyId(singletonList(id)));
     }
 
+    /**
+     * Get complete information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
+     * @return
+     * <ul>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
+     * </ul>
+     */
     @RequestMapping(value = TERMS + "/{ids}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findCompleteTerms(@PathVariable(value = "ids") String ids) {
         checkValidIds(ids);
@@ -139,6 +161,17 @@ public abstract class OBOController<T extends OBOTerm> {
         return getTermResponse(id, ontologyService.findHistoryInfoByOntologyId(singletonList(id)));
     }
 
+    /**
+     * Get history information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
+     * @return
+     * <ul>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
+     * </ul>
+     */
     @RequestMapping(value = TERMS + "/{ids}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
         checkValidIds(ids);
@@ -163,7 +196,17 @@ public abstract class OBOController<T extends OBOTerm> {
         return getTermResponse(id, ontologyService.findXRefsInfoByOntologyId(singletonList(id)));
     }
 
-
+    /**
+     * Get cross-reference information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
+     * @return
+     * <ul>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
+     * </ul>
+     */
     @RequestMapping(value = TERMS + "/{ids}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
         checkValidIds(ids);
@@ -188,7 +231,17 @@ public abstract class OBOController<T extends OBOTerm> {
         return getTermResponse(id, ontologyService.findTaxonConstraintsInfoByOntologyId(singletonList(id)));
     }
 
-
+    /**
+     * Get taxonomy constraint information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
+     * @return
+     * <ul>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
+     * </ul>
+     */
     @RequestMapping(value = TERMS + "/{ids}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
         checkValidIds(ids);
@@ -213,6 +266,17 @@ public abstract class OBOController<T extends OBOTerm> {
         return getTermResponse(id, ontologyService.findXORelationsInfoByOntologyId(singletonList(id)));
     }
 
+    /**
+     * Get cross-ontology relationship information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
+     * @return
+     * <ul>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
+     * </ul>
+     */
     @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
         checkValidIds(ids);
@@ -237,6 +301,17 @@ public abstract class OBOController<T extends OBOTerm> {
         return getTermResponse(id, ontologyService.findAnnotationGuideLinesInfoByOntologyId(singletonList(id)));
     }
 
+    /**
+     * Get annotation guideline information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
+     * @return
+     * <ul>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
+     * </ul>
+     */
     @RequestMapping(value = TERMS + "/{ids}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
         checkValidIds(ids);
@@ -282,10 +357,6 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     protected abstract OntologyType getOntologyType();
 
-    private List<String> createIdList(String ids) {
-        return Arrays.asList(ids.split(COMMA));
-    }
-
     /**
      * Creates a response from a list of terms, which should have a size of 1.
      *
@@ -311,45 +382,6 @@ public abstract class OBOController<T extends OBOTerm> {
         } else {
             return new ResponseEntity<>(termList.get(0), HttpStatus.OK);
         }
-    }
-
-    private ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
-        QueryResult<T> queryResult = new QueryResult<>(docList.size(), docList, null, null, null);
-        return new ResponseEntity<>(queryResult, HttpStatus.OK);
-    }
-
-    private QueryRequest buildRequest(String query,
-            int limit,
-            int page,
-            StringToQuickGOQueryConverter converter) {
-
-        QuickGOQuery userQuery = converter.convert(query);
-        QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
-
-        QueryRequest.Builder builder = new QueryRequest
-                .Builder(restrictedUserQuery)
-                .setPageParameters(page, limit);
-
-        if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
-            ontologyRetrievalConfig.getSearchReturnedFields().stream()
-                    .forEach(builder::addProjectedField);
-        }
-
-        return builder.build();
-    }
-
-    /**
-     * Given a {@link QuickGOQuery}, create a composite {@link QuickGOQuery} by
-     * performing a conjunction with another query, which restricts all results
-     * to be of a type corresponding to that provided by {@link #getOntologyType()}.
-     *
-     * @param query the query that is constrained
-     * @return the new constrained query
-     */
-    private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
-        return query.and(
-                ontologyQueryConverter.convert(
-                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + getOntologyType().name()));
     }
 
     /**
@@ -392,5 +424,48 @@ public abstract class OBOController<T extends OBOTerm> {
         if (!isValidId(id)) {
             throw new IllegalArgumentException("Provided ID: '" + id + "' is invalid");
         }
+    }
+
+    private List<String> createIdList(String ids) {
+        return Arrays.asList(ids.split(COMMA));
+    }
+
+    private ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
+        QueryResult<T> queryResult = new QueryResult<>(docList.size(), docList, null, null, null);
+        return new ResponseEntity<>(queryResult, HttpStatus.OK);
+    }
+
+    private QueryRequest buildRequest(String query,
+            int limit,
+            int page,
+            StringToQuickGOQueryConverter converter) {
+
+        QuickGOQuery userQuery = converter.convert(query);
+        QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
+
+        QueryRequest.Builder builder = new QueryRequest
+                .Builder(restrictedUserQuery)
+                .setPageParameters(page, limit);
+
+        if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
+            ontologyRetrievalConfig.getSearchReturnedFields().stream()
+                    .forEach(builder::addProjectedField);
+        }
+
+        return builder.build();
+    }
+
+    /**
+     * Given a {@link QuickGOQuery}, create a composite {@link QuickGOQuery} by
+     * performing a conjunction with another query, which restricts all results
+     * to be of a type corresponding to that provided by {@link #getOntologyType()}.
+     *
+     * @param query the query that is constrained
+     * @return the new constrained query
+     */
+    private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
+        return query.and(
+                ontologyQueryConverter.convert(
+                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + getOntologyType().name()));
     }
 }
