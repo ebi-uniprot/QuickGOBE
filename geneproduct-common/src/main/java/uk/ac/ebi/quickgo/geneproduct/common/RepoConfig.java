@@ -23,6 +23,8 @@ import org.xml.sax.SAXException;
  */
 @Configuration
 public class RepoConfig {
+    private static final String SOLR_CORE = "geneproduct";
+
     @Bean
     static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
@@ -44,7 +46,7 @@ public class RepoConfig {
     @Profile("embeddedServer")
     public SolrServerFactory solrServerFactory(CoreContainer coreContainer)
             throws IOException, SAXException, ParserConfigurationException {
-        EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, null);
+        EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, SOLR_CORE);
         return new MulticoreSolrServerFactory(embeddedSolrServer);
     }
 
