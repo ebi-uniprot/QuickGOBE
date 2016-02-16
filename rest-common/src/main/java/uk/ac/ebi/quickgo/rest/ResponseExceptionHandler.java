@@ -28,7 +28,13 @@ public class ResponseExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    private static class ErrorInfo {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    protected ResponseEntity<ErrorInfo> handleNotFoundRequest(RuntimeException ex, HttpServletRequest request) {
+        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    public static class ErrorInfo {
         private final String url;
         private final String message;
 

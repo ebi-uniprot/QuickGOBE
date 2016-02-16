@@ -230,8 +230,29 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void finds400IfIdIsEmpty() throws Exception {
+    public void finds400IfUrlIsEmpty() throws Exception {
         mockMvc.perform(get(resourceUrl + "/"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void finds400IfTermIdIsEmpty() throws Exception {
+        mockMvc.perform(get(buildTermURL("")))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void finds400IfTermsIdIsEmpty() throws Exception {
+        mockMvc.perform(get(buildTermsURL("")))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void finds400IfUrlIsJustWrong() throws Exception {
+        mockMvc.perform(get(resourceUrl + "/thisIsAnEndPointThatDoesNotExist"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
@@ -386,7 +407,7 @@ public abstract class OBOControllerIT {
         return result
                 .andDo(print())
                 .andExpect(jsonPath("$.url", is(requestUrl(result))))
-                .andExpect(jsonPath("$.message", containsString("Provided id: " + id)));
+                .andExpect(jsonPath("$.message", containsString("Provided ID: '" + id + "'")));
     }
 
     protected ResultActions expectResultsInfoExists(ResultActions result) throws Exception {

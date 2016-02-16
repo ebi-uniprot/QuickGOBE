@@ -5,10 +5,9 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
-import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
-import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.ResourceNotFoundException;
+import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
+import uk.ac.ebi.quickgo.rest.search.*;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -36,17 +35,14 @@ import static java.util.Collections.singletonList;
  * @author Edd
  */
 public abstract class OBOController<T extends OBOTerm> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COMMA = ",";
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     private static final String COLON = ":";
-
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
-
     private static final String TERM = "term";
     private static final String TERMS = "terms";
-
+    static final int MAX_PAGE_RESULTS = 100;
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
@@ -71,8 +67,8 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return a 400 response
      */
     @RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> emptyId() {
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
+        throw new IllegalArgumentException("The requested end-point does not exist.");
     }
 
     /**
@@ -91,36 +87,14 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<T> findCoreTerm(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findCoreInfoByOntologyId(singletonList(id)));
+        return getTermResponse(id, ontologyService.findCoreInfoByOntologyId(singletonList(id)));
     }
 
     @RequestMapping(value = TERMS + "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findCoreTerms(@PathVariable(value = "ids") String ids) {
-        Arrays.asList(ids.split(COMMA))
-                .stream()
-                .forEach(this::checkValidId);
+        checkValidIds(ids);
 
-        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
-    }
-
-    public abstract boolean isValidId(String id);
-
-    private ResponseEntity<T> getTermResponse(List<T> docList) {
-        // 1 result => success
-        // 0 => not found
-        // null or 1+ => something went wrong
-        if (docList == null || docList.size() > 1) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } else if (docList.size() == 0) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(docList.get(0), HttpStatus.OK);
-        }
-    }
-
-    private ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
-        QueryResult<T> queryResult = new QueryResult<>(docList.size(), docList, null, null, null);
-        return new ResponseEntity<>(queryResult, HttpStatus.OK);
+        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(createIdList(ids)));
     }
 
     /**
@@ -137,16 +111,14 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<T> findCompleteTerm(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findCompleteInfoByOntologyId(singletonList(id)));
+        return getTermResponse(id, ontologyService.findCompleteInfoByOntologyId(singletonList(id)));
     }
 
     @RequestMapping(value = TERMS + "/{ids}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findCompleteTerms(@PathVariable(value = "ids") String ids) {
-        Arrays.asList(ids.split(COMMA))
-                .stream()
-                .forEach(this::checkValidId);
+        checkValidIds(ids);
 
-        return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
+        return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(createIdList(ids)));
     }
 
     /**
@@ -164,16 +136,14 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<T> findTermHistory(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findHistoryInfoByOntologyId(singletonList(id)));
+        return getTermResponse(id, ontologyService.findHistoryInfoByOntologyId(singletonList(id)));
     }
 
     @RequestMapping(value = TERMS + "/{ids}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
-        Arrays.asList(ids.split(COMMA))
-                .stream()
-                .forEach(this::checkValidId);
+        checkValidIds(ids);
 
-        return getTermsResponse(ontologyService.findHistoryInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
+        return getTermsResponse(ontologyService.findHistoryInfoByOntologyId(createIdList(ids)));
     }
 
     /**
@@ -190,20 +160,19 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<T> findTermXRefs(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findXRefsInfoByOntologyId(singletonList(id)));
+        return getTermResponse(id, ontologyService.findXRefsInfoByOntologyId(singletonList(id)));
     }
+
 
     @RequestMapping(value = TERMS + "/{ids}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
-        Arrays.asList(ids.split(COMMA))
-                .stream()
-                .forEach(this::checkValidId);
+        checkValidIds(ids);
 
-        return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
+        return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(createIdList(ids)));
     }
 
     /**
-     * Get taxonomy constraint and blacklist information about a term based on its id
+     * Get taxonomy constraint information (and blacklist, for GO terms) about a term based on its id
      * @param id ontology identifier
      * @return
      * <ul>
@@ -216,16 +185,15 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<T> findTermTaxonConstraints(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(singletonList(id)));
+        return getTermResponse(id, ontologyService.findTaxonConstraintsInfoByOntologyId(singletonList(id)));
     }
+
 
     @RequestMapping(value = TERMS + "/{ids}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
-        Arrays.asList(ids.split(COMMA))
-                .stream()
-                .forEach(this::checkValidId);
+        checkValidIds(ids);
 
-        return getTermsResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
+        return getTermsResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(createIdList(ids)));
     }
 
     /**
@@ -242,16 +210,14 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<T> findTermXOntologyRelations(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findXORelationsInfoByOntologyId(singletonList(id)));
+        return getTermResponse(id, ontologyService.findXORelationsInfoByOntologyId(singletonList(id)));
     }
 
     @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
-        Arrays.asList(ids.split(COMMA))
-                .stream()
-                .forEach(this::checkValidId);
+        checkValidIds(ids);
 
-        return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
+        return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(createIdList(ids)));
     }
 
     /**
@@ -259,39 +225,39 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param id ontology identifier
      * @return
      * <ul>
-     * <li>id is found: response consists of a 200 with annotation guidelines of the ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
+     *      <li>id is found: response consists of a 200 with annotation guidelines of the ontology term</li>
+     *      <li>id is not found: response returns 404</li>
+     *      <li>id is not in correct format: response returns 400</li>
      * </ul>
      */
     @RequestMapping(value = TERM + "/{id}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<T> findTermAnnotationGuideLines(@PathVariable(value = "id") String id) {
         checkValidId(id);
 
-        return getTermResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(singletonList(id)));
+        return getTermResponse(id, ontologyService.findAnnotationGuideLinesInfoByOntologyId(singletonList(id)));
     }
 
     @RequestMapping(value = TERMS + "/{ids}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
-        Arrays.asList(ids.split(COMMA))
-                .stream()
-                .forEach(this::checkValidId);
+        checkValidIds(ids);
 
-        return getTermsResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(Arrays.asList(ids.split(COMMA))));
+        return getTermsResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(createIdList(ids)));
     }
 
     /**
-     * Method is invoked when a client wants to search for an ontology term via its identifier, or a generic query
-     * search
+     * Search for an ontology term via its identifier, or a generic query search
      *
      * @param query the query to search against
      * @param limit the amount of queries to return
+     * @return a {@link QueryResult} instance containing the results of the search
      */
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(
             @RequestParam(value = "query") String query,
             @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
+
+        validateRequestedResults(limit);
 
         QueryRequest request = buildRequest(
                 query,
@@ -300,6 +266,56 @@ public abstract class OBOController<T extends OBOTerm> {
                 ontologyQueryConverter);
 
         return SearchDispatcher.search(request, ontologySearchService);
+    }
+
+    /**
+     * Checks whether an ID has a valid format.
+     * @param id the ID
+     * @return boolean indicating whether or not the specified ID is valid
+     */
+    protected abstract boolean isValidId(String id);
+
+    /**
+     * Returns the {@link OntologyType} that corresponds to this controller.
+     *
+     * @return the ontology type corresponding to this controller's behaviour.
+     */
+    protected abstract OntologyType getOntologyType();
+
+    private List<String> createIdList(String ids) {
+        return Arrays.asList(ids.split(COMMA));
+    }
+
+    /**
+     * Creates a response from a list of terms, which should have a size of 1.
+     *
+     * @param requestedId the original ID that was requested
+     * @param termList a singleton list of terms
+     * @return
+     * <ul>
+     *      <li>termList's size is 1: response consists of a 200 with annotation guidelines of the ontology term</li>
+     *      <li>termList's size is 0: response returns 404</li>
+     *      <li>otherwise: response returns 500</li>
+     * </ul>
+     */
+    protected ResponseEntity<T> getTermResponse(String requestedId, List<T> termList) {
+        if (termList == null) {
+            LOGGER.error("Provided ID: '{}' caused a server error because the specified termList was null", requestedId);
+            throw new RetrievalException("Provided ID: '" + requestedId + "' caused a server error.");
+        } else if(termList.size() > 1) {
+            LOGGER.error("Provided ID: '{}' caused a server error because the specified termList contains more than 1" +
+                    " element", requestedId);
+            throw new RetrievalException("Provided ID: '" + requestedId + "' caused a server error.");
+        } else if (termList.size() == 0) {
+            throw new ResourceNotFoundException("Provided ID: '" + requestedId + "' was not found");
+        } else {
+            return new ResponseEntity<>(termList.get(0), HttpStatus.OK);
+        }
+    }
+
+    private ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
+        QueryResult<T> queryResult = new QueryResult<>(docList.size(), docList, null, null, null);
+        return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 
     private QueryRequest buildRequest(String query,
@@ -337,21 +353,44 @@ public abstract class OBOController<T extends OBOTerm> {
     }
 
     /**
-     * Returns the {@link OntologyType} that corresponds to this controller.
-     *
-     * @return the ontology type corresponding to this controller's behaviour.
+     * Checks the validity of a list of IDs in CSV format.
+     * @param ids a list of IDs in CSV format
+     * @throws IllegalArgumentException is thrown if an ID is not valid, or if
+     * number of IDs listed is greater than {@link #MAX_PAGE_RESULTS}.
      */
-    protected abstract OntologyType getOntologyType();
+    protected void checkValidIds(String ids) {
+        List<String> idList = createIdList(ids);
+
+        validateRequestedResults(idList.size());
+
+        idList
+                .stream()
+                .forEach(this::checkValidId);
+    }
+
+    /**
+     * Checks whether the requested number of results is valid.
+     * @param requestedResultsSize the number of results being requested
+     * @throws IllegalArgumentException if the number is greater than {@link #MAX_PAGE_RESULTS}
+     */
+    protected void validateRequestedResults(int requestedResultsSize) {
+        if (requestedResultsSize > MAX_PAGE_RESULTS) {
+            String errorMessage = "Cannot retrieve more than " + MAX_PAGE_RESULTS + " results in one request. " +
+                    "Please consider using end-points that return paged results.";
+            LOGGER.error(errorMessage);
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
 
     /**
      * Checks the validity of a term id.
      *
      * @param id the term id to check
-     * @throws IllegalArgumentException is thrown if the id is not valid
+     * @throws IllegalArgumentException is thrown if the ID is not valid
      */
-    private void checkValidId(String id) {
+    protected void checkValidId(String id) {
         if (!isValidId(id)) {
-            throw new IllegalArgumentException("Provided id: " + id + " is invalid");
+            throw new IllegalArgumentException("Provided ID: '" + id + "' is invalid");
         }
     }
 }
