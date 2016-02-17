@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.common.document;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,7 +44,7 @@ public class OntologyFields {
      * Ontology fields that are stored, and can therefore be retrieved.
      */
     public static final class Retrievable extends OntologyFields {
-        public static final Set<String> VALUES = new HashSet<>();
+        private static final Set<String> VALUES = new HashSet<>();
 
         public static final String ID = storeAndGet(VALUES, OntologyFields.ID);
         public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, OntologyFields.ONTOLOGY_TYPE);
@@ -66,13 +67,21 @@ public class OntologyFields {
         public static final String XRELATION = storeAndGet(VALUES, OntologyFields.XRELATION);
         public static final String BLACKLIST = storeAndGet(VALUES, OntologyFields.BLACKLIST);
         public static final String SECONDARY_ID = storeAndGet(VALUES, OntologyFields.SECONDARY_ID);
+
+        public static boolean isRetrievable(String field) {
+            return VALUES.contains(field);
+        }
+
+        private static Set<String> retrievableFields() {
+            return Collections.unmodifiableSet(VALUES);
+        }
     }
 
     /**
      * Ontology fields that are indexed, and can therefore be searched.
      */
     public static final class Searchable {
-        public static final Set<String> VALUES = new HashSet<>();
+        private static final Set<String> VALUES = new HashSet<>();
 
         public static final String ASPECT = storeAndGet(VALUES, OntologyFields.ASPECT);
         public static final String ID = storeAndGet(VALUES, OntologyFields.ID);
@@ -80,6 +89,14 @@ public class OntologyFields {
         public static final String NAME = storeAndGet(VALUES, OntologyFields.NAME);
         public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, OntologyFields.ONTOLOGY_TYPE);
         public static final String SYNONYM_NAME = storeAndGet(VALUES, OntologyFields.SYNONYM_NAME);
+
+        public static boolean isSearchable(String field) {
+            return VALUES.contains(field);
+        }
+
+        public static Set<String> searcheableFields() {
+            return Collections.unmodifiableSet(VALUES);
+        }
     }
     
     private static String storeAndGet(Set<String> values, String value) {
