@@ -60,7 +60,7 @@ public class RepoConfig {
 
     @Bean
     public SolrTemplate geneProductTemplate(SolrServer solrServer)  {
-        return new SolrTemplate(solrServer, "geneproduct");
+        return new SolrTemplate(solrServer, SOLR_CORE);
     }
 
     @Bean
