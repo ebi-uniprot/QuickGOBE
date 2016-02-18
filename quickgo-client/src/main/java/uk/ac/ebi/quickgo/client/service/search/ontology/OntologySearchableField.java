@@ -11,6 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class OntologySearchableField implements SearchableField {
     @Override public boolean isSearchable(String field) {
-        return OntologyFields.Searchable.VALUES.contains(field);
+        return OntologyFields.Searchable.isSearchable(field);
     }
 }

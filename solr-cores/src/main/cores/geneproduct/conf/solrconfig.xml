@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>4.8</luceneMatchVersion>
+  <luceneMatchVersion>4.10</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load an Jars
        identified and use them to resolve any "plugins" specified in
@@ -834,7 +834,6 @@
        <str name="echoParams">explicit</str>
        <int name="rows">10</int>
        <str name="df">text</str>
-       <str name="sort">dbObjectId asc</str>
      </lst>
     <!-- In addition to defaults, "appends" params can be specified
          to identify values which should be appended to the list of
@@ -897,7 +896,6 @@
        <str name="wt">json</str>
        <str name="indent">true</str>
        <str name="df">text</str>
-       <str name="sort">dbObjectId asc</str> 
      </lst>
   </requestHandler>
 

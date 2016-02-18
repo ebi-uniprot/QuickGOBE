@@ -36,23 +36,6 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class GOTermToODocConverterTest {
-
-    @Ignore
-    @Test
-    public void converts1Term() {
-        //GOSourceFiles sourceFiles = new GOSourceFiles(new File("/home/eddturner/working/quickgo-local/quickgo-data/ff"));
-        GOSourceFiles sourceFiles = new GOSourceFiles(new File("C:\\Users\\twardell\\Projects\\QuickGo\\data_ontology"));
-
-        GOLoader goLoader = new GOLoader(sourceFiles);
-        Optional<GeneOntology> geneOntologyOptional = goLoader.load();
-        assertThat(geneOntologyOptional.isPresent(), is(true));
-
-        GeneOntology geneOntology = geneOntologyOptional.get();
-        GOTermToODocConverter docConverter = new GOTermToODocConverter();
-
-        System.out.println(docConverter.apply(Optional.of((GOTerm) geneOntology.getTerm("GO:0000003"))));
-    }
-
     private static final String TERM_ID = "id1";
 
     @Mock

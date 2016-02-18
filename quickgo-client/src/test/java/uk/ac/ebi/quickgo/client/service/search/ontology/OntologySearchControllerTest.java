@@ -87,7 +87,7 @@ public class OntologySearchControllerTest {
     // validate facets ----------------------------------------------
     @Test
     public void allSearchableFieldsColonValueAreValidForFacets() {
-        List<String> facets = OntologyFields.Searchable.VALUES.stream().collect(Collectors.toList());
+        List<String> facets = OntologyFields.Searchable.searcheableFields().stream().collect(Collectors.toList());
         assertThat(isValidFacets(ontologySearchableField, facets), is(true));
     }
 
@@ -113,7 +113,7 @@ public class OntologySearchControllerTest {
     // validate filter queries ----------------------------------------------
     @Test
     public void allSearchableFieldsColonValueAreValidForFilterQueries() {
-        List<String> filterQueries = OntologyFields.Searchable.VALUES.stream()
+        List<String> filterQueries = OntologyFields.Searchable.searcheableFields().stream()
                 .map(field -> field +":pretendValue")
                 .collect(Collectors.toList());
 
