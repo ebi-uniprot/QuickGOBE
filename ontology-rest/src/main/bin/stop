@@ -1,0 +1,44 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# check the right user runs this
+if [ $USER != "eddturner" ] ; then
+    echo "This service can only be run as user, 'uni_adm'";
+    exit 1;
+fi;
+
+
+JAR="ontology-rest*.jar"
+SERVICE_PATH="/home/eddturner/working/intellij/unp.goa.quickgo/ontology-rest/target"
+PIDFILE="$SERVICE_PATH/run.pid"
+CONFIG_FILE="$SERVICE_PATH/config.properties"
+SERVICE_JAR="$JAR"
+
+if [ ! -r $PIDFILE ]
+then
+    echo "Warning: PID file does not exist. Please check if the service is running."
+    exit 1;
+fi
+
+# read PIDFILE to check the hostname.
+PIDSTR=$(cat $PIDFILE)
+read -ra PIDFILE_ARRAY <<<"$PIDSTR"
+
+if [ ${PIDFILE_ARRAY[1]} != $(hostname) ]
+then
+    echo "Current host: $(hostname), PID host: ${PIDFILE_ARRAY[1]} "
+    echo "This 'stop' command needs to be run on the same host it was started on."
+    exit 1
+fi
+
+
+echo "Stopping the job with PID: ${PIDFILE_ARRAY[0]}."
+kill ${PIDFILE_ARRAY[0]} > /dev/null || {
+    echo "Could not kill process. Please check the PID manually: ${PIDFILE_ARRAY[0]}"
+    exit 1;
+}
+
+rm $PIDFILE
+
+echo "Stopped."

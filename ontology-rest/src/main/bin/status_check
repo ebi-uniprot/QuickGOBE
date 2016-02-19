@@ -1,0 +1,13 @@
+#! /bin/bash
+
+set -euo pipefail
+
+PORT="8080"
+CONTEXT_PATH="/QuickGO/services"
+
+TEST_URL=""http://127.0.0.1:$PORT$CONTEXT_PATH""
+curl --silent "$TEST_URL" > /dev/null || {
+    echo "Status Check: $TEST_URL is DOWN"
+    exit 1
+}
+echo "Status Check: $TEST_URL is UP"
