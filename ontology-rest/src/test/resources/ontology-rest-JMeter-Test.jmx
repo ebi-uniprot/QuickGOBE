@@ -2,9 +2,9 @@
 <jmeterTestPlan version="1.2" properties="2.8" jmeter="2.13 r1665067">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Ontology REST Service Test Plan" enabled="true">
-      <stringProp name="TestPlan.comments"></stringProp>
+      <stringProp name="TestPlan.comments">Tony Wardell</stringProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
-      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">true</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
         <collectionProp name="Arguments.arguments">
           <elementProp name="LOOPS" elementType="Argument">
@@ -15,6 +15,11 @@
           <elementProp name="RESOURCES_PATH" elementType="Argument">
             <stringProp name="Argument.name">RESOURCES_PATH</stringProp>
             <stringProp name="Argument.value">C:\Users\twardell\IdeaProjects\QuickGO-Edd\unp.goa.quickgo\ontology-rest\src\test\resources\</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="USERS" elementType="Argument">
+            <stringProp name="Argument.name">USERS</stringProp>
+            <stringProp name="Argument.value">5</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -42,7 +47,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
         <longProp name="ThreadGroup.start_time">1455617609000</longProp>
         <longProp name="ThreadGroup.end_time">1455617609000</longProp>
@@ -177,7 +182,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
@@ -890,13 +895,13 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/go/{id} 5/100" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/go/{id} 5/100" enabled="false">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
@@ -1337,7 +1342,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
@@ -1484,7 +1489,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
@@ -1625,13 +1630,13 @@
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/go/{id}/guidelines" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/go/{id}/guidelines" enabled="false">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
@@ -1778,7 +1783,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
@@ -1925,7 +1930,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
@@ -2072,7 +2077,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
@@ -2213,13 +2218,13 @@
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/eco/search" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/eco/search ontologyType:ECO" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
@@ -2228,7 +2233,7 @@
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Parameter: ontologyType:ECO" enabled="false">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Parameter: ontologyType:ECO" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="query" elementType="HTTPArgument">
@@ -2356,7 +2361,23 @@
           </ResultCollector>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Parameter: id:{id}" enabled="false">
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/eco/search Parameter: id{id}" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${LOOPS}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <longProp name="ThreadGroup.start_time">1455621971000</longProp>
+        <longProp name="ThreadGroup.end_time">1455621971000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Parameter: id:{id}" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="query" elementType="HTTPArgument">
@@ -2501,7 +2522,23 @@
           </ResultCollector>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Parameter: definition" enabled="false">
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/eco/search Parameter definition" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${LOOPS}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <longProp name="ThreadGroup.start_time">1455621971000</longProp>
+        <longProp name="ThreadGroup.end_time">1455621971000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Parameter: definition" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="query" elementType="HTTPArgument">
@@ -2646,6 +2683,22 @@
           </ResultCollector>
           <hashTree/>
         </hashTree>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/eco/search Parameter name" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${LOOPS}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <longProp name="ThreadGroup.start_time">1455621971000</longProp>
+        <longProp name="ThreadGroup.end_time">1455621971000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Parameter: name" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
@@ -2765,7 +2818,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
@@ -2912,7 +2965,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
@@ -3053,13 +3106,13 @@
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/eco/{id}/history" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="/QuickGO/services/eco/{id}/history" enabled="false">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">5</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">2</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
