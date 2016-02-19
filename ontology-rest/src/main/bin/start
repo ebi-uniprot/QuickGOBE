@@ -1,23 +1,26 @@
 #! /bin/bash
 
 set -euo pipefail
-IFS=$'\n\t'
+IFS=$'\n\t '
 
 # check the right user runs this
-if [ $USER != "eddturner" ] ; then
+if [ $USER != "edd" ] ; then
     echo "This service can only be run as user, 'uni_adm'";
     exit 1;
 fi;
 
-JAR="ontology-rest*.jar"
-SERVICE_PATH="/home/eddturner/working/intellij/unp.goa.quickgo/ontology-rest/target"
+if [ ! -f "environment.variables" ]; then
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1;
+fi
+source "environment.variables"
+
 PIDFILE="$SERVICE_PATH/run.pid"
-CONFIG_FILE="$SERVICE_PATH/config.properties"
 SERVICE_JAR="$JAR"
 
 if [ -e $PIDFILE ]
 then
-    echo "Service has already been started: `cat $PIDFILE`"
+    echo "Service has already been started: $(cat $PIDFILE)"
     exit 1
 fi
 
@@ -25,18 +28,16 @@ fi
 pushd . > /dev/null
 
 cd $SERVICE_PATH
-ls -1 $SERVICE_PATH/$SERVICE_JAR > /dev/null 2>&1
+
+ls -1 $SERVICE_JAR > /dev/null 2>&1
 if [ ! $? ]; then
     echo "Error: $SERVICE_PATH/$SERVICE_JAR does not exist. Aborting."
     exit 1
 fi
 
-# use config.properties if it exists
-if [ -e $CONFIG_FILE ]
-then
-    echo "Application configuration will use $(readlink -f $CONFIG_FILE)";
-else
-    echo "(No configuration file found in $SERVICE_PATH)";
+if [ -z "$JAVA_HOME" ]; then
+    echo "JAVA_HOME environment variable must be set. Aborting."
+    exit 1;
 fi
 
 JAVA=$JAVA_HOME/bin/java
@@ -46,11 +47,17 @@ JAVA_OPTS="-Dcom.sun.management.jmxremote  \
             -Dcom.sun.management.jmxremote.authenticate=false \
             -Dcom.sun.management.jmxremote.ssl=false  \
             -Dcom.sun.management.jmxremote.port=9091"
-JAVA_OPTS="$JAVA_OPTS -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=loglevel=debug"
+JAVA_OPTS="$JAVA_OPTS \
+            -XX:+UnlockCommercialFeatures \
+            -XX:+FlightRecorder \
+            -XX:FlightRecorderOptions=loglevel=debug"
 
+RUN_COMMAND="$JAVA $JVM_MEM_MIN $JVM_MEM_MAX $JAVA_OPTS -jar -Dserver.port=$PORT $SERVICE_JAR"
+
+echo "Running: $RUN_COMMAND"
 # run the application headless
-# nohup $JAVA $JVM_MEM_MIN $JVM_MEM_MAX $JAVA_OPTS -jar $SERVICE_JAR 2>&1 &
-nohup $JAVA $JVM_MEM_MIN $JVM_MEM_MAX $JAVA_OPTS -jar $SERVICE_JAR > /dev/null 2>&1 &
+#nohup $RUN_COMMAND > /dev/null 2>&1 &
+nohup $RUN_COMMAND &
 PID="$!"
 echo "$PID $(hostname)" > $PIDFILE
 

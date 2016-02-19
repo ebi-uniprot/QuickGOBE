@@ -1,0 +1,3 @@
+#! /bin/bash
+
+# Fetches latest library and stores it in lib

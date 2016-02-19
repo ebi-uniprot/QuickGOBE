@@ -1,0 +1,6 @@
+JAR="ontology-rest*.jar"
+#SERVICE_PATH="/home/eddturner/working/intellij/unp.goa.quickgo/ontology-rest/target"
+#SERVICE_PATH="/Users/edd/working/git/unp.goa.quickgo/ontology-rest/target"
+SERVICE_PATH="/Users/edd/working/git/unp.goa.quickgo/ontology-rest/src/main/bin/ontology/lib"
+PORT="8081"
+CONTEXT_PATH="/QuickGO/services"

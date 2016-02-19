@@ -3,16 +3,18 @@
 set -euo pipefail
 
 # check the right user runs this
-if [ $USER != "eddturner" ] ; then
+if [ $USER != "edd" ] ; then
     echo "This service can only be run as user, 'uni_adm'";
     exit 1;
 fi;
 
+if [ ! -f "environment.variables" ]; then
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1;
+fi
+source "environment.variables"
 
-JAR="ontology-rest*.jar"
-SERVICE_PATH="/home/eddturner/working/intellij/unp.goa.quickgo/ontology-rest/target"
 PIDFILE="$SERVICE_PATH/run.pid"
-CONFIG_FILE="$SERVICE_PATH/config.properties"
 SERVICE_JAR="$JAR"
 
 if [ ! -r $PIDFILE ]
@@ -34,7 +36,7 @@ fi
 
 
 echo "Stopping the job with PID: ${PIDFILE_ARRAY[0]}."
-kill ${PIDFILE_ARRAY[0]} > /dev/null || {
+kill ${PIDFILE_ARRAY[0]} > /dev/null 2>&1 || {
     echo "Could not kill process. Please check the PID manually: ${PIDFILE_ARRAY[0]}"
     exit 1;
 }

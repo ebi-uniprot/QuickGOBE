@@ -2,10 +2,31 @@
 
 set -euo pipefail
 
-PORT="8080"
-CONTEXT_PATH="/QuickGO/services"
+if [ ! -f "environment.variables" ]; then
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1;
+fi
+source "environment.variables"
 
-TEST_URL=""http://127.0.0.1:$PORT$CONTEXT_PATH""
+if [ -z "$PORT" ]; then
+    echo "$PORT environment variable must be set. Aborting."
+    exit 1;
+fi
+
+if [ -z "$CONTEXT_PATH" ]; then
+    echo "$CONTEXT_PATH environment variable must be set. Aborting."
+    exit 1;
+fi
+
+
+TEST_URL="http://127.0.0.1:$PORT"
+curl --silent "$TEST_URL" > /dev/null || {
+    echo "Status Check: $TEST_URL is DOWN"
+    exit 1
+}
+echo "Status Check: $TEST_URL is UP"
+
+TEST_URL="http://127.0.0.1:$PORT$CONTEXT_PATH"
 curl --silent "$TEST_URL" > /dev/null || {
     echo "Status Check: $TEST_URL is DOWN"
     exit 1
