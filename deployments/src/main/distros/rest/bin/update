@@ -78,6 +78,13 @@ REPO_URL="http://wwwdev.ebi.ac.uk/uniprot/artifactory/$REPO_TYPE"
 GAV="$ARTIFACT_GROUP:$ARTIFACT_ID:$ARTIFACT_VERSION"
 echo "Fetching artifact: $GAV"
 TEMP_DIR="$(addTimeStamp 'temp')"
+# first get the pom, so that later we can get the jar
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.7:get \
+        -DrepoUrl="$REPO_URL" \
+        -DrepoId="$REPO_NAME" \
+        -Dartifact="$GAV" \
+        -Dtype=pom
+# ... and get the jar
 mvn org.apache.maven.plugins:maven-dependency-plugin:2.7:copy \
         -DrepoUrl="$REPO_URL" \
         -DrepoId="$REPO_NAME" \
