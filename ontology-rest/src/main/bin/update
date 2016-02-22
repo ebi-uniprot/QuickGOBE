@@ -8,7 +8,23 @@
 set -euo pipefail
 IFS=$'\n\t '
 
-# take a string and add a time-stamp to it
+
+# ======= CONSTANTS =======================================
+RELEASE_REPO_TYPE="release"
+RELEASE_REPO_NAME="uniprot-artifactory-release"
+SNAPSHOT_REPO_TYPE="snapshot"
+SNAPSHOT_REPO_NAME="uniprot-artifactory-snapshots"
+PERMITTED_USER="uni_adm,eddturner"
+
+# ======= check the right user runs this script =======================================
+if echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
+    echo "This service can only be run as user, 'uni_adm'";
+    exit 1;
+fi;
+
+
+# ======= FUNCTIONS ======================================================================
+# ======= take a string and add a time-stamp to it =======================================
 function addTimeStamp() {
     local dirname="$(dirname $1)"
     local fname=$(basename "$1")
@@ -51,11 +67,11 @@ fi
 JAR_NAME="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
 GROUP_AS_URL="$(echo $ARTIFACT_GROUP | sed -e 's/\./\//g')"
 
-REPO_TYPE="release"
-REPO_NAME="uniprot-artifactory-release"
+REPO_TYPE="$RELEASE_REPO_TYPE"
+REPO_NAME="$RELEASE_REPO_NAME"
 if echo "$JAR_NAME" | grep 'SNAPSHOT' > /dev/null; then
-    REPO_TYPE="snapshot"
-    REPO_NAME="uniprot-artifactory-snapshots"
+    REPO_TYPE="$SNAPSHOT_REPO_TYPE"
+    REPO_NAME="$SNAPSHOT_REPO_NAME"
 fi
 REPO_URL="http://wwwdev.ebi.ac.uk/uniprot/artifactory/$REPO_TYPE"
 
