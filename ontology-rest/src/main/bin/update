@@ -1,5 +1,10 @@
 #! /bin/bash
 
+##=========================================================================================
+# Fetches latest library and stores it in lib
+# Also, backs-up the currently used libraries in lib/backups
+##=========================================================================================
+
 set -euo pipefail
 IFS=$'\n\t '
 
@@ -15,8 +20,7 @@ function addTimeStamp() {
     echo "$dirname/$fname-$(date '+%d-%m-%Y--%H:%M:%S')$fext"
 }
 
-# Fetches latest library and stores it in lib
-
+# ======= read the variables used by the control scripts =======================================
 source "environment.variables" || {
     echo "Please create a file called, environment.variables, containing the necessary environment variables."
     exit 1;
@@ -30,6 +34,7 @@ environment.variables."
 
 LIB_DIR="$SERVICE_PATH/lib"
 BACKUP_LIB_DIR="$SERVICE_PATH/lib/backups"
+TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
 
 if [ ! -d "$LIB_DIR" ]; then
     mkdir $LIB_DIR
@@ -37,38 +42,28 @@ fi
 if [ ! -d "$BACKUP_LIB_DIR" ]; then
     mkdir $BACKUP_LIB_DIR
 fi
-
-JAR_NAME="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
-JAR_NAME_TEMP="$(addTimeStamp $JAR_NAME)"
-TEMP_DIR="$(addTimeStamp 'temp')"
-TIMESTAMP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
-
-if [ ! -d "$TIMESTAMP_DIR" ]; then
-    mkdir $TIMESTAMP_DIR
+if [ ! -d "$TIMESTAMPED_BACKUP_DIR" ]; then
+    mkdir $TIMESTAMPED_BACKUP_DIR
 fi
 
 
+# ======= build the variables required for artifact retrieval =======================================
+JAR_NAME="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
 GROUP_AS_URL="$(echo $ARTIFACT_GROUP | sed -e 's/\./\//g')"
 
-ARTIFACT_URL="$GROUP_AS_URL/$ARTIFACT_ID/$ARTIFACT_VERSION/$JAR_NAME"
-
-# repository info
 REPO_TYPE="release"
 REPO_NAME="uniprot-artifactory-release"
 if echo "$JAR_NAME" | grep 'SNAPSHOT' > /dev/null; then
     REPO_TYPE="snapshot"
     REPO_NAME="uniprot-artifactory-snapshots"
 fi
-
 REPO_URL="http://wwwdev.ebi.ac.uk/uniprot/artifactory/$REPO_TYPE"
-ARTIFACT_URL="http://wwwdev.ebi.ac.uk/uniprot/artifactory/$REPO_TYPE/$ARTIFACT_URL"
 
-# fetch the artifact and store in lib dir
-echo "Fetching $ARTIFACT_URL"
 
+# ======= get the artifact from maven =======================================
 GAV="$ARTIFACT_GROUP:$ARTIFACT_ID:$ARTIFACT_VERSION"
-
-# get the artifact
+echo "Fetching artifact: $GAV"
+TEMP_DIR="$(addTimeStamp 'temp')"
 mvn org.apache.maven.plugins:maven-dependency-plugin:2.7:copy \
         -DrepoUrl="$REPO_URL" \
         -DrepoId="$REPO_NAME" \
@@ -76,11 +71,8 @@ mvn org.apache.maven.plugins:maven-dependency-plugin:2.7:copy \
         -Dtype=jar \
         -DoutputDirectory="$TEMP_DIR"
 
-for lib in "$(ls $LIB_DIR/*.jar)"; do
-#    echo "--- $lib"
-    ls "$lib" > /dev/null 2>&1 && mv "$lib" "$TIMESTAMP_DIR"
-done
 
+# ======= keep only last 5 backups =======================================
 pushd . > /dev/null
 cd "$BACKUP_LIB_DIR"
 # double check we're actually in the backup directory, before deleting anything!
@@ -90,8 +82,13 @@ if [ "$(basename $(pwd))" == "$(basename $BACKUP_LIB_DIR)" ]; then
 fi
 popd > /dev/null
 
+# ======= backup old lib =======================================
+for lib in "$(ls $LIB_DIR/*.jar)"; do
+    ls "$lib" > /dev/null 2>&1 && mv "$lib" "$TIMESTAMPED_BACKUP_DIR"
+done
+
+# ======= move new artifact into lib =======================================
 for new_lib in "$(ls $TEMP_DIR/*.jar)"; do
-#    echo "--- moving new_lib"
     ls "$new_lib" > /dev/null 2>&1 && mv "$new_lib" "$LIB_DIR"
 done
 rmdir $TEMP_DIR || {
