@@ -4,7 +4,7 @@ set -euo pipefail
 IFS=$'\n\t '
 
 # check the right user runs this
-if [ $USER != "edd" ] ; then
+if [ $USER != "eddturner" ] ; then
     echo "This service can only be run as user, 'uni_adm'";
     exit 1;
 fi;
@@ -15,8 +15,11 @@ if [ ! -f "environment.variables" ]; then
 fi
 source "environment.variables"
 
-PIDFILE="$SERVICE_PATH/run.pid"
+RUN_DIR="$SERVICE_PATH/out"
+LIB_DIR="$SERVICE_PATH/lib"
+PIDFILE="$RUN_DIR/run.pid"
 SERVICE_JAR="$JAR"
+SERVER_ADDR_BINDING="-Dserver.address=0.0.0.0"
 
 if [ -e $PIDFILE ]
 then
@@ -27,13 +30,19 @@ fi
 # save current directory
 pushd . > /dev/null
 
-cd $SERVICE_PATH
+cd $LIB_DIR
 
 ls -1 $SERVICE_JAR > /dev/null 2>&1
 if [ ! $? ]; then
-    echo "Error: $SERVICE_PATH/$SERVICE_JAR does not exist. Aborting."
+    echo "Error: $LIB_DIR/$SERVICE_JAR does not exist. Aborting."
     exit 1
 fi
+
+if [ ! -e "$RUN_DIR" ]; then
+    mkdir -p $RUN_DIR
+fi
+
+cd $RUN_DIR
 
 if [ -z "$JAVA_HOME" ]; then
     echo "JAVA_HOME environment variable must be set. Aborting."
@@ -46,19 +55,28 @@ JVM_MEM_MIN="-Xmx3096M"
 JAVA_OPTS="-Dcom.sun.management.jmxremote  \
             -Dcom.sun.management.jmxremote.authenticate=false \
             -Dcom.sun.management.jmxremote.ssl=false  \
-            -Dcom.sun.management.jmxremote.port=9091"
+            -Dcom.sun.management.jmxremote.port=$JXM_REMOTE_PORT"
 JAVA_OPTS="$JAVA_OPTS \
             -XX:+UnlockCommercialFeatures \
             -XX:+FlightRecorder \
             -XX:FlightRecorderOptions=loglevel=debug"
 
-RUN_COMMAND="$JAVA $JVM_MEM_MIN $JVM_MEM_MAX $JAVA_OPTS -jar -Dserver.port=$PORT $SERVICE_JAR"
+RUN_COMMAND="$JAVA $JVM_MEM_MIN $JVM_MEM_MAX $JAVA_OPTS -jar -Dserver.port=$PORT $SERVER_ADDR_BINDING $LIB_DIR/$SERVICE_JAR"
 
 echo "Running: $RUN_COMMAND"
+
 # run the application headless
 #nohup $RUN_COMMAND > /dev/null 2>&1 &
 nohup $RUN_COMMAND &
 PID="$!"
+
+echo "Acquiring PID"
+sleep 2
+ps $PID > /dev/null || {
+    echo "The process could not be started. Please check."
+    exit 1
+}
+
 echo "$PID $(hostname)" > $PIDFILE
 
 # jump back to current directory

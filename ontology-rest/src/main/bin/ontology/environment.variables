@@ -1,6 +1,10 @@
 JAR="ontology-rest*.jar"
-#SERVICE_PATH="/home/eddturner/working/intellij/unp.goa.quickgo/ontology-rest/target"
-#SERVICE_PATH="/Users/edd/working/git/unp.goa.quickgo/ontology-rest/target"
-SERVICE_PATH="/Users/edd/working/git/unp.goa.quickgo/ontology-rest/src/main/bin/ontology/lib"
+SERVICE_PATH="/home/eddturner/working/intellij/unp.goa.quickgo/ontology-rest/src/main/bin/ontology"
+#SERVICE_PATH="/Users/edd/working/git/unp.goa.quickgo/ontology-rest/src/main/bin/ontology/lib"
 PORT="8081"
+JXM_REMOTE_PORT="9091"
 CONTEXT_PATH="/QuickGO/services"
+
+ARTIFACT_GROUP="uk.ac.ebi.quickgo"
+ARTIFACT_ID="ontology-rest"
+ARTIFACT_VERSION="0.0.1-SNAPSHOT"

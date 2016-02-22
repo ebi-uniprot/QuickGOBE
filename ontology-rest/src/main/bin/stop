@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # check the right user runs this
-if [ $USER != "edd" ] ; then
+if [ $USER != "eddturner" ] ; then
     echo "This service can only be run as user, 'uni_adm'";
     exit 1;
 fi;
@@ -14,8 +14,8 @@ if [ ! -f "environment.variables" ]; then
 fi
 source "environment.variables"
 
-PIDFILE="$SERVICE_PATH/run.pid"
-SERVICE_JAR="$JAR"
+RUN_DIR="$SERVICE_PATH/out"
+PIDFILE="$RUN_DIR/run.pid"
 
 if [ ! -r $PIDFILE ]
 then
