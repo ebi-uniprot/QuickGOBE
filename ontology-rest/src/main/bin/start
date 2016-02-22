@@ -7,8 +7,20 @@
 set -euo pipefail
 IFS=$'\n\t '
 
+# ======= read the variables used by the control scripts =======================================
+source "environment.variables" || {
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1;
+}
+
 # ======= CONSTANTS =======================================
 PERMITTED_USER="uni_adm,eddturner"
+SERVICE_PATH="$(pwd -P)"
+RUN_DIR="$SERVICE_PATH/out"
+LIB_DIR="$SERVICE_PATH/lib"
+PIDFILE="$RUN_DIR/run.pid"
+SERVICE_JAR="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
+SERVER_ADDR_BINDING="-Dserver.address=0.0.0.0"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
@@ -17,11 +29,6 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
 fi;
 
 
-# ======= read the variables used by the control scripts =======================================
-source "environment.variables" || {
-    echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1;
-}
 
 [ ! -z "$ARTIFACT_GROUP" ] || [ ! -z "$ARTIFACT_VERSION" ] || [[ ! -z "$ARTIFACT_ID" ]] || {
     echo "Please specify the environment variables ARTIFACT_GROUP, ARTIFACT_VERSION and ARTIFACT_ID, in file, \
@@ -29,12 +36,6 @@ environment.variables."
     exit 1
 }
 
-# ======= CONSTANTS =======================================
-RUN_DIR="$SERVICE_PATH/out"
-LIB_DIR="$SERVICE_PATH/lib"
-PIDFILE="$RUN_DIR/run.pid"
-SERVICE_JAR="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
-SERVER_ADDR_BINDING="-Dserver.address=0.0.0.0"
 
 # ======= build java variables =======================================
 if [ -z "$JAVA_HOME" ]; then

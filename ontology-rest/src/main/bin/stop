@@ -1,29 +1,40 @@
-#!/bin/bash
+#! /bin/bash
+
+##=========================================================================================
+# Stops the self-contained web-application
+##=========================================================================================
 
 set -euo pipefail
 
-# check the right user runs this
-if [ $USER != "eddturner" ] ; then
+# ======= read the variables used by the control scripts =======================================
+source "environment.variables" || {
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1;
+}
+
+# ======= CONSTANTS =======================================
+PERMITTED_USER="uni_adm,eddturner"
+
+# ======= check the right user runs this script =======================================
+if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
     echo "This service can only be run as user, 'uni_adm'";
     exit 1;
 fi;
 
-if [ ! -f "environment.variables" ]; then
-    echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1;
-fi
-source "environment.variables"
 
+# ======= variables to ID service =======================================
+SERVICE_PATH="$(pwd -P)"
 RUN_DIR="$SERVICE_PATH/out"
 PIDFILE="$RUN_DIR/run.pid"
 
-if [ ! -r $PIDFILE ]
+# ======= no PID file existence indicates the service is not running =======================================
+if [ ! -f $PIDFILE ]
 then
     echo "Warning: PID file does not exist. Please check if the service is running."
     exit 1;
 fi
 
-# read PIDFILE to check the hostname.
+# ======= read PIDFILE to check the hostname =======================================
 PIDSTR=$(cat $PIDFILE)
 read -ra PIDFILE_ARRAY <<<"$PIDSTR"
 
@@ -34,7 +45,7 @@ then
     exit 1
 fi
 
-
+# ======= stop the application =======================================
 echo "Stopping the job with PID: ${PIDFILE_ARRAY[0]}."
 kill ${PIDFILE_ARRAY[0]} > /dev/null 2>&1 || {
     echo "Could not kill process. Please check the PID manually: ${PIDFILE_ARRAY[0]}"
