@@ -1,0 +1,14 @@
+# ================ ADDRESS INFO ================
+PORT="8081"
+JXM_REMOTE_PORT="9091"
+CONTEXT_PATH="/QuickGO/services"
+
+# ================ ARTIFACT INFO ================
+ARTIFACT_GROUP="uk.ac.ebi.quickgo"
+ARTIFACT_ID="ontology-rest"
+ARTIFACT_VERSION="0.0.1-SNAPSHOT"
+
+# ================ JVM OPTIONS ================
+JVM_MEM_MAX="-Xms1024M"
+JVM_MEM_MIN="-Xmx3096M"
+JVM_FLIGHT_RECORDER="off" # on|off
