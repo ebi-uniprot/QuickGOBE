@@ -21,6 +21,11 @@ LIB_DIR="$SERVICE_PATH/lib"
 PIDFILE="$RUN_DIR/run.pid"
 SERVICE_JAR="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
 SERVER_ADDR_BINDING="-Dserver.address=0.0.0.0"
+SERVER_PORT="-Dserver.port=$PORT"
+SPRING_CONFIG_LOCATION="--spring.config.location=$SERVICE_PATH/"
+SPRING_LOADER_PATH="-Dloader.path=lib/,config/,$SERVICE_PATH/"
+SPRING_TOMCAT_ACCESS_LOGS="server.tomcat.access-log-enabled=true"
+
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
@@ -60,7 +65,7 @@ else
 fi
 
 # ======= build the command to start the service =======================================
-RUN_COMMAND="$JAVA $JVM_MEM_MIN $JVM_MEM_MAX $JAVA_OPTS -jar -Dserver.port=$PORT $SERVER_ADDR_BINDING $LIB_DIR/$SERVICE_JAR"
+RUN_COMMAND="$JAVA $JVM_MEM_MIN $JVM_MEM_MAX $JAVA_OPTS $SERVER_PORT $SPRING_LOADER_PATH $SERVER_ADDR_BINDING -jar $LIB_DIR/$SERVICE_JAR $SPRING_CONFIG_LOCATION"
 
 # ======= bail if the service has already been started =======================================
 if [ -e $PIDFILE ]
@@ -86,7 +91,6 @@ if [ ! -e "$RUN_DIR" ]; then
     echo "Created base directory '$RUN_DIR' for recording activities of the live application, e.g., logs"
 fi
 
-
 # ======= start the application and record the PID =======================================
 cd $RUN_DIR
 echo "Running command: $RUN_COMMAND"
@@ -102,10 +106,10 @@ ps $PID > /dev/null || {
     exit 1
 }
 
-echo "PID retrieved successfully"
-echo "$PID $(hostname)" > $PIDFILE
-
 # jump back to current directory
 popd > /dev/null
+
+echo "PID retrieved successfully"
+echo "$PID $(hostname)" > $PIDFILE
 
 echo "Service was started with PID, $PID, on host, $(hostname)"
