@@ -9,7 +9,7 @@
 
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}/src/main/distros/rest</directory>
+            <directory>${project.basedir}/src/main/distros/rest/bin</directory>
             <outputDirectory>rest-bin</outputDirectory>
         </fileSet>
     </fileSets>
