@@ -106,7 +106,7 @@ ps $PID > /dev/null || {
     exit 1
 }
 
-# jump back to current directory
+# ======= jump back to saved directory =======================================
 popd > /dev/null
 
 echo "PID retrieved successfully"
