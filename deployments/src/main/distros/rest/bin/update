@@ -14,7 +14,7 @@ RELEASE_REPO_TYPE="release"
 RELEASE_REPO_NAME="uniprot-artifactory-release"
 SNAPSHOT_REPO_TYPE="snapshot"
 SNAPSHOT_REPO_NAME="uniprot-artifactory-snapshots"
-PERMITTED_USER="uni_adm,eddturner"
+PERMITTED_USER="uni_qgo,uni_adm,eddturner"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then

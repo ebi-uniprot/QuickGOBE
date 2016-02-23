@@ -14,7 +14,7 @@ source "environment.variables" || {
 }
 
 # ======= CONSTANTS =======================================
-PERMITTED_USER="uni_adm,eddturner"
+PERMITTED_USER="uni_qgo,uni_adm,eddturner"
 SERVICE_PATH="$(pwd -P)"
 RUN_DIR="$SERVICE_PATH/out"
 LIB_DIR="$SERVICE_PATH/lib"

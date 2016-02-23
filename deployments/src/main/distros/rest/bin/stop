@@ -13,7 +13,7 @@ source "environment.variables" || {
 }
 
 # ======= CONSTANTS =======================================
-PERMITTED_USER="uni_adm,eddturner"
+PERMITTED_USER="uni_qgo,uni_adm,eddturner"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
