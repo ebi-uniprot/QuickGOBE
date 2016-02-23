@@ -5,6 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>build</artifactId>
+    <modules>
+        <module>deployments</module>
+    </modules>
     <groupId>uk.ac.ebi.quickgo</groupId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
