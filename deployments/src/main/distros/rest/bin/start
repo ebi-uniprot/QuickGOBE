@@ -18,7 +18,7 @@ PERMITTED_USER="uni_qgo,uni_adm,eddturner"
 SERVICE_PATH="$(pwd -P)"
 RUN_DIR="$SERVICE_PATH/out"
 LIB_DIR="$SERVICE_PATH/lib"
-PIDFILE="$RUN_DIR/run.pid"
+PIDFILE="$RUN_DIR/up@$(hostname).pid"
 SERVICE_JAR="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
 SERVER_ADDR_BINDING="-Dserver.address=0.0.0.0"
 SERVER_PORT="-Dserver.port=$PORT"
@@ -33,7 +33,22 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
     exit 1;
 fi;
 
+# ======= if a PID file exists, it looks as though the service has already been started =======================================
+if [ -e $PIDFILE ]
+then
+    # ======= read PIDFILE to check the PID =======================================
+    PIDSTR=$(cat $PIDFILE)
 
+    if ps "$PIDSTR" > /dev/null; then
+        # ======= PID exists so do not proceed =======================================
+        echo "Service is already running (see PID $PIDSTR). Please stop it before trying to start it."
+        exit 1
+    else
+        # ======= PID does not exist so remove invalid PID file =======================================
+        echo "No PID $PIDSTR on host, $(hostname) found. Removing invalid PID file, $PIDFILE."
+        rm $PIDFILE
+    fi
+fi
 
 [ ! -z "$ARTIFACT_GROUP" ] || [ ! -z "$ARTIFACT_VERSION" ] || [[ ! -z "$ARTIFACT_ID" ]] || {
     echo "Please specify the environment variables ARTIFACT_GROUP, ARTIFACT_VERSION and ARTIFACT_ID, in file, \
@@ -67,12 +82,7 @@ fi
 # ======= build the command to start the service =======================================
 RUN_COMMAND="$JAVA $JVM_MEM_MIN $JVM_MEM_MAX $JAVA_OPTS $SERVER_PORT $SPRING_LOADER_PATH $SERVER_ADDR_BINDING -jar $LIB_DIR/$SERVICE_JAR $SPRING_CONFIG_LOCATION"
 
-# ======= bail if the service has already been started =======================================
-if [ -e $PIDFILE ]
-then
-    echo "Service has already been started: $(cat $PIDFILE)"
-    exit 1
-fi
+
 
 # ======= save current directory =======================================
 pushd . > /dev/null
@@ -110,6 +120,6 @@ ps $PID > /dev/null || {
 popd > /dev/null
 
 echo "PID retrieved successfully"
-echo "$PID $(hostname)" > $PIDFILE
+echo "$PID" > $PIDFILE
 
-echo "Service was started with PID, $PID, on host, $(hostname)"
+echo "Service has now been started with PID, $PID, on host, $(hostname)"
