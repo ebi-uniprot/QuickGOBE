@@ -3,7 +3,7 @@
     <include resource="org/springframework/boot/logging/logback/basic.xml"/>
     <property name="FILE_LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%t] --- %m%n"/>
-    <property name="LOG_PATH" value="${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}" />
+    <!--<property name="LOG_PATH" value="${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}" />-->
 
     <appender name="serverConsole"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -15,7 +15,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/catalina-%d{yyyy-MM-dd}.out
             </fileNamePattern>
-            <maxHistory>15</maxHistory>
+            <maxHistory>30</maxHistory>
         </rollingPolicy>
     </appender>
 
