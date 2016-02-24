@@ -24,7 +24,10 @@ SERVER_ADDR_BINDING="-Dserver.address=0.0.0.0"
 SERVER_PORT="-Dserver.port=$PORT"
 SPRING_CONFIG_LOCATION="--spring.config.location=$SERVICE_PATH/"
 SPRING_LOADER_PATH="-Dloader.path=lib/,config/,$SERVICE_PATH/"
-SPRING_TOMCAT_ACCESS_LOGS="server.tomcat.access-log-enabled=true"
+SPRING_TOMCAT_ACCESS_LOGS="-Dserver.tomcat.access-log-enabled=true"
+SPRING_TOMCAT_BASEDIR="-Dserver.tomcat.basedir=$(hostname)"
+SPRING_LOGGING_CONFIG="-Dlogging.config=$SERVICE_PATH/logback.xml"
+SPRING_LOGGING_DEST="-Dlogging.path=$(hostname)/logs/"
 
 
 # ======= check the right user runs this script =======================================
@@ -79,9 +82,9 @@ else
     echo "JVM flight recorder options not in use"
 fi
 
-# ======= build the command to start the service =======================================
-RUN_COMMAND="$JAVA $JVM_MEM_MIN $JVM_MEM_MAX $JAVA_OPTS $SERVER_PORT $SPRING_LOADER_PATH $SERVER_ADDR_BINDING -jar $LIB_DIR/$SERVICE_JAR $SPRING_CONFIG_LOCATION"
 
+# ======= build the command to start the service =======================================
+RUN_COMMAND="$JAVA $JVM_MEM_MIN $JVM_MEM_MAX $JAVA_OPTS $SERVER_PORT $SPRING_LOADER_PATH $SERVER_ADDR_BINDING $SPRING_TOMCAT_BASEDIR $SPRING_TOMCAT_ACCESS_LOGS $SPRING_LOGGING_CONFIG $SPRING_LOGGING_DEST -jar $LIB_DIR/$SERVICE_JAR $SPRING_CONFIG_LOCATION"
 
 
 # ======= save current directory =======================================
