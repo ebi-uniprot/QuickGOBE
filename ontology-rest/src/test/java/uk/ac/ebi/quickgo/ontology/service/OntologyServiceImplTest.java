@@ -7,9 +7,11 @@ import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
+import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
@@ -31,7 +33,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createECODoc;
 import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createGODoc;
-import static uk.ac.ebi.quickgo.ontology.service.OntologyServiceImpl.buildIdList;
 
 /**
  * Testing the {@link OntologyServiceImpl} class.
@@ -42,8 +43,8 @@ import static uk.ac.ebi.quickgo.ontology.service.OntologyServiceImpl.buildIdList
 @RunWith(HierarchicalContextRunner.class)
 public class OntologyServiceImplTest {
 
-    private OntologyService<GOTerm> goOntologyService;
-    private OntologyService<ECOTerm> ecoOntologyService;
+    private OntologyServiceImpl<GOTerm> goOntologyService;
+    private OntologyServiceImpl<ECOTerm> ecoOntologyService;
 
     private OntologyRepository repositoryMock;
     private GODocConverter goDocumentConverterMock;
@@ -55,21 +56,46 @@ public class OntologyServiceImplTest {
         goDocumentConverterMock = mock(GODocConverter.class);
         ecoDocumentConverterMock = mock(ECODocConverter.class);
 
-        goOntologyService = new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO);
-        ecoOntologyService = new OntologyServiceImpl<>(repositoryMock, ecoDocumentConverterMock, OntologyType.ECO);
+        goOntologyService = new OntologyServiceImpl<>
+                (repositoryMock, goDocumentConverterMock, OntologyType.GO, new SolrQueryStringSanitizer());
+        ecoOntologyService = new OntologyServiceImpl<>
+                (repositoryMock, ecoDocumentConverterMock, OntologyType.ECO, new SolrQueryStringSanitizer());
     }
 
     @Test
-    public void convertsEmptyOptionalDoc() {
-        // create any OntologyServiceImpl to test its convertOptionalDoc method
+    public void convertsEmptyDocList() {
+        // create any OntologyServiceImpl to test its document conversion method
         OntologyServiceImpl<GOTerm> ontologyServiceSpy =
-                new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO);
+                new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO,
+                        new SolrQueryStringSanitizer());
 
         List<GOTerm> goTerms = ontologyServiceSpy.convertDocs(Collections.emptyList());
         assertThat(goTerms.size(), is(0));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void nullRepoProducesIllegalArgumentException() {
+        new OntologyServiceImpl<>(null, goDocumentConverterMock, OntologyType.GO, new SolrQueryStringSanitizer());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullConverterProducesIllegalArgumentException() {
+        new OntologyServiceImpl<>(repositoryMock, null, OntologyType.GO, new SolrQueryStringSanitizer());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullDocTypeProducesIllegalArgumentException() {
+        new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, null,
+                new SolrQueryStringSanitizer());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullQueryStringSanitizerProducesIllegalArgumentException() {
+        new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO, null);
+    }
+
     public class GOServiceTests {
+
         private GOTerm createGOTerm(String id) {
             GOTerm term = new GOTerm();
             term.id = id;
@@ -82,7 +108,7 @@ public class OntologyServiceImplTest {
 
             OntologyDocument doc = createGODoc(goId, "name1");
 
-            when(repositoryMock.findCompleteByTermId(OntologyType.GO.name(), buildIdList(singletonList(goId))))
+            when(repositoryMock.findCompleteByTermId(OntologyType.GO.name(), idsViaOntologyService(goId)))
                     .thenReturn(singletonList(doc));
 
             when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(goId));
@@ -115,10 +141,11 @@ public class OntologyServiceImplTest {
         }
 
         @Test
-        public void findsEmptyOptionalForMissingGoIdentifier() {
+        public void findsEmptyListForMissingGoIdentifier() {
             String ecoId = "GO:0000001";
 
-            when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), buildIdList(singletonList(ecoId))))
+            when(repositoryMock
+                    .findCompleteByTermId(OntologyType.ECO.name(), idsViaOntologyService(ecoId)))
                     .thenReturn(Collections.emptyList());
 
             List<ECOTerm> ecoTerms =
@@ -132,8 +159,9 @@ public class OntologyServiceImplTest {
 
             OntologyDocument doc = createGODoc(id, "name1");
 
-            when(repositoryMock.findCoreByTermId(OntologyType.GO.name(), buildIdList(singletonList(id)))).thenReturn
-                    (singletonList(doc));
+            when(repositoryMock
+                    .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
+                    .thenReturn(singletonList(doc));
             when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
 
             List<GOTerm> goTerms = goOntologyService.findCoreInfoByOntologyId(singletonList(id));
@@ -150,7 +178,8 @@ public class OntologyServiceImplTest {
 
             OntologyDocument doc = createGODoc(id, "name1");
 
-            when(repositoryMock.findHistoryByTermId(OntologyType.GO.name(), buildIdList(singletonList(id))))
+            when(repositoryMock
+                    .findHistoryByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
                     .thenReturn(singletonList(doc));
             when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
 
@@ -167,8 +196,9 @@ public class OntologyServiceImplTest {
 
             OntologyDocument doc = createGODoc(id, "name1");
 
-            when(repositoryMock.findXRefsByTermId(OntologyType.GO.name(), buildIdList(singletonList(id)))).thenReturn
-                    (singletonList(doc));
+            when(repositoryMock
+                    .findXRefsByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
+                    .thenReturn(singletonList(doc));
             when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
 
             List<GOTerm> goTerms =
@@ -185,7 +215,8 @@ public class OntologyServiceImplTest {
 
             OntologyDocument doc = createGODoc(id, "name1");
 
-            when(repositoryMock.findTaxonConstraintsByTermId(OntologyType.GO.name(), buildIdList(singletonList(id))))
+            when(repositoryMock
+                    .findTaxonConstraintsByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
                     .thenReturn(singletonList(doc));
             when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
 
@@ -203,7 +234,7 @@ public class OntologyServiceImplTest {
             OntologyDocument doc = createGODoc(id, "name1");
 
             when(repositoryMock
-                    .findXOntologyRelationsByTermId(OntologyType.GO.name(), buildIdList(singletonList(id))))
+                    .findXOntologyRelationsByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
                     .thenReturn(singletonList(doc));
             when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
 
@@ -221,17 +252,20 @@ public class OntologyServiceImplTest {
             OntologyDocument doc = createGODoc(id, "name1");
 
             when(repositoryMock
-                    .findAnnotationGuidelinesByTermId(OntologyType.GO.name(), buildIdList(singletonList(id))))
+                    .findAnnotationGuidelinesByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
                     .thenReturn(singletonList(doc));
             when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
 
-            List<GOTerm> optionalGoTerm = goOntologyService.findAnnotationGuideLinesInfoByOntologyId(singletonList(id));
-            assertThat(optionalGoTerm.size(), is(1));
+            List<GOTerm> goTerms = goOntologyService.findAnnotationGuideLinesInfoByOntologyId(singletonList(id));
+            assertThat(goTerms.size(), is(1));
 
-            GOTerm expectedGoTerm = optionalGoTerm.get(0);
+            GOTerm expectedGoTerm = goTerms.get(0);
             assertThat(expectedGoTerm.id, is(equalTo(id)));
         }
 
+        private List<String> idsViaOntologyService(String... ids) {
+            return goOntologyService.buildIdList(Arrays.asList(ids));
+        }
     }
 
     public class ECOServiceTests {
@@ -247,7 +281,8 @@ public class OntologyServiceImplTest {
 
             OntologyDocument doc = createECODoc(ecoId, "name1");
 
-            when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), buildIdList(singletonList(ecoId))))
+            when(repositoryMock
+                    .findCompleteByTermId(OntologyType.ECO.name(), idsViaOntologyService(ecoId)))
                     .thenReturn(singletonList(doc));
 
             when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(ecoId));
@@ -260,10 +295,11 @@ public class OntologyServiceImplTest {
         }
 
         @Test
-        public void findsEmptyOptionalForMissingEcoIdentifier() {
+        public void findsEmptyListForMissingEcoIdentifier() {
             String ecoId = "ECO:0000001";
 
-            when(repositoryMock.findCompleteByTermId(OntologyType.ECO.name(), buildIdList(singletonList(ecoId))))
+            when(repositoryMock
+                    .findCompleteByTermId(OntologyType.ECO.name(), idsViaOntologyService(ecoId)))
                     .thenReturn(Collections.emptyList());
 
             List<ECOTerm> ecoTerms = ecoOntologyService.findCompleteInfoByOntologyId(singletonList(ecoId));
@@ -276,7 +312,8 @@ public class OntologyServiceImplTest {
 
             OntologyDocument doc = createECODoc(ecoId, "name1");
 
-            when(repositoryMock.findCoreByTermId(OntologyType.ECO.name(), buildIdList(singletonList(ecoId))))
+            when(repositoryMock
+                    .findCoreAttrByTermId(OntologyType.ECO.name(), idsViaOntologyService(ecoId)))
                     .thenReturn(singletonList((doc)));
             when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(ecoId));
 
@@ -294,7 +331,8 @@ public class OntologyServiceImplTest {
 
             OntologyDocument doc = createECODoc(id, "name1");
 
-            when(repositoryMock.findHistoryByTermId(OntologyType.ECO.name(), buildIdList(singletonList(id))))
+            when(repositoryMock
+                    .findHistoryByTermId(OntologyType.ECO.name(), idsViaOntologyService(id)))
                     .thenReturn(singletonList(doc));
             when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
 
@@ -311,7 +349,8 @@ public class OntologyServiceImplTest {
 
             OntologyDocument doc = createECODoc(id, "name1");
 
-            when(repositoryMock.findXRefsByTermId(OntologyType.ECO.name(), buildIdList(singletonList(id))))
+            when(repositoryMock
+                    .findXRefsByTermId(OntologyType.ECO.name(), idsViaOntologyService(id)))
                     .thenReturn(singletonList(doc));
             when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
 
@@ -329,14 +368,15 @@ public class OntologyServiceImplTest {
 
             OntologyDocument doc = createECODoc(id, "name1");
 
-            when(repositoryMock.findTaxonConstraintsByTermId(OntologyType.ECO.name(), buildIdList(singletonList(id))))
+            when(repositoryMock
+                    .findTaxonConstraintsByTermId(OntologyType.ECO.name(), idsViaOntologyService(id)))
                     .thenReturn(singletonList(doc));
             when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
 
-            List<ECOTerm> optionalTerm = ecoOntologyService.findTaxonConstraintsInfoByOntologyId(singletonList(id));
-            assertThat(optionalTerm.size(), is(1));
+            List<ECOTerm> ecoTerms = ecoOntologyService.findTaxonConstraintsInfoByOntologyId(singletonList(id));
+            assertThat(ecoTerms.size(), is(1));
 
-            ECOTerm expectedTerm = optionalTerm.get(0);
+            ECOTerm expectedTerm = ecoTerms.get(0);
             assertThat(expectedTerm.id, is(equalTo(id)));
         }
 
@@ -347,7 +387,7 @@ public class OntologyServiceImplTest {
             OntologyDocument doc = createECODoc(id, "name1");
 
             when(repositoryMock
-                    .findXOntologyRelationsByTermId(OntologyType.ECO.name(), buildIdList(singletonList(id))))
+                    .findXOntologyRelationsByTermId(OntologyType.ECO.name(), idsViaOntologyService(id)))
                     .thenReturn(singletonList(doc));
             when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
 
@@ -365,7 +405,7 @@ public class OntologyServiceImplTest {
             OntologyDocument doc = createECODoc(id, "name1");
 
             when(repositoryMock
-                    .findAnnotationGuidelinesByTermId(OntologyType.ECO.name(), buildIdList(singletonList(id))))
+                    .findAnnotationGuidelinesByTermId(OntologyType.ECO.name(), idsViaOntologyService(id)))
                     .thenReturn(singletonList(doc));
             when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
 
@@ -374,6 +414,10 @@ public class OntologyServiceImplTest {
 
             ECOTerm expectedTerm = ecoTerms.get(0);
             assertThat(expectedTerm.id, is(equalTo(id)));
+        }
+
+        private List<String> idsViaOntologyService(String... ids) {
+            return ecoOntologyService.buildIdList(Arrays.asList(ids));
         }
     }
 }

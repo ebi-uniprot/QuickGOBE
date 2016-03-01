@@ -5,12 +5,12 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
+import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
  * @author Edd
  */
 public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T> {
+    private QueryStringSanitizer queryStringSanitizer;
     private OntologyRepository ontologyRepository;
     private OntologyDocConverter<T> converter;
     private String ontologyType;
@@ -31,15 +32,18 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     public OntologyServiceImpl(
             OntologyRepository repository,
             OntologyDocConverter<T> converter,
-            OntologyType type) {
+            OntologyType type,
+            QueryStringSanitizer queryStringSanitizer) {
 
-        Preconditions.checkArgument(repository != null, "Ontology repository can not be null");
-        Preconditions.checkArgument(type != null, "Ontology type can not be null");
-        Preconditions.checkArgument(converter != null, "Ontology converter can not be null");
+        Preconditions.checkArgument(repository != null, "Ontology repository cannot be null");
+        Preconditions.checkArgument(type != null, "Ontology type cannot be null");
+        Preconditions.checkArgument(converter != null, "Ontology converter cannot be null");
+        Preconditions.checkArgument(queryStringSanitizer != null, "Ontology query string sanitizer cannot be null");
 
         this.ontologyType = type.name();
         this.ontologyRepository = repository;
         this.converter = converter;
+        this.queryStringSanitizer = queryStringSanitizer;
     }
 
     @Override public List<T> findCompleteInfoByOntologyId(List<String> ids) {
@@ -47,7 +51,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override public List<T> findCoreInfoByOntologyId(List<String> ids) {
-        return convertDocs(ontologyRepository.findCoreByTermId(ontologyType, buildIdList(ids)));
+        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)));
     }
 
     @Override public List<T> findHistoryInfoByOntologyId(List<String> ids) {
@@ -82,9 +86,9 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 .collect(Collectors.toList());
     }
 
-    protected static List<String> buildIdList(List<String> ids) {
+    protected List<String> buildIdList(List<String> ids) {
         Preconditions.checkArgument(ids != null, "List of IDs cannot be null");
 
-        return ids.stream().map(ClientUtils::escapeQueryChars).collect(Collectors.toList());
+        return ids.stream().map(queryStringSanitizer::sanitize).collect(Collectors.toList());
     }
 }
