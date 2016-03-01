@@ -5,15 +5,18 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.ResourceNotFoundException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
-import uk.ac.ebi.quickgo.rest.search.*;
+import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Abstract controller defining common end-points of an OBO related
@@ -81,9 +86,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = TERMS + "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
-        checkValidIds(ids);
-
-        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(createIdList(ids)));
+        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(validateIds(ids)));
     }
 
     /**
@@ -99,9 +102,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = TERMS + "/{ids}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
-        checkValidIds(ids);
-
-        return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(createIdList(ids)));
+        return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(validateIds(ids)));
     }
 
     /**
@@ -117,9 +118,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = TERMS + "/{ids}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
-        checkValidIds(ids);
-
-        return getTermsResponse(ontologyService.findHistoryInfoByOntologyId(createIdList(ids)));
+        return getTermsResponse(ontologyService.findHistoryInfoByOntologyId(validateIds(ids)));
     }
 
     /**
@@ -135,9 +134,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = TERMS + "/{ids}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
-        checkValidIds(ids);
-
-        return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(createIdList(ids)));
+        return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(validateIds(ids)));
     }
 
     /**
@@ -153,9 +150,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = TERMS + "/{ids}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
-        checkValidIds(ids);
-
-        return getTermsResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(createIdList(ids)));
+        return getTermsResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(validateIds(ids)));
     }
 
     /**
@@ -171,9 +166,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
-        checkValidIds(ids);
-
-        return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(createIdList(ids)));
+        return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(validateIds(ids)));
     }
 
     /**
@@ -189,9 +182,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = TERMS + "/{ids}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
-        checkValidIds(ids);
-
-        return getTermsResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(createIdList(ids)));
+        return getTermsResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(validateIds(ids)));
     }
 
     /**
@@ -233,45 +224,20 @@ public abstract class OBOController<T extends OBOTerm> {
     protected abstract OntologyType getOntologyType();
 
     /**
-     * Creates a response from a list of terms, which should have a size of 1.
-     *
-     * @param requestedId the original ID that was requested
-     * @param termList a singleton list of terms
-     * @return
-     * <ul>
-     *      <li>termList's size is 1: response consists of a 200 with annotation guidelines of the ontology term</li>
-     *      <li>termList's size is 0: response returns 404</li>
-     *      <li>otherwise: response returns 500</li>
-     * </ul>
-     */
-    protected ResponseEntity<T> getTermResponse(String requestedId, List<T> termList) {
-        if (termList == null) {
-            LOGGER.error("Provided ID: '{}' caused a server error because the specified termList was null", requestedId);
-            throw new RetrievalException("Provided ID: '" + requestedId + "' caused a server error.");
-        } else if(termList.size() > 1) {
-            LOGGER.error("Provided ID: '{}' caused a server error because the specified termList contains more than 1" +
-                    " element", requestedId);
-            throw new RetrievalException("Provided ID: '" + requestedId + "' caused a server error.");
-        } else if (termList.size() == 0) {
-            throw new ResourceNotFoundException("Provided ID: '" + requestedId + "' was not found");
-        } else {
-            return new ResponseEntity<>(termList.get(0), HttpStatus.OK);
-        }
-    }
-
-    /**
      * Checks the validity of a list of IDs in CSV format.
      * @param ids a list of IDs in CSV format
      * @throws IllegalArgumentException is thrown if an ID is not valid, or if
      * number of IDs listed is greater than {@link #MAX_PAGE_RESULTS}.
      */
-    protected void checkValidIds(String ids) {
-        List<String> idList = createIdList(ids);
+    protected List<String> validateIds(String ids) {
+        List<String> idList = csvToList(ids);
 
         validateRequestedResults(idList.size());
 
         idList.stream()
                 .forEach(this::checkValidId);
+
+        return idList;
     }
 
     /**
@@ -300,12 +266,36 @@ public abstract class OBOController<T extends OBOTerm> {
         }
     }
 
-    private List<String> createIdList(String ids) {
-        return Arrays.asList(ids.split(COMMA));
+    /**
+     * Creates a list of items from a scalar representation of a list, in CSV format. If the
+     * parameter is null, an empty list is returned.
+     *
+     * @param csv a CSV list of items
+     * @return a list of values originally comprising the CSV input String
+     */
+    protected List<String> csvToList(String csv) {
+        if (!isNullOrEmpty(csv)) {
+            return Arrays.asList(csv.split(COMMA));
+        } else {
+            return Collections.emptyList();
+        }
     }
 
-    private ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
-        QueryResult<T> queryResult = new QueryResult<>(docList.size(), docList, null, null, null);
+    /**
+     * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.
+     *
+     * @param docList a list of results
+     * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents
+     */
+    protected ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
+        List<T> resultsToShow;
+        if (docList == null) {
+            resultsToShow = Collections.emptyList();
+        } else {
+            resultsToShow = docList;
+        }
+
+        QueryResult<T> queryResult = new QueryResult<>(resultsToShow.size(), resultsToShow, null, null, null);
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 
