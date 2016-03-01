@@ -25,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static java.util.Collections.singletonList;
-
 /**
  * Abstract controller defining common end-points of an OBO related
  * REST API.
@@ -41,7 +39,6 @@ public abstract class OBOController<T extends OBOTerm> {
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
-    private static final String TERM = "term";
     private static final String TERMS = "terms";
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
@@ -72,25 +69,6 @@ public abstract class OBOController<T extends OBOTerm> {
     }
 
     /**
-     * Get core information about a term based on its id
-     *
-     * @param id ontology identifier
-     *
-     * @return
-     * <ul>
-     * <li>id is found: response consists of a 200 with the core information of the ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
-     * </ul>
-     */
-    @RequestMapping(value = TERM + "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findCoreTerm(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(id, ontologyService.findCoreInfoByOntologyId(singletonList(id)));
-    }
-
-    /**
      * Get core information about a list of terms in comma-separated-value (CSV) format
      *
      * @param ids ontology identifiers in CSV format
@@ -102,27 +80,10 @@ public abstract class OBOController<T extends OBOTerm> {
      * </ul>
      */
     @RequestMapping(value = TERMS + "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<T>> findCoreTerms(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
         checkValidIds(ids);
 
         return getTermsResponse(ontologyService.findCoreInfoByOntologyId(createIdList(ids)));
-    }
-
-    /**
-     * Get complete information about a term based on its id
-     * @param id ontology identifier
-     * @return
-     * <ul>
-     * <li>id is found: response consists of a 200 with all of the information the ontology term has</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
-     * </ul>
-     */
-    @RequestMapping(value = TERM + "/{id}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findCompleteTerm(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(id, ontologyService.findCompleteInfoByOntologyId(singletonList(id)));
     }
 
     /**
@@ -137,28 +98,10 @@ public abstract class OBOController<T extends OBOTerm> {
      * </ul>
      */
     @RequestMapping(value = TERMS + "/{ids}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<T>> findCompleteTerms(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
         checkValidIds(ids);
 
         return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(createIdList(ids)));
-    }
-
-    /**
-     * Get history information about a term based on its id
-     *
-     * @param id ontology identifier
-     * @return
-     * <ul>
-     * <li>id is found: response consists of a 200 with the history of the ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
-     * </ul>
-     */
-    @RequestMapping(value = TERM + "/{id}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermHistory(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(id, ontologyService.findHistoryInfoByOntologyId(singletonList(id)));
     }
 
     /**
@@ -180,23 +123,6 @@ public abstract class OBOController<T extends OBOTerm> {
     }
 
     /**
-     * Get cross-reference information about a term based on its id
-     * @param id ontology identifier
-     * @return
-     * <ul>
-     * <li>id is found: response consists of a 200 with the cross-references of the ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
-     * </ul>
-     */
-    @RequestMapping(value = TERM + "/{id}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermXRefs(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(id, ontologyService.findXRefsInfoByOntologyId(singletonList(id)));
-    }
-
-    /**
      * Get cross-reference information about a list of terms in comma-separated-value (CSV) format
      *
      * @param ids ontology identifiers in CSV format
@@ -212,23 +138,6 @@ public abstract class OBOController<T extends OBOTerm> {
         checkValidIds(ids);
 
         return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(createIdList(ids)));
-    }
-
-    /**
-     * Get taxonomy constraint information (and blacklist, for GO terms) about a term based on its id
-     * @param id ontology identifier
-     * @return
-     * <ul>
-     * <li>id is found: response consists of a 200 with the constraint and blacklist of an ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
-     * </ul>
-     */
-    @RequestMapping(value = TERM + "/{id}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermTaxonConstraints(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(id, ontologyService.findTaxonConstraintsInfoByOntologyId(singletonList(id)));
     }
 
     /**
@@ -250,23 +159,6 @@ public abstract class OBOController<T extends OBOTerm> {
     }
 
     /**
-     * Get cross-ontology relationship information about a term based on its id
-     * @param id ontology identifier
-     * @return
-     * <ul>
-     * <li>id is found: response consists of a 200 with cross-ontology relations of the ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
-     * </ul>
-     */
-    @RequestMapping(value = TERM + "/{id}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermXOntologyRelations(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(id, ontologyService.findXORelationsInfoByOntologyId(singletonList(id)));
-    }
-
-    /**
      * Get cross-ontology relationship information about a list of terms in comma-separated-value (CSV) format
      *
      * @param ids ontology identifiers in CSV format
@@ -282,23 +174,6 @@ public abstract class OBOController<T extends OBOTerm> {
         checkValidIds(ids);
 
         return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(createIdList(ids)));
-    }
-
-    /**
-     * Get annotation guideline information about a term based on its id
-     * @param id ontology identifier
-     * @return
-     * <ul>
-     *      <li>id is found: response consists of a 200 with annotation guidelines of the ontology term</li>
-     *      <li>id is not found: response returns 404</li>
-     *      <li>id is not in correct format: response returns 400</li>
-     * </ul>
-     */
-    @RequestMapping(value = TERM + "/{id}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermAnnotationGuideLines(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(id, ontologyService.findAnnotationGuideLinesInfoByOntologyId(singletonList(id)));
     }
 
     /**
@@ -395,8 +270,7 @@ public abstract class OBOController<T extends OBOTerm> {
 
         validateRequestedResults(idList.size());
 
-        idList
-                .stream()
+        idList.stream()
                 .forEach(this::checkValidId);
     }
 

@@ -87,16 +87,6 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCoreById() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermURL(validId)));
-
-        expectCoreFields(response, validId)
-                .andExpect(jsonPath("$.history").doesNotExist())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void canRetrieveCoreByIds() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV)));
 
@@ -107,29 +97,10 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCompleteById() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermURL(validId) + "/complete"));
-
-        expectCompleteFields(response, validId)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void canRetrieveCompleteByIds() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/complete"));
 
         expectCompleteFieldsInResults(response, validIdList)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    public void canRetrieveHistoryById() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermURL(validId) + "/history"));
-
-        expectBasicFields(response, validId)
-                .andExpect(jsonPath("$.history").isArray())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
@@ -145,36 +116,11 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveXRefsById() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermURL(validId) + "/xrefs"));
-
-        expectBasicFields(response, validId)
-                .andExpect(jsonPath("$.xRefs").isArray())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void canRetrieveXRefsByIds() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/xrefs"));
 
         expectBasicFieldsInResults(response, validIdList)
                 .andExpect(jsonPath("$.results.*.xRefs", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    /**
-     * Shows taxon constraints and blacklist for term
-     *
-     * @throws Exception
-     */
-    @Test
-    public void canRetrieveTaxonConstraintsById() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermURL(validId) + "/constraints"));
-
-        expectBasicFields(response, validId)
-                .andExpect(jsonPath("$.taxonConstraints").isArray())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
@@ -190,31 +136,11 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveAnnotationGuideLinesById() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermURL(validId) + "/guidelines"));
-
-        expectBasicFields(response, validId)
-                .andExpect(jsonPath("$.annotationGuidelines").isArray())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void canRetrieveAnnotationGuideLinesByIds() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/guidelines"));
 
         expectBasicFieldsInResults(response, validIdList)
                 .andExpect(jsonPath("$.results.*.annotationGuidelines", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    public void canRetrieveXORelsById() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermURL(validId) + "/xontologyrelations"));
-
-        expectBasicFields(response, validId)
-                .andExpect(jsonPath("$.xRelations").isArray())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
@@ -237,13 +163,6 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void finds400IfTermIdIsEmpty() throws Exception {
-        mockMvc.perform(get(buildTermURL("")))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     public void finds400IfTermsIdIsEmpty() throws Exception {
         mockMvc.perform(get(buildTermsURL("")))
                 .andDo(print())
@@ -258,15 +177,15 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void finds404IfIdDoesNotExist() throws Exception {
-        mockMvc.perform(get(buildTermURL(idMissingInRepository())))
+    public void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
+        mockMvc.perform(get(buildTermsURL(idMissingInRepository())))
                 .andDo(print())
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
     @Test
     public void finds400OnInvalidId() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermURL(invalidId())))
+        ResultActions response = mockMvc.perform(get(buildTermsURL(invalidId())))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
@@ -365,10 +284,6 @@ public abstract class OBOControllerIT {
         }
 
         return result;
-    }
-
-    protected ResultActions expectCompleteFields(ResultActions result, String id) throws Exception {
-        return expectCompleteFields(result, id, "$.");
     }
 
     protected ResultActions expectCompleteFieldsInResults(ResultActions result, List<String> ids) throws Exception {

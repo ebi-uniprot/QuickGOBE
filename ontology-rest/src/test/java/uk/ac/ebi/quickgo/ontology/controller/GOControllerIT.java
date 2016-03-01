@@ -29,16 +29,6 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String GO_0000002 = "GO:0000002";
 
     @Test
-    public void canRetrieveBlacklistById() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermURL(GO_0000001) + "/constraints"));
-
-        expectBasicFields(response, GO_0000001)
-                .andExpect(jsonPath("$.blacklist").isArray())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void canRetrieveBlacklistByIds() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(GO_0000001+COMMA+GO_0000002) + "/constraints"));
 
@@ -58,15 +48,6 @@ public class GOControllerIT extends OBOControllerIT {
                 .expectCoreFields(result, id)
                 .andExpect(jsonPath("$.aspect").value("Biological Process"))
                 .andExpect(jsonPath("$.usage").value("Unrestricted"));
-    }
-
-    /*
-     * GO provides blacklist information in addition to the standard complete OBO response.
-     */
-    @Override
-    protected ResultActions expectCompleteFields(ResultActions result, String id) throws Exception {
-        return super.expectCoreFields(result, id)
-                .andExpect(jsonPath("$.blacklist").exists());
     }
 
     @Override
