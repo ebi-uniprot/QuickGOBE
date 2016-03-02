@@ -4,12 +4,10 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.ResourceNotFoundException;
-import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
 import org.junit.Before;
@@ -20,8 +18,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
  * Unit tests available components of the {@link OBOController} class.
@@ -79,40 +77,47 @@ public class OBOControllerTest {
     }
 
     @Test
-    public void getTermResponseSucceeds() {
-        FakeOBOTerm term = new FakeOBOTerm();
-        term.id = "termId1";
-        ResponseEntity<FakeOBOTerm> termResponse = controller.getTermResponse("id1", Collections.singletonList(term));
-        assertThat(termResponse, is(notNullValue()));
+    public void createsListFromNullCSV() {
+        assertThat(controller.csvToList(null).size(), is(0));
     }
 
-    @Test(expected = RetrievalException.class)
-    public void getTermResponseFailsWhenResponseIsNotOne() {
-        FakeOBOTerm term1 = new FakeOBOTerm();
-        term1.id = "termId1";
-        FakeOBOTerm term2 = new FakeOBOTerm();
-        term2.id = "termId1";
-
-        controller.getTermResponse("id1", Arrays.asList(term1, term2));
+    @Test
+    public void createsListFromCSVForNoItems() {
+        assertThat(controller.csvToList("").size(), is(0));
     }
 
-    @Test(expected = RetrievalException.class)
-    public void getTermResponseFailsWhenResponseIsNull() {
-        FakeOBOTerm term1 = new FakeOBOTerm();
-        term1.id = "termId1";
-        FakeOBOTerm term2 = new FakeOBOTerm();
-        term2.id = "termId1";
-
-        controller.getTermResponse("id1", null);
+    @Test
+    public void createsListFromCSVForOneItem() {
+        assertThat(controller.csvToList("a").size(), is(1));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void getTermResponseFailsWhenResponseContainsZeroElements() {
-        controller.getTermResponse("id1", Collections.emptyList());
+    @Test
+    public void createsListFromCSVForTwoItems() {
+        assertThat(controller.csvToList("a,b").size(), is(2));
     }
 
-    private static class FakeOBOTerm extends OBOTerm {
-        String id;
+    @Test
+    public void termsResponseForNullListContainsZeroResults() {
+        ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getTermsResponse(null);
+        assertThat(termsResponse.getBody().getNumberOfHits(), is(0L));
+        assertThat(termsResponse.getBody().getResults(), is(empty()));
     }
+
+    @Test
+    public void termsResponseForEmptyListContainsZeroResults() {
+        ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getTermsResponse(Collections.emptyList());
+        assertThat(termsResponse.getBody().getNumberOfHits(), is(0L));
+        assertThat(termsResponse.getBody().getResults(), is(empty()));
+    }
+
+    @Test
+    public void termsResponseForListOfOneContainsOneResult() {
+        ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getTermsResponse(Collections
+                .singletonList(new FakeOBOTerm()));
+        assertThat(termsResponse.getBody().getNumberOfHits(), is(1L));
+        assertThat(termsResponse.getBody().getResults().size(), is(1));
+    }
+
+    private static class FakeOBOTerm extends OBOTerm {}
 
 }
