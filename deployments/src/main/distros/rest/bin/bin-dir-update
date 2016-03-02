@@ -1,0 +1,75 @@
+#! /bin/bash
+
+##=========================================================================================
+# Updates from Git the directory used for running the RESTful applications.
+# It is not necessary to update with each release, only when the scripts
+# that run the applications change.
+#
+# It is recommended that this script is symlinked to from outside the
+# containing bin directory, and then run to update its contents. For this
+# reason, be careful with this script!
+##=========================================================================================
+
+set -euo pipefail
+
+# ======= CONSTANTS =======================================
+REPOS_DIR="$(pwd -P)/repos"
+REST_BIN_CONTENT_DIR="rest-bin"
+REST_BIN="rest-bin.tar.gz"
+
+# ======= FUNCTIONS ======================================================================
+# ======= take a string and add a time-stamp to it =======================================
+function addTimeStamp() {
+    local dirname="$(dirname $1)"
+    local fname=$(basename "$1")
+    local fext=""
+    if echo "$fname" | grep '\.'; then
+        fext=".${fname##*.}"
+    fi
+    local fname="${fname%.*}"
+    echo "$dirname/$fname-$(date '+%d-%m-%Y--%H:%M:%S')$fext"
+}
+
+# ======= save current directory =======================================
+dirs -c
+pushd . > /dev/null
+cd "$REPOS_DIR"
+
+cd "unp.goa.quickgo"
+git fetch
+git checkout GOA-1806_web-app-deployment-scripts
+git pull
+cd "deployments"
+mvn -U -DskipTests -P assemble-rest-bin-archive package
+eval "mv" "target/$REST_BIN" "$(dirs +1)"
+
+eval "cd" "$(dirs +1)"
+
+# backup $REST_BIN_CONTENT_DIR, before replacing it
+if [ -d "$REST_BIN_CONTENT_DIR" ]; then
+        archives=".$REST_BIN_CONTENT_DIR-archives";
+        if [ ! -d "$archives" ]; then
+                mkdir "$archives";
+        fi
+        backup="$archives/$(addTimeStamp $REST_BIN_CONTENT_DIR).old";
+        echo "Archiving old bin directory '$REST_BIN_CONTENT_DIR' to '$backup'"
+
+        mv $REST_BIN_CONTENT_DIR $backup
+
+        cd "$archives";
+        if [ "$(basename $(pwd))" == "$archives" ]; then # double check we're actually in the backup directory, before deleting anything!
+                echo "Deleting oldest archives, but keeping newest 5";
+                (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf;
+        fi
+fi
+
+# replace $REST_BIN_CONTENT_DIR
+eval "cd" "$(dirs +1)"
+tar xzf $REST_BIN
+
+# remove the archive after it's been decompressed
+rm $REST_BIN
+
+
+# ======= jump back to saved directory =======================================
+popd > /dev/null
