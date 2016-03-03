@@ -34,7 +34,7 @@ function addTimeStamp() {
         fext=".${fname##*.}"
     fi
     local fname="${fname%.*}"
-    echo "$dirname/$fname-$(date '+%d-%m-%Y--%H:%M:%S')$fext"
+    echo "$dirname/$fname-$(date '+%s.%N')$fext"
 }
 
 # ======= save current directory =======================================
