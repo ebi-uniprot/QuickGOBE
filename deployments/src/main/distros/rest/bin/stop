@@ -25,7 +25,8 @@ fi;
 # ======= variables to ID service =======================================
 SERVICE_CONF_PATH="$(pwd -P)"
 SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
-SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../apps)"
+SERVICE_LIVE_NAME="live"
+SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
 SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME"
 RUN_DIR="$SERVICE_PATH/out"
 PIDFILE="$RUN_DIR/up@$(hostname).pid"
