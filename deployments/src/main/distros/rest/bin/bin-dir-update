@@ -14,7 +14,7 @@ set -euo pipefail
 
 # ======= CONSTANTS =======================================
 REPOS_DIR="$(pwd -P)/repos"
-REST_BIN_CONTENT_DIR="rest-bin"
+REST_BIN_CONTENT_DIR="bin"
 REST_BIN="rest-bin.tar.gz"
 PERMITTED_USER="uni_adm,uni_qgo,eddturner"
 
