@@ -50,16 +50,19 @@ environment.variables."
     exit 1
 }
 
-SERVICE_PATH="$(pwd -P)"
+SERVICE_CONF_PATH="$(pwd -P)"
+SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
+SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../apps)"
+SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME"
 LIB_DIR="$SERVICE_PATH/lib"
 BACKUP_LIB_DIR="$SERVICE_PATH/lib/backups"
 TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
 
 if [ ! -d "$LIB_DIR" ]; then
-    mkdir $LIB_DIR
+    mkdir -p $LIB_DIR
 fi
 if [ ! -d "$BACKUP_LIB_DIR" ]; then
-    mkdir $BACKUP_LIB_DIR
+    mkdir -p $BACKUP_LIB_DIR
 fi
 
 
@@ -122,5 +125,13 @@ done
 rmdir $TEMP_DIR || {
     echo "Could not clean up temp directory: '$TEMP_DIR'. Please check it is empty."
 }
+
+# ======= add a readme describing the contents of the app directory =======================================
+if [ -d "$SERVICE_BASE" ]; then
+    mkdir -p $SERVICE_BASE
+    echo "Contains live details (libraries, logs and PID files) for applications that " \
+          "correspond to their configuration details in ../bin." > "$SERVICE_BASE/readme.txt"
+fi
+
 
 echo "done"

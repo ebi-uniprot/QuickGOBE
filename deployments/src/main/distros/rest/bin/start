@@ -15,18 +15,21 @@ source "environment.variables" || {
 
 # ======= CONSTANTS =======================================
 PERMITTED_USER="uni_qgo,uni_adm,eddturner"
-SERVICE_PATH="$(pwd -P)"
+SERVICE_CONF_PATH="$(pwd -P)"
+SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
+SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../apps)"
+SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME"
 RUN_DIR="$SERVICE_PATH/out"
 LIB_DIR="$SERVICE_PATH/lib"
 PIDFILE="$RUN_DIR/up@$(hostname).pid"
 SERVICE_JAR="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
 SERVER_ADDR_BINDING="-Dserver.address=0.0.0.0"
 SERVER_PORT="-Dserver.port=$PORT"
-SPRING_CONFIG_LOCATION="--spring.config.location=$SERVICE_PATH/"
-SPRING_LOADER_PATH="-Dloader.path=lib/,config/,$SERVICE_PATH/"
+SPRING_CONFIG_LOCATION="--spring.config.location=$SERVICE_CONF_PATH/"
+SPRING_LOADER_PATH="-Dloader.path=lib/,config/,$SERVICE_CONF_PATH/"
 SPRING_TOMCAT_ACCESS_LOGS="-Dserver.tomcat.access-log-enabled=true"
 SPRING_TOMCAT_BASEDIR="-Dserver.tomcat.basedir=$(hostname)"
-SPRING_LOGGING_CONFIG="-Dlogging.config=$SERVICE_PATH/logback.xml"
+SPRING_LOGGING_CONFIG="-Dlogging.config=$SERVICE_CONF_PATH/logback.xml"
 SPRING_LOGGING_DEST="-Dlogging.path=$(hostname)/logs/"
 
 
@@ -125,4 +128,4 @@ popd > /dev/null
 echo "PID retrieved successfully"
 echo "$PID" > $PIDFILE
 
-echo "Service has now been started with PID, $PID, on host, $(hostname)"
+echo "Service has now been started with PID, $PID, on host, $(hostname), at port $PORT"
