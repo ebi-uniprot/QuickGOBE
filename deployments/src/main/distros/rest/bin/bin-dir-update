@@ -69,6 +69,9 @@ if [ -d "$REST_BIN_CONTENT_DIR" ]; then
         echo "extracting contents of $REST_BIN to $(readlink -f .)"
         tar xzf $REST_BIN
 
+        # remove the archive after it's been decompressed
+        rm $REST_BIN
+
         cd "$archives";
         if [ "$(basename $(pwd))" == "$archives" ]; then # double check we're actually in the backup directory, before deleting anything!
                 echo "Deleting oldest archives, but keeping newest 5";
@@ -79,16 +82,10 @@ else
     eval "cd" "$(dirs +1)"
     echo "extracting contents of $REST_BIN to $(readlink -f .)"
     tar xzf $REST_BIN
+
+    # remove the archive after it's been decompressed
+    rm $REST_BIN
 fi
-
-
-# replace $REST_BIN_CONTENT_DIR
-eval "cd" "$(dirs +1)"
-tar xzf $REST_BIN
-
-# remove the archive after it's been decompressed
-rm $REST_BIN
-
 
 # ======= jump back to saved directory =======================================
 popd > /dev/null
