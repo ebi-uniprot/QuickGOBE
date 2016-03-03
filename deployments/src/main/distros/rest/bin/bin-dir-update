@@ -16,6 +16,13 @@ set -euo pipefail
 REPOS_DIR="$(pwd -P)/repos"
 REST_BIN_CONTENT_DIR="rest-bin"
 REST_BIN="rest-bin.tar.gz"
+PERMITTED_USER="uni_adm,uni_qgo,eddturner"
+
+# ======= check the right user runs this script =======================================
+if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
+    echo "This service can only be run as user(s), '$PERMITTED_USER'";
+    exit 1;
+fi;
 
 # ======= FUNCTIONS ======================================================================
 # ======= take a string and add a time-stamp to it =======================================

@@ -32,7 +32,7 @@ SPRING_LOGGING_DEST="-Dlogging.path=$(hostname)/logs/"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user, 'uni_adm'";
+    echo "This service can only be run as user(s), '$PERMITTED_USER'";
     exit 1;
 fi;
 

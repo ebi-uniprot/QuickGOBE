@@ -17,7 +17,7 @@ PERMITTED_USER="uni_qgo,uni_adm,eddturner"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user, 'uni_adm'";
+    echo "This service can only be run as user(s), '$PERMITTED_USER'";
     exit 1;
 fi;
 
@@ -30,7 +30,7 @@ PIDFILE="$RUN_DIR/up@$(hostname).pid"
 # ======= no PID file existence indicates the service is not running =======================================
 if [ ! -f $PIDFILE ]
 then
-    echo "Warning: PID file does not exist ($PIDFILE). Please check if the service is running."
+    echo "Warning: PID file does not exist ($PIDFILE). Please check this service should be running on this machine ($(hostname))."
     exit 1;
 fi
 
