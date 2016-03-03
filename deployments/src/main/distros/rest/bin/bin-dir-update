@@ -66,8 +66,7 @@ if [ -d "$REST_BIN_CONTENT_DIR" ]; then
         mv $REST_BIN_CONTENT_DIR $backup
 
         # replace $REST_BIN_CONTENT_DIR
-        eval "cd" "$(dirs +1)"
-        echo "extracting contents of $REST_BIN"
+        echo "extracting contents of $REST_BIN to $(readlink -f .)"
         tar xzf $REST_BIN
 
         cd "$archives";
@@ -78,7 +77,7 @@ if [ -d "$REST_BIN_CONTENT_DIR" ]; then
 else
     # replace $REST_BIN_CONTENT_DIR
     eval "cd" "$(dirs +1)"
-    echo "extracting contents of $REST_BIN"
+    echo "extracting contents of $REST_BIN to $(readlink -f .)"
     tar xzf $REST_BIN
 fi
 
