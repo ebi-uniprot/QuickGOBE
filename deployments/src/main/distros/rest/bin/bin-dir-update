@@ -24,6 +24,9 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
     exit 1;
 fi;
 
+echo "I am:"
+echo "readlink -f $0"
+
 # ======= FUNCTIONS ======================================================================
 # ======= take a string and add a time-stamp to it =======================================
 function addTimeStamp() {
