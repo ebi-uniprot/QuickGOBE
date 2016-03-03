@@ -61,6 +61,8 @@ if [ -d "$REST_BIN_CONTENT_DIR" ]; then
         backup="$archives/$(addTimeStamp $REST_BIN_CONTENT_DIR).old";
         echo "Archiving old bin directory '$REST_BIN_CONTENT_DIR' to '$backup'"
 
+        ls -l $REST_BIN_CONTENT_DIR
+        echo "moving $REST_BIN_CONTENT_DIR to $backup"
         mv $REST_BIN_CONTENT_DIR $backup
 
         cd "$archives";
