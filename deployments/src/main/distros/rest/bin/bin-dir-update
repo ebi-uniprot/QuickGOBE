@@ -4,10 +4,6 @@
 # Updates from Git the directory used for running the RESTful applications.
 # It is not necessary to update with each release, only when the scripts
 # that run the applications change.
-#
-# It is recommended that this script is symlinked to from outside the
-# containing bin directory, and then run to update its contents. For this
-# reason, be careful with this script!
 ##=========================================================================================
 
 set -euo pipefail
@@ -23,9 +19,6 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
     echo "This service can only be run as user(s), '$PERMITTED_USER'";
     exit 1;
 fi;
-
-echo "I am:"
-echo "readlink -f $0"
 
 # ======= FUNCTIONS ======================================================================
 # ======= take a string and add a time-stamp to it =======================================
@@ -76,13 +69,9 @@ if [ -d "$REST_BIN_CONTENT_DIR" ]; then
         rm $REST_BIN
 
         cd "$archives";
-        echo "---";ls -l; echo "---"
         if [ "$(basename $(pwd))" == "$archives" ]; then # double check we're actually in the backup directory, before deleting anything!
                 echo "Deleting oldest archives, but keeping newest 5";
-                (ls -t|head -n 5;ls)|sort|uniq -u
-#                sleep 0.2
-                eval "(ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rvf"
-#                rm -rvf `ls -t | tail -n +6`
+                (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rvf
         fi
 else
     # replace $REST_BIN_CONTENT_DIR

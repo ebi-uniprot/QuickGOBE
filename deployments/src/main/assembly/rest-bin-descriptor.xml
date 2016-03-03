@@ -7,10 +7,19 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
 
+    <files>
+        <file>
+            <source>${project.basedir}/src/main/distros/rest/bin/bin-dir-update</source>
+        </file>
+    </files>
+
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/src/main/distros/rest/bin</directory>
             <outputDirectory>bin</outputDirectory>
+            <excludes>
+                <exclude>bin-dir-update</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
 </assembly>
