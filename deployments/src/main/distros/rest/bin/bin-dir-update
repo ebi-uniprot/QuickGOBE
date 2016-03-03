@@ -54,11 +54,9 @@ if [ -d "$REST_BIN_CONTENT_DIR" ]; then
         if [ ! -d "$archives" ]; then
                 mkdir "$archives";
         fi
+
         backup="$archives/$(addTimeStamp $REST_BIN_CONTENT_DIR).old";
         echo "Archiving old bin directory '$REST_BIN_CONTENT_DIR' to '$backup'"
-
-        ls -l $REST_BIN_CONTENT_DIR
-        echo "moving $REST_BIN_CONTENT_DIR to $backup"
         mv $REST_BIN_CONTENT_DIR $backup
 
         # replace $REST_BIN_CONTENT_DIR
