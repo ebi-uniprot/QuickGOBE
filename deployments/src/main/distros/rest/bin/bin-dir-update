@@ -66,7 +66,7 @@ if [ -d "$REST_BIN_CONTENT_DIR" ]; then
         cd "$archives";
         if [ "$(basename $(pwd))" == "$archives" ]; then # double check we're actually in the backup directory, before deleting anything!
                 echo "Deleting oldest archives, but keeping newest 5";
-                (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf;
+                (ls -t|head -n 5;ls)|sort|uniq -u|xargs "rm" "-rf";
         fi
 fi
 
