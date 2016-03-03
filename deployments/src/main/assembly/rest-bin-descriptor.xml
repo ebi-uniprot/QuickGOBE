@@ -10,7 +10,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/src/main/distros/rest/bin</directory>
-            <outputDirectory>rest-bin</outputDirectory>
+            <outputDirectory>bin</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>
