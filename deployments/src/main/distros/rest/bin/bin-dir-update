@@ -77,7 +77,7 @@ if [ -d "$REST_BIN_CONTENT_DIR" ]; then
                 echo "Deleting oldest archives, but keeping newest 5";
                 (ls -t|head -n 5;ls)|sort|uniq -u
 #                (ls -t|head -n 5;ls)|sort|uniq -u|xargs "rm" "-rf";
-                rm -rf `ls -t | tail -n +6`
+                rm -rvf `ls -t | tail -n +6`
         fi
 else
     # replace $REST_BIN_CONTENT_DIR
