@@ -40,10 +40,10 @@ public class GeneProductDocument implements QuickGODocument {
     public List<String> databaseSubsets;
 
     @Field(GeneProductFields.COMPLETE_PROTEOME)
-    public boolean completeProteome;
+    public boolean isCompleteProteome;
 
     @Field(GeneProductFields.REFERENCE_POTEOME)
-    public boolean referenceProteome;
+    public boolean isReferenceProteome;
 
     @Field(GeneProductFields.IS_ISOFORM)
     public boolean isIsoform;
@@ -65,10 +65,10 @@ public class GeneProductDocument implements QuickGODocument {
         if (taxonId != that.taxonId) {
             return false;
         }
-        if (completeProteome != that.completeProteome) {
+        if (isCompleteProteome != that.isCompleteProteome) {
             return false;
         }
-        if (referenceProteome != that.referenceProteome) {
+        if (isReferenceProteome != that.isReferenceProteome) {
             return false;
         }
         if (isIsoform != that.isIsoform) {
@@ -110,8 +110,8 @@ public class GeneProductDocument implements QuickGODocument {
         result = 31 * result + taxonId;
         result = 31 * result + (taxonName != null ? taxonName.hashCode() : 0);
         result = 31 * result + (databaseSubsets != null ? databaseSubsets.hashCode() : 0);
-        result = 31 * result + (completeProteome ? 1 : 0);
-        result = 31 * result + (referenceProteome ? 1 : 0);
+        result = 31 * result + (isCompleteProteome ? 1 : 0);
+        result = 31 * result + (isReferenceProteome ? 1 : 0);
         result = 31 * result + (isIsoform ? 1 : 0);
         return result;
     }
@@ -127,8 +127,8 @@ public class GeneProductDocument implements QuickGODocument {
                 ", taxonId=" + taxonId +
                 ", taxonName='" + taxonName + '\'' +
                 ", databaseSubsets=" + databaseSubsets +
-                ", completeProteome=" + completeProteome +
-                ", referenceProteome=" + referenceProteome +
+                ", isCompleteProteome=" + isCompleteProteome +
+                ", isReferenceProteome=" + isReferenceProteome +
                 ", isIsoform=" + isIsoform +
                 '}';
     }
