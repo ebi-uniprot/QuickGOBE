@@ -1,12 +1,13 @@
-package uk.ac.ebi.quickgo.index.reader;
+package uk.ac.ebi.quickgo.index.ontology;
 
 import uk.ac.ebi.quickgo.ff.files.ontology.ECOSourceFiles;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
 import uk.ac.ebi.quickgo.ff.loader.ontology.ECOLoader;
 import uk.ac.ebi.quickgo.ff.loader.ontology.GOLoader;
-import uk.ac.ebi.quickgo.index.reader.converter.GOTermToODocConverter;
-import uk.ac.ebi.quickgo.index.reader.converter.GenericTermToODocConverter;
-import uk.ac.ebi.quickgo.index.write.IndexingJobConfig;
+import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
+import uk.ac.ebi.quickgo.index.ontology.converter.GOTermToODocConverter;
+import uk.ac.ebi.quickgo.index.ontology.converter.GenericTermToODocConverter;
+import uk.ac.ebi.quickgo.index.IndexingJobConfig;
 import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
@@ -31,9 +32,9 @@ import static java.util.Objects.requireNonNull;
  * Created 03/12/15
  * @author Edd
  */
-public class ODocReader extends AbstractItemStreamItemReader<OntologyDocument> {
+public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocument> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ODocReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OntologyReader.class);
 
     private static final GOTermToODocConverter GO_TERM_TO_DOC_CONVERTER = new GOTermToODocConverter();
     private static final GenericTermToODocConverter GENERIC_TERM_TO_DOC_CONVERTER = new GenericTermToODocConverter();
@@ -44,13 +45,13 @@ public class ODocReader extends AbstractItemStreamItemReader<OntologyDocument> {
     private Iterator<GenericTerm> goTermIterator;
     private Iterator<GenericTerm> ecoTermIterator;
 
-    public ODocReader(File sourceFileDir) {
+    public OntologyReader(File sourceFileDir) {
         this(
                 new GOLoader(new GOSourceFiles(requireNonNull(sourceFileDir))).load(),
                 new ECOLoader(new ECOSourceFiles(requireNonNull(sourceFileDir))).load());
     }
 
-    ODocReader(Optional<GeneOntology> goOptional, Optional<EvidenceCodeOntology>
+    OntologyReader(Optional<GeneOntology> goOptional, Optional<EvidenceCodeOntology>
             ecoOptional) {
         this.goOptional = goOptional;
         this.ecoOptional = ecoOptional;

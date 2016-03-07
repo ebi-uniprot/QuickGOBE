@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.reader.converter;
+package uk.ac.ebi.quickgo.index.ontology.converter;
 
 import uk.ac.ebi.quickgo.model.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;

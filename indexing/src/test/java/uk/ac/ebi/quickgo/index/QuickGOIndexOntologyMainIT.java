@@ -1,9 +1,8 @@
 package uk.ac.ebi.quickgo.index;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.index.reader.DocumentReaderException;
-import uk.ac.ebi.quickgo.index.reader.ODocReader;
-import uk.ac.ebi.quickgo.index.write.IndexingJobConfig;
+import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
+import uk.ac.ebi.quickgo.index.ontology.OntologyReader;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 
 import org.hamcrest.core.Is;
@@ -30,7 +29,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 /**
- * Test specific behaviour of the job executed by {@link QuickGOIndexOntologyMain}.
+ * Test specific behaviour of the job executed by {@link QuickGOIndexMain}.
  * <p>
  * To see how to steps are configured, refer to:
  * <ul>
@@ -54,7 +53,7 @@ public class QuickGOIndexOntologyMainIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private ODocReader reader;
+    private OntologyReader reader;
 
     @Value("${indexing.ontology.skip.limit}")
     private int skipLimit;

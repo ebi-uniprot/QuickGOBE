@@ -1,23 +1,19 @@
-package uk.ac.ebi.quickgo.index.reader.converter;
+package uk.ac.ebi.quickgo.index.ontology.converter;
 
-import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
-import uk.ac.ebi.quickgo.ff.loader.ontology.GOLoader;
+import uk.ac.ebi.quickgo.index.ontology.converter.GOTermToODocConverter;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.generic.RelationType;
 import uk.ac.ebi.quickgo.model.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTermBlacklist;
-import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.model.ontology.go.TaxonConstraint;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.reader;
+package uk.ac.ebi.quickgo.index.common;
 
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 

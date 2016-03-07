@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index;
 
-import uk.ac.ebi.quickgo.index.reader.ODocReader;
+import uk.ac.ebi.quickgo.index.ontology.OntologyReader;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 public class QuickGOIndexOntologyMainITConfig {
     @Bean
     @Primary
-    public ODocReader reader() {
-        return mock(ODocReader.class);
+    public OntologyReader reader() {
+        return mock(OntologyReader.class);
     }
 }

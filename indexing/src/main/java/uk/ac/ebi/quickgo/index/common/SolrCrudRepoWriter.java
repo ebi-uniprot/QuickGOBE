@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.write.writer;
+package uk.ac.ebi.quickgo.index.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,7 +6,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
 import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.index.write.IndexingJobConfig;
+import uk.ac.ebi.quickgo.index.IndexingJobConfig;
 
 import java.util.List;
 

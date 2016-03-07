@@ -1,10 +1,10 @@
-package uk.ac.ebi.quickgo.index.write;
+package uk.ac.ebi.quickgo.index;
 
-import uk.ac.ebi.quickgo.index.reader.DocumentReaderException;
-import uk.ac.ebi.quickgo.index.reader.ODocReader;
-import uk.ac.ebi.quickgo.index.write.listener.LogJobListener;
-import uk.ac.ebi.quickgo.index.write.listener.LogStepListener;
-import uk.ac.ebi.quickgo.index.write.writer.SolrCrudRepoWriter;
+import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
+import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
+import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
+import uk.ac.ebi.quickgo.index.ontology.OntologyReader;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
@@ -92,7 +92,7 @@ public class IndexingJobConfig {
     }
 
     @Bean
-    public ODocReader reader() {
-        return new ODocReader(new File(sourceFile));
+    public OntologyReader reader() {
+        return new OntologyReader(new File(sourceFile));
     }
 }

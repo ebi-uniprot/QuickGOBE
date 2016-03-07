@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.write.listener;
+package uk.ac.ebi.quickgo.index.common.listener;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;

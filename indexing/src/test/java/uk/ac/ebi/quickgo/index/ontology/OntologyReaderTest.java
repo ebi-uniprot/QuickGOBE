@@ -1,5 +1,6 @@
-package uk.ac.ebi.quickgo.index.reader;
+package uk.ac.ebi.quickgo.index.ontology;
 
+import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.model.ontology.eco.ECOTerm;
 import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
@@ -31,9 +32,9 @@ import static org.mockito.Mockito.when;
  * @author Edd
  */
 @RunWith(HierarchicalContextRunner.class)
-public class ODocReaderTest {
+public class OntologyReaderTest {
 
-    private ODocReader oDocReader;
+    private OntologyReader ontologyReader;
     private int docCount;
 
     public class DocReaderAccessingValidOntologies {
@@ -51,15 +52,15 @@ public class ODocReaderTest {
 
             Optional<GeneOntology> goOptional = Optional.of(go);
             Optional<EvidenceCodeOntology> ecoOptional = Optional.of(eco);
-            oDocReader = new ODocReader(goOptional, ecoOptional);
+            ontologyReader = new OntologyReader(goOptional, ecoOptional);
 
-            oDocReader.open(new ExecutionContext());
+            ontologyReader.open(new ExecutionContext());
         }
 
         @Test
         public void readsAllDocsWithoutError() throws Exception {
             int count = 0;
-            while (oDocReader.read() != null) {
+            while (ontologyReader.read() != null) {
                 count++;
             }
             assertThat(count, is(docCount));
@@ -67,12 +68,12 @@ public class ODocReaderTest {
 
         @Test(expected = DocumentReaderException.class)
         public void extractingEmptyOntologyDocumentThrowsDocumentReadException() throws DocumentReaderException {
-            oDocReader.extractOntologyDocument(Optional.empty());
+            ontologyReader.extractOntologyDocument(Optional.empty());
         }
 
         @Test
         public void extractingNonEmptyOntologyDocumentSucceeds() throws DocumentReaderException {
-            OntologyDocument ontologyDocument = oDocReader.extractOntologyDocument(Optional.of(new OntologyDocument()));
+            OntologyDocument ontologyDocument = ontologyReader.extractOntologyDocument(Optional.of(new OntologyDocument()));
             assertThat(ontologyDocument, is(not(nullValue())));
         }
 
@@ -96,21 +97,21 @@ public class ODocReaderTest {
 
         @Test(expected = DocumentReaderException.class)
         public void openingEmptyGOWillCauseDocumentReaderException() {
-            oDocReader = new ODocReader(validGOOptional, Optional.empty());
-            oDocReader.open(new ExecutionContext());
+            ontologyReader = new OntologyReader(validGOOptional, Optional.empty());
+            ontologyReader.open(new ExecutionContext());
         }
 
         @Test(expected = DocumentReaderException.class)
         public void openingEmptyECOWillCauseDocumentReaderException() {
-            oDocReader = new ODocReader(Optional.empty(), validECOOptional);
-            oDocReader.open(new ExecutionContext());
+            ontologyReader = new OntologyReader(Optional.empty(), validECOOptional);
+            ontologyReader.open(new ExecutionContext());
         }
 
         @Test
         public void opensSuccessfully() {
-            oDocReader = new ODocReader(validGOOptional, validECOOptional);
-            oDocReader.open(new ExecutionContext());
-            assertThat(oDocReader, is(not(nullValue())));
+            ontologyReader = new OntologyReader(validGOOptional, validECOOptional);
+            ontologyReader.open(new ExecutionContext());
+            assertThat(ontologyReader, is(not(nullValue())));
         }
     }
 
@@ -132,7 +133,7 @@ public class ODocReaderTest {
 
     @After
     public void after() {
-        oDocReader.close();
+        ontologyReader.close();
     }
 
 }
