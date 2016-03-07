@@ -43,7 +43,10 @@ public class GeneProductDocument implements QuickGODocument {
     public boolean completeProteome;
 
     @Field(GeneProductFields.REFERENCE_POTEOME)
-    public boolean referenceProteome = false;
+    public boolean referenceProteome;
+
+    @Field(GeneProductFields.IS_ISOFORM)
+    public boolean isIsoform;
 
     @Override public String getUniqueName() {
         return id;
@@ -68,6 +71,9 @@ public class GeneProductDocument implements QuickGODocument {
         if (referenceProteome != that.referenceProteome) {
             return false;
         }
+        if (isIsoform != that.isIsoform) {
+            return false;
+        }
         if (id != null ? !id.equals(that.id) : that.id != null) {
             return false;
         }
@@ -89,6 +95,7 @@ public class GeneProductDocument implements QuickGODocument {
         if (taxonName != null ? !taxonName.equals(that.taxonName) : that.taxonName != null) {
             return false;
         }
+
         return databaseSubsets != null ? databaseSubsets.equals(that.databaseSubsets) : that.databaseSubsets == null;
 
     }
@@ -105,6 +112,7 @@ public class GeneProductDocument implements QuickGODocument {
         result = 31 * result + (databaseSubsets != null ? databaseSubsets.hashCode() : 0);
         result = 31 * result + (completeProteome ? 1 : 0);
         result = 31 * result + (referenceProteome ? 1 : 0);
+        result = 31 * result + (isIsoform ? 1 : 0);
         return result;
     }
 
@@ -121,6 +129,7 @@ public class GeneProductDocument implements QuickGODocument {
                 ", databaseSubsets=" + databaseSubsets +
                 ", completeProteome=" + completeProteome +
                 ", referenceProteome=" + referenceProteome +
+                ", isIsoform=" + isIsoform +
                 '}';
     }
 }
