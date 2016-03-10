@@ -48,6 +48,9 @@ public class GeneProductDocument implements QuickGODocument {
     @Field(GeneProductFields.IS_ISOFORM)
     public boolean isIsoform;
 
+    @Field(GeneProductFields.IS_ANNOTATED)
+    public boolean isAnnotated;
+
     @Override public String getUniqueName() {
         return id;
     }
@@ -69,6 +72,9 @@ public class GeneProductDocument implements QuickGODocument {
             return false;
         }
         if (isIsoform != document.isIsoform) {
+            return false;
+        }
+        if (isAnnotated != document.isAnnotated) {
             return false;
         }
         if (id != null ? !id.equals(document.id) : document.id != null) {
@@ -114,6 +120,7 @@ public class GeneProductDocument implements QuickGODocument {
         result = 31 * result + (isCompleteProteome ? 1 : 0);
         result = 31 * result + (referenceProteome != null ? referenceProteome.hashCode() : 0);
         result = 31 * result + (isIsoform ? 1 : 0);
+        result = 31 * result + (isAnnotated ? 1 : 0);
         return result;
     }
 
@@ -131,6 +138,7 @@ public class GeneProductDocument implements QuickGODocument {
                 ", isCompleteProteome=" + isCompleteProteome +
                 ", referenceProteome='" + referenceProteome + '\'' +
                 ", isIsoform=" + isIsoform +
+                ", isAnnotated=" + isAnnotated +
                 '}';
     }
 }

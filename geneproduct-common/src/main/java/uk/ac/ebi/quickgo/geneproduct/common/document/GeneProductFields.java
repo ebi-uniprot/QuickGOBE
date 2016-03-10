@@ -22,6 +22,7 @@ public class GeneProductFields {
     public static final String COMPLETE_PROTEOME = "isCompleteProteome";
     public static final String REFERENCE_POTEOME = "referenceProteome";
     public static final String IS_ISOFORM = "isIsoform";
+    public static final String IS_ANNOTATED = "isAnnotated";
 
     /**
      * GeneProduct fields that are stored, and can therefore be retrieved.

@@ -32,6 +32,7 @@
     <field name="isCompleteProteome" type="boolean" indexed="false" stored="true"/>
     <field name="referenceProteome" type="string" indexed="false" stored="true"/>
     <field name="isIsoform" type="boolean" indexed="false" stored="true"/>
+    <field name="isAnnotated" type="boolean" indexed="false" stored="true"/>
 
     <!-- cross-references -->
     <!--<field name="xrefDb" type="string" indexed="true" stored="true"/>-->
