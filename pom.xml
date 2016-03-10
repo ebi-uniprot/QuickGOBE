@@ -34,6 +34,7 @@
                 <module>sources</module>
                 <module>common</module>
                 <module>ontology-common</module>
+                <module>geneproduct-common</module>
                 <module>indexing</module>
             </modules>
         </profile>
