@@ -83,11 +83,13 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
 
         String[] unformattedProps = splitValue(propsText, interValueDelimiter);
 
-        Arrays.stream(unformattedProps)
-                .forEach(unformattedProp -> {
-                    String[] splitProp = splitValue(unformattedProp, intraValueDelimiter);
-                    propMap.put(splitProp[0], splitProp[1]);
-                });
+        if(propsText.length() > 0) {
+            Arrays.stream(unformattedProps)
+                    .forEach(unformattedProp -> {
+                        String[] splitProp = splitValue(unformattedProp, intraValueDelimiter);
+                        propMap.put(splitProp[0], splitProp[1]);
+                    });
+        }
 
         return propMap;
     }
