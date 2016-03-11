@@ -26,18 +26,22 @@ public class StringToGeneProductMapper implements FieldSetMapper<GeneProduct> {
 
         GeneProduct geneProduct = new GeneProduct();
 
-        geneProduct.database = fieldSet.readString(COLUMN_DB.getPosition());
-        geneProduct.id = fieldSet.readString(COLUMN_ID.getPosition());
-        geneProduct.symbol = fieldSet.readString(COLUMN_SYMBOL.getPosition());
-        geneProduct.name = fieldSet.readString(COLUMN_NAME.getPosition());
-        geneProduct.synonym = fieldSet.readString(COLUMN_SYNONYM.getPosition());
-        geneProduct.type = fieldSet.readString(COLUMN_TYPE.getPosition());
-        geneProduct.taxonId = fieldSet.readString(COLUMN_TAXON_ID.getPosition());
-        geneProduct.parentId = fieldSet.readString(COLUMN_PARENT_ID.getPosition());
-        geneProduct.xref = fieldSet.readString(COLUMN_XREF.getPosition());
-        geneProduct.properties = fieldSet.readString(COLUMN_PROPERTIES.getPosition());
+        geneProduct.database = trimIfNotNull(fieldSet.readString(COLUMN_DB.getPosition()));
+        geneProduct.id = trimIfNotNull(fieldSet.readString(COLUMN_ID.getPosition()));
+        geneProduct.symbol = trimIfNotNull(fieldSet.readString(COLUMN_SYMBOL.getPosition()));
+        geneProduct.name = trimIfNotNull(fieldSet.readString(COLUMN_NAME.getPosition()));
+        geneProduct.synonym = trimIfNotNull(fieldSet.readString(COLUMN_SYNONYM.getPosition()));
+        geneProduct.type = trimIfNotNull(fieldSet.readString(COLUMN_TYPE.getPosition()));
+        geneProduct.taxonId = trimIfNotNull(fieldSet.readString(COLUMN_TAXON_ID.getPosition()));
+        geneProduct.parentId = trimIfNotNull(fieldSet.readString(COLUMN_PARENT_ID.getPosition()));
+        geneProduct.xref = trimIfNotNull(fieldSet.readString(COLUMN_XREF.getPosition()));
+        geneProduct.properties = trimIfNotNull(fieldSet.readString(COLUMN_PROPERTIES.getPosition()));
 
         return geneProduct;
+    }
+
+    private String trimIfNotNull(String value) {
+        return value == null ? null : value.trim();
     }
 
     enum Columns {
