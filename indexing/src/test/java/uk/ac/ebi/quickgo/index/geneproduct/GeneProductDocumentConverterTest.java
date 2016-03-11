@@ -27,6 +27,7 @@ public class GeneProductDocumentConverterTest {
     private static final String PROTEOME = "proteome";
     private static final String REFERENCE_PROTEOME = "reference_proteome";
     private static final String DB_SUBSETS = "db_subsets";
+    private static final String TAXON_NAME = "taxon_name";
 
     private GeneProductDocumentConverter converter;
 
@@ -159,7 +160,7 @@ public class GeneProductDocumentConverterTest {
 
     @Test
     public void convertsAbsenceOfBooleanValuePropertiesInGeneProductToFalseBooleanFields() throws Exception {
-        geneProduct.properties = concatProperty(DB_SUBSETS, "UniProtKB");
+        geneProduct.properties = "";
 
         GeneProductDocument doc = converter.process(geneProduct);
 
@@ -180,7 +181,7 @@ public class GeneProductDocumentConverterTest {
 
     @Test
     public void convertsAbsenceReferenceProteomeInPropertiesInGeneProductToNullField() throws Exception {
-        geneProduct.properties = concatProperty(DB_SUBSETS, "UniProtKB");
+        geneProduct.properties = "";
 
         GeneProductDocument doc = converter.process(geneProduct);
 
@@ -199,11 +200,30 @@ public class GeneProductDocumentConverterTest {
 
     @Test
     public void convertsAbsenceOfDBSubsetInPropertiesInGeneProductToNullList() throws Exception {
-        geneProduct.properties = concatProperty(IS_ANNOTATED, "Y");
+        geneProduct.properties = "";
 
         GeneProductDocument doc = converter.process(geneProduct);
 
-        assertThat(doc.databaseSubsets, is(nullValue()));
+        assertThat(doc.taxonName, is(nullValue()));
+    }
+
+    @Test
+    public void convertsTaxonNameInPropertiesInGeneProductToField() throws Exception {
+        String taxonName = "Homo sapiens";
+        geneProduct.properties = concatProperty(TAXON_NAME, taxonName);
+
+        GeneProductDocument doc = converter.process(geneProduct);
+
+        assertThat(doc.taxonName, is(taxonName));
+    }
+
+    @Test
+    public void convertsAbsenceOfTaxonNameInPropertiesInGeneProductToNull() throws Exception {
+        geneProduct.properties = "";
+
+        GeneProductDocument doc = converter.process(geneProduct);
+
+        assertThat(doc.taxonName, is(nullValue()));
     }
 
     private String createUnconvertedTaxonId(int taxonId) {
