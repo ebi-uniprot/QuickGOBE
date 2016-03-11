@@ -35,6 +35,8 @@ import org.springframework.core.io.Resource;
 @EnableBatchProcessing
 @Import({RepoConfig.class})
 public class GeneProductConfig {
+    static final String GENE_PRODUCT_INDEXING_STEP_NAME = "geneProductIndex";
+
     private static final String COLUMN_DELIMITER = "\t";
     private static final String INTER_VALUE_DELIMITER = "\\|";
     private static final String INTRA_VALUE_DELIMITER = "=";
@@ -64,7 +66,7 @@ public class GeneProductConfig {
     }
 
     private Step readGeneProductData() {
-        return stepBuilders.get("geneProductIndex")
+        return stepBuilders.get(GENE_PRODUCT_INDEXING_STEP_NAME)
                 .<GeneProduct, GeneProductDocument>chunk(chunkSize)
                 .<GeneProduct>reader(multiFileReader())
                 .processor(convertToDoc())
