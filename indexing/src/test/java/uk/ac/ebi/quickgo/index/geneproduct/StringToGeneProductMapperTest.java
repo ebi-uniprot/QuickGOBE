@@ -14,7 +14,7 @@ import static uk.ac.ebi.quickgo.index.geneproduct.StringToGeneProductMapper.Colu
 /**
  * Tests the behaviour of the {@link StringToGeneProductMapper} class.
  */
-public class StringToGeneMapperTest {
+public class StringToGeneProductMapperTest {
     private StringToGeneProductMapper mapper;
 
     @Before
