@@ -1,0 +1,32 @@
+package uk.ac.ebi.quickgo.geneproduct.common.document;
+
+/**
+ * Enumeration that expresses the possible types of gene products.
+ *
+ * @author Ricardo Antunes
+ */
+public enum GeneProductType {
+    COMPLEX("complex"),
+    PROTEIN("protein"),
+    RNA("rna");
+
+    private String name;
+
+    GeneProductType(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public static GeneProductType typeOf(String name) {
+        for (GeneProductType type : GeneProductType.values()) {
+            if (type.getName().equalsIgnoreCase(name)) {
+                return type;
+            }
+        }
+
+        throw new IllegalArgumentException("The provided name argument does not map to an existing gene product type");
+    }
+}
