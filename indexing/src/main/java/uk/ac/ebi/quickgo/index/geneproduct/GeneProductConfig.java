@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.geneproduct.common.RepoConfig;
 
+import java.util.Arrays;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -21,6 +22,9 @@ import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.LineTokenizer;
+import org.springframework.batch.item.support.CompositeItemProcessor;
+import org.springframework.batch.item.validator.ValidatingItemProcessor;
+import org.springframework.batch.item.validator.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -69,7 +73,7 @@ public class GeneProductConfig {
         return stepBuilders.get(GENE_PRODUCT_INDEXING_STEP_NAME)
                 .<GeneProduct, GeneProductDocument>chunk(chunkSize)
                 .<GeneProduct>reader(multiFileReader())
-                .processor(convertToDoc())
+                .processor(compositeProcessor(gpValidator(), docConverter()))
                 .writer(geneProductRepositoryWriter())
                 .listener(logStepListener())
                 .build();
@@ -105,8 +109,21 @@ public class GeneProductConfig {
         return new StringToGeneProductMapper();
     }
 
-    private ItemProcessor<GeneProduct, GeneProductDocument> convertToDoc() {
+    private ItemProcessor<GeneProduct, GeneProductDocument> docConverter() {
         return new GeneProductDocumentConverter(INTER_VALUE_DELIMITER, INTRA_VALUE_DELIMITER);
+    }
+
+    private ItemProcessor<GeneProduct, GeneProduct> gpValidator() {
+        Validator<GeneProduct> geneProductValidator =
+                new GeneProductValidator(INTER_VALUE_DELIMITER, INTRA_VALUE_DELIMITER);
+        return new ValidatingItemProcessor<>(geneProductValidator);
+    }
+
+    private ItemProcessor<GeneProduct, GeneProductDocument> compositeProcessor(ItemProcessor<GeneProduct, ?>... processors) {
+        CompositeItemProcessor<GeneProduct, GeneProductDocument> compositeProcessor = new CompositeItemProcessor<>();
+        compositeProcessor.setDelegates(Arrays.asList(processors));
+
+        return compositeProcessor;
     }
 
     private ItemWriter<GeneProductDocument> geneProductRepositoryWriter() {
