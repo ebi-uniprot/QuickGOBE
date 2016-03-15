@@ -49,7 +49,7 @@ public final class GeneProductParsingHelper {
                 Arrays.stream(unformattedProps)
                         .forEach(unformattedProp -> {
                             String[] splitProp = splitValue(unformattedProp, intraValueDelimiter);
-                            propMap.put(splitProp[0], splitProp[1]);
+                            propMap.put(splitProp[0], splitProp.length == 2 ? splitProp[1] : "");
                         });
             }
         }
