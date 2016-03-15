@@ -12,7 +12,7 @@ enum Columns {
     COLUMN_NAME(3, "Name"),
     COLUMN_SYNONYM(4, "Synonyms"),
     COLUMN_TYPE(5, "Type"),
-    COLUMN_TAXON_ID(6, "Taxonmy id"),
+    COLUMN_TAXON_ID(6, "Taxonomy id"),
     COLUMN_PARENT_ID(7, "Parent id"),
     COLUMN_XREF(8, "Cross-references"),
     COLUMN_PROPERTIES(9, "Properties");
