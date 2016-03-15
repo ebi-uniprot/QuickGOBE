@@ -57,6 +57,9 @@ public class GeneProductConfig {
     @Value("${indexing.geneproduct.chunk.size:500}")
     private int chunkSize;
 
+    @Value("${indexing.geneproduct.header.lines:17}")
+    private int linesToSkip;
+
     @Autowired
     private GeneProductRepository repository;
 
@@ -83,13 +86,13 @@ public class GeneProductConfig {
         MultiResourceItemReader<GeneProduct> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setDelegate(singleFileReader());
-
         return reader;
     }
 
     private FlatFileItemReader<GeneProduct> singleFileReader() {
         FlatFileItemReader<GeneProduct> reader = new FlatFileItemReader<>();
         reader.setLineMapper(lineMapper());
+        reader.setLinesToSkip(linesToSkip);
         return reader;
     }
 
