@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,6 +13,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.concatStrings;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
 
 /**
  * Tests the behaviour of the {@link GeneProductDocumentConverter} class.
@@ -119,13 +121,13 @@ public class GeneProductDocumentConverterTest {
 
     @Test
     public void converts3SynonymsInGeneProductToListWith3Synonyms() throws Exception {
-        String[] synonyms = {"A0A009DWW0_ACIBA", "J503_3808", "J503_4252"};
+        List<String> synonyms = Arrays.asList("A0A009DWW0_ACIBA", "J503_3808", "J503_4252");
 
-        geneProduct.synonym = concatStrings(synonyms);
+        geneProduct.synonym = concatStrings(synonyms, INTER_VALUE_DELIMITER);
 
         GeneProductDocument doc = converter.process(geneProduct);
 
-        assertThat(doc.synonyms, containsInAnyOrder(synonyms));
+        assertThat(doc.synonyms, containsInAnyOrder(synonyms.toArray(new String[synonyms.size()])));
     }
 
     @Test
@@ -134,7 +136,7 @@ public class GeneProductDocumentConverterTest {
         String isIsoform = concatProperty(IS_ISOFORM, "Y");
         String proteome = concatProperty(PROTEOME, "Y");
 
-        geneProduct.properties = concatStrings(isAnnotated, isIsoform, proteome);
+        geneProduct.properties = concatStrings(Arrays.asList(isAnnotated, isIsoform, proteome), INTER_VALUE_DELIMITER);
 
         GeneProductDocument doc = converter.process(geneProduct);
 
@@ -149,7 +151,7 @@ public class GeneProductDocumentConverterTest {
         String isIsoform = concatProperty(IS_ISOFORM, "N");
         String proteome = concatProperty(PROTEOME, "N");
 
-        geneProduct.properties = concatStrings(isAnnotated, isIsoform, proteome);
+        geneProduct.properties = concatStrings(Arrays.asList(isAnnotated, isIsoform, proteome), INTER_VALUE_DELIMITER);
 
         GeneProductDocument doc = converter.process(geneProduct);
 
@@ -226,15 +228,7 @@ public class GeneProductDocumentConverterTest {
         assertThat(doc.taxonName, is(nullValue()));
     }
 
-    private String createUnconvertedTaxonId(int taxonId) {
-        return "taxon:" + taxonId;
-    }
-
-    private String concatStrings(String... values) {
-        return Arrays.stream(values).collect(Collectors.joining(INTER_VALUE_DELIMITER));
-    }
-
     private String concatProperty(String key, String value) {
-        return key + INTRA_VALUE_DELIMITER + value;
+        return GeneProductUtil.concatProperty(key, value, INTRA_VALUE_DELIMITER);
     }
 }
