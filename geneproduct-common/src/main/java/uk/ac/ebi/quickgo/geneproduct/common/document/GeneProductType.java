@@ -27,6 +27,6 @@ public enum GeneProductType {
             }
         }
 
-        throw new IllegalArgumentException("The provided name argument does not map to an existing gene product type");
+        throw new IllegalArgumentException("No type maps to provided name: " + name);
     }
 }
