@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 /**
  * Helper class to aid in the population of the Gene Product objects.
  */
-public final class GeneProductParsingHelper {
+final class GeneProductParsingHelper {
     public static final int DEFAULT_TAXON_ID = 0;
 
     static final String TAXON_NAME_KEY = "taxon_name";
