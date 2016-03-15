@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
+import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
@@ -24,6 +25,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.item.validator.ValidatingItemProcessor;
+import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.item.validator.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,7 +60,10 @@ public class GeneProductConfig {
     private int chunkSize;
 
     @Value("${indexing.geneproduct.header.lines:17}")
-    private int linesToSkip;
+    private int headerLines;
+
+    @Value("${indexing.geneproduct.skip.limit:100}")
+    private int skipLimit;
 
     @Autowired
     private GeneProductRepository repository;
@@ -78,6 +83,10 @@ public class GeneProductConfig {
                 .<GeneProduct>reader(multiFileReader())
                 .processor(compositeProcessor(gpValidator(), docConverter()))
                 .writer(geneProductRepositoryWriter())
+                .faultTolerant()
+                .skip(DocumentReaderException.class)
+                .skip(ValidationException.class)
+                .skipLimit(skipLimit)
                 .listener(logStepListener())
                 .build();
     }
@@ -92,7 +101,7 @@ public class GeneProductConfig {
     private FlatFileItemReader<GeneProduct> singleFileReader() {
         FlatFileItemReader<GeneProduct> reader = new FlatFileItemReader<>();
         reader.setLineMapper(lineMapper());
-        reader.setLinesToSkip(linesToSkip);
+        reader.setLinesToSkip(headerLines);
         return reader;
     }
 
