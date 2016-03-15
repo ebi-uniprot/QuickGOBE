@@ -3,11 +3,16 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Helper class to aid in the population of the Gene Product objects.
  */
 public final class GeneProductParsingHelper {
+    public static final int DEFAULT_TAXON_ID = 0;
+
     static final String TAXON_NAME_KEY = "taxon_name";
     static final String COMPLETE_PROTEOME_KEY = "proteome";
     static final String REFERENCE_PROTEOME_KEY = "reference_proteome";
@@ -18,6 +23,7 @@ public final class GeneProductParsingHelper {
     static final String TRUE_STRING = "Y";
     static final String FALSE_STRING = "N";
 
+    private static final Pattern TAXON_ID_PATTERN = Pattern.compile("taxon:([0-9]+)");
 
     private GeneProductParsingHelper() {}
 
@@ -64,5 +70,30 @@ public final class GeneProductParsingHelper {
         }
 
         return splitValues;
+    }
+
+    static int extractTaxonIdFromValue(String value) {
+        return taxonIdMatcher(value)
+                .filter(Matcher::matches)
+                .map(matcher -> Integer.parseInt(matcher.group(1)))
+                .orElse(DEFAULT_TAXON_ID);
+    }
+
+    static boolean taxonIdMatchesRegex(String value) {
+        return taxonIdMatcher(value)
+                .map(Matcher::matches)
+                .orElse(false);
+    }
+
+    private static Optional<Matcher> taxonIdMatcher(String value) {
+        Optional<Matcher> matcherOpt;
+
+        if (value != null) {
+            matcherOpt = Optional.of(TAXON_ID_PATTERN.matcher(value));
+        } else {
+            matcherOpt = Optional.empty();
+        }
+
+        return matcherOpt;
     }
 }

@@ -5,8 +5,6 @@ import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Preconditions;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
@@ -18,10 +16,6 @@ import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
  * @author Ricardo Antunes
  */
 public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, GeneProductDocument> {
-    public static final int DEFAULT_TAXON_ID = 0;
-
-    private final static Pattern TAXON_ID_PATTERN = Pattern.compile("taxon:([0-9]+)");
-
     private final String interValueDelimiter;
     private final String intraValueDelimiter;
 
@@ -73,19 +67,5 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
                 .collect(Collectors.toList());
 
         return list.size() == 0 ? null : list;
-    }
-
-    private int extractTaxonIdFromValue(String value) {
-        int taxonId = DEFAULT_TAXON_ID;
-
-        if (value != null) {
-            Matcher matcher = TAXON_ID_PATTERN.matcher(value);
-
-            if (matcher.matches()) {
-                taxonId = Integer.parseInt(matcher.group(1));
-            }
-        }
-
-        return taxonId;
     }
 }
