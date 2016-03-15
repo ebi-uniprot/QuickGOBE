@@ -9,7 +9,7 @@ import org.springframework.batch.item.file.transform.FieldSet;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.index.geneproduct.StringToGeneProductMapper.Columns.*;
+import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
 
 /**
  * Tests the behaviour of the {@link StringToGeneProductMapper} class.

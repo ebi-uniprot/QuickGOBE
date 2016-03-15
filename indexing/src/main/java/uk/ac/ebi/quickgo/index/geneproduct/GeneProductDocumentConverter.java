@@ -10,22 +10,17 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
+
 /**
  * Converts a {@link GeneProduct} into an {@link uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument}
  *
  * @author Ricardo Antunes
  */
 public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, GeneProductDocument> {
-    private static final String TAXON_NAME_KEY = "taxon_name";
-    private static final String COMPLETE_PROTEOME_KEY = "proteome";
-    private static final String REFERENCE_PROTEOME_KEY = "reference_proteome";
-    private static final String IS_ANNOTATED_KEY = "is_annotated";
-    private static final String IS_ISOFORM = "is_isoform";
-    private static final String DATABASE_SUBSET_KEY = "db_subsets";
+    public static final int DEFAULT_TAXON_ID = 0;
 
-    private static final String TRUE_STRING = "Y";
     private final static Pattern TAXON_ID_PATTERN = Pattern.compile("taxon:([0-9]+)");
-
 
     private final String interValueDelimiter;
     private final String intraValueDelimiter;
@@ -41,11 +36,12 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
     }
 
     @Override public GeneProductDocument process(GeneProduct geneProduct) throws Exception {
-        if(geneProduct == null) {
+        if (geneProduct == null) {
             throw new DocumentReaderException("Gene product object is null");
         }
 
-        Map<String, String> properties = convertToMap(geneProduct.properties);
+        Map<String, String> properties =
+                convertToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
 
         GeneProductDocument doc = new GeneProductDocument();
         doc.database = geneProduct.database;
@@ -67,52 +63,25 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         return doc;
     }
 
-    private String[] splitValue(String value, String delimiter) {
-        String[] splitValues;
-        if (value != null) {
-            splitValues = value.split(delimiter);
-        } else {
-            splitValues = new String[0];
-        }
-
-        return splitValues;
-    }
-
-    private Map<String, String> convertToMap(String propsText) {
-        Map<String, String> propMap = new HashMap<>();
-
-        String[] unformattedProps = splitValue(propsText, interValueDelimiter);
-
-        if(propsText.length() > 0) {
-            Arrays.stream(unformattedProps)
-                    .forEach(unformattedProp -> {
-                        String[] splitProp = splitValue(unformattedProp, intraValueDelimiter);
-                        propMap.put(splitProp[0], splitProp[1]);
-                    });
-        }
-
-        return propMap;
-    }
-
     private boolean isTrue(String value) {
         return value != null && value.equalsIgnoreCase(TRUE_STRING);
     }
 
     @SafeVarargs private final <T> List<T> convertToList(T... elements) {
         List<T> list = Arrays.stream(elements)
-                    .filter(element -> element != null)
-                    .collect(Collectors.toList());
+                .filter(element -> element != null)
+                .collect(Collectors.toList());
 
         return list.size() == 0 ? null : list;
     }
 
     private int extractTaxonIdFromValue(String value) {
-        int taxonId = 0;
+        int taxonId = DEFAULT_TAXON_ID;
 
-        if(value != null) {
+        if (value != null) {
             Matcher matcher = TAXON_ID_PATTERN.matcher(value);
 
-            if(matcher.matches()) {
+            if (matcher.matches()) {
                 taxonId = Integer.parseInt(matcher.group(1));
             }
         }

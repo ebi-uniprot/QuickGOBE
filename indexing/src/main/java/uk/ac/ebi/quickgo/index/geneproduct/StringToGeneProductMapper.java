@@ -6,7 +6,7 @@ import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.validation.BindException;
 
-import static uk.ac.ebi.quickgo.index.geneproduct.StringToGeneProductMapper.Columns.*;
+import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
 
 /**
  * Converts a String representing a gene product into a {@link GeneProduct} object.
@@ -19,9 +19,9 @@ public class StringToGeneProductMapper implements FieldSetMapper<GeneProduct> {
             throw new DocumentReaderException("Provided field set is null");
         }
 
-        if (fieldSet.getFieldCount() < Columns.numColumns()) {
+        if (fieldSet.getFieldCount() < numColumns()) {
             throw new DocumentReaderException(
-                    "Expected at least: " + Columns.numColumns() + ", but found: " + fieldSet.getFieldCount());
+                    "Expected at least: " + numColumns() + ", but found: " + fieldSet.getFieldCount());
         }
 
         GeneProduct geneProduct = new GeneProduct();
@@ -42,32 +42,5 @@ public class StringToGeneProductMapper implements FieldSetMapper<GeneProduct> {
 
     private String trimIfNotNull(String value) {
         return value == null ? null : value.trim();
-    }
-
-    enum Columns {
-         COLUMN_DB(0),
-         COLUMN_ID(1),
-         COLUMN_SYMBOL(2),
-         COLUMN_NAME(3),
-         COLUMN_SYNONYM(4),
-         COLUMN_TYPE(5),
-         COLUMN_TAXON_ID(6),
-         COLUMN_PARENT_ID(7),
-         COLUMN_XREF(8),
-         COLUMN_PROPERTIES(9);
-
-        private int position;
-
-        Columns(int position) {
-            this.position = position;
-        }
-
-        public int getPosition() {
-            return position;
-        }
-
-        public static int numColumns() {
-            return Columns.values().length;
-        }
     }
 }
