@@ -22,4 +22,4 @@ IntAct	EBI-10043123	atf1-atf4_mouse	ATF1-ATF4 transcription factor complex	Atf1:
 IntAct	EBI-10043549	smad3_human-1	SMAD3 homotrimer	SMAD3 trimer	complex	taxon:9606			taxon_name=Homo sapiens|is_annotated=N
 RNAcentral	URS0000000005_77133	URS0000000005_77133	Uncultured bacterium partial 16S ribosomal RNA		rna	taxon:77133			taxon_name=uncultured bacterium|is_annotated=N
 RNAcentral	URS0000000017_77133	URS0000000017_77133	environmental samples uncultured bacterium SSU rRNA bacteria		rna	taxon:77133			taxon_name=uncultured bacterium|is_annotated=N
-
+	Fails because of missing database name	symbol			protein	taxon:0			
