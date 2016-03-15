@@ -1,0 +1,425 @@
+package uk.ac.ebi.quickgo.index.geneproduct;
+
+import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.springframework.batch.item.validator.ValidationException;
+
+import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.concatStrings;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
+
+/**
+ * Tests the behaviour of the {@link GeneProductValidator} class.
+ */
+public class GeneProductValidatorTest {
+    private static final String INTER_VALUE_DELIMITER_REGEX = "\\|";
+    private static final String INTER_VALUE_DELIMITER = "|";
+    private static final String INTRA_VALUE_DELIMITER = "=";
+
+    private static final String NULL_FIELD_MESSAGE = "Found null value in field: %s";
+    private static final String EMPTY_FIELD_MESSAGE = "Found empty value in field: %s";
+    private static final String INVALID_FIELD_MESSAGE = "Found invalid value for field: %s";
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    private GeneProductValidator validator;
+
+    private GeneProduct geneProduct;
+
+    @Before
+    public void setUp() throws Exception {
+        validator = new GeneProductValidator(INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
+        geneProduct = createGeneProductWithPopulatedMandatoryFields();
+    }
+
+    private GeneProduct createGeneProductWithPopulatedMandatoryFields() {
+        GeneProduct geneProduct = new GeneProduct();
+        geneProduct.database = "UniProtKB";
+        geneProduct.id = "A0A000";
+        geneProduct.symbol = "moeA5";
+        geneProduct.name = "MoeA5";
+        geneProduct.type = "protein";
+        geneProduct.parentId = "A0A001";
+        geneProduct.taxonId = createUnconvertedTaxonId(9606);
+
+        geneProduct.properties = concatProperty(TAXON_NAME_KEY, "Homo sapiens");
+
+        return geneProduct;
+    }
+
+    @Test
+    public void nullInterValueDelimiterThrowsException() throws Exception {
+        String interValueDelimiter = null;
+        String intraValueDelimiter = INTRA_VALUE_DELIMITER;
+
+        assertExceptionThrown(IllegalArgumentException.class, "Inter value delimiter can not be null or empty");
+        validator = new GeneProductValidator(interValueDelimiter, intraValueDelimiter);
+    }
+
+    @Test
+    public void nullIntraValueDelimiterThrowsException() throws Exception {
+        String interValueDelimiter = INTER_VALUE_DELIMITER_REGEX;
+        String intraValueDelimiter = null;
+
+        assertExceptionThrown(IllegalArgumentException.class, "Intra value delimiter can not be null or empty");
+        validator = new GeneProductValidator(interValueDelimiter, intraValueDelimiter);
+    }
+
+    @Test(expected = DocumentReaderException.class)
+    public void nullGeneProductThrowsException() throws Exception {
+        validator.validate(null);
+    }
+
+    @Test
+    public void nullDatabaseThrowsException() throws Exception {
+        geneProduct.database = null;
+
+        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, COLUMN_DB.getName()));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void emptyDatabaseThrowsException() throws Exception {
+        geneProduct.database = "";
+
+        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, COLUMN_DB.getName()));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void databaseValidates() throws Exception {
+        geneProduct.database = "UniProtKB";
+
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void nullIdThrowsException() throws Exception {
+        geneProduct.id = null;
+
+        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, COLUMN_ID.getName()));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void emptyIdThrowsException() throws Exception {
+        geneProduct.id = "";
+
+        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, COLUMN_ID.getName()));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void idValidates() throws Exception {
+        geneProduct.id = "moeA5";
+
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void nullSymbolThrowsException() throws Exception {
+        geneProduct.symbol = null;
+
+        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, COLUMN_SYMBOL.getName()));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void emptySymbolThrowsException() throws Exception {
+        geneProduct.symbol = "";
+
+        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, COLUMN_SYMBOL.getName()));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void symbolValidates() throws Exception {
+        geneProduct.symbol = "A0A000";
+
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void nullTypeThrowsException() throws Exception {
+        geneProduct.type = null;
+
+        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, COLUMN_TYPE.getName()));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void emptyTypeThrowsException() throws Exception {
+        geneProduct.type = "";
+
+        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, COLUMN_TYPE.getName()));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void invalidTypeThrowsException() throws Exception {
+        geneProduct.type = "invalid";
+
+        String errorMsg = "Error in field: " + COLUMN_TYPE.getName() + " - [No type maps to provided name: " +
+                geneProduct.type + "]";
+
+        assertExceptionThrown(ValidationException.class, errorMsg);
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void typeIsValid() throws Exception {
+        geneProduct.type = GeneProductType.PROTEIN.getName();
+
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void nullParentIdIsValid() throws Exception {
+        geneProduct.parentId = null;
+
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void emptyParentIdIsValid() throws Exception {
+        geneProduct.parentId = "";
+
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void singleParentIdIsValid() throws Exception {
+        geneProduct.parentId = "A0A001";
+
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void multipleParentIdThrowsException() throws Exception {
+        geneProduct.parentId = "A0A001" + INTER_VALUE_DELIMITER + "A0A002";
+
+        String errorMsg = "Found more than one id in field: " + COLUMN_PARENT_ID.getName();
+
+        assertExceptionThrown(ValidationException.class, errorMsg);
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void nullTaxonIdThrowsException() throws Exception {
+        geneProduct.taxonId = null;
+
+        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, COLUMN_TAXON_ID.getName()));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void emptyTaxonIdThrowsException() throws Exception {
+        geneProduct.taxonId = "";
+
+        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, COLUMN_TAXON_ID.getName()));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void taxonIdIsValid() throws Exception {
+        geneProduct.taxonId = createUnconvertedTaxonId(9606);
+
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void negativeTaxonIdThrowsException() throws Exception {
+        geneProduct.taxonId = createUnconvertedTaxonId(-9606);
+
+        assertExceptionThrown(ValidationException.class, "Taxon id column does not conform to regex: "
+                + createUnconvertedTaxonId(-9606));
+
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void nullTaxonNameThrowsException() throws Exception {
+        geneProduct.properties = null;
+
+        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, TAXON_NAME_KEY));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void emptyTaxonNameThrowsException() throws Exception {
+        geneProduct.properties = concatProperty(TAXON_NAME_KEY, "");
+
+        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, TAXON_NAME_KEY));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void taxonNameIsValid() throws Exception {
+        geneProduct.properties = concatProperty(TAXON_NAME_KEY, "name");
+
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void noIsIsoformIsValid() throws Exception {
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void emptyIsIsoformThrowsException() throws Exception {
+        String pair = concatProperty(IS_ISOFORM_KEY, "");
+
+        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
+
+        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, IS_ISOFORM_KEY));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void isIsoformWithInvalidValueThrowsException() throws Exception {
+        String pair = concatProperty(IS_ISOFORM_KEY, "invalid");
+
+        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
+
+        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, IS_ISOFORM_KEY));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void isIsoformWithYValueIsValid() throws Exception {
+        assertYValue(IS_ISOFORM_KEY);
+    }
+
+    @Test
+    public void isIsoformWithNValueIsValid() throws Exception {
+        assertNValue(IS_ISOFORM_KEY);
+    }
+
+    @Test
+    public void noIsAnnotatedIsValid() throws Exception {
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void emptyIsAnnotatedThrowsException() throws Exception {
+        String pair = concatProperty(IS_ANNOTATED_KEY, "");
+
+        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
+
+        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, IS_ANNOTATED_KEY));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void isAnnotatedWithInvalidValueThrowsException() throws Exception {
+        String pair = concatProperty(IS_ANNOTATED_KEY, "invalid");
+
+        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
+
+        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, IS_ANNOTATED_KEY));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void isAnnotatedWithYValueIsValid() throws Exception {
+        assertYValue(IS_ANNOTATED_KEY);
+    }
+
+    @Test
+    public void isAnnotatedWithNValueIsValid() throws Exception {
+        assertNValue(IS_ANNOTATED_KEY);
+    }
+
+    @Test
+    public void noCompleteProteomeIsValid() throws Exception {
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void emptyCompleteProteomeThrowsException() throws Exception {
+        String pair = concatProperty(COMPLETE_PROTEOME_KEY, "");
+
+        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
+
+        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, COMPLETE_PROTEOME_KEY));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void completeProteoemeWithInvalidValueThrowsException() throws Exception {
+        String pair = concatProperty(COMPLETE_PROTEOME_KEY, "invalid");
+
+        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
+
+        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, COMPLETE_PROTEOME_KEY));
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void completeProteoemeWithYValueIsValid() throws Exception {
+        assertYValue(COMPLETE_PROTEOME_KEY);
+    }
+
+    @Test
+    public void completeProteoemeWithNValueIsValid() throws Exception {
+        assertNValue(COMPLETE_PROTEOME_KEY);
+    }
+
+    @Test
+    public void noReferenceProteomeIsValid() throws Exception {
+        validator.validate(geneProduct);
+    }
+
+    @Test
+    public void populatedReferenceProteomeIsValid() throws Exception {
+        String pair = concatProperty(REFERENCE_PROTEOME_KEY, "ref prodt id");
+
+        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
+
+        validator.validate(geneProduct);
+    }
+
+
+    private void assertExceptionThrown(Class<? extends Exception> exceptionClass, String message) {
+        thrown.expect(exceptionClass);
+        thrown.expectMessage(message);
+    }
+
+    private void assertYValue(String field) {
+        String pair = concatProperty(field, "Y");
+
+        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
+
+        validator.validate(geneProduct);
+    }
+
+    private void assertNValue(String field) {
+        String pair = concatProperty(field, "N");
+
+        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
+
+        validator.validate(geneProduct);
+    }
+
+    private String concatProperty(String key, String value) {
+        return GeneProductUtil.concatProperty(key, value, INTRA_VALUE_DELIMITER);
+    }
+
+    private String appendToProperties(String geneProductProperties, List<String> valuesToAppend) {
+        List<String> allValues = new ArrayList<>();
+        allValues.add(geneProduct.properties);
+        allValues.addAll(valuesToAppend);
+
+        return concatStrings(allValues, INTER_VALUE_DELIMITER);
+    }
+}
