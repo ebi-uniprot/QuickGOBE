@@ -17,6 +17,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
@@ -80,13 +81,13 @@ public class GeneProductConfig {
     private Step readGeneProductData() {
         return stepBuilders.get(GENE_PRODUCT_INDEXING_STEP_NAME)
                 .<GeneProduct, GeneProductDocument>chunk(chunkSize)
+                .faultTolerant()
+                .skipLimit(skipLimit)
+                .skip(FlatFileParseException.class)
+                .skip(ValidationException.class)
                 .<GeneProduct>reader(multiFileReader())
                 .processor(compositeProcessor(gpValidator(), docConverter()))
                 .writer(geneProductRepositoryWriter())
-                .faultTolerant()
-                .skip(DocumentReaderException.class)
-                .skip(ValidationException.class)
-                .skipLimit(skipLimit)
                 .listener(logStepListener())
                 .build();
     }
