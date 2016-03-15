@@ -52,7 +52,7 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
 
         doc.isCompleteProteome = isTrue(properties.get(COMPLETE_PROTEOME_KEY));
         doc.isAnnotated = isTrue(properties.get(IS_ANNOTATED_KEY));
-        doc.isIsoform = isTrue(properties.get(IS_ISOFORM));
+        doc.isIsoform = isTrue(properties.get(IS_ISOFORM_KEY));
 
         return doc;
     }
