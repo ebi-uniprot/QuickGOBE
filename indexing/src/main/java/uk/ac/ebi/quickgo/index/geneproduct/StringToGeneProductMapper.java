@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
 import org.springframework.validation.BindException;
 
 import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
@@ -16,12 +17,12 @@ import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
 public class StringToGeneProductMapper implements FieldSetMapper<GeneProduct> {
     @Override public GeneProduct mapFieldSet(FieldSet fieldSet) throws BindException {
         if (fieldSet == null) {
-            throw new DocumentReaderException("Provided field set is null");
+            throw new IllegalArgumentException("Provided field set is null");
         }
 
         if (fieldSet.getFieldCount() < numColumns()) {
-            throw new DocumentReaderException(
-                    "Expected at least: " + numColumns() + ", but found: " + fieldSet.getFieldCount());
+            throw new IncorrectTokenCountException("Incorrect number of columns", numColumns(), fieldSet
+                    .getFieldCount());
         }
 
         GeneProduct geneProduct = new GeneProduct();

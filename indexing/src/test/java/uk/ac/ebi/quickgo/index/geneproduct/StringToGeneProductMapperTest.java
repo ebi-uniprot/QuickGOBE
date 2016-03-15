@@ -1,11 +1,10 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,12 +21,12 @@ public class StringToGeneProductMapperTest {
         mapper = new StringToGeneProductMapper();
     }
 
-    @Test(expected = DocumentReaderException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void nullFieldSetThrowsException() throws Exception {
         mapper.mapFieldSet(null);
     }
 
-    @Test(expected = DocumentReaderException.class)
+    @Test(expected = IncorrectTokenCountException.class)
     public void fieldSetWithInsufficientValuesThrowsException() throws Exception {
         String[] tokens = new String[numColumns() - 1];
         FieldSet fieldSet = new DefaultFieldSet(tokens);
