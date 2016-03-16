@@ -45,18 +45,23 @@ public class LogJobListener implements JobExecutionListener {
         long skipCount = 0L;
         long readSkips = 0L;
         long writeSkips = 0L;
+        long processingSkips = 0L;
         long readCount = 0L;
         long writeCount = 0L;
+
         for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
             readSkips += stepExecution.getReadSkipCount();
             writeSkips += stepExecution.getWriteSkipCount();
+            processingSkips += stepExecution.getProcessSkipCount();
             readCount += stepExecution.getReadCount();
             writeCount += stepExecution.getWriteCount();
             skipCount += stepExecution.getSkipCount();
+
         }
         LOGGER.info("Read count    : {}", readCount);
         LOGGER.info("Write count   : {}", writeCount);
-        LOGGER.info("Skip count    : {} ({} read / {} write)", skipCount, readSkips, writeSkips);
+        LOGGER.info("Skip count    : {} ({} read / {} processing / {} write)", skipCount, readSkips, processingSkips,
+                writeSkips);
         LOGGER.info("=====================================================");
         jobExecution.getExitStatus();
     }
