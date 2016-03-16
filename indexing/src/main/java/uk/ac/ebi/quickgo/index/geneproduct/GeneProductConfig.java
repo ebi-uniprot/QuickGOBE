@@ -2,15 +2,17 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
-import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.geneproduct.common.RepoConfig;
+import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
 import java.util.Arrays;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -72,9 +74,8 @@ public class GeneProductConfig {
     @Bean
     public Job geneProductJob() {
         return jobBuilders.get("geneProductJob")
+                .start(readGeneProductData())
                 .listener(logJobListener())
-                .flow(readGeneProductData())
-                .end()
                 .build();
     }
 
@@ -89,6 +90,7 @@ public class GeneProductConfig {
                 .processor(compositeProcessor(gpValidator(), docConverter()))
                 .writer(geneProductRepositoryWriter())
                 .listener(logStepListener())
+                .listener(skipLogListener())
                 .build();
     }
 
@@ -143,11 +145,15 @@ public class GeneProductConfig {
         return new SolrCrudRepoWriter<>(repository);
     }
 
-    private LogJobListener logJobListener() {
+    private JobExecutionListener logJobListener() {
         return new LogJobListener();
     }
 
-    private LogStepListener logStepListener() {
+    private StepListener logStepListener() {
         return new LogStepListener();
+    }
+
+    private StepListener skipLogListener() {
+        return new SkipLoggerListener();
     }
 }
