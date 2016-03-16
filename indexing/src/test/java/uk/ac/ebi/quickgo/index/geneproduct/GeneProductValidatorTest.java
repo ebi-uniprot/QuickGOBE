@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.index.ExceptionMatcher;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import java.util.ArrayList;
@@ -62,7 +63,8 @@ public class GeneProductValidatorTest {
         String interValueDelimiter = null;
         String intraValueDelimiter = INTRA_VALUE_DELIMITER;
 
-        assertExceptionThrown(IllegalArgumentException.class, "Inter value delimiter can not be null or empty");
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Inter value delimiter can not be null or empty");
         validator = new GeneProductValidator(interValueDelimiter, intraValueDelimiter);
     }
 
@@ -71,7 +73,8 @@ public class GeneProductValidatorTest {
         String interValueDelimiter = INTER_VALUE_DELIMITER_REGEX;
         String intraValueDelimiter = null;
 
-        assertExceptionThrown(IllegalArgumentException.class, "Intra value delimiter can not be null or empty");
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Intra value delimiter can not be null or empty");
         validator = new GeneProductValidator(interValueDelimiter, intraValueDelimiter);
     }
 
@@ -84,7 +87,7 @@ public class GeneProductValidatorTest {
     public void nullDatabaseThrowsException() throws Exception {
         geneProduct.database = null;
 
-        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, COLUMN_DB.getName()));
+        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_DB.getName())));
         validator.validate(geneProduct);
     }
 
@@ -92,7 +95,7 @@ public class GeneProductValidatorTest {
     public void emptyDatabaseThrowsException() throws Exception {
         geneProduct.database = "";
 
-        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, COLUMN_DB.getName()));
+        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_DB.getName())));
         validator.validate(geneProduct);
     }
 
@@ -107,7 +110,7 @@ public class GeneProductValidatorTest {
     public void nullIdThrowsException() throws Exception {
         geneProduct.id = null;
 
-        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, COLUMN_ID.getName()));
+        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_ID.getName())));
         validator.validate(geneProduct);
     }
 
@@ -115,7 +118,7 @@ public class GeneProductValidatorTest {
     public void emptyIdThrowsException() throws Exception {
         geneProduct.id = "";
 
-        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, COLUMN_ID.getName()));
+        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_ID.getName())));
         validator.validate(geneProduct);
     }
 
@@ -130,7 +133,7 @@ public class GeneProductValidatorTest {
     public void nullSymbolThrowsException() throws Exception {
         geneProduct.symbol = null;
 
-        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, COLUMN_SYMBOL.getName()));
+        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_SYMBOL.getName())));
         validator.validate(geneProduct);
     }
 
@@ -138,7 +141,7 @@ public class GeneProductValidatorTest {
     public void emptySymbolThrowsException() throws Exception {
         geneProduct.symbol = "";
 
-        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, COLUMN_SYMBOL.getName()));
+        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_SYMBOL.getName())));
         validator.validate(geneProduct);
     }
 
@@ -153,7 +156,7 @@ public class GeneProductValidatorTest {
     public void nullTypeThrowsException() throws Exception {
         geneProduct.type = null;
 
-        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, COLUMN_TYPE.getName()));
+        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_TYPE.getName())));
         validator.validate(geneProduct);
     }
 
@@ -161,7 +164,7 @@ public class GeneProductValidatorTest {
     public void emptyTypeThrowsException() throws Exception {
         geneProduct.type = "";
 
-        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, COLUMN_TYPE.getName()));
+        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_TYPE.getName())));
         validator.validate(geneProduct);
     }
 
@@ -172,7 +175,7 @@ public class GeneProductValidatorTest {
         String errorMsg = "Error in field: " + COLUMN_TYPE.getName() + " - [No type maps to provided name: " +
                 geneProduct.type + "]";
 
-        assertExceptionThrown(ValidationException.class, errorMsg);
+        assertExceptionThrown(createValidationException(errorMsg));
         validator.validate(geneProduct);
     }
 
@@ -210,7 +213,7 @@ public class GeneProductValidatorTest {
 
         String errorMsg = "Found more than one id in field: " + COLUMN_PARENT_ID.getName();
 
-        assertExceptionThrown(ValidationException.class, errorMsg);
+        assertExceptionThrown(createValidationException(errorMsg));
         validator.validate(geneProduct);
     }
 
@@ -218,7 +221,7 @@ public class GeneProductValidatorTest {
     public void nullTaxonIdThrowsException() throws Exception {
         geneProduct.taxonId = null;
 
-        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, COLUMN_TAXON_ID.getName()));
+        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_TAXON_ID.getName())));
         validator.validate(geneProduct);
     }
 
@@ -226,7 +229,7 @@ public class GeneProductValidatorTest {
     public void emptyTaxonIdThrowsException() throws Exception {
         geneProduct.taxonId = "";
 
-        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, COLUMN_TAXON_ID.getName()));
+        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_TAXON_ID.getName())));
         validator.validate(geneProduct);
     }
 
@@ -241,8 +244,8 @@ public class GeneProductValidatorTest {
     public void negativeTaxonIdThrowsException() throws Exception {
         geneProduct.taxonId = createUnconvertedTaxonId(-9606);
 
-        assertExceptionThrown(ValidationException.class, "Taxon id column does not conform to regex: "
-                + createUnconvertedTaxonId(-9606));
+        assertExceptionThrown(createValidationException("Taxon id column does not conform to regex: "
+                + createUnconvertedTaxonId(-9606)));
 
         validator.validate(geneProduct);
     }
@@ -251,7 +254,7 @@ public class GeneProductValidatorTest {
     public void nullTaxonNameThrowsException() throws Exception {
         geneProduct.properties = null;
 
-        assertExceptionThrown(ValidationException.class, String.format(NULL_FIELD_MESSAGE, TAXON_NAME_KEY));
+        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, TAXON_NAME_KEY)));
         validator.validate(geneProduct);
     }
 
@@ -259,7 +262,7 @@ public class GeneProductValidatorTest {
     public void emptyTaxonNameThrowsException() throws Exception {
         geneProduct.properties = concatProperty(TAXON_NAME_KEY, "");
 
-        assertExceptionThrown(ValidationException.class, String.format(EMPTY_FIELD_MESSAGE, TAXON_NAME_KEY));
+        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, TAXON_NAME_KEY)));
         validator.validate(geneProduct);
     }
 
@@ -281,7 +284,7 @@ public class GeneProductValidatorTest {
 
         geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
 
-        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, IS_ISOFORM_KEY));
+        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, IS_ISOFORM_KEY)));
         validator.validate(geneProduct);
     }
 
@@ -291,7 +294,7 @@ public class GeneProductValidatorTest {
 
         geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
 
-        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, IS_ISOFORM_KEY));
+        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, IS_ISOFORM_KEY)));
         validator.validate(geneProduct);
     }
 
@@ -316,7 +319,7 @@ public class GeneProductValidatorTest {
 
         geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
 
-        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, IS_ANNOTATED_KEY));
+        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, IS_ANNOTATED_KEY)));
         validator.validate(geneProduct);
     }
 
@@ -326,7 +329,7 @@ public class GeneProductValidatorTest {
 
         geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
 
-        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, IS_ANNOTATED_KEY));
+        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, IS_ANNOTATED_KEY)));
         validator.validate(geneProduct);
     }
 
@@ -351,7 +354,7 @@ public class GeneProductValidatorTest {
 
         geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
 
-        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, COMPLETE_PROTEOME_KEY));
+        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, COMPLETE_PROTEOME_KEY)));
         validator.validate(geneProduct);
     }
 
@@ -361,7 +364,7 @@ public class GeneProductValidatorTest {
 
         geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
 
-        assertExceptionThrown(ValidationException.class, String.format(INVALID_FIELD_MESSAGE, COMPLETE_PROTEOME_KEY));
+        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, COMPLETE_PROTEOME_KEY)));
         validator.validate(geneProduct);
     }
 
@@ -389,10 +392,8 @@ public class GeneProductValidatorTest {
         validator.validate(geneProduct);
     }
 
-
-    private void assertExceptionThrown(Class<? extends Exception> exceptionClass, String message) {
-        thrown.expect(exceptionClass);
-        thrown.expectMessage(message);
+    private void assertExceptionThrown(Exception exception) {
+        thrown.expectCause(new ExceptionMatcher(exception.getClass(), exception.getMessage()));
     }
 
     private void assertYValue(String field) {
@@ -421,5 +422,9 @@ public class GeneProductValidatorTest {
         allValues.addAll(valuesToAppend);
 
         return concatStrings(allValues, INTER_VALUE_DELIMITER);
+    }
+
+    private ValidationException createValidationException(String message) {
+        return new ValidationException(message);
     }
 }
