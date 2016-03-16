@@ -25,8 +25,9 @@ public class LogStepListener implements StepExecutionListener {
         LOGGER.info("Exit status   : {}", stepExecution.getExitStatus().getExitCode());
         LOGGER.info("Read count    : {}", stepExecution.getReadCount());
         LOGGER.info("Write count   : {}", stepExecution.getWriteCount());
-        LOGGER.info("Skip count    : {} ({} read / {} write)", stepExecution.getSkipCount(), stepExecution
-                .getReadSkipCount(), stepExecution.getWriteSkipCount());
+        LOGGER.info("Skip count    : {} ({} read / {} processing /{} write)", stepExecution.getSkipCount(),
+                stepExecution.getReadSkipCount(), stepExecution.getProcessSkipCount(),
+                stepExecution.getWriteSkipCount());
         LOGGER.info("=====================================================");
         return stepExecution.getExitStatus();
     }
