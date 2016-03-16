@@ -21,8 +21,8 @@ public class StringToGeneProductMapper implements FieldSetMapper<GeneProduct> {
         }
 
         if (fieldSet.getFieldCount() < numColumns()) {
-            throw new IncorrectTokenCountException("Incorrect number of columns", numColumns(), fieldSet
-                    .getFieldCount());
+            throw new IncorrectTokenCountException("Incorrect number of columns, expected: " + numColumns() + "; " +
+                    "found: " + fieldSet.getFieldCount(), numColumns(), fieldSet.getFieldCount());
         }
 
         GeneProduct geneProduct = new GeneProduct();
