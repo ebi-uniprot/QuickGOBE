@@ -35,23 +35,29 @@ public class GeneProductValidator implements Validator<GeneProduct> {
             throw new DocumentReaderException("Gene product can not be null");
         }
 
-        checkIsNullOrEmpty(geneProduct.database, COLUMN_DB.getName());
-        checkIsNullOrEmpty(geneProduct.id, COLUMN_ID.getName());
-        checkIsNullOrEmpty(geneProduct.symbol, COLUMN_SYMBOL.getName());
+        try {
+            checkIsNullOrEmpty(geneProduct.database, COLUMN_DB.getName());
+            checkIsNullOrEmpty(geneProduct.id, COLUMN_ID.getName());
+            checkIsNullOrEmpty(geneProduct.symbol, COLUMN_SYMBOL.getName());
 
-        checkTaxonId(geneProduct.taxonId);
-        checkType(geneProduct.type, COLUMN_TYPE.getName());
+            checkTaxonId(geneProduct.taxonId);
+            checkType(geneProduct.type, COLUMN_TYPE.getName());
 
-        checkHasAtMostOneParentId(geneProduct.parentId);
+            checkHasAtMostOneParentId(geneProduct.parentId);
 
-        Map<String, String> properties =
-                convertToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
+            Map<String, String> properties =
+                    convertToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
 
-        checkIsNullOrEmpty(properties.get(TAXON_NAME_KEY), TAXON_NAME_KEY);
+            checkIsNullOrEmpty(properties.get(TAXON_NAME_KEY), TAXON_NAME_KEY);
 
-        checkBooleanValue(properties.get(COMPLETE_PROTEOME_KEY), COMPLETE_PROTEOME_KEY);
-        checkBooleanValue(properties.get(IS_ANNOTATED_KEY), IS_ANNOTATED_KEY);
-        checkBooleanValue(properties.get(IS_ISOFORM_KEY), IS_ISOFORM_KEY);
+            checkBooleanValue(properties.get(COMPLETE_PROTEOME_KEY), COMPLETE_PROTEOME_KEY);
+            checkBooleanValue(properties.get(IS_ANNOTATED_KEY), IS_ANNOTATED_KEY);
+            checkBooleanValue(properties.get(IS_ISOFORM_KEY), IS_ISOFORM_KEY);
+        } catch (ValidationException e) {
+            throw new ValidationException("Error occurred in database: " + geneProduct.database + ", for entry: " +
+                    geneProduct.id, e);
+        }
+
     }
 
     /**
