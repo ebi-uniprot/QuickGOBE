@@ -7,7 +7,6 @@ import uk.ac.ebi.quickgo.ff.loader.ontology.GOLoader;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.ontology.converter.GOTermToODocConverter;
 import uk.ac.ebi.quickgo.index.ontology.converter.GenericTermToODocConverter;
-import uk.ac.ebi.quickgo.index.IndexingJobConfig;
 import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
@@ -27,7 +26,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * This provides standard reading of an ontology core source file, which can be
- * hooked into a Spring Batch step, see {@link IndexingJobConfig}.
+ * hooked into a Spring Batch step, see {@link OntologyConfig}.
  *
  * Created 03/12/15
  * @author Edd

@@ -1,16 +1,13 @@
-package uk.ac.ebi.quickgo.index;
+package uk.ac.ebi.quickgo.index.ontology;
 
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
-import uk.ac.ebi.quickgo.index.ontology.OntologyReader;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -32,9 +29,7 @@ import java.io.File;
 @Configuration
 @EnableBatchProcessing
 @Import({RepoConfig.class})
-public class IndexingJobConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(IndexingJobConfig.class);
-
+public class OntologyConfig {
     @Autowired
     private JobBuilderFactory jobBuilders;
 
@@ -54,31 +49,36 @@ public class IndexingJobConfig {
     private String sourceFile;
 
     @Bean
-    public Job job() {
+    public Job ontologyJob(Step ontologyStep) {
         return jobBuilders.get("indexingJob")
-                .start(step())
+                .start(ontologyStep)
                 .listener(logJobListener())
                 .build();
     }
 
     @Bean
-    public Step step() {
+    public Step ontologyStep(OntologyReader reader) {
         return stepBuilders
                 .get("readThenWriteToRepoStep")
                 // read and process items in chunks of the following size
                 .<OntologyDocument, OntologyDocument>chunk(chunkSize)
-                .reader(reader())
+                .reader(reader)
                 .faultTolerant()
                 .skip(DocumentReaderException.class)
                 .skipLimit(skipLimit)
-                .writer(writer())
+                .writer(ontologyWriter())
                 .listener(logStepListener())
                 .build();
     }
 
     @Bean
-    public ItemWriter<OntologyDocument> writer() {
+    public ItemWriter<OntologyDocument> ontologyWriter() {
         return new SolrCrudRepoWriter<>(ontologyRepository);
+    }
+
+    @Bean
+    public OntologyReader ontologyReader() {
+        return new OntologyReader(new File(sourceFile));
     }
 
     @Bean
@@ -89,10 +89,5 @@ public class IndexingJobConfig {
     @Bean
     public LogStepListener logStepListener() {
         return new LogStepListener();
-    }
-
-    @Bean
-    public OntologyReader reader() {
-        return new OntologyReader(new File(sourceFile));
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
 import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.index.IndexingJobConfig;
+import uk.ac.ebi.quickgo.index.ontology.OntologyConfig;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
  * the configured repository. The size of this list is specified
  * during job configuration.
  *
- * See also, {@link IndexingJobConfig}
+ * See also, {@link OntologyConfig}
  *
  * Created 02/12/15
  * @author Edd

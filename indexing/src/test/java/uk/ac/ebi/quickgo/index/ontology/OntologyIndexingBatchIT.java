@@ -1,8 +1,9 @@
-package uk.ac.ebi.quickgo.index;
+package uk.ac.ebi.quickgo.index.ontology;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.index.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.index.QuickGOIndexMain;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
-import uk.ac.ebi.quickgo.index.ontology.OntologyReader;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 
 import org.hamcrest.core.Is;
@@ -39,13 +40,13 @@ import static org.mockito.Mockito.when;
  * Created 18/12/15
  * @author Edd
  */
-@ActiveProfiles(profiles = {"QuickGOIndexOntologyMainIT", "embeddedServer"})
+@ActiveProfiles(profiles = {"OntologyIndexingBatchIT", "embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {IndexingJobConfig.class, JobTestRunnerConfig.class, QuickGOIndexOntologyMainITConfig.class},
+        classes = {JobTestRunnerConfig.class, OntologyIndexingConfig.class, OntologyConfig.class},
         loader = SpringApplicationContextLoader.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class QuickGOIndexOntologyMainIT {
+public class OntologyIndexingBatchIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 

@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.index;
-
-import uk.ac.ebi.quickgo.index.ontology.OntologyReader;
+package uk.ac.ebi.quickgo.index.ontology;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +13,7 @@ import static org.mockito.Mockito.mock;
  */
 @Profile("QuickGOIndexOntologyMainIT")
 @Configuration
-public class QuickGOIndexOntologyMainITConfig {
+public class OntologyIndexingConfig {
     @Bean
     @Primary
     public OntologyReader reader() {
