@@ -16,7 +16,8 @@ import static org.mockito.Mockito.mock;
 public class OntologyIndexingConfig {
     @Bean
     @Primary
-    public OntologyReader reader() {
+    @Profile("QuickGOIndexOntologyMainIT")
+    public OntologyReader ontologyReader() {
         return mock(OntologyReader.class);
     }
 }
