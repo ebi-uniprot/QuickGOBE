@@ -30,7 +30,7 @@ public class LogJobListener implements JobExecutionListener {
         long durationMillis = jobExecution.getEndTime().getTime() - jobExecution.getStartTime().getTime();
         String duration = String.format("%d hrs, %d min, %d sec",
                 TimeUnit.MILLISECONDS.toHours(durationMillis),
-                TimeUnit.MILLISECONDS.toMinutes(durationMillis) - TimeUnit.HOURS.toSeconds(TimeUnit.MILLISECONDS
+                TimeUnit.MILLISECONDS.toMinutes(durationMillis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
                         .toHours(durationMillis)),
                 TimeUnit.MILLISECONDS.toSeconds(durationMillis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
                         .toMinutes(durationMillis))
