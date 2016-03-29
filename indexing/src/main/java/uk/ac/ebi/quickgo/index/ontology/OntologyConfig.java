@@ -30,6 +30,9 @@ import java.io.File;
 @EnableBatchProcessing
 @Import({RepoConfig.class})
 public class OntologyConfig {
+    static final String ONTOLOGY_INDEXING_JOB_NAME = "ontologyIndexingJob";
+    static final String ONTOLOGY_INDEXING_STEP_NAME = "ontologyIndexStep";
+
     @Autowired
     private JobBuilderFactory jobBuilders;
 
@@ -50,19 +53,19 @@ public class OntologyConfig {
 
     @Bean
     public Job ontologyJob(Step ontologyStep) {
-        return jobBuilders.get("indexingJob")
+        return jobBuilders.get(ONTOLOGY_INDEXING_JOB_NAME)
                 .start(ontologyStep)
                 .listener(logJobListener())
                 .build();
     }
 
     @Bean
-    public Step ontologyStep(OntologyReader reader) {
+    public Step ontologyStep() {
         return stepBuilders
-                .get("readThenWriteToRepoStep")
+                .get(ONTOLOGY_INDEXING_STEP_NAME)
                 // read and process items in chunks of the following size
                 .<OntologyDocument, OntologyDocument>chunk(chunkSize)
-                .reader(reader)
+                .reader(ontologyReader())
                 .faultTolerant()
                 .skip(DocumentReaderException.class)
                 .skipLimit(skipLimit)
@@ -72,22 +75,20 @@ public class OntologyConfig {
     }
 
     @Bean
-    public ItemWriter<OntologyDocument> ontologyWriter() {
+    ItemWriter<OntologyDocument> ontologyWriter() {
         return new SolrCrudRepoWriter<>(ontologyRepository);
     }
 
     @Bean
-    public OntologyReader ontologyReader() {
+    OntologyReader ontologyReader() {
         return new OntologyReader(new File(sourceFile));
     }
 
-    @Bean
-    public LogJobListener logJobListener() {
+    private LogJobListener logJobListener() {
         return new LogJobListener();
     }
 
-    @Bean
-    public LogStepListener logStepListener() {
+    private LogStepListener logStepListener() {
         return new LogStepListener();
     }
 }
