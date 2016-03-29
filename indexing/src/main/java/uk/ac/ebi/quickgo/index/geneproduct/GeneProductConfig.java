@@ -44,6 +44,7 @@ import org.springframework.core.io.Resource;
 @EnableBatchProcessing
 @Import({RepoConfig.class})
 public class GeneProductConfig {
+    static final String GENE_PRODUCT_INDEXING_JOB_NAME = "geneProductIndexingJob";
     static final String GENE_PRODUCT_INDEXING_STEP_NAME = "geneProductIndexStep";
 
     private static final String COLUMN_DELIMITER = "\t";
@@ -73,7 +74,7 @@ public class GeneProductConfig {
 
     @Bean
     public Job geneProductJob() {
-        return jobBuilders.get("geneProductIndexingJob")
+        return jobBuilders.get(GENE_PRODUCT_INDEXING_JOB_NAME)
                 .start(geneProductIndexingStep())
                 .listener(logJobListener())
                 .build();
