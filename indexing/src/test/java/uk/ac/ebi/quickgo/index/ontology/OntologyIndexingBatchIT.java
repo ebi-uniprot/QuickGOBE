@@ -28,6 +28,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.index.ontology.OntologyConfig.ONTOLOGY_INDEXING_STEP_NAME;
 
 /**
  * Test specific behaviour of the job executed by {@link QuickGOIndexMain}.
@@ -40,10 +41,10 @@ import static org.mockito.Mockito.when;
  * Created 18/12/15
  * @author Edd
  */
-@ActiveProfiles(profiles = {"OntologyIndexingBatchIT", "embeddedServer"})
+@ActiveProfiles(profiles = {"QuickGOIndexOntologyMainIT", "embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {JobTestRunnerConfig.class, OntologyIndexingConfig.class, OntologyConfig.class},
+        classes = {JobTestRunnerConfig.class, OntologyConfig.class, OntologyIndexingConfig.class},
         loader = SpringApplicationContextLoader.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class OntologyIndexingBatchIT {
@@ -63,7 +64,7 @@ public class OntologyIndexingBatchIT {
     public void documentReaderExceptionThrownWhenReaderIsOpenedCausesStepFailure() {
         Mockito.doThrow(new DocumentReaderException("Error!")).when(reader).open(any(ExecutionContext.class));
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
     }
 
@@ -79,7 +80,7 @@ public class OntologyIndexingBatchIT {
                 .thenReturn(OntologyDocMocker.createECODoc("eco3", "eco3-name"))
                 .thenReturn(null);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
@@ -98,7 +99,7 @@ public class OntologyIndexingBatchIT {
                 .thenReturn(OntologyDocMocker.createECODoc("eco1", "eco1-name"))
                 .thenReturn(null);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
@@ -123,7 +124,7 @@ public class OntologyIndexingBatchIT {
                 .thenReturn(OntologyDocMocker.createECODoc("eco3", "eco3-name"))
                 .thenReturn(null);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
@@ -162,7 +163,7 @@ public class OntologyIndexingBatchIT {
                 // null indicates reading is done
                 .thenReturn(null);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
