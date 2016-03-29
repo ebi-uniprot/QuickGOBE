@@ -44,7 +44,7 @@ import org.springframework.core.io.Resource;
 @EnableBatchProcessing
 @Import({RepoConfig.class})
 public class GeneProductConfig {
-    static final String GENE_PRODUCT_INDEXING_STEP_NAME = "geneProductIndex";
+    static final String GENE_PRODUCT_INDEXING_STEP_NAME = "geneProductIndexStep";
 
     private static final String COLUMN_DELIMITER = "\t";
     private static final String INTER_VALUE_DELIMITER = "\\|";
@@ -73,75 +73,86 @@ public class GeneProductConfig {
 
     @Bean
     public Job geneProductJob() {
-        return jobBuilders.get("geneProductJob")
-                .start(readGeneProductData())
+        return jobBuilders.get("geneProductIndexingJob")
+                .start(geneProductIndexingStep())
                 .listener(logJobListener())
                 .build();
     }
 
-    private Step readGeneProductData() {
+    @Bean
+    public Step geneProductIndexingStep() {
         return stepBuilders.get(GENE_PRODUCT_INDEXING_STEP_NAME)
                 .<GeneProduct, GeneProductDocument>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(skipLimit)
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
-                .<GeneProduct>reader(multiFileReader())
-                .processor(compositeProcessor(gpValidator(), docConverter()))
+                .<GeneProduct>reader(geneProductMultiFileReader())
+                .processor(geneProductCompositeProcessor(geneProductValidator(), geneProductDocConverter()))
                 .writer(geneProductRepositoryWriter())
                 .listener(logStepListener())
                 .listener(skipLogListener())
                 .build();
     }
 
-    private MultiResourceItemReader<GeneProduct> multiFileReader() {
+    @Bean
+    MultiResourceItemReader<GeneProduct> geneProductMultiFileReader() {
         MultiResourceItemReader<GeneProduct> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
-        reader.setDelegate(singleFileReader());
+        reader.setDelegate(geneProductSingleFileReader());
         return reader;
     }
 
-    private FlatFileItemReader<GeneProduct> singleFileReader() {
+    @Bean
+    FlatFileItemReader<GeneProduct> geneProductSingleFileReader() {
         FlatFileItemReader<GeneProduct> reader = new FlatFileItemReader<>();
-        reader.setLineMapper(lineMapper());
+        reader.setLineMapper(geneProductLineMapper());
         reader.setLinesToSkip(headerLines);
         return reader;
     }
 
-    private LineMapper<GeneProduct> lineMapper() {
+    @Bean
+    LineMapper<GeneProduct> geneProductLineMapper() {
         DefaultLineMapper<GeneProduct> lineMapper = new DefaultLineMapper<>();
-        lineMapper.setLineTokenizer(lineTokenizer());
-        lineMapper.setFieldSetMapper(fieldSetMapper());
+        lineMapper.setLineTokenizer(geneProductLineTokenizer());
+        lineMapper.setFieldSetMapper(geneProductFieldSetMapper());
 
         return lineMapper;
     }
 
-    private LineTokenizer lineTokenizer() {
+    @Bean
+    LineTokenizer geneProductLineTokenizer() {
         return new DelimitedLineTokenizer(COLUMN_DELIMITER);
     }
 
-    private FieldSetMapper<GeneProduct> fieldSetMapper() {
+    @Bean
+    FieldSetMapper<GeneProduct> geneProductFieldSetMapper() {
         return new StringToGeneProductMapper();
     }
 
-    private ItemProcessor<GeneProduct, GeneProductDocument> docConverter() {
+    @Bean
+    ItemProcessor<GeneProduct, GeneProductDocument> geneProductDocConverter() {
         return new GeneProductDocumentConverter(INTER_VALUE_DELIMITER, INTRA_VALUE_DELIMITER);
     }
 
-    private ItemProcessor<GeneProduct, GeneProduct> gpValidator() {
+    @Bean
+    ItemProcessor<GeneProduct, GeneProduct> geneProductValidator() {
         Validator<GeneProduct> geneProductValidator =
                 new GeneProductValidator(INTER_VALUE_DELIMITER, INTRA_VALUE_DELIMITER);
         return new ValidatingItemProcessor<>(geneProductValidator);
     }
 
-    private ItemProcessor<GeneProduct, GeneProductDocument> compositeProcessor(ItemProcessor<GeneProduct, ?>... processors) {
+    @Bean
+    ItemProcessor<GeneProduct, GeneProductDocument> geneProductCompositeProcessor(ItemProcessor<GeneProduct, ?>...
+            processors) {
         CompositeItemProcessor<GeneProduct, GeneProductDocument> compositeProcessor = new CompositeItemProcessor<>();
         compositeProcessor.setDelegates(Arrays.asList(processors));
 
         return compositeProcessor;
     }
 
-    private ItemWriter<GeneProductDocument> geneProductRepositoryWriter() {
+    @Bean
+    ItemWriter<GeneProductDocument> geneProductRepositoryWriter() {
         return new SolrCrudRepoWriter<>(repository);
     }
 
