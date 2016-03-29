@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.geneproduct.common;
 
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
@@ -16,4 +17,6 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
 public interface GeneProductRepository extends SolrCrudRepository<GeneProductDocument, String> {
 
     Optional<GeneProductDocument> findById(String id);
+
+    List<GeneProductDocument> findCoreAttrByGeneProductId(List<String> ids);
 }
