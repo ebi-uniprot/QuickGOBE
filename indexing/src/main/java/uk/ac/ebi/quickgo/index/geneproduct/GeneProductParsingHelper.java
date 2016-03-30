@@ -62,8 +62,7 @@ final class GeneProductParsingHelper {
 
         String[] splitValues;
 
-        if (value != null) {
-
+        if (value != null && value.trim().length() > 0) {
             splitValues = value.split(delimiter);
         } else {
             splitValues = new String[0];
