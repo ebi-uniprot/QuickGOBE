@@ -85,14 +85,6 @@ final class GeneProductParsingHelper {
     }
 
     private static Optional<Matcher> taxonIdMatcher(String value) {
-        Optional<Matcher> matcherOpt;
-
-        if (value != null) {
-            matcherOpt = Optional.of(TAXON_ID_PATTERN.matcher(value));
-        } else {
-            matcherOpt = Optional.empty();
-        }
-
-        return matcherOpt;
+        return Optional.ofNullable(value).map(TAXON_ID_PATTERN::matcher);
     }
 }
