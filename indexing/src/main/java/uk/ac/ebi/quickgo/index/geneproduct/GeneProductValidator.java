@@ -93,7 +93,7 @@ public class GeneProductValidator implements Validator<GeneProduct> {
 
     private void checkHasAtMostOneParentId(String parentId) {
         if (parentId != null) {
-            String[] parentIds = parentId.split(interValueDelimiter);
+            String[] parentIds = splitValue(parentId, interValueDelimiter);
 
             checkAttribute(parentIds.length > 1,
                     "Found more than one id in field: " + COLUMN_PARENT_ID.getName());
