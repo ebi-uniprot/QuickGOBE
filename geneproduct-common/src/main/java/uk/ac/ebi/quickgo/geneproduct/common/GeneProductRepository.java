@@ -18,5 +18,5 @@ public interface GeneProductRepository extends SolrCrudRepository<GeneProductDoc
 
     Optional<GeneProductDocument> findById(String id);
 
-    List<GeneProductDocument> findCoreAttrByGeneProductId(List<String> ids);
+    List<GeneProductDocument> findById(List<String> ids);
 }
