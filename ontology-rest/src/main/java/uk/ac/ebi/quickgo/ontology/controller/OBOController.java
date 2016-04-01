@@ -5,13 +5,19 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.search.*;
+import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
+import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 /**
  * Abstract controller defining common end-points of an OBO related
  * REST API.
@@ -30,13 +38,13 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author Edd
  */
 public abstract class OBOController<T extends OBOTerm> {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    static final int MAX_PAGE_RESULTS = 100;
+    private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
+    private static final String COMMA = ",";
     private static final String COLON = ":";
-
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
-
+    private static final String TERMS = "terms";
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
@@ -61,151 +69,136 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return a 400 response
      */
     @RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> emptyId() {
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
+        throw new IllegalArgumentException("The requested end-point does not exist.");
     }
 
     /**
-     * Get core information about a term based on its id
+     * Get core information about a list of terms in comma-separated-value (CSV) format
      *
-     * @param id ontology identifier
+     * @param ids ontology identifiers in CSV format
+     * @return
+     * <ul>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
+     * </ul>
+     */
+    @RequestMapping(value = TERMS + "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
+        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(validateIds(ids)));
+    }
+
+    /**
+     * Get complete information about a list of terms in comma-separated-value (CSV) format
      *
+     * @param ids ontology identifiers in CSV format
      * @return
      * <ul>
-     * <li>id is found: response consists of a 200 with the core information of the ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findCoreTerm(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(ontologyService.findCoreInfoByOntologyId(id));
-    }
-
-    public abstract boolean isValidId(String id);
-
-    private ResponseEntity<T> getTermResponse(Optional<T> optionalECODoc) {
-        return optionalECODoc.map(ontology -> new ResponseEntity<>(ontology, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    @RequestMapping(value = TERMS + "/{ids}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
+        return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(validateIds(ids)));
     }
 
     /**
-     * Get complete information about a term based on its id
-     * @param id ontology identifier
-     * @return
-     * <ul>
-     * <li>id is found: response consists of a 200 with all of the information the ontology term has</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
-     * </ul>
-     */
-    @RequestMapping(value = "/{id}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findCompleteTerm(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(ontologyService.findCompleteInfoByOntologyId(id));
-    }
-
-    /**
-     * Get history information about a term based on its id
+     * Get history information about a list of terms in comma-separated-value (CSV) format
      *
-     * @param id ontology identifier
+     * @param ids ontology identifiers in CSV format
      * @return
      * <ul>
-     * <li>id is found: response consists of a 200 with the history of the ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermHistory(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(ontologyService.findHistoryInfoByOntologyId(id));
+    @RequestMapping(value = TERMS + "/{ids}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
+        return getTermsResponse(ontologyService.findHistoryInfoByOntologyId(validateIds(ids)));
     }
 
     /**
-     * Get cross-reference information about a term based on its id
-     * @param id ontology identifier
+     * Get cross-reference information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
      * @return
      * <ul>
-     * <li>id is found: response consists of a 200 with the cross-references of the ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermXRefs(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(ontologyService.findXRefsInfoByOntologyId(id));
+    @RequestMapping(value = TERMS + "/{ids}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
+        return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(validateIds(ids)));
     }
 
     /**
-     * Get taxonomy constraint and blacklist information about a term based on its id
-     * @param id ontology identifier
+     * Get taxonomy constraint information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
      * @return
      * <ul>
-     * <li>id is found: response consists of a 200 with the constraint and blacklist of an ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermTaxonConstraints(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(id));
+    @RequestMapping(value = TERMS + "/{ids}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
+        return getTermsResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(validateIds(ids)));
     }
 
     /**
-     * Get cross-ontology relationship information about a term based on its id
-     * @param id ontology identifier
+     * Get cross-ontology relationship information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
      * @return
      * <ul>
-     * <li>id is found: response consists of a 200 with cross-ontology relations of the ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermXOntologyRelations(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(ontologyService.findXORelationsInfoByOntologyId(id));
+    @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
+        return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(validateIds(ids)));
     }
 
     /**
-     * Get annotation guideline information about a term based on its id
-     * @param id ontology identifier
+     * Get annotation guideline information about a list of terms in comma-separated-value (CSV) format
+     *
+     * @param ids ontology identifiers in CSV format
      * @return
      * <ul>
-     * <li>id is found: response consists of a 200 with annotation guidelines of the ontology term</li>
-     * <li>id is not found: response returns 404</li>
-     * <li>id is not in correct format: response returns 400</li>
+     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{id}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<T> findTermAnnotationGuideLines(@PathVariable(value = "id") String id) {
-        checkValidId(id);
-
-        return getTermResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(id));
+    @RequestMapping(value = TERMS + "/{ids}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
+        return getTermsResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(validateIds(ids)));
     }
 
     /**
-     * Method is invoked when a client wants to search for an ontology term via its identifier, or a generic query
-     * search
+     * Search for an ontology term via its identifier, or a generic query search
      *
      * @param query the query to search against
      * @param limit the amount of queries to return
+     * @return a {@link QueryResult} instance containing the results of the search
      */
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(
             @RequestParam(value = "query") String query,
             @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
+
+        validateRequestedResults(limit);
 
         QueryRequest request = buildRequest(
                 query,
@@ -214,6 +207,96 @@ public abstract class OBOController<T extends OBOTerm> {
                 ontologyQueryConverter);
 
         return SearchDispatcher.search(request, ontologySearchService);
+    }
+
+    /**
+     * Checks whether an ID has a valid format.
+     * @param id the ID
+     * @return boolean indicating whether or not the specified ID is valid
+     */
+    protected abstract boolean isValidId(String id);
+
+    /**
+     * Returns the {@link OntologyType} that corresponds to this controller.
+     *
+     * @return the ontology type corresponding to this controller's behaviour.
+     */
+    protected abstract OntologyType getOntologyType();
+
+    /**
+     * Checks the validity of a list of IDs in CSV format.
+     * @param ids a list of IDs in CSV format
+     * @throws IllegalArgumentException is thrown if an ID is not valid, or if
+     * number of IDs listed is greater than {@link #MAX_PAGE_RESULTS}.
+     */
+    protected List<String> validateIds(String ids) {
+        List<String> idList = csvToList(ids);
+
+        validateRequestedResults(idList.size());
+
+        idList.stream()
+                .forEach(this::checkValidId);
+
+        return idList;
+    }
+
+    /**
+     * Checks whether the requested number of results is valid.
+     * @param requestedResultsSize the number of results being requested
+     * @throws IllegalArgumentException if the number is greater than {@link #MAX_PAGE_RESULTS}
+     */
+    protected void validateRequestedResults(int requestedResultsSize) {
+        if (requestedResultsSize > MAX_PAGE_RESULTS) {
+            String errorMessage = "Cannot retrieve more than " + MAX_PAGE_RESULTS + " results in one request. " +
+                    "Please consider using end-points that return paged results.";
+            LOGGER.error(errorMessage);
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
+
+    /**
+     * Checks the validity of a term id.
+     *
+     * @param id the term id to check
+     * @throws IllegalArgumentException is thrown if the ID is not valid
+     */
+    protected void checkValidId(String id) {
+        if (!isValidId(id)) {
+            throw new IllegalArgumentException("Provided ID: '" + id + "' is invalid");
+        }
+    }
+
+    /**
+     * Creates a list of items from a scalar representation of a list, in CSV format. If the
+     * parameter is null, an empty list is returned.
+     *
+     * @param csv a CSV list of items
+     * @return a list of values originally comprising the CSV input String
+     */
+    protected List<String> csvToList(String csv) {
+        if (!isNullOrEmpty(csv)) {
+            return Arrays.asList(csv.split(COMMA));
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.
+     *
+     * @param docList a list of results
+     * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents
+     */
+    protected ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
+        List<T> resultsToShow;
+        if (docList == null) {
+            resultsToShow = Collections.emptyList();
+        } else {
+            resultsToShow = docList;
+        }
+
+        QueryResult<T> queryResult = new QueryResult<>(resultsToShow.size(), resultsToShow, null, null, null);
+        return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 
     private QueryRequest buildRequest(String query,
@@ -248,24 +331,5 @@ public abstract class OBOController<T extends OBOTerm> {
         return query.and(
                 ontologyQueryConverter.convert(
                         OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + getOntologyType().name()));
-    }
-
-    /**
-     * Returns the {@link OntologyType} that corresponds to this controller.
-     *
-     * @return the ontology type corresponding to this controller's behaviour.
-     */
-    protected abstract OntologyType getOntologyType();
-
-    /**
-     * Checks the validity of a term id.
-     *
-     * @param id the term id to check
-     * @throws IllegalArgumentException is thrown if the id is not valid
-     */
-    private void checkValidId(String id) {
-        if (!isValidId(id)) {
-            throw new IllegalArgumentException("Provided id: " + id + " is invalid");
-        }
     }
 }

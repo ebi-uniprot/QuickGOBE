@@ -8,6 +8,8 @@ import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
+import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,7 +30,11 @@ import org.springframework.context.annotation.Import;
 public class ServiceConfig {
     @Bean
     public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository) {
-        return new OntologyServiceImpl<>(ontologyRepository, goDocumentConverter(), OntologyType.GO);
+        return new OntologyServiceImpl<>(
+                ontologyRepository,
+                goDocumentConverter(),
+                OntologyType.GO,
+                queryStringSanitizer());
     }
 
     private GODocConverter goDocumentConverter() {
@@ -37,10 +43,18 @@ public class ServiceConfig {
 
     @Bean
     public OntologyService<ECOTerm> ecoOntologyService(OntologyRepository ontologyRepository) {
-        return new OntologyServiceImpl<>(ontologyRepository, ecoDocConverter(), OntologyType.ECO);
+        return new OntologyServiceImpl<>(
+                ontologyRepository,
+                ecoDocConverter(),
+                OntologyType.ECO,
+                queryStringSanitizer());
     }
 
     private ECODocConverter ecoDocConverter() {
         return new ECODocConverter();
+    }
+
+    private QueryStringSanitizer queryStringSanitizer() {
+        return new SolrQueryStringSanitizer();
     }
 }

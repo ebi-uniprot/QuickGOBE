@@ -1,11 +1,12 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
+import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
+
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.util.ClientUtils;
 
 /**
  * Converts a {@link QueryRequest} into a {@link SolrQuery} object.
@@ -16,15 +17,18 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
     private static final int MIN_COUNT_TO_DISPLAY_FACET = 1;
 
     private final String requestHandler;
+    private final SolrQueryStringSanitizer queryStringSanitizer;
 
     public SolrQueryConverter(String requestHandler) {
         Preconditions.checkArgument(requestHandler != null && !requestHandler.trim().isEmpty(),
                 "Request handler name cannot be null or empty");
+
         this.requestHandler = requestHandler;
+        this.queryStringSanitizer = new SolrQueryStringSanitizer();
     }
 
     @Override public String visit(FieldQuery query) {
-        return "(" + query.field() + SOLR_FIELD_SEPARATOR + ClientUtils.escapeQueryChars(query.value()) + ")";
+        return "(" + query.field() + SOLR_FIELD_SEPARATOR + queryStringSanitizer.sanitize(query.value()) + ")";
     }
 
     @Override public String visit(CompositeQuery query) {
@@ -39,7 +43,7 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
     }
 
     @Override public String visit(NoFieldQuery query) {
-        return "(" + ClientUtils.escapeQueryChars(query.getValue()) + ")";
+        return "(" + queryStringSanitizer.sanitize(query.getValue()) + ")";
     }
 
     @Override public SolrQuery convert(QueryRequest request) {

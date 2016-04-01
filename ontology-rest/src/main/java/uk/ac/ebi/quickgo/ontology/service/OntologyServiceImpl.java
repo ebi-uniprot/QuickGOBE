@@ -5,13 +5,12 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
+import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -22,6 +21,7 @@ import org.springframework.data.domain.Pageable;
  * @author Edd
  */
 public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T> {
+    private QueryStringSanitizer queryStringSanitizer;
     private OntologyRepository ontologyRepository;
     private OntologyDocConverter<T> converter;
     private String ontologyType;
@@ -32,54 +32,50 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     public OntologyServiceImpl(
             OntologyRepository repository,
             OntologyDocConverter<T> converter,
-            OntologyType type) {
+            OntologyType type,
+            QueryStringSanitizer queryStringSanitizer) {
 
-        Preconditions.checkArgument(repository != null, "Ontology repository can not be null");
-        Preconditions.checkArgument(type != null, "Ontology type can not be null");
-        Preconditions.checkArgument(converter != null, "Ontology converter can not be null");
+        Preconditions.checkArgument(repository != null, "Ontology repository cannot be null");
+        Preconditions.checkArgument(type != null, "Ontology type cannot be null");
+        Preconditions.checkArgument(converter != null, "Ontology converter cannot be null");
+        Preconditions.checkArgument(queryStringSanitizer != null, "Ontology query string sanitizer cannot be null");
 
         this.ontologyType = type.name();
         this.ontologyRepository = repository;
         this.converter = converter;
+        this.queryStringSanitizer = queryStringSanitizer;
     }
 
-    @Override public Optional<T> findCompleteInfoByOntologyId(String id) {
-        return convertOptionalDoc(ontologyRepository.findCompleteByTermId(ontologyType,
-                ClientUtils.escapeQueryChars(id)));
+    @Override public List<T> findCompleteInfoByOntologyId(List<String> ids) {
+        return convertDocs(ontologyRepository.findCompleteByTermId(ontologyType, buildIdList(ids)));
     }
 
-    @Override public Optional<T> findCoreInfoByOntologyId(String id) {
-        return convertOptionalDoc(ontologyRepository.findCoreByTermId(ontologyType,
-                ClientUtils.escapeQueryChars(id)));
+    @Override public List<T> findCoreInfoByOntologyId(List<String> ids) {
+        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)));
     }
 
-    @Override public Optional<T> findHistoryInfoByOntologyId(String id) {
-        return convertOptionalDoc(ontologyRepository.findHistoryByTermId(ontologyType,
-                ClientUtils.escapeQueryChars(id)));
+    @Override public List<T> findHistoryInfoByOntologyId(List<String> ids) {
+        return convertDocs(ontologyRepository.findHistoryByTermId(ontologyType, buildIdList(ids)));
     }
 
-    @Override public Optional<T> findXRefsInfoByOntologyId(String id) {
-        return convertOptionalDoc(ontologyRepository.findXRefsByTermId(ontologyType,
-                ClientUtils.escapeQueryChars(id)));
+    @Override public List<T> findXRefsInfoByOntologyId(List<String> ids) {
+        return convertDocs(ontologyRepository.findXRefsByTermId(ontologyType, buildIdList(ids)));
     }
 
-    @Override public Optional<T> findTaxonConstraintsInfoByOntologyId(String id) {
-        return convertOptionalDoc(ontologyRepository.findTaxonConstraintsByTermId(ontologyType,
-                ClientUtils.escapeQueryChars(id)));
+    @Override public List<T> findTaxonConstraintsInfoByOntologyId(List<String> ids) {
+        return convertDocs(ontologyRepository.findTaxonConstraintsByTermId(ontologyType, buildIdList(ids)));
     }
 
-    @Override public Optional<T> findXORelationsInfoByOntologyId(String id) {
-        return convertOptionalDoc(ontologyRepository.findXOntologyRelationsByTermId(ontologyType,
-                ClientUtils.escapeQueryChars(id)));
+    @Override public List<T> findXORelationsInfoByOntologyId(List<String> ids) {
+        return convertDocs(ontologyRepository.findXOntologyRelationsByTermId(ontologyType, buildIdList(ids)));
     }
 
-    @Override public Optional<T> findAnnotationGuideLinesInfoByOntologyId(String id) {
-        return convertOptionalDoc(ontologyRepository.findAnnotationGuidelinesByTermId(ontologyType,
-                ClientUtils.escapeQueryChars(id)));
+    @Override public List<T> findAnnotationGuideLinesInfoByOntologyId(List<String> ids) {
+        return convertDocs(ontologyRepository.findAnnotationGuidelinesByTermId(ontologyType, buildIdList(ids)));
     }
 
-    protected Optional<T> convertOptionalDoc(Optional<OntologyDocument> optionalDoc) {
-        return optionalDoc.map(converter::convert);
+    protected List<T> convertDocs(List<OntologyDocument> docs) {
+        return docs.stream().map(converter::convert).collect(Collectors.toList());
     }
 
     @Override public List<T> findAll(Pageable pageable) {
@@ -88,5 +84,11 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                         .map(converter::convert)
                         .spliterator(), false)
                 .collect(Collectors.toList());
+    }
+
+    protected List<String> buildIdList(List<String> ids) {
+        Preconditions.checkArgument(ids != null, "List of IDs cannot be null");
+
+        return ids.stream().map(queryStringSanitizer::sanitize).collect(Collectors.toList());
     }
 }

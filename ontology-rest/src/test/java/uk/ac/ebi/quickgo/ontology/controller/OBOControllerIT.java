@@ -5,6 +5,10 @@ import uk.ac.ebi.quickgo.ontology.OntologyREST;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -19,8 +23,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -43,6 +51,9 @@ public abstract class OBOControllerIT {
 
     private static final String SEARCH_ENDPOINT = "search";
     private static final String QUERY_PARAM = "query";
+    protected static final String COMMA = ",";
+    private static final String TERM = "term";
+    private static final String TERMS = "terms";
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
@@ -54,7 +65,8 @@ public abstract class OBOControllerIT {
 
     private String resourceUrl;
     private String validId;
-
+    private String validIdsCSV;
+    private List<String> validIdList;
 
     @Before
     public void setup() {
@@ -65,103 +77,187 @@ public abstract class OBOControllerIT {
 
         resourceUrl = getResourceURL();
 
-        OntologyDocument basicDoc = createBasicDoc();
-        validId = basicDoc.id;
-        ontologyRepository.save(basicDoc);
+        List<OntologyDocument> basicDocs = createBasicDocs();
+        assertThat(basicDocs.size(), is(greaterThan(1)));
+
+        validId = basicDocs.get(0).id;
+        validIdsCSV = basicDocs.stream().map(doc -> doc.id).collect(Collectors.joining(","));
+        validIdList = Arrays.asList(validIdsCSV.split(COMMA));
+
+        ontologyRepository.save(basicDocs);
     }
 
     @Test
-    public void canRetrieveCoreById() throws Exception {
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId));
+    public void canRetrieveCoreAttrByOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId)));
 
-        expectCoreFields(response, validId)
-                .andExpect(jsonPath("$.history").doesNotExist())
+        expectCoreFieldsInResults(response, singletonList(validId))
+                .andExpect(jsonPath("$.results.*.id", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void canRetrieveCompleteById() throws Exception {
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId +
-                "/complete"));
+    public void canRetrieveCoreAttrByTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV)));
 
-        expectCompleteFields(response, validId)
+        expectCoreFieldsInResults(response, validIdList)
+                .andExpect(jsonPath("$.results.*.id", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void canRetrieveHistoryById() throws Exception {
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId + "/history"));
+    public void canRetrieveCompletebyOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/complete"));
 
-        expectBasicFields(response, validId)
-                .andExpect(jsonPath("$.history").isArray())
+        expectCompleteFieldsInResults(response, singletonList(validId))
+                .andExpect(jsonPath("$.results.*.history", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void canRetrieveXRefsById() throws Exception {
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId + "/xrefs"));
+    public void canRetrieveCompletebyTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/complete"));
 
-        expectBasicFields(response, validId)
-                .andExpect(jsonPath("$.xRefs").isArray())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    /**
-     * Shows taxon constraints and blacklist for term
-     *
-     * @throws Exception
-     */
-    @Test
-    public void canRetrieveTaxonConstraintsById() throws Exception {
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId + "/constraints"));
-
-        expectBasicFields(response, validId)
-                .andExpect(jsonPath("$.taxonConstraints").isArray())
+        expectCompleteFieldsInResults(response, validIdList)
+                .andExpect(jsonPath("$.results.*.history", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void canRetrieveAnnotationGuideLinesById() throws Exception {
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId + "/guidelines"));
+    public void canRetrieveHistorybyOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/history"));
 
-        expectBasicFields(response, validId)
-                .andExpect(jsonPath("$.annotationGuidelines").isArray())
+        expectBasicFieldsInResults(response, singletonList(validId))
+                .andExpect(jsonPath("$.results.*.history", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void canRetrieveXORelsById() throws Exception {
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + validId + "/xontologyrelations"));
+    public void canRetrieveHistorybyTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/history"));
 
-        expectBasicFields(response, validId)
-                .andExpect(jsonPath("$.xRelations").isArray())
+        expectBasicFieldsInResults(response, validIdList)
+                .andExpect(jsonPath("$.results.*.history", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void finds400IfIdIsEmpty() throws Exception {
+    public void canRetrieveXRefsbyOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/xrefs"));
+
+        expectBasicFieldsInResults(response, singletonList(validId))
+                .andExpect(jsonPath("$.results.*.xRefs", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveXRefsbyTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/xrefs"));
+
+        expectBasicFieldsInResults(response, validIdList)
+                .andExpect(jsonPath("$.results.*.xRefs", hasSize(2)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveTaxonConstraintsbyOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/constraints"));
+
+        expectBasicFieldsInResults(response, singletonList(validId))
+                .andExpect(jsonPath("$.results.*.taxonConstraints", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveTaxonConstraintsbyTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/constraints"));
+
+        expectBasicFieldsInResults(response, validIdList)
+                .andExpect(jsonPath("$.results.*.taxonConstraints", hasSize(2)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveAnnotationGuideLinesbyOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/guidelines"));
+
+        expectBasicFieldsInResults(response, singletonList(validId))
+                .andExpect(jsonPath("$.results.*.annotationGuidelines", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveAnnotationGuideLinesbyTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/guidelines"));
+
+        expectBasicFieldsInResults(response, validIdList)
+                .andExpect(jsonPath("$.results.*.annotationGuidelines", hasSize(2)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveXORelsbyOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/xontologyrelations"));
+
+        expectBasicFieldsInResults(response, singletonList(validId))
+                .andExpect(jsonPath("$.results.*.xRelations", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveXORelsbyTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/xontologyrelations"));
+
+        expectBasicFieldsInResults(response, validIdList)
+                .andExpect(jsonPath("$.results.*.xRelations", hasSize(2)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void finds400IfUrlIsEmpty() throws Exception {
         mockMvc.perform(get(resourceUrl + "/"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void finds404IfIdDoesNotExist() throws Exception {
-        mockMvc.perform(get(resourceUrl + "/" + idMissingInRepository()))
+    public void finds400IfTermsIdIsEmpty() throws Exception {
+        mockMvc.perform(get(buildTermsURL("")))
                 .andDo(print())
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void finds400IfUrlIsJustWrong() throws Exception {
+        mockMvc.perform(get(resourceUrl + "/thisIsAnEndPointThatDoesNotExist"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
+        mockMvc.perform(get(buildTermsURL(idMissingInRepository())))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 
     @Test
     public void finds400OnInvalidId() throws Exception {
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/" + invalidId()))
+        ResultActions response = mockMvc.perform(get(buildTermsURL(invalidId())))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
@@ -212,6 +308,91 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.results").isArray());
     }
 
+    protected abstract String getResourceURL();
+
+    /**
+     * Create a basic document to be stored in the repository.
+     * It must be a valid document, with a valid document ID.
+     * This document will serve as the basis for numerous common
+     * tests, relevant to all OBO controllers.
+     *
+     * @return a valid document with a valid ID
+     */
+    protected abstract List<OntologyDocument> createBasicDocs();
+
+    protected ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
+        return expectCoreFields(result, id, "$.");
+    }
+
+    protected ResultActions expectCoreFields(ResultActions result, String id, String path) throws Exception {
+        return expectBasicFields(result, id, path)
+                .andExpect(jsonPath(path + "synonyms").exists())
+                .andExpect(jsonPath(path + "ancestors").exists());
+    }
+
+    protected ResultActions expectBasicFields(ResultActions result, String id, String path) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath(path + "id").value(id))
+                .andExpect(jsonPath(path + "name").exists())
+                .andExpect(jsonPath(path + "isObsolete").exists())
+                .andExpect(jsonPath(path + "comment").exists())
+                .andExpect(jsonPath(path + "definition").exists());
+    }
+
+    protected String buildTermsURL(String id) {
+        return getResourceURL() + "/" + TERMS + "/" + id;
+    }
+
+    protected ResultActions expectCoreFieldsInResults(ResultActions result, List<String> ids) throws Exception {
+        AtomicInteger index = new AtomicInteger(0);
+
+        for (String id : ids) {
+            expectCoreFields(result, id, "$.results[" + index.getAndIncrement() + "].");
+        }
+
+        return result;
+    }
+
+    protected ResultActions expectCompleteFieldsInResults(ResultActions result, List<String> ids) throws Exception {
+        AtomicInteger index = new AtomicInteger(0);
+
+        for (String id : ids) {
+            expectCompleteFields(result, id, "$.results[" + index.getAndIncrement() + "].");
+        }
+
+        return result;
+    }
+
+    protected ResultActions expectCompleteFields(ResultActions result, String id, String path) throws Exception {
+        return expectCoreFields(result, id, path)
+                .andExpect(jsonPath(path + "children").exists())
+                .andExpect(jsonPath(path + "secondaryIds").exists())
+                .andExpect(jsonPath(path + "history").exists())
+                .andExpect(jsonPath(path + "xRefs").exists())
+                .andExpect(jsonPath(path + "xRelations").exists())
+                .andExpect(jsonPath(path + "annotationGuidelines").exists())
+                .andExpect(jsonPath(path + "taxonConstraints").exists())
+                .andExpect(jsonPath(path + "consider").exists())
+                .andExpect(jsonPath(path + "subsets").exists())
+                .andExpect(jsonPath(path + "replacedBy").exists());
+    }
+
+    protected ResultActions expectBasicFields(ResultActions result, String id) throws Exception {
+        return expectBasicFields(result, id, "$.");
+    }
+
+    protected abstract String idMissingInRepository();
+
+    protected abstract String invalidId();
+
+    protected ResultActions expectInvalidIdError(ResultActions result, String id) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.url", is(requestUrl(result))))
+                .andExpect(jsonPath("$.message", containsString("Provided ID: '" + id + "'")));
+    }
+
     protected ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
         return result
                 .andDo(print())
@@ -222,58 +403,15 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.pageInfo.current").exists());
     }
 
-    protected ResultActions expectCompleteFields(ResultActions result, String id) throws Exception {
-        return expectCoreFields(result, id)
-                .andExpect(jsonPath("$.children").exists())
-                .andExpect(jsonPath("$.secondaryIds").exists())
-                .andExpect(jsonPath("$.history").exists())
-                .andExpect(jsonPath("$.xRefs").exists())
-                .andExpect(jsonPath("$.xRelations").exists())
-                .andExpect(jsonPath("$.annotationGuidelines").exists())
-                .andExpect(jsonPath("$.taxonConstraints").exists())
-                .andExpect(jsonPath("$.consider").exists())
-                .andExpect(jsonPath("$.subsets").exists())
-                .andExpect(jsonPath("$.replacedBy").exists());
+    protected ResultActions expectBasicFieldsInResults(ResultActions result, List<String> ids) throws Exception {
+        AtomicInteger index = new AtomicInteger(0);
+
+        for (String id : ids) {
+            expectBasicFields(result, id, "$.results[" + index.getAndIncrement() + "].");
+        }
+
+        return result;
     }
-
-    protected ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
-        return expectBasicFields(result, id)
-                .andExpect(jsonPath("$.synonyms").exists())
-                .andExpect(jsonPath("$.ancestors").exists());
-    }
-
-    protected ResultActions expectBasicFields(ResultActions result, String id) throws Exception {
-        return result
-                .andDo(print())
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.name").exists())
-                .andExpect(jsonPath("$.isObsolete").exists())
-                .andExpect(jsonPath("$.comment").exists())
-                .andExpect(jsonPath("$.definition").exists());
-    }
-
-    protected ResultActions expectInvalidIdError(ResultActions result, String id) throws Exception {
-        return result
-                .andDo(print())
-                .andExpect(jsonPath("$.url", is(requestUrl(result))))
-                .andExpect(jsonPath("$.message", containsString("Provided id: " + id)));
-    }
-
-    /**
-     * Create a basic document to be stored in the repository.
-     * It must be a valid document, with a valid document ID.
-     * This document will serve as the basis for numerous common
-     * tests, relevant to all OBO controllers.
-     *
-     * @return a valid document with a valid ID
-     */
-    protected abstract OntologyDocument createBasicDoc();
-
-    protected abstract String idMissingInRepository();
-
-    protected abstract String invalidId();
-
-    protected abstract String getResourceURL();
 
     private String requestUrl(ResultActions resultActions) {
         return resultActions.andReturn().getRequest().getRequestURL().toString();
