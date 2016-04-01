@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.reader.converter;
+package uk.ac.ebi.quickgo.index.ontology.converter;
 
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;

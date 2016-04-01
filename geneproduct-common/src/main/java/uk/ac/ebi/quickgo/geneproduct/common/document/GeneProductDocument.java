@@ -40,10 +40,19 @@ public class GeneProductDocument implements QuickGODocument {
     public List<String> databaseSubsets;
 
     @Field(GeneProductFields.COMPLETE_PROTEOME)
-    public boolean completeProteome;
+    public boolean isCompleteProteome;
 
     @Field(GeneProductFields.REFERENCE_POTEOME)
-    public boolean referenceProteome = false;
+    public String referenceProteome;
+
+    @Field(GeneProductFields.IS_ISOFORM)
+    public boolean isIsoform;
+
+    @Field(GeneProductFields.IS_ANNOTATED)
+    public boolean isAnnotated;
+
+    @Field(GeneProductFields.PARENT_ID)
+    public String parentId;
 
     @Override public String getUniqueName() {
         return id;
@@ -57,39 +66,50 @@ public class GeneProductDocument implements QuickGODocument {
             return false;
         }
 
-        GeneProductDocument that = (GeneProductDocument) o;
+        GeneProductDocument document = (GeneProductDocument) o;
 
-        if (taxonId != that.taxonId) {
+        if (taxonId != document.taxonId) {
             return false;
         }
-        if (completeProteome != that.completeProteome) {
+        if (isCompleteProteome != document.isCompleteProteome) {
             return false;
         }
-        if (referenceProteome != that.referenceProteome) {
+        if (isIsoform != document.isIsoform) {
             return false;
         }
-        if (id != null ? !id.equals(that.id) : that.id != null) {
+        if (isAnnotated != document.isAnnotated) {
             return false;
         }
-        if (database != null ? !database.equals(that.database) : that.database != null) {
+        if (id != null ? !id.equals(document.id) : document.id != null) {
             return false;
         }
-        if (symbol != null ? !symbol.equals(that.symbol) : that.symbol != null) {
+        if (database != null ? !database.equals(document.database) : document.database != null) {
             return false;
         }
-        if (name != null ? !name.equals(that.name) : that.name != null) {
+        if (symbol != null ? !symbol.equals(document.symbol) : document.symbol != null) {
             return false;
         }
-        if (synonyms != null ? !synonyms.equals(that.synonyms) : that.synonyms != null) {
+        if (name != null ? !name.equals(document.name) : document.name != null) {
             return false;
         }
-        if (type != null ? !type.equals(that.type) : that.type != null) {
+        if (synonyms != null ? !synonyms.equals(document.synonyms) : document.synonyms != null) {
             return false;
         }
-        if (taxonName != null ? !taxonName.equals(that.taxonName) : that.taxonName != null) {
+        if (type != null ? !type.equals(document.type) : document.type != null) {
             return false;
         }
-        return databaseSubsets != null ? databaseSubsets.equals(that.databaseSubsets) : that.databaseSubsets == null;
+        if (taxonName != null ? !taxonName.equals(document.taxonName) : document.taxonName != null) {
+            return false;
+        }
+        if (databaseSubsets != null ? !databaseSubsets.equals(document.databaseSubsets) :
+                document.databaseSubsets != null) {
+            return false;
+        }
+        if (referenceProteome != null ? !referenceProteome.equals(document.referenceProteome) :
+                document.referenceProteome != null) {
+            return false;
+        }
+        return parentId != null ? parentId.equals(document.parentId) : document.parentId == null;
 
     }
 
@@ -103,8 +123,11 @@ public class GeneProductDocument implements QuickGODocument {
         result = 31 * result + taxonId;
         result = 31 * result + (taxonName != null ? taxonName.hashCode() : 0);
         result = 31 * result + (databaseSubsets != null ? databaseSubsets.hashCode() : 0);
-        result = 31 * result + (completeProteome ? 1 : 0);
-        result = 31 * result + (referenceProteome ? 1 : 0);
+        result = 31 * result + (isCompleteProteome ? 1 : 0);
+        result = 31 * result + (referenceProteome != null ? referenceProteome.hashCode() : 0);
+        result = 31 * result + (isIsoform ? 1 : 0);
+        result = 31 * result + (isAnnotated ? 1 : 0);
+        result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
         return result;
     }
 
@@ -119,8 +142,11 @@ public class GeneProductDocument implements QuickGODocument {
                 ", taxonId=" + taxonId +
                 ", taxonName='" + taxonName + '\'' +
                 ", databaseSubsets=" + databaseSubsets +
-                ", completeProteome=" + completeProteome +
-                ", referenceProteome=" + referenceProteome +
+                ", isCompleteProteome=" + isCompleteProteome +
+                ", referenceProteome='" + referenceProteome + '\'' +
+                ", isIsoform=" + isIsoform +
+                ", isAnnotated=" + isAnnotated +
+                ", parentId='" + parentId + '\'' +
                 '}';
     }
 }

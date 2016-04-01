@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index;
 
-import uk.ac.ebi.quickgo.index.write.IndexingJobConfig;
+import uk.ac.ebi.quickgo.index.geneproduct.GeneProductConfig;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,10 +22,10 @@ import org.springframework.context.annotation.Import;
  * Created 02/12/15
  * @author Edd
  */
-@Import({IndexingJobConfig.class})
+@Import({GeneProductConfig.class})
 @SpringBootApplication
-public class QuickGOIndexOntologyMain {
+public class QuickGOIndexMain {
     public static void main(String[] args) {
-        SpringApplication.run(QuickGOIndexOntologyMain.class, args);
+        SpringApplication.run(QuickGOIndexMain.class, args);
     }
 }
