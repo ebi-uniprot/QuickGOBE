@@ -25,7 +25,7 @@ public class GeneProduct {
 	public String symbol;
 
 	//name of gene or gene product this field is not mandatory, cardinality 0, 1 [white space allowed]
-	public Optional<String> name;
+	public String name;
 
 	//Gene symbol [or other text]
 	public List<Synonym> synonyms;
