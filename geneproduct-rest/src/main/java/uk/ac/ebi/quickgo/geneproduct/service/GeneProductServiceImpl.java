@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
+import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +34,9 @@ public class GeneProductServiceImpl implements GeneProductService {
 	}
 
 	protected List<GeneProduct> convertDocs(List<GeneProductDocument> docs) {
-		return docs.stream().map(converter::convert).collect(Collectors.toList());
+		return docs
+				.stream()
+				.map(converter::convert)
+				.collect(Collectors.toList());
 	}
 }
