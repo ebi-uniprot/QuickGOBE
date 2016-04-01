@@ -74,6 +74,13 @@ public abstract class OBOController<T extends OBOTerm> {
         throw new IllegalArgumentException("The requested end-point does not exist.");
     }
 
+    /**
+     * Get all information about all terms and page through the results.
+     *
+     * @param page the page number of results to retrieve
+     * @return  the specified page of results as a {@link QueryResult} instance or a 400 response
+     *          if the page number is invalid
+     */
     @RequestMapping(value = "/" + TERMS, method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
