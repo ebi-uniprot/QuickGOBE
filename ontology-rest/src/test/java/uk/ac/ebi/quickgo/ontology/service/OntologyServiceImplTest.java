@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -121,49 +122,37 @@ public class OntologyServiceImplTest {
             GOTerm expectedGoTerm = goTerms.get(0);
             assertThat(expectedGoTerm.id, is(equalTo(goId)));
         }
-//
-//        @Test
-//        public void findsAllGOTerms() {
-//            List<OntologyDocument> allDocs = new ArrayList<>();
-//            int realDocCount = 23;
-//            for (int i = 0; i < realDocCount; i++) {
-//                allDocs.add(createGODoc("id" + i, "name" + i));
-//            }
-//            Page<OntologyDocument> allDocsPage = new PageImpl<>(allDocs);
-//
-//            when(repositoryMock.findAll(any(Pageable.class))).thenReturn(allDocsPage);
-//
-//            when(goDocumentConverterMock.convert(any(OntologyDocument.class))).thenReturn(createGOTerm("stub"));
-//
-//            int fakePageNumber = 1;
-//            int fakePageSize = 10;
-//            List<GOTerm> page = goOntologyService.findAll(new PageRequest(fakePageNumber, fakePageSize));
-//            assertThat(page.size(), is(realDocCount));
-//        }
 
         @Test
-        public void findsAllGOTerms() {
+        public void retrievesFirstPageOfGOTerms() {
+            int fakePageNumber = 0;
+            int fakePageSize = 10;
+
             List<OntologyDocument> allDocs = new ArrayList<>();
+
             long realDocCount = 23;
 
             for (int i = 0; i < realDocCount; i++) {
                 allDocs.add(createGODoc("id" + i, "name" + i));
             }
 
-            Page<OntologyDocument> allDocsPage = new PageImpl<>(allDocs);
+            Pageable firstPageable = new PageRequest(fakePageNumber, fakePageSize);
 
-            when(repositoryMock.findAll(any(Pageable.class))).thenReturn(allDocsPage);
+            List<OntologyDocument> firstResultSet = allDocs.subList(0, fakePageSize);
+            Page<OntologyDocument> firstPage =
+                    new PageImpl<>(firstResultSet, firstPageable, realDocCount);
+
+            when(repositoryMock.findAll(firstPageable)).thenReturn(firstPage);
 
             when(goDocumentConverterMock.convert(any(OntologyDocument.class))).thenReturn(createGOTerm("stub"));
 
-            int fakePageNumber = 1;
-            int fakePageSize = 10;
-
-            uk.ac.ebi.quickgo.rest.search.query.Page page = new uk.ac.ebi.quickgo.rest.search.query.Page
-                    (fakePageNumber, fakePageSize);
+            uk.ac.ebi.quickgo.rest.search.query.Page page =
+                    new uk.ac.ebi.quickgo.rest.search.query.Page(fakePageNumber, fakePageSize);
             QueryResult<GOTerm> queryResult = goOntologyService.findAll(page);
 
-            assertThat(queryResult.getNumberOfHits(), is(realDocCount));
+            assertThat(queryResult.getResults(), hasSize(10));
+            assertThat(queryResult.getPageInfo().getCurrent(), is(0));
+            assertThat(queryResult.getPageInfo().getTotal(), is(3));
         }
 
         @Test
