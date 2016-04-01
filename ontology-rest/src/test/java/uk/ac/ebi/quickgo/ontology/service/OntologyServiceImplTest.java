@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.ArrayList;
@@ -120,14 +121,35 @@ public class OntologyServiceImplTest {
             GOTerm expectedGoTerm = goTerms.get(0);
             assertThat(expectedGoTerm.id, is(equalTo(goId)));
         }
+//
+//        @Test
+//        public void findsAllGOTerms() {
+//            List<OntologyDocument> allDocs = new ArrayList<>();
+//            int realDocCount = 23;
+//            for (int i = 0; i < realDocCount; i++) {
+//                allDocs.add(createGODoc("id" + i, "name" + i));
+//            }
+//            Page<OntologyDocument> allDocsPage = new PageImpl<>(allDocs);
+//
+//            when(repositoryMock.findAll(any(Pageable.class))).thenReturn(allDocsPage);
+//
+//            when(goDocumentConverterMock.convert(any(OntologyDocument.class))).thenReturn(createGOTerm("stub"));
+//
+//            int fakePageNumber = 1;
+//            int fakePageSize = 10;
+//            List<GOTerm> page = goOntologyService.findAll(new PageRequest(fakePageNumber, fakePageSize));
+//            assertThat(page.size(), is(realDocCount));
+//        }
 
         @Test
         public void findsAllGOTerms() {
             List<OntologyDocument> allDocs = new ArrayList<>();
-            int realDocCount = 23;
+            long realDocCount = 23;
+
             for (int i = 0; i < realDocCount; i++) {
                 allDocs.add(createGODoc("id" + i, "name" + i));
             }
+
             Page<OntologyDocument> allDocsPage = new PageImpl<>(allDocs);
 
             when(repositoryMock.findAll(any(Pageable.class))).thenReturn(allDocsPage);
@@ -136,8 +158,12 @@ public class OntologyServiceImplTest {
 
             int fakePageNumber = 1;
             int fakePageSize = 10;
-            List<GOTerm> page = goOntologyService.findAll(new PageRequest(fakePageNumber, fakePageSize));
-            assertThat(page.size(), is(realDocCount));
+
+            uk.ac.ebi.quickgo.rest.search.query.Page page = new uk.ac.ebi.quickgo.rest.search.query.Page
+                    (fakePageNumber, fakePageSize);
+            QueryResult<GOTerm> queryResult = goOntologyService.findAll(page);
+
+            assertThat(queryResult.getNumberOfHits(), is(realDocCount));
         }
 
         @Test
