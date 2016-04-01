@@ -19,5 +19,5 @@ public interface GeneProductService {
 	 * @return a {@link List} of {@link GeneProduct} instances corresponding to the gene product ids containing the
 	 * chosen information
 	 */
-	List<GeneProduct> findCoreInfoByGeneProductId(List<String> ids);
+	List<GeneProduct> findById(List<String> ids);
 }

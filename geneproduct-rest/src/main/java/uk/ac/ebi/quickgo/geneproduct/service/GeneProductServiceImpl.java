@@ -28,8 +28,8 @@ public class GeneProductServiceImpl implements GeneProductService {
 	}
 
 	@Override
-	public List<GeneProduct> findCoreInfoByGeneProductId(List<String> ids) {
-		return convertDocs(geneProductRepository.findCoreAttrByGeneProductId(serviceHelper.buildIdList(ids)));
+	public List<GeneProduct> findById(List<String> ids) {
+		return convertDocs(geneProductRepository.findById(serviceHelper.buildIdList(ids)));
 	}
 
 	protected List<GeneProduct> convertDocs(List<GeneProductDocument> docs) {
