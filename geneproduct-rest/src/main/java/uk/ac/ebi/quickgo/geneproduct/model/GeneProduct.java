@@ -28,7 +28,7 @@ public class GeneProduct {
 	public String name;
 
 	//Gene symbol [or other text]
-	public List<Synonym> synonyms;
+	public List<String> synonyms;
 
 	//A description of the type of the gene or gene product being annotated. one of the following: protein_complex;
 	// protein; transcript; ncRNA; rRNA; tRNA; snRNA; snoRNA; any subtype of ncRNA in the Sequence Ontology.
@@ -37,7 +37,7 @@ public class GeneProduct {
 	//taxonomic identifier(s) The NCBI taxon ID of the species encoding the gene product. this field is mandatory,
 	public Taxonomy taxonomy;
 
-	public String databaseSubset;
+	public List<String> databaseSubset;
 
 	//UPID
 	public String referenceProteome;
@@ -45,18 +45,17 @@ public class GeneProduct {
 	public boolean isIsoform;
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
-	public static class Synonym implements FieldType {
-		public String synonymName;
-		public String synonymType;
-	}
-
-	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	public static class Taxonomy implements FieldType {
 
 		//Numeric id e.g. 35758
-		public String identifier;
+		public int id;
 
 		//Organism name e.g. Streptomyces ghanaensis
 		public String name;
+
+		public Taxonomy(int identifier, String name) {
+			this.id = identifier;
+			this.name = name;
+		}
 	}
 }
