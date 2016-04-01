@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
+import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +63,8 @@ public class GeneProductController {
 	 * </ul>
 	 */
 	@RequestMapping(value = RESOURCE_PATH + "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<QueryResult<GeneProduct>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
-		return getGeneProductResponse(geneProductService.findCoreInfoByGeneProductId(validateIds(ids)));
+	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable(value = "ids") String ids) {
+		return getGeneProductResponse(geneProductService.findById(validateIds(ids)));
 	}
 
 
@@ -94,11 +95,10 @@ public class GeneProductController {
 	 */
 	protected java.util.List<String> validateIds(String ids) {
 		java.util.List<String> idList =  controllerHelper.csvToList(ids);
-		validateRequestedResults(idList.size());
-
-		idList
-				.stream()
-				.forEach(this::checkValidId);
+//		validateRequestedResults(idList.size());
+//		idList
+//				.stream()
+//				.forEach(this::checkValidId);
 
 		return idList;
 	}
