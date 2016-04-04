@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
- * Runnable class to start an embedded Jetty server to host the defined RESTful components.
+ * Runnable class to start an embedded server to host the defined RESTful components.
  *
  * Created 16/11/15
  * @author Edd
