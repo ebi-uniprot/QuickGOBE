@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.geneproduct.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import uk.ac.ebi.quickgo.common.FieldType;
+import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,9 +31,8 @@ public class GeneProduct {
 	//Gene symbol [or other text]
 	public List<String> synonyms;
 
-	//A description of the type of the gene or gene product being annotated. one of the following: protein_complex;
-	// protein; transcript; ncRNA; rRNA; tRNA; snRNA; snoRNA; any subtype of ncRNA in the Sequence Ontology.
-	public String type;
+	//Protein; RNA or complex
+	public GeneProductType type;
 
 	//taxonomic identifier(s) The NCBI taxon ID of the species encoding the gene product. this field is mandatory,
 	public Taxonomy taxonomy;

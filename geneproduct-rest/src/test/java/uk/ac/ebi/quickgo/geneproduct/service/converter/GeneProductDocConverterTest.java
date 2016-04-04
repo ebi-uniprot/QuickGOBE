@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.geneproduct.service.converter;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 
 import java.util.Arrays;
@@ -28,7 +29,7 @@ public class GeneProductDocConverterTest {
 	private static final String SYMBOL = "G12345";
 	private static final int TAX_ID = 789;
 	private static final String TAX_NAME = "Streptomyces ghanaensis";
-	private static final String TYPE = "snRNA";
+	private static final String TYPE = "protein";
 	private final List<String> synonyms =  Arrays.asList("Q1234","R1234","S1234");
 	private static final String NAME = "moeA5";
 	private static final String PARENT_ID = "QWERTY";
@@ -82,7 +83,7 @@ public class GeneProductDocConverterTest {
 		assertThat(convertedGeneProduct.symbol, is(SYMBOL));
 		assertThat(convertedGeneProduct.taxonomy.id, is(TAX_ID));
 		assertThat(convertedGeneProduct.taxonomy.name, is(TAX_NAME));
-		assertThat(convertedGeneProduct.type, is(TYPE));
+		assertThat(convertedGeneProduct.type, is(GeneProductType.PROTEIN));
 
 
 	}
