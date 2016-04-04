@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.write.listener;
+package uk.ac.ebi.quickgo.index.common.listener;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +30,7 @@ public class LogJobListener implements JobExecutionListener {
         long durationMillis = jobExecution.getEndTime().getTime() - jobExecution.getStartTime().getTime();
         String duration = String.format("%d hrs, %d min, %d sec",
                 TimeUnit.MILLISECONDS.toHours(durationMillis),
-                TimeUnit.MILLISECONDS.toMinutes(durationMillis) - TimeUnit.HOURS.toSeconds(TimeUnit.MILLISECONDS
+                TimeUnit.MILLISECONDS.toMinutes(durationMillis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
                         .toHours(durationMillis)),
                 TimeUnit.MILLISECONDS.toSeconds(durationMillis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
                         .toMinutes(durationMillis))
@@ -45,18 +45,23 @@ public class LogJobListener implements JobExecutionListener {
         long skipCount = 0L;
         long readSkips = 0L;
         long writeSkips = 0L;
+        long processingSkips = 0L;
         long readCount = 0L;
         long writeCount = 0L;
+
         for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
             readSkips += stepExecution.getReadSkipCount();
             writeSkips += stepExecution.getWriteSkipCount();
+            processingSkips += stepExecution.getProcessSkipCount();
             readCount += stepExecution.getReadCount();
             writeCount += stepExecution.getWriteCount();
             skipCount += stepExecution.getSkipCount();
+
         }
         LOGGER.info("Read count    : {}", readCount);
         LOGGER.info("Write count   : {}", writeCount);
-        LOGGER.info("Skip count    : {} ({} read / {} write)", skipCount, readSkips, writeSkips);
+        LOGGER.info("Skip count    : {} ({} read / {} processing / {} write)", skipCount, readSkips, processingSkips,
+                writeSkips);
         LOGGER.info("=====================================================");
         jobExecution.getExitStatus();
     }

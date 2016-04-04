@@ -1,9 +1,9 @@
-package uk.ac.ebi.quickgo.index;
+package uk.ac.ebi.quickgo.index.ontology;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.index.reader.DocumentReaderException;
-import uk.ac.ebi.quickgo.index.reader.ODocReader;
-import uk.ac.ebi.quickgo.index.write.IndexingJobConfig;
+import uk.ac.ebi.quickgo.index.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.index.QuickGOIndexMain;
+import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 
 import org.hamcrest.core.Is;
@@ -28,9 +28,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.index.ontology.OntologyConfig.ONTOLOGY_INDEXING_STEP_NAME;
 
 /**
- * Test specific behaviour of the job executed by {@link QuickGOIndexOntologyMain}.
+ * Test specific behaviour of the job executed by {@link QuickGOIndexMain}.
  * <p>
  * To see how to steps are configured, refer to:
  * <ul>
@@ -43,10 +44,10 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles(profiles = {"QuickGOIndexOntologyMainIT", "embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {IndexingJobConfig.class, JobTestRunnerConfig.class, QuickGOIndexOntologyMainITConfig.class},
+        classes = {JobTestRunnerConfig.class, OntologyConfig.class, OntologyIndexingConfig.class},
         loader = SpringApplicationContextLoader.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class QuickGOIndexOntologyMainIT {
+public class OntologyIndexingBatchIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
@@ -54,7 +55,7 @@ public class QuickGOIndexOntologyMainIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private ODocReader reader;
+    private OntologyReader reader;
 
     @Value("${indexing.ontology.skip.limit}")
     private int skipLimit;
@@ -63,7 +64,7 @@ public class QuickGOIndexOntologyMainIT {
     public void documentReaderExceptionThrownWhenReaderIsOpenedCausesStepFailure() {
         Mockito.doThrow(new DocumentReaderException("Error!")).when(reader).open(any(ExecutionContext.class));
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
     }
 
@@ -79,7 +80,7 @@ public class QuickGOIndexOntologyMainIT {
                 .thenReturn(OntologyDocMocker.createECODoc("eco3", "eco3-name"))
                 .thenReturn(null);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
@@ -98,7 +99,7 @@ public class QuickGOIndexOntologyMainIT {
                 .thenReturn(OntologyDocMocker.createECODoc("eco1", "eco1-name"))
                 .thenReturn(null);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
@@ -123,7 +124,7 @@ public class QuickGOIndexOntologyMainIT {
                 .thenReturn(OntologyDocMocker.createECODoc("eco3", "eco3-name"))
                 .thenReturn(null);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
@@ -162,7 +163,7 @@ public class QuickGOIndexOntologyMainIT {
                 // null indicates reading is done
                 .thenReturn(null);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("readThenWriteToRepoStep");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();

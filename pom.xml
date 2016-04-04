@@ -22,6 +22,7 @@
                 <module>common</module>
                 <module>ontology-common</module>
                 <module>ontology-rest</module>
+                <module>geneproduct-common</module>
                 <module>quickgo-client</module>
                 <module>indexing</module>
                 <module>sources</module>
@@ -34,6 +35,7 @@
                 <module>sources</module>
                 <module>common</module>
                 <module>ontology-common</module>
+                <module>geneproduct-common</module>
                 <module>indexing</module>
             </modules>
         </profile>
