@@ -42,6 +42,8 @@ public class RepoConfig {
     @Bean(name = "solrServer")
     @Profile("embeddedServer")
     public SolrServer embeddedSolrServer(SolrServerFactory solrServerFactory) {
+
+        LOGGER.info("Using embedded server");
         return solrServerFactory.getSolrServer();
     }
 
