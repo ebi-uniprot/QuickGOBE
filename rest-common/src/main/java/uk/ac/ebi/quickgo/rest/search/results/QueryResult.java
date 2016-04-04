@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
 import com.google.common.base.Preconditions;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Contains the all the information pertaining to a search result submitted to a data source.
@@ -14,8 +13,8 @@ public class QueryResult<T> {
     private final Facet facet;
     private final List<DocHighlight> highlighting;
 
-    public QueryResult(long numberOfHits, List<T> results, PageInfo pageInfo, Facet facet, List<DocHighlight>
-            highlighting) {
+    private QueryResult(long numberOfHits, List<T> results, PageInfo pageInfo, Facet facet,
+            List<DocHighlight> highlighting) {
         Preconditions.checkArgument(numberOfHits >= 0, "Total number of hits can not be negative: " + numberOfHits);
         Preconditions.checkArgument(results != null, "Results list can not be null");
         Preconditions.checkArgument(results.size() <= numberOfHits,
@@ -26,7 +25,7 @@ public class QueryResult<T> {
         this.results = Collections.unmodifiableList(results);
         this.pageInfo = pageInfo;
         this.facet = facet;
-        this.highlighting = (highlighting != null)?
+        this.highlighting = (highlighting != null) ?
                 Collections.unmodifiableList(highlighting) : null;
     }
 
@@ -93,5 +92,54 @@ public class QueryResult<T> {
                 ", facet=" + facet +
                 ", highlighting=" + highlighting +
                 '}';
+    }
+
+    /**
+     * Builder used to facilitate the creation of {@link QueryResult} instances.
+     *
+     * @author Ricardo Antunes
+     */
+    public static class Builder<T> {
+        private final long numberOfHits;
+        private final List<T> results;
+
+        private PageInfo pageInfo;
+        private Facet facets;
+        private Set<DocHighlight> highlights;
+
+        public Builder(long hits, List<T> results) {
+            this.numberOfHits = hits;
+            this.results = results;
+
+            this.highlights = new LinkedHashSet<>();
+        }
+
+        public Builder<T> withPageInfo(PageInfo pageInfo) {
+            this.pageInfo = pageInfo;
+            return this;
+        }
+
+        public Builder<T> withFacets(Facet facets) {
+            this.facets = facets;
+            return this;
+        }
+
+        public Builder<T> appendHighlights(DocHighlight... highlight) {
+            if (highlight != null) {
+                highlights.addAll(Arrays.asList(highlight));
+            }
+            return this;
+        }
+
+        public Builder<T> appendHighlights(Collection<DocHighlight> highlightCol) {
+            if (highlightCol != null) {
+                highlights.addAll(highlightCol);
+            }
+            return this;
+        }
+
+        public QueryResult<T> build() {
+            return new QueryResult<>(numberOfHits, results, pageInfo, facets, new ArrayList<>(highlights));
+        }
     }
 }

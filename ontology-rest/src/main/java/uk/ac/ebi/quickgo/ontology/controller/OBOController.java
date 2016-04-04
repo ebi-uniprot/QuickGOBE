@@ -310,7 +310,7 @@ public abstract class OBOController<T extends OBOTerm> {
             resultsToShow = docList;
         }
 
-        QueryResult<T> queryResult = new QueryResult<>(resultsToShow.size(), resultsToShow, null, null, null);
+        QueryResult<T> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 
