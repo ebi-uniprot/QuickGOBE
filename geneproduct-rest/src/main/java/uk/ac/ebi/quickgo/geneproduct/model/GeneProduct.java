@@ -42,7 +42,14 @@ public class GeneProduct {
 	//UPID
 	public String referenceProteome;
 
+	//The identifier of the gene product from which this gene product was derived
+	public String parentId;
+
+
 	public boolean isIsoform;
+	public boolean isAnnotated;
+	public boolean isCompleteProteome;
+
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	public static class Taxonomy implements FieldType {
