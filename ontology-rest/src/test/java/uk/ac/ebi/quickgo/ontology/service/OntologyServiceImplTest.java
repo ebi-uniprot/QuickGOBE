@@ -125,8 +125,10 @@ public class OntologyServiceImplTest {
 
         @Test
         public void retrievesFirstPageOfGOTerms() {
-            int fakePageNumber = 0;
-            int fakePageSize = 10;
+            int zeroBasedPageNumber = 0;
+            int oneBasedPageNumber = zeroBasedPageNumber + 1;
+
+            int pageSize = 10;
 
             List<OntologyDocument> allDocs = new ArrayList<>();
 
@@ -136,9 +138,9 @@ public class OntologyServiceImplTest {
                 allDocs.add(createGODoc("id" + i, "name" + i));
             }
 
-            Pageable firstPageable = new PageRequest(fakePageNumber, fakePageSize);
+            Pageable firstPageable = new PageRequest(zeroBasedPageNumber, pageSize);
 
-            List<OntologyDocument> firstResultSet = allDocs.subList(0, fakePageSize);
+            List<OntologyDocument> firstResultSet = allDocs.subList(0, pageSize);
             Page<OntologyDocument> firstPage =
                     new PageImpl<>(firstResultSet, firstPageable, realDocCount);
 
@@ -147,11 +149,11 @@ public class OntologyServiceImplTest {
             when(goDocumentConverterMock.convert(any(OntologyDocument.class))).thenReturn(createGOTerm("stub"));
 
             uk.ac.ebi.quickgo.rest.search.query.Page page =
-                    new uk.ac.ebi.quickgo.rest.search.query.Page(fakePageNumber, fakePageSize);
+                    new uk.ac.ebi.quickgo.rest.search.query.Page(oneBasedPageNumber, pageSize);
             QueryResult<GOTerm> queryResult = goOntologyService.findAllByOntologyType(OntologyType.GO, page);
 
             assertThat(queryResult.getResults(), hasSize(10));
-            assertThat(queryResult.getPageInfo().getCurrent(), is(0));
+            assertThat(queryResult.getPageInfo().getCurrent(), is(1));
             assertThat(queryResult.getPageInfo().getTotal(), is(3));
         }
 

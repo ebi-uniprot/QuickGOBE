@@ -340,7 +340,7 @@ public abstract class OBOControllerIT {
 
         ResultActions response = mockMvc.perform(
                 get(resourceUrl + "/" + TERMS_ENDPOINT)
-                        .param(PAGE_PARAM, "0"));
+                        .param(PAGE_PARAM, "1"));
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.results").isArray())
@@ -379,7 +379,14 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.results", hasSize(OBOController.MAX_PAGE_RESULTS)));
     }
 
+    @Test
+    public void canRetrieveCompleteByFindAll() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL()));
 
+        expectCompleteFieldsInResults(response, validIdList)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
 
     protected abstract String getResourceURL();
 
@@ -415,6 +422,9 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "definition").exists());
     }
 
+    protected String buildTermsURL() {
+        return getResourceURL() + "/" + TERMS_ENDPOINT;
+    }
     protected String buildTermsURL(String id) {
         return getResourceURL() + "/" + TERMS_ENDPOINT + "/" + id;
     }
@@ -449,7 +459,7 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "annotationGuidelines").exists())
                 .andExpect(jsonPath(path + "taxonConstraints").exists())
                 .andExpect(jsonPath(path + "consider").exists())
-                .andExpect(jsonPath(path + "subsets").exists())
+                    .andExpect(jsonPath(path + "subsets").exists())
                 .andExpect(jsonPath(path + "replacedBy").exists());
     }
 
