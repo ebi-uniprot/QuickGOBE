@@ -24,10 +24,13 @@ public class GeneProductDocConverterImpl implements GeneProductDocConverter {
 		geneProduct.isIsoform			= geneProductDocument.isIsoform;
 		geneProduct.name				= geneProductDocument.name;
 		geneProduct.referenceProteome 	= geneProductDocument.referenceProteome;
-		geneProduct.synonyms 			=  geneProductDocument.synonyms;
+		geneProduct.synonyms 			= geneProductDocument.synonyms;
 		geneProduct.symbol				= geneProductDocument.symbol;
 		geneProduct.taxonomy			= new GeneProduct.Taxonomy(geneProductDocument.taxonId, geneProductDocument.taxonName);
 		geneProduct.type				= geneProductDocument.type;
+		geneProduct.isAnnotated			= geneProductDocument.isAnnotated;
+		geneProduct.isCompleteProteome	= geneProductDocument.isCompleteProteome;
+		geneProduct.parentId			= geneProductDocument.parentId;
 
 		return geneProduct;
 	}
