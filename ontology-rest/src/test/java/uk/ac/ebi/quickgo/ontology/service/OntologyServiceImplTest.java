@@ -142,13 +142,13 @@ public class OntologyServiceImplTest {
             Page<OntologyDocument> firstPage =
                     new PageImpl<>(firstResultSet, firstPageable, realDocCount);
 
-            when(repositoryMock.findAll(firstPageable)).thenReturn(firstPage);
+            when(repositoryMock.findAllByOntologyType(OntologyType.GO.name(),firstPageable)).thenReturn(firstPage);
 
             when(goDocumentConverterMock.convert(any(OntologyDocument.class))).thenReturn(createGOTerm("stub"));
 
             uk.ac.ebi.quickgo.rest.search.query.Page page =
                     new uk.ac.ebi.quickgo.rest.search.query.Page(fakePageNumber, fakePageSize);
-            QueryResult<GOTerm> queryResult = goOntologyService.findAll(page);
+            QueryResult<GOTerm> queryResult = goOntologyService.findAllByOntologyType(OntologyType.GO, page);
 
             assertThat(queryResult.getResults(), hasSize(10));
             assertThat(queryResult.getPageInfo().getCurrent(), is(0));

@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -23,7 +24,7 @@ public interface OntologyService<T extends OBOTerm> {
      * @param page the requested page of results
      * @return the page of results
      */
-    QueryResult<T> findAll(Page page);
+    QueryResult<T> findAllByOntologyType(OntologyType type, Page page);
 
     /**
      * Find the complete data set stored for a specified list of ontology IDs.

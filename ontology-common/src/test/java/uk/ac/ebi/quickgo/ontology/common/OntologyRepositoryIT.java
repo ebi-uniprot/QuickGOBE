@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,6 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 
@@ -236,6 +238,41 @@ public class OntologyRepositoryIT {
         assertThat(ontologyRepository.findHistoryByTermId(OntologyType.GO.name(), buildIdList("A")).size(), is(1));
     }
 
+    @Test
+    public void add1GoAnd1EcoDocumentsAndFindAllOfTypeGO() {
+        OntologyDocument goDoc = OntologyDocMocker.createGODoc("A", "Alice Cooper");
+        OntologyDocument ecoDoc = OntologyDocMocker.createECODoc("B", "Bob The Builder");
+
+        ontologyRepository.save(goDoc);
+        ontologyRepository.save(ecoDoc);
+
+        Page<OntologyDocument> pagedDocs =
+                ontologyRepository.findAllByOntologyType(OntologyType.GO.name(), new PageRequest(0, 2));
+
+        assertThat(pagedDocs.getTotalElements(), is(1L));
+        assertThat(pagedDocs.getContent().get(0).getUniqueName(), is(goDoc.getUniqueName()));
+    }
+
+    @Test
+    public void add3GoDocumentsAndFindAllOfTypeGOWith1DocPerPage() {
+        List<OntologyDocument> ontologyDocuments = Arrays.asList(
+                OntologyDocMocker.createGODoc("A", "Alice Cooper"),
+                OntologyDocMocker.createGODoc("B", "Bob The Builder"),
+                OntologyDocMocker.createGODoc("C", "Clint Eastwood")
+        );
+
+        ontologyRepository.save(ontologyDocuments);
+
+        int count = 0;
+        for (OntologyDocument ontologyDocument : ontologyDocuments) {
+            Page<OntologyDocument> pagedDocs =
+                    ontologyRepository.findAllByOntologyType(OntologyType.GO.name(), new PageRequest(count++, 1));
+
+            assertThat(pagedDocs.getContent(), hasSize(1));
+            assertThat(pagedDocs.getContent().get(0).getUniqueName(), is(ontologyDocument.getUniqueName()));
+        }
+    }
+
     /**
      * Shows how to save directly to a solr server, bypassing transactional
      * operations that are managed by Spring.
@@ -277,9 +314,5 @@ public class OntologyRepositoryIT {
         coreDoc.aspect = document.aspect;
         coreDoc.ancestors = document.ancestors;
         return coreDoc;
-    }
-
-    private void checkIsCoreDoc(OntologyDocument document) {
-        assertThat(copyAsCoreDoc(document), is(equalTo(document)));
     }
 }

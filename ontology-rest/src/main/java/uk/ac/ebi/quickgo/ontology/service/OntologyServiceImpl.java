@@ -81,10 +81,11 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return docs.stream().map(converter::convert).collect(Collectors.toList());
     }
 
-    @Override public QueryResult<T> findAll(Page page) {
+    @Override public QueryResult<T> findAllByOntologyType(OntologyType type, Page page) {
         Pageable pageable = new PageRequest(page.getPageNumber(), page.getPageSize());
 
-        org.springframework.data.domain.Page<OntologyDocument> pagedResult = ontologyRepository.findAll(pageable);
+        org.springframework.data.domain.Page<OntologyDocument> pagedResult =
+                ontologyRepository.findAllByOntologyType(type.name(), pageable);
 
         return buildQueryResult(pagedResult, page);
     }
