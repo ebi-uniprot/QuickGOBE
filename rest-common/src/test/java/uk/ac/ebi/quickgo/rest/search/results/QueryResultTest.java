@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
@@ -26,12 +27,9 @@ public class QueryResultTest {
     public void negativeTotalNumberResultsThrowsException() throws Exception {
         long numberOfHits = -1;
         List<String> results = Collections.emptyList();
-        uk.ac.ebi.quickgo.rest.search.results.PageInfo pageInfo = null;
-        Facet facet = null;
-        List<DocHighlight> highlights = null;
 
         try {
-            new QueryResult<>(numberOfHits, results, pageInfo, facet, highlights);
+            new QueryResult.Builder<>(numberOfHits, results).build();
             fail();
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), startsWith("Total number of hits can not be negative"));
@@ -42,12 +40,9 @@ public class QueryResultTest {
     public void nullResultsListThrowsException() throws Exception {
         long numberOfHits = 1;
         List<String> results = null;
-        uk.ac.ebi.quickgo.rest.search.results.PageInfo pageInfo = null;
-        Facet facet = null;
-        List<DocHighlight> highlights = null;
 
         try {
-            new QueryResult<>(numberOfHits, results, pageInfo, facet, highlights);
+            new QueryResult.Builder<>(numberOfHits, results).build();
             fail();
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), startsWith("Results list can not be null"));
@@ -58,12 +53,9 @@ public class QueryResultTest {
     public void totalNumberOfHitsLessThanResultsListSizeThrowsException() throws Exception {
         long numberOfHits = 1;
         List<String> results = Arrays.asList("result1", "result2");
-        uk.ac.ebi.quickgo.rest.search.results.PageInfo pageInfo = null;
-        Facet facet = null;
-        List<DocHighlight> highlights = null;
 
         try {
-            new QueryResult<>(numberOfHits, results, pageInfo, facet, highlights);
+            new QueryResult.Builder<>(numberOfHits, results).build();
             fail();
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), startsWith("Total number of results is less than number of results in list"));
@@ -74,17 +66,14 @@ public class QueryResultTest {
     public void validQueryResultWithNoPageInfoAndNoFacet() throws Exception {
         long numberOfHits = 2;
         List<String> results = Arrays.asList("result1", "result2");
-        uk.ac.ebi.quickgo.rest.search.results.PageInfo pageInfo = null;
-        Facet facet = null;
-        List<DocHighlight> highlights = null;
 
-        QueryResult<String> result = new QueryResult<>(numberOfHits, results, pageInfo, facet, highlights);
+        QueryResult<String> result = new QueryResult.Builder<>(numberOfHits, results).build();
 
         assertThat(result.getNumberOfHits(), is(numberOfHits));
         assertThat(result.getResults(), is(results));
         assertThat(result.getPageInfo(), is(nullValue()));
         assertThat(result.getFacet(), is(nullValue()));
-        assertThat(result.getHighlighting(), is(nullValue()));
+        assertThat(result.getHighlighting(), is(emptyIterable()));
     }
 
     @Test
@@ -95,7 +84,11 @@ public class QueryResultTest {
         Facet facet = new Facet();
         List<DocHighlight> highlights = new ArrayList<>();
 
-        QueryResult<String> result = new QueryResult<>(numberOfHits, results, pageInfo, facet, highlights);
+        QueryResult<String> result = new QueryResult.Builder<>(numberOfHits, results)
+                .withPageInfo(pageInfo)
+                .withFacets(facet)
+                .appendHighlights(highlights)
+                .build();
 
         assertThat(result.getNumberOfHits(), is(numberOfHits));
         assertThat(result.getResults(), is(results));

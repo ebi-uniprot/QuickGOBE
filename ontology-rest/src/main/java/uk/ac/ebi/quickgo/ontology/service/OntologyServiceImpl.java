@@ -104,7 +104,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 .map(converter::convert)
                 .collect(Collectors.toList());
 
-        return new QueryResult<>(totalNumberOfHits, entryHits, pageInfo, null, null);
+        return new QueryResult.Builder<>(totalNumberOfHits, entryHits).withPageInfo(pageInfo).build();
     }
 
     protected List<String> buildIdList(List<String> ids) {
