@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.core.CoreContainer;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,8 @@ import org.xml.sax.SAXException;
  */
 @Configuration
 public class RepoConfig {
+
+    Logger LOGGER  =  org.slf4j.LoggerFactory.getLogger(RepoConfig.class);
     private static final String SOLR_CORE = "geneproduct";
 
     @Bean
@@ -39,6 +42,8 @@ public class RepoConfig {
     @Bean(name = "solrServer")
     @Profile("embeddedServer")
     public SolrServer embeddedSolrServer(SolrServerFactory solrServerFactory) {
+
+        LOGGER.info("Using embedded server");
         return solrServerFactory.getSolrServer();
     }
 
