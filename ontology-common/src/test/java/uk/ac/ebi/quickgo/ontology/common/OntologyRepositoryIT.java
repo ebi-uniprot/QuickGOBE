@@ -1,16 +1,15 @@
 package uk.ac.ebi.quickgo.ontology.common;
 
+import uk.ac.ebi.quickgo.common.QueryUtils;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
-import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
-import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -24,7 +23,6 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -51,12 +49,9 @@ public class OntologyRepositoryIT {
     @Autowired
     private SolrTemplate ontologyTemplate;
 
-    private QueryStringSanitizer queryStringSanitizer;
-
     @Before
     public void before() {
         ontologyRepository.deleteAll();
-        queryStringSanitizer = new SolrQueryStringSanitizer();
     }
 
     @Test
@@ -104,15 +99,9 @@ public class OntologyRepositoryIT {
     }
 
     private List<String> buildIdList(String... ids) {
-        if (ids.length == 1) {
-            return singletonList(queryStringSanitizer.sanitize(ids[0]));
-        } else {
-            List<String> escapedList = new ArrayList<>();
-            for (String id : ids) {
-                escapedList.add(queryStringSanitizer.sanitize(id));
-            }
-            return escapedList;
-        }
+        return Arrays.stream(ids)
+                .map(QueryUtils::solrEscape)
+                .collect(Collectors.toList());
     }
 
     @Test
