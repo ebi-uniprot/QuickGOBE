@@ -69,7 +69,11 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
             highlights = queryResultHighlightingConverter.convertResultHighlighting(solrResults, resultHighlights);
         }
 
-        return new QueryResult<>(totalNumberOfResults, results, pageInfo, facet, highlights);
+        return new QueryResult.Builder<>(totalNumberOfResults, results)
+                .withPageInfo(pageInfo)
+                .withFacets(facet)
+                .appendHighlights(highlights)
+                .build();
     }
 
     /**
