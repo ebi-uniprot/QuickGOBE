@@ -269,8 +269,13 @@ public class OntologyUserQueryScoringIT {
 
     @Test
     public void termFrequencyDoesNotInfluenceScoring() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:0000001", "go1");
-        OntologyDocument doc2 = createDoc("GO:0000002", "go1", "go1 and go1 is not go2", "go1 synonym", "go1 or go1");
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1 go2");
+        OntologyDocument doc2 = createDoc(
+                "GO:0000002",
+                "go1 go2",
+                "go1 and go1 is not go2",
+                "go1 go2 synonym",
+                "go1 or go1");
 
         repository.save(doc1);
         repository.save(doc2);
