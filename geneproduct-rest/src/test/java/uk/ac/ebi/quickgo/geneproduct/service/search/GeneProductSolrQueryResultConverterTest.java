@@ -33,4 +33,6 @@ public class GeneProductSolrQueryResultConverterTest {
     public void nullResultsListThrowsAssertionError() throws Exception {
         converter.convertResults(null);
     }
+
+    // todo: GeneProductSolrQueryResultConverter tests
 }
