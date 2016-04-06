@@ -37,7 +37,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RepoConfig.class, loader = SpringApplicationContextLoader.class)
+@ContextConfiguration(classes = OntologyRepoConfig.class, loader = SpringApplicationContextLoader.class)
 public class OntologyRepositoryIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
