@@ -20,11 +20,11 @@
     <!-- ========================================================================== -->
     <!--                   Start of QuickGO Gene Product fields                         -->
 
-    <field name="id" type="string" indexed="true" stored="true"/>
+    <field name="id" type="lowercase" indexed="true" stored="true"/>
+    <field name="name" type="text_ignorecase" indexed="true" stored="true"/>
+    <field name="synonym" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
+    <field name="symbol" type="text_ignorecase" indexed="true" stored="true"/>
     <field name="database" type="string" indexed="false" stored="true"/>
-    <field name="symbol" type="string" indexed="false" stored="true"/>
-    <field name="name" type="string" indexed="false" stored="true"/>
-    <field name="synonym" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="type" type="string" indexed="false" stored="true"/>
     <field name="taxonId" type="int" indexed="false" stored="true"/>
     <field name="taxonName" type="string" indexed="false" stored="true"/>
@@ -35,31 +35,72 @@
     <field name="isAnnotated" type="boolean" indexed="false" stored="true"/>
     <field name="parentId" type="string" indexed="false" stored="true"/>
 
-    <!-- cross-references -->
-    <!--<field name="xrefDb" type="string" indexed="true" stored="true"/>-->
-    <!--<field name="xrefId" type="string" indexed="true" stored="true"/>-->
-
     <!-- computed field that contains most of the gene product information -->
     <field name="text" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
 
-    <!-- _version_ is required for some Solr 4.0 functionality, particularly if SolrCloud is being used -->
-    <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
+    <!-- autocomplete search fields -->
+    <field name="edge_symbol" type="text_edge" indexed="true" stored="true" multiValued="true"/>
+    <field name="edge_name" type="text_edge" indexed="true" stored="true" multiValued="false"/>
+    <field name="edge_synonym" type="text_edge" indexed="true" stored="true" multiValued="true"/>
+
+    <field name="exact_symbol" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
+    <field name="exact_name" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
+    <field name="exact_synonym" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
 
     <!--                     End of QuickGO Ontology fields                         -->
     <!-- ========================================================================== -->
 
+    <!-- _version_ is required for some Solr 4.0 functionality, particularly if SolrCloud is being used -->
+    <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
+
     <!-- Field to use to determine and enforce document uniqueness.
          Unless this field is marked with required="false", it will be a required field -->
-
     <uniqueKey>id</uniqueKey>
 
     <!-- copyField commands copy one field to another at the time a document
           is added to the index.  It's used either to index the same field differently,
           or to add multiple fields to the same field for easier/faster searching.  -->
 
+    <!-- Copy fields for generic search -->
     <copyField source="id" dest="text"/>
-    <!--<copyField source="symbol" dest="text"/> -->
+    <copyField source="symbol" dest="text"/>
     <copyField source="name" dest="text"/>
+    <copyField source="synonym" dest="text"/>
+
+    <!-- Copy fields for autocomplete search-->
+    <copyField source="symbol" dest="edge_symbol"/>
+    <copyField source="name" dest="edge_name"/>
+    <copyField source="synonym" dest="edge_synonym"/>
+
+    <copyField source="symbol" dest="exact_symbol"/>
+    <copyField source="name" dest="exact_name"/>
+    <copyField source="synonym" dest="exact_synonym"/>
+
+    <!--Use this for autocomplete searches-->
+    <fieldType name="text_edge" class="solr.TextField" sortMissingLast="true" omitNorms="false"
+               positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.EdgeNGramFilterFactory" minGramSize="1" maxGramSize="15"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
+    <fieldType name="exact_lower" class="solr.TextField" sortMissingLast="true" omitNorms="true"
+               positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
 
     <!-- Above, multiple source fields are copied to the [text] field.
        Another way to map multiple source fields to the same
@@ -377,9 +418,5 @@
          the default is fine for most applications.
          For more info: http://wiki.apache.org/solr/SchemaXml#Similarity
       -->
-    <!--
-       <similarity class="com.example.solr.CustomSimilarityFactory">
-         <str name="paramkey">param value</str>
-       </similarity>
-      -->
+    <similarity class="uk.ac.ebi.quickgo.solr.similarity.GoSimilarity"/>
 </schema>
