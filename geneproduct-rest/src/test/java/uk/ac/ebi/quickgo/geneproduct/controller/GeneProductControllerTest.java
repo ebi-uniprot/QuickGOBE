@@ -1,26 +1,29 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.when;
-
+import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
+import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
+import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
-import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
-import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
-import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.mockito.Mockito.when;
 
 /**
  * @Author Tony Wardell
@@ -48,14 +51,28 @@ public class GeneProductControllerTest {
 	@Mock
 	private GeneProduct geneProduct3;
 
-	static final String SINGLE_CSV = "A0A000";
-	static final String MULTI_CSV = "A0A000,A0A001,A0A002";
-	static final String NOTFOUND_CSV = "Butter";
+	@Mock
+	private SearchService<GeneProduct> geneProductSearchService;
 
+	@Mock
+	private SearchableField geneProductSearchableField;
+
+	@Mock
+	private SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig;
+
+	private static final String SINGLE_CSV = "A0A000";
+	private static final String MULTI_CSV = "A0A000,A0A001,A0A002";
+	static final String NOTFOUND_CSV = "Butter";
 
 	@Before
 	public void setUp() {
-		this.controller = new GeneProductController(geneProductService, controllerHelper);
+		this.controller = new GeneProductController(
+				geneProductService,
+				controllerHelper,
+				geneProductSearchService,
+				geneProductSearchableField,
+				geneProductRetrievalConfig
+		);
 
 		//Lookup for single Id
 		final List<String> singleId = Arrays.asList(SINGLE_CSV);
@@ -108,4 +125,5 @@ public class GeneProductControllerTest {
 		assertThat(response.getBody().getResults(), contains(geneProduct, geneProduct2, geneProduct3));
 	}
 
+	// todo: test basic searching behaviour using mocks for controller
 }

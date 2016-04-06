@@ -1,48 +1,66 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
+import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
- * @Author Tony Wardell
- * Date: 29/03/2016
- * Time: 10:09
+ * Provides RESTful end-points for retrieving gene product information.
  *
- * Provides RESTful endpoints for retrieving Gene Product Information
- *
- * Created with IntelliJ IDEA.
+ * Created 29/03/2016
+ * @author Tony Wardell, Edd
  */
 @RestController
 @RequestMapping(value = "/QuickGO/services/geneproduct")
 public class GeneProductController {
 
-	Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
-	static final int MAX_PAGE_RESULTS = 100;
-//	private static final String RESOURCE_PATH = "geneproducts";
+	private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
+
+	public static final int MAX_PAGE_RESULTS = 100;
+	private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
+	private static final String DEFAULT_PAGE_NUMBER = "1";
 
 	private final ControllerHelper controllerHelper;
 	private final GeneProductService geneProductService;
+	private final SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig;
+	private final SearchService<GeneProduct> geneProductSearchService;
+	private final SearchableField geneProductSearchableField;
+	private final StringToQuickGOQueryConverter geneProductQueryConverter;
 
 	@Autowired
-	public GeneProductController(GeneProductService gpService, ControllerHelper controllerHelper) {
+	public GeneProductController(
+			GeneProductService gpService,
+			ControllerHelper controllerHelper,
+			SearchService<GeneProduct> geneProductSearchService,
+			SearchableField geneProductSearchableField,
+			SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig) {
 		this.geneProductService = gpService;
 		this.controllerHelper = controllerHelper;
+		this.geneProductRetrievalConfig = geneProductRetrievalConfig;
+		this.geneProductSearchService = geneProductSearchService;
+		this.geneProductSearchableField = geneProductSearchableField;
+		this.geneProductQueryConverter = new StringToQuickGOQueryConverter(geneProductSearchableField);
 	}
 
 	/**
@@ -70,6 +88,34 @@ public class GeneProductController {
 	@RequestMapping(value = "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable(value = "ids") String ids) {
 		return getGeneProductResponse(geneProductService.findById(validateIds(ids)));
+	}
+
+	/**
+	 * Method is invoked when a client wants to search for an ontology term via its identifier, or a generic query
+	 * search
+	 *
+	 * @param query the query to search against
+	 * @param limit the amount of queries to return
+	 */
+	@RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<QueryResult<GeneProduct>> geneProductSearch(
+			@RequestParam(value = "query") String query,
+			@RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
+			@RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page,
+			@RequestParam(value = "filterQuery", required = false) List<String> filterQueries,
+			@RequestParam(value = "facet", required = false) List<String> facets,
+			@RequestParam(value = "highlighting", required = false) boolean highlighting) {
+		QueryRequest request = buildRequest(
+				query,
+				limit,
+				page,
+				filterQueries,
+				facets,
+				highlighting,
+				geneProductQueryConverter,
+				geneProductSearchableField);
+
+		return search(request, geneProductSearchService);
 	}
 
 
@@ -144,5 +190,56 @@ public class GeneProductController {
 		return true;
 	}
 
+	private QueryRequest buildRequest(String query,
+			int limit,
+			int page,
+			List<String> filterQueries,
+			List<String> facets,
+			boolean highlighting,
+			StringToQuickGOQueryConverter converter,
+			SearchableField fieldSpec) {
 
+		checkFacets(fieldSpec, facets);
+		checkFilters(fieldSpec, filterQueries);
+
+		QueryRequest.Builder builder = new QueryRequest.Builder(converter.convert(query));
+		builder.setPageParameters(page, limit);
+
+		if (facets != null) {
+			facets.forEach(builder::addFacetField);
+		}
+
+		if (filterQueries != null) {
+			filterQueries.stream()
+					.map(converter::convert)
+					.forEach(builder::addQueryFilter);
+		}
+
+		if (highlighting) {
+			geneProductRetrievalConfig.repo2DomainFieldMap().keySet().stream()
+					.forEach(builder::addHighlightedField);
+			builder.setHighlightStartDelim(geneProductRetrievalConfig.getHighlightStartDelim());
+			builder.setHighlightEndDelim(geneProductRetrievalConfig.getHighlightEndDelim());
+		}
+
+		geneProductRetrievalConfig
+				.getSearchReturnedFields()
+				.stream()
+				.forEach(builder::addProjectedField);
+
+		return builder.build();
+	}
+
+	private void checkFacets(SearchableField fieldSpec, List<String> facets) {
+		if (!isValidFacets(fieldSpec, facets)) {
+			throw new IllegalArgumentException("At least one of the provided facets is not searchable: " + facets);
+		}
+	}
+
+	private void checkFilters(SearchableField fieldSpec, List<String> filterQueries) {
+		if (!isValidFilterQueries(fieldSpec, filterQueries)) {
+			throw new IllegalArgumentException("At least one of the provided filter queries is not filterable: " +
+					filterQueries);
+		}
+	}
 }
