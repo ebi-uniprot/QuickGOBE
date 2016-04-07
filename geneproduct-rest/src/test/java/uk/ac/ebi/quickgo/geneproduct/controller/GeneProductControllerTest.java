@@ -125,5 +125,4 @@ public class GeneProductControllerTest {
 		assertThat(response.getBody().getResults(), contains(geneProduct, geneProduct2, geneProduct3));
 	}
 
-	// todo: test basic searching behaviour using mocks for controller
 }
