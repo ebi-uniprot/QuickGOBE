@@ -69,7 +69,7 @@ public class GeneProductController {
 	 */
 	@RequestMapping(value = "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable(value = "ids") String ids) {
-		return getGeneProductResponse(geneProductService.findById(validateIds(ids)));
+		return getGeneProductResponse(geneProductService.findById(controllerHelper.csvToList(ids)));
 	}
 
 
@@ -92,21 +92,6 @@ public class GeneProductController {
 	}
 
 
-	/**
-	 * Checks the validity of a list of IDs in CSV format.
-	 * @param ids a list of IDs in CSV format
-	 * @throws IllegalArgumentException is thrown if an ID is not valid, or if
-	 * number of IDs listed is greater than {@link #MAX_PAGE_RESULTS}.
-	 */
-	protected java.util.List<String> validateIds(String ids) {
-		java.util.List<String> idList =  controllerHelper.csvToList(ids);
-//		validateRequestedResults(idList.size());
-//		idList
-//				.stream()
-//				.forEach(this::checkValidId);
-
-		return idList;
-	}
 
 	/**
 	 * Checks whether the requested number of results is valid.
