@@ -93,6 +93,18 @@ public class GeneProductControllerIT {
 				.andExpect(status().isOk());
 	}
 
+
+	@Test
+	public void canRetrieveMultiGeneProductById() throws Exception {
+		ResultActions response = mockMvc.perform(get(buildGeneProductURL(validIdsCSV)));
+
+		response.andDo(print())
+				.andExpect(jsonPath("$.results.*.identifier", hasSize(3)))
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isOk());
+	}
+
+
 	protected String buildGeneProductURL(String id) {
 		return RESOURCE_URL + "/" + id;
 	}
