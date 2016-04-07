@@ -36,10 +36,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *     Search order requirements are specified in: https://www.ebi.ac.uk/panda/jira/browse/GOA-1840
  * </p>
  * <p>
- *     Terminology used in test names:
+ *     Terminology used in test names and comments:
  *     <ul>
  *         <li>Exact match: indicates contents of query is matched entirely in a field, e.g., "contents"
- *         vs "contents</li>
+ *         vs "contents"</li>
  *         <li>Word match: indicates there is a matching word in both the query and the field value, e.g., "one" vs
  *         "one two"</li>
  *         <li>Partial match: indicates that part of a word from the query/field matches the value of the
@@ -502,6 +502,65 @@ public class GeneProductUserQueryScoringIT {
                 .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
+    // Length matches -------------------------------------------------------------------------
+    @Test
+    public void wordInShortestPhraseMatchesFirst() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym is like, err, awesome");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym is really weird");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym is rocking");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "synonym"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    @Test
+    public void partialInSameWordReturnsShortestMatchesFirst() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym is like, err, awesome");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym is really weird");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym is rocking");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "syno"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    @Test
+    public void partialInDifferentWordsReturnsShortestMatchesFirst() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synon is like, err, awesome");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 1", "symbol", "a synony is like, err, awesome");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 1", "symbol", "a synonym is like, err, awesome");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "syno"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    // Helpers -------------------------------------------------------------------------
     private static GeneProductDocument createDoc(String id, String name, String symbol, String... synonyms) {
         GeneProductDocument document = new GeneProductDocument();
 
