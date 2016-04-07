@@ -35,6 +35,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>
  *     Search order requirements are specified in: https://www.ebi.ac.uk/panda/jira/browse/GOA-1840
  * </p>
+ * <p>
+ *     Terminology used in test names:
+ *     <ul>
+ *         <li>Exact match: indicates contents of query is matched entirely in a field, e.g., "contents"
+ *         vs "contents</li>
+ *         <li>Word match: indicates there is a matching word in both the query and the field value, e.g., "one" vs
+ *         "one two"</li>
+ *         <li>Partial match: indicates that part of a word from the query/field matches the value of the
+ *         field/query, e.g., "import" vs "important"</li>
+ *     </ul>
+ * </p>
  *
  * <b>Note: This class should be used solely for functional tests on the user query, and no other section of the user
  * request.</b>
@@ -106,7 +117,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void partiallyMatchingIdInQueryReturnsNoEntries() throws Exception {
+    public void partialIdMatchInQueryReturnsNoEntries() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "sym 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "sym 2", "synonym 2");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "glycine metabolic process", "sym 3", "synonym 3");
@@ -159,7 +170,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMatchesSynonymInEntry1PartiallyMatchesSymbolInEntry2AndReturnsEntry1Entry2() throws
+    public void queryExactMatchesSynonymInEntry1WordMatchesSymbolInEntry2AndReturnsEntry1Entry2() throws
                                                                                                            Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "important");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -178,7 +189,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMatchesNameInEntry1PartiallyMatchesSymbolInEntry2AndReturnsEntry1Entry2() throws
+    public void queryExactMatchesNameInEntry1WordMatchesSymbolInEntry2AndReturnsEntry1Entry2() throws
                                                                                                        Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "important", "symbol 1", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -213,7 +224,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void tokenisedNameFieldHasMatch() throws Exception {
+    public void nameWordMatchFindsResult() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine snazzy process", "symbol 2", "synonym 2");
 
@@ -228,7 +239,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void tokenisedSymbolFieldHasMatch() throws Exception {
+    public void symbolWordMatchFindsResult() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "cymbal 2", "synonym 2");
 
@@ -243,7 +254,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void tokenisedSynonymFieldHasMatch() throws Exception {
+    public void synonymWordMatchFindsResult() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "symbol 2", "syn 2");
 
@@ -295,7 +306,43 @@ public class GeneProductUserQueryScoringIT {
                 .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
+    @Test
+    public void phraseMatchOnNameReturnsShortestMatchFirst() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "a metabolic process is handy", "symbol 1", "synonym 1");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metabolic process is handy", "symbol 2", "synonym 2");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "ab metabolic process is handy", "symbol 3", "synonym 3");
 
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "metabolic process"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    @Test
+    public void phraseMatchOnSynonymReturnsShortestMatchFirst() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym is like, err, awesome");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym is really weird");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym is rocking");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "synonym is"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
 
     private static GeneProductDocument createDoc(String id, String name, String symbol, String... synonyms) {
         GeneProductDocument document = new GeneProductDocument();
