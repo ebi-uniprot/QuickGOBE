@@ -70,7 +70,7 @@ public class GeneProductDocConverterTest {
 		GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
 
 		//Verify
-		assertThat(convertedGeneProduct.identifier , is(equalTo(ID)));
+		assertThat(convertedGeneProduct.id, is(equalTo(ID)));
 		assertThat(convertedGeneProduct.database , is(equalTo(DATABASE)));
 		assertThat(convertedGeneProduct.databaseSubset , containsInAnyOrder("SUB1", "SUB2"));
 		assertThat(convertedGeneProduct.isAnnotated, is(true));

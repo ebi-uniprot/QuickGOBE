@@ -20,7 +20,7 @@ public class GeneProduct {
 	public String database;
 
 	//e.g. A0A000 http://www.uniprot.org/uniprot/A0A000
-	public String identifier;
+	public String id;
 
 	//A (unique and valid) symbol to which DB object ID is matched this field is mandatory, cardinality 1
 	public String symbol;
@@ -34,7 +34,7 @@ public class GeneProduct {
 	//Protein; RNA or complex
 	public GeneProductType type;
 
-	//taxonomic identifier(s) The NCBI taxon ID of the species encoding the gene product. this field is mandatory,
+	//taxonomic id(s) The NCBI taxon ID of the species encoding the gene product. this field is mandatory,
 	public Taxonomy taxonomy;
 
 	public List<String> databaseSubset;
@@ -42,7 +42,7 @@ public class GeneProduct {
 	//UPID
 	public String referenceProteome;
 
-	//The identifier of the gene product from which this gene product was derived
+	//The id of the gene product from which this gene product was derived
 	public String parentId;
 
 

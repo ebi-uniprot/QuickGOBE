@@ -88,7 +88,7 @@ public class GeneProductControllerIT {
 		ResultActions response = mockMvc.perform(get(buildGeneProductURL(validId)));
 
 		response.andDo(print())
-				.andExpect(jsonPath("$.results.*.identifier", hasSize(1)))
+				.andExpect(jsonPath("$.results.*.id", hasSize(1)))
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().isOk());
 	}
@@ -99,7 +99,7 @@ public class GeneProductControllerIT {
 		ResultActions response = mockMvc.perform(get(buildGeneProductURL(validIdsCSV)));
 
 		response.andDo(print())
-				.andExpect(jsonPath("$.results.*.identifier", hasSize(3)))
+				.andExpect(jsonPath("$.results.*.id", hasSize(3)))
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().isOk());
 	}

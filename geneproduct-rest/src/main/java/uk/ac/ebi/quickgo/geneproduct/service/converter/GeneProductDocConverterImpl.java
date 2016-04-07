@@ -21,7 +21,7 @@ public class GeneProductDocConverterImpl implements GeneProductDocConverter {
 		GeneProduct geneProduct			= new GeneProduct();
 		geneProduct.database 			= geneProductDocument.database;
 		geneProduct.databaseSubset 		= geneProductDocument.databaseSubsets;
-		geneProduct.identifier			= geneProductDocument.id;
+		geneProduct.id = geneProductDocument.id;
 		geneProduct.isIsoform			= geneProductDocument.isIsoform;
 		geneProduct.name				= geneProductDocument.name;
 		geneProduct.referenceProteome 	= geneProductDocument.referenceProteome;
