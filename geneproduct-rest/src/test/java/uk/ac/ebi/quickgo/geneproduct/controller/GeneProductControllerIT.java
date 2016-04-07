@@ -52,6 +52,7 @@ public class GeneProductControllerIT {
 	private static final String RESOURCE_URL = "/QuickGO/services/geneproduct";
 
 	protected static final String COMMA = ",";
+	public static final String NON_EXISTANT_ID = "Y0Y000";
 
 
 	@Autowired
@@ -112,6 +113,30 @@ public class GeneProductControllerIT {
 		}
 
 	}
+
+
+	@Test
+	public void finds400IfUrlIsEmpty() throws Exception {
+		mockMvc.perform(get(RESOURCE_URL + "/"))
+				.andDo(print())
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void finds400IfTermsIdIsEmpty() throws Exception {
+		mockMvc.perform(get(buildGeneProductURL("")))
+				.andDo(print())
+				.andExpect(status().isBadRequest());
+	}
+
+
+	@Test
+	public void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
+		mockMvc.perform(get(buildGeneProductURL(NON_EXISTANT_ID)))
+				.andDo(print())
+				.andExpect(status().isOk());
+	}
+
 
 
 	protected ResultActions expectFields(ResultActions result, String id, String path) throws Exception {
