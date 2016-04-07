@@ -25,7 +25,7 @@ import org.springframework.http.ResponseEntity;
 public final class SearchDispatcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchDispatcher.class);
 
-    protected static final Pattern VALID_FILTER_QUERY_FORMAT = Pattern.compile("(\\w+):\\w+");
+    private static final Pattern VALID_FILTER_QUERY_FORMAT = Pattern.compile("(\\w+):\\w+");
 
     private SearchDispatcher() { }
 

@@ -29,7 +29,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
  * Provides RESTful end-points for retrieving gene product information.
  *
  * Created 29/03/2016
- * @author Tony Wardell, Edd
+ * @author Tony Wardell
  */
 @RestController
 @RequestMapping(value = "/QuickGO/services/geneproduct")
