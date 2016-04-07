@@ -21,6 +21,7 @@ import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -65,6 +66,7 @@ public class GeneProductControllerIT {
 	private String validIdsCSV;
 	private List<String> validIdList;
 
+
 	@Before
 	public void setup() {
 		geneProductRepository.deleteAll();
@@ -96,12 +98,41 @@ public class GeneProductControllerIT {
 
 	@Test
 	public void canRetrieveMultiGeneProductById() throws Exception {
-		ResultActions response = mockMvc.perform(get(buildGeneProductURL(validIdsCSV)));
+		ResultActions result = mockMvc.perform(get(buildGeneProductURL(validIdsCSV)));
 
-		response.andDo(print())
+		result.andDo(print())
 				.andExpect(jsonPath("$.results.*.id", hasSize(3)))
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().isOk());
+
+		AtomicInteger index = new AtomicInteger(0);
+
+		for (String id : validIdList) {
+			expectFields(result, id, "$.results[" + index.getAndIncrement() + "].");
+		}
+
+	}
+
+
+	protected ResultActions expectFields(ResultActions result, String id, String path) throws Exception {
+		return result
+				.andDo(print())
+				.andExpect(jsonPath(path + "id").value(id))
+				.andExpect(jsonPath(path + "type").value("PROTEIN"))
+				.andExpect(jsonPath(path + "taxonomy.id").value(35758))
+				.andExpect(jsonPath(path + "taxonomy.name").value("Streptomyces ghanaensis"))
+				.andExpect(jsonPath(path + "symbol").value("Streptomyces ghanaensis - symbol"))
+				.andExpect(jsonPath(path + "parentId").value("UniProtKB:OK0206"))
+				.andExpect(jsonPath(path + "databaseSubset[0]").value("RRR"))
+				.andExpect(jsonPath(path + "databaseSubset[1]").value("QQQ"))
+				.andExpect(jsonPath(path + "isAnnotated").value(true))
+				.andExpect(jsonPath(path + "isIsoform").value(true))
+				.andExpect(jsonPath(path + "isCompleteProteome").value(true))
+				.andExpect(jsonPath(path + "name").value("moeA5"))
+				.andExpect(jsonPath(path + "referenceProteome").value("AAAA"))
+				.andExpect(jsonPath(path + "synonyms[0]").value("3SSW23"));
+
+
 	}
 
 
