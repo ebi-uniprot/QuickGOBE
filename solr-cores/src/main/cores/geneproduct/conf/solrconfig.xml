@@ -899,6 +899,7 @@
             <str name="q.op">AND</str>
             <str name="q.alt">*:*</str>
             <str name="rows">25</str>
+            <!--<str name="tie">0.5</str>-->
 
             <!-- Search in order of importance:
                     - Ontology identifier
@@ -913,11 +914,17 @@
                      - increase scoring of documents that match, with 0 slop, to search queries with more than one search
                      term. Again exact matches have higher boosting to make use these come first.
             -->
+            <!--<str name="qf">-->
+                <!--exact_symbol^10 id exact_name^5 exact_synonym^5 edge_name edge_symbol^3 edge_synonym-->
+            <!--</str>-->
+            <!--<str name="pf">-->
+                <!--exact_symbol^10 exact_name^5 exact_synonym^5 edge_name edge_symbol^3 edge_synonym-->
+            <!--</str>-->
             <str name="qf">
-                exact_symbol^10 id exact_name^5 exact_synonym^5 edge_name edge_symbol^2 edge_synonym
+                exact_symbol^20 id exact_name^10 exact_synonym^10 edge_name edge_symbol^5 edge_synonym
             </str>
             <str name="pf">
-                exact_symbol^10 exact_name^5 exact_synonym^5 edge_name edge_symbol^2 edge_synonym
+                exact_symbol^20 exact_name^10 exact_synonym^10 edge_name edge_symbol^3 edge_synonym
             </str>
             <int name="ps">0</int>
         </lst>

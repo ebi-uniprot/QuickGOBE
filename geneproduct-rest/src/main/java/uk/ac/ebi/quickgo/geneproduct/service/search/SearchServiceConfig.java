@@ -39,10 +39,10 @@ import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extrac
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
 
-    public static final String SOLR_GENE_PRODUCT_QUERY_REQUEST_HANDLER = "/search";
-//    public static final String SOLR_GENE_PRODUCT_QUERY_REQUEST_HANDLER = "/select";
+    private static final String SOLR_GENE_PRODUCT_QUERY_REQUEST_HANDLER = "/search";
+
     private static final String COMMA = ",";
-    private static final String DEFAULT_GENE_PRODUCT_SEARCH_RETURN_FIELDS = "id,name,ontologyType";
+    private static final String DEFAULT_GENE_PRODUCT_SEARCH_RETURN_FIELDS = "id,name,synonym";
 
     @Bean
     public SearchService<GeneProduct> geneProductSearchService(RequestRetrieval<GeneProduct>
