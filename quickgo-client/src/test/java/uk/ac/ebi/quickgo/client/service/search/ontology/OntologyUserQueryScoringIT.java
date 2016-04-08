@@ -291,7 +291,7 @@ public class OntologyUserQueryScoringIT {
     public void whenQueryMatchesDocumentsEquallyResultsAreOrderedByShortestToLongest() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 has a particularly long function");
         OntologyDocument doc2 = createDoc("GO:0000002", "go1 has a long function");
-        OntologyDocument doc3 = createDoc("GO:0000003", "go1 a function");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go1 has a function");
 
         repository.save(doc1);
         repository.save(doc2);
