@@ -210,7 +210,7 @@ public class GeneProductUserQueryScoringIT {
 
     @Test
     public void queryExactMatchesSymbolInEntry1WordMatchesSymbolInEntry2AndReturnsEntry1Entry2() throws
-                                                                                               Exception {
+                                                                                                 Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "important", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "glycine metabolic process", "symbol 3", "synonym X");
@@ -229,7 +229,7 @@ public class GeneProductUserQueryScoringIT {
 
     @Test
     public void queryExactMatchesNameInEntry1PartialMatchesSymbolInEntry2AndReturnsEntry1Entry2() throws
-                                                                                               Exception {
+                                                                                                  Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "import", "symbol 1", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "glycine metabolic process", "symbol 3", "synonym X");
@@ -248,7 +248,7 @@ public class GeneProductUserQueryScoringIT {
 
     @Test
     public void queryExactMatchesSynonymInEntry1PartialMatchesSymbolInEntry2AndReturnsEntry1Entry2() throws
-                                                                                                  Exception {
+                                                                                                     Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "import");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "glycine metabolic process", "symbol 3", "synonym X");
@@ -267,7 +267,7 @@ public class GeneProductUserQueryScoringIT {
 
     @Test
     public void queryExactMatchesSymbolInEntry1PartialMatchesSymbolInEntry2AndReturnsEntry1Entry2() throws
-                                                                                                  Exception {
+                                                                                                    Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "import", "important");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "glycine metabolic process", "symbol 3", "synonym X");
@@ -287,7 +287,7 @@ public class GeneProductUserQueryScoringIT {
     // Word matches win -------------------------------------------------------------------------
     @Test
     public void queryWordMatchesSymbolInEntry2WordMatchesSynonymInEntry1AndReturnsEntry2Entry1() throws
-                                                                                                           Exception {
+                                                                                                 Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "important 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "glycine metabolic process", "symbol 3", "synonym X");
@@ -306,7 +306,7 @@ public class GeneProductUserQueryScoringIT {
 
     @Test
     public void queryWordMatchesSymbolInEntry2WordMatchesNameInEntry1AndReturnsEntry2Entry1() throws
-                                                                                                        Exception {
+                                                                                              Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "important 1", "symbol 3", "synonym X");
@@ -326,7 +326,7 @@ public class GeneProductUserQueryScoringIT {
     // Partial matches win -------------------------------------------------------------------------
     @Test
     public void queryPartiallyMatchesSymbolInEntry2PartiallyMatchesSynonymInEntry1AndReturnsEntry2Entry1() throws
-                                                                                                       Exception {
+                                                                                                           Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "important 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "glycine metabolic process", "symbol 3", "synonym X");
@@ -345,7 +345,7 @@ public class GeneProductUserQueryScoringIT {
 
     @Test
     public void queryPartiallyMatchesSymbolInEntry2PartiallyMatchesNameInEntry1AndReturnsEntry2Entry1() throws
-                                                                                                           Exception {
+                                                                                                        Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "important 1", "symbol 3", "synonym X");
@@ -485,15 +485,19 @@ public class GeneProductUserQueryScoringIT {
 
     @Test
     public void phraseMatchOnSynonymReturnsShortestMatchFirst() throws Exception {
-        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym is like, err, awesome");
-        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym is really weird");
-        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym is rocking");
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym abcdef attention hup sir");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym abcde attention hup");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym abcd attention");
+
+        //        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym sg12 attention");
+        //        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym sg123 attention");
+        //        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym sg1234 attention");
 
         repository.save(doc1);
         repository.save(doc2);
         repository.save(doc3);
 
-        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "synonym is"))
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "synonym abcd"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
@@ -505,7 +509,7 @@ public class GeneProductUserQueryScoringIT {
     // Length matches -------------------------------------------------------------------------
     @Test
     public void wordInShortestPhraseMatchesFirst() throws Exception {
-        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym is like, err, awesome");
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym is really weird silly");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym is really weird");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym is rocking");
 
@@ -524,9 +528,9 @@ public class GeneProductUserQueryScoringIT {
 
     @Test
     public void partialInSameWordReturnsShortestMatchesFirst() throws Exception {
-        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym is like, err, awesome");
-        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym is really weird");
-        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym is rocking");
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym one two three");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym one two");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym one");
 
         repository.save(doc1);
         repository.save(doc2);
@@ -572,4 +576,405 @@ public class GeneProductUserQueryScoringIT {
 
         return document;
     }
+
+    // debug edgengram issues
+    @Test
+    public void debugging1() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "abcdef");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "abcde");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "abcd");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "abcd"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    @Test
+    public void debugging2() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "one two three abcde");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "one two abcde");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "one abcde");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "one abcd"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    /**
+     * SUCCESS -----------------------------------------------
+     * @throws Exception
+     */
+    @Test
+    public void debugging3() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "go1 has a particularly long function", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "go1 has a long function", "symbol", "X");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "go1 a function", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1 function"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    @Test
+    public void debugging5() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "go1 haa aad particularly long function", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "go1 haa aad long function", "symbol", "X");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "go1 haa aad function", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1 function"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    /*
+     * FAILS ----------------------------------------------------
+     */
+
+    @Test
+    public void debugging4() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "go1 particularly long function", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "go1 long function", "symbol", "X");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "go1 function", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1 function"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    // ==============================================================================================================
+    // ==============================================================================================================
+
+    // passes
+    @Test
+    public void debugging6_P() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "go1 haa aaa particularly long function", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "go1 haa aaa long function", "symbol", "X");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "go1 haa aaa function", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1 function"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    // fails
+    @Test
+    public void debugging6_F() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "go1 haa particularly long function", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "go1 haa long function", "symbol", "X");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "go1 haa function", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1 function"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
+    }
+
+    // --------------------------------------------------------------------------------------------------
+    // passes
+    @Test
+    public void debugging7_P() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa bbb"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    // fails
+    @Test
+    public void debugging7_F() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc ddd", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb ccc", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa bbb"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    // --------------------------------------------------------------------------------------------------
+    // passes
+    @Test
+    public void debugging8_P() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    // fails
+    @Test
+    public void debugging8_F() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc ddd", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb ccc", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    // passes
+    @Test
+    public void debugging8_P2() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc ddd eee", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb ccc ddd", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    // passes
+    @Test
+    public void debugging8_P3() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc ddd eee fff", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb ccc ddd eee", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    // fails
+    @Test
+    public void debugging8_F4() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc ddd eee fff ggg", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb ccc ddd eee fff", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    // passes
+    @Test
+    public void debugging8_P4() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc ddd eee fff ggg hhh", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb ccc ddd eee fff ggg", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    // passes
+    @Test
+    public void debugging8_P6() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc ddd eee fff ggg hhh iii", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb ccc ddd eee fff ggg hhh", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    // fails
+    @Test
+    public void debugging8_P5() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc ddd eee fff ggg hhh iii jjj", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb ccc ddd eee fff ggg hhh iii", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    // passes
+    @Test
+    public void debugging8_P7() throws Exception {
+        GeneProductDocument doc1 = createDoc(VALID_ID_1, "aaa bbb ccc ddd eee fff ggg hhh iii jjj kkk", "symbol", "X");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "aaa bbb ccc ddd eee fff ggg hhh iii jjj", "symbol", "X");
+
+        repository.save(doc1);
+        repository.save(doc2);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(2)));
+    }
+
+    @Test
+    public void suiteOfTripletWordTests() {
+        StringBuilder report = new StringBuilder("\n\n========== Start of test report ==========").append("\n");
+        for (int i = 0; i < 26; i++) {
+            String doc1Name = alphabetFieldValue(i + 1);
+            String doc2Name = alphabetFieldValue(i);
+            GeneProductDocument doc1 = createDoc(VALID_ID_1, doc1Name, "symbol", "X");
+            GeneProductDocument doc2 = createDoc(VALID_ID_2, doc2Name, "symbol", "X");
+
+            repository.save(doc1);
+            repository.save(doc2);
+
+            report.append(checkTripletsInDocuments(doc1Name, doc2Name));
+
+            repository.deleteAll();
+        }
+
+        report
+                .append("\n")
+                .append("-- The search query tested was (aaa)").append("\n")
+                .append("-- Successful tests returned results in the order, [doc2,doc1], as indicated by, \"PASS\"").append("\n")
+                .append("-- Unsuccessful tests returned results in the order, [doc1,doc2], as indicated by, \"FAIL\"").append("\n")
+                .append("========== end of test report ==========").append("\n");
+        System.out.println(report);
+
+        if (report.indexOf("FAIL") > 0) {
+            throw new AssertionError("There were test failures");
+        } else {
+            System.out.println("Tests passed -- nice one!");
+        }
+    }
+
+    private StringBuilder checkTripletsInDocuments(String doc1Name, String doc2Name) {
+        StringBuilder result = new StringBuilder();
+        result
+                .append("--------------------------").append("\n")
+                .append("Index contents:").append("\n")
+                .append("    doc1.name=").append(doc1Name).append("\n")
+                .append("    doc2.name=").append(doc2Name).append("\n")
+                .append("Test result: \n");
+        try{
+            mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
+                    .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                    .andExpect(jsonPath("$.results.*", hasSize(2)));
+            result.append("    PASS:").append("\n");
+        } catch (AssertionError | Exception e) {
+            result.append("    FAIL:").append("\n");
+        }
+        return result;
+    }
+
+    private String alphabetFieldValue(int letterNumber) {
+        String alphabet = "abcdefghijklmnopqrstuvwxyz";
+        StringBuilder doc = new StringBuilder();
+        for (int i = 0; i < alphabet.length() && i <= letterNumber; i++) {
+            String letter = alphabet.substring(i, i + 1);
+            doc.append(letter).append(letter).append(letter).append(" ");
+        }
+        return doc.toString().trim();
+    }
+
 }
