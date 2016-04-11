@@ -42,7 +42,7 @@ public class SearchServiceConfig {
     private static final String SOLR_GENE_PRODUCT_QUERY_REQUEST_HANDLER = "/search";
 
     private static final String COMMA = ",";
-    private static final String DEFAULT_GENE_PRODUCT_SEARCH_RETURN_FIELDS = "id,name,synonym";
+    private static final String DEFAULT_GENE_PRODUCT_SEARCH_RETURN_FIELDS = "id,name,synonym,symbol";
 
     @Bean
     public SearchService<GeneProduct> geneProductSearchService(RequestRetrieval<GeneProduct>

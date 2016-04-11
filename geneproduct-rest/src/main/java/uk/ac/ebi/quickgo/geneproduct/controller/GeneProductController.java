@@ -91,7 +91,7 @@ public class GeneProductController {
 	}
 
 	/**
-	 * Method is invoked when a client wants to search for an ontology term via its identifier, or a generic query
+	 * Method is invoked when a client wants to search for a gene product term via its identifier, or a generic query
 	 * search
 	 *
 	 * @param query the query to search against
