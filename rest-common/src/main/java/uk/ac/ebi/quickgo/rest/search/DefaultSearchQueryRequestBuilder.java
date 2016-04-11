@@ -12,6 +12,10 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQuerie
  * Default implementation of a {@link SearchQueryRequestBuilder}. Its purpose
  * is to encapsulate and simplify the creation of search queries. The built
  * instances are of type, {@link QueryRequest}.
+ * <p>
+ * This class wraps {@link uk.ac.ebi.quickgo.rest.search.query.QueryRequest.Builder}
+ * and performs common tasks, such as transforming {@link String} representations
+ * of queries into model entities.
  *
  * Created 11/04/16
  * @author Edd
