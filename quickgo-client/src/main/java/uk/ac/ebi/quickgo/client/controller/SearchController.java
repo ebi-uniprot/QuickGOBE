@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
-import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.*;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
+import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.Builder;
 
 /**
  * Search controller responsible for providing consistent search
@@ -112,15 +114,15 @@ public class SearchController {
                     .forEach(builder::addQueryFilter);
         }
 
-            if (highlighting) {
-                ontologyRetrievalConfig.repo2DomainFieldMap().keySet().stream()
-                        .forEach(builder::addHighlightedField);
-                builder.setHighlightStartDelim(ontologyRetrievalConfig.getHighlightStartDelim());
-                builder.setHighlightEndDelim(ontologyRetrievalConfig.getHighlightEndDelim());
-            }
+        if (highlighting) {
+            ontologyRetrievalConfig.repo2DomainFieldMap().keySet().stream()
+                    .forEach(builder::addHighlightedField);
+            builder.setHighlightStartDelim(ontologyRetrievalConfig.getHighlightStartDelim());
+            builder.setHighlightEndDelim(ontologyRetrievalConfig.getHighlightEndDelim());
+        }
 
-            ontologyRetrievalConfig.getSearchReturnedFields().stream()
-                    .forEach(builder::addProjectedField);
+        ontologyRetrievalConfig.getSearchReturnedFields().stream()
+                .forEach(builder::addProjectedField);
 
         return builder.build();
     }
