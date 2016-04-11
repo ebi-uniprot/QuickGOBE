@@ -11,7 +11,6 @@ import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +30,8 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/QuickGO/services/geneproduct")
 public class GeneProductController {
-
 	Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
 	static final int MAX_PAGE_RESULTS = 100;
-//	private static final String RESOURCE_PATH = "geneproducts";
 
 	private final ControllerHelper controllerHelper;
 	private final GeneProductService geneProductService;
@@ -55,7 +52,6 @@ public class GeneProductController {
 		throw new IllegalArgumentException("The requested end-point does not exist.");
 	}
 
-
 	/**
 	 * Get core information about a list of gene products in comma-separated-value (CSV) format
 	 *
@@ -71,7 +67,6 @@ public class GeneProductController {
 	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable(value = "ids") String ids) {
 		return getGeneProductResponse(geneProductService.findById(controllerHelper.csvToList(ids)));
 	}
-
 
 	/**
 	 * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.
@@ -91,8 +86,6 @@ public class GeneProductController {
 		return new ResponseEntity<>(queryResult, HttpStatus.OK);
 	}
 
-
-
 	/**
 	 * Checks whether the requested number of results is valid.
 	 * @param requestedResultsSize the number of results being requested
@@ -106,7 +99,6 @@ public class GeneProductController {
 			throw new IllegalArgumentException(errorMessage);
 		}
 	}
-
 
 	/**
 	 * Checks the validity of a geneproduct id.
@@ -128,6 +120,4 @@ public class GeneProductController {
 	protected boolean isValidId(String id) {
 		return true;
 	}
-
-
 }
