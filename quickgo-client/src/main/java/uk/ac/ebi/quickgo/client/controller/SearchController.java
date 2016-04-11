@@ -2,10 +2,10 @@ package uk.ac.ebi.quickgo.client.controller;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryRequestBuilder;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
-import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.Builder;
 
 /**
  * Search controller responsible for providing consistent search
@@ -61,12 +58,17 @@ public class SearchController {
     }
 
     /**
-     * Method is invoked when a client wants to search for an ontology term via its identifier, or a generic query
-     * search
+     * Perform a custom client search
      *
-     * @param query the query to search against
-     * @param limit the amount of queries to return
+     * @param query the user query
+     * @param limit number of entries per page
+     * @param page which page number of entries to retrieve
+     * @param filterQueries an optional list of filter queries
+     * @param facets an optional list of facet fields
+     * @param highlighting whether or not to highlight the search results
+     * @return the search results
      */
+
     @RequestMapping(value = "/ontology", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OntologyTerm>> ontologySearch(
             @RequestParam(value = "query") String query,
@@ -76,67 +78,22 @@ public class SearchController {
             @RequestParam(value = "facet", required = false) List<String> facets,
             @RequestParam(value = "highlighting", required = false) boolean highlighting) {
 
-        QueryRequest request = buildRequest(
+        DefaultSearchQueryRequestBuilder requestBuilder = new DefaultSearchQueryRequestBuilder(
                 query,
-                limit,
-                page,
-                filterQueries,
-                facets,
-                highlighting,
                 ontologyQueryConverter,
-                ontologySearchableField);
+                ontologySearchableField,
+                ontologyRetrievalConfig.getSearchReturnedFields(),
+                ontologyRetrievalConfig.repo2DomainFieldMap().keySet(),
+                ontologyRetrievalConfig.getHighlightStartDelim(),
+                ontologyRetrievalConfig.getHighlightEndDelim())
 
-        return search(request, ontologySearchService);
+                .addFacets(facets)
+                .addFilters(filterQueries)
+                .useHighlighting(highlighting)
+                .setPage(page)
+                .setPageSize(limit);
+
+        return search(requestBuilder.build(), ontologySearchService);
     }
 
-    private QueryRequest buildRequest(String query,
-            int limit,
-            int page,
-            List<String> filterQueries,
-            List<String> facets,
-            boolean highlighting,
-            StringToQuickGOQueryConverter converter,
-            SearchableField fieldSpec) {
-
-        checkFacets(fieldSpec, facets);
-        checkFilters(fieldSpec, filterQueries);
-
-        Builder builder = new Builder(converter.convert(query));
-        builder.setPageParameters(page, limit);
-
-        if (facets != null) {
-            facets.forEach(builder::addFacetField);
-        }
-
-        if (filterQueries != null) {
-            filterQueries.stream()
-                    .map(converter::convert)
-                    .forEach(builder::addQueryFilter);
-        }
-
-        if (highlighting) {
-            ontologyRetrievalConfig.repo2DomainFieldMap().keySet().stream()
-                    .forEach(builder::addHighlightedField);
-            builder.setHighlightStartDelim(ontologyRetrievalConfig.getHighlightStartDelim());
-            builder.setHighlightEndDelim(ontologyRetrievalConfig.getHighlightEndDelim());
-        }
-
-        ontologyRetrievalConfig.getSearchReturnedFields().stream()
-                .forEach(builder::addProjectedField);
-
-        return builder.build();
-    }
-
-    private void checkFacets(SearchableField fieldSpec, List<String> facets) {
-        if (!isValidFacets(fieldSpec, facets)) {
-            throw new IllegalArgumentException("At least one of the provided facets is not searchable: " + facets);
-        }
-    }
-
-    private void checkFilters(SearchableField fieldSpec, List<String> filterQueries) {
-        if (!isValidFilterQueries(fieldSpec, filterQueries)) {
-            throw new IllegalArgumentException("At least one of the provided filter queries is not filterable: " +
-                    filterQueries);
-        }
-    }
 }

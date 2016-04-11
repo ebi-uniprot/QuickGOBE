@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.rest.search;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,10 +96,10 @@ public final class SearchDispatcher {
      * valid if it is also a searchable field. This method returns {@code false}
      * if any of the specified facets are not searchable.
      * @param searchableField a specification of which fields are searchable
-     * @param facets a list of facet names
+     * @param facets the facet names
      * @return validity of the facets
      */
-    public static boolean isValidFacets(SearchableField searchableField, List<String> facets) {
+    public static boolean isValidFacets(SearchableField searchableField, Iterable<String> facets) {
         if (Objects.nonNull(facets)) {
             for (String facet : facets) {
                 if (!searchableField.isSearchable(facet)) {
@@ -118,10 +117,10 @@ public final class SearchDispatcher {
      * refers to a searchable field. This method returns {@code false}
      * if any of the specified fields are not searchable.
      * @param searchableField a specification of which fields are searchable
-     * @param filterQueries a list of filter queries
+     * @param filterQueries the filter queries
      * @return validity of the filter queries
      */
-    public static boolean isValidFilterQueries(SearchableField searchableField, List<String> filterQueries) {
+    public static boolean isValidFilterQueries(SearchableField searchableField, Iterable<String> filterQueries) {
         if (Objects.nonNull(filterQueries)) {
             for (String filterQuery : filterQueries) {
                 Matcher filterQueryMatcher = VALID_FILTER_QUERY_FORMAT.matcher(filterQuery);
