@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <include resource="org/springframework/boot/logging/logback/basic.xml"/>
+    <property name="FILE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%t] --- %m%n"/>
+    <!--<property name="LOG_PATH" value="${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}" />-->
+
+    <appender name="serverConsole"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <Append>true</Append>
+        <File>${LOG_PATH}/catalina.out</File>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/catalina-%d{yyyy-MM-dd}.out
+            </fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="serverConsole"/>
+    </root>
+</configuration>
