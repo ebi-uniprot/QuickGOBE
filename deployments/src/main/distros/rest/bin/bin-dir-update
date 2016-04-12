@@ -40,7 +40,7 @@ cd "$REPOS_DIR"
 
 cd "unp.goa.quickgo"
 git fetch
-git checkout GOA-1806_web-app-deployment-scripts
+git checkout GOA-1793_GO_code_reshuffle
 git pull
 cd "deployments"
 mvn -U -DskipTests -P assemble-rest-bin-archive package
