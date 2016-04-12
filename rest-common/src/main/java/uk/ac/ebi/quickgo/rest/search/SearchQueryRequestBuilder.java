@@ -10,5 +10,10 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
  * @author Edd
  */
 public interface SearchQueryRequestBuilder {
+
+    /**
+     * Builds a QueryRequest tailored to searching.
+     * @return
+     */
     QueryRequest build();
 }

@@ -14,8 +14,9 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQuerie
  * instances are of type, {@link QueryRequest}.
  * <p>
  * This class wraps {@link uk.ac.ebi.quickgo.rest.search.query.QueryRequest.Builder}
- * and performs common tasks, such as transforming {@link String} representations
- * of queries into model entities.
+ * and performs boiler-plate configuration tasks which all callers
+ * of a search require. These tasks include, setting up field projections,
+ * highlighting fields, validating facets and filters, etc.
  *
  * Created 11/04/16
  * @author Edd
@@ -58,6 +59,14 @@ public class DefaultSearchQueryRequestBuilder implements SearchQueryRequestBuild
         this.highlighting = NO_HIGHLIGHTING;
     }
 
+    /**
+     * Specify a list of facets that should be used.
+     * <p>
+     * Note that this argument is nullable.
+     *
+     * @param facets the facets
+     * @return this {@link DefaultSearchQueryRequestBuilder} instance
+     */
     public DefaultSearchQueryRequestBuilder addFacets(List<String> facets) {
         if (facets != null) {
             this.facets.addAll(facets);
@@ -65,6 +74,14 @@ public class DefaultSearchQueryRequestBuilder implements SearchQueryRequestBuild
         return this;
     }
 
+    /**
+     * Specify a list of filter queries that should be used.
+     * <p>
+     * Note that this argument is nullable.
+     *
+     * @param filters the filter queries
+     * @return this {@link DefaultSearchQueryRequestBuilder} instance
+     */
     public DefaultSearchQueryRequestBuilder addFilters(List<String> filters) {
         if (filters != null) {
             this.filterQueries.addAll(filters);
@@ -72,16 +89,34 @@ public class DefaultSearchQueryRequestBuilder implements SearchQueryRequestBuild
         return this;
     }
 
+    /**
+     * Whether or not to use highlighting.
+     *
+     * @param highlighting whether or not to use highlighting
+     * @return this {@link DefaultSearchQueryRequestBuilder} instance
+     */
     public DefaultSearchQueryRequestBuilder useHighlighting(boolean highlighting) {
         this.highlighting = highlighting;
         return this;
     }
 
+    /**
+     * Specify the number of results to be returned per page, i.e., page size.
+     *
+     * @param pageSize the page size.
+     * @return this {@link DefaultSearchQueryRequestBuilder} instance
+     */
     public DefaultSearchQueryRequestBuilder setPageSize(int pageSize) {
         this.pageSize = pageSize;
         return this;
     }
 
+    /**
+     * Specify which page of results to return.
+     *
+     * @param page the page of results to return.
+     * @return this {@link DefaultSearchQueryRequestBuilder} instance
+     */
     public DefaultSearchQueryRequestBuilder setPage(int page) {
         this.page = page;
         return this;
@@ -117,12 +152,22 @@ public class DefaultSearchQueryRequestBuilder implements SearchQueryRequestBuild
         return builder.build();
     }
 
+    /**
+     * Checks the specified facets are all searchable fields.
+     *
+     * @param facets the facets
+     */
     void checkFacets(Iterable<String> facets) {
         if (!isValidFacets(fieldSpec, facets)) {
             throw new IllegalArgumentException("At least one of the provided facets is not searchable: " + facets);
         }
     }
 
+    /**
+     * Checks the specified filters all refer to searchable fields.
+     *
+     * @param filterQueries the filter queries
+     */
     void checkFilters(Iterable<String> filterQueries) {
         if (!isValidFilterQueries(fieldSpec, filterQueries)) {
             throw new IllegalArgumentException("At least one of the provided filter queries is not filterable: " +
