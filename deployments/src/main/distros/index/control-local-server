@@ -1,0 +1,39 @@
+#! /bin/bash
+
+## This script should be run as tc_uni02, and functions to control starting,
+## stopping, and re-starting the indexing server.
+## It should be run from the staging environment's build directory
+##   Arguments: status              => show whether the index machine tomcats are up or down
+##              start all|machine   => start all or a specific index machine
+##              stop all|machine    => stop all or a specific index machine
+
+VALID_USERS=("tc_uni02");
+orig_dir="$(pwd)";
+
+# ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
+properties_not_found="false";
+source "common/common.variables";
+if [ $? -eq 1 ]; then
+    properties_not_found="true";
+fi
+
+if [ "$properties_not_found" = "true" ]; then
+    echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
+
+
+## ---------------------------- UTILITY FUNCTIONS ----------------------------
+function showHelp {
+    cat<<EOF
+Usage: $0 [status|stop|start]
+Argument description:
+  status                => show whether the local machine $solr_vm is up or down, and the contents of its release base directory.
+  start                 => starts the tomcat of the $solr_vm
+  stop                  => stops the tomcat of the $solr_vm
+
+  Example: $0 stop -- causes the tomcat on $solr_vm to be stopped
+
+  WARNING: Please be aware of who is using the machine before starting/stopping them.
+EOF
+}

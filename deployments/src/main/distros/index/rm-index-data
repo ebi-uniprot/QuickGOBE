@@ -1,0 +1,56 @@
+#! /bin/bash
+
+VALID_USERS=("uni_qgo");
+
+# read common environment variables
+properties_not_found="false";
+source "../common/common.variables";
+if [ $? -eq 1 ]; then
+    properties_not_found="true";
+fi
+
+source "index.variables";
+if [ $? -eq 1 ]; then
+    properties_not_found="true";
+fi
+
+if [ "$properties_not_found" = "true" ]; then
+    echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
+
+# ------------------------ abort if we're building in a staging environment ------------------------
+if [ "$vm_purpose" == "STAGE" ] ; then
+    prettyEcho "Data-services <bold>build related tasks</bold> should not take place in a <bold>STAGING</bold> environment";
+    exit 1;
+fi
+
+# ------------------------ start off the deletion ------------------------
+commandStr="curl \"$SOLR_ADDRESS/update?commit=true\" -H \"Content-Type: text/xml\" --data-binary '<delete><query>*:*</query></delete>'"
+if [ "$1" = "submit" ]; then
+    echo "Are you sure you want to delete: $data_dir? [yes|no]";
+    read answer;
+    if [ "$answer" == "yes" ]; then
+
+        # ensure indexing job variable is defined
+        if [ ! -z "$commandStr" ]; then
+
+            echo "executing command:"
+            echo "$commandStr";
+
+            eval "$commandStr";
+            echo "Please reload the core, for changes to take effect: $SOLR_ADDRESS/#/~cores/$CORE_NAME"
+        else
+              echo "\$commandStr variable must be set";
+              exit 1;
+        fi
+    else
+        echo "Aborting.";
+        exit 1;
+    fi
+else
+      echo "The following command will be executed:";
+      echo "$commandStr";
+      echo ""
+      echo "If this is correct, please re-run this script with parameter \"submit\""
+fi
