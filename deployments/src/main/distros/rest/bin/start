@@ -14,7 +14,7 @@ source "environment.variables" || {
 }
 
 # ======= CONSTANTS =======================================
-PERMITTED_USER="uni_qgo,eddturner"
+PERMITTED_USER="uni_qgo"
 SERVICE_CONF_PATH="$(pwd -P)"
 SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
 SERVICE_LIVE_NAME="live"

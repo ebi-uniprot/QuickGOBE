@@ -14,7 +14,7 @@ RELEASE_REPO_TYPE="release"
 RELEASE_REPO_NAME="uniprot-artifactory-release"
 SNAPSHOT_REPO_TYPE="snapshot"
 SNAPSHOT_REPO_NAME="uniprot-artifactory-snapshots"
-PERMITTED_USER="uni_qgo,eddturner"
+PERMITTED_USER="uni_qgo"
 JAVA="$JAVA_HOME/bin/java"
 MAVEN="$MAVEN_HOME/bin/mvn"
 
