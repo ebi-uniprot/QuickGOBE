@@ -16,7 +16,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 01/04/2016
  * Time: 15:58
  * Created with IntelliJ IDEA.

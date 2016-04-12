@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.Mockito.when;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 01/04/2016
  * Time: 13:01
  * Created with IntelliJ IDEA.

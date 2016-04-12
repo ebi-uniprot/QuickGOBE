@@ -7,7 +7,7 @@ import org.springframework.context.annotation.PropertySource;
 import uk.ac.ebi.quickgo.geneproduct.common.RepoConfig;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 04/04/2016
  * Time: 11:45
  * Created with IntelliJ IDEA.

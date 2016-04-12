@@ -21,7 +21,7 @@ import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
  * made available by {@link RepoConfig} and {@link SearchServiceConfig}. Services
  * to additionally make accessible are defined in specified the {@link ComponentScan} packages.
  *
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 04/04/2016
  * Time: 11:42
  * Created with IntelliJ IDEA.

@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Performs tests on GeneProduct REST controller.
  * Uses an embedded Solr server that is cleaned up automatically after tests complete.
  *
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 04/04/2016
  */
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -7,7 +7,7 @@ import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 /**
  * Turn a GeneProduct document from Solr into a model to be used by the RESTful service.
  *
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 01/04/2016
  * Time: 14:31
  * Created with IntelliJ IDEA.

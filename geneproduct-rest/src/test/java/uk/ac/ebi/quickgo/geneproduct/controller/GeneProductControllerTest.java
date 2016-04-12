@@ -23,7 +23,7 @@ import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 30/03/2016
  * Time: 16:33
  * Created with IntelliJ IDEA.

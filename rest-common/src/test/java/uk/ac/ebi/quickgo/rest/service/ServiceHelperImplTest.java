@@ -18,7 +18,7 @@ import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.when;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 01/04/2016
  * Time: 13:31
  * Created with IntelliJ IDEA.

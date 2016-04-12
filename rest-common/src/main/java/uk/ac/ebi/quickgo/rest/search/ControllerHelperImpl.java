@@ -7,7 +7,7 @@ import java.util.List;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 29/03/2016
  * Time: 10:39
  * Created with IntelliJ IDEA.

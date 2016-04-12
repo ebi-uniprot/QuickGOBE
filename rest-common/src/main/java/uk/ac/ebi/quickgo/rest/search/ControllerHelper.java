@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.rest.search;
 import java.util.List;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 01/04/2016
  * Time: 10:13
  * Created with IntelliJ IDEA.
