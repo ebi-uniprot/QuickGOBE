@@ -1,25 +1,28 @@
 package uk.ac.ebi.quickgo.client.service.search.ontology;
 
-import uk.ac.ebi.quickgo.client.service.search.SearchControllerSetup;
+import uk.ac.ebi.quickgo.client.QuickGOREST;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
+import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+@SpringApplicationConfiguration(classes = {QuickGOREST.class})
 public class OntologySearchIT extends SearchControllerSetup {
     @Autowired
     private OntologyRepository repository;
 
-    private static final String ONTOLOGY_RESOURCE_URL = SEARCH_RESOURCE_URL + "/ontology";
+    private static final String ONTOLOGY_RESOURCE_URL = "/QuickGO/internal/search/ontology";
 
     @Before
     public void setUp() throws Exception {
