@@ -45,9 +45,9 @@ public class GeneProduct {
 	//The id of the gene product from which this gene product was derived
 	public String parentId;
 
-
 	public boolean isIsoform;
-	public boolean isAnnotated;
+
+	//todo maybe.. this value could be replaced with the UPID (as we have for referenceProteome)
 	public boolean isCompleteProteome;
 
 
@@ -80,7 +80,6 @@ public class GeneProduct {
 				", referenceProteome='" + referenceProteome + '\'' +
 				", parentId='" + parentId + '\'' +
 				", isIsoform=" + isIsoform +
-				", isAnnotated=" + isAnnotated +
 				", isCompleteProteome=" + isCompleteProteome +
 				'}';
 	}
