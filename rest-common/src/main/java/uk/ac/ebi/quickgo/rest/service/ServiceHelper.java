@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.rest.service;
 import java.util.List;
 
 /**
- * @author Tony Wardell
+ * @Author Tony Wardell
  * Date: 01/04/2016
  * Time: 13:32
  *
@@ -12,5 +12,5 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  */
 public interface ServiceHelper {
-	List<String> buildIdList(List<String> ids);
+	List<String> buildIdList(String[] ids);
 }

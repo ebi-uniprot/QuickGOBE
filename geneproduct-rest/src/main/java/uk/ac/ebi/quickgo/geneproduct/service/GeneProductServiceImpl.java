@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Tony Wardell
+ * @Author Tony Wardell
  * Date: 29/03/2016
  * Time: 10:56
  * Created with IntelliJ IDEA.
@@ -29,7 +29,7 @@ public class GeneProductServiceImpl implements GeneProductService {
 	}
 
 	@Override
-	public List<GeneProduct> findById(List<String> ids) {
+	public List<GeneProduct> findById(String[] ids) {
 		return convertDocs(geneProductRepository.findById(serviceHelper.buildIdList(ids)));
 	}
 

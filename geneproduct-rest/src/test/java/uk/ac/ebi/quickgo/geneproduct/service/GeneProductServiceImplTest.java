@@ -50,18 +50,19 @@ public class GeneProductServiceImplTest {
 
 		//stub single
 		List<GeneProductDocument> singleDocList = Arrays.asList(geneProductDocument);
-		when(serviceHelper.buildIdList(id)).thenReturn(id);
+		when(serviceHelper.buildIdList(ID_ARRAY)).thenReturn(id);
 		when(geneProductRepository.findById(id)).thenReturn(singleDocList);
 		when(geneProductDocConverter.convert(geneProductDocument)).thenReturn(geneProduct);
 
 	}
 
 	final List<String> id = Arrays.asList("A0A000");
+	final static String[] ID_ARRAY = new String[] {"A0A000"};
 
 	@Test
 	public void testWeFindASingleId(){
 
-		List<GeneProduct> geneProducts = geneProductService.findById(id);
+		List<GeneProduct> geneProducts = geneProductService.findById(ID_ARRAY);
 		assertThat(geneProducts, containsInAnyOrder(geneProduct));
 	}
 
