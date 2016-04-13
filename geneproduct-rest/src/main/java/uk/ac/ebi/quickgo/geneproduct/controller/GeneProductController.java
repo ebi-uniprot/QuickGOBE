@@ -16,10 +16,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Tony Wardell
@@ -87,15 +84,13 @@ public class GeneProductController {
 	 * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents
 	 */
 	protected ResponseEntity<QueryResult<GeneProduct>> getGeneProductResponse(List<GeneProduct> docList) {
-		List<GeneProduct> resultsToShow;
+		QueryResult.Builder<GeneProduct> builder;
 		if (docList == null) {
-			resultsToShow = Collections.emptyList();
+			builder = new QueryResult.Builder<>(0, Collections.emptyList());
 		} else {
-			resultsToShow = docList;
+ 			builder = new QueryResult.Builder<>(docList.size(), docList);
 		}
-
-		QueryResult<GeneProduct> queryResult = new QueryResult<>(resultsToShow.size(), resultsToShow, null, null, null);
-		return new ResponseEntity<>(queryResult, HttpStatus.OK);
+		return new ResponseEntity<>(builder.build(), HttpStatus.OK);
 	}
 
 
