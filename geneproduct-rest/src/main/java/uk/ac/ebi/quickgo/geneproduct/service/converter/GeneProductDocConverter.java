@@ -11,6 +11,11 @@ import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
  */
 public interface GeneProductDocConverter {
 
+	/**
+	 * Convert a Gene Product Document from Solr into a model to be returned to the user
+	 * @param geneProductDocument
+	 * @return
+	 */
 	GeneProduct convert(GeneProductDocument geneProductDocument);
 
 }
