@@ -86,13 +86,14 @@ public class GeneProductControllerTest {
 	@Test
 	public void retrieveSingleGeneProduct() {
 		ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(SINGLE_CSV_LIST);
-		assertThat(geneProduct , sameInstance(response.getBody().getResults().get(0)));
+		assertThat(response.getBody().getResults(), contains(geneProduct));
+		assertThat(response.getBody().getResults(), hasSize(1));
 	}
 
 	@Test
 	public void retrieveMultipleGeneProduct() {
 		ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(MULTI_CSV_LIST);
-		assertThat(response.getBody().getResults().size(), is(3));
+		assertThat(response.getBody().getResults(), hasSize(3));
 		assertThat(response.getBody().getResults(), contains(geneProduct, geneProduct2, geneProduct3));
 	}
 
