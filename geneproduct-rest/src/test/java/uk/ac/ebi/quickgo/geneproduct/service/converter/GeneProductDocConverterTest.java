@@ -74,7 +74,6 @@ public class GeneProductDocConverterTest {
 		assertThat(convertedGeneProduct.id, is(equalTo(ID)));
 		assertThat(convertedGeneProduct.database , is(equalTo(DATABASE)));
 		assertThat(convertedGeneProduct.databaseSubset , containsInAnyOrder("SUB1", "SUB2"));
-		assertThat(convertedGeneProduct.isAnnotated, is(true));
 		assertThat(convertedGeneProduct.synonyms, containsInAnyOrder("Q1234","R1234","S1234"));
 		assertThat(convertedGeneProduct.isIsoform, is(true));
 		assertThat(convertedGeneProduct.name, is(NAME));
