@@ -108,15 +108,4 @@ public class GeneProductController {
 			throw new IllegalArgumentException(errorMessage);
 		}
 	}
-
-	/**
-	 * Are there any requirements for the validity of a gene product id
-	 * @param id
-	 * @return
-	 */
-	protected boolean isValidId(String id) {
-		return true;
-	}
-
-
 }
