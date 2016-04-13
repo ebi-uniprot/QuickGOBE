@@ -46,7 +46,7 @@ public class GeneProductRepoConfig {
     @Profile("embeddedServer")
     public SolrServerFactory embeddedSolrServerFactory(CoreContainer coreContainer)
             throws IOException, SAXException, ParserConfigurationException {
-        EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, SOLR_CORE);
+        EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, null);
         return new MulticoreSolrServerFactory(embeddedSolrServer);
     }
 
