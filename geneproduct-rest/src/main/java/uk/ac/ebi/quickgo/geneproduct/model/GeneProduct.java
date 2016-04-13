@@ -65,4 +65,23 @@ public class GeneProduct {
 			this.name = name;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "GeneProduct{" +
+				"database='" + database + '\'' +
+				", id='" + id + '\'' +
+				", symbol='" + symbol + '\'' +
+				", name='" + name + '\'' +
+				", synonyms=" + synonyms +
+				", type=" + type +
+				", taxonomy=" + taxonomy +
+				", databaseSubset=" + databaseSubset +
+				", referenceProteome='" + referenceProteome + '\'' +
+				", parentId='" + parentId + '\'' +
+				", isIsoform=" + isIsoform +
+				", isAnnotated=" + isAnnotated +
+				", isCompleteProteome=" + isCompleteProteome +
+				'}';
+	}
 }
