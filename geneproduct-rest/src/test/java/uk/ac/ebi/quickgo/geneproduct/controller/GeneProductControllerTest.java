@@ -76,17 +76,6 @@ public class GeneProductControllerTest {
 		when(controllerHelper.csvToList(MULTI_CSV)).thenReturn(multiIds);
 	}
 
-
-	@Test
-	public void validatesValidRequestedResults() {
-		controller.validateRequestedResults(GeneProductController.MAX_PAGE_RESULTS);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void validatesInvalidRequestedResults() {
-		controller.validateRequestedResults(GeneProductController.MAX_PAGE_RESULTS + 1);
-	}
-
 	@Test
 	public void retrieveEmptyList() {
 		ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(new String[]{""});
