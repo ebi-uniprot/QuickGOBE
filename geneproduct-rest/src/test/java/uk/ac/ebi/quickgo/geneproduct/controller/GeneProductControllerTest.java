@@ -76,10 +76,6 @@ public class GeneProductControllerTest {
 		when(controllerHelper.csvToList(MULTI_CSV)).thenReturn(multiIds);
 	}
 
-	@Test
-	public void checkValidId() {
-		controller.checkValidId("id0");
-	}
 
 	@Test
 	public void validatesValidRequestedResults() {

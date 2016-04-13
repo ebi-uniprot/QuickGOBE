@@ -109,19 +109,6 @@ public class GeneProductController {
 		}
 	}
 
-
-	/**
-	 * Checks the validity of a geneproduct id.
-	 *
-	 * @param id the term id to check
-	 * @throws IllegalArgumentException is thrown if the ID is not valid
-	 */
-	protected void checkValidId(String id) {
-		if (!isValidId(id)) {
-			throw new IllegalArgumentException("Provided ID: '" + id + "' is invalid");
-		}
-	}
-
 	/**
 	 * Are there any requirements for the validity of a gene product id
 	 * @param id
