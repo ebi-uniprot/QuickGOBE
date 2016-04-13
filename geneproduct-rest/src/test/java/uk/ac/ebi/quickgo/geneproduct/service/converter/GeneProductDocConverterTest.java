@@ -12,6 +12,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 
@@ -84,6 +85,16 @@ public class GeneProductDocConverterTest {
 		assertThat(convertedGeneProduct.taxonomy.id, is(TAX_ID));
 		assertThat(convertedGeneProduct.taxonomy.name, is(TAX_NAME));
 		assertThat(convertedGeneProduct.type, is(GeneProductType.PROTEIN));
+
+	}
+
+	@Test
+	public void thereIsNoTaxId(){
+		geneProductDocument.taxonId=0;
+		GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
+
+		//Verify
+		assertThat(convertedGeneProduct.taxonomy, is(nullValue()));
 
 
 	}

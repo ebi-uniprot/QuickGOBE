@@ -21,13 +21,13 @@ public class GeneProductDocConverterImpl implements GeneProductDocConverter {
 		GeneProduct geneProduct			= new GeneProduct();
 		geneProduct.database 			= geneProductDocument.database;
 		geneProduct.databaseSubset 		= geneProductDocument.databaseSubsets;
-		geneProduct.id = geneProductDocument.id;
+		geneProduct.id 					= geneProductDocument.id;
 		geneProduct.isIsoform			= geneProductDocument.isIsoform;
 		geneProduct.name				= geneProductDocument.name;
 		geneProduct.referenceProteome 	= geneProductDocument.referenceProteome;
 		geneProduct.synonyms 			= geneProductDocument.synonyms;
 		geneProduct.symbol				= geneProductDocument.symbol;
-		geneProduct.taxonomy			= new GeneProduct.Taxonomy(geneProductDocument.taxonId, geneProductDocument.taxonName);
+		geneProduct.taxonomy			= geneProductDocument.taxonId == 0? null : new GeneProduct.Taxonomy(geneProductDocument.taxonId, geneProductDocument.taxonName);
 		geneProduct.type				= GeneProductType.typeOf(geneProductDocument.type);
 		geneProduct.isAnnotated			= geneProductDocument.isAnnotated;
 		geneProduct.isCompleteProteome	= geneProductDocument.isCompleteProteome;
