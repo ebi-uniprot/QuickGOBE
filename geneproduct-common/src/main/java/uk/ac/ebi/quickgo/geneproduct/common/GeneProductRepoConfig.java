@@ -19,7 +19,7 @@ import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
 import org.xml.sax.SAXException;
 
 /**
- * Publishes the configuration beans of the ontology repository.
+ * Publishes the configuration beans of the Gene Product repository.
  */
 @Configuration
 public class GeneProductRepoConfig {
@@ -30,7 +30,6 @@ public class GeneProductRepoConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Bean
     @Profile("httpServer")
     public SolrServerFactory httpSolrServerFactory(@Value("${solr.host}") String solrUrl) {
         return new MulticoreSolrServerFactory(new HttpSolrServer(solrUrl));
