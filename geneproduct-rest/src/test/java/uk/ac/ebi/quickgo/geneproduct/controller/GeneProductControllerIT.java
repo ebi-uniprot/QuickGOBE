@@ -56,12 +56,12 @@ public class GeneProductControllerIT {
 
 
 	@Autowired
-	protected WebApplicationContext webApplicationContext;
+	private WebApplicationContext webApplicationContext;
 
 	@Autowired
-	protected GeneProductRepository geneProductRepository;
+	private GeneProductRepository geneProductRepository;
 
-	protected MockMvc mockMvc;
+	private MockMvc mockMvc;
 
 	private String validId;
 	private String validIdsCSV;
@@ -72,9 +72,7 @@ public class GeneProductControllerIT {
 	public void setup() {
 		geneProductRepository.deleteAll();
 
-		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-				.build();
-
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
 		List<GeneProductDocument> basicDocs = createBasicDocs();
 		assertThat(basicDocs.size(), is(greaterThan(1)));
@@ -139,7 +137,7 @@ public class GeneProductControllerIT {
 
 
 
-	protected ResultActions expectFields(ResultActions result, String id, String path) throws Exception {
+	private ResultActions expectFields(ResultActions result, String id, String path) throws Exception {
 		return result
 				.andDo(print())
 				.andExpect(jsonPath(path + "id").value(id))
@@ -161,11 +159,11 @@ public class GeneProductControllerIT {
 	}
 
 
-	protected String buildGeneProductURL(String id) {
+	private String buildGeneProductURL(String id) {
 		return RESOURCE_URL + "/" + id;
 	}
 
-	protected List<GeneProductDocument> createBasicDocs() {
+	private List<GeneProductDocument> createBasicDocs() {
 		return Arrays.asList(
 				GeneProductDocMocker.createDocWithId("A0A000"),
 				GeneProductDocMocker.createDocWithId("A0A001"),
