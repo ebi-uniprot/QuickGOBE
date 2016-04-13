@@ -3,12 +3,19 @@ package uk.ac.ebi.quickgo.geneproduct.search;
 import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
+import java.util.Collections;
+import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringApplicationConfiguration(classes = {GeneProductREST.class})
 public class GeneProductSearchIT extends SearchControllerSetup {
@@ -27,290 +34,276 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     @Test
     public void requestWhichFindsNothingReturnsValidResponse() throws Exception {
         GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process");
+
         saveToRepository(doc1);
 
         checkValidEmptyResultsResponse("doesn't exist");
     }
 
-//    @Test
-//    public void requestWhichAsksForPage0WithLimit0Returns400Response() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go1");
-//        saveToRepository(doc1);
-//
-//        checkInvalidPageInfoInResponse("aaaa", 0, 0, HttpStatus.SC_BAD_REQUEST);
-//    }
-//
-//    @Test
-//    public void requestWithNegativePageNumberReturns400Response() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go3");
-//
-//        saveToRepository(doc1, doc2, doc3);
-//
-//        int pageNum = -1;
-//        int entriesPerPage = 10;
-//
-//        checkInvalidPageInfoInResponse("go", pageNum, entriesPerPage, HttpStatus.SC_BAD_REQUEST);
-//    }
-//
-//    @Test
-//    public void requestWithNegativeLimitNumberReturns400Response() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go3");
-//
-//        saveToRepository(doc1, doc2, doc3);
-//
-//        int pageNum = 1;
-//        int entriesPerPage = -1;
-//
-//        checkInvalidPageInfoInResponse("go", pageNum, entriesPerPage, HttpStatus.SC_BAD_REQUEST);
-//    }
-//
-//    @Test
-//    public void requestForFirstPageWithLimitOf10ReturnsAllResults() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go3");
-//
-//        saveToRepository(doc1, doc2, doc3);
-//
-//        int pageNum = 1;
-//        int entriesPerPage = 3;
-//
-//        checkValidPageInfoInResponse("go", pageNum, entriesPerPage);
-//    }
-//
-//    @Test
-//    public void requestForSecondPageWithLimitOf2ReturnsLastEntry() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go3");
-//
-//        saveToRepository(doc1, doc2, doc3);
-//
-//        int pageNum = 2;
-//        int entriesPerPage = 2;
-//
-//        checkValidPageInfoInResponse("go", pageNum, entriesPerPage);
-//    }
-//
-//    @Test
-//    public void requestForPageThatIsLargerThanTotalNumberOfPagesInResponseReturns400Response() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go3");
-//
-//        saveToRepository(doc1, doc2, doc3);
-//
-//        int pageNum = 3;
-//        int entriesPerPage = 2;
-//
-//        checkInvalidPageInfoInResponse("go", pageNum, entriesPerPage, HttpStatus.SC_INTERNAL_SERVER_ERROR);
-//    }
-//
-//    // facets ---------------------------------------------------------
-//    @Test
-//    public void requestWithInValidFacetFieldReturns400Response() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go3");
-//
-//        saveToRepository(doc1, doc2, doc3);
-//
-//        checkInvalidFacetResponse("go", "incorrect_field");
-//    }
-//
-//    @Test
-//    public void requestWithValidFacetFieldReturnsResponseWithFacetInResult() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go3");
-//
-//        saveToRepository(doc1, doc2, doc3);
-//
-//        checkValidFacetResponse("go", OntologyFields.Searchable.ASPECT);
-//    }
-//
-//    @Test
-//    public void requestWithMultipleValidFacetFieldsReturnsResponseWithMultipleFacetsInResult() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go3");
-//
-//        saveToRepository(doc1, doc2, doc3);
-//
-//        checkValidFacetResponse("go", OntologyFields.Searchable.ASPECT,
-//                OntologyFields.Searchable.NAME);
-//    }
-//
-//    // filter queries ---------------------------------------------------------
-//    @Test
-//    public void requestWithInvalidFilterQueryReturns400Response() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go3");
-//
-//        saveToRepository(doc1, doc2, doc3);
-//
-//        String fq = buildFilterQuery("thisFieldDoesNotExist", "Process");
-//
-//        checkInvalidFilterQueryResponse("go", fq);
-//    }
-//
-//    @Test
-//    public void requestWithAFilterQueryReturnsFilteredResponse() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go function 1");
-//        doc1.aspect = "Process";
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go function 2");
-//        doc2.aspect = "Function";
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go function 3");
-//        doc3.aspect = "Process";
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//        repository.save(doc3);
-//
-//        String fq = buildFilterQuery(OntologyFields.Searchable.ASPECT, "Process");
-//
-//        checkValidFilterQueryResponse("go function", 2, fq);
-//    }
-//
-//    @Test
-//    public void requestWith3FilterQueriesThatFilterOutAllResults() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go function 1");
-//        doc1.aspect = "Process";
-//        doc1.definition = "definition Klose";
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go function 2");
-//        doc2.aspect = "Function";
-//        doc2.definition = "definition Jerome";
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go function 3");
-//        doc3.aspect = "Process";
-//        doc3.definition = "definition Jerome";
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//        repository.save(doc3);
-//
-//        String fq1 = buildFilterQuery(OntologyFields.Searchable.ASPECT, "Process");
-//        String fq2 = buildFilterQuery(OntologyFields.Searchable.DEFINITION, "Klose");
-//        String fq3 = buildFilterQuery(OntologyFields.Searchable.DEFINITION, "Ibrahimovic");
-//
-//        checkValidFilterQueryResponse("go function", 0, fq1, fq2, fq3);
-//    }
-//
-//    @Test
-//    public void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go function 1");
-//        doc1.aspect = "Process";
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go function 2");
-//        doc2.aspect = "Process";
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go function 3");
-//        doc3.aspect = "Process";
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//        repository.save(doc3);
-//
-//        String fq = buildFilterQuery(OntologyFields.Searchable.ASPECT, "Process");
-//
-//        checkValidFilterQueryResponse("go function", 3, fq);
-//    }
-//
-//    @Test
-//    public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go function 1");
-//        doc1.aspect = "Process";
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go function 2");
-//        doc2.aspect = "Function";
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go function 3");
-//        doc3.aspect = "Process";
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//        repository.save(doc3);
-//
-//        checkValidFilterQueryResponse("go function", 2, OntologyFields.Searchable.ASPECT + ":Process")
-//                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))
-//                .andExpect(jsonPath("$.results[1].id").value("GO:0000003"));
-//    }
-//
-//    // highlighting ------------------------------------------------
-//    @Test
-//    public void requestWithHighlightingOnAndOneHitReturnsValidResponse() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go function 1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go function 2");
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//
-//        checkValidHighlightOnQueryResponse("function 2", "GO:0000002");
-//    }
-//
-//    @Test
-//    public void requestWithHighlightingOnAndTwoHitsReturnsValidResponse() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go function 1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go anotherFunction 2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go anotherFunction 3");
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//        repository.save(doc3);
-//
-//        checkValidHighlightOnQueryResponse("anotherFunction", "GO:0000002", "GO:0000003");
-//    }
-//
-//    @Test
-//    public void requestWithHighlightingOnAndZeroHitsReturnsValidResponse() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go function 1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go function 2");
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//
-//        checkValidHighlightOnQueryResponse("Southampton");
-//    }
-//
-//    @Test
-//    public void requestWithHighlightingOffAndOneHitReturnsValidResponse() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go function 1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go function 2");
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//
-//        checkValidHighlightOffQueryResponse("function 2", 1);
-//    }
-//
-//    @Test
-//    public void requestWithHighlightingOffAndOnZeroHitsReturnsValidResponse() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go function 1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go function 2");
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//
-//        checkValidHighlightOffQueryResponse("Southampton", 0);
-//    }
-//
-//    @Test
-//    public void requestWithHighlightingOnReturnsTwoHighlightedValuesInResponse() throws Exception {
-//        OntologyDocument doc1 = createGeneProductDoc("GO:0000001", "go function 1");
-//        OntologyDocument doc2 = createGeneProductDoc("GO:0000002", "go anotherFunction 2");
-//        OntologyDocument doc3 = createGeneProductDoc("GO:0000003", "go anotherFunction 3");
-//
-//        repository.save(doc1);
-//        repository.save(doc2);
-//        repository.save(doc3);
-//
-//        checkValidHighlightOnQueryResponse("anotherFunction", "GO:0000002", "GO:0000003")
-//                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder("GO:0000002", "GO:0000003")))
-//                .andExpect(jsonPath("$.highlighting.*.id", containsInAnyOrder("GO:0000002", "GO:0000003")))
-//                .andExpect(jsonPath("$.highlighting.*.matches.*.field", containsInAnyOrder("name", "name")))
-//                .andExpect(jsonPath("$.highlighting[0].matches[0].values[0]", containsString("anotherFunction")))
-//                .andExpect(jsonPath("$.highlighting[1].matches[0].values[0]", containsString("anotherFunction")));
-//    }
+    @Test
+    public void requestWhichAsksForPage0WithLimit0Returns400Response() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process");
+
+        saveToRepository(doc1);
+
+        checkInvalidPageInfoInResponse("aaaa", 0, 0, HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void requestWithNegativePageNumberReturns400Response() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        int pageNum = -1;
+        int entriesPerPage = 10;
+
+        checkInvalidPageInfoInResponse("glycine", pageNum, entriesPerPage, HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void requestWithNegativeLimitNumberReturns400Response() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        int pageNum = 1;
+        int entriesPerPage = -1;
+
+        checkInvalidPageInfoInResponse("process 3", pageNum, entriesPerPage, HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void requestForFirstPageWithLimitOf10ReturnsAllResults() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        int pageNum = 1;
+        int entriesPerPage = 3;
+
+        checkValidPageInfoInResponse("glycine", pageNum, entriesPerPage);
+    }
+
+    @Test
+    public void requestForSecondPageWithLimitOf2ReturnsLastEntry() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        int pageNum = 2;
+        int entriesPerPage = 2;
+
+        checkValidPageInfoInResponse("glycine", pageNum, entriesPerPage);
+    }
+
+    @Test
+    public void requestForPageThatIsLargerThanTotalNumberOfPagesInResponseReturns400Response() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        int pageNum = 3;
+        int entriesPerPage = 2;
+
+        checkInvalidPageInfoInResponse("metabolic", pageNum, entriesPerPage, HttpStatus.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    // facets ---------------------------------------------------------
+    @Test
+    public void requestWithInValidFacetFieldReturns400Response() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkInvalidFacetResponse("glycine", "incorrect_field");
+    }
+
+    @Test
+    public void requestWithValidFacetFieldReturnsResponseWithFacetInResult() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkValidFacetResponse("glycine", GeneProductFields.Searchable.NAME);
+    }
+
+    @Test
+    public void requestWithMultipleValidFacetFieldsReturnsResponseWithMultipleFacetsInResult() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkValidFacetResponse("glycine", GeneProductFields.Searchable.ID,
+                GeneProductFields.Searchable.NAME);
+    }
+
+    // filter queries ---------------------------------------------------------
+    @Test
+    public void requestWithInvalidFilterQueryReturns400Response() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        String fq = buildFilterQuery("thisFieldDoesNotExist", "Process");
+
+        checkInvalidFilterQueryResponse("glycine", fq);
+    }
+
+    @Test
+    public void requestWithAFilterQueryReturnsFilteredResponse() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        doc1.symbol = "important";
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        doc2.symbol = "important";
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        doc3.symbol = "pointless";
+
+        saveToRepository(doc1, doc2, doc3);
+
+        String fq = buildFilterQuery(GeneProductFields.Searchable.SYMBOL, "important");
+
+        checkValidFilterQueryResponse("metabolic", 2, fq);
+    }
+
+    @Test
+    public void requestWith3FilterQueriesThatFilterOutAllResults() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        doc1.symbol = "important";
+        doc1.synonyms = Collections.singletonList("Klose");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        doc2.symbol = "important";
+        doc2.synonyms = Collections.singletonList("Jerome");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        doc3.symbol = "pointless";
+        doc3.synonyms = Collections.singletonList("Jerome");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        String fq1 = buildFilterQuery(GeneProductFields.Searchable.SYMBOL, "Process");
+        String fq2 = buildFilterQuery(GeneProductFields.Searchable.SYNONYM, "Klose");
+        String fq3 = buildFilterQuery(GeneProductFields.Searchable.SYNONYM, "Ibrahimovic");
+
+        checkValidFilterQueryResponse("process", 0, fq1, fq2, fq3);
+    }
+
+    @Test
+    public void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        doc1.symbol = "important";
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        doc2.symbol = "important";
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        doc3.symbol = "important";
+
+        saveToRepository(doc1, doc2, doc3);
+
+        String fq = buildFilterQuery(GeneProductFields.Searchable.SYNONYM, "important");
+
+        checkValidFilterQueryResponse("glycine", 3, fq);
+    }
+
+    @Test
+    public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        doc1.symbol = "important";
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        doc2.symbol = "pointless";
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        doc3.symbol = "important";
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkValidFilterQueryResponse("go function", 2, GeneProductFields.Searchable.SYMBOL + ":important")
+                .andExpect(jsonPath("$.results[0].identifier").value("A0A0F8CSS1"))
+                .andExpect(jsonPath("$.results[1].identifier").value("A0A0F8CSS1"));
+    }
+
+    // highlighting ------------------------------------------------
+    @Test
+    public void requestWithHighlightingOnAndOneHitReturnsValidResponse() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+
+        saveToRepository(doc1, doc2);
+
+        checkValidHighlightOnQueryResponse("process 2", "A0A0F8CSS2");
+    }
+
+    @Test
+    public void requestWithHighlightingOnAndTwoHitsReturnsValidResponse() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic smurf 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic smurf 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkValidHighlightOnQueryResponse("anotherFunction", "A0A0F8CSS2", "A0A0F8CSS3");
+    }
+
+    @Test
+    public void requestWithHighlightingOnAndZeroHitsReturnsValidResponse() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+
+        saveToRepository(doc1, doc2);
+
+        checkValidHighlightOnQueryResponse("Southampton");
+    }
+
+    @Test
+    public void requestWithHighlightingOffAndOneHitReturnsValidResponse() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+
+        saveToRepository(doc1, doc2);
+
+        checkValidHighlightOffQueryResponse("metabolic process", 1);
+    }
+
+    @Test
+    public void requestWithHighlightingOffAndOnZeroHitsReturnsValidResponse() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+
+        saveToRepository(doc1, doc2);
+
+        checkValidHighlightOffQueryResponse("Southampton", 0);
+    }
+
+    @Test
+    public void requestWithHighlightingOnReturnsTwoHighlightedValuesInResponse() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic Slider 2");
+        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic Slider 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkValidHighlightOnQueryResponse("metabolic", "A0A0F8CSS2", "A0A0F8CSS3")
+                .andExpect(jsonPath("$.results.*.identifier", containsInAnyOrder("A0A0F8CSS2", "A0A0F8CSS3")))
+                .andExpect(jsonPath("$.highlighting.*.identifier", containsInAnyOrder("A0A0F8CSS2", "A0A0F8CSS3")))
+                .andExpect(jsonPath("$.highlighting.*.matches.*.field", containsInAnyOrder("name", "name")))
+                .andExpect(jsonPath("$.highlighting[0].matches[0].values[0]", containsString("metabolic")))
+                .andExpect(jsonPath("$.highlighting[1].matches[0].values[0]", containsString("metabolic")));
+    }
 
     private void saveToRepository(GeneProductDocument... documents) {
         for (GeneProductDocument doc : documents) {
