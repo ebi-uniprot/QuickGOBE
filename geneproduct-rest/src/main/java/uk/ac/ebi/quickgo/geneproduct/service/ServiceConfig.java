@@ -18,7 +18,7 @@ import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
 /**
  *
  * Spring configuration for the service layer, which depends on the repositories
- * made available by {@link GeneProductRepoConfig} and {@link SearchServiceConfig}. Services
+ * made available by {@link GeneProductRepoConfig}. Services
  * to additionally make accessible are defined in specified the {@link ComponentScan} packages.
  *
  * @author Tony Wardell
@@ -28,7 +28,7 @@ import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.geneproduct.service"})
-@Import({GeneProductRepoConfig.class, SearchServiceConfig.class})
+@Import({GeneProductRepoConfig.class})
 public class ServiceConfig {
 
 	@Bean
