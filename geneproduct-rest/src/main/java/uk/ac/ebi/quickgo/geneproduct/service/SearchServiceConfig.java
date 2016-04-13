@@ -4,7 +4,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
-import uk.ac.ebi.quickgo.geneproduct.common.RepoConfig;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 
 /**
  * @author Tony Wardell
@@ -13,7 +13,7 @@ import uk.ac.ebi.quickgo.geneproduct.common.RepoConfig;
  * Created with IntelliJ IDEA.
  */
 @Configuration
-@Import({RepoConfig.class})
+@Import({GeneProductRepoConfig.class})
 @ComponentScan({"uk.ac.ebi.quickgo.service.search"})
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
