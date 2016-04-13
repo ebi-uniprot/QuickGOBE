@@ -10,6 +10,7 @@ import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -71,6 +72,21 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
         throw new IllegalArgumentException("The requested end-point does not exist.");
+    }
+
+    /**
+     * Get all information about all terms and page through the results.
+     *
+     * @param page the page number of results to retrieve
+     * @return  the specified page of results as a {@link QueryResult} instance or a 400 response
+     *          if the page number is invalid
+     */
+    @RequestMapping(value = "/" + TERMS, method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> baseUrl(
+            @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
+
+        return new ResponseEntity<>(ontologyService.findAllByOntologyType(getOntologyType(),
+                new Page(page, MAX_PAGE_RESULTS)), HttpStatus.OK);
     }
 
     /**
@@ -295,7 +311,7 @@ public abstract class OBOController<T extends OBOTerm> {
             resultsToShow = docList;
         }
 
-        QueryResult<T> queryResult = new QueryResult<>(resultsToShow.size(), resultsToShow, null, null, null);
+        QueryResult<T> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 

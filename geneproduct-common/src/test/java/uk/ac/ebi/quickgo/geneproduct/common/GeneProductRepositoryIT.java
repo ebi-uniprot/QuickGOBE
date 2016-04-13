@@ -24,7 +24,7 @@ import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.*
  * Tests the behaviour of the {@link GeneProductRepository}
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RepoConfig.class, loader = SpringApplicationContextLoader.class)
+@ContextConfiguration(classes = GeneProductRepoConfig.class, loader = SpringApplicationContextLoader.class)
 public class GeneProductRepositoryIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();

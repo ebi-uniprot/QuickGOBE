@@ -6,11 +6,14 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
+import uk.ac.ebi.quickgo.rest.search.query.Page;
+import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -78,12 +81,30 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return docs.stream().map(converter::convert).collect(Collectors.toList());
     }
 
-    @Override public List<T> findAll(Pageable pageable) {
-        return StreamSupport.stream(
-                ontologyRepository.findAll(pageable)
-                        .map(converter::convert)
-                        .spliterator(), false)
+    @Override public QueryResult<T> findAllByOntologyType(OntologyType type, Page page) {
+        Pageable pageable = new PageRequest(calculatePageNumber(page.getPageNumber()), page.getPageSize());
+
+        org.springframework.data.domain.Page<OntologyDocument> pagedResult =
+                ontologyRepository.findAllByOntologyType(type.name(), pageable);
+
+        return buildQueryResult(pagedResult, page);
+    }
+
+    private int calculatePageNumber(int oneBasedPageNum) {
+        return oneBasedPageNum - 1;
+    }
+
+    private QueryResult<T> buildQueryResult(org.springframework.data.domain.Page<OntologyDocument> pagedResult,
+            Page page) {
+        long totalNumberOfHits = pagedResult.getTotalElements();
+
+        PageInfo pageInfo = new PageInfo(pagedResult.getTotalPages(), page.getPageNumber(), page.getPageSize());
+
+        List<T> entryHits = pagedResult.getContent().stream()
+                .map(converter::convert)
                 .collect(Collectors.toList());
+
+        return new QueryResult.Builder<>(totalNumberOfHits, entryHits).withPageInfo(pageInfo).build();
     }
 
     protected List<String> buildIdList(List<String> ids) {

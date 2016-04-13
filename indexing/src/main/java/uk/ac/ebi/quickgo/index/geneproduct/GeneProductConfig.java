@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
-import uk.ac.ebi.quickgo.geneproduct.common.RepoConfig;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
 import java.util.Arrays;
@@ -42,7 +42,7 @@ import org.springframework.core.io.Resource;
  */
 @Configuration
 @EnableBatchProcessing
-@Import({RepoConfig.class})
+@Import({GeneProductRepoConfig.class})
 public class GeneProductConfig {
     static final String GENE_PRODUCT_INDEXING_JOB_NAME = "geneProductIndexingJob";
     static final String GENE_PRODUCT_INDEXING_STEP_NAME = "geneProductIndexStep";

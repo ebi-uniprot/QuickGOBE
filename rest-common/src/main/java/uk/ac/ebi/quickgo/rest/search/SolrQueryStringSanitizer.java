@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import org.apache.solr.client.solrj.util.ClientUtils;
+import uk.ac.ebi.quickgo.common.QueryUtils;
 
 /**
  * An Solr specific implementation for sanitizing Solr queries.
@@ -16,6 +16,6 @@ public class SolrQueryStringSanitizer implements QueryStringSanitizer {
      * @return the sanitized query
      */
     @Override public String sanitize(String query) {
-        return ClientUtils.escapeQueryChars(query);
+        return QueryUtils.solrEscape(query);
     }
 }

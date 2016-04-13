@@ -1,7 +1,10 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
+import uk.ac.ebi.quickgo.rest.search.query.Page;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +21,10 @@ public interface OntologyService<T extends OBOTerm> {
     /**
      * Search over everything and return a list of results,
      * which fulfil the specification of the {@code pageable} instance.
-     * @param pageable the requested page of results
+     * @param page the requested page of results
      * @return the page of results
      */
-    List<T> findAll(Pageable pageable);
+    QueryResult<T> findAllByOntologyType(OntologyType type, Page page);
 
     /**
      * Find the complete data set stored for a specified list of ontology IDs.
