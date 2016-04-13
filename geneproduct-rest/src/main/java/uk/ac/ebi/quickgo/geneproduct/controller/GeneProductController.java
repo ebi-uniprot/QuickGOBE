@@ -16,8 +16,10 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Tony Wardell
@@ -32,7 +34,7 @@ import java.util.List;
 @RequestMapping(value = "/QuickGO/services/geneproduct")
 public class GeneProductController {
 
-	Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
+	private final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
 	static final int MAX_PAGE_RESULTS = 100;
 //	private static final String RESOURCE_PATH = "geneproducts";
 
@@ -41,6 +43,10 @@ public class GeneProductController {
 
 	@Autowired
 	public GeneProductController(GeneProductService gpService, ControllerHelper controllerHelper) {
+		Objects.requireNonNull(gpService, "The GeneProductService instance passed to the constructor of " +
+				"GeneProductController should not be null.");
+		Objects.requireNonNull(controllerHelper, "The ControllerHelper instance passed to the constructor of " +
+				"GeneProductController should not be null.");
 		this.geneProductService = gpService;
 		this.controllerHelper = controllerHelper;
 	}
@@ -50,10 +56,10 @@ public class GeneProductController {
 	 *
 	 * @return a 400 response
 	 */
-	@RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
-		throw new IllegalArgumentException("The requested end-point does not exist.");
-	}
+//	@RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
+//	public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
+//		throw new IllegalArgumentException("The requested end-point does not exist.");
+//	}
 
 
 	/**
@@ -67,9 +73,10 @@ public class GeneProductController {
 	 *     <li>any id is of the an invalid format: response returns 400</li>
 	 * </ul>
 	 */
-	@RequestMapping(value = "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable(value = "ids") String ids) {
-		return getGeneProductResponse(geneProductService.findById(controllerHelper.csvToList(ids)));
+	@RequestMapping(value = "/{ids:,*}", produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable String[] ids) {
+		validateRequestedResults(ids.length);
+		return getGeneProductResponse(geneProductService.findById(ids));
 	}
 
 
