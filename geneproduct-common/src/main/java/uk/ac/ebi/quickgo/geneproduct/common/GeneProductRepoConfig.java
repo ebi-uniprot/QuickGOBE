@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.core.CoreContainer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,11 @@ public class GeneProductRepoConfig {
     @Bean
     static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public SolrServer solrServer(SolrServerFactory solrServerFactory) {
+        return solrServerFactory.getSolrServer();
     }
 
     @Bean
@@ -53,7 +59,7 @@ public class GeneProductRepoConfig {
     }
 
     @Bean
-    public SolrTemplate geneProductTemplate(SolrServerFactory solrServerFactory)  {
+    public SolrTemplate geneProductTemplate(SolrServerFactory solrServerFactory) {
         SolrTemplate template = new SolrTemplate(solrServerFactory);
         template.setSolrCore(SOLR_CORE);
 
@@ -61,7 +67,8 @@ public class GeneProductRepoConfig {
     }
 
     @Bean
-    public GeneProductRepository geneProductRepository(SolrTemplate geneProductTemplate) {
+    public GeneProductRepository geneProductRepository(
+            @Qualifier("geneProductTemplate") SolrTemplate geneProductTemplate) {
         return new SolrRepositoryFactory(geneProductTemplate)
                 .getRepository(GeneProductRepository.class);
     }
