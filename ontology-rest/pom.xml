@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ontology-rest</artifactId>
-    <name>Ontology RESTful service</name>
+    <name>Ontology REST service</name>
     <packaging>jar</packaging>
 
     <properties>
@@ -48,6 +48,12 @@
             <artifactId>spring-data-solr</artifactId>
         </dependency>
 
+        <!-- REST API documentation -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
+
         <!--Test dependencies-->
         <dependency>
             <groupId>uk.ac.ebi.quickgo</groupId>
@@ -77,7 +83,6 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <version>${json-path.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

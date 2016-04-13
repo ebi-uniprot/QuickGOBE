@@ -16,6 +16,7 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
+import io.swagger.annotations.ApiOperation;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +70,7 @@ public abstract class OBOController<T extends OBOTerm> {
      *
      * @return a 400 response
      */
+    @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status")
     @RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
         throw new IllegalArgumentException("The requested end-point does not exist.");
@@ -81,6 +83,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return  the specified page of results as a {@link QueryResult} instance or a 400 response
      *          if the page number is invalid
      */
+    @ApiOperation(value = "Get all information on all terms and page through the results")
     @RequestMapping(value = "/" + TERMS, method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
@@ -100,7 +103,10 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = TERMS + "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ApiOperation(value = "Get core information about a (CSV) list of terms based on their ids",
+            notes = "If possible, response fields include: id, isObsolete, name, definition, ancestors, synonyms, " +
+                    "aspect and usage.")
+    @RequestMapping(value = TERMS + "/{ids}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
         return getTermsResponse(ontologyService.findCoreInfoByOntologyId(validateIds(ids)));
     }
@@ -116,7 +122,9 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = TERMS + "/{ids}/complete", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ApiOperation(value = "Get complete information about a (CSV) list of terms based on their ids",
+            notes = "All fields will be populated providing they have a value.")
+    @RequestMapping(value = TERMS + "/{ids}/complete", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
         return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(validateIds(ids)));
     }
@@ -132,7 +140,9 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = TERMS + "/{ids}/history", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ApiOperation(value = "Get history information about a (CSV) list of terms based on their ids",
+            notes = "If possible, response fields include: id, isObsolete, name, definition, history.")
+    @RequestMapping(value = TERMS + "/{ids}/history", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
         return getTermsResponse(ontologyService.findHistoryInfoByOntologyId(validateIds(ids)));
     }
@@ -148,7 +158,9 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = TERMS + "/{ids}/xrefs", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ApiOperation(value = "Get cross-reference information about a (CSV) list of terms based on their ids",
+            notes = "If possible, response fields include: id, isObsolete, name, definition, xRefs.")
+    @RequestMapping(value = TERMS + "/{ids}/xrefs", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
         return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(validateIds(ids)));
     }
@@ -164,7 +176,9 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = TERMS + "/{ids}/constraints", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ApiOperation(value = "Get taxonomy constraint information about a (CSV) list of terms based on their ids",
+            notes = "If possible, response fields include: id, isObsolete, name, definition, taxonConstraints.")
+    @RequestMapping(value = TERMS + "/{ids}/constraints", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
         return getTermsResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(validateIds(ids)));
     }
@@ -180,7 +194,9 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ApiOperation(value = "Get cross ontology relationship information about a (CSV) list of terms based on their ids",
+            notes = "If possible, response fields include: id, isObsolete, name, definition, xRelations.")
+    @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
         return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(validateIds(ids)));
     }
@@ -196,7 +212,9 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = TERMS + "/{ids}/guidelines", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ApiOperation(value = "Get annotation guideline information about a (CSV) list of terms based on their ids",
+            notes = "If possible, response fields include: id, isObsolete, name, definition, annotationGuidelines.")
+    @RequestMapping(value = TERMS + "/{ids}/guidelines", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
         return getTermsResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(validateIds(ids)));
     }
@@ -208,6 +226,8 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param limit the amount of queries to return
      * @return a {@link QueryResult} instance containing the results of the search
      */
+    @ApiOperation(value="Searches a simple user query, e.g., query=apopto",
+            notes = "If possible, response fields include: id, name, definition, isObsolete")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(
             @RequestParam(value = "query") String query,
