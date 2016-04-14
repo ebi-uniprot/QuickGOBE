@@ -72,4 +72,4 @@ public class GeneProductRepoConfig {
         return new SolrRepositoryFactory(geneProductTemplate)
                 .getRepository(GeneProductRepository.class);
     }
-`}
+}
