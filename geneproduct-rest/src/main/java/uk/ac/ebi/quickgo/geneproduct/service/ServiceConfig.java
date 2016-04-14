@@ -8,8 +8,6 @@ import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
@@ -51,8 +49,4 @@ public class ServiceConfig {
 		return new SolrQueryStringSanitizer();
 	}
 
-	@Bean
-	public ControllerHelper controllerHelper(){
-		return new ControllerHelperImpl();
-	}
 }
