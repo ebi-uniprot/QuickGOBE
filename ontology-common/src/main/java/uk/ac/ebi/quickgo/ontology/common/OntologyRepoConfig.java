@@ -9,6 +9,7 @@ import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,11 +28,16 @@ import org.xml.sax.SAXException;
 public class OntologyRepoConfig {
     private static final String SOLR_CORE = "ontology";
 
-    Logger LOGGER  =  org.slf4j.LoggerFactory.getLogger(OntologyRepoConfig.class);
+    Logger LOGGER = org.slf4j.LoggerFactory.getLogger(OntologyRepoConfig.class);
 
     @Bean
     static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public SolrServer solrServer(SolrServerFactory solrServerFactory) {
+        return solrServerFactory.getSolrServer();
     }
 
     @Bean
@@ -57,7 +63,7 @@ public class OntologyRepoConfig {
     }
 
     @Bean
-    public SolrTemplate ontologyTemplate(SolrServerFactory solrServerFactory)  {
+    public SolrTemplate ontologyTemplate(SolrServerFactory solrServerFactory) {
         SolrTemplate template = new SolrTemplate(solrServerFactory);
         template.setSolrCore(SOLR_CORE);
 
@@ -65,12 +71,11 @@ public class OntologyRepoConfig {
     }
 
     @Bean
-    public OntologyRepository ontologyRepository(SolrTemplate ontologyTemplate) {
+    public OntologyRepository ontologyRepository(
+            @Qualifier("ontologyTemplate") SolrTemplate ontologyTemplate) {
         LOGGER.info("Returning ontology repo {}", ontologyTemplate.toString());
 
-        OntologyRepository repo = new SolrRepositoryFactory(ontologyTemplate)
+        return new SolrRepositoryFactory(ontologyTemplate)
                 .getRepository(OntologyRepository.class);
-
-        return repo;
     }
 }
