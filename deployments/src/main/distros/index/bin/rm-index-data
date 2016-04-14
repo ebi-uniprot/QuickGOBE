@@ -28,25 +28,17 @@ fi
 # ------------------------ start off the deletion ------------------------
 commandStr="curl \"$SOLR_ADDRESS/update?commit=true\" -H \"Content-Type: text/xml\" --data-binary '<delete><query>*:*</query></delete>'"
 if [ "$1" = "submit" ]; then
-    echo "Are you sure you want to delete: $data_dir? [yes|no]";
-    read answer;
-    if [ "$answer" == "yes" ]; then
+    # ensure indexing job variable is defined
+    if [ ! -z "$commandStr" ]; then
 
-        # ensure indexing job variable is defined
-        if [ ! -z "$commandStr" ]; then
+        echo "executing command:"
+        echo "$commandStr";
 
-            echo "executing command:"
-            echo "$commandStr";
-
-            eval "$commandStr";
-            echo "Please reload the core, for changes to take effect: $SOLR_ADDRESS/#/~cores/$CORE_NAME"
-        else
-              echo "\$commandStr variable must be set";
-              exit 1;
-        fi
+        eval "$commandStr";
+        echo "Please reload the core, for changes to take effect: $SOLR_ADDRESS/#/~cores/$CORE_NAME"
     else
-        echo "Aborting.";
-        exit 1;
+          echo "\$commandStr variable must be set";
+          exit 1;
     fi
 else
       echo "The following command will be executed:";
