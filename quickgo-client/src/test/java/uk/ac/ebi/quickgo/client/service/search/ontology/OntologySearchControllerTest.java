@@ -13,11 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidNumRows;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidPage;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidQuery;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
 
 /**
  * Unit tests for the {@link SearchController}. Primarily tests
@@ -87,7 +83,7 @@ public class OntologySearchControllerTest {
     // validate facets ----------------------------------------------
     @Test
     public void allSearchableFieldsColonValueAreValidForFacets() {
-        List<String> facets = OntologyFields.Searchable.searcheableFields().stream().collect(Collectors.toList());
+        List<String> facets = OntologyFields.Searchable.searchableFields().stream().collect(Collectors.toList());
         assertThat(isValidFacets(ontologySearchableField, facets), is(true));
     }
 
@@ -113,7 +109,7 @@ public class OntologySearchControllerTest {
     // validate filter queries ----------------------------------------------
     @Test
     public void allSearchableFieldsColonValueAreValidForFilterQueries() {
-        List<String> filterQueries = OntologyFields.Searchable.searcheableFields().stream()
+        List<String> filterQueries = OntologyFields.Searchable.searchableFields().stream()
                 .map(field -> field +":pretendValue")
                 .collect(Collectors.toList());
 
