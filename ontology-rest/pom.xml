@@ -80,12 +80,6 @@
             <version>${json-path.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <build>
