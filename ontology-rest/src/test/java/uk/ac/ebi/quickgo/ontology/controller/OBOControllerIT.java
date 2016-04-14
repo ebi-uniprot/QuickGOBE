@@ -302,7 +302,6 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.results").isArray());
     }
 
-
     @Test
     public void negativePageRequestOfAllEntriesRequestReturns400() throws Exception {
         ontologyRepository.deleteAll();
@@ -425,6 +424,7 @@ public abstract class OBOControllerIT {
     protected String buildTermsURL() {
         return getResourceURL() + "/" + TERMS_ENDPOINT;
     }
+
     protected String buildTermsURL(String id) {
         return getResourceURL() + "/" + TERMS_ENDPOINT + "/" + id;
     }
@@ -459,7 +459,7 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "annotationGuidelines").exists())
                 .andExpect(jsonPath(path + "taxonConstraints").exists())
                 .andExpect(jsonPath(path + "consider").exists())
-                    .andExpect(jsonPath(path + "subsets").exists())
+                .andExpect(jsonPath(path + "subsets").exists())
                 .andExpect(jsonPath(path + "replacedBy").exists());
     }
 
