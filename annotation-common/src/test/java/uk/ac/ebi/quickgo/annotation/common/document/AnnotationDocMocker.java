@@ -9,15 +9,17 @@ import java.util.Arrays;
  * @author Edd
  */
 public class AnnotationDocMocker {
-    public static final int FLAT_FIELD_DEPTH = 0;
-
     private AnnotationDocMocker() {}
 
     public static AnnotationDocument createAnnotationDoc(String geneProductId) {
         AnnotationDocument doc = new AnnotationDocument();
         doc.geneProductId = geneProductId;
 
+        // automatically compute a document identifier,
+        // to overcome non-uniqueness of all other annotation fields
+        // (in solrconfig.xml this is set automatically as a UUID)
         doc.id = geneProductId + "-" + System.nanoTime();
+
         doc.goId = "GO:0003824";
         doc.ecoId = "ECO:0000256";
         doc.symbol = "moeA5";
@@ -31,18 +33,4 @@ public class AnnotationDocMocker {
 
         return doc;
     }
-
-    /**
-     * geneProductId
-     symbol
-     qualifier
-     goId
-     goEvidence
-     ecoId
-     reference
-     withFrom
-     taxonId
-     assignedBy
-     extension
-     */
 }
