@@ -1,0 +1,85 @@
+#! /bin/bash
+
+##=========================================================================================
+# Updates from Git the directory used for running the RESTful applications.
+# It is not necessary to update with each release, only when the scripts
+# that run the applications change.
+##=========================================================================================
+
+set -euo pipefail
+
+# ======= CONSTANTS =======================================
+REPOS_DIR="$(pwd -P)/repos"
+REST_BIN_CONTENT_DIR="bin"
+REST_BIN="rest-bin.tar.gz"
+PERMITTED_USER="uni_qgo"
+
+# ======= check the right user runs this script =======================================
+if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
+    echo "This service can only be run as user(s), '$PERMITTED_USER'";
+    exit 1;
+fi;
+
+# ======= FUNCTIONS ======================================================================
+# ======= take a string and add a time-stamp to it =======================================
+function addTimeStamp() {
+    local dirname="$(dirname $1)"
+    local fname=$(basename "$1")
+    local fext=""
+    if echo "$fname" | grep '\.'; then
+        fext=".${fname##*.}"
+    fi
+    local fname="${fname%.*}"
+    echo "$dirname/$fname-$(date '+%s.%N')$fext"
+}
+
+# ======= save current directory =======================================
+dirs -c
+pushd . > /dev/null
+cd "$REPOS_DIR"
+
+cd "unp.goa.quickgo"
+git fetch
+git checkout GOA-1793_GO_code_reshuffle
+git pull
+cd "deployments"
+mvn -U -DskipTests -P assemble-rest-bin-archive package
+eval "mv" "target/$REST_BIN" "$(dirs +1)"
+
+eval "cd" "$(dirs +1)"
+
+# backup $REST_BIN_CONTENT_DIR, before replacing it
+if [ -d "$REST_BIN_CONTENT_DIR" ]; then
+        archives=".$REST_BIN_CONTENT_DIR-archives";
+        if [ ! -d "$archives" ]; then
+                mkdir "$archives";
+        fi
+
+        backup="$archives/$(addTimeStamp $REST_BIN_CONTENT_DIR).old";
+        echo "Archiving old bin directory '$REST_BIN_CONTENT_DIR' to '$backup'"
+        mv $REST_BIN_CONTENT_DIR $backup
+
+        # replace $REST_BIN_CONTENT_DIR
+        echo "extracting contents of $REST_BIN to $(readlink -f .)"
+        tar xzf $REST_BIN
+
+        # remove the archive after it's been decompressed
+        rm $REST_BIN
+
+        cd "$archives";
+        if [ "$(basename $(pwd))" == "$archives" ]; then # double check we're actually in the backup directory, before deleting anything!
+                echo "Deleting oldest archives, but keeping newest 5";
+                (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf
+        fi
+else
+    # replace $REST_BIN_CONTENT_DIR
+    eval "cd" "$(dirs +1)"
+    echo "extracting contents of $REST_BIN to $(readlink -f .)"
+    tar xzf $REST_BIN
+
+    # remove the archive after it's been decompressed
+    rm $REST_BIN
+fi
+
+# ======= jump back to saved directory =======================================
+popd > /dev/null

@@ -7,7 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 30/03/2016
  * Time: 16:48
  * Created with IntelliJ IDEA.

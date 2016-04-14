@@ -12,5 +12,5 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  */
 public interface ServiceHelper {
-	List<String> buildIdList(List<String> ids);
+	List<String> buildIdList(String[] ids);
 }

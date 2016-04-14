@@ -23,7 +23,7 @@ import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 30/03/2016
  * Time: 16:33
  * Created with IntelliJ IDEA.
@@ -49,9 +49,12 @@ public class GeneProductControllerTest {
 	private GeneProduct geneProduct3;
 
 	static final String SINGLE_CSV = "A0A000";
+	static final String[] SINGLE_CSV_LIST = new String[]{"A0A000"};
+
 	static final String MULTI_CSV = "A0A000,A0A001,A0A002";
 	static final String NOTFOUND_CSV = "Butter";
-
+	static final String[] MULTI_CSV_LIST = new String[]{"A0A000","A0A001","A0A002"};
+	static final String[] MULTI_CSV_OVER_LIMIT = new String[101];
 
 	@Before
 	public void setUp() {
@@ -60,12 +63,12 @@ public class GeneProductControllerTest {
 		//Lookup for single Id
 		final List<String> singleId = Arrays.asList(SINGLE_CSV);
 		final List<GeneProduct> singleGP = Arrays.asList(geneProduct);
-		when(geneProductService.findById(singleId)).thenReturn(singleGP);
+		when(geneProductService.findById(SINGLE_CSV_LIST)).thenReturn(singleGP);
 
 		//Lookup for multi Id
 		final List<String> multiIds = Arrays.asList(MULTI_CSV);
 		final List<GeneProduct> multiGP = Arrays.asList(geneProduct, geneProduct2, geneProduct3);
-		when(geneProductService.findById(multiIds)).thenReturn(multiGP);
+		when(geneProductService.findById(MULTI_CSV_LIST)).thenReturn(multiGP);
 
 
 		//stub behaviour for controller helper
@@ -74,38 +77,30 @@ public class GeneProductControllerTest {
 	}
 
 	@Test
-	public void checkValidId() {
-		controller.checkValidId("id0");
-	}
-
-	@Test
-	public void validatesValidRequestedResults() {
-		controller.validateRequestedResults(GeneProductController.MAX_PAGE_RESULTS);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void validatesInvalidRequestedResults() {
-		controller.validateRequestedResults(GeneProductController.MAX_PAGE_RESULTS + 1);
-	}
-
-	@Test
 	public void retrieveEmptyList() {
-		ResponseEntity<QueryResult<GeneProduct>> response = controller.findById("");
+		ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(new String[]{""});
 		assertThat(response.getHeaders().isEmpty(), is(true));
 		assertThat(response.getBody().getResults(), is(empty()));
 	}
 
 	@Test
 	public void retrieveSingleGeneProduct() {
-		ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(SINGLE_CSV);
-		assertThat(geneProduct , sameInstance(response.getBody().getResults().get(0)));
+		ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(SINGLE_CSV_LIST);
+		assertThat(response.getBody().getResults(), contains(geneProduct));
+		assertThat(response.getBody().getResults(), hasSize(1));
 	}
 
 	@Test
 	public void retrieveMultipleGeneProduct() {
-		ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(MULTI_CSV);
-		assertThat(response.getBody().getResults().size(), is(3));
+		ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(MULTI_CSV_LIST);
+		assertThat(response.getBody().getResults(), hasSize(3));
 		assertThat(response.getBody().getResults(), contains(geneProduct, geneProduct2, geneProduct3));
+	}
+
+
+	@Test(expected = IllegalArgumentException.class)
+	public void retrieveMultipleGeneProductOverLimit() {
+		controller.findById(MULTI_CSV_OVER_LIMIT);
 	}
 
 }

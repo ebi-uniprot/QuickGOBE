@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
+import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import org.springframework.batch.core.Job;
@@ -28,7 +28,7 @@ import java.io.File;
  */
 @Configuration
 @EnableBatchProcessing
-@Import({RepoConfig.class})
+@Import({OntologyRepoConfig.class})
 public class OntologyConfig {
     static final String ONTOLOGY_INDEXING_JOB_NAME = "ontologyIndexingJob";
     static final String ONTOLOGY_INDEXING_STEP_NAME = "ontologyIndexStep";

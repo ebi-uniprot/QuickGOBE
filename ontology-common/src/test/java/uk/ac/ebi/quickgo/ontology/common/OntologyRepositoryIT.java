@@ -1,16 +1,15 @@
 package uk.ac.ebi.quickgo.ontology.common;
 
+import uk.ac.ebi.quickgo.common.QueryUtils;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
-import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
-import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -18,14 +17,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 
@@ -37,7 +37,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RepoConfig.class, loader = SpringApplicationContextLoader.class)
+@ContextConfiguration(classes = OntologyRepoConfig.class, loader = SpringApplicationContextLoader.class)
 public class OntologyRepositoryIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
@@ -49,12 +49,9 @@ public class OntologyRepositoryIT {
     @Autowired
     private SolrTemplate ontologyTemplate;
 
-    private QueryStringSanitizer queryStringSanitizer;
-
     @Before
     public void before() {
         ontologyRepository.deleteAll();
-        queryStringSanitizer = new SolrQueryStringSanitizer();
     }
 
     @Test
@@ -102,15 +99,9 @@ public class OntologyRepositoryIT {
     }
 
     private List<String> buildIdList(String... ids) {
-        if (ids.length == 1) {
-            return singletonList(queryStringSanitizer.sanitize(ids[0]));
-        } else {
-            List<String> escapedList = new ArrayList<>();
-            for (String id : ids) {
-                escapedList.add(queryStringSanitizer.sanitize(id));
-            }
-            return escapedList;
-        }
+        return Arrays.stream(ids)
+                .map(QueryUtils::solrEscape)
+                .collect(Collectors.toList());
     }
 
     @Test
@@ -236,6 +227,41 @@ public class OntologyRepositoryIT {
         assertThat(ontologyRepository.findHistoryByTermId(OntologyType.GO.name(), buildIdList("A")).size(), is(1));
     }
 
+    @Test
+    public void add1GoAnd1EcoDocumentsAndFindAllOfTypeGO() {
+        OntologyDocument goDoc = OntologyDocMocker.createGODoc("A", "Alice Cooper");
+        OntologyDocument ecoDoc = OntologyDocMocker.createECODoc("B", "Bob The Builder");
+
+        ontologyRepository.save(goDoc);
+        ontologyRepository.save(ecoDoc);
+
+        Page<OntologyDocument> pagedDocs =
+                ontologyRepository.findAllByOntologyType(OntologyType.GO.name(), new PageRequest(0, 2));
+
+        assertThat(pagedDocs.getTotalElements(), is(1L));
+        assertThat(pagedDocs.getContent().get(0).getUniqueName(), is(goDoc.getUniqueName()));
+    }
+
+    @Test
+    public void add3GoDocumentsAndFindAllOfTypeGOWith1DocPerPage() {
+        List<OntologyDocument> ontologyDocuments = Arrays.asList(
+                OntologyDocMocker.createGODoc("A", "Alice Cooper"),
+                OntologyDocMocker.createGODoc("B", "Bob The Builder"),
+                OntologyDocMocker.createGODoc("C", "Clint Eastwood")
+        );
+
+        ontologyRepository.save(ontologyDocuments);
+
+        int count = 0;
+        for (OntologyDocument ontologyDocument : ontologyDocuments) {
+            Page<OntologyDocument> pagedDocs =
+                    ontologyRepository.findAllByOntologyType(OntologyType.GO.name(), new PageRequest(count++, 1));
+
+            assertThat(pagedDocs.getContent(), hasSize(1));
+            assertThat(pagedDocs.getContent().get(0).getUniqueName(), is(ontologyDocument.getUniqueName()));
+        }
+    }
+
     /**
      * Shows how to save directly to a solr server, bypassing transactional
      * operations that are managed by Spring.
@@ -277,9 +303,5 @@ public class OntologyRepositoryIT {
         coreDoc.aspect = document.aspect;
         coreDoc.ancestors = document.ancestors;
         return coreDoc;
-    }
-
-    private void checkIsCoreDoc(OntologyDocument document) {
-        assertThat(copyAsCoreDoc(document), is(equalTo(document)));
     }
 }

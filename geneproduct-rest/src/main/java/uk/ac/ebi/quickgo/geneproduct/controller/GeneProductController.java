@@ -11,15 +11,15 @@ import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
+import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 29/03/2016
  * Time: 10:09
  *
@@ -30,14 +30,20 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/QuickGO/services/geneproduct")
 public class GeneProductController {
-	Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
+
+	private final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
 	static final int MAX_PAGE_RESULTS = 100;
+//	private static final String RESOURCE_PATH = "geneproducts";
 
 	private final ControllerHelper controllerHelper;
 	private final GeneProductService geneProductService;
 
 	@Autowired
 	public GeneProductController(GeneProductService gpService, ControllerHelper controllerHelper) {
+		Objects.requireNonNull(gpService, "The GeneProductService instance passed to the constructor of " +
+				"GeneProductController should not be null.");
+		Objects.requireNonNull(controllerHelper, "The ControllerHelper instance passed to the constructor of " +
+				"GeneProductController should not be null.");
 		this.geneProductService = gpService;
 		this.controllerHelper = controllerHelper;
 	}
@@ -47,10 +53,11 @@ public class GeneProductController {
 	 *
 	 * @return a 400 response
 	 */
-	@RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
-		throw new IllegalArgumentException("The requested end-point does not exist.");
-	}
+//	@RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
+//	public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
+//		throw new IllegalArgumentException("The requested end-point does not exist.");
+//	}
+
 
 	/**
 	 * Get core information about a list of gene products in comma-separated-value (CSV) format
@@ -63,10 +70,12 @@ public class GeneProductController {
 	 *     <li>any id is of the an invalid format: response returns 400</li>
 	 * </ul>
 	 */
-	@RequestMapping(value = "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable(value = "ids") String ids) {
-		return getGeneProductResponse(geneProductService.findById(controllerHelper.csvToList(ids)));
+	@RequestMapping(value = "/{ids:,*}", produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable String[] ids) {
+		validateRequestedResults(ids.length);
+		return getGeneProductResponse(geneProductService.findById(ids));
 	}
+
 
 	/**
 	 * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.
@@ -75,16 +84,16 @@ public class GeneProductController {
 	 * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents
 	 */
 	protected ResponseEntity<QueryResult<GeneProduct>> getGeneProductResponse(List<GeneProduct> docList) {
-		List<GeneProduct> resultsToShow;
+		QueryResult.Builder<GeneProduct> builder;
 		if (docList == null) {
-			resultsToShow = Collections.emptyList();
+			builder = new QueryResult.Builder<>(0, Collections.emptyList());
 		} else {
-			resultsToShow = docList;
+ 			builder = new QueryResult.Builder<>(docList.size(), docList);
 		}
-
-		QueryResult<GeneProduct> queryResult = new QueryResult<>(resultsToShow.size(), resultsToShow, null, null, null);
-		return new ResponseEntity<>(queryResult, HttpStatus.OK);
+		return new ResponseEntity<>(builder.build(), HttpStatus.OK);
 	}
+
+
 
 	/**
 	 * Checks whether the requested number of results is valid.
@@ -98,26 +107,5 @@ public class GeneProductController {
 			LOGGER.error(errorMessage);
 			throw new IllegalArgumentException(errorMessage);
 		}
-	}
-
-	/**
-	 * Checks the validity of a geneproduct id.
-	 *
-	 * @param id the term id to check
-	 * @throws IllegalArgumentException is thrown if the ID is not valid
-	 */
-	protected void checkValidId(String id) {
-		if (!isValidId(id)) {
-			throw new IllegalArgumentException("Provided ID: '" + id + "' is invalid");
-		}
-	}
-
-	/**
-	 * Are there any requirements for the validity of a gene product id
-	 * @param id
-	 * @return
-	 */
-	protected boolean isValidId(String id) {
-		return true;
 	}
 }

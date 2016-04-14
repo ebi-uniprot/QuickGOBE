@@ -50,10 +50,11 @@ public abstract class OBOControllerIT {
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     private static final String SEARCH_ENDPOINT = "search";
+    private static final String TERMS_ENDPOINT = "terms";
+
     private static final String QUERY_PARAM = "query";
     protected static final String COMMA = ",";
-    private static final String TERM = "term";
-    private static final String TERMS = "terms";
+    private static final String PAGE_PARAM = "page";
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
@@ -235,13 +236,6 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void finds400IfTermsIdIsEmpty() throws Exception {
-        mockMvc.perform(get(buildTermsURL("")))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     public void finds400IfUrlIsJustWrong() throws Exception {
         mockMvc.perform(get(resourceUrl + "/thisIsAnEndPointThatDoesNotExist"))
                 .andDo(print())
@@ -308,6 +302,92 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.results").isArray());
     }
 
+
+    @Test
+    public void negativePageRequestOfAllEntriesRequestReturns400() throws Exception {
+        ontologyRepository.deleteAll();
+
+        int existingPages = 4;
+        createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
+
+        mockMvc.perform(
+                get(resourceUrl + "/" + TERMS_ENDPOINT)
+                        .param(PAGE_PARAM, "-1"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void pageRequestHigherThanAvailablePagesForAllEntriesRequestReturns400() throws Exception {
+        ontologyRepository.deleteAll();
+
+        int existingPages = 4;
+        createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
+
+        mockMvc.perform(
+                get(resourceUrl + "/" + TERMS_ENDPOINT)
+                        .param(PAGE_PARAM, String.valueOf(existingPages + 1)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void retrievesFirstPageOfAllEntriesRequest() throws Exception {
+        ontologyRepository.deleteAll();
+
+        int existingPages = 4;
+        createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
+
+        ResultActions response = mockMvc.perform(
+                get(resourceUrl + "/" + TERMS_ENDPOINT)
+                        .param(PAGE_PARAM, "1"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.results").isArray())
+                .andExpect(jsonPath("$.results", hasSize(OBOController.MAX_PAGE_RESULTS)));
+    }
+
+    @Test
+    public void retrievesSecondPageOfAllEntriesRequest() throws Exception {
+        ontologyRepository.deleteAll();
+
+        int existingPages = 4;
+        createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
+
+        ResultActions response = mockMvc.perform(
+                get(resourceUrl + "/" + TERMS_ENDPOINT)
+                        .param(PAGE_PARAM, "2"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.results").isArray())
+                .andExpect(jsonPath("$.results", hasSize(OBOController.MAX_PAGE_RESULTS)));
+    }
+
+    @Test
+    public void retrievesLastPageOfAllEntriesRequest() throws Exception {
+        ontologyRepository.deleteAll();
+
+        int existingPages = 4;
+        createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
+
+        ResultActions response = mockMvc.perform(
+                get(resourceUrl + "/" + TERMS_ENDPOINT)
+                        .param(PAGE_PARAM, String.valueOf(existingPages - 1)));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.results").isArray())
+                .andExpect(jsonPath("$.results", hasSize(OBOController.MAX_PAGE_RESULTS)));
+    }
+
+    @Test
+    public void canRetrieveCompleteByFindAll() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL()));
+
+        expectCompleteFieldsInResults(response, validIdList)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
     protected abstract String getResourceURL();
 
     /**
@@ -319,6 +399,8 @@ public abstract class OBOControllerIT {
      * @return a valid document with a valid ID
      */
     protected abstract List<OntologyDocument> createBasicDocs();
+
+    protected abstract List<OntologyDocument> createNDocs(int n);
 
     protected ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
         return expectCoreFields(result, id, "$.");
@@ -340,8 +422,11 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "definition").exists());
     }
 
+    protected String buildTermsURL() {
+        return getResourceURL() + "/" + TERMS_ENDPOINT;
+    }
     protected String buildTermsURL(String id) {
-        return getResourceURL() + "/" + TERMS + "/" + id;
+        return getResourceURL() + "/" + TERMS_ENDPOINT + "/" + id;
     }
 
     protected ResultActions expectCoreFieldsInResults(ResultActions result, List<String> ids) throws Exception {
@@ -374,7 +459,7 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "annotationGuidelines").exists())
                 .andExpect(jsonPath(path + "taxonConstraints").exists())
                 .andExpect(jsonPath(path + "consider").exists())
-                .andExpect(jsonPath(path + "subsets").exists())
+                    .andExpect(jsonPath(path + "subsets").exists())
                 .andExpect(jsonPath(path + "replacedBy").exists());
     }
 
@@ -415,5 +500,9 @@ public abstract class OBOControllerIT {
 
     private String requestUrl(ResultActions resultActions) {
         return resultActions.andReturn().getRequest().getRequestURL().toString();
+    }
+
+    private void createAndSaveDocs(int n) {
+        ontologyRepository.save(createNDocs(n));
     }
 }

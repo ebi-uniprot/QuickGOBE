@@ -5,6 +5,8 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -50,12 +52,24 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(jsonPath("$.usage").value("Unrestricted"));
     }
 
+    @Override protected List<OntologyDocument> createNDocs(int n) {
+        return IntStream.range(0, n)
+                .mapToObj(i -> OntologyDocMocker.createGODoc(createId(i), "eco doc name " + i)).collect
+                        (Collectors.toList());
+    }
+
+    private String createId(int idNum) {
+        return String.format("GO:%07d", idNum);
+    }
+
     @Override
     protected List<OntologyDocument> createBasicDocs() {
         return Arrays.asList(
                 OntologyDocMocker.createGODoc(GO_0000001, "go name 1"),
                 OntologyDocMocker.createGODoc(GO_0000002, "go name 2"));
     }
+
+
 
     @Override
     protected String idMissingInRepository() {

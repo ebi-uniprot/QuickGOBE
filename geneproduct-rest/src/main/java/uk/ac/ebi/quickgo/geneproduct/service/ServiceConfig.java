@@ -5,7 +5,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.RepoConfig;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
 import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
@@ -18,17 +18,17 @@ import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
 /**
  *
  * Spring configuration for the service layer, which depends on the repositories
- * made available by {@link RepoConfig} and {@link SearchServiceConfig}. Services
+ * made available by {@link GeneProductRepoConfig}. Services
  * to additionally make accessible are defined in specified the {@link ComponentScan} packages.
  *
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 04/04/2016
  * Time: 11:42
  * Created with IntelliJ IDEA.
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.geneproduct.service"})
-@Import({RepoConfig.class, SearchServiceConfig.class})
+@Import({GeneProductRepoConfig.class})
 public class ServiceConfig {
 
 	@Bean
