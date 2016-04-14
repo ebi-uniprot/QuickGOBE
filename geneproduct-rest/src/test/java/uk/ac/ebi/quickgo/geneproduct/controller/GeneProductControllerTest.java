@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 /**
@@ -33,9 +32,6 @@ public class GeneProductControllerTest {
 
     @Mock
     private GeneProductService geneProductService;
-
-    @Mock
-    private ControllerHelper controllerHelper;
 
     @Mock
     private GeneProduct geneProduct;
@@ -55,21 +51,16 @@ public class GeneProductControllerTest {
 
     @Before
     public void setUp() {
-        this.controller = new GeneProductController(geneProductService, controllerHelper);
+        this.controller = new GeneProductController(geneProductService);
 
         //Lookup for single Id
-        final List<String> singleId = Collections.singletonList(SINGLE_CSV);
         final List<GeneProduct> singleGP = Collections.singletonList(geneProduct);
         when(geneProductService.findById(SINGLE_CSV_LIST)).thenReturn(singleGP);
 
         //Lookup for multi Id
-        final List<String> multiIds = Collections.singletonList(MULTI_CSV);
         final List<GeneProduct> multiGP = asList(geneProduct, geneProduct2, geneProduct3);
         when(geneProductService.findById(MULTI_CSV_LIST)).thenReturn(multiGP);
 
-        //stub behaviour for controller helper
-        when(controllerHelper.csvToList(SINGLE_CSV)).thenReturn(singleId);
-        when(controllerHelper.csvToList(MULTI_CSV)).thenReturn(multiIds);
     }
 
     @Test

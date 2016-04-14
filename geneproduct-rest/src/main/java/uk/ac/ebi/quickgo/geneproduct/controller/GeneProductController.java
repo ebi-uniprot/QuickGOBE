@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,28 +31,14 @@ public class GeneProductController {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
 
-	private final ControllerHelper controllerHelper;
 	private final GeneProductService geneProductService;
 
 	@Autowired
-	public GeneProductController(GeneProductService gpService, ControllerHelper controllerHelper) {
+	public GeneProductController(GeneProductService gpService) {
 		Objects.requireNonNull(gpService, "The GeneProductService instance passed to the constructor of " +
 				"GeneProductController should not be null.");
-		Objects.requireNonNull(controllerHelper, "The ControllerHelper instance passed to the constructor of " +
-				"GeneProductController should not be null.");
 		this.geneProductService = gpService;
-		this.controllerHelper = controllerHelper;
 	}
-
-	/**
-	 * An empty or unknown path should result in a bad request
-	 *
-	 * @return a 400 response
-	 */
-//	@RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
-//	public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
-//		throw new IllegalArgumentException("The requested end-point does not exist.");
-//	}
 
 
 	/**
@@ -80,7 +65,7 @@ public class GeneProductController {
 	 * @param docList a list of results
 	 * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents
 	 */
-	protected ResponseEntity<QueryResult<GeneProduct>> getGeneProductResponse(List<GeneProduct> docList) {
+	private ResponseEntity<QueryResult<GeneProduct>> getGeneProductResponse(List<GeneProduct> docList) {
 		QueryResult.Builder<GeneProduct> builder;
 		if (docList == null) {
 			builder = new QueryResult.Builder<>(0, Collections.emptyList());
@@ -95,7 +80,7 @@ public class GeneProductController {
 	 * @param requestedResultsSize the number of results being requested
 	 * @throws IllegalArgumentException if the number is greater than {@link #MAX_PAGE_RESULTS}
 	 */
-	protected void validateRequestedResults(int requestedResultsSize) {
+	private void validateRequestedResults(int requestedResultsSize) {
 		if (requestedResultsSize > MAX_PAGE_RESULTS) {
 			String errorMessage = "Cannot retrieve more than " + MAX_PAGE_RESULTS + " results in one request. " +
 					"Please consider using end-points that return paged results.";
