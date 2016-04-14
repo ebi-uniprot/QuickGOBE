@@ -7,7 +7,6 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -430,20 +429,20 @@ public abstract class OBOControllerIT {
     }
 
     protected ResultActions expectCoreFieldsInResults(ResultActions result, List<String> ids) throws Exception {
-        AtomicInteger index = new AtomicInteger(0);
+        int index = 0;
 
         for (String id : ids) {
-            expectCoreFields(result, id, "$.results[" + index.getAndIncrement() + "].");
+            expectCoreFields(result, id, "$.results[" + index++ + "].");
         }
 
         return result;
     }
 
     protected ResultActions expectCompleteFieldsInResults(ResultActions result, List<String> ids) throws Exception {
-        AtomicInteger index = new AtomicInteger(0);
+        int index = 0;
 
         for (String id : ids) {
-            expectCompleteFields(result, id, "$.results[" + index.getAndIncrement() + "].");
+            expectCompleteFields(result, id, "$.results[" + index++ + "].");
         }
 
         return result;
@@ -489,10 +488,10 @@ public abstract class OBOControllerIT {
     }
 
     protected ResultActions expectBasicFieldsInResults(ResultActions result, List<String> ids) throws Exception {
-        AtomicInteger index = new AtomicInteger(0);
+        int index = 0;
 
         for (String id : ids) {
-            expectBasicFields(result, id, "$.results[" + index.getAndIncrement() + "].");
+            expectBasicFields(result, id, "$.results[" + index++ + "].");
         }
 
         return result;

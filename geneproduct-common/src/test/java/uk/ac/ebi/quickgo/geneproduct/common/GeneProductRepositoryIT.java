@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.geneproduct.common;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -73,9 +75,9 @@ public class GeneProductRepositoryIT {
 
         geneProductRepository.delete(id);
 
-        Optional<GeneProductDocument> retrievedDoc = geneProductRepository.findById(id);
+        List<GeneProductDocument> retrievedDoc = geneProductRepository.findById(Arrays.asList(id));
 
-        assertThat(retrievedDoc.isPresent(), is(false));
+        assertThat(retrievedDoc.isEmpty(), is(true));
     }
 
     @Test
@@ -86,10 +88,10 @@ public class GeneProductRepositoryIT {
 
         geneProductRepository.save(doc);
 
-        Optional<GeneProductDocument> retrievedDoc = geneProductRepository.findById(id);
+        List<GeneProductDocument>  retrievedDoc = geneProductRepository.findById(Arrays.asList(id));
 
-        assertThat(retrievedDoc.isPresent(), is(true));
-        assertThat(retrievedDoc.get(), is(doc));
+        assertThat(retrievedDoc.isEmpty(), is(false));
+        assertThat(retrievedDoc.get(0), is(doc));
 
     }
 }
