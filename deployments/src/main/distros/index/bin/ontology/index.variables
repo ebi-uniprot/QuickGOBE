@@ -4,7 +4,7 @@
 
 ## ---------------------------- ASSOCIATED SOLR CORE INFO ----------------------------
 CORE_NAME="ontology";
-JOB_NAME="myJob";
+JOB_NAME="ontologyIndexingJob";
 
 
 ## ---------------------------- FOR JAVA ----------------------------
