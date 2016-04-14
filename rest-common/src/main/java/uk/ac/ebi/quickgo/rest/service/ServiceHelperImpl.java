@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 29/03/2016
  * Time: 11:01
  * Created with IntelliJ IDEA.

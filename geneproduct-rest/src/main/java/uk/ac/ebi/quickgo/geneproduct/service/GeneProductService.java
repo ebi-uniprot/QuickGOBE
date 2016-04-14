@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import java.util.List;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 29/03/2016
  * Time: 10:55
  * Created with IntelliJ IDEA.

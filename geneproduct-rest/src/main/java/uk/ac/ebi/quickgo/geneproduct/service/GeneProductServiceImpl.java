@@ -1,19 +1,16 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
-import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 29/03/2016
  * Time: 10:56
  * Created with IntelliJ IDEA.
