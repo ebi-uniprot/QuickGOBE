@@ -19,17 +19,22 @@
           </elementProp>
           <elementProp name="USERS" elementType="Argument">
             <stringProp name="Argument.name">USERS</stringProp>
-            <stringProp name="Argument.value">5</stringProp>
+            <stringProp name="Argument.value">${__property(users,,100)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="PORT" elementType="Argument">
             <stringProp name="Argument.name">PORT</stringProp>
-            <stringProp name="Argument.value">${_P(port,8080)}</stringProp>
+            <stringProp name="Argument.value">${__property(port,,8081)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="HOST" elementType="Argument">
             <stringProp name="Argument.name">HOST</stringProp>
-            <stringProp name="Argument.value">{_P(host,ves-hx-xx)}</stringProp>
+            <stringProp name="Argument.value">${__property(host,,ves-hx-c2.ebi.ac.uk)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="RAMP" elementType="Argument">
+            <stringProp name="Argument.name">RAMP</stringProp>
+            <stringProp name="Argument.value">${__property(ramp,,2)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -41,8 +46,8 @@
         <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
           <collectionProp name="Arguments.arguments"/>
         </elementProp>
-        <stringProp name="HTTPSampler.domain">$HOST</stringProp>
-        <stringProp name="HTTPSampler.port">$PORT</stringProp>
+        <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+        <stringProp name="HTTPSampler.port">${PORT}</stringProp>
         <stringProp name="HTTPSampler.connect_timeout"></stringProp>
         <stringProp name="HTTPSampler.response_timeout"></stringProp>
         <stringProp name="HTTPSampler.protocol"></stringProp>
@@ -58,7 +63,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -133,7 +138,7 @@
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="false">
+          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -166,7 +171,7 @@
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -208,7 +213,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -358,7 +363,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -403,7 +408,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}goterms_large_shuf</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}all_goterm_ids_shuffled.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -519,7 +524,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -680,7 +685,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -841,7 +846,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -872,7 +877,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}goterms_large_shuf</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}all_goterm_ids_shuffled.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -988,7 +993,7 @@
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -1019,7 +1024,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter"></stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}goterms_request5.txt</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}five_goterm_ids_per_request.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -1135,7 +1140,7 @@
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -1166,7 +1171,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter"></stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}go_term_long_list</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}multiple_go_terms_per_request.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -1282,7 +1287,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -1313,7 +1318,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}goterms_large_shuf</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}all_goterm_ids_shuffled.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -1429,7 +1434,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -1460,7 +1465,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}term_taxon_constraints</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}term_taxon_constraints.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -1576,7 +1581,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -1607,7 +1612,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}term_guidelines_us</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}term_guidelines_us.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -1723,7 +1728,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -1754,7 +1759,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}goterms_large_shuf</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}all_goterm_ids_shuffled.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -1870,7 +1875,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -1901,7 +1906,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}goterms_large_shuf</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}all_goterm_ids_shuffled.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -2017,7 +2022,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -2048,7 +2053,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}xontology_relations</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}xontology_relations.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -2164,7 +2169,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -2308,7 +2313,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -2353,7 +2358,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}eco_codes.txt</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}all_eco_codes.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -2469,7 +2474,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -2630,7 +2635,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -2758,7 +2763,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -2789,7 +2794,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}eco_codes.txt</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}all_eco_codes.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -2905,7 +2910,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -2936,7 +2941,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}eco_codes.txt</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}all_eco_codes.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -3052,7 +3057,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -3083,7 +3088,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}eco_codes.txt</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}all_eco_codes.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -3199,7 +3204,7 @@
           <stringProp name="LoopController.loops">${LOOPS}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">2</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
         <longProp name="ThreadGroup.start_time">1455542625000</longProp>
         <longProp name="ThreadGroup.end_time">1455542625000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -3230,7 +3235,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
             <stringProp name="delimiter"></stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">${RESOURCES_PATH}eco_terms_shuf_long_lines</stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}multiple_eco_terms_per_request.txt</stringProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
@@ -3325,6 +3330,119 @@
               <responseData>false</responseData>
               <samplerData>false</samplerData>
               <xml>false</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <threadCounts>true</threadCounts>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Ontology Benchmark" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
+        <longProp name="ThreadGroup.start_time">1455542625000</longProp>
+        <longProp name="ThreadGroup.end_time">1455542625000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="/QuickGO/services/go/${goterm}" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/QuickGO/services/go/${goterm}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
+            <stringProp name="delimiter"></stringProp>
+            <stringProp name="fileEncoding"></stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}five_goterm_ids_per_request.txt</stringProp>
+            <boolProp name="quotedData">false</boolProp>
+            <boolProp name="recycle">true</boolProp>
+            <stringProp name="shareMode">shareMode.all</stringProp>
+            <boolProp name="stopThread">false</boolProp>
+            <stringProp name="variableNames">goterm</stringProp>
+          </CSVDataSet>
+          <hashTree/>
+        </hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="/QuickGO/services/eco/${ecocode}" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/QuickGO/services/eco/${ecocode}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
+            <stringProp name="delimiter"></stringProp>
+            <stringProp name="fileEncoding"></stringProp>
+            <stringProp name="filename">${RESOURCES_PATH}multiple_eco_terms_per_request.txt</stringProp>
+            <boolProp name="quotedData">false</boolProp>
+            <boolProp name="recycle">true</boolProp>
+            <stringProp name="shareMode">shareMode.all</stringProp>
+            <boolProp name="stopThread">false</boolProp>
+            <stringProp name="variableNames">ecocode</stringProp>
+          </CSVDataSet>
+          <hashTree/>
+        </hashTree>
+        <ResultCollector guiclass="GraphVisualizer" testclass="ResultCollector" testname="Graph Results" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
               <fieldNames>false</fieldNames>
               <responseHeaders>false</responseHeaders>
               <requestHeaders>false</requestHeaders>
