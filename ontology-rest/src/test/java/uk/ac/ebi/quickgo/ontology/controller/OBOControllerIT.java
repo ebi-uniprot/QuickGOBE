@@ -463,10 +463,6 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "replacedBy").exists());
     }
 
-    protected ResultActions expectBasicFields(ResultActions result, String id) throws Exception {
-        return expectBasicFields(result, id, "$.");
-    }
-
     protected abstract String idMissingInRepository();
 
     protected abstract String invalidId();
@@ -489,10 +485,10 @@ public abstract class OBOControllerIT {
     }
 
     protected ResultActions expectBasicFieldsInResults(ResultActions result, List<String> ids) throws Exception {
-        AtomicInteger index = new AtomicInteger(0);
+        int i = 0;
 
         for (String id : ids) {
-            expectBasicFields(result, id, "$.results[" + index.getAndIncrement() + "].");
+            expectBasicFields(result, id, "$.results[" + i++ + "].");
         }
 
         return result;
