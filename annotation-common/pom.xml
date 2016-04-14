@@ -11,10 +11,11 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>ontology-common</artifactId>
-    <name>Ontology Common components</name>
+    <artifactId>annotation-common</artifactId>
+    <name>Annotation Common Components</name>
+    <version>0.0.1-SNAPSHOT</version>
     <description>
-        Contains a set of ontology related classes that are used by both the web-services and indexing services
+        Contains a set of annotation related classes that are used by both the web-services and indexing services
     </description>
     <packaging>jar</packaging>
 
@@ -34,7 +35,6 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
         </dependency>
-
 
         <!-- Test dependencies -->
         <dependency>
@@ -81,4 +81,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
