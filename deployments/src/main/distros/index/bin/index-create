@@ -24,7 +24,6 @@ if [ "$properties_not_found" = "true" ]; then
     exit 1;
 fi
 
-
 # ------------------------ abort if we're building in a staging environment ------------------------
 if [ "$vm_purpose" == "STAGE" ] ; then
     prettyEcho "QuickGO <bold>build related tasks</bold> should not take place in a <bold>STAGING</bold> environment";
@@ -41,25 +40,12 @@ fi
 # change log file so it prints correctly
 javaJob="bsub $(lsfJavaJobOptions)"
 
-
 # ------------------------ start off the indexing via LSF ------------------------
 if [ "$1" = "submit" ]; then
 
-se" == "STAGE" ] ; then
-    prettyEcho "QuickGO <bold>build related tasks</bold> should not take place in a <bold>STAGING</bold> environment";
-    exit 1;
-fi
-
-# ------------------------ verify the solr address variable is set ------------------------
-if [ -z "$SOLR_ADDRESS" ]; then
-    echo '$SOLR_ADDRESS variable must be set';
-    exit 1;
-fi
-
-# ------------------------ compute the java indexing job string ------------------------
-
     # ensure indexing job variable is defined
     if [ ! -z "$javaJob" ]; then
+        ../rm-index-data submit
 
         echo "executing command:"
         echo "$javaJob";
@@ -74,6 +60,6 @@ else
       echo "The following command will be executed:";
       echo "$javaJob";
       echo ""
-      echo "Variables used to create these command(s) can be changed in index.variables, if necessary.";
+      echo "Variables used to create these command\(s\) can be changed in index.variables, if necessary.";
       echo "Otherwise, if this is all correct and you want to submit this command, please re-run this script with parameter \"submit\"";
 fi
