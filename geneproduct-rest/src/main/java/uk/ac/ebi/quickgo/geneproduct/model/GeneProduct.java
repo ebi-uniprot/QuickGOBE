@@ -50,7 +50,6 @@ public class GeneProduct {
 	//todo maybe.. this value could be replaced with the UPID (as we have for referenceProteome)
 	public boolean isCompleteProteome;
 
-
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	public static class Taxonomy implements FieldType {
 

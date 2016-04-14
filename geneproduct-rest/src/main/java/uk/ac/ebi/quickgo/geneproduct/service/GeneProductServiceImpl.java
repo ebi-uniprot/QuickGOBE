@@ -17,38 +17,42 @@ import java.util.stream.Collectors;
  */
 public class GeneProductServiceImpl implements GeneProductService {
 
-	private final ServiceHelper serviceHelper;
-	private final GeneProductRepository geneProductRepository;
-	private final GeneProductDocConverter converter;
+    private final ServiceHelper serviceHelper;
+    private final GeneProductRepository geneProductRepository;
+    private final GeneProductDocConverter converter;
 
-	public GeneProductServiceImpl(ServiceHelper serviceHelper, GeneProductRepository geneProductRepository, GeneProductDocConverter converter) {
+    public GeneProductServiceImpl(ServiceHelper serviceHelper, GeneProductRepository geneProductRepository,
+            GeneProductDocConverter converter) {
 
-		java.util.Objects.requireNonNull(serviceHelper, "The ServiceHelper instance passed to the constructor of " +
-				"GeneProductServiceImpl should not be null.");
-		java.util.Objects.requireNonNull(geneProductRepository, "The GeneProductRepository instance passed to the constructor of " +
-				"GeneProductServiceImpl should not be null.");
-		java.util.Objects.requireNonNull(converter, "The GeneProductDocConverter instance passed to the constructor of " +
-				"GeneProductServiceImpl should not be null.");
-		this.serviceHelper = serviceHelper;
-		this.geneProductRepository = geneProductRepository;
-		this.converter = converter;
-	}
+        java.util.Objects.requireNonNull(serviceHelper, "The ServiceHelper instance passed to the constructor of " +
+                "GeneProductServiceImpl should not be null.");
+        java.util.Objects.requireNonNull(geneProductRepository,
+                "The GeneProductRepository instance passed to the constructor of " +
+                        "GeneProductServiceImpl should not be null.");
+        java.util.Objects
+                .requireNonNull(converter, "The GeneProductDocConverter instance passed to the constructor of " +
+                        "GeneProductServiceImpl should not be null.");
 
-	/**
-	 * Find the core data set stored for a specified list of geneProduct IDs.
-	 * @param ids the ontology IDs
-	 * @return a {@link List} of {@link GeneProduct} instances corresponding to the gene product ids containing the
-	 * chosen information
-	 */
-	@Override
-	public List<GeneProduct> findById(String[] ids) {
-		return convertDocs(geneProductRepository.findById(serviceHelper.buildIdList(ids)));
-	}
+        this.serviceHelper = serviceHelper;
+        this.geneProductRepository = geneProductRepository;
+        this.converter = converter;
+    }
 
-	protected List<GeneProduct> convertDocs(List<GeneProductDocument> docs) {
-		return docs
-				.stream()
-				.map(converter::convert)
-				.collect(Collectors.toList());
-	}
+    /**
+     * Find the core data set stored for a specified list of geneProduct IDs.
+     * @param ids the ontology IDs
+     * @return a {@link List} of {@link GeneProduct} instances corresponding to the gene product ids containing the
+     * chosen information
+     */
+    @Override
+    public List<GeneProduct> findById(String[] ids) {
+        return convertDocs(geneProductRepository.findById(serviceHelper.buildIdList(ids)));
+    }
+
+    protected List<GeneProduct> convertDocs(List<GeneProductDocument> docs) {
+        return docs
+                .stream()
+                .map(converter::convert)
+                .collect(Collectors.toList());
+    }
 }
