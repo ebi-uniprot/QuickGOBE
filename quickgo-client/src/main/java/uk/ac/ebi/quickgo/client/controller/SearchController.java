@@ -2,13 +2,14 @@ package uk.ac.ebi.quickgo.client.controller;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryRequestBuilder;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
+import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.*;
 
 /**
  * Search controller responsible for providing consistent search
@@ -68,7 +70,8 @@ public class SearchController {
      * @param highlighting whether or not to highlight the search results
      * @return the search results
      */
-
+    @ApiOperation(value="Searches a user defined query, e.g., query=apopto",
+            notes = "Response fields include: id and name (and aspect for GO terms)")
     @RequestMapping(value = "/ontology", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OntologyTerm>> ontologySearch(
             @RequestParam(value = "query") String query,
