@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 22/03/2016
  * Time: 14:10
  * Created with IntelliJ IDEA.
@@ -20,7 +20,7 @@ public class GeneProduct {
 	public String database;
 
 	//e.g. A0A000 http://www.uniprot.org/uniprot/A0A000
-	public String identifier;
+	public String id;
 
 	//A (unique and valid) symbol to which DB object ID is matched this field is mandatory, cardinality 1
 	public String symbol;
@@ -34,7 +34,7 @@ public class GeneProduct {
 	//Protein; RNA or complex
 	public GeneProductType type;
 
-	//taxonomic identifier(s) The NCBI taxon ID of the species encoding the gene product. this field is mandatory,
+	//taxonomic id(s) The NCBI taxon ID of the species encoding the gene product. this field is mandatory,
 	public Taxonomy taxonomy;
 
 	public List<String> databaseSubset;
@@ -42,14 +42,13 @@ public class GeneProduct {
 	//UPID
 	public String referenceProteome;
 
-	//The identifier of the gene product from which this gene product was derived
+	//The id of the gene product from which this gene product was derived
 	public String parentId;
 
-
 	public boolean isIsoform;
-	public boolean isAnnotated;
-	public boolean isCompleteProteome;
 
+	//todo maybe.. this value could be replaced with the UPID (as we have for referenceProteome)
+	public boolean isCompleteProteome;
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	public static class Taxonomy implements FieldType {
@@ -64,5 +63,23 @@ public class GeneProduct {
 			this.id = identifier;
 			this.name = name;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "GeneProduct{" +
+				"database='" + database + '\'' +
+				", id='" + id + '\'' +
+				", symbol='" + symbol + '\'' +
+				", name='" + name + '\'' +
+				", synonyms=" + synonyms +
+				", type=" + type +
+				", taxonomy=" + taxonomy +
+				", databaseSubset=" + databaseSubset +
+				", referenceProteome='" + referenceProteome + '\'' +
+				", parentId='" + parentId + '\'' +
+				", isIsoform=" + isIsoform +
+				", isCompleteProteome=" + isCompleteProteome +
+				'}';
 	}
 }

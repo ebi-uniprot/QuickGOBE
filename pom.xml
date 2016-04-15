@@ -22,6 +22,7 @@
                 <module>common</module>
                 <module>ontology-common</module>
                 <module>ontology-rest</module>
+                <module>geneproduct-common</module>
                 <module>quickgo-client</module>
                 <module>geneproduct-common</module>
                 <module>geneproduct-rest</module>

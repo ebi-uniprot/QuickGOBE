@@ -4,6 +4,8 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
@@ -63,4 +65,6 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
                     OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT,
                     OntologyFields.DEFINITION, OntologyFields.ANNOTATION_GUIDELINE})
     List<OntologyDocument> findAnnotationGuidelinesByTermId(String idType, List<String> ids);
+
+    Page<OntologyDocument> findAllByOntologyType(String type, Pageable pageable);
 }

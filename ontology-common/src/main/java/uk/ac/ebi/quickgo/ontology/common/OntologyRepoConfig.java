@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.spi.LoggerFactory;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,33 +25,30 @@ import org.xml.sax.SAXException;
  * Publishes the configuration beans of the ontology repository.
  */
 @Configuration
-public class RepoConfig {
-    Logger LOGGER  =  org.slf4j.LoggerFactory.getLogger(RepoConfig.class);
+public class OntologyRepoConfig {
+    private static final String SOLR_CORE = "ontology";
+
+    Logger LOGGER = org.slf4j.LoggerFactory.getLogger(OntologyRepoConfig.class);
 
     @Bean
     static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Bean(name = "solrServer")
-    @Profile("httpServer")
-    public SolrServer httpSolrServer(@Value("${solr.host}") String solrUrl)  {
-
-
-        return new HttpSolrServer(solrUrl);
-    }
-
-    @Bean(name = "solrServer")
-    @Profile("embeddedServer")
-    public SolrServer embeddedSolrServer(SolrServerFactory solrServerFactory) {
-
-        LOGGER.info("Using embedded server");
+    @Bean
+    public SolrServer solrServer(SolrServerFactory solrServerFactory) {
         return solrServerFactory.getSolrServer();
     }
 
     @Bean
+    @Profile("httpServer")
+    public SolrServerFactory httpSolrServerFactory(@Value("${solr.host}") String solrUrl) {
+        return new MulticoreSolrServerFactory(new HttpSolrServer(solrUrl));
+    }
+
+    @Bean
     @Profile("embeddedServer")
-    public SolrServerFactory solrServerFactory(CoreContainer coreContainer)
+    public SolrServerFactory embeddedSolrServerFactory(CoreContainer coreContainer)
             throws IOException, SAXException, ParserConfigurationException {
         EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, null);
         return new MulticoreSolrServerFactory(embeddedSolrServer);
@@ -66,12 +63,16 @@ public class RepoConfig {
     }
 
     @Bean
-    public SolrTemplate ontologyTemplate(SolrServer solrServer)  {
-        return new SolrTemplate(solrServer, "ontology");
+    public SolrTemplate ontologyTemplate(SolrServerFactory solrServerFactory) {
+        SolrTemplate template = new SolrTemplate(solrServerFactory);
+        template.setSolrCore(SOLR_CORE);
+
+        return template;
     }
 
     @Bean
-    public OntologyRepository ontologyRepository(SolrTemplate ontologyTemplate) {
+    public OntologyRepository ontologyRepository(
+            @Qualifier("ontologyTemplate") SolrTemplate ontologyTemplate) {
         LOGGER.info("Returning ontology repo {}", ontologyTemplate.toString());
 
         return new SolrRepositoryFactory(ontologyTemplate)

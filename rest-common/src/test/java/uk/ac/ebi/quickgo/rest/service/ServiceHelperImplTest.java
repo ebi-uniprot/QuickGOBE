@@ -18,7 +18,7 @@ import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.when;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 01/04/2016
  * Time: 13:31
  * Created with IntelliJ IDEA.
@@ -35,6 +35,7 @@ public class ServiceHelperImplTest {
 	private QueryStringSanitizer queryStringSanitizer;
 
 	public static final String SINGLE_ID = "A0A000";
+	public static final String[] SINGLE_ID_LIST = new String[]{"A0A000"};
 
 
 	@Before
@@ -46,8 +47,8 @@ public class ServiceHelperImplTest {
 
 	@Test
 	public void valid(){
-		List<String> singleId = Arrays.asList(SINGLE_ID);
-		List<String>  sanitizedList = serviceHelper.buildIdList(singleId);
+		List<String> singleId = Arrays.asList(SINGLE_ID_LIST);
+		List<String>  sanitizedList = serviceHelper.buildIdList(SINGLE_ID_LIST);
 		assertThat(sanitizedList, containsInAnyOrder(SINGLE_ID));
 
 	}

@@ -1,11 +1,11 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
-import uk.ac.ebi.quickgo.geneproduct.common.RepoConfig;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
 import java.util.Arrays;
@@ -42,7 +42,7 @@ import org.springframework.core.io.Resource;
  */
 @Configuration
 @EnableBatchProcessing
-@Import({RepoConfig.class})
+@Import({GeneProductRepoConfig.class})
 public class GeneProductConfig {
     static final String GENE_PRODUCT_INDEXING_JOB_NAME = "geneProductIndexingJob";
     static final String GENE_PRODUCT_INDEXING_STEP_NAME = "geneProductIndexStep";
@@ -70,7 +70,7 @@ public class GeneProductConfig {
     private int skipLimit;
 
     @Autowired
-    private GeneProductRepository repository;
+    private GeneProductRepository geneProductRepository;
 
     @Bean
     public Job geneProductJob() {
@@ -154,7 +154,7 @@ public class GeneProductConfig {
 
     @Bean
     ItemWriter<GeneProductDocument> geneProductRepositoryWriter() {
-        return new SolrCrudRepoWriter<>(repository);
+        return new SolrCrudRepoWriter<>(geneProductRepository);
     }
 
     private JobExecutionListener logJobListener() {

@@ -18,15 +18,15 @@ public final class GeneProductDocMocker {
         doc.taxonId = 35758;
         doc.taxonName = "Streptomyces ghanaensis";
         doc.symbol = "Streptomyces ghanaensis - symbol";
-        doc.parentId = " UniProtKB:OK0206";
+        doc.parentId = "UniProtKB:OK0206";
         doc.database = "UniProt";
-        doc.databaseSubsets = new ArrayList<>();
+        doc.databaseSubsets = Arrays.asList("RRR","QQQ");
         doc.isAnnotated = true;
         doc.isIsoform = true;
         doc.isCompleteProteome = true;
         doc.name = "moeA5";
         doc.referenceProteome = "AAAA";
-        doc.synonyms = Arrays.asList("Bernie");
+        doc.synonyms = Arrays.asList("3SSW23");
         return doc;
     }
 }

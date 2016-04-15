@@ -6,7 +6,8 @@ import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.JobTestRunnerConfig;
 
 import com.google.common.collect.Lists;
-import java.util.*;
+import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -42,7 +43,7 @@ public class GeneProductIndexingBatchIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private GeneProductRepository repository;
+    private GeneProductRepository geneProductRepository;
 
     @Test
     public void successfulJobRun() throws Exception {
@@ -57,7 +58,7 @@ public class GeneProductIndexingBatchIT {
         assertThat(indexingStep.getProcessSkipCount(), is(1));
         assertThat(indexingStep.getWriteCount(), is(6));
 
-        Collection<GeneProductDocument> gpDocs = convertToCollection(repository.findAll());
+        Collection<GeneProductDocument> gpDocs = convertToCollection(geneProductRepository.findAll());
 
         assertThat(gpDocs, hasSize(6));
         assertThat(extractIdsFromGPDocs(gpDocs),

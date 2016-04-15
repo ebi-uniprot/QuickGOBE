@@ -1,29 +1,31 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
-import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
-import uk.ac.ebi.quickgo.rest.search.*;
+import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
+import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
- * Provides RESTful end-points for retrieving gene product information.
+ * Provides RESTful endpoints for retrieving gene product information
  *
- * Created 29/03/2016
  * @author Tony Wardell
+ * Date: 29/03/2016
+ * Time: 10:09
+ * Created with IntelliJ IDEA.
  */
 @RestController
 @RequestMapping(value = "/QuickGO/services/geneproduct")
@@ -35,7 +37,6 @@ public class GeneProductController {
 	private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
 	private static final String DEFAULT_PAGE_NUMBER = "1";
 
-	private final ControllerHelper controllerHelper;
 	private final GeneProductService geneProductService;
 	private final SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig;
 	private final SearchService<GeneProduct> geneProductSearchService;
@@ -45,12 +46,13 @@ public class GeneProductController {
 	@Autowired
 	public GeneProductController(
 			GeneProductService gpService,
-			ControllerHelper controllerHelper,
 			SearchService<GeneProduct> geneProductSearchService,
 			SearchableField geneProductSearchableField,
 			SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig) {
+	public GeneProductController(GeneProductService gpService) {
+		Objects.requireNonNull(gpService, "The GeneProductService instance passed to the constructor of " +
+				"GeneProductController should not be null.");
 		this.geneProductService = gpService;
-		this.controllerHelper = controllerHelper;
 		this.geneProductRetrievalConfig = geneProductRetrievalConfig;
 		this.geneProductSearchService = geneProductSearchService;
 		this.geneProductSearchableField = geneProductSearchableField;
@@ -79,9 +81,10 @@ public class GeneProductController {
 	 *     <li>any id is of the an invalid format: response returns 400</li>
 	 * </ul>
 	 */
-	@RequestMapping(value = "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable(value = "ids") String ids) {
-		return getGeneProductResponse(geneProductService.findById(validateIds(ids)));
+	@RequestMapping(value = "/{ids:,*}", produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable String[] ids) {
+		validateRequestedResults(ids.length);
+		return getGeneProductResponse(geneProductService.findById(ids));
 	}
 
 	/**
@@ -129,33 +132,14 @@ public class GeneProductController {
 	 * @param docList a list of results
 	 * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents
 	 */
-	protected ResponseEntity<QueryResult<GeneProduct>> getGeneProductResponse(List<GeneProduct> docList) {
-		List<GeneProduct> resultsToShow;
+	private ResponseEntity<QueryResult<GeneProduct>> getGeneProductResponse(List<GeneProduct> docList) {
+		QueryResult.Builder<GeneProduct> builder;
 		if (docList == null) {
-			resultsToShow = Collections.emptyList();
+			builder = new QueryResult.Builder<>(0, Collections.emptyList());
 		} else {
-			resultsToShow = docList;
+ 			builder = new QueryResult.Builder<>(docList.size(), docList);
 		}
-
-		QueryResult<GeneProduct> queryResult = new QueryResult<>(resultsToShow.size(), resultsToShow, null, null, null);
-		return new ResponseEntity<>(queryResult, HttpStatus.OK);
-	}
-
-
-	/**
-	 * Checks the validity of a list of IDs in CSV format.
-	 * @param ids a list of IDs in CSV format
-	 * @throws IllegalArgumentException is thrown if an ID is not valid, or if
-	 * number of IDs listed is greater than {@link #MAX_PAGE_RESULTS}.
-	 */
-	protected java.util.List<String> validateIds(String ids) {
-		java.util.List<String> idList =  controllerHelper.csvToList(ids);
-//		validateRequestedResults(idList.size());
-//		idList
-//				.stream()
-//				.forEach(this::checkValidId);
-
-		return idList;
+		return new ResponseEntity<>(builder.build(), HttpStatus.OK);
 	}
 
 	/**
@@ -163,7 +147,7 @@ public class GeneProductController {
 	 * @param requestedResultsSize the number of results being requested
 	 * @throws IllegalArgumentException if the number is greater than {@link #MAX_PAGE_RESULTS}
 	 */
-	protected void validateRequestedResults(int requestedResultsSize) {
+	private void validateRequestedResults(int requestedResultsSize) {
 		if (requestedResultsSize > MAX_PAGE_RESULTS) {
 			String errorMessage = "Cannot retrieve more than " + MAX_PAGE_RESULTS + " results in one request. " +
 					"Please consider using end-points that return paged results.";
@@ -193,4 +177,6 @@ public class GeneProductController {
 	protected boolean isValidId(String id) {
 		return true;
 	}
+
+
 }
