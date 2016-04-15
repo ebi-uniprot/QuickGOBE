@@ -2,11 +2,11 @@ package uk.ac.ebi.quickgo.geneproduct.common.common;
 
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
- * Class to create mocked objects of different {@code docType}s, which are valid according to {@link OntologyDocument}.
+ * Class to create mocked objects of type {@link GeneProductDocument}.
  */
 public final class GeneProductDocMocker {
     private GeneProductDocMocker() {}
@@ -26,7 +26,7 @@ public final class GeneProductDocMocker {
         doc.isCompleteProteome = true;
         doc.name = "moeA5";
         doc.referenceProteome = "AAAA";
-        doc.synonyms = Arrays.asList("3SSW23");
+        doc.synonyms = Collections.singletonList("3SSW23");
         return doc;
     }
 }
