@@ -47,11 +47,11 @@ fi
 CORE_NAME=
 
 # source environment specific variables
-source "$BASE_DIR/my-solr.properties";
+source "$BASE_DIR/$solr_server.properties";
 
 # check vm purpose defined
 if [ -z $vm_purpose ]; then
-    echo "Please specify the purpose of the VM in, vm_purpose, in $BASE_DIR/my-solr.properties";
+    echo "Please specify the purpose of the VM in, vm_purpose, in $BASE_DIR/$solr_server.properties";
     exit 1;
 fi
 PURPOSE="$vm_purpose";
