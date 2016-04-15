@@ -9,13 +9,14 @@ package uk.ac.ebi.quickgo.geneproduct;
  * Created with IntelliJ IDEA.
  */
 
+import uk.ac.ebi.quickgo.geneproduct.service.ServiceConfig;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import uk.ac.ebi.quickgo.geneproduct.service.ServiceConfig;
 
 @SpringBootApplication
 @ComponentScan({"uk.ac.ebi.quickgo.geneproduct.controller", "uk.ac.ebi.quickgo.rest"})

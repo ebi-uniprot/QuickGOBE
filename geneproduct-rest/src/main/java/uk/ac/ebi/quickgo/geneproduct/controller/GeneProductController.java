@@ -1,23 +1,27 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
+import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryRequestBuilder;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
  * Provides RESTful endpoints for retrieving gene product information
@@ -45,14 +49,14 @@ public class GeneProductController {
 
 	@Autowired
 	public GeneProductController(
-			GeneProductService gpService,
+			GeneProductService geneProductService,
 			SearchService<GeneProduct> geneProductSearchService,
 			SearchableField geneProductSearchableField,
 			SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig) {
-	public GeneProductController(GeneProductService gpService) {
-		Objects.requireNonNull(gpService, "The GeneProductService instance passed to the constructor of " +
+		Objects.requireNonNull(geneProductService, "The GeneProductService instance passed to the constructor of " +
 				"GeneProductController should not be null.");
-		this.geneProductService = gpService;
+
+		this.geneProductService = geneProductService;
 		this.geneProductRetrievalConfig = geneProductRetrievalConfig;
 		this.geneProductSearchService = geneProductSearchService;
 		this.geneProductSearchableField = geneProductSearchableField;
@@ -155,28 +159,4 @@ public class GeneProductController {
 			throw new IllegalArgumentException(errorMessage);
 		}
 	}
-
-
-	/**
-	 * Checks the validity of a geneproduct id.
-	 *
-	 * @param id the term id to check
-	 * @throws IllegalArgumentException is thrown if the ID is not valid
-	 */
-	protected void checkValidId(String id) {
-		if (!isValidId(id)) {
-			throw new IllegalArgumentException("Provided ID: '" + id + "' is invalid");
-		}
-	}
-
-	/**
-	 * Are there any requirements for the validity of a gene product id
-	 * @param id
-	 * @return
-	 */
-	protected boolean isValidId(String id) {
-		return true;
-	}
-
-
 }

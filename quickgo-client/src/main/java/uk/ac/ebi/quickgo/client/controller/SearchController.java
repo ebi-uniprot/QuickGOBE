@@ -2,10 +2,10 @@ package uk.ac.ebi.quickgo.client.controller;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryRequestBuilder;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
@@ -21,8 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
-import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.*;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
  * Search controller responsible for providing consistent search

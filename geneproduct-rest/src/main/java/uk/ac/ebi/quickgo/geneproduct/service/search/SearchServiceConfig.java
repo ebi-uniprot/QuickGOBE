@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.service.search;
 
-import uk.ac.ebi.quickgo.geneproduct.common.RepoConfig;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
@@ -34,7 +34,7 @@ import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extrac
  * @author Edd
  */
 @Configuration
-@Import({RepoConfig.class})
+@Import({GeneProductRepoConfig.class})
 @ComponentScan({"uk.ac.ebi.quickgo.geneproduct.service.search"})
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {

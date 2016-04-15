@@ -1,26 +1,28 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
+import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
+import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
+import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.when;
-
-
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
-import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
-import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
-import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Tony Wardell
@@ -54,12 +56,9 @@ public class GeneProductControllerTest {
     @Mock
     private SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig;
 
-    static final String SINGLE_CSV = "A0A000";
-    static final String[] SINGLE_CSV_LIST = new String[]{"A0A000"};
-
-    static final String MULTI_CSV = "A0A000,A0A001,A0A002";
-    static final String[] MULTI_CSV_LIST = new String[]{"A0A000", "A0A001", "A0A002"};
-    static final String[] MULTI_CSV_OVER_LIMIT = new String[101];
+    private static final String[] SINGLE_CSV_LIST = new String[]{"A0A000"};
+    private static final String[] MULTI_CSV_LIST = new String[]{"A0A000", "A0A001", "A0A002"};
+    private static final String[] MULTI_CSV_OVER_LIMIT = new String[101];
 
     @Before
     public void setUp() {
@@ -68,20 +67,6 @@ public class GeneProductControllerTest {
                 geneProductSearchService,
                 geneProductSearchableField,
                 geneProductRetrievalConfig);
-
-	private static final String SINGLE_CSV = "A0A000";
-	private static final String MULTI_CSV = "A0A000,A0A001,A0A002";
-	static final String NOTFOUND_CSV = "Butter";
-
-	@Before
-	public void setUp() {
-		this.controller = new GeneProductController(
-				geneProductService,
-				controllerHelper,
-				geneProductSearchService,
-				geneProductSearchableField,
-				geneProductRetrievalConfig
-		);
 
         //Lookup for single Id
         final List<GeneProduct> singleGP = Collections.singletonList(geneProduct);
