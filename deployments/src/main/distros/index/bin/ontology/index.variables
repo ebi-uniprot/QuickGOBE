@@ -18,4 +18,4 @@ LSF_JVM_MIN_MEM=4096m   # min mem used by JVM
 LSF_JVM_MAX_MEM=12288m  # max mem used by JVM
 LSF_JOB_NAME="Ontology-Solr-Index-Creation"
 log_file_name=$(date "+$CORE_NAME-index-%N.%s.log") # time stamp the log file
-LSF_LOG_FILE="$BASE_DIR/solr-data/logs/$log_file_name"
+LSF_LOG_FILE="$BASE_DIR/solr-data/$solr_server/logs/$log_file_name"

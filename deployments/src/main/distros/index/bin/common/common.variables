@@ -58,31 +58,35 @@ PURPOSE="$vm_purpose";
 
 # check release base dir is set
 if [ -z $release_base_dir ]; then
-    echo "Please specify the release data's base directory in, release_base_dir, in $BASE_DIR/my-solr.properties";
+    echo "Please specify the release data's base directory in, release_base_dir, in $BASE_DIR/$solr_server.properties";
     exit 1;
 fi
 
 # check current data symlink name is set
 if [ -z $current_data_symlink_name ]; then
-    echo "Please specify the symlink name to point to the current release data, in current_data_symlink_name, in $BASE_DIR/my-solr.properties";
+    echo "Please specify the symlink name to point to the current release data, in current_data_symlink_name, in
+    $BASE_DIR/$solr_server.properties";
     exit 1;
 fi
 
 # check solr vm, e.g., ves-xx-xx for http://ves-xx-xx:PORT/solr-dashboard
 if [ -z $solr_vm ]; then
-    echo "Please specify Solr's vm, e.g., ves-xx-xx if http://ves-xx-xx:PORT/solr-dashboard exists, in solr_vm, in $BASE_DIR/my-solr.properties";
+    echo "Please specify Solr's vm, e.g., ves-xx-xx if http://ves-xx-xx:PORT/solr-dashboard exists, in solr_vm, in
+    $BASE_DIR/$solr_server.properties";
     exit 1;
 fi
 
 # check solr path, e.g., solr-dashboard if http://ves-xx-xx:PORT/solr-dashboard exists
 if [ -z $http_solr_path ]; then
-    echo "Please specify the Solr path, e.g., solr-dashboard for http://ves-xx-xx:PORT/solr-dashboard, in http_solr_path, in $BASE_DIR/my-solr.properties";
+    echo "Please specify the Solr path, e.g., solr-dashboard for http://ves-xx-xx:PORT/solr-dashboard, in
+    http_solr_path, in $BASE_DIR/$solr_server.properties";
     exit 1;
 fi
 
 # check solr port, e.g., PORT if http://ves-xx-xx:PORT/solr-dashboard exists
 if [ -z $http_solr_port ]; then
-    echo "Please specify Solr's port, e.g., PORT for http://ves-xx-xx:PORT/solr-dashboard exists, in http_solr_port, in $BASE_DIR/my-solr.properties";
+    echo "Please specify Solr's port, e.g., PORT for http://ves-xx-xx:PORT/solr-dashboard exists, in http_solr_port,
+    in $BASE_DIR/$solr_server.properties";
     exit 1;
 fi
 SOLR_ADDRESS_BASE="http://$solr_vm:$http_solr_port/$http_solr_path";
@@ -111,7 +115,7 @@ MAIN_CLASS_PARAMS=
 LSF_JOB_NAME=
 
 # java class path -- include all jars for creating the indexes
-QUICKGO_SERVICE_JAR="$BASE_DIR/solr-conf/lib/quickgo/*"
+QUICKGO_SERVICE_JAR="$BASE_DIR/solr-conf/$solr_server/lib/quickgo/*"
 
 
 ## ---------------------------- GENERAL UTILITY FUNCTIONS ----------------------------
