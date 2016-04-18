@@ -1,5 +1,14 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
+import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
+import uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker;
+import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -13,16 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
