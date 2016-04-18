@@ -2,35 +2,41 @@ package uk.ac.ebi.quickgo.geneproduct.common;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.*;
+import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.createDocWithId;
 
 /**
  * Tests the behaviour of the {@link GeneProductRepository}
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RepoConfig.class, loader = SpringApplicationContextLoader.class)
+@ContextConfiguration(classes = GeneProductRepoConfig.class, loader = SpringApplicationContextLoader.class)
 public class GeneProductRepositoryIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     @Autowired
     private GeneProductRepository geneProductRepository;
+
+    @Autowired
+    private SolrTemplate geneProductTemplate;
 
     @Before
     public void before() {
@@ -66,16 +72,16 @@ public class GeneProductRepositoryIT {
     }
 
     @Test
-    public void removeGeneProductFromRepository() {
+    public void removeGeneProductFromRepository() throws IOException, SolrServerException {
         String id = "geneProduct1";
 
         GeneProductDocument doc = createDocWithId(id);
 
         geneProductRepository.save(doc);
 
-        geneProductRepository.delete(id);
+        deleteFromRepositoryByIds(doc);
 
-        List<GeneProductDocument> retrievedDoc = geneProductRepository.findById(Arrays.asList(id));
+        List<GeneProductDocument> retrievedDoc = geneProductRepository.findById(Collections.singletonList(id));
 
         assertThat(retrievedDoc.isEmpty(), is(true));
     }
@@ -88,10 +94,29 @@ public class GeneProductRepositoryIT {
 
         geneProductRepository.save(doc);
 
-        List<GeneProductDocument>  retrievedDoc = geneProductRepository.findById(Arrays.asList(id));
+        List<GeneProductDocument> retrievedDoc = geneProductRepository.findById(Collections.singletonList(id));
 
         assertThat(retrievedDoc.isEmpty(), is(false));
         assertThat(retrievedDoc.get(0), is(doc));
 
+    }
+
+    /**
+     * Deleting from a repository is a special case when the schema.xml defines a non-"string"
+     * analyzer on the field used to identify the documents to delete. We use a lower-casing analyser
+     * for IDs, which means the geneProductTemplate.deleteById fails.
+     * <p>
+     * To get the desired behaviour, delete by accessing the solr server instance directly, so that
+     * the request goes through a query, which is subject to the same analyser used for indexing.
+     *
+     * @param docs the documents to delete
+     * @throws SolrServerException
+     * @throws IOException
+     */
+    private void deleteFromRepositoryByIds(GeneProductDocument... docs) throws SolrServerException, IOException {
+        for (GeneProductDocument doc : docs) {
+            geneProductTemplate.getSolrServer().deleteByQuery(GeneProductFields.Searchable.ID + ":" + doc.id);
+        }
+        geneProductTemplate.getSolrServer().commit();
     }
 }

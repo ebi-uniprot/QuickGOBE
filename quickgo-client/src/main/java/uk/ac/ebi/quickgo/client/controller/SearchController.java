@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,8 @@ public class SearchController {
      * @param highlighting whether or not to highlight the search results
      * @return the search results
      */
-
+    @ApiOperation(value="Searches a user defined query, e.g., query=apopto",
+            notes = "Response fields include: id and name (and aspect for GO terms)")
     @RequestMapping(value = "/ontology", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OntologyTerm>> ontologySearch(
             @RequestParam(value = "query") String query,

@@ -1,9 +1,12 @@
 package uk.ac.ebi.quickgo.geneproduct;
 
-/**
+ /**
  * Runnable class to start an embedded server to host the defined RESTful components.
  *
  * @author Tony Wardell
+ * Date: 04/04/2016
+ * Time: 11:39
+ * Created with IntelliJ IDEA.
  */
 
 import uk.ac.ebi.quickgo.geneproduct.service.ServiceConfig;

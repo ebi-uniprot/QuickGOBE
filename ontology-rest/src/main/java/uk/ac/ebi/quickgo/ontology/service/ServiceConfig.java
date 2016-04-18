@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
+import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Import;
 
 /**
  * Spring configuration for the service layer, which depends on the repositories
- * made available by {@link RepoConfig} and {@link SearchServiceConfig}. Services
+ * made available by {@link OntologyRepoConfig} and {@link SearchServiceConfig}. Services
  * to additionally make accessible are defined in specified the {@link ComponentScan} packages.
  *
  * Created 19/11/15
@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.ontology.service"})
-@Import({RepoConfig.class, SearchServiceConfig.class})
+@Import({OntologyRepoConfig.class})
 public class ServiceConfig {
     @Bean
     public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository) {

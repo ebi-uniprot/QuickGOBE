@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.rest.service;
 import java.util.List;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 01/04/2016
  * Time: 13:32
  *

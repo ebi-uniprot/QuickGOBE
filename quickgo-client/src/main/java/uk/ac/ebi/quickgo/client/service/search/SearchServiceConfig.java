@@ -12,7 +12,7 @@ import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
-import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
+import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +32,7 @@ import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extrac
 
 /**
  * Spring configuration for the service layer, which depends on the repositories
- * made available by {@link RepoConfig}. Services to additionally make accessible
+ * made available by {@link OntologyRepoConfig}. Services to additionally make accessible
  * are defined in specified the {@link ComponentScan} packages.
  *
  * Created 19/11/15
@@ -40,7 +40,7 @@ import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extrac
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.client.service.search"})
-@Import({RepoConfig.class})
+@Import({OntologyRepoConfig.class})
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
     public static final String SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER = "/search";

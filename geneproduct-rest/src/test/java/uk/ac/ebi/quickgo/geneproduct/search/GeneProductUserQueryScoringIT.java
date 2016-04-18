@@ -19,10 +19,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assume.assumeThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.createDocWithId;
 
 /**
  * <p>
@@ -57,6 +60,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringApplicationConfiguration(classes = {GeneProductREST.class})
 @WebAppConfiguration
 public class GeneProductUserQueryScoringIT {
+    /*
+     * TODO: fix behaviour documented in https://www.ebi.ac.uk/panda/jira/browse/GOA-2041
+     */
+    private static final boolean FIXED_GOA_2041 = false;
+
     private static final String RESOURCE_URL = "/QuickGO/services/geneproduct/search";
     private static final String QUERY_PARAM = "query";
 
@@ -114,7 +122,7 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, VALID_ID_2))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2));
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2));
     }
 
     @Test
@@ -147,8 +155,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "important 1"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_1))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -165,8 +173,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "important 1"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_3))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -184,8 +192,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "important"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -203,8 +211,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "important"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -222,8 +230,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "important"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -241,8 +249,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "import"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -260,8 +268,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "import"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -279,8 +287,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "import"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -299,8 +307,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "important"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_1))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -318,8 +326,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "important"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_3))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -338,8 +346,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "import"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_1))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -357,8 +365,8 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "import"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_3))
                 .andExpect(jsonPath("$.results.*", hasSize(2)));
     }
 
@@ -375,8 +383,8 @@ public class GeneProductUserQueryScoringIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.*", hasSize(2)))
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2));
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2));
     }
 
     // Basic field matching -------------------------------------------------------------------------
@@ -391,7 +399,7 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "metabolic"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
                 .andExpect(jsonPath("$.results.*", hasSize(1)));
     }
 
@@ -406,7 +414,7 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "symbol"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
                 .andExpect(jsonPath("$.results.*", hasSize(1)));
     }
 
@@ -421,7 +429,7 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "synonym"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
                 .andExpect(jsonPath("$.results.*", hasSize(1)));
     }
 
@@ -438,9 +446,9 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "process"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].id").value(VALID_ID_3))
                 .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
@@ -457,15 +465,17 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "synonym"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].id").value(VALID_ID_3))
                 .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
     // Phrase matches -------------------------------------------------------------------------
     @Test
     public void phraseMatchOnNameReturnsShortestMatchFirst() throws Exception {
+        assumeThat(FIXED_GOA_2041, is(true));
+
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "a metabolic process is handy", "symbol 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "metabolic process is handy", "symbol 2", "synonym 2");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "ab metabolic process is handy", "symbol 3", "synonym 3");
@@ -477,14 +487,16 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "metabolic process"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[2].id").value(VALID_ID_3))
                 .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
     @Test
     public void phraseMatchOnSynonymReturnsShortestMatchFirst() throws Exception {
+        assumeThat(FIXED_GOA_2041, is(true));
+
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym abcdef attention hup sir");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym abcde attention hup");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym abcd attention");
@@ -496,15 +508,17 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "synonym abcd"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].id").value(VALID_ID_1))
                 .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
     // Length matches -------------------------------------------------------------------------
     @Test
     public void wordInShortestPhraseMatchesFirst() throws Exception {
+        assumeThat(FIXED_GOA_2041, is(true));
+
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym is really weird silly");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym is really weird");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym is really");
@@ -516,14 +530,16 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "synonym"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].id").value(VALID_ID_1))
                 .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
     @Test
     public void partialInSameWordReturnsShortestMatchesFirst() throws Exception {
+        assumeThat(FIXED_GOA_2041, is(true));
+
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym one two three");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym one two");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym one");
@@ -535,9 +551,9 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "syno"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_3))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].id").value(VALID_ID_1))
                 .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
@@ -554,17 +570,16 @@ public class GeneProductUserQueryScoringIT {
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "syno"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_1))
-                .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results[2].identifier").value(VALID_ID_3))
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results[2].id").value(VALID_ID_3))
                 .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
     // Helpers -------------------------------------------------------------------------
     private static GeneProductDocument createDoc(String id, String name, String symbol, String... synonyms) {
-        GeneProductDocument document = new GeneProductDocument();
+        GeneProductDocument document = createDocWithId(id);
 
-        document.id = id;
         document.name = name;
         document.synonyms = Arrays.asList(synonyms);
         document.symbol = symbol;
@@ -575,6 +590,8 @@ public class GeneProductUserQueryScoringIT {
 
     @Test
     public void suiteOfTripletWordTests() {
+        assumeThat(FIXED_GOA_2041, is(true));
+
         StringBuilder report = new StringBuilder("\n\n========== Start of test report ==========").append("\n");
         for (int i = 0; i < 26; i++) {
             String doc1Name = alphabetFieldValue(i + 1);
@@ -617,8 +634,8 @@ public class GeneProductUserQueryScoringIT {
             mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "aaa"))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.results[0].identifier").value(VALID_ID_2))
-                    .andExpect(jsonPath("$.results[1].identifier").value(VALID_ID_1))
+                    .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
+                    .andExpect(jsonPath("$.results[1].id").value(VALID_ID_1))
                     .andExpect(jsonPath("$.results.*", hasSize(2)));
             result.append("    PASS:").append("\n");
         } catch (AssertionError | Exception e) {

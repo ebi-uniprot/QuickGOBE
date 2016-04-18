@@ -1,12 +1,9 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
 
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.RepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
-import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelper;
-import uk.ac.ebi.quickgo.rest.search.ControllerHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
@@ -18,38 +15,39 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
+ *
  * Spring configuration for the service layer, which depends on the repositories
- * made available by {@link RepoConfig} and {@link SearchServiceConfig}. Services
+ * made available by {@link GeneProductRepoConfig}. Services
  * to additionally make accessible are defined in specified the {@link ComponentScan} packages.
  *
- * Created 19/11/15
+ * @author Tony Wardell
+ * Date: 04/04/2016
+ * Time: 11:42
+ * Created with IntelliJ IDEA.
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.geneproduct.service"})
-@Import({RepoConfig.class, SearchServiceConfig.class})
+@Import({GeneProductRepoConfig.class})
 public class ServiceConfig {
-    @Bean
-    public GeneProductService goOntologyService(GeneProductRepository geneProductRepository) {
-        return new GeneProductServiceImpl(
-                serviceHelper(),
-                geneProductRepository,
-                geneProductDocumentConverter());
-    }
 
-    private GeneProductDocConverter geneProductDocumentConverter() {
-        return new GeneProductDocConverterImpl();
-    }
+	@Bean
+	public GeneProductService geneProductService(GeneProductRepository geneProductRepository) {
+		return new GeneProductServiceImpl(
+				serviceHelper(),
+				geneProductRepository,
+				geneProductDocConverter());
+	}
 
-    private ServiceHelper serviceHelper() {
-        return new ServiceHelperImpl(queryStringSanitizer());
-    }
+	private ServiceHelper serviceHelper(){
+		return new ServiceHelperImpl(queryStringSanitizer());
+	}
 
-    private QueryStringSanitizer queryStringSanitizer() {
-        return new SolrQueryStringSanitizer();
-    }
+	private GeneProductDocConverter geneProductDocConverter() {
+		return new GeneProductDocConverterImpl();
+	}
 
-    @Bean
-    public ControllerHelper controllerHelper() {
-        return new ControllerHelperImpl();
-    }
+	private QueryStringSanitizer queryStringSanitizer() {
+		return new SolrQueryStringSanitizer();
+	}
+
 }

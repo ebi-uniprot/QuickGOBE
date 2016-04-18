@@ -20,7 +20,7 @@ public class GeneProductFields {
     public static final String TAXON_NAME = "taxonName";
     public static final String DATABASE_SUBSET = "dbSubset";
     public static final String COMPLETE_PROTEOME = "isCompleteProteome";
-    public static final String REFERENCE_POTEOME = "referenceProteome";
+    public static final String REFERENCE_PROTEOME = "referenceProteome";
     public static final String IS_ISOFORM = "isIsoform";
     public static final String IS_ANNOTATED = "isAnnotated";
     public static final String PARENT_ID = "parentId";

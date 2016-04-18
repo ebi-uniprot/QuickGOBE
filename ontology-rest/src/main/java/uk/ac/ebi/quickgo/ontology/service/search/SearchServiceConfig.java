@@ -7,7 +7,7 @@ import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
-import uk.ac.ebi.quickgo.ontology.common.RepoConfig;
+import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
@@ -31,8 +31,8 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.conve
 import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extractFieldMappings;
 
 @Configuration
-@Import({RepoConfig.class})
-@ComponentScan({"uk.ac.ebi.quickgo.service.search"})
+@Import({OntologyRepoConfig.class})
+@ComponentScan({"uk.ac.ebi.quickgo.ontology.service.search"})
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
     public static final String SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER = "/search";

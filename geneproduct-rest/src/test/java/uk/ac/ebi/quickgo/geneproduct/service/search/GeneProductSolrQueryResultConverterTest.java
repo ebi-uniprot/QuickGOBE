@@ -105,7 +105,7 @@ public class GeneProductSolrQueryResultConverterTest {
 
     private GeneProduct createGeneProduct(String id) {
         GeneProduct geneProduct = new GeneProduct();
-        geneProduct.identifier = id;
+        geneProduct.id = id;
 
         return geneProduct;
     }

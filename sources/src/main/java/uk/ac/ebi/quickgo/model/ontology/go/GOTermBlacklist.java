@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.model.ontology.go;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 05/01/2016
  * Time: 14:33
  * Extend the black list entry to something that can be saved on a per term basis.
