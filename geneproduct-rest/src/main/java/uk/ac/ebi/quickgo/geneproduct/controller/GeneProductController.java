@@ -49,7 +49,7 @@ public class GeneProductController {
 	 * @param ids gene product identifiers in CSV format
 	 * @return
 	 * <ul>
-	 *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
+	 *     <li>all ids are valid: response consists of a 200 with the chosen information about the gene product ids</li>
 	 *     <li>any id is not found: response returns 404</li>
 	 *     <li>any id is of the an invalid format: response returns 400</li>
 	 * </ul>

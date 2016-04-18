@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Class to create mocked objects of different {@code docType}s, which are valid according to {@link OntologyDocument}.
+ * Class to create mocked objects of different {@code docType}s, which are valid according to {@link GeneProductDocument}.
  */
 public final class GeneProductDocMocker {
     private GeneProductDocMocker() {}
