@@ -24,6 +24,7 @@
                 <module>ontology-rest</module>
                 <module>geneproduct-common</module>
                 <module>quickgo-client</module>
+                <module>geneproduct-rest</module>
                 <module>indexing</module>
                 <module>sources</module>
                 <module>rest-common</module>
