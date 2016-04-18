@@ -161,6 +161,5 @@ public class GeneProductControllerIT {
                 GeneProductDocMocker.createDocWithId("A0A000"),
                 GeneProductDocMocker.createDocWithId("A0A001"),
                 GeneProductDocMocker.createDocWithId("A0A002"));
-
     }
 }

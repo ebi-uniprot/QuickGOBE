@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.rest.service;
 
+import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
+
+import java.util.Collections;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -7,14 +11,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.when;
 
 /**
@@ -47,8 +46,7 @@ public class ServiceHelperImplTest {
 
 	@Test
 	public void valid(){
-		List<String> singleId = Arrays.asList(SINGLE_ID_LIST);
-		List<String>  sanitizedList = serviceHelper.buildIdList(SINGLE_ID_LIST);
+		List<String> sanitizedList = serviceHelper.buildIdList(Collections.singletonList(SINGLE_ID));
 		assertThat(sanitizedList, containsInAnyOrder(SINGLE_ID));
 
 	}
@@ -57,6 +55,5 @@ public class ServiceHelperImplTest {
 	public void blowupIfNull(){
 		thrown.expect(IllegalArgumentException.class);
 		List<String>  sanitizedList = serviceHelper.buildIdList(null);
-
 	}
 }

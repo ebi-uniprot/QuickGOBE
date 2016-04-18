@@ -1,28 +1,25 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
-import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.when;
 
 /**
@@ -33,11 +30,9 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class GeneProductServiceImplTest {
-    private final static List<String> id = Collections.singletonList("A0A000");
-    private final static String[] ID_ARRAY = new String[]{"A0A000"};
 
-    private final static String[] MULTI_IDS = new String[]{"A0A001", "A0A002", "A0A003", "A0A004"};
-    private final static List<String> ids = Arrays.asList(MULTI_IDS);
+    private final static List<String> id = Collections.singletonList("A0A000");
+    private final static List<String> ids = Arrays.asList("A0A001", "A0A002", "A0A003", "A0A004");
 
     @Mock
     private ServiceHelper serviceHelper;
@@ -70,27 +65,27 @@ public class GeneProductServiceImplTest {
         geneProduct = new GeneProduct();
         geneProductDocument = GeneProductDocMocker.createDocWithId("A0A000");
         List<GeneProductDocument> singleDocList = Collections.singletonList(geneProductDocument);
-        when(serviceHelper.buildIdList(ID_ARRAY)).thenReturn(id);
+        when(serviceHelper.buildIdList(id)).thenReturn(id);
         when(geneProductRepository.findById(id)).thenReturn(singleDocList);
         when(geneProductDocConverter.convert(geneProductDocument)).thenReturn(geneProduct);
     }
 
     private void stubMultipleGeneProducts() {
         geneProduct0 = new GeneProduct();
-        geneProduct0.id = MULTI_IDS[0];
+        geneProduct0.id = new String[]{"A0A001", "A0A002", "A0A003", "A0A004"}[0];
         geneProduct1 = new GeneProduct();
-        geneProduct1.id = MULTI_IDS[1];
+        geneProduct1.id = new String[]{"A0A001", "A0A002", "A0A003", "A0A004"}[1];
         geneProduct2 = new GeneProduct();
-        geneProduct2.id = MULTI_IDS[2];
+        geneProduct2.id = new String[]{"A0A001", "A0A002", "A0A003", "A0A004"}[2];
         geneProduct3 = new GeneProduct();
-        geneProduct3.id = MULTI_IDS[3];
+        geneProduct3.id = new String[]{"A0A001", "A0A002", "A0A003", "A0A004"}[3];
 
         List<GeneProductDocument> multiDocList = new ArrayList<>();
-        multiDocList.add(GeneProductDocMocker.createDocWithId(MULTI_IDS[0]));
-        multiDocList.add(GeneProductDocMocker.createDocWithId(MULTI_IDS[1]));
-        multiDocList.add(GeneProductDocMocker.createDocWithId(MULTI_IDS[2]));
-        multiDocList.add(GeneProductDocMocker.createDocWithId(MULTI_IDS[3]));
-        when(serviceHelper.buildIdList(MULTI_IDS)).thenReturn(Arrays.asList(MULTI_IDS));
+        multiDocList.add(GeneProductDocMocker.createDocWithId(new String[]{"A0A001", "A0A002", "A0A003", "A0A004"}[0]));
+        multiDocList.add(GeneProductDocMocker.createDocWithId(new String[]{"A0A001", "A0A002", "A0A003", "A0A004"}[1]));
+        multiDocList.add(GeneProductDocMocker.createDocWithId(new String[]{"A0A001", "A0A002", "A0A003", "A0A004"}[2]));
+        multiDocList.add(GeneProductDocMocker.createDocWithId(new String[]{"A0A001", "A0A002", "A0A003", "A0A004"}[3]));
+        when(serviceHelper.buildIdList(ids)).thenReturn(ids);
         when(geneProductRepository.findById(ids)).thenReturn(multiDocList);
         when(geneProductDocConverter.convert(multiDocList.get(0))).thenReturn(geneProduct0);
         when(geneProductDocConverter.convert(multiDocList.get(1))).thenReturn(geneProduct1);
@@ -101,21 +96,21 @@ public class GeneProductServiceImplTest {
     @Test
 
     public void findSingleId() {
-        List<GeneProduct> geneProducts = geneProductService.findById(ID_ARRAY);
+        List<GeneProduct> geneProducts = geneProductService.findById(id);
         assertThat(geneProducts, contains(geneProduct));
         assertThat(geneProducts, hasSize(1));
     }
 
     @Test
     public void findForMultipleIDs() {
-        List<GeneProduct> geneProducts = geneProductService.findById(MULTI_IDS);
+        List<GeneProduct> geneProducts = geneProductService.findById(ids);
         assertThat(geneProducts, contains(geneProduct0, geneProduct1, geneProduct2, geneProduct3));
         assertThat(geneProducts, hasSize(4));
     }
 
     @Test
     public void idDoesntExist() {
-        List<GeneProduct> geneProducts = geneProductService.findById(new String[]{"QWERTY"});
+        List<GeneProduct> geneProducts = geneProductService.findById(Collections.singletonList("QWERTY"));
         assertThat(geneProducts, hasSize(0));
     }
 }
