@@ -1,0 +1,31 @@
+#! /bin/bash
+
+VALID_USERS=("uni_qgo");
+
+current_dir=$(pwd)
+
+cd $QUICKGO_REPO_DIR
+
+git fetch
+git checkout GOA-1793_GO_code_reshuffle
+git pull
+
+if [ -d "$SOLR_CORES_DIR" ]; then
+        archives=".$SOLR_CORES_DIR-archives";
+
+        if [ ! -d "$archives" ]; then
+                mkdir "$archives";
+        fi
+
+        backup="$archives/$(addTimeStamp $SOLR_CORES_DIR).old";
+        echo "Archiving old cores directory '$SOLR_CORES_DIR' to '$backup'"
+        mv $SOLR_CORES_DIR $backup
+
+        cd "$archives";
+        if [ "$(basename $(pwd))" == "$archives" ]; then # double check we're actually in the backup directory, before deleting anything!
+                echo "Deleting oldest archives, but keeping newest 5";
+                (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf
+        fi
+fi
+
+cp -R "./solr-cores/src/main/cores" $SOLR_CORES_DIR
