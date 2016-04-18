@@ -16,6 +16,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.createDocWithId;
 
 @SpringApplicationConfiguration(classes = {GeneProductREST.class})
 public class GeneProductSearchIT extends SearchControllerSetup {
@@ -216,7 +217,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        String fq = buildFilterQuery(GeneProductFields.Searchable.SYNONYM, "important");
+        String fq = buildFilterQuery(GeneProductFields.Searchable.SYMBOL, "important");
 
         checkValidFilterQueryResponse("glycine", 3, fq);
     }
@@ -232,20 +233,20 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFilterQueryResponse("go function", 2, GeneProductFields.Searchable.SYMBOL + ":important")
-                .andExpect(jsonPath("$.results[0].identifier").value("A0A0F8CSS1"))
-                .andExpect(jsonPath("$.results[1].identifier").value("A0A0F8CSS1"));
+        checkValidFilterQueryResponse("process", 2, GeneProductFields.Searchable.SYMBOL + ":important")
+                .andExpect(jsonPath("$.results[0].id").value("A0A0F8CSS1"))
+                .andExpect(jsonPath("$.results[1].id").value("A0A0F8CSS3"));
     }
 
     // highlighting ------------------------------------------------
     @Test
     public void requestWithHighlightingOnAndOneHitReturnsValidResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process one");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process two");
 
         saveToRepository(doc1, doc2);
 
-        checkValidHighlightOnQueryResponse("process 2", "A0A0F8CSS2");
+        checkValidHighlightOnQueryResponse("process two", "A0A0F8CSS2");
     }
 
     @Test
@@ -256,7 +257,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidHighlightOnQueryResponse("anotherFunction", "A0A0F8CSS2", "A0A0F8CSS3");
+        checkValidHighlightOnQueryResponse("smurf", "A0A0F8CSS2", "A0A0F8CSS3");
     }
 
     @Test
@@ -272,7 +273,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     @Test
     public void requestWithHighlightingOffAndOneHitReturnsValidResponse() throws Exception {
         GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic sausage 2");
 
         saveToRepository(doc1, doc2);
 
@@ -297,12 +298,12 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidHighlightOnQueryResponse("metabolic", "A0A0F8CSS2", "A0A0F8CSS3")
-                .andExpect(jsonPath("$.results.*.identifier", containsInAnyOrder("A0A0F8CSS2", "A0A0F8CSS3")))
-                .andExpect(jsonPath("$.highlighting.*.identifier", containsInAnyOrder("A0A0F8CSS2", "A0A0F8CSS3")))
+        checkValidHighlightOnQueryResponse("Slider", "A0A0F8CSS2", "A0A0F8CSS3")
+                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder("A0A0F8CSS2", "A0A0F8CSS3")))
+                .andExpect(jsonPath("$.highlighting.*.id", containsInAnyOrder("A0A0F8CSS2", "A0A0F8CSS3")))
                 .andExpect(jsonPath("$.highlighting.*.matches.*.field", containsInAnyOrder("name", "name")))
-                .andExpect(jsonPath("$.highlighting[0].matches[0].values[0]", containsString("metabolic")))
-                .andExpect(jsonPath("$.highlighting[1].matches[0].values[0]", containsString("metabolic")));
+                .andExpect(jsonPath("$.highlighting[0].matches[0].values[0]", containsString("Slider")))
+                .andExpect(jsonPath("$.highlighting[1].matches[0].values[0]", containsString("Slider")));
     }
 
     private void saveToRepository(GeneProductDocument... documents) {
@@ -316,8 +317,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     }
 
     private GeneProductDocument createGeneProductDoc(String id, String name) {
-        GeneProductDocument geneProductDocument = new GeneProductDocument();
-        geneProductDocument.id = id;
+        GeneProductDocument geneProductDocument = createDocWithId(id);
         geneProductDocument.name = name;
 
         return geneProductDocument;
