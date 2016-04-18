@@ -6,6 +6,8 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
+import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
+import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
@@ -20,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -51,6 +54,7 @@ public abstract class OBOController<T extends OBOTerm> {
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
+    private final ControllerValidationHelper controllerValidationHelper;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
@@ -63,6 +67,7 @@ public abstract class OBOController<T extends OBOTerm> {
         this.ontologySearchService = ontologySearchService;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
         this.ontologyRetrievalConfig = ontologyRetrievalConfig;
+        this.controllerValidationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
     }
 
     /**
@@ -108,7 +113,8 @@ public abstract class OBOController<T extends OBOTerm> {
                     "aspect and usage.")
     @RequestMapping(value = TERMS + "/{ids}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(validateIds(ids)));
+        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(controllerValidationHelper.validateCSVIds
+                (ids)));
     }
 
     /**
@@ -126,7 +132,7 @@ public abstract class OBOController<T extends OBOTerm> {
             notes = "All fields will be populated providing they have a value.")
     @RequestMapping(value = TERMS + "/{ids}/complete", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(validateIds(ids)));
+        return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -144,7 +150,7 @@ public abstract class OBOController<T extends OBOTerm> {
             notes = "If possible, response fields include: id, isObsolete, name, definition, history.")
     @RequestMapping(value = TERMS + "/{ids}/history", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findHistoryInfoByOntologyId(validateIds(ids)));
+        return getTermsResponse(ontologyService.findHistoryInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -162,7 +168,7 @@ public abstract class OBOController<T extends OBOTerm> {
             notes = "If possible, response fields include: id, isObsolete, name, definition, xRefs.")
     @RequestMapping(value = TERMS + "/{ids}/xrefs", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(validateIds(ids)));
+        return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -180,7 +186,7 @@ public abstract class OBOController<T extends OBOTerm> {
             notes = "If possible, response fields include: id, isObsolete, name, definition, taxonConstraints.")
     @RequestMapping(value = TERMS + "/{ids}/constraints", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(validateIds(ids)));
+        return getTermsResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -198,7 +204,7 @@ public abstract class OBOController<T extends OBOTerm> {
             notes = "If possible, response fields include: id, isObsolete, name, definition, xRelations.")
     @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(validateIds(ids)));
+        return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -216,7 +222,7 @@ public abstract class OBOController<T extends OBOTerm> {
             notes = "If possible, response fields include: id, isObsolete, name, definition, annotationGuidelines.")
     @RequestMapping(value = TERMS + "/{ids}/guidelines", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(validateIds(ids)));
+        return getTermsResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -234,7 +240,7 @@ public abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
-        validateRequestedResults(limit);
+        controllerValidationHelper.validateRequestedResults(limit);
 
         QueryRequest request = buildRequest(
                 query,
@@ -250,7 +256,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param id the ID
      * @return boolean indicating whether or not the specified ID is valid
      */
-    protected abstract boolean isValidId(String id);
+    protected abstract Predicate<String> idValidator();
 
     /**
      * Returns the {@link OntologyType} that corresponds to this controller.
@@ -258,64 +264,6 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return the ontology type corresponding to this controller's behaviour.
      */
     protected abstract OntologyType getOntologyType();
-
-    /**
-     * Checks the validity of a list of IDs in CSV format.
-     * @param ids a list of IDs in CSV format
-     * @throws IllegalArgumentException is thrown if an ID is not valid, or if
-     * number of IDs listed is greater than {@link #MAX_PAGE_RESULTS}.
-     */
-    protected List<String> validateIds(String ids) {
-        List<String> idList = csvToList(ids);
-
-        validateRequestedResults(idList.size());
-
-        idList.stream()
-                .forEach(this::checkValidId);
-
-        return idList;
-    }
-
-    /**
-     * Checks whether the requested number of results is valid.
-     * @param requestedResultsSize the number of results being requested
-     * @throws IllegalArgumentException if the number is greater than {@link #MAX_PAGE_RESULTS}
-     */
-    protected void validateRequestedResults(int requestedResultsSize) {
-        if (requestedResultsSize > MAX_PAGE_RESULTS) {
-            String errorMessage = "Cannot retrieve more than " + MAX_PAGE_RESULTS + " results in one request. " +
-                    "Please consider using end-points that return paged results.";
-            LOGGER.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
-        }
-    }
-
-    /**
-     * Checks the validity of a term id.
-     *
-     * @param id the term id to check
-     * @throws IllegalArgumentException is thrown if the ID is not valid
-     */
-    protected void checkValidId(String id) {
-        if (!isValidId(id)) {
-            throw new IllegalArgumentException("Provided ID: '" + id + "' is invalid");
-        }
-    }
-
-    /**
-     * Creates a list of items from a scalar representation of a list, in CSV format. If the
-     * parameter is null, an empty list is returned.
-     *
-     * @param csv a CSV list of items
-     * @return a list of values originally comprising the CSV input String
-     */
-    protected List<String> csvToList(String csv) {
-        if (!isNullOrEmpty(csv)) {
-            return Arrays.asList(csv.split(COMMA));
-        } else {
-            return Collections.emptyList();
-        }
-    }
 
     /**
      * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.

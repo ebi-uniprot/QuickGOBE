@@ -45,7 +45,7 @@ public class GeneProductServiceImpl implements GeneProductService {
      * chosen information
      */
     @Override
-    public List<GeneProduct> findById(String[] ids) {
+    public List<GeneProduct> findById(List<String> ids) {
         return convertDocs(geneProductRepository.findById(serviceHelper.buildIdList(ids)));
     }
 
