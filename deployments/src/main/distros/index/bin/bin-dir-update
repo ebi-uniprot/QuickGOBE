@@ -9,6 +9,7 @@
 set -euo pipefail
 
 # ======= CONSTANTS =======================================
+REPOS_DIR="$(pwd -P)/repos"
 INDEX_BIN_CONTENT_DIR="bin"
 INDEX_BIN="index-bin.tar.gz"
 PERMITTED_USER="uni_qgo"
