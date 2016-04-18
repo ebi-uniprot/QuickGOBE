@@ -2,30 +2,52 @@
 
 VALID_USERS=("uni_qgo");
 
+if [ -z "$1" ] || [ "$1" == "submit" ]; then
+   echo "No server type was input [dev]";
+   exit 1;
+else
+   solr_server=$1;
+fi
+
+
+# read common environment variables
+properties_not_found="false";
+
+source "./common/common.variables";
+if [ $? -eq 1 ]; then
+    properties_not_found="true";
+fi
+
+if [ "$properties_not_found" = "true" ]; then
+    echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
+
 current_dir=$(pwd)
 
-cd $QUICKGO_REPO_DIR
+cd "$QUICKGO_REPO_DIR"
 
 git fetch
-git checkout GOA-1793_GO_code_reshuffle
+git checkout master
 git pull
 
 if [ -d "$SOLR_CORES_DIR" ]; then
-        archives=".$SOLR_CORES_DIR-archives";
+        archives="$SOLR_CORES_DIR-archives";
 
         if [ ! -d "$archives" ]; then
-                mkdir "$archives";
+                mkdir --parent "$archives";
         fi
 
-        backup="$archives/$(addTimeStamp $SOLR_CORES_DIR).old";
+        backup="$archives/$(addTimeStamp cores).old";
         echo "Archiving old cores directory '$SOLR_CORES_DIR' to '$backup'"
         mv $SOLR_CORES_DIR $backup
 
         cd "$archives";
-        if [ "$(basename $(pwd))" == "$archives" ]; then # double check we're actually in the backup directory, before deleting anything!
-                echo "Deleting oldest archives, but keeping newest 5";
-                (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf
-        fi
+
+        echo "Deleting oldest archives, but keeping newest 5";
+        (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf
+else
+        mkdir --parent $SOLR_CORES_DIR
 fi
 
-cp -R "./solr-cores/src/main/cores" $SOLR_CORES_DIR
+cp -r "${QUICKGO_REPO_DIR}/solr-cores/src/main/cores" $SOLR_CORES_DIR
