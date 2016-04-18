@@ -42,6 +42,9 @@ if [ -z $BASE_DIR ] && [ ! -d "$BASE_DIR" ]; then
     exit 1;
 fi
 
+# ---------------------------- GIT INFO ----------------------------------
+REPOS_DIR="$BASE_DIR/repos"
+QUICKGO_REPO_DIR="$REPOS_DIR/unp.goa.quickgo"
 
 # ---------------------------- SOLR CORE INFO ----------------------------
 CORE_NAME=
@@ -91,6 +94,8 @@ if [ -z $http_solr_port ]; then
 fi
 SOLR_ADDRESS_BASE="http://$solr_vm:$http_solr_port/$http_solr_path";
 
+SOLR_CONF_DIR="$BASE_DIR/solr-conf/$solr_server"
+SOLR_CORES_DIR="$SOLR_CONF_DIR/homes/cores/"
 
 # ---------------------------- LOGGING ----------------------------
 LOGBACK_CONF=$PWD/logback.xml
@@ -114,12 +119,9 @@ MAIN_CLASS=
 MAIN_CLASS_PARAMS=
 LSF_JOB_NAME=
 
-#target lib dir
-QUICKGO_SERVICE_DIR="$BASE_DIR/solr-conf/$solr_server/lib/quickgo"
-
 # java class path -- include all jars for creating the indexes
+QUICKGO_SERVICE_DIR="$SOLR_CONF_DIR/lib/quickgo"
 QUICKGO_SERVICE_JAR="$QUICKGO_SERVICE_DIR/*"
-
 
 ## ---------------------------- GENERAL UTILITY FUNCTIONS ----------------------------
 # quick way for echoing coloured text

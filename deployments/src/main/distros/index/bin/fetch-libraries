@@ -1,8 +1,6 @@
 #!/bin/bash
 
 VALID_USERS=("uni_qgo");
-REPOS_DIR="../../repos"
-QUICKGO_DIR="unp.goa.quickgo"
 
 if [ -z "$1" ] || [ "$1" == "submit" ]; then
    echo "No server type was input [dev]";
@@ -25,12 +23,12 @@ if [ "$properties_not_found" = "true" ]; then
 fi
 
 if [ ! -d "$QUICKGO_SERVICE_DIR" ]; then
-    mkdir --parents "$QUICKGO_SERVICE_DIR"
+    mkdir --parents $QUICKGO_SERVICE_DIR
 fi
 
 current_dir=$(pwd)
 
-cd "$REPOS_DIR/$QUICKGO_DIR"
+cd $QUICKGO_REPO_DIR
 
 git fetch
 git checkout GOA-1793_GO_code_reshuffle
