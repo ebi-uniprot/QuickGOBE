@@ -13,7 +13,7 @@ fi
 # read common environment variables
 properties_not_found="false";
 
-source "./common/common.variables";
+source "../common/common.variables";
 if [ $? -eq 1 ]; then
     properties_not_found="true";
 fi
