@@ -1,19 +1,21 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Tony Wardell
@@ -52,7 +54,7 @@ public class GeneProductController {
 	 *     <li>any id is of the an invalid format: response returns 400</li>
 	 * </ul>
 	 */
-	@RequestMapping(value = "/{ids:,*}", produces = {MediaType.APPLICATION_JSON_VALUE})
+	@RequestMapping(value = "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable String[] ids) {
 		validateRequestedResults(ids.length);
 		return getGeneProductResponse(geneProductService.findById(ids));
