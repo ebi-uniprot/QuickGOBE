@@ -44,7 +44,7 @@ fi
 
 # ---------------------------- GIT INFO ----------------------------------
 REPOS_DIR="$BASE_DIR/repos"
-QUICKGO_REPO_DIR="$REPOS_DIR/unp.goa.quickgo"
+QUICKGO_REPO_DIR="$REPOS_DIR/QuickGOBE"
 
 # ---------------------------- SOLR CORE INFO ----------------------------
 CORE_NAME=
