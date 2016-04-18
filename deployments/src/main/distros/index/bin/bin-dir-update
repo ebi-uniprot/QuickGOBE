@@ -38,7 +38,7 @@ dirs -c
 pushd . > /dev/null
 cd "$REPOS_DIR"
 
-cd "unp.goa.quickgo"
+cd "QuickGOBE"
 git fetch
 git checkout GOA-1805_Create_indexing_scripts
 git pull
