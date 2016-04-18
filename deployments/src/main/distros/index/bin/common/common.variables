@@ -95,7 +95,7 @@ fi
 SOLR_ADDRESS_BASE="http://$solr_vm:$http_solr_port/$http_solr_path";
 
 SOLR_CONF_DIR="$BASE_DIR/solr-conf/$solr_server"
-SOLR_CORES_DIR="$SOLR_CONF_DIR/homes/cores/"
+SOLR_CORES_DIR="$SOLR_CONF_DIR/homes/cores"
 
 # ---------------------------- LOGGING ----------------------------
 LOGBACK_CONF=$PWD/logback.xml
