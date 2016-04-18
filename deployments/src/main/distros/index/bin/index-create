@@ -52,6 +52,7 @@ if [ "$2" = "submit" ]; then
 
     # ensure indexing job variable is defined
     if [ ! -z "$javaJob" ]; then
+        ../fetch-libraries $solr_server
         ../rm-index-data $solr_server submit
 
         echo "executing command:"
