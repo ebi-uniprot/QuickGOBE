@@ -20,7 +20,7 @@ import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
 import org.xml.sax.SAXException;
 
 /**
- * Publishes the configuration beans of the ontology repository.
+ * Publishes the configuration beans of the annotation repository.
  *
  * Created 14/04/16
  * @author Edd
@@ -50,7 +50,7 @@ public class AnnotationRepoConfig {
     @Profile("embeddedServer")
     public SolrServerFactory embeddedSolrServerFactory(CoreContainer coreContainer)
             throws IOException, SAXException, ParserConfigurationException {
-        return new MulticoreSolrServerFactory(new EmbeddedSolrServer(coreContainer, null));
+        return new MulticoreSolrServerFactory(new EmbeddedSolrServer(coreContainer, SOLR_CORE));
     }
 
     @Bean
