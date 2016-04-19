@@ -14,6 +14,7 @@ QUICKGO_REPO="QuickGOBE"
 REST_BIN_CONTENT_DIR="bin"
 REST_BIN="rest-bin.tar.gz"
 PERMITTED_USER="uni_qgo"
+BRANCH="GOA-2047_update_ontology_rest_service_scripts"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
@@ -39,9 +40,9 @@ dirs -c
 pushd . > /dev/null
 cd "$REPOS_DIR"
 
-cd QUICKGO_REPO
+cd $QUICKGO_REPO
 git fetch
-git checkout GOA-1793_GO_code_reshuffle
+git checkout $BRANCH
 git pull
 cd "deployments"
 mvn -U -DskipTests -P assemble-rest-bin-archive package
