@@ -1,6 +1,20 @@
-#! /bin/bash
+#!/bin/bash
+
+#fail on error
+set -e
 
 VALID_USERS=("uni_qgo");
+RELEASE_VERSION_PREFIX="v"
+
+nextReleaseVersion () {
+   current_release="$(ls $release_dir | sed "s/${RELEASE_VERSION_PREFIX}//g" | sort -n | tail -1)"
+
+   if [ ! -z "$current_release" ]; then
+    next_release="${RELEASE_VERSION_PREFIX}$((current_release + 1))"
+   else
+    next_release="${RELEASE_VERSION_PREFIX}1"
+   fi
+}
 
 if [ -z "$1" ] || [ "$1" == "submit" ]; then
    echo "No server type was input [dev]";
@@ -11,7 +25,9 @@ fi
 
 # read common environment variables
 properties_not_found="false";
+
 source "../common/common.variables";
+
 if [ $? -eq 1 ]; then
     properties_not_found="true";
 fi
@@ -52,14 +68,25 @@ if [ "$2" = "submit" ]; then
 
     # ensure indexing job variable is defined
     if [ ! -z "$javaJob" ]; then
+        release_dir="${SOLR_INDEX_DIR}/${solr_server}/${CORE_NAME}"
+
+        if [ ! -d "$release_dir" ]; then
+           echo "Directory for storing solr-indexes [$SOLR_INDEX_DIR] NOT FOUND. Creating..."
+           mkdir -p "$release_dir"
+        fi
+
+        #calculate the next release for the current $release_dir
+        nextReleaseVersion
+
+        #create dir for current release
+        release_dir="${release_dir}/${next_release}/conf"
+        mkdir -p "$release_dir"
+
         echo "executing fetch-libraries"
-        ../fetch-libraries $solr_server
+        ../fetch-libraries "$solr_server" "$release_dir"
 
-        echo "executing update-cores"
-        ../update-cores $solr_server
-
-        echo "exeuting rm-index-data"
-        ../rm-index-data $solr_server submit
+        echo "executing fetch-cores"
+        ../fetch-cores "$solr_server" "$release_dir"
 
         echo "executing command:"
         echo "$javaJob";
@@ -74,6 +101,6 @@ else
       echo "The following command will be executed:";
       echo "$javaJob";
       echo ""
-      echo "Variables used to create these command\(s\) can be changed in index.variables, if necessary.";
+      echo "Variables used to create these command(s) can be changed in index.variables, if necessary.";
       echo "Otherwise, if this is all correct and you want to submit this command, please re-run this script with parameter \"submit\"";
 fi

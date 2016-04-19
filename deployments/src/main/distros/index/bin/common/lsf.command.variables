@@ -20,15 +20,6 @@ function lsfOptionsBase {
 }
 
 function javaCommand {
-#    if [ -z "$MAIN_CLASS" ]; then
-#        echo '$MAIN_CLASS variable must be set';
-#        exit 1;
-#    elif [ -z "$MAIN_CLASS_PARAMS" ]; then
-#        echo '$MAIN_CLASS_PARAMS variable must be set';
-#        exit 1;
-#    fi
-                  #-jar \\\\\\\"$QUICKGO_SERVICE_JAR\\\\\\\" $MAIN_CLASS $MAIN_CLASS_PARAMS";
-
     set -f
     local str="$JVM \
                   -Dcom.sun.management.jmxremote.port=$JMX_PORT \
@@ -43,7 +34,7 @@ function javaCommand {
                   -XX:HeapDumpPath=$LSF_HEAPDUMP_PATH  \
                   $JVM_PARAMS \
                   -jar $QUICKGO_SERVICE_JAR $MAIN_CLASS $MAIN_CLASS_PARAMS";
-#    set +f
+
     echo $(eval "echo "$str"");
 }
 
