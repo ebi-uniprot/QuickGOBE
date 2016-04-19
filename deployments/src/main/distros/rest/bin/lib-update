@@ -66,6 +66,8 @@ if [ ! -d "$BACKUP_LIB_DIR" ]; then
     mkdir -p $BACKUP_LIB_DIR
 fi
 
+# ======= install the REST artifacts before fetching them =======================================
+ mvn -P all -DskipTests install
 
 # ======= build the variables required for artifact retrieval =======================================
 JAR_NAME="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
