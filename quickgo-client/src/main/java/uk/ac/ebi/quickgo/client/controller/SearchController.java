@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.client.controller;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryRequestBuilder;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
@@ -42,6 +42,7 @@ public class SearchController {
     private final SearchService<OntologyTerm> ontologySearchService;
     private final SearchableField ontologySearchableField;
     private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
+    private final DefaultSearchQueryTemplate requestTemplate;
 
     @Autowired
     public SearchController(
@@ -56,6 +57,14 @@ public class SearchController {
         this.ontologySearchableField = ontologySearchableField;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(ontologySearchableField);
         this.ontologyRetrievalConfig = ontologyRetrievalConfig;
+
+        this.requestTemplate = new DefaultSearchQueryTemplate(
+                new StringToQuickGOQueryConverter(ontologySearchableField),
+                ontologySearchableField,
+                ontologyRetrievalConfig.getSearchReturnedFields(),
+                ontologyRetrievalConfig.repo2DomainFieldMap().keySet(),
+                ontologyRetrievalConfig.getHighlightStartDelim(),
+                ontologyRetrievalConfig.getHighlightEndDelim());
     }
 
     /**
@@ -80,15 +89,8 @@ public class SearchController {
             @RequestParam(value = "facet", required = false) List<String> facets,
             @RequestParam(value = "highlighting", required = false) boolean highlighting) {
 
-        DefaultSearchQueryRequestBuilder requestBuilder = new DefaultSearchQueryRequestBuilder(
-                query,
-                ontologyQueryConverter,
-                ontologySearchableField,
-                ontologyRetrievalConfig.getSearchReturnedFields(),
-                ontologyRetrievalConfig.repo2DomainFieldMap().keySet(),
-                ontologyRetrievalConfig.getHighlightStartDelim(),
-                ontologyRetrievalConfig.getHighlightEndDelim())
-
+        DefaultSearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
+                .setQuery(query)
                 .addFacets(facets)
                 .addFilters(filterQueries)
                 .useHighlighting(highlighting)

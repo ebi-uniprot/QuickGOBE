@@ -21,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -87,6 +88,7 @@ public class OntologyUserQueryScoringIT {
         repository.save(doc3);
 
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "GO:0000002"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000002"));

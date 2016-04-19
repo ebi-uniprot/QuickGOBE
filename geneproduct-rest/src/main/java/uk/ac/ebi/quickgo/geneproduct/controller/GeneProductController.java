@@ -6,7 +6,7 @@ import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
-import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryRequestBuilder;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
@@ -46,11 +46,9 @@ public class GeneProductController {
     private static final String DEFAULT_PAGE_NUMBER = "1";
 
     private final GeneProductService geneProductService;
-    private final SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig;
     private final SearchService<GeneProduct> geneProductSearchService;
-    private final SearchableField geneProductSearchableField;
-    private final StringToQuickGOQueryConverter geneProductQueryConverter;
     private final ControllerValidationHelper controllerValidationHelper;
+    private final DefaultSearchQueryTemplate requestTemplate;
 
     @Autowired
     public GeneProductController(
@@ -62,11 +60,16 @@ public class GeneProductController {
                 "GeneProductController should not be null.");
 
         this.geneProductService = geneProductService;
-        this.geneProductRetrievalConfig = geneProductRetrievalConfig;
         this.geneProductSearchService = geneProductSearchService;
-        this.geneProductSearchableField = geneProductSearchableField;
-        this.geneProductQueryConverter = new StringToQuickGOQueryConverter(geneProductSearchableField);
         this.controllerValidationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
+
+        this.requestTemplate = new DefaultSearchQueryTemplate(
+                new StringToQuickGOQueryConverter(geneProductSearchableField),
+                geneProductSearchableField,
+                geneProductRetrievalConfig.getSearchReturnedFields(),
+                geneProductRetrievalConfig.repo2DomainFieldMap().keySet(),
+                geneProductRetrievalConfig.getHighlightStartDelim(),
+                geneProductRetrievalConfig.getHighlightEndDelim());
     }
 
     /**
@@ -116,15 +119,8 @@ public class GeneProductController {
             @RequestParam(value = "facet", required = false) List<String> facets,
             @RequestParam(value = "highlighting", required = false) boolean highlighting) {
 
-        DefaultSearchQueryRequestBuilder requestBuilder = new DefaultSearchQueryRequestBuilder(
-                query,
-                geneProductQueryConverter,
-                geneProductSearchableField,
-                geneProductRetrievalConfig.getSearchReturnedFields(),
-                geneProductRetrievalConfig.repo2DomainFieldMap().keySet(),
-                geneProductRetrievalConfig.getHighlightStartDelim(),
-                geneProductRetrievalConfig.getHighlightEndDelim())
-
+        DefaultSearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
+                .setQuery(query)
                 .addFacets(facets)
                 .addFilters(filterQueries)
                 .useHighlighting(highlighting)
