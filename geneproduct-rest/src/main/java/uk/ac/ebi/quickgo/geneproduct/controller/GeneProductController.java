@@ -78,7 +78,7 @@ public class GeneProductController {
      * @return a 400 response
      */
     @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status")
-    @RequestMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
         throw new IllegalArgumentException("The requested end-point does not exist.");
     }
@@ -94,7 +94,7 @@ public class GeneProductController {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @RequestMapping(value = "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/{ids}", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable String ids) {
         return getGeneProductResponse(geneProductService.findById(controllerValidationHelper.validateCSVIds(ids)));
     }

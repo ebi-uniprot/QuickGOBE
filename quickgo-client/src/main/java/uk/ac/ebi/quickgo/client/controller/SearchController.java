@@ -38,10 +38,7 @@ public class SearchController {
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
 
-    private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchService<OntologyTerm> ontologySearchService;
-    private final SearchableField ontologySearchableField;
-    private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
     private final DefaultSearchQueryTemplate requestTemplate;
 
     @Autowired
@@ -54,9 +51,6 @@ public class SearchController {
         Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
 
         this.ontologySearchService = ontologySearchService;
-        this.ontologySearchableField = ontologySearchableField;
-        this.ontologyQueryConverter = new StringToQuickGOQueryConverter(ontologySearchableField);
-        this.ontologyRetrievalConfig = ontologyRetrievalConfig;
 
         this.requestTemplate = new DefaultSearchQueryTemplate(
                 new StringToQuickGOQueryConverter(ontologySearchableField),
