@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.geneproduct.controller;
 
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
+import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.List;
@@ -15,10 +16,8 @@ import org.springframework.http.ResponseEntity;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -34,6 +33,9 @@ public class GeneProductControllerTest {
 
     @Mock
     private GeneProductService geneProductService;
+
+    @Mock
+    private ControllerValidationHelper validationHelper;
 
     @Mock
     private GeneProduct geneProduct;
@@ -54,7 +56,7 @@ public class GeneProductControllerTest {
 
     @Before
     public void setUp() {
-        this.controller = new GeneProductController(geneProductService);
+        this.controller = new GeneProductController(geneProductService, validationHelper);
 
         //Lookup for single Id
         final List<GeneProduct> singleGP = singletonList(geneProduct);
@@ -64,6 +66,7 @@ public class GeneProductControllerTest {
         final List<GeneProduct> multiGP = asList(geneProduct, geneProduct2, geneProduct3);
         when(geneProductService.findById(MULTI_CSV_LIST)).thenReturn(multiGP);
 
+
         // too big CSV
         String delim = "";
         StringBuilder sb = new StringBuilder();
@@ -72,6 +75,10 @@ public class GeneProductControllerTest {
             delim = ",";
         }
         multiCSVTooBig = sb.toString();
+
+        when(validationHelper.validateCSVIds(MULTI_CSV)).thenReturn(MULTI_CSV_LIST);
+        when(validationHelper.validateCSVIds(SINGLE_CSV)).thenReturn(SINGLE_CSV_LIST);
+        doThrow(new IllegalArgumentException()).when(validationHelper).validateCSVIds(multiCSVTooBig);
     }
 
     @Test
