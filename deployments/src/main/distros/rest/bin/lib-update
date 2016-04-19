@@ -58,6 +58,7 @@ SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME"
 LIB_DIR="$SERVICE_PATH/lib"
 BACKUP_LIB_DIR="$SERVICE_PATH/lib/backups"
 TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
+QUICKGO_REPO_DIR="$SERVICE_CONF_PATH/../../repos/QuickGOBE"
 
 if [ ! -d "$LIB_DIR" ]; then
     mkdir -p $LIB_DIR
@@ -67,7 +68,9 @@ if [ ! -d "$BACKUP_LIB_DIR" ]; then
 fi
 
 # ======= install the REST artifacts before fetching them =======================================
- mvn -P all -DskipTests install
+cd $QUICKGO_REPO_DIR
+mvn -P all -DskipTests install
+cd $SERVICE_CONF_PATH
 
 # ======= build the variables required for artifact retrieval =======================================
 JAR_NAME="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
