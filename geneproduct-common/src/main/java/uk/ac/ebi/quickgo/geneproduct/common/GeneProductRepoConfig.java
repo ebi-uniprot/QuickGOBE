@@ -20,7 +20,7 @@ import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
 import org.xml.sax.SAXException;
 
 /**
- * Publishes the configuration beans of the ontology repository.
+ * Publishes the configuration beans of the Gene Product repository.
  */
 @Configuration
 public class GeneProductRepoConfig {
@@ -46,7 +46,7 @@ public class GeneProductRepoConfig {
     @Profile("embeddedServer")
     public SolrServerFactory embeddedSolrServerFactory(CoreContainer coreContainer)
             throws IOException, SAXException, ParserConfigurationException {
-        EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, null);
+        EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, SOLR_CORE);
         return new MulticoreSolrServerFactory(embeddedSolrServer);
     }
 

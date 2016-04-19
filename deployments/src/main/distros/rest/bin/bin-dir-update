@@ -10,9 +10,11 @@ set -euo pipefail
 
 # ======= CONSTANTS =======================================
 REPOS_DIR="$(pwd -P)/repos"
+QUICKGO_REPO="QuickGOBE"
 REST_BIN_CONTENT_DIR="bin"
 REST_BIN="rest-bin.tar.gz"
 PERMITTED_USER="uni_qgo"
+BRANCH="master"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
@@ -38,9 +40,9 @@ dirs -c
 pushd . > /dev/null
 cd "$REPOS_DIR"
 
-cd "unp.goa.quickgo"
+cd $QUICKGO_REPO
 git fetch
-git checkout GOA-1793_GO_code_reshuffle
+git checkout $BRANCH
 git pull
 cd "deployments"
 mvn -U -DskipTests -P assemble-rest-bin-archive package

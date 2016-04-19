@@ -23,6 +23,7 @@
                 <module>ontology-common</module>
                 <module>ontology-rest</module>
                 <module>geneproduct-common</module>
+                <module>geneproduct-rest</module>
                 <module>annotation-common</module>
                 <module>quickgo-client</module>
                 <module>indexing</module>
@@ -57,6 +58,15 @@
                 <module>ontology-common</module>
                 <module>rest-common</module>
                 <module>quickgo-client</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>geneproduct_web_service</id>
+            <modules>
+                <module>common</module>
+                <module>ontology-common</module>
+                <module>rest-common</module>
+                <module>geneproduct-rest</module>
             </modules>
         </profile>
     </profiles>
