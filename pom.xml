@@ -58,5 +58,14 @@
                 <module>quickgo-client</module>
             </modules>
         </profile>
+        <profile>
+            <id>geneproduct_web_service</id>
+            <modules>
+                <module>common</module>
+                <module>ontology-common</module>
+                <module>rest-common</module>
+                <module>geneproduct-rest</module>
+            </modules>
+        </profile>
     </profiles>
 </project>
