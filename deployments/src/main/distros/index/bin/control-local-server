@@ -8,7 +8,6 @@
 ##              stop all|machine    => stop all or a specific index machine
 
 VALID_USERS=("tc_uni02");
-orig_dir="$(pwd)";
 
 # ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
 properties_not_found="false";
