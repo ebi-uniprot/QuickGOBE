@@ -25,61 +25,58 @@ import static org.hamcrest.Matchers.nullValue;
  * @author Edd
  */
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultSearchQueryRequestBuilderTest {
+public class DefaultSearchQueryTemplateTest {
 
     private static final String SEARCHABLE_FIELD = "searchable";
+    private static final String START_HIGHLIGHT = "startHighlight";
+    private static final String END_HIGHLIGHT = "endHighlight";
+    private static final String QUERY = "query";
+    private static final String ID = "id";
+
     private String query;
     private String id;
-    private String startHighlight;
-    private String endHighlight;
     private SearchableField searchableField = field -> field.equals(SEARCHABLE_FIELD) || field.equals(id);
     private List<String> returnedFields;
-    private List<String> highlightedFields;
-    private StringToQuickGOQueryConverter str2QueryConverter;
+    private DefaultSearchQueryTemplate defaultSearchQueryTemplate;
+    private StringToQuickGOQueryConverter queryConverter;
 
     @Before
     public void setUp() {
-        this.id = "id";
+        this.id = ID;
         this.returnedFields = Arrays.asList(id, SEARCHABLE_FIELD);
-        this.highlightedFields = Collections.singletonList(id);
-        this.query = "query";
-        this.str2QueryConverter = new StringToQuickGOQueryConverter(searchableField);
-        this.startHighlight = "startHighlight";
-        this.endHighlight = "endHighlight";
-    }
+        this.query = QUERY;
 
-    private DefaultSearchQueryRequestBuilder createSearchQueryRequestBuilder() {
-        return new DefaultSearchQueryRequestBuilder(
-                query,
-                str2QueryConverter,
+        this.queryConverter = new StringToQuickGOQueryConverter(searchableField);
+        this.defaultSearchQueryTemplate = new DefaultSearchQueryTemplate(
+                queryConverter,
                 searchableField,
                 returnedFields,
-                highlightedFields,
-                startHighlight,
-                endHighlight
+                Collections.singletonList(id),
+                START_HIGHLIGHT,
+                END_HIGHLIGHT
         );
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nonSearchableFacetThrowsException() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         requestBuilder.checkFacets(Collections.singleton("nonExistingFacet"));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nonSearchableFilterThrowsException() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         requestBuilder.checkFilters(Collections.singleton("nonExistingFilterField:someQuery"));
     }
 
     @Test
     public void queryRequestQueryWasSet() {
-        assertThat(createSearchQueryRequestBuilder().build().getQuery(), is(str2QueryConverter.convert(query)));
+        assertThat(createBuilder().build().getQuery(), is(queryConverter.convert(query)));
     }
 
     @Test
     public void queryRequestFacetWasSet() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         List<String> strFacets = new ArrayList<>();
         strFacets.add(id);
         requestBuilder.addFacets(strFacets);
@@ -92,33 +89,33 @@ public class DefaultSearchQueryRequestBuilderTest {
 
     @Test
     public void queryRequestHasNoFacetByDefault() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         assertThat(requestBuilder.build().getFacets(), is(emptyIterable()));
     }
 
     @Test
     public void queryRequestFilterWasSet() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         List<String> strFilters = new ArrayList<>();
         String filterQueryStr = id + ":value";
         strFilters.add(filterQueryStr);
         requestBuilder.addFilters(strFilters);
 
         List<QuickGOQuery> modelFilters = new ArrayList<>();
-        modelFilters.add(str2QueryConverter.convert(filterQueryStr));
+        modelFilters.add(queryConverter.convert(filterQueryStr));
 
         assertThat(requestBuilder.build().getFilters(), is(modelFilters));
     }
 
     @Test
     public void queryRequestHasNoFiltersByDefault() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         assertThat(requestBuilder.build().getFilters(), is(emptyIterable()));
     }
 
     @Test
     public void queryRequestPageWasSetExplicitly() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         int page = 11;
         requestBuilder.setPage(page);
         assertThat(requestBuilder.build().getPage().getPageNumber(), is(page));
@@ -126,13 +123,13 @@ public class DefaultSearchQueryRequestBuilderTest {
 
     @Test
     public void queryRequestPageWasSetByDefault() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
-        assertThat(requestBuilder.build().getPage().getPageNumber(), is(DefaultSearchQueryRequestBuilder.DEFAULT_PAGE_NUMBER));
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
+        assertThat(requestBuilder.build().getPage().getPageNumber(), is(DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER));
     }
 
     @Test
     public void queryRequestPageSizeWasSetExplicitly() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         int pageSize = 11;
         requestBuilder.setPageSize(pageSize);
         assertThat(requestBuilder.build().getPage().getPageSize(), is(pageSize));
@@ -140,13 +137,13 @@ public class DefaultSearchQueryRequestBuilderTest {
 
     @Test
     public void queryRequestPageSizeWasSetByDefault() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
-        assertThat(requestBuilder.build().getPage().getPageSize(), is(DefaultSearchQueryRequestBuilder.DEFAULT_PAGE_SIZE));
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
+        assertThat(requestBuilder.build().getPage().getPageSize(), is(DefaultSearchQueryTemplate.DEFAULT_PAGE_SIZE));
     }
 
     @Test
     public void queryRequestHighlightingWasTurnedOn() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         requestBuilder.useHighlighting(true);
 
         QueryRequest queryRequest = requestBuilder.build();
@@ -157,7 +154,7 @@ public class DefaultSearchQueryRequestBuilderTest {
 
     @Test
     public void queryRequestHighlightingWasTurnedOff() {
-        DefaultSearchQueryRequestBuilder requestBuilder = createSearchQueryRequestBuilder();
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         requestBuilder.useHighlighting(false);
 
         QueryRequest queryRequest = requestBuilder.build();
@@ -168,7 +165,7 @@ public class DefaultSearchQueryRequestBuilderTest {
 
     @Test
     public void queryRequestHighlightingIsOffByDefault() {
-        QueryRequest queryRequest = createSearchQueryRequestBuilder().build();
+        QueryRequest queryRequest = createBuilder().build();
         assertThat(queryRequest.getHighlightedFields(), is(emptyIterable()));
         assertThat(queryRequest.getHighlightStartDelim(), is(nullValue()));
         assertThat(queryRequest.getHighlightEndDelim(), is(nullValue()));
@@ -176,11 +173,17 @@ public class DefaultSearchQueryRequestBuilderTest {
 
     @Test
     public void queryRequestReturnedFieldsIsSetByDefault() {
-        QueryRequest queryRequest = createSearchQueryRequestBuilder().build();
+        QueryRequest queryRequest = createBuilder().build();
 
         List<FieldProjection> fieldProjections = new ArrayList<>();
         this.returnedFields.stream().map(FieldProjection::new).forEach(fieldProjections::add);
 
         assertThat(queryRequest.getProjectedFields(), is(fieldProjections));
+    }
+
+    private DefaultSearchQueryTemplate.Builder createBuilder() {
+        DefaultSearchQueryTemplate.Builder builder = defaultSearchQueryTemplate.newBuilder();
+        builder.setQuery(this.query);
+        return builder;
     }
 }
