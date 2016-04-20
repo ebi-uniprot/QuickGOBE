@@ -66,8 +66,8 @@ elif [ "$1" == "stop" ] || [ "$1" == "start" ]; then
             # stop the server
             echo "Stopping $solr_vm";
             ssh $solr_vm bash << EOF
-                cd "$BASE_DIR/bin";
-                ./stop;
+                cd "$tomcat_server_dir/bin";
+                ./controller stop;
 EOF
         fi
     else # the server is down
@@ -75,8 +75,8 @@ EOF
             # start the server
             echo "Starting $solr_vm";
             ssh $solr_vm bash << EOF
-                cd "$BASE_DIR/bin";
-                ./start;
+                cd "$tomcat_server_dir/bin";
+                ./controller start;
 EOF
         elif [ "$1" == "stop" ]; then
             echo "Cannot stop $solr_vm because it is already down";
