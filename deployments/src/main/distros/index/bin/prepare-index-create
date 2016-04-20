@@ -53,42 +53,32 @@ if [ -z "$SOLR_ADDRESS" ]; then
 fi
 
 # ------------------------ start off the indexing via LSF ------------------------
-if [ "$1" = "submit" ]; then
-    release_dir="${SOLR_INDEX_DIR}/${CORE_NAME}";
+release_dir="${SOLR_INDEX_DIR}/${CORE_NAME}";
 
-    if [ ! -d "$release_dir" ]; then
-       echo "Directory for storing solr-indexes [$SOLR_INDEX_DIR] NOT FOUND. Creating...";
-       mkdir -p "$release_dir";
-    fi
+if [ ! -d "$release_dir" ]; then
+   echo "Directory for storing solr-indexes [$SOLR_INDEX_DIR] NOT FOUND. Creating...";
+   mkdir -p "$release_dir";
+fi
 
-    #calculate the next release for the current $release_dir
-    nextReleaseVersion;
+#calculate the next release for the current $release_dir
+nextReleaseVersion;
 
-    #create dir for current release
-    release_dir="${release_dir}/${next_release}/conf";
-    mkdir -p "$release_dir";
+#create dir for current release
+release_dir="${release_dir}/${next_release}/conf";
+mkdir -p "$release_dir";
 
-    echo "executing fetch-libraries"
-    ../fetch-libraries "$release_dir";
+echo "executing fetch-libraries"
+../fetch-libraries "$release_dir";
 
-    echo "executing fetch-cores"
-    ../fetch-cores "$release_dir";
+echo "executing fetch-cores"
+../fetch-cores "$release_dir";
 
-    #check solr server status
-    solrServerStatus;
+#check solr server status
+solrServerStatus;
 
-    if [ "$server_status" == "UP" ]; then
-        echo "Solr server is currently UP, please restart the server, before proceeding to index-create";
-        exit 1;
-    else
-        echo "Preparation to create index DONE."
-        echo "Proceed to index-create to submit indexing job";
-    fi
+if [ "$server_status" == "UP" ]; then
+    echo "Solr server is currently UP, please restart the server, before proceeding to index-create";
 else
-    printDivider "Simulation";
-    echo "The following command will be executed:";
-    echo "$javaJob";
-    echo ""
-    echo "Variables used to create these command(s) can be changed in index.variables, if necessary.";
-    echo "Otherwise, if this is all correct and you want to submit this command, please re-run this script with parameter \"submit\"";
+    echo "Preparation to create index DONE."
+    echo "Proceed to index-create to submit indexing job";
 fi
