@@ -43,5 +43,8 @@ core_dir="${conf_release_dir}/homes/cores/${CORE_NAME}"
 mkdir -p "${core_dir}"
 cp -a "${QUICKGO_REPO_DIR}/solr-cores/src/main/cores/${CORE_NAME}/." "${core_dir}"
 
+#make core dir readable and writable to user and group
+chmod -R 774 "$core_dir"
+
 #update core link in $SOLR_CONFIG_DIR directory
 ln -snf "$core_dir" "${SOLR_CONFIG_DIR}/cores/${CORE_NAME}"
