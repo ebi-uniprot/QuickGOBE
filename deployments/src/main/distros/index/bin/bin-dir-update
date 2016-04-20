@@ -73,3 +73,15 @@ fi
 
 # ======= jump back to saved directory =======================================
 popd > /dev/null
+
+# ======= take a string and add a time-stamp to it =======================================
+function addTimeStamp() {
+    local dirname="$(dirname $1)"
+    local fname=$(basename "$1")
+    local fext=""
+    if echo "$fname" | grep '\.'; then
+        fext=".${fname##*.}"
+    fi
+    local fname="${fname%.*}"
+    echo "$dirname/$fname-$(date '+%s.%N')$fext"
+}
