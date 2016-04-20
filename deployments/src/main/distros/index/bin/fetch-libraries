@@ -55,4 +55,4 @@ mkdir -p "$lib_dir"
 mv ./indexing/target/*.jar "$lib_dir"
 
 #update simlink to the latest version of the indexing jar
-ln -snf "$lib_dir" "${SOLR_CONFIG_DIR}/${solr_server}/${QUICKGO_LIB_PATH}"
+ln -snf "$lib_dir" "${SOLR_CONFIG_DIR}/${QUICKGO_LIB_PATH}"
