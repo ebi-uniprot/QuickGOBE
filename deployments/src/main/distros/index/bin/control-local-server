@@ -3,15 +3,16 @@
 ## This script should be run as tc_uni02, and functions to control starting,
 ## stopping, and re-starting the indexing server.
 ## It should be run from the staging environment's build directory
-##   Arguments: status              => show whether the index machine tomcats are up or down
-##              start all|machine   => start all or a specific index machine
-##              stop all|machine    => stop all or a specific index machine
+##   Arguments: status              => show whether the index machine tomcat is up or down
+##              start               => start all or a specific index machine
+##              stop                => stop all or a specific index machine
 
 VALID_USERS=("tc_uni02");
 
 # ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
 properties_not_found="false";
 source "common/common.variables";
+
 if [ $? -eq 1 ]; then
     properties_not_found="true";
 fi
@@ -26,6 +27,7 @@ fi
 function showHelp {
     cat<<EOF
 Usage: $0 [status|stop|start]
+
 Argument description:
   status                => show whether the local machine $solr_vm is up or down, and the contents of its release base directory.
   start                 => starts the tomcat of the $solr_vm
@@ -36,3 +38,53 @@ Argument description:
   WARNING: Please be aware of who is using the machine before starting/stopping them.
 EOF
 }
+
+## ---------------------------- CHECK ARGUMENTS ----------------------------
+if [ "$#" -ne 1 ]; then
+    showHelp;
+    exit 1;
+fi
+
+## ---------------------------- PRINT STATUS OF SOLR SERVER ----------------------------
+if [ "$1" == "status" ]; then
+    # show status of up / down, and data version
+    printDivider;
+    printTomcatServerStatus;
+    printSolrServerStatus;
+
+    echo "";
+    printReleaseBaseDirContents;
+
+## ---------------------------- STOP/START SERVER ----------------------------
+elif [ "$1" == "stop" ] || [ "$1" == "start" ]; then
+    action="$1";
+
+    if [ "$(serverIsUp $solr_vm)" == "UP" ]; then
+        if [ "$1" == "start" ]; then
+            echo "Cannot start $solr_vm because it is already up";
+        elif [ "$1" == "stop" ]; then
+            # stop the server
+            echo "Stopping $solr_vm";
+            ssh $solr_vm bash << EOF
+                cd "$BASE_DIR/bin";
+                ./stop;
+        fi
+    else # the server is down
+        if [ "$1" == "start" ]; then
+            # start the server
+            echo "Starting $solr_vm";
+            ssh $solr_vm bash << EOF
+                cd "$BASE_DIR/bin";
+                ./start;
+        elif [ "$1" == "stop" ]; then
+            echo "Cannot stop $solr_vm because it is already down";
+        fi
+    fi
+
+    echo "done";
+
+## ---------------------------- UNRECOGNISED OPTION ----------------------------
+else
+    showHelp;
+    exit 1;
+fi
