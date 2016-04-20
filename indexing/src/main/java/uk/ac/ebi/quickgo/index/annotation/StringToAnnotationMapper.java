@@ -26,7 +26,6 @@ public class StringToAnnotationMapper implements FieldSetMapper<Annotation> {
 
         Annotation annotation = new Annotation();
 
-        annotation.name = trimIfNotNull(fieldSet.readString(COLUMN_NAME.getPosition()));
         annotation.db = trimIfNotNull(fieldSet.readString(COLUMN_DB.getPosition()));
         annotation.dbObjectId = trimIfNotNull(fieldSet.readString(COLUMN_DB_OBJECT_ID.getPosition()));
         annotation.qualifier = trimIfNotNull(fieldSet.readString(COLUMN_QUALIFIER.getPosition()));

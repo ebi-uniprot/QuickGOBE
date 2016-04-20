@@ -7,6 +7,30 @@ package uk.ac.ebi.quickgo.index.annotation;
  * @author Edd
  */
 public enum Columns {
+    /*
+     * ==================================================
+     * Column specification (as given in goa_uniprot.gpa)
+     * ==================================================
+     *  !gpa-version: 1.1
+     *  !
+     *  !Columns:
+     *  !
+     *  !   name                  required? cardinality   GAF column #
+     *  !   DB                    required  1             1
+     *  !   DB_Object_ID          required  1             2 / 17
+     *  !   Qualifier             required  1 or greater  4
+     *  !   GO ID                 required  1             5
+     *  !   DB:Reference(s)       required  1 or greater  6
+     *  !   ECO evidence code     required  1             7 + 6 (GO evidence code + reference)
+     *  !   With                  optional  0 or greater  8
+     *  !   Interacting taxon ID  optional  0 or 1        13
+     *  !   Date                  required  1             14
+     *  !   Assigned_by           required  1             15
+     *  !   Annotation Extension  optional  0 or greater  16
+     *  !   Annotation Properties optional  0 or 1        n/a
+     *
+     */
+
     COLUMN_DB(0, "Database"),
     COLUMN_DB_OBJECT_ID(1, "DB Object ID"),
     COLUMN_QUALIFIER(2, "Qualifier"),

@@ -9,7 +9,6 @@ package uk.ac.ebi.quickgo.index.annotation;
  * @author Edd
  */
 public class Annotation {
-    String name;
     String db;
     String dbObjectId;
     String qualifier;
@@ -23,6 +22,22 @@ public class Annotation {
     String annotationExtension;
     String annotationProperties;
 
+    @Override public int hashCode() {
+        int result = db != null ? db.hashCode() : 0;
+        result = 31 * result + (dbObjectId != null ? dbObjectId.hashCode() : 0);
+        result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
+        result = 31 * result + (goId != null ? goId.hashCode() : 0);
+        result = 31 * result + (dbReferences != null ? dbReferences.hashCode() : 0);
+        result = 31 * result + (eco != null ? eco.hashCode() : 0);
+        result = 31 * result + (with != null ? with.hashCode() : 0);
+        result = 31 * result + (interactingTaxonId != null ? interactingTaxonId.hashCode() : 0);
+        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
+        result = 31 * result + (annotationExtension != null ? annotationExtension.hashCode() : 0);
+        result = 31 * result + (annotationProperties != null ? annotationProperties.hashCode() : 0);
+        return result;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -33,9 +48,6 @@ public class Annotation {
 
         Annotation that = (Annotation) o;
 
-        if (name != null ? !name.equals(that.name) : that.name != null) {
-            return false;
-        }
         if (db != null ? !db.equals(that.db) : that.db != null) {
             return false;
         }
@@ -76,20 +88,20 @@ public class Annotation {
 
     }
 
-    @Override public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (db != null ? db.hashCode() : 0);
-        result = 31 * result + (dbObjectId != null ? dbObjectId.hashCode() : 0);
-        result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
-        result = 31 * result + (goId != null ? goId.hashCode() : 0);
-        result = 31 * result + (dbReferences != null ? dbReferences.hashCode() : 0);
-        result = 31 * result + (eco != null ? eco.hashCode() : 0);
-        result = 31 * result + (with != null ? with.hashCode() : 0);
-        result = 31 * result + (interactingTaxonId != null ? interactingTaxonId.hashCode() : 0);
-        result = 31 * result + (date != null ? date.hashCode() : 0);
-        result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
-        result = 31 * result + (annotationExtension != null ? annotationExtension.hashCode() : 0);
-        result = 31 * result + (annotationProperties != null ? annotationProperties.hashCode() : 0);
-        return result;
+    @Override public String toString() {
+        return "Annotation{" +
+                "db='" + db + '\'' +
+                ", dbObjectId='" + dbObjectId + '\'' +
+                ", qualifier='" + qualifier + '\'' +
+                ", goId='" + goId + '\'' +
+                ", dbReferences='" + dbReferences + '\'' +
+                ", eco='" + eco + '\'' +
+                ", with='" + with + '\'' +
+                ", interactingTaxonId='" + interactingTaxonId + '\'' +
+                ", date='" + date + '\'' +
+                ", assignedBy='" + assignedBy + '\'' +
+                ", annotationExtension='" + annotationExtension + '\'' +
+                ", annotationProperties='" + annotationProperties + '\'' +
+                '}';
     }
 }

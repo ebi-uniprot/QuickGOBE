@@ -1,0 +1,172 @@
+package uk.ac.ebi.quickgo.index.annotation;
+
+import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
+import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
+import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
+
+import java.util.Arrays;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.batch.item.file.LineMapper;
+import org.springframework.batch.item.file.MultiResourceItemReader;
+import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.item.file.transform.LineTokenizer;
+import org.springframework.batch.item.support.CompositeItemProcessor;
+import org.springframework.batch.item.validator.ValidatingItemProcessor;
+import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.item.validator.Validator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.io.Resource;
+
+import static uk.ac.ebi.quickgo.index.common.datafile.DataFileParsingHelper.TAB;
+
+/**
+ * Sets up batch jobs for annotation indexing.
+ *
+ * Created 20/04/16
+ * @author Edd
+ */
+@Configuration
+@EnableBatchProcessing
+@Import({AnnotationRepoConfig.class})
+public class AnnotationConfig {
+    static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
+    static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
+
+    @Value("${indexing.annotation.source}")
+    private Resource[] resources;
+
+    @Value("${indexing.annotation.chunk.size:500}")
+    private int chunkSize;
+
+    @Value("${indexing.annotation.header.lines:21}")
+    private int headerLines;
+
+    @Value("${indexing.annotation.skip.limit:100}")
+    private int skipLimit;
+
+    @Autowired
+    private AnnotationRepository annotationRepository;
+
+    @Autowired
+    private JobBuilderFactory jobBuilders;
+
+    @Autowired
+    private StepBuilderFactory stepBuilders;
+
+    @Bean
+    public Job annotationJob() {
+        return jobBuilders.get(ANNOTATION_INDEXING_JOB_NAME)
+                .start(annotationIndexingStep())
+                .listener(logJobListener())
+                .build();
+    }
+
+    @Bean
+    public Step annotationIndexingStep() {
+        return stepBuilders.get(ANNOTATION_INDEXING_STEP_NAME)
+                .<Annotation, AnnotationDocument>chunk(chunkSize)
+                .faultTolerant()
+                .skipLimit(skipLimit)
+                .skip(FlatFileParseException.class)
+                .skip(ValidationException.class)
+                .<Annotation>reader(annotationMultiFileReader())
+                .processor(annotationCompositeProcessor(annotationValidator(), annotationDocConverter()))
+                .writer(annotationRepositoryWriter())
+                .listener(logStepListener())
+                .listener(skipLogListener())
+                .build();
+    }
+
+    @Bean
+    MultiResourceItemReader<Annotation> annotationMultiFileReader() {
+        MultiResourceItemReader<Annotation> reader = new MultiResourceItemReader<>();
+        reader.setResources(resources);
+        reader.setDelegate(annotationSingleFileReader());
+        return reader;
+    }
+
+    @Bean
+    FlatFileItemReader<Annotation> annotationSingleFileReader() {
+        FlatFileItemReader<Annotation> reader = new FlatFileItemReader<>();
+        reader.setLineMapper(annotationLineMapper());
+        reader.setLinesToSkip(headerLines);
+        return reader;
+    }
+
+    @Bean
+    LineMapper<Annotation> annotationLineMapper() {
+        DefaultLineMapper<Annotation> lineMapper = new DefaultLineMapper<>();
+        lineMapper.setLineTokenizer(annotationLineTokenizer());
+        lineMapper.setFieldSetMapper(annotationFieldSetMapper());
+
+        return lineMapper;
+    }
+
+    @Bean
+    LineTokenizer annotationLineTokenizer() {
+        return new DelimitedLineTokenizer(TAB);
+    }
+
+    @Bean
+    FieldSetMapper<Annotation> annotationFieldSetMapper() {
+        return new StringToAnnotationMapper();
+    }
+
+    @Bean
+    ItemProcessor<Annotation, AnnotationDocument> annotationDocConverter() {
+        return new AnnotationDocumentConverter();
+    }
+
+    @Bean
+    ItemProcessor<Annotation, Annotation> annotationValidator() {
+        Validator<Annotation> annotationValidator =
+                new AnnotationValidator();
+        return new ValidatingItemProcessor<>(annotationValidator);
+    }
+
+    @Bean
+    ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor(ItemProcessor<Annotation, ?>...
+            processors) {
+        CompositeItemProcessor<Annotation, AnnotationDocument> compositeProcessor = new CompositeItemProcessor<>();
+        compositeProcessor.setDelegates(Arrays.asList(processors));
+
+        return compositeProcessor;
+    }
+
+    @Bean
+    ItemWriter<AnnotationDocument> annotationRepositoryWriter() {
+        return new SolrCrudRepoWriter<>(annotationRepository);
+    }
+
+    private JobExecutionListener logJobListener() {
+        return new LogJobListener();
+    }
+
+    private StepListener logStepListener() {
+        return new LogStepListener();
+    }
+
+    private StepListener skipLogListener() {
+        return new SkipLoggerListener();
+    }
+}
