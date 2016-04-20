@@ -32,7 +32,7 @@ import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extrac
 
 @Configuration
 @Import({OntologyRepoConfig.class})
-@ComponentScan({"uk.ac.ebi.quickgo.service.search"})
+@ComponentScan({"uk.ac.ebi.quickgo.ontology.service.search"})
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
     public static final String SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER = "/search";

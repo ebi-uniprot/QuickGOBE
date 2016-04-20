@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
-import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.*;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
+import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.Builder;
 
 /**
  * Search controller responsible for providing consistent search
@@ -65,6 +68,8 @@ public class SearchController {
      * @param query the query to search against
      * @param limit the amount of queries to return
      */
+    @ApiOperation(value="Searches a user defined query, e.g., query=apopto",
+            notes = "Response fields include: id and name (and aspect for GO terms)")
     @RequestMapping(value = "/ontology", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OntologyTerm>> ontologySearch(
             @RequestParam(value = "query") String query,

@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.ontology.service"})
-@Import({OntologyRepoConfig.class, SearchServiceConfig.class})
+@Import({OntologyRepoConfig.class})
 public class ServiceConfig {
     @Bean
     public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository) {
