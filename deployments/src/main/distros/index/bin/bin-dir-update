@@ -82,4 +82,4 @@ else
 fi
 
 # ======= jump back to saved directory =======================================
-popd > /dev/nul
+popd > /dev/null
