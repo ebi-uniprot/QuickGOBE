@@ -48,8 +48,6 @@ public class GeneProductValidator implements Validator<GeneProduct> {
             Map<String, String> properties =
                     convertToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
 
-            checkIsNullOrEmpty(properties.get(TAXON_NAME_KEY), TAXON_NAME_KEY);
-
             checkBooleanValue(properties.get(COMPLETE_PROTEOME_KEY), COMPLETE_PROTEOME_KEY);
             checkBooleanValue(properties.get(IS_ANNOTATED_KEY), IS_ANNOTATED_KEY);
             checkBooleanValue(properties.get(IS_ISOFORM_KEY), IS_ISOFORM_KEY);
