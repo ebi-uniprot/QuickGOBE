@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -35,9 +34,6 @@ public class AnnotationRepositoryIT {
 
     @Autowired
     private AnnotationRepository annotationRepository;
-
-    @Autowired
-    private SolrTemplate annotationTemplate;
 
     @Before
     public void before() {
