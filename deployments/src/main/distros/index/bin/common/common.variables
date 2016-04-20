@@ -64,12 +64,6 @@ if [ -z $vm_purpose ]; then
 fi
 PURPOSE="$vm_purpose";
 
-# check release base dir is set
-if [ -z $release_base_dir ]; then
-    echo "Please specify the release data's base directory in, release_base_dir, in $BASE_DIR/index.properties";
-    exit 1;
-fi
-
 # check current data symlink name is set
 if [ -z $current_data_symlink_name ]; then
     echo "Please specify the symlink name to point to the current release data, in current_data_symlink_name, in
