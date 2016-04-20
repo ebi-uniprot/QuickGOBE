@@ -15,7 +15,6 @@ public class AnnotationFields {
     // all fields from annotations's schema.xml
     public final static String ID = "id";
     public final static String GENE_PRODUCT_ID = "geneProductId";
-    public final static String SYMBOL = "symbol";
     public final static String QUALIFIER = "qualifier";
     public final static String GO_ID = "goId";
     public final static String GO_EVIDENCE = "goEvidence";

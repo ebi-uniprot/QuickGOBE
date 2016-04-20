@@ -22,7 +22,6 @@ public class AnnotationDocMocker {
 
         doc.goId = "GO:0003824";
         doc.ecoId = "ECO:0000256";
-        doc.symbol = "moeA5";
         doc.qualifier = "enables";
         doc.goEvidence = "IEA";
         doc.reference = "GO_REF:0000002";
