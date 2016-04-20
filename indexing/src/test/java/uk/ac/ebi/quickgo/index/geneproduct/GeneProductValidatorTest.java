@@ -251,22 +251,6 @@ public class GeneProductValidatorTest {
     }
 
     @Test
-    public void nullTaxonNameThrowsException() throws Exception {
-        geneProduct.properties = null;
-
-        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, TAXON_NAME_KEY)));
-        validator.validate(geneProduct);
-    }
-
-    @Test
-    public void emptyTaxonNameThrowsException() throws Exception {
-        geneProduct.properties = concatProperty(TAXON_NAME_KEY, "");
-
-        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, TAXON_NAME_KEY)));
-        validator.validate(geneProduct);
-    }
-
-    @Test
     public void taxonNameIsValid() throws Exception {
         geneProduct.properties = concatProperty(TAXON_NAME_KEY, "name");
 
