@@ -4,24 +4,6 @@
 set -e
 
 VALID_USERS=("uni_qgo");
-RELEASE_VERSION_PREFIX="v"
-
-nextReleaseVersion () {
-   current_release="$(ls $release_dir | sed "s/${RELEASE_VERSION_PREFIX}//g" | sort -n | tail -1)"
-
-   if [ ! -z "$current_release" ]; then
-    next_release="${RELEASE_VERSION_PREFIX}$((current_release + 1))"
-   else
-    next_release="${RELEASE_VERSION_PREFIX}1"
-   fi
-}
-
-if [ -z "$1" ] || [ "$1" == "submit" ]; then
-   echo "No server type was input [dev]";
-   exit 1;
-else
-   solr_server=$1;
-fi
 
 # read common environment variables
 properties_not_found="false";
@@ -61,37 +43,22 @@ fi
 
 # ------------------------ compute the java indexing job string ------------------------
 # change log file so it prints correctly
-javaJob="bsub $(lsfJavaJobOptions)"
+javaJob="bsub $(lsfJavaJobOptions)";
 
 # ------------------------ start off the indexing via LSF ------------------------
-if [ "$2" = "submit" ]; then
+if [ "$1" = "submit" ]; then
 
     # ensure indexing job variable is defined
     if [ ! -z "$javaJob" ]; then
-        release_dir="${SOLR_INDEX_DIR}/${solr_server}/${CORE_NAME}"
+        if [ "$server_status" == "UP" ]; then
+            echo "executing command:"
+            echo "$javaJob";
 
-        if [ ! -d "$release_dir" ]; then
-           echo "Directory for storing solr-indexes [$SOLR_INDEX_DIR] NOT FOUND. Creating..."
-           mkdir -p "$release_dir"
+            eval "$javaJob";
+        else
+            echo "Solr server is currently down. Please start server before restarting index-create";
+            exit 1;
         fi
-
-        #calculate the next release for the current $release_dir
-        nextReleaseVersion
-
-        #create dir for current release
-        release_dir="${release_dir}/${next_release}/conf"
-        mkdir -p "$release_dir"
-
-        echo "executing fetch-libraries"
-        ../fetch-libraries "$solr_server" "$release_dir"
-
-        echo "executing fetch-cores"
-        ../fetch-cores "$solr_server" "$release_dir"
-
-        echo "executing command:"
-        echo "$javaJob";
-
-        eval "$javaJob";
     else
           echo "\$javaJob variable must be set";
           exit 1;

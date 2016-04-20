@@ -1,0 +1,94 @@
+#!/bin/bash
+
+#fail on error
+set -e
+
+VALID_USERS=("uni_qgo" "rantunes");
+RELEASE_VERSION_PREFIX="v";
+
+nextReleaseVersion (){
+   current_release="$(ls $release_dir | sed "s/${RELEASE_VERSION_PREFIX}//g" | sort -n | tail -1)";
+
+   if [ ! -z "$current_release" ]; then
+    next_release="${RELEASE_VERSION_PREFIX}$((current_release + 1))";
+   else
+    next_release="${RELEASE_VERSION_PREFIX}1";
+   fi
+}
+
+# read common environment variables
+properties_not_found="false";
+
+source "../common/common.variables";
+
+if [ $? -eq 1 ]; then
+    properties_not_found="true";
+fi
+
+source "index.variables";
+if [ $? -eq 1 ]; then
+    properties_not_found="true";
+fi
+
+source "../common/lsf.command.variables";
+if [ $? -eq 1 ]; then
+    properties_not_found="true";
+fi
+
+if [ "$properties_not_found" = "true" ]; then
+    echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
+
+# ------------------------ abort if we're building in a staging environment ------------------------
+if [ "$vm_purpose" == "STAGE" ] ; then
+    prettyEcho "QuickGO <bold>build related tasks</bold> should not take place in a <bold>STAGING</bold> environment";
+    exit 1;
+fi
+
+# ------------------------ verify the solr address variable is set ------------------------
+if [ -z "$SOLR_ADDRESS" ]; then
+    echo '$SOLR_ADDRESS variable must be set';
+    exit 1;
+fi
+
+# ------------------------ start off the indexing via LSF ------------------------
+if [ "$1" = "submit" ]; then
+    release_dir="${SOLR_INDEX_DIR}/${CORE_NAME}";
+
+    if [ ! -d "$release_dir" ]; then
+       echo "Directory for storing solr-indexes [$SOLR_INDEX_DIR] NOT FOUND. Creating...";
+       mkdir -p "$release_dir";
+    fi
+
+    #calculate the next release for the current $release_dir
+    nextReleaseVersion;
+
+    #create dir for current release
+    release_dir="${release_dir}/${next_release}/conf";
+    mkdir -p "$release_dir";
+
+    echo "executing fetch-libraries"
+    ../fetch-libraries "$release_dir";
+
+    echo "executing fetch-cores"
+    ../fetch-cores "$release_dir";
+
+    #check solr server status
+    solrServerStatus;
+
+    if [ "$server_status" == "UP" ]; then
+        echo "Solr server is currently UP, please restart the server, before proceeding to index-create";
+        exit 1;
+    else
+        echo "Preparation to create index DONE."
+        echo "Proceed to index-create to submit indexing job";
+    fi
+else
+    printDivider "Simulation";
+    echo "The following command will be executed:";
+    echo "$javaJob";
+    echo ""
+    echo "Variables used to create these command(s) can be changed in index.variables, if necessary.";
+    echo "Otherwise, if this is all correct and you want to submit this command, please re-run this script with parameter \"submit\"";
+fi

@@ -49,52 +49,52 @@ fi
 # ---------------------------- GIT INFO ----------------------------------
 REPOS_DIR="$BASE_DIR/repos"
 QUICKGO_REPO_DIR="$REPOS_DIR/QuickGOBE"
-QUICKGO_BRANCH="master"
+QUICKGO_BRANCH="GOA-1805_Create_indexing_scripts"
 
 # ---------------------------- SOLR CORE INFO ----------------------------
 CORE_NAME=
 
 # source environment specific variables
-source "$BASE_DIR/$solr_server.properties";
+source "$BASE_DIR/index.properties";
 
 # check vm purpose defined
 if [ -z $vm_purpose ]; then
-    echo "Please specify the purpose of the VM in, vm_purpose, in $BASE_DIR/$solr_server.properties";
+    echo "Please specify the purpose of the VM in, vm_purpose, in $BASE_DIR/index.properties";
     exit 1;
 fi
 PURPOSE="$vm_purpose";
 
 # check release base dir is set
 if [ -z $release_base_dir ]; then
-    echo "Please specify the release data's base directory in, release_base_dir, in $BASE_DIR/$solr_server.properties";
+    echo "Please specify the release data's base directory in, release_base_dir, in $BASE_DIR/index.properties";
     exit 1;
 fi
 
 # check current data symlink name is set
 if [ -z $current_data_symlink_name ]; then
     echo "Please specify the symlink name to point to the current release data, in current_data_symlink_name, in
-    $BASE_DIR/$solr_server.properties";
+    $BASE_DIR/index.properties";
     exit 1;
 fi
 
 # check solr vm, e.g., ves-xx-xx for http://ves-xx-xx:PORT/solr-dashboard
 if [ -z $solr_vm ]; then
     echo "Please specify Solr's vm, e.g., ves-xx-xx if http://ves-xx-xx:PORT/solr-dashboard exists, in solr_vm, in
-    $BASE_DIR/$solr_server.properties";
+    $BASE_DIR/index.properties";
     exit 1;
 fi
 
 # check solr path, e.g., solr-dashboard if http://ves-xx-xx:PORT/solr-dashboard exists
 if [ -z $http_solr_path ]; then
     echo "Please specify the Solr path, e.g., solr-dashboard for http://ves-xx-xx:PORT/solr-dashboard, in
-    http_solr_path, in $BASE_DIR/$solr_server.properties";
+    http_solr_path, in $BASE_DIR/index.properties";
     exit 1;
 fi
 
 # check solr port, e.g., PORT if http://ves-xx-xx:PORT/solr-dashboard exists
 if [ -z $http_solr_port ]; then
     echo "Please specify Solr's port, e.g., PORT for http://ves-xx-xx:PORT/solr-dashboard exists, in http_solr_port,
-    in $BASE_DIR/$solr_server.properties";
+    in $BASE_DIR/index.properties";
     exit 1;
 fi
 SOLR_ADDRESS_BASE="http://$solr_vm:$http_solr_port/$http_solr_path";
@@ -177,7 +177,7 @@ function printTomcatServerStatus {
     prettyEcho "Tomcat @ $tomcat_addr is $server_message";
 }
 
-function printSolrServerStatus {
+function solrServerStatus {
     server="$solr_vm"; # by default show the environment's tomcat's solr status
     if [ "$#" -eq 1 ]; then
         server="$1";
@@ -185,6 +185,9 @@ function printSolrServerStatus {
 
     solr_addr="http://$server:$http_solr_port/$http_solr_path";
     server_status=$(serverIsUp $server $http_solr_port $http_solr_path);
+}
+
+function printSolrServerStatus {
     if [ "$server_status" == "UP" ]; then
             server_message="<success>$server_status</success>";
     else
