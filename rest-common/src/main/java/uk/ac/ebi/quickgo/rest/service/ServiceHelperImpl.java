@@ -1,9 +1,8 @@
 package uk.ac.ebi.quickgo.rest.service;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
 
-import java.util.Arrays;
+import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,9 +21,9 @@ public class ServiceHelperImpl implements ServiceHelper{
 	}
 
 	@Override
-	public List<String> buildIdList(String[] ids) {
+	public List<String> buildIdList(List<String> ids) {
 		Preconditions.checkArgument(ids != null, "List of IDs cannot be null");
 
-		return Arrays.stream(ids).map(queryStringSanitizer::sanitize).collect(Collectors.toList());
+		return ids.stream().map(queryStringSanitizer::sanitize).collect(Collectors.toList());
 	}
 }

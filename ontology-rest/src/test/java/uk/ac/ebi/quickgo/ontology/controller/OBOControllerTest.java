@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.Collections;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,54 +47,14 @@ public class OBOControllerTest {
     public void setUp() {
         this.controller =
                 new OBOController<FakeOBOTerm>(ontologyService, searchService, searchableField, retrievalConfig) {
-                    @Override protected boolean isValidId(String id) {
-                        return ID_FORMAT.matcher(id).matches();
+                    @Override protected Predicate<String> idValidator() {
+                        return id -> ID_FORMAT.matcher(id).matches();
                     }
 
                     @Override protected OntologyType getOntologyType() {
                         return OntologyType.GO;
                     }
                 };
-    }
-
-    @Test
-    public void checkValidId() {
-        controller.checkValidId("id0");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void checkInvalidId() {
-        controller.checkValidId("wrongIdFormat");
-    }
-
-    @Test
-    public void validatesValidRequestedResults() {
-        controller.validateRequestedResults(OBOController.MAX_PAGE_RESULTS);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void validatesInvalidRequestedResults() {
-        controller.validateRequestedResults(OBOController.MAX_PAGE_RESULTS + 1);
-    }
-
-    @Test
-    public void createsListFromNullCSV() {
-        assertThat(controller.csvToList(null).size(), is(0));
-    }
-
-    @Test
-    public void createsListFromCSVForNoItems() {
-        assertThat(controller.csvToList("").size(), is(0));
-    }
-
-    @Test
-    public void createsListFromCSVForOneItem() {
-        assertThat(controller.csvToList("a").size(), is(1));
-    }
-
-    @Test
-    public void createsListFromCSVForTwoItems() {
-        assertThat(controller.csvToList("a,b").size(), is(2));
     }
 
     @Test

@@ -15,9 +15,9 @@ public interface GeneProductService {
 
 	/**
 	 * Find the core data set stored for a specified list of geneProduct IDs.
-	 * @param ids the ontology IDs
+	 * @param ids the gene product IDs
 	 * @return a {@link List} of {@link GeneProduct} instances corresponding to the gene product ids containing the
 	 * chosen information
 	 */
-	List<GeneProduct> findById(String[] ids);
+	List<GeneProduct> findById(List<String> ids);
 }

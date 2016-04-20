@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,8 +38,8 @@ public class GOController extends OBOController<GOTerm> {
     }
 
     @Override
-    public boolean isValidId(String id) {
-        return GO_ID_FORMAT.matcher(id).matches();
+    public Predicate<String> idValidator() {
+        return id -> GO_ID_FORMAT.matcher(id).matches();
     }
 
     @Override protected OntologyType getOntologyType() {

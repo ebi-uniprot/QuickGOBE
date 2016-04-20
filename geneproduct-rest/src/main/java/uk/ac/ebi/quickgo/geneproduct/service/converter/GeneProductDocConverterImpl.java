@@ -38,6 +38,7 @@ public class GeneProductDocConverterImpl implements GeneProductDocConverter {
         geneProduct.type = GeneProductType.typeOf(geneProductDocument.type);
         geneProduct.isCompleteProteome = geneProductDocument.isCompleteProteome;
         geneProduct.parentId = geneProductDocument.parentId;
+        geneProduct.isAnnotated = geneProductDocument.isAnnotated;
 
         return geneProduct;
     }

@@ -1,14 +1,13 @@
 package uk.ac.ebi.quickgo.geneproduct.service.converter;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 
 import java.util.Arrays;
 import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -81,6 +80,7 @@ public class GeneProductDocConverterTest {
         assertThat(convertedGeneProduct.taxonomy.id, is(TAX_ID));
         assertThat(convertedGeneProduct.taxonomy.name, is(TAX_NAME));
         assertThat(convertedGeneProduct.type, is(GeneProductType.PROTEIN));
+        assertThat(convertedGeneProduct.isAnnotated, is(true));
     }
 
     @Test

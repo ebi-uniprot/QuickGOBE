@@ -61,7 +61,7 @@ public abstract class OBOControllerIT {
     @Autowired
     protected OntologyRepository ontologyRepository;
 
-    protected MockMvc mockMvc;
+    MockMvc mockMvc;
 
     private String resourceUrl;
     private String validId;

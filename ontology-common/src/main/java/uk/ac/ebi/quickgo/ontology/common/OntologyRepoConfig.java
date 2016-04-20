@@ -50,7 +50,7 @@ public class OntologyRepoConfig {
     @Profile("embeddedServer")
     public SolrServerFactory embeddedSolrServerFactory(CoreContainer coreContainer)
             throws IOException, SAXException, ParserConfigurationException {
-        EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, null);
+        EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, SOLR_CORE);
         return new MulticoreSolrServerFactory(embeddedSolrServer);
     }
 
