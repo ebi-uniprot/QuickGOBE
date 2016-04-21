@@ -46,7 +46,6 @@ public class GeneProductController {
 		Objects.requireNonNull(gpService, "The GeneProductService instance passed to the constructor of " +
 				"GeneProductController should not be null.");
 		this.geneProductService = gpService;
-		//this.controllerValidationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
 		this.controllerValidationHelper = controllerValidationHelper;
 	}
 

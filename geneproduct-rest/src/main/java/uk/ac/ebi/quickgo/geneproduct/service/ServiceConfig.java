@@ -1,26 +1,24 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
-import uk.ac.ebi.quickgo.geneproduct.loader.DbXrefLoader;
-import uk.ac.ebi.quickgo.geneproduct.model.DbXrefEntities;
-import uk.ac.ebi.quickgo.geneproduct.model.GeneProductXrefEntity;
-import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
-import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
-import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
-import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
-import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
-import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
+        import org.springframework.beans.factory.annotation.Value;
+        import org.springframework.context.annotation.Bean;
+        import org.springframework.context.annotation.ComponentScan;
+        import org.springframework.context.annotation.Configuration;
+        import org.springframework.context.annotation.Import;
+        import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
+        import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
+        import uk.ac.ebi.quickgo.geneproduct.loader.DbXrefLoader;
+        import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXrefIDFormats;
+        import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
+        import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
+        import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
+        import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
+        import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
+        import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
+        import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
+        import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
 
-import java.util.Map;
-import java.util.function.Predicate;
+        import java.util.function.Predicate;
 
 /**
  *
@@ -38,45 +36,46 @@ import java.util.function.Predicate;
 @Import({GeneProductRepoConfig.class})
 public class ServiceConfig {
 
-	private static final String DEFAULT_DB = "UniProtKB";
-	private static final String DEFAULT_TYPE_NAME = "protein";
+    private static final String DEFAULT_DB = "UniProtKB";
+    private static final String DEFAULT_TYPE_NAME = "protein";
 
-	@Value("${public.geneproduct.source}")
-	private String directory;
+    @Value("${public.geneproduct.source}")
+    private String sourceFileDirectory;
 
+    @Bean
+    public GeneProductService goGeneProductService(GeneProductRepository geneProductRepository) {
+        return new GeneProductServiceImpl(
+                serviceHelper(),
+                geneProductRepository,
+                geneProductDocConverter());
+    }
 
-	@Bean
-	public GeneProductService goGeneProductService(GeneProductRepository geneProductRepository) {
-		return new GeneProductServiceImpl(
-				serviceHelper(),
-				geneProductRepository,
-				geneProductDocConverter());
-	}
+    private ServiceHelper serviceHelper(){
+        return new ServiceHelperImpl(queryStringSanitizer());
+    }
 
-	private ServiceHelper serviceHelper(){
-		return new ServiceHelperImpl(queryStringSanitizer());
-	}
+    private GeneProductDocConverter geneProductDocConverter() {
+        return new GeneProductDocConverterImpl();
+    }
 
-	private GeneProductDocConverter geneProductDocConverter() {
-		return new GeneProductDocConverterImpl();
-	}
+    private QueryStringSanitizer queryStringSanitizer() {
+        return new SolrQueryStringSanitizer();
+    }
 
-	private QueryStringSanitizer queryStringSanitizer() {
-		return new SolrQueryStringSanitizer();
-	}
+    @Bean
+    public ControllerValidationHelper geneProductValidator(){
+        return new ControllerValidationHelperImpl(ControllerValidationHelperImpl.MAX_PAGE_RESULTS, idValidator());
+    }
 
-	@Bean
-	public ControllerValidationHelper geneProductValidator(){
-		return new ControllerValidationHelperImpl(ControllerValidationHelperImpl.MAX_PAGE_RESULTS, idValidator());
-	}
+    private Predicate<String> idValidator() {
+        GeneProductDbXrefIDFormats
+                dbXrefEntities = GeneProductDbXrefIDFormats.createWithData(geneProductLoader().load(), DEFAULT_DB,
+                DEFAULT_TYPE_NAME);
+        return id -> dbXrefEntities.isValidId(id);	}
 
-	private Predicate<String> idValidator() {
-		DbXrefEntities dbXrefEntities = new DbXrefEntities(geneProductLoader().load(), DEFAULT_DB, DEFAULT_TYPE_NAME);
-		return id -> dbXrefEntities.isValidId(id);	}
-
-	private DbXrefLoader geneProductLoader() {
-		return new DbXrefLoader(this.directory);
-	}
+    private DbXrefLoader geneProductLoader() {
+        return new DbXrefLoader(this.sourceFileDirectory);
+    }
 
 
 }

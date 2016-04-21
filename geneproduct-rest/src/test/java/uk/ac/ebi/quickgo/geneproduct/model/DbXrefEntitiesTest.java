@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
+import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +12,6 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tony Wardell
@@ -22,32 +22,40 @@ import java.util.Map;
 @RunWith(MockitoJUnitRunner.class)
 public class DbXrefEntitiesTest {
 
-	@Mock
-	Map mockMap;
+	List<GeneProductDbXrefIDFormat> listOfFormats;
 
-	private DbXrefEntities dbXrefEntities;
-
-	private GeneProductXrefEntity.Key key1;
+	private GeneProductDbXrefIDFormats dbXrefEntities;
 
 	@Mock
-	private List<GeneProductXrefEntity> resultList;
+	private List<GeneProductDbXrefIDFormat> resultList;
 
 	@Mock
-	GeneProductXrefEntity mockEntity;
+	GeneProductDbXrefIDFormat mockEntity1;
+
+	@Mock
+	GeneProductDbXrefIDFormat mockEntity2;
+
+	@Mock
+	GeneProductDbXrefIDFormat mockEntity3;
 
 	@Before
 	public void setup(){
 
-		dbXrefEntities = new DbXrefEntities(mockMap, "Wormbase", "variation");
+		listOfFormats = new ArrayList<>();
+		listOfFormats.add(mockEntity1);
+		listOfFormats.add(mockEntity2);
+		listOfFormats.add(mockEntity3);
 
-		key1 = new GeneProductXrefEntity.Key("Wormbase", "variation"); //matches default
+		when(mockEntity1.getDatabase()).thenReturn("AGI_LocusCode");
+		when(mockEntity2.getDatabase()).thenReturn("Ensembl");
+		when(mockEntity3.getDatabase()).thenReturn("UniProt");
+		when(mockEntity1.getEntityTypeName()).thenReturn("protein");
+		when(mockEntity2.getEntityTypeName()).thenReturn("protein");
+		when(mockEntity3.getEntityTypeName()).thenReturn("protein");
+		when(mockEntity3.matches("ABC")).thenReturn(true);
+		when(mockEntity3.matches("ZZZ")).thenReturn(false);
+		dbXrefEntities = GeneProductDbXrefIDFormats.createWithData(listOfFormats, "UniProt", "protein");
 
-		when(mockMap.get(key1)).thenReturn(resultList);
-		when(resultList.get(0)).thenReturn(mockEntity);
-
-		//..finally setup what each entity would return
-		when(mockEntity.matches("ABC")).thenReturn(true);
-		when(mockEntity.matches("ZZZ")).thenReturn(false);
 	}
 
 	@Test
@@ -57,12 +65,12 @@ public class DbXrefEntitiesTest {
 
 	@Test
 	public void isValidIdWhenSupplyingDatabaseAndTypeName(){
-		assertThat(dbXrefEntities.isValidId("ABC", "Wormbase", "variation"), is(true));
+		assertThat(dbXrefEntities.isValidId("ABC", "UniProt", "protein"), is(true));
 	}
 
 	@Test
 	public void invalidDatabaseAndTypeName(){
-		assertThat(dbXrefEntities.isValidId("ABC", "WormbaseX", "variationX"), is(false));
+		assertThat(dbXrefEntities.isValidId("ABC", "UniProt", "proteinX"), is(false));
 	}
 
 	@Test

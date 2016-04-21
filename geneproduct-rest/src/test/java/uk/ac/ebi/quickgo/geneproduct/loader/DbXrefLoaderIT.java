@@ -2,10 +2,8 @@ package uk.ac.ebi.quickgo.geneproduct.loader;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import uk.ac.ebi.quickgo.geneproduct.model.GeneProductXrefEntity;
+import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXrefIDFormat;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -21,13 +19,11 @@ import static org.hamcrest.Matchers.hasSize;
 public class DbXrefLoaderIT {
 
 	@Test
-	@Ignore		//This test works successfully IF this test is run directly, not via maven/verify
+	//@Ignore		//This test works successfully IF this test is run directly, not via maven/verify
 	public void loadFileSuccessfully(){
-		//System.out.println(System.getProperty("user.dir"));
-
 		DbXrefLoader dbXrefLoader = new DbXrefLoader("../test/resources/");
-		Map<GeneProductXrefEntity.Key, List<GeneProductXrefEntity>> xrefMap = dbXrefLoader.load();
-		assertThat(xrefMap.values(), hasSize(120));
+		List<GeneProductDbXrefIDFormat> list = dbXrefLoader.load();
+		assertThat(list, hasSize(119));
 
 
 	}

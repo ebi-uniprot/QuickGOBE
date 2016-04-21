@@ -21,11 +21,11 @@ public class GeneProductXrefEntityTest {
 	private String localIdSyntax = "([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1}";
 	private String urlSyntax = " http://www.uniprot.org/uniprot/[example_id]";
 
-	GeneProductXrefEntity geneProductXrefEntity;
+	GeneProductDbXrefIDFormat geneProductXrefEntity;
 
 	@Before
 	public void setup(){
-		geneProductXrefEntity = new GeneProductXrefEntity(database, entityType, entityTypeName,
+		geneProductXrefEntity = new GeneProductDbXrefIDFormat(database, entityType, entityTypeName,
 				localIdSyntax, urlSyntax);
 	}
 
@@ -39,10 +39,5 @@ public class GeneProductXrefEntityTest {
 		assertThat(geneProductXrefEntity.matches("99999"), is(false));
 	}
 
-	@Test
-	public void keyIsCreatedSuccessfully(){
-		GeneProductXrefEntity.Key key = geneProductXrefEntity.getDbKey();
-		assertThat(key.database, is(equalTo(database)));
-		assertThat(key.entityTypeName, is(equalTo(entityTypeName)));
-	}
+
 }
