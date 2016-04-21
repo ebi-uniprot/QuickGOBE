@@ -16,37 +16,41 @@ import java.util.Map;
  */
 public class DbXrefEntities {
 
-	private final String defaultTypeName;
-	private Map<GeneProductXrefEntity.Key,  List<GeneProductXrefEntity>> geneProductXrefEntities;
-	private final String defaultDatabase;
+    private final String defaultTypeName;
+    private Map<GeneProductXrefEntity.Key, List<GeneProductXrefEntity>> geneProductXrefEntities;
+    private final String defaultDatabase;
 
-	public DbXrefEntities(Map<GeneProductXrefEntity.Key, List<GeneProductXrefEntity>> geneProductXrefEntities, String defaultDb, String defaultTypeName) {
-		this.geneProductXrefEntities = geneProductXrefEntities;
-		this.defaultDatabase = defaultDb;
-		this.defaultTypeName = defaultTypeName;
-	}
+    public DbXrefEntities(Map<GeneProductXrefEntity.Key, List<GeneProductXrefEntity>> geneProductXrefEntities,
+            String defaultDb, String defaultTypeName) {
+        this.geneProductXrefEntities = geneProductXrefEntities;
+        this.defaultDatabase = defaultDb;
+        this.defaultTypeName = defaultTypeName;
+    }
 
+    public boolean isValidId(String id) {
 
-	public boolean isValidId(String id ) {
+        //Use the default database and
+        return isValidId(id, defaultDatabase, defaultTypeName);
+    }
 
-		//Use the default database and
-		return isValidId( id, defaultDatabase, defaultTypeName );
-	}
+    public boolean isValidId(String id, String database, String typeName) {
 
-	public boolean isValidId(String id, String database, String typeName ) {
+        //If we haven't managed to load the validation regular expression then pass everything
+        if (geneProductXrefEntities == null) {
+            return true;
+        }
 
-		//If we haven't managed to load the validation regular expression then pass everything
-		if(geneProductXrefEntities==null) return true;
+        //Create key to do lookup
+        GeneProductXrefEntity.Key key = GeneProductXrefEntity.key(database, typeName);
+        final List<GeneProductXrefEntity> geneProductXrefEntities = this.geneProductXrefEntities.get(key);
 
-		//Create key to do lookup
-		GeneProductXrefEntity.Key key = GeneProductXrefEntity.key(database, typeName);
-		final List<GeneProductXrefEntity> geneProductXrefEntities = this.geneProductXrefEntities.get(key);
+        //If there is no entity for this combination then the id cannot be correct..
+        if (geneProductXrefEntities == null) {
+            return false;
+        }
 
-		//If there is no entity for this combination then the id cannot be correct..
-		if(geneProductXrefEntities==null) return false;
+        //..otherwise look up the id
+        return geneProductXrefEntities.get(0).matches(id);
 
-		//..otherwise look up the id
-		return geneProductXrefEntities.get(0).matches(id);
-
-	}
+    }
 }
