@@ -148,7 +148,7 @@ public class GeneProductUserQueryScoringIT {
 
     // Exact matches win -------------------------------------------------------------------------
     @Test
-    public void queryExactMtchSymbolInEntry2ExactMtchSynonymInEntry1AndReturnsEntry21() throws Exception {
+    public void queryExactMatchesSymbolInEntry2ExactMatchesSynonymInEntry1AndReturnsEntries21() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "important 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "glycine metabolic process", "symbol 3", "synonym X");
@@ -166,7 +166,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMtchSymbolInEntry2ExactMtchNameInEntry3AndReturnsEntry23() throws Exception {
+    public void queryExactMatchesSymbolInEntry2ExactMatchesNameInEntry3AndReturnsEntries23() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "important 1", "symbol 3", "synonym X");
@@ -184,7 +184,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMtchSynonymInEntry1WordMtchSymbolInEntry2AndReturnsEntry12() throws
+    public void queryExactMatchesSynonymInEntry1WordMatchesSymbolInEntry2AndReturnsEntries12() throws
                                                                                                   Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "important");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -203,7 +203,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMtchNameInEntry1WordMtchSymbolInEntry2AndReturnsEntry12() throws
+    public void queryExactMatchesNameInEntry1WordMatchesSymbolInEntry2AndReturnsEntries12() throws
                                                                                                Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "important", "symbol 1", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -222,7 +222,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMtchSymbolInEntry1WordMtchSymbolInEntry2AndReturnsEntry12() throws
+    public void queryExactMatchesSymbolInEntry1WordMatchesSymbolInEntry2AndReturnsEntries12() throws
                                                                                                  Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "important", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -241,7 +241,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMtchNameInEntry1PartialMtchSymbolInEntry2AndReturnsEntry12() throws
+    public void queryExactMatchesNameInEntry1PartialMatchesSymbolInEntry2AndReturnsEntries12() throws
                                                                                                   Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "import", "symbol 1", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -260,7 +260,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMtchSynonymInEntry1PartialMtchSymbolInEntry2AndReturnsEntry12() throws
+    public void queryExactMatchesSynonymInEntry1PartialMatchesSymbolInEntry2AndReturnsEntries12() throws
                                                                                                      Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "import");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -279,7 +279,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMtchSymbolInEntry1PartialMtchSymbolInEntry2AndReturnsEntry12() throws
+    public void queryExactMatchesSymbolInEntry1PartialMatchesSymbolInEntry2AndReturnsEntries12() throws
                                                                                                     Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "import", "important");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -299,7 +299,7 @@ public class GeneProductUserQueryScoringIT {
 
     // Word matches win -------------------------------------------------------------------------
     @Test
-    public void queryWordMtchSymbolInEntry2WordSynonymInEntry1AndReturnsEntry21() throws
+    public void queryWordMatchesSymbolInEntry2WordMatchesSynonymInEntry1AndReturnsEntries21() throws
                                                                                                  Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "important 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -318,7 +318,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryWordMtchSymbolInEntry2WordMtchNameInEntry3AndReturnsEntry23() throws
+    public void queryWordMatchesSymbolInEntry2WordMatchesNameInEntry3AndReturnsEntries23() throws
                                                                                               Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -338,7 +338,7 @@ public class GeneProductUserQueryScoringIT {
 
     // Partial matches win -------------------------------------------------------------------------
     @Test
-    public void queryPartiallyMtchSymbolInEntry2PartiallyMtchSynonymInEntry1AndReturnsEntry21() throws
+    public void queryPartiallyMatchesSymbolInEntry2PartiallyMatchesSynonymInEntry1AndReturnsEntries21() throws
                                                                                                            Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "important 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -357,7 +357,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryPartiallyMtchSymbolInEntry2PartiallyMtchNameInEntry3AndReturnsEntry23() throws
+    public void queryPartiallyMatchesSymbolInEntry2PartiallyMatchesNameInEntry3AndReturnsEntries23() throws
                                                                                                         Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym X");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "important 1", "synonym X");
@@ -394,7 +394,7 @@ public class GeneProductUserQueryScoringIT {
 
     // Basic field matching -------------------------------------------------------------------------
     @Test
-    public void nameWordMtchFindsResult() throws Exception {
+    public void nameWordMatchesFindsResult() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine snazzy process", "symbol 2", "synonym 2");
 
@@ -409,7 +409,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void symbolWordMtchFindsResult() throws Exception {
+    public void symbolWordMatchesFindsResult() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "cymbal 2", "synonym 2");
 
@@ -424,7 +424,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void synonymWordMtchFindsResult() throws Exception {
+    public void synonymWordMatchesFindsResult() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "symbol 2", "syn 2");
 
@@ -439,7 +439,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void nameMtchGivesResultsInOrderEntriesWereAdded() throws Exception {
+    public void nameMatchGivesResultsInOrderEntriesWereAdded() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "symbol 2", "synonym 2");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "glycine metabolic process", "symbol 3", "synonym 3");
@@ -458,7 +458,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void synonymMtchGivesResultsInOrderEntriesWereAdded() throws Exception {
+    public void synonymMatchGivesResultsInOrderEntriesWereAdded() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "glycine metabolic process", "symbol 2", "synonym 2");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "glycine metabolic process", "symbol 3", "synonym 3");
@@ -478,7 +478,7 @@ public class GeneProductUserQueryScoringIT {
 
     // Phrase matches -------------------------------------------------------------------------
     @Test
-    public void phraseMtchOnNameReturnsShortestMtchFirst() throws Exception {
+    public void phraseMatchesOnNameReturnsShortestMatchFirst() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "a metabolic process is handy", "symbol 1", "synonym 1");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "metabolic process is handy", "symbol 2", "synonym 2");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "ab metabolic process is handy", "symbol 3", "synonym 3");
@@ -497,7 +497,7 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void phraseMtchOnSynonymReturnsShortestMtchFirst() throws Exception {
+    public void phraseMatchesOnSynonymReturnsShortestMatchFirst() throws Exception {
         GeneProductDocument doc1 = createDoc(VALID_ID_1, "metal 1", "symbol", "a synonym abcdef attention hup sir");
         GeneProductDocument doc2 = createDoc(VALID_ID_2, "metal 2", "symbol", "a synonym abcde attention hup");
         GeneProductDocument doc3 = createDoc(VALID_ID_3, "metal 3", "symbol", "a synonym abcd attention");
@@ -517,7 +517,7 @@ public class GeneProductUserQueryScoringIT {
 
     // Sanity checks on matches that involve synonym, symbol and name -------------------------------------------------------------------------
     @Test
-    public void queryExactMtchSynonymInEntry1WordMtchSymbolInEntry2PartialMtchNameInEntry3AndReturnsEntry123()
+    public void queryExactMatchesSynonymInEntry1WordMatchesSymbolInEntry2PartialMatchesNameInEntry3AndReturnsEntries123()
             throws                                                                 Exception {
 
         // the query:
@@ -544,7 +544,7 @@ public class GeneProductUserQueryScoringIT {
 
     @Test
     public void
-    queryWordMtchNameInEntry3PartiallyMtchSymbolInEntry2PartiallyMtchSynonymInEntry1AndReturnsEntry321() throws
+    queryWordMatchesNameInEntry3PartiallyMatchesSymbolInEntry2PartiallyMatchesSynonymInEntry1AndReturnsEntries321() throws
                                                                                                            Exception {
         // the query:
         //    word matches name in entry 3
