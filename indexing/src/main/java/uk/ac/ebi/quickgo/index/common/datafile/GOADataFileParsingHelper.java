@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * This class provides stateless methods to help process the contents of gene ontology annotation data files.
+ *
  * Created 20/04/16
  * @author Edd
  */
-public class DataFileParsingHelper {
+public class GOADataFileParsingHelper {
     public static final String TAB = "\t";
     public static final String PIPE = "\\|";
     public static final String EQUALS = "=";

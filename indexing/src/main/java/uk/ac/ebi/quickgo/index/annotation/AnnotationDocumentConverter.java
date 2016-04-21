@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.batch.item.ItemProcessor;
 
-import static uk.ac.ebi.quickgo.index.common.datafile.DataFileParsingHelper.COLON;
-import static uk.ac.ebi.quickgo.index.common.datafile.DataFileParsingHelper.EQUALS;
-import static uk.ac.ebi.quickgo.index.common.datafile.DataFileParsingHelper.PIPE;
-import static uk.ac.ebi.quickgo.index.common.datafile.DataFileParsingHelper.convertLinePropertiesToMap;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.COLON;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.EQUALS;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.PIPE;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
 
 /**
+ * Converts an {@link Annotation} object into an {@link AnnotationDocument} object.
+ *
  * Created 19/04/16
  * @author Edd
  */
@@ -39,8 +41,6 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
         doc.assignedBy = annotation.assignedBy;
         doc.extension = annotation.annotationExtension;
         doc.ecoId = annotation.eco;
-
-        // symbol: doc.symbol = ??
 
         return doc;
     }
