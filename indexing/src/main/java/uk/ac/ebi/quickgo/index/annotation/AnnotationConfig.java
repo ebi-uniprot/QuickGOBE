@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 
-import static uk.ac.ebi.quickgo.index.common.datafile.DataFileParsingHelper.TAB;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.TAB;
 
 /**
  * Sets up batch jobs for annotation indexing.
@@ -49,8 +49,8 @@ import static uk.ac.ebi.quickgo.index.common.datafile.DataFileParsingHelper.TAB;
 @EnableBatchProcessing
 @Import({AnnotationRepoConfig.class})
 public class AnnotationConfig {
-    static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
-    static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
+    private static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
+    private static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
 
     @Value("${indexing.annotation.source}")
     private Resource[] resources;
