@@ -1,7 +1,8 @@
 package uk.ac.ebi.quickgo.geneproduct.loader;
 
 import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
-import uk.ac.ebi.quickgo.geneproduct.model.GeneProductXrefEntity;
+import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXrefIDFormats;
+import uk.ac.ebi.quickgo.geneproduct.model.GeneProductXrefIDFormat;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -41,7 +42,7 @@ public class DbXrefLoader {
         this.directory = dir;
     }
 
-    public Map<GeneProductXrefEntity.Key, List<GeneProductXrefEntity>> load() {
+    public Map<GeneProductXrefIDFormat.Key, List<GeneProductXrefIDFormat>> load() {
 
         try {
 
@@ -75,9 +76,9 @@ public class DbXrefLoader {
             return GZIPFiles.lines(path)
                     .skip(0)
                     .map(line -> line.split(COL_DELIMITER))
-                    .map(arr -> new GeneProductXrefEntity(arr[COL_DATABASE], arr[COL_ENTITY_TYPE],
+                    .map(arr -> new GeneProductXrefIDFormat(arr[COL_DATABASE], arr[COL_ENTITY_TYPE],
                             arr[COL_ENTITY_TYPE_NAME], arr[COL_LOCAL_ID_SYNTAX], arr[COL_URL_SYNTAX]))
-                    .collect(groupingBy(GeneProductXrefEntity::getDbKey));
+                    .collect(groupingBy(entity -> new GeneProductDbXrefIDFormats.Key(entity.database, entity.typeName)));
 
             //2 operations -- different
 
