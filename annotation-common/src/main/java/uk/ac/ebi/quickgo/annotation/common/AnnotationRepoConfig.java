@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.geneproduct.common;
+package uk.ac.ebi.quickgo.annotation.common;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,11 +20,15 @@ import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
 import org.xml.sax.SAXException;
 
 /**
- * Publishes the configuration beans of the Gene Product repository.
+ * Publishes the configuration beans of the annotation repository.
+ *
+ * Created 14/04/16
+ * @author Edd
  */
 @Configuration
-public class GeneProductRepoConfig {
-    private static final String SOLR_CORE = "geneproduct";
+public class AnnotationRepoConfig {
+
+    private static final String SOLR_CORE = "annotation";
 
     @Bean
     static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
@@ -58,7 +62,7 @@ public class GeneProductRepoConfig {
     }
 
     @Bean
-    public SolrTemplate geneProductTemplate(SolrServerFactory solrServerFactory) {
+    public SolrTemplate annotationTemplate(SolrServerFactory solrServerFactory) {
         SolrTemplate template = new SolrTemplate(solrServerFactory);
         template.setSolrCore(SOLR_CORE);
 
@@ -66,9 +70,8 @@ public class GeneProductRepoConfig {
     }
 
     @Bean
-    public GeneProductRepository geneProductRepository(
-            @Qualifier("geneProductTemplate") SolrTemplate geneProductTemplate) {
-        return new SolrRepositoryFactory(geneProductTemplate)
-                .getRepository(GeneProductRepository.class);
+    public AnnotationRepository annotationRepository(
+            @Qualifier("annotationTemplate") SolrTemplate annotationTemplate) {
+        return new SolrRepositoryFactory(annotationTemplate).getRepository(AnnotationRepository.class);
     }
 }

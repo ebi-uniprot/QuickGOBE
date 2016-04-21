@@ -8,7 +8,9 @@ import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
@@ -89,7 +91,7 @@ public class GeneProductConfig {
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
                 .<GeneProduct>reader(geneProductMultiFileReader())
-                .processor(geneProductCompositeProcessor(geneProductValidator(), geneProductDocConverter()))
+                .processor(geneProductCompositeProcessor())
                 .writer(geneProductRepositoryWriter())
                 .listener(logStepListener())
                 .listener(skipLogListener())
@@ -144,10 +146,13 @@ public class GeneProductConfig {
     }
 
     @Bean
-    ItemProcessor<GeneProduct, GeneProductDocument> geneProductCompositeProcessor(ItemProcessor<GeneProduct, ?>...
-            processors) {
+    ItemProcessor<GeneProduct, GeneProductDocument> geneProductCompositeProcessor() {
+        List<ItemProcessor<GeneProduct, ?>> processors = new ArrayList<>();
+        processors.add(geneProductValidator());
+        processors.add(geneProductDocConverter());
+
         CompositeItemProcessor<GeneProduct, GeneProductDocument> compositeProcessor = new CompositeItemProcessor<>();
-        compositeProcessor.setDelegates(Arrays.asList(processors));
+        compositeProcessor.setDelegates(processors);
 
         return compositeProcessor;
     }
