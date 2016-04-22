@@ -14,8 +14,6 @@ import static uk.ac.ebi.quickgo.index.annotation.AnnotationMocker.createValidAnn
  */
 public class AnnotationValidatorTest {
 
-    private static final String GOOD_QUALIFIER_LIST = "NOT|involved_in|enables|part_of|contributes_to|colocalizes_with";
-    private static final String GOOD_QUALIFIER = "involved_in";
     private AnnotationValidator validator;
     private Annotation annotation;
 
@@ -63,13 +61,7 @@ public class AnnotationValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void nullEcoEvidenceThrowsException() throws Exception {
-        annotation.eco = null;
-        validator.validate(annotation);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void nullDateThrowsException() throws Exception {
-        annotation.date = null;
+        annotation.ecoId = null;
         validator.validate(annotation);
     }
 
@@ -80,6 +72,12 @@ public class AnnotationValidatorTest {
     }
 
     // bad qualifier field -------------------------------------------------
+    @Test(expected = ValidationException.class)
+    public void invalidNotCasingCausesValidationException() {
+        annotation.qualifier = "not|contributes_to";
+        validator.validate(annotation);
+    }
+
     @Test(expected = ValidationException.class)
     public void invalidQualifierDelimiterCausesValidationException() {
         annotation.qualifier = "NOT,contributes_to";
@@ -92,23 +90,89 @@ public class AnnotationValidatorTest {
         validator.validate(annotation);
     }
 
+    @Test(expected = ValidationException.class)
+    public void tooManyQualifiersCausesValidationException() {
+        annotation.qualifier = "NOT|enables|contributes_to";
+        validator.validate(annotation);
+    }
+
     // good qualifier field -------------------------------------------------
     @Test
-    public void validatesAllGoodQualifiers() {
-        annotation.qualifier = GOOD_QUALIFIER_LIST;
+    public void validatesInvolvedInQualifier() {
+        annotation.qualifier = "involved_in";
         validator.validate(annotation);
     }
 
     @Test
-    public void validatesSingleGoodQualifiers() {
-        annotation.qualifier = GOOD_QUALIFIER;
+    public void validatesEnablesQualifier() {
+        annotation.qualifier = "enables";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validatesPartOfQualifier() {
+        annotation.qualifier = "part_of";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validatesContributesToQualifier() {
+        annotation.qualifier = "contributes_to";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validatesColocalizesWithQualifier() {
+        annotation.qualifier = "colocalizes_with";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validatesNotInvolvedInQualifier() {
+        annotation.qualifier = "NOT|involved_in";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validatesNotEnablesQualifier() {
+        annotation.qualifier = "NOT|enables";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validatesNotPartOfQualifier() {
+        annotation.qualifier = "NOT|part_of";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validatesNotContributesToQualifier() {
+        annotation.qualifier = "NOT|contributes_to";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validatesNotColocalizesWithQualifier() {
+        annotation.qualifier = "NOT|colocalizes_with";
         validator.validate(annotation);
     }
 
     // good with field -------------------------------------------------
     @Test
-    public void validWithMultiTerms() {
+    public void validWithMultiTermedComponent() {
         annotation.with = "GO:1234,IP:1234";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validWithMultiSingleTermedComponents() {
+        annotation.with = "GO:1234|IP:1234";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validWithMultiMultiTermedComponents() {
+        annotation.with = "GO:1234,GO:1235|GO:1236,IP:1234";
         validator.validate(annotation);
     }
 
@@ -127,7 +191,7 @@ public class AnnotationValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void invalidWithInterTermDelimiterCausesValidationException() {
-        annotation.with = "GO:1234|IP:1234";
+        annotation.with = "GO:1234\tIP:1234";
         validator.validate(annotation);
     }
 
@@ -137,29 +201,41 @@ public class AnnotationValidatorTest {
         validator.validate(annotation);
     }
 
-    // good date field -------------------------------------------------
+    // good annotation extension field -------------------------------------------------
     @Test
-    public void validDate() {
-        annotation.date = "20150122";
+    public void validSingleTermedComponentAnnotationExtension() {
+        annotation.annotationExtension = "part_of(something)";
         validator.validate(annotation);
     }
 
-    // bad date field -------------------------------------------------
+    @Test
+    public void validSingleTermedComponentsAnnotationExtension() {
+        annotation.annotationExtension = "part_of(something)|part_of(something_else)";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validMultiTermedComponentAnnotationExtension() {
+        annotation.annotationExtension = "part_of(something),part_of(something_else)";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validMultiTermedComponentsAnnotationExtension() {
+        annotation.annotationExtension = "part_of(something),part_of(something_else)|part_of(yet_another_thing)";
+        validator.validate(annotation);
+    }
+
+    // bad annotation extension field -------------------------------------------------
     @Test(expected = ValidationException.class)
-    public void invalidDateYear() {
-        annotation.date = "30150122";
+    public void invalidAnnotationExtensionNoClosingBrace() {
+        annotation.annotationExtension = "part_of(something";
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
-    public void invalidDateMonth() {
-        annotation.date = "20153122";
-        validator.validate(annotation);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void invalidDateDate() {
-        annotation.date = "20150142";
+    public void invalidAnnotationExtensionNoStartBrace() {
+        annotation.annotationExtension = "part_ofsomething)";
         validator.validate(annotation);
     }
 

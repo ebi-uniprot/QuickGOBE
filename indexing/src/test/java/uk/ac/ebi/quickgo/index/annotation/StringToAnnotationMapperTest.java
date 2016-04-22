@@ -115,10 +115,9 @@ public class StringToAnnotationMapperTest {
         assertThat(annotation.qualifier, is(trim(tokens[COLUMN_QUALIFIER.getPosition()])));
         assertThat(annotation.goId, is(trim(tokens[COLUMN_GO_ID.getPosition()])));
         assertThat(annotation.dbReferences, is(trim(tokens[COLUMN_DB_REFERENCES.getPosition()])));
-        assertThat(annotation.eco, is(trim(tokens[COLUMN_ECO.getPosition()])));
+        assertThat(annotation.ecoId, is(trim(tokens[COLUMN_ECO.getPosition()])));
         assertThat(annotation.with, is(trim(tokens[COLUMN_WITH.getPosition()])));
         assertThat(annotation.interactingTaxonId, is(trim(tokens[COLUMN_INTERACTING_TAXON_ID.getPosition()])));
-        assertThat(annotation.date, is(trim(tokens[COLUMN_DATE.getPosition()])));
         assertThat(annotation.assignedBy, is(trim(tokens[COLUMN_ASSIGNED_BY.getPosition()])));
         assertThat(annotation.annotationExtension, is(trim(tokens[COLUMN_ANNOTATION_EXTENSION.getPosition()])));
         assertThat(annotation.annotationProperties, is(trim(tokens[COLUMN_ANNOTATION_PROPERTIES.getPosition()])));

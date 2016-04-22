@@ -39,7 +39,7 @@ public class AnnotationDocumentConverterTest {
         annotation.dbReferences = "PMID:12871976";
         annotation.qualifier = "enables";
         annotation.goId = "GO:0000977";
-        annotation.eco = "ECO:0000353";
+        annotation.ecoId = "ECO:0000353";
         //        annotation.with = "GO:0036376,GO:1990573";
         annotation.interactingTaxonId = "taxon:12345";
         //        annotation.date = "20150122";
@@ -51,9 +51,9 @@ public class AnnotationDocumentConverterTest {
 
         assertThat(doc.geneProductId, is(constructGeneProductId(annotation)));
         assertThat(doc.goId, is(annotation.goId));
-        assertThat(doc.ecoId, is(annotation.eco));
+        assertThat(doc.ecoId, is(annotation.ecoId));
         assertThat(doc.assignedBy, is(annotation.assignedBy));
-        assertThat(doc.extension, is(annotation.annotationExtension));
+//        assertThat(doc.extension, is(annotation.annotationExtension));
         assertThat(doc.qualifier, is(annotation.qualifier));
         assertThat(doc.reference, is(annotation.dbReferences));
     }

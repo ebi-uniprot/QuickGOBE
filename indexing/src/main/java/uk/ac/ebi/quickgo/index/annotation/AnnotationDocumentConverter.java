@@ -40,10 +40,14 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
         doc.withFrom = constructWithFrom(annotation);
         doc.taxonId = annotation.interactingTaxonId;
         doc.assignedBy = annotation.assignedBy;
-        doc.extension = annotation.annotationExtension;
-        doc.ecoId = annotation.eco;
+        doc.ecoId = annotation.ecoId;
+        doc.extensions = constructExtensions(annotation);
 
         return doc;
+    }
+
+    private List<String> constructExtensions(Annotation annotation) {
+        return annotation.annotationExtension == null ? null : Arrays.asList(annotation.annotationExtension.split(PIPE));
     }
 
     private List<String> constructWithFrom(Annotation annotation) {
