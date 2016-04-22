@@ -133,7 +133,7 @@ public class AnnotationValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void invalidWithLeftPartCausesValidationException() {
-        annotation.with = "asdf:asdfsdf";
+        annotation.with = "asdf+:asdfsdf";
         validator.validate(annotation);
     }
 
