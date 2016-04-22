@@ -28,7 +28,10 @@ public class AnnotationDocMocker {
         doc.withFrom = Arrays.asList("InterPro:IPR015421", "InterPro:IPR015422");
         doc.taxonId = "35758";
         doc.assignedBy = "InterPro";
-        doc.extension = "results_in_development_of(UBERON:0001675),acts_on_population_of(CL:0000032)";
+        doc.extensions = Arrays.asList(
+                "results_in_development_of(UBERON:0001675),acts_on_population_of(CL:0000032)",
+                "results_in_development_of(UBERON:0006000)"
+        );
 
         return doc;
     }

@@ -44,7 +44,7 @@ public class AnnotationDocument implements QuickGODocument {
     public String assignedBy;
 
     @Field(AnnotationFields.EXTENSION)
-    public String extension;
+    public List<String> extensions;
 
     @Override public String getUniqueName() {
         return id;
