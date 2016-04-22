@@ -14,28 +14,27 @@ public class Annotation {
     String qualifier;
     String goId;
     String dbReferences;
-    String eco;
+    String ecoId;
     String with;
     String interactingTaxonId;
-    String date;
     String assignedBy;
     String annotationExtension;
     String annotationProperties;
 
-    @Override public int hashCode() {
-        int result = db != null ? db.hashCode() : 0;
-        result = 31 * result + (dbObjectId != null ? dbObjectId.hashCode() : 0);
-        result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
-        result = 31 * result + (goId != null ? goId.hashCode() : 0);
-        result = 31 * result + (dbReferences != null ? dbReferences.hashCode() : 0);
-        result = 31 * result + (eco != null ? eco.hashCode() : 0);
-        result = 31 * result + (with != null ? with.hashCode() : 0);
-        result = 31 * result + (interactingTaxonId != null ? interactingTaxonId.hashCode() : 0);
-        result = 31 * result + (date != null ? date.hashCode() : 0);
-        result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
-        result = 31 * result + (annotationExtension != null ? annotationExtension.hashCode() : 0);
-        result = 31 * result + (annotationProperties != null ? annotationProperties.hashCode() : 0);
-        return result;
+    @Override public String toString() {
+        return "Annotation{" +
+                "db='" + db + '\'' +
+                ", dbObjectId='" + dbObjectId + '\'' +
+                ", qualifier='" + qualifier + '\'' +
+                ", goId='" + goId + '\'' +
+                ", dbReferences='" + dbReferences + '\'' +
+                ", ecoId='" + ecoId + '\'' +
+                ", with='" + with + '\'' +
+                ", interactingTaxonId='" + interactingTaxonId + '\'' +
+                ", assignedBy='" + assignedBy + '\'' +
+                ", annotationExtension='" + annotationExtension + '\'' +
+                ", annotationProperties='" + annotationProperties + '\'' +
+                '}';
     }
 
     @Override public boolean equals(Object o) {
@@ -63,7 +62,7 @@ public class Annotation {
         if (dbReferences != null ? !dbReferences.equals(that.dbReferences) : that.dbReferences != null) {
             return false;
         }
-        if (eco != null ? !eco.equals(that.eco) : that.eco != null) {
+        if (ecoId != null ? !ecoId.equals(that.ecoId) : that.ecoId != null) {
             return false;
         }
         if (with != null ? !with.equals(that.with) : that.with != null) {
@@ -71,9 +70,6 @@ public class Annotation {
         }
         if (interactingTaxonId != null ? !interactingTaxonId.equals(that.interactingTaxonId) :
                 that.interactingTaxonId != null) {
-            return false;
-        }
-        if (date != null ? !date.equals(that.date) : that.date != null) {
             return false;
         }
         if (assignedBy != null ? !assignedBy.equals(that.assignedBy) : that.assignedBy != null) {
@@ -88,20 +84,19 @@ public class Annotation {
 
     }
 
-    @Override public String toString() {
-        return "Annotation{" +
-                "db='" + db + '\'' +
-                ", dbObjectId='" + dbObjectId + '\'' +
-                ", qualifier='" + qualifier + '\'' +
-                ", goId='" + goId + '\'' +
-                ", dbReferences='" + dbReferences + '\'' +
-                ", eco='" + eco + '\'' +
-                ", with='" + with + '\'' +
-                ", interactingTaxonId='" + interactingTaxonId + '\'' +
-                ", date='" + date + '\'' +
-                ", assignedBy='" + assignedBy + '\'' +
-                ", annotationExtension='" + annotationExtension + '\'' +
-                ", annotationProperties='" + annotationProperties + '\'' +
-                '}';
+    @Override public int hashCode() {
+        int result = db != null ? db.hashCode() : 0;
+        result = 31 * result + (dbObjectId != null ? dbObjectId.hashCode() : 0);
+        result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
+        result = 31 * result + (goId != null ? goId.hashCode() : 0);
+        result = 31 * result + (dbReferences != null ? dbReferences.hashCode() : 0);
+        result = 31 * result + (ecoId != null ? ecoId.hashCode() : 0);
+        result = 31 * result + (with != null ? with.hashCode() : 0);
+        result = 31 * result + (interactingTaxonId != null ? interactingTaxonId.hashCode() : 0);
+        result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
+        result = 31 * result + (annotationExtension != null ? annotationExtension.hashCode() : 0);
+        result = 31 * result + (annotationProperties != null ? annotationProperties.hashCode() : 0);
+        return result;
     }
+
 }
