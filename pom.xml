@@ -14,6 +14,15 @@
 
     <profiles>
         <profile>
+            <id>solr-plugins</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>solr-plugin</module>
+            </modules>
+        </profile>
+        <profile>
             <id>all</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -29,7 +38,6 @@
                 <module>indexing</module>
                 <module>sources</module>
                 <module>rest-common</module>
-                <module>solr-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -41,7 +49,6 @@
                 <module>geneproduct-common</module>
                 <module>annotation-common</module>
                 <module>indexing</module>
-                <module>solr-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -51,7 +58,6 @@
                 <module>ontology-common</module>
                 <module>rest-common</module>
                 <module>ontology-rest</module>
-                <module>solr-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -61,7 +67,6 @@
                 <module>ontology-common</module>
                 <module>rest-common</module>
                 <module>quickgo-client</module>
-                <module>solr-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -71,7 +76,6 @@
                 <module>ontology-common</module>
                 <module>rest-common</module>
                 <module>geneproduct-rest</module>
-                <module>solr-plugin</module>
             </modules>
         </profile>
     </profiles>
