@@ -71,7 +71,7 @@ public class ServiceConfig {
         GeneProductDbXrefIDFormats
                 dbXrefEntities = GeneProductDbXrefIDFormats.createWithData(geneProductLoader().load(), DEFAULT_DB,
                 DEFAULT_TYPE_NAME);
-        return id -> dbXrefEntities.isValidId(id);	}
+        return dbXrefEntities::isValidId;	}
 
     private DbXrefLoader geneProductLoader() {
         return new DbXrefLoader(this.sourceFileDirectory);
