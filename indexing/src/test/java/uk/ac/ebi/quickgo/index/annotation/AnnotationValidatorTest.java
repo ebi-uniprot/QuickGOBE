@@ -6,14 +6,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.validator.ValidationException;
 
+import static uk.ac.ebi.quickgo.index.annotation.AnnotationMocker.createValidAnnotation;
+
 /**
  * Created 21/04/16
  * @author Edd
  */
 public class AnnotationValidatorTest {
 
-    private static final String QUALIFIER_CONTRIBUTES_TO = "contributes_to";
-    private static final String QUALIFIER_COLOCALIZES_WITH = "colocalizes_with";
     private static final String GOOD_QUALIFIER_LIST = "NOT|involved_in|enables|part_of|contributes_to|colocalizes_with";
     private static final String GOOD_QUALIFIER = "involved_in";
     private AnnotationValidator validator;
@@ -137,28 +137,36 @@ public class AnnotationValidatorTest {
         validator.validate(annotation);
     }
 
+    // good date field -------------------------------------------------
+    @Test
+    public void validDate() {
+        annotation.date = "20150122";
+        validator.validate(annotation);
+    }
+
+    // bad date field -------------------------------------------------
+    @Test(expected = ValidationException.class)
+    public void invalidDateYear() {
+        annotation.date = "30150122";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidDateMonth() {
+        annotation.date = "20153122";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidDateDate() {
+        annotation.date = "20150142";
+        validator.validate(annotation);
+    }
+
     // valid annotation conversion -------------------------------------------------
     @Test
     public void createsValidAnnotationWithMandatoryFields() {
         validator.validate(createValidAnnotation());
-    }
-
-    private Annotation createValidAnnotation() {
-        Annotation annotation = new Annotation();
-        annotation.db = "IntAct";
-        annotation.dbObjectId = "EBI-10043081";
-        annotation.dbReferences = "PMID:12871976";
-        annotation.qualifier = "enables";
-        annotation.goId = "GO:0000977";
-        annotation.eco = "ECO:0000353";
-        annotation.with = "GO:0036376,GO:1990573";
-        annotation.interactingTaxonId = null;
-        annotation.date = "20150122";
-        annotation.assignedBy = "IntAct";
-        annotation.annotationExtension = "occurs_in(CL:1000428)";
-        annotation.annotationProperties = "go_evidence=IPI";
-
-        return annotation;
     }
 
 }

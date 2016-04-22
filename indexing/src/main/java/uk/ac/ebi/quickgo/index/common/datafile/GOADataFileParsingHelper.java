@@ -13,6 +13,7 @@ import java.util.Map;
 public class GOADataFileParsingHelper {
     public static final String TAB = "\t";
     public static final String PIPE = "\\|";
+    public static final String COMMA = ",";
     public static final String EQUALS = "=";
     public static final String COLON = ":";
 

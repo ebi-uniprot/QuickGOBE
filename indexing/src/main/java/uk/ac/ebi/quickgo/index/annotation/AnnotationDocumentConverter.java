@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.batch.item.ItemProcessor;
 
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.COLON;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.COMMA;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.EQUALS;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.PIPE;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
@@ -46,7 +47,7 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
     }
 
     private List<String> constructWithFrom(Annotation annotation) {
-        return annotation.with == null? null : Arrays.asList(annotation.with.split(PIPE));
+        return annotation.with == null? null : Arrays.asList(annotation.with.split(COMMA));
     }
 
     private String constructGeneProductId(Annotation annotation) {
