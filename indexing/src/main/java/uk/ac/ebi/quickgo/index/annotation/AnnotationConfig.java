@@ -8,7 +8,8 @@ import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
@@ -49,8 +50,8 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.T
 @EnableBatchProcessing
 @Import({AnnotationRepoConfig.class})
 public class AnnotationConfig {
-    private static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
-    private static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
+    static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
+    static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
 
     @Value("${indexing.annotation.source}")
     private Resource[] resources;
@@ -90,7 +91,7 @@ public class AnnotationConfig {
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
                 .<Annotation>reader(annotationMultiFileReader())
-                .processor(annotationCompositeProcessor(annotationValidator(), annotationDocConverter()))
+                .processor(annotationCompositeProcessor())
                 .writer(annotationRepositoryWriter())
                 .listener(logStepListener())
                 .listener(skipLogListener())
@@ -145,10 +146,13 @@ public class AnnotationConfig {
     }
 
     @Bean
-    ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor(ItemProcessor<Annotation, ?>...
-            processors) {
+    ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor() {
+        List<ItemProcessor<Annotation, ?>> processors = new ArrayList<>();
+        processors.add(annotationValidator());
+        processors.add(annotationDocConverter());
+
         CompositeItemProcessor<Annotation, AnnotationDocument> compositeProcessor = new CompositeItemProcessor<>();
-        compositeProcessor.setDelegates(Arrays.asList(processors));
+        compositeProcessor.setDelegates(processors);
 
         return compositeProcessor;
     }
