@@ -3,9 +3,13 @@ package uk.ac.ebi.quickgo.geneproduct.loader;
 import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXrefIDFormat;
 
+import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -23,29 +27,35 @@ import static java.util.stream.Collectors.toMap;
  */
 public class DbXrefLoader {
 
+    private Logger logger = LoggerFactory.getLogger(DbXrefLoader.class);
+
     private static final int COL_DATABASE = 0;
     private static final int COL_ENTITY_TYPE = 1;
     private static final int COL_ENTITY_TYPE_NAME = 2;
     private static final int COL_LOCAL_ID_SYNTAX = 3;
     private static final int COL_URL_SYNTAX = 4;
+    private static final String COL_DELIMITER = "\t";
+    private String path;
 
-    private static final String FILE_NAME = "DB_XREFS_ENTITIES.dat.gz";
-    public static final String COL_DELIMITER = "\t";
-    private String directory;
-
-    public DbXrefLoader(String srcDirectory) {
-        this.directory = srcDirectory;
+    public DbXrefLoader(String path) {
+        this.path = path;
     }
 
     /**
      * Read the specified file and save it to a list of GeneProductDbXrefIDFormat instances.
+     *
+     * If the file cannot be loaded supply the client with an empty list, as we will continue without
+     * validation, rather than end the process.
      * @return
      */
     public List<GeneProductDbXrefIDFormat> load() {
 
         try {
 
-            Path path = FileSystems.getDefault().getPath(this.directory, FILE_NAME);
+            Path path = FileSystems.getDefault().getPath(this.path);
+
+            File here = new File("./");
+            System.out.println("Path : " + here.getAbsolutePath());
 
             return GZIPFiles.lines(path)
                     .skip(1)    //header
@@ -55,7 +65,9 @@ public class DbXrefLoader {
                     .collect(toList());
 
         } catch (Exception e) {
-            throw new IllegalStateException("Tried to createWithData DB Xref Entities file but failed", e);
+            logger.error("Failed to load " + this.path, e);
+
+            return new ArrayList<>();
         }
 
     }
