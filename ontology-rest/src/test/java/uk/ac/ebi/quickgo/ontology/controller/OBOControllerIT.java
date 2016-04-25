@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -52,7 +53,7 @@ public abstract class OBOControllerIT {
     private static final String TERMS_ENDPOINT = "terms";
 
     private static final String QUERY_PARAM = "query";
-    protected static final String COMMA = ",";
+    static final String COMMA = ",";
     private static final String PAGE_PARAM = "page";
 
     @Autowired
@@ -60,8 +61,10 @@ public abstract class OBOControllerIT {
 
     @Autowired
     protected OntologyRepository ontologyRepository;
+    @Autowired
+    private SolrTemplate ontologyTemplate;
 
-    MockMvc mockMvc;
+    protected MockMvc mockMvc;
 
     private String resourceUrl;
     private String validId;
@@ -84,6 +87,7 @@ public abstract class OBOControllerIT {
         validIdsCSV = basicDocs.stream().map(doc -> doc.id).collect(Collectors.joining(","));
         validIdList = Arrays.asList(validIdsCSV.split(COMMA));
 
+//        ontologyTemplate.saveBeans(basicDocs);
         ontologyRepository.save(basicDocs);
     }
 
@@ -424,6 +428,7 @@ public abstract class OBOControllerIT {
     protected String buildTermsURL() {
         return getResourceURL() + "/" + TERMS_ENDPOINT;
     }
+
     protected String buildTermsURL(String id) {
         return getResourceURL() + "/" + TERMS_ENDPOINT + "/" + id;
     }
@@ -458,12 +463,8 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "annotationGuidelines").exists())
                 .andExpect(jsonPath(path + "taxonConstraints").exists())
                 .andExpect(jsonPath(path + "consider").exists())
-                    .andExpect(jsonPath(path + "subsets").exists())
+                .andExpect(jsonPath(path + "subsets").exists())
                 .andExpect(jsonPath(path + "replacedBy").exists());
-    }
-
-    protected ResultActions expectBasicFields(ResultActions result, String id) throws Exception {
-        return expectBasicFields(result, id, "$.");
     }
 
     protected abstract String idMissingInRepository();

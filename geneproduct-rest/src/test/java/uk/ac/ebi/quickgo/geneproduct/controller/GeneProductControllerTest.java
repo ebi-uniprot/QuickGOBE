@@ -2,6 +2,10 @@ package uk.ac.ebi.quickgo.geneproduct.controller;
 
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
+import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.List;
@@ -44,8 +48,16 @@ public class GeneProductControllerTest {
     @Mock
     private GeneProduct geneProduct3;
 
+    @Mock
+    private SearchService<GeneProduct> geneProductSearchService;
     private static final String SINGLE_CSV = "A0A000";
     private static final List<String> SINGLE_CSV_LIST = singletonList("A0A000");
+
+    @Mock
+    private SearchableField geneProductSearchableField;
+
+    @Mock
+    private SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig;
 
     private static final String MULTI_CSV = "A0A000,A0A001,A0A002";
     private static final List<String> MULTI_CSV_LIST = asList("A0A000", "A0A001", "A0A002");
@@ -54,7 +66,11 @@ public class GeneProductControllerTest {
 
     @Before
     public void setUp() {
-        this.controller = new GeneProductController(geneProductService);
+        this.controller = new GeneProductController(
+                geneProductService,
+                geneProductSearchService,
+                geneProductSearchableField,
+                geneProductRetrievalConfig);
 
         //Lookup for single Id
         final List<GeneProduct> singleGP = singletonList(geneProduct);
@@ -67,7 +83,7 @@ public class GeneProductControllerTest {
         // too big CSV
         String delim = "";
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < 101; i++) {
+        for(int i = 0; i < ControllerValidationHelperImpl.MAX_PAGE_RESULTS + 1; i++) {
             sb.append(delim).append("A0A").append(i);
             delim = ",";
         }

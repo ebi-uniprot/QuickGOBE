@@ -13,7 +13,9 @@
 
     <artifactId>ontology-common</artifactId>
     <name>Ontology Common components</name>
-    <description>Contains a set of classes that are used by both the web-services and indexing services</description>
+    <description>
+        Contains a set of ontology related classes that are used by both the web-services and indexing services
+    </description>
     <packaging>jar</packaging>
 
     <dependencies>

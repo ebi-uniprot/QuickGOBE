@@ -16,7 +16,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class ControllerValidationHelperImpl implements ControllerValidationHelper {
 
     private static final Logger LOGGER = getLogger(ControllerValidationHelperImpl.class);
-    static final int MAX_PAGE_RESULTS = 100;
+    public static final int MAX_PAGE_RESULTS = 100;
 
     private static final String COMMA = ",";
     private final Predicate<String> validIdCondition;
