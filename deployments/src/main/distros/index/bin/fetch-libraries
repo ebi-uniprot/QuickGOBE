@@ -43,7 +43,7 @@ cd "$QUICKGO_REPO_DIR"
 git fetch
 git checkout "$QUICKGO_BRANCH"
 git pull
-mvn -U -DskipTests -P indexing package
+mvn -U -DskipTests -P indexing,solr-plugins package
 
 #copy QuickGO jar
 mkdir -p "$lib_dir"
