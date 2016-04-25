@@ -42,7 +42,7 @@ public class GeneProductDocument implements QuickGODocument {
     @Field(GeneProductFields.COMPLETE_PROTEOME)
     public boolean isCompleteProteome;
 
-    @Field(GeneProductFields.REFERENCE_POTEOME)
+    @Field(GeneProductFields.REFERENCE_PROTEOME)
     public String referenceProteome;
 
     @Field(GeneProductFields.IS_ISOFORM)

@@ -19,13 +19,14 @@ import org.apache.solr.common.SolrDocumentList;
  * @author Ricardo Antunes
  */
 public abstract class AbstractSolrQueryResultConverter<T> implements QueryResultConverter<T, QueryResponse> {
-    private final QueryResultHighlightingConverter queryResultHighlightingConverter;
+    private final QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>>
+            queryResultHighlightingConverter;
 
     public AbstractSolrQueryResultConverter() {
         queryResultHighlightingConverter = null;
     }
 
-    public AbstractSolrQueryResultConverter(QueryResultHighlightingConverter queryResultHighlightingConverter){
+    public AbstractSolrQueryResultConverter(QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>> queryResultHighlightingConverter){
         Preconditions.checkArgument(queryResultHighlightingConverter != null, "Field map converter cannot be null");
 
         this.queryResultHighlightingConverter = queryResultHighlightingConverter;

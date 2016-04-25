@@ -13,7 +13,7 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
 
 /**
  * Defines the conversion of a {@link String} representing black list information, to a
- * corresponding {@link uk.ac.ebi.quickgo.service.model.ontology.GOTerm.BlacklistItem} instance.
+ * corresponding {@link uk.ac.ebi.quickgo.ontology.model.GOTerm.BlacklistItem} instance.
  * <p>
  * A {@link String} representation is of the form:
  * <ul>
