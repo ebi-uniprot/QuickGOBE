@@ -165,6 +165,19 @@ public class AnnotationValidatorTest {
     }
 
     @Test
+    public void validRNACentralMultiTermedComponent() {
+        annotation.with = "RNAcentral:URS00001989EA_10090,RNAcentral:URS00004AD914_10090," +
+                "RNAcentral:URS00004BCD9C_10090,RNAcentral:URS00005B3525_10090";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validWithNotSupplied() {
+        annotation.with = "With:Not_supplied";
+        validator.validate(annotation);
+    }
+
+    @Test
     public void validWithMultiSingleTermedComponents() {
         annotation.with = "GO:1234|IP:1234";
         validator.validate(annotation);
@@ -178,7 +191,13 @@ public class AnnotationValidatorTest {
 
     @Test
     public void validWithSingleTerm() {
-        annotation.with = "GO:1234";
+        annotation.with = "GO:1234-34";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validWithSingleTermEC() {
+        annotation.with = "EC:3.1.21.3";
         validator.validate(annotation);
     }
 

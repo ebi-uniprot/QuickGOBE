@@ -29,13 +29,13 @@ public class AnnotationValidator implements Validator<Annotation> {
     // e.g., a,b,c|d,e
     private static final String PIPE_SEPARATED_CSVs = "(%s(,%s)*)(\\|(%s(,%s)*))*";
     private static final String KEY_EQUALS_VALUE = ".*=.*";
-    private static final String DB_COLON_REF = "[A-Za-z_]+:[a-zA-Z0-9]+";
+    private static final String DB_COLON_REF = "[A-Za-z0-9_\\.-]+(:[A-Za-z0-9_\\.-]+){1,}";
     private static final String QUALIFIERS =
             "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$";
     private static final String WORD_LBRACE_WORD_RBRACE = "[a-zA-Z0-9_]+\\([a-zA-Z0-9_:-]+\\)";
 
     private static final Pattern WITH_REGEX = Pattern.compile(String.format(
-            PIPE_SEPARATED_CSVs,
+            "(" + PIPE_SEPARATED_CSVs + ")|(With:Not_Supplied)",
             DB_COLON_REF, DB_COLON_REF, DB_COLON_REF, DB_COLON_REF));
 
     private static final Pattern QUALIFIER_REGEX = Pattern.compile(QUALIFIERS);
@@ -75,7 +75,7 @@ public class AnnotationValidator implements Validator<Annotation> {
         if (!Strings.isNullOrEmpty(annotation.with) &&
                 !ANNOTATION_PROPERTIES_REGEX.matcher(annotation.annotationProperties).matches()) {
             handlePatternMismatchError(
-                    "Annotation Extension",
+                    "Annotation Properties",
                     annotation.annotationExtension,
                     ANNOTATION_PROPERTIES_REGEX.pattern(),
                     annotation);
