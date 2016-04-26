@@ -1,17 +1,18 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  *
@@ -30,7 +31,7 @@ import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
 public class ServiceConfig {
 
 	@Bean
-	public GeneProductService goGeneProductService(GeneProductRepository geneProductRepository) {
+	public GeneProductService geneProductService(GeneProductRepository geneProductRepository) {
 		return new GeneProductServiceImpl(
 				serviceHelper(),
 				geneProductRepository,

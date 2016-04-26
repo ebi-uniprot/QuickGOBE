@@ -5,16 +5,11 @@ import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
-import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -90,11 +85,10 @@ public class GeneProductConfig {
                 .skipLimit(skipLimit)
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
+                .listener(skipLogListener())
                 .<GeneProduct>reader(geneProductMultiFileReader())
                 .processor(geneProductCompositeProcessor())
                 .writer(geneProductRepositoryWriter())
-                .listener(logStepListener())
-                .listener(skipLogListener())
                 .build();
     }
 
@@ -166,11 +160,7 @@ public class GeneProductConfig {
         return new LogJobListener();
     }
 
-    private StepListener logStepListener() {
-        return new LogStepListener();
-    }
-
-    private StepListener skipLogListener() {
-        return new SkipLoggerListener();
+    private SkipListener<GeneProduct, GeneProductDocument> skipLogListener() {
+        return new SkipLoggerListener<>();
     }
 }

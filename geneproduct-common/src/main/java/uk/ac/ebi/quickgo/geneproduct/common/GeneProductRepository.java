@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
-import org.springframework.data.solr.repository.Query;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
 
 import java.util.List;
-import java.util.Optional;
+import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SolrCrudRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
 
 /**
  * Gene product repository interface exposing methods for performing searches over its contents.
@@ -24,8 +23,8 @@ public interface GeneProductRepository extends SolrCrudRepository<GeneProductDoc
             fields = {GeneProductFields.ID, GeneProductFields.DATABASE, GeneProductFields.NAME, GeneProductFields.SYMBOL,
                     GeneProductFields.SYNONYM, GeneProductFields.TYPE, GeneProductFields.TAXON_ID,
                     GeneProductFields.TAXON_NAME, GeneProductFields.DATABASE_SUBSET,
-                    GeneProductFields.COMPLETE_PROTEOME, GeneProductFields.REFERENCE_POTEOME,
-                    GeneProductFields.IS_ISOFORM, GeneProductFields.IS_ANNOTATED, GeneProductFields.PARENT_ID })
+                    GeneProductFields.COMPLETE_PROTEOME, GeneProductFields.REFERENCE_PROTEOME,
+                    GeneProductFields.IS_ISOFORM, GeneProductFields.IS_ANNOTATED, GeneProductFields.PARENT_ID})
     List<GeneProductDocument> findById(List<String> ids);
 
 

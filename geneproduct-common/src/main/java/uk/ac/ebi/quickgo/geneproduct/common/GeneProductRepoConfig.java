@@ -39,7 +39,7 @@ public class GeneProductRepoConfig {
     @Bean
     @Profile("httpServer")
     public SolrServerFactory httpSolrServerFactory(@Value("${solr.host}") String solrUrl) {
-        return new MulticoreSolrServerFactory(new HttpSolrServer(solrUrl + "/" + SOLR_CORE));
+        return new MulticoreSolrServerFactory(new HttpSolrServer(solrUrl), SOLR_CORE);
     }
 
     @Bean

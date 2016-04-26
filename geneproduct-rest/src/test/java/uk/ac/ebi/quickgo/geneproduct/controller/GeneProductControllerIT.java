@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -59,6 +60,9 @@ public class GeneProductControllerIT {
     @Autowired
     private GeneProductRepository geneProductRepository;
 
+    @Autowired
+    private SolrTemplate geneProductTemplate;
+
     private MockMvc mockMvc;
 
     private String validId;
@@ -78,6 +82,7 @@ public class GeneProductControllerIT {
         validIdsCSV = basicDocs.stream().map(doc -> doc.id).collect(Collectors.joining(","));
         validIdList = Arrays.asList(validIdsCSV.split(COMMA));
 
+//        geneProductTemplate.saveBeans(basicDocs);
         geneProductRepository.save(basicDocs);
     }
 
