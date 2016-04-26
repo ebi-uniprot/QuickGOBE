@@ -24,23 +24,32 @@ public class AnnotationValidator implements Validator<Annotation> {
 
     private static final Logger LOGGER = getLogger(AnnotationValidator.class);
 
-    // E.g., a,b,c|d,e
-    private static final String PIPE_SEPARATED_COMMA_DELIMITED_VALUES = "(%s(,%s)*)(\\|(%s(,%s)*))*";
-    private static final String DB_COLON_REF = "[A-Za-z]+:[a-zA-Z0-9]+";
-    private static final String KEY_EQUALS_VALUE = ".*=.*";
-    private static final String ANYTHING = "[a-zA-Z0-9_]+\\([a-zA-Z0-9_:-]+\\)";
+    // regular expressions used to validate field values -----------------------------------------------
 
-    private static final Pattern WITH_FORMAT =
-            Pattern.compile(String.format(PIPE_SEPARATED_COMMA_DELIMITED_VALUES,
-                    DB_COLON_REF, DB_COLON_REF, DB_COLON_REF, DB_COLON_REF));
-    private static final Pattern QUALIFIER_FORMAT = Pattern.compile(
-            "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$");
-    private static final Pattern ANNOTATION_EXTENSION_FORMAT =
-            Pattern.compile(String.format(PIPE_SEPARATED_COMMA_DELIMITED_VALUES,
-                    ANYTHING, ANYTHING, ANYTHING, ANYTHING));
-    private static final Pattern ANNOTATION_PROPERTIES_FORMAT =
-            Pattern.compile(String.format(PIPE_SEPARATED_COMMA_DELIMITED_VALUES,
-                    KEY_EQUALS_VALUE, KEY_EQUALS_VALUE, KEY_EQUALS_VALUE, KEY_EQUALS_VALUE));
+    // e.g., a,b,c|d,e
+    private static final String PIPE_SEPARATED_CSVs = "(%s(,%s)*)(\\|(%s(,%s)*))*";
+    private static final String KEY_EQUALS_VALUE = ".*=.*";
+    private static final String DB_COLON_REF = "[A-Za-z_]+:[a-zA-Z0-9]+";
+    private static final String QUALIFIERS =
+            "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$";
+    private static final String WORD_LBRACE_WORD_RBRACE = "[a-zA-Z0-9_]+\\([a-zA-Z0-9_:-]+\\)";
+
+    private static final Pattern WITH_REGEX = Pattern.compile(String.format(
+            PIPE_SEPARATED_CSVs,
+            DB_COLON_REF, DB_COLON_REF, DB_COLON_REF, DB_COLON_REF));
+
+    private static final Pattern QUALIFIER_REGEX = Pattern.compile(QUALIFIERS);
+
+    private static final Pattern ANNOTATION_EXTENSION_REGEX = Pattern.compile(String.format(
+            PIPE_SEPARATED_CSVs,
+            WORD_LBRACE_WORD_RBRACE, WORD_LBRACE_WORD_RBRACE,
+            WORD_LBRACE_WORD_RBRACE, WORD_LBRACE_WORD_RBRACE));
+
+    private static final Pattern ANNOTATION_PROPERTIES_REGEX = Pattern.compile(String.format(
+            PIPE_SEPARATED_CSVs,
+            KEY_EQUALS_VALUE, KEY_EQUALS_VALUE, KEY_EQUALS_VALUE, KEY_EQUALS_VALUE));
+
+    // end of regular expressions -----------------------------------------------
 
     @Override public void validate(Annotation annotation) throws ValidationException {
         if (annotation == null) {
@@ -64,51 +73,51 @@ public class AnnotationValidator implements Validator<Annotation> {
 
     private void checkProperties(Annotation annotation) {
         if (!Strings.isNullOrEmpty(annotation.with) &&
-                !ANNOTATION_PROPERTIES_FORMAT.matcher(annotation.annotationProperties).matches()) {
+                !ANNOTATION_PROPERTIES_REGEX.matcher(annotation.annotationProperties).matches()) {
             handlePatternMismatchError(
                     "Annotation Extension",
                     annotation.annotationExtension,
-                    ANNOTATION_PROPERTIES_FORMAT.pattern(),
+                    ANNOTATION_PROPERTIES_REGEX.pattern(),
                     annotation);
         }
     }
 
     private void checkExtensions(Annotation annotation) {
         if (!Strings.isNullOrEmpty(annotation.annotationExtension) &&
-                !ANNOTATION_EXTENSION_FORMAT.matcher(annotation.annotationExtension).matches()) {
+                !ANNOTATION_EXTENSION_REGEX.matcher(annotation.annotationExtension).matches()) {
             handlePatternMismatchError(
                     "Annotation Extension",
                     annotation.annotationExtension,
-                    ANNOTATION_EXTENSION_FORMAT.pattern(),
+                    ANNOTATION_EXTENSION_REGEX.pattern(),
                     annotation);
         }
     }
 
     private void checkQualifier(Annotation annotation) {
         checkIsNullOrEmpty(annotation.qualifier, COLUMN_QUALIFIER.getName());
-        if (!QUALIFIER_FORMAT.matcher(annotation.qualifier).matches()) {
+        if (!QUALIFIER_REGEX.matcher(annotation.qualifier).matches()) {
             handlePatternMismatchError(
                     "Qualifier",
                     annotation.qualifier,
-                    QUALIFIER_FORMAT.pattern(),
+                    QUALIFIER_REGEX.pattern(),
                     annotation);
         }
     }
 
     private void checkWith(Annotation annotation) {
-        if (!Strings.isNullOrEmpty(annotation.with) && !WITH_FORMAT.matcher(annotation.with).matches()) {
+        if (!Strings.isNullOrEmpty(annotation.with) && !WITH_REGEX.matcher(annotation.with).matches()) {
             handlePatternMismatchError(
                     "With",
                     annotation.with,
-                    WITH_FORMAT.pattern(),
+                    WITH_REGEX.pattern(),
                     annotation);
         }
     }
 
     private void handlePatternMismatchError(String fieldName, Object fieldValue, String pattern, Object rawObject) {
-        String errorMessage = fieldName + " field, '" + fieldValue +
-                "' does not match: " + pattern +
-                " -- see: " + rawObject.toString();
+        String errorMessage = String.format(
+                "%s field, %s does not match: %s. See, %s",
+                fieldName, fieldValue, pattern, rawObject.toString());
         LOGGER.error(errorMessage);
         throw new ValidationException(errorMessage);
     }
