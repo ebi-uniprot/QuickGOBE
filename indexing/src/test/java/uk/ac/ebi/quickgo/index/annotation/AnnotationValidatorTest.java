@@ -228,6 +228,12 @@ public class AnnotationValidatorTest {
     }
 
     @Test
+    public void validSingleTermedComponentAnnotationExtensionHasInput() {
+        annotation.annotationExtension = "has_input(PomBase:SPCC1183.12)";
+        validator.validate(annotation);
+    }
+
+    @Test
     public void validSingleTermedComponentsAnnotationExtension() {
         annotation.annotationExtension = "part_of(something)|part_of(something_else)";
         validator.validate(annotation);

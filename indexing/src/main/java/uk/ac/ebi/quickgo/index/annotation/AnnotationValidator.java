@@ -32,7 +32,7 @@ public class AnnotationValidator implements Validator<Annotation> {
     private static final String DB_COLON_REF = "[A-Za-z0-9_\\.-]+(:[A-Za-z0-9_\\.-]+){1,}";
     private static final String QUALIFIERS =
             "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$";
-    private static final String WORD_LBRACE_WORD_RBRACE = "[a-zA-Z0-9_]+\\([a-zA-Z0-9_:-]+\\)";
+    private static final String WORD_LBRACE_WORD_RBRACE = "[a-zA-Z0-9_-]+\\([a-zA-Z0-9_:\\.-]+\\)";
 
     private static final Pattern WITH_REGEX = Pattern.compile(String.format(
             "(" + PIPE_SEPARATED_CSVs + ")|(With:Not_Supplied)",
