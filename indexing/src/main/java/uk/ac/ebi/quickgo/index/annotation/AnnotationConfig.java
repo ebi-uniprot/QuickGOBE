@@ -3,17 +3,17 @@ package uk.ac.ebi.quickgo.index.annotation;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
-import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
+import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
+import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
+import org.springframework.data.solr.core.SolrTemplate;
 
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.TAB;
 
@@ -69,6 +70,9 @@ public class AnnotationConfig {
     private AnnotationRepository annotationRepository;
 
     @Autowired
+    private SolrTemplate annotationTemplate;
+
+    @Autowired
     private JobBuilderFactory jobBuilders;
 
     @Autowired
@@ -79,6 +83,15 @@ public class AnnotationConfig {
         return jobBuilders.get(ANNOTATION_INDEXING_JOB_NAME)
                 .start(annotationIndexingStep())
                 .listener(logJobListener())
+                .listener(new JobExecutionListener() {
+                    @Override public void beforeJob(JobExecution jobExecution) {
+
+                    }
+
+                    @Override public void afterJob(JobExecution jobExecution) {
+                        annotationTemplate.commit();
+                    }
+                })
                 .build();
     }
 
@@ -92,10 +105,27 @@ public class AnnotationConfig {
                 .skip(ValidationException.class)
                 .<Annotation>reader(annotationMultiFileReader())
                 .processor(annotationCompositeProcessor())
-                .writer(annotationRepositoryWriter())
+                .writer(annotationSolrServerWriter())
                 .listener(logStepListener())
+                .listener(logWriteRateListener())
                 .listener(skipLogListener())
                 .build();
+    }
+
+    private ItemWriteListener<QuickGODocument> logWriteRateListener() {
+        return new ItemRateWriterListener<>(Instant.now());
+    }
+
+    private JobExecutionListener logJobListener() {
+        return new LogJobListener();
+    }
+
+    private StepListener logStepListener() {
+        return new LogStepListener();
+    }
+
+    private StepListener skipLogListener() {
+        return new SkipLoggerListener();
     }
 
     @Bean
@@ -158,19 +188,7 @@ public class AnnotationConfig {
     }
 
     @Bean
-    ItemWriter<AnnotationDocument> annotationRepositoryWriter() {
-        return new SolrCrudRepoWriter<>(annotationRepository);
-    }
-
-    private JobExecutionListener logJobListener() {
-        return new LogJobListener();
-    }
-
-    private StepListener logStepListener() {
-        return new LogStepListener();
-    }
-
-    private StepListener skipLogListener() {
-        return new SkipLoggerListener();
+    ItemWriter<AnnotationDocument> annotationSolrServerWriter() {
+        return new SolrServerWriter<>(annotationTemplate.getSolrServer());
     }
 }
