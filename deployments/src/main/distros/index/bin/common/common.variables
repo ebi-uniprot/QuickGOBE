@@ -111,7 +111,7 @@ MAIN_CLASS_PARAMS=
 LSF_JOB_NAME=
 
 # java class path -- include all jars for creating the indexes
-QUICKGO_SERVICE_DIR="${SOLR_CONFIG_DIR}/lib/quickgo"
+local QUICKGO_SERVICE_DIR="${SOLR_CONFIG_DIR}/lib/quickgo"
 QUICKGO_SERVICE_JAR="$QUICKGO_SERVICE_DIR/*"
 
 ## ---------------------------- GENERAL UTILITY FUNCTIONS ----------------------------
@@ -120,7 +120,7 @@ QUICKGO_SERVICE_JAR="$QUICKGO_SERVICE_DIR/*"
 # e.g., prettyEcho "<info>info message: <warn>specific message</warn></info>"
 # e.g., prettyEcho "<error>warning message</error>"
 function prettyEcho {
-    string="$1";
+    local string="$1";
     string=$(echo $string | perl -pe 's@<warn>(.*?)<\/warn>@\$(tput setaf 3)\1\$(tput sgr 0)@g');
     string=$(echo $string | perl -pe 's@<info>(.*?)<\/info>@\$(tput setaf 2)\1\$(tput sgr 0)@g');
     string=$(echo $string | perl -pe 's@<error>(.*?)<\/error>@\$(tput setaf 1)\$(tput bold)\1\$(tput sgr 0)@g');
@@ -131,8 +131,8 @@ function prettyEcho {
 
 # determines if a given server is up or down
 function serverIsUp {
-    port="8090";
-    path="";
+    local port="$http_solr_port";
+    local path="";
     if [ $# -ge 2 ]; then
         port="$2";
         if [ $# -eq 3 ]; then
@@ -149,37 +149,39 @@ function serverIsUp {
 
 # print formatted message regarding up/down status of current servers
 function printTomcatServerStatus {
-    server="$solr_vm"; # by default show the environment's tomcat status
+    local server="$solr_vm"; # by default show the environment's tomcat status
     if [ "$#" -eq 1 ]; then
         server="$1";
     fi
 
-    tomcat_addr="http://$server:8080";
-    server_status="$(serverIsUp $server)";
+    local tomcat_addr="http://$server:8080";
+    local server_status="$(serverIsUp $server)";
+
+    local server_message="<error>$server_status</error>";
     if [ "$server_status" == "UP" ]; then
             server_message="<success>$server_status</success>";
-    else
-            server_message="<error>$server_status</error>";
     fi
+
     prettyEcho "Tomcat @ $tomcat_addr is $server_message";
 }
 
 function solrServerStatus {
-    server="$solr_vm"; # by default show the environment's tomcat's solr status
+    local server="$solr_vm"; # by default show the environment's tomcat's solr status
     if [ "$#" -eq 1 ]; then
         server="$1";
     fi
 
-    solr_addr="http://$server:$http_solr_port/$http_solr_path";
+    local solr_addr="http://$server:$http_solr_port/$http_solr_path";
+
     server_status=$(serverIsUp $server $http_solr_port $http_solr_path);
 }
 
 function printSolrServerStatus {
+    local server_message="<error>$server_status</error>";
     if [ "$server_status" == "UP" ]; then
             server_message="<success>$server_status</success>";
-    else
-            server_message="<error>$server_status</error>";
     fi
+
     prettyEcho "Solr @ $solr_addr is $server_message";
 }
 
