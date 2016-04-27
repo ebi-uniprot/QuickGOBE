@@ -21,12 +21,14 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
     private static final Logger LOGGER = getLogger(SolrServerWriter.class);
-    private static final int WRITE_RATE_DOCUMENT_INTERVAL = 10000;
+    static final int WRITE_RATE_DOCUMENT_INTERVAL = 10000;
     private final Instant startOfWriting;
-    private AtomicInteger writeCount = new AtomicInteger(0);
+    private AtomicInteger totalWriteCount = new AtomicInteger(0);
+    private AtomicInteger deltaWriteCount = new AtomicInteger(0);
+    private Instant startOfDelta;
 
     public ItemRateWriterListener(Instant now) {
-        startOfWriting = now;
+        startOfWriting = startOfDelta = now;
     }
 
     @Override public void beforeWrite(List<? extends O> list) {
@@ -34,10 +36,11 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
     }
 
     @Override public void afterWrite(List<? extends O> list) {
-        writeCount.addAndGet(list.size());
+        deltaWriteCount.addAndGet(list.size());
 
-        if (writeCount.get() % WRITE_RATE_DOCUMENT_INTERVAL == 0) {
-            LOGGER.info(computeWriteRateStats(Instant.now()));
+        if (deltaWriteCount.get() >= WRITE_RATE_DOCUMENT_INTERVAL) {
+            LOGGER.info(computeWriteRateStats(Instant.now()).toString());
+            resetDelta();
         }
     }
 
@@ -49,12 +52,11 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
      * Computes the rate of items written per second, from instance creation time
      * to a specified time-point, {@code now}.
      *
-     * @param now the time-point upper bound of the time points for which to compute the rate
+     * @param duration the duration for which the rate should be computed
      * @param writeCount the number of items written
      * @return a floating point number representing the rate of writing
      */
-    float getItemsPerSecond(Instant now, AtomicInteger writeCount) {
-        Duration duration = Duration.between(startOfWriting, now);
+    float getItemsPerSecond(Duration duration, AtomicInteger writeCount) {
         return (float) writeCount.get() / duration.get(ChronoUnit.SECONDS);
     }
 
@@ -65,15 +67,54 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
      * @param now the time point at which the statistics should be computed
      * @return a formatted {@link String} representing the write rate statistics
      */
-    String computeWriteRateStats(Instant now) {
-        float docsPerSecond = getItemsPerSecond(now, writeCount);
-        float docsPerHour = docsPerSecond * 3600;
+    StatsInfo computeWriteRateStats(Instant now) {
+        totalWriteCount.addAndGet(deltaWriteCount.get());
 
-        return "\t---- Write statistics ----\n" +
-                String.format("\t\t# docs\t\t:\t%d\n", writeCount.get()) +
-                String.format("\t\tdocs/sec\t:\t%.2f\n", docsPerSecond) +
-                String.format("\t\tdocs/hour\t:\t%.0f\n", docsPerHour) +
-                "\t---- End of statistics ----\n";
+        StatsInfo statsInfo = new StatsInfo();
+        statsInfo.totalWriteCount = totalWriteCount.get();
+        statsInfo.totalSeconds = Duration.between(startOfWriting, now).getSeconds();
+        statsInfo.deltaWriteCount = deltaWriteCount.get();
+        statsInfo.deltaSeconds = Duration.between(startOfDelta, now).getSeconds();
+
+        return statsInfo;
     }
+
+    private void resetDelta() {
+        deltaWriteCount.set(0);
+        startOfDelta = Instant.now();
+    }
+
+    static class StatsInfo {
+        private static final int SECONDS_IN_AN_HOUR = 3600;
+
+        int deltaWriteCount;
+        long deltaSeconds;
+
+        int totalWriteCount;
+        long totalSeconds;
+
+        @Override public String toString() {
+            float deltaDocsPerSecond = (float) deltaWriteCount / deltaSeconds;
+            float totalDocsPerSecond = (float) totalWriteCount / totalSeconds;
+            return
+                    "\t-----------------------------------------------------\n" +
+                            "\t                    Write statistics                 \n\n" +
+                            "\tLatest delta:\n" +
+                            String.format("\t\t# docs\t\t:\t%d\n", deltaWriteCount) +
+                            String.format("\t\ttime (sec)\t:\t%d\n", deltaSeconds) +
+                            String.format("\t\tdocs/sec\t:\t%.2f\n", deltaDocsPerSecond) +
+                            String.format("\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n\n", deltaDocsPerSecond
+                                    * SECONDS_IN_AN_HOUR) +
+                            "\tOverall:\n" +
+                            String.format("\t\t# docs\t\t:\t%d\n", totalWriteCount) +
+                            String.format("\t\ttime (sec)\t:\t%d\n", totalSeconds) +
+                            String.format("\t\tdocs/sec\t:\t%.2f\n", totalDocsPerSecond) +
+                            String.format("\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n", totalDocsPerSecond *
+                            SECONDS_IN_AN_HOUR) +
+                            "\n\t              End of write statistics              \n" +
+                            "\t-----------------------------------------------------\n";
+        }
+    }
+
 
 }
