@@ -20,7 +20,6 @@
             <excludes>
                 <exclude>bin-dir-update</exclude>
             </excludes>
-            <fileMode>0755</fileMode>
         </fileSet>
     </fileSets>
 </assembly>
