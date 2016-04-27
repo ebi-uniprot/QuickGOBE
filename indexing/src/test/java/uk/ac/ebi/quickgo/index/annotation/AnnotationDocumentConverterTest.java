@@ -89,7 +89,7 @@ public class AnnotationDocumentConverterTest {
 
     @Test
     public void convertsMultiValuedWithToCorrectListOfSize2() throws Exception {
-        annotation.with = "GO:0036376,GO:0036377";
+        annotation.with = "GO:0036376|GO:0036377";
 
         AnnotationDocument doc = converter.process(annotation);
 
