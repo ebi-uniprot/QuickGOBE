@@ -49,12 +49,12 @@ mvn -U -DskipTests -P indexing,solr-plugins package
 mkdir -p "$lib_dir"
 mv ./indexing/target/*.jar "$lib_dir"
 
-echo "Copied QuickGO indexing libraries into ${$lib_dir}"
+echo "Copied QuickGO indexing libraries into ${lib_dir}"
 
 #fetch the Solr plugin jars
 mv ./solr-plugin/target/*.jar "$lib_dir"
 
-echo "Copied QuickGO Solr plugins into ${$lib_dir}"
+echo "Copied QuickGO Solr plugins into ${lib_dir}"
 
 #update symlink to the latest version of the indexing jar
 ln -snf "$lib_dir" "${SOLR_CONFIG_DIR}/${QUICKGO_LIB_PATH}"
