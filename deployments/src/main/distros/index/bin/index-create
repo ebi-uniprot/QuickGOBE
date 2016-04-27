@@ -51,7 +51,7 @@ if [ "$1" = "submit" ]; then
     # ensure indexing job variable is defined
     if [ ! -z "$javaJob" ]; then
         #check the Solr server status
-        solrServerStatus;
+        local server_status="$(solrServerStatus)";
         
         if [ "$server_status" == "UP" ]; then
             echo "executing command:"

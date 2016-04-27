@@ -173,7 +173,7 @@ function solrServerStatus {
 
     local solr_addr="http://$server:$http_solr_port/$http_solr_path";
 
-    server_status=$(serverIsUp $server $http_solr_port $http_solr_path);
+    echo "$(serverIsUp $server $http_solr_port $http_solr_path)"";
 }
 
 function printSolrServerStatus {
