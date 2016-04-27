@@ -51,4 +51,5 @@ chmod -R 774 "$core_dir"
 #update core link in $SOLR_CONFIG_DIR directory
 ln -snf "$core_dir" "${SOLR_CONFIG_DIR}/cores/${CORE_NAME}"
 
-echo "Symlink ${$core_dir} has been updated with new core definitions"
+echo "Symlink ${core_dir} has been updated with new core definitions"
+ls -l "$core_dir" | sed -e 's/^/    /g';
