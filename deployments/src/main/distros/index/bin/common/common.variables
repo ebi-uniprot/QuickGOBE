@@ -111,7 +111,7 @@ MAIN_CLASS_PARAMS=
 LSF_JOB_NAME=
 
 # java class path -- include all jars for creating the indexes
-local QUICKGO_SERVICE_DIR="${SOLR_CONFIG_DIR}/lib/quickgo"
+QUICKGO_SERVICE_DIR="${SOLR_CONFIG_DIR}/lib/quickgo"
 QUICKGO_SERVICE_JAR="$QUICKGO_SERVICE_DIR/*"
 
 ## ---------------------------- GENERAL UTILITY FUNCTIONS ----------------------------
@@ -173,7 +173,7 @@ function solrServerStatus {
 
     local solr_addr="http://$server:$http_solr_port/$http_solr_path";
 
-    echo "$(serverIsUp $server $http_solr_port $http_solr_path)"";
+    echo "$(serverIsUp $server $http_solr_port $http_solr_path);
 }
 
 function printSolrServerStatus {
