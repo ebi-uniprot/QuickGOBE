@@ -74,7 +74,7 @@ echo "executing fetch-cores"
 ../fetch-cores "$release_dir";
 
 #check solr server status
-local server_status="$(solrServerStatus)";
+server_status="$(solrServerStatus)";
 
 if [ "$server_status" == "UP" ]; then
     echo "Solr server is currently UP, please restart the server, before proceeding to index-create";
