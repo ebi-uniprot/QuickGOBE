@@ -83,11 +83,9 @@ public class AnnotationConfig {
         return jobBuilders.get(ANNOTATION_INDEXING_JOB_NAME)
                 .start(annotationIndexingStep())
                 .listener(logJobListener())
+                // commit the documents to the solr server
                 .listener(new JobExecutionListener() {
-                    @Override public void beforeJob(JobExecution jobExecution) {
-
-                    }
-
+                    @Override public void beforeJob(JobExecution jobExecution) {}
                     @Override public void afterJob(JobExecution jobExecution) {
                         annotationTemplate.commit();
                     }
@@ -105,9 +103,9 @@ public class AnnotationConfig {
                 .skip(ValidationException.class)
                 .<Annotation>reader(annotationMultiFileReader())
                 .processor(annotationCompositeProcessor())
-                .writer(annotationSolrServerWriter())
-                .listener(logStepListener())
+                .<AnnotationDocument>writer(annotationSolrServerWriter())
                 .listener(logWriteRateListener())
+                .listener(logStepListener())
                 .listener(skipLogListener())
                 .build();
     }
