@@ -384,7 +384,7 @@
              have some sort of hard autoCommit to limit the log size.
           -->
         <autoCommit>
-            <maxTime>auto.commit.time.millis:30000</maxTime>
+            <maxTime>${auto.commit.time.millis:30000}</maxTime>
             <openSearcher>false</openSearcher>
         </autoCommit>
 
