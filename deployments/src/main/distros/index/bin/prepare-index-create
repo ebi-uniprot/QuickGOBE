@@ -56,7 +56,7 @@ fi
 release_dir="${SOLR_INDEX_DIR}/${CORE_NAME}";
 
 if [ ! -d "$release_dir" ]; then
-   echo "Directory for storing solr-indexes [$SOLR_INDEX_DIR] NOT FOUND. Creating...";
+   echo "Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...";
    mkdir -p "$release_dir";
 fi
 
