@@ -26,7 +26,7 @@ public class AnnotationDocMocker {
         doc.goEvidence = "IEA";
         doc.reference = "GO_REF:0000002";
         doc.withFrom = Arrays.asList("InterPro:IPR015421", "InterPro:IPR015422");
-        doc.taxonId = "35758";
+        doc.interactingTaxonId = "35758";
         doc.assignedBy = "InterPro";
         doc.extensions = Arrays.asList(
                 "results_in_development_of(UBERON:0001675),acts_on_population_of(CL:0000032)",

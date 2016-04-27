@@ -21,7 +21,7 @@ public class AnnotationFields {
     public final static String ECO_ID = "ecoId";
     public final static String REFERENCE = "reference";
     public final static String WITH_FROM = "withFrom";
-    public final static String TAXON_ID = "taxonId";
+    public final static String INTERACTING_TAXON_ID = "interactingTaxonId";
     public final static String ASSIGNED_BY = "assignedBy";
     public final static String EXTENSION = "extension";
 

@@ -65,7 +65,7 @@ public class AnnotationDocumentConverterTest {
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.taxonId, is(nullValue()));
+        assertThat(doc.interactingTaxonId, is(nullValue()));
     }
 
     // with

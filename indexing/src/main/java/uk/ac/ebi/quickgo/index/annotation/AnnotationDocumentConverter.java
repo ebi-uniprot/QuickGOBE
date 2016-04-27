@@ -37,7 +37,7 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
         doc.goEvidence = propertiesMap.get(GO_EVIDENCE);
         doc.reference = annotation.dbReferences;
         doc.withFrom = constructWithFrom(annotation);
-        doc.taxonId = annotation.interactingTaxonId;
+        doc.interactingTaxonId = annotation.interactingTaxonId;
         doc.assignedBy = annotation.assignedBy;
         doc.ecoId = annotation.ecoId;
         doc.extensions = constructExtensions(annotation);

@@ -37,8 +37,8 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.WITH_FROM)
     public List<String> withFrom;
 
-    @Field(AnnotationFields.TAXON_ID)
-    public String taxonId;
+    @Field(AnnotationFields.INTERACTING_TAXON_ID)
+    public String interactingTaxonId;
 
     @Field(AnnotationFields.ASSIGNED_BY)
     public String assignedBy;
