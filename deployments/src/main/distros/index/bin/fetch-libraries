@@ -60,4 +60,4 @@ echo "Copied QuickGO Solr plugins into ${lib_dir}"
 ln -snf "$lib_dir" "${SOLR_CONFIG_DIR}/${QUICKGO_LIB_PATH}"
 
 echo "Symlink ${lib_dir} has been updated with new library definitions"
-ls -l "$lib_dir" | sed -e 's/^/    /g';
+ls -l "${SOLR_CONFIG_DIR}/${QUICKGO_LIB_PATH}" | sed -e 's/^/    /g';

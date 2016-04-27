@@ -49,7 +49,8 @@ echo "Fetched solr cores"
 chmod -R 774 "$core_dir"
 
 #update core link in $SOLR_CONFIG_DIR directory
-ln -snf "$core_dir" "${SOLR_CONFIG_DIR}/cores/${CORE_NAME}"
+symlink=${SOLR_CONFIG_DIR}/cores/${CORE_NAME}
+ln -snf "$core_dir" "$symlink"
 
 echo "Symlink ${core_dir} has been updated with new core definitions"
-ls -l "$core_dir" | sed -e 's/^/    /g';
+ls -l "$symlink" | sed -e 's/^/    /g';
