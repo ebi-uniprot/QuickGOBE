@@ -119,7 +119,19 @@ public class GeneProductConfig {
 
     @Bean
     LineTokenizer geneProductLineTokenizer() {
-        return new DelimitedLineTokenizer(COLUMN_DELIMITER);
+        return new DelimitedLineTokenizer(COLUMN_DELIMITER) {
+            /**
+             * Need to ignore quotes because there are entries that have single quotes in them, and this throws an
+             * exception, if this method detects the quote.
+             *
+             * Here is an example of an offending entry:
+             *
+             * UniProtKB	F0Z8G9	kynu"	Kynureninase	F0Z8G9_DICPU|kynu"|DICPUDRAFT_74692	protein	taxon:5786		EMBL:GL870952|RefSeq:XP_003283711.1	db_subset=TrEMBL|taxon_name=Dictyostelium purpureum|is_annotated=Y|proteome=Y|reference_proteome=UP000001064|is_isoform=N
+             */
+            @Override protected boolean isQuoteCharacter(char c) {
+                return false;
+            }
+        };
     }
 
     @Bean
