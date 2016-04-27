@@ -3,7 +3,7 @@
 #fail on error
 set -e
 
-VALID_USERS=("uni_qgo" "rantunes");
+VALID_USERS=("uni_qgo");
 RELEASE_VERSION_PREFIX="v";
 
 nextReleaseVersion (){

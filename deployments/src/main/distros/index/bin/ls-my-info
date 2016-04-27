@@ -2,7 +2,7 @@
 
 ## This script lists information about the QuickGO services associated with this build environment
 
-VALID_USERS=("uni_qgo" "tc_uni02" "rantunes");
+VALID_USERS=("uni_qgo" "tc_uni02");
 
 # read common environment variables
 properties_not_found="false";
