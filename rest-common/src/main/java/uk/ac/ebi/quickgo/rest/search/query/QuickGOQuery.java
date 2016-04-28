@@ -48,4 +48,8 @@ public abstract class QuickGOQuery {
     public static QuickGOQuery createQuery(String value) {
         return new NoFieldQuery(value);
     }
+
+    public static QuickGOQuery createEmptyQuery() {
+        return new EmptyQuery();
+    }
 }

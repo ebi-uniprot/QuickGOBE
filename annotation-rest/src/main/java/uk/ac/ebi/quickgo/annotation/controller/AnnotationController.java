@@ -1,24 +1,54 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.service.AnnotationService;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
+import uk.ac.ebi.quickgo.annotation.search.AnnotationSearchQueryTemplate;
+import uk.ac.ebi.quickgo.annotation.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
-import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.Objects;
 
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
+
 /**
  * Provides RESTful endpoints for retrieving Annotations
+ *
+ * taxon=1234,343434
+ *
+ * gp=A0A000,A0A001
+ * gpSet=BHF-UCL,Exosome
+ * gpType=protein,rna,complexe
+ *
+ * goTerm=GO:0016021,GO:0016022
+ * goTermSet=goslim_chembl,goSlimGeneric
+ *
+ * ..the following are only applicable if goTerm ids or sets have been selected
+ * goTermUse=ancestor or goTermUse=slim  or goTermUse=exact
+ * goTermRelationship=I or goTermRelationship=IPO or goTermRelationship=IPOR
+ *
+ * aspect=F,P,C
+ *
+ * evidence=ECO:0000352,ECO0000269            ?allow go evidence codes??
+ *
+ * ..the following is only applicable if any evidence code has been selected
+ * evidenceRelationship=ancestor or evidenceRelationship=exact
+ *
+ * qualifier=enables,not_enables
+ *
+ * reference=DOI,GO_REF
+ *
+ * with=AGI_LocusCode,CGD
+ *
+ * assignedby=ASPGD,Agbase
  *
  * @author Tony Wardell
  *         Date: 21/04/2016
@@ -28,41 +58,36 @@ import java.util.Objects;
 @RestController
 @RequestMapping(value = "/QuickGO/services/annotation")
 public class AnnotationController {
+
 	private static final int MAX_PAGE_RESULTS = 100;
-	private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
-	private static final String DEFAULT_PAGE_NUMBER = "1";
-	private final AnnotationService annotationService;
+	private final SearchService<Annotation> annotationSearchService;
 	private final ControllerValidationHelperImpl controllerValidationHelper;
+	private final AnnotationSearchQueryTemplate requestTemplate;
 
 	@Autowired
-	public AnnotationController(AnnotationService annoService) {
-		Objects.requireNonNull(annoService, "The AnnotationService instance passed to the constructor of " +
+	public AnnotationController(SearchService<Annotation> annotationSearchService,
+			SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig ) {
+		Objects.requireNonNull(annotationSearchService, "The SearchService<Annotation> instance passed to the constructor of " +
 				"AnnotationController should not be null.");
-		this.annotationService = annoService;
+		this.annotationSearchService = annotationSearchService;
 		this.controllerValidationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
+		this.requestTemplate = new AnnotationSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
 	}
 
 	/**
 	 * Search for an Annotations based on their attributes
-	 *
-	 * @param query the query to search against
-	 * @param limit the amount of queries to return
 	 * @return a {@link QueryResult} instance containing the results of the search
 	 */
-	@RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<QueryResult<Annotation>> annotationSearch(
-			@RequestParam(value = "assignedBy") String assignedBy,
-			@RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
-			@RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
+	@RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<QueryResult<Annotation>> annotationLookup(AnnotationFilter filter, BindingResult bindingResult) {
 
-		controllerValidationHelper.validateRequestedResults(limit);
+		System.out.println(bindingResult.toString());
 
-		QueryRequest request = buildRequest(
-				query,
-				limit,
-				page,
-				ontologyQueryConverter);
+		filter.validation();
 
-		return SearchDispatcher.search(request, ontologySearchService);
+		AnnotationSearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
+				.addAnnotationFilter(filter);
+		return search(requestBuilder.build(), annotationSearchService);
+
 	}
 }

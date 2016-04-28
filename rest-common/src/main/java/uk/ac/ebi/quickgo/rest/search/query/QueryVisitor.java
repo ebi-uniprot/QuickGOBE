@@ -9,4 +9,6 @@ interface QueryVisitor<T> {
     T visit(CompositeQuery query);
 
     T visit(NoFieldQuery query);
+
+    T visit(EmptyQuery query);
 }

@@ -16,9 +16,9 @@
  limitations under the License.
 -->
 
-<!-- 
+<!--
      For more details about configurations options that may appear in
-     this file, see http://wiki.apache.org/solr/SolrConfigXml. 
+     this file, see http://wiki.apache.org/solr/SolrConfigXml.
 -->
 <config>
     <!-- In all configuration below, a prefix of "solr." for class names
@@ -897,6 +897,19 @@
             <str name="wt">json</str>
             <str name="indent">true</str>
             <str name="df">text</str>
+        </lst>
+    </requestHandler>
+
+    <!-- Based on /query. q always *:* -->
+    <requestHandler name="/filter" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <str name="wt">json</str>
+            <str name="indent">true</str>
+            <str name="df">text</str>
+        </lst>
+        <lst name="invariants">
+            <str name="q">*:*</str>
         </lst>
     </requestHandler>
 

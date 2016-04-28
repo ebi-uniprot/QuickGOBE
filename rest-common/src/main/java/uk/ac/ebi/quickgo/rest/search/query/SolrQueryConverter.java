@@ -46,12 +46,16 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
         return "(" + queryStringSanitizer.sanitize(query.getValue()) + ")";
     }
 
+    @Override public String visit(EmptyQuery query) {
+        return "";
+    }
+
     @Override public SolrQuery convert(QueryRequest request) {
         Preconditions.checkArgument(request != null, "Cannot convert null query request");
 
         final SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.setQuery(request.getQuery().accept(this));
+        assignQuery(request, solrQuery);
         solrQuery.setRequestHandler(requestHandler);
 
         Page page = request.getPage();
@@ -88,6 +92,11 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
         }
 
         return solrQuery;
+    }
+
+    protected void assignQuery(QueryRequest request,
+            SolrQuery solrQuery) {
+        solrQuery.setQuery(request.getQuery().accept(this));
     }
 
     private int calculateRowsFromPage(int page, int numRows) {
