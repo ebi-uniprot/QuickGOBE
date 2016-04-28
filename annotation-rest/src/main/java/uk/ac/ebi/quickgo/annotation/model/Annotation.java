@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.annotation.model;
 import java.util.List;
 
 /**
+ * Annotation DTO used by the service layer.
+ *
  * @author Tony Wardell
  *         Date: 21/04/2016
  *         Time: 11:28
