@@ -8,7 +8,6 @@ import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
-import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
@@ -24,6 +23,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
 
 /**
+ *
+ * Spring Configuration facilitating Annotation search functionality.
+ *
  * @author Tony Wardell
  * Date: 26/04/2016
  * Time: 15:07
@@ -39,7 +41,6 @@ public class SearchServiceConfig {
     private static final String COMMA = ",";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS = "id,geneProductId,qualifier,goId," +
             "goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extension";
-    //public static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
     public static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/filter";
 
     @Bean
@@ -54,7 +55,7 @@ public class SearchServiceConfig {
             QueryRequestConverter<SolrQuery> queryRequestConverter,
             AnnotationCompositeRetrievalConfig annotationRetrievalConfig) {
 
-        AnnotationSolrQueryResultConverter resultConverter = new AnnotationSolrQueryResultConverter(
+        SolrQueryResultConverter resultConverter = new SolrQueryResultConverter(
                 new DocumentObjectBinder(),
                 new AnnotationDocConverterImpl());
 
@@ -70,6 +71,11 @@ public class SearchServiceConfig {
         return new AnnotationSolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
     }
 
+    /**
+     * Annotation retrieval config. Annotations searches don't use highlighting.
+     * @param annotationSearchSolrReturnedFields
+     * @return
+     */
     @Bean
     public AnnotationCompositeRetrievalConfig annotationRetrievalConfig(
             @Value("${search.return.fields:" + DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS + "}") String
