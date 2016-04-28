@@ -7,9 +7,9 @@ import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryResultHighlightingConverter;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -44,14 +44,8 @@ public class GeneProductSolrQueryResultConverter extends AbstractSolrQueryResult
 
         List<GeneProductDocument> solrTermDocs = documentObjectBinder.getBeans(GeneProductDocument.class, results);
 
-        List<GeneProduct> domainTerms = new ArrayList<>(solrTermDocs.size());
-
-        solrTermDocs.stream()
+        return solrTermDocs.stream()
                 .map(geneProductDocConverter::convert)
-                .forEach(domainTerms::add);
-
-        assert domainTerms.size() == results.size();
-
-        return domainTerms;
+                .collect(Collectors.toList());
     }
 }
