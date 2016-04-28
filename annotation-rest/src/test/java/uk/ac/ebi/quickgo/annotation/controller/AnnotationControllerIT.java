@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,10 +28,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
+ * RESTful end point for Annotations
  * @author Tony Wardell
  * Date: 26/04/2016
  * Time: 14:21
@@ -46,15 +48,12 @@ public class AnnotationControllerIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
-    private static final String ASSIGNEDBY_PARAM = "assignedby";
+    private static final String ASSIGNED_BY_PARAM = "assignedby";
     protected MockMvc mockMvc;
 
-    private final static String COMMA = ",";
-    private String resourceUrl;
-    private String validId;
     private String validAssignedBy;
-    private String validIdsCSV;
-    private List<String> validIdList;
+    private static final String INVALID_ASSIGNED_BY = "ZZZZZ";
+    private List<AnnotationDocument> basicDocs;
     private static final String RESOURCE_URL = "/QuickGO/services/annotation";
 
     @Autowired
@@ -63,8 +62,6 @@ public class AnnotationControllerIT {
     @Autowired
     protected AnnotationRepository annotationRepository;
 
-    @Autowired
-    private SolrTemplate annotationProductTemplate; //todo required?
 
     @Before
     public void setup() {
@@ -74,38 +71,68 @@ public class AnnotationControllerIT {
                 webAppContextSetup(webApplicationContext)
                 .build();
 
-        List<AnnotationDocument> basicDocs = createBasicDocs();
+        basicDocs = createBasicDocs();
         assertThat(basicDocs.size(), is(greaterThan(1)));
-
-        validId = basicDocs.get(0).id;
         validAssignedBy = basicDocs.get(0).assignedBy;
-        validIdsCSV = basicDocs.stream().map(doc -> doc.id).collect(Collectors.joining(","));
-        validIdList = Arrays.asList(validIdsCSV.split(COMMA));
-
         annotationRepository.save(basicDocs);
     }
 
 
 
     @Test
-    public void lookupAnnotationFilterByAssignedBySuccessfullyAndReceivesValidResults() throws Exception {
+    public void lookupAnnotationFilterByAssignedBySuccessfully() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNEDBY_PARAM, validAssignedBy));
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, validAssignedBy));
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*").exists());
-    }
-
-    protected List<AnnotationDocument> createBasicDocs() {
-        return Arrays.asList(
-                AnnotationDocMocker.createAnnotationDoc("A0A000"),
-                AnnotationDocMocker.createAnnotationDoc("A0A001","ASPGD"));
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
     }
 
 
-    protected ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
-        return result
+    @Test
+    public void lookupAnnotationFilterByMultipleAssignedBySuccessfully() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM,  basicDocs.get(0).assignedBy + ","
+                        + basicDocs.get(1).assignedBy));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(2))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void lookupAnnotationFilterByInvalidAssignedBy() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, INVALID_ASSIGNED_BY));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void lookupAnnotationFilterByMultipleAssignedByOneCorrectAndOneInvalid() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, INVALID_ASSIGNED_BY + ","
+                        + basicDocs.get(1).assignedBy));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+
+    private ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
+        return expectFieldsInResults(result)
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pageInfo").exists())
@@ -114,4 +141,38 @@ public class AnnotationControllerIT {
                 .andExpect(jsonPath("$.pageInfo.current").exists());
     }
 
+    private ResultActions expectFieldsInResults(ResultActions result) throws Exception {
+        int index = 0;
+
+        for (int i=0; i>basicDocs.size(); i++) {
+            expectFields(result, "$.results[" + index++ + "].");
+        }
+
+        return result;
+    }
+
+    protected ResultActions expectFields(ResultActions result, String path) throws Exception {
+        return result
+                .andExpect(jsonPath(path + "id").exists())
+                .andExpect(jsonPath(path + "geneProductId").exists())
+                .andExpect(jsonPath(path + "qualifier").exists())
+                .andExpect(jsonPath(path + "goId").exists())
+                .andExpect(jsonPath(path + "goEvidence").exists())
+                .andExpect(jsonPath(path + "ecoId").exists())
+                .andExpect(jsonPath(path + "reference").exists())
+                .andExpect(jsonPath(path + "withFrom").exists())
+                .andExpect(jsonPath(path + "taxonId").exists())
+                .andExpect(jsonPath(path + "assignedBy").exists())
+                .andExpect(jsonPath(path + "extension").exists());
+    }
+
+    /**
+     * Create some
+     */
+    private List<AnnotationDocument> createBasicDocs() {
+        return Arrays.asList(
+                AnnotationDocMocker.createAnnotationDoc("A0A000"),
+                AnnotationDocMocker.createAnnotationDoc("A0A001","ASPGD"),
+                AnnotationDocMocker.createAnnotationDoc("A0A001","BHF-UCL"));
+    }
 }
