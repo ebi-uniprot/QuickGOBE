@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
+import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +14,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.concatStrings;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatStrings;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
 
 /**
@@ -229,6 +230,6 @@ public class GeneProductDocumentConverterTest {
     }
 
     private String concatProperty(String key, String value) {
-        return GeneProductUtil.concatProperty(key, value, INTRA_VALUE_DELIMITER);
+        return GOADataFileParsingUtil.concatProperty(key, value, INTRA_VALUE_DELIMITER);
     }
 }
