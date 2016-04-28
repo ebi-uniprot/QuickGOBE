@@ -1,7 +1,7 @@
 #! /bin/bash
 
 ##=========================================================================================
-# Updates from Git the directory used for running the RESTful applications.
+# Updates from Git the directory used for running the indexing application.
 # It is not necessary to update with each release, only when the scripts
 # that run the applications change.
 ##=========================================================================================
@@ -10,11 +10,9 @@ set -euo pipefail
 
 # ======= CONSTANTS =======================================
 REPOS_DIR="$(pwd -P)/repos"
-QUICKGO_REPO="QuickGOBE"
-REST_BIN_CONTENT_DIR="bin"
-REST_BIN="rest-bin.tar.gz"
+INDEX_BIN_CONTENT_DIR="bin"
+INDEX_BIN="index-bin.tar.gz"
 PERMITTED_USER="uni_qgo"
-BRANCH="master"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
@@ -40,33 +38,33 @@ dirs -c
 pushd . > /dev/null
 cd "$REPOS_DIR"
 
-cd $QUICKGO_REPO
+cd "QuickGOBE"
 git fetch
-git checkout $BRANCH
+git checkout GOA-1805_Create_indexing_scripts
 git pull
 cd "deployments"
-mvn -U -DskipTests -P assemble-rest-bin-archive package
-eval "mv" "target/$REST_BIN" "$(dirs +1)"
+mvn -U -DskipTests -P assemble-index-bin-archive package
+eval "mv" "target/$INDEX_BIN" "$(dirs +1)"
 
 eval "cd" "$(dirs +1)"
 
-# backup $REST_BIN_CONTENT_DIR, before replacing it
-if [ -d "$REST_BIN_CONTENT_DIR" ]; then
-        archives=".$REST_BIN_CONTENT_DIR-archives";
+# backup $INDEX_BIN_CONTENT_DIR, before replacing it
+if [ -d "$INDEX_BIN_CONTENT_DIR" ]; then
+        archives=".$INDEX_BIN_CONTENT_DIR-archives";
         if [ ! -d "$archives" ]; then
                 mkdir "$archives";
         fi
 
-        backup="$archives/$(addTimeStamp $REST_BIN_CONTENT_DIR).old";
-        echo "Archiving old bin directory '$REST_BIN_CONTENT_DIR' to '$backup'"
-        mv $REST_BIN_CONTENT_DIR $backup
+        backup="$archives/$(addTimeStamp $INDEX_BIN_CONTENT_DIR).old";
+        echo "Archiving old bin directory '$INDEX_BIN_CONTENT_DIR' to '$backup'"
+        mv $INDEX_BIN_CONTENT_DIR $backup
 
-        # replace $REST_BIN_CONTENT_DIR
-        echo "extracting contents of $REST_BIN to $(readlink -f .)"
-        tar xzf $REST_BIN
+        # replace $INDEX_BIN_CONTENT_DIR
+        echo "extracting contents of $INDEX_BIN to $(readlink -f .)"
+        tar xzf $INDEX_BIN
 
         # remove the archive after it's been decompressed
-        rm $REST_BIN
+        rm $INDEX_BIN
 
         cd "$archives";
         if [ "$(basename $(pwd))" == "$archives" ]; then # double check we're actually in the backup directory, before deleting anything!
@@ -74,13 +72,13 @@ if [ -d "$REST_BIN_CONTENT_DIR" ]; then
                 (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf
         fi
 else
-    # replace $REST_BIN_CONTENT_DIR
+    # replace $INDEX_BIN_CONTENT_DIR
     eval "cd" "$(dirs +1)"
-    echo "extracting contents of $REST_BIN to $(readlink -f .)"
-    tar xzf $REST_BIN
+    echo "extracting contents of $INDEX_BIN to $(readlink -f .)"
+    tar xzf $INDEX_BIN
 
     # remove the archive after it's been decompressed
-    rm $REST_BIN
+    rm $INDEX_BIN
 fi
 
 # ======= jump back to saved directory =======================================

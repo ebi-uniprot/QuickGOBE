@@ -1,14 +1,12 @@
-package uk.ac.ebi.quickgo.ontology.common;
+package uk.ac.ebi.quickgo.annotation.common;
 
 import java.io.File;
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.core.CoreContainer;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,13 +20,15 @@ import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
 import org.xml.sax.SAXException;
 
 /**
- * Publishes the configuration beans of the ontology repository.
+ * Publishes the configuration beans of the annotation repository.
+ *
+ * Created 14/04/16
+ * @author Edd
  */
 @Configuration
-public class OntologyRepoConfig {
-    private static final String SOLR_CORE = "ontology";
+public class AnnotationRepoConfig {
 
-    Logger LOGGER = org.slf4j.LoggerFactory.getLogger(OntologyRepoConfig.class);
+    private static final String SOLR_CORE = "annotation";
 
     @Bean
     static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
@@ -50,8 +50,7 @@ public class OntologyRepoConfig {
     @Profile("embeddedServer")
     public SolrServerFactory embeddedSolrServerFactory(CoreContainer coreContainer)
             throws IOException, SAXException, ParserConfigurationException {
-        EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, SOLR_CORE);
-        return new MulticoreSolrServerFactory(embeddedSolrServer);
+        return new MulticoreSolrServerFactory(new EmbeddedSolrServer(coreContainer, SOLR_CORE));
     }
 
     @Bean
@@ -63,7 +62,7 @@ public class OntologyRepoConfig {
     }
 
     @Bean
-    public SolrTemplate ontologyTemplate(SolrServerFactory solrServerFactory) {
+    public SolrTemplate annotationTemplate(SolrServerFactory solrServerFactory) {
         SolrTemplate template = new SolrTemplate(solrServerFactory);
         template.setSolrCore(SOLR_CORE);
 
@@ -71,11 +70,8 @@ public class OntologyRepoConfig {
     }
 
     @Bean
-    public OntologyRepository ontologyRepository(
-            @Qualifier("ontologyTemplate") SolrTemplate ontologyTemplate) {
-        LOGGER.info("Returning ontology repo {}", ontologyTemplate.toString());
-
-        return new SolrRepositoryFactory(ontologyTemplate)
-                .getRepository(OntologyRepository.class);
+    public AnnotationRepository annotationRepository(
+            @Qualifier("annotationTemplate") SolrTemplate annotationTemplate) {
+        return new SolrRepositoryFactory(annotationTemplate).getRepository(AnnotationRepository.class);
     }
 }

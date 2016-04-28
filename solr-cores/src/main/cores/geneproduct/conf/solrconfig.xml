@@ -921,10 +921,15 @@
                 <!--exact_symbol^10 exact_name^5 exact_synonym^5 edge_name edge_symbol^3 edge_synonym-->
             <!--</str>-->
             <str name="qf">
-                exact_symbol^20 id exact_name^10 exact_synonym^10 edge_name edge_symbol^5 edge_synonym
+                id
+                exact_symbol^20 symbol^12 edge_symbol^5
+                exact_synonym^10 synonym^11 edge_synonym
+                exact_name^10 name^11 edge_name
             </str>
             <str name="pf">
-                exact_symbol^20 exact_name^10 exact_synonym^10 edge_name edge_symbol^3 edge_synonym
+                exact_symbol^20 symbol^12 edge_symbol^5
+                exact_synonym^10 synonym^11 edge_synonym
+                exact_name^10 name^11 edge_name
             </str>
             <int name="ps">0</int>
         </lst>

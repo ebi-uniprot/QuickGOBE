@@ -64,7 +64,7 @@ public abstract class OBOControllerIT {
     @Autowired
     private SolrTemplate ontologyTemplate;
 
-    MockMvc mockMvc;
+    protected MockMvc mockMvc;
 
     private String resourceUrl;
     private String validId;
@@ -428,6 +428,7 @@ public abstract class OBOControllerIT {
     protected String buildTermsURL() {
         return getResourceURL() + "/" + TERMS_ENDPOINT;
     }
+
     protected String buildTermsURL(String id) {
         return getResourceURL() + "/" + TERMS_ENDPOINT + "/" + id;
     }
@@ -462,12 +463,8 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "annotationGuidelines").exists())
                 .andExpect(jsonPath(path + "taxonConstraints").exists())
                 .andExpect(jsonPath(path + "consider").exists())
-                    .andExpect(jsonPath(path + "subsets").exists())
+                .andExpect(jsonPath(path + "subsets").exists())
                 .andExpect(jsonPath(path + "replacedBy").exists());
-    }
-
-    protected ResultActions expectBasicFields(ResultActions result, String id) throws Exception {
-        return expectBasicFields(result, id, "$.");
     }
 
     protected abstract String idMissingInRepository();

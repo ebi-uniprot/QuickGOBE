@@ -94,7 +94,7 @@ public class OntologyFields {
             return VALUES.contains(field);
         }
 
-        public static Set<String> searcheableFields() {
+        public static Set<String> searchableFields() {
             return Collections.unmodifiableSet(VALUES);
         }
     }
