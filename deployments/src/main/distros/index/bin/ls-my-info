@@ -1,0 +1,37 @@
+#! /bin/bash
+
+## This script lists information about the QuickGO services associated with this build environment
+
+VALID_USERS=("uni_qgo" "tc_uni02");
+
+# read common environment variables
+properties_not_found="false";
+source "common/common.variables";
+
+if [ $? -eq 1 ]; then
+    properties_not_found="true";
+fi
+if [ "$properties_not_found" = "true" ]; then
+    echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
+
+# ------------------------ SHOW ASSOCIATED VM PURPOSE ------------------------
+printDivider;
+prettyEcho "Associated VM:          $solr_vm";
+prettyEcho "Associated VM purpose:  $vm_purpose";
+
+printSolrServerStatus;
+
+echo "";
+printReleaseBaseDirContents;
+
+if [ "$vm_purpose" == "STAGE" ]; then
+        echo "";
+        echo "Associated production servers: ${production_servers[@]}";
+
+fi
+
+echo "";
+prettyEcho "\(If these settings are wrong, please update $BASE_DIR/index.properties or use the scripts in this
+directory to achieve what you need.\)";

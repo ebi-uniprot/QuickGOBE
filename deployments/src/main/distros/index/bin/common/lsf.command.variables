@@ -1,0 +1,59 @@
+#! /bin/bash
+
+JOB_BASENAME="QuickGO-Alpha:"
+TIMESTAMP=$(date "+%N.%s")
+
+function lsfOptionsBase {
+    if [ -z "$LSF_JOB_NAME" ]; then
+        echo '$LSF_JOB_NAME variable must be set';
+        exit 1;
+    fi
+    local str="-u $LSF_EMAIL \
+            -n $LSF_CORES \
+            -o $LSF_LOG_FILE \
+            -N \
+            -q $LSF_Q \
+            -M $LSF_MEM \
+            -J \\\"$JOB_BASENAME $LSF_JOB_NAME, timestamp=$TIMESTAMP\\\" \
+            -R \\\"rusage[mem=$LSF_MEM]\\\"";
+    echo $(eval "echo "$str"");
+}
+
+function javaCommand {
+    set -f
+    local str="$JVM \
+                  -Dcom.sun.management.jmxremote.port=$JMX_PORT \
+                  -Dcom.sun.management.jmxremote.ssl=false \
+                  -Dcom.sun.management.jmxremote.authenticate=false \
+                  -Dlogback.configurationFile=$LOGBACK_CONF \
+                  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder \
+                  -XX:FlightRecorderOptions=loglevel=debug \
+                  -Xms$LSF_JVM_MIN_MEM \
+                  -Xmx$LSF_JVM_MAX_MEM \
+                  -XX:+HeapDumpOnOutOfMemoryError \
+                  -XX:HeapDumpPath=$LSF_HEAPDUMP_PATH  \
+                  $JVM_PARAMS \
+                  -jar $QUICKGO_SERVICE_JAR $MAIN_CLASS $MAIN_CLASS_PARAMS";
+
+    echo $(eval "echo "$str"");
+}
+
+# prints options to pass to a bsub command
+# using the $JOB contents as the job to run
+# require JOB to be defined
+function lsfJobOptions {
+    if [ "$#" -ne "1" ]; then
+        echo "Expected 1 argument: the job to run. Received $@"
+        exit 1;
+    elif [ -z "$1" ]; then
+        echo "Argument 1 (the job) must be set";
+        exit 1;
+    fi
+
+    #echo "$(lsfOptionsBase) \"$1\"";
+    echo "$(lsfOptionsBase) '$1'";
+}
+
+function lsfJavaJobOptions {
+    lsfJobOptions "$(javaCommand)";
+}
