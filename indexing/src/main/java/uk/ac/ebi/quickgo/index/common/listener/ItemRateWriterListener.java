@@ -97,7 +97,7 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
             float deltaDocsPerSecond = (float) deltaWriteCount / deltaSeconds;
             float totalDocsPerSecond = (float) totalWriteCount / totalSeconds;
             return
-                            "\tWrite statistics -------------------\n" +
+                            "\tWrite statistics {\n" +
                             "\t\tLatest delta:\n" +
                             String.format("\t\t\t# docs\t\t:\t%d\n", deltaWriteCount) +
                             String.format("\t\t\ttime (sec)\t:\t%d\n", deltaSeconds) +
@@ -110,7 +110,7 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
                             String.format("\t\t\tdocs/sec\t:\t%.2f\n", totalDocsPerSecond) +
                             String.format("\t\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n", totalDocsPerSecond *
                             SECONDS_IN_AN_HOUR) +
-                            "\tEnd of write statistics -------------------\n";
+                            "\t}\n";
         }
     }
 
