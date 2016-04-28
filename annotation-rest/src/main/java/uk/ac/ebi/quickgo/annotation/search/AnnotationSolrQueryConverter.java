@@ -7,6 +7,10 @@ import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 import org.apache.solr.client.solrj.SolrQuery;
 
 /**
+ *
+ * Specialized SolrQueryConverter. Doesn't assign a parameter to query (q) on
+ * the SolrQuery instance.
+ *
  * @author Tony Wardell
  * Date: 28/04/2016
  * Time: 13:20
@@ -18,9 +22,6 @@ public class AnnotationSolrQueryConverter extends SolrQueryConverter{
         super(requestHandler);
     }
 
-    @Override public String visit(FieldQuery query) {
-        return "(" + query.field() + SOLR_FIELD_SEPARATOR + query.value() + ")";
-    }
 
     /**
      * For annotation filtering (and we use fq only for annotations) don't set a query String
