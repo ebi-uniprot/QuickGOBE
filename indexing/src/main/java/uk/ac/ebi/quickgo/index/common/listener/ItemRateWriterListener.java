@@ -97,22 +97,20 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
             float deltaDocsPerSecond = (float) deltaWriteCount / deltaSeconds;
             float totalDocsPerSecond = (float) totalWriteCount / totalSeconds;
             return
-                    "\t-----------------------------------------------------\n" +
-                            "\t                    Write statistics                 \n\n" +
-                            "\tLatest delta:\n" +
-                            String.format("\t\t# docs\t\t:\t%d\n", deltaWriteCount) +
-                            String.format("\t\ttime (sec)\t:\t%d\n", deltaSeconds) +
-                            String.format("\t\tdocs/sec\t:\t%.2f\n", deltaDocsPerSecond) +
-                            String.format("\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n\n", deltaDocsPerSecond
+                            "\tWrite statistics -------------------\n" +
+                            "\t\tLatest delta:\n" +
+                            String.format("\t\t\t# docs\t\t:\t%d\n", deltaWriteCount) +
+                            String.format("\t\t\ttime (sec)\t:\t%d\n", deltaSeconds) +
+                            String.format("\t\t\tdocs/sec\t:\t%.2f\n", deltaDocsPerSecond) +
+                            String.format("\t\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n", deltaDocsPerSecond
                                     * SECONDS_IN_AN_HOUR) +
-                            "\tOverall:\n" +
-                            String.format("\t\t# docs\t\t:\t%d\n", totalWriteCount) +
-                            String.format("\t\ttime (sec)\t:\t%d\n", totalSeconds) +
-                            String.format("\t\tdocs/sec\t:\t%.2f\n", totalDocsPerSecond) +
-                            String.format("\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n", totalDocsPerSecond *
+                            "\t\tOverall:\n" +
+                            String.format("\t\t\t# docs\t\t:\t%d\n", totalWriteCount) +
+                            String.format("\t\t\ttime (sec)\t:\t%d\n", totalSeconds) +
+                            String.format("\t\t\tdocs/sec\t:\t%.2f\n", totalDocsPerSecond) +
+                            String.format("\t\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n", totalDocsPerSecond *
                             SECONDS_IN_AN_HOUR) +
-                            "\n\t              End of write statistics              \n" +
-                            "\t-----------------------------------------------------\n";
+                            "\tEnd of write statistics -------------------\n";
         }
     }
 
