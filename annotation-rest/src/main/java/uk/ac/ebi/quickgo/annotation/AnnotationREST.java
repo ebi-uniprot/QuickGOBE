@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
+ *
+ * The RESTful service configuration for Annotations
+ * 
  * @author Tony Wardell
  * Date: 26/04/2016
  * Time: 14:41
