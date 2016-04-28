@@ -76,7 +76,7 @@ public abstract class SearchControllerSetup {
         ResultActions result = mockMvc.perform(clientRequest)
                 .andExpect(MockMvcResultMatchers.status().is(errorStatus));
 
-
+        checkErrorMessage(result);
     }
 
     /**
