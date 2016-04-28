@@ -6,12 +6,15 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * Created 28/04/16
  * @author Edd
  */
+@RunWith(MockitoJUnitRunner.class)
 public class SearchControllerTest {
     @Mock
     private SearchService<OntologyTerm> searchService;
