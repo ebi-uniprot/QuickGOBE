@@ -33,6 +33,7 @@ public class AnnotationValidator implements Validator<Annotation> {
     private static final String QUALIFIERS =
             "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$";
     private static final String WORD_LBRACE_WORD_RBRACE = "[a-zA-Z0-9_-]+\\([a-zA-Z0-9_:\\.-]+\\)";
+    private static final String TAXON = "taxon:[0-9]+";
 
     private static final Pattern WITH_REGEX = Pattern.compile(String.format(
             "(" + PIPE_SEPARATED_CSVs + ")|(With:Not_Supplied)",
@@ -48,6 +49,8 @@ public class AnnotationValidator implements Validator<Annotation> {
     private static final Pattern ANNOTATION_PROPERTIES_REGEX = Pattern.compile(String.format(
             PIPE_SEPARATED_CSVs,
             KEY_EQUALS_VALUE, KEY_EQUALS_VALUE, KEY_EQUALS_VALUE, KEY_EQUALS_VALUE));
+
+    private static final Pattern TAXON_REGEX = Pattern.compile(TAXON);
 
     // end of regular expressions -----------------------------------------------
 
@@ -69,10 +72,22 @@ public class AnnotationValidator implements Validator<Annotation> {
         checkExtensions(annotation);
         checkProperties(annotation);
         checkWith(annotation);
+        checkTaxon(annotation);
+    }
+
+    private void checkTaxon(Annotation annotation) {
+        if (!Strings.isNullOrEmpty(annotation.interactingTaxonId) &&
+                !TAXON_REGEX.matcher(annotation.interactingTaxonId).matches()) {
+            handlePatternMismatchError(
+                    "Interacting Taxon",
+                    annotation.interactingTaxonId,
+                    TAXON_REGEX.pattern(),
+                    annotation);
+        }
     }
 
     private void checkProperties(Annotation annotation) {
-        if (!Strings.isNullOrEmpty(annotation.with) &&
+        if (!Strings.isNullOrEmpty(annotation.annotationProperties) &&
                 !ANNOTATION_PROPERTIES_REGEX.matcher(annotation.annotationProperties).matches()) {
             handlePatternMismatchError(
                     "Annotation Properties",

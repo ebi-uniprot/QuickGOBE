@@ -159,6 +159,18 @@ public class AnnotationValidatorTest {
 
     // good with field -------------------------------------------------
     @Test
+    public void validNullWithField() {
+        annotation.with = null;
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validEmptyWithField() {
+        annotation.with = "";
+        validator.validate(annotation);
+    }
+
+    @Test
     public void validWithMultiTermedComponent() {
         annotation.with = "GO:1234,IP:1234";
         validator.validate(annotation);
@@ -220,7 +232,63 @@ public class AnnotationValidatorTest {
         validator.validate(annotation);
     }
 
+    // good annotation properties field -------------------------------------------------
+    @Test
+    public void validNullAnnotationProperties() {
+        annotation.annotationProperties = null;
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validEmptyAnnotationProperties() {
+        annotation.annotationProperties = "";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validSingleTermedComponentAnnotationProperty() {
+        annotation.annotationProperties = "go_evidence=IPI";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validSingleTermedComponentsAnnotationProperty() {
+        annotation.annotationProperties = "go_evidence=IPI|a=b";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validMultiTermedComponentAnnotationProperty() {
+        annotation.annotationProperties = "go_evidence=IPI,a=b";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validMultiTermedComponentsAnnotationProperty() {
+        annotation.annotationProperties = "go_evidence=IPI,a=b|c=d,e=f|g=h";
+        validator.validate(annotation);
+    }
+
+    // bad annotation properties field -------------------------------------------------
+    @Test(expected = ValidationException.class)
+    public void invalidSingleTermedComponentAnnotationProperty() {
+        annotation.annotationProperties = "go_evidence:IPI";
+        validator.validate(annotation);
+    }
+
     // good annotation extension field -------------------------------------------------
+    @Test
+    public void validNullAnnotationExtension() {
+        annotation.annotationExtension = null;
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validEmptyAnnotationExtension() {
+        annotation.annotationExtension = "";
+        validator.validate(annotation);
+    }
+
     @Test
     public void validSingleTermedComponentAnnotationExtension() {
         annotation.annotationExtension = "part_of(something)";
@@ -261,6 +329,32 @@ public class AnnotationValidatorTest {
     @Test(expected = ValidationException.class)
     public void invalidAnnotationExtensionNoStartBrace() {
         annotation.annotationExtension = "part_ofsomething)";
+        validator.validate(annotation);
+    }
+
+    // good taxon field
+    @Test
+    public void validInteractingTaxon() {
+        annotation.interactingTaxonId = "taxon:652611";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validNullInteractingTaxon() {
+        annotation.interactingTaxonId = null;
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validEmptyInteractingTaxon() {
+        annotation.interactingTaxonId = "";
+        validator.validate(annotation);
+    }
+
+    // bad taxon field
+    @Test(expected = ValidationException.class)
+    public void invalidInteractingTaxon() {
+        annotation.interactingTaxonId = "taxon:652611a";
         validator.validate(annotation);
     }
 
