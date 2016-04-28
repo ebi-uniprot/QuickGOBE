@@ -57,8 +57,10 @@ public abstract class OBOController<T extends OBOTerm> {
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
-        Preconditions.checkArgument(ontologyService != null, "Ontology service can not be null");
-        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service can not be null");
+        Preconditions.checkArgument(ontologyService != null, "Ontology service cannot be null");
+        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
+        Preconditions.checkArgument(searchableField != null, "Ontology searchable field cannot be null");
+        Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
