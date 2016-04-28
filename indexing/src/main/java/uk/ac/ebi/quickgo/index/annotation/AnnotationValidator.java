@@ -33,7 +33,7 @@ public class AnnotationValidator implements Validator<Annotation> {
     private static final String QUALIFIERS =
             "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$";
     private static final String WORD_LBRACE_WORD_RBRACE = "[a-zA-Z0-9_-]+\\([a-zA-Z0-9_:\\.-]+\\)";
-    private static final String TAXON = "taxon:[0-9]+";
+    private static final String TAXON = "taxon:([0-9]+)";
 
     private static final Pattern WITH_REGEX = Pattern.compile(String.format(
             "(" + PIPE_SEPARATED_CSVs + ")|(With:Not_Supplied)",
@@ -50,7 +50,7 @@ public class AnnotationValidator implements Validator<Annotation> {
             PIPE_SEPARATED_CSVs,
             KEY_EQUALS_VALUE, KEY_EQUALS_VALUE, KEY_EQUALS_VALUE, KEY_EQUALS_VALUE));
 
-    private static final Pattern TAXON_REGEX = Pattern.compile(TAXON);
+    static final Pattern TAXON_REGEX = Pattern.compile(TAXON);
 
     // end of regular expressions -----------------------------------------------
 

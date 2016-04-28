@@ -40,12 +40,9 @@ public class AnnotationDocumentConverterTest {
         annotation.qualifier = "enables";
         annotation.goId = "GO:0000977";
         annotation.ecoId = "ECO:0000353";
-        //        annotation.with = "GO:0036376,GO:1990573";
-        annotation.interactingTaxonId = "taxon:12345";
-        //        annotation.date = "20150122";
         annotation.assignedBy = "IntAct";
         annotation.annotationExtension = "occurs_in(CL:1000428)";
-        //        annotation.annotationProperties = "go_evidence=IPI";
+        annotation.annotationProperties = "go_evidence=IPI";
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -53,7 +50,6 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.goId, is(annotation.goId));
         assertThat(doc.ecoId, is(annotation.ecoId));
         assertThat(doc.assignedBy, is(annotation.assignedBy));
-//        assertThat(doc.extension, is(annotation.annotationExtension));
         assertThat(doc.qualifier, is(annotation.qualifier));
         assertThat(doc.reference, is(annotation.dbReferences));
     }
@@ -62,6 +58,24 @@ public class AnnotationDocumentConverterTest {
     @Test
     public void convertsEmptyTaxonToNullValue() throws Exception {
         annotation.interactingTaxonId = null;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.interactingTaxonId, is(nullValue()));
+    }
+
+    @Test
+    public void convertsValidNonEmptyTaxon() throws Exception {
+        annotation.interactingTaxonId = "taxon:12345";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.interactingTaxonId, is("12345"));
+    }
+
+    @Test
+    public void convertsInvalidNonEmptyTaxon() throws Exception {
+        annotation.interactingTaxonId = "taxon:12345d";
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -113,6 +127,25 @@ public class AnnotationDocumentConverterTest {
         AnnotationDocument doc = converter.process(annotation);
 
         assertThat(doc.goEvidence, is("FIND_ME"));
+    }
+
+    // annotation extensions
+    @Test
+    public void convertsNullAnnotationExtensionToNullValue() throws Exception {
+        annotation.annotationExtension = null;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.extensions, is(nullValue()));
+    }
+
+    @Test
+    public void convertsAnnotationExtensionsToRawExtension() throws Exception {
+        annotation.annotationExtension = "x,y|z";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.extensions, containsInAnyOrder("x,y","z"));
     }
 
     private String constructGeneProductId(Annotation annotation) {return annotation.db + ":" + annotation.dbObjectId;}

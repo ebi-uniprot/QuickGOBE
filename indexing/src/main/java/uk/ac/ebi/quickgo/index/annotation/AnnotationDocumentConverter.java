@@ -3,11 +3,14 @@ package uk.ac.ebi.quickgo.index.annotation;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
+import com.google.common.base.Strings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import org.springframework.batch.item.ItemProcessor;
 
+import static uk.ac.ebi.quickgo.index.annotation.AnnotationValidator.TAXON_REGEX;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.COLON;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.EQUALS;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.PIPE;
@@ -37,7 +40,7 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
         doc.goEvidence = propertiesMap.get(GO_EVIDENCE);
         doc.reference = annotation.dbReferences;
         doc.withFrom = constructWithFrom(annotation);
-        doc.interactingTaxonId = annotation.interactingTaxonId;
+        doc.interactingTaxonId = extractInteractingTaxonId(annotation);
         doc.assignedBy = annotation.assignedBy;
         doc.ecoId = annotation.ecoId;
         doc.extensions = constructExtensions(annotation);
@@ -45,12 +48,23 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
         return doc;
     }
 
+    private String extractInteractingTaxonId(Annotation annotation) {
+        if (!Strings.isNullOrEmpty(annotation.interactingTaxonId)) {
+            Matcher matcher = TAXON_REGEX.matcher(annotation.interactingTaxonId);
+            if (matcher.matches()) {
+                return matcher.group(1);
+            }
+        }
+        return null;
+    }
+
     private List<String> constructExtensions(Annotation annotation) {
-        return annotation.annotationExtension == null ? null : Arrays.asList(annotation.annotationExtension.split(PIPE));
+        return annotation.annotationExtension == null ? null :
+                Arrays.asList(annotation.annotationExtension.split(PIPE));
     }
 
     private List<String> constructWithFrom(Annotation annotation) {
-        return annotation.with == null? null : Arrays.asList(annotation.with.split(PIPE));
+        return annotation.with == null ? null : Arrays.asList(annotation.with.split(PIPE));
     }
 
     private String constructGeneProductId(Annotation annotation) {
