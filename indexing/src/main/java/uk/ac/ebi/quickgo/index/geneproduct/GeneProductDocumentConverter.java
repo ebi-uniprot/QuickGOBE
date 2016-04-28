@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
 
 /**
@@ -35,7 +37,7 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         }
 
         Map<String, String> properties =
-                convertToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
+                convertLinePropertiesToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
 
         GeneProductDocument doc = new GeneProductDocument();
         doc.database = geneProduct.database;

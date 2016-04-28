@@ -48,7 +48,7 @@ public class GOADataFileParsingHelper {
         return propMap;
     }
 
-    private static String[] splitValue(String value, String delimiter) {
+    public static String[] splitValue(String value, String delimiter) {
         assert delimiter != null : "Delimiter cannot be null";
 
         String[] splitValues;

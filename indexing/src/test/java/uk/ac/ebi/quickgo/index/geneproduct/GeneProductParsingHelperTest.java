@@ -14,6 +14,8 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.hamcrest.core.Is.is;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.concatProperty;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.concatStrings;
@@ -35,9 +37,9 @@ public class GeneProductParsingHelperTest {
         String propsText = "";
 
         thrown.expect(AssertionError.class);
-        thrown.expectMessage("InterValueDelimiter can not be null");
+        thrown.expectMessage("InterValueDelimiter cannot be null");
 
-        convertToMap(propsText, null, INTRA_VALUE_DELIMITER);
+        convertLinePropertiesToMap(propsText, null, INTRA_VALUE_DELIMITER);
     }
 
     @Test
@@ -45,14 +47,14 @@ public class GeneProductParsingHelperTest {
         String propsText = "";
 
         thrown.expect(AssertionError.class);
-        thrown.expectMessage("IntraValueDelimiter can not be null");
+        thrown.expectMessage("IntraValueDelimiter cannot be null");
 
-        convertToMap(propsText, INTER_VALUE_DELIMITER, null);
+        convertLinePropertiesToMap(propsText, INTER_VALUE_DELIMITER, null);
     }
 
     @Test
     public void nullPropertiesTextReturnsEmptyMap() throws Exception {
-        Map<String, String> propsMap = convertToMap(null, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
+        Map<String, String> propsMap = convertLinePropertiesToMap(null, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
 
         assertThat(propsMap.isEmpty(), is(true));
     }
@@ -61,7 +63,7 @@ public class GeneProductParsingHelperTest {
     public void emptyPropertiesTextReturnsEmptyMap() throws Exception {
         String propsText = "";
 
-        Map<String, String> propsMap = convertToMap(propsText, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
+        Map<String, String> propsMap = convertLinePropertiesToMap(propsText, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
 
         assertThat(propsMap.isEmpty(), is(true));
     }
@@ -71,7 +73,7 @@ public class GeneProductParsingHelperTest {
         String propKey = "key";
         String propsText = propKey;
 
-        Map<String, String> propsMap = convertToMap(propsText, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
+        Map<String, String> propsMap = convertLinePropertiesToMap(propsText, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
 
         assertThat(propsMap.size(), is(1));
         assertThat(propsMap, hasKey(propKey));
@@ -85,7 +87,7 @@ public class GeneProductParsingHelperTest {
 
         String propsText = concatProperty(propKey, propValue, INTRA_VALUE_DELIMITER);
 
-        Map<String, String> propsMap = convertToMap(propsText, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
+        Map<String, String> propsMap = convertLinePropertiesToMap(propsText, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
 
         assertThat(propsMap.size(), is(1));
         assertThat(propsMap, hasEntry(propKey, propValue));
@@ -103,7 +105,7 @@ public class GeneProductParsingHelperTest {
 
         String propsText = concatStrings(Arrays.asList(concatProp1, concatProp2), INTER_VALUE_DELIMITER);
 
-        Map<String, String> propsMap = convertToMap(propsText, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
+        Map<String, String> propsMap = convertLinePropertiesToMap(propsText, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
 
         assertThat(propsMap.size(), is(2));
         assertThat(propsMap, hasEntry(propKey1, propValue1));
