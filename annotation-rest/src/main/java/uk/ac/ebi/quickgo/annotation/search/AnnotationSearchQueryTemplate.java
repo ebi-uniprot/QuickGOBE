@@ -132,7 +132,7 @@ public class AnnotationSearchQueryTemplate {
                     if(gpQuery==null){
                         gpQuery = QuickGOQuery.createQuery( AnnotationFields.ASSIGNED_BY,assignedBy);
                     }else{
-                        gpQuery = gpQuery.or(QuickGOQuery.createQuery( AnnotationFields.GENE_PRODUCT_ID,assignedBy));
+                        gpQuery = gpQuery.or(QuickGOQuery.createQuery( AnnotationFields.ASSIGNED_BY,assignedBy));
                     }
                 }
                 builder.addQueryFilter(gpQuery);
