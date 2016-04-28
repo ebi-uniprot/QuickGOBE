@@ -38,6 +38,7 @@
                 <module>indexing</module>
                 <module>sources</module>
                 <module>rest-common</module>
+                <module>solr-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -49,6 +50,7 @@
                 <module>geneproduct-common</module>
                 <module>annotation-common</module>
                 <module>indexing</module>
+                <module>solr-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -58,6 +60,17 @@
                 <module>ontology-common</module>
                 <module>rest-common</module>
                 <module>ontology-rest</module>
+                <module>solr-plugin</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>gene_product_web_service</id>
+            <modules>
+                <module>common</module>
+                <module>geneproduct-common</module>
+                <module>rest-common</module>
+                <module>geneproduct-rest</module>
+                <module>solr-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -67,15 +80,7 @@
                 <module>ontology-common</module>
                 <module>rest-common</module>
                 <module>quickgo-client</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>geneproduct_web_service</id>
-            <modules>
-                <module>common</module>
-                <module>ontology-common</module>
-                <module>rest-common</module>
-                <module>geneproduct-rest</module>
+                <module>solr-plugin</module>
             </modules>
         </profile>
     </profiles>
