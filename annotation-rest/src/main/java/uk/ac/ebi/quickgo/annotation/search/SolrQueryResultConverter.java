@@ -17,20 +17,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Turns SolrDocuments into instances of the Annotation DTO.
+ *
  * @author Tony Wardell
  * Date: 26/04/2016
  * Time: 16:44
  * Created with IntelliJ IDEA.
  */
-public class AnnotationSolrQueryResultConverter extends AbstractSolrQueryResultConverter<Annotation> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationSolrQueryResultConverter.class);
+public class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<Annotation> {
 
     private final DocumentObjectBinder documentObjectBinder;
     private final AnnotationDocConverter annotationDocConverter;
 
     private static final Map<String,String> emptyMap = new HashedMap();
 
-    public AnnotationSolrQueryResultConverter(DocumentObjectBinder documentObjectBinder,
+    public SolrQueryResultConverter(DocumentObjectBinder documentObjectBinder,
             AnnotationDocConverter annotationDocConverter){
         super(new SolrQueryResultHighlightingConverter(emptyMap));
 
@@ -41,19 +42,22 @@ public class AnnotationSolrQueryResultConverter extends AbstractSolrQueryResultC
         this.annotationDocConverter = annotationDocConverter;
     }
 
+    /**
+     * Turns SolrDocuments into instances of the Annotation DTO.
+     * @param results
+     * @return
+     */
     @Override protected List<Annotation> convertResults(SolrDocumentList results) {
         assert results != null : "Results list cannot be null";
 
         List<AnnotationDocument> solrTermDocs = documentObjectBinder.getBeans(AnnotationDocument.class, results);
-
-        List<Annotation> domainTerms = new ArrayList<>(solrTermDocs.size());
+        List<Annotation> domainObjs = new ArrayList<>(solrTermDocs.size());
 
         solrTermDocs.stream()
                 .map(annotationDocConverter::convert)
-                .forEach(domainTerms::add);
+                .forEach(domainObjs::add);
 
-        assert domainTerms.size() == results.size();
-
-        return domainTerms;
+        assert domainObjs.size() == results.size();
+        return domainObjs;
     }
 }
