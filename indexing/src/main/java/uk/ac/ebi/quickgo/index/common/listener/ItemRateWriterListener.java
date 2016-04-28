@@ -61,11 +61,11 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
     }
 
     /**
-     * Compute writing rate statistics and return a formatted {@link String},
+     * Compute writing rate statistics and return a formatted {@link StatsInfo} instance,
      * ready for printing.
      *
      * @param now the time point at which the statistics should be computed
-     * @return a formatted {@link String} representing the write rate statistics
+     * @return a {@link StatsInfo} instance representing the write rate statistics
      */
     StatsInfo computeWriteRateStats(Instant now) {
         totalWriteCount.addAndGet(deltaWriteCount.get());
