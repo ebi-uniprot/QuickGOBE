@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -18,6 +20,9 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Created with IntelliJ IDEA.
  */
 public class AnnotationFilterTest {
+
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
 
     @Test
     public void testSuccessfullyAddSingleAssignedBy(){
@@ -58,5 +63,23 @@ public class AnnotationFilterTest {
         AnnotationFilter annotationFilter = new AnnotationFilter();
         assertThat(annotationFilter.getPage(), equalTo("1"));
         assertThat(annotationFilter.getLimit(), equalTo("25"));
+    }
+
+    @Test
+    public void successfullySetPageAndLimitValues(){
+        AnnotationFilter annotationFilter = new AnnotationFilter();
+        annotationFilter.setPage("4");
+        annotationFilter.setLimit("15");
+        assertThat(annotationFilter.getPage(), equalTo("4"));
+        assertThat(annotationFilter.getLimit(), equalTo("15"));
+    }
+
+
+    @Test
+    public void exceptionThrownWhenAsForMoreResultsThanLimit(){
+        thrown.expect(IllegalArgumentException.class);
+        AnnotationFilter annotationFilter = new AnnotationFilter();
+        annotationFilter.setLimit("200");
+        annotationFilter.validation();
     }
 }
