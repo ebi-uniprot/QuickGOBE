@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AnnotationFilter {
 
-    private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
-    private static final String DEFAULT_PAGE_NUMBER = "1";
+    public static final String DEFAULT_ENTRIES_PER_PAGE = "25";
+    public static final String DEFAULT_PAGE_NUMBER = "1";
     public static final int MAX_PAGE_RESULTS = 100;
 
     private List<String> taxon;               // Taxon ids                E.g. 1234,343434
