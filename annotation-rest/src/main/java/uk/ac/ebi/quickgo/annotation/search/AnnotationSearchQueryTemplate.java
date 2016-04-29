@@ -62,29 +62,6 @@ public class AnnotationSearchQueryTemplate {
             return this;
         }
 
-
-//        /**
-//         * Specify the number of results to be returned per page, i.e., page size.
-//         *
-//         * @param pageSize the page size.
-//         * @return this {@link AnnotationSearchQueryTemplate.Builder} instance
-//         */
-//        public AnnotationSearchQueryTemplate.Builder setPageSize(int pageSize) {
-//            this.pageSize = pageSize;
-//            return this;
-//        }
-//
-//        /**
-//         * Specify which page of results to return.
-//         *
-//         * @param page the page of results to return.
-//         * @return this {@link AnnotationSearchQueryTemplate.Builder} instance
-//         */
-//        public AnnotationSearchQueryTemplate.Builder setPage(int page) {
-//            this.page = page;
-//            return this;
-//        }
-
         /**
          * Create QueryRequest which is an aggregation of the complete query to sent to Solr
          * Will not use query, only filterQueries,
@@ -118,5 +95,4 @@ public class AnnotationSearchQueryTemplate {
             }
         }
     }
-
 }
