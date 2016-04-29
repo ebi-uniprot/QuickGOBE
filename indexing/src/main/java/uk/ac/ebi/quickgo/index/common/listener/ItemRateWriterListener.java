@@ -21,7 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
     private static final Logger LOGGER = getLogger(SolrServerWriter.class);
-    static final int WRITE_RATE_DOCUMENT_INTERVAL = 10000;
+    static final int WRITE_RATE_DOCUMENT_INTERVAL = 100000;
     private final Instant startOfWriting;
     private AtomicInteger totalWriteCount = new AtomicInteger(0);
     private AtomicInteger deltaWriteCount = new AtomicInteger(0);
@@ -97,7 +97,7 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
             float deltaDocsPerSecond = (float) deltaWriteCount / deltaSeconds;
             float totalDocsPerSecond = (float) totalWriteCount / totalSeconds;
             return
-                            "\tWrite statistics {\n" +
+                            "\n\tWrite statistics {\n" +
                             "\t\tLatest delta:\n" +
                             String.format("\t\t\t# docs\t\t:\t%d\n", deltaWriteCount) +
                             String.format("\t\t\ttime (sec)\t:\t%d\n", deltaSeconds) +
