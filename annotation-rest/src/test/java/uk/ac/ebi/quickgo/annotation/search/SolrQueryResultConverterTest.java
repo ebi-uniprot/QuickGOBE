@@ -53,12 +53,21 @@ public class SolrQueryResultConverterTest {
     }
 
     @Test
-    public void test(){
+    public void successfullyConvertOneResult(){
         SolrQueryResultConverter converter = new SolrQueryResultConverter(mockBinder, mockDocConverter);
         List<Annotation> domainObjs = converter.convertResults(mockResults);
         assertThat(domainObjs, hasSize(1));
     }
 
+    @Test
+    public void successfullyConvertMultipleResults(){
+        //Add another result
+        solrTermDocs.add(mockAnnotationDocument);
+        when(mockResults.size()).thenReturn(2);
 
+        SolrQueryResultConverter converter = new SolrQueryResultConverter(mockBinder, mockDocConverter);
+        List<Annotation> domainObjs = converter.convertResults(mockResults);
+        assertThat(domainObjs, hasSize(2));
+    }
 
 }
