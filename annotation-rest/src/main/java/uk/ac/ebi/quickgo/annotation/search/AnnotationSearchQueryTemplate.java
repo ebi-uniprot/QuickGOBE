@@ -29,9 +29,6 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  */
 public class AnnotationSearchQueryTemplate {
-
-    public static final int DEFAULT_PAGE_SIZE = 25;
-    public static final int DEFAULT_PAGE_NUMBER = 1;
     private final Iterable<String> returnedFields;
 
 
@@ -49,13 +46,9 @@ public class AnnotationSearchQueryTemplate {
     public static class Builder implements SearchQueryRequestBuilder {
         private final Iterable<String> returnedFields;
         private AnnotationFilter annotationFilter;
-        private int page = DEFAULT_PAGE_NUMBER;
-        private int pageSize = DEFAULT_PAGE_SIZE;
-        private List<String> filterQueries;
 
         private Builder(Iterable<String> returnedFields) {
             this.returnedFields = returnedFields;
-            this.filterQueries = new ArrayList<>();
         }
 
 
@@ -70,28 +63,27 @@ public class AnnotationSearchQueryTemplate {
         }
 
 
-
-        /**
-         * Specify the number of results to be returned per page, i.e., page size.
-         *
-         * @param pageSize the page size.
-         * @return this {@link AnnotationSearchQueryTemplate.Builder} instance
-         */
-        public AnnotationSearchQueryTemplate.Builder setPageSize(int pageSize) {
-            this.pageSize = pageSize;
-            return this;
-        }
-
-        /**
-         * Specify which page of results to return.
-         *
-         * @param page the page of results to return.
-         * @return this {@link AnnotationSearchQueryTemplate.Builder} instance
-         */
-        public AnnotationSearchQueryTemplate.Builder setPage(int page) {
-            this.page = page;
-            return this;
-        }
+//        /**
+//         * Specify the number of results to be returned per page, i.e., page size.
+//         *
+//         * @param pageSize the page size.
+//         * @return this {@link AnnotationSearchQueryTemplate.Builder} instance
+//         */
+//        public AnnotationSearchQueryTemplate.Builder setPageSize(int pageSize) {
+//            this.pageSize = pageSize;
+//            return this;
+//        }
+//
+//        /**
+//         * Specify which page of results to return.
+//         *
+//         * @param page the page of results to return.
+//         * @return this {@link AnnotationSearchQueryTemplate.Builder} instance
+//         */
+//        public AnnotationSearchQueryTemplate.Builder setPage(int page) {
+//            this.page = page;
+//            return this;
+//        }
 
         /**
          * Create QueryRequest which is an aggregation of the complete query to sent to Solr
@@ -100,7 +92,8 @@ public class AnnotationSearchQueryTemplate {
          */
         @Override public QueryRequest build() {
             QueryRequest.Builder builder = new QueryRequest.Builder(QuickGOQuery.createEmptyQuery());
-            builder.setPageParameters(page, pageSize);
+            builder.setPageParameters(Integer.valueOf(annotationFilter.getPage()), Integer.valueOf(annotationFilter
+                    .getLimit()));
 
             //Add all filters to builder here.. todo others to follow
             addFilterToBuilder(builder, annotationFilter.getAssignedby(),  AnnotationFields.ASSIGNED_BY);
