@@ -59,4 +59,6 @@ public class SolrQueryResultConverterTest {
         assertThat(domainObjs, hasSize(1));
     }
 
+
+
 }
