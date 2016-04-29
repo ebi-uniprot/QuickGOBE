@@ -93,68 +93,36 @@ public class AnnotationSearchQueryTemplate {
             return this;
         }
 
+        /**
+         * Create QueryRequest which is an aggregation of the complete query to sent to Solr
+         * Will not use query, only filterQueries,
+         * @return
+         */
         @Override public QueryRequest build() {
-//            checkFacets(facets);
-//            checkFilters(filterQueries);
-
-            //Will not use query, only filterQueries
-            //but set a select all query so it doesn't blow up
             QueryRequest.Builder builder = new QueryRequest.Builder(QuickGOQuery.createEmptyQuery());
-
-
-            //This can be used as a default
-//            QueryRequest.Builder builder = new QueryRequest.Builder(QuickGOQuery.createQuery(AnnotationFields
-//                    .ID,"*"));
-
-
             builder.setPageParameters(page, pageSize);
 
-
-//            //Gene Product ID
-//            if(annotationFilter.getGp()!=null && !annotationFilter.getGp().isEmpty()){
-//                QuickGOQuery gpQuery = null;
-//                for( String gp:annotationFilter.getGp()){
-//
-//                    if(gpQuery==null){
-//                        gpQuery = QuickGOQuery.createQuery( AnnotationFields.GENE_PRODUCT_ID,gp);
-//                    }else{
-//                        gpQuery = gpQuery.or(QuickGOQuery.createQuery( AnnotationFields.GENE_PRODUCT_ID,gp));
-//                    }
-//                }
-//                builder.addQueryFilter(gpQuery);
-//            }
-//
-            //Assigned By
-//            QuickGOQuery assignedByQuery = null;
-//            if(annotationFilter.getAssignedby()!=null && !annotationFilter.getAssignedby().isEmpty()){
-//                for( String assignedBy:annotationFilter.getAssignedby()){
-//
-//                    if(assignedByQuery==null){
-//                        assignedByQuery = QuickGOQuery.createQuery( AnnotationFields.ASSIGNED_BY,assignedBy);
-//                    }else{
-//                        assignedByQuery = assignedByQuery.or(QuickGOQuery.createQuery( AnnotationFields.ASSIGNED_BY,
-//                                assignedBy));
-//                    }
-//                }
-//                if(assignedByQuery!=null){
-//                    builder.addQueryFilter(assignedByQuery);
-//                }
-//            }
-
-
-            QuickGOQuery assignedByQuery = annotationFilter.getAssignedby()
-                    .parallelStream()
-                    .reduce(null, (gpQuery, filterString) -> QuickGOQuery.createQuery( AnnotationFields.ASSIGNED_BY, filterString),
-                            (qgQuery1,qgQuery2) -> qgQuery1.or(qgQuery2)  ) ;
-
-            if(assignedByQuery!=null) {
-                builder.addQueryFilter(assignedByQuery);
-            }
+            //Add all filters to builder here.. todo others to follow
+            addFilterToBuilder(builder, annotationFilter.getAssignedby(),  AnnotationFields.ASSIGNED_BY);
+            addFilterToBuilder(builder, annotationFilter.getQualifier(),  AnnotationFields.QUALIFIER);
 
             returnedFields
                     .forEach(builder::addProjectedField);
 
             return builder.build();
+        }
+
+        private void addFilterToBuilder(QueryRequest.Builder builder, List<String> filterArgs, String solrField) {
+            if(filterArgs==null){
+                return;
+            }
+            QuickGOQuery assignedByQuery = filterArgs
+                .parallelStream()
+                .reduce(null, (q, arg) -> QuickGOQuery.createQuery( solrField, arg), (q1,q2) -> q1.or(q2)) ;
+
+            if(assignedByQuery!=null) {
+                builder.addQueryFilter(assignedByQuery);
+            }
         }
     }
 
