@@ -125,17 +125,30 @@ public class AnnotationSearchQueryTemplate {
 //            }
 //
             //Assigned By
-            if(annotationFilter.getAssignedby()!=null && !annotationFilter.getAssignedby().isEmpty()){
-                QuickGOQuery gpQuery = null;
-                for( String assignedBy:annotationFilter.getAssignedby()){
+//            QuickGOQuery assignedByQuery = null;
+//            if(annotationFilter.getAssignedby()!=null && !annotationFilter.getAssignedby().isEmpty()){
+//                for( String assignedBy:annotationFilter.getAssignedby()){
+//
+//                    if(assignedByQuery==null){
+//                        assignedByQuery = QuickGOQuery.createQuery( AnnotationFields.ASSIGNED_BY,assignedBy);
+//                    }else{
+//                        assignedByQuery = assignedByQuery.or(QuickGOQuery.createQuery( AnnotationFields.ASSIGNED_BY,
+//                                assignedBy));
+//                    }
+//                }
+//                if(assignedByQuery!=null){
+//                    builder.addQueryFilter(assignedByQuery);
+//                }
+//            }
 
-                    if(gpQuery==null){
-                        gpQuery = QuickGOQuery.createQuery( AnnotationFields.ASSIGNED_BY,assignedBy);
-                    }else{
-                        gpQuery = gpQuery.or(QuickGOQuery.createQuery( AnnotationFields.ASSIGNED_BY,assignedBy));
-                    }
-                }
-                builder.addQueryFilter(gpQuery);
+
+            QuickGOQuery assignedByQuery = annotationFilter.getAssignedby()
+                    .parallelStream()
+                    .reduce(null, (gpQuery, filterString) -> QuickGOQuery.createQuery( AnnotationFields.ASSIGNED_BY, filterString),
+                            (qgQuery1,qgQuery2) -> qgQuery1.or(qgQuery2)  ) ;
+
+            if(assignedByQuery!=null) {
+                builder.addQueryFilter(assignedByQuery);
             }
 
             returnedFields
