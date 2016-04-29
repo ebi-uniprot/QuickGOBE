@@ -4,11 +4,13 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -26,6 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -49,6 +52,9 @@ public class AnnotationControllerIT {
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     private static final String ASSIGNED_BY_PARAM = "assignedby";
+    private static final String PAGE = "page";
+
+
     protected MockMvc mockMvc;
 
     private String validAssignedBy;
@@ -131,6 +137,38 @@ public class AnnotationControllerIT {
     }
 
 
+    @Test
+    public void retrievesSecondPageOfAllEntriesRequest() throws Exception {
+        annotationRepository.deleteAll();
+        annotationRepository.save(createNDocs(60));
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, validAssignedBy)
+                        .param(PAGE, "2"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.results").isArray())
+                .andExpect(jsonPath("$.results", hasSize(Integer.parseInt(AnnotationFilter.DEFAULT_ENTRIES_PER_PAGE))));
+    }
+
+
+    @Test
+    public void cannotRetrievesPageOfEntriesPassedWhatsAvailable() throws Exception {
+        annotationRepository.deleteAll();
+        annotationRepository.save(createNDocs(60));
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, validAssignedBy)
+                        .param(PAGE, "4"));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    /**
+     *      TESTING RESULTS
+     */
+
     private ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
         return expectFieldsInResults(result)
                 .andDo(print())
@@ -174,5 +212,16 @@ public class AnnotationControllerIT {
                 AnnotationDocMocker.createAnnotationDoc("A0A000"),
                 AnnotationDocMocker.createAnnotationDoc("A0A001","ASPGD"),
                 AnnotationDocMocker.createAnnotationDoc("A0A001","BHF-UCL"));
+    }
+
+
+    private List<AnnotationDocument> createNDocs(int n) {
+        return IntStream.range(0, n)
+                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i))).collect
+                        (Collectors.toList());
+    }
+
+    private String createId(int idNum) {
+        return String.format("A0A%03d", idNum);
     }
 }
