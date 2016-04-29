@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.search;
+package uk.ac.ebi.quickgo.annotation.service.search;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
@@ -13,8 +13,6 @@ import java.util.Map;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocumentList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Turns SolrDocuments into instances of the Annotation DTO.

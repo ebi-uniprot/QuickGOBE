@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.search;
+package uk.ac.ebi.quickgo.annotation.service.search;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;

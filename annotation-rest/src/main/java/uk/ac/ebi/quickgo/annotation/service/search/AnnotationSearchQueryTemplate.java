@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.search;
+package uk.ac.ebi.quickgo.annotation.service.search;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.rest.search.SearchQueryRequestBuilder;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -1,6 +1,5 @@
-package uk.ac.ebi.quickgo.annotation.search;
+package uk.ac.ebi.quickgo.annotation.service.search;
 
-import uk.ac.ebi.quickgo.rest.search.query.FieldQuery;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 

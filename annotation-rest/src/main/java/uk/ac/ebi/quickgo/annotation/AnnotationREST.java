@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation;
 
-import uk.ac.ebi.quickgo.annotation.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,7 +13,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 /**
  *
  * The RESTful service configuration for Annotations
- * 
+ *
  * @author Tony Wardell
  * Date: 26/04/2016
  * Time: 14:41

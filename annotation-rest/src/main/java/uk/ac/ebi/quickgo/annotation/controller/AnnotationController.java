@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
-import uk.ac.ebi.quickgo.annotation.search.AnnotationSearchQueryTemplate;
-import uk.ac.ebi.quickgo.annotation.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.annotation.service.search.AnnotationSearchQueryTemplate;
+import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 

@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.search;
+package uk.ac.ebi.quickgo.annotation.service.search;
 
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 
@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
