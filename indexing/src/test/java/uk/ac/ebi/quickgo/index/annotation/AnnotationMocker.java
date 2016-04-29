@@ -10,6 +10,7 @@ package uk.ac.ebi.quickgo.index.annotation;
 class AnnotationMocker {
     static Annotation createValidAnnotation() {
         Annotation annotation = new Annotation();
+
         annotation.db = "IntAct";
         annotation.dbObjectId = "EBI-10043081";
         annotation.dbReferences = "PMID:12871976";
@@ -20,7 +21,7 @@ class AnnotationMocker {
         annotation.with = "GO:0036376,GO:1990573";
         annotation.assignedBy = "IntAct";
         annotation.annotationExtension = "occurs_in(CL:1000428)";
-        annotation.annotationProperties = "go_evidence=IPI";
+        annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";
 
         return annotation;
     }

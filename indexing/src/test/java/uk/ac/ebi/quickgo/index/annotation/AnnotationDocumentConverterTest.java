@@ -11,6 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.nullValue;
+import static uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentConverter.DEFAULT_TAXON;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationMocker.createValidAnnotation;
 
 /**
@@ -42,7 +43,7 @@ public class AnnotationDocumentConverterTest {
         annotation.ecoId = "ECO:0000353";
         annotation.assignedBy = "IntAct";
         annotation.annotationExtension = "occurs_in(CL:1000428)";
-        annotation.annotationProperties = "go_evidence=IPI";
+        annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -54,32 +55,32 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.reference, is(annotation.dbReferences));
     }
 
-    // taxon
+    // interacting taxon
     @Test
-    public void convertsEmptyTaxonToNullValue() throws Exception {
+    public void convertsEmptyInteractingTaxonToDefaultTaxon() throws Exception {
         annotation.interactingTaxonId = null;
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.interactingTaxonId, is(nullValue()));
+        assertThat(doc.interactingTaxonId, is(DEFAULT_TAXON));
     }
 
     @Test
-    public void convertsValidNonEmptyTaxon() throws Exception {
+    public void convertsValidNonEmptyInteractingTaxon() throws Exception {
         annotation.interactingTaxonId = "taxon:12345";
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.interactingTaxonId, is("12345"));
+        assertThat(doc.interactingTaxonId, is(12345));
     }
 
     @Test
-    public void convertsInvalidNonEmptyTaxon() throws Exception {
+    public void convertsInvalidNonEmptyInteractingTaxon() throws Exception {
         annotation.interactingTaxonId = "taxon:12345d";
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.interactingTaxonId, is(nullValue()));
+        assertThat(doc.interactingTaxonId, is(DEFAULT_TAXON));
     }
 
     // with
@@ -110,9 +111,9 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.withFrom, containsInAnyOrder("GO:0036376", "GO:0036377"));
     }
 
-    // annotation properties
+    // annotation properties: go evidence
     @Test
-    public void convertsNullAnnotationPropertiesToNullValue() throws Exception {
+    public void convertsNullGOEvidenceAnnotationPropertiesToNullValue() throws Exception {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -121,12 +122,103 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsAnnotationPropertiesForGoEvidence() throws Exception {
-        annotation.annotationProperties = "go_evidence=FIND_ME";
+    public void convertsGOEvidenceAnnotationProperties() throws Exception {
+        String evidence = "FIND_ME";
+        annotation.annotationProperties = "go_evidence=" + evidence;
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.goEvidence, is("FIND_ME"));
+        assertThat(doc.goEvidence, is(evidence));
+    }
+
+    // annotation properties: taxon id
+    @Test
+    public void convertsNullTaxonIdAnnotationPropertiesToDefaultTaxon() throws Exception {
+        annotation.annotationProperties = null;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonId, is(DEFAULT_TAXON));
+    }
+
+    @Test
+    public void convertsTaxonIdAnnotationProperties() throws Exception {
+        int taxon = 12345;
+        annotation.annotationProperties = "taxon_id=" + taxon;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonId, is(taxon));
+    }
+
+    @Test
+    public void convertsInvalidTaxonIdAnnotationPropertiesToDefaultTaxon() throws Exception {
+        String taxon = "12345a";
+        annotation.annotationProperties = "taxon_id=" + taxon;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonId, is(DEFAULT_TAXON));
+    }
+
+    // annotation properties: db object type
+    @Test
+    public void convertsNullDbObjectTypeAnnotationPropertiesToNullValue() throws Exception {
+        annotation.annotationProperties = null;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.dbObjectType, is(nullValue()));
+    }
+
+    @Test
+    public void convertsDbObjectTypeAnnotationProperties() throws Exception {
+        String value = "FINDME";
+        annotation.annotationProperties = "db_object_type=" + value;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.dbObjectType, is(value));
+    }
+
+    // annotation properties: db object symbol
+    @Test
+    public void convertsNullDbObjectSymbolAnnotationPropertiesToNullValue() throws Exception {
+        annotation.annotationProperties = null;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.dbObjectSymbol, is(nullValue()));
+    }
+
+    @Test
+    public void convertsDbObjectSymbolAnnotationProperties() throws Exception {
+        String value = "FINDME";
+        annotation.annotationProperties = "db_object_symbol=" + value;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.dbObjectSymbol, is(value));
+    }
+
+    // annotation properties: db subset
+    @Test
+    public void convertsNullDbSubsetAnnotationPropertiesToNullValue() throws Exception {
+        annotation.annotationProperties = null;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.dbSubset, is(nullValue()));
+    }
+
+    @Test
+    public void convertsDbSubsetAnnotationProperties() throws Exception {
+        String value = "FINDME";
+        annotation.annotationProperties = "db_subset=" + value;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.dbSubset, is(value));
     }
 
     // annotation extensions

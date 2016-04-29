@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import org.springframework.batch.item.ItemProcessor;
 
-import static uk.ac.ebi.quickgo.index.annotation.AnnotationValidator.TAXON_REGEX;
+import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.COLON;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.EQUALS;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.PIPE;
@@ -23,7 +23,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.c
  * @author Edd
  */
 public class AnnotationDocumentConverter implements ItemProcessor<Annotation, AnnotationDocument> {
-    private static final String GO_EVIDENCE = "go_evidence";
+    static final int DEFAULT_TAXON = 0;
 
     @Override public AnnotationDocument process(Annotation annotation) throws Exception {
         if (annotation == null) {
@@ -37,25 +37,41 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
         doc.geneProductId = constructGeneProductId(annotation);
         doc.qualifier = annotation.qualifier;
         doc.goId = annotation.goId;
-        doc.goEvidence = propertiesMap.get(GO_EVIDENCE);
         doc.reference = annotation.dbReferences;
-        doc.withFrom = constructWithFrom(annotation);
-        doc.interactingTaxonId = extractInteractingTaxonId(annotation);
         doc.assignedBy = annotation.assignedBy;
         doc.ecoId = annotation.ecoId;
         doc.extensions = constructExtensions(annotation);
 
+        doc.withFrom = constructWithFrom(annotation);
+        doc.interactingTaxonId = extractInteractingTaxonId(annotation);
+
+        doc.goEvidence = propertiesMap.get(GO_EVIDENCE);
+        doc.dbSubset = propertiesMap.get(DB_OBJECT_SUBSET);
+        doc.dbObjectSymbol = propertiesMap.get(DB_OBJECT_SYMBOL);
+        doc.dbObjectType = propertiesMap.get(DB_OBJECT_TYPE);
+        doc.taxonId = extractTaxonId(propertiesMap.get(TAXON_ID));
+
         return doc;
     }
 
-    private String extractInteractingTaxonId(Annotation annotation) {
+    private int extractInteractingTaxonId(Annotation annotation) {
         if (!Strings.isNullOrEmpty(annotation.interactingTaxonId)) {
-            Matcher matcher = TAXON_REGEX.matcher(annotation.interactingTaxonId);
+            Matcher matcher = INTERACTING_TAXON_REGEX.matcher(annotation.interactingTaxonId);
             if (matcher.matches()) {
-                return matcher.group(1);
+                return Integer.parseInt(matcher.group(1));
             }
         }
-        return null;
+        return DEFAULT_TAXON;
+    }
+
+    private int extractTaxonId(String rawTaxonId) {
+        if (!Strings.isNullOrEmpty(rawTaxonId)) {
+            Matcher matcher = RAW_TAXON_REGEX.matcher(rawTaxonId);
+            if (matcher.matches()) {
+                return Integer.parseInt(matcher.group(1));
+            }
+        }
+        return DEFAULT_TAXON;
     }
 
     private List<String> constructExtensions(Annotation annotation) {

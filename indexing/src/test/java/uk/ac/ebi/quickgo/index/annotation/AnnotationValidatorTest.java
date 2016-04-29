@@ -235,37 +235,38 @@ public class AnnotationValidatorTest {
     // good annotation properties field -------------------------------------------------
     @Test
     public void validNullAnnotationProperties() {
+        // if we adhere to the column specification header, this can be null
         annotation.annotationProperties = null;
         validator.validate(annotation);
     }
 
     @Test
     public void validEmptyAnnotationProperties() {
+        // if we adhere to the column specification header, this can be empty
         annotation.annotationProperties = "";
         validator.validate(annotation);
     }
 
     @Test
-    public void validSingleTermedComponentAnnotationProperty() {
-        annotation.annotationProperties = "go_evidence=IPI";
+    public void validRequiredAnnotationProperties() {
         validator.validate(annotation);
     }
 
     @Test
-    public void validSingleTermedComponentsAnnotationProperty() {
-        annotation.annotationProperties = "go_evidence=IPI|a=b";
+    public void validAnnotationPropertiesAndDbObjectSymbol() {
+        annotation.annotationProperties += "|db_object_symbol=moeA5";
         validator.validate(annotation);
     }
 
     @Test
-    public void validMultiTermedComponentAnnotationProperty() {
-        annotation.annotationProperties = "go_evidence=IPI,a=b";
+    public void validAnnotationPropertiesAndDbSubset() {
+        annotation.annotationProperties += "|db_subset=TrEMBL";
         validator.validate(annotation);
     }
 
     @Test
-    public void validMultiTermedComponentsAnnotationProperty() {
-        annotation.annotationProperties = "go_evidence=IPI,a=b|c=d,e=f|g=h";
+    public void validAnnotationPropertyWithAdditionalIgnoredTerms() {
+        annotation.annotationProperties += "|a=b|c=d,e=f|g=h";
         validator.validate(annotation);
     }
 
@@ -273,6 +274,24 @@ public class AnnotationValidatorTest {
     @Test(expected = ValidationException.class)
     public void invalidSingleTermedComponentAnnotationProperty() {
         annotation.annotationProperties = "go_evidence:IPI";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidAnnotationPropertyDueToMissingGOEvidence() {
+        annotation.annotationProperties = "taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";;
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidAnnotationPropertyDueToMissingTaxonId() {
+        annotation.annotationProperties = "go_evidence=IEA|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";;
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidAnnotationPropertyDueToMissingDbObjectType() {
+        annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5";;
         validator.validate(annotation);
     }
 

@@ -3,12 +3,12 @@ package uk.ac.ebi.quickgo.index.annotation;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Strings;
-import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.item.validator.Validator;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.annotation.Columns.*;
 import static uk.ac.ebi.quickgo.index.common.validation.ValidationHelper.checkIsNullOrEmpty;
 
@@ -23,36 +23,6 @@ import static uk.ac.ebi.quickgo.index.common.validation.ValidationHelper.checkIs
 public class AnnotationValidator implements Validator<Annotation> {
 
     private static final Logger LOGGER = getLogger(AnnotationValidator.class);
-
-    // regular expressions used to validate field values -----------------------------------------------
-
-    // e.g., a,b,c|d,e
-    private static final String PIPE_SEPARATED_CSVs = "(%s(,%s)*)(\\|(%s(,%s)*))*";
-    private static final String KEY_EQUALS_VALUE = ".*=.*";
-    private static final String DB_COLON_REF = "[A-Za-z0-9_\\.-]+(:[A-Za-z0-9_\\.-]+){1,}";
-    private static final String QUALIFIERS =
-            "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$";
-    private static final String WORD_LBRACE_WORD_RBRACE = "[a-zA-Z0-9_-]+\\([a-zA-Z0-9_:\\.-]+\\)";
-    private static final String TAXON = "taxon:([0-9]+)";
-
-    private static final Pattern WITH_REGEX = Pattern.compile(String.format(
-            "(" + PIPE_SEPARATED_CSVs + ")|(With:Not_Supplied)",
-            DB_COLON_REF, DB_COLON_REF, DB_COLON_REF, DB_COLON_REF));
-
-    private static final Pattern QUALIFIER_REGEX = Pattern.compile(QUALIFIERS);
-
-    private static final Pattern ANNOTATION_EXTENSION_REGEX = Pattern.compile(String.format(
-            PIPE_SEPARATED_CSVs,
-            WORD_LBRACE_WORD_RBRACE, WORD_LBRACE_WORD_RBRACE,
-            WORD_LBRACE_WORD_RBRACE, WORD_LBRACE_WORD_RBRACE));
-
-    private static final Pattern ANNOTATION_PROPERTIES_REGEX = Pattern.compile(String.format(
-            PIPE_SEPARATED_CSVs,
-            KEY_EQUALS_VALUE, KEY_EQUALS_VALUE, KEY_EQUALS_VALUE, KEY_EQUALS_VALUE));
-
-    static final Pattern TAXON_REGEX = Pattern.compile(TAXON);
-
-    // end of regular expressions -----------------------------------------------
 
     @Override public void validate(Annotation annotation) throws ValidationException {
         if (annotation == null) {
@@ -69,30 +39,48 @@ public class AnnotationValidator implements Validator<Annotation> {
         checkIsNullOrEmpty(annotation.assignedBy, COLUMN_ASSIGNED_BY.getName());
 
         // optional fields
-        checkExtensions(annotation);
         checkProperties(annotation);
+        checkExtensions(annotation);
         checkWith(annotation);
         checkTaxon(annotation);
     }
 
     private void checkTaxon(Annotation annotation) {
         if (!Strings.isNullOrEmpty(annotation.interactingTaxonId) &&
-                !TAXON_REGEX.matcher(annotation.interactingTaxonId).matches()) {
+                !INTERACTING_TAXON_REGEX.matcher(annotation.interactingTaxonId).matches()) {
             handlePatternMismatchError(
                     "Interacting Taxon",
                     annotation.interactingTaxonId,
-                    TAXON_REGEX.pattern(),
+                    INTERACTING_TAXON_REGEX.pattern(),
                     annotation);
         }
     }
 
     private void checkProperties(Annotation annotation) {
-        if (!Strings.isNullOrEmpty(annotation.annotationProperties) &&
-                !ANNOTATION_PROPERTIES_REGEX.matcher(annotation.annotationProperties).matches()) {
+        if (!Strings.isNullOrEmpty(annotation.annotationProperties)) {
+            if (!ANNOTATION_PROPERTIES_REGEX.matcher(annotation.annotationProperties).matches()) {
+                handlePatternMismatchError(
+                        "Annotation Properties",
+                        annotation.annotationProperties,
+                        ANNOTATION_PROPERTIES_REGEX.pattern(),
+                        annotation);
+            }
+            else {
+                checkMandatoryPropertiesFieldsExist(annotation);
+            }
+        }
+    }
+
+    private void checkMandatoryPropertiesFieldsExist(Annotation annotation) {
+        if (!(PROPS_TAXON_REGEX.matcher(annotation.annotationProperties).find() &&
+                      PROPS_GO_EVIDENCE_REGEX.matcher(annotation.annotationProperties).find() &&
+                      PROPS_DB_OBJECT_TYPE_REGEX.matcher(annotation.annotationProperties).find())) {
             handlePatternMismatchError(
-                    "Annotation Properties",
-                    annotation.annotationExtension,
-                    ANNOTATION_PROPERTIES_REGEX.pattern(),
+                    "Annotation Properties: required field not found",
+                    annotation.annotationProperties,
+                    PROPS_TAXON_REGEX.pattern()
+                            + " AND " + PROPS_GO_EVIDENCE_REGEX.pattern()
+                            + " AND " + PROPS_DB_OBJECT_TYPE_REGEX.pattern(),
                     annotation);
         }
     }
@@ -131,7 +119,7 @@ public class AnnotationValidator implements Validator<Annotation> {
 
     private void handlePatternMismatchError(String fieldName, Object fieldValue, String pattern, Object rawObject) {
         String errorMessage = String.format(
-                "%s field, %s does not match: %s. See, %s",
+                "%s field, <%s> does not match: <%s>. See, %s",
                 fieldName, fieldValue, pattern, rawObject.toString());
         LOGGER.error(errorMessage);
         throw new ValidationException(errorMessage);

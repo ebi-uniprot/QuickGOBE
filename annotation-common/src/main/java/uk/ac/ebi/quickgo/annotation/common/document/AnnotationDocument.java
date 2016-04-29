@@ -22,6 +22,18 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.QUALIFIER)
     public String qualifier;
 
+    @Field(AnnotationFields.DB_OBJECT_SYMBOL)
+    public String dbObjectSymbol;
+
+    @Field(AnnotationFields.DB_OBJECT_TYPE)
+    public String dbObjectType;
+
+    @Field(AnnotationFields.DB_SUBSET)
+    public String dbSubset;
+
+    @Field(AnnotationFields.TAXON_ID)
+    public int taxonId;
+
     @Field(AnnotationFields.GO_ID)
     public String goId;
 
@@ -38,7 +50,7 @@ public class AnnotationDocument implements QuickGODocument {
     public List<String> withFrom;
 
     @Field(AnnotationFields.INTERACTING_TAXON_ID)
-    public String interactingTaxonId;
+    public int interactingTaxonId;
 
     @Field(AnnotationFields.ASSIGNED_BY)
     public String assignedBy;

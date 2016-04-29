@@ -24,6 +24,10 @@ public class AnnotationFields {
     public final static String INTERACTING_TAXON_ID = "interactingTaxonId";
     public final static String ASSIGNED_BY = "assignedBy";
     public final static String EXTENSION = "extension";
+    public static final String DB_OBJECT_SYMBOL = "dbObjectSymbol";
+    public static final String DB_OBJECT_TYPE = "dbObjectType";
+    public static final String DB_SUBSET = "dbSubset";
+    public static final String TAXON_ID = "taxonId";
 
     /**
      * Annotation fields that are stored, and can therefore be retrieved.
