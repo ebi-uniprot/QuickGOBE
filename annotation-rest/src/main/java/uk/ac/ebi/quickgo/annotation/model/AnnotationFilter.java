@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AnnotationFilter {
 
-    private static final int DEFAULT_ENTRIES_PER_PAGE = 25;
-    private static final int DEFAULT_PAGE_NUMBER = 1;
+    private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
+    private static final String DEFAULT_PAGE_NUMBER = "1";
     public static final int MAX_PAGE_RESULTS = 100;
 
     private List<String> taxon;               // Taxon ids                E.g. 1234,343434
@@ -68,18 +68,16 @@ public class AnnotationFilter {
 
     private List<String> with;                 //                          E.g. AGI_LocusCode,CGD,..
 
-    private List<String> assignedby;                 //                          E.g. ASPGD,Agbase,..
+    private List<String> assignedby;           //                          E.g. ASPGD,Agbase,..
 
     //Non-data parameters
-    private int limit = DEFAULT_ENTRIES_PER_PAGE;
-    private int page = DEFAULT_PAGE_NUMBER;
-    private List<String> facets;        //todo not required atm
-    boolean highlighting = false;       //todo not required atm
+    private String limit = DEFAULT_ENTRIES_PER_PAGE;
+    private String page = DEFAULT_PAGE_NUMBER;
 
 
     //Defaults for required values
-    private GoTermUse DEFAULT_GO_TERM_USE=GoTermUse.ANCESTOR;
-    private EvidenceRelationship DEFAULT_EVIDENCE_RELATIONSHIP = EvidenceRelationship.ANCESTOR;
+    private static final String DEFAULT_GO_TERM_USE="Ancestor";
+    private static final String DEFAULT_EVIDENCE_RELATIONSHIP ="Ancestor";
 
     //todo @Autowired
     public ControllerValidationHelper validationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
@@ -97,16 +95,16 @@ public class AnnotationFilter {
 
         //If go terms or sets are entered, then use the default relationship if none is specified
         if(((goTerm != null && goTerm.size()>0) || (goTermSet !=null && goTermSet.size()>0))&& goTermUse==null){
-            goTermUse = DEFAULT_GO_TERM_USE.toString();
+            goTermUse = DEFAULT_GO_TERM_USE;
         }
 
         //If eco codes or go evidence codes are entered, then use the default relationship if none is specified
         if(((ecoEvidence !=null && ecoEvidence.size()>0) || (goEvidence !=null && goEvidence.size()>0)) &&
         evidenceRelationship==null){
-            evidenceRelationship = DEFAULT_EVIDENCE_RELATIONSHIP.toString();
+            evidenceRelationship = DEFAULT_EVIDENCE_RELATIONSHIP;
         }
 
-        validationHelper.validateRequestedResults(limit);
+        validationHelper.validateRequestedResults(Integer.parseInt(limit));
     }
 
     private void verifyField(List<String> args, Map<String, Object> choices, String message) {
@@ -185,11 +183,11 @@ public class AnnotationFilter {
         this.assignedby =  validationHelper.csvToList(assignedby);
     }
 
-    public void setPage(int page) {
+    public void setPage(String page) {
         this.page = page;
     }
 
-    public void setLimit(int limit) {
+    public void setLimit(String limit) {
         this.limit = limit;
     }
 
@@ -257,31 +255,11 @@ public class AnnotationFilter {
         return assignedby;
     }
 
-    public int getLimit() {
+    public String getLimit() {
         return limit;
     }
 
-    public int getPage() {
+    public String getPage() {
         return page;
-    }
-
-    public enum GeneProductType{
-        PROTEIN, RNA, COMPLEXES;
-    }
-
-    public enum  GoTermRelationship {
-        I,IPO,IPOR
-    }
-
-    public enum GoTermUse {
-        ANCESTOR, SLIM, EXACT
-    }
-
-    public enum Aspect{
-        F, P, C;
-    }
-
-    public enum EvidenceRelationship{
-        ANCESTOR, EXACT;
     }
 }
