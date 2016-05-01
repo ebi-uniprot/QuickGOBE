@@ -1,21 +1,31 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
  * Here are the list of parameters filtering will require. The values shown are the ones the FE currently uses
  * Nearly all the parameters can take multiple values, separated by commas. These types are named as plural.
  * Exceptions exists however
+ *
+ * Once the comma separated values have been set, then turn then into an object (PrototypeFilter) that
+ * encapsulates the list and solr field name to use for that argument.
+ *
+ * Consumers of this class will call the method {@link AnnotationFilter#requestConsumptionOfPrototypeFilters(Consumer)} ()}
+ * to receive each PrototypeFilter at a time.
  *
  * @author Tony Wardell
  * Date: 25/04/2016
@@ -27,6 +37,9 @@ public class AnnotationFilter {
     public static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     public static final String DEFAULT_PAGE_NUMBER = "1";
     public static final int MAX_PAGE_RESULTS = 100;
+    private static final String COMMA = ",";
+
+
 
     private List<String> taxon;               // Taxon ids                E.g. 1234,343434
 
@@ -68,8 +81,6 @@ public class AnnotationFilter {
 
     private List<String> with;                 //                          E.g. AGI_LocusCode,CGD,..
 
-    private List<String> assignedby;           //                          E.g. ASPGD,Agbase,..
-
     //Non-data parameters
     private String limit = DEFAULT_ENTRIES_PER_PAGE;
     private String page = DEFAULT_PAGE_NUMBER;
@@ -78,6 +89,8 @@ public class AnnotationFilter {
     //Defaults for required values
     private static final String DEFAULT_GO_TERM_USE="Ancestor";
     private static final String DEFAULT_EVIDENCE_RELATIONSHIP ="Ancestor";
+
+    private List<PrototypeFilter> prototypeFilters = new ArrayList<>();
 
     //todo @Autowired
     public ControllerValidationHelper validationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
@@ -179,8 +192,14 @@ public class AnnotationFilter {
         this.with =  validationHelper.csvToList(with);
     }
 
+    // E.g. ASPGD,Agbase,..
     public void setAssignedby(String assignedby) {
-        this.assignedby =  validationHelper.csvToList(assignedby);
+
+        //this.assignedby =  validationHelper.csvToList(assignedby);
+        if (!isNullOrEmpty(assignedby)) {
+            prototypeFilters.add(buildUsingArgument(AnnotationFields.ASSIGNED_BY, assignedby));
+        }
+
     }
 
     public void setPage(String page) {
@@ -191,68 +210,14 @@ public class AnnotationFilter {
         this.limit = limit;
     }
 
-    public List<String> getTaxon() {
-        return taxon;
-    }
-
-    public List<String> getGp() {
-        return gp;
-    }
-
-    public List<String> getGpSet() {
-        return gpSet;
-    }
-
-    public List<String> getGpType() {
-        return gpType;
-    }
-
-    public List<String> getGoTerm() {
-        return goTerm;
-    }
-
-    public List<String> getGoTermSet() {
-        return goTermSet;
-    }
-
-    public String getGoTermUse() {
-        return goTermUse;
-    }
-
-    public String getGoTermRelationship() {
-        return goTermRelationship;
-    }
-
-    public List<String> getAspect() {
-        return aspect;
-    }
-
-    public List<String> getEcoEvidence() {
-        return ecoEvidence;
-    }
-
-    public List<String> getGoEvidence() {
-        return goEvidence;
-    }
-
-    public String getEvidenceRelationship() {
-        return evidenceRelationship;
-    }
 
     public List<String> getQualifier() {
         return qualifier;
     }
 
-    public List<String> getReference() {
-        return reference;
-    }
 
     public List<String> getWith() {
         return with;
-    }
-
-    public List<String> getAssignedby() {
-        return assignedby;
     }
 
     public String getLimit() {
@@ -261,5 +226,47 @@ public class AnnotationFilter {
 
     public String getPage() {
         return page;
+    }
+
+    /**
+     * Pass the prototypeFilters to a PrototypeFilter consumer
+     */
+    public void requestConsumptionOfPrototypeFilters(Consumer<PrototypeFilter> consumer){
+
+        prototypeFilters.stream()
+                .forEach(pr -> consumer.accept(pr));
+    }
+
+
+    /**
+     * Create a prototype filter using the passed argument
+     * @param solrName
+     * @param argIncludingDelimiters
+     * @return
+     */
+
+    public static final PrototypeFilter buildUsingArgument(String solrName, String argIncludingDelimiters){
+        PrototypeFilter prototypeFilter = new PrototypeFilter();
+        prototypeFilter.solrName = solrName;
+        prototypeFilter.args = Arrays.asList(argIncludingDelimiters.split(COMMA));
+        return prototypeFilter;
+    }
+
+    /**
+     * Holds the content needed to be turned in to a QueryFilter
+     */
+    public static class PrototypeFilter {
+
+
+        private String solrName;
+        private List<String> args;
+
+        public String getSolrName() {
+            return solrName;
+        }
+
+        public List<String> getArgs() {
+            return args;
+        }
     }
 }

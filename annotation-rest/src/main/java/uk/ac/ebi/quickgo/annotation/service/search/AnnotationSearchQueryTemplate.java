@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
 import uk.ac.ebi.quickgo.rest.search.SearchQueryRequestBuilder;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
  *
@@ -42,9 +41,10 @@ public class AnnotationSearchQueryTemplate {
     }
 
 
-    public static class Builder implements SearchQueryRequestBuilder {
+    public static class Builder implements SearchQueryRequestBuilder, Consumer<AnnotationFilter.PrototypeFilter> {
         private final Iterable<String> returnedFields;
         private AnnotationFilter annotationFilter;
+        private QueryRequest.Builder builder;
 
         private Builder(Iterable<String> returnedFields) {
             this.returnedFields = returnedFields;
@@ -67,13 +67,12 @@ public class AnnotationSearchQueryTemplate {
          * @return
          */
         @Override public QueryRequest build() {
-            QueryRequest.Builder builder = new QueryRequest.Builder(QuickGOQuery.createEmptyQuery());
+            builder = new QueryRequest.Builder(QuickGOQuery.createEmptyQuery());
             builder.setPageParameters(Integer.valueOf(annotationFilter.getPage()), Integer.valueOf(annotationFilter
                     .getLimit()));
 
-            //Add all filters to builder here.. todo others to follow
-            addFilterToBuilder(builder, annotationFilter.getAssignedby(),  AnnotationFields.ASSIGNED_BY);
-            addFilterToBuilder(builder, annotationFilter.getQualifier(),  AnnotationFields.QUALIFIER);
+            //Call back to filters accumulator, consume the PrototypeFilters found there and turn in to QuickGOQueries
+            annotationFilter.requestConsumptionOfPrototypeFilters(this);
 
             returnedFields
                     .forEach(builder::addProjectedField);
@@ -81,17 +80,41 @@ public class AnnotationSearchQueryTemplate {
             return builder.build();
         }
 
-        private void addFilterToBuilder(QueryRequest.Builder builder, List<String> filterArgs, String solrField) {
-            if(filterArgs==null){
+
+        /**
+         * Add a new QuickGOQuery to the builder based on consuming the PrototypeFilter passed to this method.
+         * @param builder
+         * @param pr
+         */
+        private void addFilterToBuilder(QueryRequest.Builder builder, AnnotationFilter.PrototypeFilter pr) {
+            if(pr.getArgs()==null){
                 return;
             }
-            QuickGOQuery assignedByQuery = filterArgs
-                .parallelStream()
-                .reduce(null, (q, arg) -> QuickGOQuery.createQuery( solrField, arg), (q1,q2) -> q1.or(q2)) ;
+            QuickGOQuery quickGOQuery = pr.getArgs()
+                    .parallelStream()
+                    .reduce(null, (q, arg) -> QuickGOQuery.createQuery( pr.getSolrName(), arg), (q1,q2) -> q1.or(q2)) ;
 
-            if(assignedByQuery!=null) {
-                builder.addQueryFilter(assignedByQuery);
+            if(quickGOQuery!=null) {
+                builder.addQueryFilter(quickGOQuery);
             }
+        }
+
+        /**
+         * Consume the prototype filters passed to this method.
+         * @param prototypeFilter
+         */
+        @Override public void accept(AnnotationFilter.PrototypeFilter prototypeFilter) {
+            addFilterToBuilder(this.builder, prototypeFilter);
+        }
+
+        /**
+         * Not Required
+         * @param after
+         * @return
+         */
+        @Override public Consumer<AnnotationFilter.PrototypeFilter> andThen(
+                Consumer<? super AnnotationFilter.PrototypeFilter> after) {
+            return null;
         }
     }
 }
