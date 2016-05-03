@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +45,7 @@ public class AnnotationFilterTest {
 
         AnnotationFilter annotationFilter = new AnnotationFilter();
         annotationFilter.setAssignedby(UNI_PROT);
-        List<AnnotationFilter.PrototypeFilter> filterList = annotationFilter.stream().collect(toList());
+        List<PrototypeFilter> filterList = annotationFilter.stream().collect(toList());
         assertThat(filterList, hasSize(1));
         assertThat(filterList.get(0).getSolrName(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
         assertThat(filterList.get(0).getArgs().get(0), is(equalTo(UNI_PROT)));
@@ -56,7 +57,7 @@ public class AnnotationFilterTest {
 
         AnnotationFilter annotationFilter = new AnnotationFilter();
         annotationFilter.setAssignedby(multiAssignedBy);
-        List<AnnotationFilter.PrototypeFilter> filterList = annotationFilter.stream().collect(toList());
+        List<PrototypeFilter> filterList = annotationFilter.stream().collect(toList());
         assertThat(filterList, hasSize(1));
         assertThat(filterList.get(0).getSolrName(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
         assertThat(filterList.get(0).getArgs().get(0), is(equalTo(UNI_PROT)));

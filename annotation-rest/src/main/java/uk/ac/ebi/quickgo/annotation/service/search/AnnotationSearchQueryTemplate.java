@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.service.search;
 
 import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
 import uk.ac.ebi.quickgo.rest.search.SearchQueryRequestBuilder;
+import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
@@ -85,7 +86,7 @@ public class AnnotationSearchQueryTemplate {
          * @param builder
          * @param pf
          */
-        private void addFilterToBuilder(QueryRequest.Builder builder, AnnotationFilter.PrototypeFilter pf) {
+        private void addFilterToBuilder(QueryRequest.Builder builder, PrototypeFilter pf) {
             if(pf.getArgs()==null){
                 return;
             }

@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.service.search;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
+import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class AnnotationSearchQueryTemplateTest {
     AnnotationFilter mockFilter;
 
     @Mock
-    AnnotationFilter.PrototypeFilter prototypeFilter;
+    PrototypeFilter prototypeFilter;
 
     List<String> assignedBy;
 
@@ -54,7 +55,7 @@ public class AnnotationSearchQueryTemplateTest {
 
         assignedBy =  Collections.singletonList("UniProt");
 
-        List<AnnotationFilter.PrototypeFilter> filterList =  Collections.singletonList(prototypeFilter);
+        List<PrototypeFilter> filterList =  Collections.singletonList(prototypeFilter);
 
         when(mockFilter.getPage()).thenReturn("1");
         when(mockFilter.getLimit()).thenReturn("25");
