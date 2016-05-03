@@ -55,7 +55,7 @@ public class AnnotationControllerIT {
     private static final String PAGE = "page";
 
 
-    protected MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     private String validAssignedBy;
     private static final String INVALID_ASSIGNED_BY = "ZZZZZ";
@@ -189,8 +189,8 @@ public class AnnotationControllerIT {
         return result;
     }
 
-    protected ResultActions expectFields(ResultActions result, String path) throws Exception {
-        return result
+    private void expectFields(ResultActions result, String path) throws Exception {
+        result
                 .andExpect(jsonPath(path + "id").exists())
                 .andExpect(jsonPath(path + "geneProductId").exists())
                 .andExpect(jsonPath(path + "qualifier").exists())
