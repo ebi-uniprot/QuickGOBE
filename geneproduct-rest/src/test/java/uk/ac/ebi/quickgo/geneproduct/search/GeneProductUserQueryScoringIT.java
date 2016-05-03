@@ -41,8 +41,8 @@ import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.c
  * <p>
  *     Terminology used in test names and comments:
  *     <ul>
- *         <li>Exact match: indicates contents of query is matched entirely in a field, e.g., "contents"
- *         vs "contents"</li>
+ *         <li>Exact match: indicates contents of query is matched entirely in a field, e.g., (query's value) "abcde"
+ *         vs (field's value) "abcde"</li>
  *         <li>Word match: indicates there is a matching word in both the query and the field value, e.g., "one" vs
  *         "one two"</li>
  *         <li>Partial match: indicates that part of a word from the query/field matches the value of the
@@ -65,6 +65,9 @@ import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.c
 @SpringApplicationConfiguration(classes = {GeneProductREST.class})
 @WebAppConfiguration
 public class GeneProductUserQueryScoringIT {
+    @ClassRule
+    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+
     /*
      * TODO: fix behaviour documented in https://www.ebi.ac.uk/panda/jira/browse/GOA-2041
      */
@@ -72,9 +75,6 @@ public class GeneProductUserQueryScoringIT {
 
     private static final String RESOURCE_URL = "/QuickGO/services/geneproduct/search";
     private static final String QUERY_PARAM = "query";
-
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     private static final String VALID_ID_1 = "A0A0F8CSS1";
     private static final String VALID_ID_2 = "A0A0F8CSS2";
@@ -144,6 +144,28 @@ public class GeneProductUserQueryScoringIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.*", hasSize(0)));
+    }
+
+    @Test
+    public void idWithUpperCaseMatchInQueryReturns1Entry() throws Exception {
+        populateIndexWithIdenticalFieldsExceptID();
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, VALID_ID_2.toUpperCase()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results.*", hasSize(1)));
+    }
+
+    @Test
+    public void idWithLowerCaseMatchInQueryReturns1Entry() throws Exception {
+        populateIndexWithIdenticalFieldsExceptID();
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, VALID_ID_2.toLowerCase()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
+                .andExpect(jsonPath("$.results.*", hasSize(1)));
     }
 
     // Exact matches win -------------------------------------------------------------------------
@@ -630,18 +652,6 @@ public class GeneProductUserQueryScoringIT {
                 .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
-    // Helpers -------------------------------------------------------------------------
-    private static GeneProductDocument createDoc(String id, String name, String symbol, String... synonyms) {
-        GeneProductDocument document = createDocWithId(id);
-
-        document.name = name;
-        document.synonyms = Arrays.asList(synonyms);
-        document.symbol = symbol;
-        document.type = "protein";
-
-        return document;
-    }
-
     @Test
     public void suiteOfTripletWordTests() {
         assumeThat(FIXED_GOA_2041, is(true));
@@ -674,6 +684,28 @@ public class GeneProductUserQueryScoringIT {
         } else {
             System.out.println("Tests passed -- nice one!");
         }
+    }
+
+    // Helpers -------------------------------------------------------------------------
+    private static GeneProductDocument createDoc(String id, String name, String symbol, String... synonyms) {
+        GeneProductDocument document = createDocWithId(id);
+
+        document.name = name;
+        document.synonyms = Arrays.asList(synonyms);
+        document.symbol = symbol;
+        document.type = "protein";
+
+        return document;
+    }
+
+    private void populateIndexWithIdenticalFieldsExceptID() {GeneProductDocument
+            doc1 = createDoc(VALID_ID_1, "anything", "anything", "anything");
+        GeneProductDocument doc2 = createDoc(VALID_ID_2, "anything", "anything", "anything");
+        GeneProductDocument doc3 = createDoc(VALID_ID_3, "anything", "anything", "anything");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
     }
 
     private StringBuilder checkTripletsInDocuments(String doc1Name, String doc2Name) {

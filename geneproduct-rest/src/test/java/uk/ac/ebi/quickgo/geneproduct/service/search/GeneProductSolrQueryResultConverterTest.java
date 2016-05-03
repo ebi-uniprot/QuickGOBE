@@ -5,8 +5,8 @@ import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -37,12 +37,9 @@ public class GeneProductSolrQueryResultConverterTest {
     @Mock
     private GeneProductDocConverter geneProductConverterMock;
 
-    @Mock
-    private Map<String, String> fieldNameMap;
-
     @Before
     public void setUp() throws Exception {
-        converter = new GeneProductSolrQueryResultConverter(binderMock, geneProductConverterMock, fieldNameMap);
+        converter = new GeneProductSolrQueryResultConverter(binderMock, geneProductConverterMock, new HashMap<>());
     }
 
     @Test(expected = AssertionError.class)

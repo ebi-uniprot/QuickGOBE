@@ -15,7 +15,6 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import io.swagger.annotations.ApiOperation;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
@@ -39,9 +39,8 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RequestMapping(value = "/QuickGO/services/geneproduct")
 public class GeneProductController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
-
     public static final int MAX_PAGE_RESULTS = 100;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
 
@@ -56,8 +55,11 @@ public class GeneProductController {
             SearchService<GeneProduct> geneProductSearchService,
             SearchableField geneProductSearchableField,
             SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig) {
-        Objects.requireNonNull(geneProductService, "The GeneProductService instance passed to the constructor of " +
-                "GeneProductController should not be null.");
+        checkArgument(geneProductService != null,
+                "The GeneProductService instance passed to the constructor of GeneProductController must not be null.");
+        checkArgument(geneProductSearchService != null, "The SearchService<GeneProduct> must not be null.");
+        checkArgument(geneProductSearchableField != null, "The gene product SearchableField must not be null");
+        checkArgument(geneProductRetrievalConfig != null, "The GeneProductCompositeRetrievalConfig must not be null");
 
         this.geneProductService = geneProductService;
         this.geneProductSearchService = geneProductSearchService;
