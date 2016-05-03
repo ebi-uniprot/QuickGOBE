@@ -13,7 +13,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
  *
  * @author Tony Wardell
  */
-public class SearchServiceImpl implements SearchService<Annotation> {
+class SearchServiceImpl implements SearchService<Annotation> {
     private final RequestRetrieval<Annotation> requestRetrieval;
 
     public SearchServiceImpl(RequestRetrieval<Annotation> requestRetrieval) {

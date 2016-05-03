@@ -8,9 +8,9 @@ import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryResultHighlightingConverter;
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocumentList;
 
@@ -22,12 +22,12 @@ import org.apache.solr.common.SolrDocumentList;
  * Time: 16:44
  * Created with IntelliJ IDEA.
  */
-public class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<Annotation> {
+class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<Annotation> {
 
     private final DocumentObjectBinder documentObjectBinder;
     private final AnnotationDocConverter annotationDocConverter;
 
-    private static final Map<String,String> emptyMap = new HashedMap();
+    private static final Map<String,String> emptyMap = new HashMap<>();
 
     public SolrQueryResultConverter(DocumentObjectBinder documentObjectBinder,
             AnnotationDocConverter annotationDocConverter){
