@@ -82,7 +82,7 @@ public class AnnotationController {
 		filter.validation();
 
 		AnnotationSearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
-				.addAnnotationFilter(filter);
+				.setFilterProvider(filter);
 		return search(requestBuilder.build(), annotationSearchService);
 
 	}

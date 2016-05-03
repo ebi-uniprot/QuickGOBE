@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
-import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
 import uk.ac.ebi.quickgo.rest.search.SearchQueryRequestBuilder;
+import uk.ac.ebi.quickgo.rest.search.query.FilterProvider;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -42,7 +42,7 @@ public class AnnotationSearchQueryTemplate {
 
     public static class Builder implements SearchQueryRequestBuilder {
         private final Iterable<String> returnedFields;
-        private AnnotationFilter annotationFilter;
+        private FilterProvider filterProvider;
         private QueryRequest.Builder builder;
 
         private Builder(Iterable<String> returnedFields) {
@@ -52,11 +52,11 @@ public class AnnotationSearchQueryTemplate {
 
         /**
          *
-         * @param annotationFilter
+         * @param filterProvider
          * @return
          */
-        public AnnotationSearchQueryTemplate.Builder addAnnotationFilter(AnnotationFilter annotationFilter) {
-            this.annotationFilter = annotationFilter;
+        public AnnotationSearchQueryTemplate.Builder setFilterProvider(FilterProvider filterProvider) {
+            this.filterProvider = filterProvider;
             return this;
         }
 
@@ -67,10 +67,10 @@ public class AnnotationSearchQueryTemplate {
          */
         @Override public QueryRequest build() {
             builder = new QueryRequest.Builder(QuickGOQuery.createEmptyQuery());
-            builder.setPageParameters(Integer.valueOf(annotationFilter.getPage()), Integer.valueOf(annotationFilter
+            builder.setPageParameters(Integer.valueOf(filterProvider.getPage()), Integer.valueOf(filterProvider
                     .getLimit()));
 
-            annotationFilter.stream().forEach(pf -> addFilterToBuilder(builder, pf));
+            filterProvider.stream().forEach(pf -> addFilterToBuilder(builder, pf));
 
             returnedFields
                     .forEach(builder::addProjectedField);

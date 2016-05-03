@@ -67,7 +67,7 @@ public class AnnotationSearchQueryTemplateTest {
     public void successfullyCreateFilterFromOneArgument(){
         AnnotationSearchQueryTemplate aTemplate = new AnnotationSearchQueryTemplate(returnedFields);
         AnnotationSearchQueryTemplate.Builder builder = aTemplate.newBuilder();
-        builder.addAnnotationFilter(mockFilter);
+        builder.setFilterProvider(mockFilter);
 
         //don't need to mock the call to mockFilter.requestConsumptionOfPrototypeFilters(consumer)) as its void
         //just emulate the call back on to the builder

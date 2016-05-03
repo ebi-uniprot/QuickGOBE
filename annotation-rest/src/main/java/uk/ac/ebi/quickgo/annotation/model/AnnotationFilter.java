@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.model;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
+import uk.ac.ebi.quickgo.rest.search.query.FilterProvider;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * Time: 11:23
  * Created with IntelliJ IDEA.
  */
-public class AnnotationFilter {
+public class AnnotationFilter implements FilterProvider{
 
     public static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
