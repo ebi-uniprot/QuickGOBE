@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class AnnotationDocConverterImplTest {
 
-    public static final String UNI_PROT = "UniProt";
+    private static final String UNI_PROT = "UniProt";
     @Mock
     private AnnotationDocument annotationDocument;
 
