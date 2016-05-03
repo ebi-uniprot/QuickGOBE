@@ -59,9 +59,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RequestMapping(value = "/QuickGO/services/annotation")
 public class AnnotationController {
 
-	private static final int MAX_PAGE_RESULTS = 100;
 	private final SearchService<Annotation> annotationSearchService;
-	private final ControllerValidationHelperImpl controllerValidationHelper;
 	private final AnnotationSearchQueryTemplate requestTemplate;
 
 	@Autowired
@@ -70,7 +68,6 @@ public class AnnotationController {
 		Objects.requireNonNull(annotationSearchService, "The SearchService<Annotation> instance passed to the constructor of " +
 				"AnnotationController should not be null.");
 		this.annotationSearchService = annotationSearchService;
-		this.controllerValidationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
 		this.requestTemplate = new AnnotationSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
 	}
 
