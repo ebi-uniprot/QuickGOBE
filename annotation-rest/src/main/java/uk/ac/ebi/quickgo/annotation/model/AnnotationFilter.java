@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -228,13 +229,8 @@ public class AnnotationFilter {
         return page;
     }
 
-    /**
-     * Pass the prototypeFilters to a PrototypeFilter consumer
-     */
-    public void requestConsumptionOfPrototypeFilters(Consumer<PrototypeFilter> consumer){
-
-        prototypeFilters.stream()
-                .forEach(pr -> consumer.accept(pr));
+    public Stream<PrototypeFilter> stream(){
+        return prototypeFilters.stream();
     }
 
 

@@ -41,7 +41,7 @@ public class AnnotationSearchQueryTemplate {
     }
 
 
-    public static class Builder implements SearchQueryRequestBuilder, Consumer<AnnotationFilter.PrototypeFilter> {
+    public static class Builder implements SearchQueryRequestBuilder {
         private final Iterable<String> returnedFields;
         private AnnotationFilter annotationFilter;
         private QueryRequest.Builder builder;
@@ -71,8 +71,7 @@ public class AnnotationSearchQueryTemplate {
             builder.setPageParameters(Integer.valueOf(annotationFilter.getPage()), Integer.valueOf(annotationFilter
                     .getLimit()));
 
-            //Call back to filters accumulator, consume the PrototypeFilters found there and turn in to QuickGOQueries
-            annotationFilter.requestConsumptionOfPrototypeFilters(this);
+            annotationFilter.stream().forEach(pf -> addFilterToBuilder(builder, pf));
 
             returnedFields
                     .forEach(builder::addProjectedField);
@@ -84,37 +83,19 @@ public class AnnotationSearchQueryTemplate {
         /**
          * Add a new QuickGOQuery to the builder based on consuming the PrototypeFilter passed to this method.
          * @param builder
-         * @param pr
+         * @param pf
          */
-        private void addFilterToBuilder(QueryRequest.Builder builder, AnnotationFilter.PrototypeFilter pr) {
-            if(pr.getArgs()==null){
+        private void addFilterToBuilder(QueryRequest.Builder builder, AnnotationFilter.PrototypeFilter pf) {
+            if(pf.getArgs()==null){
                 return;
             }
-            QuickGOQuery quickGOQuery = pr.getArgs()
+            QuickGOQuery quickGOQuery = pf.getArgs()
                     .parallelStream()
-                    .reduce(null, (q, arg) -> QuickGOQuery.createQuery( pr.getSolrName(), arg), (q1,q2) -> q1.or(q2)) ;
+                    .reduce(null, (q, arg) -> QuickGOQuery.createQuery( pf.getSolrName(), arg), (q1,q2) -> q1.or(q2)) ;
 
             if(quickGOQuery!=null) {
                 builder.addQueryFilter(quickGOQuery);
             }
-        }
-
-        /**
-         * Consume the prototype filters passed to this method.
-         * @param prototypeFilter
-         */
-        @Override public void accept(AnnotationFilter.PrototypeFilter prototypeFilter) {
-            addFilterToBuilder(this.builder, prototypeFilter);
-        }
-
-        /**
-         * Not Required
-         * @param after
-         * @return
-         */
-        @Override public Consumer<AnnotationFilter.PrototypeFilter> andThen(
-                Consumer<? super AnnotationFilter.PrototypeFilter> after) {
-            return null;
         }
     }
 }

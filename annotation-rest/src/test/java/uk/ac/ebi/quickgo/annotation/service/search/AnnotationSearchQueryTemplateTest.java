@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.Before;
@@ -51,10 +52,13 @@ public class AnnotationSearchQueryTemplateTest {
         returnedFields.add("aspect");
         returnedFields.add("qualifier");
 
-        assignedBy = Arrays.asList("UniProt","ASPCD","Reactome");
+        assignedBy =  Collections.singletonList("UniProt");
+
+        List<AnnotationFilter.PrototypeFilter> filterList =  Collections.singletonList(prototypeFilter);
 
         when(mockFilter.getPage()).thenReturn("1");
         when(mockFilter.getLimit()).thenReturn("25");
+        when(mockFilter.stream()).thenReturn(filterList.stream());
 
         when(prototypeFilter.getArgs()).thenReturn(assignedBy);
         when(prototypeFilter.getSolrName()).thenReturn(AnnotationFields.ASSIGNED_BY);
@@ -71,7 +75,7 @@ public class AnnotationSearchQueryTemplateTest {
         //don't need to mock the call to mockFilter.requestConsumptionOfPrototypeFilters(consumer)) as its void
         //just emulate the call back on to the builder
         QueryRequest queryRequest = builder.build();
-        builder.accept(prototypeFilter);
+        //builder.accept(prototypeFilter);
         assertThat(queryRequest.getFilters(), hasSize(1));
     }
 
