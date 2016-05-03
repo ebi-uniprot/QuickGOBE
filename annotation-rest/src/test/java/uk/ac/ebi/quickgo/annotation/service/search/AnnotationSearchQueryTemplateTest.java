@@ -1,16 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +40,7 @@ public class AnnotationSearchQueryTemplateTest {
     @Mock
     PrototypeFilter prototypeFilter;
 
-    List<String> assignedBy;
+    private List<String> assignedBy;
 
     @Before
     public void setup(){
@@ -86,6 +82,6 @@ public class AnnotationSearchQueryTemplateTest {
         AnnotationSearchQueryTemplate aTemplate = new AnnotationSearchQueryTemplate(returnedFields);
         AnnotationSearchQueryTemplate.Builder builder = aTemplate.newBuilder();
         thrown.expect(NullPointerException.class);
-        QueryRequest queryRequest = builder.build();
+        builder.build();
     }
 }
