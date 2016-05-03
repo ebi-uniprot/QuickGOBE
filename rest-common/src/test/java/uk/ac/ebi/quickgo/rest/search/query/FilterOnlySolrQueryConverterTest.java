@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.service.search;
-
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+package uk.ac.ebi.quickgo.rest.search.query;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.junit.Test;
@@ -17,7 +15,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AnnotationSolrQueryConverterTest {
+public class FilterOnlySolrQueryConverterTest {
 
     @Mock
     private SolrQuery mockSolrQuery;
@@ -27,11 +25,10 @@ public class AnnotationSolrQueryConverterTest {
 
     @Test
     public void justReturns(){
-        AnnotationSolrQueryConverter converter = new AnnotationSolrQueryConverter("/handler");
+        FilterOnlySolrQueryConverter converter = new FilterOnlySolrQueryConverter("/handler");
         verifyNoMoreInteractions(mockRequest);
         verifyNoMoreInteractions(mockSolrQuery);
         converter.assignQuery(mockRequest, mockSolrQuery);
-
 
     }
 }

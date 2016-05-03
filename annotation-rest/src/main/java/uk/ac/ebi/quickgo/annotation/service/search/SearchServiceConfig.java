@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.query.FilterOnlySolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
@@ -68,7 +69,7 @@ public class SearchServiceConfig {
 
     @Bean
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
-        return new AnnotationSolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
+        return new FilterOnlySolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
     }
 
     /**

@@ -1,7 +1,5 @@
-package uk.ac.ebi.quickgo.annotation.service.search;
+package uk.ac.ebi.quickgo.rest.search.query;
 
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 
 import org.apache.solr.client.solrj.SolrQuery;
 
@@ -15,9 +13,9 @@ import org.apache.solr.client.solrj.SolrQuery;
  * Time: 13:20
  * Created with IntelliJ IDEA.
  */
-class AnnotationSolrQueryConverter extends SolrQueryConverter{
+public class FilterOnlySolrQueryConverter extends SolrQueryConverter{
 
-    public AnnotationSolrQueryConverter(String requestHandler) {
+    public FilterOnlySolrQueryConverter(String requestHandler) {
         super(requestHandler);
     }
 
@@ -27,7 +25,7 @@ class AnnotationSolrQueryConverter extends SolrQueryConverter{
      * @param request
      * @param solrQuery
      */
-    protected void assignQuery(QueryRequest request, SolrQuery solrQuery) { }
+    public void assignQuery(QueryRequest request, SolrQuery solrQuery) { }
 
 
 }
