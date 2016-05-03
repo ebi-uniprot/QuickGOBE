@@ -15,7 +15,7 @@ import org.apache.solr.client.solrj.SolrQuery;
  * Time: 13:20
  * Created with IntelliJ IDEA.
  */
-public class AnnotationSolrQueryConverter extends SolrQueryConverter{
+class AnnotationSolrQueryConverter extends SolrQueryConverter{
 
     public AnnotationSolrQueryConverter(String requestHandler) {
         super(requestHandler);
@@ -27,9 +27,7 @@ public class AnnotationSolrQueryConverter extends SolrQueryConverter{
      * @param request
      * @param solrQuery
      */
-    protected void assignQuery(QueryRequest request, SolrQuery solrQuery) {
-        return;
-    }
+    protected void assignQuery(QueryRequest request, SolrQuery solrQuery) { }
 
 
 }
