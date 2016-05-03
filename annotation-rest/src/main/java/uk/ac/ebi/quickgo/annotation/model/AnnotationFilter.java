@@ -6,14 +6,8 @@ import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -34,8 +28,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class AnnotationFilter {
 
     public static final String DEFAULT_ENTRIES_PER_PAGE = "25";
-    public static final String DEFAULT_PAGE_NUMBER = "1";
-    public static final int MAX_PAGE_RESULTS = 100;
+    private static final String DEFAULT_PAGE_NUMBER = "1";
+    private static final int MAX_PAGE_RESULTS = 100;
 
 
     //Non-data parameters
@@ -43,10 +37,10 @@ public class AnnotationFilter {
     private String page = DEFAULT_PAGE_NUMBER;
 
 
-    private List<PrototypeFilter> prototypeFilters = new ArrayList<>();
+    private final List<PrototypeFilter> prototypeFilters = new ArrayList<>();
 
     //todo @Autowired
-    public ControllerValidationHelper validationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
+    private final ControllerValidationHelper validationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
 
 
     /**
