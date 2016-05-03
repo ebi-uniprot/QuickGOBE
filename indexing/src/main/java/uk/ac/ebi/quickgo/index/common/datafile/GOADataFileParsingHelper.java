@@ -18,7 +18,7 @@ public class GOADataFileParsingHelper {
     public static final String COLON = ":";
     public static final String PIPE_SEPARATED_CSVs_FORMAT = "(%s(,%s)*)(\\|(%s(,%s)*))*";
     public static final String KEY_EQUALS_VALUE_FORMAT = ".*=.*";
-    public static final String WORD_LBRACE_WORD_RBRACE_FORMAT = "[a-zA-Z0-9_-]+\\([a-zA-Z0-9_:\\.-]+\\)";
+    public static final String WORD_LBRACE_WORD_RBRACE_FORMAT = "[a-zA-Z0-9_:\\.-]+(\\([a-zA-Z0-9_:\\.-]+\\))?";
 
     /**
      * Converts a string of key/value pairs into a corresponding {@link Map}.

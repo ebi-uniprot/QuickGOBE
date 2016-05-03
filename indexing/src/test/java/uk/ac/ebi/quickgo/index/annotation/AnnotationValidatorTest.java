@@ -309,8 +309,20 @@ public class AnnotationValidatorTest {
     }
 
     @Test
-    public void validSingleTermedComponentAnnotationExtension() {
+    public void validSingleTermedComponentAnnotationExtensionPartOf() {
         annotation.annotationExtension = "part_of(something)";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validSingleTermedComponentAnnotationExtensionGO() {
+        annotation.annotationExtension = "GO:0016540";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validMultiTermedComponentAnnotationExtensionGO() {
+        annotation.annotationExtension = "GO:0016540,GO:0016541";
         validator.validate(annotation);
     }
 
