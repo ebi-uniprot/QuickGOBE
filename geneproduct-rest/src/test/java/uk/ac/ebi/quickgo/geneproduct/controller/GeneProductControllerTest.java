@@ -69,11 +69,9 @@ public class GeneProductControllerTest {
                 geneProductSearchableField,
                 geneProductRetrievalConfig);
 
-        // lookup for single Id
         final List<GeneProduct> singleGP = singletonList(geneProduct1);
         when(geneProductService.findById(SINGLE_CSV_LIST)).thenReturn(singleGP);
 
-        // lookup for multi Id
         final List<GeneProduct> multiGP = asList(geneProduct1, geneProduct2, geneProduct3);
         when(geneProductService.findById(MULTI_CSV_LIST)).thenReturn(multiGP);
 
