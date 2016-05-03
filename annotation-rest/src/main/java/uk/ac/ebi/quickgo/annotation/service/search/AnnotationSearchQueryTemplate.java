@@ -6,8 +6,6 @@ import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
-import java.util.function.Consumer;
-
 /**
  *
  * Records common configuration details required to create a {@link QueryRequest} instance,
@@ -92,7 +90,7 @@ public class AnnotationSearchQueryTemplate {
             }
             QuickGOQuery quickGOQuery = pf.getArgs()
                     .parallelStream()
-                    .reduce(null, (q, arg) -> QuickGOQuery.createQuery( pf.getSolrName(), arg), (q1,q2) -> q1.or(q2)) ;
+                    .reduce(null, (q, arg) -> QuickGOQuery.createQuery( pf.getSolrName(), arg), QuickGOQuery::or) ;
 
             if(quickGOQuery!=null) {
                 builder.addQueryFilter(quickGOQuery);
