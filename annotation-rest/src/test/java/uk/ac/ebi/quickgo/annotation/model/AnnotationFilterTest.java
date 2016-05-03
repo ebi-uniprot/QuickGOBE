@@ -3,9 +3,7 @@ package uk.ac.ebi.quickgo.annotation.model;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,9 +26,9 @@ import static org.hamcrest.core.IsEqual.equalTo;
  */
 public class AnnotationFilterTest {
 
-    public static final String UNI_PROT = "UniProt";
-    public static final String ASPGD = "ASPGD";
-    String multiAssignedBy;
+    private static final String UNI_PROT = "UniProt";
+    private static final String ASPGD = "ASPGD";
+    private String multiAssignedBy;
 
     @Before
     public void setUp(){
