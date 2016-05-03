@@ -69,12 +69,12 @@ public class AnnotationFilter implements FilterProvider{
         this.limit = limit;
     }
 
-    public String getLimit() {
-        return limit;
+    public int getLimit() {
+        return Integer.parseInt(limit);
     }
 
-    public String getPage() {
-        return page;
+    public int getPage() {
+        return Integer.parseInt(page);
     }
 
     public Stream<PrototypeFilter> stream(){

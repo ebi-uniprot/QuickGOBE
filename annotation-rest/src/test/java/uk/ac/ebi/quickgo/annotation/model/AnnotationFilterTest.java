@@ -67,8 +67,8 @@ public class AnnotationFilterTest {
     @Test
     public void defaultPageAndLimitValuesAreCorrect(){
         AnnotationFilter annotationFilter = new AnnotationFilter();
-        assertThat(annotationFilter.getPage(), equalTo("1"));
-        assertThat(annotationFilter.getLimit(), equalTo("25"));
+        assertThat(annotationFilter.getPage(), equalTo(1));
+        assertThat(annotationFilter.getLimit(), equalTo(25));
     }
 
     @Test
@@ -76,8 +76,8 @@ public class AnnotationFilterTest {
         AnnotationFilter annotationFilter = new AnnotationFilter();
         annotationFilter.setPage("4");
         annotationFilter.setLimit("15");
-        assertThat(annotationFilter.getPage(), equalTo("4"));
-        assertThat(annotationFilter.getLimit(), equalTo("15"));
+        assertThat(annotationFilter.getPage(), equalTo(4));
+        assertThat(annotationFilter.getLimit(), equalTo(15));
     }
 
 
