@@ -1,6 +1,5 @@
-package uk.ac.ebi.quickgo.annotation.service.search;
+package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.search.SearchQueryRequestBuilder;
 import uk.ac.ebi.quickgo.rest.search.query.FilterProvider;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
@@ -25,11 +24,11 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
  * Time: 10:05
  * Created with IntelliJ IDEA.
  */
-public class AnnotationSearchQueryTemplate {
+public class FilterOnlySearchQueryTemplate {
     private final Iterable<String> returnedFields;
 
 
-    public AnnotationSearchQueryTemplate(
+    public FilterOnlySearchQueryTemplate(
             Iterable<String> returnedFields) {
         this.returnedFields = returnedFields;
 
@@ -55,7 +54,7 @@ public class AnnotationSearchQueryTemplate {
          * @param filterProvider
          * @return
          */
-        public AnnotationSearchQueryTemplate.Builder setFilterProvider(FilterProvider filterProvider) {
+        public FilterOnlySearchQueryTemplate.Builder setFilterProvider(FilterProvider filterProvider) {
             this.filterProvider = filterProvider;
             return this;
         }

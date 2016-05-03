@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
-import uk.ac.ebi.quickgo.annotation.service.search.AnnotationSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.FilterOnlySearchQueryTemplate;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
@@ -59,7 +59,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 public class AnnotationController {
 
 	private final SearchService<Annotation> annotationSearchService;
-	private final AnnotationSearchQueryTemplate requestTemplate;
+	private final FilterOnlySearchQueryTemplate requestTemplate;
 
 	@Autowired
 	public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -67,7 +67,7 @@ public class AnnotationController {
 		Objects.requireNonNull(annotationSearchService, "The SearchService<Annotation> instance passed to the constructor of " +
 				"AnnotationController should not be null.");
 		this.annotationSearchService = annotationSearchService;
-		this.requestTemplate = new AnnotationSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
+		this.requestTemplate = new FilterOnlySearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class AnnotationController {
 
 		filter.validation();
 
-		AnnotationSearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
+		FilterOnlySearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
 				.setFilterProvider(filter);
 		return search(requestBuilder.build(), annotationSearchService);
 

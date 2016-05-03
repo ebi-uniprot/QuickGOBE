@@ -1,7 +1,6 @@
-package uk.ac.ebi.quickgo.annotation.service.search;
+package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
+import uk.ac.ebi.quickgo.rest.search.query.FilterProvider;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 
@@ -27,15 +26,16 @@ import static org.mockito.Mockito.when;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AnnotationSearchQueryTemplateTest {
+public class FilterOnlySearchQueryTemplateTest {
 
+    public static final String ASSIGNED_BY = "AssignedBy";
     private List<String> returnedFields;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Mock
-    AnnotationFilter mockFilter;
+    FilterProvider filterProvider;
 
     @Mock
     PrototypeFilter prototypeFilter;
@@ -53,34 +53,30 @@ public class AnnotationSearchQueryTemplateTest {
 
         List<PrototypeFilter> filterList =  Collections.singletonList(prototypeFilter);
 
-        when(mockFilter.getPage()).thenReturn("1");
-        when(mockFilter.getLimit()).thenReturn("25");
-        when(mockFilter.stream()).thenReturn(filterList.stream());
+        when(filterProvider.getPage()).thenReturn(1);
+        when(filterProvider.getLimit()).thenReturn(25);
+        when(filterProvider.stream()).thenReturn(filterList.stream());
 
         when(prototypeFilter.getArgs()).thenReturn(assignedBy);
-        when(prototypeFilter.getSolrName()).thenReturn(AnnotationFields.ASSIGNED_BY);
+        when(prototypeFilter.getSolrName()).thenReturn(ASSIGNED_BY);
 
 
     }
 
     @Test
     public void successfullyCreateFilterFromOneArgument(){
-        AnnotationSearchQueryTemplate aTemplate = new AnnotationSearchQueryTemplate(returnedFields);
-        AnnotationSearchQueryTemplate.Builder builder = aTemplate.newBuilder();
-        builder.setFilterProvider(mockFilter);
-
-        //don't need to mock the call to mockFilter.requestConsumptionOfPrototypeFilters(consumer)) as its void
-        //just emulate the call back on to the builder
+        FilterOnlySearchQueryTemplate aTemplate = new FilterOnlySearchQueryTemplate(returnedFields);
+        FilterOnlySearchQueryTemplate.Builder builder = aTemplate.newBuilder();
+        builder.setFilterProvider(filterProvider);
         QueryRequest queryRequest = builder.build();
-        //builder.accept(prototypeFilter);
         assertThat(queryRequest.getFilters(), hasSize(1));
     }
 
 
     @Test
     public void exceptionThrownIfFiltersNotAdded(){
-        AnnotationSearchQueryTemplate aTemplate = new AnnotationSearchQueryTemplate(returnedFields);
-        AnnotationSearchQueryTemplate.Builder builder = aTemplate.newBuilder();
+        FilterOnlySearchQueryTemplate aTemplate = new FilterOnlySearchQueryTemplate(returnedFields);
+        FilterOnlySearchQueryTemplate.Builder builder = aTemplate.newBuilder();
         thrown.expect(NullPointerException.class);
         builder.build();
     }
