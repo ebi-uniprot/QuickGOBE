@@ -5,7 +5,7 @@ ARTIFACT_VERSION="0.0.1-SNAPSHOT"
 
 # ================ ADDRESS INFO ================
 PORT="8083"
-JXM_REMOTE_PORT="9091"
+JXM_REMOTE_PORT="9093"
 CONTEXT_PATH="/QuickGO/services"
 
 # ================ JVM OPTIONS ================
