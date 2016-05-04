@@ -14,15 +14,13 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl.DEFAULT_TAXON_ID;
 
 /**
- * @author Tony Wardell
- * Date: 01/04/2016
- * Time: 15:58
- * Created with IntelliJ IDEA.
+ * Unit tests the {@link GeneProductDocConverterImpl} class.
  */
-public class GeneProductDocConverterTest {
-    public static final String ID = "A0A000";
+public class GeneProductDocConverterImplTest {
+    private static final String ID = "A0A000";
 
     private static final int TAX_ID = 789;
 
@@ -46,7 +44,6 @@ public class GeneProductDocConverterTest {
 
         geneProductDocument = new GeneProductDocument();
 
-        //14 members
         geneProductDocument.id = ID;
         geneProductDocument.database = DATABASE;
         geneProductDocument.databaseSubsets = DATABASE_SUBSETS;
@@ -84,10 +81,42 @@ public class GeneProductDocConverterTest {
     }
 
     @Test
-    public void thereIsNoTaxId() {
-        geneProductDocument.taxonId = 0;
+    public void noTaxIdInDocResultsInNullModelTaxId() {
+        geneProductDocument.taxonId = DEFAULT_TAXON_ID;
         GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
 
         assertThat(convertedGeneProduct.taxonomy, is(nullValue()));
+    }
+
+    @Test
+    public void nullDocDbSubsetConvertsToNullModelDbSubset() {
+        geneProductDocument.databaseSubsets = null;
+
+        GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
+
+        assertThat(convertedGeneProduct.databaseSubset, is(nullValue()));
+    }
+
+    @Test
+    public void nullDocSynonymsConvertsToNullModelSynonyms() {
+        geneProductDocument.synonyms = null;
+
+        GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
+
+        assertThat(convertedGeneProduct.synonyms, is(nullValue()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void invalidGeneProductTypeCausesError() {
+        geneProductDocument.type = "this is not a valid gene product type, I promise.";
+
+        geneProductDocConverter.convert(geneProductDocument);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullGeneProductTypeCausesError() {
+        geneProductDocument.type = null;
+
+        geneProductDocConverter.convert(geneProductDocument);
     }
 }
