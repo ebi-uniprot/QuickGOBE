@@ -14,9 +14,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
- * Here are the list of parameters filtering will require. The values shown are the ones the FE currently uses
- * Nearly all the parameters can take multiple values, separated by commas. These types are named as plural.
- * Exceptions exists however
  *
  * Once the comma separated values have been set, then turn then into an object (PrototypeFilter) that
  * encapsulates the list and solr field name to use for that argument.
@@ -26,23 +23,20 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * Time: 11:23
  * Created with IntelliJ IDEA.
  */
-public class AnnotationFilter implements FilterProvider{
+public class AnnotationFilter implements FilterProvider {
 
     public static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
     private static final int MAX_PAGE_RESULTS = 100;
 
-
     //Non-data parameters
     private String limit = DEFAULT_ENTRIES_PER_PAGE;
     private String page = DEFAULT_PAGE_NUMBER;
-
 
     private final List<PrototypeFilter> prototypeFilters = new ArrayList<>();
 
     //todo @Autowired
     private final ControllerValidationHelper validationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
-
 
     /**
      * After filters have been loaded, ensure values are valid and defaults are in place.
@@ -77,10 +71,9 @@ public class AnnotationFilter implements FilterProvider{
         return Integer.parseInt(page);
     }
 
-    public Stream<PrototypeFilter> stream(){
+    public Stream<PrototypeFilter> stream() {
         return prototypeFilters.stream();
     }
-
 
     /**
      * Create a prototype filter using the passed argument
@@ -88,7 +81,5 @@ public class AnnotationFilter implements FilterProvider{
      * @param argIncludingDelimiters
      * @return
      */
-
-
 
 }
