@@ -7,7 +7,7 @@ package uk.ac.ebi.quickgo.rest.search.query;
  * Created with IntelliJ IDEA.
  */
 @FunctionalInterface
-public interface Validator<T,E> {
+public interface Validator<T> {
 
-    void validate(T t, E e);
+    void validate(T t);
 }

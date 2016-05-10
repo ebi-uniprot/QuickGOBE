@@ -41,20 +41,12 @@ public class AnnotationFilter implements FilterProvider {
     // E.g. ASPGD,Agbase,..
     public void setAssignedby(String assignedby) {
 
-        //if we were doing validation in situ
-
-//        if (!isNullOrEmpty(assignedby)) {
-//            final PrototypeFilter pFilter = PrototypeFilter.create(AnnotationFields.ASSIGNED_BY, assignedby);
-//            pFilter.validate((String a) -> AnnotationValidator.validateAssignedBy(a,errors));
-//            prototypeFilters.add(pFilter);
-//        }
-
         if (!isNullOrEmpty(assignedby)) {
 
-            final Validator<String, Errors> validator = (String s, Errors errors) -> {
-                Matcher m =AnnotationValidation.ALL_NUMERIC.matcher(s);
+            final Validator<String> validator = (String s) -> {
+                Matcher m = AnnotationValidation.ALL_NUMERIC.matcher(s);
                 if (m.matches()) {
-                    errors.reject( "assignedBy.invalid", "Values for assignedBy cannot be fully numeric");
+                    throw new IllegalArgumentException("Values for assignedBy cannot be fully numeric");
                 }
             };
 
