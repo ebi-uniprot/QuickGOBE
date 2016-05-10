@@ -107,7 +107,7 @@ public class AnnotationController {
 		checkState(!bindingResult.hasErrors(), "The binding of the request parameters to " +
 				"AnnotationFilter %s has errors, see binding result %s", filter, bindingResult);
 
-		filter.stream().forEach(pf -> pf.validate(bindingResult));
+		filter.stream().forEach(pf -> pf.validate());
 		validationHelper.validateRequestedResults(filter.getLimit());
 		FilterOnlySearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
 				.setFilterProvider(filter);

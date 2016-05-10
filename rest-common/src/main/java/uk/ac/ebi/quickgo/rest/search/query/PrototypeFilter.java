@@ -18,7 +18,7 @@ public class PrototypeFilter {
     private static final String COMMA = ",";
     private String solrName;
     private List<String> args;
-    private Validator<String, Errors> validator;
+    private Validator<String> validator;
 
     public String getSolrName() {
         return solrName;
@@ -28,7 +28,7 @@ public class PrototypeFilter {
         return args;
     }
 
-    public static final PrototypeFilter create(String solrName, String argIncludingDelimiters, Validator<String, Errors> validator ){
+    public static final PrototypeFilter create(String solrName, String argIncludingDelimiters, Validator<String> validator ){
         PrototypeFilter prototypeFilter = new PrototypeFilter();
         prototypeFilter.solrName = solrName;
         prototypeFilter.args = Arrays.asList(argIncludingDelimiters.split(COMMA));
@@ -38,9 +38,9 @@ public class PrototypeFilter {
 
     /**
      *
-     * @param errors
+     * Test each argument in the list to see if its valid
      */
-    public void validate(Errors errors){
-        args.stream().forEach(a -> validator.validate(a, errors));
+    public void validate(){
+        args.stream().forEach(a -> validator.validate(a));
     }
 }
