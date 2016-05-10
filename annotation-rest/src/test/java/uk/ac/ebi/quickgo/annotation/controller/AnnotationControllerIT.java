@@ -52,7 +52,7 @@ public class AnnotationControllerIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
-    private static final String ASSIGNED_BY_PARAM = "assignedby";
+    private static final String ASSIGNED_BY_PARAM = "assignedBy";
     private static final String INVALID_PARAM_NAME = "invalidparm";
     private static final String PAGE = "page";
     private static final String NUMERIC_ASSIGNED_BY = "12345";
@@ -168,7 +168,23 @@ public class AnnotationControllerIT {
     }
 
     /**
-     * Test That
+     * Test That an unknown parameter causes a Bad Request response
+     * @throws Exception
+     */
+
+    @Test
+    public void invalidParameterCausesError() throws Exception {
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(INVALID_PARAM_NAME, "XXX"));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+
+    /**
+     * Test That a value of assignedBy that is wholly numeric causes a Bad Request response
      * @throws Exception
      */
 
