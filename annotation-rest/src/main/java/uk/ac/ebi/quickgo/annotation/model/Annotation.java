@@ -28,7 +28,7 @@ public class Annotation {
 
     public List<String> withFrom;
 
-    public String taxonId;
+    public int taxonId;
 
     public String assignedBy;
 

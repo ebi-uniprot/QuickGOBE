@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +53,9 @@ public class AnnotationControllerIT {
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     private static final String ASSIGNED_BY_PARAM = "assignedby";
+    private static final String INVALID_PARAM_NAME = "invalidparm";
     private static final String PAGE = "page";
-
+    private static final String NUMERIC_ASSIGNED_BY = "12345";
 
     private MockMvc mockMvc;
 
@@ -160,6 +162,21 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, validAssignedBy)
                         .param(PAGE, "4"));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Test That
+     * @throws Exception
+     */
+
+    @Test
+    public void numericAssignedByCausesError() throws Exception {
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, NUMERIC_ASSIGNED_BY));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());

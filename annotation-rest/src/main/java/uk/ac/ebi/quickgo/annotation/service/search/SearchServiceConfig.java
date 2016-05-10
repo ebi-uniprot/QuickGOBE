@@ -16,12 +16,14 @@ import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.validation.Errors;
 
 /**
  *

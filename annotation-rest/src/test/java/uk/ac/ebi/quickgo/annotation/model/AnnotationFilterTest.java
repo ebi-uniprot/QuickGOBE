@@ -86,7 +86,6 @@ public class AnnotationFilterTest {
         thrown.expect(IllegalArgumentException.class);
         AnnotationFilter annotationFilter = new AnnotationFilter();
         annotationFilter.setLimit("200");
-        annotationFilter.validation();
     }
 
 }

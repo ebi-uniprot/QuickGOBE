@@ -1,14 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
+import uk.ac.ebi.quickgo.annotation.validation.AnnotationValidation;
 import uk.ac.ebi.quickgo.rest.search.query.FilterProvider;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
+import uk.ac.ebi.quickgo.rest.search.query.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.stream.Stream;
+import org.springframework.validation.Errors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -27,7 +29,6 @@ public class AnnotationFilter implements FilterProvider {
 
     public static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
-    private static final int MAX_PAGE_RESULTS = 100;
 
     //Non-data parameters
     private String limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -35,25 +36,35 @@ public class AnnotationFilter implements FilterProvider {
 
     private final List<PrototypeFilter> prototypeFilters = new ArrayList<>();
 
-    //todo @Autowired
-    private final ControllerValidationHelper validationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
 
-    /**
-     * After filters have been loaded, ensure values are valid and defaults are in place.
-     */
-    public void validation() {
-
-        validationHelper.validateRequestedResults(Integer.parseInt(limit));
-    }
 
     // E.g. ASPGD,Agbase,..
     public void setAssignedby(String assignedby) {
 
+        //if we were doing validation in situ
+
+//        if (!isNullOrEmpty(assignedby)) {
+//            final PrototypeFilter pFilter = PrototypeFilter.create(AnnotationFields.ASSIGNED_BY, assignedby);
+//            pFilter.validate((String a) -> AnnotationValidator.validateAssignedBy(a,errors));
+//            prototypeFilters.add(pFilter);
+//        }
+
         if (!isNullOrEmpty(assignedby)) {
-            prototypeFilters.add(PrototypeFilter.create(AnnotationFields.ASSIGNED_BY, assignedby));
+
+            final Validator<String, Errors> validator = (String s, Errors errors) -> {
+                Matcher m =AnnotationValidation.ALL_NUMERIC.matcher(s);
+                if (m.matches()) {
+                    errors.reject( "assignedBy.invalid", "Values for assignedBy cannot be fully numeric");
+                }
+            };
+
+            final PrototypeFilter pFilter = PrototypeFilter.create(AnnotationFields.ASSIGNED_BY, assignedby, validator);
+            prototypeFilters.add(pFilter);
         }
 
     }
+
+
 
     public void setPage(String page) {
         this.page = page;
@@ -74,12 +85,5 @@ public class AnnotationFilter implements FilterProvider {
     public Stream<PrototypeFilter> stream() {
         return prototypeFilters.stream();
     }
-
-    /**
-     * Create a prototype filter using the passed argument
-     * @param solrName
-     * @param argIncludingDelimiters
-     * @return
-     */
 
 }
