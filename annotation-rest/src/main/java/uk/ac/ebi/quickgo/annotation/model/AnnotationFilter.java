@@ -39,9 +39,9 @@ public class AnnotationFilter implements FilterProvider {
 
 
     // E.g. ASPGD,Agbase,..
-    public void setAssignedby(String assignedby) {
+    public void setAssignedBy(String assignedBy) {
 
-        if (!isNullOrEmpty(assignedby)) {
+        if (!isNullOrEmpty(assignedBy)) {
 
             final Validator<String> validator = (String s) -> {
                 Matcher m = AnnotationValidation.ALL_NUMERIC.matcher(s);
@@ -50,7 +50,7 @@ public class AnnotationFilter implements FilterProvider {
                 }
             };
 
-            final PrototypeFilter pFilter = PrototypeFilter.create(AnnotationFields.ASSIGNED_BY, assignedby, validator);
+            final PrototypeFilter pFilter = PrototypeFilter.create(AnnotationFields.ASSIGNED_BY, assignedBy, validator);
             prototypeFilters.add(pFilter);
         }
 

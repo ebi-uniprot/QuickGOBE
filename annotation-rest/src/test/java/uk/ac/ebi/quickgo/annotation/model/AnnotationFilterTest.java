@@ -42,7 +42,7 @@ public class AnnotationFilterTest {
     public void successfullyAddOnlyOneSingleFilter(){
 
         AnnotationFilter annotationFilter = new AnnotationFilter();
-        annotationFilter.setAssignedby(UNI_PROT);
+        annotationFilter.setAssignedBy(UNI_PROT);
         List<PrototypeFilter> filterList = annotationFilter.stream().collect(toList());
         assertThat(filterList, hasSize(1));
         assertThat(filterList.get(0).getSolrName(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
@@ -54,7 +54,7 @@ public class AnnotationFilterTest {
     public void successfullyAddMultiFilter(){
 
         AnnotationFilter annotationFilter = new AnnotationFilter();
-        annotationFilter.setAssignedby(multiAssignedBy);
+        annotationFilter.setAssignedBy(multiAssignedBy);
         List<PrototypeFilter> filterList = annotationFilter.stream().collect(toList());
         assertThat(filterList, hasSize(1));
         assertThat(filterList.get(0).getSolrName(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
