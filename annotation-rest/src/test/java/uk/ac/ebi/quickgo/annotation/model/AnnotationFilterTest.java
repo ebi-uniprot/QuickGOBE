@@ -74,8 +74,8 @@ public class AnnotationFilterTest {
     @Test
     public void successfullySetPageAndLimitValues(){
         AnnotationFilter annotationFilter = new AnnotationFilter();
-        annotationFilter.setPage("4");
-        annotationFilter.setLimit("15");
+        annotationFilter.setPage(4);
+        annotationFilter.setLimit(15);
         assertThat(annotationFilter.getPage(), equalTo(4));
         assertThat(annotationFilter.getLimit(), equalTo(15));
     }
@@ -85,7 +85,7 @@ public class AnnotationFilterTest {
     public void exceptionThrownWhenAsForMoreResultsThanLimit(){
         thrown.expect(IllegalArgumentException.class);
         AnnotationFilter annotationFilter = new AnnotationFilter();
-        annotationFilter.setLimit("200");
+        annotationFilter.setLimit(200);
     }
 
 }

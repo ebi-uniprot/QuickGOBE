@@ -150,7 +150,7 @@ public class AnnotationControllerIT {
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.results").isArray())
-                .andExpect(jsonPath("$.results", hasSize(Integer.parseInt(AnnotationFilter.DEFAULT_ENTRIES_PER_PAGE))));
+                .andExpect(jsonPath("$.results", hasSize(AnnotationFilter.DEFAULT_ENTRIES_PER_PAGE)));
     }
 
 
