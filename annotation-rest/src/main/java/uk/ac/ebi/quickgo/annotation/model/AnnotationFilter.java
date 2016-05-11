@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.rest.search.query.FilterProvider;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 import uk.ac.ebi.quickgo.rest.search.query.Validator;
 
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,12 +28,12 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 public class AnnotationFilter implements FilterProvider {
 
-    public static final String DEFAULT_ENTRIES_PER_PAGE = "25";
-    private static final String DEFAULT_PAGE_NUMBER = "1";
+    public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
+    private static final int DEFAULT_PAGE_NUMBER = 1;
 
     //Non-data parameters
-    private String limit = DEFAULT_ENTRIES_PER_PAGE;
-    private String page = DEFAULT_PAGE_NUMBER;
+    private int  limit = DEFAULT_ENTRIES_PER_PAGE;
+    private int page = DEFAULT_PAGE_NUMBER;
 
     private final List<PrototypeFilter> prototypeFilters = new ArrayList<>();
 
@@ -58,20 +59,22 @@ public class AnnotationFilter implements FilterProvider {
 
 
 
-    public void setPage(String page) {
+    public void setPage(int page) {
+        Preconditions.checkArgument(page>-1, "The value for page cannot be negative");
         this.page = page;
     }
 
-    public void setLimit(String limit) {
+    public void setLimit(int limit) {
+        Preconditions.checkArgument(limit>-1, "The value for limit cannot be negative");
         this.limit = limit;
     }
 
     public int getLimit() {
-        return Integer.parseInt(limit);
+        return limit;
     }
 
     public int getPage() {
-        return Integer.parseInt(page);
+        return page;
     }
 
     public Stream<PrototypeFilter> stream() {
