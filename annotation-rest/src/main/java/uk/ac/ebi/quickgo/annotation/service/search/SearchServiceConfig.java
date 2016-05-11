@@ -74,8 +74,9 @@ public class SearchServiceConfig {
 
     /**
      * Annotation retrieval config. Annotations searches don't use highlighting.
-     * @param annotationSearchSolrReturnedFields
-     * @return
+     * @param annotationSearchSolrReturnedFields A list of fields that can be used for filtering.
+     * @return An instance of AnnotationCompositeRetrievalConfig which meets the requirements of the Configuration
+     * interfaces it extends.
      */
     @Bean
     public AnnotationCompositeRetrievalConfig annotationRetrievalConfig(
