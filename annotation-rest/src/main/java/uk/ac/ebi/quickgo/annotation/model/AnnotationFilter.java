@@ -77,6 +77,10 @@ public class AnnotationFilter implements FilterProvider {
         return page;
     }
 
+    /**
+     * Provide a stream of the prototype filters.
+     * @return
+     */
     public Stream<PrototypeFilter> stream() {
         return prototypeFilters.stream();
     }
