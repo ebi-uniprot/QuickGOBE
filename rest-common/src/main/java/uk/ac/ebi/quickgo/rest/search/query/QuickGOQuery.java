@@ -52,4 +52,8 @@ public abstract class QuickGOQuery {
     public static QuickGOQuery createEmptyQuery() {
         return new EmptyQuery();
     }
+
+    public static QuickGOQuery createAllQuery() {
+        return new AllQuery();
+    }
 }

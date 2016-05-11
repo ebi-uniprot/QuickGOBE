@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.FilterOnlySolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
+import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
@@ -44,7 +45,7 @@ public class SearchServiceConfig {
     private static final String COMMA = ",";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS = "id,geneProductId,qualifier,goId," +
             "goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extension";
-    private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/filter";
+    private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -71,7 +72,7 @@ public class SearchServiceConfig {
 
     @Bean
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
-        return new FilterOnlySolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
+        return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
     }
 
     /**

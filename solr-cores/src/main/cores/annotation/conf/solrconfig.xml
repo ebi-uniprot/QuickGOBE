@@ -900,19 +900,6 @@
         </lst>
     </requestHandler>
 
-    <!-- Based on /query. q always *:* -->
-    <requestHandler name="/filter" class="solr.SearchHandler">
-        <lst name="defaults">
-            <str name="echoParams">explicit</str>
-            <str name="wt">json</str>
-            <str name="indent">true</str>
-            <str name="df">text</str>
-        </lst>
-        <lst name="invariants">
-            <str name="q">*:*</str>
-        </lst>
-    </requestHandler>
-
 
     <!-- realtime get handler, guaranteed to return the latest stored fields of
          any document, without the need to commit or open a new searcher.  The

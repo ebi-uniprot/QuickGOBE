@@ -13,7 +13,8 @@ class EmptyQuery extends QuickGOQuery {
     }
 
     @Override public <T> T accept(QueryVisitor<T> visitor) {
-        return visitor.visit(this);
+        return null;
+        //return visitor.visit(this);
     }
 
     @Override public boolean equals(Object o) {

@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
-import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
-import uk.ac.ebi.quickgo.rest.search.FilterOnlySearchQueryTemplate;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.search.SearchAllQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -84,7 +84,7 @@ public class AnnotationController {
 	private final ControllerValidationHelper validationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
 
 	private final SearchService<Annotation> annotationSearchService;
-	private final FilterOnlySearchQueryTemplate requestTemplate;
+	private final SearchAllQueryTemplate requestTemplate;
 
 	@Autowired
 	public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -94,7 +94,7 @@ public class AnnotationController {
 		checkNotNull(annotationRetrievalConfig, "The SearchServiceConfig.AnnotationCompositeRetrievalConfig" +
 				" instance passed to the constructor of AnnotationController should not be null.");
 		this.annotationSearchService = annotationSearchService;
-		this.requestTemplate = new FilterOnlySearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
+		this.requestTemplate = new SearchAllQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
 	}
 
 	/**
@@ -109,8 +109,8 @@ public class AnnotationController {
 
 		filter.stream().forEach(pf -> pf.validate());
 		validationHelper.validateRequestedResults(filter.getLimit());
-		FilterOnlySearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
-				.setFilterProvider(filter);
+		SearchAllQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
+				.addFilterProvider(filter);
 		return search(requestBuilder.build(), annotationSearchService);
 
 	}

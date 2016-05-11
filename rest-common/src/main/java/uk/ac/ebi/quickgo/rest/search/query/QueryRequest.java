@@ -93,16 +93,6 @@ public class QueryRequest {
             highlightedFields = new ArrayList<>();
         }
 
-        /**
-         * No query, all filtering is done as query filters
-         */
-        public Builder() {
-            facets = new ArrayList<>();
-            filters = new ArrayList<>();
-            projectedFields = new ArrayList<>();
-            highlightedFields = new ArrayList<>();
-        }
-
         public Builder setPageParameters(int currentPage, int pageSize) {
             this.page = new Page(currentPage, pageSize);
 
