@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 public class AnnotationDocConverterImplTest {
 
     @Test
-    public void convertSuccessfully(){
+    public void convertAssignedBySuccessfully(){
         AnnotationDocConverter docConverter = new AnnotationDocConverterImpl();
         Annotation model = docConverter.convert(  AnnotationDocMocker.createAnnotationDoc("A0A000"));
         assertThat(model.assignedBy, equalTo("InterPro"));
