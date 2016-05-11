@@ -172,16 +172,6 @@ public class AnnotationControllerIT {
      * @throws Exception
      */
 
-    @Test
-    public void invalidParameterCausesError() throws Exception {
-
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(INVALID_PARAM_NAME, "XXX"));
-
-        response.andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
 
     /**
      * Test That a value of assignedBy that is wholly numeric causes a Bad Request response
