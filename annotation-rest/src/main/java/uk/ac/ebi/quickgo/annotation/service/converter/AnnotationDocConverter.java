@@ -13,8 +13,8 @@ public interface AnnotationDocConverter {
 
     /**
      * Convert a Solr Annotation Document into a model to be returned to the user
-     * @param annotationDocument
-     * @return
+     * @param annotationDocument A document from Solr
+     * @return an Annotation model
      */
     Annotation convert(AnnotationDocument annotationDocument);
 }
