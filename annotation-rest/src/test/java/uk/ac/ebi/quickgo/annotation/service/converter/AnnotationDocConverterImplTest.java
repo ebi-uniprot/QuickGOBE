@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.converter;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
@@ -23,20 +24,10 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class AnnotationDocConverterImplTest {
 
-    private static final String UNI_PROT = "UniProt";
-    @Mock
-    private AnnotationDocument annotationDocument;
-
-    @Before
-    public void setup(){
-        when(annotationDocument.assignedBy).thenReturn(UNI_PROT);
-    }
-
     @Test
-    @Ignore //Doesn't use methods.
     public void convertSuccessfully(){
         AnnotationDocConverter docConverter = new AnnotationDocConverterImpl();
-        Annotation model = docConverter.convert(annotationDocument);
-        assertThat(model.assignedBy, equalTo(UNI_PROT));
+        Annotation model = docConverter.convert(  AnnotationDocMocker.createAnnotationDoc("A0A000"));
+        assertThat(model.assignedBy, equalTo("InterPro"));
     }
 }
