@@ -10,7 +10,5 @@ interface QueryVisitor<T> {
 
     T visit(NoFieldQuery query);
 
-//    T visit(EmptyQuery query);
-
     T visit(AllQuery query);
 }

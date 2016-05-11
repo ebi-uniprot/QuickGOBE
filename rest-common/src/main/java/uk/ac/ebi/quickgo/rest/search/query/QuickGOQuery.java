@@ -49,9 +49,6 @@ public abstract class QuickGOQuery {
         return new NoFieldQuery(value);
     }
 
-    public static QuickGOQuery createEmptyQuery() {
-        return new EmptyQuery();
-    }
 
     public static QuickGOQuery createAllQuery() {
         return new AllQuery();
