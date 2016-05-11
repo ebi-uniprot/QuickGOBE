@@ -11,12 +11,11 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
  */
 public class AnnotationDocConverterImpl implements AnnotationDocConverter {
 
-
     @Override public Annotation convert(AnnotationDocument annotationDocument) {
         Annotation annotation = new Annotation();
 
         //todo take elements
-        annotation.assignedBy=annotationDocument.assignedBy;
+        annotation.assignedBy = annotationDocument.assignedBy;
         return annotation;
     }
 }
