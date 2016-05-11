@@ -38,7 +38,6 @@ import org.springframework.data.solr.core.SolrTemplate;
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
 
-    private static final int MAX_PAGE_RESULTS = 100;
     private static final String COMMA = ",";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS = "id,geneProductId,qualifier,goId," +
             "goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extension";
@@ -111,10 +110,6 @@ public class SearchServiceConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Bean
-    public ControllerValidationHelper validationHelper() {
-        return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
-    }
 
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 }
