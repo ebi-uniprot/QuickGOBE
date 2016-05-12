@@ -77,7 +77,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RequestMapping(value = "/QuickGO/services/annotation")
 public class AnnotationController {
 
-	private static final int MAX_PAGE_RESULTS = 100;
+	public static final int MAX_PAGE_RESULTS = 100;
 
 	Logger logger = LoggerFactory.getLogger(AnnotationController.class);
 	//todo @Autowired
