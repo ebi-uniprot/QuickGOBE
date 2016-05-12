@@ -5,8 +5,10 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,24 +39,29 @@ public class SolrQueryResultConverterTest {
 
     private List<AnnotationDocument> solrTermDocs;
 
-    @Mock
     private AnnotationDocument mockAnnotationDocument;
 
     @Mock
     private Annotation mockAnnotation;
 
+    SolrQueryResultConverter converter;
+
     @Before
     public void setup(){
+        mockAnnotationDocument = new AnnotationDocument();
+        mockResults = new SolrDocumentList();
         solrTermDocs = new ArrayList<>();
-        solrTermDocs.add(mockAnnotationDocument);
         when(mockBinder.getBeans(AnnotationDocument.class, mockResults)).thenReturn(solrTermDocs);
         when(mockDocConverter.convert(mockAnnotationDocument)).thenReturn(mockAnnotation);
-        when(mockResults.size()).thenReturn(1);
+        converter = new SolrQueryResultConverter(mockBinder, mockDocConverter);
+
+
     }
 
     @Test
     public void successfullyConvertOneResult(){
-        SolrQueryResultConverter converter = new SolrQueryResultConverter(mockBinder, mockDocConverter);
+        mockResults.add(new SolrDocument());
+        solrTermDocs.add(mockAnnotationDocument);
         List<Annotation> domainObjs = converter.convertResults(mockResults);
         assertThat(domainObjs, hasSize(1));
     }
@@ -63,11 +70,17 @@ public class SolrQueryResultConverterTest {
     public void successfullyConvertMultipleResults(){
         //Add another result
         solrTermDocs.add(mockAnnotationDocument);
-        when(mockResults.size()).thenReturn(2);
+        solrTermDocs.add(mockAnnotationDocument);
+        mockResults.addAll(Arrays.asList(new SolrDocument(), new SolrDocument()));
 
         SolrQueryResultConverter converter = new SolrQueryResultConverter(mockBinder, mockDocConverter);
         List<Annotation> domainObjs = converter.convertResults(mockResults);
         assertThat(domainObjs, hasSize(2));
     }
+    @Test
 
+    public void EmptyList(){
+        List<Annotation> domainObjs = converter.convertResults(new SolrDocumentList());
+        assertThat(domainObjs, hasSize(0));
+    }
 }
