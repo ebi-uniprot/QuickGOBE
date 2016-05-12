@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,8 @@ public class AnnotationControllerIT {
 
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
     private static final String INVALID_PARAM_NAME = "invalidparm";
-    private static final String PAGE = "page";
+    private static final String PAGE_PARAM = "page";
+    private static final String LIMIT_PARAM = "limit";
     private static final String NUMERIC_ASSIGNED_BY = "12345";
 
     private MockMvc mockMvc;
@@ -142,11 +142,11 @@ public class AnnotationControllerIT {
     @Test
     public void retrievesSecondPageOfAllEntriesRequest() throws Exception {
         annotationRepository.deleteAll();
-        annotationRepository.save(createNDocs(60));
+        annotationRepository.save(createAndSaveDocs(60));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, validAssignedBy)
-                        .param(PAGE, "2"));
+                        .param(PAGE_PARAM, "2"));
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.results").isArray())
@@ -155,16 +155,70 @@ public class AnnotationControllerIT {
 
 
     @Test
-    public void cannotRetrievesPageOfEntriesPassedWhatsAvailable() throws Exception {
+    public void pageRequestEqualToAvailablePagesReturns200() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, validAssignedBy).param(PAGE_PARAM,"1"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void pageRequestOfZeroAndResultsAvailableReturns500() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, validAssignedBy).param(PAGE_PARAM,"0"));
+
+        response.andDo(print())
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void pageRequestHigherThanAvailablePagesReturns400() throws Exception {
+
         annotationRepository.deleteAll();
-        annotationRepository.save(createNDocs(60));
+
+        int existingPages = 4;
+        createAndSaveDocs(AnnotationController.MAX_PAGE_RESULTS * existingPages);
+
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, validAssignedBy)
-                        .param(PAGE, "4"));
+                        .param(PAGE_PARAM, String.valueOf(existingPages + 1)));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    public void limitForPageExceedsMaximumAllowed() throws Exception {
+        annotationRepository.deleteAll();
+        annotationRepository.save(createAndSaveDocs(60));
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, validAssignedBy)
+                        .param(LIMIT_PARAM, "101"));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    public void limitForPageWithinMaximumAllowed() throws Exception {
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, validAssignedBy).param(LIMIT_PARAM, "100"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
     }
 
     /**
@@ -238,7 +292,7 @@ public class AnnotationControllerIT {
     }
 
 
-    private List<AnnotationDocument> createNDocs(int n) {
+    private List<AnnotationDocument> createAndSaveDocs(int n) {
         return IntStream.range(0, n)
                 .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i))).collect
                         (Collectors.toList());
