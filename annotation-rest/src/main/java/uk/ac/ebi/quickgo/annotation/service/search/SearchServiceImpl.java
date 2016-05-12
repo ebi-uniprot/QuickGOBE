@@ -6,6 +6,8 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import com.google.common.base.Preconditions;
+
 /**
  * The search service implementation for annotations. This class implements the
  * {@link SearchService} interface, and delegates retrieval of annotation results
@@ -17,6 +19,8 @@ class SearchServiceImpl implements SearchService<Annotation> {
     private final RequestRetrieval<Annotation> requestRetrieval;
 
     public SearchServiceImpl(RequestRetrieval<Annotation> requestRetrieval) {
+        Preconditions.checkArgument(requestRetrieval!=null, "The instance of RequestRetrieval<Annotation> passed to " +
+                "the constructor of uk.ac.ebi.quickgo.annotation.service.search.SearchServiceImpl is null");
         this.requestRetrieval = requestRetrieval;
     }
 
