@@ -45,7 +45,7 @@ public class AnnotationFilterTest {
         annotationFilter.setAssignedBy(UNI_PROT);
         List<PrototypeFilter> filterList = annotationFilter.stream().collect(toList());
         assertThat(filterList, hasSize(1));
-        assertThat(filterList.get(0).getSolrName(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
+        assertThat(filterList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
         assertThat(filterList.get(0).getArgs().get(0), is(equalTo(UNI_PROT)));
     }
 
@@ -57,7 +57,7 @@ public class AnnotationFilterTest {
         annotationFilter.setAssignedBy(multiAssignedBy);
         List<PrototypeFilter> filterList = annotationFilter.stream().collect(toList());
         assertThat(filterList, hasSize(1));
-        assertThat(filterList.get(0).getSolrName(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
+        assertThat(filterList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
         assertThat(filterList.get(0).getArgs().get(0), is(equalTo(UNI_PROT)));
         assertThat(filterList.get(0).getArgs().get(1), is(equalTo(ASPGD)));
     }

@@ -9,9 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
-
 /**
  * Records common configuration details required to create a {@link QueryRequest} instance,
  * and provides a {@link SearchQueryRequestBuilder} instance that can be used to build
@@ -126,14 +123,6 @@ public class SearchAllQueryTemplate {
                     .getLimit()));
 
             filterProvider.stream().forEach(pf -> addFilterToBuilder(builder, pf));
-
-//            if (highlighting) {
-//                highlightedFields
-//                        .forEach(builder::addHighlightedField);
-//                builder.setHighlightStartDelim(highlightStartDelim);
-//                builder.setHighlightEndDelim(highlightEndDelim);
-//            }
-
             returnedFields
                     .forEach(builder::addProjectedField);
 
@@ -152,7 +141,7 @@ public class SearchAllQueryTemplate {
             }
             QuickGOQuery quickGOQuery = pf.getArgs()
                     .parallelStream()
-                    .reduce(null, (q, arg) -> QuickGOQuery.createQuery( pf.getSolrName(), arg), QuickGOQuery::or) ;
+                    .reduce(null, (q, arg) -> QuickGOQuery.createQuery( pf.getFilterField(), arg), QuickGOQuery::or) ;
 
             if(quickGOQuery!=null) {
                 builder.addQueryFilter(quickGOQuery);
