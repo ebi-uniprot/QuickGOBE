@@ -56,7 +56,7 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
 
         final SolrQuery solrQuery = new SolrQuery();
 
-        assignQuery(request, solrQuery);
+        solrQuery.setQuery(request.getQuery().accept(this));
         solrQuery.setRequestHandler(requestHandler);
 
         Page page = request.getPage();
@@ -93,11 +93,6 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
         }
 
         return solrQuery;
-    }
-
-    protected void assignQuery(QueryRequest request,
-            SolrQuery solrQuery) {
-        solrQuery.setQuery(request.getQuery().accept(this));
     }
 
     private int calculateRowsFromPage(int page, int numRows) {
