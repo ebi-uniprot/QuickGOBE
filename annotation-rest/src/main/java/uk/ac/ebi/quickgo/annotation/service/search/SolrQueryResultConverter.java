@@ -31,7 +31,7 @@ class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<Annotati
 
     public SolrQueryResultConverter(DocumentObjectBinder documentObjectBinder,
             AnnotationDocConverter annotationDocConverter){
-        super(new SolrQueryResultHighlightingConverter(emptyMap));
+        super();
 
         Preconditions.checkArgument(documentObjectBinder != null, "Document Object Binder cannot be null");
         Preconditions.checkArgument(annotationDocConverter != null, "Gene product document converter cannot be null");
