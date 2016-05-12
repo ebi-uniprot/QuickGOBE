@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocumentList;
 
@@ -42,18 +43,17 @@ class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<Annotati
 
     /**
      * Turns SolrDocuments into instances of the Annotation DTO.
-     * @param results
-     * @return
+     * @param results a list of SolrDocuments that meet search criteria (if applicable)
+     * @return a corresponding list of Annotations converted from the Solr Document list argument
      */
     @Override protected List<Annotation> convertResults(SolrDocumentList results) {
         assert results != null : "Results list cannot be null";
 
         List<AnnotationDocument> solrTermDocs = documentObjectBinder.getBeans(AnnotationDocument.class, results);
-        List<Annotation> domainObjs = new ArrayList<>(solrTermDocs.size());
 
-        solrTermDocs.stream()
+        List<Annotation> domainObjs = solrTermDocs.stream()
                 .map(annotationDocConverter::convert)
-                .forEach(domainObjs::add);
+                .collect(Collectors.toList());
 
         assert domainObjs.size() == results.size();
         return domainObjs;
