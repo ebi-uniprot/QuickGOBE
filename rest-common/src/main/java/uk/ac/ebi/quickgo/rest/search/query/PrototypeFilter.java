@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
+import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -19,6 +20,8 @@ public class PrototypeFilter {
     private List<String> args;
     private Validator<String> validator;
 
+    private PrototypeFilter() {}
+
     public String getFilterField() {
         return filterField;
     }
@@ -26,6 +29,7 @@ public class PrototypeFilter {
 
     public static final PrototypeFilter create(String filterField, String argIncludingDelimiters, Validator<String>
             validator ){
+
         PrototypeFilter prototypeFilter = new PrototypeFilter();
         prototypeFilter.filterField = filterField;
         prototypeFilter.args = Arrays.asList(argIncludingDelimiters.split(COMMA));
