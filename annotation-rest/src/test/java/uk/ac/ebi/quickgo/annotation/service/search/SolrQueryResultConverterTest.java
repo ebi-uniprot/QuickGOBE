@@ -41,7 +41,7 @@ public class SolrQueryResultConverterTest {
     private AnnotationDocument mockAnnotationDocument;
 
     @Mock
-    private uk.ac.ebi.quickgo.annotation.model.Annotation mockAnnotation;
+    private Annotation mockAnnotation;
 
     @Before
     public void setup(){
