@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.query;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Holds the data required to specify a filter value
@@ -22,9 +23,6 @@ public class PrototypeFilter {
         return filterField;
     }
 
-    public List<String> getArgs() {
-        return args;
-    }
 
     public static final PrototypeFilter create(String filterField, String argIncludingDelimiters, Validator<String>
             validator ){
@@ -41,5 +39,10 @@ public class PrototypeFilter {
      */
     public void validate(){
         args.stream().forEach(a -> validator.validate(a));
+    }
+
+    public Stream<String> provideStream(){
+        return args.stream();
+
     }
 }
