@@ -45,7 +45,16 @@ public class PrototypeFilter {
         args.stream().forEach(a -> validator.validate(a));
     }
 
-    public Stream<String> provideStream(){
+    public Stream<String> provideArgStream(){
+        return args.stream();
+
+    }
+
+    /**
+     * Provides filtering values in the format field:value
+     * @return
+     */
+    public Stream<String> provideNamedArgStream(){
         return args.stream();
 
     }

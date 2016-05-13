@@ -137,7 +137,7 @@ public class SearchAllQueryTemplate {
          */
         private void addFilterToBuilder(QueryRequest.Builder builder, PrototypeFilter pf) {
 
-            QuickGOQuery quickGOQuery = pf.provideStream()
+            QuickGOQuery quickGOQuery = pf.provideArgStream()
                     .parallel()
                     .reduce(null, (q, arg) -> QuickGOQuery.createQuery( pf.getFilterField(), arg), QuickGOQuery::or) ;
 
