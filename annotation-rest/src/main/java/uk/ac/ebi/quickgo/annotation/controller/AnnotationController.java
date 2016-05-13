@@ -1,10 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import java.util.Collections;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -20,8 +19,8 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
@@ -102,9 +101,10 @@ public class AnnotationController {
 	 * @return a {@link QueryResult} instance containing the results of the search
 	 */
 	@RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<QueryResult<Annotation>> annotationLookup(AnnotationFilter filter, BindingResult bindingResult) {
+	public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationFilter filter, BindingResult
+			bindingResult) {
 
-		checkState(!bindingResult.hasErrors(), "The binding of the request parameters to " +
+		checkArgument(!bindingResult.hasErrors(), "The binding of the request parameters to " +
 				"AnnotationFilter %s has errors, see binding result %s", filter, bindingResult);
 
 		filter.stream().forEach(pf -> pf.validate());
