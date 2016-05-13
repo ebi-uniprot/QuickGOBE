@@ -4,11 +4,14 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -43,10 +46,16 @@ public class AnnotationFilterTest {
 
         AnnotationFilter annotationFilter = new AnnotationFilter();
         annotationFilter.setAssignedBy(UNI_PROT);
-        List<PrototypeFilter> filterList = annotationFilter.stream().collect(toList());
-        assertThat(filterList, hasSize(1));
-        assertThat(filterList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
-        assertThat(filterList.get(0).getArgs().get(0), is(equalTo(UNI_PROT)));
+        final List<PrototypeFilter> pfList = annotationFilter.stream().collect(toList());
+        assertThat(pfList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
+        assertThat(pfList, hasSize(1));
+
+        Optional<String> result = pfList.get(0)
+                .provideArgStream()
+                .findFirst();
+
+        assertThat(result.isPresent(), is(true));
+        assertThat(result.get(), is(equalTo(UNI_PROT)));
     }
 
 
@@ -55,11 +64,26 @@ public class AnnotationFilterTest {
 
         AnnotationFilter annotationFilter = new AnnotationFilter();
         annotationFilter.setAssignedBy(multiAssignedBy);
-        List<PrototypeFilter> filterList = annotationFilter.stream().collect(toList());
-        assertThat(filterList, hasSize(1));
-        assertThat(filterList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
-        assertThat(filterList.get(0).getArgs().get(0), is(equalTo(UNI_PROT)));
-        assertThat(filterList.get(0).getArgs().get(1), is(equalTo(ASPGD)));
+        final List<PrototypeFilter> pfList = annotationFilter.stream().collect(toList());
+        assertThat(pfList, hasSize(1));
+        assertThat(pfList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
+
+        Optional<String> result1 = pfList.get(0)
+                .provideArgStream()
+                .findFirst();
+        assertThat(result1.get(), is(equalTo(UNI_PROT)));
+
+        Optional<String> result2 = pfList.get(0)
+                .provideArgStream()
+                .filter(a -> a.equals(ASPGD))
+                .findFirst();
+        assertThat(result2.get(), is(equalTo(ASPGD)));
+
+       long countASPGD = pfList.get(0)
+                .provideArgStream()
+                .filter(a -> a.equals(ASPGD))
+                .count();
+        assertThat(countASPGD, is(1l));
     }
 
 
