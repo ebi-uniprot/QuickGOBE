@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Stream;
+import javax.validation.constraints.Pattern;
 import org.springframework.validation.Errors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -37,19 +38,20 @@ public class AnnotationFilter implements FilterProvider {
 
     private final List<PrototypeFilter> prototypeFilters = new ArrayList<>();
 
+    @Pattern(regexp = "^[A-Za-z][A-Za-z_]+(,[A-Za-z][A-Za-z_]+)*")
+    private String assignedBy;
 
-
-    // E.g. ASPGD,Agbase,..
+    /**
+     *  E.g. ASPGD,Agbase,..
+     *  In the format assignedBy=ASPGD,Agbase
+     */
     public void setAssignedBy(String assignedBy) {
+
+        this.assignedBy = assignedBy;
 
         if (!isNullOrEmpty(assignedBy)) {
 
-            final Validator<String> validator = (String s) -> {
-                Matcher m = AnnotationValidation.ALL_NUMERIC.matcher(s);
-                if (m.matches()) {
-                    throw new IllegalArgumentException("Values for assignedBy cannot be fully numeric");
-                }
-            };
+            final Validator<String> validator = (String s) -> {};   //todo needs to be removed.
 
             final PrototypeFilter pFilter = PrototypeFilter.create(AnnotationFields.ASSIGNED_BY, assignedBy, validator);
             prototypeFilters.add(pFilter);
