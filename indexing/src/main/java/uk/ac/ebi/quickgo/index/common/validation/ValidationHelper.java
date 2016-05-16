@@ -1,6 +1,9 @@
 package uk.ac.ebi.quickgo.index.common.validation;
 
+import org.slf4j.Logger;
 import org.springframework.batch.item.validator.ValidationException;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * This class defines common validation logic used during the validation of
@@ -10,6 +13,7 @@ import org.springframework.batch.item.validator.ValidationException;
  * @author Edd
  */
 public class ValidationHelper {
+    private static final Logger LOGGER = getLogger(ValidationHelper.class);
 
     /**
      * Checks whether the expression holds and if it does, a {@link ValidationException} is thrown.
@@ -55,5 +59,24 @@ public class ValidationHelper {
     public static void checkIsNullOrEmpty(String value, String field) {
         checkIsNull(value, field);
         checkIsEmpty(value, field);
+    }
+
+    /**
+     * Upon a {@link java.util.regex.Pattern} mis-match, log the error with traceable detail, and
+     * throw a {@link ValidationException}.
+     *
+     * @param fieldName field name
+     * @param fieldValue field value
+     * @param pattern the pattern, which {@code fieldValue} does not match
+     * @param rawObject the object containing the field, which is printed for traceability
+     * @throws ValidationException
+     */
+    public static void handleFieldPatternMismatchError(String fieldName, Object fieldValue, String pattern, Object
+            rawObject) {
+        String errorMessage = String.format(
+                "%s field, <%s> does not match: <%s>. See, %s",
+                fieldName, fieldValue, pattern, rawObject.toString());
+        LOGGER.error(errorMessage);
+        throw new ValidationException(errorMessage);
     }
 }

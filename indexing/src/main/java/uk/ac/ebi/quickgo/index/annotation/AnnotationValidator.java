@@ -11,6 +11,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.annotation.Columns.*;
 import static uk.ac.ebi.quickgo.index.common.validation.ValidationHelper.checkIsNullOrEmpty;
+import static uk.ac.ebi.quickgo.index.common.validation.ValidationHelper.handleFieldPatternMismatchError;
 
 /**
  * Validates the contents of an {@link Annotation} object. The validation
@@ -48,7 +49,7 @@ public class AnnotationValidator implements Validator<Annotation> {
     private void checkTaxon(Annotation annotation) {
         if (!Strings.isNullOrEmpty(annotation.interactingTaxonId) &&
                 !INTERACTING_TAXON_REGEX.matcher(annotation.interactingTaxonId).matches()) {
-            handlePatternMismatchError(
+            handleFieldPatternMismatchError(
                     "Interacting Taxon",
                     annotation.interactingTaxonId,
                     INTERACTING_TAXON_REGEX.pattern(),
@@ -59,7 +60,7 @@ public class AnnotationValidator implements Validator<Annotation> {
     private void checkProperties(Annotation annotation) {
         if (!Strings.isNullOrEmpty(annotation.annotationProperties)) {
             if (!ANNOTATION_PROPERTIES_REGEX.matcher(annotation.annotationProperties).matches()) {
-                handlePatternMismatchError(
+                handleFieldPatternMismatchError(
                         "Annotation Properties",
                         annotation.annotationProperties,
                         ANNOTATION_PROPERTIES_REGEX.pattern(),
@@ -75,7 +76,7 @@ public class AnnotationValidator implements Validator<Annotation> {
         if (!(PROPS_TAXON_REGEX.matcher(annotation.annotationProperties).find() &&
                       PROPS_GO_EVIDENCE_REGEX.matcher(annotation.annotationProperties).find() &&
                       PROPS_DB_OBJECT_TYPE_REGEX.matcher(annotation.annotationProperties).find())) {
-            handlePatternMismatchError(
+            handleFieldPatternMismatchError(
                     "Annotation Properties: required field not found",
                     annotation.annotationProperties,
                     PROPS_TAXON_REGEX.pattern()
@@ -88,7 +89,7 @@ public class AnnotationValidator implements Validator<Annotation> {
     private void checkExtensions(Annotation annotation) {
         if (!Strings.isNullOrEmpty(annotation.annotationExtension) &&
                 !ANNOTATION_EXTENSION_REGEX.matcher(annotation.annotationExtension).matches()) {
-            handlePatternMismatchError(
+            handleFieldPatternMismatchError(
                     "Annotation Extension",
                     annotation.annotationExtension,
                     ANNOTATION_EXTENSION_REGEX.pattern(),
@@ -99,7 +100,7 @@ public class AnnotationValidator implements Validator<Annotation> {
     private void checkQualifier(Annotation annotation) {
         checkIsNullOrEmpty(annotation.qualifier, COLUMN_QUALIFIER.getName());
         if (!QUALIFIER_REGEX.matcher(annotation.qualifier).matches()) {
-            handlePatternMismatchError(
+            handleFieldPatternMismatchError(
                     "Qualifier",
                     annotation.qualifier,
                     QUALIFIER_REGEX.pattern(),
@@ -109,19 +110,11 @@ public class AnnotationValidator implements Validator<Annotation> {
 
     private void checkWith(Annotation annotation) {
         if (!Strings.isNullOrEmpty(annotation.with) && !WITH_REGEX.matcher(annotation.with).matches()) {
-            handlePatternMismatchError(
+            handleFieldPatternMismatchError(
                     "With",
                     annotation.with,
                     WITH_REGEX.pattern(),
                     annotation);
         }
-    }
-
-    private void handlePatternMismatchError(String fieldName, Object fieldValue, String pattern, Object rawObject) {
-        String errorMessage = String.format(
-                "%s field, <%s> does not match: <%s>. See, %s",
-                fieldName, fieldValue, pattern, rawObject.toString());
-        LOGGER.error(errorMessage);
-        throw new ValidationException(errorMessage);
     }
 }
