@@ -1,9 +1,7 @@
 package uk.ac.ebi.quickgo.index.common.listener;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,38 +30,6 @@ public class ItemRateWriterListenerTest {
     public void setUp() {
         start = Instant.now();
         itemRateWriterListener = new ItemRateWriterListener<>(start);
-    }
-
-    @Test
-    public void computesZeroDocsPerSecond() {
-        Instant now = start.plusSeconds(10);
-        Duration duration = Duration.between(start, now);
-        float docsPerSecond = itemRateWriterListener.getItemsPerSecond(duration, new AtomicInteger(0));
-        assertThat(docsPerSecond, is(0.0F));
-    }
-
-    @Test
-    public void computes1DocPerSecond() {
-        Instant now = start.plusSeconds(44);
-        Duration duration = Duration.between(start, now);
-        float docsPerSecond = itemRateWriterListener.getItemsPerSecond(duration, new AtomicInteger(44));
-        assertThat(docsPerSecond, is(1.0F));
-    }
-
-    @Test
-    public void computes8DocPerSecond() {
-        Instant now = start.plusSeconds(5);
-        Duration duration = Duration.between(start, now);
-        float docsPerSecond = itemRateWriterListener.getItemsPerSecond(duration, new AtomicInteger(40));
-        assertThat(docsPerSecond, is(8.0F));
-    }
-
-    @Test
-    public void demonstrateGoingBackInTimeDoesntKillGetItemsPerSecond() {
-        Instant now = start.minusSeconds(5); // minus (hopefully this doesn't happen, Marty)
-        Duration duration = Duration.between(start, now);
-        float docsPerSecond = itemRateWriterListener.getItemsPerSecond(duration, new AtomicInteger(40));
-        assertThat(docsPerSecond, is(-8.0F));
     }
 
     @Test

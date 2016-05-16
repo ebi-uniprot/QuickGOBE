@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
@@ -46,18 +45,6 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
 
     @Override public void onWriteError(Exception e, List<? extends O> list) {
 
-    }
-
-    /**
-     * Computes the rate of items written per second, from instance creation time
-     * to a specified time-point, {@code now}.
-     *
-     * @param duration the duration for which the rate should be computed
-     * @param writeCount the number of items written
-     * @return a floating point number representing the rate of writing
-     */
-    float getItemsPerSecond(Duration duration, AtomicInteger writeCount) {
-        return (float) writeCount.get() / duration.get(ChronoUnit.SECONDS);
     }
 
     /**
