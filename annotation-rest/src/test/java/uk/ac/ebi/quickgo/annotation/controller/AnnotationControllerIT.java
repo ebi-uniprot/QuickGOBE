@@ -143,20 +143,11 @@ public class AnnotationControllerIT {
     }
 
 
-    /**
-     * Test That a value of assignedBy that is wholly numeric causes a Bad Request response
-     * @throws Exception
-     */
-
-
     @Test
     public void allTheseValuesForAssignedShouldNotThrowAnError() throws Exception {
-
         for(String validAssignedBy:VALID_ASSIGNED_BY_PARMS) {
-
             ResultActions response = mockMvc.perform(
                     get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, validAssignedBy));
-
             expectResultsInfoExists(response)
                     .andExpect(status().isOk());
         }
@@ -168,7 +159,6 @@ public class AnnotationControllerIT {
         for(String inValidAssignedBy:INVALID_ASSIGNED_BY_PARMS) {
             ResultActions response = mockMvc.perform(
                     get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, inValidAssignedBy));
-
             response.andDo(print())
                     .andExpect(status().isBadRequest());
         }
