@@ -60,7 +60,7 @@ public class AnnotationFilterTest {
 
 
     @Test
-    public void successfullyAddMultiFilter(){
+    public void successfullyAddMultiFilterForAssignedBy(){
 
         AnnotationFilter annotationFilter = new AnnotationFilter();
         annotationFilter.setAssignedBy(multiAssignedBy);
@@ -68,22 +68,20 @@ public class AnnotationFilterTest {
         assertThat(pfList, hasSize(1));
         assertThat(pfList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
 
-        Optional<String> result1 = pfList.get(0)
+        assertThat(pfList.get(0)
                 .provideArgStream()
-                .findFirst();
-        assertThat(result1.get(), is(equalTo(UNI_PROT)));
+                .findFirst().get(), is(equalTo(UNI_PROT)));
 
-        Optional<String> result2 = pfList.get(0)
+        assertThat(pfList.get(0)
                 .provideArgStream()
                 .filter(a -> a.equals(ASPGD))
-                .findFirst();
-        assertThat(result2.get(), is(equalTo(ASPGD)));
+                .findFirst().get(), is(equalTo(ASPGD)));
 
        long countASPGD = pfList.get(0)
                 .provideArgStream()
                 .filter(a -> a.equals(ASPGD))
                 .count();
-        assertThat(countASPGD, is(1l));
+        assertThat(countASPGD, is(1L));
     }
 
 
