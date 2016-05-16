@@ -52,6 +52,12 @@ public class GOADataFileParsingHelper {
         return propMap;
     }
 
+    /**
+     * Splits a {@link String} value on occurrences of a {@link String} delimiter.
+     * @param value the value to split
+     * @param delimiter the delimiter on which splitting takes place
+     * @return an array of {@link String} values
+     */
     public static String[] splitValue(String value, String delimiter) {
         assert delimiter != null : "Delimiter cannot be null";
 

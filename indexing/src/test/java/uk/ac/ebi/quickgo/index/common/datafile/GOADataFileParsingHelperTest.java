@@ -7,11 +7,14 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.hamcrest.core.Is.is;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatProperty;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatStrings;
 
@@ -106,5 +109,34 @@ public class GOADataFileParsingHelperTest {
         assertThat(propsMap.size(), is(2));
         assertThat(propsMap, hasEntry(propKey1, propValue1));
         assertThat(propsMap, hasEntry(propKey2, propValue2));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void splittingOnNullDelimiterCausesException() {
+        splitValue("some value", null);
+    }
+
+    @Test
+    public void splittingNullValueReturnsEmptyStringArray() {
+        String[] splitValues = splitValue(null, "whatever");
+        assertThat(splitValues, is(notNullValue()));
+        assertThat(splitValues.length, is(0));
+    }
+
+    @Test
+    public void splittingUnsplittableValueReturnsStringArrayOfSizeOne() {
+        String value = "thisCannotBeSplit";
+        String[] splitValues = splitValue(value, "whatever");
+        assertThat(splitValues, is(notNullValue()));
+        assertThat(splitValues.length, is(1));
+        assertThat(splitValues[0], is(value));
+    }
+
+    @Test
+    public void splittingSplittableValueReturnsCorrectlySplitStringArray() {
+        String[] splitValues = splitValue("a-b-c", "-");
+        assertThat(splitValues, is(notNullValue()));
+        assertThat(splitValues.length, is(3));
+        assertThat(splitValues, arrayContainingInAnyOrder("a", "b", "c"));
     }
 }
