@@ -104,12 +104,5 @@ public class AnnotationFilterTest {
         assertThat(annotationFilter.getLimit(), equalTo(15));
     }
 
-
-    @Test
-    public void exceptionThrownWhenAsForMoreResultsThanLimit(){
-        thrown.expect(IllegalArgumentException.class);
-        AnnotationFilter annotationFilter = new AnnotationFilter();
-        annotationFilter.setLimit(200);
-    }
-
+    
 }
