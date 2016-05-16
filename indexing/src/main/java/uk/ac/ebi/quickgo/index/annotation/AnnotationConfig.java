@@ -122,8 +122,8 @@ public class AnnotationConfig {
         return new LogStepListener();
     }
 
-    private StepListener skipLogListener() {
-        return new SkipLoggerListener();
+    private SkipLoggerListener<Annotation, AnnotationDocument> skipLogListener() {
+        return new SkipLoggerListener<>();
     }
 
     @Bean
