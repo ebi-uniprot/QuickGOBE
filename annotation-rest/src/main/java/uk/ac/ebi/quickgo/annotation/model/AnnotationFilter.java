@@ -38,7 +38,7 @@ public class AnnotationFilter implements FilterProvider {
 
     private final List<PrototypeFilter> prototypeFilters = new ArrayList<>();
 
-    @Pattern(regexp = "^[A-Za-z][A-Za-z_]+(,[A-Za-z][A-Za-z_]+)*")
+    @Pattern(regexp = "^[A-Za-z][A-Za-z-_]+(,[A-Za-z][A-Za-z-_]+[,]*)*")
     private String assignedBy;
 
     /**
