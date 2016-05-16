@@ -1,11 +1,11 @@
 # ================ ARTIFACT INFO ================
 ARTIFACT_GROUP="uk.ac.ebi.quickgo"
-ARTIFACT_ID="ontology-rest"
+ARTIFACT_ID="geneproduct-rest"
 ARTIFACT_VERSION="0.0.1-SNAPSHOT"
 
 # ================ ADDRESS INFO ================
-PORT="8082"
-JXM_REMOTE_PORT="9092"
+PORT="8081"
+JXM_REMOTE_PORT="9091"
 CONTEXT_PATH="/QuickGO/services"
 
 # ================ JVM OPTIONS ================
