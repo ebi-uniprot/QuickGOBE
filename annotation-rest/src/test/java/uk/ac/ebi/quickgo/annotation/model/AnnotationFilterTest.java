@@ -51,12 +51,16 @@ public class AnnotationFilterTest {
         assertThat(pfList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
         assertThat(pfList, hasSize(1));
 
-        Optional<String> result = pfList.get(0)
-                .provideArgStream()
-                .findFirst();
 
-        assertThat(result.isPresent(), is(true));
-        assertThat(result.get(), is(equalTo(UNI_PROT)));
+        assertThat(pfList.get(0)
+                .provideArgStream()
+                .findFirst().isPresent(), is(true));
+        assertThat(pfList.get(0)
+                .provideArgStream()
+                .findFirst().get(), is(equalTo(UNI_PROT)));
+        assertThat(pfList.get(0)
+                .provideArgStream()
+                .count(), is(1L));
     }
 
 
