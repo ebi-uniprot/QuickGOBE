@@ -21,6 +21,7 @@ import java.util.List;
  * of a search require. These tasks include, setting up field projections,
  * highlighting fields, validating facets and filters, etc.
  *
+ *
  * Created 11/04/16
  * @author Edd
  */
@@ -36,8 +37,7 @@ public class SearchAllQueryTemplate {
     private SearchableField fieldSpec;
 
 
-    public SearchAllQueryTemplate(
-            Iterable<String> returnedFields) {
+    public SearchAllQueryTemplate(Iterable<String> returnedFields) {
         this.highlightedFields = Collections.emptyList();
         this.highlightStartDelim = null;
         this.highlightEndDelim = null;
