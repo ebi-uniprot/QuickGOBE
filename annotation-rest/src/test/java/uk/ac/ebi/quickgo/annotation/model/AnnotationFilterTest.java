@@ -104,5 +104,5 @@ public class AnnotationFilterTest {
         assertThat(annotationFilter.getLimit(), equalTo(15));
     }
 
-    
+
 }
