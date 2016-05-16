@@ -31,22 +31,21 @@ public class AnnotationFilterTest {
 
     private static final String UNI_PROT = "UniProt";
     private static final String ASPGD = "ASPGD";
-
-    private AnnotationFilter annotationFilter;
-
     private String multiAssignedBy;
 
     @Before
-    public void setUp() {
-        annotationFilter = new AnnotationFilter();
-        multiAssignedBy = UNI_PROT + "," + ASPGD;
+    public void setUp(){
+        multiAssignedBy = UNI_PROT+","+ASPGD;
     }
 
     @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    public ExpectedException thrown= ExpectedException.none();
 
     @Test
-    public void successfullyAddOnlyOneSingleFilter() {
+    public void successfullyAddOnlyOneSingleFilter(){
+
+        AnnotationFilter annotationFilter = new AnnotationFilter();
+        annotationFilter.setAssignedBy(UNI_PROT);
         final List<PrototypeFilter> pfList = annotationFilter.stream().collect(toList());
         assertThat(pfList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
         assertThat(pfList, hasSize(1));
@@ -59,8 +58,12 @@ public class AnnotationFilterTest {
         assertThat(result.get(), is(equalTo(UNI_PROT)));
     }
 
+
     @Test
-    public void successfullyAddMultiFilter() {
+    public void successfullyAddMultiFilter(){
+
+        AnnotationFilter annotationFilter = new AnnotationFilter();
+        annotationFilter.setAssignedBy(multiAssignedBy);
         final List<PrototypeFilter> pfList = annotationFilter.stream().collect(toList());
         assertThat(pfList, hasSize(1));
         assertThat(pfList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
@@ -76,24 +79,30 @@ public class AnnotationFilterTest {
                 .findFirst();
         assertThat(result2.get(), is(equalTo(ASPGD)));
 
-        long countASPGD = pfList.get(0)
+       long countASPGD = pfList.get(0)
                 .provideArgStream()
                 .filter(a -> a.equals(ASPGD))
                 .count();
         assertThat(countASPGD, is(1l));
     }
 
+
+
     @Test
-    public void defaultPageAndLimitValuesAreCorrect() {
+    public void defaultPageAndLimitValuesAreCorrect(){
+        AnnotationFilter annotationFilter = new AnnotationFilter();
         assertThat(annotationFilter.getPage(), equalTo(1));
         assertThat(annotationFilter.getLimit(), equalTo(25));
     }
 
     @Test
-    public void successfullySetPageAndLimitValues() {
+    public void successfullySetPageAndLimitValues(){
+        AnnotationFilter annotationFilter = new AnnotationFilter();
         annotationFilter.setPage(4);
         annotationFilter.setLimit(15);
         assertThat(annotationFilter.getPage(), equalTo(4));
         assertThat(annotationFilter.getLimit(), equalTo(15));
     }
+
+
 }
