@@ -206,12 +206,12 @@ public class AnnotationControllerIT {
 
 
     @Test
-    public void pageRequestOfZeroAndResultsAvailableReturns500() throws Exception {
+    public void pageRequestOfZeroAndResultsAvailableReturns400() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy).param(PAGE_PARAM,"0"));
 
         response.andDo(print())
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
