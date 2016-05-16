@@ -55,8 +55,8 @@ public class AnnotationControllerIT {
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
 
-    private static final List<String> VALID_ASSIGNED_BY_PARMS=Arrays.asList("ASPGD","ASPGD,Agbase","ASPGD,Agbase",
-            "ASPGD,Agbase,","ASPGD,Agbase,,","BHF-UCL,Agbase","Roslin_Institute,BHF-UCL,Agbase");
+    private static final List<String> VALID_ASSIGNED_BY_PARMS=Arrays.asList("ASPGD","ASPGD,Agbase","ASPGD_,Agbase",
+            "ASPGD,Agbase_,","ASPGD,Agbase,,","BHF-UCL,Agbase","Roslin_Institute,BHF-UCL,Agbase");
 
     private static final List<String> INVALID_ASSIGNED_BY_PARMS=Arrays.asList("_ASPGD","ASPGD,_Agbase","5555,Agbase",
             "ASPGD,5555,","4444,5555,");
@@ -158,8 +158,6 @@ public class AnnotationControllerIT {
                     get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, validAssignedBy));
 
             expectResultsInfoExists(response)
-                    .andExpect(jsonPath("$.results.*").exists())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                     .andExpect(status().isOk());
         }
     }
