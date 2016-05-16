@@ -1,18 +1,15 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.annotation.validation.AnnotationValidation;
 import uk.ac.ebi.quickgo.rest.search.query.FilterProvider;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 import uk.ac.ebi.quickgo.rest.search.query.Validator;
 
-import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.stream.Stream;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
-import org.springframework.validation.Errors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -33,7 +30,10 @@ public class AnnotationFilter implements FilterProvider {
     private static final int DEFAULT_PAGE_NUMBER = 1;
 
     //Non-data parameters
+    @Min(0)
     private int  limit = DEFAULT_ENTRIES_PER_PAGE;
+
+    @Min(1)
     private int page = DEFAULT_PAGE_NUMBER;
 
     private final List<PrototypeFilter> prototypeFilters = new ArrayList<>();
@@ -60,14 +60,11 @@ public class AnnotationFilter implements FilterProvider {
     }
 
 
-
     public void setPage(int page) {
-        Preconditions.checkArgument(page>-1, "The value for page cannot be negative");
         this.page = page;
     }
 
     public void setLimit(int limit) {
-        Preconditions.checkArgument(limit>-1, "The value for limit cannot be negative");
         this.limit = limit;
     }
 

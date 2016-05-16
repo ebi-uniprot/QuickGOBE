@@ -206,12 +206,12 @@ public class AnnotationControllerIT {
 
 
     @Test
-    public void pageRequestOfZeroAndResultsAvailableReturns500() throws Exception {
+    public void pageRequestOfZeroAndResultsAvailableReturns400() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy).param(PAGE_PARAM,"0"));
 
         response.andDo(print())
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -231,6 +231,7 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
+    //---------- Limit related tests.
 
     @Test
     public void limitForPageExceedsMaximumAllowed() throws Exception {
@@ -259,7 +260,15 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void limitForPageThrowsErrorWhenNegative() throws Exception {
 
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy)
+                        .param(LIMIT_PARAM, "-20"));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 
     /**
      *      TESTING RESULTS
