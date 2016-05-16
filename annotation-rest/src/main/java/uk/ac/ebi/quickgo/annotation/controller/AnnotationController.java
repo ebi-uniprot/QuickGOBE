@@ -76,7 +76,6 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RequestMapping(value = "/QuickGO/services/annotation")
 public class AnnotationController {
 
-	Logger logger = LoggerFactory.getLogger(AnnotationController.class);
 	//todo @Autowired
 	private final ControllerValidationHelper validationHelper;
 
