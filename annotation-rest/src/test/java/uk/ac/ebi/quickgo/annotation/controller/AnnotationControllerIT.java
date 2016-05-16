@@ -118,6 +118,22 @@ public class AnnotationControllerIT {
     }
 
     @Test
+    public void lookupAnnotationFilterByRepetitionOfParmsSuccessfully() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM,  basicDocs.get(0).assignedBy)
+                        .param(ASSIGNED_BY_PARAM, basicDocs.get(1).assignedBy)
+                        .param(ASSIGNED_BY_PARAM, basicDocs.get(3).assignedBy));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(3))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+
+
+    @Test
     public void lookupAnnotationFilterByInvalidAssignedBy() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, UNAVAILABLE_ASSIGNED_BY));
@@ -306,7 +322,8 @@ public class AnnotationControllerIT {
         return Arrays.asList(
                 AnnotationDocMocker.createAnnotationDoc("A0A000"),
                 AnnotationDocMocker.createAnnotationDoc("A0A001","ASPGD"),
-                AnnotationDocMocker.createAnnotationDoc("A0A001","BHF-UCL"));
+                AnnotationDocMocker.createAnnotationDoc("A0A001","BHF-UCL"),
+                AnnotationDocMocker.createAnnotationDoc("A0A002","AGPRD"));
     }
 
 
