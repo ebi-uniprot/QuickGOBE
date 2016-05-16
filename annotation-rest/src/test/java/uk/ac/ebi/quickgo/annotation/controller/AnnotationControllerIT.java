@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.Arrays;
@@ -226,7 +227,7 @@ public class AnnotationControllerIT {
         annotationRepository.deleteAll();
 
         int existingPages = 4;
-        createAndSaveDocs(AnnotationController.MAX_PAGE_RESULTS * existingPages);
+        createAndSaveDocs(SearchServiceConfig.MAX_PAGE_RESULTS * existingPages);
 
 
         ResultActions response = mockMvc.perform(
