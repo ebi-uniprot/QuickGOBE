@@ -56,7 +56,7 @@ public class AnnotationControllerIT {
     private static final String LIMIT_PARAM = "limit";
 
     private static final List<String> VALID_ASSIGNED_BY_PARMS=Arrays.asList("ASPGD","ASPGD,Agbase","ASPGD_,Agbase",
-            "ASPGD,Agbase_,","ASPGD,Agbase,,","BHF-UCL,Agbase","Roslin_Institute,BHF-UCL,Agbase");
+            "ASPGD,Agbase_","ASPGD,Agbase","BHF-UCL,Agbase","Roslin_Institute,BHF-UCL,Agbase");
 
     private static final List<String> INVALID_ASSIGNED_BY_PARMS=Arrays.asList("_ASPGD","ASPGD,_Agbase","5555,Agbase",
             "ASPGD,5555,","4444,5555,");
