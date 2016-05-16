@@ -34,12 +34,11 @@ public class AnnotationFilterTest {
 
     private AnnotationFilter annotationFilter;
 
-    private String multiAssignedBy;
+    private String multiAssignedBy = UNI_PROT + "," + ASPGD;
 
     @Before
     public void setUp() {
         annotationFilter = new AnnotationFilter();
-        multiAssignedBy = UNI_PROT + "," + ASPGD;
     }
 
     @Rule
@@ -47,6 +46,7 @@ public class AnnotationFilterTest {
 
     @Test
     public void successfullyAddOnlyOneSingleFilter() {
+        annotationFilter.setAssignedBy(UNI_PROT);
         final List<PrototypeFilter> pfList = annotationFilter.stream().collect(toList());
         assertThat(pfList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
         assertThat(pfList, hasSize(1));
@@ -63,7 +63,6 @@ public class AnnotationFilterTest {
     @Test
     public void successfullyAddMultiFilterForAssignedBy(){
 
-        AnnotationFilter annotationFilter = new AnnotationFilter();
         annotationFilter.setAssignedBy(multiAssignedBy);
         final List<PrototypeFilter> pfList = annotationFilter.stream().collect(toList());
         assertThat(pfList, hasSize(1));
