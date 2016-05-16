@@ -12,8 +12,8 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 public interface AnnotationDocConverter {
 
     /**
-     * Convert a Solr Annotation Document into a model to be returned to the user
-     * @param annotationDocument A document from Solr
+     * Convert an Annotation Document into a model to be returned to the user
+     * @param annotationDocument  A document retrieved from the Annotation data source
      * @return an Annotation model
      */
     Annotation convert(AnnotationDocument annotationDocument);
