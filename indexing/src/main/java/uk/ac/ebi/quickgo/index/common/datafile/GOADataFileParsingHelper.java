@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.index.common.datafile;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This class provides stateless methods to help process the contents of gene ontology annotation data files.
@@ -54,14 +55,9 @@ public class GOADataFileParsingHelper {
     public static String[] splitValue(String value, String delimiter) {
         assert delimiter != null : "Delimiter cannot be null";
 
-        String[] splitValues;
-
-        if (value != null && value.trim().length() > 0) {
-            splitValues = value.split(delimiter);
-        } else {
-            splitValues = new String[0];
-        }
-
-        return splitValues;
+        return Optional.ofNullable(value)
+                .filter(v -> !v.isEmpty())
+                .map(v -> v.split(delimiter))
+                .orElse(new String[0]);
     }
 }
