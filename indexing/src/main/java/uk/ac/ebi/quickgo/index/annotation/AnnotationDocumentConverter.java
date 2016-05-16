@@ -75,12 +75,15 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
     }
 
     private List<String> constructExtensions(Annotation annotation) {
-        return annotation.annotationExtension == null ? null :
-                Arrays.asList(annotation.annotationExtension.split(PIPE));
+        return createNullableListFromPipeSeparatedValue(annotation.annotationExtension);
     }
 
     private List<String> constructWithFrom(Annotation annotation) {
-        return annotation.with == null ? null : Arrays.asList(annotation.with.split(PIPE));
+        return createNullableListFromPipeSeparatedValue(annotation.with);
+    }
+
+    private List<String> createNullableListFromPipeSeparatedValue(String value) {
+        return value == null ? null : Arrays.asList(value.split(PIPE));
     }
 
     private String constructGeneProductId(Annotation annotation) {
