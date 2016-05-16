@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.Arrays;
@@ -194,7 +194,7 @@ public class AnnotationControllerIT {
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.results").isArray())
-                .andExpect(jsonPath("$.results", hasSize(AnnotationFilter.DEFAULT_ENTRIES_PER_PAGE)));
+                .andExpect(jsonPath("$.results", hasSize(AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE)));
     }
 
 

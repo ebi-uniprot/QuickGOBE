@@ -24,7 +24,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * Time: 11:23
  * Created with IntelliJ IDEA.
  */
-public class AnnotationFilter implements FilterProvider {
+public class AnnotationRequest implements FilterProvider {
 
     public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
     private static final int DEFAULT_PAGE_NUMBER = 1;

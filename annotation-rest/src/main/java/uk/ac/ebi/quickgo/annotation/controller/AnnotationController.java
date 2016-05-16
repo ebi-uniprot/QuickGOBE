@@ -10,7 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
@@ -101,11 +101,11 @@ public class AnnotationController {
 	 * @return a {@link QueryResult} instance containing the results of the search
 	 */
 	@RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationFilter filter, BindingResult
+	public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest filter, BindingResult
 			bindingResult) {
 
 		checkArgument(!bindingResult.hasErrors(), "The binding of the request parameters to " +
-				"AnnotationFilter %s has errors, see binding result %s", filter, bindingResult);
+				"AnnotationRequest %s has errors, see binding result %s", filter, bindingResult);
 
 		filter.stream().forEach(pf -> pf.validate());
 		validationHelper.validateRequestedResults(filter.getLimit());
