@@ -63,6 +63,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>uk.ac.ebi.quickgo</groupId>
+            <artifactId>rest-common</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>geneproduct-common</artifactId>
             <version>${project.version}</version>

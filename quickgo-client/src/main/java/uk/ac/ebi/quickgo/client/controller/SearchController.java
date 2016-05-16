@@ -48,6 +48,7 @@ public class SearchController {
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
 
         Preconditions.checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
+        Preconditions.checkArgument(ontologySearchableField != null, "Ontology searchable field cannot be null");
         Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
 
         this.ontologySearchService = ontologySearchService;

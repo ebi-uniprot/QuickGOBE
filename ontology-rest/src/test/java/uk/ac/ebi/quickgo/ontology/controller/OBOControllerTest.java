@@ -30,31 +30,22 @@ import static org.hamcrest.Matchers.is;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class OBOControllerTest {
-    private OBOController<FakeOBOTerm> controller;
     private static final Pattern ID_FORMAT = Pattern.compile("id[0-9]");
 
+    @Mock
+    SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig;
     @Mock
     private OntologyService<FakeOBOTerm> ontologyService;
     @Mock
     private SearchService<OBOTerm> searchService;
     @Mock
     private SearchableField searchableField;
-    @Mock
-    SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig;
+
+    private OBOController<FakeOBOTerm> controller;
 
     @Before
-
     public void setUp() {
-        this.controller =
-                new OBOController<FakeOBOTerm>(ontologyService, searchService, searchableField, retrievalConfig) {
-                    @Override protected Predicate<String> idValidator() {
-                        return id -> ID_FORMAT.matcher(id).matches();
-                    }
-
-                    @Override protected OntologyType getOntologyType() {
-                        return OntologyType.GO;
-                    }
-                };
+        this.controller = createOBOController(ontologyService, searchService, searchableField, retrievalConfig);
     }
 
     @Test
@@ -77,6 +68,42 @@ public class OBOControllerTest {
                 .singletonList(new FakeOBOTerm()));
         assertThat(termsResponse.getBody().getNumberOfHits(), is(1L));
         assertThat(termsResponse.getBody().getResults().size(), is(1));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void controllerInstantiationFailsOnNullOntologyService() {
+        createOBOController(
+                null, searchService, searchableField, retrievalConfig);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void controllerInstantiationFailsOnNullSearchService() {
+        createOBOController(ontologyService, null, searchableField, retrievalConfig);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void controllerInstantiationFailsOnNullSearchableField() {
+        createOBOController(ontologyService, searchService, null, retrievalConfig);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void controllerInstantiationFailsOnNullRetrievalConfig() {
+        createOBOController(ontologyService, searchService, searchableField, null);
+    }
+
+    private static OBOController<FakeOBOTerm> createOBOController(
+            final OntologyService<FakeOBOTerm> ontologyService, final SearchService<OBOTerm> searchService,
+            final SearchableField searchableField,
+            final SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig) {
+        return new OBOController<FakeOBOTerm>(ontologyService, searchService, searchableField, retrievalConfig) {
+            @Override protected Predicate<String> idValidator() {
+                return id -> ID_FORMAT.matcher(id).matches();
+            }
+
+            @Override protected OntologyType getOntologyType() {
+                return OntologyType.GO;
+            }
+        };
     }
 
     private static class FakeOBOTerm extends OBOTerm {}

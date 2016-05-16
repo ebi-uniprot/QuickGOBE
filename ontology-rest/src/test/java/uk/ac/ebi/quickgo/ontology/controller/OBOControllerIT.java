@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -49,11 +48,11 @@ public abstract class OBOControllerIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
+    static final String COMMA = ",";
+
     private static final String SEARCH_ENDPOINT = "search";
     private static final String TERMS_ENDPOINT = "terms";
-
     private static final String QUERY_PARAM = "query";
-    static final String COMMA = ",";
     private static final String PAGE_PARAM = "page";
 
     @Autowired
@@ -61,10 +60,8 @@ public abstract class OBOControllerIT {
 
     @Autowired
     protected OntologyRepository ontologyRepository;
-    @Autowired
-    private SolrTemplate ontologyTemplate;
 
-    protected MockMvc mockMvc;
+    MockMvc mockMvc;
 
     private String resourceUrl;
     private String validId;
@@ -87,7 +84,6 @@ public abstract class OBOControllerIT {
         validIdsCSV = basicDocs.stream().map(doc -> doc.id).collect(Collectors.joining(","));
         validIdList = Arrays.asList(validIdsCSV.split(COMMA));
 
-//        ontologyTemplate.saveBeans(basicDocs);
         ontologyRepository.save(basicDocs);
     }
 
@@ -405,6 +401,10 @@ public abstract class OBOControllerIT {
 
     protected abstract List<OntologyDocument> createNDocs(int n);
 
+    protected abstract String idMissingInRepository();
+
+    protected abstract String invalidId();
+
     protected ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
         return expectCoreFields(result, id, "$.");
     }
@@ -466,10 +466,6 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "subsets").exists())
                 .andExpect(jsonPath(path + "replacedBy").exists());
     }
-
-    protected abstract String idMissingInRepository();
-
-    protected abstract String invalidId();
 
     protected ResultActions expectInvalidIdError(ResultActions result, String id) throws Exception {
         return result
