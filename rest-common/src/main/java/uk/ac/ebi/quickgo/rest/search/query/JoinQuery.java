@@ -40,7 +40,7 @@ class JoinQuery extends QuickGOQuery {
     }
 
     @Override public <T> T accept(QueryVisitor<T> visitor) {
-        return null;
+        return visitor.visit(this);
     }
 
     public String getJoinFromAttribute() {
