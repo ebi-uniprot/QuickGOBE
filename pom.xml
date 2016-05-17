@@ -75,6 +75,16 @@
             </modules>
         </profile>
         <profile>
+            <id>annotation_web_service</id>
+            <modules>
+                <module>common</module>
+                <module>annotation-common</module>
+                <module>rest-common</module>
+                <module>annotation-rest</module>
+                <module>solr-plugin</module>
+            </modules>
+        </profile>
+        <profile>
             <id>client_web_service</id>
             <modules>
                 <module>common</module>
