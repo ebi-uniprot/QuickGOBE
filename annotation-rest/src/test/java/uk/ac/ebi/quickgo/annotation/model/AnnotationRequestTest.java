@@ -4,8 +4,6 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,25 +18,25 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
  *
- * Test methods and structure of AnnotationFilter
+ * Test methods and structure of AnnotationRequest
  *
  * @author Tony Wardell
  * Date: 29/04/2016
  * Time: 11:25
  * Created with IntelliJ IDEA.
  */
-public class AnnotationFilterTest {
+public class AnnotationRequestTest {
 
     private static final String UNI_PROT = "UniProt";
     private static final String ASPGD = "ASPGD";
 
-    private AnnotationFilter annotationFilter;
+    private AnnotationRequest annotationFilter;
 
     private String multiAssignedBy = UNI_PROT + "," + ASPGD;
 
     @Before
     public void setUp() {
-        annotationFilter = new AnnotationFilter();
+        annotationFilter = new AnnotationRequest();
     }
 
     @Rule

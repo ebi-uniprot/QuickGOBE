@@ -1,0 +1,195 @@
+#!/bin/bash
+
+# ---------------------------- VALIDATE USER ----------------------------
+# require VALID_USERS defined
+if [ -z $VALID_USERS ]; then
+    echo "VALID_USERS array variable must be defined, e.g., VALID_USERS=(\"uni_qgo\");";
+    exit 1;
+fi
+
+i_am_a_valid_user="no";
+user=$(whoami);
+for valid_user in "${VALID_USERS[@]}"; do
+    if [ "$user" == "$valid_user" ]; then
+        i_am_a_valid_user="yes";
+    fi
+done
+
+if [ "$i_am_a_valid_user" == "no" ]; then
+    echo "You ($user) are not allowed to run this script. Authorized users are: ${VALID_USERS[@]}.";
+    exit 1;
+fi
+
+
+# ---------------------------- ENVIRONMENT ----------------------------
+# the JVM (minimum required, 1.8)
+if [[ -z "$JAVA_HOME" ]]; then
+     echo "JAVA_HOME not set. Please set your JAVA_HOME, e.g. /nfs/web-hx/uniprot/software/java/jdks/latest_1.8"
+     exit 1
+fi
+
+JVM=$JAVA_HOME/bin/java
+
+# specify here because of problems with LSF choosing a different version for different users
+rsync="/usr/bin/rsync"
+
+
+# ---------------------------- INDEX SCRIPTS BASE DIRECTORY  ----------------------------
+
+# set the base directory, used as a root in other scripts
+SCRIPT="$(readlink -e $0)"
+SCRIPTPATH="$(dirname $SCRIPT)"
+BASE_DIR="$(dirname $SCRIPTPATH)";     # base directory
+
+if [ -z $BASE_DIR ] && [ ! -d "$BASE_DIR" ]; then
+    echo "Base directory does not exist: $BASE_DIR. Aborting.";
+    exit 1;
+fi
+
+# ---------------------------- GIT INFO ----------------------------------
+REPOS_DIR="$BASE_DIR/repos"
+QUICKGO_REPO_DIR="$REPOS_DIR/QuickGOBE"
+QUICKGO_BRANCH="GOA-1805_Create_indexing_scripts"
+
+# ---------------------------- SOLR CORE INFO ----------------------------
+CORE_NAME=
+
+# source environment specific variables
+source "$BASE_DIR/index.properties";
+
+# check vm purpose defined
+if [ -z $vm_purpose ]; then
+    echo "Please specify the purpose of the VM in, vm_purpose, in $BASE_DIR/index.properties";
+    exit 1;
+fi
+PURPOSE="$vm_purpose";
+
+# check solr vm, e.g., ves-xx-xx for http://ves-xx-xx:PORT/solr-dashboard
+if [ -z $solr_vm ]; then
+    echo "Please specify Solr's vm, e.g., ves-xx-xx if http://ves-xx-xx:PORT/solr-dashboard exists, in solr_vm, in
+    $BASE_DIR/index.properties";
+    exit 1;
+fi
+
+# check solr path, e.g., solr-dashboard if http://ves-xx-xx:PORT/solr-dashboard exists
+if [ -z $http_solr_path ]; then
+    echo "Please specify the Solr path, e.g., solr-dashboard for http://ves-xx-xx:PORT/solr-dashboard, in
+    http_solr_path, in $BASE_DIR/index.properties";
+    exit 1;
+fi
+
+# check solr port, e.g., PORT if http://ves-xx-xx:PORT/solr-dashboard exists
+if [ -z $http_solr_port ]; then
+    echo "Please specify Solr's port, e.g., PORT for http://ves-xx-xx:PORT/solr-dashboard exists, in http_solr_port,
+    in $BASE_DIR/index.properties";
+    exit 1;
+fi
+SOLR_ADDRESS_BASE="http://$solr_vm:$http_solr_port/$http_solr_path";
+
+SOLR_INDEX_DIR="${BASE_DIR}/.quickgo-indexes"
+SOLR_CONFIG_DIR="${BASE_DIR}/solr-conf"
+
+# ---------------------------- LOGGING ----------------------------
+LOGBACK_CONF=$PWD/logback.xml
+
+## ---------------------------- LSF ----------------------------
+
+# who to email when LSF jobs finish; comma separated format on a single line
+LSF_EMAIL="$LOGNAME"
+LSF_CORES=8,32
+LSF_Q=production-rh6
+LSF_MEM=4096
+LSF_JVM_MIN_MEM=4096m
+LSF_JVM_MAX_MEM=4096m
+LSF_HEAPDUMP_PATH=$PWD/logs
+JMX_PORT=3333
+
+
+## ---------------------------- FOR JAVA ----------------------------
+MAIN_CLASS=
+MAIN_CLASS_PARAMS=
+LSF_JOB_NAME=
+
+# java class path -- include all jars for creating the indexes
+QUICKGO_SERVICE_DIR="${SOLR_CONFIG_DIR}/lib/quickgo"
+QUICKGO_SERVICE_JAR="$QUICKGO_SERVICE_DIR/*"
+
+## ---------------------------- GENERAL UTILITY FUNCTIONS ----------------------------
+# quick way for echoing coloured text
+# e.g., prettyEcho "<warn>warning message</warn>"
+# e.g., prettyEcho "<info>info message: <warn>specific message</warn></info>"
+# e.g., prettyEcho "<error>warning message</error>"
+function prettyEcho {
+    local string="$1";
+    string=$(echo $string | perl -pe 's@<warn>(.*?)<\/warn>@\$(tput setaf 3)\1\$(tput sgr 0)@g');
+    string=$(echo $string | perl -pe 's@<info>(.*?)<\/info>@\$(tput setaf 2)\1\$(tput sgr 0)@g');
+    string=$(echo $string | perl -pe 's@<error>(.*?)<\/error>@\$(tput setaf 1)\$(tput bold)\1\$(tput sgr 0)@g');
+    string=$(echo $string | perl -pe 's@<success>(.*?)<\/success>@\$(tput setaf 2)\$(tput bold)\1\$(tput sgr 0)@g');
+    string=$(echo $string | perl -pe 's@<bold>(.*?)<\/bold>@\$(tput bold)\1\$(tput sgr 0)@g');
+    eval "echo "$string"";
+}
+
+# determines if a given server is up or down
+function serverIsUp {
+    local port="$http_solr_port";
+    local path="";
+    if [ $# -ge 2 ]; then
+        port="$2";
+        if [ $# -eq 3 ]; then
+            path="/$3";
+        fi
+    fi
+
+    if curl --output /dev/null --silent --head --fail "http://$1:$port$path"; then
+        echo "UP";
+    else
+        echo "DOWN";
+    fi
+}
+
+# print formatted message regarding up/down status of current servers
+function printTomcatServerStatus {
+    local server="$solr_vm"; # by default show the environment's tomcat status
+    if [ "$#" -eq 1 ]; then
+        server="$1";
+    fi
+
+    local tomcat_addr="http://$server:8080";
+    local server_status="$(serverIsUp $server)";
+
+    local server_message="<error>$server_status</error>";
+    if [ "$server_status" == "UP" ]; then
+            server_message="<success>$server_status</success>";
+    fi
+
+    prettyEcho "Tomcat @ $tomcat_addr is $server_message";
+}
+
+function solrServerStatus {
+    local server="$solr_vm"; # by default show the environment's tomcat's solr status
+    if [ "$#" -eq 1 ]; then
+        server="$1";
+    fi
+
+    local solr_addr="http://$server:$http_solr_port/$http_solr_path";
+
+    echo "$(serverIsUp $server $http_solr_port $http_solr_path)";
+}
+
+function printSolrServerStatus {
+    local server_message="<error>$server_status</error>";
+    if [ "$server_status" == "UP" ]; then
+            server_message="<success>$server_status</success>";
+    fi
+
+    prettyEcho "Solr @ $solr_addr is $server_message";
+}
+
+function printReleaseBaseDirContents {
+    prettyEcho "Listing contents of release base directory, $SOLR_INDEX_DIR:";
+    ls -l "$SOLR_INDEX_DIR" | sed 's/^/     /';
+}
+
+function printDivider {
+    echo "======================================================";
+}

@@ -31,10 +31,9 @@ public class DefaultSearchQueryTemplate {
     private final String highlightStartDelim;
     private final String highlightEndDelim;
     private final Iterable<String> returnedFields;
-    private Iterable<String> highlightedFields;
-    private StringToQuickGOQueryConverter converter;
-    private SearchableField fieldSpec;
-
+    private final Iterable<String> highlightedFields;
+    private final StringToQuickGOQueryConverter converter;
+    private final SearchableField fieldSpec;
 
     public DefaultSearchQueryTemplate(
             StringToQuickGOQueryConverter converter,
@@ -64,15 +63,15 @@ public class DefaultSearchQueryTemplate {
     public static class Builder implements SearchQueryRequestBuilder {
         private final String highlightStartDelim;
         private final String highlightEndDelim;
-        private Iterable<String> highlightedFields;
-        private StringToQuickGOQueryConverter converter;
+        private final Iterable<String> highlightedFields;
+        private final StringToQuickGOQueryConverter converter;
         private final Iterable<String> returnedFields;
+        private final List<String> filterQueries;
+        private final List<String> facets;
 
         private String query;
         private int page = DEFAULT_PAGE_NUMBER;
         private int pageSize = DEFAULT_PAGE_SIZE;
-        private List<String> filterQueries;
-        private List<String> facets;
         private SearchableField fieldSpec;
         private boolean highlighting;
 

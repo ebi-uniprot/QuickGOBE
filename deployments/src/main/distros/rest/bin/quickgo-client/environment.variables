@@ -1,0 +1,14 @@
+# ================ ARTIFACT INFO ================
+ARTIFACT_GROUP="uk.ac.ebi.quickgo"
+ARTIFACT_ID="quickgo-client"
+ARTIFACT_VERSION="0.0.1-SNAPSHOT"
+
+# ================ ADDRESS INFO ================
+PORT="8083"
+JXM_REMOTE_PORT="9093"
+CONTEXT_PATH="/QuickGO/services"
+
+# ================ JVM OPTIONS ================
+JVM_MEM_MAX="-Xms1024M"
+JVM_MEM_MIN="-Xmx3096M"
+JVM_FLIGHT_RECORDER="off" # on|off

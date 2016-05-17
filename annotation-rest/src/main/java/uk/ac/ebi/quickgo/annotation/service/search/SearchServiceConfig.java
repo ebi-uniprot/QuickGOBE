@@ -42,6 +42,7 @@ public class SearchServiceConfig {
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS = "id,geneProductId,qualifier,goId," +
             "goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extension";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
+    public static final int MAX_PAGE_RESULTS = 100;
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -64,6 +65,11 @@ public class SearchServiceConfig {
                 queryRequestConverter,
                 resultConverter,
                 annotationRetrievalConfig);
+    }
+
+    @Bean
+    public ControllerValidationHelper validationHelper(){
+        return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
     }
 
     @Bean

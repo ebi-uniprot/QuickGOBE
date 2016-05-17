@@ -1,0 +1,56 @@
+#! /bin/bash
+
+#fail on error
+set -e
+
+VALID_USERS=("uni_qgo");
+
+if [ -z "$1" ] || [ "$1" == "submit" ]; then
+   echo "Missing the release directory to copy the libraries into";
+   exit 1;
+else
+   conf_release_dir=$1;
+fi
+
+if [ ! -d "$conf_release_dir" ]; then
+    echo "Release directory does not exist: $conf_release_dir";
+    exit 1;
+fi
+
+# read common environment variables
+properties_not_found="false";
+
+source "../common/common.variables";
+source "index.variables";
+
+if [ $? -eq 1 ]; then
+    properties_not_found="true";
+fi
+
+if [ "$properties_not_found" = "true" ]; then
+    echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
+
+cd "$QUICKGO_REPO_DIR"
+
+git fetch
+git checkout "$QUICKGO_BRANCH"
+git pull
+
+core_dir="${conf_release_dir}/homes/cores/${CORE_NAME}"
+
+mkdir -p "${core_dir}"
+cp -a "${QUICKGO_REPO_DIR}/solr-cores/src/main/cores/${CORE_NAME}/." "${core_dir}"
+
+echo "Fetched solr cores"
+
+#make core dir readable and writable to user and group
+chmod -R 774 "$core_dir"
+
+#update core link in $SOLR_CONFIG_DIR directory
+symlink=${SOLR_CONFIG_DIR}/cores/${CORE_NAME}
+ln -snf "$core_dir" "$symlink"
+
+echo "Symlink ${core_dir} has been updated with new core definitions"
+ls -l "$symlink" | sed -e 's/^/    /g';

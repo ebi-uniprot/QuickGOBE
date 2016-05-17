@@ -15,10 +15,11 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class ControllerValidationHelperImpl implements ControllerValidationHelper {
 
-    private static final Logger LOGGER = getLogger(ControllerValidationHelperImpl.class);
     public static final int MAX_PAGE_RESULTS = 100;
 
+    private static final Logger LOGGER = getLogger(ControllerValidationHelperImpl.class);
     private static final String COMMA = ",";
+
     private final Predicate<String> validIdCondition;
     private final Predicate<Integer> validNumberOfPageResults;
 

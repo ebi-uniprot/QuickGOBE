@@ -4,8 +4,8 @@ ARTIFACT_ID="ontology-rest"
 ARTIFACT_VERSION="0.0.1-SNAPSHOT"
 
 # ================ ADDRESS INFO ================
-PORT="8081"
-JXM_REMOTE_PORT="9091"
+PORT="8082"
+JXM_REMOTE_PORT="9092"
 CONTEXT_PATH="/QuickGO/services"
 
 # ================ JVM OPTIONS ================
