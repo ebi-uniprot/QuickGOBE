@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
 import javax.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchAllQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
+import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -75,8 +73,6 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RestController
 @RequestMapping(value = "/QuickGO/services/annotation")
 public class AnnotationController {
-
-	//todo @Autowired
 	private final ControllerValidationHelper validationHelper;
 
 	private final SearchService<Annotation> annotationSearchService;
@@ -106,11 +102,10 @@ public class AnnotationController {
 		checkArgument(!bindingResult.hasErrors(), "The binding of the request parameters to " +
 				"AnnotationRequest %s has errors, see binding result %s", filter, bindingResult);
 
-		filter.stream().forEach(pf -> pf.validate());
+		filter.stream().forEach(PrototypeFilter::validate);
 		validationHelper.validateRequestedResults(filter.getLimit());
 		SearchAllQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
 				.addFilterProvider(filter);
 		return search(requestBuilder.build(), annotationSearchService);
-
 	}
 }
