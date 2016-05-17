@@ -42,7 +42,11 @@ public class DbXrefLoader {
     }
 
     /**
-     * Read the specified file and save it to a list of GeneProductDbXrefIDFormat instances.
+     * Load the file which contains information about database cross references and save it to a list of
+     * GeneProductDbXrefIDFormat instances.
+     *
+     * We load this file to use the regexes it contains to validate gene product ids (each Db will have it's own
+     * regex for the id it uses).
      *
      * If the file cannot be loaded supply the client with an empty list, as we will continue without
      * validation, rather than end the process.
