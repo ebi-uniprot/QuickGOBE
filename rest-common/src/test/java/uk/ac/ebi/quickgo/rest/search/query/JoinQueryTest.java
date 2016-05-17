@@ -3,16 +3,24 @@ package uk.ac.ebi.quickgo.rest.search.query;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests the behaviour of the {@link JoinQuery} class.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class JoinQueryTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    @Mock
+    private QueryVisitor visitor;
 
     private JoinQuery query;
 
@@ -124,6 +132,15 @@ public class JoinQueryTest {
         assertThat(query.getJoinToAttribute(), is(joinToAttribute));
         assertThat(query.getQuery(), is(filterQuery));
     }
+
+    @Test
+    public void visitorIsCalledCorrectly() throws Exception {
+        FieldQuery
+                query = new FieldQuery("field1", "value1");
+        query.accept(visitor);
+        verify(visitor).visit(query);
+    }
+
 
     private void assertNullOrEmpty(String errorMsg) {
         thrown.expect(IllegalArgumentException.class);
