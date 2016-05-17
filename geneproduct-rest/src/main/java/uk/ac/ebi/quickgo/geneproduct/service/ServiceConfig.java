@@ -39,8 +39,8 @@ public class ServiceConfig {
     private static final String DEFAULT_DB = "UniProtKB";
     private static final String DEFAULT_TYPE_NAME = "protein";
 
-    @Value("${public.geneproduct.source}")
-    private String sourceFileDirectory;
+    @Value("${geneproduct.db.xref.valid.regexes}")
+    private String xrefValidationRegexFile;
 
     @Bean
     public GeneProductService goGeneProductService(GeneProductRepository geneProductRepository) {
@@ -74,7 +74,7 @@ public class ServiceConfig {
         return dbXrefEntities::isValidId;	}
 
     private DbXRefLoader geneProductLoader() {
-        return new DbXRefLoader(this.sourceFileDirectory);
+        return new DbXRefLoader(this.xrefValidationRegexFile);
     }
 
 
