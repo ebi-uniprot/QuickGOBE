@@ -43,23 +43,23 @@ class JoinQuery extends QuickGOQuery {
         return visitor.visit(this);
     }
 
-    public String getJoinFromAttribute() {
+    String getJoinFromAttribute() {
         return joinFromAttribute;
     }
 
-    public String getJoinFromTable() {
+    String getJoinFromTable() {
         return joinFromTable;
     }
 
-    public String getJoinToAttribute() {
+    String getJoinToAttribute() {
         return joinToAttribute;
     }
 
-    public String getJoinToTable() {
+    String getJoinToTable() {
         return joinToTable;
     }
 
-    public QuickGOQuery getQuery() {
+    QuickGOQuery getQuery() {
         return query;
     }
 
