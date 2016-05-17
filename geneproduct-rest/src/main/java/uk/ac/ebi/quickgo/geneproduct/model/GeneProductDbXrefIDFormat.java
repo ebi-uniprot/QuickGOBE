@@ -24,19 +24,19 @@ public class GeneProductDbXRefIDFormat {
     private String entityTypeName;
 
     //E.g. regex for validation  ([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])...
-    private Pattern localIDSyntax;
+    private Pattern idValidationPattern;
 
     //E.g. http://www.uniprot.org/uniprot/[example_id]/
     private String URLSyntax;
 
-    public GeneProductDbXRefIDFormat(String database, String entityType, String entityTypeName, String localIDSyntax,
+    public GeneProductDbXRefIDFormat(String database, String entityType, String entityTypeName, String idValidationPattern,
             String URLSyntax) {
-        Preconditions.checkNotNull(localIDSyntax,
+        Preconditions.checkNotNull(idValidationPattern,
                 "The regex for the validation of ids from " + database + " is null and therefore invalid");
         this.database = database;
         this.entityType = entityType;
         this.entityTypeName = entityTypeName;
-        this.localIDSyntax = Pattern.compile(localIDSyntax);
+        this.idValidationPattern = Pattern.compile(idValidationPattern);
         this.URLSyntax = URLSyntax;
     }
 
@@ -46,7 +46,7 @@ public class GeneProductDbXRefIDFormat {
      * @return
      */
     public boolean matches(String id) {
-        return localIDSyntax.matcher(id).matches();
+        return idValidationPattern.matcher(id).matches();
     }
 
     public String getDatabase() {
@@ -61,8 +61,8 @@ public class GeneProductDbXRefIDFormat {
         return entityTypeName;
     }
 
-    public Pattern getLocalIDSyntax() {
-        return localIDSyntax;
+    public Pattern getIdValidationPattern() {
+        return idValidationPattern;
     }
 
     public String getURLSyntax() {
@@ -75,7 +75,7 @@ public class GeneProductDbXRefIDFormat {
                 "database='" + database + '\'' +
                 ", entityType='" + entityType + '\'' +
                 ", entityTypeName='" + entityTypeName + '\'' +
-                ", localIDSyntax=" + localIDSyntax +
+                ", idValidationPattern=" + idValidationPattern +
                 ", URLSyntax='" + URLSyntax + '\'' +
                 '}';
     }
