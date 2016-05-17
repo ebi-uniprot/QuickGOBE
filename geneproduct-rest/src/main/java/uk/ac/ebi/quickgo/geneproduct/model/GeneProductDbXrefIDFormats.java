@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
@@ -23,13 +24,13 @@ public class GeneProductDbXRefIDFormats {
     private Map<GeneProductDbXRefIDFormats.Key, List<GeneProductDbXRefIDFormat>> geneProductXrefEntities;
     private final String defaultDatabase;
 
-    private GeneProductDbXRefIDFormats(Map<GeneProductDbXRefIDFormats.Key, List<GeneProductDbXRefIDFormat>>
-            geneProductXrefEntities,
-            String defaultDb, String defaultTypeName) {
-        this.geneProductXrefEntities = geneProductXrefEntities;
-        this.defaultDatabase = defaultDb;
-        this.defaultTypeName = defaultTypeName;
+    public GeneProductDbXRefIDFormats(Map<GeneProductDbXRefIDFormats.Key, List<GeneProductDbXRefIDFormat>>
+            geneProductXrefEntities, String defaultDb, String defaultTypeName) {
+        this.defaultTypeName = checkNotNull(defaultTypeName);
+        this.defaultDatabase = checkNotNull(defaultDb);
+        this.geneProductXrefEntities = checkNotNull(geneProductXrefEntities);
     }
+
 
     /**
      *  Use the default database and type name to test if a gene product id is valid.
