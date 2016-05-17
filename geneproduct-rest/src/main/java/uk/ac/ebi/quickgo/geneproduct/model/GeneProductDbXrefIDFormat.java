@@ -1,18 +1,18 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
-import java.util.Objects;
+import com.google.common.base.Preconditions;
 import java.util.regex.Pattern;
 
 /**
- * Hold a list of regular expressions that are used to validate gene product ids based on source database and the id
- * type.
+ * The information for a single Database cross reference.
+ * This information is used, for example, to validate gene product ids based on source database and the id type.
  *
  * @author Tony Wardell
  *         Date: 18/04/2016
  *         Time: 13:52
  *         Created with IntelliJ IDEA.
  */
-public class GeneProductDbXrefIDFormat {
+public class GeneProductDbXRefIDFormat {
 
     //E.g. UniProtKB
     private String database;
@@ -29,9 +29,9 @@ public class GeneProductDbXrefIDFormat {
     //E.g. http://www.uniprot.org/uniprot/[example_id]/
     private String URLSyntax;
 
-    public GeneProductDbXrefIDFormat(String database, String entityType, String entityTypeName, String localIDSyntax,
+    public GeneProductDbXRefIDFormat(String database, String entityType, String entityTypeName, String localIDSyntax,
             String URLSyntax) {
-        Objects.requireNonNull(localIDSyntax,
+        Preconditions.checkNotNull(localIDSyntax,
                 "The regex for the validation of ids from " + database + " is null and therefore invalid");
         this.database = database;
         this.entityType = entityType;
