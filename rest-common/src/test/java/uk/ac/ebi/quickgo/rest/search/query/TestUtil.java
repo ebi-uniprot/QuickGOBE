@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.query;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -9,6 +10,6 @@ import java.util.Set;
  */
 public class TestUtil {
     public static <T> Set<T> asSet(T... elements) {
-        return new HashSet<>(Arrays.asList(elements));
+        return new LinkedHashSet<>(Arrays.asList(elements));
     }
 }
