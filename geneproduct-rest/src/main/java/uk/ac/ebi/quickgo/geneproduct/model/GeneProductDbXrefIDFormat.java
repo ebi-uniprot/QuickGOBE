@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.geneproduct.model;
 import com.google.common.base.Preconditions;
 import java.util.regex.Pattern;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * The information for a single Database cross reference.
  * This information is used, for example, to validate gene product ids based on source database and the id type.
@@ -29,13 +31,20 @@ public class GeneProductDbXRefIDFormat {
     //E.g. http://www.uniprot.org/uniprot/[example_id]/
     private String databaseURL;
 
+    public GeneProductDbXRefIDFormat(String database, String entityType, Pattern idValidationPattern) {
+        this.database = checkNotNull(database);
+        this.entityType = checkNotNull(entityType);
+        this.idValidationPattern = checkNotNull(idValidationPattern);
+    }
+
     public GeneProductDbXRefIDFormat(String database, String entityType, String entityTypeName, String idValidationPattern,
             String databaseURL) {
+
+        this.database =  checkNotNull(database, "The database ID should not be null");
+        this.entityType =  checkNotNull(entityType, "The entity type should not be null");
+        this.entityTypeName = entityTypeName;
         Preconditions.checkNotNull(idValidationPattern,
                 "The regex for the validation of ids from " + database + " is null and therefore invalid");
-        this.database = database;
-        this.entityType = entityType;
-        this.entityTypeName = entityTypeName;
         this.idValidationPattern = Pattern.compile(idValidationPattern);
         this.databaseURL = databaseURL;
     }
