@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.geneproduct.loader;
 import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXRefIDFormat;
 
-import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -11,9 +10,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 /**
  *
@@ -57,8 +54,6 @@ public class DbXRefLoader {
         try {
 
             Path path = FileSystems.getDefault().getPath(this.path);
-
-            File here = new File("./");
 
             return GZIPFiles.lines(path)
                     .skip(1)    //header
