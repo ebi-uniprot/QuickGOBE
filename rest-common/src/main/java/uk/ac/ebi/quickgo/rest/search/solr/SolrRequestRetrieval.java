@@ -33,7 +33,7 @@ public class SolrRequestRetrieval<T> implements RequestRetrieval<T> {
         this.solrServer = solrServer;
         this.resultConverter = resultConverter;
         this.queryRequestConverter = queryRequestConverter;
-        
+
         checkArguments(solrServer, queryRequestConverter, resultConverter, serviceProperties);
     }
 
@@ -64,7 +64,7 @@ public class SolrRequestRetrieval<T> implements RequestRetrieval<T> {
         try {
             QueryResponse response = solrServer.query(query);
             return resultConverter.convert(response, request);
-        } catch (SolrServerException | SolrException | IllegalArgumentException e) {
+        } catch (SolrServerException | SolrException  e) {
             throw new RetrievalException(e);
         }
     }

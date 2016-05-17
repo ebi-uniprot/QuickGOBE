@@ -114,6 +114,9 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
         int resultsPerPage = page.getPageSize();
         int totalPages = (int) Math.ceil((double) totalNumberOfResults / (double) resultsPerPage);
 
+        Preconditions.checkArgument((page.getPageNumber()-1)<=totalPages, "The requested page number should not be " +
+                "greater " +
+                "than the number of pages available.");
         int currentPage = (totalPages == 0 ? 0 : page.getPageNumber());
 
         return new PageInfo(totalPages, currentPage, resultsPerPage);

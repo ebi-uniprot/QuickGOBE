@@ -16,9 +16,9 @@
  limitations under the License.
 -->
 
-<!-- 
+<!--
      For more details about configurations options that may appear in
-     this file, see http://wiki.apache.org/solr/SolrConfigXml. 
+     this file, see http://wiki.apache.org/solr/SolrConfigXml.
 -->
 <config>
     <!-- In all configuration below, a prefix of "solr." for class names

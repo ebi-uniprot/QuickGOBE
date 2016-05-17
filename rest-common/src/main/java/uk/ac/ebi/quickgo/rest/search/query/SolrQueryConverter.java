@@ -46,6 +46,11 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
         return "(" + queryStringSanitizer.sanitize(query.getValue()) + ")";
     }
 
+
+    @Override public String visit(AllQuery query) {
+        return "*:*";
+    }
+
     @Override public SolrQuery convert(QueryRequest request) {
         Preconditions.checkArgument(request != null, "Cannot convert null query request");
 
