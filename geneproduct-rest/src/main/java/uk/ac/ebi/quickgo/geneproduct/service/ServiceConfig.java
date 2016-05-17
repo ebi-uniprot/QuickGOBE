@@ -36,8 +36,8 @@ package uk.ac.ebi.quickgo.geneproduct.service;
 @Import({GeneProductRepoConfig.class})
 public class ServiceConfig {
 
-    private static final String DEFAULT_DB = "UniProtKB";
-    private static final String DEFAULT_TYPE_NAME = "protein";
+    private static final String DEFAULT_ID_VALIDATION_DB = "UniProtKB";
+    private static final String DEFAULT_VALIDATION_TYPE_NAME = "protein";
 
     @Value("${geneproduct.db.xref.valid.regexes}")
     private String xrefValidationRegexFile;
@@ -69,8 +69,9 @@ public class ServiceConfig {
 
     private Predicate<String> idValidator() {
         GeneProductDbXRefIDFormats
-                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load(), DEFAULT_DB,
-                DEFAULT_TYPE_NAME);
+                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load(),
+                DEFAULT_ID_VALIDATION_DB,
+                DEFAULT_VALIDATION_TYPE_NAME);
         return dbXrefEntities::isValidId;	}
 
     private DbXRefLoader geneProductLoader() {
