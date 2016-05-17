@@ -22,7 +22,7 @@ import java.util.List;
  *         Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class DbXrefEntitiesTest {
+public class GeneProductDbXRefIDFormatsTest {
 
 	List<GeneProductDbXRefIDFormat> listOfFormats;
 
