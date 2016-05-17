@@ -24,36 +24,31 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ServiceHelperImplTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-	@Rule
-	public ExpectedException thrown= ExpectedException.none();
+    @Mock
+    private QueryStringSanitizer queryStringSanitizer;
 
-	private ServiceHelper serviceHelper;
+    private ServiceHelper serviceHelper;
 
-	@Mock
-	private QueryStringSanitizer queryStringSanitizer;
+    private static final String SINGLE_ID = "A0A000";
 
-	public static final String SINGLE_ID = "A0A000";
-	public static final String[] SINGLE_ID_LIST = new String[]{"A0A000"};
+    @Before
+    public void setup() {
+        serviceHelper = new ServiceHelperImpl(queryStringSanitizer);
+        when(queryStringSanitizer.sanitize(SINGLE_ID)).thenReturn(SINGLE_ID);
+    }
 
+    @Test
+    public void valid() {
+        List<String> sanitizedList = serviceHelper.buildIdList(Collections.singletonList(SINGLE_ID));
+        assertThat(sanitizedList, containsInAnyOrder(SINGLE_ID));
+    }
 
-	@Before
-	public void setup(){
-		serviceHelper = new ServiceHelperImpl(queryStringSanitizer);
-		when(queryStringSanitizer.sanitize(SINGLE_ID)).thenReturn(SINGLE_ID);
-	}
-
-
-	@Test
-	public void valid(){
-		List<String> sanitizedList = serviceHelper.buildIdList(Collections.singletonList(SINGLE_ID));
-		assertThat(sanitizedList, containsInAnyOrder(SINGLE_ID));
-
-	}
-
-	@Test
-	public void blowupIfNull(){
-		thrown.expect(IllegalArgumentException.class);
-		List<String>  sanitizedList = serviceHelper.buildIdList(null);
-	}
+    @Test
+    public void blowupIfNull() {
+        thrown.expect(IllegalArgumentException.class);
+        serviceHelper.buildIdList(null);
+    }
 }
