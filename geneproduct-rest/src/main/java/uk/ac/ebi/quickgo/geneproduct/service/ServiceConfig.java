@@ -7,7 +7,7 @@ package uk.ac.ebi.quickgo.geneproduct.service;
         import org.springframework.context.annotation.Import;
         import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
         import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
-        import uk.ac.ebi.quickgo.geneproduct.loader.DbXrefLoader;
+        import uk.ac.ebi.quickgo.geneproduct.loader.DbXRefLoader;
         import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXrefIDFormats;
         import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
         import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
@@ -73,8 +73,8 @@ public class ServiceConfig {
                 DEFAULT_TYPE_NAME);
         return dbXrefEntities::isValidId;	}
 
-    private DbXrefLoader geneProductLoader() {
-        return new DbXrefLoader(this.sourceFileDirectory);
+    private DbXRefLoader geneProductLoader() {
+        return new DbXRefLoader(this.sourceFileDirectory);
     }
 
 

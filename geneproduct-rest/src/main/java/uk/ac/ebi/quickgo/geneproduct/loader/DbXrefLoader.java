@@ -25,9 +25,9 @@ import static java.util.stream.Collectors.toMap;
  *         Time: 14:06
  *         Created with IntelliJ IDEA.
  */
-public class DbXrefLoader {
+public class DbXRefLoader {
 
-    private Logger logger = LoggerFactory.getLogger(DbXrefLoader.class);
+    private Logger logger = LoggerFactory.getLogger(DbXRefLoader.class);
 
     private static final int COL_DATABASE = 0;
     private static final int COL_ENTITY_TYPE = 1;
@@ -37,7 +37,7 @@ public class DbXrefLoader {
     private static final String COL_DELIMITER = "\t";
     private String path;
 
-    public DbXrefLoader(String path) {
+    public DbXRefLoader(String path) {
         this.path = path;
     }
 

@@ -12,14 +12,14 @@ import static org.hamcrest.Matchers.hasSize;
  *         Time: 09:27
  *         Created with IntelliJ IDEA.
  */
-public class DbXrefLoaderTest {
+public class DbXRefLoaderTest {
 
 	private static final String NOWHERE_CANTFIND = "OVER/RAINBOW";
 
 	@Test
 	public void loadFileUnsuccessfully(){
-		DbXrefLoader dbXrefLoader = new DbXrefLoader(NOWHERE_CANTFIND);
-		List<GeneProductDbXrefIDFormat> list = dbXrefLoader.load();
+		DbXRefLoader dbXRefLoader = new DbXRefLoader(NOWHERE_CANTFIND);
+		List<GeneProductDbXrefIDFormat> list = dbXRefLoader.load();
 		assertThat(list, hasSize(0));
 	}
 }
