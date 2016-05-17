@@ -12,8 +12,22 @@ class JoinQuery extends QuickGOQuery {
     private String joinFromTable;
     private String joinToAttribute;
     private String joinToTable;
-    private QuickGOQuery query;
+    private QuickGOQuery fromFilter;
 
+    /**
+     * Defines a simple inner join between two tables on the given attributes.
+     * <p/>
+     * This constructor represents the SQL equivalent to
+     * <p/>
+     * SELECT ...
+     * FROM joinFromTable.joinFromAttribute = joinToTable.joinToAttribute
+     * ...
+     *
+     * @param joinFromTable The table where the join originates from
+     * @param joinFromAttribute a join attribute that exists within the {@param joinFromTable}
+     * @param joinToTable The table where the join points to
+     * @param joinToAttribute a join attribute that exists within the {@param joinToTable}
+     */
     JoinQuery(String joinFromTable, String joinFromAttribute, String joinToTable, String joinToAttribute) {
         checkNullOrEmpty(joinFromTable, "Join From Table cannot be null or empty");
         checkNullOrEmpty(joinFromAttribute, "Join From Attribute cannot be null or empty");
@@ -26,12 +40,28 @@ class JoinQuery extends QuickGOQuery {
         this.joinToTable = joinToTable;
     }
 
+    /**
+     * Defines an inner join between two tables on the given attributes, and also allows a fromFilter that will
+     * be executed on the {@param joinToTable}.
+     * <p/>
+     * This constructor represents the SQL equivalent to
+     * <p/>
+     * SELECT ...
+     * FROM joinFromTable.joinFromAttribute = joinToTable.joinToAttribute
+     * WHERE joinToTable.fromFilter
+     *
+     * @param joinFromTable The table where the join originates from
+     * @param joinFromAttribute a join attribute that exists within the {@param joinFromTable}
+     * @param joinToTable The table where the join points to
+     * @param joinToAttribute a join attribute that exists within the {@param joinToTable}
+     * @param fromFilter a fromFilter to be executed on the {@param joinToTable}
+     */
     JoinQuery(String joinFromTable, String joinFromAttribute, String joinToTable, String joinToAttribute,
-            QuickGOQuery query) {
+            QuickGOQuery fromFilter) {
         this(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
 
-        Preconditions.checkArgument(query != null, "Filter query cannot be null");
-        this.query = query;
+        Preconditions.checkArgument(fromFilter != null, "Filter cannot be null");
+        this.fromFilter = fromFilter;
     }
 
     private void checkNullOrEmpty(String value, String errorMsg) {
@@ -59,8 +89,8 @@ class JoinQuery extends QuickGOQuery {
         return joinToTable;
     }
 
-    QuickGOQuery getQuery() {
-        return query;
+    QuickGOQuery getFromFilter() {
+        return fromFilter;
     }
 
     @Override public boolean equals(Object o) {
@@ -85,8 +115,8 @@ class JoinQuery extends QuickGOQuery {
         if (!joinToTable.equals(joinQuery.joinToTable)) {
             return false;
         }
-        return query != null ? query.equals(joinQuery.query) : joinQuery.query == null;
 
+        return fromFilter != null ? fromFilter.equals(joinQuery.fromFilter) : joinQuery.fromFilter == null;
     }
 
     @Override public int hashCode() {
@@ -94,7 +124,7 @@ class JoinQuery extends QuickGOQuery {
         result = 31 * result + joinFromTable.hashCode();
         result = 31 * result + joinToAttribute.hashCode();
         result = 31 * result + joinToTable.hashCode();
-        result = 31 * result + (query != null ? query.hashCode() : 0);
+        result = 31 * result + (fromFilter != null ? fromFilter.hashCode() : 0);
         return result;
     }
 
@@ -104,7 +134,7 @@ class JoinQuery extends QuickGOQuery {
                 ", joinFromTable='" + joinFromTable + '\'' +
                 ", joinToAttribute='" + joinToAttribute + '\'' +
                 ", joinToTable='" + joinToTable + '\'' +
-                ", query=" + query +
+                ", fromFilter=" + fromFilter +
                 "} " + super.toString();
     }
 }

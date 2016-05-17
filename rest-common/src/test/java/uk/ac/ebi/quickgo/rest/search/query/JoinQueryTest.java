@@ -29,7 +29,7 @@ public class JoinQueryTest {
     private String joinToAttribute = "id";
     private String joinToTable = "ontology";
 
-    private QuickGOQuery filterQuery = QuickGOQuery.createAllQuery();
+    private QuickGOQuery fromFilter = QuickGOQuery.createAllQuery();
 
     @Test
     public void throwsExceptionWhenJoinFromTableIsNull() throws Exception {
@@ -115,22 +115,22 @@ public class JoinQueryTest {
 
     @Test
     public void throwsExceptionWhenQueryIsNull() throws Exception {
-        filterQuery = null;
+        fromFilter = null;
 
-        assertNullOrEmpty("Filter query cannot be null");
+        assertNullOrEmpty("Filter cannot be null");
 
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, filterQuery);
+        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, fromFilter);
     }
 
     @Test
     public void createsJoinQueryWithJoinParametersAndFilterQueryInitializedCorrectly() {
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, filterQuery);
+        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, fromFilter);
 
         assertThat(query.getJoinFromTable(), is(joinFromTable));
         assertThat(query.getJoinFromAttribute(), is(joinFromAttribute));
         assertThat(query.getJoinToTable(), is(joinToTable));
         assertThat(query.getJoinToAttribute(), is(joinToAttribute));
-        assertThat(query.getQuery(), is(filterQuery));
+        assertThat(query.getFromFilter(), is(fromFilter));
     }
 
     @Test
