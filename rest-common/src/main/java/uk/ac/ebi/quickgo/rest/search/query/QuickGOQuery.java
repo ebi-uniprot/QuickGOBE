@@ -49,8 +49,17 @@ public abstract class QuickGOQuery {
         return new NoFieldQuery(value);
     }
 
-
     public static QuickGOQuery createAllQuery() {
         return new AllQuery();
+    }
+
+    public static QuickGOQuery createJoinQuery(String joinFromTable, String joinFromAttribute, String joinToTable,
+            String joinToAttribute) {
+        return new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
+    }
+
+    public static QuickGOQuery createJoinQueryWithFilter(String joinFromTable, String joinFromAttribute,
+            String joinToTable, String joinToAttribute, QuickGOQuery filter) {
+        return new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, filter);
     }
 }

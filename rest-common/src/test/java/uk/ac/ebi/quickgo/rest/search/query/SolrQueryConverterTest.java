@@ -1,10 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
 
 /**
  * Tests the implementations of the {@link SolrQueryConverter} implementation.
@@ -22,7 +18,7 @@ import static org.hamcrest.Matchers.equalTo;
 public class SolrQueryConverterTest {
     private static final String REQUEST_HANDLER_NAME = "/select";
 
-    private QueryRequestConverter<SolrQuery> converter;
+    private SolrQueryConverter converter;
 
     @Before
     public void setUp() throws Exception {
@@ -275,6 +271,44 @@ public class SolrQueryConverterTest {
         SolrQuery query = converter.convert(request);
 
         assertThat(query.getFields(), is(nullValue()));
+    }
+
+    @Test
+    public void convertJoinQueryWithNoFilterToSolrCompatibleString() {
+        String joinFromTable = "annotation";
+        String joinFromAttribute = "id";
+        String joinToTable = "ontology";
+        String joinToAttribute = "id";
+
+        String fromFilterString  = "";
+
+        JoinQuery query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
+
+        String solrJoinString = converter.visit(query);
+
+        assertThat(solrJoinString, is(String.format(CROSS_CORE_JOIN_SYNTAX, joinFromAttribute, joinToAttribute,
+                joinFromTable, fromFilterString)));
+    }
+
+    @Test
+    public void convertJoinQueryWithFromFilterToSolrCompatibleString() {
+        String joinFromTable = "annotation";
+        String joinFromAttribute = "id";
+        String joinToTable = "ontology";
+        String joinToAttribute = "id";
+
+        String fromFilterField = "aspect";
+        String fromFilterValue = "molecular_function";
+        QuickGOQuery fromFilter = QuickGOQuery.createQuery(fromFilterField, fromFilterValue);
+
+        String fromFilterString = buildFieldQuery(fromFilterField, fromFilterValue);
+
+        JoinQuery query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, fromFilter);
+
+        String solrJoinString = converter.visit(query);
+
+        assertThat(solrJoinString, is(String.format(CROSS_CORE_JOIN_SYNTAX, joinFromAttribute, joinToAttribute,
+                joinFromTable, fromFilterString)));
     }
 
     private String buildFieldQuery(String field, String value) {
