@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +44,9 @@ public class GeneProductController {
 
 	@Autowired
 	public GeneProductController(GeneProductService gpService, ControllerValidationHelper controllerValidationHelper) {
-		Objects.requireNonNull(gpService, "The GeneProductService instance passed to the constructor of " +
+		Preconditions.checkNotNull(gpService, "The GeneProductService instance passed to the constructor of " +
+				"GeneProductController should not be null.");
+		Preconditions.checkNotNull(controllerValidationHelper, "The ControllerValidationHelper instance passed to the constructor of " +
 				"GeneProductController should not be null.");
 		this.geneProductService = gpService;
 		this.controllerValidationHelper = controllerValidationHelper;
