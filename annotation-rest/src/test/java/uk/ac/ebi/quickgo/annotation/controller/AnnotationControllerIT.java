@@ -4,7 +4,8 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.Arrays;
@@ -56,7 +57,7 @@ public class AnnotationControllerIT {
     private static final String LIMIT_PARAM = "limit";
 
     private static final List<String> VALID_ASSIGNED_BY_PARMS=Arrays.asList("ASPGD","ASPGD,Agbase","ASPGD_,Agbase",
-            "ASPGD,Agbase_,","ASPGD,Agbase,,","BHF-UCL,Agbase","Roslin_Institute,BHF-UCL,Agbase");
+            "ASPGD,Agbase_","ASPGD,Agbase","BHF-UCL,Agbase","Roslin_Institute,BHF-UCL,Agbase");
 
     private static final List<String> INVALID_ASSIGNED_BY_PARMS=Arrays.asList("_ASPGD","ASPGD,_Agbase","5555,Agbase",
             "ASPGD,5555,","4444,5555,");
@@ -118,6 +119,22 @@ public class AnnotationControllerIT {
     }
 
     @Test
+    public void lookupAnnotationFilterByRepetitionOfParmsSuccessfully() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM,  basicDocs.get(0).assignedBy)
+                        .param(ASSIGNED_BY_PARAM, basicDocs.get(1).assignedBy)
+                        .param(ASSIGNED_BY_PARAM, basicDocs.get(3).assignedBy));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(3))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+
+
+    @Test
     public void lookupAnnotationFilterByInvalidAssignedBy() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, UNAVAILABLE_ASSIGNED_BY));
@@ -143,20 +160,11 @@ public class AnnotationControllerIT {
     }
 
 
-    /**
-     * Test That a value of assignedBy that is wholly numeric causes a Bad Request response
-     * @throws Exception
-     */
-
-
     @Test
     public void allTheseValuesForAssignedShouldNotThrowAnError() throws Exception {
-
         for(String validAssignedBy:VALID_ASSIGNED_BY_PARMS) {
-
             ResultActions response = mockMvc.perform(
                     get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, validAssignedBy));
-
             expectResultsInfoExists(response)
                     .andExpect(status().isOk());
         }
@@ -168,7 +176,6 @@ public class AnnotationControllerIT {
         for(String inValidAssignedBy:INVALID_ASSIGNED_BY_PARMS) {
             ResultActions response = mockMvc.perform(
                     get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, inValidAssignedBy));
-
             response.andDo(print())
                     .andExpect(status().isBadRequest());
         }
@@ -188,7 +195,7 @@ public class AnnotationControllerIT {
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.results").isArray())
-                .andExpect(jsonPath("$.results", hasSize(AnnotationFilter.DEFAULT_ENTRIES_PER_PAGE)));
+                .andExpect(jsonPath("$.results", hasSize(AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE)));
     }
 
 
@@ -220,7 +227,7 @@ public class AnnotationControllerIT {
         annotationRepository.deleteAll();
 
         int existingPages = 4;
-        createAndSaveDocs(AnnotationController.MAX_PAGE_RESULTS * existingPages);
+        createAndSaveDocs(SearchServiceConfig.MAX_PAGE_RESULTS * existingPages);
 
 
         ResultActions response = mockMvc.perform(
@@ -316,7 +323,8 @@ public class AnnotationControllerIT {
         return Arrays.asList(
                 AnnotationDocMocker.createAnnotationDoc("A0A000"),
                 AnnotationDocMocker.createAnnotationDoc("A0A001","ASPGD"),
-                AnnotationDocMocker.createAnnotationDoc("A0A001","BHF-UCL"));
+                AnnotationDocMocker.createAnnotationDoc("A0A001","BHF-UCL"),
+                AnnotationDocMocker.createAnnotationDoc("A0A002","AGPRD"));
     }
 
 

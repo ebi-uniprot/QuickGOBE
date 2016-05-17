@@ -10,7 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationFilter;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
@@ -76,24 +76,23 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RequestMapping(value = "/QuickGO/services/annotation")
 public class AnnotationController {
 
-	public static final int MAX_PAGE_RESULTS = 100;
-
-	Logger logger = LoggerFactory.getLogger(AnnotationController.class);
 	//todo @Autowired
-	private final ControllerValidationHelper validationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
+	private final ControllerValidationHelper validationHelper;
 
 	private final SearchService<Annotation> annotationSearchService;
 	private final SearchAllQueryTemplate requestTemplate;
 
 	@Autowired
 	public AnnotationController(SearchService<Annotation> annotationSearchService,
-			SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig) {
+			SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
+			ControllerValidationHelper validationHelper) {
 		checkNotNull(annotationSearchService, "The SearchService<Annotation> instance passed to the constructor of " +
 				"AnnotationController should not be null.");
 		checkNotNull(annotationRetrievalConfig, "The SearchServiceConfig.AnnotationCompositeRetrievalConfig" +
 				" instance passed to the constructor of AnnotationController should not be null.");
 		this.annotationSearchService = annotationSearchService;
 		this.requestTemplate = new SearchAllQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
+		this.validationHelper = validationHelper;
 	}
 
 	/**
@@ -101,11 +100,11 @@ public class AnnotationController {
 	 * @return a {@link QueryResult} instance containing the results of the search
 	 */
 	@RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationFilter filter, BindingResult
+	public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest filter, BindingResult
 			bindingResult) {
 
 		checkArgument(!bindingResult.hasErrors(), "The binding of the request parameters to " +
-				"AnnotationFilter %s has errors, see binding result %s", filter, bindingResult);
+				"AnnotationRequest %s has errors, see binding result %s", filter, bindingResult);
 
 		filter.stream().forEach(pf -> pf.validate());
 		validationHelper.validateRequestedResults(filter.getLimit());
