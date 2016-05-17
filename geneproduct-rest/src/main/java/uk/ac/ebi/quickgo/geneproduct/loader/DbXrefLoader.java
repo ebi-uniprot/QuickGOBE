@@ -55,7 +55,6 @@ public class DbXrefLoader {
             Path path = FileSystems.getDefault().getPath(this.path);
 
             File here = new File("./");
-            System.out.println("Path : " + here.getAbsolutePath());
 
             return GZIPFiles.lines(path)
                     .skip(1)    //header
