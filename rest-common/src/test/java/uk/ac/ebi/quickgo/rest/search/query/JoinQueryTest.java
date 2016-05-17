@@ -135,12 +135,10 @@ public class JoinQueryTest {
 
     @Test
     public void visitorIsCalledCorrectly() throws Exception {
-        FieldQuery
-                query = new FieldQuery("field1", "value1");
+        FieldQuery query = new FieldQuery("field1", "value1");
         query.accept(visitor);
         verify(visitor).visit(query);
     }
-
 
     private void assertNullOrEmpty(String errorMsg) {
         thrown.expect(IllegalArgumentException.class);
