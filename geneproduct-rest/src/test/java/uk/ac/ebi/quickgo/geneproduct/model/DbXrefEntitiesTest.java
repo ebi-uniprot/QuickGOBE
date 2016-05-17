@@ -2,7 +2,9 @@ package uk.ac.ebi.quickgo.geneproduct.model;
 
 import java.util.ArrayList;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -37,6 +39,9 @@ public class DbXrefEntitiesTest {
 
 	@Mock
 	GeneProductDbXRefIDFormat mockEntity3;
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	@Before
 	public void setup(){
@@ -78,5 +83,11 @@ public class DbXrefEntitiesTest {
 
 		assertThat(dbXrefEntities.isValidId("ZZZ"), is(false));
 
+	}
+
+	@Test
+	public void throwsErrorIfEntitiesIsNull(){
+		thrown.expect(NullPointerException.class);
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(null, "UniProt", "protein");
 	}
 }

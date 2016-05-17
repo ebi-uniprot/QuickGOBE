@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +77,9 @@ public class GeneProductDbXRefIDFormats {
      */
     public static GeneProductDbXRefIDFormats createWithData(List<GeneProductDbXRefIDFormat> entities, String defaultDb,
             String defaultTypeName) {
+
+        Preconditions.checkNotNull(entities, "The list of GeneProductDbXRefIDFormat entities passed to createWithData" +
+                " was null, which is illegal");
 
         Map<Key, List<GeneProductDbXRefIDFormat>> mappedEntities =
                 entities.stream().collect(groupingBy(e -> new GeneProductDbXRefIDFormats.Key(e
