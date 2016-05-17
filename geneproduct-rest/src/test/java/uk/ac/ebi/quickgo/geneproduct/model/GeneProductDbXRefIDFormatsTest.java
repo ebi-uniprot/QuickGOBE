@@ -90,4 +90,16 @@ public class GeneProductDbXRefIDFormatsTest {
 		thrown.expect(NullPointerException.class);
 		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(null, "UniProt", "protein");
 	}
+
+	@Test
+	public void throwsErrorIfDbIDIsNull(){
+		thrown.expect(NullPointerException.class);
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats, null, "protein");
+	}
+
+	@Test
+	public void throwsErrorIfEntityTypeIsNull(){
+		thrown.expect(NullPointerException.class);
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats, "UniProt", null);
+	}
 }
