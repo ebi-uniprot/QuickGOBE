@@ -1,7 +1,9 @@
 package uk.ac.ebi.quickgo.geneproduct.loader;
 
 import org.junit.Test;
-import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXrefIDFormat;
+
+import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXRefIDFormat;
+
 import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -19,7 +21,7 @@ public class DbXRefLoaderTest {
 	@Test
 	public void loadFileUnsuccessfully(){
 		DbXRefLoader dbXRefLoader = new DbXRefLoader(NOWHERE_CANTFIND);
-		List<GeneProductDbXrefIDFormat> list = dbXRefLoader.load();
+		List<GeneProductDbXRefIDFormat> list = dbXRefLoader.load();
 		assertThat(list, hasSize(0));
 	}
 }

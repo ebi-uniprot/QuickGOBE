@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.loader;
 
 import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
-import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXrefIDFormat;
+import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXRefIDFormat;
 
 import java.io.File;
 import java.nio.file.FileSystems;
@@ -43,7 +43,7 @@ public class DbXRefLoader {
 
     /**
      * Load the file which contains information about database cross references and save it to a list of
-     * GeneProductDbXrefIDFormat instances.
+     * GeneProductDbXRefIDFormat instances.
      *
      * We load this file to use the regexes it contains to validate gene product ids (each Db will have it's own
      * regex for the id it uses).
@@ -52,7 +52,7 @@ public class DbXRefLoader {
      * validation, rather than end the process.
      * @return
      */
-    public List<GeneProductDbXrefIDFormat> load() {
+    public List<GeneProductDbXRefIDFormat> load() {
 
         try {
 
@@ -63,7 +63,7 @@ public class DbXRefLoader {
             return GZIPFiles.lines(path)
                     .skip(1)    //header
                     .map(line -> line.split(COL_DELIMITER))
-                    .map(fields -> new GeneProductDbXrefIDFormat(fields[COL_DATABASE], fields[COL_ENTITY_TYPE],
+                    .map(fields -> new GeneProductDbXRefIDFormat(fields[COL_DATABASE], fields[COL_ENTITY_TYPE],
                             fields[COL_ENTITY_TYPE_NAME], fields[COL_LOCAL_ID_SYNTAX], fields[COL_URL_SYNTAX]))
                     .collect(toList());
 
