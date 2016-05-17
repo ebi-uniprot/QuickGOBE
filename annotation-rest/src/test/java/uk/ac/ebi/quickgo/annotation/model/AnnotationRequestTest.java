@@ -25,7 +25,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Time: 11:25
  * Created with IntelliJ IDEA.
  */
-public class AnnotationFilterTest {
+public class AnnotationRequestTest {
 
     private static final String UNI_PROT = "UniProt";
     private static final String ASPGD = "ASPGD";
