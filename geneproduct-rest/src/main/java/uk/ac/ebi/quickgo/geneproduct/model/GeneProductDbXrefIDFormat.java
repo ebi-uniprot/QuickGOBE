@@ -27,17 +27,17 @@ public class GeneProductDbXRefIDFormat {
     private Pattern idValidationPattern;
 
     //E.g. http://www.uniprot.org/uniprot/[example_id]/
-    private String URLSyntax;
+    private String databaseURL;
 
     public GeneProductDbXRefIDFormat(String database, String entityType, String entityTypeName, String idValidationPattern,
-            String URLSyntax) {
+            String databaseURL) {
         Preconditions.checkNotNull(idValidationPattern,
                 "The regex for the validation of ids from " + database + " is null and therefore invalid");
         this.database = database;
         this.entityType = entityType;
         this.entityTypeName = entityTypeName;
         this.idValidationPattern = Pattern.compile(idValidationPattern);
-        this.URLSyntax = URLSyntax;
+        this.databaseURL = databaseURL;
     }
 
     /**
@@ -65,8 +65,8 @@ public class GeneProductDbXRefIDFormat {
         return idValidationPattern;
     }
 
-    public String getURLSyntax() {
-        return URLSyntax;
+    public String getDatabaseURL() {
+        return databaseURL;
     }
 
     @Override
@@ -76,7 +76,7 @@ public class GeneProductDbXRefIDFormat {
                 ", entityType='" + entityType + '\'' +
                 ", entityTypeName='" + entityTypeName + '\'' +
                 ", idValidationPattern=" + idValidationPattern +
-                ", URLSyntax='" + URLSyntax + '\'' +
+                ", databaseURL='" + databaseURL + '\'' +
                 '}';
     }
 }
