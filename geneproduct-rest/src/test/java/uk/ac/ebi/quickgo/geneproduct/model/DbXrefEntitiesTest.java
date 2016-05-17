@@ -22,21 +22,21 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class DbXrefEntitiesTest {
 
-	List<GeneProductDbXrefIDFormat> listOfFormats;
+	List<GeneProductDbXRefIDFormat> listOfFormats;
 
-	private GeneProductDbXrefIDFormats dbXrefEntities;
-
-	@Mock
-	private List<GeneProductDbXrefIDFormat> resultList;
+	private GeneProductDbXRefIDFormats dbXrefEntities;
 
 	@Mock
-	GeneProductDbXrefIDFormat mockEntity1;
+	private List<GeneProductDbXRefIDFormat> resultList;
 
 	@Mock
-	GeneProductDbXrefIDFormat mockEntity2;
+	GeneProductDbXRefIDFormat mockEntity1;
 
 	@Mock
-	GeneProductDbXrefIDFormat mockEntity3;
+	GeneProductDbXRefIDFormat mockEntity2;
+
+	@Mock
+	GeneProductDbXRefIDFormat mockEntity3;
 
 	@Before
 	public void setup(){
@@ -54,7 +54,7 @@ public class DbXrefEntitiesTest {
 		when(mockEntity3.getEntityTypeName()).thenReturn("protein");
 		when(mockEntity3.matches("ABC")).thenReturn(true);
 		when(mockEntity3.matches("ZZZ")).thenReturn(false);
-		dbXrefEntities = GeneProductDbXrefIDFormats.createWithData(listOfFormats, "UniProt", "protein");
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats, "UniProt", "protein");
 
 	}
 

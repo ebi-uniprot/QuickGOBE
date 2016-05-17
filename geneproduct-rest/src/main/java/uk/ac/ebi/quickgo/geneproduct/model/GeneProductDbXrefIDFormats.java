@@ -16,13 +16,13 @@ import static java.util.stream.Collectors.groupingBy;
  *         Time: 13:36
  *         Created with IntelliJ IDEA.
  */
-public class GeneProductDbXrefIDFormats {
+public class GeneProductDbXRefIDFormats {
 
     private final String defaultTypeName;
-    private Map<GeneProductDbXrefIDFormats.Key, List<GeneProductDbXrefIDFormat>> geneProductXrefEntities;
+    private Map<GeneProductDbXRefIDFormats.Key, List<GeneProductDbXRefIDFormat>> geneProductXrefEntities;
     private final String defaultDatabase;
 
-    private GeneProductDbXrefIDFormats(Map<GeneProductDbXrefIDFormats.Key, List<GeneProductDbXrefIDFormat>>
+    private GeneProductDbXRefIDFormats(Map<GeneProductDbXRefIDFormats.Key, List<GeneProductDbXRefIDFormat>>
             geneProductXrefEntities,
             String defaultDb, String defaultTypeName) {
         this.geneProductXrefEntities = geneProductXrefEntities;
@@ -54,7 +54,7 @@ public class GeneProductDbXrefIDFormats {
         }
 
         //find the ID entity that matches
-        final List<GeneProductDbXrefIDFormat> geneProductXrefEntities
+        final List<GeneProductDbXRefIDFormat> geneProductXrefEntities
                 = this.geneProductXrefEntities.get(new Key(database, typeName));
 
         //If there is no entity for this combination then the id cannot be correct..
@@ -74,14 +74,14 @@ public class GeneProductDbXrefIDFormats {
      * @param defaultTypeName
      * @return
      */
-    public static GeneProductDbXrefIDFormats createWithData(List<GeneProductDbXrefIDFormat> entities, String defaultDb,
+    public static GeneProductDbXRefIDFormats createWithData(List<GeneProductDbXRefIDFormat> entities, String defaultDb,
             String defaultTypeName) {
 
-        Map<Key, List<GeneProductDbXrefIDFormat>> mappedEntities =
-                entities.stream().collect(groupingBy(e -> new GeneProductDbXrefIDFormats.Key(e
+        Map<Key, List<GeneProductDbXRefIDFormat>> mappedEntities =
+                entities.stream().collect(groupingBy(e -> new GeneProductDbXRefIDFormats.Key(e
                         .getDatabase(), e.getEntityTypeName())));
 
-        GeneProductDbXrefIDFormats formats = new GeneProductDbXrefIDFormats(mappedEntities, defaultDb, defaultTypeName);
+        GeneProductDbXRefIDFormats formats = new GeneProductDbXRefIDFormats(mappedEntities, defaultDb, defaultTypeName);
         return formats;
     }
 

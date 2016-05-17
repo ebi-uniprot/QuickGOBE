@@ -8,7 +8,7 @@ package uk.ac.ebi.quickgo.geneproduct.service;
         import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
         import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
         import uk.ac.ebi.quickgo.geneproduct.loader.DbXRefLoader;
-        import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXrefIDFormats;
+        import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXRefIDFormats;
         import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
         import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
         import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
@@ -68,8 +68,8 @@ public class ServiceConfig {
     }
 
     private Predicate<String> idValidator() {
-        GeneProductDbXrefIDFormats
-                dbXrefEntities = GeneProductDbXrefIDFormats.createWithData(geneProductLoader().load(), DEFAULT_DB,
+        GeneProductDbXRefIDFormats
+                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load(), DEFAULT_DB,
                 DEFAULT_TYPE_NAME);
         return dbXrefEntities::isValidId;	}
 
