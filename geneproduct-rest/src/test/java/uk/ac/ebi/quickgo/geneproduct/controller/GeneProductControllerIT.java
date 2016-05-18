@@ -126,7 +126,7 @@ public class GeneProductControllerIT {
     public void finds400IfIdIsInvalid() throws Exception {
         mockMvc.perform(get(buildGeneProductURL(INVALID_ID)))
                 .andDo(print())
-                .andExpect(jsonPath("$.message", is("Provided ID: 'ZZZZ' is invalid")))
+                .andExpect(jsonPath("$.message", is("Provided ID: '" + INVALID_ID + "' is invalid")))
                 .andExpect(status().isBadRequest());
 
     }
