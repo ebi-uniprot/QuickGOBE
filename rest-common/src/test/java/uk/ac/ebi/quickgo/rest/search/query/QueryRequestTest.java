@@ -1,10 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import uk.ac.ebi.quickgo.rest.search.query.Facet;
-import uk.ac.ebi.quickgo.rest.search.query.Page;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-
 import java.util.Collection;
 import java.util.stream.Collectors;
 import org.junit.Test;
@@ -101,8 +96,8 @@ public class QueryRequestTest {
     public void buildsQueryRequestWithQueryAndFilterQuery() throws Exception {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
 
-        QuickGOQuery filterQuery1 = QuickGOQuery.createQuery("field1", "value1");
-        QuickGOQuery filterQuery2 = QuickGOQuery.createQuery("field1", "value1");
+        QuickGOQuery filterQuery1 = QuickGOQuery.createQuery("field2", "value2");
+        QuickGOQuery filterQuery2 = QuickGOQuery.createQuery("field3", "value3");
 
         QueryRequest request = new QueryRequest.Builder(query)
                 .addQueryFilter(filterQuery1)

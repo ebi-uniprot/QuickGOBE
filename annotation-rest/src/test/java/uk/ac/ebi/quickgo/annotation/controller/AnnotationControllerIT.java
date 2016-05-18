@@ -56,12 +56,12 @@ public class AnnotationControllerIT {
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
 
-    private static final List<String> VALID_ASSIGNED_BY_PARMS=Arrays.asList("ASPGD","ASPGD,Agbase","ASPGD_,Agbase",
-            "ASPGD,Agbase_","ASPGD,Agbase","BHF-UCL,Agbase","Roslin_Institute,BHF-UCL,Agbase");
+    private static final List<String> VALID_ASSIGNED_BY_PARMS = Arrays.asList("ASPGD", "ASPGD,Agbase", "ASPGD_,Agbase",
+            "ASPGD,Agbase_", "ASPGD,Agbase", "BHF-UCL,Agbase", "Roslin_Institute,BHF-UCL,Agbase");
 
-    private static final List<String> INVALID_ASSIGNED_BY_PARMS=Arrays.asList("_ASPGD","ASPGD,_Agbase","5555,Agbase",
-            "ASPGD,5555,","4444,5555,");
-
+    private static final List<String> INVALID_ASSIGNED_BY_PARMS =
+            Arrays.asList("_ASPGD", "ASPGD,_Agbase", "5555,Agbase",
+                    "ASPGD,5555,", "4444,5555,");
 
     private MockMvc mockMvc;
 
@@ -74,7 +74,6 @@ public class AnnotationControllerIT {
 
     @Autowired
     protected AnnotationRepository annotationRepository;
-
 
     @Before
     public void setup() {
@@ -90,12 +89,10 @@ public class AnnotationControllerIT {
         annotationRepository.save(basicDocs);
     }
 
-
-
     @Test
     public void lookupAnnotationFilterByAssignedBySuccessfully() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy));
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy));
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.numberOfHits").value(1))
@@ -104,11 +101,10 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     public void lookupAnnotationFilterByMultipleAssignedBySuccessfully() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM,  basicDocs.get(0).assignedBy + ","
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, basicDocs.get(0).assignedBy + ","
                         + basicDocs.get(1).assignedBy));
 
         expectResultsInfoExists(response)
@@ -121,7 +117,7 @@ public class AnnotationControllerIT {
     @Test
     public void lookupAnnotationFilterByRepetitionOfParmsSuccessfully() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM,  basicDocs.get(0).assignedBy)
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, basicDocs.get(0).assignedBy)
                         .param(ASSIGNED_BY_PARAM, basicDocs.get(1).assignedBy)
                         .param(ASSIGNED_BY_PARAM, basicDocs.get(3).assignedBy));
 
@@ -132,12 +128,10 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk());
     }
 
-
-
     @Test
     public void lookupAnnotationFilterByInvalidAssignedBy() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, UNAVAILABLE_ASSIGNED_BY));
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, UNAVAILABLE_ASSIGNED_BY));
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.numberOfHits").value(0))
@@ -145,11 +139,10 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     public void lookupAnnotationFilterByMultipleAssignedByOneCorrectAndOneUnavailable() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, UNAVAILABLE_ASSIGNED_BY + ","
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, UNAVAILABLE_ASSIGNED_BY + ","
                         + basicDocs.get(1).assignedBy));
 
         expectResultsInfoExists(response)
@@ -159,10 +152,9 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     public void allTheseValuesForAssignedShouldNotThrowAnError() throws Exception {
-        for(String validAssignedBy:VALID_ASSIGNED_BY_PARMS) {
+        for (String validAssignedBy : VALID_ASSIGNED_BY_PARMS) {
             ResultActions response = mockMvc.perform(
                     get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, validAssignedBy));
             expectResultsInfoExists(response)
@@ -170,10 +162,9 @@ public class AnnotationControllerIT {
         }
     }
 
-
     @Test
     public void allTheseValuesForAssignedShouldThrowAnError() throws Exception {
-        for(String inValidAssignedBy:INVALID_ASSIGNED_BY_PARMS) {
+        for (String inValidAssignedBy : INVALID_ASSIGNED_BY_PARMS) {
             ResultActions response = mockMvc.perform(
                     get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, inValidAssignedBy));
             response.andDo(print())
@@ -183,14 +174,13 @@ public class AnnotationControllerIT {
 
     //---------- Page related tests.
 
-
     @Test
     public void retrievesSecondPageOfAllEntriesRequest() throws Exception {
         annotationRepository.deleteAll();
         annotationRepository.save(createAndSaveDocs(60));
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy)
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy)
                         .param(PAGE_PARAM, "2"));
 
         expectResultsInfoExists(response)
@@ -198,11 +188,10 @@ public class AnnotationControllerIT {
                 .andExpect(jsonPath("$.results", hasSize(AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE)));
     }
 
-
     @Test
     public void pageRequestEqualToAvailablePagesReturns200() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy).param(PAGE_PARAM,"1"));
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy).param(PAGE_PARAM, "1"));
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.numberOfHits").value(1))
@@ -211,11 +200,10 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     public void pageRequestOfZeroAndResultsAvailableReturns400() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy).param(PAGE_PARAM,"0"));
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy).param(PAGE_PARAM, "0"));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
@@ -229,9 +217,8 @@ public class AnnotationControllerIT {
         int existingPages = 4;
         createAndSaveDocs(SearchServiceConfig.MAX_PAGE_RESULTS * existingPages);
 
-
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy)
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy)
                         .param(PAGE_PARAM, String.valueOf(existingPages + 1)));
 
         response.andDo(print())
@@ -246,19 +233,18 @@ public class AnnotationControllerIT {
         annotationRepository.save(createAndSaveDocs(60));
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy)
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy)
                         .param(LIMIT_PARAM, "101"));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
-
     @Test
     public void limitForPageWithinMaximumAllowed() throws Exception {
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy).param(LIMIT_PARAM, "100"));
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy).param(LIMIT_PARAM, "100"));
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.numberOfHits").value(1))
@@ -270,8 +256,8 @@ public class AnnotationControllerIT {
     @Test
     public void limitForPageThrowsErrorWhenNegative() throws Exception {
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy)
-                        .param(LIMIT_PARAM, "-20"));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy)
+                .param(LIMIT_PARAM, "-20"));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
@@ -294,7 +280,7 @@ public class AnnotationControllerIT {
     private ResultActions expectFieldsInResults(ResultActions result) throws Exception {
         int index = 0;
 
-        for (int i=0; i>basicDocs.size(); i++) {
+        for (int i = 0; i > basicDocs.size(); i++) {
             expectFields(result, "$.results[" + index++ + "].");
         }
 
@@ -322,11 +308,10 @@ public class AnnotationControllerIT {
     private List<AnnotationDocument> createBasicDocs() {
         return Arrays.asList(
                 AnnotationDocMocker.createAnnotationDoc("A0A000"),
-                AnnotationDocMocker.createAnnotationDoc("A0A001","ASPGD"),
-                AnnotationDocMocker.createAnnotationDoc("A0A001","BHF-UCL"),
-                AnnotationDocMocker.createAnnotationDoc("A0A002","AGPRD"));
+                AnnotationDocMocker.createAnnotationDoc("A0A001", "ASPGD"),
+                AnnotationDocMocker.createAnnotationDoc("A0A001", "BHF-UCL"),
+                AnnotationDocMocker.createAnnotationDoc("A0A002", "AGPRD"));
     }
-
 
     private List<AnnotationDocument> createAndSaveDocs(int n) {
         return IntStream.range(0, n)
