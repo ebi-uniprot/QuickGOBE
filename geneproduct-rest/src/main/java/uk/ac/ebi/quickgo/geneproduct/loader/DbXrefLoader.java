@@ -64,7 +64,7 @@ public class DbXRefLoader {
 
         } catch (Exception e) {
             logger.error("DbXRefLoader failed to load file " + this.path + ", the source of validation regexes to " +
-                    "validate gene product IDs", e);
+                    "validate gene product IDs. Gene Product ID validation will not take place", e);
 
             return new ArrayList<>();
         }
