@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.rest.search.filter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
-import uk.ac.ebi.quickgo.rest.search.filter.FilterFactory;
 import uk.ac.ebi.quickgo.rest.search.query.FilterProvider;
 
 import java.util.HashMap;
@@ -69,8 +69,8 @@ public class AnnotationRequest implements FilterProvider {
         return page;
     }
 
-    public Stream<RequestFilter> convertToFilters(FilterFactory factory) {
-        return filters.entrySet().stream().map(filter -> factory.createFilter(filter.getKey(),
+    public Stream<RequestFilter> convertToFilters() {
+        return filters.entrySet().stream().map(filter -> new RequestFilter(filter.getKey(),
                 splitFilterValues(filter.getValue())));
     }
 
