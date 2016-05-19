@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
 import uk.ac.ebi.quickgo.common.batch.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyTraversalConfig;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

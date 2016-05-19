@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.traversal;
+package uk.ac.ebi.quickgo.ontology.traversal.read;
 
 import org.springframework.batch.item.ItemProcessor;
 

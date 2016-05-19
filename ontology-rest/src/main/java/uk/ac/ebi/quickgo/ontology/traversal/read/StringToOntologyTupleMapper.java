@@ -1,14 +1,14 @@
-package uk.ac.ebi.quickgo.ontology.traversal;
+package uk.ac.ebi.quickgo.ontology.traversal.read;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
 import org.springframework.validation.BindException;
 
-import static uk.ac.ebi.quickgo.ontology.traversal.Columns.COLUMN_CHILD;
-import static uk.ac.ebi.quickgo.ontology.traversal.Columns.COLUMN_PARENT;
-import static uk.ac.ebi.quickgo.ontology.traversal.Columns.COLUMN_RELATIONSHIP;
-import static uk.ac.ebi.quickgo.ontology.traversal.Columns.numColumns;
+import static uk.ac.ebi.quickgo.ontology.traversal.read.Columns.COLUMN_CHILD;
+import static uk.ac.ebi.quickgo.ontology.traversal.read.Columns.COLUMN_PARENT;
+import static uk.ac.ebi.quickgo.ontology.traversal.read.Columns.COLUMN_RELATIONSHIP;
+import static uk.ac.ebi.quickgo.ontology.traversal.read.Columns.numColumns;
 
 /**
  * Created 18/05/16

@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationshipTuple;
+
 import java.util.HashSet;
 import java.util.Set;
 

@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.traversal;
+package uk.ac.ebi.quickgo.ontology.traversal.read;
 
 /**
  * Created 18/05/16

@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.ontology.traversal;
+package uk.ac.ebi.quickgo.ontology.traversal.read;
+
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
 import java.util.List;
 import org.slf4j.Logger;
