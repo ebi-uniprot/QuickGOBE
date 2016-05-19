@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +13,10 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
-import uk.ac.ebi.quickgo.rest.search.filter.FilterFactory;
+import uk.ac.ebi.quickgo.rest.search.filter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -28,7 +29,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 /**
  * Provides RESTful endpoints for retrieving Gene Ontology (GO) Annotations to gene products.
  *
- * Gene Ontology: the framework for the model of biology. The GO defines concepts/classes used
+/ * Gene Ontology: the framework for the model of biology. The GO defines concepts/classes used
  * to describe gene function, and relationships between these concepts.
  *
  * GO annotations: the model of biology. Annotations are statements describing the functions of specific genes,
@@ -81,26 +82,24 @@ public class AnnotationController {
 
     private final SearchService<Annotation> annotationSearchService;
 
-    private final FilterFactory filterFactory;
-
-    private final List<String> projectionFields;
+    private final BasicSearchQueryTemplate queryTemplate;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
-            FilterFactory filterFactory) {
+            FilterConverterFactory filterConverterFactory) {
         checkNotNull(annotationSearchService, "The SearchService<Annotation> instance passed to the constructor of " +
                 "AnnotationController should not be null.");
         checkNotNull(annotationRetrievalConfig, "The SearchServiceConfig.AnnotationCompositeRetrievalConfig" +
                 " instance passed to the constructor of AnnotationController should not be null.");
-        checkNotNull(filterFactory, "The FilterFactory cannot be null.");
+        checkNotNull(filterConverterFactory, "The FilterConverterFactory cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
-        this.filterFactory = filterFactory;
 
-        this.projectionFields = annotationRetrievalConfig.getSearchReturnedFields();
+        this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields(),
+                filterConverterFactory);
     }
 
     /**
@@ -114,17 +113,19 @@ public class AnnotationController {
         checkArgument(!bindingResult.hasErrors(), "The binding of the request parameters to " +
                 "AnnotationRequest %s has errors, see binding result %s", annotationRequest, bindingResult);
 
-        List<QuickGOQuery> filters = annotationRequest.convertToFilters(filterFactory)
-                .map(RequestFilter::transform)
-                .collect(Collectors.toList());
-
-        QueryRequest.Builder queryBuilder = new QueryRequest.Builder(QuickGOQuery.createAllQuery())
-                .addProjectedFields(projectionFields)
-                .addQueryFilters(filters)
-                .setPageParameters(annotationRequest.getPage(), annotationRequest.getLimit());
-
         validationHelper.validateRequestedResults(annotationRequest.getLimit());
 
-        return search(queryBuilder.build(), annotationSearchService);
+        Set<RequestFilter> filters = annotationRequest
+                .convertToFilters()
+                .collect(Collectors.toSet());
+
+        QueryRequest queryRequest = queryTemplate.newBuilder()
+                .setQuery(QuickGOQuery.createAllQuery())
+                .setFilters(filters)
+                .setPage(annotationRequest.getPage())
+                .setPageSize(annotationRequest.getLimit())
+                .build();
+
+        return search(queryRequest, annotationSearchService);
     }
 }
