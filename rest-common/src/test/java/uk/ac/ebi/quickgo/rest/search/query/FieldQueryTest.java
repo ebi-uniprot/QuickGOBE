@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import uk.ac.ebi.quickgo.rest.search.query.FieldQuery;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -25,7 +23,7 @@ public class FieldQueryTest {
         String field = null;
         String value = "value";
 
-        new uk.ac.ebi.quickgo.rest.search.query.FieldQuery(field, value);
+        new FieldQuery(field, value);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -33,7 +31,7 @@ public class FieldQueryTest {
         String field = null;
         String value = "value";
 
-        new uk.ac.ebi.quickgo.rest.search.query.FieldQuery(field, value);
+        new FieldQuery(field, value);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -41,7 +39,7 @@ public class FieldQueryTest {
         String field = "field";
         String value = null;
 
-        new uk.ac.ebi.quickgo.rest.search.query.FieldQuery(field, value);
+        new FieldQuery(field, value);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -49,7 +47,7 @@ public class FieldQueryTest {
         String field = "field";
         String value = "";
 
-        new uk.ac.ebi.quickgo.rest.search.query.FieldQuery(field, value);
+        new FieldQuery(field, value);
     }
 
     @Test
@@ -57,8 +55,8 @@ public class FieldQueryTest {
         String field = "field";
         String value = "myName";
 
-        uk.ac.ebi.quickgo.rest.search.query.FieldQuery
-                query = new uk.ac.ebi.quickgo.rest.search.query.FieldQuery(field, value);
+        FieldQuery
+                query = new FieldQuery(field, value);
 
         assertThat(query.field(), is(equalTo(field)));
         assertThat(query.value(), is(equalTo(value)));
@@ -66,8 +64,8 @@ public class FieldQueryTest {
 
     @Test
     public void visitorIsCalledCorrectly() throws Exception {
-        uk.ac.ebi.quickgo.rest.search.query.FieldQuery
-                query = new uk.ac.ebi.quickgo.rest.search.query.FieldQuery("field1", "value1");
+        FieldQuery
+                query = new FieldQuery("field1", "value1");
         query.accept(visitor);
         verify(visitor).visit(query);
     }

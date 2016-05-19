@@ -14,6 +14,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestConverter<SolrQuery> {
     public static final String SOLR_FIELD_SEPARATOR = ":";
 
+    static final String CROSS_CORE_JOIN_SYNTAX = "{!join from=%s to=%s fromIndex=%s} %s";
+
     private static final int MIN_COUNT_TO_DISPLAY_FACET = 1;
 
     private final String requestHandler;
@@ -46,9 +48,21 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
         return "(" + queryStringSanitizer.sanitize(query.getValue()) + ")";
     }
 
-
     @Override public String visit(AllQuery query) {
         return "*:*";
+    }
+
+    @Override public String visit(JoinQuery query) {
+        String fromFilterString;
+
+        if (query.getFromFilter() != null) {
+            fromFilterString = query.getFromFilter().accept(this);
+        } else {
+            fromFilterString = "";
+        }
+
+        return String.format(CROSS_CORE_JOIN_SYNTAX, query.getJoinFromAttribute(), query.getJoinToAttribute(),
+                query.getJoinFromTable(), fromFilterString);
     }
 
     @Override public SolrQuery convert(QueryRequest request) {

@@ -11,4 +11,6 @@ interface QueryVisitor<T> {
     T visit(NoFieldQuery query);
 
     T visit(AllQuery query);
+
+    T visit(JoinQuery query);
 }
