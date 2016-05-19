@@ -19,7 +19,6 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -32,8 +31,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Abstract controller defining common end-points of an OBO related
@@ -60,8 +57,10 @@ public abstract class OBOController<T extends OBOTerm> {
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
-        Preconditions.checkArgument(ontologyService != null, "Ontology service can not be null");
-        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service can not be null");
+        Preconditions.checkArgument(ontologyService != null, "Ontology service cannot be null");
+        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
+        Preconditions.checkArgument(searchableField != null, "Ontology searchable field cannot be null");
+        Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
@@ -252,9 +251,8 @@ public abstract class OBOController<T extends OBOTerm> {
     }
 
     /**
-     * Checks whether an ID has a valid format.
-     * @param id the ID
-     * @return boolean indicating whether or not the specified ID is valid
+     * Predicate that determines the validity of an ID.
+     * @return {@link Predicate<String>} indicating the validity of an ID.
      */
     protected abstract Predicate<String> idValidator();
 

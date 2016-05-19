@@ -28,21 +28,9 @@ if [ -z "$PORT" ]; then
     exit 1;
 fi
 
-if [ -z "$CONTEXT_PATH" ]; then
-    echo "$CONTEXT_PATH environment variable must be set. Aborting."
-    exit 1;
-fi
-
 
 TEST_URL="http://127.0.0.1:$PORT"
-curl --silent "$TEST_URL" > /dev/null || {
-    echo "Status Check: $TEST_URL is DOWN"
-    exit 1
-}
-echo "Status Check: $TEST_URL is UP"
-
-TEST_URL="http://127.0.0.1:$PORT$CONTEXT_PATH"
-curl --silent "$TEST_URL" > /dev/null || {
+nc -zv 127.0.0.1 $PORT > /dev/null 2>&1 || {
     echo "Status Check: $TEST_URL is DOWN"
     exit 1
 }

@@ -39,15 +39,14 @@ public class GeneProductRepoConfig {
     @Bean
     @Profile("httpServer")
     public SolrServerFactory httpSolrServerFactory(@Value("${solr.host}") String solrUrl) {
-        return new MulticoreSolrServerFactory(new HttpSolrServer(solrUrl));
+        return new MulticoreSolrServerFactory(new HttpSolrServer(solrUrl), SOLR_CORE);
     }
 
     @Bean
     @Profile("embeddedServer")
     public SolrServerFactory embeddedSolrServerFactory(CoreContainer coreContainer)
             throws IOException, SAXException, ParserConfigurationException {
-        EmbeddedSolrServer embeddedSolrServer = new EmbeddedSolrServer(coreContainer, SOLR_CORE);
-        return new MulticoreSolrServerFactory(embeddedSolrServer);
+        return new MulticoreSolrServerFactory(new EmbeddedSolrServer(coreContainer, SOLR_CORE));
     }
 
     @Bean

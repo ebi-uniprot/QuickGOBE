@@ -48,11 +48,11 @@ public abstract class OBOControllerIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
+    static final String COMMA = ",";
+
     private static final String SEARCH_ENDPOINT = "search";
     private static final String TERMS_ENDPOINT = "terms";
-
     private static final String QUERY_PARAM = "query";
-    protected static final String COMMA = ",";
     private static final String PAGE_PARAM = "page";
 
     @Autowired
@@ -401,6 +401,10 @@ public abstract class OBOControllerIT {
 
     protected abstract List<OntologyDocument> createNDocs(int n);
 
+    protected abstract String idMissingInRepository();
+
+    protected abstract String invalidId();
+
     protected ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
         return expectCoreFields(result, id, "$.");
     }
@@ -424,6 +428,7 @@ public abstract class OBOControllerIT {
     protected String buildTermsURL() {
         return getResourceURL() + "/" + TERMS_ENDPOINT;
     }
+
     protected String buildTermsURL(String id) {
         return getResourceURL() + "/" + TERMS_ENDPOINT + "/" + id;
     }
@@ -458,17 +463,9 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "annotationGuidelines").exists())
                 .andExpect(jsonPath(path + "taxonConstraints").exists())
                 .andExpect(jsonPath(path + "consider").exists())
-                    .andExpect(jsonPath(path + "subsets").exists())
+                .andExpect(jsonPath(path + "subsets").exists())
                 .andExpect(jsonPath(path + "replacedBy").exists());
     }
-
-    protected ResultActions expectBasicFields(ResultActions result, String id) throws Exception {
-        return expectBasicFields(result, id, "$.");
-    }
-
-    protected abstract String idMissingInRepository();
-
-    protected abstract String invalidId();
 
     protected ResultActions expectInvalidIdError(ResultActions result, String id) throws Exception {
         return result

@@ -19,13 +19,14 @@ import org.apache.solr.common.SolrDocumentList;
  * @author Ricardo Antunes
  */
 public abstract class AbstractSolrQueryResultConverter<T> implements QueryResultConverter<T, QueryResponse> {
-    private final QueryResultHighlightingConverter queryResultHighlightingConverter;
+    private final QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>>
+            queryResultHighlightingConverter;
 
     public AbstractSolrQueryResultConverter() {
         queryResultHighlightingConverter = null;
     }
 
-    public AbstractSolrQueryResultConverter(QueryResultHighlightingConverter queryResultHighlightingConverter){
+    public AbstractSolrQueryResultConverter(QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>> queryResultHighlightingConverter){
         Preconditions.checkArgument(queryResultHighlightingConverter != null, "Field map converter cannot be null");
 
         this.queryResultHighlightingConverter = queryResultHighlightingConverter;
@@ -113,6 +114,9 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
         int resultsPerPage = page.getPageSize();
         int totalPages = (int) Math.ceil((double) totalNumberOfResults / (double) resultsPerPage);
 
+        Preconditions.checkArgument((page.getPageNumber()-1)<=totalPages, "The requested page number should not be " +
+                "greater " +
+                "than the number of pages available.");
         int currentPage = (totalPages == 0 ? 0 : page.getPageNumber());
 
         return new PageInfo(totalPages, currentPage, resultsPerPage);

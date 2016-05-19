@@ -15,10 +15,13 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class ControllerValidationHelperImpl implements ControllerValidationHelper {
 
-    private static final Logger LOGGER = getLogger(ControllerValidationHelperImpl.class);
     public static final int MAX_PAGE_RESULTS = 100;
 
+    private static final Logger LOGGER = getLogger(ControllerValidationHelperImpl.class);
+    static final int MAX_PAGE_RESULTS = 100;
+
     private static final String COMMA = ",";
+
     private final Predicate<String> validIdCondition;
     private final Predicate<Integer> validNumberOfPageResults;
 
@@ -71,7 +74,7 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
      * @param csv a CSV list of items
      * @return a list of values originally comprising the CSV input String
      */
-    List<String> csvToList(String csv) {
+    @Override public List<String> csvToList(String csv) {
         if (!isNullOrEmpty(csv)) {
             return Arrays.asList(csv.split(COMMA));
         } else {

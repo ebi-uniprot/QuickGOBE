@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.concatStrings;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
 
@@ -23,13 +24,6 @@ public class GeneProductDocumentConverterTest {
     private static final String INTER_VALUE_DELIMITER = "|";
     private static final String INTER_VALUE_DELIMITER_REGEX = "\\|";
     private static final String INTRA_VALUE_DELIMITER = "=";
-
-    private static final String IS_ISOFORM = "is_isoform";
-    private static final String IS_ANNOTATED = "is_annotated";
-    private static final String PROTEOME = "proteome";
-    private static final String REFERENCE_PROTEOME = "reference_proteome";
-    private static final String DB_SUBSETS = "db_subsets";
-    private static final String TAXON_NAME = "taxon_name";
 
     private GeneProductDocumentConverter converter;
 
@@ -132,9 +126,9 @@ public class GeneProductDocumentConverterTest {
 
     @Test
     public void convertsYValuePropertiesInGeneProductToTrueBooleanFields() throws Exception {
-        String isAnnotated = concatProperty(IS_ANNOTATED, "Y");
-        String isIsoform = concatProperty(IS_ISOFORM, "Y");
-        String proteome = concatProperty(PROTEOME, "Y");
+        String isAnnotated = concatProperty(IS_ANNOTATED_KEY, "Y");
+        String isIsoform = concatProperty(IS_ISOFORM_KEY, "Y");
+        String proteome = concatProperty(COMPLETE_PROTEOME_KEY, "Y");
 
         geneProduct.properties = concatStrings(Arrays.asList(isAnnotated, isIsoform, proteome), INTER_VALUE_DELIMITER);
 
@@ -147,9 +141,9 @@ public class GeneProductDocumentConverterTest {
 
     @Test
     public void convertsNValuePropertiesInGeneProductToTrueBooleanFields() throws Exception {
-        String isAnnotated = concatProperty(IS_ANNOTATED, "N");
-        String isIsoform = concatProperty(IS_ISOFORM, "N");
-        String proteome = concatProperty(PROTEOME, "N");
+        String isAnnotated = concatProperty(IS_ANNOTATED_KEY, "N");
+        String isIsoform = concatProperty(IS_ISOFORM_KEY, "N");
+        String proteome = concatProperty(COMPLETE_PROTEOME_KEY, "N");
 
         geneProduct.properties = concatStrings(Arrays.asList(isAnnotated, isIsoform, proteome), INTER_VALUE_DELIMITER);
 
@@ -174,7 +168,7 @@ public class GeneProductDocumentConverterTest {
     @Test
     public void convertsReferenceProteomeInPropertiesInGeneProduct() throws Exception {
         String referenceProteome = "UP000005640";
-        geneProduct.properties = concatProperty(REFERENCE_PROTEOME, referenceProteome);
+        geneProduct.properties = concatProperty(REFERENCE_PROTEOME_KEY, referenceProteome);
 
         GeneProductDocument doc = converter.process(geneProduct);
 
@@ -193,7 +187,7 @@ public class GeneProductDocumentConverterTest {
     @Test
     public void convertsDBSubsetInPropertiesInGeneProductToList() throws Exception {
         String db = "UniProtKB";
-        geneProduct.properties = concatProperty(DB_SUBSETS, db);
+        geneProduct.properties = concatProperty(DATABASE_SUBSET_KEY, db);
 
         GeneProductDocument doc = converter.process(geneProduct);
 
@@ -212,7 +206,7 @@ public class GeneProductDocumentConverterTest {
     @Test
     public void convertsTaxonNameInPropertiesInGeneProductToField() throws Exception {
         String taxonName = "Homo sapiens";
-        geneProduct.properties = concatProperty(TAXON_NAME, taxonName);
+        geneProduct.properties = concatProperty(TAXON_NAME_KEY, taxonName);
 
         GeneProductDocument doc = converter.process(geneProduct);
 
