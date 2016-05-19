@@ -1,42 +1,43 @@
 package uk.ac.ebi.quickgo.rest.search.filter;
 
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-
+import com.google.common.base.Preconditions;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
- * Represents a filter at the web application level.
+ * Data structure that holds the field name and values of a filter requested by a REST service endpoint.
  *
- * When a client communicates that it wants the search query to be filtered by a given parameter, the REST controller
- * will receive those parameters and transform them into RequestFilters.
- *
- * A request filter can then be transformed into a {@link QuickGOQuery}, which is then understandable by the data
- * source executing the filter.
- *
- * @author Ricardo Antunes.
+ * @author Tony Wardell
+ * Date: 03/05/2016
+ * Time: 10:25
  */
-public interface RequestFilter {
+public class RequestFilter {
+    private String field;
+    private String[] values;
+
+    public RequestFilter(String field, String... values) {
+        Preconditions.checkArgument(field != null && !field.trim().isEmpty(), "Filter field cannot be null or empty");
+        Preconditions.checkArgument(values != null && values.length > 0, "Filter values cannot be null or empty");
+
+        this.field = field;
+        this.values = values;
+    }
+
     /**
      * Provides the field (column) the filter will be applied to.
      *
      * @return the field
      */
-    String getField();
+    public String getField() {
+        return field;
+    }
 
     /**
-     * Provides a {@link Stream} of filtering values pertaining to the {@link #getField()} field.
+     * Provides the field (column) the filter will be applied to.
      *
-     * @return the filtering values
+     * @return the field
      */
-    Stream<String> getValues();
-
-    /**
-     * Transforms the filter into a domain specific {@link QuickGOQuery}.
-     *
-     * Note: It is assumed that if the filter contains multiple values then the resulting QuickGOQuery will have the
-     * values implicitly ORed.
-     *
-     * @return a {@link QuickGOQuery} that represents the filter
-     */
-    QuickGOQuery transform();
+    public Stream<String> getValues() {
+        return Arrays.stream(values);
+    }
 }

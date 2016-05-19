@@ -6,7 +6,7 @@ package uk.ac.ebi.quickgo.rest.search.filter;
  *
  * @author Ricardo Antunes
  */
-public interface FilterFactory {
+public interface FilterConverterFactory {
 
-    RequestFilter createFilter(String field, String[] values);
+    FilterConverter createConverter(RequestFilter requestFilter);
 }
