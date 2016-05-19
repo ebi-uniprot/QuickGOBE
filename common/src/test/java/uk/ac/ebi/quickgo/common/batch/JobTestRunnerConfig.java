@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index;
+package uk.ac.ebi.quickgo.common.batch;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Utility class providing beans for testing batch jobs.
+ *
  * Created 12/01/16
  * @author Edd
  */
