@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.index.ontology;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.index.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.common.batch.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.index.QuickGOIndexMain;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;

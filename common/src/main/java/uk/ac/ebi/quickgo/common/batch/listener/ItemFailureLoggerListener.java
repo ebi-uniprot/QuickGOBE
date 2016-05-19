@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.common.listener;
+package uk.ac.ebi.quickgo.common.batch.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

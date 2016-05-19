@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.index.common.listener;
-
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
+package uk.ac.ebi.quickgo.common.batch.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,10 +9,10 @@ import org.springframework.batch.core.SkipListener;
  *
  * @author Ricardo Antunes
  */
-public class SkipLoggerListener<T> implements SkipListener<T, GeneProductDocument> {
+public class SkipLoggerListener<T, S> implements SkipListener<T, S> {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Override public void onSkipInWrite(GeneProductDocument item, Throwable t) {
+    @Override public void onSkipInWrite(S item, Throwable t) {
         logger.error("Error whilst writing: {}", item, t);
     }
 

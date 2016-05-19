@@ -2,8 +2,8 @@ package uk.ac.ebi.quickgo.index.ontology;
 
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
-import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
-import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
+import uk.ac.ebi.quickgo.common.batch.listener.LogJobListener;
+import uk.ac.ebi.quickgo.common.batch.listener.LogStepListener;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;

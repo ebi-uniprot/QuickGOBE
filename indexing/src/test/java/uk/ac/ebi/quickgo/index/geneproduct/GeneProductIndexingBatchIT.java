@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
-import uk.ac.ebi.quickgo.index.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.common.batch.JobTestRunnerConfig;
 
 import com.google.common.collect.Lists;
 import java.util.Collection;

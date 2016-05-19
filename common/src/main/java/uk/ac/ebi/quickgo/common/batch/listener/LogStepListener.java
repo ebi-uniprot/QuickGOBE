@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.common.listener;
+package uk.ac.ebi.quickgo.common.batch.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +7,8 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
 /**
+ * Log statistics of a QuickGO step.
+ *
  * Created 02/12/15
  * @author Edd
  */
@@ -15,7 +17,7 @@ public class LogStepListener implements StepExecutionListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogStepListener.class);
 
     @Override public void beforeStep(StepExecution stepExecution) {
-        LOGGER.info("QuickGO indexing STEP '{}' starting.", stepExecution.getStepName());
+        LOGGER.info("Starting QuickGO STEP '{}'.", stepExecution.getStepName());
     }
 
     @Override public ExitStatus afterStep(StepExecution stepExecution) {

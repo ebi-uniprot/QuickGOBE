@@ -4,8 +4,8 @@ import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
-import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
-import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
+import uk.ac.ebi.quickgo.common.batch.listener.LogJobListener;
+import uk.ac.ebi.quickgo.common.batch.listener.SkipLoggerListener;
 
 import java.util.ArrayList;
 import java.util.List;
