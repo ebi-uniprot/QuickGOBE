@@ -108,12 +108,6 @@ public class QueryRequest {
             return this;
         }
 
-        public Builder addQueryFilters(Collection<QuickGOQuery> filters) {
-            this.filters.addAll(filters);
-
-            return this;
-        }
-
         public Builder addHighlightedField(String field) {
             this.highlightedFields.add(new FieldHighlight(field));
 
@@ -122,12 +116,6 @@ public class QueryRequest {
 
         public Builder addProjectedField(String field) {
             this.projectedFields.add(new FieldProjection(field));
-            return this;
-        }
-
-        public Builder addProjectedFields(Collection<String> fields) {
-            fields.stream().forEach(field -> this.projectedFields.add(new FieldProjection(field)));
-
             return this;
         }
 
