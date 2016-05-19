@@ -117,7 +117,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         int pageNum = 3;
         int entriesPerPage = 2;
 
-        checkInvalidPageInfoInResponse("metabolic", pageNum, entriesPerPage, HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        checkInvalidPageInfoInResponse("metabolic", pageNum, entriesPerPage, HttpStatus.SC_BAD_REQUEST);
     }
 
     // facets ---------------------------------------------------------

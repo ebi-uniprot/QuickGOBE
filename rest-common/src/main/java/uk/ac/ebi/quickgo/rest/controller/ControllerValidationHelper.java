@@ -23,4 +23,6 @@ public interface ControllerValidationHelper {
      * @throws IllegalArgumentException if the number is greater than the maximum permissible number of results.
      */
     void validateRequestedResults(int requestedResultsSize);
+
+    List<String> csvToList(String csv);
 }

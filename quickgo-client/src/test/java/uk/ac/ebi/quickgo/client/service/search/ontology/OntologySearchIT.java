@@ -114,7 +114,7 @@ public class OntologySearchIT extends SearchControllerSetup {
         int pageNum = 3;
         int entriesPerPage = 2;
 
-        checkInvalidPageInfoInResponse("go", pageNum, entriesPerPage, HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        checkInvalidPageInfoInResponse("go", pageNum, entriesPerPage, HttpStatus.SC_BAD_REQUEST);
     }
 
     // facets ---------------------------------------------------------

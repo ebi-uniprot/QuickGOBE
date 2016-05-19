@@ -10,6 +10,7 @@ package uk.ac.ebi.quickgo.geneproduct;
  */
 
 import uk.ac.ebi.quickgo.geneproduct.service.ServiceConfig;
+import uk.ac.ebi.quickgo.rest.controller.CORSFilter;
 import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
 
 import org.springframework.boot.SpringApplication;
@@ -22,7 +23,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @SpringBootApplication(exclude = {SolrRepositoriesAutoConfiguration.class})
 @ComponentScan({"uk.ac.ebi.quickgo.geneproduct.controller", "uk.ac.ebi.quickgo.rest"})
-@Import({ServiceConfig.class, SwaggerConfig.class})
+@Import({ServiceConfig.class, SwaggerConfig.class, CORSFilter.class})
 public class GeneProductREST {
 
 	/**

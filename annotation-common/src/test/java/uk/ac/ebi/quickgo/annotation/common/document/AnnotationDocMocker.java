@@ -40,4 +40,10 @@ public class AnnotationDocMocker {
 
         return doc;
     }
+
+    public static AnnotationDocument createAnnotationDoc(String geneProductId, String assignedBy) {
+        AnnotationDocument doc = createAnnotationDoc(geneProductId);
+        doc.assignedBy = assignedBy;
+        return doc;
+    }
 }
