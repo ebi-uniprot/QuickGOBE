@@ -25,7 +25,7 @@ public class AnnotationValidatorTest {
 
     // check required fields -------------------------------------------------
     @Test(expected = DocumentReaderException.class)
-    public void nullGeneProductThrowsException() throws Exception {
+    public void nullAnnotationThrowsException() throws Exception {
         validator.validate(null);
     }
 
