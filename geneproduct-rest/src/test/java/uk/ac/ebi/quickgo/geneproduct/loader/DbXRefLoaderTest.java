@@ -1,10 +1,9 @@
 package uk.ac.ebi.quickgo.geneproduct.loader;
 
-import org.junit.Test;
-
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXRefIDFormat;
 
 import java.util.List;
+import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
