@@ -27,9 +27,9 @@ public class StringToOntologyTupleMapper implements FieldSetMapper<OntologyRelat
 
         OntologyRelationshipTuple relationshipTuple = new OntologyRelationshipTuple();
 
-        relationshipTuple.childVertex = trimIfNotNull(fieldSet.readString(COLUMN_CHILD.getPosition()));
-        relationshipTuple.parentVertex = trimIfNotNull(fieldSet.readString(COLUMN_PARENT.getPosition()));
-        relationshipTuple.edgeLabel = trimIfNotNull(fieldSet.readString(COLUMN_RELATIONSHIP.getPosition()));
+        relationshipTuple.child = trimIfNotNull(fieldSet.readString(COLUMN_CHILD.getPosition()));
+        relationshipTuple.parent = trimIfNotNull(fieldSet.readString(COLUMN_PARENT.getPosition()));
+        relationshipTuple.edge = trimIfNotNull(fieldSet.readString(COLUMN_RELATIONSHIP.getPosition()));
 
         return relationshipTuple;
     }

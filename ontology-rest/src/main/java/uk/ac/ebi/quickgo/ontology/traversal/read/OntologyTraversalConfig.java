@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
+import org.slf4j.Logger;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
@@ -35,6 +36,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * Created 18/05/16
  * @author Edd
@@ -42,30 +45,22 @@ import org.springframework.core.io.Resource;
 @Configuration
 @EnableBatchProcessing
 public class OntologyTraversalConfig {
+
+    private static final Logger LOGGER = getLogger(OntologyTraversalConfig.class);
     private static final String ONTOLOGY_TRAVERSAL_LOADING_JOB_NAME = "OntologyTraversalReadingJob";
     private static final String ONTOLOGY_TRAVERSAL_LOADING_STEP_NAME = "OntologyTraversalReadingStep";
     private static final String TAB = "\t";
 
-    @Bean
-    static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
-    }
-
     @Autowired
     private JobBuilderFactory jobBuilders;
-
     @Autowired
     private StepBuilderFactory stepBuilders;
-
-    @Value("${ontology.traversal.source}")
+    @Value("#{'${ontology.traversal.source:}'.split(',')}")
     private Resource[] resources;
-
     @Value("${ontology.traversal.chunk.size:500}")
     private int chunkSize;
-
     @Value("${ontology.traversal.header.lines:1}")
     private int headerLines;
-
     @Value("${ontology.traversal.skip.limit:100}")
     private int skipLimit;
 
@@ -75,15 +70,15 @@ public class OntologyTraversalConfig {
     }
 
     @Bean
-    public Job ontologyGraphBuildJob(OntologyGraph ontologyGraph) throws IOException {
+    public Job ontologyGraphBuildJob(OntologyGraph ontologyGraph) {
         return jobBuilders.get(ONTOLOGY_TRAVERSAL_LOADING_JOB_NAME)
-                .start(ontologyGraphBuildStep(ontologyGraph))
-                .listener(logJobListener())
-                .build();
+                    .start(ontologyGraphBuildStep(ontologyGraph))
+                    .listener(logJobListener())
+                    .build();
     }
 
     @Bean
-    public Step ontologyGraphBuildStep(OntologyGraph ontologyGraph) throws IOException {
+    public Step ontologyGraphBuildStep(OntologyGraph ontologyGraph) {
         return stepBuilders.get(ONTOLOGY_TRAVERSAL_LOADING_STEP_NAME)
                 .<OntologyRelationshipTuple, OntologyRelationshipTuple>chunk(chunkSize)
                 .faultTolerant()
@@ -98,13 +93,13 @@ public class OntologyTraversalConfig {
                 .build();
     }
 
-    private SkipLoggerListener<OntologyRelationshipTuple, OntologyRelationshipTuple> skipLogListener() {
-        return new SkipLoggerListener<>();
+    @Bean
+    static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Bean
-    ItemWriter<OntologyRelationshipTuple> ontologyGraphPopulator(OntologyGraph ontologyGraph) {
-        return new OntologyGraphPopulator(ontologyGraph);
+    private SkipLoggerListener<OntologyRelationshipTuple, OntologyRelationshipTuple> skipLogListener() {
+        return new SkipLoggerListener<>();
     }
 
     private JobExecutionListener logJobListener() {
@@ -113,6 +108,32 @@ public class OntologyTraversalConfig {
 
     private StepExecutionListener logStepListener() {
         return new LogStepListener();
+    }
+
+    private ItemProcessor<OntologyRelationshipTuple, OntologyRelationshipTuple> ontologyRelationshipValidator() {
+        return new OntologyRelationshipValidator();
+    }
+
+    /**
+     * Since the resources are zipped files loaded from an input stream, we cannot
+     * process files in an order based on their names; instead we process them in
+     * the order they were specified in the properties file.
+     *
+     * @param reader the resource reader
+     */
+    private void setResourceComparator(MultiResourceItemReader<OntologyRelationshipTuple> reader) {
+        reader.setComparator((o1, o2) -> 0);
+    }
+
+    private static class GZIPResource extends InputStreamResource implements Resource {
+        GZIPResource(Resource delegate) throws IOException {
+            super(new GZIPInputStream(delegate.getInputStream()));
+        }
+    }
+
+    @Bean
+    ItemWriter<OntologyRelationshipTuple> ontologyGraphPopulator(OntologyGraph ontologyGraph) {
+        return new OntologyGraphPopulator(ontologyGraph);
     }
 
     @Bean
@@ -128,21 +149,25 @@ public class OntologyTraversalConfig {
         return compositeProcessor;
     }
 
-    private ItemProcessor<OntologyRelationshipTuple, OntologyRelationshipTuple> ontologyRelationshipValidator() {
-        return new OntologyRelationshipValidator();
-    }
-
     @Bean
-    MultiResourceItemReader<OntologyRelationshipTuple> ontologyTraversalMultiFileReader() throws IOException {
+    MultiResourceItemReader<OntologyRelationshipTuple> ontologyTraversalMultiFileReader() {
         MultiResourceItemReader<OntologyRelationshipTuple> reader = new MultiResourceItemReader<>();
 
-        GZIPResource[] zippedResources = new GZIPResource[resources.length];
-        for (int i = 0; i < resources.length; i++) {
-            zippedResources[i] = new GZIPResource(resources[i]);
+        setResourceComparator(reader);
+
+        try {
+            GZIPResource[] zippedResources = new GZIPResource[resources.length];
+            for (int i = 0; i < resources.length; i++) {
+                zippedResources[i] = new GZIPResource(resources[i]);
+            }
+
+            reader.setResources(zippedResources);
+            reader.setDelegate(ontologyTraversalSingleFileReader());
+        } catch (IOException e) {
+            LOGGER.error("Failed to populate ontology traversal graph, and therefore there will be " +
+                    "no graph operations supported, e.g., closures and slimming: ", e);
         }
 
-        reader.setResources(zippedResources);
-        reader.setDelegate(ontologyTraversalSingleFileReader());
         return reader;
     }
 
@@ -166,11 +191,5 @@ public class OntologyTraversalConfig {
     @Bean
     FieldSetMapper<OntologyRelationshipTuple> geneProductFieldSetMapper() {
         return new StringToOntologyTupleMapper();
-    }
-
-    private static class GZIPResource extends InputStreamResource implements Resource {
-        GZIPResource(Resource delegate) throws IOException {
-            super(new GZIPInputStream(delegate.getInputStream()));
-        }
     }
 }

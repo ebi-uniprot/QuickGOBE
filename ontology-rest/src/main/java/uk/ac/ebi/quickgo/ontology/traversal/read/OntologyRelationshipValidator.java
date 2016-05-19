@@ -10,6 +10,7 @@ public class OntologyRelationshipValidator
         implements ItemProcessor<OntologyRelationshipTuple, OntologyRelationshipTuple> {
     @Override public OntologyRelationshipTuple process(OntologyRelationshipTuple ontologyRelationshipTuple)
             throws Exception {
+
         return ontologyRelationshipTuple;
     }
 }

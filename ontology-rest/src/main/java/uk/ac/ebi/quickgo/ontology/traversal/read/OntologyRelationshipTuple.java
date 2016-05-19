@@ -5,7 +5,7 @@ package uk.ac.ebi.quickgo.ontology.traversal.read;
  * @author Edd
  */
 public class OntologyRelationshipTuple {
-    public String childVertex;
-    public String parentVertex;
-    public String edgeLabel;
+    String child;
+    String parent;
+    String edge;
 }

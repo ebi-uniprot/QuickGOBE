@@ -5,11 +5,10 @@ import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyTraversalConfig;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
@@ -49,12 +48,5 @@ public class OntologyTraversalLoaderTest {
         assertThat(status, is(BatchStatus.COMPLETED));
 
         System.out.println(ontologyGraph);
-    }
-
-    @Test
-    public void runManuallyOntologyGraphLoading()
-            throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException,
-                   JobInstanceAlreadyCompleteException {
-        launcher.run(ontologyGraphBuildJob, new JobParameters());
     }
 }
