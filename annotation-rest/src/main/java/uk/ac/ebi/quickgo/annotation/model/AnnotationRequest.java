@@ -1,9 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.rest.search.filter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
-import uk.ac.ebi.quickgo.rest.search.query.FilterProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +21,7 @@ import javax.validation.constraints.Pattern;
  * Time: 11:23
  * Created with IntelliJ IDEA.
  */
-public class AnnotationRequest implements FilterProvider {
+public class AnnotationRequest {
     public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
     public static final int MAX_ENTRIES_PER_PAGE = 100;
 
