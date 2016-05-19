@@ -9,6 +9,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The information for a single Database cross reference.
  * This information is used, for example, to validate gene product ids based on source database and the id type.
  *
+ *
  * @author Tony Wardell
  *         Date: 18/04/2016
  *         Time: 13:52

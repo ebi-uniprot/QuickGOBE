@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.groupingBy;
  * Ask this class if the id is a valid gene product id.
  * Can either use defaults or supply the identifying database and typeName (protein or gene).
  *
+ *
  * @author Tony Wardell
  *         Date: 18/04/2016
  *         Time: 13:36
