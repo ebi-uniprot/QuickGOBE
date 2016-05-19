@@ -16,18 +16,17 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class ControllerValidationHelperImpl implements ControllerValidationHelper {
 
     public static final int MAX_PAGE_RESULTS = 100;
-
     private static final Logger LOGGER = getLogger(ControllerValidationHelperImpl.class);
-    static final int MAX_PAGE_RESULTS = 100;
-
     private static final String COMMA = ",";
 
     private final Predicate<String> validIdCondition;
     private final Predicate<Integer> validNumberOfPageResults;
+    private final int maxPageResults;
 
     public ControllerValidationHelperImpl(int maxPageResults, Predicate<String> validIDCondition) {
         this.validNumberOfPageResults = pageResults -> pageResults <= maxPageResults;
         this.validIdCondition = validIDCondition;
+        this.maxPageResults = maxPageResults;
     }
 
     public ControllerValidationHelperImpl(int maxPageResults) {
@@ -59,8 +58,8 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
 
     @Override public void validateRequestedResults(int requestedResultsSize) {
         if (validNumberOfPageResults.negate().test(requestedResultsSize)) {
-            String errorMessage = "Cannot retrieve retrieve the requested number of results. Must satisfy the " +
-                    "Predicate: " + validNumberOfPageResults.toString() + ". Please consider using end-points that " +
+            String errorMessage = "Cannot retrieve the requested number of results. Upper limit is: " +
+                    maxPageResults + ". Please consider using end-points that " +
                     "return paged results.";
             LOGGER.error(errorMessage);
             throw new IllegalArgumentException(errorMessage);

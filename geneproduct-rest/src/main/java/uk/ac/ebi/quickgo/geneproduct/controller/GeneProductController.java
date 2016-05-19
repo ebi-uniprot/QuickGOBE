@@ -2,25 +2,28 @@ package uk.ac.ebi.quickgo.geneproduct.controller;
 
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
+import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import io.swagger.annotations.ApiOperation;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
  * @author Tony Wardell
@@ -35,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/QuickGO/services/geneproduct")
 public class GeneProductController {
 
-    public static final int MAX_PAGE_RESULTS = 100;
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
@@ -50,16 +52,18 @@ public class GeneProductController {
             GeneProductService geneProductService,
             SearchService<GeneProduct> geneProductSearchService,
             SearchableField geneProductSearchableField,
-            SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig) {
+            SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig,
+            ControllerValidationHelper controllerValidationHelper) {
         checkArgument(geneProductService != null,
                 "The GeneProductService instance passed to the constructor of GeneProductController must not be null.");
         checkArgument(geneProductSearchService != null, "The SearchService<GeneProduct> must not be null.");
         checkArgument(geneProductSearchableField != null, "The gene product SearchableField must not be null");
         checkArgument(geneProductRetrievalConfig != null, "The GeneProductCompositeRetrievalConfig must not be null");
+        checkArgument(controllerValidationHelper != null, "The ControllerValidationHelper must not be null");
 
         this.geneProductService = geneProductService;
         this.geneProductSearchService = geneProductSearchService;
-        this.controllerValidationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
+        this.controllerValidationHelper = controllerValidationHelper;
 
         this.requestTemplate = new DefaultSearchQueryTemplate(
                 new StringToQuickGOQueryConverter(geneProductSearchableField),
