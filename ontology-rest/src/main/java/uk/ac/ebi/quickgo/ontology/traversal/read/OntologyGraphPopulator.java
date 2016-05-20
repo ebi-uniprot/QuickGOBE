@@ -9,10 +9,13 @@ import org.springframework.batch.item.ItemWriter;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
+ * The purpose of this class is to populate an ontology graph with the base information:
+ * vertices and edges.
+ *
  * Created 18/05/16
  * @author Edd
  */
-public class OntologyGraphPopulator implements ItemWriter<OntologyRelationshipTuple> {
+public class OntologyGraphPopulator implements ItemWriter<OntologyRelationship> {
     private static final Logger LOGGER = getLogger(OntologyGraphPopulator.class);
     private final OntologyGraph ontologyGraph;
 
@@ -20,8 +23,8 @@ public class OntologyGraphPopulator implements ItemWriter<OntologyRelationshipTu
         this.ontologyGraph = ontologyGraph;
     }
 
-    @Override public void write(List<? extends OntologyRelationshipTuple> list) throws Exception {
-        LOGGER.info("Adding {} ontology graph tuples.", list.size());
-        ontologyGraph.getTuples().addAll(list);
+    @Override public void write(List<? extends OntologyRelationship> list) throws Exception {
+        LOGGER.debug("Adding {} ontology graph tuples.", list.size());
+        ontologyGraph.addTuples(list);
     }
 }
