@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.ontology.traversal.read;
 /**
  * Enumeration representing the columns of the relationship source files.
  *
- * CHILD_ID, PARENT_ID, RELATIONSHIP_TYPE
+ * Columns: CHILD_ID, PARENT_ID, RELATIONSHIP_TYPE
  *
  * Created 18/05/16
  * @author Edd
