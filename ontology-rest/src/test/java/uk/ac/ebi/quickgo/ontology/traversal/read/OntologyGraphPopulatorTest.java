@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelations;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class OntologyGraphPopulatorTest {
             OntologyRelationship tuple = new OntologyRelationship();
             tuple.child = "child" + i;
             tuple.parent = "parent" + i;
-            tuple.relationship = OntologyRelations.CAPABLE_OF.getShortName();
+            tuple.relationship = OntologyRelation.CAPABLE_OF.getShortName();
             tuples.add(tuple);
         }
         return tuples;

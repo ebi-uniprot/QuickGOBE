@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelations;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelation;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class OntologyRelationshipValidatorTest {
         OntologyRelationship tuple = new OntologyRelationship();
         tuple.child = "GO:childValue";
         tuple.parent = "GO:parentValue";
-        tuple.relationship = OntologyRelations.CAPABLE_OF.getShortName();
+        tuple.relationship = OntologyRelation.CAPABLE_OF.getShortName();
         return tuple;
     }
 

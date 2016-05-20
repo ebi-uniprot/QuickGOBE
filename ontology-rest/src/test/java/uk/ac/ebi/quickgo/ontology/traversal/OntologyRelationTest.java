@@ -11,17 +11,17 @@ import static org.hamcrest.Matchers.is;
  * Created 20/05/16
  * @author Edd
  */
-public class OntologyRelationsTest {
+public class OntologyRelationTest {
     @Test
     public void validRelationshipsCanBeRetrieved() {
-        for (OntologyRelations relation : OntologyRelations.values()) {
-            OntologyRelations relationRetrieved = OntologyRelations.getByShortName(relation.getShortName());
+        for (OntologyRelation relation : OntologyRelation.values()) {
+            OntologyRelation relationRetrieved = OntologyRelation.getByShortName(relation.getShortName());
             assertThat(relationRetrieved, is(relation));
         }
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidRelationshipCausesIllegalArgumentException() {
-        OntologyRelations.getByShortName("THIS_DOES_NOT_EXIST");
+        OntologyRelation.getByShortName("THIS_DOES_NOT_EXIST");
     }
 }

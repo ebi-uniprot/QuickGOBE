@@ -10,7 +10,7 @@ import java.util.Map;
  * Created 20/05/16
  * @author Edd
  */
-public enum OntologyRelations {
+public enum OntologyRelation {
 
     UNDEFINED("?", "ancestor"),
     IDENTITY("=", "equals"),
@@ -30,7 +30,7 @@ public enum OntologyRelations {
     private final String shortName;
     private final String longName;
 
-    OntologyRelations(String shortName, String longName) {
+    OntologyRelation(String shortName, String longName) {
         this.shortName = shortName;
         this.longName = longName;
     }
@@ -43,15 +43,15 @@ public enum OntologyRelations {
         return longName;
     }
 
-    private static final Map<String, OntologyRelations> nameToValueMap = new HashMap<>();
+    private static final Map<String, OntologyRelation> nameToValueMap = new HashMap<>();
 
     static {
-        for (OntologyRelations value : OntologyRelations.values()) {
+        for (OntologyRelation value : OntologyRelation.values()) {
             nameToValueMap.put(value.getShortName(), value);
         }
     }
 
-    public static OntologyRelations getByShortName(String shortName) {
+    public static OntologyRelation getByShortName(String shortName) {
         if (nameToValueMap.containsKey(shortName)) {
             return nameToValueMap.get(shortName);
         } else {

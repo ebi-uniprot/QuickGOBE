@@ -33,7 +33,7 @@ public class OntologyGraph {
     }
 
 
-    public boolean addTuples(Collection<? extends OntologyRelationship> tuples) {
+    public boolean addRelationships(Collection<? extends OntologyRelationship> tuples) {
         // populate graph with edges, whilst recording the vertices
         tuples.stream().forEach(
                 oEdge -> {
@@ -47,7 +47,7 @@ public class OntologyGraph {
                             oEdge.child,
                             oEdge.parent,
                             new LabelledEdge<>(oEdge.child, oEdge.parent,
-                                    OntologyRelations.getByShortName(oEdge.relationship)));
+                                    OntologyRelation.getByShortName(oEdge.relationship)));
                 }
         );
 
@@ -57,9 +57,9 @@ public class OntologyGraph {
     public static class LabelledEdge<V> extends DefaultEdge {
         private V v1;
         private V v2;
-        private OntologyRelations relation;
+        private OntologyRelation relation;
 
-        LabelledEdge(V v1, V v2, OntologyRelations relation) {
+        LabelledEdge(V v1, V v2, OntologyRelation relation) {
             this.v1 = v1;
             this.v2 = v2;
             this.relation = relation;

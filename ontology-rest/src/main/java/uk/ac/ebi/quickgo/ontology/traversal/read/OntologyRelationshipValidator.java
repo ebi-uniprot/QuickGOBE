@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelations;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +59,7 @@ class OntologyRelationshipValidator
 
     void checkValidRelationship(String relationship) {
         try {
-            OntologyRelations.getByShortName(relationship);
+            OntologyRelation.getByShortName(relationship);
         } catch (IllegalArgumentException ie) {
             String errorMessage = "Could not find ontology relationship: " + relationship;
             LOGGER.error(errorMessage);

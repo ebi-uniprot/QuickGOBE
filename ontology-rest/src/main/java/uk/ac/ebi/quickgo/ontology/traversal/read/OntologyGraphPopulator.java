@@ -25,6 +25,6 @@ public class OntologyGraphPopulator implements ItemWriter<OntologyRelationship> 
 
     @Override public void write(List<? extends OntologyRelationship> list) throws Exception {
         LOGGER.debug("Adding {} ontology graph tuples.", list.size());
-        ontologyGraph.addTuples(list);
+        ontologyGraph.addRelationships(list);
     }
 }
