@@ -8,6 +8,8 @@ import java.util.Map;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.item.validator.Validator;
 
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
 import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
 
@@ -46,7 +48,7 @@ public class GeneProductValidator implements Validator<GeneProduct> {
             checkHasAtMostOneParentId(geneProduct.parentId);
 
             Map<String, String> properties =
-                    convertToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
+                    convertLinePropertiesToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
 
             checkBooleanValue(properties.get(COMPLETE_PROTEOME_KEY), COMPLETE_PROTEOME_KEY);
             checkBooleanValue(properties.get(IS_ANNOTATED_KEY), IS_ANNOTATED_KEY);

@@ -85,12 +85,24 @@ public class AnnotationControllerIT {
                 .build();
 
         basicDocs = createBasicDocs();
-        assertThat(basicDocs.size(), is(greaterThan(1)));
+        assertThat(basicDocs.size(), is(4));
         savedAssignedBy = basicDocs.get(0).assignedBy;
         annotationRepository.save(basicDocs);
+        System.out.println("");
     }
 
+    @Test
+    public void lookupAnnotationGetAll() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL+"/search"));
 
+        expectResultsInfoExists(response)
+                .andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(4))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
 
     @Test
     public void lookupAnnotationFilterByAssignedBySuccessfully() throws Exception {
@@ -98,6 +110,7 @@ public class AnnotationControllerIT {
                 get(RESOURCE_URL+"/search").param(ASSIGNED_BY_PARAM, savedAssignedBy));
 
         expectResultsInfoExists(response)
+                .andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*").exists())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
