@@ -39,14 +39,17 @@ import org.springframework.core.io.Resource;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
+ * Configuration for reading ontology relationship source files and populating a corresponding
+ * graph.
+ *
  * Created 18/05/16
  * @author Edd
  */
 @Configuration
 @EnableBatchProcessing
-public class OntologyTraversalConfig {
+public class OntologyGraphConfig {
 
-    private static final Logger LOGGER = getLogger(OntologyTraversalConfig.class);
+    private static final Logger LOGGER = getLogger(OntologyGraphConfig.class);
     private static final String ONTOLOGY_TRAVERSAL_LOADING_JOB_NAME = "OntologyTraversalReadingJob";
     private static final String ONTOLOGY_TRAVERSAL_LOADING_STEP_NAME = "OntologyTraversalReadingStep";
     private static final String TAB = "\t";
@@ -80,12 +83,12 @@ public class OntologyTraversalConfig {
     @Bean
     public Step ontologyGraphBuildStep(OntologyGraph ontologyGraph) {
         return stepBuilders.get(ONTOLOGY_TRAVERSAL_LOADING_STEP_NAME)
-                .<OntologyRelationshipTuple, OntologyRelationshipTuple>chunk(chunkSize)
+                .<OntologyRelationship, OntologyRelationship>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(skipLimit)
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
-                .<OntologyRelationshipTuple>reader(ontologyTraversalMultiFileReader())
+                .<OntologyRelationship>reader(ontologyTraversalMultiFileReader())
                 .processor(ontologyRelationshipCompositeProcessor())
                 .writer(ontologyGraphPopulator(ontologyGraph))
                 .listener(logStepListener())
@@ -98,7 +101,7 @@ public class OntologyTraversalConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    private SkipLoggerListener<OntologyRelationshipTuple, OntologyRelationshipTuple> skipLogListener() {
+    private SkipLoggerListener<OntologyRelationship, OntologyRelationship> skipLogListener() {
         return new SkipLoggerListener<>();
     }
 
@@ -110,7 +113,7 @@ public class OntologyTraversalConfig {
         return new LogStepListener();
     }
 
-    private ItemProcessor<OntologyRelationshipTuple, OntologyRelationshipTuple> ontologyRelationshipValidator() {
+    private ItemProcessor<OntologyRelationship, OntologyRelationship> ontologyRelationshipValidator() {
         return new OntologyRelationshipValidator();
     }
 
@@ -121,7 +124,7 @@ public class OntologyTraversalConfig {
      *
      * @param reader the resource reader
      */
-    private void setResourceComparator(MultiResourceItemReader<OntologyRelationshipTuple> reader) {
+    private void setResourceComparator(MultiResourceItemReader<OntologyRelationship> reader) {
         reader.setComparator((o1, o2) -> 0);
     }
 
@@ -132,17 +135,17 @@ public class OntologyTraversalConfig {
     }
 
     @Bean
-    ItemWriter<OntologyRelationshipTuple> ontologyGraphPopulator(OntologyGraph ontologyGraph) {
+    ItemWriter<OntologyRelationship> ontologyGraphPopulator(OntologyGraph ontologyGraph) {
         return new OntologyGraphPopulator(ontologyGraph);
     }
 
     @Bean
-    ItemProcessor<OntologyRelationshipTuple, OntologyRelationshipTuple> ontologyRelationshipCompositeProcessor() {
-        List<ItemProcessor<OntologyRelationshipTuple, OntologyRelationshipTuple>> processors = new ArrayList<>();
+    ItemProcessor<OntologyRelationship, OntologyRelationship> ontologyRelationshipCompositeProcessor() {
+        List<ItemProcessor<OntologyRelationship, OntologyRelationship>> processors = new ArrayList<>();
 
         processors.add(ontologyRelationshipValidator());
 
-        CompositeItemProcessor<OntologyRelationshipTuple, OntologyRelationshipTuple> compositeProcessor =
+        CompositeItemProcessor<OntologyRelationship, OntologyRelationship> compositeProcessor =
                 new CompositeItemProcessor<>();
         compositeProcessor.setDelegates(processors);
 
@@ -150,8 +153,8 @@ public class OntologyTraversalConfig {
     }
 
     @Bean
-    MultiResourceItemReader<OntologyRelationshipTuple> ontologyTraversalMultiFileReader() {
-        MultiResourceItemReader<OntologyRelationshipTuple> reader = new MultiResourceItemReader<>();
+    MultiResourceItemReader<OntologyRelationship> ontologyTraversalMultiFileReader() {
+        MultiResourceItemReader<OntologyRelationship> reader = new MultiResourceItemReader<>();
 
         setResourceComparator(reader);
 
@@ -172,16 +175,16 @@ public class OntologyTraversalConfig {
     }
 
     @Bean
-    FlatFileItemReader<OntologyRelationshipTuple> ontologyTraversalSingleFileReader() {
-        FlatFileItemReader<OntologyRelationshipTuple> reader = new FlatFileItemReader<>();
+    FlatFileItemReader<OntologyRelationship> ontologyTraversalSingleFileReader() {
+        FlatFileItemReader<OntologyRelationship> reader = new FlatFileItemReader<>();
         reader.setLineMapper(ontologyRelationshipLineMapper());
         reader.setLinesToSkip(headerLines);
         return reader;
     }
 
     @Bean
-    LineMapper<OntologyRelationshipTuple> ontologyRelationshipLineMapper() {
-        DefaultLineMapper<OntologyRelationshipTuple> lineMapper = new DefaultLineMapper<>();
+    LineMapper<OntologyRelationship> ontologyRelationshipLineMapper() {
+        DefaultLineMapper<OntologyRelationship> lineMapper = new DefaultLineMapper<>();
         lineMapper.setLineTokenizer(new DelimitedLineTokenizer(TAB));
         lineMapper.setFieldSetMapper(geneProductFieldSetMapper());
 
@@ -189,7 +192,7 @@ public class OntologyTraversalConfig {
     }
 
     @Bean
-    FieldSetMapper<OntologyRelationshipTuple> geneProductFieldSetMapper() {
-        return new StringToOntologyTupleMapper();
+    FieldSetMapper<OntologyRelationship> geneProductFieldSetMapper() {
+        return new StringToOntologyRelationshipMapper();
     }
 }
