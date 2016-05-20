@@ -10,8 +10,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
-import static uk.ac.ebi.quickgo.rest.search.query.TestUtil.asSet;
 
 /**
  * Tests the implementations of the {@link SolrQueryConverter} implementation.
