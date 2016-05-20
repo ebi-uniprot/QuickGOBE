@@ -14,8 +14,8 @@ import static uk.ac.ebi.quickgo.ontology.traversal.read.Columns.numColumns;
  * Created 18/05/16
  * @author Edd
  */
-public class StringToOntologyTupleMapper implements FieldSetMapper<OntologyRelationshipTuple> {
-    @Override public OntologyRelationshipTuple mapFieldSet(FieldSet fieldSet) throws BindException {
+public class StringToOntologyRelationshipMapper implements FieldSetMapper<OntologyRelationship> {
+    @Override public OntologyRelationship mapFieldSet(FieldSet fieldSet) throws BindException {
         if (fieldSet == null) {
             throw new IllegalArgumentException("Provided field set is null");
         }
@@ -25,11 +25,11 @@ public class StringToOntologyTupleMapper implements FieldSetMapper<OntologyRelat
                     "found: " + fieldSet.getFieldCount(), numColumns(), fieldSet.getFieldCount());
         }
 
-        OntologyRelationshipTuple relationshipTuple = new OntologyRelationshipTuple();
+        OntologyRelationship relationshipTuple = new OntologyRelationship();
 
         relationshipTuple.child = trimIfNotNull(fieldSet.readString(COLUMN_CHILD.getPosition()));
         relationshipTuple.parent = trimIfNotNull(fieldSet.readString(COLUMN_PARENT.getPosition()));
-        relationshipTuple.edge = trimIfNotNull(fieldSet.readString(COLUMN_RELATIONSHIP.getPosition()));
+        relationshipTuple.relationship = trimIfNotNull(fieldSet.readString(COLUMN_RELATIONSHIP.getPosition()));
 
         return relationshipTuple;
     }
