@@ -54,7 +54,7 @@ public class OntologyGraph {
         return true;
     }
 
-    static class LabelledEdge<V> extends DefaultEdge {
+    public static class LabelledEdge<V> extends DefaultEdge {
         private V v1;
         private V v2;
         private OntologyRelations relation;
