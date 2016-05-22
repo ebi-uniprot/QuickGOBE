@@ -13,10 +13,31 @@ public class OntologyRelationship {
     public String relationship;
 
     @Override public String toString() {
-        return "OntologyRelationshipTuple{" +
+        return "OntologyRelationship{" +
                 "child='" + child + '\'' +
                 ", parent='" + parent + '\'' +
                 ", relationship='" + relationship + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OntologyRelationship that = (OntologyRelationship) o;
+
+        if (child != null ? !child.equals(that.child) : that.child != null) return false;
+        if (parent != null ? !parent.equals(that.parent) : that.parent != null) return false;
+        return !(relationship != null ? !relationship.equals(that.relationship) : that.relationship != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = child != null ? child.hashCode() : 0;
+        result = 31 * result + (parent != null ? parent.hashCode() : 0);
+        result = 31 * result + (relationship != null ? relationship.hashCode() : 0);
+        return result;
     }
 }

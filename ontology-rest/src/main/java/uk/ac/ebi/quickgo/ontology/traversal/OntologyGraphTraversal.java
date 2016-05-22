@@ -20,7 +20,7 @@ public interface OntologyGraphTraversal {
      *                  By omitting a {@code relation} value, all paths will be returned.
      * @return a list of paths, ordered shorted first, from {@code v1} to {@code v2} via {@code relations}
      */
-    List<OntologyGraph.LabelledEdge> paths(String v1, String v2, OntologyRelation... relations);
+    List<List<OntologyGraph.LabelledEdge>> paths(String v1, String v2, OntologyRelation... relations);
 
     /**
      * Find the set of ancestor vertices reachable from a base vertex, navigable via a specified
