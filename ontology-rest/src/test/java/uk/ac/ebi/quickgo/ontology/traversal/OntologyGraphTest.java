@@ -64,8 +64,62 @@ public class OntologyGraphTest {
         assertThat(ontologyGraph.getEdges().size(), is(3));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void findingPathsBetweenSameVertexThrowsException() {
+        ontologyGraph.addRelationships(
+                asList(
+                        createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF),
+                        createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF_PART_OF),
+                        createRelationship(goID("2"), goID("3"), OntologyRelation.OCCURS_IN)
+                )
+        );
+
+        List<List<OntologyGraph.StringEdge>> paths = ontologyGraph.paths(
+                goID("1"),
+                goID("1"),
+                OntologyRelation.CAPABLE_OF_PART_OF
+        );
+    }
+
     @Test
-    public void findAllPathsBetweenLevel1AncestorsViaAllRelations() {
+    public void findAllPathsBetween1LevelOfAncestorsViaAllRelations() {
+        ontologyGraph.addRelationships(
+                asList(
+                        createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF),
+                        createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF_PART_OF),
+                        createRelationship(goID("2"), goID("3"), OntologyRelation.OCCURS_IN)
+                )
+        );
+
+        List<List<OntologyGraph.StringEdge>> paths = ontologyGraph.paths(
+                goID("1"),
+                goID("2")
+        );
+        System.out.println(paths);
+        assertThat(paths.size(), is(2));
+    }
+
+    @Test
+    public void findAllPathsBetween1LevelOfAncestorsVia1Relation() {
+        ontologyGraph.addRelationships(
+                asList(
+                        createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF),
+                        createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF_PART_OF),
+                        createRelationship(goID("2"), goID("3"), OntologyRelation.OCCURS_IN)
+                )
+        );
+
+        List<List<OntologyGraph.StringEdge>> paths = ontologyGraph.paths(
+                goID("1"),
+                goID("2"),
+                OntologyRelation.CAPABLE_OF_PART_OF
+        );
+        System.out.println(paths);
+        assertThat(paths.size(), is(1));
+    }
+
+    @Test
+    public void findAllPathsBetween2LevelsOfAncestorsViaAllRelations() {
         ontologyGraph.addRelationships(
                 asList(
                         createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF),
@@ -83,7 +137,7 @@ public class OntologyGraphTest {
     }
 
     @Test
-    public void findZeroPathsBetweenLevel1AncestorsVia1Relation() {
+    public void findZeroPathsBetween2LevelsOfAncestorsVia1Relation() {
         ontologyGraph.addRelationships(
                 asList(
                         createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF),
@@ -102,7 +156,7 @@ public class OntologyGraphTest {
     }
 
     @Test
-    public void findAllPathsBetweenLevel1AncestorsVia2Relations() {
+    public void findAllPathsBetween2LevelsOfAncestorsVia2Relations() {
         OntologyRelationship v1_CO_v2 = createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF);
         OntologyRelationship v1_CP_v2 = createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF_PART_OF);
         OntologyRelationship v2_OI_v3 = createRelationship(goID("2"), goID("3"), OntologyRelation.OCCURS_IN);

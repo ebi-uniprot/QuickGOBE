@@ -61,7 +61,20 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
     @Override
     public List<List<StringEdge>> paths(String v1, String v2, OntologyRelation... relations) {
-        Set<String> relationsSet = new HashSet<>(Arrays.asList(relations.length == 0 ? OntologyRelation.values() : relations).stream().map(o -> o.getShortName()).collect(Collectors.toList()));
+        Set<String> relationsSet = createRelevantRelationsSet(relations);
+
+        if (v1.equals(v2)) {
+            throw new IllegalArgumentException("Cannot find paths between vertex and itself: " + v1);
+        }
+
+        List<List<StringEdge>> interestingPaths = new ArrayList<>();
+        List<StringEdge> immediateSuccessors = successors(v1, v2, relationsSet);
+        if (immediateSuccessors.size() > 0) {
+            immediateSuccessors.stream()
+                    .map(Collections::singletonList)
+                    .forEach(interestingPaths::add);
+        }
+
         AllDirectedPaths<String, StringEdge> allPaths = new AllDirectedPaths<>(ontology);
         List<GraphPath<String, StringEdge>> v1v2Paths = allPaths.getAllPaths(v1, v2, true, null);
         List<GraphPath<String, StringEdge>> invalidPaths = new ArrayList<>();
@@ -74,13 +87,33 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
         v1v2Paths.removeAll(invalidPaths);
 
-        return v1v2Paths.stream().map(GraphPath::getEdgeList).collect(Collectors.toList());
+        interestingPaths.addAll(v1v2Paths.stream().map(GraphPath::getEdgeList).collect(Collectors.toList()));
+
+        return interestingPaths;
+    }
+
+    private List<StringEdge> successors(String from, String to, Set<String> relations) {
+        List<StringEdge> successors = new ArrayList<>();
+
+        Set<StringEdge> outgoingEdgesOfV = ontology.outgoingEdgesOf(from);
+        outgoingEdgesOfV.stream()
+                .filter(e -> relations.contains(e.relation) && e.v2.equals(to))
+                .forEach(successors::add);
+
+        return successors;
+    }
+
+    private HashSet<String> createRelevantRelationsSet(OntologyRelation... relations) {
+        return new HashSet<>(Arrays.asList(relations.length == 0 ? OntologyRelation.values() : relations)
+                .stream()
+                .map(OntologyRelation::getShortName)
+                .collect(Collectors.toList()));
     }
 
     @Override
     public Set<String> ancestors(String base, OntologyRelation... relations) {
         Set<String> ancestorsFound = new HashSet<>();
-        Set<String> relationsSet = new HashSet<>(Arrays.asList(relations.length == 0 ? OntologyRelation.values() : relations).stream().map(o -> o.getShortName()).collect(Collectors.toList()));
+        Set<String> relationsSet = createRelevantRelationsSet(relations);
         ancestors(base, ancestorsFound, relationsSet);
         return ancestorsFound;
     }
@@ -125,7 +158,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
     @Override
     public Set<String> descendants(String top, OntologyRelation... relations) {
         Set<String> descendantsFound = new HashSet<>();
-        Set<String> relationsSet = new HashSet<>(Arrays.asList(relations.length == 0 ? OntologyRelation.values() : relations).stream().map(o -> o.getShortName()).collect(Collectors.toList()));
+        Set<String> relationsSet = createRelevantRelationsSet(relations);
         descendants(top, descendantsFound, relationsSet);
         return descendantsFound;
     }
@@ -140,7 +173,6 @@ public class OntologyGraph implements OntologyGraphTraversal {
     }
 
     public static class StringEdge extends LabelledEdge<String> {
-
         StringEdge(String v1, String v2, OntologyRelation relation) {
             super(v1, v2, relation);
         }
