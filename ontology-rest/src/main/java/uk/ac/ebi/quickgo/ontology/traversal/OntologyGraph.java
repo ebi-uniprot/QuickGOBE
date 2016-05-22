@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AllDirectedPaths;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
@@ -9,6 +10,7 @@ import org.jgrapht.graph.DirectedMultigraph;
 import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -20,14 +22,14 @@ import java.util.stream.Collectors;
  * @author Edd
  */
 public class OntologyGraph implements OntologyGraphTraversal {
-    private final DirectedGraph<String, LabelledEdge> ontology;
+    private final DirectedGraph<String, StringEdge> ontology;
 
     public OntologyGraph() {
         ontology =
-                new DirectedMultigraph<>(new ClassBasedEdgeFactory<>(LabelledEdge.class));
+                new DirectedMultigraph<>(new ClassBasedEdgeFactory<>(StringEdge.class));
     }
 
-    public Set<LabelledEdge> getEdges() {
+    public Set<StringEdge> getEdges() {
         return ontology.edgeSet();
     }
 
@@ -49,7 +51,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
                     ontology.addEdge(
                             oEdge.child,
                             oEdge.parent,
-                            new LabelledEdge<>(oEdge.child, oEdge.parent,
+                            new StringEdge(oEdge.child, oEdge.parent,
                                     OntologyRelation.getByShortName(oEdge.relationship)));
                 }
         );
@@ -58,13 +60,13 @@ public class OntologyGraph implements OntologyGraphTraversal {
     }
 
     @Override
-    public List<List<LabelledEdge>> paths(String v1, String v2, OntologyRelation... relations) {
+    public List<List<StringEdge>> paths(String v1, String v2, OntologyRelation... relations) {
         Set<String> relationsSet = new HashSet<>(Arrays.asList(relations.length == 0 ? OntologyRelation.values() : relations).stream().map(o -> o.getShortName()).collect(Collectors.toList()));
-        AllDirectedPaths<String, LabelledEdge> allPaths = new AllDirectedPaths<>(ontology);
-        List<GraphPath<String, LabelledEdge>> v1v2Paths = allPaths.getAllPaths(v1, v2, true, null);
-        List<GraphPath<String, LabelledEdge>> invalidPaths = new ArrayList<>();
+        AllDirectedPaths<String, StringEdge> allPaths = new AllDirectedPaths<>(ontology);
+        List<GraphPath<String, StringEdge>> v1v2Paths = allPaths.getAllPaths(v1, v2, true, null);
+        List<GraphPath<String, StringEdge>> invalidPaths = new ArrayList<>();
 
-        for (GraphPath<String, LabelledEdge> path : v1v2Paths) {
+        for (GraphPath<String, StringEdge> path : v1v2Paths) {
             if (!relationsSet.containsAll(path.getEdgeList().stream().map(e -> e.relation).collect(Collectors.toList()))) {
                 invalidPaths.add(path);
             }
@@ -77,18 +79,78 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
     @Override
     public Set<String> ancestors(String base, OntologyRelation... relations) {
-        return null;
+        Set<String> ancestorsFound = new HashSet<>();
+        Set<String> relationsSet = new HashSet<>(Arrays.asList(relations.length == 0 ? OntologyRelation.values() : relations).stream().map(o -> o.getShortName()).collect(Collectors.toList()));
+        ancestors(base, ancestorsFound, relationsSet);
+        return ancestorsFound;
+    }
+
+    private void ancestors(String base, Set<String> currentAncestors, Set<String> relations) {
+        Set<String> parents = getRelatives(base, ontology::outgoingEdgesOf, relations);
+
+        for (String parent : parents) {
+            currentAncestors.add(parent);
+            ancestors(parent, currentAncestors, relations);
+        }
+    }
+
+    private Set<String> getRelatives(String base, Function<String, Set<StringEdge>> relativeEdges, Set<String> relations) {
+        Set<String> relatives = new HashSet<>();
+        Set<StringEdge> edges = relativeEdges.apply(base);
+
+        edges.forEach(
+                e -> {
+                    if (relations.contains(e.relation)) {
+                        relatives.add(getOppositeVertex(ontology, e, base));
+                    }
+                }
+        );
+
+        return relatives;
+    }
+
+    private static String getOppositeVertex(Graph<String, StringEdge> g, StringEdge e, String v) {
+        String source = g.getEdgeSource(e);
+        String target = g.getEdgeTarget(e);
+        if (v.equals(source)) {
+            return target;
+        } else if (v.equals(target)) {
+            return source;
+        } else {
+            throw new IllegalArgumentException(
+                    "No such vertex: " + v);
+        }
     }
 
     @Override
     public Set<String> descendants(String top, OntologyRelation... relations) {
-        return null;
+        Set<String> descendantsFound = new HashSet<>();
+        Set<String> relationsSet = new HashSet<>(Arrays.asList(relations.length == 0 ? OntologyRelation.values() : relations).stream().map(o -> o.getShortName()).collect(Collectors.toList()));
+        descendants(top, descendantsFound, relationsSet);
+        return descendantsFound;
     }
 
+    private void descendants(String top, Set<String> currentDescendants, Set<String> relations) {
+        Set<String> parents = getRelatives(top, ontology::incomingEdgesOf, relations);
+
+        for (String parent : parents) {
+            currentDescendants.add(parent);
+            descendants(parent, currentDescendants, relations);
+        }
+    }
+
+    public static class StringEdge extends LabelledEdge<String> {
+
+        StringEdge(String v1, String v2, OntologyRelation relation) {
+            super(v1, v2, relation);
+        }
+    }
+
+
     public static class LabelledEdge<V> extends DefaultEdge {
-        private V v1;
-        private V v2;
-        private String relation;
+        protected V v1;
+        protected V v2;
+        protected String relation;
 
         LabelledEdge(V v1, V v2, OntologyRelation relation) {
             this.v1 = v1;
@@ -128,5 +190,21 @@ public class OntologyGraph implements OntologyGraphTraversal {
             result = 31 * result + (relation != null ? relation.hashCode() : 0);
             return result;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OntologyGraph that = (OntologyGraph) o;
+
+        return !(ontology != null ? !ontology.equals(that.ontology) : that.ontology != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return ontology != null ? ontology.hashCode() : 0;
     }
 }

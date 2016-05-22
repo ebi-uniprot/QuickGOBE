@@ -6,11 +6,11 @@ import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Created 20/05/16
@@ -74,7 +74,7 @@ public class OntologyGraphTest {
                 )
         );
 
-        List<List<OntologyGraph.LabelledEdge>> paths = ontologyGraph.paths(
+        List<List<OntologyGraph.StringEdge>> paths = ontologyGraph.paths(
                 goID("1"),
                 goID("3")
         );
@@ -92,7 +92,7 @@ public class OntologyGraphTest {
                 )
         );
 
-        List<List<OntologyGraph.LabelledEdge>> paths = ontologyGraph.paths(
+        List<List<OntologyGraph.StringEdge>> paths = ontologyGraph.paths(
                 goID("1"),
                 goID("3"),
                 OntologyRelation.CAPABLE_OF_PART_OF
@@ -109,21 +109,72 @@ public class OntologyGraphTest {
 
         ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
 
-        List<List<OntologyGraph.LabelledEdge>> paths = ontologyGraph.paths(
+        List<List<OntologyGraph.StringEdge>> paths = ontologyGraph.paths(
                 goID("1"),
                 goID("3"),
                 OntologyRelation.CAPABLE_OF_PART_OF,
                 OntologyRelation.OCCURS_IN
         );
         System.out.println(paths);
-        assertThat(paths.size(), is(1));
         assertThat(paths, contains(edgesFor(v1_CP_v2, v2_OI_v3)));
+    }
+
+    @Test
+    public void findAncestorsViaAllRelations() {
+        OntologyRelationship v1_CO_v2 = createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF);
+        OntologyRelationship v1_CP_v2 = createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF_PART_OF);
+        OntologyRelationship v2_OI_v3 = createRelationship(goID("2"), goID("3"), OntologyRelation.OCCURS_IN);
+
+        ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+
+        Set<String> ancestors = ontologyGraph.ancestors(goID("1"));
+
+        assertThat(ancestors, containsInAnyOrder(goID("2"), goID("3")));
+    }
+
+    @Test
+    public void findAncestorsVia1Relation() {
+        OntologyRelationship v1_CO_v2 = createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF);
+        OntologyRelationship v1_CP_v2 = createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF_PART_OF);
+        OntologyRelationship v2_OI_v3 = createRelationship(goID("2"), goID("3"), OntologyRelation.OCCURS_IN);
+
+        ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+
+        Set<String> ancestors = ontologyGraph.ancestors(goID("1"), OntologyRelation.CAPABLE_OF_PART_OF);
+
+        assertThat(ancestors, contains(goID("2")));
+    }
+
+    @Test
+    public void findDescendantsViaAllRelations() {
+        OntologyRelationship v1_CO_v2 = createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF);
+        OntologyRelationship v1_CP_v2 = createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF_PART_OF);
+        OntologyRelationship v2_OI_v3 = createRelationship(goID("2"), goID("3"), OntologyRelation.OCCURS_IN);
+
+        ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+
+        Set<String> ancestors = ontologyGraph.descendants(goID("3"));
+
+        assertThat(ancestors, containsInAnyOrder(goID("1"), goID("2")));
+    }
+
+    @Test
+    public void findDescendantsVia1Relation() {
+        OntologyRelationship v1_CO_v2 = createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF);
+        OntologyRelationship v1_CP_v2 = createRelationship(goID("1"), goID("2"), OntologyRelation.CAPABLE_OF_PART_OF);
+        OntologyRelationship v2_OI_v3 = createRelationship(goID("2"), goID("3"), OntologyRelation.OCCURS_IN);
+
+        ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+
+        Set<String> ancestors = ontologyGraph.descendants(goID("3"), OntologyRelation.OCCURS_IN);
+
+        assertThat(ancestors, contains(goID("2")));
     }
 
     private static List<OntologyGraph.LabelledEdge> edgesFor(OntologyRelationship... relations) {
         List<OntologyGraph.LabelledEdge> edges = new ArrayList<>();
         for (OntologyRelationship relation : relations) {
-            OntologyGraph.LabelledEdge<String> labelledEdge = new OntologyGraph.LabelledEdge<>(
+            OntologyGraph.StringEdge labelledEdge = new OntologyGraph.StringEdge(
                     relation.child, relation.parent, OntologyRelation.getByShortName(relation.relationship)
             );
             edges.add(labelledEdge);
