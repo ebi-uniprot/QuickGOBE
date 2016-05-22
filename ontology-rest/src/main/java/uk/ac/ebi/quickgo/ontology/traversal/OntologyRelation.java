@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,5 +58,9 @@ public enum OntologyRelation {
         } else {
             throw new IllegalArgumentException("Unknown OntologyRelation: " + shortName);
         }
+    }
+
+    public static EnumSet<OntologyRelation> getDefaultRelations() {
+        return EnumSet.of(IS_A, PART_OF, OCCURS_IN);
     }
 }

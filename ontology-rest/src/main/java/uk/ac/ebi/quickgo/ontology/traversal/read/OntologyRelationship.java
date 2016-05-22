@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelation;
+
 /**
  * This class represents the components of an ontology graph: child vertices, parent vertices
  * and the edges that relate these vertices them.
@@ -39,5 +41,49 @@ public class OntologyRelationship {
         result = 31 * result + (parent != null ? parent.hashCode() : 0);
         result = 31 * result + (relationship != null ? relationship.hashCode() : 0);
         return result;
+    }
+
+
+    /**
+     * Combine ontology relationships, as documented on http://geneontology.org/page/ontology-relations
+     * @param child the relationship from which the combination starts
+     * @param parent the relationship to which the combination ends
+     * @return
+     */
+    public static OntologyRelationship combineRelationships(OntologyRelationship child, OntologyRelationship parent) {
+        if (!child.parent.equals(parent.child)) {
+            throw new RuntimeException("Incorrectly combined relationships");
+        }
+
+        String mergedType = OntologyRelation.UNDEFINED.getShortName();
+
+        String childRelationship = child.relationship;
+        String parentRelationship = parent.relationship;
+        if (childRelationship.equals(OntologyRelation.IDENTITY.getShortName())) {
+            mergedType = parentRelationship;
+        } else if (parentRelationship.equals(OntologyRelation.IDENTITY.getShortName())) {
+            mergedType = childRelationship;
+        } else if (childRelationship.equals(OntologyRelation.HAS_PART.getShortName()) || parentRelationship.equals(OntologyRelation.HAS_PART.getShortName())) {
+            mergedType = OntologyRelation.UNDEFINED.getShortName();
+        } else if (childRelationship.equals(OntologyRelation.IS_A.getShortName())) {
+            mergedType = parentRelationship;
+        } else if (parentRelationship.equals((OntologyRelation.IS_A.getShortName()))) {
+            mergedType = childRelationship;
+        } else if (childRelationship.equals(OntologyRelation.PART_OF.getShortName()) && parentRelationship.equals((OntologyRelation.PART_OF.getShortName()))) {
+            mergedType = OntologyRelation.PART_OF.getShortName();
+        } else if (childRelationship.equals((OntologyRelation.OCCURS_IN.getShortName()))) {
+            mergedType = OntologyRelation.OCCURS_IN.getShortName();
+        } else if (childRelationship.equals(OntologyRelation.REGULATES.getShortName()) && parentRelationship.equals(OntologyRelation.PART_OF.getShortName()))
+        {
+            mergedType = OntologyRelation.REGULATES.getShortName();
+        }
+
+
+        OntologyRelationship mergedRelationship = new OntologyRelationship();
+        mergedRelationship.child = child.child;
+        mergedRelationship.parent = parent.parent;
+        mergedRelationship.relationship = mergedType;
+
+        return mergedRelationship;
     }
 }
