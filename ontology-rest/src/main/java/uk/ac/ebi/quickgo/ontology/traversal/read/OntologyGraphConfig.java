@@ -101,39 +101,6 @@ public class OntologyGraphConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    private SkipLoggerListener<OntologyRelationship, OntologyRelationship> skipLogListener() {
-        return new SkipLoggerListener<>();
-    }
-
-    private JobExecutionListener logJobListener() {
-        return new LogJobListener();
-    }
-
-    private StepExecutionListener logStepListener() {
-        return new LogStepListener();
-    }
-
-    private ItemProcessor<RawOntologyRelationship, OntologyRelationship> ontologyRelationshipValidator() {
-        return new OntologyRelationshipValidator();
-    }
-
-    /**
-     * Since the resources are zipped files loaded from an input stream, we cannot
-     * process files in an order based on their names; instead we process them in
-     * the order they were specified in the properties file.
-     *
-     * @param reader the resource reader
-     */
-    private void setResourceComparator(MultiResourceItemReader<RawOntologyRelationship> reader) {
-        reader.setComparator((o1, o2) -> 0);
-    }
-
-    private static class GZIPResource extends InputStreamResource implements Resource {
-        GZIPResource(Resource delegate) throws IOException {
-            super(new GZIPInputStream(delegate.getInputStream()));
-        }
-    }
-
     @Bean
     ItemWriter<OntologyRelationship> ontologyGraphPopulator(OntologyGraph ontologyGraph) {
         return new OntologyGraphPopulator(ontologyGraph);
@@ -194,5 +161,38 @@ public class OntologyGraphConfig {
     @Bean
     FieldSetMapper<RawOntologyRelationship> geneProductFieldSetMapper() {
         return new StringToOntologyRelationshipMapper();
+    }
+
+    private SkipLoggerListener<OntologyRelationship, OntologyRelationship> skipLogListener() {
+        return new SkipLoggerListener<>();
+    }
+
+    private JobExecutionListener logJobListener() {
+        return new LogJobListener();
+    }
+
+    private StepExecutionListener logStepListener() {
+        return new LogStepListener();
+    }
+
+    private ItemProcessor<RawOntologyRelationship, OntologyRelationship> ontologyRelationshipValidator() {
+        return new OntologyRelationshipValidator();
+    }
+
+    /**
+     * Since the resources are zipped files loaded from an input stream, we cannot
+     * process files in an order based on their names; instead we process them in
+     * the order they were specified in the properties file.
+     *
+     * @param reader the resource reader
+     */
+    private void setResourceComparator(MultiResourceItemReader<RawOntologyRelationship> reader) {
+        reader.setComparator((o1, o2) -> 0);
+    }
+
+    private static class GZIPResource extends InputStreamResource implements Resource {
+        GZIPResource(Resource delegate) throws IOException {
+            super(new GZIPInputStream(delegate.getInputStream()));
+        }
     }
 }
