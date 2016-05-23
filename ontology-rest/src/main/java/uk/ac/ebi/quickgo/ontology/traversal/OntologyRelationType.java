@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +25,7 @@ public enum OntologyRelationType {
     OCCURS_IN("OI", "occurs_in"),
     USED_IN("UI", "used_in"),
     CAPABLE_OF("CO", "capable_of"),
-    CAPABLE_OF_PART_OF("CP", "capable_of_part_of"),;
+    CAPABLE_OF_PART_OF("CP", "capable_of_part_of");
 
     private final String shortName;
     private final String longName;
@@ -60,7 +59,19 @@ public enum OntologyRelationType {
         }
     }
 
-    public static EnumSet<OntologyRelationType> getDefaultRelations() {
-        return EnumSet.of(IS_A, PART_OF, OCCURS_IN);
+    boolean hasType(OntologyRelationType type) {
+        return (type == UNDEFINED)
+                || (this == IDENTITY)
+                || (type == this)
+                || (type == REGULATES && (this == POSITIVE_REGULATES || this == NEGATIVE_REGULATES));
+    }
+
+    public boolean hasType(OntologyRelationType... types) {
+        for (OntologyRelationType type : types) {
+            if (this.hasType(type)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
