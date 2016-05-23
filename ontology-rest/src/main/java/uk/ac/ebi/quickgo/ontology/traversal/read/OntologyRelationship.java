@@ -94,6 +94,13 @@ public class OntologyRelationship extends LabelledEdge<String> {
     }
 }
 
+/**
+ * Class representing labelled edges, required by the JGraphT library.
+ * The class is encapsulated in the same file, because it is currently
+ * not required by any other class.
+ * <p>
+ * @param <V> the edge type.
+ */
 class LabelledEdge<V> extends DefaultEdge {
     public V child;
     public V parent;
@@ -104,6 +111,4 @@ class LabelledEdge<V> extends DefaultEdge {
         this.parent = v2;
         this.relation = relation.getShortName();
     }
-
-
 }
