@@ -27,6 +27,14 @@ public class OntologyRelationship extends LabelledEdge<String> {
                 '}';
     }
 
+    @Override
+    public int hashCode() {
+        int result = child != null ? child.hashCode() : 0;
+        result = 31 * result + (parent != null ? parent.hashCode() : 0);
+        result = 31 * result + (relationship != null ? relationship.hashCode() : 0);
+        return result;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -47,23 +55,16 @@ public class OntologyRelationship extends LabelledEdge<String> {
 
     }
 
-    @Override
-    public int hashCode() {
-        int result = child != null ? child.hashCode() : 0;
-        result = 31 * result + (parent != null ? parent.hashCode() : 0);
-        result = 31 * result + (relationship != null ? relationship.hashCode() : 0);
-        return result;
-    }
-
     /**
-     * Combine ontology relationships, as documented on http://geneontology.org/page/ontology-relations
+     * Combine ontology relationships, as documented on http://geneontology.org/page/ontology-relations.
      * @param child the relationship from which the combination starts
      * @param parent the relationship to which the combination ends
      * @return the combined relationship
      */
     public static OntologyRelationship combineRelationships(OntologyRelationship child, OntologyRelationship parent) {
         if (!child.parent.equals(parent.child)) {
-            throw new IllegalArgumentException("Incorrectly combined relationships");
+            throw new IllegalArgumentException("Incorrectly combined relationships: child:" + child.toString() + ", " +
+                    "parent: " + parent.toString());
         }
 
         OntologyRelationType mergedType = OntologyRelationType.UNDEFINED;
@@ -72,20 +73,20 @@ public class OntologyRelationship extends LabelledEdge<String> {
             mergedType = parent.relationship;
         } else if (parent.relationship == OntologyRelationType.IDENTITY) {
             mergedType = child.relationship;
-        } else if (child.relationship == OntologyRelationType.HAS_PART ||
-                parent.relationship == OntologyRelationType.HAS_PART) {
+        } else if (child.relationship == OntologyRelationType.HAS_PART
+                || parent.relationship == OntologyRelationType.HAS_PART) {
             mergedType = OntologyRelationType.UNDEFINED;
         } else if (child.relationship == OntologyRelationType.IS_A) {
             mergedType = parent.relationship;
         } else if (parent.relationship == OntologyRelationType.IS_A) {
             mergedType = child.relationship;
-        } else if (child.relationship == OntologyRelationType.PART_OF &&
-                parent.relationship == OntologyRelationType.PART_OF) {
+        } else if (child.relationship == OntologyRelationType.PART_OF
+                && parent.relationship == OntologyRelationType.PART_OF) {
             mergedType = OntologyRelationType.PART_OF;
         } else if (child.relationship == OntologyRelationType.OCCURS_IN) {
             mergedType = OntologyRelationType.OCCURS_IN;
-        } else if (child.relationship == OntologyRelationType.REGULATES &&
-                parent.relationship == OntologyRelationType.PART_OF) {
+        } else if (child.relationship == OntologyRelationType.REGULATES
+                && parent.relationship == OntologyRelationType.PART_OF) {
             mergedType = OntologyRelationType.REGULATES;
         }
 
