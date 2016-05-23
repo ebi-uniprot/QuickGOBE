@@ -20,7 +20,7 @@ public interface OntologyGraphTraversal {
      * @param v2 the end vertex from which returned paths end
      * @param relations a varargs value containing the relationships over which paths can only travel.
      *                  By omitting a {@code relation} value, all paths will be returned.
-     * @return a list of paths, ordered shorted first, from {@code child} to {@code parent} via {@code relations}
+     * @return a list of paths from {@code child} to {@code parent} via {@code relations}
      */
     List<List<OntologyRelationship>> paths(String v1, String v2, OntologyRelationType... relations);
 
