@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -322,7 +321,7 @@ public class OntologyGraphTest {
 
             Set<String> ancestors = ontologyGraph.descendants(id("3"));
 
-            assertThat(ancestors, containsInAnyOrder(id("1"), id("2")));
+            assertThat(ancestors, containsInAnyOrder(id("1"), id("2"), id("3")));
         }
 
         @Test
@@ -335,8 +334,59 @@ public class OntologyGraphTest {
 
             Set<String> ancestors = ontologyGraph.descendants(id("3"), OCCURS_IN);
 
-            assertThat(ancestors, contains(id("2")));
+            assertThat(ancestors, containsInAnyOrder(id("3"), id("2")));
+        }
+
+        @Test
+        public void findDescendantsViaAllRelationsOverComplexGraph() {
+            OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
+            OntologyRelationship v2_HP_v3 = createRelationship(id("2"), id("3"), HAS_PART);
+            OntologyRelationship v3_HP_v4 = createRelationship(id("3"), id("4"), HAS_PART);
+            OntologyRelationship v2_IS_v5 = createRelationship(id("2"), id("5"), IS_A);
+            OntologyRelationship v5_IS_v6 = createRelationship(id("5"), id("6"), IS_A);
+            OntologyRelationship v1_IS_v8 = createRelationship(id("1"), id("8"), IS_A);
+            OntologyRelationship v7_IS_v8 = createRelationship(id("7"), id("8"), IS_A);
+            OntologyRelationship v8_IS_v9 = createRelationship(id("8"), id("9"), IS_A);
+
+            ontologyGraph.addRelationships(asList(
+                    v1_IS_v2,
+                    v2_HP_v3,
+                    v3_HP_v4,
+                    v2_IS_v5,
+                    v5_IS_v6,
+                    v1_IS_v8,
+                    v7_IS_v8,
+                    v8_IS_v9
+            ));
+
+            Set<String> ancestors = ontologyGraph.descendants(id("4"));
+            assertThat(ancestors, containsInAnyOrder(id("4"), id("3"), id("2"), id("1")));
+        }
+
+        @Test
+        public void findDescendantsVia1RelationOverComplexGraph() {
+            OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
+            OntologyRelationship v2_HP_v3 = createRelationship(id("2"), id("3"), HAS_PART);
+            OntologyRelationship v3_HP_v4 = createRelationship(id("3"), id("4"), HAS_PART);
+            OntologyRelationship v2_IS_v5 = createRelationship(id("2"), id("5"), IS_A);
+            OntologyRelationship v5_IS_v6 = createRelationship(id("5"), id("6"), IS_A);
+            OntologyRelationship v1_IS_v8 = createRelationship(id("1"), id("8"), IS_A);
+            OntologyRelationship v7_IS_v8 = createRelationship(id("7"), id("8"), IS_A);
+            OntologyRelationship v8_IS_v9 = createRelationship(id("8"), id("9"), IS_A);
+
+            ontologyGraph.addRelationships(asList(
+                    v1_IS_v2,
+                    v2_HP_v3,
+                    v3_HP_v4,
+                    v2_IS_v5,
+                    v5_IS_v6,
+                    v1_IS_v8,
+                    v7_IS_v8,
+                    v8_IS_v9
+            ));
+
+            Set<String> ancestors = ontologyGraph.descendants(id("4"), HAS_PART);
+            assertThat(ancestors, containsInAnyOrder(id("4"), id("3"), id("2")));
         }
     }
-
 }
