@@ -5,8 +5,8 @@ import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
 import org.jgrapht.graph.DefaultEdge;
 
 /**
- * This class represents the components of an ontology graph: child vertices, parent vertices
- * and the edges that relate these vertices them.
+ * This class represents the components of an ontology graph:child vertices,
+ * parent vertices and the edges that relate these vertices.
  *
  * Created 18/05/16
  * @author Edd
