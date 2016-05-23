@@ -6,7 +6,7 @@ package uk.ac.ebi.quickgo.ontology.traversal.read;
  * Created 23/05/16
  * @author Edd
  */
-public class RawOntologyRelationship {
+class RawOntologyRelationship {
     public String child;
     public String parent;
     public String relationship;
