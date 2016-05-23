@@ -138,26 +138,26 @@ public class OntologyGraph implements OntologyGraphTraversal {
                 that.ancestorEdgesMap == null;
     }
 
-    private static String getOppositeVertex(Graph<String, OntologyRelationship> g, OntologyRelationship edge, String v) {
-        String source = g.getEdgeSource(edge);
-        String target = g.getEdgeTarget(edge);
-        if (v.equals(source)) {
+    private static String getOppositeVertex(Graph<String, OntologyRelationship> graph, OntologyRelationship edge, String vertex) {
+        String source = graph.getEdgeSource(edge);
+        String target = graph.getEdgeTarget(edge);
+        if (vertex.equals(source)) {
             return target;
-        } else if (v.equals(target)) {
+        } else if (vertex.equals(target)) {
             return source;
         } else {
             throw new IllegalArgumentException(
-                    "No such vertex: " + v);
+                    "No such vertex: " + vertex);
         }
     }
 
-    private Set<OntologyRelationship> getAncestorEdges(String v) {
-        if (!ancestorEdgesMap.containsKey(v)) {
+    private Set<OntologyRelationship> getAncestorEdges(String vertex) {
+        if (!ancestorEdgesMap.containsKey(vertex)) {
             Set<OntologyRelationship> ancestorEdgesOfV = new HashSet<>();
 
-            ancestorEdgesOfV.add(new OntologyRelationship(v, v, OntologyRelationType.IDENTITY));
+            ancestorEdgesOfV.add(new OntologyRelationship(vertex, vertex, OntologyRelationType.IDENTITY));
 
-            for (OntologyRelationship successorEdge : ontology.outgoingEdgesOf(v)) {
+            for (OntologyRelationship successorEdge : ontology.outgoingEdgesOf(vertex)) {
                 for (OntologyRelationship grandparentSuccessorEdge : getAncestorEdges(successorEdge.parent)) {
                     OntologyRelationship combinedRelationship =
                             OntologyRelationship.combineRelationships(successorEdge, grandparentSuccessorEdge);
@@ -167,9 +167,9 @@ public class OntologyGraph implements OntologyGraphTraversal {
                 }
             }
 
-            ancestorEdgesMap.put(v, ancestorEdgesOfV);
+            ancestorEdgesMap.put(vertex, ancestorEdgesOfV);
         }
-        return ancestorEdgesMap.get(v);
+        return ancestorEdgesMap.get(vertex);
     }
 
     private List<OntologyRelationship> successorEdges(String from, String to, Set<OntologyRelationType> relations) {
