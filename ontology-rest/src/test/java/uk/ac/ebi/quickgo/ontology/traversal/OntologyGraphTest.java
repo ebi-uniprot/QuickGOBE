@@ -16,6 +16,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType.*;
@@ -100,6 +101,7 @@ public class OntologyGraphTest {
                     id("2")
             );
 
+            assertThat(paths, hasSize(2));
             checkPathsContains(paths, Collections.singletonList(v1_CO_v2));
             checkPathsContains(paths, Collections.singletonList(v1_CP_v2));
         }
@@ -123,6 +125,7 @@ public class OntologyGraphTest {
                     CAPABLE_OF_PART_OF
             );
 
+            assertThat(paths, hasSize(1));
             checkPathsContains(paths, Collections.singletonList(v1_CP_v2));
         }
 
@@ -144,6 +147,7 @@ public class OntologyGraphTest {
                     id("3")
             );
 
+            assertThat(paths, hasSize(2));
             checkPathsContains(paths, Arrays.asList(v1_CO_v2, v2_OI_v3));
             checkPathsContains(paths, Arrays.asList(v1_CP_v2, v2_OI_v3));
         }
@@ -164,7 +168,7 @@ public class OntologyGraphTest {
                     CAPABLE_OF_PART_OF
             );
 
-            assertThat(paths.size(), is(0));
+            assertThat(paths, hasSize(0));
         }
 
         @Test
@@ -182,6 +186,7 @@ public class OntologyGraphTest {
                     OCCURS_IN
             );
 
+            assertThat(paths, hasSize(1));
             checkPathsContains(paths, Arrays.asList(v1_CP_v2, v2_OI_v3));
         }
 
@@ -194,7 +199,9 @@ public class OntologyGraphTest {
             OntologyRelationship v5_IS_v6 = createRelationship(id("5"), id("6"), IS_A);
             OntologyRelationship v1_IS_v8 = createRelationship(id("1"), id("8"), IS_A);
             OntologyRelationship v7_IS_v8 = createRelationship(id("7"), id("8"), IS_A);
+            OntologyRelationship v1_IS_v7 = createRelationship(id("1"), id("7"), IS_A);
             OntologyRelationship v8_IS_v9 = createRelationship(id("8"), id("9"), IS_A);
+            OntologyRelationship v7_IS_v9 = createRelationship(id("7"), id("9"), IS_A);
             OntologyRelationship v9_IS_v6 = createRelationship(id("9"), id("6"), IS_A);
 
             ontologyGraph.addRelationships(asList(
@@ -205,7 +212,9 @@ public class OntologyGraphTest {
                     v5_IS_v6,
                     v1_IS_v8,
                     v7_IS_v8,
+                    v1_IS_v7,
                     v8_IS_v9,
+                    v7_IS_v9,
                     v9_IS_v6
             ));
 
@@ -214,9 +223,11 @@ public class OntologyGraphTest {
                     id("6")
             );
 
+            assertThat(paths, hasSize(4));
             checkPathsContains(paths, Arrays.asList(v1_IS_v2, v2_IS_v5, v5_IS_v6));
             checkPathsContains(paths, Arrays.asList(v1_IS_v8, v8_IS_v9, v9_IS_v6));
-//            checkPathsContains(paths, Arrays.asList(v2_IS_v8, v8_IS_v9, v9_IS_v6));
+            checkPathsContains(paths, Arrays.asList(v1_IS_v7, v7_IS_v9, v9_IS_v6));
+            checkPathsContains(paths, Arrays.asList(v1_IS_v7, v7_IS_v8, v8_IS_v9, v9_IS_v6));
         }
 
         private void checkPathsContains(
