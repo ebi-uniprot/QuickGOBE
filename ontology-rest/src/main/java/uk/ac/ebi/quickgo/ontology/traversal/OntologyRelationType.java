@@ -59,6 +59,12 @@ public enum OntologyRelationType {
         }
     }
 
+    /**
+     * Check whether this type is that of a specified type.
+     *
+     * @param type the type to test against
+     * @return true if {@code type} matches this type, or if certain properties are matched. Return false otherwise.
+     */
     boolean hasType(OntologyRelationType type) {
         return (type == UNDEFINED)
                 || (this == IDENTITY)
@@ -66,6 +72,12 @@ public enum OntologyRelationType {
                 || (type == REGULATES && (this == POSITIVE_REGULATES || this == NEGATIVE_REGULATES));
     }
 
+    /**
+     * Checks whether this type has the same type as any of those specified in the vargargs parameter of types.
+     *
+     * @param types a vararg of types to check against
+     * @return whether or not this type matches one of those specified as parameter
+     */
     public boolean hasType(OntologyRelationType... types) {
         for (OntologyRelationType type : types) {
             if (this.hasType(type)) {
