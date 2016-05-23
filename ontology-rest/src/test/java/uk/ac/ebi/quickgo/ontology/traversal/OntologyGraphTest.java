@@ -10,7 +10,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,17 +17,19 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType.*;
 
 /**
+ * Validates the behaviour of {@link OntologyGraph}. The tests are divided amongst different
+ * nested classes, to help with organisation of the different types of tests.
+ *
  * Created 20/05/16
  *
  * @author Edd
  */
 @RunWith(HierarchicalContextRunner.class)
 public class OntologyGraphTest {
-    private static final Logger LOGGER = getLogger(OntologyGraphTest.class);
+
     private OntologyGraph ontologyGraph;
 
     @Before
@@ -243,8 +244,7 @@ public class OntologyGraphTest {
         @Test
         public void findAncestorsViaAllRelations() {
             OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 =
-                    createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
+            OntologyRelationship v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
             OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OntologyRelationType.IS_A);
 
             ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
@@ -257,8 +257,7 @@ public class OntologyGraphTest {
         @Test
         public void findAncestorsVia1Relation() {
             OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 =
-                    createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
+            OntologyRelationship v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
             OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
 
             ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
@@ -329,8 +328,7 @@ public class OntologyGraphTest {
         @Test
         public void findDescendantsVia1Relation() {
             OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 =
-                    createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
+            OntologyRelationship v1_CP_v2 =createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
             OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
 
             ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
