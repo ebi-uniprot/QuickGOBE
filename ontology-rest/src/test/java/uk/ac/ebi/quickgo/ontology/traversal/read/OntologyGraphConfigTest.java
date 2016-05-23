@@ -54,7 +54,7 @@ public class OntologyGraphConfigTest {
 
         Set<String> edges = ontologyGraph.getEdges()
                 .stream()
-                .map(OntologyGraph.LabelledEdge::toString)
+                .map(rel -> rel.relationship.getShortName())
                 .collect(Collectors.toSet());
         assertThat(edges,
                 containsInAnyOrder(

@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelation;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.is;
 public class OntologyRelationshipValidatorTest {
 
     private OntologyRelationshipValidator validator;
-    private OntologyRelationship relationship;
+    private RawOntologyRelationship relationship;
 
     @Before
     public void setUp() {
@@ -25,29 +25,13 @@ public class OntologyRelationshipValidatorTest {
         relationship = createValidRelationship();
     }
 
-    private OntologyRelationship createValidRelationship() {
-        OntologyRelationship tuple = new OntologyRelationship();
+    private RawOntologyRelationship createValidRelationship() {
+        RawOntologyRelationship tuple = new RawOntologyRelationship();
         tuple.child = "GO:childValue";
         tuple.parent = "GO:parentValue";
-        tuple.relationship = OntologyRelation.CAPABLE_OF.getShortName();
+        tuple.relationship = OntologyRelationType.CAPABLE_OF.getShortName();
         return tuple;
     }
-
-//    private OntologyRelationship createInvalidTupleWithDifferingNameSpaces() {
-//        OntologyRelationship tuple = new OntologyRelationship();
-//        tuple.child = "GO:childValue";
-//        tuple.parent = "ECO:parentValue";
-//        tuple.relationship = "NOT_A_VALID_LABEL";
-//        return tuple;
-//    }
-//
-//    private OntologyRelationship createInvalidTupleWithWrongNameSpaces() {
-//        OntologyRelationship tuple = new OntologyRelationship();
-//        tuple.child = "nameSpaceOne:childValue";
-//        tuple.parent = "nameSpaceTwo:parentValue";
-//        tuple.relationship = OntologyRelations.CAPABLE_OF.getShortName();
-//        return tuple;
-//    }
 
     @Test
     public void findsCorrectNameSpace() {
@@ -99,7 +83,9 @@ public class OntologyRelationshipValidatorTest {
     @Test
     public void fullRelationshipIsValid() throws Exception {
         OntologyRelationship validatedTuple = validator.process(this.relationship);
-        assertThat(validatedTuple, is(relationship));
+        assertThat(validatedTuple.child, is(relationship.child));
+        assertThat(validatedTuple.parent, is(relationship.parent));
+        assertThat(validatedTuple.relationship, is(OntologyRelationType.getByShortName(relationship.relationship)));
     }
 
     @Test(expected = ValidationException.class)

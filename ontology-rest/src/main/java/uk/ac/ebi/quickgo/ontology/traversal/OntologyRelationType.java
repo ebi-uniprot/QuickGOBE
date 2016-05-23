@@ -11,7 +11,7 @@ import java.util.Map;
  * Created 20/05/16
  * @author Edd
  */
-public enum OntologyRelation {
+public enum OntologyRelationType {
 
     UNDEFINED("?", "ancestor"),
     IDENTITY("=", "equals"),
@@ -31,7 +31,7 @@ public enum OntologyRelation {
     private final String shortName;
     private final String longName;
 
-    OntologyRelation(String shortName, String longName) {
+    OntologyRelationType(String shortName, String longName) {
         this.shortName = shortName;
         this.longName = longName;
     }
@@ -44,15 +44,15 @@ public enum OntologyRelation {
         return longName;
     }
 
-    private static final Map<String, OntologyRelation> nameToValueMap = new HashMap<>();
+    private static final Map<String, OntologyRelationType> nameToValueMap = new HashMap<>();
 
     static {
-        for (OntologyRelation value : OntologyRelation.values()) {
+        for (OntologyRelationType value : OntologyRelationType.values()) {
             nameToValueMap.put(value.getShortName(), value);
         }
     }
 
-    public static OntologyRelation getByShortName(String shortName) {
+    public static OntologyRelationType getByShortName(String shortName) {
         if (nameToValueMap.containsKey(shortName)) {
             return nameToValueMap.get(shortName);
         } else {
@@ -60,7 +60,7 @@ public enum OntologyRelation {
         }
     }
 
-    public static EnumSet<OntologyRelation> getDefaultRelations() {
+    public static EnumSet<OntologyRelationType> getDefaultRelations() {
         return EnumSet.of(IS_A, PART_OF, OCCURS_IN);
     }
 }

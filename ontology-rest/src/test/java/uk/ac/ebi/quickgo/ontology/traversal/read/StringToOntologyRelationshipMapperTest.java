@@ -47,7 +47,7 @@ public class StringToOntologyRelationshipMapperTest {
 
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
-        OntologyRelationship ontologyRelationship = mapper.mapFieldSet(fieldSet);
+        RawOntologyRelationship ontologyRelationship = mapper.mapFieldSet(fieldSet);
 
         assertThat(ontologyRelationship.child, is(tokens[COLUMN_CHILD.getPosition()]));
         assertThat(ontologyRelationship.parent, is(tokens[COLUMN_PARENT.getPosition()]));
@@ -63,7 +63,7 @@ public class StringToOntologyRelationshipMapperTest {
 
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
-        OntologyRelationship ontologyRelationship = mapper.mapFieldSet(fieldSet);
+        RawOntologyRelationship ontologyRelationship = mapper.mapFieldSet(fieldSet);
 
         assertThat(ontologyRelationship.child, is(tokens[COLUMN_CHILD.getPosition()]));
         assertThat(ontologyRelationship.parent, is(tokens[COLUMN_PARENT.getPosition()]));
@@ -79,7 +79,7 @@ public class StringToOntologyRelationshipMapperTest {
 
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
-        OntologyRelationship ontologyRelationship = mapper.mapFieldSet(fieldSet);
+        RawOntologyRelationship ontologyRelationship = mapper.mapFieldSet(fieldSet);
 
         assertThat(ontologyRelationship.child, is(tokens[COLUMN_CHILD.getPosition()].trim()));
         assertThat(ontologyRelationship.parent, is(tokens[COLUMN_PARENT.getPosition()].trim()));

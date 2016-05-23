@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelation;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 class OntologyRelationshipValidator
-        implements ItemProcessor<OntologyRelationship, OntologyRelationship> {
+        implements ItemProcessor<RawOntologyRelationship, OntologyRelationship> {
 
     private static final Logger LOGGER = getLogger(OntologyRelationshipValidator.class);
 
@@ -48,18 +48,21 @@ class OntologyRelationshipValidator
 
     private static final Pattern NAME_SPACE_PATTERN = Pattern.compile("(.*):.*");
 
-    @Override public OntologyRelationship process(OntologyRelationship ontologyRelationship)
+    @Override public OntologyRelationship process(RawOntologyRelationship ontologyRelationship)
             throws Exception {
 
         checkValidNameSpaces(ontologyRelationship);
         checkValidRelationship(ontologyRelationship.relationship);
 
-        return ontologyRelationship;
+        return new OntologyRelationship(
+                ontologyRelationship.child,
+                ontologyRelationship.parent,
+                OntologyRelationType.getByShortName(ontologyRelationship.relationship));
     }
 
     void checkValidRelationship(String relationship) {
         try {
-            OntologyRelation.getByShortName(relationship);
+            OntologyRelationType.getByShortName(relationship);
         } catch (IllegalArgumentException ie) {
             String errorMessage = "Could not find ontology relationship: " + relationship;
             LOGGER.error(errorMessage);
@@ -68,7 +71,7 @@ class OntologyRelationshipValidator
 
     }
 
-    void checkValidNameSpaces(OntologyRelationship ontologyRelationship) {
+    void checkValidNameSpaces(RawOntologyRelationship ontologyRelationship) {
         String childNameSpace = nameSpaceOf(ontologyRelationship.child);
         String parentNameSpace = nameSpaceOf(ontologyRelationship.parent);
         if (!childNameSpace.equals(parentNameSpace)) {

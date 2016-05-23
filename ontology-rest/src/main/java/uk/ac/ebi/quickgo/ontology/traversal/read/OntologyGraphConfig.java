@@ -83,12 +83,12 @@ public class OntologyGraphConfig {
     @Bean
     public Step ontologyGraphBuildStep(OntologyGraph ontologyGraph) {
         return stepBuilders.get(ONTOLOGY_TRAVERSAL_LOADING_STEP_NAME)
-                .<OntologyRelationship, OntologyRelationship>chunk(chunkSize)
+                .<RawOntologyRelationship, OntologyRelationship>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(skipLimit)
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
-                .<OntologyRelationship>reader(ontologyTraversalMultiFileReader())
+                .<RawOntologyRelationship>reader(ontologyTraversalMultiFileReader())
                 .processor(ontologyRelationshipCompositeProcessor())
                 .writer(ontologyGraphPopulator(ontologyGraph))
                 .listener(logStepListener())
@@ -113,7 +113,7 @@ public class OntologyGraphConfig {
         return new LogStepListener();
     }
 
-    private ItemProcessor<OntologyRelationship, OntologyRelationship> ontologyRelationshipValidator() {
+    private ItemProcessor<RawOntologyRelationship, OntologyRelationship> ontologyRelationshipValidator() {
         return new OntologyRelationshipValidator();
     }
 
@@ -124,7 +124,7 @@ public class OntologyGraphConfig {
      *
      * @param reader the resource reader
      */
-    private void setResourceComparator(MultiResourceItemReader<OntologyRelationship> reader) {
+    private void setResourceComparator(MultiResourceItemReader<RawOntologyRelationship> reader) {
         reader.setComparator((o1, o2) -> 0);
     }
 
@@ -140,12 +140,12 @@ public class OntologyGraphConfig {
     }
 
     @Bean
-    ItemProcessor<OntologyRelationship, OntologyRelationship> ontologyRelationshipCompositeProcessor() {
-        List<ItemProcessor<OntologyRelationship, OntologyRelationship>> processors = new ArrayList<>();
+    ItemProcessor<RawOntologyRelationship, OntologyRelationship> ontologyRelationshipCompositeProcessor() {
+        List<ItemProcessor<RawOntologyRelationship, OntologyRelationship>> processors = new ArrayList<>();
 
         processors.add(ontologyRelationshipValidator());
 
-        CompositeItemProcessor<OntologyRelationship, OntologyRelationship> compositeProcessor =
+        CompositeItemProcessor<RawOntologyRelationship, OntologyRelationship> compositeProcessor =
                 new CompositeItemProcessor<>();
         compositeProcessor.setDelegates(processors);
 
@@ -153,8 +153,8 @@ public class OntologyGraphConfig {
     }
 
     @Bean
-    MultiResourceItemReader<OntologyRelationship> ontologyTraversalMultiFileReader() {
-        MultiResourceItemReader<OntologyRelationship> reader = new MultiResourceItemReader<>();
+    MultiResourceItemReader<RawOntologyRelationship> ontologyTraversalMultiFileReader() {
+        MultiResourceItemReader<RawOntologyRelationship> reader = new MultiResourceItemReader<>();
 
         setResourceComparator(reader);
 
@@ -175,16 +175,16 @@ public class OntologyGraphConfig {
     }
 
     @Bean
-    FlatFileItemReader<OntologyRelationship> ontologyTraversalSingleFileReader() {
-        FlatFileItemReader<OntologyRelationship> reader = new FlatFileItemReader<>();
+    FlatFileItemReader<RawOntologyRelationship> ontologyTraversalSingleFileReader() {
+        FlatFileItemReader<RawOntologyRelationship> reader = new FlatFileItemReader<>();
         reader.setLineMapper(ontologyRelationshipLineMapper());
         reader.setLinesToSkip(headerLines);
         return reader;
     }
 
     @Bean
-    LineMapper<OntologyRelationship> ontologyRelationshipLineMapper() {
-        DefaultLineMapper<OntologyRelationship> lineMapper = new DefaultLineMapper<>();
+    LineMapper<RawOntologyRelationship> ontologyRelationshipLineMapper() {
+        DefaultLineMapper<RawOntologyRelationship> lineMapper = new DefaultLineMapper<>();
         lineMapper.setLineTokenizer(new DelimitedLineTokenizer(TAB));
         lineMapper.setFieldSetMapper(geneProductFieldSetMapper());
 
@@ -192,7 +192,7 @@ public class OntologyGraphConfig {
     }
 
     @Bean
-    FieldSetMapper<OntologyRelationship> geneProductFieldSetMapper() {
+    FieldSetMapper<RawOntologyRelationship> geneProductFieldSetMapper() {
         return new StringToOntologyRelationshipMapper();
     }
 }

@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship;
+
 import java.util.List;
 import java.util.Set;
 
@@ -18,9 +20,9 @@ public interface OntologyGraphTraversal {
      * @param v2 the end vertex from which returned paths end
      * @param relations a varargs value containing the relationships over which paths can only travel.
      *                  By omitting a {@code relation} value, all paths will be returned.
-     * @return a list of paths, ordered shorted first, from {@code v1} to {@code v2} via {@code relations}
+     * @return a list of paths, ordered shorted first, from {@code child} to {@code parent} via {@code relations}
      */
-    List<List<OntologyGraph.StringEdge>> paths(String v1, String v2, OntologyRelation... relations);
+    List<List<OntologyRelationship>> paths(String v1, String v2, OntologyRelationType... relations);
 
     /**
      * Find the set of ancestor vertices reachable from a base vertex, navigable via a specified
@@ -31,7 +33,7 @@ public interface OntologyGraphTraversal {
      *                  By omitting a {@code relation} value, all paths will be returned.
      * @return the set of ancestor vertices.
      */
-    Set<String> ancestors(String base, OntologyRelation... relations);
+    Set<String> ancestors(String base, OntologyRelationType... relations);
 
     /**
      * Find the set of descendant vertices reachable from a top vertex, navigable via a specified
@@ -42,5 +44,5 @@ public interface OntologyGraphTraversal {
      *                  By omitting a {@code relation} value, all paths will be returned.
      * @return the set of descendant vertices.
      */
-    Set<String> descendants(String top, OntologyRelation... relations);
+    Set<String> descendants(String top, OntologyRelationType... relations);
 }
