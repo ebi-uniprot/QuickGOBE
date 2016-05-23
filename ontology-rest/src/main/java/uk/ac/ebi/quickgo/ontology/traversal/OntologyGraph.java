@@ -110,6 +110,8 @@ public class OntologyGraph implements OntologyGraphTraversal {
     @Override
     public Set<String> descendants(String top, OntologyRelationType... relations) {
         Set<String> descendantsFound = new HashSet<>();
+        descendantsFound.add(top); // as with ancestors, include itself (indicating IDENTITY relationship)
+
         Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
         descendants(top, descendantsFound, relationsSet);
         return descendantsFound;
