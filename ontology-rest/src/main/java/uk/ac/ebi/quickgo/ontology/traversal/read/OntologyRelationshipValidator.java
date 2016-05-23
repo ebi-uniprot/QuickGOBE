@@ -23,29 +23,6 @@ class OntologyRelationshipValidator
         implements ItemProcessor<RawOntologyRelationship, OntologyRelationship> {
 
     private static final Logger LOGGER = getLogger(OntologyRelationshipValidator.class);
-
-    private enum OntologyNameSpace {
-        ECO, GO;
-
-        private static final Map<String, OntologyNameSpace> nameToValueMap = new HashMap<>();
-
-        static {
-            for (OntologyNameSpace value : OntologyNameSpace.values()) {
-                nameToValueMap.put(value.name(), value);
-            }
-        }
-
-        public static OntologyNameSpace getName(String shortName) {
-            if (nameToValueMap.containsKey(shortName)) {
-                return nameToValueMap.get(shortName);
-            } else {
-                String errorMessage = "Unknown OntologyRelation: " + shortName;
-                LOGGER.error(errorMessage);
-                throw new IllegalArgumentException(errorMessage);
-            }
-        }
-    }
-
     private static final Pattern NAME_SPACE_PATTERN = Pattern.compile("(.*):.*");
 
     @Override public OntologyRelationship process(RawOntologyRelationship ontologyRelationship)
@@ -101,6 +78,28 @@ class OntologyRelationshipValidator
         String errorMessage = "Could not retrieve namespace for term: " + term;
         LOGGER.error(errorMessage);
         throw new ValidationException(errorMessage);
+    }
+
+    private enum OntologyNameSpace {
+        ECO, GO;
+
+        private static final Map<String, OntologyNameSpace> nameToValueMap = new HashMap<>();
+
+        static {
+            for (OntologyNameSpace value : OntologyNameSpace.values()) {
+                nameToValueMap.put(value.name(), value);
+            }
+        }
+
+        public static OntologyNameSpace getName(String shortName) {
+            if (nameToValueMap.containsKey(shortName)) {
+                return nameToValueMap.get(shortName);
+            } else {
+                String errorMessage = "Unknown OntologyRelation: " + shortName;
+                LOGGER.error(errorMessage);
+                throw new IllegalArgumentException(errorMessage);
+            }
+        }
     }
 
 }

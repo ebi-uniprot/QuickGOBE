@@ -27,6 +27,14 @@ public enum OntologyRelationType {
     CAPABLE_OF("CO", "capable_of"),
     CAPABLE_OF_PART_OF("CP", "capable_of_part_of");
 
+    private static final Map<String, OntologyRelationType> nameToValueMap = new HashMap<>();
+
+    static {
+        for (OntologyRelationType value : OntologyRelationType.values()) {
+            nameToValueMap.put(value.getShortName(), value);
+        }
+    }
+
     private final String shortName;
     private final String longName;
 
@@ -43,33 +51,12 @@ public enum OntologyRelationType {
         return longName;
     }
 
-    private static final Map<String, OntologyRelationType> nameToValueMap = new HashMap<>();
-
-    static {
-        for (OntologyRelationType value : OntologyRelationType.values()) {
-            nameToValueMap.put(value.getShortName(), value);
-        }
-    }
-
     public static OntologyRelationType getByShortName(String shortName) {
         if (nameToValueMap.containsKey(shortName)) {
             return nameToValueMap.get(shortName);
         } else {
             throw new IllegalArgumentException("Unknown OntologyRelation: " + shortName);
         }
-    }
-
-    /**
-     * Check whether this type is that of a specified type.
-     *
-     * @param type the type to test against
-     * @return true if {@code type} matches this type, or if certain properties are matched. Return false otherwise.
-     */
-    boolean hasType(OntologyRelationType type) {
-        return (type == UNDEFINED)
-                || (this == IDENTITY)
-                || (type == this)
-                || (type == REGULATES && (this == POSITIVE_REGULATES || this == NEGATIVE_REGULATES));
     }
 
     /**
@@ -85,5 +72,18 @@ public enum OntologyRelationType {
             }
         }
         return false;
+    }
+
+    /**
+     * Check whether this type is that of a specified type.
+     *
+     * @param type the type to test against
+     * @return true if {@code type} matches this type, or if certain properties are matched. Return false otherwise.
+     */
+    boolean hasType(OntologyRelationType type) {
+        return (type == UNDEFINED)
+                || (this == IDENTITY)
+                || (type == this)
+                || (type == REGULATES && (this == POSITIVE_REGULATES || this == NEGATIVE_REGULATES));
     }
 }
