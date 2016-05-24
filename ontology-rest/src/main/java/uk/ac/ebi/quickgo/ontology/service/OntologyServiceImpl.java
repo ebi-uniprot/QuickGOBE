@@ -5,6 +5,9 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
@@ -12,6 +15,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +28,7 @@ import org.springframework.data.domain.Pageable;
  * @author Edd
  */
 public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T> {
+    private OntologyGraphTraversal ontologyTraversal;
     private QueryStringSanitizer queryStringSanitizer;
     private OntologyRepository ontologyRepository;
     private OntologyDocConverter<T> converter;
@@ -32,21 +37,33 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     // necessary for Spring to create a proxy class
     private OntologyServiceImpl() {}
 
-    public OntologyServiceImpl(
+    OntologyServiceImpl(
             OntologyRepository repository,
             OntologyDocConverter<T> converter,
             OntologyType type,
-            QueryStringSanitizer queryStringSanitizer) {
+            QueryStringSanitizer queryStringSanitizer,
+            OntologyGraphTraversal ontologyTraversal) {
 
         Preconditions.checkArgument(repository != null, "Ontology repository cannot be null");
         Preconditions.checkArgument(type != null, "Ontology type cannot be null");
         Preconditions.checkArgument(converter != null, "Ontology converter cannot be null");
         Preconditions.checkArgument(queryStringSanitizer != null, "Ontology query string sanitizer cannot be null");
+        Preconditions.checkArgument(ontologyTraversal != null, "OntologyGraphTraversal cannot be null");
 
         this.ontologyType = type.name();
         this.ontologyRepository = repository;
         this.converter = converter;
         this.queryStringSanitizer = queryStringSanitizer;
+        this.ontologyTraversal = ontologyTraversal;
+    }
+
+    @Override public QueryResult<T> findAllByOntologyType(OntologyType type, Page page) {
+        Pageable pageable = new PageRequest(calculatePageNumber(page.getPageNumber()), page.getPageSize());
+
+        org.springframework.data.domain.Page<OntologyDocument> pagedResult =
+                ontologyRepository.findAllByOntologyType(type.name(), pageable);
+
+        return buildQueryResult(pagedResult, page);
     }
 
     @Override public List<T> findCompleteInfoByOntologyId(List<String> ids) {
@@ -77,17 +94,27 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return convertDocs(ontologyRepository.findAnnotationGuidelinesByTermId(ontologyType, buildIdList(ids)));
     }
 
-    protected List<T> convertDocs(List<OntologyDocument> docs) {
+    @Override public List<List<OntologyRelationship>> paths(Set<String> startingIds, Set<String> endingIds,
+            OntologyRelationType... relations) {
+        return ontologyTraversal.paths(startingIds, endingIds, relations);
+    }
+
+    @Override public Set<String> ancestors(Set<String> ids, OntologyRelationType... relations) {
+        return ontologyTraversal.ancestors(ids, relations);
+    }
+
+    @Override public Set<String> descendants(Set<String> ids, OntologyRelationType... relations) {
+        return ontologyTraversal.descendants(ids, relations);
+    }
+
+    List<T> convertDocs(List<OntologyDocument> docs) {
         return docs.stream().map(converter::convert).collect(Collectors.toList());
     }
 
-    @Override public QueryResult<T> findAllByOntologyType(OntologyType type, Page page) {
-        Pageable pageable = new PageRequest(calculatePageNumber(page.getPageNumber()), page.getPageSize());
+    List<String> buildIdList(List<String> ids) {
+        Preconditions.checkArgument(ids != null, "List of IDs cannot be null");
 
-        org.springframework.data.domain.Page<OntologyDocument> pagedResult =
-                ontologyRepository.findAllByOntologyType(type.name(), pageable);
-
-        return buildQueryResult(pagedResult, page);
+        return ids.stream().map(queryStringSanitizer::sanitize).collect(Collectors.toList());
     }
 
     private int calculatePageNumber(int oneBasedPageNum) {
@@ -105,11 +132,5 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 .collect(Collectors.toList());
 
         return new QueryResult.Builder<>(totalNumberOfHits, entryHits).withPageInfo(pageInfo).build();
-    }
-
-    protected List<String> buildIdList(List<String> ids) {
-        Preconditions.checkArgument(ids != null, "List of IDs cannot be null");
-
-        return ids.stream().map(queryStringSanitizer::sanitize).collect(Collectors.toList());
     }
 }

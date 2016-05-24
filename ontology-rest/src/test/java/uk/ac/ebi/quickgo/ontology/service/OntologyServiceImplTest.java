@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -51,17 +52,27 @@ public class OntologyServiceImplTest {
     private OntologyRepository repositoryMock;
     private GODocConverter goDocumentConverterMock;
     private ECODocConverter ecoDocumentConverterMock;
+    private OntologyGraphTraversal ontologyTraversalMock;
 
     @Before
     public void setUp() throws Exception {
         repositoryMock = mock(OntologyRepository.class);
         goDocumentConverterMock = mock(GODocConverter.class);
         ecoDocumentConverterMock = mock(ECODocConverter.class);
+        ontologyTraversalMock = mock(OntologyGraphTraversal.class);
 
         goOntologyService = new OntologyServiceImpl<>
-                (repositoryMock, goDocumentConverterMock, OntologyType.GO, new SolrQueryStringSanitizer());
+                (repositoryMock,
+                        goDocumentConverterMock,
+                        OntologyType.GO,
+                        new SolrQueryStringSanitizer(),
+                        ontologyTraversalMock);
         ecoOntologyService = new OntologyServiceImpl<>
-                (repositoryMock, ecoDocumentConverterMock, OntologyType.ECO, new SolrQueryStringSanitizer());
+                (repositoryMock,
+                        ecoDocumentConverterMock,
+                        OntologyType.ECO,
+                        new SolrQueryStringSanitizer(),
+                        ontologyTraversalMock);
     }
 
     @Test
@@ -69,7 +80,7 @@ public class OntologyServiceImplTest {
         // create any OntologyServiceImpl to test its document conversion method
         OntologyServiceImpl<GOTerm> ontologyServiceSpy =
                 new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO,
-                        new SolrQueryStringSanitizer());
+                        new SolrQueryStringSanitizer(), ontologyTraversalMock);
 
         List<GOTerm> goTerms = ontologyServiceSpy.convertDocs(Collections.emptyList());
         assertThat(goTerms.size(), is(0));
@@ -77,23 +88,29 @@ public class OntologyServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void nullRepoProducesIllegalArgumentException() {
-        new OntologyServiceImpl<>(null, goDocumentConverterMock, OntologyType.GO, new SolrQueryStringSanitizer());
+        new OntologyServiceImpl<>(null, goDocumentConverterMock, OntologyType.GO, new SolrQueryStringSanitizer(), ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullConverterProducesIllegalArgumentException() {
-        new OntologyServiceImpl<>(repositoryMock, null, OntologyType.GO, new SolrQueryStringSanitizer());
+        new OntologyServiceImpl<>(repositoryMock, null, OntologyType.GO, new SolrQueryStringSanitizer(), ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullDocTypeProducesIllegalArgumentException() {
         new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, null,
-                new SolrQueryStringSanitizer());
+                new SolrQueryStringSanitizer(), ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullQueryStringSanitizerProducesIllegalArgumentException() {
-        new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO, null);
+        new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO, null, ontologyTraversalMock);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullOntologyTraversalProducesIllegalArgumentException() {
+        new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO, new
+                SolrQueryStringSanitizer(), null);
     }
 
     public class GOServiceTests {

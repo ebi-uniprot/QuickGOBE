@@ -5,9 +5,8 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
@@ -20,7 +19,9 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Created 27/11/15
  * @author Edd
  */
-abstract class OBOController<T extends OBOTerm> {
+public abstract class OBOController<T extends OBOTerm> {
     static final int MAX_PAGE_RESULTS = 100;
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COMMA = ",";
@@ -51,9 +52,9 @@ abstract class OBOController<T extends OBOTerm> {
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
-    private final ControllerValidationHelper controllerValidationHelper;
+    private final OBOControllerValidationHelper validationHelper;
 
-    OBOController(OntologyService<T> ontologyService,
+    public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
@@ -66,7 +67,7 @@ abstract class OBOController<T extends OBOTerm> {
         this.ontologySearchService = ontologySearchService;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
         this.ontologyRetrievalConfig = ontologyRetrievalConfig;
-        this.controllerValidationHelper = new ControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
+        this.validationHelper = new OBOControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
     }
 
     /**
@@ -84,7 +85,7 @@ abstract class OBOController<T extends OBOTerm> {
      * Get all information about all terms and page through the results.
      *
      * @param page the page number of results to retrieve
-     * @return  the specified page of results as a {@link QueryResult} instance or a 400 response
+     * @return the specified page of results as a {@link QueryResult} instance or a 400 response
      *          if the page number is invalid
      */
     @ApiOperation(value = "Get all information on all terms and page through the results")
@@ -112,7 +113,7 @@ abstract class OBOController<T extends OBOTerm> {
                     "aspect and usage.")
     @RequestMapping(value = TERMS + "/{ids}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(controllerValidationHelper.validateCSVIds
+        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds
                 (ids)));
     }
 
@@ -129,9 +130,11 @@ abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get complete information about a (CSV) list of terms based on their ids",
             notes = "All fields will be populated providing they have a value.")
-    @RequestMapping(value = TERMS + "/{ids}/complete", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERMS + "/{ids}/complete", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findCompleteInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
+        return getTermsResponse(
+                ontologyService.findCompleteInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -147,9 +150,11 @@ abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get history information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, history.")
-    @RequestMapping(value = TERMS + "/{ids}/history", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERMS + "/{ids}/history", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findHistoryInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
+        return getTermsResponse(
+                ontologyService.findHistoryInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -165,9 +170,11 @@ abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get cross-reference information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, xRefs.")
-    @RequestMapping(value = TERMS + "/{ids}/xrefs", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERMS + "/{ids}/xrefs", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findXRefsInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
+        return getTermsResponse(
+                ontologyService.findXRefsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -183,9 +190,11 @@ abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get taxonomy constraint information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, taxonConstraints.")
-    @RequestMapping(value = TERMS + "/{ids}/constraints", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERMS + "/{ids}/constraints", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findTaxonConstraintsInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
+        return getTermsResponse(
+                ontologyService.findTaxonConstraintsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -201,9 +210,11 @@ abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get cross ontology relationship information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, xRelations.")
-    @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findXORelationsInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
+        return getTermsResponse(
+                ontologyService.findXORelationsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -219,9 +230,11 @@ abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get annotation guideline information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, annotationGuidelines.")
-    @RequestMapping(value = TERMS + "/{ids}/guidelines", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERMS + "/{ids}/guidelines", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findAnnotationGuideLinesInfoByOntologyId(controllerValidationHelper.validateCSVIds(ids)));
+        return getTermsResponse(ontologyService
+                .findAnnotationGuideLinesInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -231,7 +244,7 @@ abstract class OBOController<T extends OBOTerm> {
      * @param limit the amount of queries to return
      * @return a {@link QueryResult} instance containing the results of the search
      */
-    @ApiOperation(value="Searches a simple user query, e.g., query=apopto",
+    @ApiOperation(value = "Searches a simple user query, e.g., query=apopto",
             notes = "If possible, response fields include: id, name, definition, isObsolete")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(
@@ -239,7 +252,7 @@ abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
-        controllerValidationHelper.validateRequestedResults(limit);
+        validationHelper.validateRequestedResults(limit);
 
         QueryRequest request = buildRequest(
                 query,
@@ -248,6 +261,26 @@ abstract class OBOController<T extends OBOTerm> {
                 ontologyQueryConverter);
 
         return SearchDispatcher.search(request, ontologySearchService);
+    }
+
+    @RequestMapping(value = TERMS + "/{ids}/ancestors", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Set<String>> findAncestors(
+            @PathVariable(value = "ids") String ids,
+            @RequestParam(value = "relations", defaultValue = "") String relations) {
+        OntologyRelationType[] relations1 = validationHelper.validateRelationTypes(relations)
+                .stream()
+                .toArray(OntologyRelationType[]::new);
+        return asResponseEntity(
+                ontologyService.ancestors(
+                        new HashSet<>(validationHelper.validateCSVIds(ids))));
+    }
+
+    @RequestMapping(value = TERMS + "/{ids}/descendants", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Set<String>> findDescendants(@PathVariable(value = "ids") String ids) {
+        return asResponseEntity(ontologyService.descendants(new HashSet<>(validationHelper
+                .validateCSVIds(ids))));
     }
 
     /**
@@ -261,6 +294,7 @@ abstract class OBOController<T extends OBOTerm> {
      *
      * @return the ontology type corresponding to this controller's behaviour.
      */
+
     protected abstract OntologyType getOntologyType();
 
     /**
@@ -279,6 +313,10 @@ abstract class OBOController<T extends OBOTerm> {
 
         QueryResult<T> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
+    }
+
+    private <E> ResponseEntity<E> asResponseEntity(E type) {
+        return new ResponseEntity<>(type, HttpStatus.OK);
     }
 
     private QueryRequest buildRequest(String query,
