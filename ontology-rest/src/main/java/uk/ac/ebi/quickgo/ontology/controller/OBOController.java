@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Created 27/11/15
  * @author Edd
  */
-public abstract class OBOController<T extends OBOTerm> {
+abstract class OBOController<T extends OBOTerm> {
     static final int MAX_PAGE_RESULTS = 100;
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COMMA = ",";
@@ -53,7 +53,7 @@ public abstract class OBOController<T extends OBOTerm> {
     private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
     private final ControllerValidationHelper controllerValidationHelper;
 
-    public OBOController(OntologyService<T> ontologyService,
+    OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
