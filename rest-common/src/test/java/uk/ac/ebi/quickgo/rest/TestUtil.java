@@ -1,9 +1,6 @@
 package uk.ac.ebi.quickgo.rest;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -12,7 +9,7 @@ import java.util.stream.Stream;
  */
 public class TestUtil {
     public static <T> Set<T> asSet(T... elements) {
-        return new HashSet<>(Arrays.asList(elements));
+        return new LinkedHashSet<>(Arrays.asList(elements));
     }
 
     public static <T> Collection<T> convertToCollection(Stream<T> stream) {
