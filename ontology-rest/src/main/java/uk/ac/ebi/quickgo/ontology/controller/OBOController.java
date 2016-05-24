@@ -269,7 +269,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param docList a list of results
      * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents
      */
-    protected ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
+    ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
         List<T> resultsToShow;
         if (docList == null) {
             resultsToShow = Collections.emptyList();
