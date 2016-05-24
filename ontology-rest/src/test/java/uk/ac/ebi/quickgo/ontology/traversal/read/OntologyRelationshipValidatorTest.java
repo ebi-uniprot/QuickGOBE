@@ -85,7 +85,7 @@ public class OntologyRelationshipValidatorTest {
         OntologyRelationship validatedTuple = validator.process(this.relationship);
         assertThat(validatedTuple.child, is(relationship.child));
         assertThat(validatedTuple.parent, is(relationship.parent));
-        assertThat(validatedTuple.relationship, is(OntologyRelationType.getByShortName(relationship.relationship)));
+        assertThat(validatedTuple.relationship, is(OntologyRelationType.getByName(relationship.relationship)));
     }
 
     @Test(expected = ValidationException.class)

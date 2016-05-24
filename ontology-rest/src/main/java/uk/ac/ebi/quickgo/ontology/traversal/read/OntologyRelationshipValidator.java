@@ -34,12 +34,12 @@ class OntologyRelationshipValidator
         return new OntologyRelationship(
                 ontologyRelationship.child,
                 ontologyRelationship.parent,
-                OntologyRelationType.getByShortName(ontologyRelationship.relationship));
+                OntologyRelationType.getByName(ontologyRelationship.relationship));
     }
 
     void checkValidRelationship(String relationship) {
         try {
-            OntologyRelationType.getByShortName(relationship);
+            OntologyRelationType.getByName(relationship);
         } catch (IllegalArgumentException ie) {
             String errorMessage = "Could not find ontology relationship: " + relationship;
             LOGGER.error(errorMessage);

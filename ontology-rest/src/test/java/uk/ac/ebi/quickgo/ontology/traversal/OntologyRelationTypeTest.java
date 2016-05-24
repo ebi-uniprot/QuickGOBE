@@ -15,13 +15,13 @@ public class OntologyRelationTypeTest {
     @Test
     public void validRelationshipsCanBeRetrieved() {
         for (OntologyRelationType relation : OntologyRelationType.values()) {
-            OntologyRelationType relationRetrieved = OntologyRelationType.getByShortName(relation.getShortName());
+            OntologyRelationType relationRetrieved = OntologyRelationType.getByName(relation.getShortName());
             assertThat(relationRetrieved, is(relation));
         }
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidRelationshipCausesIllegalArgumentException() {
-        OntologyRelationType.getByShortName("THIS_DOES_NOT_EXIST");
+        OntologyRelationType.getByName("THIS_DOES_NOT_EXIST");
     }
 }
