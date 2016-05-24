@@ -63,23 +63,6 @@ public class OntologyRelationshipTest {
             return testCaseParameters;
         }
 
-        private static Collection<Object[]> createRelationshipCompositionTestCases() {
-            List<Object[]> testCases = new ArrayList<>();
-
-            addTestCase(IDENTITY, IDENTITY, IDENTITY, testCases);
-            addTestCase(IDENTITY, IDENTITY, IDENTITY, testCases);
-            addTestCase(UNDEFINED, IDENTITY, UNDEFINED, testCases);
-            addTestCase(HAS_PART, NEGATIVE_REGULATES, UNDEFINED, testCases);
-            addTestCase(NEGATIVE_REGULATES, HAS_PART, UNDEFINED, testCases);
-            addTestCase(IS_A, NEGATIVE_REGULATES, NEGATIVE_REGULATES, testCases);
-            addTestCase(NEGATIVE_REGULATES, IS_A, NEGATIVE_REGULATES, testCases);
-            addTestCase(PART_OF, PART_OF, PART_OF, testCases);
-            addTestCase(OCCURS_IN, PART_OF, OCCURS_IN, testCases);
-            addTestCase(REGULATES, PART_OF, REGULATES, testCases);
-
-            return testCases;
-        }
-
         public static Collection<Object[]> generateCombinationsResultingInUndefined() {
             List<Object[]> testCases = new ArrayList<>();
             for (OntologyRelationType relationship1 : OntologyRelationType.values()) {
@@ -107,6 +90,23 @@ public class OntologyRelationshipTest {
             OntologyRelationship combination = combineRelationships(child2Parent, parent2GrandParent);
             checkVerticesAreCorrect(child2Parent, parent2GrandParent, combination);
             assertThat(combination.relationship, is(combinedRelationship));
+        }
+
+        private static Collection<Object[]> createRelationshipCompositionTestCases() {
+            List<Object[]> testCases = new ArrayList<>();
+
+            addTestCase(IDENTITY, IDENTITY, IDENTITY, testCases);
+            addTestCase(IDENTITY, IDENTITY, IDENTITY, testCases);
+            addTestCase(UNDEFINED, IDENTITY, UNDEFINED, testCases);
+            addTestCase(HAS_PART, NEGATIVE_REGULATES, UNDEFINED, testCases);
+            addTestCase(NEGATIVE_REGULATES, HAS_PART, UNDEFINED, testCases);
+            addTestCase(IS_A, NEGATIVE_REGULATES, NEGATIVE_REGULATES, testCases);
+            addTestCase(NEGATIVE_REGULATES, IS_A, NEGATIVE_REGULATES, testCases);
+            addTestCase(PART_OF, PART_OF, PART_OF, testCases);
+            addTestCase(OCCURS_IN, PART_OF, OCCURS_IN, testCases);
+            addTestCase(REGULATES, PART_OF, REGULATES, testCases);
+
+            return testCases;
         }
 
         private static void addTestCase(OntologyRelationType childParent, OntologyRelationType parentGrandParent,
