@@ -51,6 +51,20 @@ public class AnnotationRequest {
         return filters.get(AnnotationFields.ASSIGNED_BY);
     }
 
+    /**
+     * E.g. DOI*, GO_REF*, PMID*, Reactome*, GO_REF:0000037 etc
+     * @param reference
+     * @return
+     */
+    public void setReference(String reference){
+        filters.put(AnnotationFields.REFERENCE, reference);
+    }
+
+    //todo create validation pattern @Pattern(regexp = "")
+    public String getReference(){
+        return filters.get(AnnotationFields.REFERENCE);
+    }
+
     public void setPage(int page) {
         this.page = page;
     }
