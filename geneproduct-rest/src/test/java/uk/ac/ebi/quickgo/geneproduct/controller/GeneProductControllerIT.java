@@ -52,6 +52,7 @@ public class GeneProductControllerIT {
 
     protected static final String COMMA = ",";
     public static final String NON_EXISTANT_ID = "Y0Y000";
+    public static final String INVALID_ID = "ZZZZ";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -118,6 +119,16 @@ public class GeneProductControllerIT {
         mockMvc.perform(get(buildGeneProductURL("")))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    public void finds400IfIdIsInvalid() throws Exception {
+        mockMvc.perform(get(buildGeneProductURL(INVALID_ID)))
+                .andDo(print())
+                .andExpect(jsonPath("$.message", is("Provided ID: '" + INVALID_ID + "' is invalid")))
+                .andExpect(status().isBadRequest());
+
     }
 
     @Test
