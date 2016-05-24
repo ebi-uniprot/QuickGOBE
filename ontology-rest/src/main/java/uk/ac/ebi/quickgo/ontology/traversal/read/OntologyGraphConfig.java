@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.common.batch.listener.LogJobListener;
 import uk.ac.ebi.quickgo.common.batch.listener.LogStepListener;
 import uk.ac.ebi.quickgo.common.batch.listener.SkipLoggerListener;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,6 +71,11 @@ public class OntologyGraphConfig {
     @Bean
     public OntologyGraph ontologyGraph() {
         return new OntologyGraph();
+    }
+
+    @Bean
+    public OntologyGraphTraversal ontologyGraphTraversal(OntologyGraph ontologyGraph) {
+        return ontologyGraph;
     }
 
     @Bean
