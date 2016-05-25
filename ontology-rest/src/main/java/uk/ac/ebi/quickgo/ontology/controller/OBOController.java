@@ -19,8 +19,12 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -113,7 +117,7 @@ public abstract class OBOController<T extends OBOTerm> {
                     "aspect and usage.")
     @RequestMapping(value = TERMS + "/{ids}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds
+        return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds
                 (ids)));
     }
 
@@ -133,7 +137,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS + "/{ids}/complete", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(
+        return getResultsResponse(
                 ontologyService.findCompleteInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
@@ -153,7 +157,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS + "/{ids}/history", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(
+        return getResultsResponse(
                 ontologyService.findHistoryInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
@@ -173,7 +177,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS + "/{ids}/xrefs", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(
+        return getResultsResponse(
                 ontologyService.findXRefsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
@@ -193,7 +197,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS + "/{ids}/constraints", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(
+        return getResultsResponse(
                 ontologyService.findTaxonConstraintsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
@@ -213,7 +217,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(
+        return getResultsResponse(
                 ontologyService.findXORelationsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
@@ -233,7 +237,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS + "/{ids}/guidelines", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
-        return getTermsResponse(ontologyService
+        return getResultsResponse(ontologyService
                 .findAnnotationGuideLinesInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
@@ -271,14 +275,15 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = TERMS + "/{ids}/ancestors", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Set<String>> findAncestors(
+    public ResponseEntity<QueryResult<String>> findAncestors(
             @PathVariable(value = "ids") String ids,
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
-        return asResponseEntity(
-                ontologyService.ancestors(
-                        asSet(validationHelper.validateCSVIds(ids)),
-                        asArray(validationHelper.validateRelationTypes(relations))
-                ));
+        return getResultsResponse(
+                asList(
+                        ontologyService.ancestors(
+                                asSet(validationHelper.validateCSVIds(ids)),
+                                asArray(validationHelper.validateRelationTypes(relations))
+                        )));
     }
 
     /**
@@ -289,14 +294,15 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = TERMS + "/{ids}/descendants", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Set<String>> findDescendants(
+    public ResponseEntity<QueryResult<String>> findDescendants(
             @PathVariable(value = "ids") String ids,
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
-        return asResponseEntity(
-                ontologyService.descendants(
-                        asSet(validationHelper.validateCSVIds(ids)),
-                        asArray(validationHelper.validateRelationTypes(relations))
-                ));
+        return getResultsResponse(
+                asList(
+                        ontologyService.descendants(
+                                asSet(validationHelper.validateCSVIds(ids)),
+                                asArray(validationHelper.validateRelationTypes(relations))
+                        )));
     }
 
     /**
@@ -308,11 +314,11 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @RequestMapping(value = TERMS + "/{ids}/paths/{toIds}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<List<List<OntologyRelationship>>> findPaths(
+    public ResponseEntity<QueryResult<List<OntologyRelationship>>> findPaths(
             @PathVariable(value = "ids") String ids,
             @PathVariable(value = "toIds") String toIds,
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
-        return asResponseEntity(
+        return getResultsResponse(
                 ontologyService.paths(
                         asSet(validationHelper.validateCSVIds(ids)),
                         asSet(validationHelper.validateCSVIds(toIds)),
@@ -336,11 +342,15 @@ public abstract class OBOController<T extends OBOTerm> {
     /**
      * Wrap a collection as a {@link Set}
      * @param items the items to wrap as a {@link Set}
-     * @param <ST> the type of the {@link Collection}, i.e., this method works for any type
+     * @param <ItemType> the type of the {@link Collection}, i.e., this method works for any type
      * @return a {@link Set} wrapping the items in a {@link Collection}
      */
-    private static <ST> Set<ST> asSet(Collection<ST> items) {
-        return new HashSet<>(items);
+    private static <ItemType> Set<ItemType> asSet(Collection<ItemType> items) {
+        return items.stream().collect(Collectors.toSet());
+    }
+
+    private static <ItemType> List<ItemType> asList(Collection<ItemType> items) {
+        return items.stream().collect(Collectors.toList());
     }
 
     /**
@@ -354,20 +364,20 @@ public abstract class OBOController<T extends OBOTerm> {
     }
 
     /**
-     * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.
+     * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of results.
      *
-     * @param docList a list of results
-     * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents
+     * @param results a list of results
+     * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of results
      */
-    ResponseEntity<QueryResult<T>> getTermsResponse(List<T> docList) {
-        List<T> resultsToShow;
-        if (docList == null) {
+    <ResponseType> ResponseEntity<QueryResult<ResponseType>> getResultsResponse(List<ResponseType> results) {
+        List<ResponseType> resultsToShow;
+        if (results == null) {
             resultsToShow = Collections.emptyList();
         } else {
-            resultsToShow = docList;
+            resultsToShow = results;
         }
 
-        QueryResult<T> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
+        QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
         return asResponseEntity(queryResult);
     }
 

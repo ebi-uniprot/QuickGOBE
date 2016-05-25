@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +52,7 @@ public enum OntologyRelationType {
         return shortName;
     }
 
+    @JsonValue
     public String getLongName() {
         return longName;
     }
