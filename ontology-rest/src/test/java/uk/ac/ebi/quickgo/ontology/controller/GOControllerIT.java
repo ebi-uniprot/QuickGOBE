@@ -32,7 +32,7 @@ public class GOControllerIT extends OBOControllerIT {
 
     @Test
     public void canRetrieveBlacklistByIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(GO_0000001+COMMA+GO_0000002) + "/constraints"));
+        ResultActions response = mockMvc.perform(get(buildTermsURL(GO_0000001 + COMMA + GO_0000002) + "/constraints"));
 
         expectBasicFieldsInResults(response, Arrays.asList(GO_0000001, GO_0000002))
                 .andExpect(jsonPath("$.results.*.blacklist", hasSize(2)))
@@ -54,7 +54,7 @@ public class GOControllerIT extends OBOControllerIT {
 
     @Override protected List<OntologyDocument> createNDocs(int n) {
         return IntStream.range(0, n)
-                .mapToObj(i -> OntologyDocMocker.createGODoc(createId(i), "eco doc name " + i)).collect
+                .mapToObj(i -> OntologyDocMocker.createGODoc(createId(i), "go doc name " + i)).collect
                         (Collectors.toList());
     }
 
@@ -68,8 +68,6 @@ public class GOControllerIT extends OBOControllerIT {
                 OntologyDocMocker.createGODoc(GO_0000001, "go name 1"),
                 OntologyDocMocker.createGODoc(GO_0000002, "go name 2"));
     }
-
-
 
     @Override
     protected String idMissingInRepository() {
