@@ -1,14 +1,18 @@
 package uk.ac.ebi.quickgo.rest.search.filter;
 
+import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,6 +31,20 @@ public class ExternalFilterExecutionConfigIT {
     @ComponentScan
     @EnableConfigurationProperties
     public static class TestApplication {
+
+        @Bean
+        public SearchableDocumentFields dummySearchableDocumentFields() {
+            return new SearchableDocumentFields() {
+                @Override public boolean isDocumentSearchable(String field) {
+                    return false;
+                }
+
+                @Override public Stream<String> searchableDocumentFields() {
+                    return Stream.empty();
+                }
+            };
+        }
+
         public static void main(String[] args) {
             SpringApplication.run(TestApplication.class);
         }
