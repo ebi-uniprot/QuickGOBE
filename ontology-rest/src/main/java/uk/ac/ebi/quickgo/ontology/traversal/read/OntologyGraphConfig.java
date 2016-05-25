@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.ontology.traversal.read;
 import uk.ac.ebi.quickgo.common.batch.listener.LogJobListener;
 import uk.ac.ebi.quickgo.common.batch.listener.LogStepListener;
 import uk.ac.ebi.quickgo.common.batch.listener.SkipLoggerListener;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
 

@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import com.google.common.base.Preconditions;
 import java.util.*;

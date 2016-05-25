@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.*;
@@ -13,7 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType.*;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
 
 /**
  * Validates the behaviour of {@link OntologyGraph}. The tests are divided amongst different

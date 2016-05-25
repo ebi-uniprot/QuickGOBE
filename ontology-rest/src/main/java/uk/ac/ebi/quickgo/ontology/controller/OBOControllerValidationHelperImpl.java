@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 
 import java.util.ArrayList;

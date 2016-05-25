@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.traversal;
+package uk.ac.ebi.quickgo.ontology.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;

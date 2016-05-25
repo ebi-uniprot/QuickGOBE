@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.traversal.read;
-
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
+package uk.ac.ebi.quickgo.ontology.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,8 +10,8 @@ import org.junit.runners.Parameterized;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType.*;
-import static uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship.combineRelationships;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationship.combineRelationships;
 
 /**
  * This class tests that the composition of relationships produces the expected combined relationship.
