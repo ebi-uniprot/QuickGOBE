@@ -14,7 +14,7 @@ interface FilterExecutionConfig {
      * @param fieldName the name of the field
      * @return an Optional instance of {@link FieldExecutionConfig} which contains inofrmation on how to process
      * the given field
-     * @throws IllegalArgumentException if the field name is null
+     * @throws IllegalArgumentException if the field name is null or empty
      */
     Optional<FieldExecutionConfig> getField(String fieldName);
 }
