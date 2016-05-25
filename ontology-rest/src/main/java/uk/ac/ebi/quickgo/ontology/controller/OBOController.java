@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
+import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
+import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -273,6 +275,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param relations the ontology relationships over which ancestors will be found
      * @return a result instance containing the ancestors
      */
+    @ApiOperation(value = "Retrieves the ancestors of specified ontology terms")
     @RequestMapping(value = TERMS + "/{ids}/ancestors", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<String>> findAncestors(
@@ -292,6 +295,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param relations the ontology relationships over which descendants will be found
      * @return a result containing the descendants
      */
+    @ApiOperation(value = "Retrieves the descendants of specified ontology terms")
     @RequestMapping(value = TERMS + "/{ids}/descendants", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<String>> findDescendants(
@@ -312,6 +316,8 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param relations the ontology relationships over which descendants will be found
      * @return a result containing a list of paths between the {@code ids} terms, and {@code toIds} terms
      */
+    @ApiOperation(value = "Retrieves the paths between two specified sets of ontology terms. Each path is " +
+            "formed from a list of (term, relationship, term) triples.")
     @RequestMapping(value = TERMS + "/{ids}/paths/{toIds}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<List<OntologyRelationship>>> findPaths(

@@ -19,7 +19,7 @@ public class OntologyRelationTypeTest {
     @Test
     public void validRelationshipsCanBeRetrievedByShortName() {
         for (OntologyRelationType relation : OntologyRelationType.values()) {
-            OntologyRelationType relationRetrieved = OntologyRelationType.getByName(relation.getShortName());
+            OntologyRelationType relationRetrieved = OntologyRelationType.getByShortName(relation.getShortName());
             assertThat(relationRetrieved, is(relation));
         }
     }
@@ -27,7 +27,7 @@ public class OntologyRelationTypeTest {
     @Test
     public void validRelationshipsCanBeRetrievedByLongName() {
         for (OntologyRelationType relation : OntologyRelationType.values()) {
-            OntologyRelationType relationRetrieved = OntologyRelationType.getByName(relation.getLongName());
+            OntologyRelationType relationRetrieved = OntologyRelationType.getByLongName(relation.getLongName());
             assertThat(relationRetrieved, is(relation));
         }
     }
@@ -35,12 +35,12 @@ public class OntologyRelationTypeTest {
     @Test
     public void ensureDefaultTraversalTypesAreValid() {
         for (String traversalType : DEFAULT_TRAVERSAL_TYPES_CSV.split(COMMA)) {
-            OntologyRelationType.getByName(traversalType);
+            OntologyRelationType.getByLongName(traversalType);
         }
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidRelationshipCausesIllegalArgumentException() {
-        OntologyRelationType.getByName("THIS_DOES_NOT_EXIST");
+        OntologyRelationType.getByShortName("THIS_DOES_NOT_EXIST");
     }
 }

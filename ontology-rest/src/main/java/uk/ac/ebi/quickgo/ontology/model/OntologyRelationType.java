@@ -2,7 +2,11 @@ package uk.ac.ebi.quickgo.ontology.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
 
 /**
  * This {@code enum} defines the ontology relationships that are valid for use in QuickGO's source files.
@@ -28,11 +32,11 @@ public enum OntologyRelationType {
     CAPABLE_OF("CO", "capable_of"),
     CAPABLE_OF_PART_OF("CP", "capable_of_part_of");
 
-    public static final String DEFAULT_TRAVERSAL_TYPES_CSV = "is_a,part_of,occurs_in,regulates";
+    private final String shortName;
+    private final String longName;
 
     private static final Map<String, OntologyRelationType> shortNameToValueMap = new HashMap<>();
     private static final Map<String, OntologyRelationType> longNameToValueMap = new HashMap<>();
-
     static {
         for (OntologyRelationType value : OntologyRelationType.values()) {
             shortNameToValueMap.put(value.getShortName(), value);
@@ -40,8 +44,12 @@ public enum OntologyRelationType {
         }
     }
 
-    private final String shortName;
-    private final String longName;
+    // keep these variables below the above 'static' block
+    public static final String DEFAULT_TRAVERSAL_TYPES_CSV = "is_a,part_of,occurs_in,regulates";
+    public static final List<OntologyRelationType> DEFAULT_TRAVERSAL_TYPES =
+            asList(DEFAULT_TRAVERSAL_TYPES_CSV.split(",")).stream()
+                    .map(OntologyRelationType::getByLongName)
+                    .collect(Collectors.toList());
 
     OntologyRelationType(String shortName, String longName) {
         this.shortName = shortName;
@@ -57,13 +65,19 @@ public enum OntologyRelationType {
         return longName;
     }
 
-    public static OntologyRelationType getByName(String name) {
+    public static OntologyRelationType getByShortName(String name) {
         if (shortNameToValueMap.containsKey(name)) {
             return shortNameToValueMap.get(name);
-        } else if (longNameToValueMap.containsKey(name)) {
+        } else {
+            throw new IllegalArgumentException("Unknown OntologyRelationType: " + name);
+        }
+    }
+
+    public static OntologyRelationType getByLongName(String name) {
+        if (longNameToValueMap.containsKey(name)) {
             return longNameToValueMap.get(name);
         } else {
-            throw new IllegalArgumentException("Unknown OntologyRelation: " + name);
+            throw new IllegalArgumentException("Unknown OntologyRelationType: " + name);
         }
     }
 
@@ -74,6 +88,7 @@ public enum OntologyRelationType {
      * @return whether or not this type matches one of those specified as parameter
      */
     public boolean hasType(OntologyRelationType... types) {
+
         for (OntologyRelationType type : types) {
             if (this.hasType(type)) {
                 return true;
