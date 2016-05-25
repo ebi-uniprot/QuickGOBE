@@ -730,7 +730,7 @@ public abstract class OBOControllerIT {
                     validRelationType));                            // relationship
         }
 
-        this.relationships = simpleRelationships;
+        relationships = simpleRelationships;
         relationshipChainLength = idCount;
         validRelation = OntologyRelationType.IS_A.getLongName();
         invalidRelation = "this-does-not-exist";
