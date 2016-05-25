@@ -27,6 +27,8 @@ public enum OntologyRelationType {
     CAPABLE_OF("CO", "capable_of"),
     CAPABLE_OF_PART_OF("CP", "capable_of_part_of");
 
+    public static final String DEFAULT_TRAVERSAL_TYPES_CSV = "is_a,part_of,occurs_in,regulates";
+
     private static final Map<String, OntologyRelationType> shortNameToValueMap = new HashMap<>();
     private static final Map<String, OntologyRelationType> longNameToValueMap = new HashMap<>();
 

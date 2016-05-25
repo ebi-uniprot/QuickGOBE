@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
 
 /**
  * Validate that ontology relationships are retrieved correctly.
@@ -12,11 +13,29 @@ import static org.hamcrest.Matchers.is;
  * @author Edd
  */
 public class OntologyRelationTypeTest {
+
+    private static final String COMMA = ",";
+
     @Test
-    public void validRelationshipsCanBeRetrieved() {
+    public void validRelationshipsCanBeRetrievedByShortName() {
         for (OntologyRelationType relation : OntologyRelationType.values()) {
             OntologyRelationType relationRetrieved = OntologyRelationType.getByName(relation.getShortName());
             assertThat(relationRetrieved, is(relation));
+        }
+    }
+
+    @Test
+    public void validRelationshipsCanBeRetrievedByLongName() {
+        for (OntologyRelationType relation : OntologyRelationType.values()) {
+            OntologyRelationType relationRetrieved = OntologyRelationType.getByName(relation.getLongName());
+            assertThat(relationRetrieved, is(relation));
+        }
+    }
+
+    @Test
+    public void ensureDefaultTraversalTypesAreValid() {
+        for (String traversalType : DEFAULT_TRAVERSAL_TYPES_CSV.split(COMMA)) {
+            OntologyRelationType.getByName(traversalType);
         }
     }
 
