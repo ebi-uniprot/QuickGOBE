@@ -29,22 +29,22 @@ public class ReferenceModifier implements FilterModifier{
     public String[] modify(String[] original){
         Set<String> modifiedArgs = new LinkedHashSet<>();
         for (int i = 0; i < original.length; i++) {
-            String s = original[i];
 
-            //If given just a
-            if( s.equals("DOI") || s.equals("GO_REF") || s.equals("PMID") || s.equals("Reactome")  ){
+            //If given just a Database identifier, make it a wildcard search
+            if( searchConfig.referenceDbs.contains(original[i]) ){
                 modifiedArgs.add(original[i]+":*");
-            }
+            } else {
 
-            //If we have just an id, create a request for all known DBs
-            Matcher m = ALL_NUMERIC.matcher(s);
-            if(m.matches()){
-                modifiedArgs.add("DOI:" + original[i]);
-                modifiedArgs.add("GO_REF:" + original[i]);
-                modifiedArgs.add("PMID:" + original[i]);
-                modifiedArgs.add("Reactome:" + original[i]);
+                //If we have just an id, create a request for all known DBs
+                Matcher m = ALL_NUMERIC.matcher(original[i]);
+                if (m.matches()) {
+                    for (String db : searchConfig.referenceDbs)
+                        modifiedArgs.add(db + ":" + original[i]);
+                } else {
+                    modifiedArgs.add(original[i]);
+                }
             }
         }
-        return original;
+        return modifiedArgs.toArray(new String[modifiedArgs.size()]);
     }
 }
