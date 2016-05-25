@@ -378,17 +378,7 @@ public abstract class OBOController<T extends OBOTerm> {
         }
 
         QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
-        return asResponseEntity(queryResult);
-    }
-
-    /**
-     * Wraps a type as a {@link ResponseEntity} with a {@link HttpStatus} okay code.
-     * @param value the value to wrap in a {@link ResponseEntity}
-     * @param <TypeValue> any type
-     * @return the wrapped {@code value}
-     */
-    <TypeValue> ResponseEntity<TypeValue> asResponseEntity(TypeValue value) {
-        return new ResponseEntity<>(value, HttpStatus.OK);
+        return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 
     private QueryRequest buildRequest(String query,
