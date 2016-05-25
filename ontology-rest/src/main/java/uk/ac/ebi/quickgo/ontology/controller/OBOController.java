@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
@@ -18,10 +19,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +30,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import static uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
 
 /**
  * Abstract controller defining common end-points of an OBO related
@@ -263,24 +263,61 @@ public abstract class OBOController<T extends OBOTerm> {
         return SearchDispatcher.search(request, ontologySearchService);
     }
 
+    /**
+     * Retrieves the ancestors of ontology terms
+     * @param ids the term ids in CSV format
+     * @param relations the ontology relationships over which ancestors will be found
+     * @return a result instance containing the ancestors
+     */
     @RequestMapping(value = TERMS + "/{ids}/ancestors", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Set<String>> findAncestors(
             @PathVariable(value = "ids") String ids,
-            @RequestParam(value = "relations", defaultValue = "") String relations) {
-        OntologyRelationType[] relations1 = validationHelper.validateRelationTypes(relations)
-                .stream()
-                .toArray(OntologyRelationType[]::new);
+            @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return asResponseEntity(
                 ontologyService.ancestors(
-                        new HashSet<>(validationHelper.validateCSVIds(ids))));
+                        asSet(validationHelper.validateCSVIds(ids)),
+                        asArray(validationHelper.validateRelationTypes(relations))
+                ));
     }
 
+    /**
+     * Retrieves the descendants of ontology terms
+     * @param ids the term ids in CSV format
+     * @param relations the ontology relationships over which descendants will be found
+     * @return a result containing the descendants
+     */
     @RequestMapping(value = TERMS + "/{ids}/descendants", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Set<String>> findDescendants(@PathVariable(value = "ids") String ids) {
-        return asResponseEntity(ontologyService.descendants(new HashSet<>(validationHelper
-                .validateCSVIds(ids))));
+    public ResponseEntity<Set<String>> findDescendants(
+            @PathVariable(value = "ids") String ids,
+            @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
+        return asResponseEntity(
+                ontologyService.descendants(
+                        asSet(validationHelper.validateCSVIds(ids)),
+                        asArray(validationHelper.validateRelationTypes(relations))
+                ));
+    }
+
+    /**
+     * Retrieves the paths between ontology terms
+     * @param ids the term ids in CSV format, from which paths begin
+     * @param toIds the term ids in CSV format, to which the paths lead
+     * @param relations the ontology relationships over which descendants will be found
+     * @return a result containing a list of paths between the {@code ids} terms, and {@code toIds} terms
+     */
+    @RequestMapping(value = TERMS + "/{ids}/paths/{toIds}", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<List<List<OntologyRelationship>>> findPaths(
+            @PathVariable(value = "ids") String ids,
+            @PathVariable(value = "toIds") String toIds,
+            @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
+        return asResponseEntity(
+                ontologyService.paths(
+                        asSet(validationHelper.validateCSVIds(ids)),
+                        asSet(validationHelper.validateCSVIds(toIds)),
+                        asArray(validationHelper.validateRelationTypes(relations))
+                ));
     }
 
     /**
@@ -294,8 +331,27 @@ public abstract class OBOController<T extends OBOTerm> {
      *
      * @return the ontology type corresponding to this controller's behaviour.
      */
-
     protected abstract OntologyType getOntologyType();
+
+    /**
+     * Wrap a collection as a {@link Set}
+     * @param items the items to wrap as a {@link Set}
+     * @param <ST> the type of the {@link Collection}, i.e., this method works for any type
+     * @return a {@link Set} wrapping the items in a {@link Collection}
+     */
+    private static <ST> Set<ST> asSet(Collection<ST> items) {
+        return new HashSet<>(items);
+    }
+
+    /**
+     * Converts a {@link Collection} of {@link OntologyRelationType}s to a corresponding array of
+     * {@link OntologyRelationType}s
+     * @param relations the {@link OntologyRelationType}s
+     * @return an array of {@link OntologyRelationType}s
+     */
+    private static OntologyRelationType[] asArray(Collection<OntologyRelationType> relations) {
+        return relations.stream().toArray(OntologyRelationType[]::new);
+    }
 
     /**
      * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.
@@ -312,11 +368,17 @@ public abstract class OBOController<T extends OBOTerm> {
         }
 
         QueryResult<T> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
-        return new ResponseEntity<>(queryResult, HttpStatus.OK);
+        return asResponseEntity(queryResult);
     }
 
-    private <E> ResponseEntity<E> asResponseEntity(E type) {
-        return new ResponseEntity<>(type, HttpStatus.OK);
+    /**
+     * Wraps a type as a {@link ResponseEntity} with a {@link HttpStatus} okay code.
+     * @param value the value to wrap in a {@link ResponseEntity}
+     * @param <TypeValue> any type
+     * @return the wrapped {@code value}
+     */
+    <TypeValue> ResponseEntity<TypeValue> asResponseEntity(TypeValue value) {
+        return new ResponseEntity<>(value, HttpStatus.OK);
     }
 
     private QueryRequest buildRequest(String query,

@@ -35,8 +35,8 @@ public class OBOControllerValidationHelperImpl
 
     final static String VALID_TRAVERSAL_RELATION_TYPES_STRING =
             VALID_TRAVERSAL_RELATION_TYPES.stream()
-                    .map(OntologyRelationType::getShortName)
-                    .collect(Collectors.joining(","));
+                    .map(OntologyRelationType::getLongName)
+                    .collect(Collectors.joining(", "));
 
     @Override public List<OntologyRelationType> validateRelationTypes(String relationTypesCSV) {
         if (relationTypesCSV.isEmpty()) {
@@ -49,14 +49,16 @@ public class OBOControllerValidationHelperImpl
 
         List<OntologyRelationType> relationTypes = new ArrayList<>();
         for (String relationTypeStr : relationTypeList) {
+            OntologyRelationType relationType;
             try {
-                OntologyRelationType relationType = OntologyRelationType.getByName(relationTypeStr);
-                if (isValidTraversalRelationType(relationType)) {
-                    relationTypes.add(relationType);
-                }
+                relationType = OntologyRelationType.getByName(relationTypeStr);
             } catch (IllegalArgumentException e) {
                 LOGGER.error(e.getMessage());
                 throw new IllegalArgumentException("Unknown relationship requested");
+            }
+
+            if (relationType != null && isValidTraversalRelationType(relationType)) {
+                relationTypes.add(relationType);
             }
         }
 
