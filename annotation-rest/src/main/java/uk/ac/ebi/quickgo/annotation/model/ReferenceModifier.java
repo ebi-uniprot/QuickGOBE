@@ -5,7 +5,10 @@ import uk.ac.ebi.quickgo.annotation.service.search.SearchConfig;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Modify filter values for references.
@@ -47,4 +50,23 @@ public class ReferenceModifier implements FilterModifier{
         }
         return modifiedArgs.toArray(new String[modifiedArgs.size()]);
     }
+
+
+    public String[] modify2(String[] original){
+        List<String> modifiedArgs = new ArrayList<>();
+
+        Arrays.stream(original)
+                .distinct()
+                .filter(arg -> searchConfig.referenceDbs.contains(arg))
+                .map(arg -> arg+":*")
+                .forEach(modifiedArgs::add);
+
+
+
+
+        return modifiedArgs.toArray(new String[modifiedArgs.size()]);
+    }
+
+
+
 }
