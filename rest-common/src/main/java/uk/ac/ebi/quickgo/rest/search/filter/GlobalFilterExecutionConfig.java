@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.filter;
 import com.google.common.base.Preconditions;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Holds the definitions of both the {@link InternalFilterExecutionConfig} and the
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Ricardo Antunes
  */
+@Component
 class GlobalFilterExecutionConfig implements FilterExecutionConfig {
     private final InternalFilterExecutionConfig internalExecutionConfig;
     private final ExternalFilterExecutionConfig externalExecutionConfig;
