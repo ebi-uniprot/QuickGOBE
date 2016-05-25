@@ -38,7 +38,7 @@ public class OBOControllerValidationHelperImpl
                 relationType = OntologyRelationType.getByLongName(relationTypeStr);
             } catch (IllegalArgumentException e) {
                 LOGGER.error(e.getMessage());
-                throw new IllegalArgumentException("Unknown relationship requested");
+                throw new IllegalArgumentException("Unknown relationship requested: '" + relationTypeStr + "'");
             }
 
             if (relationType != null) {
