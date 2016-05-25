@@ -57,16 +57,21 @@ public class ReferenceModifier implements FilterModifier{
 
         Arrays.stream(original)
                 .distinct()
-                .filter(arg -> searchConfig.referenceDbs.contains(arg))
-                .map(arg -> arg+":*")
-                .forEach(modifiedArgs::add);
-
-
-
+                .map(arg -> searchConfig.referenceDbs.contains(arg)? arg + ":*" : arg)
+                .map(arg -> ALL_NUMERIC.matcher(arg).matches()? allDbs(arg) : arg)
+                .forEach(modifiedArgs::addAll);
 
         return modifiedArgs.toArray(new String[modifiedArgs.size()]);
     }
 
 
+    private String[] allDbs(String arg){
+        String[] allDbs = new String[searchConfig.referenceDbs.size()];
+        int i=0;
+        for (String db : searchConfig.referenceDbs) {
+            allDbs[i] = db + ":" + arg;
+        }
+        return allDbs;
+    }
 
 }
