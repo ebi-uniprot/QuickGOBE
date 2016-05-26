@@ -63,6 +63,39 @@ public class AnnotationRequestValidationIT {
         );
     }
 
+    //TAXONOMY ID PARAMETER
+    @Test
+    public void negativeTaxonIdIsInvalid() {
+        String taxId = "-1";
+
+        annotationRequest.setTaxonId(taxId);
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void taxonIdWithNonNumberCharactersIsInvalid() {
+        String[] invalidTaxonIdParms = {"1a", "a", "$1"};
+
+        Arrays.stream(invalidTaxonIdParms).forEach(
+                invalidValue -> {
+                    AnnotationRequest request = new AnnotationRequest();
+                    annotationRequest.setTaxonId(invalidValue);
+
+                    assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+                }
+        );
+    }
+
+    @Test
+    public void positiveNumericTaxonIdIsValid() {
+        String taxId = "2";
+
+        annotationRequest.setTaxonId(taxId);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
     //PAGE PARAMETER
     @Test
     public void negativePageValueIsInvalid() {
