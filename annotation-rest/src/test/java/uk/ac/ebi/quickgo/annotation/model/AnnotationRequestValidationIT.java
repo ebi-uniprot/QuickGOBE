@@ -96,6 +96,16 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
+    @Test
+    public void multiplePositiveNumericTaxonIdsIsValid() {
+        String taxId = "2,3,4,5";
+
+        annotationRequest.setTaxon(taxId);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+
     //PAGE PARAMETER
     @Test
     public void negativePageValueIsInvalid() {

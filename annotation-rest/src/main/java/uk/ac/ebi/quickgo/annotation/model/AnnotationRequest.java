@@ -77,10 +77,10 @@ public class AnnotationRequest {
     }
 
     public void setTaxon(String taxId) {
-        filters.put(AnnotationFields.TAXON_ID, String.valueOf(taxId));
+        filters.put(AnnotationFields.TAXON_ID, taxId);
     }
 
-    @Pattern(regexp = "[0-9]+")
+    @Pattern(regexp = "[0-9]+(,[0-9]+)*")
     public String getTaxon() {
         return filters.get(AnnotationFields.TAXON_ID);
     }
