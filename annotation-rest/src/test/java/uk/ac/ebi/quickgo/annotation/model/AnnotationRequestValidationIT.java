@@ -68,7 +68,7 @@ public class AnnotationRequestValidationIT {
     public void negativeTaxonIdIsInvalid() {
         String taxId = "-1";
 
-        annotationRequest.setTaxonId(taxId);
+        annotationRequest.setTaxon(taxId);
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
@@ -80,7 +80,7 @@ public class AnnotationRequestValidationIT {
         Arrays.stream(invalidTaxonIdParms).forEach(
                 invalidValue -> {
                     AnnotationRequest request = new AnnotationRequest();
-                    annotationRequest.setTaxonId(invalidValue);
+                    annotationRequest.setTaxon(invalidValue);
 
                     assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
                 }
@@ -91,7 +91,7 @@ public class AnnotationRequestValidationIT {
     public void positiveNumericTaxonIdIsValid() {
         String taxId = "2";
 
-        annotationRequest.setTaxonId(taxId);
+        annotationRequest.setTaxon(taxId);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }

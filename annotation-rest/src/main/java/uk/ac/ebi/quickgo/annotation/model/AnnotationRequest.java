@@ -76,12 +76,12 @@ public class AnnotationRequest {
         return values.split(COMMA);
     }
 
-    public void setTaxonId(String taxId) {
+    public void setTaxon(String taxId) {
         filters.put(AnnotationFields.TAXON_ID, String.valueOf(taxId));
     }
 
     @Pattern(regexp = "[0-9]+")
-    public String getTaxonId() {
+    public String getTaxon() {
         return filters.get(AnnotationFields.TAXON_ID);
     }
 }
