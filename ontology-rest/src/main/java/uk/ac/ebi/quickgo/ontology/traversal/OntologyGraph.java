@@ -173,7 +173,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
             return source;
         } else {
             throw new IllegalArgumentException(
-                    "No such vertex: " + vertex);
+                    "No such graph vertex: " + vertex);
         }
     }
 
