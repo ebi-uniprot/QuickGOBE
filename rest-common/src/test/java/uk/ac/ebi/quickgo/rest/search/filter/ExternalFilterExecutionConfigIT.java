@@ -15,6 +15,8 @@ import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -26,12 +28,14 @@ import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ExternalFilterExecutionConfigIT.TestApplication.class,
         initializers = ConfigFileApplicationContextInitializer.class)
+@ActiveProfiles(profiles = {"test"})
 public class ExternalFilterExecutionConfigIT {
     @Configuration
     @ComponentScan
     @EnableConfigurationProperties
     public static class TestApplication {
 
+        @Profile(value = "test")
         @Bean
         public SearchableDocumentFields dummySearchableDocumentFields() {
             return new SearchableDocumentFields() {
