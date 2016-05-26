@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static uk.ac.ebi.quickgo.rest.search.filter.JoinFilterConverter.createJoinConverterUsingMap;
+
 /**
  * Implementation of the {@link FilterConverterFactory} interface.
  *
@@ -47,7 +49,8 @@ public class FilterConverterFactoryImpl implements FilterConverterFactory {
                 filterConverter = new SimpleFilterConverter(filter);
                 break;
             case JOIN:
-                throw new RuntimeException("JOIN: Functionality not Implemented yet");
+                filterConverter = createJoinConverterUsingMap(field.getProperties(),
+                        new SimpleFilterConverter(filter)); break;
             case REST_COMM:
                 throw new RuntimeException("REST_COMM: Functionality not Implemented yet");
             default:

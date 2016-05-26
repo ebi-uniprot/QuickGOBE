@@ -43,4 +43,21 @@ public class FilterConverterFactoryImplTest {
 
         assertThat(converter, instanceOf(SimpleFilterConverter.class));
     }
+
+    @Test
+    public void createsAJoinFilterConverterForFieldThatRequiresJoinExecution() {
+        String field = "field";
+
+        Optional<FieldExecutionConfig> fieldConfig = Optional.of(
+                FilterUtil.createExecutionConfig(field, ExecutionType.JOIN)
+        );
+
+        when(configMock.getField(field)).thenReturn(fieldConfig);
+
+        RequestFilter filter = new RequestFilter(field, "value");
+
+        FilterConverter converter = factory.createConverter(filter);
+
+        assertThat(converter, instanceOf(JoinFilterConverter.class));
+    }
 }
