@@ -105,6 +105,14 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
+    @Test
+    public void oneValidTaxIdAndOneInvalidTaxIdIsValid() {
+        String taxId = "2,-1";
+
+        annotationRequest.setTaxon(taxId);
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
 
     //PAGE PARAMETER
     @Test
