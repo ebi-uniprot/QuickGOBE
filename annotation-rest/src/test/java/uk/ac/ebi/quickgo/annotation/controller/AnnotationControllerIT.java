@@ -53,6 +53,7 @@ public class AnnotationControllerIT {
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
+    private static final String REF_PARAM = "reference";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
 
@@ -94,12 +95,28 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy));
 
-        expectResultsInfoExists(response)
+
+        expectResultsInfoExists(response, 1)
+                .andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*").exists())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
+
+
+    @Test
+    public void lookupAll() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search"));
+
+        expectResultsInfoExists(response, basicDocs.size() )
+                .andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
 
     @Test
     public void lookupAnnotationFilterByMultipleAssignedBySuccessfully() throws Exception {
@@ -107,7 +124,7 @@ public class AnnotationControllerIT {
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, basicDocs.get(0).assignedBy + ","
                         + basicDocs.get(1).assignedBy));
 
-        expectResultsInfoExists(response)
+        expectResultsInfoExists(response, 2)
                 .andExpect(jsonPath("$.numberOfHits").value(2))
                 .andExpect(jsonPath("$.results.*").exists())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -121,7 +138,7 @@ public class AnnotationControllerIT {
                         .param(ASSIGNED_BY_PARAM, basicDocs.get(1).assignedBy)
                         .param(ASSIGNED_BY_PARAM, basicDocs.get(3).assignedBy));
 
-        expectResultsInfoExists(response)
+        expectResultsInfoExists(response,3)
                 .andExpect(jsonPath("$.numberOfHits").value(3))
                 .andExpect(jsonPath("$.results.*").exists())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -133,7 +150,7 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, UNAVAILABLE_ASSIGNED_BY));
 
-        expectResultsInfoExists(response)
+        expectResultsInfoExists(response,0)
                 .andExpect(jsonPath("$.numberOfHits").value(0))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -145,7 +162,7 @@ public class AnnotationControllerIT {
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, UNAVAILABLE_ASSIGNED_BY + ","
                         + basicDocs.get(1).assignedBy));
 
-        expectResultsInfoExists(response)
+        expectResultsInfoExists(response,1)
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*").exists())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -157,7 +174,7 @@ public class AnnotationControllerIT {
         for (String validAssignedBy : VALID_ASSIGNED_BY_PARMS) {
             ResultActions response = mockMvc.perform(
                     get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, validAssignedBy));
-            expectResultsInfoExists(response)
+            expectResultsInfoExists(response,0)
                     .andExpect(status().isOk());
         }
     }
@@ -183,7 +200,7 @@ public class AnnotationControllerIT {
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy)
                         .param(PAGE_PARAM, "2"));
 
-        expectResultsInfoExists(response)
+        expectResultsInfoExists(response,2)
                 .andExpect(jsonPath("$.results").isArray())
                 .andExpect(jsonPath("$.results", hasSize(AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE)));
     }
@@ -193,7 +210,7 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy).param(PAGE_PARAM, "1"));
 
-        expectResultsInfoExists(response)
+        expectResultsInfoExists(response,1)
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*").exists())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -246,7 +263,7 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, savedAssignedBy).param(LIMIT_PARAM, "100"));
 
-        expectResultsInfoExists(response)
+        expectResultsInfoExists(response,1)
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*").exists())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -263,12 +280,80 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
+
+    @Test
+    public void singleReferenceIsSuccessful() throws Exception{
+
+        AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        a.reference = "PMID:0000002";
+        annotationRepository.save(a);
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, AnnotationDocMocker.GO_REF_0000002));
+
+        expectResultsInfoExists(response, basicDocs.size())
+                .andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void dbNameIsSuccessful() throws Exception{
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "GO_REF"));
+
+        response.andDo(print());
+
+        expectResultsInfoExists(response, basicDocs.size())
+                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void unknownDbNameIsUnsuccessful() throws Exception{
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "999999"));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void dbIdIsSuccessful() throws Exception{
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "0000002"));
+
+        expectResultsInfoExists(response, basicDocs.size())
+                .andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void unknownDbIdIsUnsuccessful() throws Exception{
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "999999"));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
     /**
      *      TESTING RESULTS
      */
 
-    private ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
-        return expectFieldsInResults(result)
+    private ResultActions expectResultsInfoExists(ResultActions result, int expectedHits) throws Exception {
+        return expectFieldsInResults(result, expectedHits)
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pageInfo").exists())
@@ -277,10 +362,10 @@ public class AnnotationControllerIT {
                 .andExpect(jsonPath("$.pageInfo.current").exists());
     }
 
-    private ResultActions expectFieldsInResults(ResultActions result) throws Exception {
+    private ResultActions expectFieldsInResults(ResultActions result, int expectedHits) throws Exception {
         int index = 0;
 
-        for (int i = 0; i > basicDocs.size(); i++) {
+        for (int i = 0; i < expectedHits; i++) {
             expectFields(result, "$.results[" + index++ + "].");
         }
 
@@ -289,17 +374,20 @@ public class AnnotationControllerIT {
 
     private void expectFields(ResultActions result, String path) throws Exception {
         result
-                .andExpect(jsonPath(path + "id").exists())
-                .andExpect(jsonPath(path + "geneProductId").exists())
-                .andExpect(jsonPath(path + "qualifier").exists())
-                .andExpect(jsonPath(path + "goId").exists())
-                .andExpect(jsonPath(path + "goEvidence").exists())
-                .andExpect(jsonPath(path + "ecoId").exists())
                 .andExpect(jsonPath(path + "reference").exists())
-                .andExpect(jsonPath(path + "withFrom").exists())
-                .andExpect(jsonPath(path + "taxonId").exists())
-                .andExpect(jsonPath(path + "assignedBy").exists())
-                .andExpect(jsonPath(path + "extension").exists());
+                .andExpect(jsonPath(path + "reference").value(is(AnnotationDocMocker.GO_REF_0000002)))
+                .andExpect(jsonPath(path + "assignedBy").exists());
+
+//        .andExpect(jsonPath(path + "id").exists())
+//                .andExpect(jsonPath(path + "geneProductId").exists())
+//                .andExpect(jsonPath(path + "qualifier").exists())
+//                .andExpect(jsonPath(path + "goId").exists())
+//                .andExpect(jsonPath(path + "goEvidence").exists())
+//                .andExpect(jsonPath(path + "ecoId").exists())
+//                .andExpect(jsonPath(path + "withFrom").exists())
+//                .andExpect(jsonPath(path + "taxonId").exists())
+//                .andExpect(jsonPath(path + "extension").exists());
+
     }
 
     /**
