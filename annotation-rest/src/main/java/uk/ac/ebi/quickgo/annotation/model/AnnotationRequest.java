@@ -58,6 +58,7 @@ public class AnnotationRequest {
         filters.put(ASPECT_FIELD, aspect);
     }
 
+    @Pattern(regexp = "(?iu)process|function|component")
     public String getAspect() {
         return filters.get(ASPECT_FIELD);
     }
