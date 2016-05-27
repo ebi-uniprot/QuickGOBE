@@ -28,14 +28,14 @@ import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ExternalFilterExecutionConfigIT.TestApplication.class,
         initializers = ConfigFileApplicationContextInitializer.class)
-@ActiveProfiles(profiles = {"test"})
+@ActiveProfiles(profiles = {"ExternalFilterExecutionConfigIT"})
 public class ExternalFilterExecutionConfigIT {
     @Configuration
     @ComponentScan
     @EnableConfigurationProperties
     public static class TestApplication {
 
-        @Profile(value = "test")
+        @Profile(value = "ExternalFilterExecutionConfigIT")
         @Bean
         public SearchableDocumentFields dummySearchableDocumentFields() {
             return new SearchableDocumentFields() {
