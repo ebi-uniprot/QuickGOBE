@@ -16,6 +16,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
 
         //todo take elements
         annotation.assignedBy = annotationDocument.assignedBy;
+        annotation.goEvidence = annotationDocument.goEvidence;
         return annotation;
     }
 }

@@ -63,6 +63,9 @@ public class AnnotationControllerIT {
             Arrays.asList("_ASPGD", "ASPGD,_Agbase", "5555,Agbase",
                     "ASPGD,5555,", "4444,5555,");
 
+    private static final String GOEVIDENCE_PARM="goEvidence";
+    private static final String SINGLE_GOEVIDENCE="IEA";
+
     private MockMvc mockMvc;
 
     private String savedAssignedBy;
@@ -171,6 +174,35 @@ public class AnnotationControllerIT {
                     .andExpect(status().isBadRequest());
         }
     }
+
+    //---------- GoEvidence related tests.
+
+    @Test
+    public void lookupAnnotationFilterByGoEvidenceCodeBySuccessfully() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, SINGLE_GOEVIDENCE));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void all() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search"));
+        response.andDo(print());
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+
+
 
     //---------- Page related tests.
 
