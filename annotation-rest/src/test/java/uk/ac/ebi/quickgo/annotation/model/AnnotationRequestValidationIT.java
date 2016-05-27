@@ -22,6 +22,10 @@ public class AnnotationRequestValidationIT {
     private static final String[] INVALID_ASSIGNED_BY_PARMS = {"_ASPGD", "ASPGD,_Agbase",
             "5555,Agbase", "ASPGD,5555,", "4444,5555,"};
 
+    private static final String[] VALID_GO_EVIDENCE = {"IEA,IBD,IC"};
+    private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
+
+
     private Validator validator;
     private AnnotationRequest annotationRequest;
 
@@ -37,7 +41,6 @@ public class AnnotationRequestValidationIT {
     @Test
     public void nullAssignedByIsValid() {
         annotationRequest.setAssignedBy(null);
-
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -58,6 +61,32 @@ public class AnnotationRequestValidationIT {
                     AnnotationRequest annotationRequest = new AnnotationRequest();
                     annotationRequest.setAssignedBy(invalidValue);
 
+                    assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+                }
+        );
+    }
+
+    //GO EVIDENCE
+    @Test
+    public void nullGoEvidenceIsValid() {
+        annotationRequest.setGoEvidence(null);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void allGoEvidenceValuesAreValid() {
+        String goEvidenceValues = Arrays.stream(VALID_GO_EVIDENCE)
+                .collect(Collectors.joining(","));
+        annotationRequest.setGoEvidence(goEvidenceValues);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void allGoEvidenceValuesAreInvalid() {
+        Arrays.stream(INVALID_GO_EVIDENCE).forEach(
+                invalidValue -> {
+                    AnnotationRequest annotationRequest = new AnnotationRequest();
+                    annotationRequest.setGoEvidence(invalidValue);
                     assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
                 }
         );

@@ -28,8 +28,9 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class AnnotationRequestTest {
     private static final String UNI_PROT = "UniProt";
     private static final String ASPGD = "ASPGD";
+    private static final String EVIDENCE_IEA = "IEA";
+    private static final String EVIDENCE_MULTI = "IEA,IBD";
 
-    private String multiAssignedBy = UNI_PROT + "," + ASPGD;
 
     private AnnotationRequest annotationRequest;
 
@@ -59,49 +60,20 @@ public class AnnotationRequestTest {
     @Test
     public void setAndGetAssignedBy() {
         annotationRequest.setAssignedBy(UNI_PROT);
-
         assertThat(annotationRequest.getAssignedBy(), is(UNI_PROT));
     }
 
-//    @Test
-//    public void addSingleFilter() {
-//        annotationRequest.setAssignedBy(UNI_PROT);
-//        final List<RequestFilter> pfList = annotationRequest.stream().collect(toList());
-//        assertThat(pfList.get(0).getField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
-//        assertThat(pfList, hasSize(1));
-//
-//        assertThat(pfList.get(0)
-//                .provideArgStream()
-//                .findFirst().isPresent(), is(true));
-//        assertThat(pfList.get(0)
-//                .provideArgStream()
-//                .findFirst().get(), is(equalTo(UNI_PROT)));
-//        assertThat(pfList.get(0)
-//                .provideArgStream()
-//                .count(), is(1L));
-//    }
 
-//    @Test
-//    public void successfullyAddMultiFilterForAssignedBy() {
-//
-//        annotationRequest.setAssignedBy(multiAssignedBy);
-//        final List<RequestFilter> pfList = annotationRequest.stream().collect(toList());
-//        assertThat(pfList, hasSize(1));
-//        assertThat(pfList.get(0).getField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
-//
-//        assertThat(pfList.get(0)
-//                .provideArgStream()
-//                .findFirst().get(), is(equalTo(UNI_PROT)));
-//
-//        assertThat(pfList.get(0)
-//                .provideArgStream()
-//                .filter(a -> a.equals(ASPGD))
-//                .findFirst().get(), is(equalTo(ASPGD)));
-//
-//        long countASPGD = pfList.get(0)
-//                .provideArgStream()
-//                .filter(a -> a.equals(ASPGD))
-//                .count();
-//        assertThat(countASPGD, is(1L));
-//    }
+    @Test
+    public void setAndGetEvidence(){
+        annotationRequest.setGoEvidence(EVIDENCE_IEA);
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_IEA));
+    }
+
+    @Test
+    public void setAndGetEvidenceMulti(){
+        annotationRequest.setGoEvidence(EVIDENCE_MULTI);
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
+    }
+
 }
