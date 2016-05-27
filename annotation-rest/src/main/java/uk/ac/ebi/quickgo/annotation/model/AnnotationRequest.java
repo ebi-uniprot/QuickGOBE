@@ -51,6 +51,20 @@ public class AnnotationRequest {
         return filters.get(AnnotationFields.ASSIGNED_BY);
     }
 
+    /**
+     * The older evidence codes
+     * E.g. IEA, IBA, IBD etc
+     * @param evidence
+     */
+    public void setGoEvidence(String evidence){
+        filters.put(AnnotationFields.GO_EVIDENCE, evidence);
+    }
+
+    @Pattern(regexp = "^[A-Z]{2,3}(,[A-Z]{2,3})*")
+    public String getGoEvidence(){
+        return filters.get(AnnotationFields.GO_EVIDENCE);
+    }
+
     public void setPage(int page) {
         this.page = page;
     }
