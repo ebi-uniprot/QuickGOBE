@@ -51,6 +51,17 @@ public class AnnotationRequest {
         return filters.get(AnnotationFields.ASSIGNED_BY);
     }
 
+    //TODO:change the way the field is referenced
+    private static final String ASPECT_FIELD = "aspect";
+
+    public void setAspect(String aspect) {
+        filters.put(ASPECT_FIELD, aspect);
+    }
+
+    public String getAspect() {
+        return filters.get(ASPECT_FIELD);
+    }
+
     public void setPage(int page) {
         this.page = page;
     }
