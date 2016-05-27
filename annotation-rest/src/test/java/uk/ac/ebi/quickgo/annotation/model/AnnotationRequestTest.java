@@ -1,18 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
-
-import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -25,14 +20,15 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Time: 11:25
  * Created with IntelliJ IDEA.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AnnotationRequestTest {
 
     //AssignedBy values
     private static final String UNI_PROT = "UniProt";
-    private static final String ASPGD = "ASPGD";
 
     //Reference
     private static final String EXAMPLE_REFERENCES="DOI,PMID,Reactome,GO_REF:0000037";
+    private static final String ONE_GOREF = "GO_REF:123456";
 
     private AnnotationRequest annotationRequest;
 
@@ -69,6 +65,7 @@ public class AnnotationRequestTest {
 
     @Test
     public void setAndGetReference(){
-        annotationRequest.setReference(EXAMPLE_REFERENCES);
+        annotationRequest.setReference(ONE_GOREF);
+        assertThat(annotationRequest.getReference(), is(ONE_GOREF));
     }
 }
