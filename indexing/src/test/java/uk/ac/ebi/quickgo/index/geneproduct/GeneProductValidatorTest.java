@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
 import uk.ac.ebi.quickgo.index.ExceptionMatcher;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
+import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +16,6 @@ import org.springframework.batch.item.validator.ValidationException;
 
 import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.concatStrings;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
 
 /**
@@ -343,7 +343,7 @@ public class GeneProductValidatorTest {
     }
 
     @Test
-    public void completeProteoemeWithInvalidValueThrowsException() throws Exception {
+    public void completeProteomeWithInvalidValueThrowsException() throws Exception {
         String pair = concatProperty(COMPLETE_PROTEOME_KEY, "invalid");
 
         geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
@@ -353,12 +353,12 @@ public class GeneProductValidatorTest {
     }
 
     @Test
-    public void completeProteoemeWithYValueIsValid() throws Exception {
+    public void completeProteomeWithYValueIsValid() throws Exception {
         assertYValue(COMPLETE_PROTEOME_KEY);
     }
 
     @Test
-    public void completeProteoemeWithNValueIsValid() throws Exception {
+    public void completeProteomeWithNValueIsValid() throws Exception {
         assertNValue(COMPLETE_PROTEOME_KEY);
     }
 
@@ -397,7 +397,7 @@ public class GeneProductValidatorTest {
     }
 
     private String concatProperty(String key, String value) {
-        return GeneProductUtil.concatProperty(key, value, INTRA_VALUE_DELIMITER);
+        return GOADataFileParsingUtil.concatProperty(key, value, INTRA_VALUE_DELIMITER);
     }
 
     private String appendToProperties(String geneProductProperties, List<String> valuesToAppend) {
@@ -405,7 +405,7 @@ public class GeneProductValidatorTest {
         allValues.add(geneProduct.properties);
         allValues.addAll(valuesToAppend);
 
-        return concatStrings(allValues, INTER_VALUE_DELIMITER);
+        return GOADataFileParsingUtil.concatStrings(allValues, INTER_VALUE_DELIMITER);
     }
 
     private ValidationException createValidationException(String message) {

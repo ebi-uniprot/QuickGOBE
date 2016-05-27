@@ -38,6 +38,7 @@ public class LogJobListener implements JobExecutionListener {
 
         LOGGER.info("=====================================================");
         LOGGER.info("              QuickGO Job Statistics                 ");
+        LOGGER.info("Job name      : {}", jobExecution.getJobInstance().getJobName());
         LOGGER.info("Exit status   : {}", jobExecution.getExitStatus().getExitCode());
         LOGGER.info("Start time    : {}", jobExecution.getStartTime());
         LOGGER.info("End time      : {}", jobExecution.getEndTime());
