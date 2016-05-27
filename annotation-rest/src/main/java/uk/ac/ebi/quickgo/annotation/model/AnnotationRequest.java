@@ -57,12 +57,12 @@ public class AnnotationRequest {
      * @return
      */
     public void setReference(String reference){
-        filters.put(AnnotationFields.REFERENCE, reference);
+        filters.put(AnnotationFields.REFERENCE_SEARCH, reference);
     }
 
     //todo create validation pattern @Pattern(regexp = "")
     public String getReference(){
-        return filters.get(AnnotationFields.REFERENCE);
+        return filters.get(AnnotationFields.REFERENCE_SEARCH);
     }
 
     public void setPage(int page) {
@@ -80,6 +80,7 @@ public class AnnotationRequest {
     public int getPage() {
         return page;
     }
+
 
     public Stream<RequestFilter> convertToFilters() {
         return filters.entrySet().stream().map(filter -> new RequestFilter(filter.getKey(),
