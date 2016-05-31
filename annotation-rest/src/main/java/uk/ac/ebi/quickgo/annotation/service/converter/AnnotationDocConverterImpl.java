@@ -16,6 +16,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
 
         //todo take elements
         annotation.assignedBy = annotationDocument.assignedBy;
+        annotation.withFrom = annotationDocument.withFrom;
         return annotation;
     }
 }
