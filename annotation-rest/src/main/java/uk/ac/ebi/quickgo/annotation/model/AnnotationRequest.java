@@ -52,7 +52,8 @@ public class AnnotationRequest {
     }
 
     /**
-     * E.g. DOI*, GO_REF*, PMID*, Reactome*, GO_REF:0000037 etc
+     * E.g. DOI, DOI:10.1002/adsc.201200590, GO_REF, PMID, PMID:12882977, Reactome, Reactome:R-RNO-912619,
+     * GO_REF:0000037 etc
      * @param reference
      * @return
      */
