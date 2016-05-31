@@ -78,6 +78,7 @@
     <field name="ecoId" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="reference" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="withFrom" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="withFromSearch" type="string" indexed="true" stored="false" multiValued="true"/>
     <field name="taxonId" type="int" indexed="true" stored="false" multiValued="false"/>
     <field name="interactingTaxonId" type="int" indexed="false" stored="true" multiValued="false"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>
