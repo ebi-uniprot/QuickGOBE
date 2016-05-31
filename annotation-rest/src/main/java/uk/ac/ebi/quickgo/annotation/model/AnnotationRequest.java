@@ -55,7 +55,7 @@ public class AnnotationRequest {
      * A list of with/from values, separated by commas
      * In the format withFrom=PomBase:SPBP23A10.14c,RGD:621207 etc
      * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
-     * @param withFrom
+     * @param withFrom comma separated with/from values
      */
     public void setWithFrom(String withFrom){
         filters.put(AnnotationFields.WITH_FROM_SEARCH, withFrom);
@@ -63,7 +63,7 @@ public class AnnotationRequest {
 
     /**
      * Return a list of with/from values, separated by commas
-     * @return
+     * @return String containing comma separated list of with/From values.
      */
     public  String getWithFrom(){
         return filters.get(AnnotationFields.WITH_FROM_SEARCH);
