@@ -260,6 +260,31 @@ public class AnnotationControllerIT {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
+
+
+    @Test
+    public void successfulLookupWithFromUsingDatabaseNameOnly()throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void successfulLookupWithFromUsingDatabaseIdOnly()throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "IPR015421"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
     //---------- Limit related tests.
 
     @Test
