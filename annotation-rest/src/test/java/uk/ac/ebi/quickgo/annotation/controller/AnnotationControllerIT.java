@@ -189,20 +189,6 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    public void all() throws Exception {
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search"));
-        response.andDo(print());
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-
-
 
     //---------- Page related tests.
 
