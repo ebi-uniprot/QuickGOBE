@@ -55,6 +55,7 @@ public class AnnotationControllerIT {
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
+    private static final String WITHFROM_PARAM= "withFrom";
 
     private static final List<String> VALID_ASSIGNED_BY_PARMS = Arrays.asList("ASPGD", "ASPGD,Agbase", "ASPGD_,Agbase",
             "ASPGD,Agbase_", "ASPGD,Agbase", "BHF-UCL,Agbase", "Roslin_Institute,BHF-UCL,Agbase");
@@ -225,6 +226,40 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
+    //---------- withFrom related tests.
+    @Test
+    public void successfulLookupWithFromForSingleId()throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro:IPR015421"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void successfulLookupWithFromForMultipleValues()throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM,
+                "InterPro:IPR015421,InterPro:IPR015422"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
+                .andExpect(jsonPath("$.results.*").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void searchingForUnknownWithFromBringsBackNoResults()throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "XXX:54321"));
+
+        expectResultsInfoExists(response)
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
     //---------- Limit related tests.
 
     @Test
