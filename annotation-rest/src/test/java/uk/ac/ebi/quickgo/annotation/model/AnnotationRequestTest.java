@@ -30,6 +30,7 @@ public class AnnotationRequestTest {
     private static final String ASPGD = "ASPGD";
 
     private String multiAssignedBy = UNI_PROT + "," + ASPGD;
+    private String WITH_FROM = "RGD:1623038";
 
     private AnnotationRequest annotationRequest;
 
@@ -61,6 +62,12 @@ public class AnnotationRequestTest {
         annotationRequest.setAssignedBy(UNI_PROT);
 
         assertThat(annotationRequest.getAssignedBy(), is(UNI_PROT));
+    }
+
+    @Test
+    public void setAndGetWithFrom(){
+        annotationRequest.setWithFrom(WITH_FROM);
+        assertThat(annotationRequest.getWithFrom(), is(WITH_FROM));
     }
 
 //    @Test
