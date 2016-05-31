@@ -94,12 +94,6 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
-    public void convertExtensionsSuccessfully() {
-        Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.extensions, is(EXTENSIONS));
-    }
-
-    @Test
     public void convertAssignedBySuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
         assertThat(model.assignedBy, is(ASSIGNED_BY));
@@ -111,11 +105,9 @@ public class AnnotationDocConverterImplTest {
         doc.geneProductId = GENE_PRODUCT_ID;
         doc.qualifier = QUALIFIER;
         doc.goId = GO_ID;
-        doc.taxonId = TAXON_ID;
         doc.ecoId = ECO_ID;
         doc.withFrom = WITH_FROM;
         doc.assignedBy = ASSIGNED_BY;
-        doc.extensions = EXTENSIONS;
 
         return doc;
     }
