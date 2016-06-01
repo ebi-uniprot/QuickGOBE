@@ -1,0 +1,11 @@
+## ================= Search =================
+# the fields to return in search results from a solr query
+# ontology search: if you define a value, ensure ontologyType is also included
+search:
+  return:
+    fields: [id,geneProductId,qualifier,goId,goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extensions]
+  external:
+    fields:
+      - name: aspect
+        execution: join
+        properties: {fromTable: ontology, fromAttribute: id_join, toTable: annotation, toAttribute: goId_join}
