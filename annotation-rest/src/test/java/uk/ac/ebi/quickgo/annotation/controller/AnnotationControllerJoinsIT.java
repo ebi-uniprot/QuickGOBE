@@ -67,7 +67,7 @@ public class AnnotationControllerJoinsIT {
             throws Exception {
         String geneProductId = "P99999";
         String goId = "ECO:0000256";
-        String aspect = Aspect.CELLULAR_COMPONENT.getShortName();
+        String aspect = "cellular_component";
 
         AnnotationDocument annotationDoc = createAnnotationDocWithGoId(geneProductId, goId);
         annotationRepository.save(annotationDoc);
@@ -92,8 +92,8 @@ public class AnnotationControllerJoinsIT {
             throws Exception {
         String geneProductId = "P99999";
         String goId = "ECO:0000256";
-        String ontologyAspect = Aspect.MOLECULAR_FUNCTION.getShortName();
-        String queryAspect = Aspect.CELLULAR_COMPONENT.getShortName();
+        String ontologyAspect = "molecular_function";
+        String queryAspect = "cellular_component";
 
         AnnotationDocument annotationDoc = createAnnotationDocWithGoId(geneProductId, goId);
         annotationRepository.save(annotationDoc);

@@ -77,7 +77,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void processAspectIsValid() {
-        String aspect = "process";
+        String aspect = "biological_process";
 
         annotationRequest.setAspect(aspect);
 
@@ -86,7 +86,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void functionAspectIsValid() {
-        String aspect = "function";
+        String aspect = "molecular_function";
 
         annotationRequest.setAspect(aspect);
 
@@ -95,7 +95,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void componentAspectIsValid() {
-        String aspect = "component";
+        String aspect = "cellular_component";
 
         annotationRequest.setAspect(aspect);
 
@@ -113,7 +113,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void mixedCaseAspectIsValid() {
-        String[] aspects = {"FuNcTiOn", "pRoCeSs", "CoMpOnEnT"};
+        String[] aspects = {"MoLeCuLaR_FuNcTiOn", "BiOlOgIcAl_pRoCeSs", "CelLUlar_CoMpOnEnT"};
 
         Arrays.stream(aspects).forEach(
                 mixedCaseAspect -> {

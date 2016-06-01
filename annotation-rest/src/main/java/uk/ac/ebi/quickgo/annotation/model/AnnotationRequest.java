@@ -55,10 +55,12 @@ public class AnnotationRequest {
     private static final String ASPECT_FIELD = "aspect";
 
     public void setAspect(String aspect) {
-        filters.put(ASPECT_FIELD, aspect);
+        if(aspect != null) {
+            filters.put(ASPECT_FIELD, aspect.toLowerCase());
+        }
     }
 
-    @Pattern(regexp = "(?iu)process|function|component")
+    @Pattern(regexp = "(?iu)biological_process|molecular_function|cellular_component")
     public String getAspect() {
         return filters.get(ASPECT_FIELD);
     }
