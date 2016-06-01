@@ -51,8 +51,8 @@ public class GeneProductDbXRefIDFormats {
      */
     public boolean isValidId(String id, String database, String typeName) {
 
-        //If we haven't managed to createWithData the validation regular expression then pass everything
-        if (geneProductXrefEntities == null) {
+        //If we haven't managed to load the validation regular expressions then pass everything
+        if (geneProductXrefEntities.size()==0) {
             return true;
         }
 
