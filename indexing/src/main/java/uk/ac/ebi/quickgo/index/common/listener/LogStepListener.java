@@ -7,6 +7,8 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
 /**
+ * Logs statistics to show the progress of the indexing step.
+ *
  * Created 02/12/15
  * @author Edd
  */

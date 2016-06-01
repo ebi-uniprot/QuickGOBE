@@ -67,21 +67,21 @@
     <!-- ========================================================================== -->
     <!--                  Start of QuickGO Annotation fields                        -->
 
-    <field name="id" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true"/>
     <field name="geneProductId" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="symbol" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="qualifier" type="string" indexed="false" stored="true" multiValued="false"/>
-    <field name="goId" type="string" indexed="true" stored="true" multiValued="false"/>
-    <!--Used for cross-core joins with the ontology core, do not change this field's definition-->
-    <field name="goId_join" type="string" indexed="true" stored="false" multiValued="false"/>
-    <!--<field name="goName" type="string" indexed="false" stored="true" multiValued="false"/>-->
+    <field name="goId" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="dbObjectType" type="string" indexed="true" stored="false" multiValued="false"/>
+    <field name="dbObjectSymbol" type="string" indexed="true" stored="false" multiValued="false"/>
+    <field name="dbSubset" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="goEvidence" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="ecoId" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="reference" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="withFrom" type="string" indexed="false" stored="true" multiValued="true"/>
-    <field name="taxonId" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="taxonId" type="int" indexed="true" stored="false" multiValued="false"/>
+    <field name="interactingTaxonId" type="int" indexed="false" stored="true" multiValued="false"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="extension" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="extension" type="string" indexed="false" stored="true" multiValued="true"/>
 
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->
