@@ -71,6 +71,7 @@
     <field name="geneProductId" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="qualifier" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="goId" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="goId_join" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="dbObjectType" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="dbObjectSymbol" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="dbSubset" type="string" indexed="true" stored="false" multiValued="false"/>
