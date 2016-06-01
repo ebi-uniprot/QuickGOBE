@@ -10,8 +10,6 @@ import uk.ac.ebi.quickgo.ontology.common.document.Aspect;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -19,7 +17,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,11 +25,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createAnnotationDoc;
+import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 
 /**
  * Tests filter parameters in the {@link AnnotationController} that require joins between different collections/tables.
@@ -60,8 +55,6 @@ public class AnnotationControllerJoinsIT {
 
     private MockMvc mockMvc;
 
-    private List<AnnotationDocument> genericDocs = new ArrayList<>();
-
     @Before
     public void setUp() throws Exception {
         mockMvc = MockMvcBuilders.
@@ -69,8 +62,7 @@ public class AnnotationControllerJoinsIT {
                 .build();
     }
 
-    @Test
-    public void
+    @Test public void
     filterByCellularComponentAspectHitsAnnotationDocumentWhoseOntologyIdentifierMatchesAnOntologyDocumentWithACellularComponentAspect()
             throws Exception {
         String geneProductId = "P99999";
@@ -86,11 +78,12 @@ public class AnnotationControllerJoinsIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ASPECT_PARAM, aspect));
 
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results[0].geneProductId").value(geneProductId))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
     }
 
     @Test
@@ -111,45 +104,10 @@ public class AnnotationControllerJoinsIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ASPECT_PARAM, queryAspect));
 
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(0))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    private ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
-        return expectFieldsInResults(result)
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.pageInfo").exists())
-                .andExpect(jsonPath("$.pageInfo.resultsPerPage").exists())
-                .andExpect(jsonPath("$.pageInfo.total").exists())
-                .andExpect(jsonPath("$.pageInfo.current").exists());
-    }
-
-    private ResultActions expectFieldsInResults(ResultActions result) throws Exception {
-        int index = 0;
-
-        for (int i = 0; i > genericDocs.size(); i++) {
-            expectFields(result, "$.results[" + index++ + "].");
-        }
-
-        return result;
-    }
-
-    private void expectFields(ResultActions result, String path) throws Exception {
-        result
-                .andExpect(jsonPath(path + "id").exists())
-                .andExpect(jsonPath(path + "geneProductId").exists())
-                .andExpect(jsonPath(path + "qualifier").exists())
-                .andExpect(jsonPath(path + "goId").exists())
-                .andExpect(jsonPath(path + "goEvidence").exists())
-                .andExpect(jsonPath(path + "ecoId").exists())
-                .andExpect(jsonPath(path + "reference").exists())
-                .andExpect(jsonPath(path + "withFrom").exists())
-                .andExpect(jsonPath(path + "taxonId").exists())
-                .andExpect(jsonPath(path + "assignedBy").exists())
-                .andExpect(jsonPath(path + "extensions").exists());
+        response.andExpect(status().isOk())
+                .andExpect(totalNumOfResults(0))
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists());
     }
 
     @After
