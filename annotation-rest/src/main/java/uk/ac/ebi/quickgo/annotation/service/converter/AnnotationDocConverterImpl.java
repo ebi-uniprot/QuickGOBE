@@ -23,12 +23,15 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         annotation.goEvidence = annotationDocument.goEvidence;
         annotation.ecoId = annotationDocument.ecoId;
         annotation.reference = annotationDocument.reference;
-        annotation.extension = annotationDocument.extension;
 
         annotation.assignedBy = annotationDocument.assignedBy;
 
         if(annotationDocument.withFrom != null) {
             annotation.withFrom = new ArrayList<>(annotationDocument.withFrom);
+        }
+
+        if(annotationDocument.extensions != null) {
+            annotation.extensions = new ArrayList<>(annotationDocument.extensions);
         }
 
         return annotation;

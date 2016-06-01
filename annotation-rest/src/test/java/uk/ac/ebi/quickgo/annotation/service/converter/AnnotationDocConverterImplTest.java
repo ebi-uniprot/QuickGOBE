@@ -89,13 +89,18 @@ public class AnnotationDocConverterImplTest {
 
     @Test
     public void convertExtensionSuccessfully() {
-        String extensionValue = "extension";
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.extensions, is(EXTENSIONS));
+
+    }
+
+    @Test
+    public void convertNullExtensionsSuccessfully() {
         AnnotationDocument doc = new AnnotationDocument();
-        doc.extension = extensionValue;
+        doc.extensions = null;
 
         Annotation model = docConverter.convert(doc);
-        assertThat(model.extension, is(extensionValue));
-
+        assertThat(model.extensions, is(nullValue()));
     }
 
     @Test
@@ -113,6 +118,7 @@ public class AnnotationDocConverterImplTest {
         doc.ecoId = ECO_ID;
         doc.withFrom = WITH_FROM;
         doc.assignedBy = ASSIGNED_BY;
+        doc.extensions = EXTENSIONS;
 
         return doc;
     }
