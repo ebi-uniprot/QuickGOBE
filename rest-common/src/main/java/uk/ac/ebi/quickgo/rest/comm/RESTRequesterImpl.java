@@ -33,13 +33,13 @@ class RESTRequesterImpl implements RESTRequester {
         return get(new RestTemplate(), responseType);
     }
 
+    static Builder newBuilder(String url) {
+        return new Builder(url);
+    }
+
     <T> CompletableFuture<T> get(RestTemplate template, Class<T> responseType) {
         return CompletableFuture.supplyAsync(() ->
                 template.getForObject(url, responseType, requestParameters));
-    }
-
-    static Builder newBuilder(String url) {
-        return new Builder(url);
     }
 
     public static class Builder {
@@ -48,7 +48,7 @@ class RESTRequesterImpl implements RESTRequester {
         private Map<String, List<String>> requestParameters;
 
         Builder(String url) {
-            Preconditions.checkArgument(url != null && !url.trim().isEmpty(), "URL cannot be null or empty");
+            checkURL(url);
 
             this.url = url;
             this.requestParameters = new LinkedHashMap<>();
@@ -59,7 +59,7 @@ class RESTRequesterImpl implements RESTRequester {
         }
 
         public Builder resetURL(String url) {
-            Preconditions.checkArgument(url != null && !url.trim().isEmpty(), "URL cannot be null or empty");
+            checkURL(url);
 
             this.url = url;
             return this;
@@ -83,6 +83,10 @@ class RESTRequesterImpl implements RESTRequester {
             this.requestParameters = requestParameters;
 
             return this;
+        }
+
+        private void checkURL(String url) {
+            Preconditions.checkArgument(url != null && !url.trim().isEmpty(), "URL cannot be null or empty");
         }
     }
 }

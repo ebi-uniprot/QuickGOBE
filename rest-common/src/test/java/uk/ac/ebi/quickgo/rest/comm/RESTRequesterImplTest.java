@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.rest.comm;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.junit.Before;
@@ -19,10 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * Created 31/05/16
@@ -36,7 +34,7 @@ public class RESTRequesterImplTest {
 
     @Mock
     private RestTemplate restTemplateMock;
-    private HashMap<String, List<String>> requestParameters;
+    private Map<String, List<String>> requestParameters;
 
     @Before
     public void setUp() {
@@ -52,6 +50,51 @@ public class RESTRequesterImplTest {
         assertThat(requester, is(notNullValue()));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void creatingWithNullURLThrowsException() {
+        RESTRequesterImpl.newBuilder(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void creatingWithEmptyURLThrowsException() {
+        RESTRequesterImpl.newBuilder("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void resettingURLWithNullValueThrowsException() {
+        requesterBuilder.resetURL(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void resettingURLWithEmptyValueThrowsException() {
+        requesterBuilder.resetURL("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addingRequestParamWithNullNameThrowsException() {
+        requesterBuilder.addRequestParameter(null, "value");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addingRequestParamWithEmptyNameThrowsException() {
+        requesterBuilder.addRequestParameter("", "value");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addingRequestParamWithNullValueThrowsException() {
+        requesterBuilder.addRequestParameter("name", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addingRequestParamWithEmptyValueThrowsException() {
+        requesterBuilder.addRequestParameter("name", "");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addingRequestParamsWithNullValueThrowsException() {
+        requesterBuilder.setRequestParameters(null);
+    }
+
     @Test
     public void addingRequestParamsResultsInTheseParamsBeingUsed() {
         addRequestParameter("param1", "value1");
@@ -65,7 +108,7 @@ public class RESTRequesterImplTest {
 
     @Test
     public void resettingURLResultsInNewURLBeingAccessed() {
-        String newURL = "another url";
+        String newURL = "new url";
         requesterBuilder.resetURL(newURL);
 
         RESTRequesterImpl requester = requesterBuilder.build();
@@ -75,22 +118,35 @@ public class RESTRequesterImplTest {
     }
 
     @Test
-    public void showSuccessfulURLGet() throws ExecutionException, InterruptedException {
+    public void showSuccessfulURLGetWithNoDelay() throws ExecutionException, InterruptedException {
         String dtoValue = "value";
-        delayAnswer(1000, new FakeDTO(dtoValue)).when(restTemplateMock)
+        when(restTemplateMock.getForObject(SERVICE_ENDPOINT, FakeDTO.class, requestParameters))
+                .thenReturn(new FakeDTO(dtoValue));
+
+        RESTRequesterImpl requester = requesterBuilder.build();
+
+        CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class);
+
+        FakeDTO fakeDTO = completableFuture.get();
+        assertThat(fakeDTO.value, is(dtoValue));
+    }
+
+    @Test
+    public void showSuccessfulURLGetWithDelay() throws ExecutionException, InterruptedException {
+        String dtoValue = "value";
+        delayAnswer(500, new FakeDTO(dtoValue)).when(restTemplateMock)
                 .getForObject(SERVICE_ENDPOINT, FakeDTO.class, requestParameters);
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
         CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class);
 
-        FakeDTO fakeyFakey = completableFuture.get();
-        assertThat(fakeyFakey.value, is(dtoValue));
+        FakeDTO fakeDTO = completableFuture.get();
+        assertThat(fakeDTO.value, is(dtoValue));
     }
 
     @Test
     public void showHandlingOfAFailedURLGet() throws ExecutionException, InterruptedException {
-
         doThrow(new RestClientException("Didn't work", new Exception("For some reason"))).when(restTemplateMock)
                 .getForObject(SERVICE_ENDPOINT, FakeDTO.class, requestParameters);
 
@@ -100,8 +156,8 @@ public class RESTRequesterImplTest {
         CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class)
                 .exceptionally(ex -> new FakeDTO(failed));
 
-        FakeDTO fakeyFakey = completableFuture.get();
-        assertThat(fakeyFakey.value, is(failed));
+        FakeDTO fakeDTO = completableFuture.get();
+        assertThat(fakeDTO.value, is(failed));
     }
 
     private static Stubber delayAnswer(int delay, Object toReturn) {
@@ -122,6 +178,24 @@ public class RESTRequesterImplTest {
 
         FakeDTO(String value) {
             this.value = value;
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            FakeDTO fakeDTO = (FakeDTO) o;
+
+            return value != null ? value.equals(fakeDTO.value) : fakeDTO.value == null;
+
+        }
+
+        @Override public int hashCode() {
+            return value != null ? value.hashCode() : 0;
         }
     }
 
