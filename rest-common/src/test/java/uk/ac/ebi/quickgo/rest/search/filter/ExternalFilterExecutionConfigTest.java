@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.filter;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
@@ -91,5 +92,24 @@ public class ExternalFilterExecutionConfigTest {
         config.setFields(Collections.singletonList(field));
 
         assertThat(config.getField("fake"), is(Optional.empty()));
+    }
+
+    @Test
+    public void getsFirstOfTwoFieldsWithTheSameName() {
+        String name = "field";
+        FieldExecutionConfig.ExecutionType type1 = JOIN;
+        FieldExecutionConfig.ExecutionType type2 = SIMPLE;
+
+        FieldExecutionConfig field1 = createExecutionConfig(name, type1);
+        FieldExecutionConfig field2 = createExecutionConfig(name, type2);
+
+        config.setFields(Arrays.asList(field1, field2));
+
+        Optional<FieldExecutionConfig> retrievedFieldOpt = config.getField(name);
+
+        FieldExecutionConfig retrievedField = retrievedFieldOpt.get();
+
+        assertThat(retrievedField.getName(), is(name));
+        assertThat(retrievedField.getExecution(), is(JOIN));
     }
 }
