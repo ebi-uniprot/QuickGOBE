@@ -12,7 +12,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Created 31/05/16
  * @author Edd
  */
-class RESTRequesterImpl implements RESTRequester {
+public class RESTRequesterImpl implements RESTRequester {
     private static final String EMPTY_URL = "";
     private static final Logger LOGGER = getLogger(RESTRequesterImpl.class);
     private final String url;
@@ -33,7 +33,7 @@ class RESTRequesterImpl implements RESTRequester {
         return get(new RestTemplate(), responseType);
     }
 
-    static Builder newBuilder(String url) {
+    public static Builder newBuilder(String url) {
         return new Builder(url);
     }
 

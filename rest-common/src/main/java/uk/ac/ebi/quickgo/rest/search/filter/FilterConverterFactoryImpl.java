@@ -49,8 +49,10 @@ public class FilterConverterFactoryImpl implements FilterConverterFactory {
                 filterConverter = new SimpleFilterConverter(filter);
                 break;
             case JOIN:
-                filterConverter = createJoinConverterUsingMap(field.getProperties(),
-                        new SimpleFilterConverter(filter)); break;
+                filterConverter = createJoinConverterUsingMap(
+                        field.getProperties(),
+                        new SimpleFilterConverter(filter));
+                break;
             case REST_COMM:
                 throw new RuntimeException("REST_COMM: Functionality not Implemented yet");
             default:
