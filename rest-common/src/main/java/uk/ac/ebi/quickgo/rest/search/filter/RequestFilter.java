@@ -12,8 +12,8 @@ import java.util.stream.Stream;
  * Time: 10:25
  */
 public class RequestFilter {
-    private String field;
-    private String[] values;
+    private final String field;
+    private final String[] values;
 
     public RequestFilter(String field, String... values) {
         Preconditions.checkArgument(field != null && !field.trim().isEmpty(), "Filter field cannot be null or empty");
