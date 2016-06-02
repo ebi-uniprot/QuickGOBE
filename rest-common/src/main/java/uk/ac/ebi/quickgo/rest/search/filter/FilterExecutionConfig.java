@@ -12,7 +12,7 @@ interface FilterExecutionConfig {
      * Provide the {@link FieldExecutionConfig} for the given {@param fieldName}.
      *
      * @param fieldName the name of the field
-     * @return an Optional instance of {@link FieldExecutionConfig} which contains inofrmation on how to process
+     * @return an Optional instance of {@link FieldExecutionConfig} which contains information on how to process
      * the given field
      * @throws IllegalArgumentException if the field name is null or empty
      */
