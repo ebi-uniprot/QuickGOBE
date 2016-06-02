@@ -76,6 +76,7 @@ public class GlobalFilterExecutionConfigTest {
         );
 
         when(internalConfigMock.getField(internalFieldName)).thenReturn(expectedFieldConfigOpt);
+        when(externalConfigMock.getField(internalFieldName)).thenReturn(Optional.empty());
 
         Optional<FieldExecutionConfig> fieldConfigOpt = config.getField(internalFieldName);
 
@@ -92,6 +93,7 @@ public class GlobalFilterExecutionConfigTest {
                 FilterUtil.createExecutionConfig(externalFieldName, ExecutionType.SIMPLE)
         );
 
+        when(internalConfigMock.getField(externalFieldName)).thenReturn(Optional.empty());
         when(externalConfigMock.getField(externalFieldName)).thenReturn(expectedFieldConfigOpt);
 
         Optional<FieldExecutionConfig> fieldConfigOpt = config.getField(externalFieldName);
@@ -109,5 +111,29 @@ public class GlobalFilterExecutionConfigTest {
         Optional<FieldExecutionConfig> fieldConfigOpt = config.getField(unknownFieldName);
 
         assertThat(fieldConfigOpt, is(Optional.empty()));
+    }
+
+    @Test
+    public void searchableFieldExistsInInternalAndExternalExecutionConfigSoInternalTakesPrecedence() throws Exception {
+        String searchableField = "field";
+
+        Optional<FieldExecutionConfig> internalFieldConfigOpt = Optional.of(
+                FilterUtil.createExecutionConfig(searchableField, ExecutionType.SIMPLE)
+        );
+
+        Optional<FieldExecutionConfig> externalFieldConfigOpt = Optional.of(
+                FilterUtil.createExecutionConfig(searchableField, ExecutionType.JOIN)
+        );
+
+
+        when(internalConfigMock.getField(searchableField)).thenReturn(internalFieldConfigOpt);
+        when(externalConfigMock.getField(searchableField)).thenReturn(externalFieldConfigOpt);
+
+        Optional<FieldExecutionConfig> fieldConfigOpt = config.getField(searchableField);
+
+        FieldExecutionConfig retrievedField = fieldConfigOpt.get();
+
+        assertThat(retrievedField.getName(), is(searchableField));
+        assertThat(retrievedField.getExecution(), is(ExecutionType.SIMPLE));
     }
 }
