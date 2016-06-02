@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
 import com.google.common.base.Preconditions;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,13 +23,13 @@ import static java.util.stream.Collectors.groupingBy;
 public class GeneProductDbXRefIDFormats {
 
     private final String defaultTypeName;
-    private Map<GeneProductDbXRefIDFormats.Key, List<GeneProductDbXRefIDFormat>> geneProductXrefEntities;
-    private final String defaultDatabase;
+    private final Map<GeneProductDbXRefIDFormats.Key, GeneProductDbXRefIDFormat> geneProductXrefEntities;
+    private final String[] targetDatabases;
 
-    public GeneProductDbXRefIDFormats(Map<GeneProductDbXRefIDFormats.Key, List<GeneProductDbXRefIDFormat>>
-            geneProductXrefEntities, String defaultDb, String defaultTypeName) {
+    public GeneProductDbXRefIDFormats(Map<Key, GeneProductDbXRefIDFormat> geneProductXrefEntities,
+            String[]targetDBs, String defaultTypeName) {
         this.defaultTypeName = checkNotNull(defaultTypeName);
-        this.defaultDatabase = checkNotNull(defaultDb);
+        this.targetDatabases = checkNotNull(targetDBs);
         this.geneProductXrefEntities = checkNotNull(geneProductXrefEntities);
     }
 
@@ -39,55 +40,61 @@ public class GeneProductDbXRefIDFormats {
      * @return
      */
     public boolean isValidId(String id) {
-        return isValidId(id, defaultDatabase, defaultTypeName);
+        return isValidId(id,  this.targetDatabases, defaultTypeName);
     }
 
     /**
      * Use the supplied database and type name to test if a gene product id is valid.
      * @param id
-     * @param database
+     * @param targetDBs
      * @param typeName
      * @return
      */
-    public boolean isValidId(String id, String database, String typeName) {
+    public boolean isValidId(String id, String[] targetDBs, String typeName) {
 
         //If we haven't managed to load the validation regular expressions then pass everything
         if (geneProductXrefEntities.size()==0) {
             return true;
         }
 
-        //find the ID entity that matches
-        final List<GeneProductDbXRefIDFormat> geneProductXrefEntities
-                = this.geneProductXrefEntities.get(new Key(database, typeName));
+        //for each target database, attempt to validate the id
+        for(String targetDB : targetDBs){
 
-        //If there is no entity for this combination then the id cannot be correct..
-        if (geneProductXrefEntities == null) {
-            return false;
+            final GeneProductDbXRefIDFormat Xref = this.geneProductXrefEntities.get(new Key(targetDB, typeName));
+            if(Xref.matches(id)) return true;
+
+            //otherwise continue in loop to try next database if available
+
         }
 
-        //..otherwise look up the id
-        return geneProductXrefEntities.get(0).matches(id);
+        //no matches
+        return false;
 
     }
 
     /**
      * Create an instance of this class
      * @param entities
-     * @param defaultDb
+     * @param allowedDBs
      * @param defaultTypeName
      * @return
      */
-    public static GeneProductDbXRefIDFormats createWithData(List<GeneProductDbXRefIDFormat> entities, String defaultDb,
-            String defaultTypeName) {
+    public static GeneProductDbXRefIDFormats createWithData(List<GeneProductDbXRefIDFormat> entities, String[]
+            allowedDBs, String defaultTypeName) {
 
         Preconditions.checkNotNull(entities, "The list of GeneProductDbXRefIDFormat entities passed to createWithData" +
                 " was null, which is illegal");
 
-        Map<Key, List<GeneProductDbXRefIDFormat>> mappedEntities =
-                entities.stream().collect(groupingBy(e -> new GeneProductDbXRefIDFormats.Key(e
-                        .getDatabase(), e.getEntityTypeName())));
+        Map<Key, GeneProductDbXRefIDFormat> mappedEntities = new LinkedHashMap<>();
 
-        GeneProductDbXRefIDFormats formats = new GeneProductDbXRefIDFormats(mappedEntities, defaultDb, defaultTypeName);
+        for(GeneProductDbXRefIDFormat entity : entities) {
+            GeneProductDbXRefIDFormats.Key key = new GeneProductDbXRefIDFormats.Key(entity.getDatabase(), entity
+                    .getEntityTypeName());
+            mappedEntities.put(key, entity);
+        }
+
+
+        GeneProductDbXRefIDFormats formats = new GeneProductDbXRefIDFormats(mappedEntities, allowedDBs, defaultTypeName);
         return formats;
     }
 

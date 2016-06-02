@@ -24,6 +24,7 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class GeneProductDbXRefIDFormatsTest {
 
+	public static final String[] ALLOWED_D_BS = new String[]{"UniProt"};
 	List<GeneProductDbXRefIDFormat> listOfFormats;
 
 	private GeneProductDbXRefIDFormats dbXrefEntities;
@@ -59,7 +60,7 @@ public class GeneProductDbXRefIDFormatsTest {
 		when(mockEntity3.getEntityTypeName()).thenReturn("protein");
 		when(mockEntity3.matches("ABC")).thenReturn(true);
 		when(mockEntity3.matches("ZZZ")).thenReturn(false);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats, "UniProt", "protein");
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats, ALLOWED_D_BS, "protein");
 
 	}
 
@@ -70,12 +71,12 @@ public class GeneProductDbXRefIDFormatsTest {
 
 	@Test
 	public void isValidIdWhenSupplyingDatabaseAndTypeName(){
-		assertThat(dbXrefEntities.isValidId("ABC", "UniProt", "protein"), is(true));
+		assertThat(dbXrefEntities.isValidId("ABC", ALLOWED_D_BS, "protein"), is(true));
 	}
 
 	@Test
 	public void invalidDatabaseAndTypeName(){
-		assertThat(dbXrefEntities.isValidId("ABC", "UniProt", "proteinX"), is(false));
+		assertThat(dbXrefEntities.isValidId("ABC", ALLOWED_D_BS, "proteinX"), is(false));
 	}
 
 	@Test
@@ -88,7 +89,7 @@ public class GeneProductDbXRefIDFormatsTest {
 	@Test
 	public void throwsErrorIfEntitiesIsNull(){
 		thrown.expect(NullPointerException.class);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(null, "UniProt", "protein");
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(null, ALLOWED_D_BS, "protein");
 	}
 
 	@Test
@@ -100,6 +101,6 @@ public class GeneProductDbXRefIDFormatsTest {
 	@Test
 	public void throwsErrorIfEntityTypeIsNull(){
 		thrown.expect(NullPointerException.class);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats, "UniProt", null);
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats, ALLOWED_D_BS, null);
 	}
 }
