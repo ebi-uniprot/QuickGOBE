@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * </p>
  * The configuration definitions held within this data structure are used to indicate how to process fields held in
  * collections/tables this RESTful service does not have direct access to. It is with these definitions that the
- * {@link FilterConverter} instances will be able to connect to other services in order to execute the field.
+ * {@link FilterConverter} instances will be able to connect to other services in order to use the field.
  * </p>
  * This configuration is read in from a yaml configuration file.
  * @author Ricardo Antunes
