@@ -7,16 +7,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * This class knows how to convert instances of {@link RequestFilter} that do not require extra processing into
+ * This class knows how to convert instances of {@link RequestFilterOld} that do not require extra processing into
  * {@link QuickGOQuery}.
  *
  * @author Ricardo Antunes
  */
 class SimpleFilterConverter implements FilterConverter {
-    private final RequestFilter filter;
+    private final RequestFilterOld filter;
 
-    SimpleFilterConverter(RequestFilter filter) {
-        Preconditions.checkArgument(filter != null, "RequestFilter can not be null.");
+    SimpleFilterConverter(RequestFilterOld filter) {
+        Preconditions.checkArgument(filter != null, "RequestFilter cannot be null.");
 
         this.filter = filter;
     }

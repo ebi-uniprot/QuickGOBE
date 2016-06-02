@@ -18,7 +18,7 @@ public class SimpleFilterConverterTest {
 
     @Test
     public void transformsFilterWithSingleValueIntoAQuickGoQuery() {
-        RequestFilter filter = new RequestFilter(FILTER_FIELD, SINGLE_VALUE);
+        RequestFilterOld filter = new RequestFilterOld(FILTER_FIELD, SINGLE_VALUE);
 
         SimpleFilterConverter converter = new SimpleFilterConverter(filter);
 
@@ -31,7 +31,7 @@ public class SimpleFilterConverterTest {
 
     @Test
     public void transformsFilterWithMultipleValuesIntoAQuickGoQuery() {
-        RequestFilter filter = new RequestFilter(FILTER_FIELD, MULTIPLE_VALUES);
+        RequestFilterOld filter = new RequestFilterOld(FILTER_FIELD, MULTIPLE_VALUES);
 
         SimpleFilterConverter converter = new SimpleFilterConverter(filter);
 

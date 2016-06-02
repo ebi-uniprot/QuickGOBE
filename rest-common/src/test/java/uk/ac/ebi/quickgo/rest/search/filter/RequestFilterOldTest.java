@@ -10,13 +10,13 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static uk.ac.ebi.quickgo.rest.TestUtil.convertToCollection;
 
 /**
- * Tests the behaviour of the {@link RequestFilter} class.
+ * Tests the behaviour of the {@link RequestFilterOld} class.
  *
  * @author Tony Wardell
  * Date: 12/05/2016
  * Time: 14:02
  */
-public class RequestFilterTest {
+public class RequestFilterOldTest {
     private static String FILTER_FIELD = "AssignedBy";
     private static String SINGLE_VALUE = "AAA";
     private static String[] MULTIPLE_VALUES = {"AAA", "BBB"};
@@ -24,7 +24,7 @@ public class RequestFilterTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private RequestFilter filter;
+    private RequestFilterOld filter;
 
     @Test
     public void throwsExceptionWhenFieldIsNull() {
@@ -33,7 +33,7 @@ public class RequestFilterTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Filter field cannot be null or empty");
 
-        filter = new RequestFilter(field, MULTIPLE_VALUES);
+        filter = new RequestFilterOld(field, MULTIPLE_VALUES);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class RequestFilterTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Filter field cannot be null or empty");
 
-        filter = new RequestFilter(field, MULTIPLE_VALUES);
+        filter = new RequestFilterOld(field, MULTIPLE_VALUES);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class RequestFilterTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Filter values cannot be null or empty");
 
-        filter = new RequestFilter(FILTER_FIELD, values);
+        filter = new RequestFilterOld(FILTER_FIELD, values);
     }
 
     @Test
@@ -63,12 +63,12 @@ public class RequestFilterTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Filter values cannot be null or empty");
 
-        filter = new RequestFilter(FILTER_FIELD, values);
+        filter = new RequestFilterOld(FILTER_FIELD, values);
     }
 
     @Test
     public void fieldAndSingleValueCreateAFilter() {
-        filter = new RequestFilter(FILTER_FIELD, SINGLE_VALUE);
+        filter = new RequestFilterOld(FILTER_FIELD, SINGLE_VALUE);
 
         assertThat(filter.getField(), is(FILTER_FIELD));
         assertThat(convertToCollection(filter.getValues()), contains(SINGLE_VALUE));
@@ -76,7 +76,7 @@ public class RequestFilterTest {
 
     @Test
     public void fieldAndMultipleValuesCreateAFilter() {
-        filter = new RequestFilter(FILTER_FIELD, MULTIPLE_VALUES);
+        filter = new RequestFilterOld(FILTER_FIELD, MULTIPLE_VALUES);
 
         assertThat(filter.getField(), is(FILTER_FIELD));
         assertThat(convertToCollection(filter.getValues()), contains(MULTIPLE_VALUES));

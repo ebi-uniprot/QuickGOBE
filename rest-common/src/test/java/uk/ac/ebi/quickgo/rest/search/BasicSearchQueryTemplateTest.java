@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.rest.search;
 
 import uk.ac.ebi.quickgo.rest.search.filter.FilterConverter;
 import uk.ac.ebi.quickgo.rest.search.filter.FilterConverterFactory;
-import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
+import uk.ac.ebi.quickgo.rest.search.filter.RequestFilterOld;
 import uk.ac.ebi.quickgo.rest.search.query.FieldProjection;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.rest.TestUtil.*;
+import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
 
 /**
  * Tests the behvaiour of the {@link BasicSearchQueryTemplate} class.
@@ -120,7 +120,7 @@ public class BasicSearchQueryTemplateTest {
         String fieldX = "fieldX";
         String valueX = "valueX";
 
-        RequestFilter requestFilter = new RequestFilter(fieldX, valueX);
+        RequestFilterOld requestFilter = new RequestFilterOld(fieldX, valueX);
 
         builder.setFilters(asSet(requestFilter));
 
@@ -171,15 +171,15 @@ public class BasicSearchQueryTemplateTest {
     }
 
     /**
-     * Fake class that does simple conversion simple conversion between a {@link RequestFilter} and a
+     * Fake class that does simple conversion simple conversion between a {@link RequestFilterOld} and a
      * {@link QuickGOQuery}.
      *
-     * This class assumes that the {@link RequestFilter} has a field and just a single value.
+     * This class assumes that the {@link RequestFilterOld} has a field and just a single value.
      */
     private class FakeFilterConverter implements FilterConverter {
-        private final RequestFilter filter;
+        private final RequestFilterOld filter;
 
-        FakeFilterConverter(RequestFilter filter) {
+        FakeFilterConverter(RequestFilterOld filter) {
             this.filter = filter;
         }
 

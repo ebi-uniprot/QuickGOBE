@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
+import uk.ac.ebi.quickgo.rest.search.filter.RequestFilterOld;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,6 @@ public class AnnotationRequest {
     private static final String COMMA = ",";
     private static final int DEFAULT_PAGE_NUMBER = 1;
 
-    //Non-data parameters
     @Min(0)
     @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -39,7 +38,7 @@ public class AnnotationRequest {
     private final Map<String, String> filters = new HashMap<>();
 
     /**
-     *  E.g. ASPGD,Agbase,..
+     *  E.g., ASPGD,Agbase,..
      *  In the format assignedBy=ASPGD,Agbase
      */
     public void setAssignedBy(String assignedBy) {
@@ -67,9 +66,11 @@ public class AnnotationRequest {
         return page;
     }
 
-    public Stream<RequestFilter> convertToFilters() {
-        return filters.entrySet().stream().map(filter -> new RequestFilter(filter.getKey(),
-                splitFilterValues(filter.getValue())));
+    public Stream<RequestFilterOld> convertToFilters() {
+        return filters.entrySet().stream()
+                .map(filter -> new RequestFilterOld(
+                        filter.getKey(),
+                        splitFilterValues(filter.getValue())));
     }
 
     private String[] splitFilterValues(String values) {

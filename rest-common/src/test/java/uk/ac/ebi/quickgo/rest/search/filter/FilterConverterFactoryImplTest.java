@@ -10,7 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.*;
+import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.ExecutionType;
 
 /**
  * Tests the behaviour of the {@link FilterConverterFactoryImpl} class.
@@ -37,7 +37,7 @@ public class FilterConverterFactoryImplTest {
 
         when(configMock.getField(field)).thenReturn(fieldConfig);
 
-        RequestFilter filter = new RequestFilter(field, "value");
+        RequestFilterOld filter = new RequestFilterOld(field, "value");
 
         FilterConverter converter = factory.createConverter(filter);
 
@@ -54,7 +54,7 @@ public class FilterConverterFactoryImplTest {
 
         when(configMock.getField(field)).thenReturn(fieldConfig);
 
-        RequestFilter filter = new RequestFilter(field, "value");
+        RequestFilterOld filter = new RequestFilterOld(field, "value");
 
         FilterConverter converter = factory.createConverter(filter);
 

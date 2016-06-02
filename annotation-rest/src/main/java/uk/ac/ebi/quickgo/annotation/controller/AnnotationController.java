@@ -1,5 +1,17 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
+import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.filter.FilterConverterFactory;
+import uk.ac.ebi.quickgo.rest.search.filter.RequestFilterOld;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+
 import com.google.common.base.Preconditions;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -8,23 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
-import uk.ac.ebi.quickgo.rest.search.SearchService;
-
-import uk.ac.ebi.quickgo.rest.search.filter.FilterConverterFactory;
-import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
@@ -117,7 +117,7 @@ public class AnnotationController {
 
         validationHelper.validateRequestedResults(annotationRequest.getLimit());
 
-        Set<RequestFilter> filters = annotationRequest
+        Set<RequestFilterOld> filters = annotationRequest
                 .convertToFilters()
                 .collect(Collectors.toSet());
 

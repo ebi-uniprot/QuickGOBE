@@ -2,12 +2,15 @@ package uk.ac.ebi.quickgo.rest.search;
 
 import uk.ac.ebi.quickgo.rest.search.filter.FilterConverter;
 import uk.ac.ebi.quickgo.rest.search.filter.FilterConverterFactory;
-import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
+import uk.ac.ebi.quickgo.rest.search.filter.RequestFilterOld;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
 import com.google.common.base.Preconditions;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Reduces the amount of boiler plate code necessary to setup the mandatory elements to configure a
@@ -46,7 +49,7 @@ public class BasicSearchQueryTemplate {
         private final FilterConverterFactory converterFactory;
 
         private Set<String> returnedFields;
-        private Set<RequestFilter> filters;
+        private Set<RequestFilterOld> filters;
 
         private QuickGOQuery query;
         private int page;
@@ -70,7 +73,7 @@ public class BasicSearchQueryTemplate {
          * @param filters the filter queries
          * @return this {@link Builder} instance
          */
-        public Builder setFilters(Set<RequestFilter> filters) {
+        public Builder setFilters(Set<RequestFilterOld> filters) {
             if (filters != null) {
                 this.filters = filters;
             }

@@ -10,8 +10,9 @@ import java.util.Map;
  *
  * @author Ricardo Antunes
  */
+// todo change name to RequestFilterExecutionConfig
 public class FieldExecutionConfig {
-    private String name;
+    private String name; // todo: change name to signature
     private ExecutionType execution;
     private Map<String, String> properties = new HashMap<>();
 

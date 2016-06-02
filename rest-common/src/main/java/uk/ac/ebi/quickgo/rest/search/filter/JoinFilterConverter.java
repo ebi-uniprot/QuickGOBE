@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
 import java.util.Map;
 
 /**
- * Converts a {@link RequestFilter} into a {@link QuickGOQuery} that represents a join between two tables/collections.
+ * Converts a {@link RequestFilterOld} into a {@link QuickGOQuery} that represents a join between two tables/collections.
  *
  * @author Ricardo Antunes
  */

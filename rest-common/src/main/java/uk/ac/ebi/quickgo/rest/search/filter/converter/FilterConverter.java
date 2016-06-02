@@ -1,9 +1,9 @@
-package uk.ac.ebi.quickgo.rest.search.filter;
+package uk.ac.ebi.quickgo.rest.search.filter.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
 /**
- * Knows how to convert a {@link RequestFilterOld} into a {@link QuickGOQuery}.
+ * Knows how to convert a {@link RequestFilter} into a {@link QuickGOQuery}.
  *
  * @author Ricardo Antunes
  */
