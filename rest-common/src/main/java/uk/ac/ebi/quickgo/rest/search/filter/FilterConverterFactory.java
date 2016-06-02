@@ -9,7 +9,7 @@ package uk.ac.ebi.quickgo.rest.search.filter;
 public interface FilterConverterFactory {
     /**
      * Will create the appropriate {@link uk.ac.ebi.quickgo.common.converter.FieldConverter} for the
-     * {@link RequestFilter}. The decision is based on what type of value is conteind within the
+     * {@link RequestFilter}. The decision is based on what type of value is contained within the
      * {@link RequestFilter#getField()}.
      *
      * @param requestFilter the filter to convert
