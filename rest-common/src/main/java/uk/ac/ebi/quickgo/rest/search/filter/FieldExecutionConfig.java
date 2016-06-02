@@ -68,6 +68,14 @@ public class FieldExecutionConfig {
 
     /**
      * Specifies the execution types that can be carried out by a {@link FilterConverter} instance.
+     *
+     * The enum values are:
+     * <ul>
+     *     <ui>{@link ExecutionType#SIMPLE} - A filter that can be applied directly on the data source</ui>
+     *     <ui>{@link ExecutionType#JOIN} - A filter that requires join two data source tables/collections</ui>
+     *     <ui>{@link ExecutionType#REST_COMM} - The filter requires that information be retrieved from another
+     *     service. So a REST request will need to be sent.</ui>
+     * </ul>
      */
     public enum ExecutionType {
         SIMPLE,
