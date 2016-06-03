@@ -66,7 +66,7 @@ public class AnnotationControllerJoinsIT {
     filterByCellularComponentAspectHitsAnnotationDocumentWhoseOntologyIdentifierMatchesAnOntologyDocumentWithACellularComponentAspect()
             throws Exception {
         String geneProductId = "P99999";
-        String goId = "ECO:0000256";
+        String goId = "GO:0003870";
         String aspect = "cellular_component";
 
         AnnotationDocument annotationDoc = createAnnotationDocWithGoId(geneProductId, goId);
@@ -91,7 +91,7 @@ public class AnnotationControllerJoinsIT {
     filterByCellularComponentAspectDoesNotHitAnnotationDocumentBecauseOntologyIdentifierMatchesAnOntologyDocumentWithAMolecularFunctionAspect()
             throws Exception {
         String geneProductId = "P99999";
-        String goId = "ECO:0000256";
+        String goId = "GO:0003870";
         String ontologyAspect = "molecular_function";
         String queryAspect = "cellular_component";
 
