@@ -2,23 +2,23 @@ package uk.ac.ebi.quickgo.rest.search.filter;
 
 import java.util.Map;
 
-import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.*;
+import static uk.ac.ebi.quickgo.rest.search.filter.RequestFilterConfig.ExecutionType;
 
 public final class FilterUtil {
     private FilterUtil(){}
 
-    public static FieldExecutionConfig createExecutionConfig(String name, ExecutionType type) {
-        FieldExecutionConfig field = new FieldExecutionConfig();
-        field.setName(name);
+    public static RequestFilterConfig createExecutionConfig(String name, ExecutionType type) {
+        RequestFilterConfig field = new RequestFilterConfig();
+        field.setSignature(name);
         field.setExecution(type);
 
         return field;
     }
 
-    public static FieldExecutionConfig createExecutionConfigWithProps(String name, ExecutionType type, 
+    public static RequestFilterConfig createExecutionConfigWithProps(String name, ExecutionType type,
             Map<String, String> props) {
-        FieldExecutionConfig field = new FieldExecutionConfig();
-        field.setName(name);
+        RequestFilterConfig field = new RequestFilterConfig();
+        field.setSignature(name);
         field.setExecution(type);
         field.setProperties(props);
 

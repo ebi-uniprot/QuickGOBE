@@ -2,9 +2,12 @@ package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.search.filter.RequestFilterOld;
+import uk.ac.ebi.quickgo.rest.search.filter.request.RESTCommRequestFilter;
+import uk.ac.ebi.quickgo.rest.search.filter.request.SimpleRequestFilter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -75,5 +78,15 @@ public class AnnotationRequest {
 
     private String[] splitFilterValues(String values) {
         return values.split(COMMA);
+    }
+
+    // todo: implement fetching of simple requests -- maintain a variable that's returned and populated when set by binder (e.g., in a setAssignedBy call)
+    public Set<SimpleRequestFilter> getSimpleRequests() {
+        return null;
+    }
+
+    // todo: implement fetching of rest requests -- there might be multiple types, each added to a set of them whenever one is created
+    public Set<RESTCommRequestFilter> getRESTRequests() {
+        return null;
     }
 }

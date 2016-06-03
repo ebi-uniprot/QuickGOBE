@@ -1,16 +1,14 @@
 package uk.ac.ebi.quickgo.rest.search.filter;
 
-import uk.ac.ebi.quickgo.rest.search.filter.converter.RESTCommFilterConverter;
 import uk.ac.ebi.quickgo.rest.search.filter.request.RESTCommRequestFilter;
 import uk.ac.ebi.quickgo.rest.search.filter.request.SimpleRequestFilter;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.ExecutionType.REST_COMM;
 import static uk.ac.ebi.quickgo.rest.search.filter.JoinFilterConverter.createJoinConverterUsingMap;
+import static uk.ac.ebi.quickgo.rest.search.filter.RequestFilterConfig.ExecutionType.REST_COMM;
 
 /**
  * Implementation of the {@link FilterConverterFactory} interface.
@@ -20,13 +18,13 @@ import static uk.ac.ebi.quickgo.rest.search.filter.JoinFilterConverter.createJoi
  *
  * @author Ricardo Antunes
  */
-@Component
+//@Component
 public class FilterConverterFactoryImpl implements FilterConverterFactory {
-    private final FilterExecutionConfig globalFilterExecutionConfig;
+    private final RequestFilterConfigRetrieval globalRequestFilterConfigRetrieval;
 
     @Autowired
-    public FilterConverterFactoryImpl(FilterExecutionConfig globalFilterExecutionConfig) {
-        this.globalFilterExecutionConfig = globalFilterExecutionConfig;
+    public FilterConverterFactoryImpl(RequestFilterConfigRetrieval globalRequestFilterConfigRetrieval) {
+        this.globalRequestFilterConfigRetrieval = globalRequestFilterConfigRetrieval;
     }
 
     @Override public FilterConverter createConverter(RequestFilterOld requestFilter) {
@@ -35,7 +33,7 @@ public class FilterConverterFactoryImpl implements FilterConverterFactory {
         // requestFilter.signature identifies the execution config
         // (requestFilter, execution config) pair identifies FilterConverter
 
-        Optional<FieldExecutionConfig> fieldOpt = globalFilterExecutionConfig.getField(requestFilter.getField());
+        Optional<RequestFilterConfig> fieldOpt = globalRequestFilterConfigRetrieval.getSignature(requestFilter.getField());
 
         return fieldOpt
                 .map(field -> createConverter(requestFilter, field))
@@ -45,14 +43,14 @@ public class FilterConverterFactoryImpl implements FilterConverterFactory {
     /**
      * Creates the appropriate {@link FilterConverter} for the given {@link RequestFilterOld} based on the
      * processing
-     * information of the provided by the {@link uk.ac.ebi.quickgo.rest.search.filter.FilterExecutionConfig}.
+     * information of the provided by the {@link RequestFilterConfigRetrieval}.
      *
      * @param field holds details about the search field and how to execute it
      * @param filter the filter that will be converted
      * @return a {@link FilterConverter} capable of processing the {@param filter}
      */
 
-    private FilterConverter createConverter(RequestFilterOld filter, FieldExecutionConfig field) {
+    private FilterConverter createConverter(RequestFilterOld filter, RequestFilterConfig field) {
         FilterConverter filterConverter;
 
         // FilterConverterFactoryX factory = null;
@@ -81,18 +79,19 @@ public class FilterConverterFactoryImpl implements FilterConverterFactory {
     }
 
     @Override public uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverter createConverter(RESTCommRequestFilter requestFilter) {
-        Preconditions.checkArgument(requestFilter != null, "RequestFilter cannot be null");
-        Optional<FieldExecutionConfig> optionalFilterExecutionConfig = globalFilterExecutionConfig.getField(requestFilter.getSignature());
-        // check it's a REST_COMM execution type
-
-        RESTCommFilterConverter restCommFilterConverter = new RESTCommFilterConverter();
-
-        // populate converter with stub of url info
-        restCommFilterConverter.setRESTFetcher(optionalFilterExecutionConfig.get().getProperties());
-
-        // populate converter with request specific info
-        requestFilter.configure(restCommFilterConverter);
-
-        return restCommFilterConverter;
+//        Preconditions.checkArgument(requestFilter != null, "RequestFilter cannot be null");
+//        Optional<FieldExecutionConfig> optionalFilterExecutionConfig = globalFilterExecutionConfig.getSignature(requestFilter.getSignature());
+//        // check it's a REST_COMM execution type
+//
+//        RESTCommFilterConverter restCommFilterConverter = new RESTCommFilterConverter();
+//
+//        // populate converter with stub of url info
+//        restCommFilterConverter.setRESTFetcher(optionalFilterExecutionConfig.get().getProperties());
+//
+//        // populate converter with request specific info
+//        requestFilter.configure(restCommFilterConverter);
+//
+//        return restCommFilterConverter;
+        return null;
     }
 }

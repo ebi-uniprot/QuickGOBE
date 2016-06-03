@@ -10,7 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.ExecutionType;
+import static uk.ac.ebi.quickgo.rest.search.filter.RequestFilterConfig.ExecutionType;
 
 /**
  * Tests the behaviour of the {@link FilterConverterFactoryImpl} class.
@@ -20,7 +20,7 @@ public class FilterConverterFactoryImplTest {
     private FilterConverterFactoryImpl factory;
 
     @Mock
-    private FilterExecutionConfig configMock;
+    private RequestFilterConfigRetrieval configMock;
 
     @Before
     public void setUp() throws Exception {
@@ -31,11 +31,11 @@ public class FilterConverterFactoryImplTest {
     public void createsASimpleFilterConverterForFieldThatRequiresSimpleExecution() {
         String field = "field";
 
-        Optional<FieldExecutionConfig> fieldConfig = Optional.of(
+        Optional<RequestFilterConfig> fieldConfig = Optional.of(
                 FilterUtil.createExecutionConfig(field, ExecutionType.SIMPLE)
         );
 
-        when(configMock.getField(field)).thenReturn(fieldConfig);
+        when(configMock.getSignature(field)).thenReturn(fieldConfig);
 
         RequestFilterOld filter = new RequestFilterOld(field, "value");
 
@@ -48,11 +48,11 @@ public class FilterConverterFactoryImplTest {
     public void createsAJoinFilterConverterForFieldThatRequiresJoinExecution() {
         String field = "field";
 
-        Optional<FieldExecutionConfig> fieldConfig = Optional.of(
+        Optional<RequestFilterConfig> fieldConfig = Optional.of(
                 FilterUtil.createExecutionConfig(field, ExecutionType.JOIN)
         );
 
-        when(configMock.getField(field)).thenReturn(fieldConfig);
+        when(configMock.getSignature(field)).thenReturn(fieldConfig);
 
         RequestFilterOld filter = new RequestFilterOld(field, "value");
 

@@ -23,7 +23,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.*;
+import static uk.ac.ebi.quickgo.rest.search.filter.RequestFilterConfig.ExecutionType;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ExternalFilterExecutionConfigIT.TestApplication.class,
@@ -55,20 +55,20 @@ public class ExternalFilterExecutionConfigIT {
     }
 
     @Autowired
-    private ExternalFilterExecutionConfig externalFilterExecutionConfig;
+    private ExternalRequestFilterConfigRetrieval externalFilterExecutionConfig;
 
     @Test
     public void yamlPropertiesLoadedCorrectlyIntoBean() {
-        List<FieldExecutionConfig> fieldConfigs = externalFilterExecutionConfig.getFields();
+        List<RequestFilterConfig> fieldConfigs = externalFilterExecutionConfig.getFilterConfigs();
 
-        FieldExecutionConfig aspectField = createStubAspectField();
-        FieldExecutionConfig usageField = createStubUsageField();
+        RequestFilterConfig aspectField = createStubAspectField();
+        RequestFilterConfig usageField = createStubUsageField();
 
         assertThat(fieldConfigs, hasSize(2));
         assertThat(fieldConfigs, containsInAnyOrder(aspectField, usageField));
     }
 
-    private FieldExecutionConfig createStubAspectField() {
+    private RequestFilterConfig createStubAspectField() {
         Map<String, String> map = new HashMap<>();
         map.put("fromTable", "ontology");
         map.put("fromAttribute", "id");
@@ -78,7 +78,7 @@ public class ExternalFilterExecutionConfigIT {
         return FilterUtil.createExecutionConfigWithProps("aspect", ExecutionType.JOIN, map);
     }
 
-    private FieldExecutionConfig createStubUsageField() {
+    private RequestFilterConfig createStubUsageField() {
         Map<String, String> map = new HashMap<>();
         map.put("ip", "123.456.789");
         map.put("endpoint", "endpoint");

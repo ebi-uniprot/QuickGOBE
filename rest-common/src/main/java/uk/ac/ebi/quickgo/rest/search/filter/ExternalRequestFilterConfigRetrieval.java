@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.rest.search.filter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
@@ -16,26 +18,26 @@ import org.springframework.stereotype.Component;
  * @author Ricardo Antunes
  */
 @Component
-@ConfigurationProperties(prefix = "search.external") class ExternalFilterExecutionConfig
-        implements FilterExecutionConfig {
+@ConfigurationProperties(prefix = "search.external") class ExternalRequestFilterConfigRetrieval
+        implements RequestFilterConfigRetrieval {
 
     @NestedConfigurationProperty
-    private List<FieldExecutionConfig> fields = new ArrayList<>();
+    private List<RequestFilterConfig> filterConfigs = new ArrayList<>();
 
-    public List<FieldExecutionConfig> getFields() {
-        return fields;
+    public List<RequestFilterConfig> getFilterConfigs() {
+        return filterConfigs;
     }
 
-    public void setFields(List<FieldExecutionConfig> fields) {
-        if(fields != null) {
-            this.fields = fields;
+    public void setFilterConfigs(List<RequestFilterConfig> filterConfigs) {
+        if(filterConfigs != null) {
+            this.filterConfigs = filterConfigs;
         }
     }
 
     @Override
-    public Optional<FieldExecutionConfig> getField(String fieldName) {
-        return fields.stream()
-                .filter(field -> field.getName().equals(fieldName))
+    public Optional<RequestFilterConfig> getSignature(String signature) {
+        return filterConfigs.stream()
+                .filter(field -> field.getSignature().equals(signature))
                 .findFirst();
     }
 
@@ -47,19 +49,19 @@ import org.springframework.stereotype.Component;
             return false;
         }
 
-        ExternalFilterExecutionConfig that = (ExternalFilterExecutionConfig) o;
+        ExternalRequestFilterConfigRetrieval that = (ExternalRequestFilterConfigRetrieval) o;
 
-        return fields.equals(that.fields);
+        return filterConfigs.equals(that.filterConfigs);
 
     }
 
     @Override public int hashCode() {
-        return fields.hashCode();
+        return filterConfigs.hashCode();
     }
 
     @Override public String toString() {
         return "FilterConfigImpl{" +
-                "fields=" + fields +
+                "fields=" + filterConfigs +
                 '}';
     }
 }

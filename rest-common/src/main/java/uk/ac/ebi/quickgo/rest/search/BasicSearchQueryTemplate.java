@@ -1,8 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.search.filter.FilterConverter;
-import uk.ac.ebi.quickgo.rest.search.filter.FilterConverterFactory;
-import uk.ac.ebi.quickgo.rest.search.filter.RequestFilterOld;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
@@ -27,37 +24,28 @@ public class BasicSearchQueryTemplate {
     static final int DEFAULT_PAGE_SIZE = 25;
     static final int DEFAULT_PAGE_NUMBER = 1;
 
-    private final FilterConverterFactory filterConverterFactory;
     private final List<String> returnedFields;
 
-    public BasicSearchQueryTemplate(List<String> returnedFields, FilterConverterFactory filterConverterFactory) {
+    public BasicSearchQueryTemplate(List<String> returnedFields) {
         Preconditions.checkArgument(returnedFields != null, "Returned fields list cannot be null.");
-        Preconditions.checkArgument(filterConverterFactory != null, "FilterConverterFactory can not be null.");
 
         this.returnedFields = returnedFields;
-        this.filterConverterFactory = filterConverterFactory;
     }
 
     public Builder newBuilder() {
-        return new Builder(
-                returnedFields,
-                filterConverterFactory
-        );
+        return new Builder(returnedFields);
     }
 
     public static class Builder implements SearchQueryRequestBuilder {
-        private final FilterConverterFactory converterFactory;
-
         private Set<String> returnedFields;
-        private Set<RequestFilterOld> filters;
+        private Set<QuickGOQuery> filters;
 
         private QuickGOQuery query;
         private int page;
         private int pageSize;
 
-        public Builder(List<String> returnedFields, FilterConverterFactory converterFactory) {
+        public Builder(List<String> returnedFields) {
             this.returnedFields = new LinkedHashSet<>(returnedFields);
-            this.converterFactory = converterFactory;
 
             page = DEFAULT_PAGE_NUMBER;
             pageSize = DEFAULT_PAGE_SIZE;
@@ -73,7 +61,7 @@ public class BasicSearchQueryTemplate {
          * @param filters the filter queries
          * @return this {@link Builder} instance
          */
-        public Builder setFilters(Set<RequestFilterOld> filters) {
+        public Builder setFilters(Set<QuickGOQuery> filters) {
             if (filters != null) {
                 this.filters = filters;
             }
@@ -141,8 +129,8 @@ public class BasicSearchQueryTemplate {
             builder.setPageParameters(page, pageSize);
 
             filters.stream()
-                    .map(converterFactory::createConverter)
-                    .map(FilterConverter::transform)
+//                    .map(converterFactory::createConverter)
+//                    .map(FilterConverter::transform)
                     .forEach(builder::addQueryFilter);
 
             returnedFields

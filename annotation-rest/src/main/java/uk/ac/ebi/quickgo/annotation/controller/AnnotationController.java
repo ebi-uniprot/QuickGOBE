@@ -6,15 +6,14 @@ import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.filter.FilterConverterFactory;
-import uk.ac.ebi.quickgo.rest.search.filter.RequestFilterOld;
+import uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -25,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequestHelper.createRESTQueries;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequestHelper.createSimpleQueries;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
@@ -84,6 +85,7 @@ public class AnnotationController {
     private final SearchService<Annotation> annotationSearchService;
 
     private final BasicSearchQueryTemplate queryTemplate;
+    private final FilterConverterFactory filterConverterFactory;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -100,8 +102,8 @@ public class AnnotationController {
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
 
-        this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields(),
-                filterConverterFactory);
+        this.filterConverterFactory = filterConverterFactory;
+        this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
     }
 
     /**
@@ -109,25 +111,33 @@ public class AnnotationController {
      * @return a {@link QueryResult} instance containing the results of the search
      */
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest annotationRequest,
+    public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest request,
             BindingResult bindingResult) {
 
         checkArgument(!bindingResult.hasErrors(), "The binding of the request parameters to " +
-                "AnnotationRequest %s has errors, see binding result %s", annotationRequest, bindingResult);
+                "AnnotationRequest %s has errors, see binding result %s", request, bindingResult);
 
-        validationHelper.validateRequestedResults(annotationRequest.getLimit());
-
-        Set<RequestFilterOld> filters = annotationRequest
-                .convertToFilters()
-                .collect(Collectors.toSet());
+        validationHelper.validateRequestedResults(request.getLimit());
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(filters)
-                .setPage(annotationRequest.getPage())
-                .setPageSize(annotationRequest.getLimit())
+                .setFilters(addFilterQueries(request))
+                .setPage(request.getPage())
+                .setPageSize(request.getLimit())
                 .build();
 
         return search(queryRequest, annotationSearchService);
     }
+
+    private Set<QuickGOQuery> addFilterQueries(AnnotationRequest request) {
+        Set<QuickGOQuery> filterQueries = new HashSet<>();
+
+        createSimpleQueries(request.getSimpleRequests(), filterConverterFactory)
+                .forEach(filterQueries::add);
+        createRESTQueries(request.getRESTRequests(), filterConverterFactory)
+                .forEach(filterQueries::add);
+
+        return filterQueries;
+    }
+
 }

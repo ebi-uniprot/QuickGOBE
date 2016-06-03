@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.rest.search.filter;
+package uk.ac.ebi.quickgo.rest.search.filter.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * @author Ricardo Antunes
  */
-public class JoinFilterConverter implements FilterConverter {
+class JoinFilterConverter implements FilterConverter {
     static final String FROM_TABLE_NAME = "fromTable";
     static final String FROM_ATTRIBUTE_NAME = "fromAttribute";
     static final String TO_TABLE_NAME = "toTable";
@@ -55,13 +55,13 @@ public class JoinFilterConverter implements FilterConverter {
     /**
      * Factory method that creates a {@link JoinFilterConverter} by extracting the joining attributes found within
      * {@param joinProperties}, and uses the filter query that will come out of the provided
-     * {@link FilterConverter#transform()} to further filter the joining collection/table.
+     * {@link uk.ac.ebi.quickgo.rest.search.filter.FilterConverter#transform()} to further filter the joining collection/table.
      *
      * @param joinProperties a map containing the attributes necessary to execute a join between two collections/tables.
      * @param filterConverter a converter which holds a query that will further filter down the join to collection/table
      * @return a converter that knows how to transform the data into a join {@link QuickGOQuery}
      */
-    public static JoinFilterConverter createJoinConverterUsingMap(Map<String, String> joinProperties, FilterConverter
+    static JoinFilterConverter createJoinConverterUsingMap(Map<String, String> joinProperties, FilterConverter
             filterConverter) {
         Preconditions.checkArgument(joinProperties != null, "Map containing join properties cannot be null.");
 
@@ -76,7 +76,7 @@ public class JoinFilterConverter implements FilterConverter {
     /**
      * Factory method that creates a {@link JoinFilterConverter} using the joining attributes found
      * and uses the filter query that will come out of the provided
-     * {@link FilterConverter#transform()} to further filter the joining collection/table.
+     * {@link uk.ac.ebi.quickgo.rest.search.filter.FilterConverter#transform()} to further filter the joining collection/table.
      *
      * @param fromTable the collection/table to join from
      * @param fromAttribute a joining attribute found in {@param fromTable}

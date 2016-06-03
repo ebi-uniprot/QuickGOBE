@@ -60,7 +60,7 @@ public class AnnotationRequestTest {
 //    public void addSingleFilter() {
 //        annotationRequest.setAssignedBy(UNI_PROT);
 //        final List<RequestFilter> pfList = annotationRequest.stream().collect(toList());
-//        assertThat(pfList.get(0).getField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
+//        assertThat(pfList.get(0).getSignature(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
 //        assertThat(pfList, hasSize(1));
 //
 //        assertThat(pfList.get(0)
@@ -80,7 +80,7 @@ public class AnnotationRequestTest {
 //        annotationRequest.setAssignedBy(multiAssignedBy);
 //        final List<RequestFilter> pfList = annotationRequest.stream().collect(toList());
 //        assertThat(pfList, hasSize(1));
-//        assertThat(pfList.get(0).getField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
+//        assertThat(pfList.get(0).getSignature(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
 //
 //        assertThat(pfList.get(0)
 //                .provideArgStream()

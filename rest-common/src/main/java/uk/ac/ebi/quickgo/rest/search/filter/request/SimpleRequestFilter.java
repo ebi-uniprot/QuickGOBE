@@ -16,15 +16,11 @@ public class SimpleRequestFilter implements RequestFilter {
         this.values = values;
     }
 
-    public String getField() {
-        return field;
-    }
-
     public List<String> getValues() {
         return values;
     }
 
     @Override public String getSignature() {
-        return getField();
+        return field;
     }
 }

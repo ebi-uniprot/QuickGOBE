@@ -10,18 +10,17 @@ import java.util.Map;
  *
  * @author Ricardo Antunes
  */
-// todo change name to RequestFilterExecutionConfig
-public class FieldExecutionConfig {
-    private String name; // todo: change name to signature
+public class RequestFilterConfig {
+    private String signature;
     private ExecutionType execution;
     private Map<String, String> properties = new HashMap<>();
 
-    public String getName() {
-        return name;
+    public String getSignature() {
+        return signature;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     public ExecutionType getExecution() {
@@ -50,18 +49,18 @@ public class FieldExecutionConfig {
             return false;
         }
 
-        FieldExecutionConfig field = (FieldExecutionConfig) o;
+        RequestFilterConfig config = (RequestFilterConfig) o;
 
-        return name.equals(field.name);
+        return signature.equals(config.signature);
     }
 
     @Override public int hashCode() {
-        return name.hashCode();
+        return signature.hashCode();
     }
 
     @Override public String toString() {
         return "FieldExecutionConfig{" +
-                "name='" + name + '\'' +
+                "signature='" + signature + '\'' +
                 ", execution=" + execution +
                 ", properties=" + properties +
                 '}';
