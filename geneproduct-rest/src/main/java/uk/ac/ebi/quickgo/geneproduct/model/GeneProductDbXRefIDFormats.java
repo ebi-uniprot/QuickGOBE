@@ -22,46 +22,33 @@ import static java.util.stream.Collectors.groupingBy;
  */
 public class GeneProductDbXRefIDFormats {
 
-    private final String defaultTypeName;
     private final Map<GeneProductDbXRefIDFormats.Key, GeneProductDbXRefIDFormat> geneProductXrefEntities;
-    private final String[] targetDatabases;
+    static final Key[] targetDBs = new Key[]{ new Key("UniProtKB","PR:000000001"), new Key("IntAct","GO:0043234"),
+            new Key("RNAcentral","CHEBI:33697")};
 
-    public GeneProductDbXRefIDFormats(Map<Key, GeneProductDbXRefIDFormat> geneProductXrefEntities,
-            String[]targetDBs, String defaultTypeName) {
-        this.defaultTypeName = checkNotNull(defaultTypeName);
-        this.targetDatabases = checkNotNull(targetDBs);
+    private GeneProductDbXRefIDFormats(Map<Key, GeneProductDbXRefIDFormat> geneProductXrefEntities) {
         this.geneProductXrefEntities = checkNotNull(geneProductXrefEntities);
     }
 
 
     /**
-     *  Use the default database and type name to test if a gene product id is valid.
-     * @param id
+     * Test if a gene product id is valid.
+     * @param id The gene product ID passed in from the client
      * @return
      */
     public boolean isValidId(String id) {
-        return isValidId(id,  this.targetDatabases, defaultTypeName);
-    }
-
-    /**
-     * Use the supplied database and type name to test if a gene product id is valid.
-     * @param id
-     * @param targetDBs
-     * @param typeName
-     * @return
-     */
-    public boolean isValidId(String id, String[] targetDBs, String typeName) {
 
         //If we haven't managed to load the validation regular expressions then pass everything
         if (geneProductXrefEntities.size()==0) {
             return true;
         }
 
-        //for each target database, attempt to validate the id
-        for(String targetDB : targetDBs){
+        //check against
 
-            final GeneProductDbXRefIDFormat Xref = this.geneProductXrefEntities.get(new Key(targetDB, typeName));
-            if(Xref.matches(id)) return true;
+        //for each target database, attempt to validate the id
+        for(Key targetDB : targetDBs){
+
+            if(this.geneProductXrefEntities.get(targetDB).matches(id)) return true;
 
             //otherwise continue in loop to try next database if available
 
@@ -69,7 +56,6 @@ public class GeneProductDbXRefIDFormats {
 
         //no matches
         return false;
-
     }
 
     /**
@@ -79,8 +65,7 @@ public class GeneProductDbXRefIDFormats {
      * @param defaultTypeName
      * @return
      */
-    public static GeneProductDbXRefIDFormats createWithData(List<GeneProductDbXRefIDFormat> entities, String[]
-            allowedDBs, String defaultTypeName) {
+    public static GeneProductDbXRefIDFormats createWithData(List<GeneProductDbXRefIDFormat> entities) {
 
         Preconditions.checkNotNull(entities, "The list of GeneProductDbXRefIDFormat entities passed to createWithData" +
                 " was null, which is illegal");
@@ -89,12 +74,11 @@ public class GeneProductDbXRefIDFormats {
 
         for(GeneProductDbXRefIDFormat entity : entities) {
             GeneProductDbXRefIDFormats.Key key = new GeneProductDbXRefIDFormats.Key(entity.getDatabase(), entity
-                    .getEntityTypeName());
+                    .getEntityType());
             mappedEntities.put(key, entity);
         }
 
-
-        GeneProductDbXRefIDFormats formats = new GeneProductDbXRefIDFormats(mappedEntities, allowedDBs, defaultTypeName);
+        GeneProductDbXRefIDFormats formats = new GeneProductDbXRefIDFormats(mappedEntities);
         return formats;
     }
 
@@ -104,15 +88,14 @@ public class GeneProductDbXRefIDFormats {
 
     public static class Key {
         String database;
-        String entityTypeName;
+        String entityType;
 
-        public Key(String database, String entityTypeName) {
+        public Key(String database, String entityType) {
             this.database = database;
-            this.entityTypeName = entityTypeName;
+            this.entityType = entityType;
         }
 
-        @Override
-        public boolean equals(Object o) {
+        @Override public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
@@ -122,25 +105,23 @@ public class GeneProductDbXRefIDFormats {
 
             Key key = (Key) o;
 
-            if (database != null ? !database.equals(key.database) : key.database != null) {
+            if (!database.equals(key.database)) {
                 return false;
             }
-            return entityTypeName != null ? entityTypeName.equals(key.entityTypeName) : key.entityTypeName == null;
+            return entityType.equals(key.entityType);
 
         }
 
-        @Override
-        public int hashCode() {
-            int result = database != null ? database.hashCode() : 0;
-            result = 31 * result + (entityTypeName != null ? entityTypeName.hashCode() : 0);
+        @Override public int hashCode() {
+            int result = database.hashCode();
+            result = 31 * result + entityType.hashCode();
             return result;
         }
 
-        @Override
-        public String toString() {
+        @Override public String toString() {
             return "Key{" +
                     "database='" + database + '\'' +
-                    ", entityTypeName='" + entityTypeName + '\'' +
+                    ", entityType='" + entityType + '\'' +
                     '}';
         }
     }
