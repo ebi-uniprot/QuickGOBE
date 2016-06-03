@@ -60,7 +60,7 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "(?iu)biological_process|molecular_function|cellular_component")
+    @Pattern(regexp = "(?i)biological_process|molecular_function|cellular_component")
     public String getAspect() {
         return filters.get(ASPECT_FIELD);
     }
