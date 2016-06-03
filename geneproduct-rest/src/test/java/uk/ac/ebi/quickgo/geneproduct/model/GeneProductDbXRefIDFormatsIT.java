@@ -23,27 +23,17 @@ import static org.hamcrest.Matchers.contains;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {GeneProductREST.class})
-//@WebAppConfiguration
+@WebAppConfiguration
 public class GeneProductDbXRefIDFormatsIT {
-
-    //private GeneProductDbXRefIDFormats gpFormats;
-    //ServiceConfig serviceConfig = new ServiceConfig();
 
     @Autowired
     private ControllerValidationHelper validator;
 
-    @Before
-    public void setup(){
-//        serviceConfig.xrefValidationRegexFile = "src/test/resources/DB_XREFS_ENTITIES.dat.gz";
-//        //gpFormats = GeneProductDbXRefIDFormats.createWithData()
-//        validator = serviceConfig.geneProductValidator();
-    }
-
     @Test
     public void successfullyValidateRNACentralID(){
 
-       assertThat(validator.validateCSVIds("EBI-11166735"),contains("EBI-11166735"));
-
+        assertThat(validator.validateCSVIds("EBI-11166735"),contains("EBI-11166735"));
+        assertThat(validator.validateCSVIds("URS00000CCDAD_559292"),contains("URS00000CCDAD_559292"));
 
     }
 }
