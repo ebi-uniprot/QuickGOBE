@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
  * @author Ricardo Antunes
  */
 @Component
-@ConfigurationProperties(prefix = "search.external") class ExternalFilterExecutionConfig
-        implements FilterExecutionConfig {
+@ConfigurationProperties(prefix = "search.external")
+class ExternalFilterExecutionConfig implements FilterExecutionConfig {
 
     @NestedConfigurationProperty
     private List<FieldExecutionConfig> fields = new ArrayList<>();
