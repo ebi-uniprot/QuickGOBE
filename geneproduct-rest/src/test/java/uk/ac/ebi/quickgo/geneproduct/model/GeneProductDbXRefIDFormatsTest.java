@@ -60,7 +60,7 @@ public class GeneProductDbXRefIDFormatsTest {
 		when(mockEntity3.getEntityTypeName()).thenReturn("protein");
 		when(mockEntity3.matches("ABC")).thenReturn(true);
 		when(mockEntity3.matches("ZZZ")).thenReturn(false);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats, ALLOWED_D_BS, "protein");
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats);
 
 	}
 
@@ -71,12 +71,12 @@ public class GeneProductDbXRefIDFormatsTest {
 
 	@Test
 	public void isValidIdWhenSupplyingDatabaseAndTypeName(){
-		assertThat(dbXrefEntities.isValidId("ABC", ALLOWED_D_BS, "protein"), is(true));
+		assertThat(dbXrefEntities.isValidId("ABC"), is(true));
 	}
 
 	@Test
 	public void invalidDatabaseAndTypeName(){
-		assertThat(dbXrefEntities.isValidId("ABC", ALLOWED_D_BS, "proteinX"), is(false));
+		assertThat(dbXrefEntities.isValidId("ABC"), is(false));
 	}
 
 	@Test
@@ -89,18 +89,18 @@ public class GeneProductDbXRefIDFormatsTest {
 	@Test
 	public void throwsErrorIfEntitiesIsNull(){
 		thrown.expect(NullPointerException.class);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(null, ALLOWED_D_BS, "protein");
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(null);
 	}
 
 	@Test
 	public void throwsErrorIfDbIDIsNull(){
 		thrown.expect(NullPointerException.class);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats, null, "protein");
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats);
 	}
 
 	@Test
 	public void throwsErrorIfEntityTypeIsNull(){
 		thrown.expect(NullPointerException.class);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats, ALLOWED_D_BS, null);
+		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats);
 	}
 }
