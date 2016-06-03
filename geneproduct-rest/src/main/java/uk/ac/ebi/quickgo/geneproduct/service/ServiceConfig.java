@@ -39,13 +39,6 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.M
 @Import({GeneProductRepoConfig.class})
 public class ServiceConfig {
 
-    private static final String DEFAULT_ID_VALIDATION_DB = "UniProtKB";
-    private static final String DEFAULT_VALIDATION_TYPE_NAME = "protein";
-    private static final String COMMA = ",";
-
-    @Value("${geneproduct.db.xref.target.DBs}")
-    public String targetDatabases;
-
     @Value("${geneproduct.db.xref.valid.regexes}")
     public String xrefValidationRegexFile;
 
@@ -76,9 +69,7 @@ public class ServiceConfig {
 
     private Predicate<String> idValidator() {
         GeneProductDbXRefIDFormats
-                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load(),
-                targetDatabases.split(APP_PROPERTIES_DELIMITER),
-                DEFAULT_VALIDATION_TYPE_NAME);
+                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load());
         return dbXrefEntities::isValidId;
     }
 
