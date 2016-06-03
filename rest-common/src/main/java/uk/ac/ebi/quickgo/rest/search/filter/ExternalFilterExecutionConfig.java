@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * collections/tables this RESTful service does not have direct access to. It is with these definitions that the
  * {@link FilterConverter} instances will be able to connect to other services in order to execute the field.
  * </p>
- * This configuration is read in from a yaml configuration file.
+ * This configuration is read in from a YAML configuration file.
  * @author Ricardo Antunes
  */
 @Component
