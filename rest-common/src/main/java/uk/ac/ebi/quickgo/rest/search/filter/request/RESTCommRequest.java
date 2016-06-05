@@ -5,7 +5,7 @@ package uk.ac.ebi.quickgo.rest.search.filter.request;
  * @author Edd
  */
 // instances created at controller level
-public class RESTCommRequestFilter implements RequestFilter {
+public class RESTCommRequest implements ControllerRequest {
     // fields to populate rest comm fetcher
     @Override public String getSignature() {
         return null;

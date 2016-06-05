@@ -6,12 +6,12 @@ import java.util.List;
  * Created 02/06/16
  * @author Edd
  */
-public class SimpleRequestFilter implements RequestFilter {
+public class SimpleRequest implements ControllerRequest {
 
     private final String field;
     private final List<String> values;
 
-    public SimpleRequestFilter(String field, List<String> values) {
+    public SimpleRequest(String field, List<String> values) {
         this.field = field;
         this.values = values;
     }

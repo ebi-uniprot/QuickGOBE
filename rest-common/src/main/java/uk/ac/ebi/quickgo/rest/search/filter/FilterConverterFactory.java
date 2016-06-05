@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.filter;
 
-import uk.ac.ebi.quickgo.rest.search.filter.request.RESTCommRequestFilter;
-import uk.ac.ebi.quickgo.rest.search.filter.request.SimpleRequestFilter;
+import uk.ac.ebi.quickgo.rest.search.filter.request.RESTCommRequest;
+import uk.ac.ebi.quickgo.rest.search.filter.request.SimpleRequest;
 
 /**
  * A factory responsible for creating {@link RequestFilterOld} instances based on the type of field and the values
@@ -21,6 +21,6 @@ public interface FilterConverterFactory {
     FilterConverter createConverter(RequestFilterOld requestFilter);
 
     // todo: have more createConverters here, based on type -- overloading conversion?
-    uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverter createConverter(SimpleRequestFilter requestFilter);
-    uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverter createConverter(RESTCommRequestFilter requestFilter);
+    uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverter createConverter(SimpleRequest requestFilter);
+    uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverter createConverter(RESTCommRequest requestFilter);
 }

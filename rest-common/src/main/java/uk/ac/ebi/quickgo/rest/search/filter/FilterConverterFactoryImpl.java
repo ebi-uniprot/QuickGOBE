@@ -1,11 +1,11 @@
 package uk.ac.ebi.quickgo.rest.search.filter;
 
-import uk.ac.ebi.quickgo.rest.search.filter.request.RESTCommRequestFilter;
-import uk.ac.ebi.quickgo.rest.search.filter.request.SimpleRequestFilter;
-
 import com.google.common.base.Preconditions;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import uk.ac.ebi.quickgo.rest.search.filter.request.RESTCommRequest;
+import uk.ac.ebi.quickgo.rest.search.filter.request.SimpleRequest;
+
+import java.util.Optional;
 
 import static uk.ac.ebi.quickgo.rest.search.filter.JoinFilterConverter.createJoinConverterUsingMap;
 import static uk.ac.ebi.quickgo.rest.search.filter.RequestFilterConfig.ExecutionType.REST_COMM;
@@ -74,11 +74,11 @@ public class FilterConverterFactoryImpl implements FilterConverterFactory {
         return filterConverter;
     }
 
-    @Override public uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverter createConverter(SimpleRequestFilter requestFilter) {
+    @Override public uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverter createConverter(SimpleRequest requestFilter) {
         return null;
     }
 
-    @Override public uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverter createConverter(RESTCommRequestFilter requestFilter) {
+    @Override public uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverter createConverter(RESTCommRequest requestFilter) {
 //        Preconditions.checkArgument(requestFilter != null, "RequestFilter cannot be null");
 //        Optional<FieldExecutionConfig> optionalFilterExecutionConfig = globalFilterExecutionConfig.getSignature(requestFilter.getSignature());
 //        // check it's a REST_COMM execution type

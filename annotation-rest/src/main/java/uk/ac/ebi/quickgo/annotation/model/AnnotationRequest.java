@@ -2,8 +2,8 @@ package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.search.filter.RequestFilterOld;
-import uk.ac.ebi.quickgo.rest.search.filter.request.RESTCommRequestFilter;
-import uk.ac.ebi.quickgo.rest.search.filter.request.SimpleRequestFilter;
+import uk.ac.ebi.quickgo.rest.search.filter.request.RESTCommRequest;
+import uk.ac.ebi.quickgo.rest.search.filter.request.SimpleRequest;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -81,17 +81,17 @@ public class AnnotationRequest {
     }
 
     // todo: implement fetching of simple requests -- maintain a variable that's returned and populated when set by binder (e.g., in a setAssignedBy call)
-    public Set<SimpleRequestFilter> getSimpleRequests() {
+    public Set<SimpleRequest> getSimpleRequests() {
         return null;
     }
 
     // todo: implement fetching of join requests -- there might be multiple types, each added to a set of them whenever one is created
-    public Set<SimpleRequestFilter> getJoinRequests() {
+    public Set<SimpleRequest> getJoinRequests() {
         return null;
     }
 
     // todo: implement fetching of rest requests -- there might be multiple types, each added to a set of them whenever one is created
-    public Set<RESTCommRequestFilter> getRESTRequests() {
+    public Set<RESTCommRequest> getRESTRequests() {
         return null;
     }
 }
