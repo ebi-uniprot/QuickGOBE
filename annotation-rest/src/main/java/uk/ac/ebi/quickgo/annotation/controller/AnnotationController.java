@@ -1,20 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
-import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
-import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.filter.converter.FilterConverterFactory;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
-
 import com.google.common.base.Preconditions;
-import java.util.HashSet;
-import java.util.Set;
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +8,22 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
+import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.filter.converter.RequestConverterFactory;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+
+import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequestHelper.createRESTQueries;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequestHelper.createSimpleQueries;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
@@ -85,24 +83,24 @@ public class AnnotationController {
     private final SearchService<Annotation> annotationSearchService;
 
     private final BasicSearchQueryTemplate queryTemplate;
-    private final FilterConverterFactory filterConverterFactory;
+    private final RequestConverterFactory converterFactory;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
-            SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
-            ControllerValidationHelper validationHelper,
-            FilterConverterFactory filterConverterFactory) {
+                                SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
+                                ControllerValidationHelper validationHelper,
+                                RequestConverterFactory converterFactory) {
         Preconditions.checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         Preconditions.checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
                 ".AnnotationCompositeRetrievalConfig instance passed to the constructor of AnnotationController " +
                 "should not be null.");
-        Preconditions.checkArgument(filterConverterFactory != null, "The FilterConverterFactory cannot be null.");
+        Preconditions.checkArgument(converterFactory != null, "The ConverterFactory cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
 
-        this.filterConverterFactory = filterConverterFactory;
+        this.converterFactory = converterFactory;
         this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
     }
 
@@ -132,9 +130,11 @@ public class AnnotationController {
     private Set<QuickGOQuery> addFilterQueries(AnnotationRequest request) {
         Set<QuickGOQuery> filterQueries = new HashSet<>();
 
-        createSimpleQueries(request.getSimpleRequests(), filterConverterFactory)
+        request.getSimpleRequests().stream().map(converterFactory::convertSimple)
                 .forEach(filterQueries::add);
-        createRESTQueries(request.getRESTRequests(), filterConverterFactory)
+        request.getRESTRequests().stream().map(converterFactory::convertREST)
+                .forEach(filterQueries::add);
+        request.getJoinRequests().stream().map(converterFactory::convertJoin)
                 .forEach(filterQueries::add);
 
         return filterQueries;
