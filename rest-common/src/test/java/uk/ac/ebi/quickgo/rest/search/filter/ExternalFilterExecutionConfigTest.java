@@ -103,9 +103,9 @@ public class ExternalFilterExecutionConfigTest {
         FieldExecutionConfig field1 = createExecutionConfig(name, type1);
         FieldExecutionConfig field2 = createExecutionConfig(name, type2);
 
-        config.setFields(Arrays.asList(field1, field2));
+        config.setConfigs(Arrays.asList(field1, field2));
 
-        Optional<FieldExecutionConfig> retrievedFieldOpt = config.getField(name);
+        Optional<FieldExecutionConfig> retrievedFieldOpt = config.getConfig(name);
 
         FieldExecutionConfig retrievedField = retrievedFieldOpt.get();
 
