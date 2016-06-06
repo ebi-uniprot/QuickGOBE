@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Takes care of providing {@link RequestConfig} instances for fields that are searchable via the provided
- * {@link SearchableDocumentFields} instance.
+ * Takes care of providing {@link RequestConfig} instances for {@link uk.ac.ebi.quickgo.rest.search.request.ClientRequest}
+ * signatures that are searchable via the provided{@link SearchableDocumentFields} instance.
  *
  * @author Ricardo Antunes
  */
@@ -39,13 +39,13 @@ class InternalRequestConfigRetrieval implements RequestConfigRetrieval {
         final RequestConfig.ExecutionType executionType = RequestConfig.ExecutionType.SIMPLE;
 
         return searchableDocumentFields.searchableDocumentFields()
-                .map(field -> createFieldConfig(field, executionType))
+                .map(field -> createRequestConfig(field, executionType))
                 .collect(Collectors.toMap(RequestConfig::getSignature, Function.identity()));
     }
 
-    private RequestConfig createFieldConfig(String fieldName, RequestConfig.ExecutionType type) {
+    private RequestConfig createRequestConfig(String signature, RequestConfig.ExecutionType type) {
         RequestConfig config = new RequestConfig();
-        config.setSignature(fieldName);
+        config.setSignature(signature);
         config.setExecution(type);
 
         return config;

@@ -13,10 +13,11 @@ public interface RequestConfigRetrieval {
     /**
      * Provide the {@link RequestConfig} for the given {@param signature}.
      *
-     * @param signature the field names (sorted in alphabetical order, comma-separated) of the {@link ClientRequest}
+     * @param signature the signature (sorted in alphabetical order, comma-separated) of the
+     * {@link ClientRequest}
      * @return an Optional instance of {@link RequestConfig} which contains information on how to process
-     * the given filter request, identified by the signature
-     * @throws IllegalArgumentException if the field name is null or empty
+     * the given request, identified by the signature
+     * @throws IllegalArgumentException if the signature is null or empty
      */
     Optional<RequestConfig> getSignature(String signature);
 }

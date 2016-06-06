@@ -1,10 +1,12 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
+import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Defines a data structure that indicates how a field within a table/collection should be processed.
+ * Defines a data structure that indicates how a {@link ClientRequest} within a table/collection should be processed.
  * </p>
  * Note: this class needs to remain public for spring wiring purposes.
  *

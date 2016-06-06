@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component;
  * Holds the execution configuration of fields that do not belong to the current data-source.
  * </p>
  * The configuration definitions held within this data structure are used to indicate how to process fields held in
- * collections/tables this RESTful service does not have direct access to. It is with these definitions that the
- * {@link FilterConverter} instances will be able to connect to other services in order to use the field.
+ * collections/tables this RESTful service does not have direct access to.
  * </p>
  * This configuration is read in from a yaml configuration file.
  * @author Ricardo Antunes
@@ -22,21 +21,21 @@ import org.springframework.stereotype.Component;
         implements RequestConfigRetrieval {
 
     @NestedConfigurationProperty
-    private List<RequestConfig> filterConfigs = new ArrayList<>();
+    private List<RequestConfig> requestConfigs = new ArrayList<>();
 
-    public List<RequestConfig> getFilterConfigs() {
-        return filterConfigs;
+    public List<RequestConfig> getRequestConfigs() {
+        return requestConfigs;
     }
 
-    public void setFilterConfigs(List<RequestConfig> filterConfigs) {
-        if(filterConfigs != null) {
-            this.filterConfigs = filterConfigs;
+    public void setRequestConfigs(List<RequestConfig> requestConfigs) {
+        if(requestConfigs != null) {
+            this.requestConfigs = requestConfigs;
         }
     }
 
     @Override
     public Optional<RequestConfig> getSignature(String signature) {
-        return filterConfigs.stream()
+        return requestConfigs.stream()
                 .filter(field -> field.getSignature().equals(signature))
                 .findFirst();
     }
@@ -51,17 +50,17 @@ import org.springframework.stereotype.Component;
 
         ExternalRequestConfigRetrieval that = (ExternalRequestConfigRetrieval) o;
 
-        return filterConfigs.equals(that.filterConfigs);
+        return requestConfigs.equals(that.requestConfigs);
 
     }
 
     @Override public int hashCode() {
-        return filterConfigs.hashCode();
+        return requestConfigs.hashCode();
     }
 
     @Override public String toString() {
-        return "FilterConfigImpl{" +
-                "fields=" + filterConfigs +
+        return "ExternalRequestConfigRetrieval{" +
+                "requestConfigs=" + requestConfigs +
                 '}';
     }
 }

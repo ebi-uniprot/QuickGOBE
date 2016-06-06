@@ -8,7 +8,9 @@ import com.google.common.base.Preconditions;
 import java.util.function.Function;
 
 /**
- * Created by edd on 05/06/2016.
+ * Defines the conversion of a join request to a corresponding {@link QuickGOQuery}.
+ *
+ * Created by Edd on 05/06/2016.
  */
 class JoinRequestConverter implements Function<SimpleRequest, QuickGOQuery> {
 
@@ -22,9 +24,13 @@ class JoinRequestConverter implements Function<SimpleRequest, QuickGOQuery> {
     private final String toTable;
     private final String toAttribute;
 
-
     private final RequestConfig requestConfig;
 
+    /**
+     * A join request converter uses the {@link RequestConfig} instance passed as parameter
+     * to retrieve the join parameters: from/to which tables, and on which attributes.
+     * @param requestConfig the execution configuration details associated with client requests
+     */
     JoinRequestConverter(RequestConfig requestConfig) {
         Preconditions.checkArgument(requestConfig != null, "RequestConfig cannot be null");
 
@@ -36,6 +42,14 @@ class JoinRequestConverter implements Function<SimpleRequest, QuickGOQuery> {
         this.toAttribute = this.requestConfig.getProperties().get(TO_ATTRIBUTE_NAME);
     }
 
+    /**
+     * Converts a given {@link SimpleRequest} into a {@link QuickGOQuery} that represents
+     * a join. If {@code simpleRequest} has no values, a query with no filter is created. Otherwise,
+     * a query is created with a filter corresponding to the {@code simpleRequest}.
+     *
+     * @param simpleRequest the client request
+     * @return a {@link QuickGOQuery} corresponding to a join query, representing the original client request
+     */
     @Override
     public QuickGOQuery apply(SimpleRequest simpleRequest) {
         Preconditions.checkArgument(simpleRequest != null, "SimpleRequest cannot be null");

@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
+import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
+
 import com.google.common.base.Preconditions;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -9,7 +11,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Holds the definitions of both the {@link InternalRequestConfigRetrieval} and the
- * {@link ExternalRequestConfigRetrieval}. It is then capable of providing information for all types of fields.
+ * {@link ExternalRequestConfigRetrieval}. It is then capable of providing information for all types of
+ * {@link ClientRequest} instance signatures.
  *
  * @author Ricardo Antunes
  */
@@ -36,9 +39,9 @@ import org.springframework.stereotype.Component;
      * Note: This implementation looks first at the {@link InternalRequestConfigRetrieval} and then at
      * {@link ExternalRequestConfigRetrieval} to find the required field.
      *
-     * @param signature the name of the field
+     * @param signature the signature of the {@link ClientRequest} whose {@link RequestConfig} one wants
      * @return an Optional containing the correct {@link RequestConfig} or an empty Optional if no config is
-     * found for the given field.
+     * found for the given signature.
      */
     @Override public Optional<RequestConfig> getSignature(String signature) {
         Preconditions.checkArgument(signature != null && !signature.trim().isEmpty(),
@@ -52,7 +55,7 @@ import org.springframework.stereotype.Component;
         if(internalConfig.isPresent() && externalConfig.isPresent()) {
             logger.warn(
                     "Both the internal and external execution configurators contain definitions " +
-                            "for the field: {}. Will choose internal config over external config.");
+                            "for the signature: {}. Will choose internal config over external config.");
             config = internalConfig;
         } else if(internalConfig.isPresent()) {
             config = internalConfig;
