@@ -59,7 +59,7 @@ public class ExternalFilterExecutionConfigIT {
 
     @Test
     public void yamlPropertiesLoadedCorrectlyIntoBean() {
-        List<FieldExecutionConfig> fieldConfigs = externalFilterExecutionConfig.getFields();
+        List<FieldExecutionConfig> fieldConfigs = externalFilterExecutionConfig.getConfigs();
 
         FieldExecutionConfig aspectField = createStubAspectField();
         FieldExecutionConfig usageField = createStubUsageField();

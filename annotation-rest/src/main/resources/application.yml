@@ -3,7 +3,7 @@
 # ontology search: if you define a value, ensure ontologyType is also included
 search:
   external:
-    fields:
+    configs:
       - name: aspect
         execution: join
         properties: {fromTable: ontology, fromAttribute: id_join, toTable: annotation, toAttribute: goId_join}

@@ -6,9 +6,9 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * Holds the execution configuration of fields that do not belong to the current data-source.
+ * Holds the execution configuration of configs that do not belong to the current data-source.
  * </p>
- * The configuration definitions held within this data structure are used to indicate how to process fields held in
+ * The configuration definitions held within this data structure are used to indicate how to process configs held in
  * collections/tables this RESTful service does not have direct access to. It is with these definitions that the
  * {@link FilterConverter} instances will be able to connect to other services in order to execute the field.
  * </p>
@@ -20,20 +20,20 @@ import org.springframework.stereotype.Component;
 class ExternalFilterExecutionConfig implements FilterExecutionConfig {
 
     @NestedConfigurationProperty
-    private List<FieldExecutionConfig> fields = new ArrayList<>();
+    private List<FieldExecutionConfig> configs = new ArrayList<>();
 
-    public List<FieldExecutionConfig> getFields() {
-        return fields;
+    public List<FieldExecutionConfig> getConfigs() {
+        return configs;
     }
 
-    public void setFields(List<FieldExecutionConfig> fields) {
+    public void setConfigs(List<FieldExecutionConfig> fields) {
         if(fields != null) {
-            this.fields = fields;
+            this.configs = fields;
         }
     }
 
     public Optional<FieldExecutionConfig> getConfig(String fieldName) {
-        return fields.stream()
+        return configs.stream()
                 .filter(field -> field.getName().equals(fieldName))
                 .findFirst();
     }
@@ -48,17 +48,17 @@ class ExternalFilterExecutionConfig implements FilterExecutionConfig {
 
         ExternalFilterExecutionConfig that = (ExternalFilterExecutionConfig) o;
 
-        return fields.equals(that.fields);
+        return configs.equals(that.configs);
 
     }
 
     @Override public int hashCode() {
-        return fields.hashCode();
+        return configs.hashCode();
     }
 
     @Override public String toString() {
         return "FilterConfigImpl{" +
-                "fields=" + fields +
+                "configs=" + configs +
                 '}';
     }
 }
