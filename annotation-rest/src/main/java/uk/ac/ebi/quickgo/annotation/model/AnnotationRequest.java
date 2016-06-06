@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.annotation.model;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
-import uk.ac.ebi.quickgo.rest.search.request.RESTCommRequest;
+import uk.ac.ebi.quickgo.rest.search.request.RESTRequest;
 import uk.ac.ebi.quickgo.rest.search.request.SimpleRequest;
 
 import java.util.HashSet;
@@ -82,7 +82,7 @@ public class AnnotationRequest {
 
     // todo: implement fetching of rest requests -- there might be multiple types, each added to a set of them
     // whenever one is created
-    public Set<RESTCommRequest> getRESTRequests() {
+    public Set<RESTRequest> getRESTRequests() {
         return emptySet();
     }
 

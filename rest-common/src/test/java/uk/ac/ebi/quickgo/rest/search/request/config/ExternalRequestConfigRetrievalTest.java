@@ -33,7 +33,7 @@ public class ExternalRequestConfigRetrievalTest {
 
     @Test
     public void newExternalFilterConfigHasNoFields() {
-        assertThat(config.getFilterConfigs(), hasSize(0));
+        assertThat(config.getRequestConfigs(), hasSize(0));
     }
 
     @Test
@@ -45,14 +45,14 @@ public class ExternalRequestConfigRetrievalTest {
 
     @Test
     public void settingFieldsToNullReturnsAnEmptyListWhenCallingGetFields() {
-        config.setFilterConfigs(null);
+        config.setRequestConfigs(null);
 
-        assertThat(config.getFilterConfigs(), hasSize(0));
+        assertThat(config.getRequestConfigs(), hasSize(0));
     }
 
     @Test
     public void settingFieldsToNullReturnsEmptyOptionalWhenCallingGetField(){
-        config.setFilterConfigs(null);
+        config.setRequestConfigs(null);
 
         Optional<RequestConfig> fieldConfigOpt = config.getSignature("field");
 
@@ -66,9 +66,9 @@ public class ExternalRequestConfigRetrievalTest {
 
         RequestConfig field = createExecutionConfig(name, type);
 
-        config.setFilterConfigs(Collections.singletonList(field));
+        config.setRequestConfigs(Collections.singletonList(field));
 
-        assertThat(config.getFilterConfigs(), contains(field));
+        assertThat(config.getRequestConfigs(), contains(field));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class ExternalRequestConfigRetrievalTest {
 
         RequestConfig field = createExecutionConfig(name, type);
 
-        config.setFilterConfigs(Collections.singletonList(field));
+        config.setRequestConfigs(Collections.singletonList(field));
 
         assertThat(config.getSignature(name), is(Optional.of(field)));
     }
@@ -90,7 +90,7 @@ public class ExternalRequestConfigRetrievalTest {
 
         RequestConfig field = createExecutionConfig(name, type);
 
-        config.setFilterConfigs(Collections.singletonList(field));
+        config.setRequestConfigs(Collections.singletonList(field));
 
         assertThat(config.getSignature("fake"), is(Optional.empty()));
     }
@@ -104,7 +104,7 @@ public class ExternalRequestConfigRetrievalTest {
         RequestConfig field1 = createExecutionConfig(name, type1);
         RequestConfig field2 = createExecutionConfig(name, type2);
 
-        config.setFilterConfigs(Arrays.asList(field1, field2));
+        config.setRequestConfigs(Arrays.asList(field1, field2));
 
         Optional<RequestConfig> retrievedFieldOpt = config.getSignature(name);
 

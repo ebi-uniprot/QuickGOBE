@@ -43,6 +43,13 @@ public class RequestConfig {
         }
     }
 
+    @Override public int hashCode() {
+        int result = signature != null ? signature.hashCode() : 0;
+        result = 31 * result + (execution != null ? execution.hashCode() : 0);
+        result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        return result;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -61,13 +68,6 @@ public class RequestConfig {
         }
         return properties != null ? properties.equals(that.properties) : that.properties == null;
 
-    }
-
-    @Override public int hashCode() {
-        int result = signature != null ? signature.hashCode() : 0;
-        result = 31 * result + (execution != null ? execution.hashCode() : 0);
-        result = 31 * result + (properties != null ? properties.hashCode() : 0);
-        return result;
     }
 
     @Override public String toString() {

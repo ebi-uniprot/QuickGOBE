@@ -8,9 +8,9 @@ import com.google.common.base.Preconditions;
 import java.util.function.Function;
 
 /**
- * Defines the conversion of a REST request to a corresponding {@link QuickGOQuery}.
+ * <p>Defines the conversion of a REST request to a corresponding {@link QuickGOQuery}.
  *
- * NB. This class is a placeholder for a real implementation
+ * <p>NB. This class is a placeholder for a real implementation
  *
  * Created by Edd on 05/06/2016.
  */

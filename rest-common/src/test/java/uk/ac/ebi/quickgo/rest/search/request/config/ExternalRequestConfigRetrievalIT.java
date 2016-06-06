@@ -60,7 +60,7 @@ public class ExternalRequestConfigRetrievalIT {
 
     @Test
     public void yamlPropertiesLoadedCorrectlyIntoBean() {
-        List<RequestConfig> fieldConfigs = externalFilterExecutionConfig.getFilterConfigs();
+        List<RequestConfig> fieldConfigs = externalFilterExecutionConfig.getRequestConfigs();
 
         RequestConfig aspectField = createStubAspectSignature();
         RequestConfig usageField = createStubUsageSignature();

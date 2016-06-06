@@ -40,6 +40,10 @@ import org.springframework.stereotype.Component;
                 .findFirst();
     }
 
+    @Override public int hashCode() {
+        return requestConfigs.hashCode();
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -52,10 +56,6 @@ import org.springframework.stereotype.Component;
 
         return requestConfigs.equals(that.requestConfigs);
 
-    }
-
-    @Override public int hashCode() {
-        return requestConfigs.hashCode();
     }
 
     @Override public String toString() {
