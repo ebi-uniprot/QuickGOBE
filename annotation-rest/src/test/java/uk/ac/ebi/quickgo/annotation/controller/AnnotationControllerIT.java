@@ -8,7 +8,6 @@ import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -26,6 +25,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -37,7 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * RESTful end point for Annotations
+ * This class tests the annotation RESTful end-points
+ *
  * @author Tony Wardell
  * Date: 26/04/2016
  * Time: 14:21
@@ -56,12 +57,22 @@ public class AnnotationControllerIT {
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
 
-    private static final List<String> VALID_ASSIGNED_BY_PARMS = Arrays.asList("ASPGD", "ASPGD,Agbase", "ASPGD_,Agbase",
-            "ASPGD,Agbase_", "ASPGD,Agbase", "BHF-UCL,Agbase", "Roslin_Institute,BHF-UCL,Agbase");
+    private static final List<String> VALID_ASSIGNED_BY_PARMS = asList(
+            "ASPGD",
+            "ASPGD,Agbase",
+            "ASPGD_,Agbase",
+            "ASPGD,Agbase_",
+            "ASPGD,Agbase",
+            "BHF-UCL,Agbase",
+            "Roslin_Institute,BHF-UCL,Agbase"
+    );
 
-    private static final List<String> INVALID_ASSIGNED_BY_PARMS =
-            Arrays.asList("_ASPGD", "ASPGD,_Agbase", "5555,Agbase",
-                    "ASPGD,5555,", "4444,5555,");
+    private static final List<String> INVALID_ASSIGNED_BY_PARMS = asList(
+            "_ASPGD",
+            "ASPGD,_Agbase",
+            "5555,Agbase",
+            "ASPGD,5555,",
+            "4444,5555,");
 
     private MockMvc mockMvc;
 
@@ -173,7 +184,6 @@ public class AnnotationControllerIT {
     }
 
     //---------- Page related tests.
-
     @Test
     public void retrievesSecondPageOfAllEntriesRequest() throws Exception {
         annotationRepository.deleteAll();
@@ -226,7 +236,6 @@ public class AnnotationControllerIT {
     }
 
     //---------- Limit related tests.
-
     @Test
     public void limitForPageExceedsMaximumAllowed() throws Exception {
         annotationRepository.deleteAll();
@@ -263,10 +272,7 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
-    /**
-     *      TESTING RESULTS
-     */
-
+    //----------  test helpers
     private ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
         return expectFieldsInResults(result)
                 .andDo(print())
@@ -302,11 +308,8 @@ public class AnnotationControllerIT {
                 .andExpect(jsonPath(path + "extension").exists());
     }
 
-    /**
-     * Create some
-     */
     private List<AnnotationDocument> createBasicDocs() {
-        return Arrays.asList(
+        return asList(
                 AnnotationDocMocker.createAnnotationDoc("A0A000"),
                 AnnotationDocMocker.createAnnotationDoc("A0A001", "ASPGD"),
                 AnnotationDocMocker.createAnnotationDoc("A0A001", "BHF-UCL"),
