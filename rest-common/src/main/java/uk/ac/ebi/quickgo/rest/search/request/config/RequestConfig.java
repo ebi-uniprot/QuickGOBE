@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.rest.search.filter;
+package uk.ac.ebi.quickgo.rest.search.request.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * @author Ricardo Antunes
  */
-public class RequestFilterConfig {
+public class RequestConfig {
     private String signature;
     private ExecutionType execution;
     private Map<String, String> properties = new HashMap<>();
@@ -49,17 +49,27 @@ public class RequestFilterConfig {
             return false;
         }
 
-        RequestFilterConfig config = (RequestFilterConfig) o;
+        RequestConfig that = (RequestConfig) o;
 
-        return signature.equals(config.signature);
+        if (signature != null ? !signature.equals(that.signature) : that.signature != null) {
+            return false;
+        }
+        if (execution != that.execution) {
+            return false;
+        }
+        return properties != null ? properties.equals(that.properties) : that.properties == null;
+
     }
 
     @Override public int hashCode() {
-        return signature.hashCode();
+        int result = signature != null ? signature.hashCode() : 0;
+        result = 31 * result + (execution != null ? execution.hashCode() : 0);
+        result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        return result;
     }
 
     @Override public String toString() {
-        return "FieldExecutionConfig{" +
+        return "RequestConfig{" +
                 "signature='" + signature + '\'' +
                 ", execution=" + execution +
                 ", properties=" + properties +

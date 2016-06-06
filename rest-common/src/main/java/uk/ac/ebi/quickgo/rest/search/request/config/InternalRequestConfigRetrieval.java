@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.rest.search.filter;
+package uk.ac.ebi.quickgo.rest.search.request.config;
 
 import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
 
@@ -11,40 +11,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Takes care of providing {@link RequestFilterConfig} instances for fields that are searchable via the provided
+ * Takes care of providing {@link RequestConfig} instances for fields that are searchable via the provided
  * {@link SearchableDocumentFields} instance.
  *
  * @author Ricardo Antunes
  */
 @Component
-class InternalRequestFilterConfigRetrieval implements RequestFilterConfigRetrieval {
-    private final Map<String, RequestFilterConfig> executionConfigs;
+class InternalRequestConfigRetrieval implements RequestConfigRetrieval {
+    private final Map<String, RequestConfig> executionConfigs;
 
     @Autowired
-    public InternalRequestFilterConfigRetrieval(SearchableDocumentFields searchableDocumentFields) {
+    public InternalRequestConfigRetrieval(SearchableDocumentFields searchableDocumentFields) {
         Preconditions
                 .checkArgument(searchableDocumentFields != null, "SearchableDocumentFields instance cannot be null.");
 
         executionConfigs = populateExecutionConfigs(searchableDocumentFields);
     }
 
-    @Override public Optional<RequestFilterConfig> getSignature(String signature) {
+    @Override public Optional<RequestConfig> getSignature(String signature) {
         Preconditions
                 .checkArgument(signature != null && !signature.trim().isEmpty(), "Field name cannot be null or empty");
         return Optional.ofNullable(executionConfigs.get(signature));
     }
 
-    private Map<String, RequestFilterConfig> populateExecutionConfigs(SearchableDocumentFields
+    private Map<String, RequestConfig> populateExecutionConfigs(SearchableDocumentFields
             searchableDocumentFields) {
-        final RequestFilterConfig.ExecutionType executionType = RequestFilterConfig.ExecutionType.SIMPLE;
+        final RequestConfig.ExecutionType executionType = RequestConfig.ExecutionType.SIMPLE;
 
         return searchableDocumentFields.searchableDocumentFields()
                 .map(field -> createFieldConfig(field, executionType))
-                .collect(Collectors.toMap(RequestFilterConfig::getSignature, Function.identity()));
+                .collect(Collectors.toMap(RequestConfig::getSignature, Function.identity()));
     }
 
-    private RequestFilterConfig createFieldConfig(String fieldName, RequestFilterConfig.ExecutionType type) {
-        RequestFilterConfig config = new RequestFilterConfig();
+    private RequestConfig createFieldConfig(String fieldName, RequestConfig.ExecutionType type) {
+        RequestConfig config = new RequestConfig();
         config.setSignature(fieldName);
         config.setExecution(type);
 

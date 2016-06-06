@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.rest.search.filter;
+package uk.ac.ebi.quickgo.rest.search.request.config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,24 +18,24 @@ import org.springframework.stereotype.Component;
  * @author Ricardo Antunes
  */
 @Component
-@ConfigurationProperties(prefix = "search.external") class ExternalRequestFilterConfigRetrieval
-        implements RequestFilterConfigRetrieval {
+@ConfigurationProperties(prefix = "search.external") class ExternalRequestConfigRetrieval
+        implements RequestConfigRetrieval {
 
     @NestedConfigurationProperty
-    private List<RequestFilterConfig> filterConfigs = new ArrayList<>();
+    private List<RequestConfig> filterConfigs = new ArrayList<>();
 
-    public List<RequestFilterConfig> getFilterConfigs() {
+    public List<RequestConfig> getFilterConfigs() {
         return filterConfigs;
     }
 
-    public void setFilterConfigs(List<RequestFilterConfig> filterConfigs) {
+    public void setFilterConfigs(List<RequestConfig> filterConfigs) {
         if(filterConfigs != null) {
             this.filterConfigs = filterConfigs;
         }
     }
 
     @Override
-    public Optional<RequestFilterConfig> getSignature(String signature) {
+    public Optional<RequestConfig> getSignature(String signature) {
         return filterConfigs.stream()
                 .filter(field -> field.getSignature().equals(signature))
                 .findFirst();
@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
             return false;
         }
 
-        ExternalRequestFilterConfigRetrieval that = (ExternalRequestFilterConfigRetrieval) o;
+        ExternalRequestConfigRetrieval that = (ExternalRequestConfigRetrieval) o;
 
         return filterConfigs.equals(that.filterConfigs);
 

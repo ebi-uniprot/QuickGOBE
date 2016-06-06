@@ -1,6 +1,7 @@
-package uk.ac.ebi.quickgo.rest.search.filter;
+package uk.ac.ebi.quickgo.rest.search.request.config;
 
 import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
+import uk.ac.ebi.quickgo.rest.search.request.FilterUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,13 +24,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static uk.ac.ebi.quickgo.rest.search.filter.RequestFilterConfig.ExecutionType;
+import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ExternalFilterExecutionConfigIT.TestApplication.class,
+@ContextConfiguration(classes = ExternalRequestConfigRetrievalIT.TestApplication.class,
         initializers = ConfigFileApplicationContextInitializer.class)
 @ActiveProfiles(profiles = {"ExternalFilterExecutionConfigIT"})
-public class ExternalFilterExecutionConfigIT {
+public class ExternalRequestConfigRetrievalIT {
     @Configuration
     @ComponentScan
     @EnableConfigurationProperties
@@ -55,20 +56,20 @@ public class ExternalFilterExecutionConfigIT {
     }
 
     @Autowired
-    private ExternalRequestFilterConfigRetrieval externalFilterExecutionConfig;
+    private ExternalRequestConfigRetrieval externalFilterExecutionConfig;
 
     @Test
     public void yamlPropertiesLoadedCorrectlyIntoBean() {
-        List<RequestFilterConfig> fieldConfigs = externalFilterExecutionConfig.getFilterConfigs();
+        List<RequestConfig> fieldConfigs = externalFilterExecutionConfig.getFilterConfigs();
 
-        RequestFilterConfig aspectField = createStubAspectField();
-        RequestFilterConfig usageField = createStubUsageField();
+        RequestConfig aspectField = createStubAspectSignature();
+        RequestConfig usageField = createStubUsageSignature();
 
         assertThat(fieldConfigs, hasSize(2));
         assertThat(fieldConfigs, containsInAnyOrder(aspectField, usageField));
     }
 
-    private RequestFilterConfig createStubAspectField() {
+    private RequestConfig createStubAspectSignature() {
         Map<String, String> map = new HashMap<>();
         map.put("fromTable", "ontology");
         map.put("fromAttribute", "id");
@@ -78,11 +79,11 @@ public class ExternalFilterExecutionConfigIT {
         return FilterUtil.createExecutionConfigWithProps("aspect", ExecutionType.JOIN, map);
     }
 
-    private RequestFilterConfig createStubUsageField() {
+    private RequestConfig createStubUsageSignature() {
         Map<String, String> map = new HashMap<>();
         map.put("ip", "123.456.789");
         map.put("endpoint", "endpoint");
 
-        return FilterUtil.createExecutionConfigWithProps("usage", ExecutionType.REST_COMM, map);
+        return FilterUtil.createExecutionConfigWithProps("goIds,relations,usage", ExecutionType.REST_COMM, map);
     }
 }
