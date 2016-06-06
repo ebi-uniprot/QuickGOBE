@@ -23,6 +23,35 @@ class JoinFilterConverter implements FilterConverter {
 
     private FilterConverter filterConverter;
 
+    private JoinFilterConverter(String fromTable, String fromAttribute, String toTable, String toAttribute) {
+        this.fromTable = fromTable;
+        this.fromAttribute = fromAttribute;
+        this.toTable = toTable;
+        this.toAttribute = toAttribute;
+    }
+
+    private JoinFilterConverter(String fromTable, String fromAttribute, String toTable, String toAttribute,
+            FilterConverter filterConverter) {
+        this(fromTable, fromAttribute, toTable, toAttribute);
+
+        Preconditions.checkArgument(filterConverter != null, "Converter for the filter query cannot be null.");
+
+        this.filterConverter = filterConverter;
+    }
+
+    @Override public QuickGOQuery transform() {
+        QuickGOQuery query;
+
+        if (filterConverter == null) {
+            query = QuickGOQuery.createJoinQuery(fromTable, fromAttribute, toTable, toAttribute);
+        } else {
+            query = QuickGOQuery.createJoinQueryWithFilter(fromTable, fromAttribute, toTable, toAttribute,
+                    filterConverter.transform());
+        }
+
+        return query;
+    }
+
     /**
      * Factory method that creates a {@link JoinFilterConverter} by extracting the joining attributes found within
      * {@param joinProperties}, and uses the filter query that will come out of the provided
@@ -73,34 +102,5 @@ class JoinFilterConverter implements FilterConverter {
     static JoinFilterConverter createJoinConverterUsingParametersWithoutFilter(String fromTable, String fromAttribute,
             String toTable, String toAttribute) {
         return new JoinFilterConverter(fromTable, fromAttribute, toTable, toAttribute);
-    }
-
-    private JoinFilterConverter(String fromTable, String fromAttribute, String toTable, String toAttribute) {
-        this.fromTable = fromTable;
-        this.fromAttribute = fromAttribute;
-        this.toTable = toTable;
-        this.toAttribute = toAttribute;
-    }
-
-    private JoinFilterConverter(String fromTable, String fromAttribute, String toTable, String toAttribute,
-            FilterConverter filterConverter) {
-        this(fromTable, fromAttribute, toTable, toAttribute);
-
-        Preconditions.checkArgument(filterConverter != null, "Converter for the filter query cannot be null.");
-
-        this.filterConverter = filterConverter;
-    }
-
-    @Override public QuickGOQuery transform() {
-        QuickGOQuery query;
-
-        if (filterConverter == null) {
-            query = QuickGOQuery.createJoinQuery(fromTable, fromAttribute, toTable, toAttribute);
-        } else {
-            query = QuickGOQuery.createJoinQueryWithFilter(fromTable, fromAttribute, toTable, toAttribute,
-                    filterConverter.transform());
-        }
-
-        return query;
     }
 }

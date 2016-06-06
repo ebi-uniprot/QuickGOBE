@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.ExecutionType.REST_COMM;
 import static uk.ac.ebi.quickgo.rest.search.filter.JoinFilterConverter.createJoinConverterUsingMap;
 
 /**
@@ -25,7 +26,7 @@ public class FilterConverterFactoryImpl implements FilterConverterFactory {
     }
 
     @Override public FilterConverter createConverter(RequestFilter requestFilter) {
-        Preconditions.checkArgument(requestFilter != null, "RequestFilter can not be null");
+        Preconditions.checkArgument(requestFilter != null, "RequestFilter cannot be null");
 
         Optional<FieldExecutionConfig> fieldOpt = globalFilterExecutionConfig.getConfig(requestFilter.getField());
 
@@ -50,9 +51,10 @@ public class FilterConverterFactoryImpl implements FilterConverterFactory {
                 break;
             case JOIN:
                 filterConverter = createJoinConverterUsingMap(field.getProperties(),
-                        new SimpleFilterConverter(filter)); break;
+                        new SimpleFilterConverter(filter));
+                break;
             case REST_COMM:
-                throw new RuntimeException("REST_COMM: Functionality not Implemented yet");
+                throw new RuntimeException(REST_COMM + ": Functionality not Implemented yet");
             default:
                 throw new RuntimeException("Unrecognized ExecutionType: " + field.getExecution());
         }
