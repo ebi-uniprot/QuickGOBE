@@ -36,7 +36,7 @@ public class ExternalFilterExecutionConfigTest {
 
     @Test
     public void newExternalFilterConfigReturnsEmptyOptionalWhenCallingGetField() {
-        Optional<FieldExecutionConfig> fieldConfigOpt = config.getField("field");
+        Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig("field");
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
@@ -52,7 +52,7 @@ public class ExternalFilterExecutionConfigTest {
     public void settingFieldsToNullReturnsEmptyOptionalWhenCallingGetField(){
         config.setFields(null);
 
-        Optional<FieldExecutionConfig> fieldConfigOpt = config.getField("field");
+        Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig("field");
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
@@ -78,7 +78,7 @@ public class ExternalFilterExecutionConfigTest {
 
         config.setFields(Collections.singletonList(field));
 
-        assertThat(config.getField(name), is(Optional.of(field)));
+        assertThat(config.getConfig(name), is(Optional.of(field)));
     }
 
     @Test
@@ -90,6 +90,6 @@ public class ExternalFilterExecutionConfigTest {
 
         config.setFields(Collections.singletonList(field));
 
-        assertThat(config.getField("fake"), is(Optional.empty()));
+        assertThat(config.getConfig("fake"), is(Optional.empty()));
     }
 }

@@ -56,7 +56,7 @@ public class GlobalFilterExecutionConfigTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Field name cannot be null or empty");
 
-        config.getField(null);
+        config.getConfig(null);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class GlobalFilterExecutionConfigTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Field name cannot be null or empty");
 
-        config.getField("");
+        config.getConfig("");
     }
 
     @Test
@@ -75,9 +75,9 @@ public class GlobalFilterExecutionConfigTest {
                 FilterUtil.createExecutionConfig(internalFieldName, ExecutionType.SIMPLE)
         );
 
-        when(internalConfigMock.getField(internalFieldName)).thenReturn(expectedFieldConfigOpt);
+        when(internalConfigMock.getConfig(internalFieldName)).thenReturn(expectedFieldConfigOpt);
 
-        Optional<FieldExecutionConfig> fieldConfigOpt = config.getField(internalFieldName);
+        Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig(internalFieldName);
 
         assertThat(fieldConfigOpt, is(expectedFieldConfigOpt));
     }
@@ -86,15 +86,15 @@ public class GlobalFilterExecutionConfigTest {
     public void searchableFieldNameKnownToExternalConfigReturnsPopulatedOptional() throws Exception {
         String externalFieldName = "field";
 
-        when(internalConfigMock.getField(externalFieldName)).thenReturn(Optional.empty());
+        when(internalConfigMock.getConfig(externalFieldName)).thenReturn(Optional.empty());
 
         Optional<FieldExecutionConfig> expectedFieldConfigOpt = Optional.of(
                 FilterUtil.createExecutionConfig(externalFieldName, ExecutionType.SIMPLE)
         );
 
-        when(externalConfigMock.getField(externalFieldName)).thenReturn(expectedFieldConfigOpt);
+        when(externalConfigMock.getConfig(externalFieldName)).thenReturn(expectedFieldConfigOpt);
 
-        Optional<FieldExecutionConfig> fieldConfigOpt = config.getField(externalFieldName);
+        Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig(externalFieldName);
 
         assertThat(fieldConfigOpt, is(expectedFieldConfigOpt));
     }
@@ -103,10 +103,10 @@ public class GlobalFilterExecutionConfigTest {
     public void unknownSearchableFieldNameReturnsEmptyOptional() throws Exception {
         String unknownFieldName = "unknown";
 
-        when(internalConfigMock.getField(unknownFieldName)).thenReturn(Optional.empty());
-        when(externalConfigMock.getField(unknownFieldName)).thenReturn(Optional.empty());
+        when(internalConfigMock.getConfig(unknownFieldName)).thenReturn(Optional.empty());
+        when(externalConfigMock.getConfig(unknownFieldName)).thenReturn(Optional.empty());
 
-        Optional<FieldExecutionConfig> fieldConfigOpt = config.getField(unknownFieldName);
+        Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig(unknownFieldName);
 
         assertThat(fieldConfigOpt, is(Optional.empty()));
     }

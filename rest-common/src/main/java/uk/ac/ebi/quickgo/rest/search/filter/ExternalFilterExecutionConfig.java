@@ -32,7 +32,7 @@ class ExternalFilterExecutionConfig implements FilterExecutionConfig {
         }
     }
 
-    public Optional<FieldExecutionConfig> getField(String fieldName) {
+    public Optional<FieldExecutionConfig> getConfig(String fieldName) {
         return fields.stream()
                 .filter(field -> field.getName().equals(fieldName))
                 .findFirst();

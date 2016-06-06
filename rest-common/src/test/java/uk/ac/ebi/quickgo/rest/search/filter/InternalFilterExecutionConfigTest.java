@@ -55,7 +55,7 @@ public class InternalFilterExecutionConfigTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Field name cannot be null or empty");
 
-        config.getField(null);
+        config.getConfig(null);
     }
 
     @Test
@@ -63,21 +63,21 @@ public class InternalFilterExecutionConfigTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Field name cannot be null or empty");
 
-        config.getField("");
+        config.getConfig("");
     }
 
     @Test
     public void nonSearchableFieldNameReturnsEmptyOptional() throws Exception {
         String nonSearchableField = "nonField";
 
-        Optional<FieldExecutionConfig> fieldConfigOpt = config.getField(nonSearchableField);
+        Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig(nonSearchableField);
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
 
     @Test
     public void searchableFieldNameReturnsPopulatedOptional() throws Exception {
-        Optional<FieldExecutionConfig> fieldConfigOpt = config.getField(SEARCHABLE_FIELD_NAME);
+        Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig(SEARCHABLE_FIELD_NAME);
 
         assertThat(fieldConfigOpt, is(Optional.of(FIELD_EXECUTION_CONFIG)));
     }

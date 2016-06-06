@@ -16,5 +16,5 @@ interface FilterExecutionConfig {
      * the given field
      * @throws IllegalArgumentException if the field name is null or empty
      */
-    Optional<FieldExecutionConfig> getField(String fieldName);
+    Optional<FieldExecutionConfig> getConfig(String fieldName);
 }

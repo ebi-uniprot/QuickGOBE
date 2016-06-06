@@ -26,14 +26,14 @@ class GlobalFilterExecutionConfig implements FilterExecutionConfig {
         this.externalExecutionConfig = externalExecutionConfig;
     }
 
-    @Override public Optional<FieldExecutionConfig> getField(String fieldName) {
+    @Override public Optional<FieldExecutionConfig> getConfig(String fieldName) {
         Preconditions.checkArgument(fieldName != null && !fieldName.trim().isEmpty(),
                 "Field name cannot be null or empty");
 
-        Optional<FieldExecutionConfig> config = internalExecutionConfig.getField(fieldName);
+        Optional<FieldExecutionConfig> config = internalExecutionConfig.getConfig(fieldName);
 
         if (!config.isPresent()) {
-            config = externalExecutionConfig.getField(fieldName);
+            config = externalExecutionConfig.getConfig(fieldName);
         }
 
         return config;

@@ -35,7 +35,7 @@ public class FilterConverterFactoryImplTest {
                 FilterUtil.createExecutionConfig(field, ExecutionType.SIMPLE)
         );
 
-        when(configMock.getField(field)).thenReturn(fieldConfig);
+        when(configMock.getConfig(field)).thenReturn(fieldConfig);
 
         RequestFilter filter = new RequestFilter(field, "value");
 
@@ -52,7 +52,7 @@ public class FilterConverterFactoryImplTest {
                 FilterUtil.createExecutionConfig(field, ExecutionType.JOIN)
         );
 
-        when(configMock.getField(field)).thenReturn(fieldConfig);
+        when(configMock.getConfig(field)).thenReturn(fieldConfig);
 
         RequestFilter filter = new RequestFilter(field, "value");
 

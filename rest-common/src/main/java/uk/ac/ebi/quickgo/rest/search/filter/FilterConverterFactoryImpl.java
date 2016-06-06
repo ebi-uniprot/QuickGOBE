@@ -27,7 +27,7 @@ public class FilterConverterFactoryImpl implements FilterConverterFactory {
     @Override public FilterConverter createConverter(RequestFilter requestFilter) {
         Preconditions.checkArgument(requestFilter != null, "RequestFilter can not be null");
 
-        Optional<FieldExecutionConfig> fieldOpt = globalFilterExecutionConfig.getField(requestFilter.getField());
+        Optional<FieldExecutionConfig> fieldOpt = globalFilterExecutionConfig.getConfig(requestFilter.getField());
 
         return fieldOpt.map(field -> createConverter(requestFilter, field))
                 .orElseThrow(() -> new IllegalArgumentException("Unable to process request filter: " + requestFilter));

@@ -40,7 +40,7 @@ import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.*;
      * @param fieldName the name of the field
      * @return
      */
-    @Override public Optional<FieldExecutionConfig> getField(String fieldName) {
+    @Override public Optional<FieldExecutionConfig> getConfig(String fieldName) {
         Preconditions
                 .checkArgument(fieldName != null && !fieldName.trim().isEmpty(), "Field name cannot be null or empty");
         return Optional.ofNullable(executionConfigs.get(fieldName));
