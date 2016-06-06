@@ -75,9 +75,8 @@ public class GlobalFilterExecutionConfigTest {
                 FilterUtil.createExecutionConfig(internalFieldName, ExecutionType.SIMPLE)
         );
 
-        when(internalConfigMock.getField(internalFieldName)).thenReturn(expectedFieldConfigOpt);
-        when(externalConfigMock.getField(internalFieldName)).thenReturn(Optional.empty());
         when(internalConfigMock.getConfig(internalFieldName)).thenReturn(expectedFieldConfigOpt);
+        when(externalConfigMock.getConfig(internalFieldName)).thenReturn(Optional.empty());
 
         Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig(internalFieldName);
 
@@ -94,8 +93,7 @@ public class GlobalFilterExecutionConfigTest {
                 FilterUtil.createExecutionConfig(externalFieldName, ExecutionType.SIMPLE)
         );
 
-        when(internalConfigMock.getField(externalFieldName)).thenReturn(Optional.empty());
-        when(externalConfigMock.getField(externalFieldName)).thenReturn(expectedFieldConfigOpt);
+        when(internalConfigMock.getConfig(externalFieldName)).thenReturn(Optional.empty());
         when(externalConfigMock.getConfig(externalFieldName)).thenReturn(expectedFieldConfigOpt);
 
         Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig(externalFieldName);
@@ -128,10 +126,10 @@ public class GlobalFilterExecutionConfigTest {
         );
 
 
-        when(internalConfigMock.getField(searchableField)).thenReturn(internalFieldConfigOpt);
-        when(externalConfigMock.getField(searchableField)).thenReturn(externalFieldConfigOpt);
+        when(internalConfigMock.getConfig(searchableField)).thenReturn(internalFieldConfigOpt);
+        when(externalConfigMock.getConfig(searchableField)).thenReturn(externalFieldConfigOpt);
 
-        Optional<FieldExecutionConfig> fieldConfigOpt = config.getField(searchableField);
+        Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig(searchableField);
 
         FieldExecutionConfig retrievedField = fieldConfigOpt.get();
 
