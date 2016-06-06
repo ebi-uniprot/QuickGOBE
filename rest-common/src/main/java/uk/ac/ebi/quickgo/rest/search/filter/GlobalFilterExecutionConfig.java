@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.rest.search.filter;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Component;
  * @author Ricardo Antunes
  */
 @Component class GlobalFilterExecutionConfig implements FilterExecutionConfig {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final InternalFilterExecutionConfig internalExecutionConfig;
     private final ExternalFilterExecutionConfig externalExecutionConfig;
 
@@ -29,10 +33,19 @@ import org.springframework.stereotype.Component;
         Preconditions.checkArgument(fieldName != null && !fieldName.trim().isEmpty(),
                 "Field name cannot be null or empty");
 
-        Optional<FieldExecutionConfig> config = internalExecutionConfig.getConfig(fieldName);
+        Optional<FieldExecutionConfig> internalConfig = internalExecutionConfig.getConfig(fieldName);
+        Optional<FieldExecutionConfig> externalConfig = externalExecutionConfig.getConfig(fieldName);
 
-            if (!config.isPresent()) {
-                config = externalExecutionConfig.getConfig(fieldName);
+        Optional<FieldExecutionConfig> config;
+
+        if(internalConfig.isPresent() && externalConfig.isPresent()) {
+            logger.warn("Both the internal and external execution configurators contain definitions for the field: {}" +
+                    ". Will choose internal config over external config.");
+            config = internalConfig;
+        } else if(internalConfig.isPresent()) {
+            config = internalConfig;
+        } else {
+            config = externalConfig;
             }
 
         return config;
