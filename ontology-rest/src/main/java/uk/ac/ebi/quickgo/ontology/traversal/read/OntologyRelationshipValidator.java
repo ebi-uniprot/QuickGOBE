@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationship;
 
 import java.util.HashMap;
 import java.util.Map;

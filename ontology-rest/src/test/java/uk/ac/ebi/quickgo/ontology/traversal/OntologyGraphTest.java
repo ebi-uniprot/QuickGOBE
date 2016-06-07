@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship;
-
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.Arrays;
 import java.util.Collections;

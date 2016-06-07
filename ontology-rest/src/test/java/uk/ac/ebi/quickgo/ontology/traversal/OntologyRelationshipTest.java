@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.traversal.read;
-
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
+package uk.ac.ebi.quickgo.ontology.traversal;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +11,7 @@ import org.junit.runners.Parameterized;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType.*;
-import static uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship.combineRelationships;
+import static uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationship.combineRelationships;
 
 /**
  * This class tests that the composition of relationships produces the expected combined relationship.
@@ -117,7 +115,7 @@ public class OntologyRelationshipTest {
 
     public static class SetupTest {
         @Test(expected = IllegalArgumentException.class)
-        public void incorrectlyCombinedRelationshipsCausesException() {
+        public void incorrectlyCombinedRelationshipCausesException() {
             OntologyRelationship child2Parent = createChildParentRelationship(OntologyRelationType.UNDEFINED);
             OntologyRelationship parent2GrandParent = createChildParentRelationship(OntologyRelationType.UNDEFINED);
 

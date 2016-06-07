@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyRelationship;
-
 import java.util.List;
 import java.util.Set;
 

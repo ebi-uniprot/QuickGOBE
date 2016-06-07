@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.traversal.read;
-
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
+package uk.ac.ebi.quickgo.ontology.traversal;
 
 import org.jgrapht.graph.DefaultEdge;
 
