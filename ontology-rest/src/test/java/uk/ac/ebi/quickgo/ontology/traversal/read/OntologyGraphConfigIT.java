@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import uk.ac.ebi.quickgo.common.batch.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
 import java.util.Set;
@@ -30,7 +29,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 @ContextConfiguration(
         classes = {OntologyGraphConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
-public class OntologyGraphConfigTest {
+public class OntologyGraphConfigIT {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;

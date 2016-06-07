@@ -1,9 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-
-import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.jgrapht.DirectedGraph;
@@ -38,7 +34,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
         return ontology.vertexSet();
     }
 
-    public boolean addRelationships(Collection<? extends OntologyRelationship> relationships) {
+    public void addRelationships(Collection<? extends OntologyRelationship> relationships) {
         Preconditions.checkArgument(relationships != null, "Relationships to add to the graph cannot be null");
 
         // populate graph with edges, whilst recording the vertices
@@ -56,8 +52,6 @@ public class OntologyGraph implements OntologyGraphTraversal {
                             new OntologyRelationship(oEdge.child, oEdge.parent, oEdge.relationship));
                 }
         );
-
-        return true;
     }
 
     @Override
@@ -119,7 +113,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
         for (String base : baseVertices) {
             for (OntologyRelationship relation : getAncestorEdges(base)) {
-                if (relation.relationship.hasType(relations)) {
+                if (relation.relationship.hasTransitiveType(relations)) {
                     ancestorsFound.add(relation.parent);
                 }
             }

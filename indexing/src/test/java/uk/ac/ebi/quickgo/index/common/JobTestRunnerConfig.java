@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.common.batch;
+package uk.ac.ebi.quickgo.index.common;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.test.JobLauncherTestUtils;
