@@ -54,13 +54,6 @@ public class AnnotationControllerIT {
 
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
 
-    private static final List<String> VALID_ASSIGNED_BY_PARMS = Arrays.asList("ASPGD", "ASPGD,Agbase", "ASPGD_,Agbase",
-            "ASPGD,Agbase_", "ASPGD,Agbase", "BHF-UCL,Agbase", "Roslin_Institute,BHF-UCL,Agbase");
-
-    private static final List<String> INVALID_ASSIGNED_BY_PARMS =
-            Arrays.asList("_ASPGD", "ASPGD,_Agbase", "5555,Agbase",
-                    "ASPGD,5555,", "4444,5555,");
-
     private MockMvc mockMvc;
 
     private List<AnnotationDocument> genericDocs;
@@ -188,13 +181,7 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, invalidAssignedBy));
-        response.andDo(print())
-                .andExpect(status().isBadRequest());
-    public void invalidAssignedByThrowsAnError() throws Exception {
-        String invalidAssignedBy = "_ASPGD";
 
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, invalidAssignedBy));
         response.andDo(print())
                 .andExpect(status().isBadRequest());
     }
@@ -211,11 +198,11 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(TAXON_ID_PARAM, "2"));
 
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results[0].geneProductId").value(geneProductId))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
     }
 
     @Test
@@ -237,11 +224,11 @@ public class AnnotationControllerIT {
                         .param(TAXON_ID_PARAM, String.valueOf(taxonId1))
                         .param(TAXON_ID_PARAM, String.valueOf(taxonId2)));
 
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(2))
-                .andExpect(jsonPath("$.results.[*].geneProductId", contains(geneProductId1, geneProductId2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId1, geneProductId2));
     }
 
     @Test
@@ -357,6 +344,13 @@ public class AnnotationControllerIT {
         return doc;
     }
 
+    private AnnotationDocument createDocWithTaxonId(String geneProductId, int taxonId) {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        doc.taxonId = taxonId;
+
+        return doc;
+    }
+
     private List<AnnotationDocument> createGenericDocs(int n) {
         return IntStream.range(0, n)
                 .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i))).collect
@@ -370,3 +364,4 @@ public class AnnotationControllerIT {
     private int totalPages(int totalEntries, int resultsPerPage) {
         return (int) Math.ceil(totalEntries / resultsPerPage) + 1;
     }
+}

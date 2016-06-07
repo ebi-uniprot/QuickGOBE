@@ -55,14 +55,16 @@ public class AnnotationRequestTest {
     @Test
     public void setAndGetOntologyAspect() {
         String aspect = "function";
-    @Test
-    public void setAndGetTaxon() {
-        String taxonId = "1";
 
         annotationRequest.setAspect(aspect);
 
         assertThat(annotationRequest.getAspect(), is(aspect));
     }
+
+    @Test
+    public void setAndGetTaxon() {
+        String taxonId = "1";
+
         annotationRequest.setTaxon(taxonId);
 
         assertThat(annotationRequest.getTaxon(), is(taxonId));
