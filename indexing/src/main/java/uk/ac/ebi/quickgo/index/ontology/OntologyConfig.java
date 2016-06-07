@@ -2,12 +2,13 @@ package uk.ac.ebi.quickgo.index.ontology;
 
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
-import uk.ac.ebi.quickgo.common.batch.listener.LogJobListener;
-import uk.ac.ebi.quickgo.common.batch.listener.LogStepListener;
-import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
+import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
+import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
+import java.io.File;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -19,8 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-
-import java.io.File;
 
 /**
  * Created 02/12/15

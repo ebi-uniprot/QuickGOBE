@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.common.batch.listener;
+package uk.ac.ebi.quickgo.ontology.traversal.read;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;

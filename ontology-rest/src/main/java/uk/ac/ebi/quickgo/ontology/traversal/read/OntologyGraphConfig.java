@@ -1,8 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import uk.ac.ebi.quickgo.common.batch.listener.LogJobListener;
-import uk.ac.ebi.quickgo.common.batch.listener.LogStepListener;
-import uk.ac.ebi.quickgo.common.batch.listener.SkipLoggerListener;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
 import java.io.IOException;
@@ -13,21 +10,18 @@ import org.slf4j.Logger;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.support.CompositeItemProcessor;
-import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -64,8 +58,8 @@ public class OntologyGraphConfig {
     private int chunkSize;
     @Value("${ontology.traversal.header.lines:1}")
     private int headerLines;
-    @Value("${ontology.traversal.skip.limit:100}")
-    private int skipLimit;
+
+    private static final int SKIP_LIMIT = 0;
 
     @Bean
     public OntologyGraph ontologyGraph() {
@@ -85,14 +79,10 @@ public class OntologyGraphConfig {
         return stepBuilders.get(ONTOLOGY_TRAVERSAL_LOADING_STEP_NAME)
                 .<RawOntologyRelationship, OntologyRelationship>chunk(chunkSize)
                 .faultTolerant()
-                .skipLimit(skipLimit)
-                .skip(FlatFileParseException.class)
-                .skip(ValidationException.class)
+                .skipLimit(SKIP_LIMIT)
                 .<RawOntologyRelationship>reader(ontologyTraversalMultiFileReader())
                 .processor(ontologyRelationshipCompositeProcessor())
                 .writer(ontologyGraphPopulator(ontologyGraph))
-                .listener(logStepListener())
-                .listener(skipLogListener())
                 .build();
     }
 
@@ -163,16 +153,8 @@ public class OntologyGraphConfig {
         return new StringToOntologyRelationshipMapper();
     }
 
-    private SkipLoggerListener<OntologyRelationship, OntologyRelationship> skipLogListener() {
-        return new SkipLoggerListener<>();
-    }
-
     private JobExecutionListener logJobListener() {
         return new LogJobListener();
-    }
-
-    private StepExecutionListener logStepListener() {
-        return new LogStepListener();
     }
 
     private ItemProcessor<RawOntologyRelationship, OntologyRelationship> ontologyRelationshipValidator() {

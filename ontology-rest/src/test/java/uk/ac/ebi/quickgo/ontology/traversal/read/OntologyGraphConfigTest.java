@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import uk.ac.ebi.quickgo.common.batch.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
 import java.util.Set;
