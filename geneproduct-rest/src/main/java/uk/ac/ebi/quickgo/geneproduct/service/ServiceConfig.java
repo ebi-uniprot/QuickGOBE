@@ -20,7 +20,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import static uk.ac.ebi.quickgo.common.Definitions.APP_PROPERTIES_DELIMITER;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_RESULTS;
 
 /**
