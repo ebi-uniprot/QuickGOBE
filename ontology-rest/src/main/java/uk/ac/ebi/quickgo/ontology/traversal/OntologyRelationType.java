@@ -27,11 +27,11 @@ public enum OntologyRelationType {
     CAPABLE_OF("CO", "capable_of"),
     CAPABLE_OF_PART_OF("CP", "capable_of_part_of");
 
-    private static final Map<String, OntologyRelationType> nameToValueMap = new HashMap<>();
+    private static final Map<String, OntologyRelationType> shortNameToValueMap = new HashMap<>();
 
     static {
         for (OntologyRelationType value : OntologyRelationType.values()) {
-            nameToValueMap.put(value.getShortName(), value);
+            shortNameToValueMap.put(value.getShortName(), value);
         }
     }
 
@@ -52,8 +52,8 @@ public enum OntologyRelationType {
     }
 
     public static OntologyRelationType getByShortName(String shortName) {
-        if (nameToValueMap.containsKey(shortName)) {
-            return nameToValueMap.get(shortName);
+        if (shortNameToValueMap.containsKey(shortName)) {
+            return shortNameToValueMap.get(shortName);
         } else {
             throw new IllegalArgumentException("Unknown OntologyRelation: " + shortName);
         }
