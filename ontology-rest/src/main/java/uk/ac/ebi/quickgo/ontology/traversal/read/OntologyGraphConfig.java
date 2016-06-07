@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import java.io.IOException;
 import java.util.ArrayList;

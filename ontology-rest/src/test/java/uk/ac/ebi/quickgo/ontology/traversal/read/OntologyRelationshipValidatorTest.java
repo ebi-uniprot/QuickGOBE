@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.model;
+package uk.ac.ebi.quickgo.ontology.traversal.read;
 
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
