@@ -90,8 +90,6 @@ public class AnnotationRequest {
         return simpleRequests;
     }
 
-    // todo: implement fetching of join requests -- there might be multiple types, each added to a set of them
-    // whenever one is created
     public Set<SimpleRequest> getJoinRequests() {
         return joinRequests;
     }
