@@ -46,17 +46,23 @@ public class AnnotationRequestTest {
 
     @Test
     public void setAndGetAssignedBy() {
-        String assignedByValue = "UniProt";
+        String assignedBy = "UniProt";
+        annotationRequest.setAssignedBy(assignedBy);
 
-        annotationRequest.setAssignedBy(assignedByValue);
-
-        assertThat(annotationRequest.getAssignedBy(), is(assignedByValue));
+        assertThat(annotationRequest.getAssignedBy(), is(assignedBy));
     }
 
+    @Test
+    public void setAndGetOntologyAspect() {
+        String aspect = "function";
     @Test
     public void setAndGetTaxon() {
         String taxonId = "1";
 
+        annotationRequest.setAspect(aspect);
+
+        assertThat(annotationRequest.getAspect(), is(aspect));
+    }
         annotationRequest.setTaxon(taxonId);
 
         assertThat(annotationRequest.getTaxon(), is(taxonId));

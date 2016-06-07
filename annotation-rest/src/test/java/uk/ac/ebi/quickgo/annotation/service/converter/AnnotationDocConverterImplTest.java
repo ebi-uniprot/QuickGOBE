@@ -67,15 +67,15 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
-    public void convertTaxonIdSuccessfully() {
-        Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.taxonId, is(TAXON_ID));
-    }
-
-    @Test
     public void convertECOIdSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
         assertThat(model.ecoId, is(ECO_ID));
+    }
+
+    @Test
+    public void convertTaxonIdSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.taxonId, is(TAXON_ID));
     }
 
     @Test
@@ -94,9 +94,19 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
-    public void convertExtensionsSuccessfully() {
+    public void convertExtensionSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
         assertThat(model.extensions, is(EXTENSIONS));
+
+    }
+
+    @Test
+    public void convertNullExtensionsSuccessfully() {
+        AnnotationDocument doc = new AnnotationDocument();
+        doc.extensions = null;
+
+        Annotation model = docConverter.convert(doc);
+        assertThat(model.extensions, is(nullValue()));
     }
 
     @Test

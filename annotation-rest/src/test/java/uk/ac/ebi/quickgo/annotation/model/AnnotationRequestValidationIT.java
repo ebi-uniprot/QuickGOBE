@@ -1,7 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -59,6 +61,68 @@ public class AnnotationRequestValidationIT {
                     annotationRequest.setAssignedBy(invalidValue);
 
                     assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+                }
+        );
+    }
+
+    //ASPECT PARAMETER
+    @Test
+    public void nullAspectIsValid() {
+        String aspect = null;
+
+        annotationRequest.setAspect(aspect);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void processAspectIsValid() {
+        String aspect = "biological_process";
+
+        annotationRequest.setAspect(aspect);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void functionAspectIsValid() {
+        String aspect = "molecular_function";
+
+        annotationRequest.setAspect(aspect);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void componentAspectIsValid() {
+        String aspect = "cellular_component";
+
+        annotationRequest.setAspect(aspect);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void unknownAspectIsInvalid() {
+        String aspect = "unknown";
+
+        annotationRequest.setAspect(aspect);
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void mixedCaseAspectIsValid() {
+        String[] aspects = {"MoLeCuLaR_FuNcTiOn", "BiOlOgIcAl_pRoCeSs", "CelLUlar_CoMpOnEnT"};
+
+        Arrays.stream(aspects).forEach(
+                mixedCaseAspect -> {
+                    annotationRequest.setAspect(mixedCaseAspect);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
                 }
         );
     }
@@ -170,5 +234,9 @@ public class AnnotationRequestValidationIT {
         annotationRequest.setLimit(AnnotationRequest.MAX_ENTRIES_PER_PAGE + 1);
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    private void printConstraintViolations(Set<ConstraintViolation<AnnotationRequest>> violations) {
+        violations.stream().forEach(System.out::println);
     }
 }
