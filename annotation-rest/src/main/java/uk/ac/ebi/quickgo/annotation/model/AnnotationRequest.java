@@ -40,11 +40,10 @@ public class AnnotationRequest {
 
     private ControllerValidationHelper validationHelper = new ControllerValidationHelperImpl();
     private String assignedBy = null;
+    private String aspect = null;
 
-    @Pattern(regexp = "^[A-Za-z][A-Za-z\\-_]+(,[A-Za-z][A-Za-z\\-_]+)*")
-    public String getAssignedBy() {
-        return assignedBy;
-    }
+    //TODO:change the way the field is referenced
+    private static final String ASPECT_FIELD = "aspect";
 
     /**
      *  E.g., ASPGD,Agbase,..
@@ -52,6 +51,22 @@ public class AnnotationRequest {
      */
     public void setAssignedBy(String assignedBy) {
         simpleRequests.add(createSimpleRequest(AnnotationFields.ASSIGNED_BY, this.assignedBy = assignedBy));
+    }
+
+    @Pattern(regexp = "^[A-Za-z][A-Za-z\\-_]+(,[A-Za-z][A-Za-z\\-_]+)*")
+    public String getAssignedBy() {
+        return assignedBy;
+    }
+
+    public void setAspect(String aspect) {
+        if(aspect != null) {
+            simpleRequests.add(createSimpleRequest(ASPECT_FIELD, this.aspect = aspect.toLowerCase()));
+        }
+    }
+
+    @Pattern(regexp = "(?i)biological_process|molecular_function|cellular_component")
+    public String getAspect() {
+        return aspect;
     }
 
     public int getLimit() {

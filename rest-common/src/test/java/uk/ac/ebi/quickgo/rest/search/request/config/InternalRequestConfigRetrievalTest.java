@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.rest.search.request.config;
+package uk.ac.ebi.quickgo.rest.search.filter;
 
 import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
 

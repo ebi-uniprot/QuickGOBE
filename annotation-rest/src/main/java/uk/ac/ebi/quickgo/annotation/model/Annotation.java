@@ -32,5 +32,5 @@ public class Annotation {
 
     public String assignedBy;
 
-    public String extension;
+    public List<String> extensions;
 }
