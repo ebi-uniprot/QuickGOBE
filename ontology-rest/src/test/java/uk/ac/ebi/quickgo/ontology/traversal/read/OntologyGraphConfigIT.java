@@ -29,7 +29,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 @ContextConfiguration(
         classes = {OntologyGraphConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
-public class OntologyGraphConfigTest {
+public class OntologyGraphConfigIT {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
