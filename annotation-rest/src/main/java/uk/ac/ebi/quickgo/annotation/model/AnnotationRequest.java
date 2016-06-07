@@ -31,6 +31,7 @@ public class AnnotationRequest {
     private static final int DEFAULT_PAGE_NUMBER = 1;
 
     private final Set<SimpleRequest> simpleRequests = new HashSet<>();
+    private final Set<SimpleRequest> joinRequests = new HashSet<>();
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -60,7 +61,7 @@ public class AnnotationRequest {
 
     public void setAspect(String aspect) {
         if(aspect != null) {
-            simpleRequests.add(createSimpleRequest(ASPECT_FIELD, this.aspect = aspect.toLowerCase()));
+            joinRequests.add(createSimpleRequest(ASPECT_FIELD, this.aspect = aspect.toLowerCase()));
         }
     }
 
@@ -92,7 +93,7 @@ public class AnnotationRequest {
     // todo: implement fetching of join requests -- there might be multiple types, each added to a set of them
     // whenever one is created
     public Set<SimpleRequest> getJoinRequests() {
-        return emptySet();
+        return joinRequests;
     }
 
     // todo: implement fetching of rest requests -- there might be multiple types, each added to a set of them
