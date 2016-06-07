@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
 import com.google.common.base.Preconditions;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.stream.Collectors.groupingBy;
 
 /**
  *
@@ -42,16 +41,8 @@ public class GeneProductDbXRefIDFormats {
         if (geneProductXrefEntities.size()==0) {
             return true;
         }
-
-        //check against
-
-        //for each target database, attempt to validate the id
         for(Key targetDB : targetDBs){
-
             if(this.geneProductXrefEntities.get(targetDB).matches(id)) return true;
-
-            //otherwise continue in loop to try next database if available
-
         }
 
         //no matches
@@ -60,17 +51,16 @@ public class GeneProductDbXRefIDFormats {
 
     /**
      * Create an instance of this class
-     * @param entities
-     * @param allowedDBs
-     * @param defaultTypeName
+     * @param entities A list of regex expressions specified by database and usage.
      * @return
      */
     public static GeneProductDbXRefIDFormats createWithData(List<GeneProductDbXRefIDFormat> entities) {
 
-        Preconditions.checkNotNull(entities, "The list of GeneProductDbXRefIDFormat entities passed to createWithData" +
+        Preconditions.checkArgument(entities != null, "The list of GeneProductDbXRefIDFormat entities passed to " +
+                "createWithData" +
                 " was null, which is illegal");
 
-        Map<Key, GeneProductDbXRefIDFormat> mappedEntities = new LinkedHashMap<>();
+        Map<Key, GeneProductDbXRefIDFormat> mappedEntities = new HashMap<>();
 
         for(GeneProductDbXRefIDFormat entity : entities) {
             GeneProductDbXRefIDFormats.Key key = new GeneProductDbXRefIDFormats.Key(entity.getDatabase(), entity
