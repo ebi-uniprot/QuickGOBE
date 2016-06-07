@@ -43,7 +43,7 @@ public class OntologyRelationshipValidatorTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void failsToFindNameSpace() {
+    public void nodeWithMissingColonFailsToFindNameSpace() {
         String nameSpace = "nameSpace";
         String noSeparator = "";
         String value = "value";
@@ -51,19 +51,19 @@ public class OntologyRelationshipValidatorTest {
     }
 
     @Test
-    public void nameSpacesAreValid() {
+    public void relationshipNameSpacesAreValidAsTheyTraverseSameNameSpaceAndIncludeColonsAsSeparators() {
         validator.checkValidNameSpaces(relationship);
     }
 
     @Test(expected = ValidationException.class)
-    public void differingNameSpacesAreInvalid() {
+    public void differingNameSpacesBetweenParentAndChildVerticesAreInvalid() {
         relationship.child = "GO:value";
         relationship.parent = "ECO:value";
         validator.checkValidNameSpaces(relationship);
     }
 
     @Test(expected = ValidationException.class)
-    public void wrongNameSpacesAreInvalid() {
+    public void nonECOOrGONameSpacesAreInvalid() {
         relationship.child = "nameSpace1:value";
         relationship.parent = "nameSpace1:value";
         validator.checkValidNameSpaces(relationship);
@@ -75,7 +75,7 @@ public class OntologyRelationshipValidatorTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void relationshipIsInvalid() {
+    public void nonOntologyRelationshipIsInvalid() {
         relationship.relationship = "THIS_DOES_NOT_EXIST";
         validator.checkValidRelationship(relationship.relationship);
     }
