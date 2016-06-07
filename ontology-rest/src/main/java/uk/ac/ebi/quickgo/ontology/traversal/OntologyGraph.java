@@ -36,7 +36,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
         return ontology.vertexSet();
     }
 
-    public boolean addRelationships(Collection<? extends OntologyRelationship> relationships) {
+    public void addRelationships(Collection<? extends OntologyRelationship> relationships) {
         // populate graph with edges, whilst recording the vertices
         relationships.stream().forEach(
                 oEdge -> {
@@ -52,8 +52,6 @@ public class OntologyGraph implements OntologyGraphTraversal {
                             new OntologyRelationship(oEdge.child, oEdge.parent, oEdge.relationship));
                 }
         );
-
-        return true;
     }
 
     @Override
