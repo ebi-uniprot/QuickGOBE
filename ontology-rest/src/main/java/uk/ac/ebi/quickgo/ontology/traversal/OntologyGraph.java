@@ -99,7 +99,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
         }
 
         for (OntologyRelationship relation : getAncestorEdges(base)) {
-            if (relation.relationship.hasType(relations)) {
+            if (relation.relationship.hasTransitiveType(relations)) {
                 ancestorsFound.add(relation.parent);
             }
         }

@@ -60,14 +60,17 @@ public enum OntologyRelationType {
     }
 
     /**
-     * Checks whether this type has the same type as any of those specified in the vargargs parameter of types.
+     * This checks whether an {@link OntologyRelationType} has
+     * any of the types specified in the vargargs parameter. This
+     * is used when computing transitive relationships to ancestor
+     * ontology terms.
      *
      * @param types a vararg of types to check against
      * @return whether or not this type matches one of those specified as parameter
      */
-    public boolean hasType(OntologyRelationType... types) {
+    public boolean hasTransitiveType(OntologyRelationType... types) {
         for (OntologyRelationType type : types) {
-            if (this.hasType(type)) {
+            if (this.hasTransitiveType(type)) {
                 return true;
             }
         }
@@ -75,12 +78,22 @@ public enum OntologyRelationType {
     }
 
     /**
-     * Check whether this type is that of a specified type.
+     * Checks whether this type <i>is</i> that of a specified type. This method is used
+     * when computing the transitive ancestors of this ontology term. We say that
+     * a provided relationship type matches if:
+     *
+     * <ul>
+     *     <li>{@code UNDEFINED} => we do not know enough about it and so target vertices of the relationship
+     *         should not be ignored</li>
+     *     <li>{@code IDENTITY} => it is the special identity relationship, and so is itself</li>
+     *     <li>{@code REGULATES} (or its children relationships, {@code POSITIVE_REGULATES} / {@code
+     *         NEGATIVE_REGULATES}) => we state that all ancestors are reachable over the regulation relationships</li>
+     * </ul>
      *
      * @param type the type to test against
      * @return true if {@code type} matches this type, or if certain properties are matched. Return false otherwise.
      */
-    boolean hasType(OntologyRelationType type) {
+    private boolean hasTransitiveType(OntologyRelationType type) {
         return (type == UNDEFINED)
                 || (this == IDENTITY)
                 || (type == this)
