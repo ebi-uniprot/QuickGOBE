@@ -39,7 +39,7 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.M
 public class ServiceConfig {
 
     @Value("${geneproduct.db.xref.valid.regexes}")
-    public String xrefValidationRegexFile;
+    private String xrefValidationRegexFile;
 
     @Bean
     public GeneProductService goGeneProductService(GeneProductRepository geneProductRepository) {
