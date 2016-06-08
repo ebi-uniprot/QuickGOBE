@@ -34,47 +34,6 @@ public class GenericTermToODocConverterTest {
         when(term.getId()).thenReturn(TERM_ID);
     }
 
-    // ancestors
-    @Test
-    public void extractsAncestorsWhenPresent() {
-        GenericTerm parentTermMock = mock(GenericTerm.class);
-        when(parentTermMock.getId()).thenReturn("parent1");
-
-        TermRelation self = new TermRelation(term, term, RelationType.IDENTITY);
-        TermRelation parent1Rel = new TermRelation(term, parentTermMock, RelationType.ISA);
-        List<TermRelation> ancestors = Arrays.asList(self, parent1Rel);
-
-        when(term.getAncestors()).thenReturn(ancestors);
-
-        List<String> ancestorStrList = converter.extractAncestors(term);
-        assertThat(ancestorStrList, is(not(nullValue())));
-        assertThat(ancestorStrList.size(), is(2));
-        assertThat(ancestorStrList.get(1).contains("parent1"), is(true));
-        System.out.printf(ancestorStrList.get(1));
-    }
-
-    @Test
-    public void extractsAncestorsWhenOnlySelfRelationExists() {
-        TermRelation self = new TermRelation(term, term, RelationType.IDENTITY);
-        List<TermRelation> ancestors = Collections.singletonList(self);
-
-        when(term.getAncestors()).thenReturn(ancestors);
-
-        List<String> ancestorStrList = converter.extractAncestors(term);
-        assertThat(ancestorStrList, is(not(nullValue())));
-        assertThat(ancestorStrList.size(), is(1));
-        assertThat(ancestorStrList.get(0).contains("id1"), is(true));
-        System.out.printf(ancestorStrList.get(0));
-    }
-
-    @Test
-    public void extractsNoAncestorsWhenNull() {
-        when(term.getAncestors()).thenReturn(null);
-
-        List<String> ancestorStrList = converter.extractAncestors(term);
-        assertThat(ancestorStrList, is(nullValue()));
-    }
-
     // considers
     @Test
     public void extractsNoConsideredWhenNull() {
