@@ -31,9 +31,19 @@ public class GeneProductDbXRefIDFormatsIT {
 
     @Test
     public void successfullyValidateRNACentralID(){
+        assertThat(validator.validateCSVIds("URS0000000001_77133"),contains("URS0000000001_77133"));
 
+    }
+
+    @Test
+    public void successfullyValidateIntActIDs(){
         assertThat(validator.validateCSVIds("EBI-11166735"),contains("EBI-11166735"));
-        assertThat(validator.validateCSVIds("URS00000CCDAD_559292"),contains("URS00000CCDAD_559292"));
+        assertThat(validator.validateCSVIds("EBI-10021614"),contains("EBI-10021614"));
+    }
 
+    @Test
+    public void successfullyValidateUniProtIDs(){
+        assertThat(validator.validateCSVIds("A0A000"),contains("A0A000"));
+        assertThat(validator.validateCSVIds("A1E959"),contains("A1E959"));
     }
 }
