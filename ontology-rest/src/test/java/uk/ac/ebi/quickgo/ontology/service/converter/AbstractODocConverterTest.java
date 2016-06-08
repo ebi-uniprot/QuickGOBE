@@ -3,12 +3,10 @@ package uk.ac.ebi.quickgo.ontology.service.converter;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 
-import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -50,11 +48,6 @@ public class AbstractODocConverterTest {
     @Test
     public void convertsNameWithoutError() {
         assertThat(oboTermFromValidGODoc.name, is(equalTo("name1")));
-    }
-
-    @Test
-    public void convertsAncestorsWithoutError() {
-        assertThat(oboTermFromValidGODoc.ancestors, is(validGODoc.ancestors));
     }
 
     @Test
@@ -110,11 +103,9 @@ public class AbstractODocConverterTest {
     public void documentWithNullFieldsCanBeConverted() {
         OntologyDocument doc = new OntologyDocument();
         doc.id = "id field";
-        doc.ancestors = Arrays.asList("ancestor 0", "ancestor 1");
         OBOTerm term = new OBOTerm();
         converter.addCommonFields(doc, term);
         assertThat(term.id, is("id field"));
-        assertThat(term.ancestors, containsInAnyOrder("ancestor 0", "ancestor 1"));
         assertThat(term.name, is(nullValue()));
     }
 

@@ -409,8 +409,8 @@ public abstract class OBOControllerIT {
                 get(buildTermsURL(lowestChild) + "/" + ANCESTORS_ENDPOINT));
 
         response.andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(relationshipChainLength))
-                .andExpect(jsonPath("$.results").isArray());
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results[0].ancestors", hasSize(10)));
     }
 
     @Test
@@ -422,8 +422,9 @@ public abstract class OBOControllerIT {
                 get(buildTermsURL(asCSV(bottom, secondBottom)) + "/" + ANCESTORS_ENDPOINT));
 
         response.andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(relationshipChainLength))
-                .andExpect(jsonPath("$.results").isArray());
+                .andExpect(jsonPath("$.numberOfHits").value(2))
+                .andExpect(jsonPath("$.results[0].ancestors", hasSize(10)))
+                .andExpect(jsonPath("$.results[1].ancestors", hasSize(9)));
     }
 
     @Test
@@ -435,8 +436,8 @@ public abstract class OBOControllerIT {
                         .param(RELATIONS_PARAM, validRelation));
 
         response.andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(relationshipChainLength))
-                .andExpect(jsonPath("$.results").isArray());
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results[0].ancestors", hasSize(10)));
     }
 
     @Test
@@ -460,38 +461,53 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canFetchAllDescendantsFrom1Term() throws Exception {
-        String highestParent = relationships.get(relationships.size() - 1).parent;
+        int relCount = relationships.size();
+        String highestParent = relationships.get(relCount - 1).parent;
+
+        ontologyRepository.deleteAll();
+        createAndSaveDocs(relCount + 1);
+
         ResultActions response = mockMvc.perform(
                 get(buildTermsURL(highestParent) + "/" + DESCENDANTS_ENDPOINT));
 
         response.andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(relationshipChainLength))
-                .andExpect(jsonPath("$.results").isArray());
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results[0].descendants", hasSize(10)));
     }
 
     @Test
     public void canFetchAllDescendantsFrom2Terms() throws Exception {
-        String top = relationships.get(relationships.size() - 1).parent;
-        String secondTop = relationships.get(relationships.size() - 2).parent;
+        int relCount = relationships.size();
+        String top = relationships.get(relCount - 1).parent;
+        String secondTop = relationships.get(relCount - 2).parent;
+
+        ontologyRepository.deleteAll();
+        createAndSaveDocs(relCount + 1);
 
         ResultActions response = mockMvc.perform(
                 get(buildTermsURL(asCSV(top, secondTop)) + "/" + DESCENDANTS_ENDPOINT));
 
         response.andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(relationshipChainLength))
-                .andExpect(jsonPath("$.results").isArray());
+                .andExpect(jsonPath("$.numberOfHits").value(2))
+                .andExpect(jsonPath("$.results[0].descendants", hasSize(9)))
+                .andExpect(jsonPath("$.results[1].descendants", hasSize(10)));
     }
 
     @Test
     public void canFetchAllDescendantsFromRelation() throws Exception {
-        String highestParent = relationships.get(relationships.size() - 1).parent;
+        int relCount = relationships.size();
+        String highestParent = relationships.get(relCount - 1).parent;
+
+        ontologyRepository.deleteAll();
+        createAndSaveDocs(relCount + 1);
+
         ResultActions response = mockMvc.perform(
                 get(buildTermsURL(highestParent) + "/" + DESCENDANTS_ENDPOINT)
                         .param(RELATIONS_PARAM, validRelation));
 
         response.andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(relationshipChainLength))
-                .andExpect(jsonPath("$.results").isArray());
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results[0].descendants", hasSize(10)));
     }
 
     @Test
@@ -718,16 +734,20 @@ public abstract class OBOControllerIT {
     }
 
     private void setupSimpleRelationshipChain() {
+        setupSimpleRelationshipChain(10);
+    }
+
+    private void setupSimpleRelationshipChain(int idCount) {
         List<OntologyRelationship> simpleRelationships = new ArrayList<>();
 
-        int idCount = 10;
         List<OntologyDocument> fakeDocuments = createNDocs(idCount);
         OntologyRelationType validRelationType = OntologyRelationType.IS_A;
         for (int i = 0; i < fakeDocuments.size() - 1; i++) {
-            simpleRelationships.add(new OntologyRelationship(
-                    fakeDocuments.get(i).id,                        // child
-                    fakeDocuments.get(i + 1).id,                    // parent
-                    validRelationType));                            // relationship
+            simpleRelationships.add(
+                    new OntologyRelationship(
+                            fakeDocuments.get(i).id,                        // child
+                            fakeDocuments.get(i + 1).id,                    // parent
+                            validRelationType));                            // relationship
         }
 
         relationships = simpleRelationships;
@@ -743,5 +763,6 @@ public abstract class OBOControllerIT {
 
     private void createAndSaveDocs(int n) {
         ontologyRepository.save(createNDocs(n));
+        setupSimpleRelationshipChain(n);
     }
 }

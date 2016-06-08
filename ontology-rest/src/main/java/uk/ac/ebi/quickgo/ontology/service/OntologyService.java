@@ -92,7 +92,7 @@ public interface OntologyService<T extends OBOTerm> {
      * @param endingIds the ending ids from which returned paths end
      * @param relations a varargs value containing the relationships over which paths can only travel.
      *                  By omitting a {@code relation} value, all paths will be returned.
-     * @return a list of paths from {@code startignIds} to {@code endingIds} via {@code relations}
+     * @return a list of paths from {@code startingIds} to {@code endingIds} via {@code relations}
      */
     List<List<OntologyRelationship>> paths(
             Set<String> startingIds,
@@ -100,24 +100,26 @@ public interface OntologyService<T extends OBOTerm> {
             OntologyRelationType... relations);
 
     /**
-     * Find the set of ancestor vertices reachable from a set of ids, {@code ids}, navigable via a specified
+     * Find the set of ancestor vertices reachable from a list of ids, {@code ids}, navigable via a specified
      * set of relations.
      *
-     * @param ids a {@link Set} of ids whose ancestors one is interested in
+     * @param ids a {@link List} of ids whose ancestors one is interested in
      * @param relations a varargs value containing the relationships over which paths can only travel.
      *                  By omitting a {@code relation} value, all paths will be returned.
-     * @return the set of ancestor ids.
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
      */
-    Set<String> ancestors(Set<String> ids, OntologyRelationType... relations);
+    List<T> findAncestorsInfoByOntologyId(List<String> ids, OntologyRelationType... relations);
 
     /**
-     * Find the set of descendant ids reachable from a specified set of ids, {@code ids}, navigable via a specified
+     * Find the set of descendant ids reachable from a specified list of ids, {@code ids}, navigable via a specified
      * set of relations.
      *
-     * @param ids a {@link Set} ids whose descendants one is interested in
+     * @param ids a {@link List} ids whose descendants one is interested in
      * @param relations a varargs value containing the relationships over which paths can only travel.
      *                  By omitting a {@code relation} value, all paths will be returned.
-     * @return the set of descendant ids.
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
      */
-    Set<String> descendants(Set<String> ids, OntologyRelationType... relations);
+    List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations);
 }

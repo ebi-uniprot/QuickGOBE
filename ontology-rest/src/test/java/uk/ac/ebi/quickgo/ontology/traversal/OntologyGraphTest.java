@@ -350,7 +350,7 @@ public class OntologyGraphTest {
 
             ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
 
-            Set<String> ancestors = ontologyGraph.ancestors(ids("1"));
+            List<String> ancestors = ontologyGraph.ancestors(ids("1"));
 
             assertThat(ancestors, containsInAnyOrder(id("1"), id("2"), id("3")));
         }
@@ -363,7 +363,7 @@ public class OntologyGraphTest {
 
             ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
 
-            Set<String> ancestors = ontologyGraph.ancestors(ids("1"), CAPABLE_OF_PART_OF);
+            List<String> ancestors = ontologyGraph.ancestors(ids("1"), CAPABLE_OF_PART_OF);
 
             assertThat(ancestors, containsInAnyOrder(id("1"), id("2")));
         }
@@ -375,7 +375,7 @@ public class OntologyGraphTest {
 
             ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2));
 
-            Set<String> ancestors = ontologyGraph.ancestors(ids("1"));
+            List<String> ancestors = ontologyGraph.ancestors(ids("1"));
 
             // only the terms related to the first relationship
             assertThat(ancestors, containsInAnyOrder(id("1"), id("2")));
@@ -403,7 +403,7 @@ public class OntologyGraphTest {
                     v8_IS_v9
             ));
 
-            Set<String> ancestors = ontologyGraph.ancestors(ids("1"));
+            List<String> ancestors = ontologyGraph.ancestors(ids("1"));
 
             // ancestors do not include those involved in
             // the transitive HAS_PART relationship
@@ -432,7 +432,7 @@ public class OntologyGraphTest {
                     v8_IS_v9
             ));
 
-            Set<String> ancestors = ontologyGraph.ancestors(ids("1", "7"));
+            List<String> ancestors = ontologyGraph.ancestors(ids("1", "7"));
 
             assertThat(ancestors, containsInAnyOrder(id("1"), id("2"), id("5"), id("6"), id("7"), id("8"), id("9")));
         }
@@ -458,7 +458,7 @@ public class OntologyGraphTest {
 
             ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
 
-            Set<String> ancestors = ontologyGraph.descendants(ids("3"));
+            List<String> ancestors = ontologyGraph.descendants(ids("3"));
 
             assertThat(ancestors, containsInAnyOrder(id("1"), id("2"), id("3")));
         }
@@ -471,7 +471,7 @@ public class OntologyGraphTest {
 
             ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
 
-            Set<String> ancestors = ontologyGraph.descendants(ids("3"), OCCURS_IN);
+            List<String> ancestors = ontologyGraph.descendants(ids("3"), OCCURS_IN);
 
             assertThat(ancestors, containsInAnyOrder(id("3"), id("2")));
         }
@@ -498,7 +498,7 @@ public class OntologyGraphTest {
                     v8_IS_v9
             ));
 
-            Set<String> ancestors = ontologyGraph.descendants(ids("4"));
+            List<String> ancestors = ontologyGraph.descendants(ids("4"));
             assertThat(ancestors, containsInAnyOrder(id("4"), id("3"), id("2"), id("1")));
         }
 
@@ -524,7 +524,7 @@ public class OntologyGraphTest {
                     v8_IS_v9
             ));
 
-            Set<String> ancestors = ontologyGraph.descendants(ids("4", "8"));
+            List<String> ancestors = ontologyGraph.descendants(ids("4", "8"));
             assertThat(ancestors, containsInAnyOrder(id("4"), id("3"), id("2"), id("1"), id("7"), id("8")));
         }
 
@@ -550,7 +550,7 @@ public class OntologyGraphTest {
                     v8_IS_v9
             ));
 
-            Set<String> ancestors = ontologyGraph.descendants(ids("4"), HAS_PART);
+            List<String> ancestors = ontologyGraph.descendants(ids("4"), HAS_PART);
             assertThat(ancestors, containsInAnyOrder(id("4"), id("3"), id("2")));
         }
     }

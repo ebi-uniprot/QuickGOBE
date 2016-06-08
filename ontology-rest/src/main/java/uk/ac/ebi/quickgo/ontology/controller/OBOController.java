@@ -278,15 +278,13 @@ public abstract class OBOController<T extends OBOTerm> {
     @ApiOperation(value = "Retrieves the ancestors of specified ontology terms")
     @RequestMapping(value = TERMS + "/{ids}/ancestors", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<String>> findAncestors(
+    public ResponseEntity<QueryResult<T>> findAncestors(
             @PathVariable(value = "ids") String ids,
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return getResultsResponse(
-                asList(
-                        ontologyService.ancestors(
-                                asSet(validationHelper.validateCSVIds(ids)),
-                                asArray(validationHelper.validateRelationTypes(relations))
-                        )));
+                ontologyService.findAncestorsInfoByOntologyId(
+                        validationHelper.validateCSVIds(ids),
+                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))));
     }
 
     /**
@@ -298,15 +296,13 @@ public abstract class OBOController<T extends OBOTerm> {
     @ApiOperation(value = "Retrieves the descendants of specified ontology terms")
     @RequestMapping(value = TERMS + "/{ids}/descendants", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<String>> findDescendants(
+    public ResponseEntity<QueryResult<T>> findDescendants(
             @PathVariable(value = "ids") String ids,
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return getResultsResponse(
-                asList(
-                        ontologyService.descendants(
-                                asSet(validationHelper.validateCSVIds(ids)),
-                                asArray(validationHelper.validateRelationTypes(relations))
-                        )));
+                ontologyService.findDescendantsInfoByOntologyId(
+                        validationHelper.validateCSVIds(ids),
+                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))));
     }
 
     /**
@@ -328,7 +324,7 @@ public abstract class OBOController<T extends OBOTerm> {
                 ontologyService.paths(
                         asSet(validationHelper.validateCSVIds(ids)),
                         asSet(validationHelper.validateCSVIds(toIds)),
-                        asArray(validationHelper.validateRelationTypes(relations))
+                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))
                 ));
     }
 
@@ -355,17 +351,13 @@ public abstract class OBOController<T extends OBOTerm> {
         return items.stream().collect(Collectors.toSet());
     }
 
-    private static <ItemType> List<ItemType> asList(Collection<ItemType> items) {
-        return items.stream().collect(Collectors.toList());
-    }
-
     /**
      * Converts a {@link Collection} of {@link OntologyRelationType}s to a corresponding array of
      * {@link OntologyRelationType}s
      * @param relations the {@link OntologyRelationType}s
      * @return an array of {@link OntologyRelationType}s
      */
-    private static OntologyRelationType[] asArray(Collection<OntologyRelationType> relations) {
+    private static OntologyRelationType[] asOntologyRelationTypeArray(Collection<OntologyRelationType> relations) {
         return relations.stream().toArray(OntologyRelationType[]::new);
     }
 

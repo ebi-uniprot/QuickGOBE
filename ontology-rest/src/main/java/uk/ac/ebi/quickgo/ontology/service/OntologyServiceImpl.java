@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import static java.util.Collections.singleton;
+
 /**
  * Service to query information from the {@link OntologyRepository}
  * and return {@link OBOTerm} subclasses.
@@ -99,16 +101,31 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return ontologyTraversal.paths(startingIds, endingIds, relations);
     }
 
-    @Override public Set<String> ancestors(Set<String> ids, OntologyRelationType... relations) {
-        return ontologyTraversal.ancestors(ids, relations);
+    @Override public List<T> findAncestorsInfoByOntologyId(List<String> ids, OntologyRelationType... relations) {
+        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
+                .stream()
+                .map(term -> {
+                    term.ancestors = ontologyTraversal.ancestors(singleton(term.id), relations);
+                    return term;
+                })
+                .collect(Collectors.toList());
     }
 
-    @Override public Set<String> descendants(Set<String> ids, OntologyRelationType... relations) {
-        return ontologyTraversal.descendants(ids, relations);
+    @Override public List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations) {
+        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
+                .stream()
+                .map(term -> {
+                    term.descendants = ontologyTraversal.descendants(singleton(term.id), relations);
+                    return term;
+                })
+                .collect(Collectors.toList());
     }
 
     List<T> convertDocs(List<OntologyDocument> docs) {
-        return docs.stream().map(converter::convert).collect(Collectors.toList());
+        return docs.stream()
+                .map(converter::convert)
+                .map(this::insertAncestors)
+                .collect(Collectors.toList());
     }
 
     List<String> buildIdList(List<String> ids) {
@@ -129,8 +146,14 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
 
         List<T> entryHits = pagedResult.getContent().stream()
                 .map(converter::convert)
+                .map(this::insertAncestors)
                 .collect(Collectors.toList());
 
         return new QueryResult.Builder<>(totalNumberOfHits, entryHits).withPageInfo(pageInfo).build();
+    }
+
+    private T insertAncestors(T term) {
+        term.ancestors = ontologyTraversal.ancestors(singleton(term.id));
+        return term;
     }
 }

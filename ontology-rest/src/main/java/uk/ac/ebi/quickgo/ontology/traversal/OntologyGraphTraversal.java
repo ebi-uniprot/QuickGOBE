@@ -35,9 +35,9 @@ public interface OntologyGraphTraversal {
      * @param baseVertices a {@link Set} of vertices whose ancestors one is interested in
      * @param relations a varargs value containing the relationships over which paths can only travel.
      *                  By omitting a {@code relation} value, all paths will be returned.
-     * @return the set of ancestor vertices.
+     * @return the list of ancestor vertices.
      */
-    Set<String> ancestors(Set<String> baseVertices, OntologyRelationType... relations);
+    List<String> ancestors(Set<String> baseVertices, OntologyRelationType... relations);
 
     /**
      * Find the set of descendant vertices reachable from a top vertex, navigable via a specified
@@ -46,7 +46,7 @@ public interface OntologyGraphTraversal {
      * @param topVertices a {@link Set} vertices whose descendants one is interested in
      * @param relations a varargs value containing the relationships over which paths can only travel.
      *                  By omitting a {@code relation} value, all paths will be returned.
-     * @return the set of descendant vertices.
+     * @return the list of descendant vertices.
      */
-    Set<String> descendants(Set<String> topVertices, OntologyRelationType... relations);
+    List<String> descendants(Set<String> topVertices, OntologyRelationType... relations);
 }

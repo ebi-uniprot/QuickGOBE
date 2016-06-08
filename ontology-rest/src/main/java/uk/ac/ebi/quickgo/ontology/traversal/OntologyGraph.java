@@ -106,7 +106,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
     }
 
     @Override
-    public Set<String> ancestors(Set<String> baseVertices, OntologyRelationType... relations) {
+    public List<String> ancestors(Set<String> baseVertices, OntologyRelationType... relations) {
         Preconditions.checkArgument(!isNullOrEmpty(baseVertices), "Base vertices cannot be null/empty.");
 
         Set<String> ancestorsFound = new HashSet<>();
@@ -123,11 +123,11 @@ public class OntologyGraph implements OntologyGraphTraversal {
             }
         }
 
-        return ancestorsFound;
+        return ancestorsFound.stream().collect(Collectors.toList());
     }
 
     @Override
-    public Set<String> descendants(Set<String> topVertices, OntologyRelationType... relations) {
+    public List<String> descendants(Set<String> topVertices, OntologyRelationType... relations) {
         Preconditions.checkArgument(!isNullOrEmpty(topVertices), "Top vertices cannot be null/empty.");
 
         Set<String> descendantsFound = new HashSet<>();
@@ -135,7 +135,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
         Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
         descendants(topVertices, descendantsFound, relationsSet);
-        return descendantsFound;
+        return descendantsFound.stream().collect(Collectors.toList());
     }
 
     @Override public int hashCode() {

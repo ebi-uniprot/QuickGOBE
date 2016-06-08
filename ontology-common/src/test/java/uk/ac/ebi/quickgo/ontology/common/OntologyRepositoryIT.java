@@ -301,7 +301,6 @@ public class OntologyRepositoryIT {
         coreDoc.usage = document.usage;
         coreDoc.synonyms = document.synonyms;
         coreDoc.aspect = document.aspect;
-        coreDoc.ancestors = document.ancestors;
         return coreDoc;
     }
 }
