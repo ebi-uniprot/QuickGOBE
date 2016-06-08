@@ -30,6 +30,13 @@ public class SimpleRequest implements ClientRequest {
         this.values = values;
     }
 
+    /**
+     * Creates a request upon a field, but without supplying any values. This might be used
+     * for example when one is creating a request on a field whose configuration comes entirely from
+     * an external source, and does not require any values supplied by the user.
+     *
+     * @param field the field involved in the request
+     */
     public SimpleRequest(String field) {
         this(field, emptyList());
     }
