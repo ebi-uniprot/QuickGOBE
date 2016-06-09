@@ -24,54 +24,63 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class GeneProductDbXRefIDFormatsTest {
 
-	public static final String[] ALLOWED_D_BS = new String[]{"UniProt"};
-	List<GeneProductDbXRefIDFormat> listOfFormats;
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
+	private List<GeneProductDbXRefIDFormat> listOfFormats;
 
 	private GeneProductDbXRefIDFormats dbXrefEntities;
 
 	@Mock
-	private List<GeneProductDbXRefIDFormat> resultList;
+	private GeneProductDbXRefIDFormat rnaCentralEntity;
 
 	@Mock
-	GeneProductDbXRefIDFormat mockEntity1;
+	private GeneProductDbXRefIDFormat intactEntity;
 
 	@Mock
-	GeneProductDbXRefIDFormat mockEntity2;
+	private GeneProductDbXRefIDFormat uniprotEntity;
 
-	@Mock
-	GeneProductDbXRefIDFormat mockEntity3;
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Before
 	public void setup(){
 
 		listOfFormats = new ArrayList<>();
-		listOfFormats.add(mockEntity1);
-		listOfFormats.add(mockEntity2);
-		listOfFormats.add(mockEntity3);
+		listOfFormats.add(rnaCentralEntity);
+		listOfFormats.add(intactEntity);
+		listOfFormats.add(uniprotEntity);
 
-		when(mockEntity1.getDatabase()).thenReturn("AGI_LocusCode");
-		when(mockEntity2.getDatabase()).thenReturn("Ensembl");
-		when(mockEntity3.getDatabase()).thenReturn("UniProt");
-		when(mockEntity1.getEntityTypeName()).thenReturn("protein");
-		when(mockEntity2.getEntityTypeName()).thenReturn("protein");
-		when(mockEntity3.getEntityTypeName()).thenReturn("protein");
-		when(mockEntity3.matches("ABC")).thenReturn(true);
-		when(mockEntity3.matches("ZZZ")).thenReturn(false);
+		when(rnaCentralEntity.getDatabase()).thenReturn("RNAcentral");
+		when(rnaCentralEntity.getEntityType()).thenReturn("CHEBI:33697");
+		when(rnaCentralEntity.matches("71URS0000000001_733")).thenReturn(true);
+
+		when(intactEntity.getDatabase()).thenReturn("IntAct");
+		when(intactEntity.getEntityType()).thenReturn("GO:0043234");
+		when(intactEntity.matches("EBI-11166735")).thenReturn(true);
+
+
+		when(uniprotEntity.getDatabase()).thenReturn("UniProtKB");
+		when(uniprotEntity.getEntityType()).thenReturn("PR:000000001");
+		when(uniprotEntity.matches("A0A000")).thenReturn(true);
+		when(uniprotEntity.matches("999999")).thenReturn(false);
+
 		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats);
 
 	}
 
 	@Test
 	public void isValidId(){
-		assertThat(dbXrefEntities.isValidId("ABC"), is(true));
+		assertThat(dbXrefEntities.isValidId("A0A000"), is(true));
 	}
 
 	@Test
-	public void isValidIdWhenSupplyingDatabaseAndTypeName(){
-		assertThat(dbXrefEntities.isValidId("ABC"), is(true));
+	public void isValidRNACentralID(){
+		assertThat(dbXrefEntities.isValidId("71URS0000000001_733"), is(true));
+	}
+
+	@Test
+	public void isValidIntActID(){
+		assertThat(dbXrefEntities.isValidId("EBI-11166735"), is(true));
 	}
 
 	@Test
@@ -82,25 +91,14 @@ public class GeneProductDbXRefIDFormatsTest {
 	@Test
 	public void isInvalidId(){
 
-		assertThat(dbXrefEntities.isValidId("ZZZ"), is(false));
+		assertThat(dbXrefEntities.isValidId("9999"), is(false));
 
 	}
 
 	@Test
 	public void throwsErrorIfEntitiesIsNull(){
-		thrown.expect(NullPointerException.class);
+		thrown.expect(IllegalArgumentException.class);
 		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(null);
 	}
 
-	@Test
-	public void throwsErrorIfDbIDIsNull(){
-		thrown.expect(NullPointerException.class);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats);
-	}
-
-	@Test
-	public void throwsErrorIfEntityTypeIsNull(){
-		thrown.expect(NullPointerException.class);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats);
-	}
 }
