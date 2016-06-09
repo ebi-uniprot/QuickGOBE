@@ -41,8 +41,8 @@ public class GeneProductDbXRefIDFormats {
         if (geneProductXrefEntities.size()==0) {
             return true;
         }
-        for(Key targetDB : targetDBs){
-            if(this.geneProductXrefEntities.get(targetDB).matches(id)) return true;
+        for(Key dbKey : targetDBs){
+            if(this.geneProductXrefEntities.get(dbKey).matches(id)) return true;
         }
 
         //no matches
