@@ -147,14 +147,15 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     @Test
     public void requestWithTypeFacetFieldReturnsResponseWithFacetInResult() throws Exception {
         GeneProductType type = GeneProductType.PROTEIN;
+        String name = "name";
 
-        GeneProductDocument doc1 = createGeneProductDocWithType("A0A0F8CSS1", type);
-        GeneProductDocument doc2 = createGeneProductDocWithType("A0A0F8CSS2", type);
-        GeneProductDocument doc3 = createGeneProductDocWithType("A0A0F8CSS3", type);
+        GeneProductDocument doc1 = createGeneProductDocWithNameAndType("A0A0F8CSS1", name, type);
+        GeneProductDocument doc2 = createGeneProductDocWithNameAndType("A0A0F8CSS2", name, type);
+        GeneProductDocument doc3 = createGeneProductDocWithNameAndType("A0A0F8CSS3", name, type);
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse(type.getName(), GeneProductFields.Searchable.TYPE);
+        checkValidFacetResponse(name, GeneProductFields.Searchable.TYPE);
     }
 
     @Test
@@ -337,9 +338,10 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         return geneProductDocument;
     }
 
-    private GeneProductDocument createGeneProductDocWithType(String id, GeneProductType type) {
+    private GeneProductDocument createGeneProductDocWithNameAndType(String id, String name, GeneProductType type) {
         GeneProductDocument geneProductDocument = createDocWithId(id);
         geneProductDocument.type = type.getName();
+        geneProductDocument.name = name;
 
         return geneProductDocument;
     }
