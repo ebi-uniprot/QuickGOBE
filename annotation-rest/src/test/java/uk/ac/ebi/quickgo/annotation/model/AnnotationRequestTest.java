@@ -57,12 +57,20 @@ public class AnnotationRequestTest {
 
     @Test
     public void setAndGetAssignedBy() {
-        annotationRequest.setAssignedBy(UNI_PROT);
+        String assignedBy = "UniProt";
+        annotationRequest.setAssignedBy(assignedBy);
 
-        assertThat(annotationRequest.getAssignedBy(), is(UNI_PROT));
+        assertThat(annotationRequest.getAssignedBy(), is(assignedBy));
     }
 
+    @Test
+    public void setAndGetOntologyAspect() {
+        String aspect = "function";
 
+        annotationRequest.setAspect(aspect);
+
+        assertThat(annotationRequest.getAspect(), is(aspect));
+    }
     @Test
     public void setAndGetReference(){
         annotationRequest.setReference(ONE_GOREF);

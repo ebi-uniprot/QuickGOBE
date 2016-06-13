@@ -71,6 +71,7 @@
     <field name="geneProductId" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="qualifier" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="goId" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="goId_join" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="dbObjectType" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="dbObjectSymbol" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="dbSubset" type="string" indexed="true" stored="false" multiValued="false"/>
@@ -87,59 +88,6 @@
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->
 
-    <!-- old fields -->
-    <!--<field name="goEvidence" type="string" indexed="true" stored="true" multiValued="false"/>-->
-
-    <!--<field name="docType" type="text_general" indexed="true" stored="true"/>-->
-    <!--<field name="db" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="dbObjectID" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="dbObjectSymbol" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <!--<field name="dbObjectName" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <!--<field name="dbObjectType" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <!--<field name="dbObjectSynonyms" type="string" indexed="false" stored="true" multiValued="true"/>-->
-
-    <!--&lt;!&ndash; the (protein) set(s) of which the annotation target is a member &ndash;&gt;-->
-    <!--<field name="targetSets" type="string" indexed="true" stored="false" multiValued="true"/>-->
-
-    <!--<field name="qualifier" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="goID" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="goAspect" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="ecoID" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="termName" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="interactingTaxID" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="date" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="extension" type="string" indexed="true" stored="true" multiValued="true"/>-->
-    <!--<field name="fullExtension" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <!--<field name="properties" type="string" indexed="true" stored="true" multiValued="false"/>-->
-
-    <!--&lt;!&ndash; Ancestors &ndash;&gt;-->
-    <!--<field name="ancestorsI" type="string" indexed="true" stored="false" multiValued="true"/>-->
-    <!--&lt;!&ndash; We need to store ancestorsIPO to retrieve the term we are slimming to &ndash;&gt;-->
-    <!--<field name="ancestorsIPO" type="string" indexed="true" stored="true" multiValued="true"/>-->
-    <!--<field name="ancestorsIPOR" type="string" indexed="true" stored="false" multiValued="true"/>-->
-
-    <!--&lt;!&ndash; ECO ancestors &ndash;&gt;-->
-    <!--<field name="ecoAncestorsI" type="string" indexed="true" stored="false" multiValued="true"/>-->
-
-    <!--&lt;!&ndash; Reference &ndash;&gt;-->
-    <!--<field name="reference" type="string" indexed="true" stored="true" multiValued="false"/>-->
-
-    <!--&lt;!&ndash; With_string &ndash;&gt;-->
-    <!--<field name="with" type="string" indexed="true" stored="true" multiValued="true"/>-->
-    <!--<field name="fullWith" type="string" indexed="false" stored="true" multiValued="false"/>-->
-
-    <!--&lt;!&ndash; Identifier & closure (i.e., taxonomic hierarchy) of the gene product's taxon &ndash;&gt;-->
-    <!--<field name="taxonomyId" type="int" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="taxonomyName" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <!--<field name="taxonomyClosure" type="int" indexed="true" stored="false" multiValued="true"/>-->
-
-    <!--&lt;!&ndash; Sequence length &ndash;&gt;-->
-    <!--<field name="sequenceLength" type="int" indexed="false" stored="true" multiValued="false"/>-->
-
-    <!--&lt;!&ndash; Cross references to identifiers in other databases &ndash;&gt;-->
-    <!--<field name="xrefs" type="string" indexed="true" stored="true" multiValued="true"/>-->
-
     <!-- _version_ is required for some Solr 4.0 functionality, particularly if SolrCloud is being used -->
     <field name="_version_" type="long" indexed="true" stored="true"/>
     <field name="text" type="string" indexed="true" stored="false" multiValued="true"/>
@@ -147,8 +95,8 @@
 
     <!-- Field to use to determine and enforce document uniqueness.
          Unless this field is marked with required="false", it will be a required field
-   -->
-        <uniqueKey>id</uniqueKey>
+    -->
+    <uniqueKey>id</uniqueKey>
 
 
     <!-- DEPRECATED: The defaultSearchField is consulted by various query parsers when
@@ -175,6 +123,9 @@
        Another way to map multiple source fields to the same
        destination field is to use the dynamic field syntax.
        copyField also supports a maxChars to copy setting.  -->
+
+    <!--Field used in cross-core joins with other the ontology collection-->
+    <copyField source="goId" dest="goId_join"/>
 
     <!-- <copyField source="*_t" dest="text" maxChars="3000"/> -->
 
