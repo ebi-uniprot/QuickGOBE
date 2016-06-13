@@ -10,6 +10,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
+
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
  *
@@ -63,6 +65,18 @@ public class AnnotationRequest {
     @Pattern(regexp = "(?i)biological_process|molecular_function|cellular_component")
     public String getAspect() {
         return filters.get(ASPECT_FIELD);
+    }
+
+    /**
+     * NOT, enables etc
+     * @param qualifier
+     */
+    public void setQualifier(String qualifier){
+        filters.put(QUALIFIER, qualifier);
+    }
+
+    public String getQualifter(){
+        return filters.get(QUALIFIER);
     }
 
     public void setPage(int page) {
