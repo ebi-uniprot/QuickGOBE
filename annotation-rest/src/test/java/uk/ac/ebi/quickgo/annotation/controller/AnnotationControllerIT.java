@@ -48,6 +48,7 @@ public class AnnotationControllerIT {
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
 
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
+    private static final String QUALIFIER_PARAM = "qualifier";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
 
@@ -167,11 +168,12 @@ public class AnnotationControllerIT {
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, UNAVAILABLE_ASSIGNED_BY + ","
                         + assignedBy));
 
-        response.andExpect(status().isOk())
+        response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
+                .andExpect(valueOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
     }
 
     @Test
@@ -182,6 +184,26 @@ public class AnnotationControllerIT {
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, invalidAssignedBy));
         response.andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void successfullyLookupAnnotationsByQualifier() throws Exception {
+        String qualifier = "enables";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, qualifier));
+        final String RESULTS = "results";
+
+
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valueOccurInField(QUALIFIER, qualifier));
+                //.andExpect(valuesOccurInField(QUALIFIER, qualifier));
+                //.andExpect(   jsonPath(RESULTS +"[2]." + "qualifier").value(qualifier));
+
     }
 
     //---------- Page related tests.
