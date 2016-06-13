@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -25,6 +26,10 @@ final class ResponseVerifier {
 
     static ResultMatcher valuesOccurInField(String fieldName, String... values) {
         return jsonPath(RESULTS + ".*." + fieldName, contains(values));
+    }
+
+    static ResultMatcher valueInElement(int element, String fieldName, String value) {
+        return jsonPath(RESULTS + "[" + element + "]" + fieldName, is(value));
     }
 
     static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {
