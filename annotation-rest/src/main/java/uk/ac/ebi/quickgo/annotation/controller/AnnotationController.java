@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import com.google.common.base.Preconditions;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -29,7 +30,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 /**
  * Provides RESTful endpoints for retrieving Gene Ontology (GO) Annotations to gene products.
  *
-/ * Gene Ontology: the framework for the model of biology. The GO defines concepts/classes used
+ * Gene Ontology: the framework for the model of biology. The GO defines concepts/classes used
  * to describe gene function, and relationships between these concepts.
  *
  * GO annotations: the model of biology. Annotations are statements describing the functions of specific genes,
@@ -89,11 +90,12 @@ public class AnnotationController {
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
             FilterConverterFactory filterConverterFactory) {
-        checkNotNull(annotationSearchService, "The SearchService<Annotation> instance passed to the constructor of " +
-                "AnnotationController should not be null.");
-        checkNotNull(annotationRetrievalConfig, "The SearchServiceConfig.AnnotationCompositeRetrievalConfig" +
-                " instance passed to the constructor of AnnotationController should not be null.");
-        checkNotNull(filterConverterFactory, "The FilterConverterFactory cannot be null.");
+        Preconditions.checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
+                "to the constructor of AnnotationController should not be null.");
+        Preconditions.checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
+                ".AnnotationCompositeRetrievalConfig instance passed to the constructor of AnnotationController " +
+                "should not be null.");
+        Preconditions.checkArgument(filterConverterFactory != null, "The FilterConverterFactory cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
