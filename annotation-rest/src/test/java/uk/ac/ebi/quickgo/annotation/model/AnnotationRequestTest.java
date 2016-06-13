@@ -59,23 +59,6 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.getWithFrom(), is(WITH_FROM));
     }
 
-//    @Test
-//    public void addSingleFilter() {
-//        annotationRequest.setAssignedBy(UNI_PROT);
-//        final List<RequestFilter> pfList = annotationRequest.stream().collect(toList());
-//        assertThat(pfList.get(0).getField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
-//        assertThat(pfList, hasSize(1));
-//
-//        assertThat(pfList.get(0)
-//                .provideArgStream()
-//                .findFirst().isPresent(), is(true));
-//        assertThat(pfList.get(0)
-//                .provideArgStream()
-//                .findFirst().get(), is(equalTo(UNI_PROT)));
-//        assertThat(pfList.get(0)
-//                .provideArgStream()
-//                .count(), is(1L));
-//    }
     @Test
     public void setAndGetOntologyAspect() {
         String aspect = "function";
