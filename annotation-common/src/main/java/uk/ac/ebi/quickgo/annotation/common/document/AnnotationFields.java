@@ -52,6 +52,7 @@ public class AnnotationFields {
         private static final Set<String> VALUES = new HashSet<>();
 
         public static final String ASSIGNED_BY = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
+        public static final String REFERENCE_SEARCH = storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);
