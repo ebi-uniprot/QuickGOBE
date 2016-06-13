@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
@@ -285,6 +286,8 @@ public class AnnotationControllerIT {
     private AnnotationDocument createDocWithAssignedBy(String geneProductId, String assignedBy) {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         doc.assignedBy = assignedBy;
+        return doc;
+    }
 
     //----- Tests for reference ---------------------//
 
@@ -293,15 +296,13 @@ public class AnnotationControllerIT {
 
         AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
         a.reference = "PMID:0000002";
-        annotationRepository.save(a);
+            repository.save(a);
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, AnnotationDocMocker.GO_REF_0000002));
 
-        expectResultsInfoExists(response, basicDocs.size())
-                .andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(fieldsInAllResultsExist(1));
     }
 
     @Test
@@ -309,28 +310,24 @@ public class AnnotationControllerIT {
 
         AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
         a.reference = "PMID:0000002";
-        annotationRepository.save(a);
+            repository.save(a);
 
         AnnotationDocument b = AnnotationDocMocker.createAnnotationDoc("A0A124");
         b.reference = "PMID:0000003";
-        annotationRepository.save(b);
+            repository.save(b);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
                 AnnotationDocMocker.GO_REF_0000002 + "," + a.reference + "," + b.reference));
 
-        expectResultsInfoExists(response, basicDocs.size())
-                .andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size() + 2))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(jsonPath("$.results[0].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[1].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[2].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[3].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[4].reference").value(a.reference))
-                .andExpect(jsonPath("$.results[5].reference").value(b.reference))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()+2))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valueInElement(0, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(1, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(2, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(3, AnnotationFields.REFERENCE, a.reference))
+                .andExpect(valueInElement(4, AnnotationFields.REFERENCE, b.reference));
     }
 
 
@@ -339,29 +336,25 @@ public class AnnotationControllerIT {
 
         AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
         a.reference = "PMID:0000002";
-        annotationRepository.save(a);
+            repository.save(a);
 
         AnnotationDocument b = AnnotationDocMocker.createAnnotationDoc("A0A124");
         b.reference = "PMID:0000003";
-        annotationRepository.save(b);
+            repository.save(b);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
                 AnnotationDocMocker.GO_REF_0000002).param(REF_PARAM, a.reference).param(REF_PARAM, b.reference));
 
-        expectResultsInfoExists(response, basicDocs.size())
-                .andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size() + 2))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(jsonPath("$.results[0].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[1].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[2].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[3].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[4].reference").value(a.reference))
-                .andExpect(jsonPath("$.results[5].reference").value(b.reference))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()+2))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valueInElement(0, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(1, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(2, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(3, AnnotationFields.REFERENCE, a.reference))
+                .andExpect(valueInElement(4, AnnotationFields.REFERENCE, b.reference));
     }
-
 
 
     @Test
@@ -372,24 +365,18 @@ public class AnnotationControllerIT {
         //This one shouldn't be found
         AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
         a.reference = "PMID:0000002";
-        annotationRepository.save(a);
-
-        expectResultsInfoExists(response, basicDocs.size())
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+            repository.save(a);
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()));
     }
 
     @Test
     public void unknownDbNameIsUnsuccessful() throws Exception{
-
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "GO_LEFT"));
-
-        response.andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(0))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
     }
 
 
@@ -398,51 +385,42 @@ public class AnnotationControllerIT {
         //Don't find this one.
         AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
         a.reference = "PMID:0000002";
-        annotationRepository.save(a);
+            repository.save(a);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "0000002"));
-
-        expectResultsInfoExists(response, basicDocs.size())
-                .andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()+1))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(jsonPath("$.results[0].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[1].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[2].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[3].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[4].reference").value(a.reference))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()+1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valueInElement(0, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(1, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(2, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(3, AnnotationFields.REFERENCE, a.reference));
     }
-
 
     @Test
     public void multipleDbIdIsSuccessful() throws Exception{
         AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
         a.reference = "PMID:0000002";
-        annotationRepository.save(a);
+            repository.save(a);
 
         AnnotationDocument b = AnnotationDocMocker.createAnnotationDoc("A0A124");
         b.reference = "PMID:0000003";
-        annotationRepository.save(b);
+        repository.save(b);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "0000002")
                 .param(REF_PARAM, "0000003"));
 
-        expectResultsInfoExists(response, basicDocs.size())
-                .andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()+2))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(jsonPath("$.results[0].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[1].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[2].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[3].reference").value(AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(jsonPath("$.results[4].reference").value(a.reference))
-                .andExpect(jsonPath("$.results[5].reference").value(b.reference))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()+2))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valueInElement(0, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(1, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(2, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
+                .andExpect(valueInElement(3, AnnotationFields.REFERENCE, a.reference))
+                .andExpect(valueInElement(4, AnnotationFields.REFERENCE, b.reference));
     }
-
 
 
     @Test
@@ -450,67 +428,12 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "999999"));
 
-        response.andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(0))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
-
-    /**
-     *      TESTING RESULTS
-     */
-
-        return doc;
-    private ResultActions expectResultsInfoExists(ResultActions result, int expectedHits) throws Exception {
-        return expectFieldsInResults(result, expectedHits)
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.pageInfo").exists())
-                .andExpect(jsonPath("$.pageInfo.resultsPerPage").exists())
-                .andExpect(jsonPath("$.pageInfo.total").exists())
-                .andExpect(jsonPath("$.pageInfo.current").exists());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
     }
 
     private List<AnnotationDocument> createGenericDocs(int n) {
-    private ResultActions expectFieldsInResults(ResultActions result, int expectedHits) throws Exception {
-        int index = 0;
-
-        for (int i = 0; i < expectedHits; i++) {
-            expectFields(result, "$.results[" + index++ + "].");
-        }
-
-        return result;
-    }
-
-    private void expectFields(ResultActions result, String path) throws Exception {
-        result
-                .andExpect(jsonPath(path + "reference").exists())
-                .andExpect(jsonPath(path + "assignedBy").exists());
-
-//        .andExpect(jsonPath(path + "id").exists())
-//                .andExpect(jsonPath(path + "geneProductId").exists())
-//                .andExpect(jsonPath(path + "qualifier").exists())
-//                .andExpect(jsonPath(path + "goId").exists())
-//                .andExpect(jsonPath(path + "goEvidence").exists())
-//                .andExpect(jsonPath(path + "ecoId").exists())
-//                .andExpect(jsonPath(path + "withFrom").exists())
-//                .andExpect(jsonPath(path + "taxonId").exists())
-//                .andExpect(jsonPath(path + "extension").exists());
-
-    }
-
-    /**
-     * Create some
-     */
-    private List<AnnotationDocument> createBasicDocs() {
-        return Arrays.asList(
-                AnnotationDocMocker.createAnnotationDoc("A0A000"),
-                AnnotationDocMocker.createAnnotationDoc("A0A001", "ASPGD"),
-                AnnotationDocMocker.createAnnotationDoc("A0A001", "BHF-UCL"),
-                AnnotationDocMocker.createAnnotationDoc("A0A002", "AGPRD"));
-    }
-
-    private List<AnnotationDocument> createAndSaveDocs(int n) {
         return IntStream.range(0, n)
                 .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i))).collect
                         (Collectors.toList());
