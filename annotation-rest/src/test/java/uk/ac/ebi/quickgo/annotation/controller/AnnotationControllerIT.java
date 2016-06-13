@@ -256,11 +256,10 @@ public class AnnotationControllerIT {
     public void successfulLookupWithFromForSingleId()throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro:IPR015421"));
 
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()));
+
     }
 
     @Test
@@ -268,11 +267,10 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM,
                 "InterPro:IPR015421,InterPro:IPR015422"));
 
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()));
+
     }
 
 
@@ -280,10 +278,9 @@ public class AnnotationControllerIT {
     public void searchingForUnknownWithFromBringsBackNoResults()throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "XXX:54321"));
 
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(0))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
     }
 
 
@@ -291,11 +288,10 @@ public class AnnotationControllerIT {
     public void successfulLookupWithFromUsingDatabaseNameOnly()throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro"));
 
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(fieldsInAllResultsExist(1));
     }
 
 
@@ -303,11 +299,10 @@ public class AnnotationControllerIT {
     public void successfulLookupWithFromUsingDatabaseIdOnly()throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "IPR015421"));
 
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(fieldsInAllResultsExist(1));
     }
 
     //---------- Limit related tests.
