@@ -49,7 +49,7 @@ fi
 # ---------------------------- GIT INFO ----------------------------------
 REPOS_DIR="$BASE_DIR/repos"
 QUICKGO_REPO_DIR="$REPOS_DIR/QuickGOBE"
-QUICKGO_BRANCH="GOA-1805_Create_indexing_scripts"
+QUICKGO_BRANCH="master"
 
 # ---------------------------- SOLR CORE INFO ----------------------------
 CORE_NAME=

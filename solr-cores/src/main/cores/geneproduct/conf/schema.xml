@@ -25,7 +25,7 @@
     <field name="synonym" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
     <field name="symbol" type="text_ignorecase" indexed="true" stored="true"/>
     <field name="database" type="string" indexed="false" stored="true"/>
-    <field name="type" type="string" indexed="false" stored="true"/>
+    <field name="type" type="string" indexed="true" stored="true"/>
     <field name="taxonId" type="int" indexed="false" stored="true"/>
     <field name="taxonName" type="string" indexed="false" stored="true"/>
     <field name="dbSubset" type="lowercase" indexed="true" stored="true" multiValued="true"/>

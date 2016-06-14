@@ -51,6 +51,20 @@ public class AnnotationRequest {
         return filters.get(AnnotationFields.ASSIGNED_BY);
     }
 
+    //TODO:change the way the field is referenced
+    private static final String ASPECT_FIELD = "aspect";
+
+    public void setAspect(String aspect) {
+        if(aspect != null) {
+            filters.put(ASPECT_FIELD, aspect.toLowerCase());
+        }
+    }
+
+    @Pattern(regexp = "(?i)biological_process|molecular_function|cellular_component")
+    public String getAspect() {
+        return filters.get(ASPECT_FIELD);
+    }
+
     /**
      * The older evidence codes
      * E.g. IEA, IBA, IBD etc
