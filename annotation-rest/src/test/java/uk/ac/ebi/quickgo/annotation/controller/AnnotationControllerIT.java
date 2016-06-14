@@ -208,7 +208,7 @@ public class AnnotationControllerIT {
     @Test
     public void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, "chair"));
+                get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, "involved_in"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
