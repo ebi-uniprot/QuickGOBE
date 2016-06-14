@@ -15,25 +15,23 @@ import static com.google.common.base.Preconditions.checkArgument;
  *         Created with IntelliJ IDEA.
  */
 public class GeneProductDbXRefIDFormat {
-
     //E.g. UniProtKB
-    private String database;
+    private final String database;
 
     //E.g. PR:000000001
-    private String entityType;
+    private final String entityType;
 
     //E.g. protein
-    private String entityTypeName;
+    private final String entityTypeName;
 
     //E.g. regex for validation  ([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])...
-    private Pattern idValidationPattern;
+    private final Pattern idValidationPattern;
 
     //E.g. http://www.uniprot.org/uniprot/[example_id]/
-    private String databaseURL;
+    private final String databaseURL;
 
-
-    public GeneProductDbXRefIDFormat(String database, String entityType, String entityTypeName, String idValidationPattern,
-            String databaseURL) {
+    public GeneProductDbXRefIDFormat(String database, String entityType, String entityTypeName,
+            String idValidationPattern, String databaseURL) {
 
         checkArgument(database != null, "The database ID should not be null");
         checkArgument(entityType != null, "The entity type should not be null");
