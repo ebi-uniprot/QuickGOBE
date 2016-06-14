@@ -54,7 +54,6 @@ public class AnnotationControllerIT {
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
 
     private static final String GOEVIDENCE_PARM="goEvidence";
-    private static final String SINGLE_GOEVIDENCE="IEA";
 
     private MockMvc mockMvc;
 
@@ -192,7 +191,7 @@ public class AnnotationControllerIT {
     @Test
     public void lookupAnnotationFilterByGoEvidenceCodeBySuccessfully() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, SINGLE_GOEVIDENCE));
+                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, "IEA"));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -201,6 +200,27 @@ public class AnnotationControllerIT {
 
     }
 
+    @Test
+    public void lookupAnnotationFilterByNonExistentGoEvidenceCodeReturnsNothing() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, "ZZZ"));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+
+    }
+
+
+    @Test
+    public void invalidGoEvidenceThrowsException() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, "BlahBlah"));
+
+        response.andExpect(status().isBadRequest())
+                .andExpect(contentTypeToBeJson());
+
+    }
 
     //---------- Page related tests.
 
