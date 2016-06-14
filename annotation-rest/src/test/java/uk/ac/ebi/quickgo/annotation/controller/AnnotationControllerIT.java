@@ -194,11 +194,11 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, SINGLE_GOEVIDENCE));
 
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(basicDocs.size()))
-                .andExpect(jsonPath("$.results.*").exists())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(fieldsInAllResultsExist(1));
+
     }
 
 
