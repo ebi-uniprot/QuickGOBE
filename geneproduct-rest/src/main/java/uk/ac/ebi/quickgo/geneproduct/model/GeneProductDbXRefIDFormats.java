@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -26,14 +27,15 @@ public class GeneProductDbXRefIDFormats {
             new Key("RNAcentral","CHEBI:33697")};
 
     private GeneProductDbXRefIDFormats(Map<Key, GeneProductDbXRefIDFormat> geneProductXrefEntities) {
-        this.geneProductXrefEntities = checkNotNull(geneProductXrefEntities);
-    }
+        checkArgument(geneProductXrefEntities != null, "Gene product xref entities map cannot be null");
 
+        this.geneProductXrefEntities = geneProductXrefEntities;
+    }
 
     /**
      * Test if a gene product id is valid.
      * @param id The gene product ID passed in from the client
-     * @return
+     * @return true if the id is valid, false otherwise
      */
     public boolean isValidId(String id) {
 
