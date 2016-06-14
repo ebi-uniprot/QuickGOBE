@@ -23,7 +23,6 @@ import java.util.List;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class GeneProductDbXRefIDFormatsTest {
-
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
@@ -40,11 +39,8 @@ public class GeneProductDbXRefIDFormatsTest {
 	@Mock
 	private GeneProductDbXRefIDFormat uniprotEntity;
 
-
-
 	@Before
 	public void setup(){
-
 		listOfFormats = new ArrayList<>();
 		listOfFormats.add(rnaCentralEntity);
 		listOfFormats.add(intactEntity);
@@ -58,14 +54,12 @@ public class GeneProductDbXRefIDFormatsTest {
 		when(intactEntity.getEntityType()).thenReturn("GO:0043234");
 		when(intactEntity.matches("EBI-11166735")).thenReturn(true);
 
-
 		when(uniprotEntity.getDatabase()).thenReturn("UniProtKB");
 		when(uniprotEntity.getEntityType()).thenReturn("PR:000000001");
 		when(uniprotEntity.matches("A0A000")).thenReturn(true);
 		when(uniprotEntity.matches("999999")).thenReturn(false);
 
 		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats);
-
 	}
 
 	@Test
@@ -90,9 +84,7 @@ public class GeneProductDbXRefIDFormatsTest {
 
 	@Test
 	public void isInvalidId(){
-
 		assertThat(dbXrefEntities.isValidId("9999"), is(false));
-
 	}
 
 	@Test
@@ -100,5 +92,4 @@ public class GeneProductDbXRefIDFormatsTest {
 		thrown.expect(IllegalArgumentException.class);
 		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(null);
 	}
-
 }
