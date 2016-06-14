@@ -46,19 +46,19 @@ public class GeneProductXrefEntityTest {
 
 	@Test
 	public void exceptionThrownIfDatabaseIsNull(){
-		thrown.expect(NullPointerException.class);
+		thrown.expect(IllegalArgumentException.class);
 		new GeneProductDbXRefIDFormat(null, entityType, entityTypeName, idValidationPattern, dbURL);
 	}
 
 	@Test
 	public void exceptionThrownIfEntityTypeIsNull(){
-		thrown.expect(NullPointerException.class);
+		thrown.expect(IllegalArgumentException.class);
 		new GeneProductDbXRefIDFormat(database, null, entityTypeName, idValidationPattern, dbURL);
 	}
 
 	@Test
 	public void exceptionThrownIfIdValidationPatternIsNull(){
-		thrown.expect(NullPointerException.class);
+		thrown.expect(IllegalArgumentException.class);
 		new GeneProductDbXRefIDFormat(database, entityType, entityTypeName, null, dbURL);
 	}
 
