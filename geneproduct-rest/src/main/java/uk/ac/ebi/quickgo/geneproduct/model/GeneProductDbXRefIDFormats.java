@@ -57,10 +57,8 @@ public class GeneProductDbXRefIDFormats {
      * @return
      */
     public static GeneProductDbXRefIDFormats createWithData(List<GeneProductDbXRefIDFormat> entities) {
-
-        Preconditions.checkArgument(entities != null, "The list of GeneProductDbXRefIDFormat entities passed to " +
-                "createWithData" +
-                " was null, which is illegal");
+        Preconditions.checkArgument(entities != null, "The list of GeneProductDbXRefIDFormat entities is null, which " +
+                "is illegal");
 
         Map<Key, GeneProductDbXRefIDFormat> mappedEntities = new HashMap<>();
 
@@ -70,8 +68,7 @@ public class GeneProductDbXRefIDFormats {
             mappedEntities.put(key, entity);
         }
 
-        GeneProductDbXRefIDFormats formats = new GeneProductDbXRefIDFormats(mappedEntities);
-        return formats;
+        return new GeneProductDbXRefIDFormats(mappedEntities);
     }
 
     /**
