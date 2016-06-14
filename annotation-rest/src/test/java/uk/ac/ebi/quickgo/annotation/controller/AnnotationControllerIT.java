@@ -186,14 +186,13 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
+    //---------- Qualifier related tests.
+
     @Test
     public void successfullyLookupAnnotationsByQualifier() throws Exception {
         String qualifier = "enables";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, qualifier));
-        final String RESULTS = "results";
-
-
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -201,8 +200,20 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(1))
                 .andExpect(valueOccurInField(QUALIFIER, qualifier));
-                //.andExpect(valuesOccurInField(QUALIFIER, qualifier));
-                //.andExpect(   jsonPath(RESULTS +"[2]." + "qualifier").value(qualifier));
+
+    }
+
+    //todo test valid values for qualifier once a custom validator has been created
+
+    @Test
+    public void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, "chair"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
 
     }
 
