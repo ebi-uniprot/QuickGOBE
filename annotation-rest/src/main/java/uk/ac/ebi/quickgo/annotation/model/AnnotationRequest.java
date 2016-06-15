@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
 
 import java.util.HashMap;
@@ -67,13 +68,14 @@ public class AnnotationRequest {
     /**
      * Gene Product IDs, in CSV format.
      */
-    //@GeneProductIDList
+
     public void setGeneProductId(String listOfGeneProductIDs){
         if(listOfGeneProductIDs != null) {
-            filters.put(AnnotationFields.GENE_PRODUCT_ID, listOfGeneProductIDs.toLowerCase());
+            filters.put(AnnotationFields.GENE_PRODUCT_ID, listOfGeneProductIDs);
         }
     }
 
+    @GeneProductIDList
     public String getGeneProductId(){
         return filters.get(AnnotationFields.GENE_PRODUCT_ID);
     }
