@@ -19,11 +19,6 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequestTest {
-    private static final String UNI_PROT = "UniProt";
-    private static final String ASPGD = "ASPGD";
-    private static final String EVIDENCE_IEA = "IEA";
-    private static final String EVIDENCE_MULTI = "IEA,IBD";
-
 
     private AnnotationRequest annotationRequest;
 
@@ -68,12 +63,14 @@ public class AnnotationRequestTest {
     }
     @Test
     public void setAndGetEvidence(){
+        String EVIDENCE_IEA = "IEA";
         annotationRequest.setGoEvidence(EVIDENCE_IEA);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_IEA));
     }
 
     @Test
     public void setAndGetEvidenceMulti(){
+        String EVIDENCE_MULTI = "IEA,IBD";
         annotationRequest.setGoEvidence(EVIDENCE_MULTI);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
     }
