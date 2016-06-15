@@ -196,7 +196,7 @@ public class AnnotationControllerIT {
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()))
-                .andExpect(fieldsInAllResultsExist(1));
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()));
 
     }
 
