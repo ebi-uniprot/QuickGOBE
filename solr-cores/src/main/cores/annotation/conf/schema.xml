@@ -68,7 +68,7 @@
     <!--                  Start of QuickGO Annotation fields                        -->
 
     <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true"/>
-    <field name="geneProductId" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="geneProductId" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="qualifier" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="goId" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="goId_join" type="string" indexed="true" stored="false" multiValued="false"/>
