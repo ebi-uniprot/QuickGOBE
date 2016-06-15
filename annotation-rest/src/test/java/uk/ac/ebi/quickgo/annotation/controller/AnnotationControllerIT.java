@@ -53,7 +53,7 @@ public class AnnotationControllerIT {
 
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
 
-    private static final String GOEVIDENCE_PARM="goEvidence";
+    private static final String GOEVIDENCE_PARM = "goEvidence";
 
     private MockMvc mockMvc;
 
