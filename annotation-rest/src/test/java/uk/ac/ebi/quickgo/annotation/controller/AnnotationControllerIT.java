@@ -190,27 +190,51 @@ public class AnnotationControllerIT {
 
     @Test
     public void lookupAnnotationFilterByGoEvidenceCodeBySuccessfully() throws Exception {
+        String goEvidenceCode = "IEA";
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, "IEA"));
+                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, goEvidenceCode));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()))
-                .andExpect(fieldsInAllResultsExist(genericDocs.size()));
-
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()))
+                .andExpect(atLeastOneResultHasItem(GO_EVIDENCE_FIELD, goEvidenceCode));
     }
 
-    @Test
-    public void lookupAnnotationFilterByNonExistentGoEvidenceCodeReturnsNothing() throws Exception {
+    @Test    public void lookupAnnotationFilterByNonExistentGoEvidenceCodeReturnsNothing() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, "ZZZ"));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(0));
-
     }
 
+    @Test
+    public void filterAnnotationsUsingMultipleGoEvidenceCodesSuccessfully() throws Exception {
+        String goEvidenceCode = "IEA";
+
+        String goEvidenceCode1 = "BSS";
+        AnnotationDocument annoDoc1 = AnnotationDocMocker.createAnnotationDoc(createId(999));
+        annoDoc1.goEvidence = goEvidenceCode1;
+        repository.save(annoDoc1);
+
+        String goEvidenceCode2 = "AWE";
+        AnnotationDocument annoDoc2 = AnnotationDocMocker.createAnnotationDoc(createId(998));
+        annoDoc2.goEvidence = goEvidenceCode2;
+        repository.save(annoDoc2);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, "IEA,BSS,AWE,PEG"));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()+2))
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()+2))
+                .andExpect(itemExistsExpectedTimes(GO_EVIDENCE_FIELD, goEvidenceCode1, 1))
+                .andExpect(itemExistsExpectedTimes(GO_EVIDENCE_FIELD, goEvidenceCode2, 1))
+                .andExpect(itemExistsExpectedTimes(GO_EVIDENCE_FIELD, goEvidenceCode, genericDocs.size()));
+}
 
     @Test
     public void invalidGoEvidenceThrowsException() throws Exception {
