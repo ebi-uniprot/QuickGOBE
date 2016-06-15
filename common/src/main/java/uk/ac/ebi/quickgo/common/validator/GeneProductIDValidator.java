@@ -11,6 +11,12 @@ import javax.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
+ * Gene product IDs that don't match the regular expressions for recognised/supported gene product types should be
+ * rejected with an error; those that do match should be treated as valid (plausible), even if they don't actually
+ * identify a gene product in any of the supported databases.
+ * The supported databases should be: UniProtKB, RNAcentral, IntAct, and any of the databases that are available in
+ * the ID mapping function.
+ *
  * @author Tony Wardell
  * Date: 14/06/2016
  * Time: 13:32
