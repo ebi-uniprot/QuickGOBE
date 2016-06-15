@@ -607,7 +607,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="query" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">synonym:${SYNONYM}</stringProp>
+                <stringProp name="Argument.value">${SYNONYM}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 <stringProp name="Argument.name">query</stringProp>
@@ -735,7 +735,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="query" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">symbol:${SYMBOL}</stringProp>
+                <stringProp name="Argument.value">${SYMBOL}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 <stringProp name="Argument.name">query</stringProp>
@@ -887,7 +887,7 @@
               </elementProp>
               <elementProp name="filterQuery" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">name:${NAME_FRAGMENT}</stringProp>
+                <stringProp name="Argument.value">${NAME_FRAGMENT}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 <stringProp name="Argument.name">filterQuery</stringProp>
