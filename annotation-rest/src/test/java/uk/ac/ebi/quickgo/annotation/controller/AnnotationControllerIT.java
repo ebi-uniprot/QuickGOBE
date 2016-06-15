@@ -48,7 +48,7 @@ public class AnnotationControllerIT {
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
 
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
-    private static final String GP_PARAM = "gpID";
+    private static final String GP_PARAM = "geneProductId";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
 
@@ -139,7 +139,8 @@ public class AnnotationControllerIT {
                         .param(ASSIGNED_BY_PARAM, assignedBy1)
                         .param(ASSIGNED_BY_PARAM, assignedBy2));
 
-        response.andExpect(status().isOk())
+        response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
@@ -189,10 +190,12 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByGeneProductIDSuccessfully() throws Exception {
+        String geneProductId = "P99999";
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        repository.save(doc);
 
-        final String A0A001 = "A0A001";
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GP_PARAM, A0A001));
+                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
