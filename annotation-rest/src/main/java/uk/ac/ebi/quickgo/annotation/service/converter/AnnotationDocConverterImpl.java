@@ -34,7 +34,6 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
             annotation.extensions = new ArrayList<>(annotationDocument.extensions);
         }
 
-        annotation.goEvidence = annotationDocument.goEvidence;
         return annotation;
     }
 }
