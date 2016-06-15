@@ -59,12 +59,12 @@
           </elementProp>
           <elementProp name="GO_ENDPOINT" elementType="Argument">
             <stringProp name="Argument.name">GO_ENDPOINT</stringProp>
-            <stringProp name="Argument.value">${ENDPOINT_BASE}/go/terms</stringProp>
+            <stringProp name="Argument.value">${__BeanShell(${__evalVar(ENDPOINT_BASE)})}/go/terms</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="ECO_ENDPOINT" elementType="Argument">
             <stringProp name="Argument.name">ECO_ENDPOINT</stringProp>
-            <stringProp name="Argument.value">${ENDPOINT_BASE}/eco/terms</stringProp>
+            <stringProp name="Argument.value">${__BeanShell(${__evalVar(ENDPOINT_BASE)})}/eco/terms</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -704,11 +704,11 @@
           <hashTree/>
           <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion: non-200 response" enabled="true">
             <collectionProp name="Asserion.test_strings">
-              <stringProp name="49586">200</stringProp>
+              <stringProp name="1596728">40.*</stringProp>
             </collectionProp>
             <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
             <boolProp name="Assertion.assume_success">true</boolProp>
-            <intProp name="Assertion.test_type">5</intProp>
+            <intProp name="Assertion.test_type">2</intProp>
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
@@ -834,11 +834,11 @@
           <hashTree/>
           <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion: non-200 response" enabled="true">
             <collectionProp name="Asserion.test_strings">
-              <stringProp name="49586">200</stringProp>
+              <stringProp name="1596728">40.*</stringProp>
             </collectionProp>
             <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
             <boolProp name="Assertion.assume_success">true</boolProp>
-            <intProp name="Assertion.test_type">5</intProp>
+            <intProp name="Assertion.test_type">1</intProp>
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
@@ -2236,7 +2236,7 @@
       </CSVDataSet>
       <hashTree/>
       <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data -- 1 GO name per line" enabled="true">
-        <stringProp name="filename">${RESOURCES_PATH}/go-name-1-per-line.csv</stringProp>
+        <stringProp name="filename">${RESOURCES_PATH}/go-names-1-per-line.csv</stringProp>
         <stringProp name="fileEncoding"></stringProp>
         <stringProp name="variableNames">GO_NAME</stringProp>
         <stringProp name="delimiter">\n</stringProp>
@@ -2247,7 +2247,7 @@
       </CSVDataSet>
       <hashTree/>
       <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data -- 1 ECO name per line" enabled="true">
-        <stringProp name="filename">${RESOURCES_PATH}/eco-name-1-per-line.csv</stringProp>
+        <stringProp name="filename">${RESOURCES_PATH}/eco-names-1-per-line.csv</stringProp>
         <stringProp name="fileEncoding"></stringProp>
         <stringProp name="variableNames">ECO_NAME</stringProp>
         <stringProp name="delimiter">\n</stringProp>
