@@ -51,6 +51,7 @@ public class AnnotationFields {
         private static final Set<String> VALUES = new HashSet<>();
 
         public static final String ASSIGNED_BY = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
+        public static final String GENEPRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);
