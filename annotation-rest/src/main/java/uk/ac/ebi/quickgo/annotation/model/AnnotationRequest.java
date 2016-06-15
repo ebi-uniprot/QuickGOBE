@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
 
 import java.util.HashMap;
@@ -53,6 +54,7 @@ public class AnnotationRequest {
 
     //TODO:change the way the field is referenced
     private static final String ASPECT_FIELD = "aspect";
+    private static final String GENE_PRODUCT_IDS_FIELD = "gpID";
 
     public void setAspect(String aspect) {
         if(aspect != null) {
@@ -64,6 +66,22 @@ public class AnnotationRequest {
     public String getAspect() {
         return filters.get(ASPECT_FIELD);
     }
+
+    /**
+     * Gene Product IDs, in CSV format.
+     */
+    @GeneProductIDList
+    public void setGpID(String listOfGeneProductIDs){
+        if(listOfGeneProductIDs != null) {
+            filters.put(GENE_PRODUCT_IDS_FIELD, listOfGeneProductIDs.toLowerCase());
+        }
+    }
+
+    public String getGpID(){
+        return filters.get(GENE_PRODUCT_IDS_FIELD);
+    }
+
+
 
     public void setPage(int page) {
         this.page = page;
