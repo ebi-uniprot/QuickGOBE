@@ -71,10 +71,10 @@ public class AnnotationRequest {
      * @param evidence
      */
     public void setGoEvidence(String evidence){
-        filters.put(AnnotationFields.GO_EVIDENCE, evidence);
+        filters.put(AnnotationFields.GO_EVIDENCE, evidence.toLowerCase());
     }
 
-    @Pattern(regexp = "^[A-Z]{2,3}(,[A-Z]{2,3})*")
+    @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*")
     public String getGoEvidence(){
         return filters.get(AnnotationFields.GO_EVIDENCE);
     }
