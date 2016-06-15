@@ -48,6 +48,7 @@ public class AnnotationControllerIT {
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
 
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
+    private static final String GP_PARAM = "gpID";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
 
@@ -182,6 +183,21 @@ public class AnnotationControllerIT {
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, invalidAssignedBy));
         response.andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    //---------- Search by Gene Product ID tests.
+
+    @Test
+    public void filterByGeneProductIDSuccessfully() throws Exception {
+
+        final String A0A001 = "A0A001";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GP_PARAM, A0A001));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
     }
 
     //---------- Page related tests.
