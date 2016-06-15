@@ -1,0 +1,317 @@
+IPI: yeast two-hybrid assay
+IPI: far-Western analysis
+ChIP-SEQ evidence
+IMR
+inferred from system reconstruction
+IPS
+inferred by curator
+passive immunization
+IBA
+IC
+inferred from physical interaction
+Northern blot
+IDA: enzyme assays
+IEP: subtractive hybridization
+IDA: protein separation and direct sequencing
+phosphopeptide affinity enrichment evidence
+4C
+ISS: targeting sequence prediction
+IMP: analysis of visible trait
+IDA: localization of GUS fusion protein
+IDA: affinity chromatography
+ISR
+EXP
+Adoptive immunotherapy
+ITC
+Southern blot
+IKR
+IRIS
+IP
+inferred from experiment
+allografting
+nanoCAGE
+ISO
+IPI: co-purification
+IAGP
+inferred from genomic context
+RT-PCR evidence
+IDS
+site directed mutagenesis
+SDS-PAGE evidence
+2D PAGE
+3C sequencing
+Xenografting
+traceable author statement
+IDA: immunofluorescence
+IMP: analysis of physiological response
+LacZ fusion protein localization evidence
+carbon-copy 3C
+in vitro evolution evidence
+NAME
+IMP: analysis of overexpression/ectopic expression phenotype
+3C
+circularized 3C-seq
+UV footprinting
+WTTS
+IDA: in vitro reconstitution assay with recombinant protein
+PFGE
+ISS: recognized domains
+Solexa sequencing result
+mechanical constraint evidence
+circularized 3C sequencing
+IDA: Northwestern analysis
+Ortholog evidence
+ChIP-qPCR evidence
+inferred from genomic analysis
+DNA affinity purification
+ChIP-on-chip evidence
+IMS
+inferred from missing residues
+inferred from electronic annotation
+CFDA-SE staining evidence
+localization of GFP transcript
+IEP: transcript levels (e.g. microarray data)
+4C sequencing
+ISA
+IMP
+IS
+DNA sequencing
+PSSM motif search
+ICS
+3C-PCR
+GST pull-down assay
+IMP: RNAi experiment
+7-amino-actinomycin D staining evidence
+2D-PAGE
+GUS fusion protein localization evidence
+inferred from sequence alignment
+curated nucleic acid BLAST analysis
+qRT-PCR evidence
+inferred from experimental data
+IDA: localization of GFP/YFP fusion protein
+GFP reporter gene assay
+EMSA: electrophoretic mobility shift assay
+BrdU incorporation assay evidence
+inferred from reviewed computational analysis
+real-time polymerase chain reaction evidence
+GUS reporter gene assay
+IDA: immunolocalization of epitope-tagged protein
+IDA: protein expression in heterologous system
+in vitro selection evidence
+ultraviolet footprinting 
+MALDI-TOF-MS
+IPI
+NAS
+5C
+IBD
+NR
+IDA: protein separation and fragment identification
+IGI: functional complementation
+IMP: analysis of overexpression/ectopic expression phenotype
+IPI: split-ubiquitin assay
+RT-PCR transcription evidence
+radioassay
+IVS
+HSQC
+restriction landmark genome scanning evidence
+DamID
+IEP: transcript levels (e.g. RT-PCR)
+DNA-array expression analysis 
+inferred from biological aspect of ancestor
+IDA: transport assay
+IPI: Sos-recruitment assay
+SRIB
+ISS: Southern blotting
+minichromosome maintenance assay evidence
+inferred from sequence orthology
+IEP
+curated protein BLAST analysis
+IDA: immunogold labelling
+MALDI-TOF Mass Spectrometry
+zone of inhibition evidence
+Gel retardation assay
+Xenotransplantation
+inferred from sequence model
+inferred from phenotype manipulation
+7-AAD staining evidence
+WTSS
+anti-sense
+3-(4,5-dimethylthiazol-2-yl)-5-(3-carboxymethoxyphenyl)-2-(4-sulfophenyl)-2H-tetrazolium
+terminal deoxynucleotidyl transferase-dUTP nick end labeling assay evidence
+IGI: functional complementation in heterologous system
+IDA: uptake assay in heterologous system
+PSSM
+4C-seq
+green fluorescent protein promoter fusion
+IDA: in vitro reconstitution assay with recombinant protein
+LacZ protein immunolocalization evidence
+ribonuclease protection assay
+inferred from biological aspect of descendant
+chromosome conformation capture
+enzyme-linked immunosorbent assay
+IDA: electrophoretic mobility shift assay
+quantitative PCR evidence
+inferred from sequence similarity
+ChIP-exo
+3C-real-time PCR
+inferred from phenotypic similarity
+SPR evidence
+IGC
+GUS staining evidence
+curated BLAST analysis
+BrdUrd incorporation assay evidence
+evidence_code
+RNA dot blot
+ligand binding evidence
+inferred from mutant phenotype
+LUMIER assay
+FURTA
+PCR evidence
+CLIA evidence
+RNA-Seq
+ablated tissue evidence
+IDA: localization of GFP/YFP fusion protein
+IEP: protein levels (e.g. Western blots)
+Q-PCR evidence
+IDA: Southwestern analysis
+Sanger sequencing
+ChIP-seq evidence
+IGI
+TdT-mediated dUTP-biotin nick end labeling assay
+ISS
+SEAP reporter assay
+B1H evidence
+IDA: transcriptional activation assay
+pyrosequencing
+growth curve analysis
+beta-gal reporter gene assay
+ChIP-PCR evidence
+GFP promoter fusion
+IGI: epistatic interactions
+3C
+wide-field epifluorescence microscopy
+genomic SELEX
+Ortholog evidence
+inferred from direct assay
+5-bromo-2'-deoxyuridine incorporation assay evidence
+IEP: expression of a reporter gene
+chromosome conformation capture on chip
+inferred from sequence or structural similarity
+IDA: co-fractionation
+Immunoperoxidase labelling electron microscopy
+CFSE-staining evidence
+inferred by association of genotype from phenotype
+IPI: co-immunoprecipitation
+circularized 3C
+IPTS
+lacZ reporter gene assay
+HPLC evidence
+inferred from genetic interaction
+Tumor necrosis factor - alpha converting enzyme activity assay
+tissue grafting
+3C
+CAGE
+ChIP-chip evidence
+MPE-EDTA Fe(II) footprinting
+IDA: in situ hybridization
+protein immunoblot
+inferred from sequence alignment
+IDA: cell fractionation
+ortholog evidence
+ISA
+IGI: quantitative trait analysis
+RNA sequencing
+IGI: 'traditional' genetic interactions (e.g. suppressors, synthetic lethals)
+inferred from genome cluster
+CAT reporter gene assay
+qRT-PCR
+IEP: transcript levels (e.g. Northerns)
+YFP fusion protein localization evidence
+IEA
+fitness profiling
+IMP: anti-sense experiments
+RLGS evidence
+Whole Transcriptome Shotgun Sequencing
+FA
+3C-qPCR
+inferred from phenotype
+IEP: expression library screening
+2-D agarose gel electrophoresis
+Methidiumpropyl-EDTA Fe(II) footprinting
+3C-quantitative PCR
+RACE PCR
+IDA: immunolocalization
+RNAse protection assay
+ISS: transmembrane domain prediction
+IDA
+non-traceable author statement
+IDA: in vitro binding assay
+3-(4,5-dimethylthiazol-2-yl)-2,5-diphenyltetrazolium bromide
+IEP: differential hybridization
+BUdR incorporation assay evidence
+1,10-Phenanthroline-copper footprinting
+ND
+OP-Cu Complex
+IPM
+tissue grafting
+IGI: double mutant analysis
+TAS
+Allotransplantation
+IDA: thin layer chromatography
+DAPI staining evidence
+TUNEL assay evidence
+Fluorescence polarization
+Temporal assay
+IDA: bioassay
+FP
+radiologic test evidence
+inferred from expression pattern
+dye terminator sequencing
+Fluorescence polarization
+inferred from genetic similarity
+FCM
+Xenograft transplantation
+FRET
+DNA chip
+IDA: immunoprecipitation
+GFP fusion protein localization evidence
+whole transcriptome shotgun sequencing
+MPE Fe(II) footprinting
+IDA: ribohomopolymer binding assay
+IRD
+Secreted Embryonic Alkaline Phosphatase reporter assay
+DNase protection
+inferred from in-silico analysis
+radioisotopic assay
+IPI: yeast one-hybrid assay
+NMR spectroscopy
+methylation-specific PCR evidence
+evidence code
+IGES
+RPA
+ELISA evidence
+inferred from key residues
+real-time PCR evidence
+IMP: analysis of biochemical trait
+SELEX evidence
+ISM
+IEP: RNA protection assay
+inferred from rapid divergence
+IDA: two-electrode voltage clamp technique
+in vitro assay
+not recorded
+inferred from similarity
+ChIP evidence
+IED
+methylation interference footprinting
+RCA
+Spectral Reflectance Imaging Biosensor
+phosphopeptide array evidence
+IGTS
+chromatographic evidence
+ICL
+no biological data available
+GFP immunolocalization evidence
+3C-seq
+TLC evidence
+Western blot expression analysis
