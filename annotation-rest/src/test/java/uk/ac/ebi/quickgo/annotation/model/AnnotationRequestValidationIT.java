@@ -78,10 +78,12 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void allGoEvidenceValuesAreValid() {
-        String goEvidenceValues = Arrays.stream(VALID_GO_EVIDENCE)
-                .collect(Collectors.joining(","));
-        annotationRequest.setGoEvidence(goEvidenceValues);
-        assertThat(validator.validate(annotationRequest), hasSize(0));
+        for (String valid: VALID_ASSIGNED_BY_PARMS) {
+            annotationRequest.setGoEvidence(valid);
+            assertThat(valid + " expected to be a valid value, but has failed validation",validator.validate
+                    (annotationRequest), hasSize(0));
+        }
+
     }
 
     @Test
@@ -90,7 +92,8 @@ public class AnnotationRequestValidationIT {
                 invalidValue -> {
                     AnnotationRequest annotationRequest = new AnnotationRequest();
                     annotationRequest.setGoEvidence(invalidValue);
-                    assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+                    assertThat(invalidValue + " expected to be an invalid value, but it has passed " +
+                            "validation", validator.validate(annotationRequest), hasSize(greaterThan(0)));
                 }
         );
     }
