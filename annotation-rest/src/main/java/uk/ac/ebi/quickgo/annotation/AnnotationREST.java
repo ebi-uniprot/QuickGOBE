@@ -20,7 +20,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  * Created with IntelliJ IDEA.
  */
 @SpringBootApplication(exclude = {SolrRepositoriesAutoConfiguration.class})
-@ComponentScan({"uk.ac.ebi.quickgo.annotation.controller", "uk.ac.ebi.quickgo.rest"})
+@ComponentScan({"uk.ac.ebi.quickgo.annotation.controller", "uk.ac.ebi.quickgo.rest","uk.ac.ebi.quickgo.common"})
 @Import({SearchServiceConfig.class})
 public class AnnotationREST {
 
