@@ -190,7 +190,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByGeneProductIDSuccessfully() throws Exception {
-        String geneProductId = "P99999";
+        String geneProductId = "A1E959";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         repository.save(doc);
 
@@ -201,6 +201,18 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1));
+    }
+
+    @Test
+    public void filterByGeneProductUsingInvalidIDFailsValidation() throws Exception {
+        String geneProductId = "99999";
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
+
+        response.andExpect(status().isBadRequest());
     }
 
     //---------- Page related tests.
