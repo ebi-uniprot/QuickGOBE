@@ -59,12 +59,12 @@
           </elementProp>
           <elementProp name="GO_ENDPOINT" elementType="Argument">
             <stringProp name="Argument.name">GO_ENDPOINT</stringProp>
-            <stringProp name="Argument.value">${__BeanShell(${__evalVar(ENDPOINT_BASE)})}/go/terms</stringProp>
+            <stringProp name="Argument.value">${__property(base.endpoint,,/QuickGO/services)}/go/terms</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="ECO_ENDPOINT" elementType="Argument">
             <stringProp name="Argument.name">ECO_ENDPOINT</stringProp>
-            <stringProp name="Argument.value">${__BeanShell(${__evalVar(ENDPOINT_BASE)})}/eco/terms</stringProp>
+            <stringProp name="Argument.value">${__property(base.endpoint,,/QuickGO/services)}/eco/terms</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -702,14 +702,18 @@
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion: non-200 response" enabled="true">
-            <collectionProp name="Asserion.test_strings">
-              <stringProp name="1596728">40.*</stringProp>
-            </collectionProp>
-            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-            <boolProp name="Assertion.assume_success">true</boolProp>
-            <intProp name="Assertion.test_type">2</intProp>
-          </ResponseAssertion>
+          <BeanShellAssertion guiclass="BeanShellAssertionGui" testclass="BeanShellAssertion" testname="BeanShell Assertion: non-200 response" enabled="true">
+            <stringProp name="BeanShellAssertion.query">if(!ResponseCode.equals(&quot;200&quot;)) {
+	log.info(&quot;Treating HTTP non-200 as success&quot;);
+	// We want to treat this code as SUCCESS instead of FAILURE
+	SampleResult.setSuccessful(true);
+	SampleResult.setResponseCodeOK();
+	SampleResult.setResponseMessage(&quot;JMeter: changed real response code of non-200, to 200, to allow for further JMeter analysis&quot;);
+}</stringProp>
+            <stringProp name="BeanShellAssertion.filename"></stringProp>
+            <stringProp name="BeanShellAssertion.parameters"></stringProp>
+            <boolProp name="BeanShellAssertion.resetInterpreter">false</boolProp>
+          </BeanShellAssertion>
           <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Invalid ECO IDs fetched in groups (invalid, non-existing, single/multiple)" enabled="true">
@@ -832,14 +836,18 @@
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion: non-200 response" enabled="true">
-            <collectionProp name="Asserion.test_strings">
-              <stringProp name="1596728">40.*</stringProp>
-            </collectionProp>
-            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-            <boolProp name="Assertion.assume_success">true</boolProp>
-            <intProp name="Assertion.test_type">1</intProp>
-          </ResponseAssertion>
+          <BeanShellAssertion guiclass="BeanShellAssertionGui" testclass="BeanShellAssertion" testname="BeanShell Assertion: non-200 response" enabled="true">
+            <stringProp name="BeanShellAssertion.query">if(!ResponseCode.equals(&quot;200&quot;)) {
+	log.info(&quot;Treating HTTP non-200 as success&quot;);
+	// We want to treat this code as SUCCESS instead of FAILURE
+	SampleResult.setSuccessful(true);
+	SampleResult.setResponseCodeOK();
+	SampleResult.setResponseMessage(&quot;JMeter: changed real response code of non-200, to 200, to allow for further JMeter analysis&quot;);
+}</stringProp>
+            <stringProp name="BeanShellAssertion.filename"></stringProp>
+            <stringProp name="BeanShellAssertion.parameters"></stringProp>
+            <boolProp name="BeanShellAssertion.resetInterpreter">false</boolProp>
+          </BeanShellAssertion>
           <hashTree/>
         </hashTree>
       </hashTree>

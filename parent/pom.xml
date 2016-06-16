@@ -55,7 +55,7 @@
 
         <!-- jmeter default properties -->
         <jmeter-maven-plugin.version>1.10.1</jmeter-maven-plugin.version>
-        <jmeter-analysis-maven-plugin.version>1.0.4</jmeter-analysis-maven-plugin.version>
+        <jmeter-analysis-maven-plugin.version>1.0.6</jmeter-analysis-maven-plugin.version>
         <jmeter.min.jvm.mem>1024</jmeter.min.jvm.mem>
         <jmeter.max.jvm.mem>2048</jmeter.max.jvm.mem>
     </properties>
