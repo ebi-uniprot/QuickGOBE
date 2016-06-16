@@ -67,6 +67,16 @@
             <stringProp name="Argument.value">${__property(base.endpoint,,/QuickGO/services)}/eco/terms</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="GO_SEARCH_ENDPOINT" elementType="Argument">
+            <stringProp name="Argument.name">GO_SEARCH_ENDPOINT</stringProp>
+            <stringProp name="Argument.value">${__property(base.endpoint,,/QuickGO/services)}/go/search</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="ECO_SEARCH_ENDPOINT" elementType="Argument">
+            <stringProp name="Argument.name">ECO_SEARCH_ENDPOINT</stringProp>
+            <stringProp name="Argument.value">${__property(base.endpoint,,/QuickGO/services)}/eco/search</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
         </collectionProp>
       </elementProp>
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
@@ -1142,7 +1152,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">${GO_ENDPOINT}/search</stringProp>
+          <stringProp name="HTTPSampler.path">${GO_SEARCH_ENDPOINT}/search</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1270,7 +1280,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">${ECO_ENDPOINT}/search</stringProp>
+          <stringProp name="HTTPSampler.path">${ECO_SEARCH_ENDPOINT}/search</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1398,7 +1408,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">${GO_ENDPOINT}/search</stringProp>
+          <stringProp name="HTTPSampler.path">${GO_SEARCH_ENDPOINT}/search</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1526,7 +1536,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">${ECO_ENDPOINT}/search</stringProp>
+          <stringProp name="HTTPSampler.path">${ECO_SEARCH_ENDPOINT}/search</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1654,7 +1664,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">${GO_ENDPOINT}/search</stringProp>
+          <stringProp name="HTTPSampler.path">${GO_SEARCH_ENDPOINT}/search</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1782,7 +1792,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">${ECO_ENDPOINT}/search</stringProp>
+          <stringProp name="HTTPSampler.path">${ECO_SEARCH_ENDPOINT}/search</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1927,7 +1937,7 @@
           <stringProp name="HTTPSampler.response_timeout">${LONGER_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">${ECO_ENDPOINT}/search</stringProp>
+          <stringProp name="HTTPSampler.path">${ECO_SEARCH_ENDPOINT}/search</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2055,7 +2065,7 @@
           <stringProp name="HTTPSampler.response_timeout">${LONGER_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">${ECO_ENDPOINT}/search</stringProp>
+          <stringProp name="HTTPSampler.path">${ECO_SEARCH_ENDPOINT}/search</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
