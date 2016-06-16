@@ -67,8 +67,9 @@ public class AnnotationRequest {
 
     /**
      * The older evidence codes
-     * E.g. IEA, IBA, IBD etc. See {@link http://geneontology.org/page/guide-go-evidence-codes}
-     * @param evidence
+     * E.g. IEA, IBA, IBD etc. See <a href="http://geneontology.org/page/guide-go-evidence-codes">Guide QuickGO
+     * evidence codes</a>
+     * @param evidence the evidence code
      */
     public void setGoEvidence(String evidence){
         filters.put(AnnotationFields.GO_EVIDENCE, evidence.toLowerCase());
