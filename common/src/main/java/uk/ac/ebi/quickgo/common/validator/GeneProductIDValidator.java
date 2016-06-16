@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import org.springframework.beans.factory.annotation.Value;
+//import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Gene product IDs that don't match the regular expressions for recognised/supported gene product types should be
@@ -24,7 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList,String>{
 
-    //@Value("${geneproduct.db.xref.valid.regexes}") //todo define in common
+//    @Value("${geneproduct.db.xref.valid.regexes}") //todo define in common
+//    private String xrefValidationRegexFile;
     private String xrefValidationRegexFile="src/test/resources/DB_XREFS_ENTITIES.dat.gz"; //todo remove
     Predicate<String> idValidator;
 
@@ -36,9 +37,10 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
 
     @Override public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
         List invalidGeneProdIDs = Arrays.stream(s.split(",")).filter(idValidator.negate()).collect(Collectors.toList());
-
         return invalidGeneProdIDs.size() == 0;
+        //return "P99999".equalsIgnoreCase(s);
     }
+
     private DbXRefLoader geneProductLoader() {
         return new DbXRefLoader(this.xrefValidationRegexFile);
     }
