@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.annotation.service.search;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
+import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
+import uk.ac.ebi.quickgo.common.validator.GeneProductDbXRefIDFormats;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
@@ -37,6 +39,9 @@ import org.springframework.data.solr.core.SolrTemplate;
 @ComponentScan({"uk.ac.ebi.quickgo.annotation.service.search"})
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
+
+    @Value("${geneproduct.db.xref.valid.regexes}")
+    String xrefValidationRegexFile;
 
     private static final String COMMA = ",";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS = "id,geneProductId,qualifier,goId," +
@@ -118,4 +123,15 @@ public class SearchServiceConfig {
 
 
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
+
+    @Bean
+    public GeneProductDbXRefIDFormats geneProductValidator() {
+        GeneProductDbXRefIDFormats
+                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load());
+        return dbXrefEntities;
+    }
+
+    private DbXRefLoader geneProductLoader() {
+        return new DbXRefLoader(this.xrefValidationRegexFile);
+    }
 }
