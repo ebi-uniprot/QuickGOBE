@@ -72,7 +72,9 @@ public class AnnotationRequest {
      * @param evidence the evidence code
      */
     public void setGoEvidence(String evidence){
-        filters.put(AnnotationFields.GO_EVIDENCE, evidence.toLowerCase());
+        if(evidence != null) {
+            filters.put(AnnotationFields.GO_EVIDENCE, evidence.toLowerCase());
+        }
     }
 
     @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*")
