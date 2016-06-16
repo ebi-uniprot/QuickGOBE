@@ -67,7 +67,7 @@ public class AnnotationRequest {
 
     /**
      * The older evidence codes
-     * E.g. IEA, IBA, IBD etc
+     * E.g. IEA, IBA, IBD etc. See {@link http://geneontology.org/page/guide-go-evidence-codes}
      * @param evidence
      */
     public void setGoEvidence(String evidence){
