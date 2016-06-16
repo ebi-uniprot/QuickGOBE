@@ -204,6 +204,22 @@ public class AnnotationControllerIT {
     }
 
     @Test
+    public void filterByUniProtKBAndIntactAndRNACentralGeneProductIDSuccessfully() throws Exception {
+        String geneProductId = "A1E959,EBI-10043081,URS00000064B1_559292";
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
+
+
+    @Test
     public void filterByGeneProductUsingInvalidIDFailsValidation() throws Exception {
         String geneProductId = "99999";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
