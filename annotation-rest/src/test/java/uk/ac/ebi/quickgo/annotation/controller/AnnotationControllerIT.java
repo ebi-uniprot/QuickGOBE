@@ -48,12 +48,11 @@ public class AnnotationControllerIT {
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
 
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
+    private static final String GO_EVIDENCE_PARAM = "goEvidence";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
 
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
-
-    private static final String GOEVIDENCE_PARM = "goEvidence";
 
     private MockMvc mockMvc;
 
@@ -192,7 +191,7 @@ public class AnnotationControllerIT {
     public void lookupAnnotationFilterByGoEvidenceCodeBySuccessfully() throws Exception {
         String goEvidenceCode = "IEA";
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, goEvidenceCode));
+                get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, goEvidenceCode));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -205,7 +204,7 @@ public class AnnotationControllerIT {
     public void lookupAnnotationFilterByLowercaseGoEvidenceCodeBySuccessfully() throws Exception {
         String goEvidenceCode = "iea";
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, goEvidenceCode));
+                get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, goEvidenceCode));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -216,7 +215,7 @@ public class AnnotationControllerIT {
 
     @Test    public void lookupAnnotationFilterByNonExistentGoEvidenceCodeReturnsNothing() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, "ZZZ"));
+                get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, "ZZZ"));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -238,7 +237,7 @@ public class AnnotationControllerIT {
         repository.save(annoDoc2);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, "IEA,BSS,AWE,PEG"));
+                get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, "IEA,BSS,AWE,PEG"));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -252,7 +251,7 @@ public class AnnotationControllerIT {
     @Test
     public void invalidGoEvidenceThrowsException() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GOEVIDENCE_PARM, "BlahBlah"));
+                get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, "BlahBlah"));
 
         response.andExpect(status().isBadRequest())
                 .andExpect(contentTypeToBeJson());
