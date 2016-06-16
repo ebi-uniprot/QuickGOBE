@@ -75,4 +75,11 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI.toLowerCase()));
     }
 
+    @Test
+    public void setAndGetEvidenceMultiInLowerCase(){
+        String EVIDENCE_MULTI = "iea,ibd";
+        annotationRequest.setGoEvidence(EVIDENCE_MULTI);
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI.toLowerCase()));
+    }
+
 }
