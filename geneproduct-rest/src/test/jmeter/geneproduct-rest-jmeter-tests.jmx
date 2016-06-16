@@ -52,6 +52,21 @@
             <stringProp name="Argument.value">${__property(longer.query.response.timeout,,4000)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="ENDPOINT_BASE" elementType="Argument">
+            <stringProp name="Argument.name">ENDPOINT_BASE</stringProp>
+            <stringProp name="Argument.value">${__property(base.endpoint,,/QuickGO/services)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="GENEPRODUCT_ENDPOINT" elementType="Argument">
+            <stringProp name="Argument.name">GENEPRODUCT_ENDPOINT</stringProp>
+            <stringProp name="Argument.value">${__property(base.endpoint,,/QuickGO/services)}/geneproduct</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="GENEPRODUCT_SEARCH_ENDPOINT" elementType="Argument">
+            <stringProp name="Argument.name">GENEPRODUCT_SEARCH_ENDPOINT</stringProp>
+            <stringProp name="Argument.value">${__property(base.endpoint,,/QuickGO/services)}/geneproduct/search</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
         </collectionProp>
       </elementProp>
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
@@ -97,7 +112,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/QuickGO/services/geneproduct/${ID}</stringProp>
+          <stringProp name="HTTPSampler.path">${GENEPRODUCT_ENDPOINT}/${ID}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -217,7 +232,7 @@
           <stringProp name="HTTPSampler.response_timeout">${BATCH_ID_FETCH_10}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/QuickGO/services/geneproduct/${MULTI_IDs}</stringProp>
+          <stringProp name="HTTPSampler.path">${GENEPRODUCT_ENDPOINT}/${MULTI_IDs}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -327,7 +342,7 @@
           </ResultCollector>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Invalid IDs fetched in groups (invalid, non-existing, single/multiple)" enabled="false">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Invalid IDs fetched in groups (invalid, non-existing, single/multiple)" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
@@ -337,7 +352,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/QuickGO/services/geneproduct/${INVALID_IDs}</stringProp>
+          <stringProp name="HTTPSampler.path">${GENEPRODUCT_ENDPOINT}/${INVALID_IDs}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -447,14 +462,18 @@
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion: non-200 response" enabled="true">
-            <collectionProp name="Asserion.test_strings">
-              <stringProp name="49586">200</stringProp>
-            </collectionProp>
-            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-            <boolProp name="Assertion.assume_success">true</boolProp>
-            <intProp name="Assertion.test_type">5</intProp>
-          </ResponseAssertion>
+          <BeanShellAssertion guiclass="BeanShellAssertionGui" testclass="BeanShellAssertion" testname="BeanShell Assertion" enabled="true">
+            <stringProp name="BeanShellAssertion.query">if(!ResponseCode.equals(&quot;200&quot;)) {
+	log.info(&quot;Treating HTTP non-200 as success&quot;);
+	// We want to treat this code as SUCCESS instead of FAILURE
+	SampleResult.setSuccessful(true);
+	SampleResult.setResponseCodeOK();
+	SampleResult.setResponseMessage(&quot;JMeter: changed real response code of non-200, to 200, to allow for further JMeter analysis&quot;);
+}</stringProp>
+            <stringProp name="BeanShellAssertion.filename"></stringProp>
+            <stringProp name="BeanShellAssertion.parameters"></stringProp>
+            <boolProp name="BeanShellAssertion.resetInterpreter">false</boolProp>
+          </BeanShellAssertion>
           <hashTree/>
         </hashTree>
       </hashTree>
@@ -492,7 +511,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/QuickGO/services/geneproduct/search</stringProp>
+          <stringProp name="HTTPSampler.path">${GENEPRODUCT_SEARCH_ENDPOINT}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -620,7 +639,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/QuickGO/services/geneproduct/search</stringProp>
+          <stringProp name="HTTPSampler.path">${GENEPRODUCT_SEARCH_ENDPOINT}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -748,7 +767,7 @@
           <stringProp name="HTTPSampler.response_timeout">${SIMPLE_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/QuickGO/services/geneproduct/search</stringProp>
+          <stringProp name="HTTPSampler.path">${GENEPRODUCT_SEARCH_ENDPOINT}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -900,7 +919,7 @@
           <stringProp name="HTTPSampler.response_timeout">${LONGER_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/QuickGO/services/geneproduct/search</stringProp>
+          <stringProp name="HTTPSampler.path">${GENEPRODUCT_SEARCH_ENDPOINT}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1035,7 +1054,7 @@
           <stringProp name="HTTPSampler.response_timeout">${LONGER_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/QuickGO/services/geneproduct/search</stringProp>
+          <stringProp name="HTTPSampler.path">${GENEPRODUCT_SEARCH_ENDPOINT}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1170,7 +1189,7 @@
           <stringProp name="HTTPSampler.response_timeout">${LONGER_QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/QuickGO/services/geneproduct/search</stringProp>
+          <stringProp name="HTTPSampler.path">${GENEPRODUCT_SEARCH_ENDPOINT}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
