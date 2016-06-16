@@ -1,14 +1,13 @@
 package uk.ac.ebi.quickgo.common.validator;
 
-import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-//import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
  * Gene product IDs that don't match the regular expressions for recognised/supported gene product types should be
@@ -24,24 +23,17 @@ import javax.validation.ConstraintValidatorContext;
  */
 public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList,String>{
 
-//    @Value("${geneproduct.db.xref.valid.regexes}") //todo define in common
-//    private String xrefValidationRegexFile;
-    private String xrefValidationRegexFile="src/test/resources/DB_XREFS_ENTITIES.dat.gz"; //todo remove
+    @Autowired
+    GeneProductDbXRefIDFormats geneProductValidator;
     Predicate<String> idValidator;
 
     @Override public void initialize(GeneProductIDList constraintAnnotation) {
-        GeneProductDbXRefIDFormats
-                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load());
-        idValidator = dbXrefEntities::isValidId;
+        idValidator = geneProductValidator::isValidId;
     }
 
     @Override public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        List invalidGeneProdIDs = Arrays.stream(s.split(",")).filter(idValidator.negate()).collect(Collectors.toList());
+        List invalidGeneProdIDs = Arrays.stream(s.split(",")).filter(idValidator.negate()).collect
+                (Collectors.toList());
         return invalidGeneProdIDs.size() == 0;
-        //return "P99999".equalsIgnoreCase(s);
-    }
-
-    private DbXRefLoader geneProductLoader() {
-        return new DbXRefLoader(this.xrefValidationRegexFile);
     }
 }
