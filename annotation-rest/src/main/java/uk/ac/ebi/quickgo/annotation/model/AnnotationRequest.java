@@ -55,7 +55,7 @@ public class AnnotationRequest {
     private static final String ASPECT_FIELD = "aspect";
 
     public void setAspect(String aspect) {
-        if(aspect != null) {
+        if (aspect != null) {
             filters.put(ASPECT_FIELD, aspect.toLowerCase());
         }
     }
@@ -71,14 +71,12 @@ public class AnnotationRequest {
      * evidence codes</a>
      * @param evidence the evidence code
      */
-    public void setGoEvidence(String evidence){
-        if(evidence != null) {
-            filters.put(AnnotationFields.GO_EVIDENCE, evidence.toLowerCase());
-        }
+    public void setGoEvidence(String evidence) {
+        filters.put(AnnotationFields.GO_EVIDENCE, evidence);
     }
 
     @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*")
-    public String getGoEvidence(){
+    public String getGoEvidence() {
         return filters.get(AnnotationFields.GO_EVIDENCE);
     }
 
