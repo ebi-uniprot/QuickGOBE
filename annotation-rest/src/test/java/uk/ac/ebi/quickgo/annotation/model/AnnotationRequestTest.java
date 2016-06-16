@@ -65,14 +65,14 @@ public class AnnotationRequestTest {
     public void setAndGetEvidence(){
         String EVIDENCE_IEA = "IEA";
         annotationRequest.setGoEvidence(EVIDENCE_IEA);
-        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_IEA));
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_IEA.toLowerCase()));
     }
 
     @Test
     public void setAndGetEvidenceMulti(){
         String EVIDENCE_MULTI = "IEA,IBD";
         annotationRequest.setGoEvidence(EVIDENCE_MULTI);
-        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI.toLowerCase()));
     }
 
 }
