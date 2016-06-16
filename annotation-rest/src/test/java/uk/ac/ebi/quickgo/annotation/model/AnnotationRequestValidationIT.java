@@ -27,7 +27,6 @@ public class AnnotationRequestValidationIT {
     private static final String[] VALID_GO_EVIDENCE = {"IEA,IBD,IC"};
     private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
 
-
     private Validator validator;
     private AnnotationRequest annotationRequest;
 
@@ -78,12 +77,11 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void allGoEvidenceValuesAreValid() {
-        for (String valid: VALID_ASSIGNED_BY_PARMS) {
+        for (String valid : VALID_GO_EVIDENCE) {
             annotationRequest.setGoEvidence(valid);
-            assertThat(valid + " expected to be a valid value, but has failed validation",validator.validate
-                    (annotationRequest), hasSize(0));
+            assertThat(valid + " expected to be a valid value, but has failed validation",
+                    validator.validate(annotationRequest), hasSize(0));
         }
-
     }
 
     @Test
