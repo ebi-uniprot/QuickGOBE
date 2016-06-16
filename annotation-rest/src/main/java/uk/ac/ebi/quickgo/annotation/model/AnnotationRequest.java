@@ -65,6 +65,23 @@ public class AnnotationRequest {
         return filters.get(ASPECT_FIELD);
     }
 
+    /**
+     * The older evidence codes
+     * E.g. IEA, IBA, IBD etc. See <a href="http://geneontology.org/page/guide-go-evidence-codes">Guide QuickGO
+     * evidence codes</a>
+     * @param evidence the evidence code
+     */
+    public void setGoEvidence(String evidence){
+        if(evidence != null) {
+            filters.put(AnnotationFields.GO_EVIDENCE, evidence.toLowerCase());
+        }
+    }
+
+    @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*")
+    public String getGoEvidence(){
+        return filters.get(AnnotationFields.GO_EVIDENCE);
+    }
+
     public void setPage(int page) {
         this.page = page;
     }
