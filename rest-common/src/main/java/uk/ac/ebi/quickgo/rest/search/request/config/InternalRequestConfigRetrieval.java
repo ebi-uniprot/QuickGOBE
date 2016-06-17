@@ -29,7 +29,7 @@ class InternalRequestConfigRetrieval implements RequestConfigRetrieval {
         executionConfigs = populateExecutionConfigs(searchableDocumentFields);
     }
 
-    @Override public Optional<RequestConfig> getSignature(Set<String> signature) {
+    @Override public Optional<RequestConfig> getBySignature(Set<String> signature) {
         Preconditions
                 .checkArgument(signature != null && !signature.isEmpty(), "Signature cannot be null or empty");
         return Optional.ofNullable(executionConfigs.get(signature));

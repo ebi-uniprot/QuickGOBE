@@ -60,7 +60,7 @@ public class GlobalRequestConfigRetrievalTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Signature cannot be null or empty");
 
-        config.getSignature(null);
+        config.getBySignature(null);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class GlobalRequestConfigRetrievalTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Signature cannot be null or empty");
 
-        config.getSignature(asSet());
+        config.getBySignature(asSet());
     }
 
     @Test
@@ -80,10 +80,10 @@ public class GlobalRequestConfigRetrievalTest {
                 FilterUtil.createExecutionConfig(internalFieldName, ExecutionType.SIMPLE)
         );
 
-        when(internalConfigMock.getSignature(internalFieldSet)).thenReturn(expectedFieldConfigOpt);
-        when(externalConfigMock.getSignature(internalFieldSet)).thenReturn(Optional.empty());
+        when(internalConfigMock.getBySignature(internalFieldSet)).thenReturn(expectedFieldConfigOpt);
+        when(externalConfigMock.getBySignature(internalFieldSet)).thenReturn(Optional.empty());
 
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(internalFieldSet);
+        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(internalFieldSet);
 
         assertThat(fieldConfigOpt, is(expectedFieldConfigOpt));
     }
@@ -93,16 +93,16 @@ public class GlobalRequestConfigRetrievalTest {
         String externalFieldName = "field";
         Set<String> externalFieldSet = asSet(externalFieldName);
 
-        when(internalConfigMock.getSignature(externalFieldSet)).thenReturn(Optional.empty());
+        when(internalConfigMock.getBySignature(externalFieldSet)).thenReturn(Optional.empty());
 
         Optional<RequestConfig> expectedFieldConfigOpt = Optional.of(
                 FilterUtil.createExecutionConfig(externalFieldName, ExecutionType.SIMPLE)
         );
 
-        when(internalConfigMock.getSignature(externalFieldSet)).thenReturn(Optional.empty());
-        when(externalConfigMock.getSignature(externalFieldSet)).thenReturn(expectedFieldConfigOpt);
+        when(internalConfigMock.getBySignature(externalFieldSet)).thenReturn(Optional.empty());
+        when(externalConfigMock.getBySignature(externalFieldSet)).thenReturn(expectedFieldConfigOpt);
 
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(externalFieldSet);
+        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(externalFieldSet);
 
         assertThat(fieldConfigOpt, is(expectedFieldConfigOpt));
     }
@@ -112,10 +112,10 @@ public class GlobalRequestConfigRetrievalTest {
         String unknownFieldName = "unknown";
         Set<String> unknownFieldSet = asSet(unknownFieldName);
 
-        when(internalConfigMock.getSignature(unknownFieldSet)).thenReturn(Optional.empty());
-        when(externalConfigMock.getSignature(unknownFieldSet)).thenReturn(Optional.empty());
+        when(internalConfigMock.getBySignature(unknownFieldSet)).thenReturn(Optional.empty());
+        when(externalConfigMock.getBySignature(unknownFieldSet)).thenReturn(Optional.empty());
 
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(unknownFieldSet);
+        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(unknownFieldSet);
 
         assertThat(fieldConfigOpt, is(Optional.empty()));
     }
@@ -133,11 +133,10 @@ public class GlobalRequestConfigRetrievalTest {
                 FilterUtil.createExecutionConfig(searchableField, ExecutionType.JOIN)
         );
 
+        when(internalConfigMock.getBySignature(searchableFieldSet)).thenReturn(internalFieldConfigOpt);
+        when(externalConfigMock.getBySignature(searchableFieldSet)).thenReturn(externalFieldConfigOpt);
 
-        when(internalConfigMock.getSignature(searchableFieldSet)).thenReturn(internalFieldConfigOpt);
-        when(externalConfigMock.getSignature(searchableFieldSet)).thenReturn(externalFieldConfigOpt);
-
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(searchableFieldSet);
+        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(searchableFieldSet);
 
         RequestConfig retrievedField = fieldConfigOpt.get();
 

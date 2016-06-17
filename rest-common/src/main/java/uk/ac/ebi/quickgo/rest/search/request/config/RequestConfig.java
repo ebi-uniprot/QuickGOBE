@@ -13,7 +13,7 @@ import static java.util.Arrays.asList;
 /**
  * Defines a data structure that indicates how a {@link ClientRequest} within a table/collection should be processed.
  * </p>
- * Note: this class needs to remain public for spring wiring purposes.
+ * Note: this class needs to remain public for Spring wiring purposes.
  *
  * @author Ricardo Antunes
  */

@@ -54,7 +54,7 @@ public class RequestConverterFactoryTest {
         String field = "fieldX";
         ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
 
-        when(requestConfigRetrievalMock.getSignature(request.getSignature()))
+        when(requestConfigRetrievalMock.getBySignature(request.getSignature()))
                .thenReturn(Optional.of(requestConfigMock));
         when(requestConfigMock.getExecution()).thenReturn(SIMPLE);
 
@@ -70,7 +70,7 @@ public class RequestConverterFactoryTest {
         String field = "fieldX";
         ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
 
-        when(requestConfigRetrievalMock.getSignature(request.getSignature()))
+        when(requestConfigRetrievalMock.getBySignature(request.getSignature()))
                 .thenReturn(Optional.empty());
         when(requestConfigMock.getExecution()).thenReturn(SIMPLE);
 
@@ -84,7 +84,7 @@ public class RequestConverterFactoryTest {
         String field = "fieldX";
         ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
 
-        when(requestConfigRetrievalMock.getSignature(request.getSignature()))
+        when(requestConfigRetrievalMock.getBySignature(request.getSignature()))
                 .thenReturn(Optional.of(requestConfigMock));
         when(requestConfigMock.getExecution()).thenReturn(JOIN);
 
@@ -117,7 +117,7 @@ public class RequestConverterFactoryTest {
         String field = "fieldX";
         ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
 
-        when(requestConfigRetrievalMock.getSignature(request.getSignature()))
+        when(requestConfigRetrievalMock.getBySignature(request.getSignature()))
                 .thenReturn(Optional.empty());
         when(requestConfigMock.getExecution()).thenReturn(JOIN);
 

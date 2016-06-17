@@ -11,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * This class provides convenient conversions of {@link ClientRequest} instances to
- * representational {@link QuickGOQuery} instances.
+ * This class converts {@link ClientRequest} instances to representational {@link QuickGOQuery} instances.
  *
  * Created by Edd on 05/06/2016.
  */
@@ -29,7 +28,7 @@ public class RequestConverterFactory {
     }
 
     public QuickGOQuery convert(ClientRequest request) {
-        Optional<RequestConfig> configOpt = requestConfigRetrieval.getSignature(request.getSignature());
+        Optional<RequestConfig> configOpt = requestConfigRetrieval.getBySignature(request.getSignature());
         if (configOpt.isPresent()) {
             RequestConfig requestConfig = configOpt.get();
             switch (requestConfig.getExecution()) {

@@ -14,11 +14,13 @@ public interface RequestConfigRetrieval {
     /**
      * Provide the {@link RequestConfig} for the given {@param signature}.
      *
-     * @param signature the signature (sorted in alphabetical order, comma-separated) of the
-     * {@link ClientRequest}
+     * @param signature the signature of the {@link ClientRequest}, whose {@link RequestConfig}
+     *        needs retrieving. The signature value is a set of {@link String}s, whose items are
+     *        the field names associated with the request. Since a request might involve multiple fields,
+     *        signatures are of the type {@link Set}.
      * @return an Optional instance of {@link RequestConfig} which contains information on how to process
-     * the given request, identified by the signature
+     * the given request, which was identified by the signature
      * @throws IllegalArgumentException if the signature is null or empty
      */
-    Optional<RequestConfig> getSignature(Set<String> signature);
+    Optional<RequestConfig> getBySignature(Set<String> signature);
 }

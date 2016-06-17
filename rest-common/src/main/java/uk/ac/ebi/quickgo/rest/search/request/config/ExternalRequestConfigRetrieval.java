@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
     }
 
     @Override
-    public Optional<RequestConfig> getSignature(Set<String> signature) {
+    public Optional<RequestConfig> getBySignature(Set<String> signature) {
         return requestConfigs.stream()
                 .filter(field -> field.getSignature().equals(signature))
                 .findFirst();

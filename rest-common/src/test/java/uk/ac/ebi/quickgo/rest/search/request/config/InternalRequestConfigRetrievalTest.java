@@ -56,7 +56,7 @@ public class InternalRequestConfigRetrievalTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Signature cannot be null or empty");
 
-        config.getSignature(null);
+        config.getBySignature(null);
     }
 
     @Test
@@ -64,21 +64,21 @@ public class InternalRequestConfigRetrievalTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Signature cannot be null or empty");
 
-        config.getSignature(asSet());
+        config.getBySignature(asSet());
     }
 
     @Test
     public void nonSearchableFieldNameReturnsEmptyOptional() throws Exception {
         String nonSearchableField = "nonField";
 
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(asSet(nonSearchableField));
+        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(asSet(nonSearchableField));
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
 
     @Test
     public void searchableFieldNameReturnsPopulatedOptional() throws Exception {
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(asSet(SEARCHABLE_FIELD_NAME));
+        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(asSet(SEARCHABLE_FIELD_NAME));
 
         assertThat(fieldConfigOpt, is(Optional.of(FIELD_EXECUTION_CONFIG)));
     }

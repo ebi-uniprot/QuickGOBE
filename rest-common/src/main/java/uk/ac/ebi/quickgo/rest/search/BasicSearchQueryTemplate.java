@@ -129,8 +129,6 @@ public class BasicSearchQueryTemplate {
             builder.setPageParameters(page, pageSize);
 
             filters.stream()
-//                    .map(converterFactory::createConverter)
-//                    .map(FilterConverter::transform)
                     .forEach(builder::addQueryFilter);
 
             returnedFields

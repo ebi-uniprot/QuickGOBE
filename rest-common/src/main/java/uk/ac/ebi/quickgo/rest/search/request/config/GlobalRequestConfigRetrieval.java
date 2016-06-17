@@ -44,12 +44,12 @@ import org.springframework.stereotype.Component;
      * @return an Optional containing the correct {@link RequestConfig} or an empty Optional if no config is
      * found for the given signature.
      */
-    @Override public Optional<RequestConfig> getSignature(Set<String> signature) {
+    @Override public Optional<RequestConfig> getBySignature(Set<String> signature) {
         Preconditions.checkArgument(signature != null && !signature.isEmpty(),
                 "Signature cannot be null or empty");
 
-        Optional<RequestConfig> internalConfig = internalExecutionConfig.getSignature(signature);
-        Optional<RequestConfig> externalConfig = externalExecutionConfig.getSignature(signature);
+        Optional<RequestConfig> internalConfig = internalExecutionConfig.getBySignature(signature);
+        Optional<RequestConfig> externalConfig = externalExecutionConfig.getBySignature(signature);
 
         Optional<RequestConfig> config;
 

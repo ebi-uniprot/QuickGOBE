@@ -20,14 +20,26 @@ public class ClientRequest {
         this.properties = builder.properties;
     }
 
-    public Optional<List<String>> getValue(String name) {
-        if (properties.containsKey(name)) {
-            return Optional.of(properties.get(name));
+    /**
+     * Get the value(s) associated with the supplied {@code key}.
+     *
+     * @param key the key whose associated values are being required
+     * @return the value(s) associated with {@code key}
+     */
+    public Optional<List<String>> getValue(String key) {
+        if (properties.containsKey(key)) {
+            return Optional.of(properties.get(key));
         } else {
             return Optional.empty();
         }
     }
 
+    /**
+     * Retrieve all values associated with this request. This is convenient
+     * if the caller knows, e.g., that the request only has 1 property
+     *
+     * @return all values associated with this request
+     */
     public Collection<List<String>> getValues() {
         return properties.values();
     }
@@ -37,13 +49,16 @@ public class ClientRequest {
     }
 
     /**
-     * <p>This method produces a unique signature that is
-     * associated with this particular type of client request.
+     * <p>This method produces a signature that identifies
+     * this particular request. The returned value is a {@link Set}
+     * of {@link String}s, indicating the fields associated with this
+     * request.
      *
-     * <p>NB. The purpose of this signature is to allow one to identify
-     * possible additional configuration details that are associated
-     * with this client request, which are retrieved by {@link RequestConfigRetrieval}
-     * @return the unique signature associated with this type of client request
+     * <p>NB. The purpose of the signature is to allow one to identify
+     * additional configuration details associated with this client request,
+     * which are retrieved by {@link RequestConfigRetrieval}
+     *
+     * @return the signature associated with this client request
      */
     public Set<String> getSignature() {
         return this.properties.keySet();

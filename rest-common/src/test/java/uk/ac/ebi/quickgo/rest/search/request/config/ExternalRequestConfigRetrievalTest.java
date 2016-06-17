@@ -39,7 +39,7 @@ public class ExternalRequestConfigRetrievalTest {
 
     @Test
     public void newExternalFilterConfigReturnsEmptyOptionalWhenCallingGetField() {
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(asSet("field"));
+        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(asSet("field"));
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
@@ -55,7 +55,7 @@ public class ExternalRequestConfigRetrievalTest {
     public void settingFieldsToNullReturnsEmptyOptionalWhenCallingGetField(){
         config.setRequestConfigs(null);
 
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(asSet("field"));
+        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(asSet("field"));
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
@@ -81,7 +81,7 @@ public class ExternalRequestConfigRetrievalTest {
 
         config.setRequestConfigs(Collections.singletonList(field));
 
-        assertThat(config.getSignature(asSet(name)), is(Optional.of(field)));
+        assertThat(config.getBySignature(asSet(name)), is(Optional.of(field)));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ExternalRequestConfigRetrievalTest {
 
         config.setRequestConfigs(Collections.singletonList(field));
 
-        assertThat(config.getSignature(asSet("fake")), is(Optional.empty()));
+        assertThat(config.getBySignature(asSet("fake")), is(Optional.empty()));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class ExternalRequestConfigRetrievalTest {
 
         config.setRequestConfigs(Arrays.asList(field1, field2));
 
-        Optional<RequestConfig> retrievedFieldOpt = config.getSignature(asSet(name));
+        Optional<RequestConfig> retrievedFieldOpt = config.getBySignature(asSet(name));
 
         RequestConfig retrievedField = retrievedFieldOpt.get();
 

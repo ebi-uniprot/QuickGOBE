@@ -12,8 +12,7 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -87,9 +86,9 @@ public class AnnotationController {
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
-                                SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
-                                ControllerValidationHelper validationHelper,
-                                RequestConverterFactory converterFactory) {
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
+            ControllerValidationHelper validationHelper,
+            RequestConverterFactory converterFactory) {
         Preconditions.checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         Preconditions.checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
@@ -119,22 +118,13 @@ public class AnnotationController {
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(addFilterQueries(request))
+                .setFilters(request.createRequestFilters().stream()
+                        .map(converterFactory::convert)
+                        .collect(Collectors.toSet()))
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit())
                 .build();
 
         return search(queryRequest, annotationSearchService);
     }
-
-    private Set<QuickGOQuery> addFilterQueries(AnnotationRequest request) {
-        Set<QuickGOQuery> filterQueries = new HashSet<>();
-
-        request.createRequestFilters().stream()
-                .map(converterFactory::convert)
-                .forEach(filterQueries::add);
-
-        return filterQueries;
-    }
-
 }
