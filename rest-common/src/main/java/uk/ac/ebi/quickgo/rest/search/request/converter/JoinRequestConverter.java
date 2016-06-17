@@ -5,19 +5,24 @@ import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
 import com.google.common.base.Preconditions;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * Defines the conversion of a join request to a corresponding {@link QuickGOQuery}.
  *
  * Created by Edd on 05/06/2016.
  */
-class JoinRequestConverter implements RequestConverter  {
+class JoinRequestConverter implements RequestConverter {
 
     static final String FROM_TABLE_NAME = "fromTable";
     static final String FROM_ATTRIBUTE_NAME = "fromAttribute";
     static final String TO_TABLE_NAME = "toTable";
     static final String TO_ATTRIBUTE_NAME = "toAttribute";
 
+    private static final List<String> REQUIRED_PROPERTY_KEYS =
+            asList(FROM_TABLE_NAME, FROM_ATTRIBUTE_NAME, TO_TABLE_NAME, TO_ATTRIBUTE_NAME);
     private final String fromTable;
     private final String fromAttribute;
     private final String toTable;
@@ -31,7 +36,7 @@ class JoinRequestConverter implements RequestConverter  {
      * @param requestConfig the execution configuration details associated with client requests
      */
     JoinRequestConverter(RequestConfig requestConfig) {
-        Preconditions.checkArgument(requestConfig != null, "RequestConfig cannot be null");
+        validateRequestConfig(requestConfig);
 
         this.requestConfig = requestConfig;
 
@@ -40,6 +45,7 @@ class JoinRequestConverter implements RequestConverter  {
         this.toTable = this.requestConfig.getProperties().get(TO_TABLE_NAME);
         this.toAttribute = this.requestConfig.getProperties().get(TO_ATTRIBUTE_NAME);
     }
+
     /**
      * Converts a given {@link ClientRequest} into a {@link QuickGOQuery} that represents
      * a join. If {@code request} has no values, a query with no filter is created. Otherwise,
@@ -60,6 +66,17 @@ class JoinRequestConverter implements RequestConverter  {
                     toTable,
                     toAttribute,
                     new SimpleRequestConverter(requestConfig).transform(request));
+        }
+    }
+
+    private void validateRequestConfig(RequestConfig requestConfig) {
+        Preconditions.checkArgument(requestConfig != null, "RequestConfig cannot be null");
+
+        for (String requiredProperty : REQUIRED_PROPERTY_KEYS) {
+            Preconditions.checkArgument(
+                    requestConfig.getProperties().containsKey(requiredProperty)
+                            && !requestConfig.getProperties().get(requiredProperty).trim().isEmpty(),
+                    "RequestConfig properties should contain " + requiredProperty + " key.");
         }
     }
 }

@@ -53,6 +53,42 @@ public class JoinRequestConverterTest {
         converter.transform(null);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void missingFromTablePropertyForConverterCausesException() {
+        addConfigProperty(FROM_ATTRIBUTE_NAME, FROM_ATTRIBUTE_VALUE);
+        addConfigProperty(TO_TABLE_NAME, TO_TABLE_VALUE);
+        addConfigProperty(TO_ATTRIBUTE_NAME, TO_ATTRIBUTE_VALUE);
+
+        initialiseConverter();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void missingFromAttributePropertyForConverterCausesException() {
+        addConfigProperty(FROM_TABLE_NAME, FROM_TABLE_VALUE);
+        addConfigProperty(TO_TABLE_NAME, TO_TABLE_VALUE);
+        addConfigProperty(TO_ATTRIBUTE_NAME, TO_ATTRIBUTE_VALUE);
+
+        initialiseConverter();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void missingToTablePropertyForConverterCausesException() {
+        addConfigProperty(FROM_TABLE_NAME, FROM_TABLE_VALUE);
+        addConfigProperty(FROM_ATTRIBUTE_NAME, FROM_ATTRIBUTE_VALUE);
+        addConfigProperty(TO_ATTRIBUTE_NAME, TO_ATTRIBUTE_VALUE);
+
+        initialiseConverter();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void missingToAttributePropertyForConverterCausesException() {
+        addConfigProperty(FROM_TABLE_NAME, FROM_TABLE_VALUE);
+        addConfigProperty(FROM_ATTRIBUTE_NAME, FROM_ATTRIBUTE_VALUE);
+        addConfigProperty(TO_TABLE_NAME, TO_TABLE_VALUE);
+
+        initialiseConverter();
+    }
+
     @Test
     public void convertsRequestIntoJoinQuery() {
         String field = "fieldX";
