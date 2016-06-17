@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.SimpleRequest;
+import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
 import org.junit.Before;
@@ -10,8 +10,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -21,7 +19,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SimpleRequestConverterTest {
-    private static final String FIELD = "field";
+    private static final String FIELD1 = "field1";
+    private static final String FIELD2 = "field2";
     private static final String FIELD_VALUE_1 = "value1";
     private static final String FIELD_VALUE_2 = "value2";
 
@@ -41,25 +40,34 @@ public class SimpleRequestConverterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void nullRequestForConverterThrowsException() {
-        converter.apply(null);
+        converter.transform(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void requestWithMultiplePropertiesThrowsException() {
+        ClientRequest request = ClientRequest.newBuilder()
+                .addProperty(FIELD1, FIELD_VALUE_1)
+                .addProperty(FIELD2, FIELD_VALUE_2)
+                .build();
+        converter.transform(request);
     }
 
     @Test
     public void transformsRequestWithSingleValueIntoAQuickGOQuery() {
-        SimpleRequest request = new SimpleRequest(FIELD, singletonList(FIELD_VALUE_1));
-        QuickGOQuery resultingQuery = converter.apply(request);
-        QuickGOQuery expectedQuery = QuickGOQuery.createQuery(FIELD, FIELD_VALUE_1);
+        ClientRequest request = ClientRequest.newBuilder().addProperty(FIELD1, FIELD_VALUE_1).build();
+        QuickGOQuery resultingQuery = converter.transform(request);
+        QuickGOQuery expectedQuery = QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_1);
 
         assertThat(resultingQuery, is(expectedQuery));
     }
 
     @Test
     public void transformsRequestWithMultipleValuesIntoAQuickGOQuery() {
-        SimpleRequest request = new SimpleRequest(FIELD, asList(FIELD_VALUE_1, FIELD_VALUE_2));
-        QuickGOQuery resultingQuery = converter.apply(request);
+        ClientRequest request = ClientRequest.newBuilder().addProperty(FIELD1, FIELD_VALUE_1, FIELD_VALUE_2).build();
+        QuickGOQuery resultingQuery = converter.transform(request);
 
         QuickGOQuery expectedQuery =
-                QuickGOQuery.createQuery(FIELD, FIELD_VALUE_1).or(QuickGOQuery.createQuery(FIELD, FIELD_VALUE_2));
+                QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_1).or(QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_2));
 
         assertThat(resultingQuery, is(expectedQuery));
     }

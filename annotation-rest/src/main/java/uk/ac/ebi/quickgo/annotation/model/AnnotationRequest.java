@@ -1,18 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
-import uk.ac.ebi.quickgo.rest.search.request.RESTRequest;
-import uk.ac.ebi.quickgo.rest.search.request.SimpleRequest;
+import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
-import static java.util.Collections.emptySet;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -29,9 +27,9 @@ public class AnnotationRequest {
     public static final int MAX_ENTRIES_PER_PAGE = 100;
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
+    private static final String COMMA = ",";
 
-    private final Set<SimpleRequest> simpleRequests = new HashSet<>();
-    private final Set<SimpleRequest> joinRequests = new HashSet<>();
+    private final HashMap<String, String> requestMap = new HashMap<>();
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -39,11 +37,9 @@ public class AnnotationRequest {
     @Min(1)
     private int page = DEFAULT_PAGE_NUMBER;
 
-    private ControllerValidationHelper validationHelper = new ControllerValidationHelperImpl();
     private String assignedBy = null;
     private String aspect = null;
 
-    //TODO:change the way the field is referenced
     private static final String ASPECT_FIELD = "aspect";
 
     /**
@@ -51,23 +47,25 @@ public class AnnotationRequest {
      *  In the format assignedBy=ASPGD,Agbase
      */
     public void setAssignedBy(String assignedBy) {
-        simpleRequests.add(createSimpleRequest(AnnotationFields.ASSIGNED_BY, this.assignedBy = assignedBy));
+        if (assignedBy != null) {
+            requestMap.put(ASSIGNED_BY, assignedBy);
+        }
     }
 
     @Pattern(regexp = "^[A-Za-z][A-Za-z\\-_]+(,[A-Za-z][A-Za-z\\-_]+)*")
     public String getAssignedBy() {
-        return assignedBy;
+        return requestMap.get(ASSIGNED_BY);
     }
 
     public void setAspect(String aspect) {
         if(aspect != null) {
-            joinRequests.add(createSimpleRequest(ASPECT_FIELD, this.aspect = aspect.toLowerCase()));
+            requestMap.put(ASPECT_FIELD, aspect.toLowerCase());
         }
     }
 
     @Pattern(regexp = "(?i)biological_process|molecular_function|cellular_component")
     public String getAspect() {
-        return aspect;
+        return requestMap.get(ASPECT_FIELD);
     }
 
     public int getLimit() {
@@ -86,21 +84,26 @@ public class AnnotationRequest {
         this.page = page;
     }
 
-    public Set<SimpleRequest> getSimpleRequests() {
-        return simpleRequests;
+    public List<ClientRequest> createRequestFilters() {
+        List<ClientRequest> clientRequests = new ArrayList<>();
+
+        createSimpleFilter(ASPECT_FIELD).ifPresent(clientRequests::add);
+        createSimpleFilter(ASSIGNED_BY).ifPresent(clientRequests::add);
+
+        return clientRequests;
     }
 
-    public Set<SimpleRequest> getJoinRequests() {
-        return joinRequests;
+    private Optional<ClientRequest> createSimpleFilter(String key) {
+        Optional<ClientRequest> request;
+        if (requestMap.containsKey(key)) {
+            ClientRequest.Builder requestBuilder = ClientRequest.newBuilder();
+            requestBuilder.addProperty(key, requestMap.get(key).split(COMMA));
+            request = Optional.of(requestBuilder.build());
+        } else {
+            request = Optional.empty();
+        }
+
+        return request;
     }
 
-    // todo: implement fetching of rest requests -- there might be multiple types, each added to a set of them
-    // whenever one is created
-    public Set<RESTRequest> getRESTRequests() {
-        return emptySet();
-    }
-
-    private SimpleRequest createSimpleRequest(String field, String value) {
-        return new SimpleRequest(field, validationHelper.csvToList(value));
-    }
 }

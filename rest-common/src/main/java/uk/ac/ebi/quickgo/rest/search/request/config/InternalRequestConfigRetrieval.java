@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
 import com.google.common.base.Preconditions;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 class InternalRequestConfigRetrieval implements RequestConfigRetrieval {
-    private final Map<String, RequestConfig> executionConfigs;
+    private final Map<Set<String>, RequestConfig> executionConfigs;
 
     @Autowired
     public InternalRequestConfigRetrieval(SearchableDocumentFields searchableDocumentFields) {
@@ -28,13 +29,13 @@ class InternalRequestConfigRetrieval implements RequestConfigRetrieval {
         executionConfigs = populateExecutionConfigs(searchableDocumentFields);
     }
 
-    @Override public Optional<RequestConfig> getSignature(String signature) {
+    @Override public Optional<RequestConfig> getSignature(Set<String> signature) {
         Preconditions
-                .checkArgument(signature != null && !signature.trim().isEmpty(), "Field name cannot be null or empty");
+                .checkArgument(signature != null && !signature.isEmpty(), "Signature cannot be null or empty");
         return Optional.ofNullable(executionConfigs.get(signature));
     }
 
-    private Map<String, RequestConfig> populateExecutionConfigs(SearchableDocumentFields
+    private Map<Set<String>, RequestConfig> populateExecutionConfigs(SearchableDocumentFields
             searchableDocumentFields) {
         final RequestConfig.ExecutionType executionType = RequestConfig.ExecutionType.SIMPLE;
 

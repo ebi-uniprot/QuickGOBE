@@ -23,4 +23,4 @@
  *
  * @author Ricardo Antunes
  */
-package uk.ac.ebi.quickgo.rest.search.filter;
+package uk.ac.ebi.quickgo.rest.search.request;

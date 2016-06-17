@@ -1,11 +1,12 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.SimpleRequest;
+import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
 import com.google.common.base.Preconditions;
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -13,7 +14,7 @@ import java.util.stream.Stream;
  *
  * Created by Edd on 05/06/2016.
  */
-class SimpleRequestConverter implements Function<SimpleRequest, QuickGOQuery> {
+class SimpleRequestConverter implements RequestConverter {
 
     private final RequestConfig requestConfig;
 
@@ -24,24 +25,26 @@ class SimpleRequestConverter implements Function<SimpleRequest, QuickGOQuery> {
     }
 
     /**
-     * Converts a given {@link SimpleRequest} into a corresponding {@link QuickGOQuery}.
-     * If {@code simpleRequest} has multiple values, they are ORed together in the
+     * Converts a given {@link ClientRequest} into a corresponding {@link QuickGOQuery}.
+     * If {@code request} has multiple values, they are ORed together in the
      * resulting query.
      *
-     * @param simpleRequest the client request
+     * @param request the client request
      * @return a {@link QuickGOQuery} corresponding to a join query, representing the original client request
      */
-    @Override
-    public QuickGOQuery apply(SimpleRequest simpleRequest) {
-        Preconditions.checkArgument(simpleRequest != null, "SimpleRequest cannot be null");
+    @Override public QuickGOQuery transform(ClientRequest request) {
+        Preconditions.checkArgument(request != null, "ClientRequest cannot be null");
+        Preconditions.checkArgument(request.getValues().size() == 1,
+                "ClientRequest should contain only 1 property for application to a SimpleRequestConverter, " +
+                        "instead it contained " + request.getValues().size());
 
-        Stream<String> values = simpleRequest.getValues().stream();
+        Stream<String> values = request.getValues().stream().flatMap(Collection::stream);
 
         return values
-                .map(value -> QuickGOQuery.createQuery(simpleRequest.getSignature(), value))
+                .map(value -> QuickGOQuery
+                        .createQuery(request.getSignature().stream().collect(Collectors.joining()), value))
                 .reduce(QuickGOQuery::or)
                 .orElseThrow(() -> new IllegalStateException("Unable to create SimpleRequestConverter using: " +
-                        simpleRequest + " and " + requestConfig));
-
+                        request + " and " + requestConfig));
     }
 }

@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +44,9 @@ import org.springframework.stereotype.Component;
      * @return an Optional containing the correct {@link RequestConfig} or an empty Optional if no config is
      * found for the given signature.
      */
-    @Override public Optional<RequestConfig> getSignature(String signature) {
-        Preconditions.checkArgument(signature != null && !signature.trim().isEmpty(),
-                "Field name cannot be null or empty");
+    @Override public Optional<RequestConfig> getSignature(Set<String> signature) {
+        Preconditions.checkArgument(signature != null && !signature.isEmpty(),
+                "Signature cannot be null or empty");
 
         Optional<RequestConfig> internalConfig = internalExecutionConfig.getSignature(signature);
         Optional<RequestConfig> externalConfig = externalExecutionConfig.getSignature(signature);

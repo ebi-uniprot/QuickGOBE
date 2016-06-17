@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.request.config;
 import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Holds the configuration definitions on how to process {@link ClientRequest} instances.
@@ -19,5 +20,5 @@ public interface RequestConfigRetrieval {
      * the given request, identified by the signature
      * @throws IllegalArgumentException if the signature is null or empty
      */
-    Optional<RequestConfig> getSignature(String signature);
+    Optional<RequestConfig> getSignature(Set<String> signature);
 }

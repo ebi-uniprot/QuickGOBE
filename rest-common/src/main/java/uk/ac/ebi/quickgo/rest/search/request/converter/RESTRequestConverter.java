@@ -1,11 +1,10 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.RESTRequest;
+import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
 import com.google.common.base.Preconditions;
-import java.util.function.Function;
 
 /**
  * <p>Defines the conversion of a REST request to a corresponding {@link QuickGOQuery}.
@@ -14,7 +13,7 @@ import java.util.function.Function;
  *
  * Created by Edd on 05/06/2016.
  */
-class RESTRequestConverter implements Function<RESTRequest, QuickGOQuery> {
+class RESTRequestConverter implements RequestConverter  {
     private static final String LOCAL_FIELD = "localField";
 
     private final RequestConfig requestConfig;
@@ -25,9 +24,8 @@ class RESTRequestConverter implements Function<RESTRequest, QuickGOQuery> {
         this.localField = requestConfig.getProperties().get(LOCAL_FIELD);
     }
 
-    @Override
-    public QuickGOQuery apply(RESTRequest requestFilter) {
-        Preconditions.checkArgument(requestFilter != null, "RESTCommRequest cannot be null");
+    @Override public QuickGOQuery transform(ClientRequest request) {
+        Preconditions.checkArgument(request != null, "ClientRequest cannot be null");
 
         // create REST request executor
         // configure using requestConfig

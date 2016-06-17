@@ -2,8 +2,11 @@ package uk.ac.ebi.quickgo.rest.search.request;
 
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import static java.util.Arrays.asList;
 import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType;
 
 public final class FilterUtil {
@@ -25,5 +28,9 @@ public final class FilterUtil {
         field.setProperties(props);
 
         return field;
+    }
+
+    public static <T> Set<T> asSet(T... elements) {
+        return new HashSet<>(asList(elements));
     }
 }

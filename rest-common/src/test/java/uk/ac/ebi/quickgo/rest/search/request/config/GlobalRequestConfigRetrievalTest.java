@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.request.config;
 import uk.ac.ebi.quickgo.rest.search.request.FilterUtil;
 
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType;
 
 /**
@@ -56,31 +58,32 @@ public class GlobalRequestConfigRetrievalTest {
     @Test
     public void nullSearchableFieldThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Field name cannot be null or empty");
+        thrown.expectMessage("Signature cannot be null or empty");
 
         config.getSignature(null);
     }
 
     @Test
-    public void emptySearchableFieldThrowsException() throws Exception {
+    public void emptySignatureThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Field name cannot be null or empty");
+        thrown.expectMessage("Signature cannot be null or empty");
 
-        config.getSignature("");
+        config.getSignature(asSet());
     }
 
     @Test
     public void searchableFieldNameKnownToInternalConfigReturnsPopulatedOptional() throws Exception {
         String internalFieldName = "field";
+        Set<String> internalFieldSet = asSet(internalFieldName);
 
         Optional<RequestConfig> expectedFieldConfigOpt = Optional.of(
                 FilterUtil.createExecutionConfig(internalFieldName, ExecutionType.SIMPLE)
         );
 
-        when(internalConfigMock.getSignature(internalFieldName)).thenReturn(expectedFieldConfigOpt);
-        when(externalConfigMock.getSignature(internalFieldName)).thenReturn(Optional.empty());
+        when(internalConfigMock.getSignature(internalFieldSet)).thenReturn(expectedFieldConfigOpt);
+        when(externalConfigMock.getSignature(internalFieldSet)).thenReturn(Optional.empty());
 
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(internalFieldName);
+        Optional<RequestConfig> fieldConfigOpt = config.getSignature(internalFieldSet);
 
         assertThat(fieldConfigOpt, is(expectedFieldConfigOpt));
     }
@@ -88,17 +91,18 @@ public class GlobalRequestConfigRetrievalTest {
     @Test
     public void searchableFieldNameKnownToExternalConfigReturnsPopulatedOptional() throws Exception {
         String externalFieldName = "field";
+        Set<String> externalFieldSet = asSet(externalFieldName);
 
-        when(internalConfigMock.getSignature(externalFieldName)).thenReturn(Optional.empty());
+        when(internalConfigMock.getSignature(externalFieldSet)).thenReturn(Optional.empty());
 
         Optional<RequestConfig> expectedFieldConfigOpt = Optional.of(
                 FilterUtil.createExecutionConfig(externalFieldName, ExecutionType.SIMPLE)
         );
 
-        when(internalConfigMock.getSignature(externalFieldName)).thenReturn(Optional.empty());
-        when(externalConfigMock.getSignature(externalFieldName)).thenReturn(expectedFieldConfigOpt);
+        when(internalConfigMock.getSignature(externalFieldSet)).thenReturn(Optional.empty());
+        when(externalConfigMock.getSignature(externalFieldSet)).thenReturn(expectedFieldConfigOpt);
 
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(externalFieldName);
+        Optional<RequestConfig> fieldConfigOpt = config.getSignature(externalFieldSet);
 
         assertThat(fieldConfigOpt, is(expectedFieldConfigOpt));
     }
@@ -106,11 +110,12 @@ public class GlobalRequestConfigRetrievalTest {
     @Test
     public void unknownSearchableFieldNameReturnsEmptyOptional() throws Exception {
         String unknownFieldName = "unknown";
+        Set<String> unknownFieldSet = asSet(unknownFieldName);
 
-        when(internalConfigMock.getSignature(unknownFieldName)).thenReturn(Optional.empty());
-        when(externalConfigMock.getSignature(unknownFieldName)).thenReturn(Optional.empty());
+        when(internalConfigMock.getSignature(unknownFieldSet)).thenReturn(Optional.empty());
+        when(externalConfigMock.getSignature(unknownFieldSet)).thenReturn(Optional.empty());
 
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(unknownFieldName);
+        Optional<RequestConfig> fieldConfigOpt = config.getSignature(unknownFieldSet);
 
         assertThat(fieldConfigOpt, is(Optional.empty()));
     }
@@ -118,6 +123,7 @@ public class GlobalRequestConfigRetrievalTest {
     @Test
     public void searchableFieldExistsInInternalAndExternalExecutionConfigSoInternalTakesPrecedence() throws Exception {
         String searchableField = "field";
+        Set<String> searchableFieldSet = asSet(searchableField);
 
         Optional<RequestConfig> internalFieldConfigOpt = Optional.of(
                 FilterUtil.createExecutionConfig(searchableField, ExecutionType.SIMPLE)
@@ -128,14 +134,14 @@ public class GlobalRequestConfigRetrievalTest {
         );
 
 
-        when(internalConfigMock.getSignature(searchableField)).thenReturn(internalFieldConfigOpt);
-        when(externalConfigMock.getSignature(searchableField)).thenReturn(externalFieldConfigOpt);
+        when(internalConfigMock.getSignature(searchableFieldSet)).thenReturn(internalFieldConfigOpt);
+        when(externalConfigMock.getSignature(searchableFieldSet)).thenReturn(externalFieldConfigOpt);
 
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(searchableField);
+        Optional<RequestConfig> fieldConfigOpt = config.getSignature(searchableFieldSet);
 
         RequestConfig retrievedField = fieldConfigOpt.get();
 
-        assertThat(retrievedField.getSignature(), is(searchableField));
+        assertThat(retrievedField.getSignature(), is(asSet(searchableField)));
         assertThat(retrievedField.getExecution(), is(ExecutionType.SIMPLE));
     }
 }

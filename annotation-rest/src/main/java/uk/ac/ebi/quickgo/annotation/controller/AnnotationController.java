@@ -130,11 +130,8 @@ public class AnnotationController {
     private Set<QuickGOQuery> addFilterQueries(AnnotationRequest request) {
         Set<QuickGOQuery> filterQueries = new HashSet<>();
 
-        request.getSimpleRequests().stream().map(converterFactory::convertSimple)
-                .forEach(filterQueries::add);
-        request.getRESTRequests().stream().map(converterFactory::convertREST)
-                .forEach(filterQueries::add);
-        request.getJoinRequests().stream().map(converterFactory::convertJoin)
+        request.createRequestFilters().stream()
+                .map(converterFactory::convert)
                 .forEach(filterQueries::add);
 
         return filterQueries;

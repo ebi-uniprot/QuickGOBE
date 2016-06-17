@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.SimpleRequest;
+import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
 import java.util.HashMap;
@@ -9,7 +9,6 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinRequestConverter.FROM_ATTRIBUTE_NAME;
@@ -51,7 +50,7 @@ public class JoinRequestConverterTest {
     @Test(expected = IllegalArgumentException.class)
     public void nullRequestForConverterThrowsException() {
         initialiseConverter();
-        converter.apply(null);
+        converter.transform(null);
     }
 
     @Test
@@ -65,15 +64,15 @@ public class JoinRequestConverterTest {
         addConfigProperty(TO_ATTRIBUTE_NAME, TO_ATTRIBUTE_VALUE);
         initialiseConverter();
 
-        SimpleRequest request = new SimpleRequest(field, singletonList(value));
-        QuickGOQuery resultingQuery = converter.apply(request);
+        ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
+        QuickGOQuery resultingQuery = converter.transform(request);
         QuickGOQuery expectedQuery =
                 QuickGOQuery.createJoinQueryWithFilter(
                         FROM_TABLE_VALUE,
                         FROM_ATTRIBUTE_VALUE,
                         TO_TABLE_VALUE,
                         TO_ATTRIBUTE_VALUE,
-                        new SimpleRequestConverter(requestConfig).apply(request));
+                        new SimpleRequestConverter(requestConfig).transform(request));
 
         assertThat(resultingQuery, is(expectedQuery));
     }

@@ -2,8 +2,13 @@ package uk.ac.ebi.quickgo.rest.search.request.config;
 
 import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 
+import com.google.common.base.Preconditions;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
 
 /**
  * Defines a data structure that indicates how a {@link ClientRequest} within a table/collection should be processed.
@@ -13,16 +18,19 @@ import java.util.Map;
  * @author Ricardo Antunes
  */
 public class RequestConfig {
-    private String signature;
+    private static final String COMMA = ",";
+    private Set<String> signature;
     private ExecutionType execution;
     private Map<String, String> properties = new HashMap<>();
 
-    public String getSignature() {
+    public Set<String> getSignature() {
         return signature;
     }
 
     public void setSignature(String signature) {
-        this.signature = signature;
+        Preconditions.checkArgument(signature != null && !signature.trim().isEmpty(),
+                "Signature cannot be null or empty");
+        this.signature = new HashSet<>(asList(signature.split(COMMA)));
     }
 
     public ExecutionType getExecution() {
@@ -43,13 +51,6 @@ public class RequestConfig {
         }
     }
 
-    @Override public int hashCode() {
-        int result = signature != null ? signature.hashCode() : 0;
-        result = 31 * result + (execution != null ? execution.hashCode() : 0);
-        result = 31 * result + (properties != null ? properties.hashCode() : 0);
-        return result;
-    }
-
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -68,6 +69,13 @@ public class RequestConfig {
         }
         return properties != null ? properties.equals(that.properties) : that.properties == null;
 
+    }
+
+    @Override public int hashCode() {
+        int result = signature != null ? signature.hashCode() : 0;
+        result = 31 * result + (execution != null ? execution.hashCode() : 0);
+        result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        return result;
     }
 
     @Override public String toString() {

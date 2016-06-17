@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.request.config;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
     }
 
     @Override
-    public Optional<RequestConfig> getSignature(String signature) {
+    public Optional<RequestConfig> getSignature(Set<String> signature) {
         return requestConfigs.stream()
                 .filter(field -> field.getSignature().equals(signature))
                 .findFirst();

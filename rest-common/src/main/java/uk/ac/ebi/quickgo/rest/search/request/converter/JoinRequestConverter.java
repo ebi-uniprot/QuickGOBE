@@ -1,18 +1,17 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.SimpleRequest;
+import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
 import com.google.common.base.Preconditions;
-import java.util.function.Function;
 
 /**
  * Defines the conversion of a join request to a corresponding {@link QuickGOQuery}.
  *
  * Created by Edd on 05/06/2016.
  */
-class JoinRequestConverter implements Function<SimpleRequest, QuickGOQuery> {
+class JoinRequestConverter implements RequestConverter  {
 
     static final String FROM_TABLE_NAME = "fromTable";
     static final String FROM_ATTRIBUTE_NAME = "fromAttribute";
@@ -41,20 +40,18 @@ class JoinRequestConverter implements Function<SimpleRequest, QuickGOQuery> {
         this.toTable = this.requestConfig.getProperties().get(TO_TABLE_NAME);
         this.toAttribute = this.requestConfig.getProperties().get(TO_ATTRIBUTE_NAME);
     }
-
     /**
-     * Converts a given {@link SimpleRequest} into a {@link QuickGOQuery} that represents
-     * a join. If {@code simpleRequest} has no values, a query with no filter is created. Otherwise,
-     * a query is created with a filter corresponding to the {@code simpleRequest}.
+     * Converts a given {@link ClientRequest} into a {@link QuickGOQuery} that represents
+     * a join. If {@code request} has no values, a query with no filter is created. Otherwise,
+     * a query is created with a filter corresponding to the {@code request}.
      *
-     * @param simpleRequest the client request
+     * @param request the client request
      * @return a {@link QuickGOQuery} corresponding to a join query, representing the original client request
      */
-    @Override
-    public QuickGOQuery apply(SimpleRequest simpleRequest) {
-        Preconditions.checkArgument(simpleRequest != null, "SimpleRequest cannot be null");
+    @Override public QuickGOQuery transform(ClientRequest request) {
+        Preconditions.checkArgument(request != null, "ClientRequest cannot be null");
 
-        if (simpleRequest.getValues().isEmpty()) {
+        if (request.getValues().isEmpty()) {
             return QuickGOQuery.createJoinQuery(fromTable, fromAttribute, toTable, toAttribute);
         } else {
             return QuickGOQuery.createJoinQueryWithFilter(
@@ -62,7 +59,7 @@ class JoinRequestConverter implements Function<SimpleRequest, QuickGOQuery> {
                     fromAttribute,
                     toTable,
                     toAttribute,
-                    new SimpleRequestConverter(requestConfig).apply(simpleRequest));
+                    new SimpleRequestConverter(requestConfig).transform(request));
         }
     }
 }

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.SimpleRequest;
+import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfigRetrieval;
 
@@ -14,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
@@ -53,42 +52,29 @@ public class RequestConverterFactoryTest {
     public void createsQueryForCorrectlyConfiguredSimpleRequest() {
         String value = "valueX";
         String field = "fieldX";
-        SimpleRequest request = new SimpleRequest(field, singletonList(value));
+        ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
 
         when(requestConfigRetrievalMock.getSignature(request.getSignature()))
                .thenReturn(Optional.of(requestConfigMock));
         when(requestConfigMock.getExecution()).thenReturn(SIMPLE);
 
-        QuickGOQuery resultingQuery = converter.convertSimple(request);
+        QuickGOQuery resultingQuery = converter.convert(request);
         QuickGOQuery expectedQuery = QuickGOQuery.createQuery(field, value);
 
         assertThat(resultingQuery, is(expectedQuery));
     }
 
     @Test(expected = IllegalStateException.class)
-    public void wrongExecutionTypeForSimpleRequestCausesException() {
-        String value = "valueX";
-        String field = "fieldX";
-        SimpleRequest request = new SimpleRequest(field, singletonList(value));
-
-        when(requestConfigRetrievalMock.getSignature(request.getSignature()))
-                .thenReturn(Optional.of(requestConfigMock));
-        when(requestConfigMock.getExecution()).thenReturn(JOIN);
-
-        converter.convertSimple(request);
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void missingSignatureInConfigForSimpleRequestCausesException() {
         String value = "valueX";
         String field = "fieldX";
-        SimpleRequest request = new SimpleRequest(field, singletonList(value));
+        ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
 
         when(requestConfigRetrievalMock.getSignature(request.getSignature()))
                 .thenReturn(Optional.empty());
         when(requestConfigMock.getExecution()).thenReturn(SIMPLE);
 
-        converter.convertSimple(request);
+        converter.convert(request);
     }
 
     // join request -> QuickGOQuery tests
@@ -96,7 +82,7 @@ public class RequestConverterFactoryTest {
     public void createsQueryForCorrectlyConfiguredJoinRequest() {
         String value = "valueX";
         String field = "fieldX";
-        SimpleRequest request = new SimpleRequest(field, singletonList(value));
+        ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
 
         when(requestConfigRetrievalMock.getSignature(request.getSignature()))
                 .thenReturn(Optional.of(requestConfigMock));
@@ -113,7 +99,7 @@ public class RequestConverterFactoryTest {
         configPropertiesMap.put(TO_ATTRIBUTE_NAME, toAttribute);
         when(requestConfigMock.getProperties()).thenReturn(configPropertiesMap);
 
-        QuickGOQuery resultingQuery = converter.convertJoin(request);
+        QuickGOQuery resultingQuery = converter.convert(request);
         QuickGOQuery expectedQuery = QuickGOQuery.createJoinQueryWithFilter(
                 fromTable,
                 fromAttribute,
@@ -126,25 +112,10 @@ public class RequestConverterFactoryTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void wrongExecutionTypeForJoinRequestCausesException() {
-        String value = "valueX";
-        String field = "fieldX";
-        SimpleRequest request = new SimpleRequest(field, singletonList(value));
-
-        when(requestConfigRetrievalMock.getSignature(request.getSignature()))
-                .thenReturn(Optional.of(requestConfigMock));
-        when(requestConfigMock.getExecution()).thenReturn(SIMPLE);
-
-        setConfigPropertiesMap();
-
-        converter.convertJoin(request);
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void missingSignatureInConfigForJoinRequestCausesException() {
         String value = "valueX";
         String field = "fieldX";
-        SimpleRequest request = new SimpleRequest(field, singletonList(value));
+        ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
 
         when(requestConfigRetrievalMock.getSignature(request.getSignature()))
                 .thenReturn(Optional.empty());
@@ -152,7 +123,7 @@ public class RequestConverterFactoryTest {
 
         setConfigPropertiesMap();
 
-        converter.convertJoin(request);
+        converter.convert(request);
     }
 
     private void setConfigPropertiesMap() {

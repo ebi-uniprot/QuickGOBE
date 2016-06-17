@@ -15,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.createExecutionConfig;
 import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType;
 
@@ -53,31 +54,31 @@ public class InternalRequestConfigRetrievalTest {
     @Test
     public void nullSearchableFieldNameThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Field name cannot be null or empty");
+        thrown.expectMessage("Signature cannot be null or empty");
 
         config.getSignature(null);
     }
 
     @Test
-    public void emptySearchableFieldNameThrowsException() throws Exception {
+    public void emptySignatureThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Field name cannot be null or empty");
+        thrown.expectMessage("Signature cannot be null or empty");
 
-        config.getSignature("");
+        config.getSignature(asSet());
     }
 
     @Test
     public void nonSearchableFieldNameReturnsEmptyOptional() throws Exception {
         String nonSearchableField = "nonField";
 
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(nonSearchableField);
+        Optional<RequestConfig> fieldConfigOpt = config.getSignature(asSet(nonSearchableField));
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
 
     @Test
     public void searchableFieldNameReturnsPopulatedOptional() throws Exception {
-        Optional<RequestConfig> fieldConfigOpt = config.getSignature(SEARCHABLE_FIELD_NAME);
+        Optional<RequestConfig> fieldConfigOpt = config.getSignature(asSet(SEARCHABLE_FIELD_NAME));
 
         assertThat(fieldConfigOpt, is(Optional.of(FIELD_EXECUTION_CONFIG)));
     }
