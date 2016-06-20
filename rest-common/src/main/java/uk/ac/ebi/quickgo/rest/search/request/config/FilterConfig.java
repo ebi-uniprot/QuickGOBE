@@ -17,7 +17,7 @@ import static java.util.Arrays.asList;
  *
  * @author Ricardo Antunes
  */
-public class RequestConfig {
+public class FilterConfig {
     private static final String COMMA = ",";
     private Set<String> signature;
     private ExecutionType execution;
@@ -59,7 +59,7 @@ public class RequestConfig {
             return false;
         }
 
-        RequestConfig that = (RequestConfig) o;
+        FilterConfig that = (FilterConfig) o;
 
         if (signature != null ? !signature.equals(that.signature) : that.signature != null) {
             return false;

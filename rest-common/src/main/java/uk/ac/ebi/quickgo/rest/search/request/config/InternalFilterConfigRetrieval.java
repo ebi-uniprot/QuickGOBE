@@ -13,13 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Takes care of providing {@link RequestConfig} instances for {@link FilterRequest}
+ * Takes care of providing {@link FilterConfig} instances for {@link FilterRequest}
  * signatures that are searchable via the provided{@link SearchableDocumentFields} instance.
  *
  * @author Ricardo Antunes
  */
 @Component class InternalFilterConfigRetrieval implements FilterConfigRetrieval {
-    private final Map<Set<String>, RequestConfig> executionConfigs;
+    private final Map<Set<String>, FilterConfig> executionConfigs;
 
     @Autowired
     public InternalFilterConfigRetrieval(SearchableDocumentFields searchableDocumentFields) {
@@ -29,23 +29,23 @@ import org.springframework.stereotype.Component;
         executionConfigs = populateExecutionConfigs(searchableDocumentFields);
     }
 
-    @Override public Optional<RequestConfig> getBySignature(Set<String> signature) {
+    @Override public Optional<FilterConfig> getBySignature(Set<String> signature) {
         Preconditions
                 .checkArgument(signature != null && !signature.isEmpty(), "Signature cannot be null or empty");
         return Optional.ofNullable(executionConfigs.get(signature));
     }
 
-    private Map<Set<String>, RequestConfig> populateExecutionConfigs(SearchableDocumentFields
+    private Map<Set<String>, FilterConfig> populateExecutionConfigs(SearchableDocumentFields
             searchableDocumentFields) {
-        final RequestConfig.ExecutionType executionType = RequestConfig.ExecutionType.SIMPLE;
+        final FilterConfig.ExecutionType executionType = FilterConfig.ExecutionType.SIMPLE;
 
         return searchableDocumentFields.searchableDocumentFields()
                 .map(field -> createRequestConfig(field, executionType))
-                .collect(Collectors.toMap(RequestConfig::getSignature, Function.identity()));
+                .collect(Collectors.toMap(FilterConfig::getSignature, Function.identity()));
     }
 
-    private RequestConfig createRequestConfig(String signature, RequestConfig.ExecutionType type) {
-        RequestConfig config = new RequestConfig();
+    private FilterConfig createRequestConfig(String signature, FilterConfig.ExecutionType type) {
+        FilterConfig config = new FilterConfig();
         config.setSignature(signature);
         config.setExecution(type);
 

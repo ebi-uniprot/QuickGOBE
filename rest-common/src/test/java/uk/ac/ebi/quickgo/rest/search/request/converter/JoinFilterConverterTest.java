@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,19 +27,19 @@ public class JoinFilterConverterTest {
     private static final String TO_TABLE_VALUE = "TO_TABLE";
     private static final String TO_ATTRIBUTE_VALUE = "TO_ATTRIBUTE";
 
-    private RequestConfig requestConfig;
+    private FilterConfig filterConfig;
     private JoinFilterConverter converter;
     private Map<String, String> configPropertiesMap;
 
     @Before
     public void setUp() {
-        this.requestConfig = new RequestConfig();
+        this.filterConfig = new FilterConfig();
         this.configPropertiesMap = new HashMap<>();
     }
 
     private void initialiseConverter() {
-        requestConfig.setProperties(configPropertiesMap);
-        this.converter = new JoinFilterConverter(this.requestConfig);
+        filterConfig.setProperties(configPropertiesMap);
+        this.converter = new JoinFilterConverter(this.filterConfig);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -108,7 +108,7 @@ public class JoinFilterConverterTest {
                         FROM_ATTRIBUTE_VALUE,
                         TO_TABLE_VALUE,
                         TO_ATTRIBUTE_VALUE,
-                        new SimpleFilterConverter(requestConfig).transform(request));
+                        new SimpleFilterConverter(filterConfig).transform(request));
 
         assertThat(resultingQuery, is(expectedQuery));
     }

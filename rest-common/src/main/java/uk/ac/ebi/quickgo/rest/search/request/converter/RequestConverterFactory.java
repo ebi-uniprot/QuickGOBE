@@ -2,8 +2,8 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
-import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
@@ -28,16 +28,16 @@ public class RequestConverterFactory {
     }
 
     public QuickGOQuery convert(FilterRequest request) {
-        Optional<RequestConfig> configOpt = filterConfigRetrieval.getBySignature(request.getSignature());
+        Optional<FilterConfig> configOpt = filterConfigRetrieval.getBySignature(request.getSignature());
         if (configOpt.isPresent()) {
-            RequestConfig requestConfig = configOpt.get();
-            switch (requestConfig.getExecution()) {
+            FilterConfig filterConfig = configOpt.get();
+            switch (filterConfig.getExecution()) {
                 case REST_COMM:
-                    return new RESTFilterConverter(requestConfig).transform(request);
+                    return new RESTFilterConverter(filterConfig).transform(request);
                 case SIMPLE:
-                    return new SimpleFilterConverter(requestConfig).transform(request);
+                    return new SimpleFilterConverter(filterConfig).transform(request);
                 case JOIN:
-                    return new JoinFilterConverter(requestConfig).transform(request);
+                    return new JoinFilterConverter(filterConfig).transform(request);
                 default:
                     throw new IllegalStateException(
                             "RequestConfig execution has not been handled " +

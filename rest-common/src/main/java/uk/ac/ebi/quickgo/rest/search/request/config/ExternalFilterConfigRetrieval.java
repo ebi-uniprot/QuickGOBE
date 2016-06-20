@@ -22,27 +22,27 @@ import org.springframework.stereotype.Component;
         implements FilterConfigRetrieval {
 
     @NestedConfigurationProperty
-    private List<RequestConfig> requestConfigs = new ArrayList<>();
+    private List<FilterConfig> filterConfigs = new ArrayList<>();
 
-    public List<RequestConfig> getRequestConfigs() {
-        return requestConfigs;
+    public List<FilterConfig> getFilterConfigs() {
+        return filterConfigs;
     }
 
-    public void setRequestConfigs(List<RequestConfig> requestConfigs) {
-        if(requestConfigs != null) {
-            this.requestConfigs = requestConfigs;
+    public void setFilterConfigs(List<FilterConfig> filterConfigs) {
+        if (filterConfigs != null) {
+            this.filterConfigs = filterConfigs;
         }
     }
 
     @Override
-    public Optional<RequestConfig> getBySignature(Set<String> signature) {
-        return requestConfigs.stream()
+    public Optional<FilterConfig> getBySignature(Set<String> signature) {
+        return filterConfigs.stream()
                 .filter(field -> field.getSignature().equals(signature))
                 .findFirst();
     }
 
     @Override public int hashCode() {
-        return requestConfigs.hashCode();
+        return filterConfigs.hashCode();
     }
 
     @Override public boolean equals(Object o) {
@@ -55,13 +55,13 @@ import org.springframework.stereotype.Component;
 
         ExternalFilterConfigRetrieval that = (ExternalFilterConfigRetrieval) o;
 
-        return requestConfigs.equals(that.requestConfigs);
+        return filterConfigs.equals(that.filterConfigs);
 
     }
 
     @Override public String toString() {
         return "ExternalRequestConfigRetrieval{" +
-                "requestConfigs=" + requestConfigs +
+                "requestConfigs=" + filterConfigs +
                 '}';
     }
 }

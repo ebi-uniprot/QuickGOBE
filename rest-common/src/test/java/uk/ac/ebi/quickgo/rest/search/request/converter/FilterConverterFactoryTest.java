@@ -2,8 +2,8 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
-import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +17,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType.JOIN;
-import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType.SIMPLE;
+import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType.JOIN;
+import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType.SIMPLE;
 import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinFilterConverter.FROM_ATTRIBUTE_NAME;
 import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinFilterConverter.FROM_TABLE_NAME;
 import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinFilterConverter.TO_ATTRIBUTE_NAME;
@@ -33,7 +33,7 @@ public class FilterConverterFactoryTest {
     @Mock
     private FilterConfigRetrieval filterConfigRetrievalMock;
     @Mock
-    private RequestConfig requestConfigMock;
+    private FilterConfig filterConfigMock;
 
     private RequestConverterFactory converter;
 
@@ -55,8 +55,8 @@ public class FilterConverterFactoryTest {
         FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
 
         when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
-               .thenReturn(Optional.of(requestConfigMock));
-        when(requestConfigMock.getExecution()).thenReturn(SIMPLE);
+                .thenReturn(Optional.of(filterConfigMock));
+        when(filterConfigMock.getExecution()).thenReturn(SIMPLE);
 
         QuickGOQuery resultingQuery = converter.convert(request);
         QuickGOQuery expectedQuery = QuickGOQuery.createQuery(field, value);
@@ -72,7 +72,7 @@ public class FilterConverterFactoryTest {
 
         when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
                 .thenReturn(Optional.empty());
-        when(requestConfigMock.getExecution()).thenReturn(SIMPLE);
+        when(filterConfigMock.getExecution()).thenReturn(SIMPLE);
 
         converter.convert(request);
     }
@@ -85,8 +85,8 @@ public class FilterConverterFactoryTest {
         FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
 
         when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
-                .thenReturn(Optional.of(requestConfigMock));
-        when(requestConfigMock.getExecution()).thenReturn(JOIN);
+                .thenReturn(Optional.of(filterConfigMock));
+        when(filterConfigMock.getExecution()).thenReturn(JOIN);
 
         String fromTable = "from table";
         String fromAttribute = "from attribute";
@@ -97,7 +97,7 @@ public class FilterConverterFactoryTest {
         configPropertiesMap.put(FROM_ATTRIBUTE_NAME, fromAttribute);
         configPropertiesMap.put(TO_TABLE_NAME, toTable);
         configPropertiesMap.put(TO_ATTRIBUTE_NAME, toAttribute);
-        when(requestConfigMock.getProperties()).thenReturn(configPropertiesMap);
+        when(filterConfigMock.getProperties()).thenReturn(configPropertiesMap);
 
         QuickGOQuery resultingQuery = converter.convert(request);
         QuickGOQuery expectedQuery = QuickGOQuery.createJoinQueryWithFilter(
@@ -119,7 +119,7 @@ public class FilterConverterFactoryTest {
 
         when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
                 .thenReturn(Optional.empty());
-        when(requestConfigMock.getExecution()).thenReturn(JOIN);
+        when(filterConfigMock.getExecution()).thenReturn(JOIN);
 
         setConfigPropertiesMap();
 
@@ -136,6 +136,6 @@ public class FilterConverterFactoryTest {
         configPropertiesMap.put(FROM_ATTRIBUTE_NAME, fromAttribute);
         configPropertiesMap.put(TO_TABLE_NAME, toTable);
         configPropertiesMap.put(TO_ATTRIBUTE_NAME, toAttribute);
-        when(requestConfigMock.getProperties()).thenReturn(configPropertiesMap);
+        when(filterConfigMock.getProperties()).thenReturn(configPropertiesMap);
     }
 }

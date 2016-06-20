@@ -14,8 +14,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.createExecutionConfig;
-import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType.JOIN;
-import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType.SIMPLE;
+import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType.JOIN;
+import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType.SIMPLE;
 
 /**
  * Tests the behaviour of the {@link ExternalFilterConfigRetrieval} class.
@@ -34,28 +34,28 @@ public class ExternalFilterConfigRetrievalTest {
 
     @Test
     public void newExternalFilterConfigHasNoFields() {
-        assertThat(config.getRequestConfigs(), hasSize(0));
+        assertThat(config.getFilterConfigs(), hasSize(0));
     }
 
     @Test
     public void newExternalFilterConfigReturnsEmptyOptionalWhenCallingGetField() {
-        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(asSet("field"));
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(asSet("field"));
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
 
     @Test
     public void settingFieldsToNullReturnsAnEmptyListWhenCallingGetFields() {
-        config.setRequestConfigs(null);
+        config.setFilterConfigs(null);
 
-        assertThat(config.getRequestConfigs(), hasSize(0));
+        assertThat(config.getFilterConfigs(), hasSize(0));
     }
 
     @Test
     public void settingFieldsToNullReturnsEmptyOptionalWhenCallingGetField(){
-        config.setRequestConfigs(null);
+        config.setFilterConfigs(null);
 
-        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(asSet("field"));
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(asSet("field"));
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
@@ -63,23 +63,23 @@ public class ExternalFilterConfigRetrievalTest {
     @Test
     public void settingFieldsWithOneFieldExecutionConfigReturnsAListWithThatField() {
         String name = "name";
-        RequestConfig.ExecutionType type = SIMPLE;
+        FilterConfig.ExecutionType type = SIMPLE;
 
-        RequestConfig field = createExecutionConfig(name, type);
+        FilterConfig field = createExecutionConfig(name, type);
 
-        config.setRequestConfigs(Collections.singletonList(field));
+        config.setFilterConfigs(Collections.singletonList(field));
 
-        assertThat(config.getRequestConfigs(), contains(field));
+        assertThat(config.getFilterConfigs(), contains(field));
     }
 
     @Test
     public void gettingFieldWithRecognizedFieldNameReturnsAnPopulatedOptional() {
         String name = "aspect";
-        RequestConfig.ExecutionType type = JOIN;
+        FilterConfig.ExecutionType type = JOIN;
 
-        RequestConfig field = createExecutionConfig(name, type);
+        FilterConfig field = createExecutionConfig(name, type);
 
-        config.setRequestConfigs(Collections.singletonList(field));
+        config.setFilterConfigs(Collections.singletonList(field));
 
         assertThat(config.getBySignature(asSet(name)), is(Optional.of(field)));
     }
@@ -87,11 +87,11 @@ public class ExternalFilterConfigRetrievalTest {
     @Test
     public void gettingFieldWithUnrecognizedFieldNameReturnsAnEmptyOptional() {
         String name = "aspect";
-        RequestConfig.ExecutionType type = JOIN;
+        FilterConfig.ExecutionType type = JOIN;
 
-        RequestConfig field = createExecutionConfig(name, type);
+        FilterConfig field = createExecutionConfig(name, type);
 
-        config.setRequestConfigs(Collections.singletonList(field));
+        config.setFilterConfigs(Collections.singletonList(field));
 
         assertThat(config.getBySignature(asSet("fake")), is(Optional.empty()));
     }
@@ -99,17 +99,17 @@ public class ExternalFilterConfigRetrievalTest {
     @Test
     public void getsFirstOfTwoFieldsWithTheSameName() {
         String name = "field";
-        RequestConfig.ExecutionType type1 = JOIN;
-        RequestConfig.ExecutionType type2 = SIMPLE;
+        FilterConfig.ExecutionType type1 = JOIN;
+        FilterConfig.ExecutionType type2 = SIMPLE;
 
-        RequestConfig field1 = createExecutionConfig(name, type1);
-        RequestConfig field2 = createExecutionConfig(name, type2);
+        FilterConfig field1 = createExecutionConfig(name, type1);
+        FilterConfig field2 = createExecutionConfig(name, type2);
 
-        config.setRequestConfigs(Arrays.asList(field1, field2));
+        config.setFilterConfigs(Arrays.asList(field1, field2));
 
-        Optional<RequestConfig> retrievedFieldOpt = config.getBySignature(asSet(name));
+        Optional<FilterConfig> retrievedFieldOpt = config.getBySignature(asSet(name));
 
-        RequestConfig retrievedField = retrievedFieldOpt.get();
+        FilterConfig retrievedField = retrievedFieldOpt.get();
 
         assertThat(retrievedField.getSignature(), is(asSet(name)));
         assertThat(retrievedField.getExecution(), is(JOIN));

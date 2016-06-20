@@ -16,7 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.asSet;
-import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType;
+import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType;
 
 /**
  * Test the behaviour of the {@link GlobalFilterConfigRetrieval} class.
@@ -76,14 +76,14 @@ public class GlobalFilterConfigRetrievalTest {
         String internalFieldName = "field";
         Set<String> internalFieldSet = asSet(internalFieldName);
 
-        Optional<RequestConfig> expectedFieldConfigOpt = Optional.of(
+        Optional<FilterConfig> expectedFieldConfigOpt = Optional.of(
                 FilterUtil.createExecutionConfig(internalFieldName, ExecutionType.SIMPLE)
         );
 
         when(internalConfigMock.getBySignature(internalFieldSet)).thenReturn(expectedFieldConfigOpt);
         when(externalConfigMock.getBySignature(internalFieldSet)).thenReturn(Optional.empty());
 
-        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(internalFieldSet);
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(internalFieldSet);
 
         assertThat(fieldConfigOpt, is(expectedFieldConfigOpt));
     }
@@ -95,14 +95,14 @@ public class GlobalFilterConfigRetrievalTest {
 
         when(internalConfigMock.getBySignature(externalFieldSet)).thenReturn(Optional.empty());
 
-        Optional<RequestConfig> expectedFieldConfigOpt = Optional.of(
+        Optional<FilterConfig> expectedFieldConfigOpt = Optional.of(
                 FilterUtil.createExecutionConfig(externalFieldName, ExecutionType.SIMPLE)
         );
 
         when(internalConfigMock.getBySignature(externalFieldSet)).thenReturn(Optional.empty());
         when(externalConfigMock.getBySignature(externalFieldSet)).thenReturn(expectedFieldConfigOpt);
 
-        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(externalFieldSet);
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(externalFieldSet);
 
         assertThat(fieldConfigOpt, is(expectedFieldConfigOpt));
     }
@@ -115,7 +115,7 @@ public class GlobalFilterConfigRetrievalTest {
         when(internalConfigMock.getBySignature(unknownFieldSet)).thenReturn(Optional.empty());
         when(externalConfigMock.getBySignature(unknownFieldSet)).thenReturn(Optional.empty());
 
-        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(unknownFieldSet);
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(unknownFieldSet);
 
         assertThat(fieldConfigOpt, is(Optional.empty()));
     }
@@ -125,20 +125,20 @@ public class GlobalFilterConfigRetrievalTest {
         String searchableField = "field";
         Set<String> searchableFieldSet = asSet(searchableField);
 
-        Optional<RequestConfig> internalFieldConfigOpt = Optional.of(
+        Optional<FilterConfig> internalFieldConfigOpt = Optional.of(
                 FilterUtil.createExecutionConfig(searchableField, ExecutionType.SIMPLE)
         );
 
-        Optional<RequestConfig> externalFieldConfigOpt = Optional.of(
+        Optional<FilterConfig> externalFieldConfigOpt = Optional.of(
                 FilterUtil.createExecutionConfig(searchableField, ExecutionType.JOIN)
         );
 
         when(internalConfigMock.getBySignature(searchableFieldSet)).thenReturn(internalFieldConfigOpt);
         when(externalConfigMock.getBySignature(searchableFieldSet)).thenReturn(externalFieldConfigOpt);
 
-        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(searchableFieldSet);
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(searchableFieldSet);
 
-        RequestConfig retrievedField = fieldConfigOpt.get();
+        FilterConfig retrievedField = fieldConfigOpt.get();
 
         assertThat(retrievedField.getSignature(), is(asSet(searchableField)));
         assertThat(retrievedField.getExecution(), is(ExecutionType.SIMPLE));

@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import com.google.common.base.Preconditions;
 import com.jayway.jsonpath.JsonPath;
@@ -29,12 +29,12 @@ class RESTFilterConverter implements FilterConverter {
 
     private static final Logger LOGGER = getLogger(RESTFilterConverter.class);
 
-    private final RequestConfig requestConfig;
+    private final FilterConfig filterConfig;
     private final String localField;
 
-    RESTFilterConverter(RequestConfig requestConfig) {
-        this.requestConfig = requestConfig;
-        this.localField = requestConfig.getProperties().get(LOCAL_FIELD);
+    RESTFilterConverter(FilterConfig filterConfig) {
+        this.filterConfig = filterConfig;
+        this.localField = filterConfig.getProperties().get(LOCAL_FIELD);
     }
 
     @Override public QuickGOQuery transform(FilterRequest request) {

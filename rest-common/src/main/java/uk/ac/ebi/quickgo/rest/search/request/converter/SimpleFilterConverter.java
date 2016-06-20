@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import com.google.common.base.Preconditions;
 import java.util.Collection;
@@ -16,12 +16,12 @@ import java.util.stream.Stream;
  */
 class SimpleFilterConverter implements FilterConverter {
 
-    private final RequestConfig requestConfig;
+    private final FilterConfig filterConfig;
 
-    SimpleFilterConverter(RequestConfig requestConfig) {
-        Preconditions.checkArgument(requestConfig != null, "RequestConfig cannot be null");
+    SimpleFilterConverter(FilterConfig filterConfig) {
+        Preconditions.checkArgument(filterConfig != null, "RequestConfig cannot be null");
 
-        this.requestConfig = requestConfig;
+        this.filterConfig = filterConfig;
     }
 
     /**
@@ -45,6 +45,6 @@ class SimpleFilterConverter implements FilterConverter {
                         .createQuery(request.getSignature().stream().collect(Collectors.joining()), value))
                 .reduce(QuickGOQuery::or)
                 .orElseThrow(() -> new IllegalStateException("Unable to create SimpleRequestConverter using: " +
-                        request + " and " + requestConfig));
+                        request + " and " + filterConfig));
     }
 }

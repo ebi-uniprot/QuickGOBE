@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
@@ -28,22 +28,22 @@ class JoinFilterConverter implements FilterConverter {
     private final String toTable;
     private final String toAttribute;
 
-    private final RequestConfig requestConfig;
+    private final FilterConfig filterConfig;
 
     /**
-     * A join request converter uses the {@link RequestConfig} instance passed as parameter
+     * A join request converter uses the {@link FilterConfig} instance passed as parameter
      * to retrieve the join parameters: from/to which tables, and on which attributes.
-     * @param requestConfig the execution configuration details associated with client requests
+     * @param filterConfig the execution configuration details associated with client requests
      */
-    JoinFilterConverter(RequestConfig requestConfig) {
-        validateRequestConfig(requestConfig);
+    JoinFilterConverter(FilterConfig filterConfig) {
+        validateRequestConfig(filterConfig);
 
-        this.requestConfig = requestConfig;
+        this.filterConfig = filterConfig;
 
-        this.fromTable = this.requestConfig.getProperties().get(FROM_TABLE_NAME);
-        this.fromAttribute = this.requestConfig.getProperties().get(FROM_ATTRIBUTE_NAME);
-        this.toTable = this.requestConfig.getProperties().get(TO_TABLE_NAME);
-        this.toAttribute = this.requestConfig.getProperties().get(TO_ATTRIBUTE_NAME);
+        this.fromTable = this.filterConfig.getProperties().get(FROM_TABLE_NAME);
+        this.fromAttribute = this.filterConfig.getProperties().get(FROM_ATTRIBUTE_NAME);
+        this.toTable = this.filterConfig.getProperties().get(TO_TABLE_NAME);
+        this.toAttribute = this.filterConfig.getProperties().get(TO_ATTRIBUTE_NAME);
     }
 
     /**
@@ -65,17 +65,17 @@ class JoinFilterConverter implements FilterConverter {
                     fromAttribute,
                     toTable,
                     toAttribute,
-                    new SimpleFilterConverter(requestConfig).transform(request));
+                    new SimpleFilterConverter(filterConfig).transform(request));
         }
     }
 
-    private void validateRequestConfig(RequestConfig requestConfig) {
-        Preconditions.checkArgument(requestConfig != null, "RequestConfig cannot be null");
+    private void validateRequestConfig(FilterConfig filterConfig) {
+        Preconditions.checkArgument(filterConfig != null, "RequestConfig cannot be null");
 
         for (String requiredProperty : REQUIRED_PROPERTY_KEYS) {
             Preconditions.checkArgument(
-                    requestConfig.getProperties().containsKey(requiredProperty)
-                            && !requestConfig.getProperties().get(requiredProperty).trim().isEmpty(),
+                    filterConfig.getProperties().containsKey(requiredProperty)
+                            && !filterConfig.getProperties().get(requiredProperty).trim().isEmpty(),
                     "RequestConfig properties should contain " + requiredProperty + " key.");
         }
     }
