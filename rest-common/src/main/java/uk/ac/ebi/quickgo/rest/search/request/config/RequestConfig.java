@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
-import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import com.google.common.base.Preconditions;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.Set;
 import static java.util.Arrays.asList;
 
 /**
- * Defines a data structure that indicates how a {@link ClientRequest} within a table/collection should be processed.
+ * Defines a data structure that indicates how a {@link FilterRequest} within a table/collection should be processed.
  * </p>
  * Note: this class needs to remain public for Spring wiring purposes.
  *

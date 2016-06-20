@@ -18,18 +18,18 @@ import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.Executi
 import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType.SIMPLE;
 
 /**
- * Tests the behaviour of the {@link ExternalRequestConfigRetrieval} class.
+ * Tests the behaviour of the {@link ExternalFilterConfigRetrieval} class.
  */
-public class ExternalRequestConfigRetrievalTest {
+public class ExternalFilterConfigRetrievalTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private ExternalRequestConfigRetrieval config;
+    private ExternalFilterConfigRetrieval config;
 
 
     @Before
     public void setUp() throws Exception {
-        config = new ExternalRequestConfigRetrieval();
+        config = new ExternalFilterConfigRetrieval();
     }
 
     @Test

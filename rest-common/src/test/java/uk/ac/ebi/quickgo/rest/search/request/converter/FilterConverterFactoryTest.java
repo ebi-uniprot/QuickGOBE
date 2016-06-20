@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
-import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfigRetrieval;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,19 +19,19 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType.JOIN;
 import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType.SIMPLE;
-import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinRequestConverter.FROM_ATTRIBUTE_NAME;
-import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinRequestConverter.FROM_TABLE_NAME;
-import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinRequestConverter.TO_ATTRIBUTE_NAME;
-import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinRequestConverter.TO_TABLE_NAME;
+import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinFilterConverter.FROM_ATTRIBUTE_NAME;
+import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinFilterConverter.FROM_TABLE_NAME;
+import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinFilterConverter.TO_ATTRIBUTE_NAME;
+import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinFilterConverter.TO_TABLE_NAME;
 
 /**
  * Created 06/06/16
  * @author Edd
  */
 @RunWith(MockitoJUnitRunner.class)
-public class RequestConverterFactoryTest {
+public class FilterConverterFactoryTest {
     @Mock
-    private RequestConfigRetrieval requestConfigRetrievalMock;
+    private FilterConfigRetrieval filterConfigRetrievalMock;
     @Mock
     private RequestConfig requestConfigMock;
 
@@ -39,7 +39,7 @@ public class RequestConverterFactoryTest {
 
     @Before
     public void setUp() {
-        this.converter = new RequestConverterFactory(requestConfigRetrievalMock);
+        this.converter = new RequestConverterFactory(filterConfigRetrievalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -52,9 +52,9 @@ public class RequestConverterFactoryTest {
     public void createsQueryForCorrectlyConfiguredSimpleRequest() {
         String value = "valueX";
         String field = "fieldX";
-        ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
+        FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
 
-        when(requestConfigRetrievalMock.getBySignature(request.getSignature()))
+        when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
                .thenReturn(Optional.of(requestConfigMock));
         when(requestConfigMock.getExecution()).thenReturn(SIMPLE);
 
@@ -68,9 +68,9 @@ public class RequestConverterFactoryTest {
     public void missingSignatureInConfigForSimpleRequestCausesException() {
         String value = "valueX";
         String field = "fieldX";
-        ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
+        FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
 
-        when(requestConfigRetrievalMock.getBySignature(request.getSignature()))
+        when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
                 .thenReturn(Optional.empty());
         when(requestConfigMock.getExecution()).thenReturn(SIMPLE);
 
@@ -82,9 +82,9 @@ public class RequestConverterFactoryTest {
     public void createsQueryForCorrectlyConfiguredJoinRequest() {
         String value = "valueX";
         String field = "fieldX";
-        ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
+        FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
 
-        when(requestConfigRetrievalMock.getBySignature(request.getSignature()))
+        when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
                 .thenReturn(Optional.of(requestConfigMock));
         when(requestConfigMock.getExecution()).thenReturn(JOIN);
 
@@ -115,9 +115,9 @@ public class RequestConverterFactoryTest {
     public void missingSignatureInConfigForJoinRequestCausesException() {
         String value = "valueX";
         String field = "fieldX";
-        ClientRequest request = ClientRequest.newBuilder().addProperty(field, value).build();
+        FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
 
-        when(requestConfigRetrievalMock.getBySignature(request.getSignature()))
+        when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
                 .thenReturn(Optional.empty());
         when(requestConfigMock.getExecution()).thenReturn(JOIN);
 

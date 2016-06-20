@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSI
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
  *
- * Each request parameter value, in CSV format, is encapsulated by a {@link ClientRequest}.
+ * Each request parameter value, in CSV format, is encapsulated by a {@link FilterRequest}.
  *
  * @author Tony Wardell
  * Date: 25/04/2016
@@ -84,19 +84,19 @@ public class AnnotationRequest {
         this.page = page;
     }
 
-    public List<ClientRequest> createRequestFilters() {
-        List<ClientRequest> clientRequests = new ArrayList<>();
+    public List<FilterRequest> createRequestFilters() {
+        List<FilterRequest> filterRequests = new ArrayList<>();
 
-        createSimpleFilter(ASPECT_FIELD).ifPresent(clientRequests::add);
-        createSimpleFilter(ASSIGNED_BY).ifPresent(clientRequests::add);
+        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
+        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
 
-        return clientRequests;
+        return filterRequests;
     }
 
-    private Optional<ClientRequest> createSimpleFilter(String key) {
-        Optional<ClientRequest> request;
+    private Optional<FilterRequest> createSimpleFilter(String key) {
+        Optional<FilterRequest> request;
         if (requestMap.containsKey(key)) {
-            ClientRequest.Builder requestBuilder = ClientRequest.newBuilder();
+            FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
             requestBuilder.addProperty(key, requestMap.get(key).split(COMMA));
             request = Optional.of(requestBuilder.build());
         } else {

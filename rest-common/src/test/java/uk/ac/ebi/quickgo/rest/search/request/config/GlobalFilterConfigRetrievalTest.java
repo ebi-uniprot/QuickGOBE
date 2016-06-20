@@ -19,24 +19,24 @@ import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType;
 
 /**
- * Test the behaviour of the {@link GlobalRequestConfigRetrieval} class.
+ * Test the behaviour of the {@link GlobalFilterConfigRetrieval} class.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class GlobalRequestConfigRetrievalTest {
+public class GlobalFilterConfigRetrievalTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private GlobalRequestConfigRetrieval config;
+    private GlobalFilterConfigRetrieval config;
 
     @Mock
-    private ExternalRequestConfigRetrieval externalConfigMock;
+    private ExternalFilterConfigRetrieval externalConfigMock;
 
     @Mock
-    private InternalRequestConfigRetrieval internalConfigMock;
+    private InternalFilterConfigRetrieval internalConfigMock;
 
     @Before
     public void setUp() throws Exception {
-        config = new GlobalRequestConfigRetrieval(internalConfigMock, externalConfigMock);
+        config = new GlobalFilterConfigRetrieval(internalConfigMock, externalConfigMock);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class GlobalRequestConfigRetrievalTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("InternalExecutionConfiguration cannot be null.");
 
-        config = new GlobalRequestConfigRetrieval(null, externalConfigMock);
+        config = new GlobalFilterConfigRetrieval(null, externalConfigMock);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class GlobalRequestConfigRetrievalTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("ExternalExecutionConfiguration cannot be null.");
 
-        config = new GlobalRequestConfigRetrieval(internalConfigMock, null);
+        config = new GlobalFilterConfigRetrieval(internalConfigMock, null);
     }
 
     @Test

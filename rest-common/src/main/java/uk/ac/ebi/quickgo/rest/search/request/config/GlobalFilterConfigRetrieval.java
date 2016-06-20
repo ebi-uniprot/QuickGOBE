@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
-import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
@@ -11,22 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Holds the definitions of both the {@link InternalRequestConfigRetrieval} and the
- * {@link ExternalRequestConfigRetrieval}. It is then capable of providing information for all types of
- * {@link ClientRequest} instance signatures.
+ * Holds the definitions of both the {@link InternalFilterConfigRetrieval} and the
+ * {@link ExternalFilterConfigRetrieval}. It is then capable of providing information for all types of
+ * {@link FilterRequest} instance signatures.
  *
  * @author Ricardo Antunes
  */
-@Component class GlobalRequestConfigRetrieval implements RequestConfigRetrieval {
+@Component class GlobalFilterConfigRetrieval implements FilterConfigRetrieval {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final InternalRequestConfigRetrieval internalExecutionConfig;
-    private final ExternalRequestConfigRetrieval externalExecutionConfig;
+    private final InternalFilterConfigRetrieval internalExecutionConfig;
+    private final ExternalFilterConfigRetrieval externalExecutionConfig;
 
     @Autowired
-    public GlobalRequestConfigRetrieval(
-            InternalRequestConfigRetrieval internalExecutionConfig,
-            ExternalRequestConfigRetrieval externalExecutionConfig) {
+    public GlobalFilterConfigRetrieval(
+            InternalFilterConfigRetrieval internalExecutionConfig,
+            ExternalFilterConfigRetrieval externalExecutionConfig) {
         Preconditions.checkArgument(internalExecutionConfig != null, "InternalExecutionConfiguration cannot be null.");
         Preconditions.checkArgument(externalExecutionConfig != null, "ExternalExecutionConfiguration cannot be null.");
 
@@ -37,10 +37,10 @@ import org.springframework.stereotype.Component;
     /**
      * {@inheritDoc}
      *
-     * Note: This implementation looks first at the {@link InternalRequestConfigRetrieval} and then at
-     * {@link ExternalRequestConfigRetrieval} to find the required field.
+     * Note: This implementation looks first at the {@link InternalFilterConfigRetrieval} and then at
+     * {@link ExternalFilterConfigRetrieval} to find the required field.
      *
-     * @param signature the signature of the {@link ClientRequest} whose {@link RequestConfig} one wants
+     * @param signature the signature of the {@link FilterRequest} whose {@link RequestConfig} one wants
      * @return an Optional containing the correct {@link RequestConfig} or an empty Optional if no config is
      * found for the given signature.
      */

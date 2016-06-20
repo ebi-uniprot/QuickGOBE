@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
 import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import com.google.common.base.Preconditions;
 import java.util.Map;
@@ -12,17 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Takes care of providing {@link RequestConfig} instances for {@link uk.ac.ebi.quickgo.rest.search.request.ClientRequest}
+ * Takes care of providing {@link RequestConfig} instances for {@link FilterRequest}
  * signatures that are searchable via the provided{@link SearchableDocumentFields} instance.
  *
  * @author Ricardo Antunes
  */
-@Component
-class InternalRequestConfigRetrieval implements RequestConfigRetrieval {
+@Component class InternalFilterConfigRetrieval implements FilterConfigRetrieval {
     private final Map<Set<String>, RequestConfig> executionConfigs;
 
     @Autowired
-    public InternalRequestConfigRetrieval(SearchableDocumentFields searchableDocumentFields) {
+    public InternalFilterConfigRetrieval(SearchableDocumentFields searchableDocumentFields) {
         Preconditions
                 .checkArgument(searchableDocumentFields != null, "SearchableDocumentFields instance cannot be null.");
 

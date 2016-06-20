@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request;
 
-import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfigRetrieval;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 
 import com.google.common.base.Preconditions;
 import java.util.*;
@@ -8,15 +8,15 @@ import java.util.*;
 import static java.util.Arrays.asList;
 
 /**
- * The contract required by a client's query request.
+ * Represents a client's filter request.
  *
  * Created 02/06/16
  * @author Edd
  */
-public class ClientRequest {
+public class FilterRequest {
     private final Map<String, List<String>> properties;
 
-    private ClientRequest(Builder builder) {
+    private FilterRequest(Builder builder) {
         this.properties = builder.properties;
     }
 
@@ -56,7 +56,7 @@ public class ClientRequest {
      *
      * <p>NB. The purpose of the signature is to allow one to identify
      * additional configuration details associated with this client request,
-     * which are retrieved by {@link RequestConfigRetrieval}
+     * which are retrieved by {@link FilterConfigRetrieval}
      *
      * @return the signature associated with this client request
      */
@@ -77,8 +77,8 @@ public class ClientRequest {
             return this;
         }
 
-        public ClientRequest build() {
-            return new ClientRequest(this);
+        public FilterRequest build() {
+            return new FilterRequest(this);
         }
     }
 }

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
 import com.google.common.base.Preconditions;
@@ -14,7 +14,7 @@ import static java.util.Arrays.asList;
  *
  * Created by Edd on 05/06/2016.
  */
-class JoinRequestConverter implements RequestConverter {
+class JoinFilterConverter implements FilterConverter {
 
     static final String FROM_TABLE_NAME = "fromTable";
     static final String FROM_ATTRIBUTE_NAME = "fromAttribute";
@@ -35,7 +35,7 @@ class JoinRequestConverter implements RequestConverter {
      * to retrieve the join parameters: from/to which tables, and on which attributes.
      * @param requestConfig the execution configuration details associated with client requests
      */
-    JoinRequestConverter(RequestConfig requestConfig) {
+    JoinFilterConverter(RequestConfig requestConfig) {
         validateRequestConfig(requestConfig);
 
         this.requestConfig = requestConfig;
@@ -47,14 +47,14 @@ class JoinRequestConverter implements RequestConverter {
     }
 
     /**
-     * Converts a given {@link ClientRequest} into a {@link QuickGOQuery} that represents
+     * Converts a given {@link FilterRequest} into a {@link QuickGOQuery} that represents
      * a join. If {@code request} has no values, a query with no filter is created. Otherwise,
      * a query is created with a filter corresponding to the {@code request}.
      *
      * @param request the client request
      * @return a {@link QuickGOQuery} corresponding to a join query, representing the original client request
      */
-    @Override public QuickGOQuery transform(ClientRequest request) {
+    @Override public QuickGOQuery transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "ClientRequest cannot be null");
 
         if (request.getValues().isEmpty()) {
@@ -65,7 +65,7 @@ class JoinRequestConverter implements RequestConverter {
                     fromAttribute,
                     toTable,
                     toAttribute,
-                    new SimpleRequestConverter(requestConfig).transform(request));
+                    new SimpleFilterConverter(requestConfig).transform(request));
         }
     }
 

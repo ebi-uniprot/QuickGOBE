@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
  * @author Ricardo Antunes
  */
 @Component
-@ConfigurationProperties(prefix = "search.external") class ExternalRequestConfigRetrieval
-        implements RequestConfigRetrieval {
+@ConfigurationProperties(prefix = "search.external") class ExternalFilterConfigRetrieval
+        implements FilterConfigRetrieval {
 
     @NestedConfigurationProperty
     private List<RequestConfig> requestConfigs = new ArrayList<>();
@@ -53,7 +53,7 @@ import org.springframework.stereotype.Component;
             return false;
         }
 
-        ExternalRequestConfigRetrieval that = (ExternalRequestConfigRetrieval) o;
+        ExternalFilterConfigRetrieval that = (ExternalFilterConfigRetrieval) o;
 
         return requestConfigs.equals(that.requestConfigs);
 

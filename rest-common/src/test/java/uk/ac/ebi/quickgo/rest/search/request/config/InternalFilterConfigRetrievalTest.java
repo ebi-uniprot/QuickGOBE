@@ -20,17 +20,17 @@ import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.createExecutionCo
 import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType;
 
 /**
- * Tests the behaviour of the {@link InternalRequestConfigRetrieval} class.
+ * Tests the behaviour of the {@link InternalFilterConfigRetrieval} class.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class InternalRequestConfigRetrievalTest {
+public class InternalFilterConfigRetrievalTest {
     private static final String SEARCHABLE_FIELD_NAME = "field";
     private static final RequestConfig FIELD_EXECUTION_CONFIG =
             createExecutionConfig(SEARCHABLE_FIELD_NAME, ExecutionType.SIMPLE);
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private InternalRequestConfigRetrieval config;
+    private InternalFilterConfigRetrieval config;
 
     @Mock
     private SearchableDocumentFields searchableDocumentFields;
@@ -40,7 +40,7 @@ public class InternalRequestConfigRetrievalTest {
         when(searchableDocumentFields.isDocumentSearchable(SEARCHABLE_FIELD_NAME)).thenReturn(true);
 
         when(searchableDocumentFields.searchableDocumentFields()).thenReturn(Stream.of(SEARCHABLE_FIELD_NAME));
-        config = new InternalRequestConfigRetrieval(searchableDocumentFields);
+        config = new InternalFilterConfigRetrieval(searchableDocumentFields);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class InternalRequestConfigRetrievalTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("SearchableDocumentFields instance cannot be null.");
 
-        config = new InternalRequestConfigRetrieval(null);
+        config = new InternalFilterConfigRetrieval(null);
     }
 
     @Test

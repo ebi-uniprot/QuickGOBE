@@ -15,22 +15,22 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * Created 17/06/16
  * @author Edd
  */
-public class ClientRequestTest {
+public class FilterRequestTest {
     @Test(expected = IllegalArgumentException.class)
     public void cannotCreateRequestWithNullName() {
-        ClientRequest.newBuilder().addProperty(null, "value");
+        FilterRequest.newBuilder().addProperty(null, "value");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotCreateRequestWithEmptyName() {
-        ClientRequest.newBuilder().addProperty("  ", "value");
+        FilterRequest.newBuilder().addProperty("  ", "value");
     }
 
     @Test
     public void createValidRequestWith1PropertyAnd1Value() {
         String field = "name";
         String fieldValue = "value";
-        ClientRequest request = ClientRequest.newBuilder().addProperty(field, fieldValue).build();
+        FilterRequest request = FilterRequest.newBuilder().addProperty(field, fieldValue).build();
         assertThat(request, is(notNullValue()));
         assertThat(request.getValue(field).isPresent(), is(true));
         assertThat(request.getValue(field).get(), contains(fieldValue));
@@ -39,7 +39,7 @@ public class ClientRequestTest {
     @Test
     public void createValidRequestWith1PropertyWithEmptyValue() {
         String field = "name";
-        ClientRequest request = ClientRequest.newBuilder().addProperty(field).build();
+        FilterRequest request = FilterRequest.newBuilder().addProperty(field).build();
         assertThat(request, is(notNullValue()));
         assertThat(request.getValue(field).isPresent(), is(true));
         assertThat(request.getValue(field).get(), is(empty()));
@@ -50,7 +50,7 @@ public class ClientRequestTest {
         String field = "name";
         String fieldValue1 = "value1";
         String fieldValue2 = "value2";
-        ClientRequest request = ClientRequest.newBuilder().addProperty(field, fieldValue1, fieldValue2).build();
+        FilterRequest request = FilterRequest.newBuilder().addProperty(field, fieldValue1, fieldValue2).build();
         assertThat(request, is(notNullValue()));
         assertThat(request.getValue(field).isPresent(), is(true));
         assertThat(request.getValue(field).get(), contains(fieldValue1, fieldValue2));
@@ -62,7 +62,7 @@ public class ClientRequestTest {
         String field1Value = "value1";
         String field2 = "name2";
         String field2Value = "value2";
-        ClientRequest request = ClientRequest.newBuilder()
+        FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(field1, field1Value)
                 .addProperty(field2, field2Value).build();
         assertThat(request, is(notNullValue()));
@@ -80,7 +80,7 @@ public class ClientRequestTest {
         String field2Value1 = "value2";
         String field2Value2 = "value3";
 
-        ClientRequest request = ClientRequest.newBuilder()
+        FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(field1, field1Value)
                 .addProperty(field2, field2Value1, field2Value2).build();
         assertThat(request, is(notNullValue()));

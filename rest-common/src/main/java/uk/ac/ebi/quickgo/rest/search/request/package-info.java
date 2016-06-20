@@ -1,7 +1,7 @@
 /**
  * Provides the classes necessary to create and process client request filters.
  * <p/>
- * {@link uk.ac.ebi.quickgo.rest.search.request.ClientRequest} instances are usually created by QuickGO REST
+ * {@link uk.ac.ebi.quickgo.rest.search.request.FilterRequest} instances are usually created by QuickGO REST
  * endpoints
  * when a client would like to filter down results from a query that (s)he has supplied.
  * <p/>
@@ -16,7 +16,7 @@
  * </ul>
  * The {@link uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverter} is the class responsible for deciding
  * how a
- * {@link uk.ac.ebi.quickgo.rest.search.request.ClientRequest} is to be processed. Note that the factory does not do
+ * {@link uk.ac.ebi.quickgo.rest.search.request.FilterRequest} is to be processed. Note that the factory does not do
  * the actual processing, it delegates this task to
  * {@link uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverter}.
  * There exist several implementations of the {@link uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverter

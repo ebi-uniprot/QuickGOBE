@@ -56,7 +56,7 @@ public class ExternalRequestConfigRetrievalIT {
     }
 
     @Autowired
-    private ExternalRequestConfigRetrieval externalFilterExecutionConfig;
+    private ExternalFilterConfigRetrieval externalFilterExecutionConfig;
 
     @Test
     public void yamlPropertiesLoadedCorrectlyIntoBean() {

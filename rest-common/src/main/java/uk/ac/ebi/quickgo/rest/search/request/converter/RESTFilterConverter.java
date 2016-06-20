@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.ClientRequest;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
 
 import com.google.common.base.Preconditions;
@@ -13,18 +13,18 @@ import com.google.common.base.Preconditions;
  *
  * Created by Edd on 05/06/2016.
  */
-class RESTRequestConverter implements RequestConverter  {
+class RESTFilterConverter implements FilterConverter {
     private static final String LOCAL_FIELD = "localField";
 
     private final RequestConfig requestConfig;
     private final String localField;
 
-    RESTRequestConverter(RequestConfig requestConfig) {
+    RESTFilterConverter(RequestConfig requestConfig) {
         this.requestConfig = requestConfig;
         this.localField = requestConfig.getProperties().get(LOCAL_FIELD);
     }
 
-    @Override public QuickGOQuery transform(ClientRequest request) {
+    @Override public QuickGOQuery transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "ClientRequest cannot be null");
 
         // create REST request executor
