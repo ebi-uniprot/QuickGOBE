@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
 /**
- * Checks if a given field is searchable searchable.
+ * Checks if a given field is searchable.
  *
  * @author Ricardo Antunes
  */
