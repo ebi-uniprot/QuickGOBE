@@ -1,28 +1,28 @@
 package uk.ac.ebi.quickgo.rest.search.request;
 
-import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
-import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType;
+import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType;
 
 public final class FilterUtil {
     private FilterUtil(){}
 
-    public static RequestConfig createExecutionConfig(String name, ExecutionType type) {
-        RequestConfig field = new RequestConfig();
+    public static FilterConfig createExecutionConfig(String name, ExecutionType type) {
+        FilterConfig field = new FilterConfig();
         field.setSignature(name);
         field.setExecution(type);
 
         return field;
     }
 
-    public static RequestConfig createExecutionConfigWithProps(String name, ExecutionType type,
+    public static FilterConfig createExecutionConfigWithProps(String name, ExecutionType type,
             Map<String, String> props) {
-        RequestConfig field = new RequestConfig();
+        FilterConfig field = new FilterConfig();
         field.setSignature(name);
         field.setExecution(type);
         field.setProperties(props);

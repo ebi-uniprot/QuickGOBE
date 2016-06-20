@@ -40,18 +40,18 @@ import org.springframework.stereotype.Component;
      * Note: This implementation looks first at the {@link InternalFilterConfigRetrieval} and then at
      * {@link ExternalFilterConfigRetrieval} to find the required field.
      *
-     * @param signature the signature of the {@link FilterRequest} whose {@link RequestConfig} one wants
-     * @return an Optional containing the correct {@link RequestConfig} or an empty Optional if no config is
+     * @param signature the signature of the {@link FilterRequest} whose {@link FilterConfig} one wants
+     * @return an Optional containing the correct {@link FilterConfig} or an empty Optional if no config is
      * found for the given signature.
      */
-    @Override public Optional<RequestConfig> getBySignature(Set<String> signature) {
+    @Override public Optional<FilterConfig> getBySignature(Set<String> signature) {
         Preconditions.checkArgument(signature != null && !signature.isEmpty(),
                 "Signature cannot be null or empty");
 
-        Optional<RequestConfig> internalConfig = internalExecutionConfig.getBySignature(signature);
-        Optional<RequestConfig> externalConfig = externalExecutionConfig.getBySignature(signature);
+        Optional<FilterConfig> internalConfig = internalExecutionConfig.getBySignature(signature);
+        Optional<FilterConfig> externalConfig = externalExecutionConfig.getBySignature(signature);
 
-        Optional<RequestConfig> config;
+        Optional<FilterConfig> config;
 
         if(internalConfig.isPresent() && externalConfig.isPresent()) {
             logger.warn(

@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-import uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,12 +25,12 @@ public class SimpleFilterConverterTest {
     private static final String FIELD_VALUE_2 = "value2";
 
     @Mock
-    private RequestConfig requestConfigMock;
+    private FilterConfig filterConfigMock;
     private SimpleFilterConverter converter;
 
     @Before
     public void setUp() {
-        this.converter = new SimpleFilterConverter(requestConfigMock);
+        this.converter = new SimpleFilterConverter(filterConfigMock);
     }
 
     @Test(expected = IllegalArgumentException.class)

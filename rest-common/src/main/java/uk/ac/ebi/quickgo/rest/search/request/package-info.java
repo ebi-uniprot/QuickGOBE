@@ -23,7 +23,7 @@
  * } interface,
  * each one tries to obtain the required information in a different way, e.g. contact another service, create a join
  * between two tables/collections or create a simple filter query. Any extra configuration required by the converter
- * is fed to them via the {@link uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig}.
+ * is fed to them via the {@link uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig}.
  *
  * @author Ricardo Antunes
  */

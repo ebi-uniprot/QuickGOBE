@@ -24,7 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType;
+import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ExternalRequestConfigRetrievalIT.TestApplication.class,
@@ -60,16 +60,16 @@ public class ExternalRequestConfigRetrievalIT {
 
     @Test
     public void yamlPropertiesLoadedCorrectlyIntoBean() {
-        List<RequestConfig> fieldConfigs = externalFilterExecutionConfig.getRequestConfigs();
+        List<FilterConfig> fieldConfigs = externalFilterExecutionConfig.getFilterConfigs();
 
-        RequestConfig aspectField = createStubAspectSignature();
-        RequestConfig usageField = createStubUsageSignature();
+        FilterConfig aspectField = createStubAspectSignature();
+        FilterConfig usageField = createStubUsageSignature();
 
         assertThat(fieldConfigs, hasSize(2));
         assertThat(fieldConfigs, containsInAnyOrder(aspectField, usageField));
     }
 
-    private RequestConfig createStubAspectSignature() {
+    private FilterConfig createStubAspectSignature() {
         Map<String, String> map = new HashMap<>();
         map.put("fromTable", "ontology");
         map.put("fromAttribute", "id");
@@ -79,7 +79,7 @@ public class ExternalRequestConfigRetrievalIT {
         return FilterUtil.createExecutionConfigWithProps("aspect", ExecutionType.JOIN, map);
     }
 
-    private RequestConfig createStubUsageSignature() {
+    private FilterConfig createStubUsageSignature() {
         Map<String, String> map = new HashMap<>();
         map.put("ip", "123.456.789");
         map.put("endpoint", "endpoint");

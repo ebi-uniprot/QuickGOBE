@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.createExecutionConfig;
-import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.ExecutionType;
+import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType;
 
 /**
  * Tests the behaviour of the {@link InternalFilterConfigRetrieval} class.
@@ -25,7 +25,7 @@ import static uk.ac.ebi.quickgo.rest.search.request.config.RequestConfig.Executi
 @RunWith(MockitoJUnitRunner.class)
 public class InternalFilterConfigRetrievalTest {
     private static final String SEARCHABLE_FIELD_NAME = "field";
-    private static final RequestConfig FIELD_EXECUTION_CONFIG =
+    private static final FilterConfig FIELD_EXECUTION_CONFIG =
             createExecutionConfig(SEARCHABLE_FIELD_NAME, ExecutionType.SIMPLE);
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -71,14 +71,14 @@ public class InternalFilterConfigRetrievalTest {
     public void nonSearchableFieldNameReturnsEmptyOptional() throws Exception {
         String nonSearchableField = "nonField";
 
-        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(asSet(nonSearchableField));
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(asSet(nonSearchableField));
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
 
     @Test
     public void searchableFieldNameReturnsPopulatedOptional() throws Exception {
-        Optional<RequestConfig> fieldConfigOpt = config.getBySignature(asSet(SEARCHABLE_FIELD_NAME));
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(asSet(SEARCHABLE_FIELD_NAME));
 
         assertThat(fieldConfigOpt, is(Optional.of(FIELD_EXECUTION_CONFIG)));
     }
