@@ -1,7 +1,10 @@
 package uk.ac.ebi.quickgo.rest.comm;
 
 import com.google.common.base.Preconditions;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.springframework.web.client.RestTemplate;
@@ -16,16 +19,16 @@ public class RESTRequesterImpl implements RESTRequester {
     private static final String EMPTY_URL = "";
     private static final Logger LOGGER = getLogger(RESTRequesterImpl.class);
     private final String url;
-    private Map<String, List<String>> requestParameters;
+    private Map<String, String> requestParameters;
 
     private RESTRequesterImpl() {
         this.url = EMPTY_URL;
         this.requestParameters = new HashMap<>();
     }
 
-    private RESTRequesterImpl(String url, Map<String, List<String>> requestParameters) {
+    private RESTRequesterImpl(String url, Map<String, String> requestParameters) {
         this.url = url;
-        this.requestParameters = requestParameters;
+        this.requestParameters = Collections.unmodifiableMap(requestParameters);
     }
 
     @Override
@@ -45,7 +48,7 @@ public class RESTRequesterImpl implements RESTRequester {
     public static class Builder {
 
         private String url;
-        private Map<String, List<String>> requestParameters;
+        private Map<String, String> requestParameters;
 
         Builder(String url) {
             checkURL(url);
@@ -70,14 +73,13 @@ public class RESTRequesterImpl implements RESTRequester {
             Preconditions.checkArgument(value != null && !value.trim().isEmpty(), "Value cannot be null or empty");
 
             if (!requestParameters.containsKey(name)) {
-                requestParameters.put(name, new ArrayList<>());
+                requestParameters.put(name, value);
             }
-            requestParameters.get(name).add(value);
 
             return this;
         }
 
-        public Builder setRequestParameters(Map<String, List<String>> requestParameters) {
+        public Builder setRequestParameters(Map<String, String> requestParameters) {
             Preconditions.checkArgument(requestParameters != null, "RequestParameters cannot be null");
 
             this.requestParameters = requestParameters;

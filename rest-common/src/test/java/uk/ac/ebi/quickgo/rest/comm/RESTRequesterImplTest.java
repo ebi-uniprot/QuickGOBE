@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.rest.comm;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -34,7 +32,7 @@ public class RESTRequesterImplTest {
 
     @Mock
     private RestTemplate restTemplateMock;
-    private Map<String, List<String>> requestParameters;
+    private Map<String, String> requestParameters;
 
     @Before
     public void setUp() {
@@ -168,9 +166,8 @@ public class RESTRequesterImplTest {
 
     private void addRequestParameter(String param, String value) {
         if (!requestParameters.containsKey(param)) {
-            requestParameters.put(param, new ArrayList<>());
+            requestParameters.put(param, value);
         }
-        requestParameters.get(param).add(value);
     }
 
     static class FakeDTO {

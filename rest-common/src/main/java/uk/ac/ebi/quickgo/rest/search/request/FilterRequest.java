@@ -17,7 +17,15 @@ public class FilterRequest {
     private final Map<String, List<String>> properties;
 
     private FilterRequest(Builder builder) {
-        this.properties = builder.properties;
+        this.properties = Collections.unmodifiableMap(builder.properties);
+    }
+
+    /**
+     * Get all of the properties associated with this filter request.
+     * @return the properties of this filter request.
+     */
+    public Map<String, List<String>> getProperties() {
+        return properties;
     }
 
     /**
