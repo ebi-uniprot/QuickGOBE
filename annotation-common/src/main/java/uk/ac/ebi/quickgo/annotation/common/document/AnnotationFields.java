@@ -52,6 +52,7 @@ public class AnnotationFields {
 
         public static final String ASSIGNED_BY = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
         public static final String TAXON_ID = storeAndGet(VALUES, AnnotationFields.TAXON_ID);
+        public static final String GO_EVIDENCE = storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);

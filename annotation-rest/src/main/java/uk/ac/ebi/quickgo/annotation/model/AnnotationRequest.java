@@ -55,7 +55,7 @@ public class AnnotationRequest {
     private static final String ASPECT_FIELD = "aspect";
 
     public void setAspect(String aspect) {
-        if(aspect != null) {
+        if (aspect != null) {
             filters.put(ASPECT_FIELD, aspect.toLowerCase());
         }
     }
@@ -63,6 +63,21 @@ public class AnnotationRequest {
     @Pattern(regexp = "(?i)biological_process|molecular_function|cellular_component")
     public String getAspect() {
         return filters.get(ASPECT_FIELD);
+    }
+
+    /**
+     * The older evidence codes
+     * E.g. IEA, IBA, IBD etc. See <a href="http://geneontology.org/page/guide-go-evidence-codes">Guide QuickGO
+     * evidence codes</a>
+     * @param evidence the evidence code
+     */
+    public void setGoEvidence(String evidence) {
+        filters.put(AnnotationFields.GO_EVIDENCE, evidence);
+    }
+
+    @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*")
+    public String getGoEvidence() {
+        return filters.get(AnnotationFields.GO_EVIDENCE);
     }
 
     public void setPage(int page) {
