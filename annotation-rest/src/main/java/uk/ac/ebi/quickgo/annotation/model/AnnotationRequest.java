@@ -60,7 +60,7 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "(?i)biological_process|molecular_function|cellular_component")
+    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = Pattern.Flag.CASE_INSENSITIVE)
     public String getAspect() {
         return filters.get(ASPECT_FIELD);
     }
