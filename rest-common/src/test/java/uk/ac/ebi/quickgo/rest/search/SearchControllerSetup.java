@@ -230,6 +230,6 @@ public abstract class SearchControllerSetup {
 
     private void checkErrorMessage(ResultActions result) throws Exception {
         result.andExpect(MockMvcResultMatchers.jsonPath("$.url", is(getRequestUrl(result))));
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.messages").exists());
     }
 }
