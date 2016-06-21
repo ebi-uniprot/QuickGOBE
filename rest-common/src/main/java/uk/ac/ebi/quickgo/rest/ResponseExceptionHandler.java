@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 /**
- * Handler responsible for returning error responses with a meaningful messages to the REST client.
+ * Handler responsible for returning error responses with meaningful messages to the REST client.
  *
  * @author Ricardo Antunes
  */
