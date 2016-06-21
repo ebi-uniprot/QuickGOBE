@@ -10,6 +10,7 @@ import javax.validation.ValidatorFactory;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -134,7 +135,10 @@ public class AnnotationRequestValidationIT {
 
         annotationRequest.setTaxon(taxId);
 
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(), is("Invalid taxonomic identifier: " + taxId));
     }
 
     @Test
@@ -143,10 +147,12 @@ public class AnnotationRequestValidationIT {
 
         Arrays.stream(invalidTaxonIdParms).forEach(
                 invalidValue -> {
-                    AnnotationRequest request = new AnnotationRequest();
                     annotationRequest.setTaxon(invalidValue);
 
-                    assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    assertThat(violations, hasSize(is(1)));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("Invalid taxonomic identifier: " + invalidValue));
                 }
         );
     }
