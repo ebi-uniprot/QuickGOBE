@@ -138,7 +138,7 @@ public class AnnotationRequestValidationIT {
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
         assertThat(violations, hasSize(1));
-        assertThat(violations.iterator().next().getMessage(), is("Invalid taxonomic identifier: " + taxId));
+        assertThat(violations.iterator().next().getMessage(), is("At least one invalid taxonomic identifier(s): " + taxId));
     }
 
     @Test
@@ -152,7 +152,7 @@ public class AnnotationRequestValidationIT {
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     assertThat(violations, hasSize(is(1)));
                     assertThat(violations.iterator().next().getMessage(),
-                            is("Invalid taxonomic identifier: " + invalidValue));
+                            is("At least one invalid taxonomic identifier(s): " + invalidValue));
                 }
         );
     }
@@ -176,12 +176,15 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void oneValidTaxIdAndOneInvalidTaxIdIsValid() {
+    public void oneValidTaxIdAndOneInvalidTaxIdIsInvalid() {
         String taxId = "2,-1";
 
         annotationRequest.setTaxon(taxId);
 
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(is(1)));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one invalid taxonomic identifier(s): " + taxId));
     }
 
     //PAGE PARAMETER

@@ -94,7 +94,7 @@ public class AnnotationRequest {
         filters.put(AnnotationFields.TAXON_ID, taxId);
     }
 
-    @Pattern(regexp = "[0-9]+(,[0-9]+)*", message = "Invalid taxonomic identifier: ${validatedValue}")
+    @Pattern(regexp = "[0-9]+(,[0-9]+)*", message = "At least one invalid taxonomic identifier(s): ${validatedValue}")
     public String getTaxon() {
         return filters.get(AnnotationFields.TAXON_ID);
     }
