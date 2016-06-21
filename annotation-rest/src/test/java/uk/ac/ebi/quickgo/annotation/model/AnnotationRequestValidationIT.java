@@ -10,6 +10,7 @@ import javax.validation.ValidatorFactory;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -156,6 +157,65 @@ public class AnnotationRequestValidationIT {
                     assertThat(violations, hasSize(0));
                 }
         );
+    }
+
+    //TAXONOMY ID PARAMETER
+    @Test
+    public void negativeTaxonIdIsInvalid() {
+        String taxId = "-1";
+
+        annotationRequest.setTaxon(taxId);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(), is("At least one invalid taxonomic identifier(s): " + taxId));
+    }
+
+    @Test
+    public void taxonIdWithNonNumberCharactersIsInvalid() {
+        String[] invalidTaxonIdParms = {"1a", "a", "$1"};
+
+        Arrays.stream(invalidTaxonIdParms).forEach(
+                invalidValue -> {
+                    annotationRequest.setTaxon(invalidValue);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    assertThat(violations, hasSize(is(1)));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one invalid taxonomic identifier(s): " + invalidValue));
+                }
+        );
+    }
+
+    @Test
+    public void positiveNumericTaxonIdIsValid() {
+        String taxId = "2";
+
+        annotationRequest.setTaxon(taxId);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void multiplePositiveNumericTaxonIdsIsValid() {
+        String taxId = "2,3,4,5";
+
+        annotationRequest.setTaxon(taxId);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void oneValidTaxIdAndOneInvalidTaxIdIsInvalid() {
+        String taxId = "2,-1";
+
+        annotationRequest.setTaxon(taxId);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(is(1)));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one invalid taxonomic identifier(s): " + taxId));
     }
 
     //PAGE PARAMETER

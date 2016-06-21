@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import com.google.common.base.Preconditions;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
@@ -24,7 +24,6 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
@@ -90,12 +89,12 @@ public class AnnotationController {
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
             FilterConverterFactory filterConverterFactory) {
-        Preconditions.checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
+        checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
-        Preconditions.checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
+        checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
                 ".AnnotationCompositeRetrievalConfig instance passed to the constructor of AnnotationController " +
                 "should not be null.");
-        Preconditions.checkArgument(filterConverterFactory != null, "The FilterConverterFactory cannot be null.");
+        checkArgument(filterConverterFactory != null, "The FilterConverterFactory cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
@@ -112,8 +111,9 @@ public class AnnotationController {
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest annotationRequest,
             BindingResult bindingResult) {
 
-        checkArgument(!bindingResult.hasErrors(), "The binding of the request parameters to " +
-                "AnnotationRequest %s has errors, see binding result %s", annotationRequest, bindingResult);
+        if(bindingResult.hasErrors()) {
+            throw new ParameterBindingException(bindingResult);
+        }
 
         validationHelper.validateRequestedResults(annotationRequest.getLimit());
 

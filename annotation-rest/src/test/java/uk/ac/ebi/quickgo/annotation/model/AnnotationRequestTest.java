@@ -37,7 +37,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void successfullySetPageAndLimitValues() {
+    public void successfullySetAndGetPageAndLimitValues() {
         annotationRequest.setPage(4);
         annotationRequest.setLimit(15);
 
@@ -82,4 +82,13 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
     }
 
+
+    @Test
+    public void setAndGetTaxon() {
+        String taxonId = "1";
+
+        annotationRequest.setTaxon(taxonId);
+
+        assertThat(annotationRequest.getTaxon(), is(taxonId));
+    }
 }
