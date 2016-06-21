@@ -25,7 +25,7 @@ class RESTFilterConverter implements FilterConverter {
     }
 
     @Override public QuickGOQuery transform(FilterRequest request) {
-        Preconditions.checkArgument(request != null, "ClientRequest cannot be null");
+        Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
 
         // create REST request executor
         // configure using requestConfig
