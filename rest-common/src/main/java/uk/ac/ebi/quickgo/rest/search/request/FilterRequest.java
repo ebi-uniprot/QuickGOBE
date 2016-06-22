@@ -72,6 +72,24 @@ public class FilterRequest {
         return this.properties.keySet();
     }
 
+    @Override public int hashCode() {
+        return properties != null ? properties.hashCode() : 0;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        FilterRequest that = (FilterRequest) o;
+
+        return properties != null ? properties.equals(that.properties) : that.properties == null;
+
+    }
+
     public static class Builder {
         private Map<String, List<String>> properties;
         private Builder() {
