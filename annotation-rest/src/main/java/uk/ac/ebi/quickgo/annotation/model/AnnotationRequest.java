@@ -15,7 +15,8 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSI
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
  *
- * Each request parameter value, in CSV format, is encapsulated by a {@link FilterRequest}.
+ * Once the comma separated values have been set, then turn then into an object (SimpleFilter) that
+ * encapsulates the list and solr field name to use for that argument.
  *
  * @author Tony Wardell
  * Date: 25/04/2016
@@ -37,13 +38,10 @@ public class AnnotationRequest {
     @Min(1)
     private int page = DEFAULT_PAGE_NUMBER;
 
-    private String assignedBy = null;
-    private String aspect = null;
-
-    private static final String ASPECT_FIELD = "aspect";
+    private final Map<String, String> filters = new HashMap<>();
 
     /**
-     *  E.g., ASPGD,Agbase,..
+     *  E.g. ASPGD,Agbase,..
      *  In the format assignedBy=ASPGD,Agbase
      */
     public void setAssignedBy(String assignedBy) {
@@ -58,13 +56,39 @@ public class AnnotationRequest {
     }
 
     public void setAspect(String aspect) {
+        if (aspect != null) {
+            filters.put(ASPECT_FIELD, aspect.toLowerCase());
         if(aspect != null) {
             requestMap.put(ASPECT_FIELD, aspect.toLowerCase());
         }
     }
 
-    @Pattern(regexp = "(?i)biological_process|molecular_function|cellular_component")
+    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = Pattern.Flag.CASE_INSENSITIVE)
     public String getAspect() {
+        return filters.get(ASPECT_FIELD);
+    }
+
+    /**
+     * The older evidence codes
+     * E.g. IEA, IBA, IBD etc. See <a href="http://geneontology.org/page/guide-go-evidence-codes">Guide QuickGO
+     * evidence codes</a>
+     * @param evidence the evidence code
+     */
+    public void setGoEvidence(String evidence) {
+        filters.put(AnnotationFields.GO_EVIDENCE, evidence);
+    }
+
+    @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*")
+    public String getGoEvidence() {
+        return filters.get(AnnotationFields.GO_EVIDENCE);
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
         return requestMap.get(ASPECT_FIELD);
     }
 
@@ -93,6 +117,10 @@ public class AnnotationRequest {
         return filterRequests;
     }
 
+    public void setTaxon(String taxId) {
+        filters.put(AnnotationFields.TAXON_ID, taxId);
+    }
+
     private Optional<FilterRequest> createSimpleFilter(String key) {
         Optional<FilterRequest> request;
         if (requestMap.containsKey(key)) {
@@ -103,6 +131,11 @@ public class AnnotationRequest {
             request = Optional.empty();
         }
 
+    @Pattern(regexp = "[0-9]+(,[0-9]+)*", message = "At least one invalid taxonomic identifier(s): ${validatedValue}")
+    public String getTaxon() {
+        return filters.get(AnnotationFields.TAXON_ID);
+    }
+}
         return request;
     }
 

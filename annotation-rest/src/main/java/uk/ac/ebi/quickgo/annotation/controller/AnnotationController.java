@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.rest.ParameterBindingException;
+import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
@@ -88,12 +90,15 @@ public class AnnotationController {
     public AnnotationController(SearchService<Annotation> annotationSearchService,
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
+            FilterConverterFactory filterConverterFactory) {
+        checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
             RequestConverterFactory converterFactory) {
         Preconditions.checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
-        Preconditions.checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
+        checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
                 ".AnnotationCompositeRetrievalConfig instance passed to the constructor of AnnotationController " +
                 "should not be null.");
+        checkArgument(filterConverterFactory != null, "The FilterConverterFactory cannot be null.");
         Preconditions.checkArgument(converterFactory != null, "The ConverterFactory cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
@@ -111,8 +116,9 @@ public class AnnotationController {
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest request,
             BindingResult bindingResult) {
 
-        checkArgument(!bindingResult.hasErrors(), "The binding of the request parameters to " +
-                "AnnotationRequest %s has errors, see binding result %s", request, bindingResult);
+        if(bindingResult.hasErrors()) {
+            throw new ParameterBindingException(bindingResult);
+        }
 
         validationHelper.validateRequestedResults(request.getLimit());
 

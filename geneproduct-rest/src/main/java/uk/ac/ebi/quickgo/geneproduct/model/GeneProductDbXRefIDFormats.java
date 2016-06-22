@@ -1,11 +1,12 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
 import com.google.common.base.Preconditions;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.stream.Collectors.groupingBy;
 
 /**
  *
@@ -21,74 +22,53 @@ import static java.util.stream.Collectors.groupingBy;
  */
 public class GeneProductDbXRefIDFormats {
 
-    private final String defaultTypeName;
-    private Map<GeneProductDbXRefIDFormats.Key, List<GeneProductDbXRefIDFormat>> geneProductXrefEntities;
-    private final String defaultDatabase;
+    private final Map<GeneProductDbXRefIDFormats.Key, GeneProductDbXRefIDFormat> geneProductXrefEntities;
+    static final Key[] targetDBs = new Key[]{ new Key("UniProtKB","PR:000000001"), new Key("IntAct","GO:0043234"),
+            new Key("RNAcentral","CHEBI:33697")};
 
-    public GeneProductDbXRefIDFormats(Map<GeneProductDbXRefIDFormats.Key, List<GeneProductDbXRefIDFormat>>
-            geneProductXrefEntities, String defaultDb, String defaultTypeName) {
-        this.defaultTypeName = checkNotNull(defaultTypeName);
-        this.defaultDatabase = checkNotNull(defaultDb);
-        this.geneProductXrefEntities = checkNotNull(geneProductXrefEntities);
+    private GeneProductDbXRefIDFormats(Map<Key, GeneProductDbXRefIDFormat> geneProductXrefEntities) {
+        checkArgument(geneProductXrefEntities != null, "Gene product xref entities map cannot be null");
+
+        this.geneProductXrefEntities = geneProductXrefEntities;
     }
 
-
     /**
-     *  Use the default database and type name to test if a gene product id is valid.
-     * @param id
-     * @return
+     * Test if a gene product id is valid.
+     * @param id The gene product ID passed in from the client
+     * @return true if the id is valid, false otherwise
      */
     public boolean isValidId(String id) {
-        return isValidId(id, defaultDatabase, defaultTypeName);
-    }
 
-    /**
-     * Use the supplied database and type name to test if a gene product id is valid.
-     * @param id
-     * @param database
-     * @param typeName
-     * @return
-     */
-    public boolean isValidId(String id, String database, String typeName) {
-
-        //If we haven't managed to createWithData the validation regular expression then pass everything
-        if (geneProductXrefEntities == null) {
+        //If we haven't managed to load the validation regular expressions then pass everything
+        if (geneProductXrefEntities.size()==0) {
             return true;
         }
-
-        //find the ID entity that matches
-        final List<GeneProductDbXRefIDFormat> geneProductXrefEntities
-                = this.geneProductXrefEntities.get(new Key(database, typeName));
-
-        //If there is no entity for this combination then the id cannot be correct..
-        if (geneProductXrefEntities == null) {
-            return false;
+        for(Key dbKey : targetDBs){
+            if(this.geneProductXrefEntities.get(dbKey).matches(id)) return true;
         }
 
-        //..otherwise look up the id
-        return geneProductXrefEntities.get(0).matches(id);
-
+        //no matches
+        return false;
     }
 
     /**
      * Create an instance of this class
-     * @param entities
-     * @param defaultDb
-     * @param defaultTypeName
+     * @param entities A list of regex expressions specified by database and usage.
      * @return
      */
-    public static GeneProductDbXRefIDFormats createWithData(List<GeneProductDbXRefIDFormat> entities, String defaultDb,
-            String defaultTypeName) {
+    public static GeneProductDbXRefIDFormats createWithData(List<GeneProductDbXRefIDFormat> entities) {
+        Preconditions.checkArgument(entities != null, "The list of GeneProductDbXRefIDFormat entities is null, which " +
+                "is illegal");
 
-        Preconditions.checkNotNull(entities, "The list of GeneProductDbXRefIDFormat entities passed to createWithData" +
-                " was null, which is illegal");
+        Map<Key, GeneProductDbXRefIDFormat> mappedEntities = new HashMap<>();
 
-        Map<Key, List<GeneProductDbXRefIDFormat>> mappedEntities =
-                entities.stream().collect(groupingBy(e -> new GeneProductDbXRefIDFormats.Key(e
-                        .getDatabase(), e.getEntityTypeName())));
+        for(GeneProductDbXRefIDFormat entity : entities) {
+            GeneProductDbXRefIDFormats.Key key = new GeneProductDbXRefIDFormats.Key(entity.getDatabase(), entity
+                    .getEntityType());
+            mappedEntities.put(key, entity);
+        }
 
-        GeneProductDbXRefIDFormats formats = new GeneProductDbXRefIDFormats(mappedEntities, defaultDb, defaultTypeName);
-        return formats;
+        return new GeneProductDbXRefIDFormats(mappedEntities);
     }
 
     /**
@@ -97,15 +77,14 @@ public class GeneProductDbXRefIDFormats {
 
     public static class Key {
         String database;
-        String entityTypeName;
+        String entityType;
 
-        public Key(String database, String entityTypeName) {
+        public Key(String database, String entityType) {
             this.database = database;
-            this.entityTypeName = entityTypeName;
+            this.entityType = entityType;
         }
 
-        @Override
-        public boolean equals(Object o) {
+        @Override public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
@@ -115,25 +94,23 @@ public class GeneProductDbXRefIDFormats {
 
             Key key = (Key) o;
 
-            if (database != null ? !database.equals(key.database) : key.database != null) {
+            if (!database.equals(key.database)) {
                 return false;
             }
-            return entityTypeName != null ? entityTypeName.equals(key.entityTypeName) : key.entityTypeName == null;
+            return entityType.equals(key.entityType);
 
         }
 
-        @Override
-        public int hashCode() {
-            int result = database != null ? database.hashCode() : 0;
-            result = 31 * result + (entityTypeName != null ? entityTypeName.hashCode() : 0);
+        @Override public int hashCode() {
+            int result = database.hashCode();
+            result = 31 * result + entityType.hashCode();
             return result;
         }
 
-        @Override
-        public String toString() {
+        @Override public String toString() {
             return "Key{" +
                     "database='" + database + '\'' +
-                    ", entityTypeName='" + entityTypeName + '\'' +
+                    ", entityType='" + entityType + '\'' +
                     '}';
         }
     }
