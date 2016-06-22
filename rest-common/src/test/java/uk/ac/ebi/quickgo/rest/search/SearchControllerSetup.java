@@ -21,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 /**
  * A template for performing several functional tests to verify that a search controller
@@ -97,7 +98,7 @@ public abstract class SearchControllerSetup {
         clientRequest.param(LIMIT_PARAM, String.valueOf(limit));
 
         mockMvc.perform(clientRequest)
-                .andDo(MockMvcResultHandlers.print())
+                .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.resultsPerPage").value(limit))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.current").value(pageNum))
@@ -120,7 +121,7 @@ public abstract class SearchControllerSetup {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         mockMvc.perform(clientRequest)
-                .andDo(MockMvcResultHandlers.print())
+                .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.resultsPerPage")
                         .value(DEFAULT_ENTRIES_PER_PAGE))
@@ -146,6 +147,7 @@ public abstract class SearchControllerSetup {
         addFacetsToRequest(clientRequest, facets);
 
         mockMvc.perform(clientRequest)
+                .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.facet.facetFields.*", hasSize(facets.length)));
     }
@@ -161,7 +163,7 @@ public abstract class SearchControllerSetup {
         addFiltersToRequest(clientRequest, filterQuery);
 
         ResultActions result = mockMvc.perform(clientRequest)
-                .andDo(MockMvcResultHandlers.print())
+                .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         checkErrorMessage(result);
@@ -174,7 +176,7 @@ public abstract class SearchControllerSetup {
         addFiltersToRequest(clientRequest, filterQuery);
 
         return mockMvc.perform(clientRequest)
-                .andDo(MockMvcResultHandlers.print())
+                .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.results.*", hasSize(expectedResponseSize)));
     }
@@ -188,7 +190,7 @@ public abstract class SearchControllerSetup {
         int expectedResponseSize = idHits.length;
 
         return mockMvc.perform(clientRequest)
-                .andDo(MockMvcResultHandlers.print())
+                .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.results.*.id", containsInAnyOrder(idHits)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.results.*", hasSize(expectedResponseSize)))
@@ -202,7 +204,7 @@ public abstract class SearchControllerSetup {
         addParamsToRequest(clientRequest, HIGHLIGHTING_PARAM, "false");
 
         return mockMvc.perform(clientRequest)
-                .andDo(MockMvcResultHandlers.print())
+                .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.results.*", hasSize(expectedResponseSize)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.highlighting.*").doesNotExist());
@@ -228,6 +230,6 @@ public abstract class SearchControllerSetup {
 
     private void checkErrorMessage(ResultActions result) throws Exception {
         result.andExpect(MockMvcResultMatchers.jsonPath("$.url", is(getRequestUrl(result))));
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.messages").exists());
     }
 }
