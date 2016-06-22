@@ -2,12 +2,11 @@ package uk.ac.ebi.quickgo.rest.comm;
 
 import com.google.common.base.Preconditions;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestOperations;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -16,31 +15,27 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class RESTRequesterImpl implements RESTRequester {
-    private static final String EMPTY_URL = "";
     private static final Logger LOGGER = getLogger(RESTRequesterImpl.class);
     private final String url;
+    private final RestOperations restOperations;
     private Map<String, String> requestParameters;
 
-    private RESTRequesterImpl() {
-        this.url = EMPTY_URL;
-        this.requestParameters = new HashMap<>();
-    }
-
-    private RESTRequesterImpl(String url, Map<String, String> requestParameters) {
-        this.url = url;
-        this.requestParameters = Collections.unmodifiableMap(requestParameters);
+    private RESTRequesterImpl(Builder builder) {
+        this.url = builder.url;
+        this.requestParameters = Collections.unmodifiableMap(builder.requestParameters);
+        this.restOperations = builder.restOperations;
     }
 
     @Override
     public <T> CompletableFuture<T> get(Class<T> responseType) {
-        return get(new RestTemplate(), responseType);
+        return get(restOperations, responseType);
     }
 
-    public static Builder newBuilder(String url) {
-        return new Builder(url);
+    public static Builder newBuilder(RestOperations restOperations, String url) {
+        return new Builder(restOperations, url);
     }
 
-    <T> CompletableFuture<T> get(RestTemplate template, Class<T> responseType) {
+    <T> CompletableFuture<T> get(RestOperations template, Class<T> responseType) {
         return CompletableFuture.supplyAsync(() ->
                 template.getForObject(url, responseType, requestParameters));
     }
@@ -49,16 +44,19 @@ public class RESTRequesterImpl implements RESTRequester {
 
         private String url;
         private Map<String, String> requestParameters;
+        private RestOperations restOperations;
 
-        Builder(String url) {
+        Builder(RestOperations restOperations, String url) {
             checkURL(url);
+            Preconditions.checkArgument(restOperations != null, "RestOperations cannot be null");
 
             this.url = url;
+            this.restOperations = restOperations;
             this.requestParameters = new LinkedHashMap<>();
         }
 
         public RESTRequesterImpl build() {
-            return new RESTRequesterImpl(url, requestParameters);
+            return new RESTRequesterImpl(this);
         }
 
         public Builder resetURL(String url) {

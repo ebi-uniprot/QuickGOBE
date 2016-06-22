@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.springframework.web.client.RestTemplate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -128,7 +129,7 @@ public class RESTFilterConverterTest {
         }
 
         private RESTFilterConverter createConverter(FilterConfig config) {
-            return new RESTFilterConverter(config) {
+            return new RESTFilterConverter(config, mock(RestTemplate.class)) {
                 @Override
                 RESTRequesterImpl.Builder createRestRequesterBuilder() {
                     return restRequestBuilderMock;

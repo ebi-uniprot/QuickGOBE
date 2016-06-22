@@ -36,7 +36,7 @@ public class RESTRequesterImplTest {
 
     @Before
     public void setUp() {
-        requesterBuilder = RESTRequesterImpl.newBuilder(SERVICE_ENDPOINT);
+        requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT);
 
         requestParameters = new HashMap<>();
         requesterBuilder.setRequestParameters(requestParameters);
@@ -49,13 +49,18 @@ public class RESTRequesterImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void creatingWithRestOperationsThrowsException() {
+        RESTRequesterImpl.newBuilder(null, "value");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void creatingWithNullURLThrowsException() {
-        RESTRequesterImpl.newBuilder(null);
+        RESTRequesterImpl.newBuilder(restTemplateMock, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void creatingWithEmptyURLThrowsException() {
-        RESTRequesterImpl.newBuilder("");
+        RESTRequesterImpl.newBuilder(restTemplateMock, "");
     }
 
     @Test(expected = IllegalArgumentException.class)

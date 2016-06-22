@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.rest.search.query.FieldProjection;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverterFactory;
+import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class BasicSearchQueryTemplateTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Mock
-    private RequestConverterFactory converterFactory;
+    private FilterConverterFactory converterFactory;
 
     private BasicSearchQueryTemplate.Builder builder;
 

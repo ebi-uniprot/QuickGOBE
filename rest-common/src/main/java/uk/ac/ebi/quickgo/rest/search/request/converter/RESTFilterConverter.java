@@ -10,10 +10,13 @@ import com.google.common.base.Preconditions;
 import com.jayway.jsonpath.JsonPath;
 import java.util.StringJoiner;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.minidev.json.JSONArray;
 import org.slf4j.Logger;
+import org.springframework.web.client.RestOperations;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -39,10 +42,18 @@ class RESTFilterConverter implements FilterConverter {
     private static final Pattern HOSTNAME_REGEX = Pattern.compile(
             HTTP_HOST_PREFIX + "([a-zA-Z0-9](?:(?:[a-zA-Z0-9-]*|(?<!-)\\.(?![-.]))*[a-zA-Z0-9]+)?)(:[0-9]+)?");
 
-    private final FilterConfig filterConfig;
+    // todo: this should be externally configurable (add a property to yaml, and if not present use default?)
+    private static final int TIMEOUT = 2000;
 
-    RESTFilterConverter(FilterConfig filterConfig) {
+    private final FilterConfig filterConfig;
+    private final RestOperations restOperations;
+
+    RESTFilterConverter(FilterConfig filterConfig, RestOperations restOperations) {
+        Preconditions.checkArgument(filterConfig != null, "FilterConfig cannot be null");
+        Preconditions.checkArgument(restOperations != null, "RestOperations cannot be null");
+
         this.filterConfig = filterConfig;
+        this.restOperations = restOperations;
 
         checkMandatoryProperty(HOST);
         checkMandatoryProperty(RESOURCE_FORMAT);
@@ -73,7 +84,7 @@ class RESTFilterConverter implements FilterConverter {
                     fetchResults(restRequesterBuilder.build()),
                     jsonPath,
                     csvs);
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
             String errorMessage = "Failed to fetch REST response";
             LOGGER.error(errorMessage);
             throw new RetrievalException(errorMessage, e);
@@ -114,7 +125,7 @@ class RESTFilterConverter implements FilterConverter {
     }
 
     RESTRequesterImpl.Builder createRestRequesterBuilder() {
-        return RESTRequesterImpl.newBuilder(buildResourceTemplate(filterConfig));
+        return RESTRequesterImpl.newBuilder(restOperations, buildResourceTemplate(filterConfig));
     }
 
     private void checkMandatoryProperty(String mandatoryProperty) {
@@ -131,8 +142,11 @@ class RESTFilterConverter implements FilterConverter {
         }
     }
 
-    private String fetchResults(RESTRequesterImpl restRequester) throws ExecutionException, InterruptedException {
-        return restRequester.get(String.class).get();
+    private String fetchResults(RESTRequesterImpl restRequester)
+            throws ExecutionException, InterruptedException, TimeoutException {
+        return restRequester
+                .get(String.class)
+                .get(TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
     static class InvalidHostNameException extends RuntimeException {

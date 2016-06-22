@@ -9,6 +9,7 @@ import com.google.common.base.Preconditions;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestOperations;
 
 /**
  * This class converts {@link FilterRequest} instances to representational {@link QuickGOQuery} instances.
@@ -16,15 +17,18 @@ import org.springframework.stereotype.Component;
  * Created by Edd on 05/06/2016.
  */
 @Component
-public class RequestConverterFactory {
+public class FilterConverterFactory {
 
     private final FilterConfigRetrieval filterConfigRetrieval;
+    private final RestOperations restOperations;
 
     @Autowired
-    public RequestConverterFactory(FilterConfigRetrieval globalFilterConfigRetrieval) {
+    public FilterConverterFactory(FilterConfigRetrieval globalFilterConfigRetrieval, RestOperations restOperations) {
         Preconditions.checkArgument(globalFilterConfigRetrieval != null, "RequestConfigRetrieval cannot be null");
+        Preconditions.checkArgument(restOperations != null, "RestOperations cannot be null");
 
         this.filterConfigRetrieval = globalFilterConfigRetrieval;
+        this.restOperations = restOperations;
     }
 
     public QuickGOQuery convert(FilterRequest request) {
@@ -33,7 +37,7 @@ public class RequestConverterFactory {
             FilterConfig filterConfig = configOpt.get();
             switch (filterConfig.getExecution()) {
                 case REST_COMM:
-                    return new RESTFilterConverter(filterConfig).transform(request);
+                    return new RESTFilterConverter(filterConfig, restOperations).transform(request);
                 case SIMPLE:
                     return new SimpleFilterConverter(filterConfig).transform(request);
                 case JOIN:
