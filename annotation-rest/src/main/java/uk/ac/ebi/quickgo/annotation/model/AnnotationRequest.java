@@ -1,16 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -30,7 +30,7 @@ public class AnnotationRequest {
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
 
-    private final HashMap<String, String> requestMap = new HashMap<>();
+    private static final String ASPECT_FIELD = "aspect";
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -38,7 +38,7 @@ public class AnnotationRequest {
     @Min(1)
     private int page = DEFAULT_PAGE_NUMBER;
 
-    private final Map<String, String> filters = new HashMap<>();
+    private final Map<String, String> filterMap = new HashMap<>();
 
     /**
      *  E.g. ASPGD,Agbase,..
@@ -46,26 +46,24 @@ public class AnnotationRequest {
      */
     public void setAssignedBy(String assignedBy) {
         if (assignedBy != null) {
-            requestMap.put(ASSIGNED_BY, assignedBy);
+            filterMap.put(ASSIGNED_BY, assignedBy);
         }
     }
 
     @Pattern(regexp = "^[A-Za-z][A-Za-z\\-_]+(,[A-Za-z][A-Za-z\\-_]+)*")
     public String getAssignedBy() {
-        return requestMap.get(ASSIGNED_BY);
+        return filterMap.get(ASSIGNED_BY);
     }
 
     public void setAspect(String aspect) {
         if (aspect != null) {
-            filters.put(ASPECT_FIELD, aspect.toLowerCase());
-        if(aspect != null) {
-            requestMap.put(ASPECT_FIELD, aspect.toLowerCase());
+            filterMap.put(ASPECT_FIELD, aspect.toLowerCase());
         }
     }
 
     @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = Pattern.Flag.CASE_INSENSITIVE)
     public String getAspect() {
-        return filters.get(ASPECT_FIELD);
+        return filterMap.get(ASPECT_FIELD);
     }
 
     /**
@@ -75,21 +73,22 @@ public class AnnotationRequest {
      * @param evidence the evidence code
      */
     public void setGoEvidence(String evidence) {
-        filters.put(AnnotationFields.GO_EVIDENCE, evidence);
+        filterMap.put(GO_EVIDENCE, evidence);
     }
 
     @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*")
     public String getGoEvidence() {
-        return filters.get(AnnotationFields.GO_EVIDENCE);
+        return filterMap.get(GO_EVIDENCE);
     }
 
-    public void setPage(int page) {
-        this.page = page;
+    public void setTaxon(String taxId) {
+        filterMap.put(TAXON_ID, taxId);
     }
 
-    public void setLimit(int limit) {
-        this.limit = limit;
-        return requestMap.get(ASPECT_FIELD);
+    @Pattern(regexp = "[0-9]+(,[0-9]+)*",
+            message = "At least one invalid taxonomic identifier(s): ${validatedValue}")
+    public String getTaxon() {
+        return filterMap.get(AnnotationFields.TAXON_ID);
     }
 
     public int getLimit() {
@@ -113,30 +112,22 @@ public class AnnotationRequest {
 
         createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
         createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
+        createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
+        createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
 
         return filterRequests;
     }
 
-    public void setTaxon(String taxId) {
-        filters.put(AnnotationFields.TAXON_ID, taxId);
-    }
-
     private Optional<FilterRequest> createSimpleFilter(String key) {
         Optional<FilterRequest> request;
-        if (requestMap.containsKey(key)) {
+        if (filterMap.containsKey(key)) {
             FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
-            requestBuilder.addProperty(key, requestMap.get(key).split(COMMA));
+            requestBuilder.addProperty(key, filterMap.get(key).split(COMMA));
             request = Optional.of(requestBuilder.build());
         } else {
             request = Optional.empty();
         }
 
-    @Pattern(regexp = "[0-9]+(,[0-9]+)*", message = "At least one invalid taxonomic identifier(s): ${validatedValue}")
-    public String getTaxon() {
-        return filters.get(AnnotationFields.TAXON_ID);
-    }
-}
         return request;
     }
-
 }
