@@ -1,14 +1,17 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -44,16 +47,16 @@ public class AnnotationRequest {
      *  In the format assignedBy=ASPGD,Agbase
      */
     public void setAssignedBy(String assignedBy) {
-        filters.put(AnnotationFields.ASSIGNED_BY, assignedBy);
+        filters.put(ASSIGNED_BY, assignedBy);
     }
 
     @Pattern(regexp = "^[A-Za-z][A-Za-z\\-_]+(,[A-Za-z][A-Za-z\\-_]+)*")
     public String getAssignedBy() {
-        return filters.get(AnnotationFields.ASSIGNED_BY);
+        return filters.get(ASSIGNED_BY);
     }
 
     public void setAspect(String aspect) {
-        if(aspect != null) {
+        if (aspect != null) {
             filters.put(ASPECT_FIELD, aspect.toLowerCase());
         }
     }
@@ -94,15 +97,6 @@ public class AnnotationRequest {
         return page;
     }
 
-    public Stream<RequestFilter> convertToFilters() {
-        return filters.entrySet().stream().map(filter -> new RequestFilter(filter.getKey(),
-                splitFilterValues(filter.getValue())));
-    }
-
-    private String[] splitFilterValues(String values) {
-        return values.split(COMMA);
-    }
-
     public void setTaxon(String taxId) {
         filters.put(AnnotationFields.TAXON_ID, taxId);
     }
@@ -115,18 +109,22 @@ public class AnnotationRequest {
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
-        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
-        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
+        Stream.of(ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE)
+                .map(this::createSimpleFilter)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(filterRequests::add);
 
         return filterRequests;
     }
 
     private Optional<FilterRequest> createSimpleFilter(String key) {
         Optional<FilterRequest> request;
-        if (requestMap.containsKey(key)) {
-            FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
-            requestBuilder.addProperty(key, filters.get(key).split(COMMA));
-            request = Optional.of(requestBuilder.build());
+        if (filters.containsKey(key)) {
+            request = Optional.of(
+                    FilterRequest.newBuilder()
+                            .addProperty(key, filters.get(key).split(COMMA))
+                            .build());
         } else {
             request = Optional.empty();
         }
