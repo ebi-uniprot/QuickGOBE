@@ -81,11 +81,10 @@ class RESTFilterConverter implements FilterConverter {
         JsonPath jsonPath = JsonPath.compile(filterConfig.getProperties().get(BODY_PATH));
         try {
             Optional<QuickGOQuery> compositeQuery =
-                    extractValues(fetchResults(
-                            restRequesterBuilder.build()), jsonPath).stream()
-                    .map(value -> QuickGOQuery
-                            .createQuery(filterConfig.getProperties().get(LOCAL_FIELD), value))
-                    .reduce(QuickGOQuery::or);
+                    extractValues(fetchResults(restRequesterBuilder.build()), jsonPath).stream()
+                            .map(value -> QuickGOQuery
+                                    .createQuery(filterConfig.getProperties().get(LOCAL_FIELD), value))
+                            .reduce(QuickGOQuery::or);
 
             if (compositeQuery.isPresent()) {
                 return compositeQuery.get();

@@ -89,11 +89,6 @@ public class RESTRequesterImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void addingRequestParamWithEmptyValueThrowsException() {
-        requesterBuilder.addRequestParameter("name", "");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void addingRequestParamsWithNullValueThrowsException() {
         requesterBuilder.setRequestParameters(null);
     }
