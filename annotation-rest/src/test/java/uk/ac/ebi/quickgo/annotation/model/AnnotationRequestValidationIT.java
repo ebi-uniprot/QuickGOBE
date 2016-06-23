@@ -64,7 +64,11 @@ public class AnnotationRequestValidationIT {
                     AnnotationRequest annotationRequest = new AnnotationRequest();
                     annotationRequest.setAssignedBy(invalidValue);
 
-                    assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+                    assertThat(violations, hasSize(1));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'Assigned By' value is invalid: " + invalidValue));
                 }
         );
     }
@@ -169,7 +173,8 @@ public class AnnotationRequestValidationIT {
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
         assertThat(violations, hasSize(1));
-        assertThat(violations.iterator().next().getMessage(), is("At least one invalid taxonomic identifier(s): " + taxId));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one invalid taxonomic identifier(s): " + taxId));
     }
 
     @Test

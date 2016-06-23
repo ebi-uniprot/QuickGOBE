@@ -50,7 +50,8 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "^[A-Za-z][A-Za-z\\-_]+(,[A-Za-z][A-Za-z\\-_]+)*")
+    @Pattern(regexp = "^[A-Za-z][A-Za-z\\-_]+(,[A-Za-z][A-Za-z\\-_]+)*",
+            message = "At least one 'Assigned By' value is invalid: ${validatedValue}")
     public String getAssignedBy() {
         return filterMap.get(ASSIGNED_BY);
     }
