@@ -6,6 +6,8 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.After;
@@ -55,7 +57,7 @@ public class AnnotationControllerRESTIT {
     private static final String RESOURCE_URL = "/QuickGO/services/annotation";
     private static final String BASE_URL = "http://localhost";
     private static final String COMMA = ",";
-    private static final String DESCENDANTS_RESOURCE_FORMAT = "/QuickGO/services/go/terms/%s/descendants";
+    private static final String DESCENDANTS_RESOURCE_FORMAT = "/QuickGO/services/go/terms/%s/descendants?relations=%s";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -230,7 +232,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallResponse(GET, String.format(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withTimeout());
+        expectRestCallResponse(GET, buildResource(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withTimeout());
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -248,7 +250,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallResponse(GET, String.format(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withServerError());
+        expectRestCallResponse(GET, buildResource(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withServerError());
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -266,7 +268,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallResponse(GET, String.format(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withBadRequest());
+        expectRestCallResponse(GET, buildResource(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withBadRequest());
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -292,11 +294,24 @@ public class AnnotationControllerRESTIT {
         return String.format("GO:000000%d", id);
     }
 
+    private String buildResource(String format, String... arguments) {
+        int requiredArgsCount = format.length() - format.replace("%", "").length();
+        List<String> args = new ArrayList<>();
+        for (int i = 0; i < requiredArgsCount; i++) {
+            if (i < arguments.length) {
+                args.add(arguments[i]);
+            } else {
+                args.add("");
+            }
+        }
+        return String.format(format, args.toArray());
+    }
+
     private void expectGoIdsHaveDescendants(String termId, String... descendantIds) {
         String descendantsCSV = Stream.of(descendantIds).collect(Collectors.joining(COMMA));
         expectRestCallSuccess(
                 GET,
-                String.format(DESCENDANTS_RESOURCE_FORMAT, termId),
+                buildResource(DESCENDANTS_RESOURCE_FORMAT, termId),
                 "{ results : [ { descendants : [" + descendantsCSV + "] } ]}");
     }
 

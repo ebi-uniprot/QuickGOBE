@@ -68,7 +68,7 @@ public class RESTRequesterImpl implements RESTRequester {
 
         public Builder addRequestParameter(String name, String value) {
             Preconditions.checkArgument(name != null && !name.trim().isEmpty(), "Name cannot be null or empty");
-            Preconditions.checkArgument(value != null && !value.trim().isEmpty(), "Value cannot be null or empty");
+            Preconditions.checkArgument(value != null, "Value cannot be null");
 
             if (!requestParameters.containsKey(name)) {
                 requestParameters.put(name, value);
