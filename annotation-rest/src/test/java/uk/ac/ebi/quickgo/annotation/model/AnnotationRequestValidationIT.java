@@ -177,7 +177,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one invalid taxonomic identifier(s): " + taxId));
+                is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
     }
 
     @Test
@@ -191,7 +191,7 @@ public class AnnotationRequestValidationIT {
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     assertThat(violations, hasSize(is(1)));
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one invalid taxonomic identifier(s): " + invalidValue));
+                            is("At least one invalid 'Taxonomic identifier' value is invalid: " + invalidValue));
                 }
         );
     }
@@ -223,7 +223,7 @@ public class AnnotationRequestValidationIT {
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(is(1)));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one invalid taxonomic identifier(s): " + taxId));
+                is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
     }
 
     //PAGE PARAMETER
