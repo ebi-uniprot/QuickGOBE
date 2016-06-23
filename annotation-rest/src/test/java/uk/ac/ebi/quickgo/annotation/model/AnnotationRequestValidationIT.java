@@ -147,7 +147,11 @@ public class AnnotationRequestValidationIT {
 
         annotationRequest.setAspect(aspect);
 
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one 'Aspect' value is invalid: " + aspect));
     }
 
     @Test

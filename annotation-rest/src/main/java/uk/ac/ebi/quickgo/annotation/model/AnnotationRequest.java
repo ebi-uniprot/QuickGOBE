@@ -62,7 +62,8 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = Pattern.Flag.CASE_INSENSITIVE)
+    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "At least one 'Aspect' value is invalid: ${validatedValue}")
     public String getAspect() {
         return filterMap.get(ASPECT_FIELD);
     }
