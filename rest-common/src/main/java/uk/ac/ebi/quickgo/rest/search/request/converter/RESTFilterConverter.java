@@ -80,9 +80,9 @@ class RESTFilterConverter implements FilterConverter {
         // apply request and store results
         JsonPath jsonPath = JsonPath.compile(filterConfig.getProperties().get(BODY_PATH));
         try {
-            Optional<QuickGOQuery> compositeQuery = extractValues(
-                    fetchResults(restRequesterBuilder.build()),
-                    jsonPath).stream()
+            Optional<QuickGOQuery> compositeQuery =
+                    extractValues(fetchResults(
+                            restRequesterBuilder.build()), jsonPath).stream()
                     .map(value -> QuickGOQuery
                             .createQuery(filterConfig.getProperties().get(LOCAL_FIELD), value))
                     .reduce(QuickGOQuery::or);
@@ -100,7 +100,7 @@ class RESTFilterConverter implements FilterConverter {
             throwRetrievalException(FAILED_REST_FETCH_PREFIX + " due to a timeout whilst waiting for response", e);
         }
 
-        return null;
+        return QuickGOQuery.createAllQuery().not();
     }
 
     static String buildResourceTemplate(FilterConfig config) {
