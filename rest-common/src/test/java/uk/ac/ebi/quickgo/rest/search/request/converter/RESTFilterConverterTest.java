@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
@@ -86,11 +87,13 @@ public class RESTFilterConverterTest {
 
             QuickGOQuery query = converter.transform(filter);
 
-            assertThat(query, is(QuickGOQuery.createQuery(field, restValue1 + "," + restValue2)));
+            assertThat(query, is(
+                    QuickGOQuery.createQuery(field, restValue2)
+                            .or(QuickGOQuery.createQuery(field, restValue1))));
         }
 
         @Test(expected = RetrievalException.class)
-        public void failedRESTResponseCausesRetrievalException() {
+        public void failedExecutionOfRESTResponseCausesRetrievalException() {
             String resource = "/subresource";
 
             doThrow(ExecutionException.class).when(restRequesterMock).get(String.class);
@@ -105,7 +108,42 @@ public class RESTFilterConverterTest {
             RESTFilterConverter converter = createConverter(config);
 
             converter.transform(filter);
+        }
 
+        @Test(expected = RetrievalException.class)
+        public void timeoutOfRESTResponseCausesRetrievalException() {
+            String resource = "/subresource";
+
+            doThrow(TimeoutException.class).when(restRequesterMock).get(String.class);
+            when(restRequestBuilderMock.build()).thenReturn(restRequesterMock);
+
+            FilterConfig config = createRestFilterConfig(resource, "$.results[*].message", "field");
+
+            FilterRequest filter = FilterRequest.newBuilder()
+                    .addProperty("id", "anything")
+                    .build();
+
+            RESTFilterConverter converter = createConverter(config);
+
+            converter.transform(filter);
+        }
+
+        @Test(expected = RetrievalException.class)
+        public void interruptionOfRESTResponseCausesRetrievalException() {
+            String resource = "/subresource";
+
+            doThrow(InterruptedException.class).when(restRequesterMock).get(String.class);
+            when(restRequestBuilderMock.build()).thenReturn(restRequesterMock);
+
+            FilterConfig config = createRestFilterConfig(resource, "$.results[*].message", "field");
+
+            FilterRequest filter = FilterRequest.newBuilder()
+                    .addProperty("id", "anything")
+                    .build();
+
+            RESTFilterConverter converter = createConverter(config);
+
+            converter.transform(filter);
         }
 
         private void setFutureRestResponse(String response) {

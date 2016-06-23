@@ -12,6 +12,7 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,6 +122,7 @@ public class AnnotationController {
                 .setQuery(QuickGOQuery.createAllQuery())
                 .setFilters(request.createFilterRequests().stream()
                         .map(converterFactory::convert)
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toSet()))
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit())

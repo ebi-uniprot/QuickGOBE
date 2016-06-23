@@ -8,7 +8,9 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import com.google.common.base.Preconditions;
 import com.jayway.jsonpath.JsonPath;
-import java.util.StringJoiner;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -43,7 +45,8 @@ class RESTFilterConverter implements FilterConverter {
             HTTP_HOST_PREFIX + "([a-zA-Z0-9](?:(?:[a-zA-Z0-9-]*|(?<!-)\\.(?![-.]))*[a-zA-Z0-9]+)?)(:[0-9]+)?");
 
     // todo: this should be externally configurable (add a property to yaml, and if not present use default?)
-    private static final int TIMEOUT = 2000;
+    private static final int TIMEOUT_MILLIS = 2000;
+    private static final String FAILED_REST_FETCH_PREFIX = "Failed to fetch REST response";
 
     private final FilterConfig filterConfig;
     private final RestOperations restOperations;
@@ -66,7 +69,6 @@ class RESTFilterConverter implements FilterConverter {
 
         // create REST request executor
         RESTRequesterImpl.Builder restRequesterBuilder = createRestRequesterBuilder();
-
         request.getProperties().entrySet().stream()
                 .forEach(entry ->
                         restRequesterBuilder.addRequestParameter(
@@ -77,20 +79,28 @@ class RESTFilterConverter implements FilterConverter {
 
         // apply request and store results
         JsonPath jsonPath = JsonPath.compile(filterConfig.getProperties().get(BODY_PATH));
-        StringJoiner csvs = new StringJoiner(COMMA);
-
         try {
-            extractValues(
+            Optional<QuickGOQuery> compositeQuery = extractValues(
                     fetchResults(restRequesterBuilder.build()),
-                    jsonPath,
-                    csvs);
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            String errorMessage = "Failed to fetch REST response";
-            LOGGER.error(errorMessage);
-            throw new RetrievalException(errorMessage, e);
+                    jsonPath).stream()
+                    .map(value -> QuickGOQuery
+                            .createQuery(filterConfig.getProperties().get(LOCAL_FIELD), value))
+                    .reduce(QuickGOQuery::or);
+
+            if (compositeQuery.isPresent()) {
+                return compositeQuery.get();
+            }
+
+        } catch (ExecutionException e) {
+            throwRetrievalException(FAILED_REST_FETCH_PREFIX, e);
+        } catch (InterruptedException e) {
+            throwRetrievalException(
+                    FAILED_REST_FETCH_PREFIX + " due to an interruption whilst waiting for response", e);
+        } catch (TimeoutException e) {
+            throwRetrievalException(FAILED_REST_FETCH_PREFIX + " due to a timeout whilst waiting for response", e);
         }
 
-        return QuickGOQuery.createQuery(filterConfig.getProperties().get(LOCAL_FIELD), csvs.toString());
+        return null;
     }
 
     static String buildResourceTemplate(FilterConfig config) {
@@ -128,25 +138,32 @@ class RESTFilterConverter implements FilterConverter {
         return RESTRequesterImpl.newBuilder(restOperations, buildResourceTemplate(filterConfig));
     }
 
+    private void throwRetrievalException(String errorMessage, Exception e) {
+        LOGGER.error(errorMessage, e);
+        throw new RetrievalException(errorMessage, e);
+    }
+
     private void checkMandatoryProperty(String mandatoryProperty) {
         Preconditions.checkArgument(this.filterConfig.getProperties().containsKey(mandatoryProperty),
                 "FilterConfig must have mandatory field: " + mandatoryProperty);
     }
 
-    private void extractValues(String responseBody, JsonPath jsonPath, StringJoiner joinedValues) {
+    private Set<String> extractValues(String responseBody, JsonPath jsonPath) {
+        Set<String> results = new HashSet<>();
         if (jsonPath.isDefinite()) {
-            joinedValues.add(jsonPath.read(responseBody));
+            results.add(jsonPath.read(responseBody));
         } else {
             ((JSONArray) jsonPath.read(responseBody)).iterator()
-                    .forEachRemaining(value -> joinedValues.add(value.toString()));
+                    .forEachRemaining(value -> results.add(value.toString()));
         }
+        return results;
     }
 
     private String fetchResults(RESTRequesterImpl restRequester)
             throws ExecutionException, InterruptedException, TimeoutException {
         return restRequester
                 .get(String.class)
-                .get(TIMEOUT, TimeUnit.MILLISECONDS);
+                .get(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
 
     static class InvalidHostNameException extends RuntimeException {

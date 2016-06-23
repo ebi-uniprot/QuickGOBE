@@ -1,8 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -19,11 +24,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 final class ResponseVerifier {
     public static final String GENEPRODUCT_ID_FIELD = "geneProductId";
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
+    public static final String GO_ID_FIELD = "goId";
 
+    private static final String ERROR_MESSAGE = "messages";
     private static final String RESULTS = "results";
     private static final String RESULTS_CONTENT_BY_INDEX = RESULTS + "[%d].";
 
     private ResponseVerifier() {}
+
+    static ResultMatcher valuesOccurInErrorMessage(String... values) {
+        return jsonPath(ERROR_MESSAGE, contains(values));
+    }
 
     static ResultMatcher valuesOccurInField(String fieldName, String... values) {
         return jsonPath(RESULTS + ".*." + fieldName, contains(values));
@@ -107,5 +118,16 @@ final class ResponseVerifier {
 
             return this;
         }
+    }
+
+    public static class TimeoutResponseCreator implements ResponseCreator {
+        @Override
+        public ClientHttpResponse createResponse(ClientHttpRequest request) throws IOException {
+            throw new SocketTimeoutException("Socket timeout generated.");
+        }
+    }
+
+    public static TimeoutResponseCreator withTimeout() {
+        return new TimeoutResponseCreator();
     }
 }

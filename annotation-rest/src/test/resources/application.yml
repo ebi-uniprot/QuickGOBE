@@ -13,5 +13,5 @@ search:
           ip: localhost,
           resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants",
           localField: goId_join,
-          responseBodyPath: "$.somekey"
+          responseBodyPath: "$.results[*].descendants[*]"
         }
