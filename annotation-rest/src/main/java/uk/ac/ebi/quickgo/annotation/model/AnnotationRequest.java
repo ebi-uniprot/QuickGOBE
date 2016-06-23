@@ -77,7 +77,8 @@ public class AnnotationRequest {
         filterMap.put(GO_EVIDENCE, evidence);
     }
 
-    @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*")
+    @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
+            message = "At least one 'GO Evidence' value is invalid: ${validatedValue}")
     public String getGoEvidence() {
         return filterMap.get(GO_EVIDENCE);
     }

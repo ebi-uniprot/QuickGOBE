@@ -95,8 +95,11 @@ public class AnnotationRequestValidationIT {
                 invalidValue -> {
                     AnnotationRequest annotationRequest = new AnnotationRequest();
                     annotationRequest.setGoEvidence(invalidValue);
-                    assertThat(invalidValue + " expected to be an invalid value, but it has passed " +
-                            "validation", validator.validate(annotationRequest), hasSize(greaterThan(0)));
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    assertThat(violations, hasSize(1));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'GO Evidence' value is invalid: " + invalidValue));
                 }
         );
     }
