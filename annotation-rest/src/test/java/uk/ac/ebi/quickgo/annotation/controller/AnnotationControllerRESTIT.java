@@ -76,7 +76,7 @@ public class AnnotationControllerRESTIT {
     }
 
     @Test
-    public void filterFor1GOTermBy0ValidDescendantMeansNothingToFilterBy()
+    public void filterFor1GOTermBy0ValidDescendantMeansFilterEverything()
             throws Exception {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
@@ -92,9 +92,7 @@ public class AnnotationControllerRESTIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(pageInfoExists())
-                .andExpect(totalNumOfResults(2))
-                .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GO_ID_FIELD, goId(1), goId(2)));
+                .andExpect(totalNumOfResults(0));
     }
 
     @Test
@@ -144,7 +142,7 @@ public class AnnotationControllerRESTIT {
     }
 
     @Test
-    public void filterFor2GOTermsBy0ValidDescendants() throws Exception {
+    public void filterFor2GOTermsBy0ValidDescendantsMeansFilterEverything() throws Exception {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
@@ -161,9 +159,7 @@ public class AnnotationControllerRESTIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(pageInfoExists())
-                .andExpect(totalNumOfResults(3))
-                .andExpect(fieldsInAllResultsExist(3))
-                .andExpect(valuesOccurInField(GO_ID_FIELD, goId(1), goId(2), goId(3)));
+                .andExpect(totalNumOfResults(0));
     }
 
     @Test
