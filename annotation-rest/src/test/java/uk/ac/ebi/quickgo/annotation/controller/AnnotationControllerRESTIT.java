@@ -9,7 +9,6 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -30,6 +29,9 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -58,6 +60,11 @@ public class AnnotationControllerRESTIT {
     private static final String BASE_URL = "http://localhost";
     private static final String COMMA = ",";
     private static final String DESCENDANTS_RESOURCE_FORMAT = "/QuickGO/services/go/terms/%s/descendants?relations=%s";
+    private static final String IS_A = "is_a";
+    private static final String DESCENDANTS_USAGE = "descendants";
+    private static final String USAGE = "usage";
+    private static final String USAGE_IDS = "usageIds";
+    private static final String USAGE_RELATIONS = "usageRelationships";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -83,12 +90,12 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectGoIdsHaveDescendants(goId(1));
+        expectRestCallHasDescendants(singletonList(goId(1)), emptyList(), emptyList());
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param("usage", "descendants")
-                        .param("usageIds", goId(1)));
+                        .param(USAGE, "descendants")
+                        .param(USAGE_IDS, goId(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -104,12 +111,12 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        expectGoIdsHaveDescendants(goId(1), goId(3));
+        expectRestCallHasDescendants(singletonList(goId(1)), emptyList(), singletonList(goId(3)));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param("usage", "descendants")
-                        .param("usageIds", goId(1)));
+                        .param(USAGE, "descendants")
+                        .param(USAGE_IDS, goId(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -127,12 +134,16 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        expectGoIdsHaveDescendants(goId(1), goId(2), goId(3));
+        expectRestCallHasDescendants(
+                singletonList(goId(1)),
+                singletonList(IS_A),
+                asList(goId(2), goId(3)));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param("usage", "descendants")
-                        .param("usageIds", goId(1)));
+                        .param(USAGE, DESCENDANTS_USAGE)
+                        .param(USAGE_IDS, goId(1))
+                        .param(USAGE_RELATIONS, IS_A));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -149,13 +160,13 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        String goIdsCSV = goId(1) + "," + goId(2);
-        expectGoIdsHaveDescendants(goIdsCSV);
+        expectRestCallHasDescendants(asList(goId(1), goId(2)), singletonList(IS_A), emptyList());
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param("usage", "descendants")
-                        .param("usageIds", goIdsCSV));
+                        .param(USAGE, DESCENDANTS_USAGE)
+                        .param(USAGE_IDS, goId(1) + "," + goId(2))
+                        .param(USAGE_RELATIONS, IS_A));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -171,12 +182,12 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
         String goIdsCSV = goId(1) + "," + goId(2);
-        expectGoIdsHaveDescendants(goIdsCSV, goId(3));
+        expectRestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), singletonList(goId(3)));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param("usage", "descendants")
-                        .param("usageIds", goIdsCSV));
+                        .param(USAGE, DESCENDANTS_USAGE)
+                        .param(USAGE_IDS, goIdsCSV));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -195,12 +206,12 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(4), goId(4)));
 
         String goIdsCSV = goId(1) + "," + goId(2);
-        expectGoIdsHaveDescendants(goIdsCSV, goId(3), goId(4));
+        expectRestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), asList(goId(3), goId(4)));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param("usage", "descendants")
-                        .param("usageIds", goIdsCSV));
+                        .param(USAGE, DESCENDANTS_USAGE)
+                        .param(USAGE_IDS, goIdsCSV));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -218,8 +229,8 @@ public class AnnotationControllerRESTIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param("usage", "descendants")
-                        .param("usageIds", goId(1)));
+                        .param(USAGE, DESCENDANTS_USAGE)
+                        .param(USAGE_IDS, goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -236,8 +247,8 @@ public class AnnotationControllerRESTIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param("usage", "descendants")
-                        .param("usageIds", goId(1)));
+                        .param(USAGE, DESCENDANTS_USAGE)
+                        .param(USAGE_IDS, goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -254,8 +265,8 @@ public class AnnotationControllerRESTIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param("usage", "descendants")
-                        .param("usageIds", goId(1)));
+                        .param(USAGE, DESCENDANTS_USAGE)
+                        .param(USAGE_IDS, goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -272,8 +283,8 @@ public class AnnotationControllerRESTIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param("usage", "descendants")
-                        .param("usageIds", goId(1)));
+                        .param(USAGE, DESCENDANTS_USAGE)
+                        .param(USAGE_IDS, goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -299,7 +310,7 @@ public class AnnotationControllerRESTIT {
         List<String> args = new ArrayList<>();
         for (int i = 0; i < requiredArgsCount; i++) {
             if (i < arguments.length) {
-                args.add(arguments[i]);
+                args.add(arguments[i].toLowerCase());
             } else {
                 args.add("");
             }
@@ -307,11 +318,21 @@ public class AnnotationControllerRESTIT {
         return String.format(format, args.toArray());
     }
 
-    private void expectGoIdsHaveDescendants(String termId, String... descendantIds) {
-        String descendantsCSV = Stream.of(descendantIds).collect(Collectors.joining(COMMA));
+    private void expectRestCallHasDescendants(
+            List<String> termIds,
+            List<String> usageRelations,
+            List<String> descendants) {
+
+        String termIdsCSV = termIds.stream().collect(Collectors.joining(COMMA));
+        String relationsCSV = usageRelations.stream().collect(Collectors.joining(COMMA));
+        String descendantsCSV = descendants.stream().collect(Collectors.joining(COMMA));
+
         expectRestCallSuccess(
                 GET,
-                buildResource(DESCENDANTS_RESOURCE_FORMAT, termId),
+                buildResource(
+                        DESCENDANTS_RESOURCE_FORMAT,
+                        termIdsCSV,
+                        relationsCSV),
                 "{ results : [ { descendants : [" + descendantsCSV + "] } ]}");
     }
 
