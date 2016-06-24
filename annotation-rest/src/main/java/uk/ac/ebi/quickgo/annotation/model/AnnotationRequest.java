@@ -32,7 +32,7 @@ public class AnnotationRequest {
     private static final String ASPECT_FIELD = "aspect";
     static final String USAGE_FIELD = "usage";
     static final String USAGE_IDS = "usageIds";
-    private static final String USAGE_RELATIONSHIPS = "usageRelationships";
+    static final String USAGE_RELATIONSHIPS = "usageRelationships";
     private final Map<String, String> filters = new HashMap<>();
 
     @Min(0)
@@ -86,6 +86,17 @@ public class AnnotationRequest {
     public void setAspect(String aspect) {
         if (aspect != null) {
             filters.put(ASPECT_FIELD, aspect.toLowerCase());
+        }
+    }
+
+    @Pattern(regexp = "is_a|part_of|occurs_in|regulates", flags = Pattern.Flag.CASE_INSENSITIVE)
+    public String getUsageRelationships() {
+        return filters.get(USAGE_RELATIONSHIPS);
+    }
+
+    public void setUsageRelationships(String usageRelationships) {
+        if (usageRelationships != null) {
+            filters.put(USAGE_RELATIONSHIPS, usageRelationships.toLowerCase());
         }
     }
 

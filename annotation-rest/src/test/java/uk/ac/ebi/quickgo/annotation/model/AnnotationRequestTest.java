@@ -14,6 +14,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_FIELD;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_IDS;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
 /**
  *
@@ -121,11 +122,28 @@ public class AnnotationRequestTest {
         annotationRequest.setUsage("descendants");
         annotationRequest.setUsageIds("GO:0000001");
 
+        FilterRequest request = FilterRequest.newBuilder()
+                .addProperty(USAGE_FIELD, "descendants")
+                .addProperty(USAGE_IDS, "GO:0000001")
+                .addProperty(USAGE_RELATIONSHIPS)
+                .build();
         assertThat(annotationRequest.createFilterRequests(),
-                contains(FilterRequest.newBuilder()
-                        .addProperty(USAGE_FIELD, "descendants")
-                        .addProperty(USAGE_IDS, "GO:0000001")
-                        .build()));
+                contains(request));
+    }
+
+    @Test
+    public void createsFilterWithUsageAndUsageIdsAndUsageRelationships() {
+        annotationRequest.setUsage("descendants");
+        annotationRequest.setUsageIds("GO:0000001");
+        annotationRequest.setUsageRelationships("is_a");
+
+        FilterRequest request = FilterRequest.newBuilder()
+                .addProperty(USAGE_FIELD, "descendants")
+                .addProperty(USAGE_IDS, "GO:0000001")
+                .addProperty(USAGE_RELATIONSHIPS, "is_a")
+                .build();
+        assertThat(annotationRequest.createFilterRequests(),
+                contains(request));
     }
 
     @Test(expected = ParameterException.class)

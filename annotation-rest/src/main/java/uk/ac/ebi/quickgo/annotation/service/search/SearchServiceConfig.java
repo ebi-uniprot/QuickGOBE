@@ -22,8 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
 
 /**
  *
@@ -77,11 +75,6 @@ public class SearchServiceConfig {
     @Bean
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
         return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
-    }
-
-    @Bean
-    public RestOperations restOperations() {
-        return new RestTemplate();
     }
 
     /**

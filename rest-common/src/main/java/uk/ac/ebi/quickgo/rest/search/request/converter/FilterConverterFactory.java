@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
+import uk.ac.ebi.quickgo.rest.controller.FilterRequestConfig;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
@@ -8,6 +9,7 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 import com.google.common.base.Preconditions;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 
@@ -17,6 +19,7 @@ import org.springframework.web.client.RestOperations;
  * Created by Edd on 05/06/2016.
  */
 @Component
+@Import(FilterRequestConfig.class)
 public class FilterConverterFactory {
 
     private final FilterConfigRetrieval filterConfigRetrieval;
