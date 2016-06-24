@@ -74,7 +74,7 @@ public class AnnotationRequest {
 
     public void setUsageIds(String usageIds) {
         if (usageIds != null) {
-            filters.put(USAGE_IDS, usageIds);
+            filters.put(USAGE_IDS, usageIds.toLowerCase());
         }
     }
 
