@@ -80,8 +80,6 @@ public class AnnotationRequest {
         return filters.get(AnnotationFields.GENE_PRODUCT_ID);
     }
 
-
-
     public void setPage(int page) {
         this.page = page;
     }
