@@ -60,4 +60,12 @@ public class AnnotationRequestTest {
 
         assertThat(annotationRequest.getAspect(), is(aspect));
     }
+
+    @Test
+    public void setAndGetGeneProductID() {
+        String geneProductID = "A0A000";
+        annotationRequest.setGeneProductId(geneProductID);
+        assertThat(annotationRequest.getGeneProductId(), is(geneProductID));
+    }
+
 }
