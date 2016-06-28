@@ -91,4 +91,12 @@ public class AnnotationRequestTest {
 
         assertThat(annotationRequest.getTaxon(), is(taxonId));
     }
+
+    @Test
+    public void setAndGetECOId() {
+        String ecoId = "ECO:0000256";
+        annotationRequest.setEcoID(ecoId);
+        assertThat(annotationRequest.getEcoID(), is(ecoId));
+    }
+
 }

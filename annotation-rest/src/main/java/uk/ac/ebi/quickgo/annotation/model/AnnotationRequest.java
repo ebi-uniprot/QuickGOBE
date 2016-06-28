@@ -9,6 +9,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ECO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
 
@@ -94,6 +95,19 @@ public class AnnotationRequest {
         return filterMap.get(AnnotationFields.TAXON_ID);
     }
 
+    /**
+     * Will receive a list of eco ids thus: EcoId=ECO:0000256,ECO:0000323
+     * @param ecoId
+     */
+    public void setEcoID(String ecoId) {
+        filterMap.put(ECO_ID,ecoId);
+    }
+
+    @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*")
+    public String getEcoID(){
+        return filterMap.get(ECO_ID);
+    }
+
     public int getLimit() {
         return limit;
     }
@@ -109,6 +123,7 @@ public class AnnotationRequest {
     public void setPage(int page) {
         this.page = page;
     }
+
 
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
@@ -133,4 +148,6 @@ public class AnnotationRequest {
 
         return request;
     }
+
+
 }
