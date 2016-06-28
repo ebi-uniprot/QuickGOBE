@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.annotation.model.*;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
@@ -12,9 +11,12 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -111,7 +113,7 @@ public class AnnotationController {
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest request,
             BindingResult bindingResult) {
 
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);
         }
 
@@ -127,5 +129,32 @@ public class AnnotationController {
                 .build();
 
         return search(queryRequest, annotationSearchService);
+    }
+
+    /**
+     * Return statistics based on the search result.
+     *
+     * The statistics are subdivided into two areas, each with
+     * @return a {@link QueryResult} instance containing the results of the search
+     */
+    @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<StatisticsGroup>> annotationLookup() {
+        StatisticsValue id1 = new StatisticsValue("GO:0016020", 2, 6);
+        StatisticsValue id2 = new StatisticsValue("GO:0016021", 2, 6);
+        StatisticsValue id3 = new StatisticsValue("GO:0005737", 2, 6);
+
+        StatisticsByType statsById = new StatisticsByType("ontologyId");
+        statsById.addValue(id1);
+        statsById.addValue(id2);
+        statsById.addValue(id3);
+
+        StatisticsGroup annotationGroup = new StatisticsGroup("annotation", 6);
+        annotationGroup.addStatsType(statsById);
+
+        List<StatisticsGroup> results = Collections.singletonList(annotationGroup);
+
+        QueryResult<StatisticsGroup> qs = new QueryResult.Builder<>(1L, results).build();
+
+        return new ResponseEntity<>(qs, HttpStatus.OK);
     }
 }
