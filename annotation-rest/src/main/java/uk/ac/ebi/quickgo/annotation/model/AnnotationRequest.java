@@ -99,12 +99,12 @@ public class AnnotationRequest {
      * Will receive a list of eco ids thus: EcoId=ECO:0000256,ECO:0000323
      * @param ecoId
      */
-    public void setEcoID(String ecoId) {
+    public void setEcoId(String ecoId) {
         filterMap.put(ECO_ID,ecoId);
     }
 
     @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*")
-    public String getEcoID(){
+    public String getEcoId(){
         return filterMap.get(ECO_ID);
     }
 
@@ -132,6 +132,7 @@ public class AnnotationRequest {
         createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
         createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
         createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
+        createSimpleFilter(ECO_ID).ifPresent(filterRequests::add);
 
         return filterRequests;
     }
