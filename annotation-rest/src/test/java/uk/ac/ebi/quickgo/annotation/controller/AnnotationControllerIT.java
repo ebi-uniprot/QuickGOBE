@@ -49,6 +49,7 @@ public class AnnotationControllerIT {
 
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
     private static final String GO_EVIDENCE_PARAM = "goEvidence";
+    private static final String ECO_ID = "ecoId";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxon";
@@ -312,6 +313,34 @@ public class AnnotationControllerIT {
         response.andExpect(status().isBadRequest())
                 .andExpect(contentTypeToBeJson());
 
+    }
+
+    //---------- ECO id
+
+    @Test
+    public void filterByEcoIdBySuccessfully() throws Exception {
+        String ecoID = "ECO:0000256";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(ECO_ID, ecoID));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()))
+                .andExpect(atLeastOneResultHasItem(ECO_ID, ecoID));
+    }
+
+
+    @Test
+    public void filterByNonExistentEcoIdReturnsZeroResults() throws Exception {
+        String ecoID = "ECO:0000999";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(ECO_ID, ecoID));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
     }
 
     //---------- Page related tests.
