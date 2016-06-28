@@ -20,7 +20,7 @@ final class ResponseVerifier {
     public static final String GENEPRODUCT_ID_FIELD = "geneProductId";
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
 
-    private static final String RESULTS = "results";
+    public static final String RESULTS = "results";
     private static final String RESULTS_CONTENT_BY_INDEX = RESULTS + "[%d].";
 
     private ResponseVerifier() {}
