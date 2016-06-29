@@ -77,6 +77,8 @@ public class AnnotationControllerIT {
 
         genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
         repository.save(genericDocs);
+        genericDocs = createGenericDocs2(NUMBER_OF_GENERIC_DOCS);
+        repository.save(genericDocs);
     }
 
     //ASSIGNED BY
@@ -91,7 +93,8 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, assignedBy));
 
-        response.andExpect(status().isOk())
+        response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
@@ -379,7 +382,7 @@ public class AnnotationControllerIT {
                 .andExpect(
                         pageInfoMatches(
                                 1,
-                                totalPages(genericDocs.size(), DEFAULT_ENTRIES_PER_PAGE),
+                                totalPages(genericDocs.size()*2, DEFAULT_ENTRIES_PER_PAGE),
                                 DEFAULT_ENTRIES_PER_PAGE)
                 );
     }
@@ -427,7 +430,7 @@ public class AnnotationControllerIT {
                 get(RESOURCE_URL + "/search").param(LIMIT_PARAM, "100"));
 
         response.andExpect(status().isOk())
-                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(totalNumOfResults(genericDocs.size()*2))
                 .andExpect(pageInfoMatches(1, 1, 100));
     }
 
@@ -460,6 +463,11 @@ public class AnnotationControllerIT {
                         (Collectors.toList());
     }
 
+    private List<AnnotationDocument> createGenericDocs2(int n) {
+        return IntStream.range(0, n)
+                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc2(createId(i))).collect
+                        (Collectors.toList());
+    }
     private String createId(int idNum) {
         return String.format("A0A%03d", idNum);
     }

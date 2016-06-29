@@ -76,7 +76,7 @@
     <field name="dbObjectSymbol" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="dbSubset" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="goEvidence" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
-    <field name="ecoId" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="ecoId" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="reference" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="withFrom" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="taxonId" type="int" indexed="true" stored="false" multiValued="false"/>
