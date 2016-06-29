@@ -8,7 +8,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
 /**
  * Gene product IDs that don't match the regular expressions for recognised/supported gene product types should be
  * rejected with an error; those that do match should be treated as valid (plausible), even if they don't actually
@@ -21,14 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Time: 13:32
  * Created with IntelliJ IDEA.
  */
+
 public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList,String>{
 
     @Autowired
-    GeneProductDbXRefIDFormats geneProductValidator;
+    GeneProductDbXRefIDFormats xRefFormats;
     Predicate<String> idValidator;
 
     @Override public void initialize(GeneProductIDList constraintAnnotation) {
-        idValidator = geneProductValidator::isValidId;
+        idValidator = xRefFormats::isValidId;
     }
 
     @Override public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
