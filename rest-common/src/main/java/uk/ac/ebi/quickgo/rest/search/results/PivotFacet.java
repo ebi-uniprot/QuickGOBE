@@ -15,15 +15,15 @@ import java.util.Set;
  *
  * @author Edd Turner, Ricardo Antunes
  */
-public class FacetPivot {
+public class PivotFacet {
     private final String name;
     private final String catName;
 
     private final long count;
 
-    private final Set<FacetPivot> pivots;
+    private final Set<PivotFacet> pivots;
 
-    public FacetPivot(String name, String catName, long count) {
+    public PivotFacet(String name, String catName, long count) {
         Preconditions.checkArgument(name != null && !name.trim().isEmpty(), "Name cannot be null or empty");
         Preconditions.checkArgument(catName != null && !catName.trim().isEmpty(), "Category name cannot be null or " +
                 "empty");
@@ -47,7 +47,7 @@ public class FacetPivot {
         return count;
     }
 
-    public void addPivot(FacetPivot childPivot) {
+    public void addPivot(PivotFacet childPivot) {
         Preconditions.checkArgument(childPivot != null, "Cannot add null child pivot");
         pivots.add(childPivot);
     }
@@ -57,7 +57,7 @@ public class FacetPivot {
      *
      * @return an unmodifiable set
      */
-    public Set<FacetPivot> getPivots() {
+    public Set<PivotFacet> getPivots() {
         return Collections.unmodifiableSet(pivots);
     }
 }

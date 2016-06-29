@@ -11,9 +11,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 /**
- * Tests the behaviour of the {@link FacetPivot} class.
+ * Tests the behaviour of the {@link PivotFacet} class.
  */
-public class FacetPivotTest {
+public class PivotFacetTest {
     private String name = "name";
     private String catName = "catName";
     private Long count = 1L;
@@ -28,7 +28,7 @@ public class FacetPivotTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Name cannot be null or empty");
 
-        new FacetPivot(name, catName, count);
+        new PivotFacet(name, catName, count);
     }
 
     @Test
@@ -38,7 +38,7 @@ public class FacetPivotTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Name cannot be null or empty");
 
-        new FacetPivot(name, catName, count);
+        new PivotFacet(name, catName, count);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class FacetPivotTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Category name cannot be null or empty");
 
-        new FacetPivot(name, catName, count);
+        new PivotFacet(name, catName, count);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class FacetPivotTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Category name cannot be null or empty");
 
-        new FacetPivot(name, catName, count);
+        new PivotFacet(name, catName, count);
     }
 
     @Test
@@ -68,29 +68,29 @@ public class FacetPivotTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Count cannot be negative");
 
-        new FacetPivot(name, catName, count);
+        new PivotFacet(name, catName, count);
     }
 
     @Test
     public void canCreateWithNameAndCategoryNameAndCount() throws Exception {
-        FacetPivot facetPivot = new FacetPivot(name, catName, count);
-        assertThat(facetPivot, is(notNullValue()));
+        PivotFacet pivotFacet = new PivotFacet(name, catName, count);
+        assertThat(pivotFacet, is(notNullValue()));
 
-        assertThat(facetPivot.getName(), is(name));
-        assertThat(facetPivot.getCatName(), is(catName));
-        assertThat(facetPivot.getCount(), is(count));
+        assertThat(pivotFacet.getName(), is(name));
+        assertThat(pivotFacet.getCatName(), is(catName));
+        assertThat(pivotFacet.getCount(), is(count));
     }
 
     @Test
     public void nullChildPivotThrowsException() throws Exception {
-        FacetPivot facetPivot = new FacetPivot(name, catName, count);
+        PivotFacet pivotFacet = new PivotFacet(name, catName, count);
 
-        FacetPivot childPivot = null;
+        PivotFacet childPivot = null;
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot add null child pivot");
 
-        facetPivot.addPivot(childPivot);
+        pivotFacet.addPivot(childPivot);
     }
 
     @Test
@@ -99,9 +99,9 @@ public class FacetPivotTest {
         String childName1 = "child1";
         String childName2 = "child2";
 
-        FacetPivot parentPivot = new FacetPivot(parentName, catName, count);
-        FacetPivot childPivot1 = new FacetPivot(childName1, catName, count);
-        FacetPivot childPivot2 = new FacetPivot(childName2, catName, count);
+        PivotFacet parentPivot = new PivotFacet(parentName, catName, count);
+        PivotFacet childPivot1 = new PivotFacet(childName1, catName, count);
+        PivotFacet childPivot2 = new PivotFacet(childName2, catName, count);
 
         parentPivot.addPivot(childPivot1);
         parentPivot.addPivot(childPivot2);
@@ -116,19 +116,19 @@ public class FacetPivotTest {
         String parentName = "parent";
         String childName = "child";
 
-        FacetPivot grandParentPivot = new FacetPivot(grandparentName, catName, count);
-        FacetPivot parentPivot = new FacetPivot(parentName, catName, count);
-        FacetPivot childPivot = new FacetPivot(childName, catName, count);
+        PivotFacet grandParentPivot = new PivotFacet(grandparentName, catName, count);
+        PivotFacet parentPivot = new PivotFacet(parentName, catName, count);
+        PivotFacet childPivot = new PivotFacet(childName, catName, count);
 
         grandParentPivot.addPivot(parentPivot);
         parentPivot.addPivot(childPivot);
 
         assertThat(grandParentPivot.getPivots(), hasSize(1));
-        FacetPivot retrievedParent = grandParentPivot.getPivots().iterator().next();
+        PivotFacet retrievedParent = grandParentPivot.getPivots().iterator().next();
         assertThat(retrievedParent.getName(), is(parentName));
 
         assertThat(parentPivot.getPivots(), hasSize(1));
-        FacetPivot retrievedChild = parentPivot.getPivots().iterator().next();
+        PivotFacet retrievedChild = parentPivot.getPivots().iterator().next();
         assertThat(retrievedChild.getName(), is(childName));
     }
 }
