@@ -247,7 +247,7 @@ public class AnnotationControllerIT {
     //---------- GoEvidence related tests.
 
     @Test
-    public void lookupAnnotationFilterByGoEvidenceCodeBySuccessfully() throws Exception {
+    public void filterAnnotationsByGoEvidenceCodeSuccessfully() throws Exception {
         String goEvidenceCode = "IEA";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, goEvidenceCode));
@@ -260,7 +260,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void lookupAnnotationFilterByLowercaseGoEvidenceCodeBySuccessfully() throws Exception {
+    public void filtersAnnotationsByLowercaseGoEvidenceCodeBySuccessfully() throws Exception {
         String goEvidenceCode = "iea";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, goEvidenceCode));
@@ -272,7 +272,8 @@ public class AnnotationControllerIT {
                 .andExpect(atLeastOneResultHasItem(GO_EVIDENCE_FIELD, goEvidenceCode.toUpperCase()));
     }
 
-    @Test    public void lookupAnnotationFilterByNonExistentGoEvidenceCodeReturnsNothing() throws Exception {
+    @Test
+    public void filterAnnotationsByNonExistentGoEvidenceCodeReturnsNothing() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, "ZZZ"));
 
