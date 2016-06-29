@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.results;
 
 import com.google.common.base.Preconditions;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -45,8 +45,8 @@ public class Facet {
     private final Set<PivotFacet> pivotFacets;
 
     public Facet() {
-        this.fieldFacets = new HashSet<>();
-        this.pivotFacets = new HashSet<>();
+        this.fieldFacets = new LinkedHashSet<>();
+        this.pivotFacets = new LinkedHashSet<>();
     }
 
     /**

@@ -77,8 +77,9 @@ public class FacetTest {
     }
 
     @Test
-    public void addingNonNullPivotIsSuccessful() throws Exception {
-        PivotFacet pivotFacet = new PivotFacet("pivot", "catName", 0);
+    public void addingNonNullPivotFacetIsSuccessful() throws Exception {
+        String[] pivotFields = {"field1", "field2"};
+        PivotFacet pivotFacet = new PivotFacet(pivotFields);
 
         facet.addPivotFacet(pivotFacet);
 
