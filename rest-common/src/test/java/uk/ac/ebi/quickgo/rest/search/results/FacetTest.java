@@ -1,10 +1,12 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -17,10 +19,15 @@ public class FacetTest {
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
 
+    private Facet facet;
+
+    @Before
+    public void setUp() throws Exception {
+        facet = new Facet();
+    }
+
     @Test
     public void newlyCreateFacetHasNoFacets() throws Exception {
-        Facet facet = new Facet();
-
         assertThat(facet.getFacetFields(), is(empty()));
     }
 
@@ -31,7 +38,6 @@ public class FacetTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot add null field facet.");
 
-        Facet facet = new Facet();
         facet.addFacetField(fieldFacet);
     }
 
@@ -41,7 +47,6 @@ public class FacetTest {
         FieldFacet fieldFacet2 = new FieldFacet("field2");
         FieldFacet fieldFacet3 = new FieldFacet("field3");
 
-        Facet facet = new Facet();
         facet.addFacetField(fieldFacet1);
         facet.addFacetField(fieldFacet2);
         facet.addFacetField(fieldFacet3);
@@ -56,12 +61,28 @@ public class FacetTest {
 
         thrown.expect(UnsupportedOperationException.class);
 
-        Facet facet = new Facet();
         facet.addFacetField(fieldFacet1);
 
         facet.getFacetFields().remove(0);
     }
 
-//    @Test
-//    public void add
+    @Test
+    public void addingNullPivotThrowsException() throws Exception {
+        PivotFacet pivotFacet = null;
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Cannot add null pivot facet.");
+
+        facet.addPivotFacet(pivotFacet);
+    }
+
+    @Test
+    public void addingNonNullPivotIsSuccessful() throws Exception {
+        PivotFacet pivotFacet = new PivotFacet("pivot", "catName", 0);
+
+        facet.addPivotFacet(pivotFacet);
+
+        assertThat(facet.getPivotFacets(), hasSize(1));
+        assertThat(facet.getPivotFacets(), contains(pivotFacet));
+    }
 }

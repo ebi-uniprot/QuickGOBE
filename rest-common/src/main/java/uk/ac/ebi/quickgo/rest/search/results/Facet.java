@@ -1,7 +1,8 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
+import com.google.common.base.Preconditions;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -22,20 +23,43 @@ import java.util.Set;
  *     <li>valueN:20</li>
  * </ul>
  *
- * Note: the above example is for a {@link FieldFacet}.
+ * <b>Note: the above example is for a {@link FieldFacet}.</b>
+ *
+ * <p/>
+ *
+ * It is also possible to store pivoted facets, which allow for the storage of drill-down facets.
+ * <p/>
+ * <b>facet: field1, field2</b>
+ * <ul>
+ *     <li>field1:5</li>
+ *     <ul>
+ *         <li>field2:a:3</li>
+ *         <li>field2:b:2</li>
+ *     </ul>
+ * </ul>
+ *
+ * <b>Note: the above example is for a {@link PivotFacet}.</b>
  */
 public class Facet {
     private final Set<FieldFacet> fieldFacets;
+    private final Set<PivotFacet> pivotFacets;
 
     public Facet() {
-        this.fieldFacets = new LinkedHashSet<>();
+        this.fieldFacets = new HashSet<>();
+        this.pivotFacets = new HashSet<>();
     }
 
+    /**
+     * Returns an unmodifiable set of {@link FieldFacet} instances.
+     * @return an unmodifiable set.
+     */
     public Set<FieldFacet> getFacetFields() {
         return Collections.unmodifiableSet(fieldFacets);
     }
 
     public void addFacetField(FieldFacet fieldFacet) {
+        Preconditions.checkArgument(fieldFacet != null, "Cannot add null field facet.");
+
         fieldFacets.add(fieldFacet);
     }
 
@@ -61,5 +85,18 @@ public class Facet {
         return "Facet{" +
                 "facetFields=" + fieldFacets +
                 '}';
+    }
+
+    public void addPivotFacet(PivotFacet pivotFacet) {
+        Preconditions.checkArgument(pivotFacet != null, "Cannot add null pivot facet.");
+        pivotFacets.add(pivotFacet);
+    }
+
+    /**
+     * Returns an unmodifiable set of {@link PivotFacet} instances.
+     * @return an unmodifiable set.
+     */
+    public Set<PivotFacet> getPivotFacets() {
+        return Collections.unmodifiableSet(pivotFacets);
     }
 }
