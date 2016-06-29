@@ -22,43 +22,43 @@ public class PivotFacetTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void nullNameThrowsException() throws Exception {
-        String name = null;
+    public void nullFieldNameThrowsException() throws Exception {
+        String field = null;
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Name cannot be null or empty");
+        thrown.expectMessage("Field cannot be null or empty");
 
-        new PivotFacet(name, catName, count);
+        new PivotFacet(field, catName, count);
     }
 
     @Test
-    public void emptyNameThrowsException() throws Exception {
-        String name = "";
+    public void emptyFieldNameThrowsException() throws Exception {
+        String field = "";
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Name cannot be null or empty");
+        thrown.expectMessage("Field cannot be null or empty");
 
-        new PivotFacet(name, catName, count);
+        new PivotFacet(field, catName, count);
     }
 
     @Test
-    public void nullCategoryNameThrowsException() throws Exception {
-        String catName = null;
+    public void nullValueThrowsException() throws Exception {
+        String value = null;
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Category name cannot be null or empty");
+        thrown.expectMessage("Value cannot be null or empty");
 
-        new PivotFacet(name, catName, count);
+        new PivotFacet(name, value, count);
     }
 
     @Test
-    public void emptyCategoryNameThrowsException() throws Exception {
-        String catName = "";
+    public void emptyValueThrowsException() throws Exception {
+        String value = "";
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Category name cannot be null or empty");
+        thrown.expectMessage("Value cannot be null or empty");
 
-        new PivotFacet(name, catName, count);
+        new PivotFacet(name, value, count);
     }
 
     @Test
@@ -72,12 +72,12 @@ public class PivotFacetTest {
     }
 
     @Test
-    public void canCreateWithNameAndCategoryNameAndCount() throws Exception {
+    public void canCreateWithFieldAndValueAndCount() throws Exception {
         PivotFacet pivotFacet = new PivotFacet(name, catName, count);
         assertThat(pivotFacet, is(notNullValue()));
 
-        assertThat(pivotFacet.getName(), is(name));
-        assertThat(pivotFacet.getCatName(), is(catName));
+        assertThat(pivotFacet.getField(), is(name));
+        assertThat(pivotFacet.getValue(), is(catName));
         assertThat(pivotFacet.getCount(), is(count));
     }
 
@@ -125,10 +125,10 @@ public class PivotFacetTest {
 
         assertThat(grandParentPivot.getPivots(), hasSize(1));
         PivotFacet retrievedParent = grandParentPivot.getPivots().iterator().next();
-        assertThat(retrievedParent.getName(), is(parentName));
+        assertThat(retrievedParent.getField(), is(parentName));
 
         assertThat(parentPivot.getPivots(), hasSize(1));
         PivotFacet retrievedChild = parentPivot.getPivots().iterator().next();
-        assertThat(retrievedChild.getName(), is(childName));
+        assertThat(retrievedChild.getField(), is(childName));
     }
 }

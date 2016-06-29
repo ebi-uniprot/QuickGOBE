@@ -16,31 +16,30 @@ import java.util.Set;
  * @author Edd Turner, Ricardo Antunes
  */
 public class PivotFacet {
-    private final String name;
-    private final String catName;
+    private final String field;
+    private final String value;
 
     private final long count;
 
     private final Set<PivotFacet> pivots;
 
-    public PivotFacet(String name, String catName, long count) {
-        Preconditions.checkArgument(name != null && !name.trim().isEmpty(), "Name cannot be null or empty");
-        Preconditions.checkArgument(catName != null && !catName.trim().isEmpty(), "Category name cannot be null or " +
-                "empty");
+    public PivotFacet(String field, String value, long count) {
+        Preconditions.checkArgument(field != null && !field.trim().isEmpty(), "Field cannot be null or empty");
+        Preconditions.checkArgument(value != null && !value.trim().isEmpty(), "Value cannot be null or empty");
         Preconditions.checkArgument(count >= 0, "Count cannot be negative");
 
-        this.name = name;
-        this.catName = catName;
+        this.field = field;
+        this.value = value;
         this.count = count;
         this.pivots = new HashSet<>();
     }
 
-    public String getName() {
-        return name;
+    public String getField() {
+        return field;
     }
 
-    public String getCatName() {
-        return catName;
+    public String getValue() {
+        return value;
     }
 
     public long getCount() {
