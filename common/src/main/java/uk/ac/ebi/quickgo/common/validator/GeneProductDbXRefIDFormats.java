@@ -42,7 +42,9 @@ public class GeneProductDbXRefIDFormats {
             return true;
         }
         for(Key dbKey : targetDBs){
-            if(this.geneProductXrefEntities.get(dbKey).matches(id)) return true;
+            GeneProductDbXRefIDFormat entity = this.geneProductXrefEntities.get(dbKey);
+            if(null==entity)continue;
+            if(entity.matches(id)) return true;
         }
 
         //no matches
