@@ -25,6 +25,17 @@ public class FacetTest {
     }
 
     @Test
+    public void addingNullFacetFieldThrowsException() throws Exception {
+        FieldFacet fieldFacet = null;
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Cannot add null field facet.");
+
+        Facet facet = new Facet();
+        facet.addFacetField(fieldFacet);
+    }
+
+    @Test
     public void addFacetField() throws Exception {
         FieldFacet fieldFacet1 = new FieldFacet("field1");
         FieldFacet fieldFacet2 = new FieldFacet("field2");
@@ -50,4 +61,7 @@ public class FacetTest {
 
         facet.getFacetFields().remove(0);
     }
+
+//    @Test
+//    public void add
 }
