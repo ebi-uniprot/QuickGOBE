@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
-import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.*;
@@ -11,6 +9,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
 
@@ -31,8 +30,6 @@ public class AnnotationRequest {
 
     private static final String COMMA = ",";
     private static final int DEFAULT_PAGE_NUMBER = 1;
-
-    private static final String ASPECT_FIELD = "aspect";
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -78,17 +75,19 @@ public class AnnotationRequest {
 
     public void setGeneProductId(String listOfGeneProductIDs){
         if(listOfGeneProductIDs != null) {
-            filters.put(AnnotationFields.GENE_PRODUCT_ID, listOfGeneProductIDs);
+            filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
         }
     }
 
     @GeneProductIDList
     public String getGeneProductId(){
-        return filters.get(AnnotationFields.GENE_PRODUCT_ID);
+        return filterMap.get(GENE_PRODUCT_ID);
     }
 
     public void setPage(int page) {
         this.page = page;
+    }
+
     /**
      * The older evidence codes
      * E.g. IEA, IBA, IBD etc. See <a href="http://geneontology.org/page/guide-go-evidence-codes">Guide QuickGO
@@ -112,7 +111,7 @@ public class AnnotationRequest {
     @Pattern(regexp = "[0-9]+(,[0-9]+)*",
             message = "At least one invalid 'Taxonomic identifier' value is invalid: ${validatedValue}")
     public String getTaxon() {
-        return filterMap.get(AnnotationFields.TAXON_ID);
+        return filterMap.get(TAXON_ID);
     }
 
     public int getLimit() {
@@ -127,9 +126,6 @@ public class AnnotationRequest {
         return page;
     }
 
-    public void setPage(int page) {
-        this.page = page;
-    }
 
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
@@ -138,6 +134,7 @@ public class AnnotationRequest {
         createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
         createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
         createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
+        createSimpleFilter(GENE_PRODUCT_ID).ifPresent(filterRequests::add);
 
         return filterRequests;
     }
