@@ -65,8 +65,8 @@ public class AnnotationRequestTest {
     @Test
     public void setAndGetGeneProductID() {
         String geneProductID = "A0A000";
-        annotationRequest.setGeneProductId(geneProductID);
-        assertThat(annotationRequest.getGeneProductId(), is(geneProductID));
+        annotationRequest.setGpId(geneProductID);
+        assertThat(annotationRequest.getGpId(), is(geneProductID));
     }
 
     @Test
