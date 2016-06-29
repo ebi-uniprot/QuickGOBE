@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.document.Aspect;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 

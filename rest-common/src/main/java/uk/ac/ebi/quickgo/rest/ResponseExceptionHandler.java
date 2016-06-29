@@ -3,6 +3,9 @@ package uk.ac.ebi.quickgo.rest;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.service.ServiceConfigException;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 /**
- * Handler responsible for returning error responses with a meaningful message to the REST client.
+ * Handler responsible for returning error responses with meaningful messages to the REST client.
  *
  * @author Ricardo Antunes
  */
@@ -28,6 +31,13 @@ public class ResponseExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ParameterException.class)
+    protected ResponseEntity<ErrorInfo> handleParameterErrorRequest(ParameterException ex, HttpServletRequest request) {
+        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(),
+                ex.getMessages().collect(Collectors.toList()));
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     protected ResponseEntity<ErrorInfo> handleNotFoundRequest(RuntimeException ex, HttpServletRequest request) {
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), ex.getMessage());
@@ -36,22 +46,30 @@ public class ResponseExceptionHandler {
 
     public static class ErrorInfo {
         private final String url;
-        private final String message;
+        private final List<String> messages;
 
         public ErrorInfo(String url, String message) {
             assert url != null : "Error URL can't be null";
-            assert message != null : "Error message can't be null";
+            assert message != null : "Error messages can't be null";
 
             this.url = url;
-            this.message = message;
+            this.messages = Collections.singletonList(message);
+        }
+
+        public ErrorInfo(String url, List<String> messages) {
+            assert url != null : "Error URL can't be null";
+            assert messages != null : "Error messages can't be null";
+
+            this.url = url;
+            this.messages = messages;
         }
 
         public String getUrl() {
             return url;
         }
 
-        public String getMessage() {
-            return message;
+        public List<String> getMessages() {
+            return messages;
         }
     }
 }
