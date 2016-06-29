@@ -1,9 +1,8 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import uk.ac.ebi.quickgo.rest.search.results.Facet;
-import uk.ac.ebi.quickgo.rest.search.results.FieldFacet;
-
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -15,6 +14,9 @@ import static org.hamcrest.Matchers.is;
  * Tests the implementation of the {@link Facet} implementation.
  */
 public class FacetTest {
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void newlyCreateFacetHasNoFacets() throws Exception {
         Facet facet = new Facet();
@@ -24,12 +26,9 @@ public class FacetTest {
 
     @Test
     public void addFacetField() throws Exception {
-        uk.ac.ebi.quickgo.rest.search.results.FieldFacet
-                fieldFacet1 = new uk.ac.ebi.quickgo.rest.search.results.FieldFacet("field1");
-        uk.ac.ebi.quickgo.rest.search.results.FieldFacet
-                fieldFacet2 = new uk.ac.ebi.quickgo.rest.search.results.FieldFacet("field2");
-        uk.ac.ebi.quickgo.rest.search.results.FieldFacet
-                fieldFacet3 = new uk.ac.ebi.quickgo.rest.search.results.FieldFacet("field3");
+        FieldFacet fieldFacet1 = new FieldFacet("field1");
+        FieldFacet fieldFacet2 = new FieldFacet("field2");
+        FieldFacet fieldFacet3 = new FieldFacet("field3");
 
         Facet facet = new Facet();
         facet.addFacetField(fieldFacet1);
@@ -40,9 +39,11 @@ public class FacetTest {
         assertThat(facet.getFacetFields(), containsInAnyOrder(fieldFacet1, fieldFacet2, fieldFacet3));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void deletingFacetFieldThrowsException() throws Exception {
-        uk.ac.ebi.quickgo.rest.search.results.FieldFacet fieldFacet1 = new FieldFacet("field1");
+        FieldFacet fieldFacet1 = new FieldFacet("field1");
+
+        thrown.expect(UnsupportedOperationException.class);
 
         Facet facet = new Facet();
         facet.addFacetField(fieldFacet1);
