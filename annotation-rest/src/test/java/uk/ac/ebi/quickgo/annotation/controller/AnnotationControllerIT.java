@@ -321,7 +321,7 @@ public class AnnotationControllerIT {
     //---------- ECO id
 
     @Test
-    public void filterByEcoIdBySuccessfully() throws Exception {
+    public void filterByEcoIdSuccessfully() throws Exception {
         String ecoID = "ECO:0000256";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ECO_ID, ecoID));
@@ -335,8 +335,43 @@ public class AnnotationControllerIT {
 
 
     @Test
+    public void filterByMultipleEcoIdMixedResults() throws Exception {
+        String ecoID1 = "ECO:0000256";  //exists
+        String ecoID2 = "ECO:0000323";  //exists
+        String ecoID3 = "ECO:0000888";  //doesn't exist
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(ECO_ID, ecoID1 + "," + ecoID2));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()*2))
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()*2))
+                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID1, 3))
+                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID2, 3))
+                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID3, 0));
+    }
+
+    @Test
+    public void filterByMultipleEcoIdMixedResultsWithMultipleParms() throws Exception {
+        String ecoID1 = "ECO:0000256";  //exists
+        String ecoID2 = "ECO:0000323";  //exists
+        String ecoID3 = "ECO:0000888";  //doesn't exist
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(ECO_ID, ecoID1)
+                        .param(ECO_ID, ecoID2));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()*2))
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()*2))
+                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID1, 3))
+                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID2, 3))
+                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID3, 0));
+    }
+
+    @Test
     public void filterByNonExistentEcoIdReturnsZeroResults() throws Exception {
-        String ecoID = "ECO:0000999";
+        String ecoID = "ECO:0000888";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ECO_ID, ecoID));
 
