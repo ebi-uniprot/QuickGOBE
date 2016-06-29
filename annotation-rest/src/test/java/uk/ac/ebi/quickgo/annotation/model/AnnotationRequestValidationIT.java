@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,6 +20,8 @@ import static org.hamcrest.Matchers.hasSize;
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes={AnnotationRequestConfig.class})
 public class AnnotationRequestValidationIT {
     private static final String[] VALID_ASSIGNED_BY_PARMS = {"ASPGD", "ASPGD,Agbase", "ASPGD_,Agbase",
             "ASPGD,Agbase_", "ASPGD,Agbase", "BHF-UCL,Agbase", "Roslin_Institute,BHF-UCL,Agbase"};
@@ -28,14 +32,16 @@ public class AnnotationRequestValidationIT {
     private static final String[] VALID_GO_EVIDENCE = {"IEA,IBD,IC"};
     private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
 
-    private Validator validator;
+    private static final String[] VALID_GENE_PRODUCT_ID  = {"A0A000","A0A003"};
+    private static final String[] INVALID_GENE_PRODUCT_ID = {"99999","&12345"};
+
+    @Autowired
+    public Validator validator;
+
     private AnnotationRequest annotationRequest;
 
     @Before
     public void setUp() throws Exception {
-        ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
-        validator = vf.getValidator();
-
         annotationRequest = new AnnotationRequest();
     }
 
@@ -53,7 +59,6 @@ public class AnnotationRequestValidationIT {
                 .collect(Collectors.joining(","));
 
         annotationRequest.setAssignedBy(assignedByValues);
-
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -108,9 +113,7 @@ public class AnnotationRequestValidationIT {
     @Test
     public void nullAspectIsValid() {
         String aspect = null;
-
-        annotationRequest.setAspect(aspect);
-
+        annotationRequest.setGpId("A0A000");
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -228,6 +231,25 @@ public class AnnotationRequestValidationIT {
         assertThat(violations, hasSize(is(1)));
         assertThat(violations.iterator().next().getMessage(),
                 is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
+    }
+
+
+    //GENE PRODUCT ID
+    @Test
+    public void allGeneProductValuesAreValid() {
+        String geneProductIdValues = Arrays.stream(VALID_GENE_PRODUCT_ID)
+                .collect(Collectors.joining(","));
+        annotationRequest.setGpId(geneProductIdValues);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void allGeneProductValuesAreInvalid() {
+        String geneProductIdValues = Arrays.stream(INVALID_GENE_PRODUCT_ID)
+                .collect(Collectors.joining(","));
+
+        annotationRequest.setGpId(geneProductIdValues);
+        assertThat(validator.validate(annotationRequest), hasSize(1));
     }
 
     //PAGE PARAMETER
