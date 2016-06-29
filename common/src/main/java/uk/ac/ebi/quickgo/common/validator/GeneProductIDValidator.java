@@ -32,6 +32,7 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
     }
 
     @Override public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+        if(s==null)return true;
         List invalidGeneProdIDs = Arrays.stream(s.split(",")).filter(idValidator.negate()).collect
                 (Collectors.toList());
         return invalidGeneProdIDs.size() == 0;
