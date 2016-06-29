@@ -73,14 +73,14 @@ public class AnnotationRequest {
      * Gene Product IDs, in CSV format.
      */
 
-    public void setGeneProductId(String listOfGeneProductIDs){
+    public void setGpId(String listOfGeneProductIDs){
         if(listOfGeneProductIDs != null) {
             filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
         }
     }
 
     @GeneProductIDList
-    public String getGeneProductId(){
+    public String getGpId(){
         return filterMap.get(GENE_PRODUCT_ID);
     }
 
