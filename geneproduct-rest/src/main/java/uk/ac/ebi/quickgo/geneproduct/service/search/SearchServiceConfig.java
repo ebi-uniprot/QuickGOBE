@@ -63,7 +63,7 @@ public class SearchServiceConfig {
         );
 
         return new SolrRequestRetrieval<>(
-                geneProductTemplate.getSolrServer(),
+                geneProductTemplate.getSolrClient(),
                 solrSelectQueryRequestConverter,
                 resultConverter,
                 geneProductRetrievalConfig);

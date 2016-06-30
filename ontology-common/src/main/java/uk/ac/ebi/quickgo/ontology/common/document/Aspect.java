@@ -6,18 +6,18 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Enumeration representing the various Aspects that a GO term can posses.
  */
 public enum Aspect {
-    BIOLOGICAL_PROCESS("Biological Process", "Process", "P"),
-    MOLECULAR_FUNCTION("Molecular Function", "Function", "F"),
-    CELLULAR_COMPONENT("Cellular Component", "Component", "C");
+    BIOLOGICAL_PROCESS("Biological Process", "Process", "biological_process"),
+    MOLECULAR_FUNCTION("Molecular Function", "Function", "molecular_function"),
+    CELLULAR_COMPONENT("Cellular Component", "Component", "cellular_component");
 
     private final String shortName;
     private final String fullName;
-    private final String abbreviation;
+    private final String scientificName;
 
-    Aspect(String fullName, String shortName, String abbreviation) {
+    Aspect(String fullName, String shortName, String scientificName) {
         this.fullName = fullName;
         this.shortName = shortName;
-        this.abbreviation = abbreviation;
+        this.scientificName = scientificName;
     }
 
     public static Aspect fromShortName(String shortName) {
@@ -33,13 +33,13 @@ public enum Aspect {
         return shortName;
     }
 
-    public String getAbbreviation() {
-        return abbreviation;
+    public String getScientificName() {
+        return scientificName;
     }
 
     @JsonValue
     public String getName() {
-        return getFullName();
+        return getScientificName();
     }
 
     public String getFullName() {

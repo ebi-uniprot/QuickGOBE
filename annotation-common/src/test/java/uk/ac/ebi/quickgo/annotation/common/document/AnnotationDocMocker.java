@@ -40,4 +40,29 @@ public class AnnotationDocMocker {
 
         return doc;
     }
+
+    public static AnnotationDocument createAnnotationDoc2(String geneProductId) {
+        AnnotationDocument doc = new AnnotationDocument();
+        doc.geneProductId = geneProductId;
+
+        // automatically compute a document identifier,
+        // to overcome non-uniqueness of all other annotation fields
+        // (in solrconfig.xml this is set automatically as a UUID)
+        doc.id = geneProductId + "-" + System.nanoTime();
+
+        doc.goId = "GO:0003824";
+        doc.ecoId = "ECO:0000323";
+        doc.qualifier = "involved_in";
+        doc.goEvidence = "IDA";
+        doc.reference = "GO_REF:0000038";
+        doc.withFrom = Arrays.asList("InterPro:IPR015421","InterPro:IPR015422");
+        doc.interactingTaxonId = 35758;
+        doc.assignedBy = "UniProt";
+        doc.extensions = Arrays.asList("occurs_in(CL:1000428)");
+        doc.dbObjectSymbol = "A0A000";
+        doc.dbObjectType = "complex";
+        doc.dbSubset = "TrEMBL";
+        doc.taxonId = 99999;
+        return doc;
+    }
 }
