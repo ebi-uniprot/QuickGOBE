@@ -40,7 +40,7 @@ public class SearchServiceConfig {
 
     private static final String COMMA = ",";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS = "id,geneProductId,qualifier,goId," +
-            "goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extension";
+            "goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extensions";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
     public static final int MAX_PAGE_RESULTS = 100;
 

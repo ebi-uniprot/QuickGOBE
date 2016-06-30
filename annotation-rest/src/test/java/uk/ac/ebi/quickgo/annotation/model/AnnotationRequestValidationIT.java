@@ -10,6 +10,7 @@ import javax.validation.ValidatorFactory;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -23,6 +24,9 @@ public class AnnotationRequestValidationIT {
 
     private static final String[] INVALID_ASSIGNED_BY_PARMS = {"_ASPGD", "ASPGD,_Agbase",
             "5555,Agbase", "ASPGD,5555,", "4444,5555,"};
+
+    private static final String[] VALID_GO_EVIDENCE = {"IEA,IBD,IC"};
+    private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
 
     private Validator validator;
     private AnnotationRequest annotationRequest;
@@ -60,7 +64,42 @@ public class AnnotationRequestValidationIT {
                     AnnotationRequest annotationRequest = new AnnotationRequest();
                     annotationRequest.setAssignedBy(invalidValue);
 
-                    assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+                    assertThat(violations, hasSize(1));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'Assigned By' value is invalid: " + invalidValue));
+                }
+        );
+    }
+
+    //GO EVIDENCE
+    @Test
+    public void nullGoEvidenceIsValid() {
+        annotationRequest.setGoEvidence(null);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void allGoEvidenceValuesAreValid() {
+        for (String valid : VALID_GO_EVIDENCE) {
+            annotationRequest.setGoEvidence(valid);
+            assertThat(valid + " expected to be a valid value, but has failed validation",
+                    validator.validate(annotationRequest), hasSize(0));
+        }
+    }
+
+    @Test
+    public void allGoEvidenceValuesAreInvalid() {
+        Arrays.stream(INVALID_GO_EVIDENCE).forEach(
+                invalidValue -> {
+                    AnnotationRequest annotationRequest = new AnnotationRequest();
+                    annotationRequest.setGoEvidence(invalidValue);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    assertThat(violations, hasSize(1));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'GO Evidence' value is invalid: " + invalidValue));
                 }
         );
     }
@@ -108,7 +147,11 @@ public class AnnotationRequestValidationIT {
 
         annotationRequest.setAspect(aspect);
 
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one 'Aspect' value is invalid: " + aspect));
     }
 
     @Test
@@ -125,6 +168,66 @@ public class AnnotationRequestValidationIT {
                     assertThat(violations, hasSize(0));
                 }
         );
+    }
+
+    //TAXONOMY ID PARAMETER
+    @Test
+    public void negativeTaxonIdIsInvalid() {
+        String taxId = "-1";
+
+        annotationRequest.setTaxon(taxId);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
+    }
+
+    @Test
+    public void taxonIdWithNonNumberCharactersIsInvalid() {
+        String[] invalidTaxonIdParms = {"1a", "a", "$1"};
+
+        Arrays.stream(invalidTaxonIdParms).forEach(
+                invalidValue -> {
+                    annotationRequest.setTaxon(invalidValue);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    assertThat(violations, hasSize(is(1)));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one invalid 'Taxonomic identifier' value is invalid: " + invalidValue));
+                }
+        );
+    }
+
+    @Test
+    public void positiveNumericTaxonIdIsValid() {
+        String taxId = "2";
+
+        annotationRequest.setTaxon(taxId);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void multiplePositiveNumericTaxonIdsIsValid() {
+        String taxId = "2,3,4,5";
+
+        annotationRequest.setTaxon(taxId);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void oneValidTaxIdAndOneInvalidTaxIdIsInvalid() {
+        String taxId = "2,-1";
+
+        annotationRequest.setTaxon(taxId);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(is(1)));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
     }
 
     //PAGE PARAMETER

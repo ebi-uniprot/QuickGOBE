@@ -4,11 +4,11 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;
+import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryResultHighlightingConverter;
 
 import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocumentList;
@@ -25,8 +25,6 @@ class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<Annotati
 
     private final DocumentObjectBinder documentObjectBinder;
     private final AnnotationDocConverter annotationDocConverter;
-
-    private static final Map<String,String> emptyMap = new HashMap<>();
 
     public SolrQueryResultConverter(DocumentObjectBinder documentObjectBinder,
             AnnotationDocConverter annotationDocConverter){

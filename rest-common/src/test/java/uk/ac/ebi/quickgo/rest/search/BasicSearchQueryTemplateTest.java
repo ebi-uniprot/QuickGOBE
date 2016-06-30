@@ -1,12 +1,10 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.search.filter.FilterConverter;
-import uk.ac.ebi.quickgo.rest.search.filter.FilterConverterFactory;
-import uk.ac.ebi.quickgo.rest.search.filter.RequestFilter;
 import uk.ac.ebi.quickgo.rest.search.query.FieldProjection;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverterFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,12 +18,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.rest.TestUtil.*;
+import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
 
 /**
  * Tests the behvaiour of the {@link BasicSearchQueryTemplate} class.
@@ -36,7 +33,7 @@ public class BasicSearchQueryTemplateTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Mock
-    private FilterConverterFactory filterConverterFactory;
+    private RequestConverterFactory converterFactory;
 
     private BasicSearchQueryTemplate.Builder builder;
 
@@ -44,7 +41,7 @@ public class BasicSearchQueryTemplateTest {
     public void setUp() throws Exception {
         List<String> returnedFields = Collections.emptyList();
 
-        BasicSearchQueryTemplate queryTemplate = new BasicSearchQueryTemplate(returnedFields, filterConverterFactory);
+        BasicSearchQueryTemplate queryTemplate = new BasicSearchQueryTemplate(returnedFields);
         builder = queryTemplate.newBuilder();
         builder.setQuery(QuickGOQuery.createAllQuery());
     }
@@ -56,18 +53,7 @@ public class BasicSearchQueryTemplateTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Returned fields list cannot be null.");
 
-        new BasicSearchQueryTemplate(returnedFields, filterConverterFactory);
-    }
-
-    @Test
-    public void nullFilterConverterFactoryInConstructorThrowsException() {
-        List<String> returnedFields = Collections.emptyList();
-        filterConverterFactory = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("FilterConverterFactory can not be null.");
-
-        new BasicSearchQueryTemplate(returnedFields, filterConverterFactory);
+        new BasicSearchQueryTemplate(returnedFields);
     }
 
     @Test
@@ -120,20 +106,12 @@ public class BasicSearchQueryTemplateTest {
         String fieldX = "fieldX";
         String valueX = "valueX";
 
-        RequestFilter requestFilter = new RequestFilter(fieldX, valueX);
+        QuickGOQuery query = QuickGOQuery.createQuery(fieldX, valueX);
 
-        builder.setFilters(asSet(requestFilter));
-
-        FilterConverter converter = new FakeFilterConverter(requestFilter);
-        when(filterConverterFactory.createConverter(requestFilter)).thenReturn(converter);
-
+        builder.setFilters(asSet(query));
         QueryRequest queryRequest = builder.build();
 
-        List<QuickGOQuery> filters = queryRequest.getFilters();
-
-        assertThat(filters, hasSize(1));
-        assertThat(filters, contains(converter.transform()));
-
+        assertThat(queryRequest.getFilters(), contains(query));
     }
 
     @Test
@@ -168,23 +146,5 @@ public class BasicSearchQueryTemplateTest {
         Page page = queryRequest.getPage();
 
         assertThat(page.getPageSize(), is(size));
-    }
-
-    /**
-     * Fake class that does simple conversion simple conversion between a {@link RequestFilter} and a
-     * {@link QuickGOQuery}.
-     *
-     * This class assumes that the {@link RequestFilter} has a field and just a single value.
-     */
-    private class FakeFilterConverter implements FilterConverter {
-        private final RequestFilter filter;
-
-        FakeFilterConverter(RequestFilter filter) {
-            this.filter = filter;
-        }
-
-        @Override public QuickGOQuery transform() {
-            return QuickGOQuery.createQuery(filter.getField(), filter.getValues().findFirst().get());
-        }
     }
 }

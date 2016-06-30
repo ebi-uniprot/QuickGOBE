@@ -73,6 +73,12 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
+    public void convertTaxonIdSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.taxonId, is(TAXON_ID));
+    }
+
+    @Test
     public void convertWithFromSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
         assertThat(model.withFrom, is(WITH_FROM));
@@ -115,6 +121,7 @@ public class AnnotationDocConverterImplTest {
         doc.geneProductId = GENE_PRODUCT_ID;
         doc.qualifier = QUALIFIER;
         doc.goId = GO_ID;
+        doc.taxonId = TAXON_ID;
         doc.ecoId = ECO_ID;
         doc.withFrom = WITH_FROM;
         doc.assignedBy = ASSIGNED_BY;
