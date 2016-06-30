@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -73,6 +74,22 @@ public class OntologySearchIT extends SearchControllerSetup {
         int entriesPerPage = -1;
 
         checkInvalidPageInfoInResponse("go", pageNum, entriesPerPage, HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void requestForOntologyFindsAllFieldsInModelPopulated() throws Exception {
+        String id = "GO:0000001";
+        String name = "go1";
+        boolean isObsolete = true;
+
+        OntologyDocument doc1 = createGODocWithObsolete(id, name, isObsolete);
+
+        saveToRepository(doc1);
+
+        checkResultsBodyResponse("go")
+                .andExpect(jsonPath("$.results[0].id", is(id)))
+                .andExpect(jsonPath("$.results[0].name", is(name)))
+                .andExpect(jsonPath("$.results[0].isObsolete", is(isObsolete)));
     }
 
     @Test
@@ -336,5 +353,12 @@ public class OntologySearchIT extends SearchControllerSetup {
         od.ontologyType = OntologyType.GO.name();
 
         return od;
+    }
+
+    private OntologyDocument createGODocWithObsolete(String id, String name, boolean isObsolete) {
+        OntologyDocument doc = createGODoc(id, name);
+        doc.isObsolete = isObsolete;
+
+        return doc;
     }
 }

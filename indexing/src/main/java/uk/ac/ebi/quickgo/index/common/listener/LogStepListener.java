@@ -7,7 +7,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
 /**
- * Log statistics of a QuickGO step.
+ * Logs statistics to show the progress of the indexing step.
  *
  * Created 02/12/15
  * @author Edd
@@ -17,7 +17,7 @@ public class LogStepListener implements StepExecutionListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogStepListener.class);
 
     @Override public void beforeStep(StepExecution stepExecution) {
-        LOGGER.info("Starting QuickGO STEP '{}'.", stepExecution.getStepName());
+        LOGGER.info("QuickGO indexing STEP '{}' starting.", stepExecution.getStepName());
     }
 
     @Override public ExitStatus afterStep(StepExecution stepExecution) {

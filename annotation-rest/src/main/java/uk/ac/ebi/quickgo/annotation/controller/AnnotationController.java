@@ -1,24 +1,28 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.rest.ParameterBindingException;
+import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
+import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverterFactory;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.search.SearchAllQueryTemplate;
-import uk.ac.ebi.quickgo.rest.search.SearchService;
-
-import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
-import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
@@ -73,39 +77,55 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RestController
 @RequestMapping(value = "/QuickGO/services/annotation")
 public class AnnotationController {
-	private final ControllerValidationHelper validationHelper;
+    private final ControllerValidationHelper validationHelper;
 
-	private final SearchService<Annotation> annotationSearchService;
-	private final SearchAllQueryTemplate requestTemplate;
+    private final SearchService<Annotation> annotationSearchService;
 
-	@Autowired
-	public AnnotationController(SearchService<Annotation> annotationSearchService,
-			SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
-			ControllerValidationHelper validationHelper) {
-		checkNotNull(annotationSearchService, "The SearchService<Annotation> instance passed to the constructor of " +
-				"AnnotationController should not be null.");
-		checkNotNull(annotationRetrievalConfig, "The SearchServiceConfig.AnnotationCompositeRetrievalConfig" +
-				" instance passed to the constructor of AnnotationController should not be null.");
-		this.annotationSearchService = annotationSearchService;
-		this.requestTemplate = new SearchAllQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
-		this.validationHelper = validationHelper;
-	}
+    private final BasicSearchQueryTemplate queryTemplate;
+    private final RequestConverterFactory converterFactory;
 
-	/**
-	 * Search for an Annotations based on their attributes
-	 * @return a {@link QueryResult} instance containing the results of the search
-	 */
-	@RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest filter, BindingResult
-			bindingResult) {
+    @Autowired
+    public AnnotationController(SearchService<Annotation> annotationSearchService,
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
+            ControllerValidationHelper validationHelper,
+            RequestConverterFactory converterFactory) {
+        checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
+                "to the constructor of AnnotationController should not be null.");
+        checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
+                ".AnnotationCompositeRetrievalConfig instance passed to the constructor of AnnotationController " +
+                "should not be null.");
+        checkArgument(converterFactory != null, "The ConverterFactory cannot be null.");
 
-		checkArgument(!bindingResult.hasErrors(), "The binding of the request parameters to " +
-				"AnnotationRequest %s has errors, see binding result %s", filter, bindingResult);
+        this.annotationSearchService = annotationSearchService;
+        this.validationHelper = validationHelper;
 
-		filter.stream().forEach(PrototypeFilter::validate);
-		validationHelper.validateRequestedResults(filter.getLimit());
-		SearchAllQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
-				.addFilterProvider(filter);
-		return search(requestBuilder.build(), annotationSearchService);
-	}
+        this.converterFactory = converterFactory;
+        this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
+    }
+
+    /**
+     * Search for an Annotations based on their attributes
+     * @return a {@link QueryResult} instance containing the results of the search
+     */
+    @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest request,
+            BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            throw new ParameterBindingException(bindingResult);
+        }
+
+        validationHelper.validateRequestedResults(request.getLimit());
+
+        QueryRequest queryRequest = queryTemplate.newBuilder()
+                .setQuery(QuickGOQuery.createAllQuery())
+                .setFilters(request.createRequestFilters().stream()
+                        .map(converterFactory::convert)
+                        .collect(Collectors.toSet()))
+                .setPage(request.getPage())
+                .setPageSize(request.getLimit())
+                .build();
+
+        return search(queryRequest, annotationSearchService);
+    }
 }

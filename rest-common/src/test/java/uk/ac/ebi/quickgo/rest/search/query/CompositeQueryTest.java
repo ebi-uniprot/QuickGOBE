@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import uk.ac.ebi.quickgo.rest.search.query.CompositeQuery;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.TestUtil;
 
 import java.util.Collections;
 import java.util.Set;

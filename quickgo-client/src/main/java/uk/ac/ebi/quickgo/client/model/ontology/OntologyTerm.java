@@ -8,4 +8,5 @@ package uk.ac.ebi.quickgo.client.model.ontology;
 public abstract class OntologyTerm {
     public String id;
     public String name;
+    public boolean isObsolete;
 }
