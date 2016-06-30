@@ -23,6 +23,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 @RunWith(MockitoJUnitRunner.class)
 public class AnnotationRequestTest {
 
+
     //AssignedBy values
     private static final String UNI_PROT = "UniProt";
 
@@ -47,7 +48,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void successfullySetPageAndLimitValues() {
+    public void successfullySetAndGetPageAndLimitValues() {
         annotationRequest.setPage(4);
         annotationRequest.setLimit(15);
 
@@ -70,6 +71,36 @@ public class AnnotationRequestTest {
         annotationRequest.setAspect(aspect);
 
         assertThat(annotationRequest.getAspect(), is(aspect));
+    }
+    @Test
+    public void setAndGetEvidence(){
+        String EVIDENCE_IEA = "IEA";
+        annotationRequest.setGoEvidence(EVIDENCE_IEA);
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_IEA));
+    }
+
+    @Test
+    public void setAndGetEvidenceMulti(){
+        String EVIDENCE_MULTI = "IEA,IBD";
+        annotationRequest.setGoEvidence(EVIDENCE_MULTI);
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
+    }
+
+    @Test
+    public void setAndGetEvidenceMultiInLowerCase(){
+        String EVIDENCE_MULTI = "iea,ibd";
+        annotationRequest.setGoEvidence(EVIDENCE_MULTI);
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
+    }
+
+
+    @Test
+    public void setAndGetTaxon() {
+        String taxonId = "1";
+
+        annotationRequest.setTaxon(taxonId);
+
+        assertThat(annotationRequest.getTaxon(), is(taxonId));
     }
     @Test
     public void setAndGetReference(){

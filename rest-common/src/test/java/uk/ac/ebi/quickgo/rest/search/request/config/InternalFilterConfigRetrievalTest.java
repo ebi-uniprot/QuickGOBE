@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.rest.search.filter;
+package uk.ac.ebi.quickgo.rest.search.request.config;
 
 import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
 
@@ -15,21 +15,22 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.rest.search.filter.FieldExecutionConfig.*;
-import static uk.ac.ebi.quickgo.rest.search.filter.FilterUtil.createExecutionConfig;
+import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.asSet;
+import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.createExecutionConfig;
+import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType;
 
 /**
- * Tests the behaviour of the {@link InternalFilterExecutionConfig} class.
+ * Tests the behaviour of the {@link InternalFilterConfigRetrieval} class.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class InternalFilterExecutionConfigTest {
+public class InternalFilterConfigRetrievalTest {
     private static final String SEARCHABLE_FIELD_NAME = "field";
-    private static final FieldExecutionConfig FIELD_EXECUTION_CONFIG =
+    private static final FilterConfig FIELD_EXECUTION_CONFIG =
             createExecutionConfig(SEARCHABLE_FIELD_NAME, ExecutionType.SIMPLE);
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private InternalFilterExecutionConfig config;
+    private InternalFilterConfigRetrieval config;
 
     @Mock
     private SearchableDocumentFields searchableDocumentFields;
@@ -39,7 +40,7 @@ public class InternalFilterExecutionConfigTest {
         when(searchableDocumentFields.isDocumentSearchable(SEARCHABLE_FIELD_NAME)).thenReturn(true);
 
         when(searchableDocumentFields.searchableDocumentFields()).thenReturn(Stream.of(SEARCHABLE_FIELD_NAME));
-        config = new InternalFilterExecutionConfig(searchableDocumentFields);
+        config = new InternalFilterConfigRetrieval(searchableDocumentFields);
     }
 
     @Test
@@ -47,37 +48,37 @@ public class InternalFilterExecutionConfigTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("SearchableDocumentFields instance cannot be null.");
 
-        config = new InternalFilterExecutionConfig(null);
+        config = new InternalFilterConfigRetrieval(null);
     }
 
     @Test
     public void nullSearchableFieldNameThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Field name cannot be null or empty");
+        thrown.expectMessage("Signature cannot be null or empty");
 
-        config.getConfig(null);
+        config.getBySignature(null);
     }
 
     @Test
-    public void emptySearchableFieldNameThrowsException() throws Exception {
+    public void emptySignatureThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Field name cannot be null or empty");
+        thrown.expectMessage("Signature cannot be null or empty");
 
-        config.getConfig("");
+        config.getBySignature(asSet());
     }
 
     @Test
     public void nonSearchableFieldNameReturnsEmptyOptional() throws Exception {
         String nonSearchableField = "nonField";
 
-        Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig(nonSearchableField);
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(asSet(nonSearchableField));
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
 
     @Test
     public void searchableFieldNameReturnsPopulatedOptional() throws Exception {
-        Optional<FieldExecutionConfig> fieldConfigOpt = config.getConfig(SEARCHABLE_FIELD_NAME);
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(asSet(SEARCHABLE_FIELD_NAME));
 
         assertThat(fieldConfigOpt, is(Optional.of(FIELD_EXECUTION_CONFIG)));
     }

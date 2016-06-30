@@ -1,9 +1,8 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
-import com.google.common.base.Preconditions;
 import java.util.regex.Pattern;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * The information for a single Database cross reference.
@@ -16,37 +15,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *         Created with IntelliJ IDEA.
  */
 public class GeneProductDbXRefIDFormat {
-
     //E.g. UniProtKB
-    private String database;
+    private final String database;
 
     //E.g. PR:000000001
-    private String entityType;
+    private final String entityType;
 
     //E.g. protein
-    private String entityTypeName;
+    private final String entityTypeName;
 
     //E.g. regex for validation  ([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])...
-    private Pattern idValidationPattern;
+    private final Pattern idValidationPattern;
 
     //E.g. http://www.uniprot.org/uniprot/[example_id]/
-    private String databaseURL;
+    private final String databaseURL;
 
-    public GeneProductDbXRefIDFormat(String database, String entityType, Pattern idValidationPattern) {
-        this.database = checkNotNull(database);
-        this.entityType = checkNotNull(entityType);
-        this.idValidationPattern = checkNotNull(idValidationPattern);
-    }
+    public GeneProductDbXRefIDFormat(String database, String entityType, String entityTypeName,
+            String idValidationPattern, String databaseURL) {
 
-    public GeneProductDbXRefIDFormat(String database, String entityType, String entityTypeName, String idValidationPattern,
-            String databaseURL) {
-
-        this.database =  checkNotNull(database, "The database ID should not be null");
-        this.entityType =  checkNotNull(entityType, "The entity type should not be null");
-        this.entityTypeName = entityTypeName;
-        Preconditions.checkNotNull(idValidationPattern,
+        checkArgument(database != null, "The database ID should not be null");
+        checkArgument(entityType != null, "The entity type should not be null");
+        checkArgument(idValidationPattern != null,
                 "The regex for the validation of ids from " + database + " is null and therefore invalid");
+        this.database = database;
+        this.entityType = entityType;
         this.idValidationPattern = Pattern.compile(idValidationPattern);
+        this.entityTypeName = entityTypeName;
         this.databaseURL = databaseURL;
     }
 

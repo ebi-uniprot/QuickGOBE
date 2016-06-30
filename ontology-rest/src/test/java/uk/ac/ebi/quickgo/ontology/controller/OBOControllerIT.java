@@ -25,9 +25,12 @@ import org.springframework.web.context.WebApplicationContext;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.AnyOf.anyOf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -471,7 +474,7 @@ public abstract class OBOControllerIT {
         return result
                 .andDo(print())
                 .andExpect(jsonPath("$.url", is(requestUrl(result))))
-                .andExpect(jsonPath("$.message", containsString("Provided ID: '" + id + "'")));
+                .andExpect(jsonPath("$.messages", hasItem(containsString("Provided ID: '" + id + "'"))));
     }
 
     protected ResultActions expectResultsInfoExists(ResultActions result) throws Exception {

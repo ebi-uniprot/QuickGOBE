@@ -1,26 +1,36 @@
-package uk.ac.ebi.quickgo.rest.search.filter;
+package uk.ac.ebi.quickgo.rest.search.request.config;
 
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+
+import com.google.common.base.Preconditions;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
 
 /**
- * Defines a data structure that indicates how a field within a table/collection should be processed.
+ * Defines a data structure that indicates how a {@link FilterRequest} within a table/collection should be processed.
  * </p>
- * Note: this class needs to remain public for spring wiring purposes.
+ * Note: this class needs to remain public for Spring wiring purposes.
  *
  * @author Ricardo Antunes
  */
-public class FieldExecutionConfig {
-    private String name;
+public class FilterConfig {
+    private static final String COMMA = ",";
+    private Set<String> signature;
     private ExecutionType execution;
     private Map<String, String> properties = new HashMap<>();
 
-    public String getName() {
-        return name;
+    public Set<String> getSignature() {
+        return signature;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSignature(String signature) {
+        Preconditions.checkArgument(signature != null && !signature.trim().isEmpty(),
+                "Signature cannot be null or empty");
+        this.signature = new HashSet<>(asList(signature.split(COMMA)));
     }
 
     public ExecutionType getExecution() {
@@ -49,18 +59,28 @@ public class FieldExecutionConfig {
             return false;
         }
 
-        FieldExecutionConfig field = (FieldExecutionConfig) o;
+        FilterConfig that = (FilterConfig) o;
 
-        return name.equals(field.name);
+        if (signature != null ? !signature.equals(that.signature) : that.signature != null) {
+            return false;
+        }
+        if (execution != that.execution) {
+            return false;
+        }
+        return properties != null ? properties.equals(that.properties) : that.properties == null;
+
     }
 
     @Override public int hashCode() {
-        return name.hashCode();
+        int result = signature != null ? signature.hashCode() : 0;
+        result = 31 * result + (execution != null ? execution.hashCode() : 0);
+        result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        return result;
     }
 
     @Override public String toString() {
-        return "FieldExecutionConfig{" +
-                "name='" + name + '\'' +
+        return "RequestConfig{" +
+                "signature='" + signature + '\'' +
                 ", execution=" + execution +
                 ", properties=" + properties +
                 '}';
