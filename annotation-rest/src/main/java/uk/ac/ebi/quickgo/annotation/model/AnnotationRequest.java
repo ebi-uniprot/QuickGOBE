@@ -10,6 +10,7 @@ import javax.validation.constraints.Pattern;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
 
 /**
@@ -29,8 +30,6 @@ public class AnnotationRequest {
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
-
-    private static final String ASPECT_FIELD = "aspect";
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -63,12 +62,12 @@ public class AnnotationRequest {
      * @return
      */
     public void setReference(String reference){
-        filters.put(AnnotationFields.REFERENCE_SEARCH, reference);
+        filterMap.put(AnnotationFields.REFERENCE_SEARCH, reference);
     }
 
     //todo create validation pattern @Pattern(regexp = "")
     public String getReference(){
-        return filters.get(AnnotationFields.REFERENCE_SEARCH);
+        return filterMap.get(AnnotationFields.REFERENCE_SEARCH);
     }
 
     //TODO:change the way the field is referenced
@@ -126,11 +125,8 @@ public class AnnotationRequest {
 
     public void setPage(int page) {
         this.page = page;
-
-    public Stream<RequestFilter> convertToFilters() {
-        return filters.entrySet().stream().map(filter -> new RequestFilter(filter.getKey(),
-                splitFilterValues(filter.getValue())));
     }
+
 
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
@@ -139,7 +135,7 @@ public class AnnotationRequest {
         createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
         createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
         createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
-
+        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
         return filterRequests;
     }
 
