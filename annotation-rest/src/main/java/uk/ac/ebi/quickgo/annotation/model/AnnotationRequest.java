@@ -78,20 +78,18 @@ public class AnnotationRequest {
      */
     public void setGoEvidence(String evidence) {
         filterMap.put(GO_EVIDENCE, evidence);
+    }
+
     /**
      * NOT, enables etc
      * @param qualifier
      */
     public void setQualifier(String qualifier){
-        filters.put(QUALIFIER, qualifier);
+        filterMap.put(QUALIFIER, qualifier);
     }
 
     public String getQualifter(){
-        return filters.get(QUALIFIER);
-    }
-
-    public void setPage(int page) {
-        this.page = page;
+        return filterMap.get(QUALIFIER);
     }
 
     @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
