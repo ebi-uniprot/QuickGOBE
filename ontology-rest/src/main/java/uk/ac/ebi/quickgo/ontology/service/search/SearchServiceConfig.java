@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.service.search;
 
+import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
+import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
+import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
+import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
@@ -7,10 +11,6 @@ import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
-import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
-import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
-import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
-import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +60,7 @@ public class SearchServiceConfig {
         );
 
         return new SolrRequestRetrieval<>(
-                ontologyTemplate.getSolrServer(),
+                ontologyTemplate.getSolrClient(),
                 solrSelectQueryRequestConverter,
                 resultConverter,
                 ontologyRetrievalConfig);

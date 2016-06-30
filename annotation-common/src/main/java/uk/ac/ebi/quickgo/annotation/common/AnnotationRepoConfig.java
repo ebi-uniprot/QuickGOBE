@@ -3,9 +3,9 @@ package uk.ac.ebi.quickgo.annotation.common;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.core.CoreContainer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.repository.support.SolrRepositoryFactory;
-import org.springframework.data.solr.server.SolrServerFactory;
-import org.springframework.data.solr.server.support.MulticoreSolrServerFactory;
+import org.springframework.data.solr.server.SolrClientFactory;
+import org.springframework.data.solr.server.support.MulticoreSolrClientFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -36,21 +36,21 @@ public class AnnotationRepoConfig {
     }
 
     @Bean
-    public SolrServer solrServer(SolrServerFactory solrServerFactory) {
-        return solrServerFactory.getSolrServer();
+    public SolrClient solrServer(SolrClientFactory solrClientFactory) {
+        return solrClientFactory.getSolrClient();
     }
 
     @Bean
     @Profile("httpServer")
-    public SolrServerFactory httpSolrServerFactory(@Value("${solr.host}") String solrUrl) {
-        return new MulticoreSolrServerFactory(new HttpSolrServer(solrUrl), SOLR_CORE);
+    public SolrClientFactory httpSolrServerFactory(@Value("${solr.host}") String solrUrl) {
+        return new MulticoreSolrClientFactory(new HttpSolrClient(solrUrl), SOLR_CORE);
     }
 
     @Bean
     @Profile("embeddedServer")
-    public SolrServerFactory embeddedSolrServerFactory(CoreContainer coreContainer)
+    public SolrClientFactory embeddedSolrServerFactory(CoreContainer coreContainer)
             throws IOException, SAXException, ParserConfigurationException {
-        return new MulticoreSolrServerFactory(new EmbeddedSolrServer(coreContainer, SOLR_CORE));
+        return new MulticoreSolrClientFactory(new EmbeddedSolrServer(coreContainer, SOLR_CORE));
     }
 
     @Bean
@@ -62,8 +62,8 @@ public class AnnotationRepoConfig {
     }
 
     @Bean
-    public SolrTemplate annotationTemplate(SolrServerFactory solrServerFactory) {
-        SolrTemplate template = new SolrTemplate(solrServerFactory);
+    public SolrTemplate annotationTemplate(SolrClientFactory solrClientFactory) {
+        SolrTemplate template = new SolrTemplate(solrClientFactory);
         template.setSolrCore(SOLR_CORE);
 
         return template;
