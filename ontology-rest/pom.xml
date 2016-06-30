@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <json-path.version>1.2.0</json-path.version>
+        <jgrapht-core.version>0.9.2</jgrapht-core.version>
     </properties>
 
     <dependencies>
@@ -44,8 +44,18 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-batch</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-solr</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+            <version>${jgrapht-core.version}</version>
         </dependency>
 
         <!-- REST API documentation -->
@@ -73,6 +83,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.batch</groupId>
+            <artifactId>spring-batch-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

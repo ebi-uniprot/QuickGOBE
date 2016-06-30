@@ -19,7 +19,6 @@
     <properties>
         <commons-collections.version>3.2.1</commons-collections.version>
         <quickgo-sources.version>1.0</quickgo-sources.version>
-        <spring-batch-test.version>3.0.5.RELEASE</spring-batch-test.version>
     </properties>
 
     <dependencies>
@@ -51,7 +50,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-batch</artifactId>
-            <version>${spring.boot.starter}</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
@@ -66,7 +64,6 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-solr</artifactId>
         </dependency>
-
 
         <!-- Test dependencies -->
         <dependency>
@@ -93,7 +90,6 @@
         <dependency>
             <groupId>org.springframework.batch</groupId>
             <artifactId>spring-batch-test</artifactId>
-            <version>${spring-batch-test.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
