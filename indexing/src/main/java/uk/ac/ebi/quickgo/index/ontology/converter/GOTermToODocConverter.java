@@ -99,7 +99,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
     }
 
     /*
-     * format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|predictedBy
+     * format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|methodId
      */
     protected List<String> extractBlacklist(GOTerm goTerm){
         if (!isEmpty(goTerm.getBlacklist())) {
