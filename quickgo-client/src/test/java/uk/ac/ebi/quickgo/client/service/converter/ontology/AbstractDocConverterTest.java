@@ -31,26 +31,29 @@ public class AbstractDocConverterTest {
 
         FakeOntologyTerm term = converter.convert(emptyDoc);
 
-        checkCommonFields(term, null, null);
+        checkCommonFields(term, null, null, false);
     }
 
     @Test
     public void ontologyDocumentWithPopulatedFieldsIsConvertedToOntologyTermWithPopulatedFields() throws Exception {
         String id = "id";
         String name = "name";
+        boolean isObsolete = true;
 
         OntologyDocument doc = new OntologyDocument();
         doc.id = id;
         doc.name = name;
+        doc.isObsolete = isObsolete;
 
         FakeOntologyTerm term = converter.convert(doc);
 
-        checkCommonFields(term, id, name);
+        checkCommonFields(term, id, name, isObsolete);
     }
 
-    private void checkCommonFields(OntologyTerm term, String id, String name) {
+    private void checkCommonFields(OntologyTerm term, String id, String name, boolean isObsolete) {
         assertThat(term.id, is(id));
         assertThat(term.name, is(name));
+        assertThat(term.isObsolete, is(isObsolete));
     }
 
     private static class FakeDocConverter extends AbstractDocConverter<FakeOntologyTerm> {

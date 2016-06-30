@@ -3,7 +3,10 @@
 # ontology search: if you define a value, ensure ontologyType is also included
 search:
   external:
-    configs:
-      - name: aspect
-        execution: join
-        properties: {fromTable: ontology, fromAttribute: id_join, toTable: annotation, toAttribute: goId_join}
+    filterConfigs:
+          - signature: aspect
+            execution: JOIN
+            properties: {fromTable: ontology, fromAttribute: id_join, toTable: annotation, toAttribute: goId_join}
+          - signature: goIds,relations,usage
+            execution: REST_COMM
+            properties: {ip: 123.456.789, endpoint: endpoint}

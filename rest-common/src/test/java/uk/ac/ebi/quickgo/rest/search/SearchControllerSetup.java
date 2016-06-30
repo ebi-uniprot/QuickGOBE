@@ -129,6 +129,13 @@ public abstract class SearchControllerSetup {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.total").value(0));
     }
 
+    protected ResultActions checkResultsBodyResponse(String query) throws Exception {
+        MockHttpServletRequestBuilder clientRequest = createRequest(query);
+
+        return mockMvc.perform(clientRequest)
+                .andDo(print());
+    }
+
     // facets ---------------------------------------------------------
     protected void checkInvalidFacetResponse(String query, String facet) throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
@@ -230,6 +237,6 @@ public abstract class SearchControllerSetup {
 
     private void checkErrorMessage(ResultActions result) throws Exception {
         result.andExpect(MockMvcResultMatchers.jsonPath("$.url", is(getRequestUrl(result))));
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.messages").exists());
     }
 }
