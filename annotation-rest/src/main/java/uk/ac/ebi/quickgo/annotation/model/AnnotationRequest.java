@@ -11,6 +11,8 @@ import javax.validation.constraints.Pattern;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -76,6 +78,8 @@ public class AnnotationRequest {
      */
     public void setGoEvidence(String evidence) {
         filterMap.put(GO_EVIDENCE, evidence);
+    }
+
     /**
      * A list of with/from values, separated by commas
      * In the format withFrom=PomBase:SPBP23A10.14c,RGD:621207 etc
@@ -83,7 +87,7 @@ public class AnnotationRequest {
      * @param withFrom comma separated with/from values
      */
     public void setWithFrom(String withFrom){
-        filters.put(AnnotationFields.WITH_FROM_SEARCH, withFrom);
+        filterMap.put(WITH_FROM_SEARCH, withFrom);
     }
 
     /**
@@ -91,11 +95,7 @@ public class AnnotationRequest {
      * @return String containing comma separated list of with/From values.
      */
     public  String getWithFrom(){
-        return filters.get(AnnotationFields.WITH_FROM_SEARCH);
-    }
-
-    public void setPage(int page) {
-        this.page = page;
+        return filterMap.get(WITH_FROM_SEARCH);
     }
 
     @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
@@ -137,6 +137,8 @@ public class AnnotationRequest {
         createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
         createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
         createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
+        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
+
 
         return filterRequests;
     }
