@@ -328,7 +328,7 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(valueOccurInField(QUALIFIER, qualifier));
 
     }
