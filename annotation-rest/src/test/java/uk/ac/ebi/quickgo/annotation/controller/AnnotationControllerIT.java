@@ -413,7 +413,7 @@ public class AnnotationControllerIT {
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(totalNumOfResults(genericDocs.size()*2))
                 .andExpect(
                         pageInfoMatches(
                                 1,
