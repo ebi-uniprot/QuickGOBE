@@ -24,7 +24,7 @@ public final class OntologyDocMocker {
         od.aspect = "Process";
 
         // example blacklist
-        // format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|predictedBy
+        // format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|methodId
         od.blacklist = new ArrayList<>();
         od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
                 .addField(newFlatFieldLeaf("GO:0000001"))
