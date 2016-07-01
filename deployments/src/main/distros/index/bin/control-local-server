@@ -7,7 +7,7 @@
 ##              start               => start all or a specific index machine
 ##              stop                => stop all or a specific index machine
 
-VALID_USERS=("uni_qgl");
+VALID_USERS=("uni_qgo");
 
 # ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
 properties_not_found="false";

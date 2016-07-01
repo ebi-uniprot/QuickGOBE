@@ -8,8 +8,24 @@
 
 set -euo pipefail
 
+VALID_USERS=("uni_qgo");
+
+# ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
+properties_not_found="false";
+source "common/common.variables";
+
+if [ $? -eq 1 ]; then
+    properties_not_found="true";
+fi
+
+if [ "$properties_not_found" = "true" ]; then
+    echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
+
+
 # ======= CONSTANTS =======================================
-REPOS_DIR="$(pwd -P)/repos"
+#REPOS_DIR="$(pwd -P)/repos"
 INDEX_BIN_CONTENT_DIR="bin"
 INDEX_BIN="index-bin.tar.gz"
 PERMITTED_USER="uni_qgo"
