@@ -24,7 +24,7 @@ public class OBOTerm {
 
     public String name;
 
-    public String definition;
+    public Definition definition;
 
     public String comment;
 
@@ -107,5 +107,11 @@ public class OBOTerm {
         public String namespace;
         public String url;
         public String relation;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Definition implements FieldType {
+        public String definition;
+        public List<XRef> definitionXrefs;
     }
 }
