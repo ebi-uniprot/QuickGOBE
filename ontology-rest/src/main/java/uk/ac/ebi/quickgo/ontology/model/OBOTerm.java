@@ -112,6 +112,6 @@ public class OBOTerm {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Definition implements FieldType {
         public String text;
-        public List<XRef> definitionXrefs;
+        public List<XRef> xrefs;
     }
 }

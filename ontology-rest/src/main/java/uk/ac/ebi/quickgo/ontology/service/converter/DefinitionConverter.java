@@ -22,11 +22,11 @@ class DefinitionConverter implements MultiDocFieldToFieldConverter<OBOTerm.Defin
         def.text = ontologyDocument.definition;
 
         if (ontologyDocument.definitionXrefs != null) {
-            def.definitionXrefs = ontologyDocument.definitionXrefs.stream()
+            def.xrefs = ontologyDocument.definitionXrefs.stream()
                     .map(this::convert)
                     .collect(Collectors.toList());
         } else {
-            def.definitionXrefs = Collections.emptyList();
+            def.xrefs = Collections.emptyList();
         }
 
         return def;
