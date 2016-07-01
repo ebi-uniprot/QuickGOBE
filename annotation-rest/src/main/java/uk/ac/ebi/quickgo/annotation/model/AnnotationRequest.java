@@ -117,7 +117,7 @@ public class AnnotationRequest {
         filterMap.put(GO_ID,goId);
     }
 
-    @Pattern(regexp = "GO:[0-9]{7}(,GO:[0-9]{7})*")
+    @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*")
     public String getGoId(){
         return filterMap.get(GO_ID);
     }
