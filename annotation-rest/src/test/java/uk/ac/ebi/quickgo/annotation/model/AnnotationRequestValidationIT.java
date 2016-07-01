@@ -234,6 +234,23 @@ public class AnnotationRequestValidationIT {
     //GO ID PARAMETER
 
     @Test
+    public void goIdIsValid() {
+        String[] goIds = {"GO:0003824", "GO:0009999", "GO:0003333"};
+
+        Arrays.stream(goIds).forEach(
+                id -> {
+                    annotationRequest.setGoId(id);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
+                }
+        );
+    }
+
+
+    @Test
     public void mixedCaseGoIdIsValid() {
         String[] goIds = {"GO:0003824", "gO:0003824", "Go:0003824"};
 
@@ -248,6 +265,23 @@ public class AnnotationRequestValidationIT {
                 }
         );
     }
+
+    @Test
+    public void goIdIsInvalid() {
+        String[] goIds = {"GO:4", "xxx:0009999", "-"};
+
+        Arrays.stream(goIds).forEach(
+                id -> {
+                    annotationRequest.setGoId(id);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(1));
+                }
+        );
+    }
+
 
     //PAGE PARAMETER
     @Test
