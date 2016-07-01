@@ -172,12 +172,13 @@ function solrServerStatus {
         server="$1";
     fi
 
-    local solr_addr="http://$server:$http_solr_port/$http_solr_path";
+    solr_addr="http://$server:$http_solr_port/$http_solr_path";
 
     echo "$(serverIsUp $server $http_solr_port $http_solr_path)";
 }
 
 function printSolrServerStatus {
+    server_status="$(solrServerStatus)"
     local server_message="<error>$server_status</error>";
     if [ "$server_status" == "UP" ]; then
             server_message="<success>$server_status</success>";
