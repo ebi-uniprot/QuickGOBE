@@ -7,7 +7,7 @@
 ##              start               => start all or a specific index machine
 ##              stop                => stop all or a specific index machine
 
-VALID_USERS=("tc_uni02");
+VALID_USERS=("uni_qgl");
 
 # ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
 properties_not_found="false";
@@ -49,7 +49,7 @@ fi
 if [ "$1" == "status" ]; then
     # show status of up / down, and data version
     printDivider;
-    printTomcatServerStatus;
+#    printTomcatServerStatus;
     printSolrServerStatus;
 
     echo "";
