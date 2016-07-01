@@ -46,6 +46,19 @@ public class DefinitionConverterTest {
     }
 
     @Test
+    public void convertsDocWithNullDefinitionXrefListIntoDefinitionObjectWithEmptyXrefs() throws Exception {
+        String text = "This is the definition of the ontology term";
+
+        doc.definition = text;
+        doc.definitionXrefs = null;
+
+        OBOTerm.Definition def = converter.apply(doc);
+
+        assertThat(def.definition, is(text));
+        assertThat(def.definitionXrefs, hasSize(0));
+    }
+
+    @Test
     public void convertsDocWithNoDefinitionTextAndWithASingleTextXrefIntoADefinitionObjectWithJustTheXref()
             throws Exception {
         String text = null;

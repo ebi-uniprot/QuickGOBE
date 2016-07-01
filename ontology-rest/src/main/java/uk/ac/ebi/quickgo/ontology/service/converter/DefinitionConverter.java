@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,9 +20,14 @@ class DefinitionConverter implements MultiDocFieldToFieldConverter<OBOTerm.Defin
     @Override public OBOTerm.Definition apply(OntologyDocument ontologyDocument) {
         OBOTerm.Definition def = new OBOTerm.Definition();
         def.definition = ontologyDocument.definition;
-        def.definitionXrefs = ontologyDocument.definitionXrefs.stream()
-                .map(this::convert)
-                .collect(Collectors.toList());
+
+        if (ontologyDocument.definitionXrefs != null) {
+            def.definitionXrefs = ontologyDocument.definitionXrefs.stream()
+                    .map(this::convert)
+                    .collect(Collectors.toList());
+        } else {
+            def.definitionXrefs = Collections.emptyList();
+        }
 
         return def;
     }
