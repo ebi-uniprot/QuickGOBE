@@ -49,7 +49,8 @@ fi
 # ---------------------------- GIT INFO ----------------------------------
 REPOS_DIR="$BASE_DIR/repos"
 QUICKGO_REPO_DIR="$REPOS_DIR/QuickGOBE"
-QUICKGO_BRANCH="master"
+#QUICKGO_BRANCH="master"
+QUICKGO_BRANCH="GOA-2230_server-side-solr"
 
 # ---------------------------- SOLR CORE INFO ----------------------------
 CORE_NAME=
