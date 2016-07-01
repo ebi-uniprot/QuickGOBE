@@ -19,7 +19,7 @@ class DefinitionConverter implements MultiDocFieldToFieldConverter<OBOTerm.Defin
 
     @Override public OBOTerm.Definition apply(OntologyDocument ontologyDocument) {
         OBOTerm.Definition def = new OBOTerm.Definition();
-        def.definition = ontologyDocument.definition;
+        def.text = ontologyDocument.definition;
 
         if (ontologyDocument.definitionXrefs != null) {
             def.definitionXrefs = ontologyDocument.definitionXrefs.stream()

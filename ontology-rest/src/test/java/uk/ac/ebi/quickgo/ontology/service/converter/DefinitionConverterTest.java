@@ -41,7 +41,7 @@ public class DefinitionConverterTest {
 
         OBOTerm.Definition def = converter.apply(doc);
 
-        assertThat(def.definition, is(text));
+        assertThat(def.text, is(text));
         assertThat(def.definitionXrefs, hasSize(0));
     }
 
@@ -54,7 +54,7 @@ public class DefinitionConverterTest {
 
         OBOTerm.Definition def = converter.apply(doc);
 
-        assertThat(def.definition, is(text));
+        assertThat(def.text, is(text));
         assertThat(def.definitionXrefs, hasSize(0));
     }
 
@@ -72,7 +72,7 @@ public class DefinitionConverterTest {
 
         OBOTerm.Definition def = converter.apply(doc);
 
-        assertThat(def.definition, is(text));
+        assertThat(def.text, is(text));
 
         List<OBOTerm.XRef> retrievedXrefs = def.definitionXrefs;
         assertThat(def.definitionXrefs, hasSize(1));
@@ -100,7 +100,7 @@ public class DefinitionConverterTest {
 
         OBOTerm.Definition def = converter.apply(doc);
 
-        assertThat(def.definition, is(text));
+        assertThat(def.text, is(text));
 
         List<OBOTerm.XRef> retrievedXrefs = def.definitionXrefs;
         assertThat(retrievedXrefs, hasSize(2));
