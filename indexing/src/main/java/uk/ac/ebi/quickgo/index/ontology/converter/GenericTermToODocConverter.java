@@ -37,6 +37,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
             doc.isObsolete = term.isObsolete();
             doc.comment = term.getComment();
             doc.definition = term.getDefinition();
+            doc.definitionXrefs = extractDefinitionXrefs(term);
             doc.history = extractHistory(term);
             doc.name = term.getName();
             doc.ontologyType = term.getOntologyType();
@@ -56,7 +57,15 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         } else {
             return Optional.empty();
         }
+    }
 
+    protected List<String> extractDefinitionXrefs(GenericTerm term) {
+        return term.getDefinitionXrefs().stream()
+                .map(xref -> FlatFieldBuilder.newFlatField()
+                        .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getDb()))
+                        .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getId()))
+                .buildString())
+                .collect(Collectors.toList());
     }
 
     private List<String> extractSubsets(GenericTerm term) {
