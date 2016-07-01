@@ -49,7 +49,6 @@ fi
 if [ "$1" == "status" ]; then
     # show status of up / down, and data version
     printDivider;
-#    printTomcatServerStatus;
     printSolrServerStatus;
 
     echo "";
