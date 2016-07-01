@@ -362,7 +362,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccurInField(GO_ID, goId));
+                .andExpect(itemExistsExpectedTimes(GO_ID, goId,3));
     }
 
     @Test
