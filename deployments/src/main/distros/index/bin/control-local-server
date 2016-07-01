@@ -65,10 +65,9 @@ elif [ "$1" == "stop" ] || [ "$1" == "start" ]; then
             # stop the server
             echo "Stopping $solr_vm";
             ssh $solr_vm bash << EOF
-                export JAVA_HOME
+                export JAVA_HOME=$JAVA_HOME
                 cd "$tomcat_server_dir/bin";
-                ./stop;
-                ./solr start $solr_jvm_properties -m $solr_memory -s $solr_home -p $http_solr_port
+                ./solr stop;
 EOF
         fi
     else # the server is down
@@ -76,9 +75,9 @@ EOF
             # start the server
             echo "Starting $solr_vm";
             ssh $solr_vm bash << EOF
-                export JAVA_HOME
+                export JAVA_HOME=$JAVA_HOME
                 cd "$tomcat_server_dir/bin";
-                ./solr stop;
+                ./solr start $solr_jvm_properties -m $solr_memory -s $solr_home -p $http_solr_port;
 EOF
         elif [ "$1" == "stop" ]; then
             echo "Cannot stop $solr_vm because it is already down";
