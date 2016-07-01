@@ -230,6 +230,24 @@ public class AnnotationRequestValidationIT {
                 is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
     }
 
+    //ECO PARAMETER
+
+    @Test
+    public void mixedCaseEcoIdIsValid() {
+        String[] goIds = {"ECO:0000256", "EcO:0000256", "eCO:0000256"};
+
+        Arrays.stream(goIds).forEach(
+                mixedCaseId -> {
+                    annotationRequest.setEcoId(mixedCaseId);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
+                }
+        );
+    }
+
     //PAGE PARAMETER
     @Test
     public void negativePageValueIsInvalid() {
