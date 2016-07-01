@@ -10,6 +10,7 @@ import javax.validation.constraints.Pattern;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
@@ -108,6 +109,18 @@ public class AnnotationRequest {
         return filterMap.get(AnnotationFields.TAXON_ID);
     }
 
+    /**
+     * List of Gene Ontology ids in CSV format
+     * @param goId
+     */
+    public void setGoId(String goId){
+        filterMap.put(GO_ID,goId);
+    }
+
+    public String getGoId(){
+        return filterMap.get(GO_ID);
+    }
+
     public int getLimit() {
         return limit;
     }
@@ -132,6 +145,9 @@ public class AnnotationRequest {
         createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
         createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
         createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
+        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
+        createSimpleFilter(GO_ID).ifPresent(filterRequests::add);
+
 
         return filterRequests;
     }

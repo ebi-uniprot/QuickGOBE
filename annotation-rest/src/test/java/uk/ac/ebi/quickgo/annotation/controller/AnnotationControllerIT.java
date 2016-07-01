@@ -26,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
 
@@ -53,6 +54,7 @@ public class AnnotationControllerIT {
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxon";
+    private static final String GO_ID_PARAM = "goId";
 
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
 
@@ -339,6 +341,50 @@ public class AnnotationControllerIT {
     public void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, "involved_in"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+
+    }
+
+    //---------- Gene Ontology Id related tests.
+
+    @Test
+    public void successfullyLookupAnnotationsByGoId() throws Exception {
+        String goId = "GO:0003824";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, goId));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(valueOccurInField(GO_ID, goId));
+    }
+
+    @Test
+    public void successfullyLookupAnnotationsByGoIdCaseInsensitive() throws Exception {
+        String argumentFromClient = "go:0003824";
+        String goId = "GO:0003824";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, argumentFromClient));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(itemExistsExpectedTimes(GO_ID, goId,3));
+    }
+
+    @Test
+    public void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
+        String goId = "GO:0009871";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, goId));
 
         response.andDo(print())
                 .andExpect(status().isOk())
