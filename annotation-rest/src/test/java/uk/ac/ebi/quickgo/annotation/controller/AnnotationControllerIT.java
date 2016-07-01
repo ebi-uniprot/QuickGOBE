@@ -390,7 +390,17 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(0));
+    }
 
+
+    @Test
+    public void incorrectFormattedGoIdCausesError() throws Exception {
+        String goId = "GO:1";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, goId));
+
+        response.andExpect(status().isBadRequest())
+                .andExpect(contentTypeToBeJson());
     }
 
     //---------- Page related tests.
