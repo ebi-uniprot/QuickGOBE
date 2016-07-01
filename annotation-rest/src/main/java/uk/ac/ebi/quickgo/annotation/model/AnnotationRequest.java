@@ -103,7 +103,7 @@ public class AnnotationRequest {
         filterMap.put(ECO_ID,ecoId);
     }
 
-    @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*")
+    @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*")
     public String getEcoId(){
         return filterMap.get(ECO_ID);
     }
