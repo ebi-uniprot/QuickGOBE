@@ -8,27 +8,12 @@
 
 set -euo pipefail
 
-VALID_USERS=("uni_qgo");
-
-# ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
-properties_not_found="false";
-source "common/common.variables";
-
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-if [ "$properties_not_found" = "true" ]; then
-    echo "Required properties files were not found. Please make sure you're in the right directory";
-    exit 1;
-fi
-
-
 # ======= CONSTANTS =======================================
-#REPOS_DIR="$(pwd -P)/repos"
+REPOS_DIR="$(pwd -P)/repos"
 INDEX_BIN_CONTENT_DIR="bin"
 INDEX_BIN="index-bin.tar.gz"
 PERMITTED_USER="uni_qgo"
+BRANCH="GOA-2230_server-side-solr"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
@@ -53,9 +38,9 @@ function addTimeStamp() {
 dirs -c
 pushd . > /dev/null
 
-cd "$QUICKGO_REPO_DIR"
+cd "$REPOS_DIR"
 git fetch
-git checkout "$QUICKGO_BRANCH"
+git checkout "$BRANCH"
 git pull
 cd "deployments"
 mvn -U -DskipTests -P assemble-index-bin-archive package
