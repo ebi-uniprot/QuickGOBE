@@ -66,7 +66,7 @@ elif [ "$1" == "stop" ] || [ "$1" == "start" ]; then
             echo "Stopping $solr_vm";
             ssh $solr_vm bash << EOF
                 export JAVA_HOME=$JAVA_HOME
-                cd "$tomcat_server_dir/bin";
+                cd "$solr_server_dir/bin";
                 ./solr stop;
 EOF
         fi
@@ -76,7 +76,7 @@ EOF
             echo "Starting $solr_vm";
             ssh $solr_vm bash << EOF
                 export JAVA_HOME=$JAVA_HOME
-                cd "$tomcat_server_dir/bin";
+                cd "$solr_server_dir/bin";
                 ./solr start $solr_jvm_properties -m $solr_memory -s $solr_home -p $http_solr_port;
 EOF
         elif [ "$1" == "stop" ]; then
