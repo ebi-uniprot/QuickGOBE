@@ -23,13 +23,8 @@ import static org.hamcrest.core.IsEqual.equalTo;
 @RunWith(MockitoJUnitRunner.class)
 public class AnnotationRequestTest {
 
-
     //AssignedBy values
     private static final String UNI_PROT = "UniProt";
-
-    //Reference
-    private static final String EXAMPLE_REFERENCES="DOI,PMID,Reactome,GO_REF:0000037";
-    private static final String ONE_GOREF = "GO_REF:123456";
 
     private AnnotationRequest annotationRequest;
 
@@ -97,9 +92,7 @@ public class AnnotationRequestTest {
     @Test
     public void setAndGetTaxon() {
         String taxonId = "1";
-
         annotationRequest.setTaxon(taxonId);
-
         assertThat(annotationRequest.getTaxon(), is(taxonId));
     }
 
@@ -109,8 +102,10 @@ public class AnnotationRequestTest {
         annotationRequest.setQualifier((qualifier));
         assertThat(annotationRequest.getQualifter(), is(qualifier));
     }
+
     @Test
     public void setAndGetReference(){
+        String ONE_GOREF = "GO_REF:123456";
         annotationRequest.setReference(ONE_GOREF);
         assertThat(annotationRequest.getReference(), is(ONE_GOREF));
     }
