@@ -347,7 +347,7 @@ public class AnnotationControllerIT {
     @Test
     public void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, "involved_in"));
+                get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, "peeled"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -532,7 +532,7 @@ public class AnnotationControllerIT {
 
     private List<AnnotationDocument> createGenericDocs2(int n) {
         return IntStream.range(0, n)
-                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc2(createId(i))).collect
+                .mapToObj(i -> AnnotationDocMocker.createAnnotationDocUniqueData(createId(i))).collect
                         (Collectors.toList());
     }
     private String createId(int idNum) {
