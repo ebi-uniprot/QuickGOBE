@@ -115,8 +115,8 @@ public class GeneProductRepositoryIT {
      */
     private void deleteFromRepositoryByIds(GeneProductDocument... docs) throws SolrServerException, IOException {
         for (GeneProductDocument doc : docs) {
-            geneProductTemplate.getSolrServer().deleteByQuery(GeneProductFields.Searchable.ID + ":" + doc.id);
+            geneProductTemplate.getSolrClient().deleteByQuery(GeneProductFields.Searchable.ID + ":" + doc.id);
         }
-        geneProductTemplate.getSolrServer().commit();
+        geneProductTemplate.getSolrClient().commit();
     }
 }

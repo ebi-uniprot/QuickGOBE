@@ -187,6 +187,6 @@ public class AnnotationConfig {
 
     @Bean
     ItemWriter<AnnotationDocument> annotationSolrServerWriter() {
-        return new SolrServerWriter<>(annotationTemplate.getSolrServer());
+        return new SolrServerWriter<>(annotationTemplate.getSolrClient());
     }
 }

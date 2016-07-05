@@ -41,7 +41,7 @@ public class BlackListFieldConverterTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("A5I1R9_CLOBH"))                 // entity name
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0007005"))                   // ancestor go id
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("1 NOT-qualified manual etc"))   // reason
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("IER12345"))                     // predictedBy
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("IER12345"))                     // methodId
                 .buildString());
 
         rawBlacklist.add(FlatFieldBuilder.newFlatField()
@@ -52,7 +52,7 @@ public class BlackListFieldConverterTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("441771"))                       // taxon id
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("B5I1R9_CLOBH"))                 // entity name
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0007006"))                   // ancestor go id
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("1 NOT-qualified manual etc"))   // predictedBy
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("1 NOT-qualified manual etc"))   // methodId
                 .addField(FlatFieldLeaf.newFlatFieldLeaf())                               // no parameter means it's got no value
                 .buildString());
 
@@ -60,7 +60,7 @@ public class BlackListFieldConverterTest {
         assertThat(blacklistItems.size(), is(2));
         assertThat(blacklistItems.get(0).goId, is("GO:0000001"));
         assertThat(blacklistItems.get(1).category, is("IS-qualified manual"));
-        assertThat(blacklistItems.get(1).predictedBy, is(nullValue()));
+        assertThat(blacklistItems.get(1).methodId, is(nullValue()));
     }
 
     @Test

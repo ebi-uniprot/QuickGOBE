@@ -60,13 +60,12 @@ public class OBOTerm {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Synonym implements FieldType {
-        public String synonymName;
-        public String synonymType;
+        public String name;
+        public String type;
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class History implements FieldType {
-        public String name;
         public String timestamp;
         public String action;
         public String category;

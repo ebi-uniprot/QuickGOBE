@@ -44,7 +44,7 @@ public class AnnotationDocMocker {
         return doc;
     }
 
-    public static AnnotationDocument createAnnotationDoc2(String geneProductId) {
+    public static AnnotationDocument createAnnotationDocUniqueData(String geneProductId) {
         AnnotationDocument doc = new AnnotationDocument();
         doc.geneProductId = geneProductId;
 

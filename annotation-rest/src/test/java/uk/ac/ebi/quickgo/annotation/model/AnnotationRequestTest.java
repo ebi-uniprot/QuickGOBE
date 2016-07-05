@@ -102,6 +102,13 @@ public class AnnotationRequestTest {
 
         assertThat(annotationRequest.getTaxon(), is(taxonId));
     }
+
+    @Test
+    public void setAndGetQualifier(){
+        String qualifier = "NOT";
+        annotationRequest.setQualifier((qualifier));
+        assertThat(annotationRequest.getQualifter(), is(qualifier));
+    }
     @Test
     public void setAndGetReference(){
         annotationRequest.setReference(ONE_GOREF);
