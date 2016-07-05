@@ -27,6 +27,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
 
@@ -462,19 +463,38 @@ public class AnnotationControllerIT {
 
     //----- Tests for reference ---------------------//
 
+
     @Test
     public void singleReferenceIsSuccessful() throws Exception{
 
-        AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        a.reference = "PMID:0000002";
-            repository.save(a);
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, AnnotationDocMocker.GO_REF_0000002));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
+                AnnotationDocMocker.REF2));
 
-        response.andExpect(status().isOk())
+        response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()))
-                .andExpect(fieldsInAllResultsExist(1));
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE,  AnnotationDocMocker.REF2, genericDocs.size()));
     }
+
+    @Test
+    public void singleReferenceIsSuccessfulAfterAddingNewReference() throws Exception{
+
+        AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        a.reference = "PMID:0000002";
+        repository.save(a);
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, a.reference));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1));
+    }
+
+
 
     @Test
     public void threeReferencesAreSuccessful() throws Exception{
@@ -488,17 +508,17 @@ public class AnnotationControllerIT {
             repository.save(b);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
-                AnnotationDocMocker.GO_REF_0000002 + "," + a.reference + "," + b.reference));
+                AnnotationDocMocker.REF2 + "," + a.reference + "," + b.reference));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()+2))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valueInElement(0, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(1, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(2, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(3, AnnotationFields.REFERENCE, a.reference))
-                .andExpect(valueInElement(4, AnnotationFields.REFERENCE, b.reference));
+                .andExpect(valueInElement(0, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(1, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(2, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(3, REFERENCE, a.reference))
+                .andExpect(valueInElement(4, REFERENCE, b.reference));
     }
 
 
@@ -514,17 +534,17 @@ public class AnnotationControllerIT {
             repository.save(b);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
-                AnnotationDocMocker.GO_REF_0000002).param(REF_PARAM, a.reference).param(REF_PARAM, b.reference));
+                AnnotationDocMocker.REF2).param(REF_PARAM, a.reference).param(REF_PARAM, b.reference));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()+2))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valueInElement(0, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(1, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(2, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(3, AnnotationFields.REFERENCE, a.reference))
-                .andExpect(valueInElement(4, AnnotationFields.REFERENCE, b.reference));
+                .andExpect(valueInElement(0, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(1, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(2, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(3, REFERENCE, a.reference))
+                .andExpect(valueInElement(4, REFERENCE, b.reference));
     }
 
 
@@ -563,10 +583,10 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()+1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valueInElement(0, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(1, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(2, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(3, AnnotationFields.REFERENCE, a.reference));
+                .andExpect(valueInElement(0, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(1, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(2, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(3, REFERENCE, a.reference));
     }
 
     @Test
@@ -586,11 +606,11 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()+2))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valueInElement(0, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(1, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(2, AnnotationFields.REFERENCE, AnnotationDocMocker.GO_REF_0000002))
-                .andExpect(valueInElement(3, AnnotationFields.REFERENCE, a.reference))
-                .andExpect(valueInElement(4, AnnotationFields.REFERENCE, b.reference));
+                .andExpect(valueInElement(0, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(1, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(2, REFERENCE, AnnotationDocMocker.REF2))
+                .andExpect(valueInElement(3, REFERENCE, a.reference))
+                .andExpect(valueInElement(4, REFERENCE, b.reference));
     }
 
 
