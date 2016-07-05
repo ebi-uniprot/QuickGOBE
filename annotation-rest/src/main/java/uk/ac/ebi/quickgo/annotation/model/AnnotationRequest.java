@@ -11,8 +11,8 @@ import javax.validation.constraints.Pattern;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
+
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -81,6 +81,18 @@ public class AnnotationRequest {
     }
 
     /**
+     * NOT, enables etc
+     * @param qualifier
+     */
+    public void setQualifier(String qualifier){
+        filterMap.put(QUALIFIER, qualifier);
+    }
+
+    public String getQualifter(){
+        return filterMap.get(QUALIFIER);
+    }
+
+    /**
      * A list of with/from values, separated by commas
      * In the format withFrom=PomBase:SPBP23A10.14c,RGD:621207 etc
      * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
@@ -137,6 +149,7 @@ public class AnnotationRequest {
         createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
         createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
         createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
+        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
         createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
 
 

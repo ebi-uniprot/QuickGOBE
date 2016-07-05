@@ -63,7 +63,7 @@ public class GOTerm extends OBOTerm {
         public String goId;
         public String reason;
         public String category;
-        public String predictedBy;
+        public String methodId;
         public String entityType;
         public String entityId;
         public String taxonId;

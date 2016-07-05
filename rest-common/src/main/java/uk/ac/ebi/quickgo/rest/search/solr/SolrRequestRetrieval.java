@@ -8,8 +8,9 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
+import java.io.IOException;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrException;
@@ -21,23 +22,23 @@ import org.apache.solr.common.SolrException;
  * @author Edd
  */
 public class SolrRequestRetrieval<T> implements RequestRetrieval<T> {
-    private SolrServer solrServer;
+    private SolrClient solrClient;
     private QueryResultConverter<T, QueryResponse> resultConverter;
     private QueryRequestConverter<SolrQuery> queryRequestConverter;
 
     public SolrRequestRetrieval(
-            SolrServer solrServer,
+            SolrClient solrClient,
             QueryRequestConverter<SolrQuery> queryRequestConverter,
             QueryResultConverter<T, QueryResponse> resultConverter,
             SolrRetrievalConfig serviceProperties) {
-        this.solrServer = solrServer;
+        this.solrClient = solrClient;
         this.resultConverter = resultConverter;
         this.queryRequestConverter = queryRequestConverter;
 
-        checkArguments(solrServer, queryRequestConverter, resultConverter, serviceProperties);
+        checkArguments(solrClient, queryRequestConverter, resultConverter, serviceProperties);
     }
 
-    private void checkArguments(SolrServer solrServer,
+    private void checkArguments(SolrClient solrServer,
             QueryRequestConverter<SolrQuery> queryRequestConverter,
             QueryResultConverter<T, QueryResponse> resultConverter,
             SolrRetrievalConfig serviceProperties) {
@@ -62,9 +63,9 @@ public class SolrRequestRetrieval<T> implements RequestRetrieval<T> {
         SolrQuery query = queryRequestConverter.convert(request);
 
         try {
-            QueryResponse response = solrServer.query(query);
+            QueryResponse response = solrClient.query(query);
             return resultConverter.convert(response, request);
-        } catch (SolrServerException | SolrException  e) {
+        } catch (SolrServerException | SolrException | IOException e) {
             throw new RetrievalException(e);
         }
     }
