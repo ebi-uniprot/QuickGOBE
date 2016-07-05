@@ -61,7 +61,7 @@ public class SearchServiceConfig {
                 new AnnotationDocConverterImpl());
 
         return new SolrRequestRetrieval<>(
-                annotationTemplate.getSolrServer(),
+                annotationTemplate.getSolrClient(),
                 queryRequestConverter,
                 resultConverter,
                 annotationRetrievalConfig);

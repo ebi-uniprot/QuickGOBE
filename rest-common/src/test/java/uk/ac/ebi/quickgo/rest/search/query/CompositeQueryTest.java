@@ -143,8 +143,20 @@ public class CompositeQueryTest {
     }
 
     @Test
-    public void negateQuery() throws Exception {
+    public void negateFieldQuery() throws Exception {
         QuickGOQuery query = createFieldQuery("field1", "value1");
+
+        uk.ac.ebi.quickgo.rest.search.query.CompositeQuery
+                compositeQuery =
+                new uk.ac.ebi.quickgo.rest.search.query.CompositeQuery(Collections.singleton(query), QueryOp.NOT);
+
+        assertThat(compositeQuery.queries(), hasSize(1));
+        assertThat(compositeQuery.queries(), contains(query));
+    }
+
+    @Test
+    public void negateAllQuery() throws Exception {
+        QuickGOQuery query = QuickGOQuery.createAllQuery();
 
         uk.ac.ebi.quickgo.rest.search.query.CompositeQuery
                 compositeQuery = new uk.ac.ebi.quickgo.rest.search.query.CompositeQuery(Collections.singleton(query), QueryOp.NOT);

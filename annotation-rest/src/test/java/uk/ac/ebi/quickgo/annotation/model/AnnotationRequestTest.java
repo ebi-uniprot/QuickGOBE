@@ -93,6 +93,13 @@ public class AnnotationRequestTest {
     }
 
     @Test
+    public void setAndGetQualifier(){
+        String qualifier = "NOT";
+        annotationRequest.setQualifier((qualifier));
+        assertThat(annotationRequest.getQualifter(), is(qualifier));
+    }
+
+    @Test
     public void setAndGetECOId() {
         String ecoId = "ECO:0000256";
         annotationRequest.setEcoId(ecoId);

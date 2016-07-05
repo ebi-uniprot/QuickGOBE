@@ -37,11 +37,16 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
         CompositeQuery.QueryOp operator = query.queryOperator();
         Set<QuickGOQuery> queries = query.queries();
 
-        String operatorText = " " + operator.name() + " ";
+        if (queries.size() == 1 && operator.equals(CompositeQuery.QueryOp.NOT)) {
+            String singletonQuery = queries.iterator().next().accept(this);
+            return CompositeQuery.QueryOp.NOT + " (" + singletonQuery + ")";
+        } else {
+            String operatorText = " " + operator.name() + " ";
 
-        return queries.stream()
-                .map(q -> q.accept(this))
-                .collect(Collectors.joining(operatorText, "(", ")"));
+            return queries.stream()
+                    .map(q -> q.accept(this))
+                    .collect(Collectors.joining(operatorText, "(", ")"));
+        }
     }
 
     @Override public String visit(NoFieldQuery query) {

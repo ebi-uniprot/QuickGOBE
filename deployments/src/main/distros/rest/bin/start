@@ -40,6 +40,12 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
     exit 1;
 fi;
 
+# ======= check if script is run on the right VM =====================================
+if [[ $(hostname) =~ ^ebi.* ]]; then
+    echo "This script can only be run on NON EBI cluster machines";
+    exit 1;
+fi
+
 # ======= if a PID file exists, it looks as though the service has already been started =======================================
 if [ -e $PIDFILE ]
 then
