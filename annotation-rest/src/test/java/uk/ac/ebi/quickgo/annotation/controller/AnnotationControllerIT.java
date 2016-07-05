@@ -597,7 +597,7 @@ public class AnnotationControllerIT {
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()+2))
-                .andExpect(fieldsInAllResultsExist(genericDocs.size()+2))
+                .andExpect(fieldsInAllResultsExist(5))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, b.reference, 1));
