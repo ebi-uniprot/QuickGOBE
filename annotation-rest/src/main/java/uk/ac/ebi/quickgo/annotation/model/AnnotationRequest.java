@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.*;
+import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
@@ -32,6 +33,9 @@ public class AnnotationRequest {
     private static final String COMMA = ",";
 
     private static final String ASPECT_FIELD = "aspect";
+
+    private static final String[] targetFields = new String[]{ASPECT_FIELD, ASSIGNED_BY,
+            TAXON_ID, GO_EVIDENCE, ECO_ID};
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -128,11 +132,9 @@ public class AnnotationRequest {
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
-        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
-        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
-        createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
-        createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
-        createSimpleFilter(ECO_ID).ifPresent(filterRequests::add);
+        Stream.of(targetFields)
+                .map(this::createSimpleFilter)
+                .forEach(f ->f.ifPresent(filterRequests::add));
 
         return filterRequests;
     }
