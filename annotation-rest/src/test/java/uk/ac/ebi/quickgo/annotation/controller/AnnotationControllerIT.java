@@ -511,8 +511,8 @@ public class AnnotationControllerIT {
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(genericDocs.size()+2))
-                .andExpect(fieldsInAllResultsExist(genericDocs.size()+2))
+                .andExpect(totalNumOfResults(5))
+                .andExpect(fieldsInAllResultsExist(5))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, b.reference, 1));
@@ -535,8 +535,8 @@ public class AnnotationControllerIT {
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(genericDocs.size()+2))
-                .andExpect(fieldsInAllResultsExist(genericDocs.size()+2))
+                .andExpect(totalNumOfResults(5))
+                .andExpect(fieldsInAllResultsExist(5))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, b.reference, 1));
@@ -568,7 +568,6 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterBySingleReferenceIdReturnsDocumentsThatContainTheReferenceId() throws Exception{
-        //Don't find this one.
         AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
         a.reference = "PMID:0000002";
             repository.save(a);
@@ -576,8 +575,8 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "0000002"));
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(genericDocs.size()+1))
-                .andExpect(fieldsInAllResultsExist(genericDocs.size()+1))
+                .andExpect(totalNumOfResults(4))
+                .andExpect(fieldsInAllResultsExist(4))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1));
     }
