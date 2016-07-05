@@ -11,8 +11,9 @@ import javax.validation.constraints.Pattern;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
-
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
+
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
