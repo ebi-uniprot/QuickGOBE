@@ -4,10 +4,8 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;
-import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryResultHighlightingConverter;
 
 import com.google.common.base.Preconditions;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
