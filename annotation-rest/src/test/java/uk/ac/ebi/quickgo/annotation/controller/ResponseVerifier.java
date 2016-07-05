@@ -44,10 +44,6 @@ final class ResponseVerifier {
     }
 
 
-    static ResultMatcher valueInElement(int element, String fieldName, String value) {
-        return jsonPath(RESULTS + "[" + element + "]" + fieldName, is(value));
-    }
-
     static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {
         String path = String.format(RESULTS_CONTENT_BY_INDEX, resultIndex);
 
