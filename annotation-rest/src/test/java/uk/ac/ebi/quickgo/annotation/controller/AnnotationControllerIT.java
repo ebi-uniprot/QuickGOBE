@@ -61,6 +61,11 @@ public class AnnotationControllerIT {
     private List<AnnotationDocument> genericDocs;
     private static final String RESOURCE_URL = "/QuickGO/services/annotation";
 
+    //Test data
+    private static final String existingECOID1 = "ECO:0000256";
+    private static final String existingECOID2 = "ECO:0000323";  //exists
+    private static final String notexistsECOID3 = "ECO:0000888";  //doesn't exist
+
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -322,58 +327,52 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByEcoIdSuccessfully() throws Exception {
-        String ecoID = "ECO:0000256";
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ECO_ID, ecoID));
+                get(RESOURCE_URL + "/search").param(ECO_ID, existingECOID1));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()))
                 .andExpect(fieldsInAllResultsExist(genericDocs.size()))
-                .andExpect(atLeastOneResultHasItem(ECO_ID, ecoID));
+                .andExpect(atLeastOneResultHasItem(ECO_ID, existingECOID1));
     }
 
 
     @Test
     public void filterByMultipleEcoIdMixedResults() throws Exception {
-        String ecoID1 = "ECO:0000256";  //exists
-        String ecoID2 = "ECO:0000323";  //exists
-        String ecoID3 = "ECO:0000888";  //doesn't exist
+
+
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ECO_ID, ecoID1 + "," + ecoID2));
+                get(RESOURCE_URL + "/search").param(ECO_ID, existingECOID1 + "," + existingECOID2));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()*2))
                 .andExpect(fieldsInAllResultsExist(genericDocs.size()*2))
-                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID1, 3))
-                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID2, 3))
-                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID3, 0));
+                .andExpect(itemExistsExpectedTimes(ECO_ID, existingECOID1, 3))
+                .andExpect(itemExistsExpectedTimes(ECO_ID, existingECOID2, 3))
+                .andExpect(itemExistsExpectedTimes(ECO_ID, notexistsECOID3, 0));
     }
 
     @Test
     public void filterByMultipleEcoIdMixedResultsWithMultipleParms() throws Exception {
-        String ecoID1 = "ECO:0000256";  //exists
-        String ecoID2 = "ECO:0000323";  //exists
-        String ecoID3 = "ECO:0000888";  //doesn't exist
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ECO_ID, ecoID1)
-                        .param(ECO_ID, ecoID2));
+                get(RESOURCE_URL + "/search").param(ECO_ID, existingECOID1)
+                        .param(ECO_ID, existingECOID2));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()*2))
                 .andExpect(fieldsInAllResultsExist(genericDocs.size()*2))
-                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID1, 3))
-                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID2, 3))
-                .andExpect(itemExistsExpectedTimes(ECO_ID, ecoID3, 0));
+                .andExpect(itemExistsExpectedTimes(ECO_ID, existingECOID1, 3))
+                .andExpect(itemExistsExpectedTimes(ECO_ID, existingECOID2, 3))
+                .andExpect(itemExistsExpectedTimes(ECO_ID, notexistsECOID3, 0));
     }
 
     @Test
     public void filterByNonExistentEcoIdReturnsZeroResults() throws Exception {
-        String ecoID = "ECO:0000888";
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ECO_ID, ecoID));
+                get(RESOURCE_URL + "/search").param(ECO_ID, notexistsECOID3));
 
         response.andDo(print())
                 .andExpect(status().isOk())
