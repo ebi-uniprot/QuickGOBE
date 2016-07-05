@@ -1678,13 +1678,13 @@
       -->
 
     <!--Processor that automatically inserts a unique identifier into an annotation document-->
-    <updateRequestProcessorChain>
-        <processor class="solr.UUIDUpdateProcessorFactory">
-            <str name="fieldName">id</str>
-        </processor>
-        <processor class="solr.LogUpdateProcessorFactory"/>
-        <processor class="solr.RunUpdateProcessorFactory"/>
-    </updateRequestProcessorChain>
+    <!--<updateRequestProcessorChain>-->
+    <!--<processor class="solr.UUIDUpdateProcessorFactory">-->
+    <!--<str name="fieldName">id</str>-->
+    <!--</processor>-->
+    <!--<processor class="solr.LogUpdateProcessorFactory"/>-->
+    <!--<processor class="solr.RunUpdateProcessorFactory"/>-->
+    <!--</updateRequestProcessorChain>-->
 
     <!-- Language identification
 
