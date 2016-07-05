@@ -20,7 +20,6 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Time: 11:25
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
 public class AnnotationRequestTest {
 
     //AssignedBy values
