@@ -459,7 +459,9 @@ public class AnnotationControllerIT {
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()))
-                .andExpect(fieldsInAllResultsExist(1));
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()))
+                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015421"))
+                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015422"));
     }
 
 
@@ -470,7 +472,7 @@ public class AnnotationControllerIT {
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()))
-                .andExpect(fieldsInAllResultsExist(1));
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()));
     }
 
     //---------- Limit related tests.
