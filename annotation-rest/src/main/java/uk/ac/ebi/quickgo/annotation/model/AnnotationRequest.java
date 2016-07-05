@@ -12,6 +12,8 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSI
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
 
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
+
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
  *
@@ -78,6 +80,18 @@ public class AnnotationRequest {
         filterMap.put(GO_EVIDENCE, evidence);
     }
 
+    /**
+     * NOT, enables etc
+     * @param qualifier
+     */
+    public void setQualifier(String qualifier){
+        filterMap.put(QUALIFIER, qualifier);
+    }
+
+    public String getQualifter(){
+        return filterMap.get(QUALIFIER);
+    }
+
     @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
             message = "At least one 'GO Evidence' value is invalid: ${validatedValue}")
     public String getGoEvidence() {
@@ -117,6 +131,7 @@ public class AnnotationRequest {
         createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
         createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
         createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
+        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
 
         return filterRequests;
     }

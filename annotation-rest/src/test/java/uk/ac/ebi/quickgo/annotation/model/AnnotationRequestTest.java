@@ -91,4 +91,11 @@ public class AnnotationRequestTest {
 
         assertThat(annotationRequest.getTaxon(), is(taxonId));
     }
+
+    @Test
+    public void setAndGetQualifier(){
+        String qualifier = "NOT";
+        annotationRequest.setQualifier((qualifier));
+        assertThat(annotationRequest.getQualifter(), is(qualifier));
+    }
 }

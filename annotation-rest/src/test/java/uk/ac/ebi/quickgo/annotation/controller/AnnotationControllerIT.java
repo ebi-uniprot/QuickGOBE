@@ -49,6 +49,7 @@ public class AnnotationControllerIT {
 
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
     private static final String GO_EVIDENCE_PARAM = "goEvidence";
+    private static final String QUALIFIER_PARAM = "qualifier";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxon";
@@ -169,7 +170,8 @@ public class AnnotationControllerIT {
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, UNAVAILABLE_ASSIGNED_BY + ","
                         + assignedBy));
 
-        response.andExpect(status().isOk())
+        response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
@@ -311,6 +313,37 @@ public class AnnotationControllerIT {
 
         response.andExpect(status().isBadRequest())
                 .andExpect(contentTypeToBeJson());
+
+    }
+
+    //---------- Qualifier related tests.
+
+    @Test
+    public void successfullyLookupAnnotationsByQualifier() throws Exception {
+        String qualifier = "enables";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, qualifier));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(valueOccurInField(QUALIFIER, qualifier));
+
+    }
+
+    //todo test valid values for qualifier once a custom validator has been created
+
+    @Test
+    public void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, "involved_in"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
 
     }
 
