@@ -513,12 +513,10 @@ public class AnnotationControllerIT {
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()+2))
-                .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valueInElement(0, REFERENCE, AnnotationDocMocker.REF2))
-                .andExpect(valueInElement(1, REFERENCE, AnnotationDocMocker.REF2))
-                .andExpect(valueInElement(2, REFERENCE, AnnotationDocMocker.REF2))
-                .andExpect(valueInElement(3, REFERENCE, a.reference))
-                .andExpect(valueInElement(4, REFERENCE, b.reference));
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()+2))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, b.reference, 1));
     }
 
 
