@@ -372,7 +372,7 @@ public class AnnotationControllerIT {
 
     }
 
-    //---------- Page related tests.
+    //---------- Qualifier
 
     @Test
     public void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
@@ -386,8 +386,11 @@ public class AnnotationControllerIT {
 
     }
 
+    //---------- ECO ID
+
+
     @Test
-    public void filterByEcoIdSuccessfully() throws Exception {
+    public void filterAnnotationsUsingSingleEcoIdReturnsResults() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ECO_ID, EXISTING_ECO_ID1));
 
@@ -399,7 +402,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByMultipleEcoIdMixedResults() throws Exception {
+    public void filterAnnotationsUsingMultipleEcoIdsInSingleParameterProducesMixedResults() throws Exception {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ECO_ID, EXISTING_ECO_ID1 + "," + EXISTING_ECO_ID2));
@@ -414,7 +417,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByMultipleEcoIdMixedResultsWithMultipleParms() throws Exception {
+    public void filterAnnotationsUsingMultipleEcoIdsAsIndependentParametersProducesMixedResults() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ECO_ID, EXISTING_ECO_ID1)
                         .param(ECO_ID, EXISTING_ECO_ID2));
