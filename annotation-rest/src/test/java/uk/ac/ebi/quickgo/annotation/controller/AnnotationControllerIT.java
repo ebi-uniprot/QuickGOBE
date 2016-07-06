@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
 
@@ -606,5 +607,153 @@ public class AnnotationControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+
+    //----- Tests for reference ---------------------//
+
+    @Test
+    public void filterBySingleReferenceReturnsDocumentsThatContainTheReference() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
+                AnnotationDocMocker.REF2));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()));
+    }
+
+    @Test
+    public void filterBySingleReferenceReturnsOnlyDocumentsThatContainTheReferenceWhenOthersExists() throws Exception {
+
+        AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        a.reference = "PMID:0000002";
+        repository.save(a);
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, a.reference));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1));
+    }
+
+    @Test
+    public void filterByThreeReferencesReturnsDocumentsThatContainThoseReferences() throws Exception {
+
+        AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        a.reference = "PMID:0000002";
+        repository.save(a);
+
+        AnnotationDocument b = AnnotationDocMocker.createAnnotationDoc("A0A124");
+        b.reference = "PMID:0000003";
+        repository.save(b);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
+                AnnotationDocMocker.REF2 + "," + a.reference + "," + b.reference));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(5))
+                .andExpect(fieldsInAllResultsExist(5))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, b.reference, 1));
+    }
+
+    @Test
+    public void filterByThreeIndependentReferencesReturnsDocumentsThatContainThoseReferences() throws Exception {
+
+        AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        a.reference = "PMID:0000002";
+        repository.save(a);
+
+        AnnotationDocument b = AnnotationDocMocker.createAnnotationDoc("A0A124");
+        b.reference = "PMID:0000003";
+        repository.save(b);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
+                AnnotationDocMocker.REF2).param(REF_PARAM, a.reference).param(REF_PARAM, b.reference));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(5))
+                .andExpect(fieldsInAllResultsExist(5))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, b.reference, 1));
+    }
+
+    @Test
+    public void filterByReferenceDbOnlyReturnsDocumentsWithReferencesThatStartWithThatDb() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "GO_REF"));
+
+        //This one shouldn't be found
+        AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        a.reference = "PMID:0000002";
+        repository.save(a);
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUM_RESULTS));
+    }
+
+    @Test
+    public void filterByReferenceDbNotAvailableInDocumentsReturnsZeroResults() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "GO_LEFT"));
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    @Test
+    public void filterBySingleReferenceIdReturnsDocumentsThatContainTheReferenceId() throws Exception {
+        AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        a.reference = "PMID:0000002";
+        repository.save(a);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "0000002"));
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(4))
+                .andExpect(fieldsInAllResultsExist(4))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1));
+    }
+
+    @Test
+    public void filterByMultipleReferenceIdReturnsDocumentsThatContainTheReferenceId() throws Exception {
+        AnnotationDocument a = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        a.reference = "PMID:0000002";
+        repository.save(a);
+
+        AnnotationDocument b = AnnotationDocMocker.createAnnotationDoc("A0A124");
+        b.reference = "PMID:0000003";
+        repository.save(b);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "0000002")
+                .param(REF_PARAM, "0000003"));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size() + 2))
+                .andExpect(fieldsInAllResultsExist(5))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, a.reference, 1))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, b.reference, 1));
+    }
+
+    @Test
+    public void filterByUnknownReferenceIdIsUnsuccessful() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "999999"));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
     }
 }
