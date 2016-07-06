@@ -349,7 +349,7 @@ public class AnnotationControllerIT {
 
     }
 
-    //---------- Gene Ontology Id related tests.
+    //---------- Gene Ontology Id
 
     @Test
     public void successfullyLookupAnnotationsByGoId() throws Exception {
