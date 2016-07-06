@@ -280,7 +280,7 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
-    //---------- Qualifier related tests.
+    //---------- GO Evidence Code
 
     @Test
     public void lookupAnnotationFilterByGoEvidenceCodeSuccessfully() throws Exception {
@@ -295,7 +295,6 @@ public class AnnotationControllerIT {
                 .andExpect(atLeastOneResultHasItem(GO_EVIDENCE_FIELD, goEvidenceCode));
     }
 
-    //todo test valid values for qualifier once a custom validator has been created
 
     @Test
     public void lookupAnnotationFilterByLowercaseGoEvidenceCodeSuccessfully() throws Exception {
@@ -310,7 +309,7 @@ public class AnnotationControllerIT {
                 .andExpect(atLeastOneResultHasItem(GO_EVIDENCE_FIELD, goEvidenceCode.toUpperCase()));
     }
 
-    //---------- ECO id
+
 
     @Test public void lookupAnnotationFilterByNonExistentGoEvidenceCodeReturnsNothing() throws Exception {
         ResultActions response = mockMvc.perform(
@@ -357,6 +356,9 @@ public class AnnotationControllerIT {
 
     }
 
+    //---------- Qualifier
+    //todo test valid values for qualifier once a custom validator has been created
+
     @Test
     public void successfullyLookupAnnotationsByQualifier() throws Exception {
         String qualifier = "enables";
@@ -372,8 +374,6 @@ public class AnnotationControllerIT {
 
     }
 
-    //---------- Qualifier
-
     @Test
     public void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
         ResultActions response = mockMvc.perform(
@@ -385,6 +385,7 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
 
     }
+
 
     //---------- ECO ID
 
