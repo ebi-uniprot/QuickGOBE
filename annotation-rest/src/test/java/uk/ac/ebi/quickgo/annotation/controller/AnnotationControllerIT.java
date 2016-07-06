@@ -52,6 +52,7 @@ public class AnnotationControllerIT {
 
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
     private static final String GO_EVIDENCE_PARAM = "goEvidence";
+    private static final String REF_PARAM = "reference";
     private static final String QUALIFIER_PARAM = "qualifier";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
