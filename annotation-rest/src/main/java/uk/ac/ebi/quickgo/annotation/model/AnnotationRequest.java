@@ -32,8 +32,7 @@ public class AnnotationRequest {
     public static final int MAX_ENTRIES_PER_PAGE = 100;
 
     private static final String COMMA = ",";
-
-    private static final String ASPECT_FIELD = "aspect";
+    private static final int DEFAULT_PAGE_NUMBER = 1;
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
