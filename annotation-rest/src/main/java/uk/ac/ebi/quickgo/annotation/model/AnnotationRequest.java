@@ -10,10 +10,12 @@ import javax.validation.constraints.Pattern;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
-
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
+
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -32,8 +34,6 @@ public class AnnotationRequest {
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
-
-    private static final String ASPECT_FIELD = "aspect";
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -58,6 +58,24 @@ public class AnnotationRequest {
     public String getAssignedBy() {
         return filterMap.get(ASSIGNED_BY);
     }
+
+    /**
+     * E.g. DOI, DOI:10.1002/adsc.201200590, GO_REF, PMID, PMID:12882977, Reactome, Reactome:R-RNO-912619,
+     * GO_REF:0000037 etc
+     * @param reference
+     * @return
+     */
+    public void setReference(String reference){
+        filterMap.put(AnnotationFields.REFERENCE_SEARCH, reference);
+    }
+
+    //todo create validation pattern @Pattern(regexp = "")
+    public String getReference(){
+        return filterMap.get(AnnotationFields.REFERENCE_SEARCH);
+    }
+
+    //TODO:change the way the field is referenced
+    private static final String ASPECT_FIELD = "aspect";
 
     public void setAspect(String aspect) {
         if (aspect != null) {
@@ -91,6 +109,24 @@ public class AnnotationRequest {
 
     public String getQualifter(){
         return filterMap.get(QUALIFIER);
+    }
+
+    /**
+     * A list of with/from values, separated by commas
+     * In the format withFrom=PomBase:SPBP23A10.14c,RGD:621207 etc
+     * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
+     * @param withFrom comma separated with/from values
+     */
+    public void setWithFrom(String withFrom){
+        filterMap.put(WITH_FROM_SEARCH, withFrom);
+    }
+
+    /**
+     * Return a list of with/from values, separated by commas
+     * @return String containing comma separated list of with/From values.
+     */
+    public  String getWithFrom(){
+        return filterMap.get(WITH_FROM_SEARCH);
     }
 
     @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
@@ -138,6 +174,7 @@ public class AnnotationRequest {
         this.page = page;
     }
 
+
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
@@ -145,7 +182,10 @@ public class AnnotationRequest {
         createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
         createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
         createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
+        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
         createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
+        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
+
         createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
         createSimpleFilter(GO_ID).ifPresent(filterRequests::add);
 

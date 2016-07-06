@@ -34,7 +34,6 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         if(annotationDocument.extensions != null) {
             annotation.extensions = new ArrayList<>(annotationDocument.extensions);
         }
-
         return annotation;
     }
 }
