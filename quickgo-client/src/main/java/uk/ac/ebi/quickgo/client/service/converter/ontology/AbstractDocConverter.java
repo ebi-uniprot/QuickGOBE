@@ -30,5 +30,6 @@ abstract class AbstractDocConverter<T extends OntologyTerm> {
     private void addCommonFields(OntologyDocument doc, T term) {
         term.id = doc.id;
         term.name = doc.name;
+        term.isObsolete = doc.isObsolete;
     }
 }

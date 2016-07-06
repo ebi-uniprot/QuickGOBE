@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.MediaType;
@@ -25,6 +23,7 @@ final class ResponseVerifier {
     public static final String GENEPRODUCT_ID_FIELD = "geneProductId";
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
     public static final String GO_ID_FIELD = "goId";
+    public static final String QUALIFIER = "qualifier";
 
     private static final String ERROR_MESSAGE = "messages";
     private static final String RESULTS = "results";
@@ -46,6 +45,14 @@ final class ResponseVerifier {
 
     static ResultMatcher itemExistsExpectedTimes(String fieldName, String value, int expectedCount) {
         return jsonPath(RESULTS + ".*.[?(@." + fieldName + " == " + value + ")]", hasSize(expectedCount));
+    }
+
+    static ResultMatcher valueOccurInField(String fieldName, String value) {
+        return jsonPath(RESULTS + ".*." + fieldName, hasItem(value));
+    }
+
+    static ResultMatcher valueOccursInCollection(String fieldName, String value) {
+        return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
     }
 
     static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {

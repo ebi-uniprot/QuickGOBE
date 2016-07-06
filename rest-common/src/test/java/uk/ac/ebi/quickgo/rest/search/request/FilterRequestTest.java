@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.request;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -85,6 +86,45 @@ public class FilterRequestTest {
                 .addProperty(field2, field2Value1, field2Value2).build();
         assertThat(request, is(notNullValue()));
         assertThat(request.getValues(), containsInAnyOrder(singletonList(field1Value), asList(field2Value1, field2Value2)));
+    }
+
+    @Test
+    public void addingPropertyWithoutValueResultsInPropertyWithEmptyValuesList() {
+        String field = "name";
+        FilterRequest request = FilterRequest.newBuilder().addProperty(field).build();
+        assertThat(request, is(notNullValue()));
+        assertThat(request.getValue(field).isPresent(), is(true));
+        assertThat(request.getValue(field).get(), is(emptyList()));
+    }
+
+    /**
+     * A filter request without properties is an unlikely situation but possible.
+     */
+    @Test
+    public void filterRequestWithNoPropertiesHasEmptySignature() {
+        FilterRequest request = FilterRequest.newBuilder().build();
+        assertThat(request, is(notNullValue()));
+        assertThat(request.getSignature(), is(empty()));
+    }
+
+    @Test
+    public void filterRequestWithOnePropertyHasSignatureContainingOneValue() {
+        String field = "name";
+        FilterRequest request = FilterRequest.newBuilder().addProperty(field, "value").build();
+        assertThat(request, is(notNullValue()));
+        assertThat(request.getSignature(), contains(field));
+    }
+
+    @Test
+    public void filterRequestWithMultiplePropertiesHasSignatureContainingMultipleValues() {
+        String field1 = "name1";
+        String field2 = "name2";
+        FilterRequest request = FilterRequest.newBuilder()
+                .addProperty(field1, "value")
+                .addProperty(field2, "value")
+                .build();
+        assertThat(request, is(notNullValue()));
+        assertThat(request.getSignature(), containsInAnyOrder(field1, field2));
     }
 
 }

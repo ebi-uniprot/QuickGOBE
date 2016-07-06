@@ -1,41 +1,37 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.rest.ParameterException;
-import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-
-import org.hibernate.validator.HibernateValidator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_FIELD;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_IDS;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
 /**
- * Check filter storage of an {@link AnnotationRequest} and validate
- * values specified in its {@link javax.validation} annotations.
+ *
+ * Test methods and structure of AnnotationRequest
+ *
+ * @author Tony Wardell
+ * Date: 29/04/2016
+ * Time: 11:25
+ * Created with IntelliJ IDEA.
  */
 public class AnnotationRequestTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    //AssignedBy values
+    private static final String UNI_PROT = "UniProt";
+
     private AnnotationRequest annotationRequest;
-    private LocalValidatorFactoryBean validator;
 
     @Before
     public void setUp() {
         annotationRequest = new AnnotationRequest();
-        validator = new LocalValidatorFactoryBean();
-        validator.setProviderClass(HibernateValidator.class);
-        validator.afterPropertiesSet();
     }
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void defaultPageAndLimitValuesAreCorrect() {
@@ -50,7 +46,6 @@ public class AnnotationRequestTest {
 
         assertThat(annotationRequest.getPage(), equalTo(4));
         assertThat(annotationRequest.getLimit(), equalTo(15));
-        expectedNumberOfValidationErrors(0);
     }
 
     @Test
@@ -59,42 +54,44 @@ public class AnnotationRequestTest {
         annotationRequest.setAssignedBy(assignedBy);
 
         assertThat(annotationRequest.getAssignedBy(), is(assignedBy));
-        expectedNumberOfValidationErrors(0);
+    }
+
+    @Test
+    public void setAndGetWithFrom(){
+        String WITH_FROM = "RGD:1623038";
+        annotationRequest.setWithFrom(WITH_FROM);
+        assertThat(annotationRequest.getWithFrom(), is(WITH_FROM));
     }
 
     @Test
     public void setAndGetOntologyAspect() {
-        String aspect = "molecular_function";
+        String aspect = "function";
 
         annotationRequest.setAspect(aspect);
 
         assertThat(annotationRequest.getAspect(), is(aspect));
-        expectedNumberOfValidationErrors(0);
     }
-
     @Test
-    public void setAndGetEvidence() {
+    public void setAndGetEvidence(){
         String EVIDENCE_IEA = "IEA";
         annotationRequest.setGoEvidence(EVIDENCE_IEA);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_IEA));
-        expectedNumberOfValidationErrors(0);
     }
 
     @Test
-    public void setAndGetEvidenceMulti() {
+    public void setAndGetEvidenceMulti(){
         String EVIDENCE_MULTI = "IEA,IBD";
         annotationRequest.setGoEvidence(EVIDENCE_MULTI);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
-        expectedNumberOfValidationErrors(0);
     }
 
     @Test
-    public void setAndGetEvidenceMultiInLowerCase() {
+    public void setAndGetEvidenceMultiInLowerCase(){
         String EVIDENCE_MULTI = "iea,ibd";
         annotationRequest.setGoEvidence(EVIDENCE_MULTI);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
-        expectedNumberOfValidationErrors(0);
     }
+
 
     @Test
     public void setAndGetTaxon() {
@@ -103,7 +100,6 @@ public class AnnotationRequestTest {
         annotationRequest.setTaxon(taxonId);
 
         assertThat(annotationRequest.getTaxon(), is(taxonId));
-        expectedNumberOfValidationErrors(0);
     }
 
     @Test
@@ -113,7 +109,6 @@ public class AnnotationRequestTest {
         annotationRequest.setUsage(usage);
 
         assertThat(annotationRequest.getUsage(), is(usage));
-        expectedNumberOfValidationErrors(0);
     }
 
     @Test
@@ -123,7 +118,6 @@ public class AnnotationRequestTest {
         annotationRequest.setUsageIds(usageIds);
 
         assertThat(annotationRequest.getUsageIds(), is(usageIds.toLowerCase()));
-        expectedNumberOfValidationErrors(0);
     }
 
     @Test
@@ -138,7 +132,6 @@ public class AnnotationRequestTest {
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
                 contains(request));
-        expectedNumberOfValidationErrors(0);
     }
 
     @Test
@@ -153,18 +146,15 @@ public class AnnotationRequestTest {
                         .addProperty(USAGE_IDS, "go:0000001")
                         .addProperty(USAGE_RELATIONSHIPS, "is_a")
                         .build()));
-        expectedNumberOfValidationErrors(0);
     }
 
-    @Test
+    @Test(expected = ParameterException.class)
     public void cannotCreatesFilterInvalidUsageRelationship() {
         annotationRequest.setUsage("descendants");
         annotationRequest.setUsageIds("GO:0000001");
         annotationRequest.setUsageRelationships("this_is_not_allowed");
 
         annotationRequest.createFilterRequests();
-
-        expectedNumberOfValidationErrors(1);
     }
 
     @Test(expected = ParameterException.class)
@@ -174,7 +164,17 @@ public class AnnotationRequestTest {
         annotationRequest.createFilterRequests();
     }
 
-    private void expectedNumberOfValidationErrors(int expectedErrorCount) {
-        assertThat(validator.validate(annotationRequest).size(), is(expectedErrorCount));
+    @Test
+    public void setAndGetQualifier(){
+        String qualifier = "NOT";
+        annotationRequest.setQualifier((qualifier));
+        assertThat(annotationRequest.getQualifter(), is(qualifier));
+    }
+
+    @Test
+    public void setAndGetReference(){
+        String ONE_GOREF = "GO_REF:123456";
+        annotationRequest.setReference(ONE_GOREF);
+        assertThat(annotationRequest.getReference(), is(ONE_GOREF));
     }
 }

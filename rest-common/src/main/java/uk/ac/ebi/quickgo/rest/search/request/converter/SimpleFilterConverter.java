@@ -19,7 +19,7 @@ class SimpleFilterConverter implements FilterConverter {
     private final FilterConfig filterConfig;
 
     SimpleFilterConverter(FilterConfig filterConfig) {
-        Preconditions.checkArgument(filterConfig != null, "RequestConfig cannot be null");
+        Preconditions.checkArgument(filterConfig != null, "FilterConfig cannot be null");
 
         this.filterConfig = filterConfig;
     }
@@ -33,9 +33,9 @@ class SimpleFilterConverter implements FilterConverter {
      * @return a {@link QuickGOQuery} corresponding to a join query, representing the original client request
      */
     @Override public QuickGOQuery transform(FilterRequest request) {
-        Preconditions.checkArgument(request != null, "ClientRequest cannot be null");
+        Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
         Preconditions.checkArgument(request.getValues().size() == 1,
-                "ClientRequest should contain only 1 property for application to a SimpleRequestConverter, " +
+                "FilterRequest should contain only 1 property for application to a SimpleRequestConverter, " +
                         "instead it contained " + request.getValues().size());
 
         Stream<String> values = request.getValues().stream().flatMap(Collection::stream);
