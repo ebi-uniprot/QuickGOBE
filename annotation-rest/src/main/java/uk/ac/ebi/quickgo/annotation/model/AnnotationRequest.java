@@ -185,8 +185,6 @@ public class AnnotationRequest {
         createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
         createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
         createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
-
-        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
         createSimpleFilter(GO_ID).ifPresent(filterRequests::add);
 
 
