@@ -42,6 +42,9 @@ final class ResponseVerifier {
         return jsonPath(RESULTS + ".*." + fieldName, hasItem(value));
     }
 
+    static ResultMatcher valueOccursInCollection(String fieldName, String value) {
+        return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
+    }
 
     static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {
         String path = String.format(RESULTS_CONTENT_BY_INDEX, resultIndex);
