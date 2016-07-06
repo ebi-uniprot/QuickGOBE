@@ -59,6 +59,13 @@ public class AnnotationRequestTest {
     }
 
     @Test
+    public void setAndGetWithFrom(){
+        String WITH_FROM = "RGD:1623038";
+        annotationRequest.setWithFrom(WITH_FROM);
+        assertThat(annotationRequest.getWithFrom(), is(WITH_FROM));
+    }
+
+    @Test
     public void setAndGetOntologyAspect() {
         String aspect = "function";
 

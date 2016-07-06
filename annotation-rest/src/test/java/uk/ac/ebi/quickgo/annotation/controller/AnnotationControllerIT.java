@@ -26,8 +26,10 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
+
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
 
 /**
@@ -50,11 +52,11 @@ public class AnnotationControllerIT {
 
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
     private static final String GO_EVIDENCE_PARAM = "goEvidence";
-    private static final String REF_PARAM = "reference";
     private static final String QUALIFIER_PARAM = "qualifier";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxon";
+    private static final String WITHFROM_PARAM= "withFrom";
 
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
 
@@ -413,6 +415,67 @@ public class AnnotationControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    //---------- withFrom related tests.
+    @Test
+    public void successfulLookupWithFromForSingleId()throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro:IPR015421"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015421"));
+
+    }
+
+    @Test
+    public void successfulLookupWithFromForMultipleValues()throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM,
+                "InterPro:IPR015421,InterPro:IPR015422"));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015421"))
+                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015422"));
+
+    }
+
+
+    @Test
+    public void searchingForUnknownWithFromBringsBackNoResults()throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "XXX:54321"));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+
+    @Test
+    public void successfulLookupWithFromUsingDatabaseNameOnly()throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro"));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()))
+                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015421"))
+                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015422"));
+    }
+
+
+    @Test
+    public void successfulLookupWithFromUsingDatabaseIdOnly()throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "IPR015421"));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(fieldsInAllResultsExist(genericDocs.size()))
+                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015421"));
     }
 
     //---------- Limit related tests.

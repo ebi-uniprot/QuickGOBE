@@ -12,8 +12,9 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSI
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
-
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
+
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -109,6 +110,24 @@ public class AnnotationRequest {
         return filterMap.get(QUALIFIER);
     }
 
+    /**
+     * A list of with/from values, separated by commas
+     * In the format withFrom=PomBase:SPBP23A10.14c,RGD:621207 etc
+     * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
+     * @param withFrom comma separated with/from values
+     */
+    public void setWithFrom(String withFrom){
+        filterMap.put(WITH_FROM_SEARCH, withFrom);
+    }
+
+    /**
+     * Return a list of with/from values, separated by commas
+     * @return String containing comma separated list of with/From values.
+     */
+    public  String getWithFrom(){
+        return filterMap.get(WITH_FROM_SEARCH);
+    }
+
     @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
             message = "At least one 'GO Evidence' value is invalid: ${validatedValue}")
     public String getGoEvidence() {
@@ -151,6 +170,8 @@ public class AnnotationRequest {
         createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
         createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
         createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
+        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
+
 
         return filterRequests;
     }
