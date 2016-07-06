@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -19,6 +21,9 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequestTest {
+
+    //AssignedBy values
+    private static final String UNI_PROT = "UniProt";
 
     private AnnotationRequest annotationRequest;
 
@@ -101,9 +106,7 @@ public class AnnotationRequestTest {
     @Test
     public void setAndGetTaxon() {
         String taxonId = "1";
-
         annotationRequest.setTaxon(taxonId);
-
         assertThat(annotationRequest.getTaxon(), is(taxonId));
     }
 
@@ -112,5 +115,12 @@ public class AnnotationRequestTest {
         String qualifier = "NOT";
         annotationRequest.setQualifier((qualifier));
         assertThat(annotationRequest.getQualifter(), is(qualifier));
+    }
+
+    @Test
+    public void setAndGetReference(){
+        String ONE_GOREF = "GO_REF:123456";
+        annotationRequest.setReference(ONE_GOREF);
+        assertThat(annotationRequest.getReference(), is(ONE_GOREF));
     }
 }

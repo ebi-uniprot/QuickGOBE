@@ -20,6 +20,7 @@ public class AnnotationFields {
     public final static String GO_EVIDENCE = "goEvidence";
     public final static String ECO_ID = "ecoId";
     public final static String REFERENCE = "reference";
+    public final static String REFERENCE_SEARCH = "referenceSearch";
     public final static String WITH_FROM = "withFrom";
     public final static String WITH_FROM_SEARCH = "withFromSearch";
     public final static String INTERACTING_TAXON_ID = "interactingTaxonId";
@@ -56,6 +57,7 @@ public class AnnotationFields {
         public static final String TAXON_ID = storeAndGet(VALUES, AnnotationFields.TAXON_ID);
         public static final String GO_EVIDENCE = storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
         public static final String QUALIFIER   = storeAndGet(VALUES, AnnotationFields.QUALIFIER);
+        public static final String REFERENCE_SEARCH = storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
         public static final String GENEPRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
 
         public static boolean isSearchable(String field) {

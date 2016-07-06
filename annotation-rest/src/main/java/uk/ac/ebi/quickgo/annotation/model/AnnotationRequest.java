@@ -11,6 +11,7 @@ import javax.validation.constraints.Pattern;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
@@ -31,8 +32,10 @@ public class AnnotationRequest {
     public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
     public static final int MAX_ENTRIES_PER_PAGE = 100;
 
-    private static final String COMMA = ",";
     private static final int DEFAULT_PAGE_NUMBER = 1;
+    private static final String COMMA = ",";
+
+    private static final String ASPECT_FIELD = "aspect";
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -57,6 +60,24 @@ public class AnnotationRequest {
     public String getAssignedBy() {
         return filterMap.get(ASSIGNED_BY);
     }
+
+    /**
+     * E.g. DOI, DOI:10.1002/adsc.201200590, GO_REF, PMID, PMID:12882977, Reactome, Reactome:R-RNO-912619,
+     * GO_REF:0000037 etc
+     * @param reference
+     * @return
+     */
+    public void setReference(String reference){
+        filterMap.put(AnnotationFields.REFERENCE_SEARCH, reference);
+    }
+
+    //todo create validation pattern @Pattern(regexp = "")
+    public String getReference(){
+        return filterMap.get(AnnotationFields.REFERENCE_SEARCH);
+    }
+
+    //TODO:change the way the field is referenced
+    private static final String ASPECT_FIELD = "aspect";
 
     //TODO:change the way the field is referenced
     private static final String ASPECT_FIELD = "aspect";
@@ -159,6 +180,10 @@ public class AnnotationRequest {
         return page;
     }
 
+    public void setPage(int page) {
+        this.page = page;
+    }
+
 
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
@@ -167,6 +192,7 @@ public class AnnotationRequest {
         createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
         createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
         createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
+        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
         createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
         createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
 
