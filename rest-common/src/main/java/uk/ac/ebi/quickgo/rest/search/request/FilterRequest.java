@@ -4,8 +4,7 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 
 import com.google.common.base.Preconditions;
 import java.util.*;
-
-import static java.util.Arrays.asList;
+import java.util.stream.Stream;
 
 /**
  * Represents a client's filter request.
@@ -73,7 +72,11 @@ public class FilterRequest {
         public Builder addProperty(String name, String... values) {
             Preconditions.checkArgument(name != null && !name.trim().isEmpty(),
                     "Property name cannot be null or empty");
-            this.properties.put(name, asList(values));
+
+            List<String> valuesList = new ArrayList<>();
+            Stream.of(values).filter(Objects::nonNull).forEach(valuesList::add);
+
+            this.properties.put(name, valuesList);
             return this;
         }
 

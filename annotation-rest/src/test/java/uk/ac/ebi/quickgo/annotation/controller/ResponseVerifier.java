@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 final class ResponseVerifier {
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
+    public static final String QUALIFIER = "qualifier";
 
     private static final String RESULTS = "results";
     private static final String RESULTS_CONTENT_BY_INDEX = RESULTS + "[%d].";
@@ -34,6 +35,14 @@ final class ResponseVerifier {
 
     static ResultMatcher itemExistsExpectedTimes(String fieldName, String value, int expectedCount) {
         return jsonPath(RESULTS + ".*.[?(@." + fieldName + " == " + value + ")]", hasSize(expectedCount));
+    }
+
+    static ResultMatcher valueOccurInField(String fieldName, String value) {
+        return jsonPath(RESULTS + ".*." + fieldName, hasItem(value));
+    }
+
+    static ResultMatcher valueOccursInCollection(String fieldName, String value) {
+        return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
     }
 
     static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {

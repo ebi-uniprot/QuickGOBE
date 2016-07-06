@@ -17,7 +17,7 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
  * <p>
  * A {@link String} representation is of the form:
  * <ul>
- *     <li>goId|geneProductDB|reason|category|predictedBy</li>
+ *     <li>goId|geneProductDB|reason|category|methodId</li>
  * </ul>
  * <p>
  * Created 01/12/15
@@ -42,7 +42,7 @@ class BlackListFieldConverter implements FieldConverter<GOTerm.BlacklistItem> {
             blacklistItem.entityName = cleanFieldValue(fields.get(5).buildString());
             blacklistItem.ancestorGoId = cleanFieldValue(fields.get(6).buildString());
             blacklistItem.reason = cleanFieldValue(fields.get(7).buildString());
-            blacklistItem.predictedBy = cleanFieldValue(fields.get(8).buildString());
+            blacklistItem.methodId = cleanFieldValue(fields.get(8).buildString());
             return Optional.of(blacklistItem);
         } else {
             LOGGER.warn("Could not parse flattened blacklist: {}", fieldsStr);

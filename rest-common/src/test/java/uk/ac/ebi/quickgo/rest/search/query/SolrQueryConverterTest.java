@@ -107,6 +107,17 @@ public class SolrQueryConverterTest {
     }
 
     @Test
+    public void visitTransformsNegatedAllQueryToString() {
+        CompositeQuery nothingQuery =
+                new CompositeQuery(asSet(QuickGOQuery.createAllQuery()), CompositeQuery.QueryOp.NOT);
+
+        String queryString = converter.visit(nothingQuery);
+
+        String expectedQuery = "NOT (*:*)";
+        assertThat(queryString, is(expectedQuery));
+    }
+
+    @Test
     public void visitTransformsJoinQueryWithNoFromFilterToString() {
         String joinFromTable = "annotation";
         String joinFromAttribute = "id";

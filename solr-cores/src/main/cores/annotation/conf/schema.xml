@@ -68,6 +68,8 @@
     <!--                  Start of QuickGO Annotation fields                        -->
 
     <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true"/>
+    <field name="geneProductId" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="qualifier" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="geneProductId" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="qualifier" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="goId" type="string" indexed="false" stored="true" multiValued="false"/>
@@ -79,6 +81,7 @@
     <field name="ecoId" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="reference" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="withFrom" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="withFromSearch" type="database_ignorecase" indexed="true" stored="false" multiValued="true"/>
     <field name="taxonId" type="int" indexed="true" stored="false" multiValued="false"/>
     <field name="interactingTaxonId" type="int" indexed="false" stored="true" multiValued="false"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>
@@ -131,6 +134,22 @@
     <!-- copy name to alphaNameSort, a field designed for sorting by name -->
     <!-- <copyField source="name" dest="alphaNameSort"/> -->
 
+
+    <copyField source="withFrom" dest="withFromSearch"/>
+
+    <!-- Be able to search for database references in the form database:id, with by database, id or combined -->
+    <fieldType name="database_ignorecase" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"
+                    preserve_original="true"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
 
     <!-- Ignore lower/upper cases -->
     <fieldType name="text_ignorecase" class="solr.TextField" positionIncrementGap="100">
@@ -233,23 +252,6 @@
 
     <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
     <fieldtype name="binary" class="solr.BinaryField"/>
-
-    <!--
-      Note:
-      These should only be used for compatibility with existing indexes (created with lucene or older Solr versions).
-      Use Trie based fields instead. As of Solr 3.5 and 4.x, Trie based fields support sortMissingFirst/Last
-
-      Plain numeric field types that store and index the text
-      value verbatim (and hence don't correctly support range queries, since the
-      lexicographic ordering isn't equal to the numeric ordering)
-
-      NOTE: These field types are deprecated will be removed in Solr 5.0!
-    -->
-    <fieldType name="pint" class="solr.IntField"/>
-    <fieldType name="plong" class="solr.LongField"/>
-    <fieldType name="pfloat" class="solr.FloatField"/>
-    <fieldType name="pdouble" class="solr.DoubleField"/>
-    <fieldType name="pdate" class="solr.DateField" sortMissingLast="true"/>
 
     <!-- The "RandomSortField" is not used to store or search any
          data.  You can declare fields of this type it in your schema

@@ -54,6 +54,13 @@ public class AnnotationRequestTest {
     }
 
     @Test
+    public void setAndGetWithFrom(){
+        String WITH_FROM = "RGD:1623038";
+        annotationRequest.setWithFrom(WITH_FROM);
+        assertThat(annotationRequest.getWithFrom(), is(WITH_FROM));
+    }
+
+    @Test
     public void setAndGetOntologyAspect() {
         String aspect = "function";
 
@@ -98,5 +105,12 @@ public class AnnotationRequestTest {
         annotationRequest.setTaxon(taxonId);
 
         assertThat(annotationRequest.getTaxon(), is(taxonId));
+    }
+
+    @Test
+    public void setAndGetQualifier(){
+        String qualifier = "NOT";
+        annotationRequest.setQualifier((qualifier));
+        assertThat(annotationRequest.getQualifter(), is(qualifier));
     }
 }
