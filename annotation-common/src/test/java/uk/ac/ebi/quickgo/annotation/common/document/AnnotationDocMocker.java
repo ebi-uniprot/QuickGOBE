@@ -9,6 +9,9 @@ import java.util.Arrays;
  * @author Edd
  */
 public class AnnotationDocMocker {
+
+    public static final String REF2 = "GO_REF:0000002";
+
     private AnnotationDocMocker() {}
 
     public static AnnotationDocument createAnnotationDoc(String geneProductId) {
@@ -24,7 +27,7 @@ public class AnnotationDocMocker {
         doc.ecoId = "ECO:0000256";
         doc.qualifier = "enables";
         doc.goEvidence = "IEA";
-        doc.reference = "GO_REF:0000002";
+        doc.reference = REF2;
         doc.withFrom = Arrays.asList("InterPro:IPR015421", "InterPro:IPR015422");
         doc.interactingTaxonId = 35758;
         doc.assignedBy = "InterPro";

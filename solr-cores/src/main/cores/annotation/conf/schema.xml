@@ -78,7 +78,11 @@
     <field name="goEvidence" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="ecoId" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="reference" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="ecoId" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="reference" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="referenceSearch" type="reference_ignorecase" indexed="true" stored="false" multiValued="false"/>
     <field name="withFrom" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="withFromSearch" type="database_ignorecase" indexed="true" stored="false" multiValued="true"/>
     <field name="taxonId" type="int" indexed="true" stored="false" multiValued="false"/>
     <field name="interactingTaxonId" type="int" indexed="false" stored="true" multiValued="false"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>
@@ -131,6 +135,37 @@
     <!-- copy name to alphaNameSort, a field designed for sorting by name -->
     <!-- <copyField source="name" dest="alphaNameSort"/> -->
 
+    <copyField source="reference" dest="referenceSearch"/>
+
+    <fieldType name="reference_ignorecase" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"
+                    preserve_original="true"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
+
+    <copyField source="withFrom" dest="withFromSearch"/>
+
+    <!-- Be able to search for database references in the form database:id, with by database, id or combined -->
+    <fieldType name="database_ignorecase" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"
+                    preserve_original="true"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
 
     <!-- Ignore lower/upper cases -->
     <fieldType name="text_ignorecase" class="solr.TextField" positionIncrementGap="100">
