@@ -68,19 +68,15 @@ public class AnnotationRequest {
      * @return
      */
     public void setReference(String reference){
-        filterMap.put(AnnotationFields.REFERENCE_SEARCH, reference);
+        filterMap.put(REFERENCE_SEARCH, reference);
     }
 
     //todo create validation pattern @Pattern(regexp = "")
     public String getReference(){
-        return filterMap.get(AnnotationFields.REFERENCE_SEARCH);
+        return filterMap.get(REFERENCE_SEARCH);
     }
 
-    //TODO:change the way the field is referenced
-    private static final String ASPECT_FIELD = "aspect";
 
-    //TODO:change the way the field is referenced
-    private static final String ASPECT_FIELD = "aspect";
     public void setAspect(String aspect) {
         if (aspect != null) {
             filterMap.put(ASPECT_FIELD, aspect.toLowerCase());
@@ -108,9 +104,6 @@ public class AnnotationRequest {
         return filterMap.get(GENE_PRODUCT_ID);
     }
 
-    public void setPage(int page) {
-        this.page = page;
-    }
 
     /**
      * The older evidence codes
