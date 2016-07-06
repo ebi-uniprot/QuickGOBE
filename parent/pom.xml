@@ -31,6 +31,7 @@
         <!-- dependency version numbers -->
         <spring.framework.version>4.1.8.RELEASE</spring.framework.version>
         <spring.boot.starter>1.2.7.RELEASE</spring.boot.starter>
+        <spring-batch-test.version>3.0.5.RELEASE</spring-batch-test.version>
 
         <spring-data-solr.version>1.5.0.RELEASE</spring-data-solr.version>
         <json-path.version>2.2.0</json-path.version>
@@ -161,6 +162,11 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.boot.starter}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-batch</artifactId>
                 <version>${spring.boot.starter}</version>
             </dependency>
             <dependency>
