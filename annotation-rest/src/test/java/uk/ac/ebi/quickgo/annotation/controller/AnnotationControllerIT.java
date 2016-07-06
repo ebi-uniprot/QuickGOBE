@@ -103,7 +103,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
 
     @Test
@@ -127,7 +127,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
     }
 
     @Test
@@ -154,7 +154,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
     }
 
     @Test
@@ -184,7 +184,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
 
     @Test
@@ -214,7 +214,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
 
     @Test
@@ -240,7 +240,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
     }
 
     @Test
