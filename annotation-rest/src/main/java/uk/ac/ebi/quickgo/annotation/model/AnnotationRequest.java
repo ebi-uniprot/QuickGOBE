@@ -35,11 +35,9 @@ public class AnnotationRequest {
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
-
     private static final String ASPECT_FIELD = "aspect";
-
     private static final String[] targetFields = new String[]{ASPECT_FIELD, ASSIGNED_BY,
-            TAXON_ID, GO_EVIDENCE, QUALIFIER, ECO_ID};
+            TAXON_ID, GO_EVIDENCE, QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID};
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -80,8 +78,6 @@ public class AnnotationRequest {
         return filterMap.get(AnnotationFields.REFERENCE_SEARCH);
     }
 
-    //TODO:change the way the field is referenced
-    private static final String ASPECT_FIELD = "aspect";
 
     public void setAspect(String aspect) {
         if (aspect != null) {
@@ -183,14 +179,6 @@ public class AnnotationRequest {
 
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
-
-        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
-        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
-        createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
-        createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
-        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
-        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
-        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
 
         Stream.of(targetFields)
                 .map(this::createSimpleFilter)
