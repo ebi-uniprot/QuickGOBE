@@ -1,17 +1,24 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_FIELD;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_IDS;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
 /**
  *
- * Test methods and structure of AnnotationRequest
+ * Tests methods and structure of AnnotationRequest
  *
  * @author Tony Wardell
  * Date: 29/04/2016
@@ -19,9 +26,6 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequestTest {
-
-    //AssignedBy values
-    private static final String UNI_PROT = "UniProt";
 
     private AnnotationRequest annotationRequest;
 
@@ -57,7 +61,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetWithFrom(){
+    public void setAndGetWithFrom() {
         String WITH_FROM = "RGD:1623038";
         annotationRequest.setWithFrom(WITH_FROM);
         assertThat(annotationRequest.getWithFrom(), is(WITH_FROM));
@@ -71,27 +75,27 @@ public class AnnotationRequestTest {
 
         assertThat(annotationRequest.getAspect(), is(aspect));
     }
+
     @Test
-    public void setAndGetEvidence(){
+    public void setAndGetEvidence() {
         String EVIDENCE_IEA = "IEA";
         annotationRequest.setGoEvidence(EVIDENCE_IEA);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_IEA));
     }
 
     @Test
-    public void setAndGetEvidenceMulti(){
+    public void setAndGetEvidenceMulti() {
         String EVIDENCE_MULTI = "IEA,IBD";
         annotationRequest.setGoEvidence(EVIDENCE_MULTI);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
     }
 
     @Test
-    public void setAndGetEvidenceMultiInLowerCase(){
+    public void setAndGetEvidenceMultiInLowerCase() {
         String EVIDENCE_MULTI = "iea,ibd";
         annotationRequest.setGoEvidence(EVIDENCE_MULTI);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
     }
-
 
     @Test
     public void setAndGetTaxon() {
@@ -121,13 +125,16 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void createsFilterWithUsageAndUsageIds() {
-        annotationRequest.setUsage("descEndants");
-        annotationRequest.setUsageIds("GO:0000001");
+    public void createsFilterWithCaseInsensitiveUsageAndUsageIds() {
+        String usage = "descEndants";
+        String usageId = "GO:0000001";
+
+        annotationRequest.setUsage(usage);
+        annotationRequest.setUsageIds(usageId);
 
         FilterRequest request = FilterRequest.newBuilder()
-                .addProperty(USAGE_FIELD, "descendants")
-                .addProperty(USAGE_IDS, "go:0000001")
+                .addProperty(USAGE_FIELD, usage.toLowerCase())
+                .addProperty(USAGE_IDS, usageId.toLowerCase())
                 .addProperty(USAGE_RELATIONSHIPS)
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
@@ -136,25 +143,20 @@ public class AnnotationRequestTest {
 
     @Test
     public void createsFilterWithCaseInsensitiveUsageAndUsageIdsAndUsageRelationships() {
-        annotationRequest.setUsage("deSCendants");
-        annotationRequest.setUsageIds("GO:0000001");
-        annotationRequest.setUsageRelationships("is_A");
+        String usage = "deSCendants";
+        String usageId = "GO:0000001";
+        String relationships = "is_A";
+
+        annotationRequest.setUsage(usage);
+        annotationRequest.setUsageIds(usageId);
+        annotationRequest.setUsageRelationships(relationships);
 
         assertThat(annotationRequest.createFilterRequests(),
                 contains(FilterRequest.newBuilder()
-                        .addProperty(USAGE_FIELD, "descendants")
-                        .addProperty(USAGE_IDS, "go:0000001")
-                        .addProperty(USAGE_RELATIONSHIPS, "is_a")
+                        .addProperty(USAGE_FIELD, usage.toLowerCase())
+                        .addProperty(USAGE_IDS, usageId.toLowerCase())
+                        .addProperty(USAGE_RELATIONSHIPS, relationships.toLowerCase())
                         .build()));
-    }
-
-    @Test(expected = ParameterException.class)
-    public void cannotCreatesFilterInvalidUsageRelationship() {
-        annotationRequest.setUsage("descendants");
-        annotationRequest.setUsageIds("GO:0000001");
-        annotationRequest.setUsageRelationships("this_is_not_allowed");
-
-        annotationRequest.createFilterRequests();
     }
 
     @Test(expected = ParameterException.class)
@@ -165,14 +167,14 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetQualifier(){
+    public void setAndGetQualifier() {
         String qualifier = "NOT";
         annotationRequest.setQualifier((qualifier));
         assertThat(annotationRequest.getQualifter(), is(qualifier));
     }
 
     @Test
-    public void setAndGetReference(){
+    public void setAndGetReference() {
         String ONE_GOREF = "GO_REF:123456";
         annotationRequest.setReference(ONE_GOREF);
         assertThat(annotationRequest.getReference(), is(ONE_GOREF));
