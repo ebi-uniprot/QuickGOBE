@@ -29,6 +29,7 @@ public class OntologyFields {
     public final static String CHILDREN = "children";
     public final static String SYNONYM = "synonym";
     public final static String SYNONYM_NAME = "synonymName";
+    public final static String ANCESTOR = "ancestor";
     public final static String HISTORY = "history";
     public final static String XREF = "xref";
     public final static String ANNOTATION_GUIDELINE = "annotationGuideline";
@@ -67,6 +68,7 @@ public class OntologyFields {
         public static final String BLACKLIST = storeAndGet(VALUES, OntologyFields.BLACKLIST);
         public static final String SECONDARY_ID = storeAndGet(VALUES, OntologyFields.SECONDARY_ID);
         public static final String DEFINITION_XREF = storeAndGet(VALUES, OntologyFields.DEFINITION_XREFS);
+        public static final String ANCESTOR = storeAndGet(VALUES, OntologyFields.ANCESTOR);
 
         public static boolean isRetrievable(String field) {
             return VALUES.contains(field);

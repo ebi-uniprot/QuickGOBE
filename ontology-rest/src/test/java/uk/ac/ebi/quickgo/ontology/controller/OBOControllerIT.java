@@ -707,7 +707,8 @@ public abstract class OBOControllerIT {
         return result
                 .andDo(print())
                 .andExpect(jsonPath("$.url", is(requestUrl(result))))
-                .andExpect(jsonPath("$.message", containsString("Unknown relationship requested: '" + relation + "'")));
+                .andExpect(jsonPath("$.messages", hasItem(
+                        containsString("Unknown relationship requested: '" + relation + "'"))));
     }
 
     protected ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
