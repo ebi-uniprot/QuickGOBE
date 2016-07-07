@@ -126,9 +126,7 @@ public class SearchServiceConfig {
 
     @Bean
     public GeneProductDbXRefIDFormats geneProductValidator() {
-        GeneProductDbXRefIDFormats
-                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load());
-        return dbXrefEntities;
+        return GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load());
     }
 
     private DbXRefLoader geneProductLoader() {
