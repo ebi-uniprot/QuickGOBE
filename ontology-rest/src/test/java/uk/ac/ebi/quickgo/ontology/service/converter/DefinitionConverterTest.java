@@ -6,14 +6,17 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createOBODoc;
@@ -104,6 +107,8 @@ public class DefinitionConverterTest {
 
         List<OBOTerm.XRef> retrievedXrefs = def.xrefs;
         assertThat(retrievedXrefs, hasSize(2));
+        assertThat(collectionHasObjectWithContents(retrievedXrefs, xrefId1, xrefDb1), is(true));
+        assertThat(collectionHasObjectWithContents(retrievedXrefs, xrefId2, xrefDb2), is(true));
     }
 
     private String createXrefText(String db, String id) {
@@ -113,11 +118,10 @@ public class DefinitionConverterTest {
                 .buildString();
     }
 
-    private OBOTerm.XRef createXref(String db, String id) {
-        OBOTerm.XRef xref = new OBOTerm.XRef();
-        xref.dbCode = db;
-        xref.dbId = id;
-
-        return xref;
+    private boolean collectionHasObjectWithContents(Collection<OBOTerm.XRef> xrefs, String id, String db) {
+        return xrefs.stream()
+                .filter(xref -> xref.dbId.equals(id) && xref.dbCode.equals(db))
+                .findFirst()
+                .isPresent();
     }
 }
