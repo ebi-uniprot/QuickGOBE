@@ -10,8 +10,6 @@ import java.util.Arrays;
  */
 public class AnnotationDocMocker {
 
-    public static final String REF2 = "GO_REF:0000002";
-
     private AnnotationDocMocker() {}
 
     public static AnnotationDocument createAnnotationDoc(String geneProductId) {
@@ -27,7 +25,7 @@ public class AnnotationDocMocker {
         doc.ecoId = "ECO:0000256";
         doc.qualifier = "enables";
         doc.goEvidence = "IEA";
-        doc.reference = REF2;
+        doc.reference = "GO_REF:0000002";
         doc.withFrom = Arrays.asList("InterPro:IPR015421", "InterPro:IPR015422");
         doc.interactingTaxonId = 35758;
         doc.assignedBy = "InterPro";
@@ -44,7 +42,7 @@ public class AnnotationDocMocker {
         return doc;
     }
 
-    public static AnnotationDocument createAnnotationDocUniqueData(String geneProductId) {
+    public static AnnotationDocument createAlternativeAnnotationDoc(String geneProductId) {
         AnnotationDocument doc = new AnnotationDocument();
         doc.geneProductId = geneProductId;
 
