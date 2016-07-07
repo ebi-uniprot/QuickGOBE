@@ -268,7 +268,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filtersAnnotationsByLowercaseGoEvidenceCodeBySuccessfully() throws Exception {
+    public void filterAnnotationsByLowercaseGoEvidenceCodeSuccessfully() throws Exception {
         String goEvidenceCode = "iea";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, goEvidenceCode));
