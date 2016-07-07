@@ -78,11 +78,6 @@ public class AbstractODocConverterTest {
     }
 
     @Test
-    public void convertsDefinitionWithoutError() {
-        assertThat(oboTermFromValidGODoc.definition, is(validGODoc.definition));
-    }
-
-    @Test
     public void convertsReplacedByWithoutError() {
         assertThat(oboTermFromValidGODoc.replacedBy, is(validGODoc.replacedBy));
     }

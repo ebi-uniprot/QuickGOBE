@@ -1,7 +1,12 @@
 package uk.ac.ebi.quickgo.ontology.common.document;
 
+import uk.ac.ebi.quickgo.common.converter.FlatField;
+import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
+import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
@@ -67,6 +72,10 @@ public final class OntologyDocMocker {
         od.definition = "The chemical reactions and pathways involving creatine (N-(aminoiminomethyl)" +
                 "-N-methylglycine), a compound synthesized from the amino acids arginine, glycine, and methionine " +
                 "that occurs in muscle.";
+        od.definitionXrefs = Collections.singletonList(FlatFieldBuilder.newFlatField()
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("PMID"))
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("21494263"))
+                .buildString());
         od.isObsolete = true;
         od.replacedBy = "GO:0000002";
         od.considers = Arrays.asList("GO:0000003", "GO:0000004");
