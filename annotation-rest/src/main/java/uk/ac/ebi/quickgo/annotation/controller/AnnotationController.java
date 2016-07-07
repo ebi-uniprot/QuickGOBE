@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.model.*;
+import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
@@ -86,11 +87,14 @@ public class AnnotationController {
     private final BasicSearchQueryTemplate queryTemplate;
     private final RequestConverterFactory converterFactory;
 
+    private final StatisticsService statsService;
+
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
-            RequestConverterFactory converterFactory) {
+            RequestConverterFactory converterFactory,
+            StatisticsService statsService) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
@@ -103,6 +107,8 @@ public class AnnotationController {
 
         this.converterFactory = converterFactory;
         this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
+
+        this.statsService = statsService;
     }
 
     /**
@@ -138,23 +144,14 @@ public class AnnotationController {
      * @return a {@link QueryResult} instance containing the results of the search
      */
     @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<StatisticsGroup>> annotationLookup() {
-        StatisticsValue id1 = new StatisticsValue("GO:0016020", 2, 6);
-        StatisticsValue id2 = new StatisticsValue("GO:0016021", 2, 6);
-        StatisticsValue id3 = new StatisticsValue("GO:0005737", 2, 6);
+    public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(@Valid AnnotationRequest request,
+            BindingResult bindingResult) {
 
-        StatisticsByType statsById = new StatisticsByType("ontologyId");
-        statsById.addValue(id1);
-        statsById.addValue(id2);
-        statsById.addValue(id3);
+        if (bindingResult.hasErrors()) {
+            throw new ParameterBindingException(bindingResult);
+        }
 
-        StatisticsGroup annotationGroup = new StatisticsGroup("annotation", 6);
-        annotationGroup.addStatsType(statsById);
-
-        List<StatisticsGroup> results = Collections.singletonList(annotationGroup);
-
-        QueryResult<StatisticsGroup> qs = new QueryResult.Builder<>(1L, results).build();
-
-        return new ResponseEntity<>(qs, HttpStatus.OK);
+        QueryResult<StatisticsGroup> stats = statsService.calculate(request);
+        return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 }
