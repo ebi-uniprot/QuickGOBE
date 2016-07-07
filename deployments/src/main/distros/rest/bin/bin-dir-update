@@ -14,7 +14,7 @@ QUICKGO_REPO="QuickGOBE"
 REST_BIN_CONTENT_DIR="bin"
 REST_BIN="rest-bin.tar.gz"
 PERMITTED_USER="uni_qgo"
-BRANCH="GOA-2230_server-side-solr"
+BRANCH="master"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
