@@ -12,6 +12,8 @@ import javax.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 /**
+ * Configuration class mimics {@link uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig} used for testing.
+ *
  * @author Tony Wardell
  * Date: 29/06/2016
  * Time: 14:24
@@ -23,6 +25,11 @@ public class AnnotationRequestConfig {
 
     public AnnotationRequestConfig() {}
 
+    /**
+     * Create test validator
+     * @return A hardcoded example of a GeneProductDbXRefIDFormats containing a validating regular expression for
+     * UniProtKB.
+     */
     @Bean
     public GeneProductDbXRefIDFormats geneProductValidator() {
 
@@ -31,13 +38,13 @@ public class AnnotationRequestConfig {
                 EXAMPLE_REGEX, "http://www.uniprot.org/uniprot/[example_id]/");
         entities.add(entity1);
 
-        GeneProductDbXRefIDFormats
-                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(entities);
-
-        return dbXrefEntities;
+        return GeneProductDbXRefIDFormats.createWithData(entities);
     }
 
-
+    /**
+     *
+     * @return instance used to run validation against the validated class.
+     */
     @Bean
     public Validator validator(){
         return new LocalValidatorFactoryBean();
