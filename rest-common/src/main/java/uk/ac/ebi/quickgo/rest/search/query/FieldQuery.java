@@ -5,7 +5,7 @@ import com.google.common.base.Preconditions;
 /**
  * Represents the simplest of {@link QuickGOQuery} objects, containing just the field and values to query against.
  */
-public class FieldQuery extends QuickGOQuery {
+class FieldQuery extends QuickGOQuery {
     private String field;
     private String value;
 

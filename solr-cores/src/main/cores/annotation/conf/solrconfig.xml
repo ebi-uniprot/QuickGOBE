@@ -35,7 +35,7 @@
          that you fully re-index after changing this setting as it can
          affect both how text is indexed and queried.
     -->
-    <luceneMatchVersion>4.8</luceneMatchVersion>
+    <luceneMatchVersion>5.5.0</luceneMatchVersion>
 
     <!-- <lib/> directives can be used to instruct Solr to load an Jars
          identified and use them to resolve any "plugins" specified in
@@ -72,17 +72,17 @@
          The examples below can be used to load some solr-contribs along
          with their external dependencies.
       -->
-    <lib dir="../../../contrib/extraction/lib" regex=".*\.jar"/>
-    <lib dir="../../../dist/" regex="solr-cell-\d.*\.jar"/>
+    <lib dir="${solr.lib:../../..}/contrib/extraction/lib" regex=".*\.jar"/>
+    <lib dir="${solr.lib:../../..}/dist/" regex="solr-cell-\d.*\.jar"/>
 
-    <lib dir="../../../contrib/clustering/lib/" regex=".*\.jar"/>
-    <lib dir="../../../dist/" regex="solr-clustering-\d.*\.jar"/>
+    <lib dir="${solr.lib:../../..}/contrib/clustering/lib/" regex=".*\.jar"/>
+    <lib dir="${solr.lib:../../..}/dist/" regex="solr-clustering-\d.*\.jar"/>
 
-    <lib dir="../../../contrib/langid/lib/" regex=".*\.jar"/>
-    <lib dir="../../../dist/" regex="solr-langid-\d.*\.jar"/>
+    <lib dir="${solr.lib:../../..}/contrib/langid/lib/" regex=".*\.jar"/>
+    <lib dir="${solr.lib:../../..}/dist/" regex="solr-langid-\d.*\.jar"/>
 
-    <lib dir="../../../contrib/velocity/lib" regex=".*\.jar"/>
-    <lib dir="../../../dist/" regex="solr-velocity-\d.*\.jar"/>
+    <lib dir="${solr.lib:../../..}/contrib/velocity/lib" regex=".*\.jar"/>
+    <lib dir="${solr.lib:../../..}/dist/" regex="solr-velocity-\d.*\.jar"/>
 
     <!-- an exact 'path' can be used instead of a 'dir' to specify a
          specific jar file.  This will cause a serious error to be logged
@@ -384,7 +384,7 @@
              have some sort of hard autoCommit to limit the log size.
           -->
         <autoCommit>
-            <maxTime>3600000</maxTime> <!-- commit every hour -->
+            <maxTime>${auto.commit.time.millis:30000}</maxTime>
             <openSearcher>false</openSearcher>
         </autoCommit>
 
@@ -930,93 +930,93 @@
          (SearchHandler) can be registered multiple times with different
          names (and different init parameters)
       -->
-    <requestHandler name="/browse" class="solr.SearchHandler">
-        <lst name="defaults">
-            <str name="echoParams">explicit</str>
+    <!--<requestHandler name="/browse" class="solr.SearchHandler">-->
+    <!--<lst name="defaults">-->
+    <!--<str name="echoParams">explicit</str>-->
 
-            <!-- VelocityResponseWriter settings -->
-            <str name="wt">velocity</str>
-            <str name="v.template">browse</str>
-            <str name="v.layout">layout</str>
-            <str name="title">Solritas</str>
+    <!--&lt;!&ndash; VelocityResponseWriter settings &ndash;&gt;-->
+    <!--<str name="wt">velocity</str>-->
+    <!--<str name="v.template">browse</str>-->
+    <!--<str name="v.layout">layout</str>-->
+    <!--<str name="title">Solritas</str>-->
 
-            <!-- Query settings -->
-            <str name="defType">edismax</str>
-            <str name="qf">
-                text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0 manu^1.1 cat^1.4
-                title^10.0 description^5.0 keywords^5.0 author^2.0 resourcename^1.0
-            </str>
-            <str name="df">text</str>
-            <str name="mm">100%</str>
-            <str name="q.alt">*:*</str>
-            <str name="rows">10</str>
-            <str name="fl">*,score</str>
+    <!--&lt;!&ndash; Query settings &ndash;&gt;-->
+    <!--<str name="defType">edismax</str>-->
+    <!--<str name="qf">-->
+    <!--text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0 manu^1.1 cat^1.4-->
+    <!--title^10.0 description^5.0 keywords^5.0 author^2.0 resourcename^1.0-->
+    <!--</str>-->
+    <!--<str name="df">text</str>-->
+    <!--<str name="mm">100%</str>-->
+    <!--<str name="q.alt">*:*</str>-->
+    <!--<str name="rows">10</str>-->
+    <!--<str name="fl">*,score</str>-->
 
-            <str name="mlt.qf">
-                text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0 manu^1.1 cat^1.4
-                title^10.0 description^5.0 keywords^5.0 author^2.0 resourcename^1.0
-            </str>
-            <str name="mlt.fl">text,features,name,sku,id,manu,cat,title,description,keywords,author,resourcename</str>
-            <int name="mlt.count">3</int>
+    <!--<str name="mlt.qf">-->
+    <!--text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0 manu^1.1 cat^1.4-->
+    <!--title^10.0 description^5.0 keywords^5.0 author^2.0 resourcename^1.0-->
+    <!--</str>-->
+    <!--<str name="mlt.fl">text,features,name,sku,id,manu,cat,title,description,keywords,author,resourcename</str>-->
+    <!--<int name="mlt.count">3</int>-->
 
-            <!-- Faceting defaults -->
-            <str name="facet">on</str>
-            <str name="facet.field">cat</str>
-            <str name="facet.field">manu_exact</str>
-            <str name="facet.field">content_type</str>
-            <str name="facet.field">author_s</str>
-            <str name="facet.query">ipod</str>
-            <str name="facet.query">GB</str>
-            <str name="facet.mincount">1</str>
-            <str name="facet.pivot">cat,inStock</str>
-            <str name="facet.range.other">after</str>
-            <str name="facet.range">price</str>
-            <int name="f.price.facet.range.start">0</int>
-            <int name="f.price.facet.range.end">600</int>
-            <int name="f.price.facet.range.gap">50</int>
-            <str name="facet.range">popularity</str>
-            <int name="f.popularity.facet.range.start">0</int>
-            <int name="f.popularity.facet.range.end">10</int>
-            <int name="f.popularity.facet.range.gap">3</int>
-            <str name="facet.range">manufacturedate_dt</str>
-            <str name="f.manufacturedate_dt.facet.range.start">NOW/YEAR-10YEARS</str>
-            <str name="f.manufacturedate_dt.facet.range.end">NOW</str>
-            <str name="f.manufacturedate_dt.facet.range.gap">+1YEAR</str>
-            <str name="f.manufacturedate_dt.facet.range.other">before</str>
-            <str name="f.manufacturedate_dt.facet.range.other">after</str>
+    <!--&lt;!&ndash; Faceting defaults &ndash;&gt;-->
+    <!--<str name="facet">on</str>-->
+    <!--<str name="facet.field">cat</str>-->
+    <!--<str name="facet.field">manu_exact</str>-->
+    <!--<str name="facet.field">content_type</str>-->
+    <!--<str name="facet.field">author_s</str>-->
+    <!--<str name="facet.query">ipod</str>-->
+    <!--<str name="facet.query">GB</str>-->
+    <!--<str name="facet.mincount">1</str>-->
+    <!--<str name="facet.pivot">cat,inStock</str>-->
+    <!--<str name="facet.range.other">after</str>-->
+    <!--<str name="facet.range">price</str>-->
+    <!--<int name="f.price.facet.range.start">0</int>-->
+    <!--<int name="f.price.facet.range.end">600</int>-->
+    <!--<int name="f.price.facet.range.gap">50</int>-->
+    <!--<str name="facet.range">popularity</str>-->
+    <!--<int name="f.popularity.facet.range.start">0</int>-->
+    <!--<int name="f.popularity.facet.range.end">10</int>-->
+    <!--<int name="f.popularity.facet.range.gap">3</int>-->
+    <!--<str name="facet.range">manufacturedate_dt</str>-->
+    <!--<str name="f.manufacturedate_dt.facet.range.start">NOW/YEAR-10YEARS</str>-->
+    <!--<str name="f.manufacturedate_dt.facet.range.end">NOW</str>-->
+    <!--<str name="f.manufacturedate_dt.facet.range.gap">+1YEAR</str>-->
+    <!--<str name="f.manufacturedate_dt.facet.range.other">before</str>-->
+    <!--<str name="f.manufacturedate_dt.facet.range.other">after</str>-->
 
-            <!-- Highlighting defaults -->
-            <str name="hl">on</str>
-            <str name="hl.fl">content features title name</str>
-            <str name="hl.encoder">html</str>
-            <str name="hl.simple.pre">&lt;b&gt;</str>
-            <str name="hl.simple.post">&lt;/b&gt;</str>
-            <str name="f.title.hl.fragsize">0</str>
-            <str name="f.title.hl.alternateField">title</str>
-            <str name="f.name.hl.fragsize">0</str>
-            <str name="f.name.hl.alternateField">name</str>
-            <str name="f.content.hl.snippets">3</str>
-            <str name="f.content.hl.fragsize">200</str>
-            <str name="f.content.hl.alternateField">content</str>
-            <str name="f.content.hl.maxAlternateFieldLength">750</str>
+    <!--&lt;!&ndash; Highlighting defaults &ndash;&gt;-->
+    <!--<str name="hl">on</str>-->
+    <!--<str name="hl.fl">content features title name</str>-->
+    <!--<str name="hl.encoder">html</str>-->
+    <!--<str name="hl.simple.pre">&lt;b&gt;</str>-->
+    <!--<str name="hl.simple.post">&lt;/b&gt;</str>-->
+    <!--<str name="f.title.hl.fragsize">0</str>-->
+    <!--<str name="f.title.hl.alternateField">title</str>-->
+    <!--<str name="f.name.hl.fragsize">0</str>-->
+    <!--<str name="f.name.hl.alternateField">name</str>-->
+    <!--<str name="f.content.hl.snippets">3</str>-->
+    <!--<str name="f.content.hl.fragsize">200</str>-->
+    <!--<str name="f.content.hl.alternateField">content</str>-->
+    <!--<str name="f.content.hl.maxAlternateFieldLength">750</str>-->
 
-            <!-- Spell checking defaults -->
-            <str name="spellcheck">on</str>
-            <str name="spellcheck.extendedResults">false</str>
-            <str name="spellcheck.count">5</str>
-            <str name="spellcheck.alternativeTermCount">2</str>
-            <str name="spellcheck.maxResultsForSuggest">5</str>
-            <str name="spellcheck.collate">true</str>
-            <str name="spellcheck.collateExtendedResults">true</str>
-            <str name="spellcheck.maxCollationTries">5</str>
-            <str name="spellcheck.maxCollations">3</str>
-        </lst>
+    <!--&lt;!&ndash; Spell checking defaults &ndash;&gt;-->
+    <!--<str name="spellcheck">on</str>-->
+    <!--<str name="spellcheck.extendedResults">false</str>-->
+    <!--<str name="spellcheck.count">5</str>-->
+    <!--<str name="spellcheck.alternativeTermCount">2</str>-->
+    <!--<str name="spellcheck.maxResultsForSuggest">5</str>-->
+    <!--<str name="spellcheck.collate">true</str>-->
+    <!--<str name="spellcheck.collateExtendedResults">true</str>-->
+    <!--<str name="spellcheck.maxCollationTries">5</str>-->
+    <!--<str name="spellcheck.maxCollations">3</str>-->
+    <!--</lst>-->
 
-        <!-- append spellchecking to our list of components -->
-        <arr name="last-components">
-            <str>spellcheck</str>
-        </arr>
-    </requestHandler>
+    <!--&lt;!&ndash; append spellchecking to our list of components &ndash;&gt;-->
+    <!--<arr name="last-components">-->
+    <!--<str>spellcheck</str>-->
+    <!--</arr>-->
+    <!--</requestHandler>-->
 
 
     <!-- Update Request Handler.
@@ -1143,8 +1143,6 @@
          Admin Handlers - This will register all the standard admin
          RequestHandlers.
       -->
-    <requestHandler name="/admin/"
-                    class="solr.admin.AdminHandlers"/>
     <!-- This single handler is equivalent to the following... -->
     <!--
        <requestHandler name="/admin/luke"       class="solr.admin.LukeRequestHandler" />
@@ -1678,13 +1676,12 @@
       -->
 
     <!--Processor that automatically inserts a unique identifier into an annotation document-->
-    <updateRequestProcessorChain>
-        <processor class="solr.UUIDUpdateProcessorFactory">
-            <str name="fieldName">id</str>
-        </processor>
-        <processor class="solr.LogUpdateProcessorFactory"/>
-        <processor class="solr.RunUpdateProcessorFactory"/>
-    </updateRequestProcessorChain>
+    <!--<updateRequestProcessorChain name="uuid">-->
+    <!--<processor class="solr.UUIDUpdateProcessorFactory">-->
+    <!--<str name="fieldName">id</str>-->
+    <!--</processor>-->
+    <!--<processor class="solr.RunUpdateProcessorFactory" />-->
+    <!--</updateRequestProcessorChain>-->
 
     <!-- Language identification
 

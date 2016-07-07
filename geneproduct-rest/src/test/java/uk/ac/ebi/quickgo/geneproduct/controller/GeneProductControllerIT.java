@@ -26,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -52,6 +53,7 @@ public class GeneProductControllerIT {
 
     protected static final String COMMA = ",";
     public static final String NON_EXISTANT_ID = "Y0Y000";
+    public static final String INVALID_ID = "ZZZZ";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -117,6 +119,15 @@ public class GeneProductControllerIT {
     public void finds400IfTermsIdIsEmpty() throws Exception {
         mockMvc.perform(get(buildGeneProductURL("")))
                 .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    public void finds400IfIdIsInvalid() throws Exception {
+        mockMvc.perform(get(buildGeneProductURL(INVALID_ID)))
+                .andDo(print())
+                .andExpect(jsonPath("$.messages", hasItem(is("Provided ID: '" + INVALID_ID + "' is invalid"))))
                 .andExpect(status().isBadRequest());
     }
 

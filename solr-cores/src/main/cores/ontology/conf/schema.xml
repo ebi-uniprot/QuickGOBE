@@ -21,6 +21,8 @@
     <!--                   Start of QuickGO Ontology fields                         -->
 
     <field name="id" type="lowercase" indexed="true" stored="true"/>
+    <!--Used for cross-core joins with other Solr cores, do not change the definition of the field-->
+    <field name="id_join" type="string" indexed="true" stored="false"/>
     <field name="ontologyType" type="string" indexed="true" stored="true"/>
     <field name="name" type="text_ignorecase" indexed="true" stored="true"/>
     <field name="secondaryId" type="string" indexed="false" stored="true" multiValued="true"/>
@@ -28,6 +30,7 @@
     <field name="consider" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="replacedBy" type="string" indexed="false" stored="true"/>
     <field name="definition" type="text_ignorecase" indexed="true" stored="true"/>
+    <field name="definitionXref" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="comment" type="string" indexed="false" stored="true"/>
     <field name="aspect" type="string" indexed="true" stored="true"/>
     <field name="usage" type="string" indexed="false" stored="true"/>
@@ -77,6 +80,9 @@
 
     <copyField source="name" dest="exact_name"/>
     <copyField source="synonymName" dest="exact_synonym"/>
+
+    <!--Field used in cross-core joins with other collections-->
+    <copyField source="id" dest="id_join"/>
 
     <!--Use this for autocomplete searches-->
     <fieldType name="text_edge" class="solr.TextField" sortMissingLast="true" omitNorms="false"
@@ -206,23 +212,6 @@
 
     <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
     <fieldtype name="binary" class="solr.BinaryField"/>
-
-    <!--
-      Note:
-      These should only be used for compatibility with existing indexes (created with lucene or older Solr versions).
-      Use Trie based fields instead. As of Solr 3.5 and 4.x, Trie based fields support sortMissingFirst/Last
-
-      Plain numeric field types that store and index the text
-      value verbatim (and hence don't correctly support range queries, since the
-      lexicographic ordering isn't equal to the numeric ordering)
-
-      NOTE: These field types are deprecated will be removed in Solr 5.0!
-    -->
-    <fieldType name="pint" class="solr.IntField"/>
-    <fieldType name="plong" class="solr.LongField"/>
-    <fieldType name="pfloat" class="solr.FloatField"/>
-    <fieldType name="pdouble" class="solr.DoubleField"/>
-    <fieldType name="pdate" class="solr.DateField" sortMissingLast="true"/>
 
     <!-- The "RandomSortField" is not used to store or search any
          data.  You can declare fields of this type it in your schema

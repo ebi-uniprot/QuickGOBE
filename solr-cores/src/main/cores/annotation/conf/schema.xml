@@ -67,75 +67,27 @@
     <!-- ========================================================================== -->
     <!--                  Start of QuickGO Annotation fields                        -->
 
-    <field name="id" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true"/>
     <field name="geneProductId" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="symbol" type="string" indexed="false" stored="true" multiValued="false"/>
-    <field name="qualifier" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="qualifier" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="goId" type="string" indexed="false" stored="true" multiValued="false"/>
-    <!--<field name="goName" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <field name="goEvidence" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="goId_join" type="string" indexed="true" stored="false" multiValued="false"/>
+    <field name="dbObjectType" type="string" indexed="true" stored="false" multiValued="false"/>
+    <field name="dbObjectSymbol" type="string" indexed="true" stored="false" multiValued="false"/>
+    <field name="dbSubset" type="string" indexed="true" stored="false" multiValued="false"/>
+    <field name="goEvidence" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="ecoId" type="string" indexed="false" stored="true" multiValued="false"/>
-    <field name="reference" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="reference" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="referenceSearch" type="reference_ignorecase" indexed="true" stored="false" multiValued="false"/>
     <field name="withFrom" type="string" indexed="false" stored="true" multiValued="true"/>
-    <field name="taxonId" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="withFromSearch" type="database_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <field name="taxonId" type="int" indexed="true" stored="false" multiValued="false"/>
+    <field name="interactingTaxonId" type="int" indexed="false" stored="true" multiValued="false"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="extension" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="extension" type="string" indexed="false" stored="true" multiValued="true"/>
 
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->
-
-    <!-- old fields -->
-    <!--<field name="goEvidence" type="string" indexed="true" stored="true" multiValued="false"/>-->
-
-    <!--<field name="docType" type="text_general" indexed="true" stored="true"/>-->
-    <!--<field name="db" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="dbObjectID" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="dbObjectSymbol" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <!--<field name="dbObjectName" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <!--<field name="dbObjectType" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <!--<field name="dbObjectSynonyms" type="string" indexed="false" stored="true" multiValued="true"/>-->
-
-    <!--&lt;!&ndash; the (protein) set(s) of which the annotation target is a member &ndash;&gt;-->
-    <!--<field name="targetSets" type="string" indexed="true" stored="false" multiValued="true"/>-->
-
-    <!--<field name="qualifier" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="goID" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="goAspect" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="ecoID" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="termName" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="interactingTaxID" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="date" type="string" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="extension" type="string" indexed="true" stored="true" multiValued="true"/>-->
-    <!--<field name="fullExtension" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <!--<field name="properties" type="string" indexed="true" stored="true" multiValued="false"/>-->
-
-    <!--&lt;!&ndash; Ancestors &ndash;&gt;-->
-    <!--<field name="ancestorsI" type="string" indexed="true" stored="false" multiValued="true"/>-->
-    <!--&lt;!&ndash; We need to store ancestorsIPO to retrieve the term we are slimming to &ndash;&gt;-->
-    <!--<field name="ancestorsIPO" type="string" indexed="true" stored="true" multiValued="true"/>-->
-    <!--<field name="ancestorsIPOR" type="string" indexed="true" stored="false" multiValued="true"/>-->
-
-    <!--&lt;!&ndash; ECO ancestors &ndash;&gt;-->
-    <!--<field name="ecoAncestorsI" type="string" indexed="true" stored="false" multiValued="true"/>-->
-
-    <!--&lt;!&ndash; Reference &ndash;&gt;-->
-    <!--<field name="reference" type="string" indexed="true" stored="true" multiValued="false"/>-->
-
-    <!--&lt;!&ndash; With_string &ndash;&gt;-->
-    <!--<field name="with" type="string" indexed="true" stored="true" multiValued="true"/>-->
-    <!--<field name="fullWith" type="string" indexed="false" stored="true" multiValued="false"/>-->
-
-    <!--&lt;!&ndash; Identifier & closure (i.e., taxonomic hierarchy) of the gene product's taxon &ndash;&gt;-->
-    <!--<field name="taxonomyId" type="int" indexed="true" stored="true" multiValued="false"/>-->
-    <!--<field name="taxonomyName" type="string" indexed="false" stored="true" multiValued="false"/>-->
-    <!--<field name="taxonomyClosure" type="int" indexed="true" stored="false" multiValued="true"/>-->
-
-    <!--&lt;!&ndash; Sequence length &ndash;&gt;-->
-    <!--<field name="sequenceLength" type="int" indexed="false" stored="true" multiValued="false"/>-->
-
-    <!--&lt;!&ndash; Cross references to identifiers in other databases &ndash;&gt;-->
-    <!--<field name="xrefs" type="string" indexed="true" stored="true" multiValued="true"/>-->
 
     <!-- _version_ is required for some Solr 4.0 functionality, particularly if SolrCloud is being used -->
     <field name="_version_" type="long" indexed="true" stored="true"/>
@@ -144,8 +96,8 @@
 
     <!-- Field to use to determine and enforce document uniqueness.
          Unless this field is marked with required="false", it will be a required field
-   -->
-        <uniqueKey>id</uniqueKey>
+    -->
+    <uniqueKey>id</uniqueKey>
 
 
     <!-- DEPRECATED: The defaultSearchField is consulted by various query parsers when
@@ -173,11 +125,45 @@
        destination field is to use the dynamic field syntax.
        copyField also supports a maxChars to copy setting.  -->
 
+    <!--Field used in cross-core joins with other the ontology collection-->
+    <copyField source="goId" dest="goId_join"/>
+
     <!-- <copyField source="*_t" dest="text" maxChars="3000"/> -->
 
     <!-- copy name to alphaNameSort, a field designed for sorting by name -->
     <!-- <copyField source="name" dest="alphaNameSort"/> -->
 
+    <copyField source="reference" dest="referenceSearch"/>
+
+    <fieldType name="reference_ignorecase" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"
+                    preserve_original="true"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
+
+    <copyField source="withFrom" dest="withFromSearch"/>
+
+    <!-- Be able to search for database references in the form database:id, with by database, id or combined -->
+    <fieldType name="database_ignorecase" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"
+                    preserve_original="true"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
 
     <!-- Ignore lower/upper cases -->
     <fieldType name="text_ignorecase" class="solr.TextField" positionIncrementGap="100">
@@ -280,23 +266,6 @@
 
     <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
     <fieldtype name="binary" class="solr.BinaryField"/>
-
-    <!--
-      Note:
-      These should only be used for compatibility with existing indexes (created with lucene or older Solr versions).
-      Use Trie based fields instead. As of Solr 3.5 and 4.x, Trie based fields support sortMissingFirst/Last
-
-      Plain numeric field types that store and index the text
-      value verbatim (and hence don't correctly support range queries, since the
-      lexicographic ordering isn't equal to the numeric ordering)
-
-      NOTE: These field types are deprecated will be removed in Solr 5.0!
-    -->
-    <fieldType name="pint" class="solr.IntField"/>
-    <fieldType name="plong" class="solr.LongField"/>
-    <fieldType name="pfloat" class="solr.FloatField"/>
-    <fieldType name="pdouble" class="solr.DoubleField"/>
-    <fieldType name="pdate" class="solr.DateField" sortMissingLast="true"/>
 
     <!-- The "RandomSortField" is not used to store or search any
          data.  You can declare fields of this type it in your schema

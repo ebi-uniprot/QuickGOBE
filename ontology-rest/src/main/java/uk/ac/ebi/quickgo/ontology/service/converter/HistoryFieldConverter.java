@@ -31,7 +31,6 @@ class HistoryFieldConverter implements FieldConverter<OBOTerm.History> {
 
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.History historicalInfo = new OBOTerm.History();
-            historicalInfo.name = cleanFieldValue(fields.get(0).buildString());
             historicalInfo.timestamp = cleanFieldValue(fields.get(1).buildString());
             historicalInfo.action = cleanFieldValue(fields.get(2).buildString());
             historicalInfo.category = cleanFieldValue(fields.get(3).buildString());

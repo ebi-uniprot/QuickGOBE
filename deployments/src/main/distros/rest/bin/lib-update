@@ -24,6 +24,11 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
     exit 1;
 fi;
 
+# ======= check if script is run on the right VM =====================================
+if ! [[ $(hostname) =~ ^ebi.* ]]; then
+    echo "This script can only be run from an EBI cluster machine";
+    exit 1;
+fi
 
 # ======= FUNCTIONS ======================================================================
 # ======= take a string and add a time-stamp to it =======================================
@@ -59,6 +64,7 @@ LIB_DIR="$SERVICE_PATH/lib"
 BACKUP_LIB_DIR="$SERVICE_PATH/lib/backups"
 TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
 QUICKGO_REPO_DIR="$SERVICE_CONF_PATH/../../repos/QuickGOBE"
+BRANCH="master"
 
 if [ ! -d "$LIB_DIR" ]; then
     mkdir -p $LIB_DIR
@@ -69,6 +75,10 @@ fi
 
 # ======= install the REST artifacts before fetching them =======================================
 cd $QUICKGO_REPO_DIR
+git fetch
+git checkout $BRANCH
+git pull
+
 mvn -P all -DskipTests install
 cd $SERVICE_CONF_PATH
 

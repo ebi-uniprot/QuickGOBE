@@ -31,6 +31,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -699,7 +700,7 @@ public abstract class OBOControllerIT {
         return result
                 .andDo(print())
                 .andExpect(jsonPath("$.url", is(requestUrl(result))))
-                .andExpect(jsonPath("$.message", containsString("Provided ID: '" + id + "'")));
+                .andExpect(jsonPath("$.messages", hasItem(containsString("Provided ID: '" + id + "'"))));
     }
 
     protected ResultActions expectInvalidRelationError(ResultActions result, String relation) throws Exception {

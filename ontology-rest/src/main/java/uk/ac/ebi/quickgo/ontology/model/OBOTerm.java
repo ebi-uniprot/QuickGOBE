@@ -24,7 +24,7 @@ public class OBOTerm {
 
     public String name;
 
-    public String definition;
+    public Definition definition;
 
     public String comment;
 
@@ -63,13 +63,12 @@ public class OBOTerm {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Synonym implements FieldType {
-        public String synonymName;
-        public String synonymType;
+        public String name;
+        public String type;
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class History implements FieldType {
-        public String name;
         public String timestamp;
         public String action;
         public String category;
@@ -111,5 +110,11 @@ public class OBOTerm {
         public String namespace;
         public String url;
         public String relation;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Definition implements FieldType {
+        public String text;
+        public List<XRef> xrefs;
     }
 }

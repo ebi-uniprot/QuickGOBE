@@ -1,10 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Contains all of the information necessary to put in a search request to a searchable data source.
@@ -76,10 +73,10 @@ public class QueryRequest {
     public static class Builder {
         private QuickGOQuery query;
         private Page page;
-        private List<Facet> facets;
-        private List<QuickGOQuery> filters;
-        private List<FieldProjection> projectedFields;
-        private List<FieldHighlight> highlightedFields;
+        private Set<Facet> facets;
+        private Set<QuickGOQuery> filters;
+        private Set<FieldProjection> projectedFields;
+        private Set<FieldHighlight> highlightedFields;
         private String highlightStartDelim;
         private String highlightEndDelim;
 
@@ -87,10 +84,10 @@ public class QueryRequest {
             Preconditions.checkArgument(query != null, "Query cannot be null");
 
             this.query = query;
-            facets = new ArrayList<>();
-            filters = new ArrayList<>();
-            projectedFields = new ArrayList<>();
-            highlightedFields = new ArrayList<>();
+            facets = new LinkedHashSet<>();
+            filters = new LinkedHashSet<>();
+            projectedFields = new LinkedHashSet<>();
+            highlightedFields = new LinkedHashSet<>();
         }
 
         public Builder setPageParameters(int currentPage, int pageSize) {
@@ -136,10 +133,10 @@ public class QueryRequest {
             return new QueryRequest(
                     query,
                     page,
-                    facets,
-                    filters,
-                    projectedFields,
-                    highlightedFields,
+                    new ArrayList<>(facets),
+                    new ArrayList<>(filters),
+                    new ArrayList<>(projectedFields),
+                    new ArrayList<>(highlightedFields),
                     highlightStartDelim,
                     highlightEndDelim);
         }

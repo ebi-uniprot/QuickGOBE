@@ -271,17 +271,17 @@ public class OntologyRepositoryIT {
      */
     @Test
     public void saveDirectlyToSolrServer() throws IOException, SolrServerException {
-        ontologyTemplate.getSolrServer().addBean(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
-        ontologyTemplate.getSolrServer().addBean(OntologyDocMocker.createGODoc("B", "Alice Cooper"));
-        ontologyTemplate.getSolrServer().addBean(OntologyDocMocker.createGODoc("C", "Alice Cooper"));
-        ontologyTemplate.getSolrServer().addBeans(
+        ontologyTemplate.getSolrClient().addBean(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
+        ontologyTemplate.getSolrClient().addBean(OntologyDocMocker.createGODoc("B", "Alice Cooper"));
+        ontologyTemplate.getSolrClient().addBean(OntologyDocMocker.createGODoc("C", "Alice Cooper"));
+        ontologyTemplate.getSolrClient().addBeans(
                 Arrays.asList(
                         OntologyDocMocker.createGODoc("D", "Alice Cooper"),
                         OntologyDocMocker.createGODoc("E", "Alice Cooper")));
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(0L));
 
-        ontologyTemplate.getSolrServer().commit();
+        ontologyTemplate.getSolrClient().commit();
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(5L));
     }

@@ -1,18 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.rest.search.query.PrototypeFilter;
-
-import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -27,78 +22,97 @@ import static org.hamcrest.core.IsEqual.equalTo;
  */
 public class AnnotationRequestTest {
 
+    //AssignedBy values
     private static final String UNI_PROT = "UniProt";
-    private static final String ASPGD = "ASPGD";
 
-    private AnnotationRequest annotationFilter;
-
-    private String multiAssignedBy = UNI_PROT + "," + ASPGD;
+    private AnnotationRequest annotationRequest;
 
     @Before
     public void setUp() {
-        annotationFilter = new AnnotationRequest();
+        annotationRequest = new AnnotationRequest();
     }
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void successfullyAddOnlyOneSingleFilter() {
-        annotationFilter.setAssignedBy(UNI_PROT);
-        final List<PrototypeFilter> pfList = annotationFilter.stream().collect(toList());
-        assertThat(pfList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
-        assertThat(pfList, hasSize(1));
-
-
-        assertThat(pfList.get(0)
-                .provideArgStream()
-                .findFirst().isPresent(), is(true));
-        assertThat(pfList.get(0)
-                .provideArgStream()
-                .findFirst().get(), is(equalTo(UNI_PROT)));
-        assertThat(pfList.get(0)
-                .provideArgStream()
-                .count(), is(1L));
-    }
-
-
-    @Test
-    public void successfullyAddMultiFilterForAssignedBy(){
-
-        annotationFilter.setAssignedBy(multiAssignedBy);
-        final List<PrototypeFilter> pfList = annotationFilter.stream().collect(toList());
-        assertThat(pfList, hasSize(1));
-        assertThat(pfList.get(0).getFilterField(), is(equalTo(AnnotationFields.ASSIGNED_BY)));
-
-        assertThat(pfList.get(0)
-                .provideArgStream()
-                .findFirst().get(), is(equalTo(UNI_PROT)));
-
-        assertThat(pfList.get(0)
-                .provideArgStream()
-                .filter(a -> a.equals(ASPGD))
-                .findFirst().get(), is(equalTo(ASPGD)));
-
-       long countASPGD = pfList.get(0)
-                .provideArgStream()
-                .filter(a -> a.equals(ASPGD))
-                .count();
-        assertThat(countASPGD, is(1L));
-    }
-
-
-
-    @Test
     public void defaultPageAndLimitValuesAreCorrect() {
-        assertThat(annotationFilter.getPage(), equalTo(1));
-        assertThat(annotationFilter.getLimit(), equalTo(25));
+        assertThat(annotationRequest.getPage(), equalTo(1));
+        assertThat(annotationRequest.getLimit(), equalTo(25));
     }
 
     @Test
-    public void successfullySetPageAndLimitValues() {
-        annotationFilter.setPage(4);
-        annotationFilter.setLimit(15);
-        assertThat(annotationFilter.getPage(), equalTo(4));
-        assertThat(annotationFilter.getLimit(), equalTo(15));
+    public void successfullySetAndGetPageAndLimitValues() {
+        annotationRequest.setPage(4);
+        annotationRequest.setLimit(15);
+
+        assertThat(annotationRequest.getPage(), equalTo(4));
+        assertThat(annotationRequest.getLimit(), equalTo(15));
+    }
+
+    @Test
+    public void setAndGetAssignedBy() {
+        String assignedBy = "UniProt";
+        annotationRequest.setAssignedBy(assignedBy);
+
+        assertThat(annotationRequest.getAssignedBy(), is(assignedBy));
+    }
+
+    @Test
+    public void setAndGetWithFrom(){
+        String WITH_FROM = "RGD:1623038";
+        annotationRequest.setWithFrom(WITH_FROM);
+        assertThat(annotationRequest.getWithFrom(), is(WITH_FROM));
+    }
+
+    @Test
+    public void setAndGetOntologyAspect() {
+        String aspect = "function";
+
+        annotationRequest.setAspect(aspect);
+
+        assertThat(annotationRequest.getAspect(), is(aspect));
+    }
+    @Test
+    public void setAndGetEvidence(){
+        String EVIDENCE_IEA = "IEA";
+        annotationRequest.setGoEvidence(EVIDENCE_IEA);
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_IEA));
+    }
+
+    @Test
+    public void setAndGetEvidenceMulti(){
+        String EVIDENCE_MULTI = "IEA,IBD";
+        annotationRequest.setGoEvidence(EVIDENCE_MULTI);
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
+    }
+
+    @Test
+    public void setAndGetEvidenceMultiInLowerCase(){
+        String EVIDENCE_MULTI = "iea,ibd";
+        annotationRequest.setGoEvidence(EVIDENCE_MULTI);
+        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
+    }
+
+
+    @Test
+    public void setAndGetTaxon() {
+        String taxonId = "1";
+        annotationRequest.setTaxon(taxonId);
+        assertThat(annotationRequest.getTaxon(), is(taxonId));
+    }
+
+    @Test
+    public void setAndGetQualifier(){
+        String qualifier = "NOT";
+        annotationRequest.setQualifier((qualifier));
+        assertThat(annotationRequest.getQualifter(), is(qualifier));
+    }
+
+    @Test
+    public void setAndGetReference(){
+        String ONE_GOREF = "GO_REF:123456";
+        annotationRequest.setReference(ONE_GOREF);
+        assertThat(annotationRequest.getReference(), is(ONE_GOREF));
     }
 }

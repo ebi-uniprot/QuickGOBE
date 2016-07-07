@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
+import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
 import java.util.Collections;
@@ -34,7 +35,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     // response format ---------------------------------------------------------
     @Test
     public void requestWhichFindsNothingReturnsValidResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process");
 
         saveToRepository(doc1);
 
@@ -43,7 +44,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWhichAsksForPage0WithLimit0Returns400Response() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process");
 
         saveToRepository(doc1);
 
@@ -52,9 +53,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWithNegativePageNumberReturns400Response() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -66,9 +67,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWithNegativeLimitNumberReturns400Response() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -80,9 +81,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestForFirstPageWithLimitOf10ReturnsAllResults() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -94,9 +95,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestForSecondPageWithLimitOf2ReturnsLastEntry() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -108,9 +109,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestForPageThatIsLargerThanTotalNumberOfPagesInResponseReturns400Response() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -123,9 +124,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     // facets ---------------------------------------------------------
     @Test
     public void requestWithInValidFacetFieldReturns400Response() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -134,9 +135,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWithValidFacetFieldReturnsResponseWithFacetInResult() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -144,10 +145,24 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     }
 
     @Test
+    public void requestWithTypeFacetFieldReturnsResponseWithFacetInResult() throws Exception {
+        GeneProductType type = GeneProductType.PROTEIN;
+        String name = "name";
+
+        GeneProductDocument doc1 = createGeneProductDocWithNameAndType("A0A0F8CSS1", name, type);
+        GeneProductDocument doc2 = createGeneProductDocWithNameAndType("A0A0F8CSS2", name, type);
+        GeneProductDocument doc3 = createGeneProductDocWithNameAndType("A0A0F8CSS3", name, type);
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkValidFacetResponse(name, GeneProductFields.Searchable.TYPE);
+    }
+
+    @Test
     public void requestWithMultipleValidFacetFieldsReturnsResponseWithMultipleFacetsInResult() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -158,9 +173,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     // filter queries ---------------------------------------------------------
     @Test
     public void requestWithInvalidFilterQueryReturns400Response() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -171,11 +186,11 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWithAFilterQueryReturnsFilteredResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
         doc1.symbol = "important";
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
         doc2.symbol = "important";
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
         doc3.symbol = "pointless";
 
         saveToRepository(doc1, doc2, doc3);
@@ -187,13 +202,13 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWith3FilterQueriesThatFilterOutAllResults() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
         doc1.symbol = "important";
         doc1.synonyms = Collections.singletonList("Klose");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
         doc2.symbol = "important";
         doc2.synonyms = Collections.singletonList("Jerome");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
         doc3.symbol = "pointless";
         doc3.synonyms = Collections.singletonList("Jerome");
 
@@ -208,11 +223,11 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
         doc1.symbol = "important";
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
         doc2.symbol = "important";
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
         doc3.symbol = "important";
 
         saveToRepository(doc1, doc2, doc3);
@@ -224,11 +239,11 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
         doc1.symbol = "important";
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
         doc2.symbol = "pointless";
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic process 3");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
         doc3.symbol = "important";
 
         saveToRepository(doc1, doc2, doc3);
@@ -241,8 +256,8 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     // highlighting ------------------------------------------------
     @Test
     public void requestWithHighlightingOnAndOneHitReturnsValidResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process one");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process two");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process one");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process two");
 
         saveToRepository(doc1, doc2);
 
@@ -251,9 +266,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWithHighlightingOnAndTwoHitsReturnsValidResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic smurf 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic smurf 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic smurf 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic smurf 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -262,8 +277,8 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWithHighlightingOnAndZeroHitsReturnsValidResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
 
         saveToRepository(doc1, doc2);
 
@@ -272,8 +287,8 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWithHighlightingOffAndOneHitReturnsValidResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic sausage 2");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic sausage 2");
 
         saveToRepository(doc1, doc2);
 
@@ -282,8 +297,8 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWithHighlightingOffAndOnZeroHitsReturnsValidResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
 
         saveToRepository(doc1, doc2);
 
@@ -292,9 +307,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     @Test
     public void requestWithHighlightingOnReturnsTwoHighlightedValuesInResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDoc("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDoc("A0A0F8CSS2", "glycine metabolic Slider 2");
-        GeneProductDocument doc3 = createGeneProductDoc("A0A0F8CSS3", "glycine metabolic Slider 3");
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic Slider 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic Slider 3");
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -316,8 +331,16 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         return field + ":" + value;
     }
 
-    private GeneProductDocument createGeneProductDoc(String id, String name) {
+    private GeneProductDocument createGeneProductDocWithName(String id, String name) {
         GeneProductDocument geneProductDocument = createDocWithId(id);
+        geneProductDocument.name = name;
+
+        return geneProductDocument;
+    }
+
+    private GeneProductDocument createGeneProductDocWithNameAndType(String id, String name, GeneProductType type) {
+        GeneProductDocument geneProductDocument = createDocWithId(id);
+        geneProductDocument.type = type.getName();
         geneProductDocument.name = name;
 
         return geneProductDocument;

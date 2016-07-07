@@ -32,8 +32,8 @@ class SynonymsFieldConverter implements FieldConverter<OBOTerm.Synonym> {
         List<FlatField> fields = FlatFieldBuilder.newFlatField().parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.Synonym synonym = new OBOTerm.Synonym();
-            synonym.synonymName = cleanFieldValue(fields.get(0).buildString());
-            synonym.synonymType = cleanFieldValue(fields.get(1).buildString());
+            synonym.name = cleanFieldValue(fields.get(0).buildString());
+            synonym.type = cleanFieldValue(fields.get(1).buildString());
             return Optional.of(synonym);
         } else {
             LOGGER.warn("Could not parse flattened synonym: {}", fieldsStr);

@@ -14,6 +14,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestConverter<SolrQuery> {
     public static final String SOLR_FIELD_SEPARATOR = ":";
 
+    static final String CROSS_CORE_JOIN_SYNTAX = "{!join from=%s to=%s fromIndex=%s} %s";
+
     private static final int MIN_COUNT_TO_DISPLAY_FACET = 1;
 
     private final String requestHandler;
@@ -35,20 +37,37 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
         CompositeQuery.QueryOp operator = query.queryOperator();
         Set<QuickGOQuery> queries = query.queries();
 
-        String operatorText = " " + operator.name() + " ";
+        if (queries.size() == 1 && operator.equals(CompositeQuery.QueryOp.NOT)) {
+            String singletonQuery = queries.iterator().next().accept(this);
+            return CompositeQuery.QueryOp.NOT + " (" + singletonQuery + ")";
+        } else {
+            String operatorText = " " + operator.name() + " ";
 
-        return queries.stream()
-                .map(q -> q.accept(this))
-                .collect(Collectors.joining(operatorText, "(", ")"));
+            return queries.stream()
+                    .map(q -> q.accept(this))
+                    .collect(Collectors.joining(operatorText, "(", ")"));
+        }
     }
 
     @Override public String visit(NoFieldQuery query) {
         return "(" + queryStringSanitizer.sanitize(query.getValue()) + ")";
     }
 
-
     @Override public String visit(AllQuery query) {
         return "*:*";
+    }
+
+    @Override public String visit(JoinQuery query) {
+        String fromFilterString;
+
+        if (query.getFromFilter() != null) {
+            fromFilterString = query.getFromFilter().accept(this);
+        } else {
+            fromFilterString = "";
+        }
+
+        return String.format(CROSS_CORE_JOIN_SYNTAX, query.getJoinFromAttribute(), query.getJoinToAttribute(),
+                query.getJoinFromTable(), fromFilterString);
     }
 
     @Override public SolrQuery convert(QueryRequest request) {
