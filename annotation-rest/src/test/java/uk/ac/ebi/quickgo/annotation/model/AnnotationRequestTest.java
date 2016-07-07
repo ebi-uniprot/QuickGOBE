@@ -82,6 +82,13 @@ public class AnnotationRequestTest {
     }
 
     @Test
+    public void setAndGetMultipleGeneProductIDs() {
+        String geneProductID = "A0A000,A0A001";
+        annotationRequest.setGpId(geneProductID);
+        assertThat(annotationRequest.getGpId(), is(geneProductID));
+    }
+
+    @Test
     public void setAndGetEvidence(){
         String EVIDENCE_IEA = "IEA";
         annotationRequest.setGoEvidence(EVIDENCE_IEA);
