@@ -36,7 +36,7 @@ public class AnnotationRequestValidationIT {
     private static final String[] INVALID_GENE_PRODUCT_ID = {"99999","&12345"};
 
     @Autowired
-    public Validator validator;
+    private Validator validator;
 
     private AnnotationRequest annotationRequest;
 
