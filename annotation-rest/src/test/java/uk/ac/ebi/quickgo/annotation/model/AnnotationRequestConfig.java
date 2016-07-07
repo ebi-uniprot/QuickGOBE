@@ -20,7 +20,8 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequestConfig {
-    private static final String EXAMPLE_REGEX="([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])" +
+    private static final String UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX="([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
+            "([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])" +
             "((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1}";
 
     public AnnotationRequestConfig() {}
@@ -35,7 +36,7 @@ public class AnnotationRequestConfig {
 
         List<GeneProductDbXRefIDFormat> entities = new ArrayList<>();
         GeneProductDbXRefIDFormat entity1 = new GeneProductDbXRefIDFormat("UniProtKB", "PR:000000001", "protein",
-                EXAMPLE_REGEX, "http://www.uniprot.org/uniprot/[example_id]/");
+                UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX, "http://www.uniprot.org/uniprot/[example_id]/");
         entities.add(entity1);
 
         return GeneProductDbXRefIDFormats.createWithData(entities);
