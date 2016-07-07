@@ -66,6 +66,7 @@ public class AnnotationControllerIT {
     private static final String EXISTING_ECO_ID1 = "ECO:0000256";
     private static final String EXISTING_ECO_ID2 = "ECO:0000323";  //exists
     private static final String NOTEXISTS_ECO_ID3 = "ECO:0000888";  //doesn't exist
+    final static String REFERENCE_ID = "GO_REF:0000002";
     public static final int NUM_RESULTS = 6;
     private MockMvc mockMvc;
     private List<AnnotationDocument> genericDocs;
@@ -97,7 +98,7 @@ public class AnnotationControllerIT {
 
     private List<AnnotationDocument> createGenericDocs2(int n) {
         return IntStream.range(0, n)
-                .mapToObj(i -> AnnotationDocMocker.createAnnotationDocUniqueData(createId(i))).collect
+                .mapToObj(i -> AnnotationDocMocker.createAlternativeAnnotationDoc(createId(i))).collect
                         (Collectors.toList());
     }
 
@@ -616,14 +617,14 @@ public class AnnotationControllerIT {
     public void filterBySingleReferenceReturnsDocumentsThatContainTheReference() throws Exception {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
-                AnnotationDocMocker.REF2));
+                REFERENCE_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size()))
                 .andExpect(fieldsInAllResultsExist(genericDocs.size()))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()));
+                .andExpect(itemExistsExpectedTimes(REFERENCE, REFERENCE_ID, genericDocs.size()));
     }
 
     @Test
@@ -654,13 +655,13 @@ public class AnnotationControllerIT {
         repository.save(docB);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
-                AnnotationDocMocker.REF2 + "," + docA.reference + "," + docB.reference));
+                REFERENCE_ID + "," + docA.reference + "," + docB.reference));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(5))
                 .andExpect(fieldsInAllResultsExist(5))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, REFERENCE_ID, genericDocs.size()))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docB.reference, 1));
     }
@@ -677,13 +678,13 @@ public class AnnotationControllerIT {
         repository.save(docB);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
-                AnnotationDocMocker.REF2).param(REF_PARAM, docA.reference).param(REF_PARAM, docB.reference));
+                REFERENCE_ID).param(REF_PARAM, docA.reference).param(REF_PARAM, docB.reference));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(5))
                 .andExpect(fieldsInAllResultsExist(5))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, REFERENCE_ID, genericDocs.size()))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docB.reference, 1));
     }
@@ -721,7 +722,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(4))
                 .andExpect(fieldsInAllResultsExist(4))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, REFERENCE_ID, genericDocs.size()))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1));
     }
 
@@ -742,7 +743,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(genericDocs.size() + 2))
                 .andExpect(fieldsInAllResultsExist(5))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REF2, genericDocs.size()))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, REFERENCE_ID, genericDocs.size()))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docB.reference, 1));
     }
