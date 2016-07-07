@@ -12,9 +12,10 @@ public class QueryResult<T> {
     private final PageInfo pageInfo;
     private final Facet facet;
     private final List<DocHighlight> highlighting;
+    private final List<Aggregation> aggregations;
 
     private QueryResult(long numberOfHits, List<T> results, PageInfo pageInfo, Facet facet,
-            List<DocHighlight> highlighting) {
+            List<DocHighlight> highlighting, List<Aggregation> aggregations) {
         Preconditions.checkArgument(numberOfHits >= 0, "Total number of hits can not be negative: " + numberOfHits);
         Preconditions.checkArgument(results != null, "Results list can not be null");
         Preconditions.checkArgument(results.size() <= numberOfHits,
@@ -25,12 +26,21 @@ public class QueryResult<T> {
         this.results = Collections.unmodifiableList(results);
         this.pageInfo = pageInfo;
         this.facet = facet;
+
         this.highlighting = (highlighting != null) ?
                 Collections.unmodifiableList(highlighting) : null;
+
+        this.aggregations = (aggregations != null) ?
+                Collections.unmodifiableList(aggregations) : null;
     }
 
+    /**
+     * Returns an unmodifiable list of highlights.
+     *
+     * @return list of highlights
+     */
     public List<DocHighlight> getHighlighting() {
-        return highlighting;
+        return Collections.unmodifiableList(highlighting);
     }
 
     public long getNumberOfHits() {
@@ -49,6 +59,15 @@ public class QueryResult<T> {
         return facet;
     }
 
+    /**
+     * Returns an unmodifiable list of aggregations.
+     *
+     * @return list of aggregation results
+     */
+    public List<Aggregation> getAggregations() {
+        return Collections.unmodifiableList(aggregations);
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -62,7 +81,7 @@ public class QueryResult<T> {
         if (numberOfHits != that.numberOfHits) {
             return false;
         }
-        if (results != null ? !results.equals(that.results) : that.results != null) {
+        if (!results.equals(that.results)) {
             return false;
         }
         if (pageInfo != null ? !pageInfo.equals(that.pageInfo) : that.pageInfo != null) {
@@ -71,16 +90,19 @@ public class QueryResult<T> {
         if (facet != null ? !facet.equals(that.facet) : that.facet != null) {
             return false;
         }
-        return highlighting != null ? highlighting.equals(that.highlighting) : that.highlighting == null;
-
+        if (!highlighting.equals(that.highlighting)) {
+            return false;
+        }
+        return aggregations.equals(that.aggregations);
     }
 
     @Override public int hashCode() {
         int result = (int) (numberOfHits ^ (numberOfHits >>> 32));
-        result = 31 * result + (results != null ? results.hashCode() : 0);
+        result = 31 * result + results.hashCode();
         result = 31 * result + (pageInfo != null ? pageInfo.hashCode() : 0);
         result = 31 * result + (facet != null ? facet.hashCode() : 0);
-        result = 31 * result + (highlighting != null ? highlighting.hashCode() : 0);
+        result = 31 * result + highlighting.hashCode();
+        result = 31 * result + aggregations.hashCode();
         return result;
     }
 
@@ -91,6 +113,7 @@ public class QueryResult<T> {
                 ", pageInfo=" + pageInfo +
                 ", facet=" + facet +
                 ", highlighting=" + highlighting +
+                ", aggregations=" + aggregations +
                 '}';
     }
 
@@ -106,12 +129,14 @@ public class QueryResult<T> {
         private PageInfo pageInfo;
         private Facet facets;
         private Set<DocHighlight> highlights;
+        private Set<Aggregation> aggregations;
 
         public Builder(long hits, List<T> results) {
             this.numberOfHits = hits;
             this.results = results;
 
             this.highlights = new LinkedHashSet<>();
+            this.aggregations = new LinkedHashSet<>();
         }
 
         public Builder<T> withPageInfo(PageInfo pageInfo) {
@@ -138,8 +163,20 @@ public class QueryResult<T> {
             return this;
         }
 
+        public Builder<T> appendAggregations(Aggregation... aggregation) {
+            if (aggregation != null) {
+                aggregations.addAll(Arrays.asList(aggregation));
+            }
+            return this;
+        }
+
         public QueryResult<T> build() {
-            return new QueryResult<>(numberOfHits, results, pageInfo, facets, new ArrayList<>(highlights));
+            return new QueryResult<>(numberOfHits,
+                    results,
+                    pageInfo,
+                    facets,
+                    new ArrayList<>(highlights),
+                    new ArrayList<>(aggregations));
         }
     }
 }
