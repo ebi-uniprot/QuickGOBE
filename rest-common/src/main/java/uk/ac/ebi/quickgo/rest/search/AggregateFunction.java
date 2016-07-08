@@ -18,4 +18,14 @@ public enum AggregateFunction {
     public String getName() {
         return name;
     }
+
+    public static AggregateFunction typeOf(String functionText) {
+        for(AggregateFunction function : AggregateFunction.values()) {
+            if(function.getName().equals(functionText)) {
+                return function;
+            }
+        }
+
+        throw new IllegalArgumentException("Unable to find aggregation function for: " + functionText);
+    }
 }
