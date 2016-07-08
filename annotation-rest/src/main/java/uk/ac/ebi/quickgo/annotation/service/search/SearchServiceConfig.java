@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
-import uk.ac.ebi.quickgo.common.validator.GeneProductDbXRefIDFormats;
+import uk.ac.ebi.quickgo.common.validator.EntityValidation;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
@@ -125,8 +125,8 @@ public class SearchServiceConfig {
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 
     @Bean
-    public GeneProductDbXRefIDFormats geneProductValidator() {
-        return GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load());
+    public EntityValidation geneProductValidator() {
+        return EntityValidation.createWithData(geneProductLoader().load());
     }
 
     private DbXRefLoader geneProductLoader() {
