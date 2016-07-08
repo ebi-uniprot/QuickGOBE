@@ -20,13 +20,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class EntityValidation {
 
     // A list of entries loaded from 'DB_XREFS_ENTITIES.dat.gz' keyed by database and entity type id.
-    private final Map<EntityValidation.Key, GeneProductDbXRefIDFormat> entityList;
+    private final Map<EntityValidation.Key, DbXRefEntityID> entityList;
 
     // Default list of databases and entity types to validate against.
     static final Key[] targetDBs = new Key[]{new Key("UniProtKB", "PR:000000001"), new Key("IntAct", "GO:0043234"),
             new Key("RNAcentral", "CHEBI:33697")};
 
-    private EntityValidation(Map<Key, GeneProductDbXRefIDFormat> entityList) {
+    private EntityValidation(Map<Key, DbXRefEntityID> entityList) {
         checkArgument(entityList != null, "Gene product xref entities map cannot be null");
 
         this.entityList = entityList;
@@ -58,13 +58,13 @@ public class EntityValidation {
      * @param entities A list of regex expressions specified by database and usage.
      * @return
      */
-    public static EntityValidation createWithData(List<GeneProductDbXRefIDFormat> entities) {
+    public static EntityValidation createWithData(List<DbXRefEntityID> entities) {
         Preconditions.checkArgument(entities != null, "The list of GeneProductDbXRefIDFormat entities is null, which " +
                 "is illegal");
 
-        Map<Key, GeneProductDbXRefIDFormat> mappedEntities = new HashMap<>();
+        Map<Key, DbXRefEntityID> mappedEntities = new HashMap<>();
 
-        for (GeneProductDbXRefIDFormat entity : entities) {
+        for (DbXRefEntityID entity : entities) {
             EntityValidation.Key key = new EntityValidation.Key(entity.getDatabase(), entity
                     .getEntityType());
             mappedEntities.put(key, entity);
