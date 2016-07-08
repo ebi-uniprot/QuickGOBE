@@ -23,7 +23,8 @@ public class EntityValidation {
     private final Map<EntityValidation.Key, DbXRefEntityID> entityList;
 
     // Default list of databases and entity types to validate against.
-    static final Key[] targetDBs = new Key[]{new Key("UniProtKB", "PR:000000001"), new Key("IntAct", "GO:0043234"),
+    private static final Key[] targetDBs = new Key[]{new Key("UniProtKB", "PR:000000001"), new Key("IntAct",
+            "GO:0043234"),
             new Key("RNAcentral", "CHEBI:33697")};
 
     private EntityValidation(Map<Key, DbXRefEntityID> entityList) {
