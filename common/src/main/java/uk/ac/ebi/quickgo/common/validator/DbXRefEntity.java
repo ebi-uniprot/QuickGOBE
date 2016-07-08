@@ -53,7 +53,7 @@ public class DbXRefEntity {
     }
 
     /**
-     * @return  A code that uniquely identifies the type of entity that this class instance applies to e.g.
+     * @return A code that uniquely identifies the type of entity that this class instance applies to e.g.
      * PR:000000001 for protein;  SO:0000704 for gene.
      */
     public String getEntityType() {
