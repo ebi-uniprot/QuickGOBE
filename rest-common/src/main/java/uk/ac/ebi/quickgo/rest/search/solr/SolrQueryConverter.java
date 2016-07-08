@@ -1,6 +1,7 @@
-package uk.ac.ebi.quickgo.rest.search.query;
+package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
+import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
@@ -16,6 +17,7 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
 
     static final String CROSS_CORE_JOIN_SYNTAX = "{!join from=%s to=%s fromIndex=%s} %s";
 
+    private static final String FACET_ANALYTICS_ID = "json.facet";
     private static final int MIN_COUNT_TO_DISPLAY_FACET = 1;
 
     private final String requestHandler;
@@ -111,7 +113,48 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
             request.getProjectedFields().forEach(field -> solrQuery.addField(field.getField()));
         }
 
-        return solrQuery;
+        if (!request.getAggregates().isEmpty()) {
+            solrQuery.setParam(FACET_ANALYTICS_ID, mockJsonFacet());
+        }
+
+        {
+            return solrQuery;
+        }
+    }
+
+    private static final String STATS_PREFIX = "stats";
+
+//    private String convertAggregates(List<Aggregate> aggregates) {
+//        StringBuilder jsonFacet = new StringBuilder("json.facet={");
+//
+//        for (Aggregate aggregate : aggregates) {
+//            jsonFacet.append(aggregate.getName()).append(":");
+//
+//            Set<AggregateField> aggFields = aggregate.getFields();
+//
+//            if(!aggFields.isEmpty()) {
+//                jsonFacet.append(":");
+//                for (AggregateField aggField : aggFields) {
+//                    jsonFacet.append(aggField)
+//                }
+//            }
+//        }
+//        jsonFacet.append("}");
+//    }
+
+    private String mockJsonFacet() {
+        return "{\n" +
+                "            unique_annotations:\"unique(id)\",\n" +
+                "            unique_geneProductId:\"unique(geneProductId)\",\n" +
+                "            stats_dbSubset:{\n" +
+                "              field:dbSubset,\n" +
+                "              type:terms,\n" +
+                "              facet:{\n" +
+                "                  unique_id:\"unique(id)\",\n" +
+                "                  unique_geneProductID:\"unique(geneProductId)\"\n" +
+                "              }\n" +
+                "          }\n" +
+                "}";
     }
 
     private int calculateRowsFromPage(int page, int numRows) {
