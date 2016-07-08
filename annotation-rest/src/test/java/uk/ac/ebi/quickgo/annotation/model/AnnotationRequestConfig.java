@@ -3,8 +3,7 @@ package uk.ac.ebi.quickgo.annotation.model;
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntity;
 import uk.ac.ebi.quickgo.common.validator.EntityValidation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 
 import javax.validation.Validator;
@@ -19,7 +18,11 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequestConfig {
-    private static final String UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX="([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
+    private static final String TARGET_DB = "UniProtKB";
+    private static final String ENTITY_TYPE_ID = "PR:000000001";
+    private static final String ENTITY_TYPE_NAME = "protein";
+    private static final String DB_URL = "http://www.uniprot.org/uniprot/[example_id]/";
+    private static final String UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX = "([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
             "([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])" +
             "((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1}";
 
@@ -32,21 +35,16 @@ public class AnnotationRequestConfig {
      */
     @Bean
     public EntityValidation geneProductValidator() {
-
-        List<DbXRefEntity> entities = new ArrayList<>();
-        DbXRefEntity entity1 = new DbXRefEntity("UniProtKB", "PR:000000001", "protein",
-                UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX, "http://www.uniprot.org/uniprot/[example_id]/");
-        entities.add(entity1);
-
-        return EntityValidation.createWithData(entities);
+        DbXRefEntity testEntity = new DbXRefEntity(TARGET_DB, ENTITY_TYPE_ID, ENTITY_TYPE_NAME,
+                UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX, DB_URL);
+        return EntityValidation.createWithData(Arrays.asList(testEntity));
     }
 
     /**
-     *
      * @return instance used to run validation against the validated class.
      */
     @Bean
-    public Validator validator(){
+    public Validator validator() {
         return new LocalValidatorFactoryBean();
     }
 
