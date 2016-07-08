@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.common.validator.GeneProductDbXRefIDFormat;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class DbXRefLoader {
             logger.error("DbXRefLoader failed to load file " + this.path + ", the source of validation regexes to " +
                     "validate gene product IDs. Gene Product ID validation will not take place", e);
 
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
     }
