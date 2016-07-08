@@ -1,4 +1,5 @@
 package uk.ac.ebi.quickgo.common.validator;
+
 import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.List;
@@ -19,41 +20,17 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class EntityValidation {
 
-    // A list of entries loaded from 'DB_XREFS_ENTITIES.dat.gz' keyed by database and entity type id.
-    private final Map<EntityValidation.Key, DbXRefEntityID> entityList;
-
     // Default list of databases and entity types to validate against.
     private static final Key[] targetDBs = new Key[]{new Key("UniProtKB", "PR:000000001"), new Key("IntAct",
             "GO:0043234"),
             new Key("RNAcentral", "CHEBI:33697")};
+    // A list of entries loaded from 'DB_XREFS_ENTITIES.dat.gz' keyed by database and entity type id.
+    private final Map<EntityValidation.Key, DbXRefEntityID> entityList;
 
     private EntityValidation(Map<Key, DbXRefEntityID> entityList) {
         checkArgument(entityList != null, "Gene product xref entities map cannot be null");
 
         this.entityList = entityList;
-    }
-
-    /**
-     * Test if a gene product id is valid.
-     * @param id The gene product ID passed in from the client
-     * @return true if the id is valid, false otherwise
-     */
-    public boolean isValidId(String id) {
-
-        //If we haven't managed to load the validation regular expressions then pass everything
-        if (entityList.size() == 0) {
-            return true;
-        }
-        for (Key dbKey : targetDBs) {
-            DbXRefEntityID entity = this.entityList.get(dbKey);
-            if(null==entity)continue;
-            if (entity.matches(id)) {
-                return true;
-            }
-        }
-
-        //no matches
-        return false;
     }
 
     /**
@@ -74,6 +51,31 @@ public class EntityValidation {
         }
 
         return new EntityValidation(mappedEntities);
+    }
+
+    /**
+     * Test if a gene product id is valid.
+     * @param id The gene product ID passed in from the client
+     * @return true if the id is valid, false otherwise
+     */
+    public boolean isValidId(String id) {
+
+        //If we haven't managed to load the validation regular expressions then pass everything
+        if (entityList.size() == 0) {
+            return true;
+        }
+        for (Key dbKey : targetDBs) {
+            DbXRefEntityID entity = this.entityList.get(dbKey);
+            if (null == entity) {
+                continue;
+            }
+            if (entity.matches(id)) {
+                return true;
+            }
+        }
+
+        //no matches
+        return false;
     }
 
     /**
