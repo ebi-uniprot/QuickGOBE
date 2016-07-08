@@ -25,9 +25,9 @@ public class EntityValidation {
             "GO:0043234"),
             new Key("RNAcentral", "CHEBI:33697")};
     // A list of entries loaded from 'DB_XREFS_ENTITIES.dat.gz' keyed by database and entity type id.
-    private final Map<EntityValidation.Key, DbXRefEntityID> entityList;
+    private final Map<EntityValidation.Key, DbXRefEntity> entityList;
 
-    private EntityValidation(Map<Key, DbXRefEntityID> entityList) {
+    private EntityValidation(Map<Key, DbXRefEntity> entityList) {
         checkArgument(entityList != null, "Gene product xref entities map cannot be null");
 
         this.entityList = entityList;
@@ -36,15 +36,15 @@ public class EntityValidation {
     /**
      * Create an instance of this class
      * @param entities A list of regex expressions specified by database and usage.
-     * @return
+     * @return an instance EntryValidation populated with the entities passed to the method.
      */
-    public static EntityValidation createWithData(List<DbXRefEntityID> entities) {
+    public static EntityValidation createWithData(List<DbXRefEntity> entities) {
         Preconditions.checkArgument(entities != null, "The list of GeneProductDbXRefIDFormat entities is null, which " +
                 "is illegal");
 
-        Map<Key, DbXRefEntityID> mappedEntities = new HashMap<>();
+        Map<Key, DbXRefEntity> mappedEntities = new HashMap<>();
 
-        for (DbXRefEntityID entity : entities) {
+        for (DbXRefEntity entity : entities) {
             EntityValidation.Key key = new EntityValidation.Key(entity.getDatabase(), entity
                     .getEntityType());
             mappedEntities.put(key, entity);
@@ -65,7 +65,7 @@ public class EntityValidation {
             return true;
         }
         for (Key dbKey : targetDBs) {
-            DbXRefEntityID entity = this.entityList.get(dbKey);
+            DbXRefEntity entity = this.entityList.get(dbKey);
             if (null == entity) {
                 continue;
             }
@@ -83,8 +83,8 @@ public class EntityValidation {
      */
 
     private static class Key {
-        String database;
-        String entityType;
+        final String database;
+        final String entityType;
 
         private Key(String database, String entityType) {
             this.database = database;

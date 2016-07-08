@@ -25,18 +25,18 @@ public class EntityValidationTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private List<DbXRefEntityID> listOfFormats;
+	private List<DbXRefEntity> listOfFormats;
 
 	private EntityValidation dbXrefEntities;
 
 	@Mock
-	private DbXRefEntityID rnaCentralEntity;
+	private DbXRefEntity rnaCentralEntity;
 
 	@Mock
-	private DbXRefEntityID intactEntity;
+	private DbXRefEntity intactEntity;
 
 	@Mock
-	private DbXRefEntityID uniprotEntity;
+	private DbXRefEntity uniprotEntity;
 
 	@Before
 	public void setup(){

@@ -13,7 +13,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  *         Time: 13:52
  *         Created with IntelliJ IDEA.
  */
-public class DbXRefEntityID {
+public class DbXRefEntity {
 
     private final String database;
     private final String entityType;
@@ -21,7 +21,7 @@ public class DbXRefEntityID {
     private final Pattern idValidationPattern;
     private final String databaseURL;
 
-    public DbXRefEntityID(String database, String entityType, String entityTypeName,
+    public DbXRefEntity(String database, String entityType, String entityTypeName,
             String idValidationPattern, String databaseURL) {
 
         checkArgument(database != null, "The database ID should not be null");

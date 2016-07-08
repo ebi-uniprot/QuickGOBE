@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.common.validator.DbXRefEntityID;
+import uk.ac.ebi.quickgo.common.validator.DbXRefEntity;
 import uk.ac.ebi.quickgo.common.validator.EntityValidation;
 
 import java.util.ArrayList;
@@ -33,8 +33,8 @@ public class AnnotationRequestConfig {
     @Bean
     public EntityValidation geneProductValidator() {
 
-        List<DbXRefEntityID> entities = new ArrayList<>();
-        DbXRefEntityID entity1 = new DbXRefEntityID("UniProtKB", "PR:000000001", "protein",
+        List<DbXRefEntity> entities = new ArrayList<>();
+        DbXRefEntity entity1 = new DbXRefEntity("UniProtKB", "PR:000000001", "protein",
                 UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX, "http://www.uniprot.org/uniprot/[example_id]/");
         entities.add(entity1);
 
