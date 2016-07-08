@@ -25,7 +25,7 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
 
     @Autowired
     EntityValidation xRefFormats;
-    Predicate<String> idValidator;
+    private Predicate<String> idValidator;
 
     @Override public void initialize(GeneProductIDList constraintAnnotation) {
         idValidator = xRefFormats::isValidId;
