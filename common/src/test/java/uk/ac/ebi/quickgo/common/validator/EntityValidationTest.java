@@ -21,22 +21,22 @@ import static org.mockito.Mockito.when;
  *         Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class GeneProductDbXRefIDFormatsTest {
+public class EntityValidationTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private List<GeneProductDbXRefIDFormat> listOfFormats;
+	private List<DbXRefEntityID> listOfFormats;
 
-	private GeneProductDbXRefIDFormats dbXrefEntities;
-
-	@Mock
-	private GeneProductDbXRefIDFormat rnaCentralEntity;
+	private EntityValidation dbXrefEntities;
 
 	@Mock
-	private GeneProductDbXRefIDFormat intactEntity;
+	private DbXRefEntityID rnaCentralEntity;
 
 	@Mock
-	private GeneProductDbXRefIDFormat uniprotEntity;
+	private DbXRefEntityID intactEntity;
+
+	@Mock
+	private DbXRefEntityID uniprotEntity;
 
 	@Before
 	public void setup(){
@@ -58,7 +58,7 @@ public class GeneProductDbXRefIDFormatsTest {
 		when(uniprotEntity.matches("A0A000")).thenReturn(true);
 		when(uniprotEntity.matches("999999")).thenReturn(false);
 
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats);
+		dbXrefEntities = EntityValidation.createWithData(listOfFormats);
 	}
 
 	@Test
@@ -89,6 +89,6 @@ public class GeneProductDbXRefIDFormatsTest {
 	@Test
 	public void throwsErrorIfEntitiesIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(null);
+		dbXrefEntities = EntityValidation.createWithData(null);
 	}
 }
