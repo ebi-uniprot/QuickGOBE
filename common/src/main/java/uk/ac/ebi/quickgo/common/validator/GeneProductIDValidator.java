@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList,String>{
 
     @Autowired
-    GeneProductDbXRefIDFormats xRefFormats;
+    EntityValidation xRefFormats;
     Predicate<String> idValidator;
 
     @Override public void initialize(GeneProductIDList constraintAnnotation) {
