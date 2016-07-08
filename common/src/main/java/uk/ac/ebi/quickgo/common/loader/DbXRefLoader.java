@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.common.loader;
 
-
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntity;
 
 import java.nio.file.FileSystems;
