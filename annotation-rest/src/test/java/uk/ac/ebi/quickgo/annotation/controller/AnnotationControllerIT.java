@@ -63,12 +63,9 @@ public class AnnotationControllerIT {
     private static final String WITHFROM_PARAM= "withFrom";
 
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
-
-    private MockMvc mockMvc;
-
-    private List<AnnotationDocument> genericDocs;
     private static final String RESOURCE_URL = "/QuickGO/services/annotation";
-
+    private MockMvc mockMvc;
+    private List<AnnotationDocument> genericDocs;
     @Autowired
     private WebApplicationContext webApplicationContext;
 
