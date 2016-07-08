@@ -1,10 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.model.*;
-import uk.ac.ebi.quickgo.rest.search.FacetedSearchQueryTemplate;
-import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverterFactory;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
 import uk.ac.ebi.quickgo.rest.search.results.Aggregation;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
@@ -12,11 +9,12 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.rest.search.AggregateFunction.*;
 
 /**
@@ -27,18 +25,19 @@ import static uk.ac.ebi.quickgo.rest.search.AggregateFunction.*;
  */
 @Service
 public class AnnotationStatisticsService implements StatisticsService {
-    private static final int FIRST_PAGE = 1;
-    private static final int RESULTS_PER_PAGE = 0;
+    private static final long NO_COUNT_FOR_GROUP_ERROR = -1L;
+
+//    private static final int FIRST_PAGE = 1;
+//    private static final int RESULTS_PER_PAGE = 0;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private RequestConverterFactory converterFactory;
-
-    private FacetedSearchQueryTemplate queryTemplate;
-
-    private SearchService searchService;
+    //    private final RequestConverterFactory converterFactory;
+    //    private final FacetedSearchQueryTemplate queryTemplate;
+    //    private final SearchService searchService;
 
     @Override public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
+        List<AnnotationRequest.StatsRequest> statsRequest = request.createStatsRequests();
 
         //        QueryRequest queryRequest = queryTemplate.newBuilder()
         //                .setFacets(null)
@@ -64,77 +63,64 @@ public class AnnotationStatisticsService implements StatisticsService {
 
         Aggregation globalAggregation = aggregations.get(0);
 
-        GlobalCounts globalCounts = extractGlobalCounts(globalAggregation);
+        List<StatisticsGroup> statsGroups = statsRequest.stream()
+                .map(req -> convert(globalAggregation, req))
+                .collect(Collectors.toList());
 
-        StatisticsConverter annotationConverter = new StatisticsConverter(AnnotationFields.ID, globalCounts
-                .annotations, "annotation");
-        StatisticsConverter geneProductConverter = new StatisticsConverter(AnnotationFields.GENE_PRODUCT_ID, globalCounts
-                .geneProducts,
-                "geneProduct");
+        return new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
+    }
 
-        StatisticsGroup annotationGroup = annotationConverter.convert(globalAggregation.getNestedAggregations());
-        StatisticsGroup geneProductGroup = geneProductConverter.convert(globalAggregation.getNestedAggregations());
+    private StatisticsGroup convert(Aggregation globalAggregation, AnnotationRequest.StatsRequest statsRequest) {
+        StatisticsConverter converter =
+                new StatisticsConverter(statsRequest.getGroupName(), statsRequest.getGroupField());
 
-        return new QueryResult.Builder<>(2L, Arrays.asList(annotationGroup, geneProductGroup)).build();
+        long totalHits = extractCount(globalAggregation, statsRequest.getGroupField());
+
+        if (totalHits == NO_COUNT_FOR_GROUP_ERROR) {
+            throw new RetrievalException("Unable to calculate statistics for group: " + statsRequest.getGroupName());
+        }
+
+        return converter.convert(globalAggregation.getNestedAggregations(), totalHits);
     }
 
     /**
-     * Extracts the counts made on the whole data set for:
-     * <ul>
-     *     <li>annotations</li>
-     *     <li>gene products</li>
-     * </ul>
+     * Extracts the counts made on the whole data set for a given group.
      *
-     * @param globalAggregation the aggregation object containing the count values
+     * @see AnnotationRequest.StatsRequest#getGroupName()
+     *
+     * @param globalAggregation the aggregation object containing the group count values
+     * @param groupField the name of the groupField the count was made upon
      * @return an object containing the global counts of things that are of interest
      */
-    private GlobalCounts extractGlobalCounts(Aggregation globalAggregation) {
-        GlobalCounts globalCounts = new GlobalCounts();
-
-        //TODO: remove DRY when extracting Optional
-        globalCounts.annotations = globalAggregation.getAggregationResult(COUNT, AnnotationFields.ID)
-                .map(agg -> (long) agg.getResult()).orElseThrow(() ->
-                        new IllegalArgumentException("Annotation count is null"));
-
-        globalCounts.geneProducts = globalAggregation.getAggregationResult(COUNT, AnnotationFields.GENE_PRODUCT_ID)
-                .map(agg -> (long) agg.getResult()).orElseThrow(() ->
-                        new IllegalArgumentException("Gene product count is null"));
-
-        return globalCounts;
+    private long extractCount(Aggregation globalAggregation, String groupField) {
+        return globalAggregation.getAggregationResult(COUNT, groupField)
+                .map(agg -> (long) agg.getResult()).orElse(NO_COUNT_FOR_GROUP_ERROR);
     }
 
     private Aggregation mockResponse() {
-        Aggregation goIdAgg = new Aggregation(AnnotationFields.GO_ID);
+        Aggregation goIdAgg = new Aggregation(GO_ID);
 
         AggregationBucket goIdBucket1 = new AggregationBucket("GO:0016020");
-        goIdBucket1.addAggregateResult(UNIQUE, AnnotationFields.ID, 2);
-        goIdBucket1.addAggregateResult(UNIQUE, AnnotationFields.GENE_PRODUCT_ID, 3);
+        goIdBucket1.addAggregateResult(UNIQUE, ID, 2);
+        goIdBucket1.addAggregateResult(UNIQUE, GENE_PRODUCT_ID, 3);
         goIdAgg.addBucket(goIdBucket1);
 
         AggregationBucket goIdBucket2 = new AggregationBucket("GO:0016021");
-        goIdBucket2.addAggregateResult(UNIQUE, AnnotationFields.ID, 2);
-        goIdBucket2.addAggregateResult(UNIQUE, AnnotationFields.GENE_PRODUCT_ID, 3);
+        goIdBucket2.addAggregateResult(UNIQUE, ID, 2);
+        goIdBucket2.addAggregateResult(UNIQUE, GENE_PRODUCT_ID, 3);
         goIdAgg.addBucket(goIdBucket2);
 
         AggregationBucket goIdBucket3 = new AggregationBucket("GO:0005737");
-        goIdBucket3.addAggregateResult(UNIQUE, AnnotationFields.ID, 2);
-        goIdBucket3.addAggregateResult(UNIQUE, AnnotationFields.GENE_PRODUCT_ID, 4);
+        goIdBucket3.addAggregateResult(UNIQUE, ID, 2);
+        goIdBucket3.addAggregateResult(UNIQUE, GENE_PRODUCT_ID, 4);
         goIdAgg.addBucket(goIdBucket3);
 
         Aggregation globalAgg = new Aggregation("global");
-        globalAgg.addAggregationResult(COUNT, AnnotationFields.ID, 6);
-        globalAgg.addAggregationResult(COUNT, AnnotationFields.GENE_PRODUCT_ID, 10);
+        globalAgg.addAggregationResult(COUNT, ID, 6);
+        globalAgg.addAggregationResult(COUNT, GENE_PRODUCT_ID, 10);
         globalAgg.addAggregation(goIdAgg);
 
         return globalAgg;
-    }
-
-    /**
-     * Stores the global counts that are necessary to run the statistics
-     */
-    private class GlobalCounts {
-        long annotations;
-        long geneProducts;
     }
 
     /**
@@ -142,49 +128,47 @@ public class AnnotationStatisticsService implements StatisticsService {
      * {@link StatisticsGroup}, that can be presented to the client.
      * </p>
      * This class is capable of creating a single {@link StatisticsGroup} per call to the
-     * {@link StatisticsConverter#convert(Collection)} method.
+     * {@link StatisticsConverter#convert(Collection, long)} method.
      */
     private class StatisticsConverter {
-        private final String field;
-        private final long totalHits;
+        private final String groupField;
         private final String groupName;
 
-        public StatisticsConverter(String field, long totalHits, String groupName) {
-            //TODO: add preconditions
-            this.field = field;
-            this.totalHits = totalHits;
+        StatisticsConverter(String groupName, String groupField) {
             this.groupName = groupName;
+            this.groupField = groupField;
         }
 
-        public StatisticsGroup convert(Collection<Aggregation> aggregations) {
+        StatisticsGroup convert(Collection<Aggregation> aggregations, long totalHits) {
             StatisticsGroup statsGroup = new StatisticsGroup(groupName, totalHits);
 
-            aggregations.stream().map(this::createStatsType)
+            aggregations.stream()
+                    .map(agg -> createStatsType(agg, totalHits))
                     .forEach(statsGroup::addStatsType);
 
             return statsGroup;
         }
 
-        private StatisticsByType createStatsType(Aggregation aggregation) {
+        private StatisticsByType createStatsType(Aggregation aggregation, long totalHits) {
             StatisticsByType type = new StatisticsByType(aggregation.getName());
 
             Set<AggregationBucket> buckets = aggregation.getBuckets();
 
             buckets.stream()
-                    .map(this::createStatsValue)
+                    .map(bucket -> createStatsValue(bucket, totalHits))
                     .forEach(value -> {
                         if (value.isPresent()) {
                             type.addValue(value.get());
                         } else {
-                            logger.warn("No stats for field {}, for type {}", field, type.getType());
+                            logger.warn("No stats for groupField {}, for type {}", groupField, type.getType());
                         }
                     });
 
             return type;
         }
 
-        private Optional<StatisticsValue> createStatsValue(AggregationBucket bucket) {
-            Optional<AggregationResult> resultOpt = bucket.getAggregationResult(UNIQUE, field);
+        private Optional<StatisticsValue> createStatsValue(AggregationBucket bucket, long totalHits) {
+            Optional<AggregationResult> resultOpt = bucket.getAggregationResult(UNIQUE, groupField);
 
             return resultOpt.
                     map(aggResult -> new StatisticsValue(bucket.getValue(), (long) aggResult.getResult(), totalHits));
