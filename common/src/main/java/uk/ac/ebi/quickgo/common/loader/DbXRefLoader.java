@@ -24,15 +24,14 @@ import static java.util.stream.Collectors.toList;
  *
  */
 public class DbXRefLoader {
-
-    private Logger logger = LoggerFactory.getLogger(DbXRefLoader.class);
-
+    
     private static final int COL_DATABASE = 0;
     private static final int COL_ENTITY_TYPE = 1;
     private static final int COL_ENTITY_TYPE_NAME = 2;
     private static final int COL_LOCAL_ID_SYNTAX = 3;
     private static final int COL_URL_SYNTAX = 4;
     private static final String COL_DELIMITER = "\t";
+    private Logger logger = LoggerFactory.getLogger(DbXRefLoader.class);
     private String path;
 
     public DbXRefLoader(String path) {
