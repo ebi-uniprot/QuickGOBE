@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.common.validator.GeneProductDbXRefIDFormat;
-import uk.ac.ebi.quickgo.common.validator.GeneProductDbXRefIDFormats;
+import uk.ac.ebi.quickgo.common.validator.DbXRefEntityID;
+import uk.ac.ebi.quickgo.common.validator.EntityValidation;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import javax.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -32,14 +31,14 @@ public class AnnotationRequestConfig {
      * UniProtKB.
      */
     @Bean
-    public GeneProductDbXRefIDFormats geneProductValidator() {
+    public EntityValidation geneProductValidator() {
 
-        List<GeneProductDbXRefIDFormat> entities = new ArrayList<>();
-        GeneProductDbXRefIDFormat entity1 = new GeneProductDbXRefIDFormat("UniProtKB", "PR:000000001", "protein",
+        List<DbXRefEntityID> entities = new ArrayList<>();
+        DbXRefEntityID entity1 = new DbXRefEntityID("UniProtKB", "PR:000000001", "protein",
                 UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX, "http://www.uniprot.org/uniprot/[example_id]/");
         entities.add(entity1);
 
-        return GeneProductDbXRefIDFormats.createWithData(entities);
+        return EntityValidation.createWithData(entities);
     }
 
     /**
