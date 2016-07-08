@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.common.loader;
 
 
-import uk.ac.ebi.quickgo.common.validator.GeneProductDbXRefIDFormat;
+import uk.ac.ebi.quickgo.common.validator.DbXRefEntityID;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -50,7 +50,7 @@ public class DbXRefLoader {
      * validation, rather than end the process.
      * @return a list of GeneProductDbXRefIDFormat instances that hold the validation regular expressions.
      */
-    public List<GeneProductDbXRefIDFormat> load() {
+    public List<DbXRefEntityID> load() {
 
         try {
 
@@ -59,7 +59,7 @@ public class DbXRefLoader {
             return GZIPFiles.lines(path)
                     .skip(1)    //header
                     .map(line -> line.split(COL_DELIMITER))
-                    .map(fields -> new GeneProductDbXRefIDFormat(fields[COL_DATABASE], fields[COL_ENTITY_TYPE],
+                    .map(fields -> new DbXRefEntityID(fields[COL_DATABASE], fields[COL_ENTITY_TYPE],
                             fields[COL_ENTITY_TYPE_NAME], fields[COL_LOCAL_ID_SYNTAX], fields[COL_URL_SYNTAX]))
                     .collect(toList());
 
