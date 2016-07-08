@@ -48,7 +48,7 @@ public class DbXRefLoader {
      *
      * If the file cannot be loaded supply the client with an empty list, as we will continue without
      * validation, rather than end the process.
-     * @return
+     * @return a list of GeneProductDbXRefIDFormat instances that hold the validation regular expressions.
      */
     public List<GeneProductDbXRefIDFormat> load() {
 
