@@ -8,26 +8,17 @@ import static com.google.common.base.Preconditions.checkArgument;
  * The information for a single Database cross reference.
  * This information is used, for example, to validate gene product ids based on source database and the id type.
  *
- *
  * @author Tony Wardell
  *         Date: 18/04/2016
  *         Time: 13:52
  *         Created with IntelliJ IDEA.
  */
 public class GeneProductDbXRefIDFormat {
-    //E.g. UniProtKB
+
     private final String database;
-
-    //E.g. PR:000000001
     private final String entityType;
-
-    //E.g. protein
     private final String entityTypeName;
-
-    //E.g. regex for validation  ([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])...
     private final Pattern idValidationPattern;
-
-    //E.g. http://www.uniprot.org/uniprot/[example_id]/
     private final String databaseURL;
 
     public GeneProductDbXRefIDFormat(String database, String entityType, String entityTypeName,
@@ -46,29 +37,46 @@ public class GeneProductDbXRefIDFormat {
 
     /**
      * Does the argument match the regular expression that determines validity of the entity?
-     * @param id
-     * @return
+     * @param id the gene product id to be checked
+     * @return true if the gene product id is positively matched to the validation regular expression.3
      */
     public boolean matches(String id) {
         return idValidationPattern.matcher(id).matches();
     }
 
+    /**
+     * @return the name of the database from which gene product ids can be validated, and which provided the
+     * validation regular expression. E.g. UniProtKB
+     */
     public String getDatabase() {
         return database;
     }
 
+    /**
+     * @return  A code that uniquely identifies the type of entity that this class instance applies to e.g.
+     * PR:000000001 for protein;  SO:0000704 for gene.
+     */
     public String getEntityType() {
         return entityType;
     }
 
+    /**
+     * @return A string that identifies the type of entity that this class instance applies to e.g. gene or protein.
+     */
     public String getEntityTypeName() {
         return entityTypeName;
     }
 
+    /**
+     * @return The regular expression used to verify an entity.
+     */
     public Pattern getIdValidationPattern() {
         return idValidationPattern;
     }
 
+    /**
+     * @return The URL of the source database of the entity. e.g. http://www.uniprot.org/uniprot/[example_id]/
+     */
     public String getDatabaseURL() {
         return databaseURL;
     }
