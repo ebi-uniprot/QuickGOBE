@@ -44,7 +44,9 @@ public class EntityValidation {
             return true;
         }
         for (Key dbKey : targetDBs) {
-            if (this.entityList.get(dbKey).matches(id)) {
+            DbXRefEntityID entity = this.entityList.get(dbKey);
+            if(null==entity)continue;
+            if (entity.matches(id)) {
                 return true;
             }
         }
