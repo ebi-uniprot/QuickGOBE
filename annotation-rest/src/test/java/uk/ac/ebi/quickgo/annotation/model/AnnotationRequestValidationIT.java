@@ -55,9 +55,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void allAssignedByValuesAreValid() {
-        String assignedByValues = Arrays.stream(VALID_ASSIGNED_BY_PARMS)
-                .collect(Collectors.joining(","));
-
+        String assignedByValues = gimmeCSV(VALID_ASSIGNED_BY_PARMS);
         annotationRequest.setAssignedBy(assignedByValues);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -237,17 +235,14 @@ public class AnnotationRequestValidationIT {
     //GENE PRODUCT ID
     @Test
     public void allGeneProductValuesAreValid() {
-        String geneProductIdValues = Arrays.stream(VALID_GENE_PRODUCT_ID)
-                .collect(Collectors.joining(","));
+        String geneProductIdValues = gimmeCSV(VALID_GENE_PRODUCT_ID);
         annotationRequest.setGpId(geneProductIdValues);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void allGeneProductValuesAreInvalid() {
-        String geneProductIdValues = Arrays.stream(INVALID_GENE_PRODUCT_ID)
-                .collect(Collectors.joining(","));
-
+        String geneProductIdValues = gimmeCSV(INVALID_GENE_PRODUCT_ID);
         annotationRequest.setGpId(geneProductIdValues);
         assertThat(validator.validate(annotationRequest), hasSize(1));
     }
@@ -312,5 +307,9 @@ public class AnnotationRequestValidationIT {
 
     private void printConstraintViolations(Set<ConstraintViolation<AnnotationRequest>> violations) {
         violations.stream().forEach(System.out::println);
+    }
+
+    private String gimmeCSV(String... values) {
+        return Arrays.stream(values).collect(Collectors.joining(","));
     }
 }
