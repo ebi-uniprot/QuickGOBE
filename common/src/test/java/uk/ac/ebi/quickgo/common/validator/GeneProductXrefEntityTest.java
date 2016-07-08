@@ -26,11 +26,11 @@ public class GeneProductXrefEntityTest {
 	private String idValidationPattern = "([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1}";
 	private String dbURL = " http://www.uniprot.org/uniprot/[example_id]";
 
-	GeneProductDbXRefIDFormat geneProductXrefEntity;
+	DbXRefEntityID geneProductXrefEntity;
 
 	@Before
 	public void setup(){
-		geneProductXrefEntity = new GeneProductDbXRefIDFormat(database, entityType, entityTypeName,
+		geneProductXrefEntity = new DbXRefEntityID(database, entityType, entityTypeName,
 				idValidationPattern, dbURL);
 	}
 
@@ -47,28 +47,28 @@ public class GeneProductXrefEntityTest {
 	@Test
 	public void exceptionThrownIfDatabaseIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		new GeneProductDbXRefIDFormat(null, entityType, entityTypeName, idValidationPattern, dbURL);
+		new DbXRefEntityID(null, entityType, entityTypeName, idValidationPattern, dbURL);
 	}
 
 	@Test
 	public void exceptionThrownIfEntityTypeIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		new GeneProductDbXRefIDFormat(database, null, entityTypeName, idValidationPattern, dbURL);
+		new DbXRefEntityID(database, null, entityTypeName, idValidationPattern, dbURL);
 	}
 
 	@Test
 	public void exceptionThrownIfIdValidationPatternIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		new GeneProductDbXRefIDFormat(database, entityType, entityTypeName, null, dbURL);
+		new DbXRefEntityID(database, entityType, entityTypeName, null, dbURL);
 	}
 
 	@Test
 	public void exceptionNotThrownIfEntityTypeNameIsNull(){
-		new GeneProductDbXRefIDFormat(database, entityType, null, idValidationPattern, dbURL);
+		new DbXRefEntityID(database, entityType, null, idValidationPattern, dbURL);
 	}
 
 	@Test
 	public void exceptionNotThrownIfDbURLIsNull(){
-		new GeneProductDbXRefIDFormat(database, entityType, entityTypeName, idValidationPattern, null);
+		new DbXRefEntityID(database, entityType, entityTypeName, idValidationPattern, null);
 	}
 }
