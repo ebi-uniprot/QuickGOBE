@@ -22,7 +22,7 @@ public class AggregationBucket {
         aggregationResultsManager = new AggregationResultsManager();
     }
 
-    public void addAggregateResult(AggregateFunction function, String name, double result) {
+    public void addAggregationResult(AggregateFunction function, String name, double result) {
         aggregationResultsManager.addAggregateResult(function, name, result);
     }
 
