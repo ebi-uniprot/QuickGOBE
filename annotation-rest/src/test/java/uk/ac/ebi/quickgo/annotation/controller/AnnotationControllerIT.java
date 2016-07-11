@@ -26,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
@@ -432,7 +433,21 @@ public class AnnotationControllerIT {
     }
 
 
+    @Test
+    public void filterByGeneProductIDAndAssignedBySuccessfully() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(GP_PARAM, genericDocs.get(0).geneProductId)
+                        .param(ASSIGNED_BY, genericDocs.get(0).assignedBy));
 
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(0).geneProductId, 1))
+                .andExpect(itemExistsExpectedTimes(ASSIGNED_BY, genericDocs.get(1).assignedBy, 1));
+    }
     //---------- Page related tests.
 
     @Test
