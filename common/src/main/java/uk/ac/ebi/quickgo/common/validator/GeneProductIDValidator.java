@@ -31,12 +31,20 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
         idValidator = xRefFormats::isValidId;
     }
 
-    @Override public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+    @Override public boolean isValid(String s, ConstraintValidatorContext context) {
         if (s == null) {
             return true;
         }
-        List invalidGeneProdIDs = Arrays.stream(s.split(",")).filter(idValidator.negate()).collect
-                (Collectors.toList());
-        return invalidGeneProdIDs.size() == 0;
+        String invalid = Arrays.stream(s.split(",")).filter(idValidator.negate()).collect
+                (Collectors.joining(", "));
+
+        if(invalid == null){
+            return true;
+        }
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate("Provided ID: '" + invalid + "' is invalid")
+                .addConstraintViolation();
+
+        return false;
     }
 }
