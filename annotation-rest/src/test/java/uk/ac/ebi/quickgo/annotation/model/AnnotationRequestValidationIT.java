@@ -111,7 +111,7 @@ public class AnnotationRequestValidationIT {
     @Test
     public void nullAspectIsValid() {
         String aspect = null;
-        annotationRequest.setGpId("A0A000");
+        annotationRequest.setAspect(aspect);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
