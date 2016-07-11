@@ -52,20 +52,20 @@ public class AnnotationFields {
     public static final class Searchable {
         private static final Set<String> VALUES = new HashSet<>();
 
-        public static final String ASSIGNED_BY = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
-        public static final String WITH_FROM_SEARCH = storeAndGet(VALUES, AnnotationFields.WITH_FROM_SEARCH);
-        public static final String TAXON_ID = storeAndGet(VALUES, AnnotationFields.TAXON_ID);
-        public static final String GO_EVIDENCE = storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
-        public static final String QUALIFIER   = storeAndGet(VALUES, AnnotationFields.QUALIFIER);
-        public static final String REFERENCE_SEARCH = storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
         static {
-              final String ASSIGNED_BY = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
-              final String TAXON_ID = storeAndGet(VALUES, AnnotationFields.TAXON_ID);
-              final String GO_EVIDENCE = storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
-              final String QUALIFIER = storeAndGet(VALUES, AnnotationFields.QUALIFIER);
-
+            storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
+            storeAndGet(VALUES, AnnotationFields.WITH_FROM_SEARCH);
+            storeAndGet(VALUES, AnnotationFields.TAXON_ID);
+            storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
+            storeAndGet(VALUES, AnnotationFields.QUALIFIER);
+            storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
+            storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
+            storeAndGet(VALUES, AnnotationFields.TAXON_ID);
+            storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
+            storeAndGet(VALUES, AnnotationFields.QUALIFIER);
+            storeAndGet(VALUES, AnnotationFields.GO_ID);
         }
-        public static final String GO_ID = storeAndGet(VALUES, AnnotationFields.GO_ID);
+
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);
         }
