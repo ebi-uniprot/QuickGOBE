@@ -414,6 +414,25 @@ public class AnnotationControllerIT {
     }
 
 
+    @Test
+    public void filterByThreeGeneProductIdsTwoOfWhichExistToEnsureTheyAreReturned() throws Exception {
+        String geneProductId = "Z0Z000";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId)
+                        .param(GP_PARAM, genericDocs.get(0).geneProductId)
+                        .param(GP_PARAM, genericDocs.get(1).geneProductId));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(0).geneProductId, 1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(1).geneProductId, 1));
+    }
+
+
+
     //---------- Page related tests.
 
     @Test
