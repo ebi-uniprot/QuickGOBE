@@ -62,6 +62,8 @@ public class AnnotationControllerIT {
     private static final String GO_ID_PARAM = "goId";
 
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
+    private static final String VALID_GO_ID = "GO:0003824";
+    private static final String INVALID_GO_ID = "GO:0009871";
 
     private MockMvc mockMvc;
 
@@ -358,38 +360,36 @@ public class AnnotationControllerIT {
 
     @Test
     public void successfullyLookupAnnotationsByGoId() throws Exception {
-        String goId = "GO:0003824";
+
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, goId));
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, VALID_GO_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(GO_ID, goId,3));
+                .andExpect(itemExistsExpectedTimes(GO_ID, VALID_GO_ID, 3));
     }
 
     @Test
     public void successfullyLookupAnnotationsByGoIdCaseInsensitive() throws Exception {
-        String argumentFromClient = "go:0003824";
-        String goId = "GO:0003824";
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, argumentFromClient));
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, VALID_GO_ID.toLowerCase()));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(GO_ID, goId,3));
+                .andExpect(itemExistsExpectedTimes(GO_ID, VALID_GO_ID, 3));
     }
 
     @Test
     public void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
-        String goId = "GO:0009871";
+
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, goId));
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, INVALID_GO_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
