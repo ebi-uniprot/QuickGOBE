@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 import uk.ac.ebi.quickgo.rest.search.results.Aggregation;
 
 /**
- * Converts the response into an {@link Aggregation} data structure that the domain understands.
+ * Converts a Solr response into an {@link Aggregation} data structure that the domain understands.
  *
  * @author Ricardo Antunes
  */
