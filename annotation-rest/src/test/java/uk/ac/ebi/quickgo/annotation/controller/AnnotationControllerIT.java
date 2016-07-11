@@ -63,7 +63,8 @@ public class AnnotationControllerIT {
 
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
     private static final String VALID_GO_ID = "GO:0003824";
-    private static final String INVALID_GO_ID = "GO:0009871";
+    private static final String UNAVAILABLE_GO_ID = "GO:0009871";
+    private static final String INVALID_GO_ID = "GO:1";
 
     private MockMvc mockMvc;
 
@@ -389,7 +390,7 @@ public class AnnotationControllerIT {
     public void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, INVALID_GO_ID));
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, UNAVAILABLE_GO_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -400,9 +401,8 @@ public class AnnotationControllerIT {
 
     @Test
     public void incorrectFormattedGoIdCausesError() throws Exception {
-        String goId = "GO:1";
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, goId));
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, INVALID_GO_ID));
 
         response.andExpect(status().isBadRequest())
                 .andExpect(contentTypeToBeJson());
