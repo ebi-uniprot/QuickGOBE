@@ -12,8 +12,6 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
