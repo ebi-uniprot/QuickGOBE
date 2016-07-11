@@ -401,6 +401,19 @@ public class AnnotationControllerIT {
         response.andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void filterByValidIdThatDoesNotExistExpectZeroResultsButNoError() throws Exception {
+        String geneProductId = "Z0Z000";
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+
     //---------- Page related tests.
 
     @Test
