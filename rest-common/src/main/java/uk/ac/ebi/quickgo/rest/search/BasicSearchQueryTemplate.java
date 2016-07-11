@@ -15,8 +15,8 @@ import java.util.Set;
  *
  * The builder exposes just enough configuration methods to create a simple {@link QueryRequest}. Which means that
  * the builder will not expose advanced configuration methods such as: faceting; highlighting. To enable these you
- * will need to use more advanced templates such as: {@link FacetedSearchQueryTemplate} or
- * {@link HighlightedSearchQueryTemplate}.
+ * will need to use more advanced templates such as: {@link FacetedSearchQueryTemplate};
+ * {@link HighlightedSearchQueryTemplate} and {@link AggregateSearchQueryTemplate}.
  *
  * @author Ricardo Antunes
  */
@@ -121,10 +121,10 @@ public class BasicSearchQueryTemplate {
         }
 
         @Override public QueryRequest build() {
-            return createBuilder().build();
+            return builder().build();
         }
 
-        protected QueryRequest.Builder createBuilder() {
+        @Override public QueryRequest.Builder builder() {
             QueryRequest.Builder builder = new QueryRequest.Builder(query);
             builder.setPageParameters(page, pageSize);
 

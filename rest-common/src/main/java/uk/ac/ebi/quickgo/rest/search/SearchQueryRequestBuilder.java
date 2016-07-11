@@ -9,11 +9,17 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
  * Created 11/04/16
  * @author Edd
  */
-public interface SearchQueryRequestBuilder {
+interface SearchQueryRequestBuilder {
 
     /**
      * Builds a QueryRequest tailored to searching.
      * @return
      */
     QueryRequest build();
+
+    /**
+     * Returns a new instance of
+     * @return
+     */
+    QueryRequest.Builder builder();
 }
