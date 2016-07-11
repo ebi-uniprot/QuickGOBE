@@ -32,7 +32,6 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
 
 /**
@@ -392,14 +391,15 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByGeneProductUsingInvalidIDFailsValidation() throws Exception {
-        String geneProductId = "99999";
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        String invalidGeneProductID = "99999";
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(invalidGeneProductID);
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
+                get(RESOURCE_URL + "/search").param(GP_PARAM, invalidGeneProductID));
 
-        response.andExpect(status().isBadRequest());
+        response.andExpect(status().isBadRequest())
+                .andExpect(messageExists("Provided ID: '" + invalidGeneProductID + "' is invalid"));
     }
 
     @Test
