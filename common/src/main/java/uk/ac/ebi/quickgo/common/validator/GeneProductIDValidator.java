@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Created with IntelliJ IDEA.
  */
 
-public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList,String>{
+public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList, String> {
 
     @Autowired
     EntityValidation xRefFormats;
@@ -32,7 +32,9 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
     }
 
     @Override public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        if(s==null)return true;
+        if (s == null) {
+            return true;
+        }
         List invalidGeneProdIDs = Arrays.stream(s.split(",")).filter(idValidator.negate()).collect
                 (Collectors.toList());
         return invalidGeneProdIDs.size() == 0;
