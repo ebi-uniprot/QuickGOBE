@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;
+import uk.ac.ebi.quickgo.rest.search.solr.SolrResponseAggregationConverter;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
@@ -33,6 +34,8 @@ class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<Annotati
 
         this.documentObjectBinder = documentObjectBinder;
         this.annotationDocConverter = annotationDocConverter;
+
+        this.setAggregationConverter(new SolrResponseAggregationConverter());
     }
 
     /**

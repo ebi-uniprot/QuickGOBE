@@ -9,6 +9,7 @@ import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.apache.solr.client.solrj.SolrResponse;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -19,18 +20,10 @@ import org.apache.solr.common.SolrDocumentList;
  * @author Ricardo Antunes
  */
 public abstract class AbstractSolrQueryResultConverter<T> implements QueryResultConverter<T, QueryResponse> {
-    private final QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>>
+    private QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>>
             queryResultHighlightingConverter;
 
-    public AbstractSolrQueryResultConverter() {
-        queryResultHighlightingConverter = null;
-    }
-
-    public AbstractSolrQueryResultConverter(QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>> queryResultHighlightingConverter){
-        Preconditions.checkArgument(queryResultHighlightingConverter != null, "Field map converter cannot be null");
-
-        this.queryResultHighlightingConverter = queryResultHighlightingConverter;
-    }
+    private AggregationConverter<SolrResponse, Aggregation> aggregationConverter;
 
     @Override public QueryResult<T> convert(QueryResponse toConvert, QueryRequest request) {
         Preconditions.checkArgument(toConvert != null, "Query response cannot be null");
@@ -70,9 +63,16 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
             highlights = queryResultHighlightingConverter.convertResultHighlighting(solrResults, resultHighlights);
         }
 
+        Aggregation aggregation = null;
+
+        if (aggregationConverter != null) {
+            aggregation = aggregationConverter.convert(toConvert);
+        }
+
         return new QueryResult.Builder<>(totalNumberOfResults, results)
                 .withPageInfo(pageInfo)
                 .withFacets(facet)
+                .withAggregation(aggregation)
                 .appendHighlights(highlights)
                 .build();
     }
@@ -111,16 +111,38 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
     }
 
     private PageInfo convertPage(Page page, long totalNumberOfResults) {
+        PageInfo pageInfo;
+
         int resultsPerPage = page.getPageSize();
-        int totalPages = (int) Math.ceil((double) totalNumberOfResults / (double) resultsPerPage);
 
-        Preconditions.checkArgument((page.getPageNumber()-1)<=totalPages, "The requested page number should not be " +
-                "greater " +
-                "than the number of pages available.");
-        int currentPage = (totalPages == 0 ? 0 : page.getPageNumber());
+        if (resultsPerPage > 0) {
+            int totalPages = (int) Math.ceil((double) totalNumberOfResults / (double) resultsPerPage);
 
-        return new PageInfo(totalPages, currentPage, resultsPerPage);
+            Preconditions.checkArgument((page.getPageNumber() - 1) <= totalPages,
+                    "The requested page number should not be greater than the number of pages available.");
+            int currentPage = (totalPages == 0 ? 0 : page.getPageNumber());
+
+            pageInfo = new PageInfo(totalPages, currentPage, resultsPerPage);
+        } else {
+            pageInfo = new PageInfo(1, 1, resultsPerPage);
+        }
+
+        return pageInfo;
     }
 
     protected abstract List<T> convertResults(SolrDocumentList results);
+
+    protected void setQueryResultHighlightingConverter(
+            QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>>
+                    queryResultHighlightingConverter) {
+        if (queryResultHighlightingConverter != null) {
+            this.queryResultHighlightingConverter = queryResultHighlightingConverter;
+        }
+    }
+
+    protected void setAggregationConverter(AggregationConverter<SolrResponse, Aggregation> aggregationConverter) {
+        if (aggregationConverter != null) {
+            this.aggregationConverter = aggregationConverter;
+        }
+    }
 }
