@@ -72,7 +72,7 @@ public class AggregateToStringConverterTest {
     public void fieldAndFunctionAreConvertedSuccessfully() throws Exception {
         String mergedText = convertToSolrAggregation(GP_ID_FIELD, COUNT_FUNCTION);
 
-        assertThat(mergedText, is(COUNT_FUNCTION.getName() + "(" + GP_ID_FIELD + ")"));
+        assertThat(mergedText, is("\""+COUNT_FUNCTION.getName() + "(" + GP_ID_FIELD + ")\""));
     }
 
     @Test
