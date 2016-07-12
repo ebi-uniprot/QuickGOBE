@@ -244,7 +244,11 @@ public class AnnotationRequestValidationIT {
     public void allGeneProductValuesAreInvalid() {
         String geneProductIdValues = gimmeCSV(INVALID_GENE_PRODUCT_ID);
         annotationRequest.setGpId(geneProductIdValues);
-        assertThat(validator.validate(annotationRequest), hasSize(1));
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one 'Gene Product ID' value is invalid: " + Arrays.stream(INVALID_GENE_PRODUCT_ID)
+                        .collect(Collectors.joining(", "))));
     }
 
     //PAGE PARAMETER
