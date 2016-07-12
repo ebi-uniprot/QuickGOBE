@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.Before;
@@ -375,17 +376,21 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByUniProtKBAndIntactAndRNACentralGeneProductIDSuccessfully() throws Exception {
-        String geneProductId = "A1E959,EBI-10043081,URS00000064B1_559292";
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
-        repository.save(doc);
-
+        String uniprotGp = "A1E959";
+        String intactGp = "EBI-10043081";
+        String rnaGp = "URS00000064B1_559292";
+        repository.save( AnnotationDocMocker.createAnnotationDoc(uniprotGp));
+        repository.save(AnnotationDocMocker.createAnnotationDoc(intactGp));
+        repository.save(AnnotationDocMocker.createAnnotationDoc(rnaGp));
+        StringJoiner sj = new StringJoiner(",");
+        sj.add(uniprotGp).add(intactGp).add(rnaGp);
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
+                get(RESOURCE_URL + "/search").param(GP_PARAM, sj.toString()));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(1))
-                .andExpect(fieldsInAllResultsExist(1));
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3));
     }
 
 
