@@ -1,20 +1,22 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import uk.ac.ebi.quickgo.annotation.model.*;
-import uk.ac.ebi.quickgo.rest.search.RetrievalException;
+import uk.ac.ebi.quickgo.rest.search.*;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
 import uk.ac.ebi.quickgo.rest.search.results.Aggregation;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.rest.search.AggregateFunction.*;
 
 /**
@@ -27,50 +29,58 @@ import static uk.ac.ebi.quickgo.rest.search.AggregateFunction.*;
 public class AnnotationStatisticsService implements StatisticsService {
     private static final long NO_COUNT_FOR_GROUP_ERROR = -1L;
 
-//    private static final int FIRST_PAGE = 1;
-//    private static final int RESULTS_PER_PAGE = 0;
+    private static final int FIRST_PAGE = 1;
+    private static final int RESULTS_PER_PAGE = 0;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    //    private final RequestConverterFactory converterFactory;
-    //    private final FacetedSearchQueryTemplate queryTemplate;
-    //    private final SearchService searchService;
+    private final RequestConverterFactory converterFactory;
+    private final SearchService<Annotation> searchService;
+    private final StatsRequestConverter converter;
+
+    @Autowired
+    public AnnotationStatisticsService(RequestConverterFactory converterFactory,
+            SearchService<Annotation> searchService,
+            StatsRequestConverter converter) {
+        this.converterFactory = converterFactory;
+        this.searchService = searchService;
+        this.converter = converter;
+    }
 
     @Override public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
         List<AnnotationRequest.StatsRequest> statsRequest = request.createStatsRequests();
 
-        //        QueryRequest queryRequest = queryTemplate.newBuilder()
-        //                .setFacets(null)
-        //                .setQuery(QuickGOQuery.createAllQuery())
-        //                .setFilters(request.createRequestFilters().stream()
-        //                        .map(converterFactory::convertAggregationPerField)
-        //                        .collect(Collectors.toSet()))
-        //                .setPage(FIRST_PAGE)
-        //                .setPageSize(RESULTS_PER_PAGE)
-        //
-        //                .build();
+        QueryRequest queryRequest = buildQueryRequest(request);
 
-        List<Annotation> results = new ArrayList<>();
+        QueryResult<Annotation> annotationQueryResult = searchService.findByQuery(queryRequest);
 
-        QueryResult<Annotation> annotationQueryResult = new QueryResult.Builder<>(6, results)
-                .appendAggregations(mockResponse())
-                .build();
-
-        List<Aggregation> aggregations = annotationQueryResult.getAggregations();
-
-        //TODO: remove this check, put something that makes more sense.
-        Preconditions.checkArgument(aggregations.size() == 1, "Aggregation size is not 1: " + aggregations.size());
-
-        Aggregation globalAggregation = aggregations.get(0);
+        Aggregation globalAggregation = annotationQueryResult.getAggregation();
 
         List<StatisticsGroup> statsGroups = statsRequest.stream()
-                .map(req -> convert(globalAggregation, req))
+                .map(req -> convertResponse(globalAggregation, req))
                 .collect(Collectors.toList());
 
         return new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
     }
 
-    private StatisticsGroup convert(Aggregation globalAggregation, AnnotationRequest.StatsRequest statsRequest) {
+    private QueryRequest buildQueryRequest(AnnotationRequest request) {
+        BasicSearchQueryTemplate basicTemplate = new BasicSearchQueryTemplate(Collections.emptyList());
+        AggregateSearchQueryTemplate aggregateTemplate = new AggregateSearchQueryTemplate();
+
+        BasicSearchQueryTemplate.Builder basicBuilder = basicTemplate.newBuilder()
+                .setQuery(QuickGOQuery.createAllQuery())
+                .setFilters(request.createRequestFilters().stream()
+                        .map(converterFactory::convert)
+                        .collect(Collectors.toSet()))
+                .setPage(FIRST_PAGE)
+                .setPageSize(RESULTS_PER_PAGE);
+
+        return aggregateTemplate.newBuilder(basicBuilder)
+                .setAggregate(converter.convert(request.createStatsRequests()))
+                .build();
+    }
+
+    private StatisticsGroup convertResponse(Aggregation globalAggregation, AnnotationRequest.StatsRequest statsRequest) {
         StatisticsConverter converter =
                 new StatisticsConverter(statsRequest.getGroupName(), statsRequest.getGroupField());
 
@@ -93,34 +103,8 @@ public class AnnotationStatisticsService implements StatisticsService {
      * @return an object containing the global counts of things that are of interest
      */
     private long extractCount(Aggregation globalAggregation, String groupField) {
-        return globalAggregation.getAggregationResult(COUNT, groupField)
+        return globalAggregation.getAggregationResult(UNIQUE, groupField)
                 .map(agg -> (long) agg.getResult()).orElse(NO_COUNT_FOR_GROUP_ERROR);
-    }
-
-    private Aggregation mockResponse() {
-        Aggregation goIdAgg = new Aggregation(GO_ID);
-
-        AggregationBucket goIdBucket1 = new AggregationBucket("GO:0016020");
-        goIdBucket1.addAggregateResult(UNIQUE, ID, 2);
-        goIdBucket1.addAggregateResult(UNIQUE, GENE_PRODUCT_ID, 3);
-        goIdAgg.addBucket(goIdBucket1);
-
-        AggregationBucket goIdBucket2 = new AggregationBucket("GO:0016021");
-        goIdBucket2.addAggregateResult(UNIQUE, ID, 2);
-        goIdBucket2.addAggregateResult(UNIQUE, GENE_PRODUCT_ID, 3);
-        goIdAgg.addBucket(goIdBucket2);
-
-        AggregationBucket goIdBucket3 = new AggregationBucket("GO:0005737");
-        goIdBucket3.addAggregateResult(UNIQUE, ID, 2);
-        goIdBucket3.addAggregateResult(UNIQUE, GENE_PRODUCT_ID, 4);
-        goIdAgg.addBucket(goIdBucket3);
-
-        Aggregation globalAgg = new Aggregation("global");
-        globalAgg.addAggregationResult(COUNT, ID, 6);
-        globalAgg.addAggregationResult(COUNT, GENE_PRODUCT_ID, 10);
-        globalAgg.addAggregation(goIdAgg);
-
-        return globalAgg;
     }
 
     /**
