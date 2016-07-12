@@ -13,6 +13,7 @@ public class QueryRequest {
     private final List<QuickGOQuery> filters;
     private final List<FieldProjection> projectedFields;
     private final List<FieldHighlight> highlightedFields;
+    private final Aggregate aggregate;
     private final String highlightStartDelim;
     private final String highlightEndDelim;
 
@@ -22,6 +23,7 @@ public class QueryRequest {
             List<QuickGOQuery> filters,
             List<FieldProjection> projectedFields,
             List<FieldHighlight> highlightedFields,
+            Aggregate aggregate,
             String highlightStartDelim,
             String highlightEndDelim) {
         this.query = query;
@@ -30,6 +32,7 @@ public class QueryRequest {
         this.filters = filters;
         this.projectedFields = projectedFields;
         this.highlightedFields = highlightedFields;
+        this.aggregate = aggregate;
         this.highlightStartDelim = highlightStartDelim;
         this.highlightEndDelim = highlightEndDelim;
     }
@@ -62,6 +65,10 @@ public class QueryRequest {
         return projectedFields;
     }
 
+    public Aggregate getAggregate() {
+        return aggregate;
+    }
+
     public String getHighlightStartDelim() {
         return highlightStartDelim;
     }
@@ -77,6 +84,7 @@ public class QueryRequest {
         private Set<QuickGOQuery> filters;
         private Set<FieldProjection> projectedFields;
         private Set<FieldHighlight> highlightedFields;
+        private Aggregate aggregate;
         private String highlightStartDelim;
         private String highlightEndDelim;
 
@@ -119,6 +127,12 @@ public class QueryRequest {
             return this;
         }
 
+        public Builder setAggregate(Aggregate aggregate) {
+            this.aggregate = aggregate;
+
+            return this;
+        }
+
         public Builder setHighlightStartDelim(String highlightStartDelim) {
             this.highlightStartDelim = highlightStartDelim;
             return this;
@@ -137,6 +151,7 @@ public class QueryRequest {
                     new ArrayList<>(filters),
                     new ArrayList<>(projectedFields),
                     new ArrayList<>(highlightedFields),
+                    aggregate,
                     highlightStartDelim,
                     highlightEndDelim);
         }
@@ -171,6 +186,9 @@ public class QueryRequest {
                 that.highlightedFields != null) {
             return false;
         }
+        if (aggregate != null ? !aggregate.equals(that.aggregate) : that.aggregate != null) {
+            return false;
+        }
         if (highlightStartDelim != null ? !highlightStartDelim.equals(that.highlightStartDelim) :
                 that.highlightStartDelim != null) {
             return false;
@@ -187,6 +205,7 @@ public class QueryRequest {
         result = 31 * result + (filters != null ? filters.hashCode() : 0);
         result = 31 * result + (projectedFields != null ? projectedFields.hashCode() : 0);
         result = 31 * result + (highlightedFields != null ? highlightedFields.hashCode() : 0);
+        result = 31 * result + (aggregate != null ? aggregate.hashCode() : 0);
         result = 31 * result + (highlightStartDelim != null ? highlightStartDelim.hashCode() : 0);
         result = 31 * result + (highlightEndDelim != null ? highlightEndDelim.hashCode() : 0);
         return result;
@@ -200,6 +219,7 @@ public class QueryRequest {
                 ", filters=" + filters +
                 ", projectedFields=" + projectedFields +
                 ", highlightedFields=" + highlightedFields +
+                ", aggregate=" + aggregate +
                 ", highlightStartDelim='" + highlightStartDelim + '\'' +
                 ", highlightEndDelim='" + highlightEndDelim + '\'' +
                 '}';

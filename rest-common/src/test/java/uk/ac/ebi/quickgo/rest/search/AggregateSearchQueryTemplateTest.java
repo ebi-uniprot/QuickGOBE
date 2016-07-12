@@ -4,14 +4,13 @@ import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
-import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 /**
  * Tests the behaviour of the {@link AggregateSearchQueryTemplate} class.
@@ -44,47 +43,43 @@ public class AggregateSearchQueryTemplateTest {
     }
 
     @Test
-    public void aggregateBuilderAddsNoAggregationConfigurationBuildsQueryRequestWithNoAggregates() throws Exception {
+    public void aggregateBuilderSetsNoAggregationConfigurationBuildsQueryRequestWithNoAggregates() throws Exception {
         FakeBuilder compositeBuilder = prePopulatedFakeBuilder();
 
         AggregateSearchQueryTemplate.Builder aggBuilder = createBuilder(compositeBuilder);
 
         QueryRequest queryRequest = aggBuilder.build();
 
-        List<Aggregate> retrievedAggregates = queryRequest.getAggregates();
+        Aggregate retrievedAggregates = queryRequest.getAggregate();
 
-        assertThat(retrievedAggregates, hasSize(0));
+        assertThat(retrievedAggregates, is(nullValue()));
     }
 
     @Test
-    public void aggregateBuilderAddsNullAggregationConfigurationBuildsQueryRequestWithNoAggregates() throws Exception {
+    public void aggregateBuilderSetsNullAggregationConfigurationBuildsQueryRequestWithNoAggregates() throws Exception {
         FakeBuilder compositeBuilder = prePopulatedFakeBuilder();
 
         AggregateSearchQueryTemplate.Builder aggBuilder = createBuilder(compositeBuilder);
-        aggBuilder.addAggregates(null);
+        aggBuilder.setAggregate(null);
 
         QueryRequest queryRequest = aggBuilder.build();
 
-        List<Aggregate> retrievedAggregates = queryRequest.getAggregates();
+        Aggregate retrievedAggregate = queryRequest.getAggregate();
 
-        assertThat(retrievedAggregates, hasSize(0));
+        assertThat(retrievedAggregate, is(nullValue()));
     }
 
     @Test
-    public void aggregateBuilderAddsAggregationConfigBuildsQueryRequestWithAggregationConfig() throws Exception {
+    public void aggregateBuilderSetsAggregationConfigBuildsQueryRequestWithAggregationConfig() throws Exception {
         FakeBuilder compositeBuilder = prePopulatedFakeBuilder();
 
         Aggregate expectedAggregate = new Aggregate("annotation");
         AggregateSearchQueryTemplate.Builder aggBuilder = createBuilder(compositeBuilder);
-        aggBuilder.addAggregates(expectedAggregate);
+        aggBuilder.setAggregate(expectedAggregate);
 
         QueryRequest queryRequest = aggBuilder.build();
 
-        List<Aggregate> retrievedAggregates = queryRequest.getAggregates();
-
-        assertThat(retrievedAggregates, hasSize(1));
-
-        Aggregate retrievedAggregate = retrievedAggregates.get(0);
+        Aggregate retrievedAggregate = queryRequest.getAggregate();
 
         assertThat(retrievedAggregate, is(expectedAggregate));
     }

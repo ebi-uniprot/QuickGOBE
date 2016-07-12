@@ -29,25 +29,20 @@ public class AggregateSearchQueryTemplate {
 
     public static class Builder implements SearchQueryRequestBuilder {
         private final QueryRequest.Builder compositeBuilder;
-        private final Set<Aggregate> aggregates;
+        private Aggregate aggregate;
 
         public Builder(SearchQueryRequestBuilder builder) {
             compositeBuilder = builder.builder();
-            aggregates = new LinkedHashSet<>();
         }
 
         /**
          * Add to the collection of aggregates which aggregates should be calculated.
          *
-         * @param aggregates the aggregates to calculate
+         * @param aggregate the aggregate to calculate
          * @return this {@link Builder} instance
          */
-        public Builder addAggregates(Aggregate... aggregates) {
-            if (aggregates != null) {
-                Arrays.stream(aggregates)
-                        .filter(aggregate -> aggregate != null)
-                        .forEach(this.aggregates::add);
-            }
+        public Builder setAggregate(Aggregate aggregate) {
+            this.aggregate = aggregate;
 
             return this;
         }
@@ -59,8 +54,7 @@ public class AggregateSearchQueryTemplate {
         @Override public QueryRequest.Builder builder() {
             QueryRequest.Builder builder = compositeBuilder;
 
-            aggregates.stream()
-                    .forEach(builder::addAggregate);
+            builder.setAggregate(aggregate);
 
             return builder;
         }
