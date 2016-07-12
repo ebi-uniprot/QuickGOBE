@@ -139,7 +139,7 @@ public class AnnotationRequest {
     }
 
     @Pattern(regexp = "[0-9]+(,[0-9]+)*",
-            message = "At least one invalid 'Taxonomic identifier' value is invalid: ${validatedValue}")
+            message = "At least one 'Taxonomic identifier' value is invalid: ${validatedValue}")
     public String getTaxon() {
         return filterMap.get(AnnotationFields.TAXON_ID);
     }
