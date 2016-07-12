@@ -28,6 +28,9 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.DEFINITION)
     public String definition;
 
+    @Field(OntologyFields.DEFINITION_XREFS)
+    public List<String> definitionXrefs;
+
     @Field(OntologyFields.COMMENT)
     public String comment;
 
@@ -78,6 +81,7 @@ public class OntologyDocument implements QuickGODocument {
 
     @Field(OntologyFields.XRELATION)
     public List<String> xRelations;
+
 
     @Override
     public String getUniqueName() {

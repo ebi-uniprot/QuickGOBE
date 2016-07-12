@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * service is working as expected.
  */
 final class ResponseVerifier {
-    public static final String GENEPRODUCT_ID_FIELD = "geneProductId";
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
     public static final String QUALIFIER = "qualifier";
 
@@ -46,6 +45,10 @@ final class ResponseVerifier {
 
     static ResultMatcher valueOccursInCollection(String fieldName, String value) {
         return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
+    }
+
+    static ResultMatcher messageExists(String message){
+        return jsonPath("$.messages", Matchers.hasItem(is(message)));
     }
 
     static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {

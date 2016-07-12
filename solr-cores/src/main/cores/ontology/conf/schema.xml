@@ -30,6 +30,7 @@
     <field name="consider" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="replacedBy" type="string" indexed="false" stored="true"/>
     <field name="definition" type="text_ignorecase" indexed="true" stored="true"/>
+    <field name="definitionXref" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="comment" type="string" indexed="false" stored="true"/>
     <field name="aspect" type="string" indexed="true" stored="true"/>
     <field name="usage" type="string" indexed="false" stored="true"/>

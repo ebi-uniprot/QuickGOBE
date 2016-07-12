@@ -21,6 +21,7 @@ public class OntologyFields {
     public final static String CONSIDER = "consider";
     public final static String REPLACED_BY = "replacedBy";
     public final static String DEFINITION = "definition";
+    public final static String DEFINITION_XREFS = "definitionXref";
     public final static String COMMENT = "comment";
     public final static String ASPECT = "aspect";
     public final static String USAGE = "usage";
@@ -67,6 +68,7 @@ public class OntologyFields {
         public static final String XRELATION = storeAndGet(VALUES, OntologyFields.XRELATION);
         public static final String BLACKLIST = storeAndGet(VALUES, OntologyFields.BLACKLIST);
         public static final String SECONDARY_ID = storeAndGet(VALUES, OntologyFields.SECONDARY_ID);
+        public static final String DEFINITION_XREF = storeAndGet(VALUES, OntologyFields.DEFINITION_XREFS);
 
         public static boolean isRetrievable(String field) {
             return VALUES.contains(field);

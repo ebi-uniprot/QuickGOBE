@@ -4,15 +4,14 @@ import uk.ac.ebi.quickgo.model.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.*;
+import java.util.regex.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -219,7 +218,6 @@ public class GenericTermToODocConverterTest {
         replacedBy.add(replacementTerm);
         when(term.replacedBy()).thenReturn(replacedBy);
 
-
         Optional<OntologyDocument> result = converter.apply(Optional.of(term));
         assertThat(result.isPresent(), is(true));
         OntologyDocument document = result.get();
@@ -252,5 +250,31 @@ public class GenericTermToODocConverterTest {
     public void convertsEmptyOptional() {
         Optional<OntologyDocument> documentOptional = converter.apply(Optional.empty());
         assertThat(documentOptional.isPresent(), is(false));
+    }
+
+    @Test
+    public void extractDefinitionXref() throws Exception {
+        String db1 = "db1";
+        String id1 = "id1";
+
+        XRef xref = mock(XRef.class);
+        when(xref.getId()).thenReturn(id1);
+        when(xref.getDb()).thenReturn(db1);
+
+        when(term.getDefinitionXrefs()).thenReturn(Collections.singletonList(xref));
+
+        List<String> xrefsText = converter.extractDefinitionXrefs(term);
+
+        assertThat(xrefsText, hasSize(1));
+        assertThat(xrefsText, hasItems(containsString(db1), containsString(id1)));
+    }
+
+    @Test
+    public void extractionOfEmptyDefinitionXrefListReturnsEmptyList() throws Exception {
+        when(term.getDefinitionXrefs()).thenReturn(Collections.emptyList());
+
+        List<String> xrefsText = converter.extractDefinitionXrefs(term);
+
+        assertThat(xrefsText, hasSize(0));
     }
 }
