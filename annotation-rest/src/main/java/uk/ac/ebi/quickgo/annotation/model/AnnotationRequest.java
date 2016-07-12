@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.*;
+import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
@@ -197,24 +198,9 @@ public class AnnotationRequest {
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
-        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
-        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
-        createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
-        createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
-        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
-        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
-        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
-        createSimpleFilter(GENE_PRODUCT_ID).ifPresent(filterRequests::add);
-        createSimpleFilter(ECO_ID).ifPresent(filterRequests::add);
-
-
-
-//        todo is this an alternative method of creating the filters?
-//        Arrays.stream(targetFields)
-//                .map(t -> createSimpleFilter(t))
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .map(filterRequests::add);
+        Stream.of(targetFields)
+                .map(this::createSimpleFilter)
+                .forEach(f ->f.ifPresent(filterRequests::add));
 
         return filterRequests;
     }
