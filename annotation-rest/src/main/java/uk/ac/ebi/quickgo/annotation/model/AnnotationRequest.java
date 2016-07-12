@@ -155,7 +155,8 @@ public class AnnotationRequest {
         filterMap.put(ECO_ID,ecoId);
     }
 
-    @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*")
+    @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*",
+            message = "At least one invalid 'ECO identifier' value is invalid: ${validatedValue}")
     public String getEcoId(){
         return filterMap.get(ECO_ID);
     }
