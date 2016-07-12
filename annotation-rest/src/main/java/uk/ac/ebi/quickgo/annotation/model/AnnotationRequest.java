@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.*;
-import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
@@ -37,8 +36,8 @@ public class AnnotationRequest {
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
     private static final String ASPECT_FIELD = "aspect";
-    private static final String[] targetFields = new String[]{ASPECT_FIELD, ASSIGNED_BY,
-            TAXON_ID, GO_EVIDENCE, QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID};
+    private static final String[] targetFields = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID};
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -205,8 +204,17 @@ public class AnnotationRequest {
         createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
         createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
         createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
-
         createSimpleFilter(GENE_PRODUCT_ID).ifPresent(filterRequests::add);
+        createSimpleFilter(ECO_ID).ifPresent(filterRequests::add);
+
+
+
+//        todo is this an alternative method of creating the filters?
+//        Arrays.stream(targetFields)
+//                .map(t -> createSimpleFilter(t))
+//                .filter(Optional::isPresent)
+//                .map(Optional::get)
+//                .map(filterRequests::add);
 
         return filterRequests;
     }
