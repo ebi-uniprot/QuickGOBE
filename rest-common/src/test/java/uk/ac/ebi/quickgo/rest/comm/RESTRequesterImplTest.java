@@ -39,7 +39,6 @@ public class RESTRequesterImplTest {
         requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT);
 
         requestParameters = new HashMap<>();
-        requesterBuilder.setRequestParameters(requestParameters);
     }
 
     @Test
@@ -88,15 +87,9 @@ public class RESTRequesterImplTest {
         requesterBuilder.addRequestParameter("name", null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void addingRequestParamsWithNullValueThrowsException() {
-        requesterBuilder.setRequestParameters(null);
-    }
-
     @Test
     public void addingRequestParamsResultsInTheseParamsBeingUsed() {
         addRequestParameter("param1", "value1");
-        requesterBuilder.setRequestParameters(requestParameters);
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
@@ -165,9 +158,8 @@ public class RESTRequesterImplTest {
     }
 
     private void addRequestParameter(String param, String value) {
-        if (!requestParameters.containsKey(param)) {
-            requestParameters.put(param, value);
-        }
+        requestParameters.put(param, value);
+        requesterBuilder.addRequestParameter(param, value);
     }
 
     static class FakeDTO {
@@ -175,6 +167,10 @@ public class RESTRequesterImplTest {
 
         FakeDTO(String value) {
             this.value = value;
+        }
+
+        @Override public int hashCode() {
+            return value != null ? value.hashCode() : 0;
         }
 
         @Override public boolean equals(Object o) {
@@ -189,10 +185,6 @@ public class RESTRequesterImplTest {
 
             return value != null ? value.equals(fakeDTO.value) : fakeDTO.value == null;
 
-        }
-
-        @Override public int hashCode() {
-            return value != null ? value.hashCode() : 0;
         }
     }
 

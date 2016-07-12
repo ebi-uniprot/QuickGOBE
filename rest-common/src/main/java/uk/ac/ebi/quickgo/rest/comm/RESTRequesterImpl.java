@@ -77,14 +77,6 @@ public class RESTRequesterImpl implements RESTRequester {
             return this;
         }
 
-        public Builder setRequestParameters(Map<String, String> requestParameters) {
-            Preconditions.checkArgument(requestParameters != null, "RequestParameters cannot be null");
-
-            this.requestParameters = requestParameters;
-
-            return this;
-        }
-
         private void checkURL(String url) {
             Preconditions.checkArgument(url != null && !url.trim().isEmpty(), "URL cannot be null or empty");
         }
