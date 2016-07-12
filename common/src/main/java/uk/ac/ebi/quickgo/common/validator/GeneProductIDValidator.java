@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList, String> {
 
+    private static final String MESSAGE = "At least one 'Gene Product ID' value is invalid: %s";
+
     @Autowired
     EntityValidation xRefFormats;
     private Predicate<String> idValidator;
@@ -42,7 +44,7 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
             return true;
         }
         context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate("Provided ID: '" + invalid + "' is invalid")
+        context.buildConstraintViolationWithTemplate(String.format(MESSAGE, invalid))
                 .addConstraintViolation();
 
         return false;
