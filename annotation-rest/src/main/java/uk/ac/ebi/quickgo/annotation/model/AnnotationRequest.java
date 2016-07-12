@@ -8,13 +8,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
-
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -143,6 +137,17 @@ public class AnnotationRequest {
     public String getTaxon() {
         return filterMap.get(AnnotationFields.TAXON_ID);
     }
+
+    void setGeneProductType(String geneProductType){
+        filterMap.put(DB_OBJECT_TYPE, geneProductType);
+    }
+
+    @Pattern(regexp = "((?i)(complex|rna|protein),?){1,3}",
+            message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
+    String getGeneProductType(){
+        return filterMap.get(DB_OBJECT_TYPE);
+    }
+
 
     public int getLimit() {
         return limit;
