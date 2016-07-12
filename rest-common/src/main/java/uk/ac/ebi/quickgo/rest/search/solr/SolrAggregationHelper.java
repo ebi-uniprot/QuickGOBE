@@ -2,35 +2,53 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 
+import com.google.common.base.Preconditions;
+
 /**
- * Defines a set of constants and utility methods to aid in the processing of aggregation results in Solr
- * requests/responses.
+ * Defines a set of constants and utility methods to aid in the processing of aggregation requests and results from
+ * Solr to the domain model, and vice versa.
  *
  * @author Ricardo Antunes
  */
 class SolrAggregationHelper {
-    static String GLOBAL_ID = "global";
+    static final String GLOBAL_ID = "global";
 
-    static String AGG_TYPE_PREFIX = "agg";
-    static String AGG_SEPARATOR = "_";
+    static final String AGG_TYPE_PREFIX = "agg";
 
-    static String BUCKETS_ID = "buckets";
-    static String BUCKET_FIELD_ID = "val";
+    static final String NAME_TO_VALUE_SEPARATOR = ":";
+    static final String DECLARATION_SEPARATOR = ",";
 
-    static String FACET_MARKER = "facets";
+    static final String BUCKETS_ID = "buckets";
+    static final String BUCKET_FIELD_ID = "val";
 
-    static String mergeFunctionWithField(AggregateFunction function, String field) {
-        return function.getName() + AGG_SEPARATOR + field;
+    static final String FACETS_MARKER = "facets";
+    static final String FACET_MARKER = "facet";
+    static final String FACET_TYPE_TERM = "terms";
+
+    static final String AGG_NAME_SEPARATOR = "_";
+
+    static String aggregateFieldTitle(AggregateFunction function, String field) {
+        Preconditions.checkArgument(function != null,
+                "Cannot create aggregate field title with null aggregate function");
+        Preconditions.checkArgument(field != null && !field.trim().isEmpty(),
+                "Cannot create aggregate field title with null field");
+
+        return function.getName() + AGG_NAME_SEPARATOR + field;
     }
 
-    static String mergeAggPrefixWithField(String field) {
-        return AGG_TYPE_PREFIX + AGG_SEPARATOR + field;
+    static String aggregatePrefixWithTypeTitle(String type) {
+        Preconditions.checkArgument(type != null && !type.trim().isEmpty(),
+                "Cannot create aggregate type title with null or empty type");
+
+        return AGG_TYPE_PREFIX + AGG_NAME_SEPARATOR + type;
     }
 
     static String fieldPrefixExtractor(String field) {
-        int separatorPos = field.indexOf(AGG_SEPARATOR);
+        Preconditions.checkArgument(field != null, "Cannot extract prefix from null input");
 
-        String prefix = null;
+        int separatorPos = field.indexOf(AGG_NAME_SEPARATOR);
+
+        String prefix = "";
 
         if (separatorPos != -1) {
             prefix = field.substring(0, separatorPos);
@@ -40,9 +58,11 @@ class SolrAggregationHelper {
     }
 
     static String fieldNameExtractor(String field) {
-        int separatorPos = field.indexOf(AGG_SEPARATOR);
+        Preconditions.checkArgument(field != null, "Cannot extract field from null input");
 
-        String fieldName = null;
+        int separatorPos = field.indexOf(AGG_NAME_SEPARATOR);
+
+        String fieldName = "";
 
         if (separatorPos != -1) {
             fieldName = field.substring(separatorPos + 1, field.length());
