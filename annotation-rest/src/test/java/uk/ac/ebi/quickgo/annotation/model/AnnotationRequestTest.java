@@ -125,6 +125,15 @@ public class AnnotationRequestTest {
     }
 
     @Test
+    public void setAndGetUsageRelationships() {
+        String usageRelationships = "iS_,paRt_of";
+
+        annotationRequest.setUsageRelationships(usageRelationships);
+
+        assertThat(annotationRequest.getUsageRelationships(), is(usageRelationships.toLowerCase()));
+    }
+
+    @Test
     public void createsFilterWithCaseInsensitiveUsageAndUsageIds() {
         String usage = "descEndants";
         String usageId = "GO:0000001";
