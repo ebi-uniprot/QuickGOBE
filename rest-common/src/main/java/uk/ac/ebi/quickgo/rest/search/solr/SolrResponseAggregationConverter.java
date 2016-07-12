@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.AGG_TYPE_PREFIX;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKETS_ID;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKET_FIELD_ID;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.FACET_MARKER;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.FACETS_MARKER;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.GLOBAL_ID;
 
 /**
@@ -78,7 +78,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
     }
 
     private NamedList<?> extractFacetsFromResponse(SolrResponse response) {
-        return (NamedList<?>) response.getResponse().get(FACET_MARKER);
+        return (NamedList<?>) response.getResponse().get(FACETS_MARKER);
     }
 
     private void convertAggregateFacets(NamedList<?> facetData, Aggregation aggregation) {
@@ -90,7 +90,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
     private void convertFacetValue(String field, Object value, Aggregation aggregation) {
         String prefix = SolrAggregationHelper.fieldPrefixExtractor(field);
 
-        if (prefix != null) {
+        if (!prefix.isEmpty()) {
             String name = SolrAggregationHelper.fieldNameExtractor(field);
 
             if (AGG_TYPE_PREFIX.equals(prefix)) {
@@ -127,7 +127,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
     private void convertBucketValue(String bucketField, Object bucketValue, AggregationBucket bucket) {
         String prefix = SolrAggregationHelper.fieldPrefixExtractor(bucketField);
 
-        if (prefix != null) {
+        if (!prefix.isEmpty()) {
             String facetName = SolrAggregationHelper.fieldNameExtractor(bucketField);
 
             AggregateFunction function = AggregateFunction.typeOf(prefix);
