@@ -22,7 +22,7 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
  */
 public class AggregateToStringConverter implements AggregateConverter<String> {
     //Solr syntax formatters
-    private static final String AGG_FUNCTION_FORMAT = "%s(%s)";
+    private static final String AGG_FUNCTION_FORMAT = "\"%s(%s)\"";
     private static final String AGG_BLOCK_FORMAT = "{%s}";
     private static final String FACET_TYPE_FORMAT = "type" + NAME_TO_VALUE_SEPARATOR + "%s";
     private static final String FACET_FIELD_FORMAT = "field" + NAME_TO_VALUE_SEPARATOR + "%s";
@@ -31,10 +31,13 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
         Preconditions.checkArgument(aggregate != null, "Aggregate to convert cannot be null");
 
         String aggFieldsText = convertAggregationFields(aggregate.getFields().stream());
-
         String nestedAggText = convertNestedAggregates(aggregate.getNestedAggregates().stream());
 
-        return encloseBlock(aggFieldsText + nestedAggText);
+        String finalText = Stream.of(aggFieldsText, nestedAggText)
+                .filter(text -> !text.isEmpty())
+                .collect(joining(DECLARATION_SEPARATOR));
+
+        return encloseBlock(finalText);
     }
 
     static String convertToSolrAggregation(String field, AggregateFunction function) {
