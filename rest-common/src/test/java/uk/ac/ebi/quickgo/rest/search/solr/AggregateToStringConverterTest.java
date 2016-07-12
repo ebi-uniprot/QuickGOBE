@@ -165,7 +165,7 @@ public class AggregateToStringConverterTest {
 
         String convertedAggregation = converter.convert(aggregate);
 
-        assertThat(convertedAggregation, containsString(aggregatePrefixWithFieldTitle(GO_ID_TYPE)));
+        assertThat(convertedAggregation, containsString(aggregatePrefixWithTypeTitle(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
         assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
     }
@@ -179,7 +179,7 @@ public class AggregateToStringConverterTest {
 
         String convertedAggregation = converter.convert(aggregate);
 
-        assertThat(convertedAggregation, containsString(aggregatePrefixWithFieldTitle(GO_ID_TYPE)));
+        assertThat(convertedAggregation, containsString(aggregatePrefixWithTypeTitle(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
         assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createSolrAggregation(GO_ID_TYPE, COUNT_FUNCTION)));

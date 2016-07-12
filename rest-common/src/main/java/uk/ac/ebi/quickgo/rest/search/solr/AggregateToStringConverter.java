@@ -145,7 +145,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
                 + createFacetField(nestedAggregate.getName()) + DECLARATION_SEPARATOR
                 + facetBlock;
 
-        return aggregatePrefixWithFieldTitle(nestedAggregate.getName())
+        return aggregatePrefixWithTypeTitle(nestedAggregate.getName())
                 + NAME_TO_VALUE_SEPARATOR
                 + encloseBlock(subFacet);
     }

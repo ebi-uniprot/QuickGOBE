@@ -26,7 +26,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKETS_ID;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKET_FIELD_ID;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.FACET_MARKER;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.FACETS_MARKER;
 
 /**
  * Tests the behaviour of the {@link SolrResponseAggregationConverter} class.
@@ -99,7 +99,7 @@ public class SolrResponseAggregationConverterTest {
 
     @Test
     public void solrResponseWithAggregatedBucketInGlobalFacetConvertToANonNullAggregate() throws Exception {
-        String aggTypeGoId = SolrAggregationHelper.mergeAggPrefixWithField("goId");
+        String aggTypeGoId = SolrAggregationHelper.aggregatePrefixWithTypeTitle("goId");
         SolrBucket bucket = new SolrBucket(aggTypeGoId);
         aggFacet.addBucket(bucket);
 
@@ -140,7 +140,7 @@ public class SolrResponseAggregationConverterTest {
         String bucketValue1 = "GO:0000001";
         String bucketValue2 = "GO:0000002";
 
-        String aggTypeGoId = SolrAggregationHelper.mergeAggPrefixWithField("goId");
+        String aggTypeGoId = SolrAggregationHelper.aggregatePrefixWithTypeTitle("goId");
         SolrBucket bucket = new SolrBucket(aggTypeGoId);
         bucket.addValueAndAggResults(bucketValue1);
         bucket.addValueAndAggResults(bucketValue2);
@@ -171,7 +171,7 @@ public class SolrResponseAggregationConverterTest {
 
         SolrAggregationResult result = new SolrAggregationResult(field, countFunc, hits);
 
-        String aggTypeGoId = SolrAggregationHelper.mergeAggPrefixWithField("goId");
+        String aggTypeGoId = SolrAggregationHelper.aggregatePrefixWithTypeTitle("goId");
         SolrBucket bucket = new SolrBucket(aggTypeGoId);
         bucket.addValueAndAggResults(bucketValue1, result);
 
@@ -195,7 +195,7 @@ public class SolrResponseAggregationConverterTest {
 
     private void addFacetsToResponse(SolrFacet facet) {
         NamedList<Object> queryResponse = new NamedList<>();
-        queryResponse.add(FACET_MARKER, facet.facetValues);
+        queryResponse.add(FACETS_MARKER, facet.facetValues);
 
         when(response.getResponse()).thenReturn(queryResponse);
     }
@@ -222,7 +222,7 @@ public class SolrResponseAggregationConverterTest {
 
         private void addFunction(SolrAggregationResult result) {
 
-            String aggField = SolrAggregationHelper.mergeFunctionWithField(result.function, result.field);
+            String aggField = SolrAggregationHelper.aggregateFieldTitle(result.function, result.field);
             facetValues.add(aggField, result.hits);
         }
 
@@ -252,7 +252,7 @@ public class SolrResponseAggregationConverterTest {
             bucketValue.add(BUCKET_FIELD_ID, value);
 
             Arrays.stream(results).forEach(result -> {
-                        String aggField = SolrAggregationHelper.mergeFunctionWithField(result.function, result.field);
+                        String aggField = SolrAggregationHelper.aggregateFieldTitle(result.function, result.field);
                         bucketValue.add(aggField, result.hits);
                     }
 
