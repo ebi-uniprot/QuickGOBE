@@ -398,8 +398,7 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GP_PARAM, invalidGeneProductID));
 
-        response.andExpect(status().isBadRequest())
-                .andExpect(messageExists("Provided ID: '" + invalidGeneProductID + "' is invalid"));
+        response.andExpect(status().isBadRequest());
     }
 
     @Test
