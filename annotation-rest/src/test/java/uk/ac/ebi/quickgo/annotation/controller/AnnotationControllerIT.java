@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.Searchable.GENEPRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
@@ -70,6 +71,7 @@ public class AnnotationControllerIT {
     private static final String EXISTING_ECO_ID1 = "ECO:0000256";
     private static final String EXISTING_ECO_ID2 = "ECO:0000323";  //exists
     private static final String NOTEXISTS_ECO_ID3 = "ECO:0000888";  //doesn't exist
+
     final static String REFERENCE_ID = "GO_REF:0000002";
     public static final int NUM_RESULTS = 6;
     private MockMvc mockMvc;
@@ -90,25 +92,10 @@ public class AnnotationControllerIT {
 
         genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
         repository.save(genericDocs);
-        genericDocs = createGenericDocs2(NUMBER_OF_GENERIC_DOCS);
+        genericDocs = createAlternativeGenericDocs(NUMBER_OF_GENERIC_DOCS);
         repository.save(genericDocs);
     }
 
-    private List<AnnotationDocument> createGenericDocs(int n) {
-        return IntStream.range(0, n)
-                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i))).collect
-                        (Collectors.toList());
-    }
-
-    private List<AnnotationDocument> createGenericDocs2(int n) {
-        return IntStream.range(0, n)
-                .mapToObj(i -> AnnotationDocMocker.createAlternativeAnnotationDoc(createId(i))).collect
-                        (Collectors.toList());
-    }
-
-    private String createId(int idNum) {
-        return String.format("A0A%03d", idNum);
-    }
 
     //ASSIGNED BY
     @Test
@@ -127,15 +114,9 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId));
     }
 
-    private AnnotationDocument createDocWithAssignedBy(String geneProductId, String assignedBy) {
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
-        doc.assignedBy = assignedBy;
-
-        return doc;
-    }
 
     @Test
     public void lookupAnnotationFilterByMultipleAssignedBySuccessfully() throws Exception {
@@ -158,7 +139,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId1, geneProductId2));
     }
 
     @Test
@@ -185,7 +166,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId1, geneProductId2));
     }
 
     @Test
@@ -215,7 +196,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId));
     }
 
     @Test
@@ -245,15 +226,9 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId));
     }
 
-    private AnnotationDocument createDocWithTaxonId(String geneProductId, int taxonId) {
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
-        doc.taxonId = taxonId;
-
-        return doc;
-    }
 
     @Test
     public void lookupAnnotationFilterByMultipleTaxonIdsSuccessfully() throws Exception {
@@ -278,7 +253,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId1, geneProductId2));
     }
 
     @Test
@@ -575,9 +550,6 @@ public class AnnotationControllerIT {
                 );
     }
 
-    private int totalPages(int totalEntries, int resultsPerPage) {
-        return (int) Math.ceil(totalEntries / resultsPerPage) + 1;
-    }
 
     @Test
     public void pageRequestEqualToAvailablePagesReturns200() throws Exception {
@@ -586,7 +558,7 @@ public class AnnotationControllerIT {
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(genericDocs.size()))
+                .andExpect(totalNumOfResults(6))
                 .andExpect(
                         pageInfoMatches(
                                 1,
@@ -879,8 +851,18 @@ public class AnnotationControllerIT {
                         (Collectors.toList());
     }
 
+    private List<AnnotationDocument> createAlternativeGenericDocs(int n) {
+        return IntStream.range(0, n)
+                .mapToObj(i -> AnnotationDocMocker.createAlternativeAnnotationDoc(createAlternativeId(i))).collect
+                        (Collectors.toList());
+    }
+
     private String createId(int idNum) {
         return String.format("A0A%03d", idNum);
+    }
+
+    private String createAlternativeId(int idNum) {
+        return String.format("B0A%03d", idNum);
     }
 
     private int totalPages(int totalEntries, int resultsPerPage) {
