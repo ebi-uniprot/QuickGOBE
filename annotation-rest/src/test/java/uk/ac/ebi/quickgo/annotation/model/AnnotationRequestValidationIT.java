@@ -268,9 +268,9 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void goIdIsInvalid() {
-        String[] goIds = {"GO:4", "xxx:0009999", "-"};
+        String[] invalidGoIds = {"GO:4", "xxx:0009999", "-"};
 
-        Arrays.stream(goIds).forEach(
+        Arrays.stream(invalidGoIds).forEach(
                 id -> {
                     annotationRequest.setGoId(id);
 
@@ -278,6 +278,8 @@ public class AnnotationRequestValidationIT {
                     printConstraintViolations(violations);
 
                     assertThat(violations, hasSize(1));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one invalid 'GO Id' value is invalid: " + id));
                 }
         );
     }
