@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,11 +71,17 @@ public class AnnotationControllerStatisticsIT {
 
     //--------------------- Annotation based stats ---------------------//
     //----------- Ontology ID -----------//
+    @Ignore
     @Test
     public void searchResultOf6DocumentsWithATotalOfThreeOntologyIdsReturnsResponseWith3OntologyIdStats()
             throws Exception {
+
+        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc.goId = "GO:0016020";
+        repository.save(extraDoc);
+
         String group = "annotation";
-        String type = "ontologyId";
+        String type = AnnotationFields.GO_ID;
         String[] keys = {"GO:0016020", "GO:0016021", "GO:0005737"};
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/stats"));
@@ -81,15 +89,15 @@ public class AnnotationControllerStatisticsIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(1))
-                .andExpect(totalHitsInGroup(group, 6))
+                .andExpect(totalNumOfResults(2))
+                .andExpect(totalHitsInGroup(group, 4))
                 .andExpect(keysInTypeWithinGroup(group, type, keys));
     }
 
     private List<AnnotationDocument> createGenericDocs(int n) {
         return IntStream.range(0, n)
-                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i))).collect
-                        (Collectors.toList());
+                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i)))
+                .collect(Collectors.toList());
     }
 
     private String createId(int idNum) {
