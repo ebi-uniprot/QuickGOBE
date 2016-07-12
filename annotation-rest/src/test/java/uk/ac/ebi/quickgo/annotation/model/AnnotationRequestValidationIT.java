@@ -230,6 +230,40 @@ public class AnnotationRequestValidationIT {
                 is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
     }
 
+    //GENE PRODUCT TYPE PARAMETER
+    @Test
+    public void validGeneProductTypeValuesDontCauseAnError(){
+        String validIds = "complex,rna,protein";
+        annotationRequest.setGeneProductType(validIds);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+
+    @Test
+    public void validGeneProductTypeNotCaseSensitive(){
+        String validIds = "comPlex,rnA,pRotein";
+        annotationRequest.setGeneProductType(validIds);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+
+    @Test
+    public void invalidGeneProductTypesCauseError() {
+        String[] invalidGeneProductTypes = {"xxx", "000", "..."};
+
+        Arrays.stream(invalidGeneProductTypes).forEach(
+                invalidValue -> {
+                    annotationRequest.setGeneProductType(invalidValue);
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    assertThat(violations, hasSize(is(1)));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'Gene Product Type' value is invalid: " + invalidValue));
+                }
+        );
+    }
+
+
+
     //PAGE PARAMETER
     @Test
     public void negativePageValueIsInvalid() {
