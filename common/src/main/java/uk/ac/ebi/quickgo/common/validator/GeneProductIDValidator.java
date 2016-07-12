@@ -40,7 +40,7 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
         String invalid = Arrays.stream(s.split(",")).filter(idValidator.negate()).collect
                 (Collectors.joining(", "));
 
-        if(invalid == null){
+        if(invalid != null && invalid.isEmpty()){
             return true;
         }
         context.disableDefaultConstraintViolation();
