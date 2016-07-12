@@ -169,8 +169,8 @@ public class AnnotationRequestTest {
     @Test
     public void setAndGetQualifier() {
         String qualifier = "NOT";
-        annotationRequest.setQualifier((qualifier));
-        assertThat(annotationRequest.getQualifter(), is(qualifier));
+        annotationRequest.setQualifier(qualifier);
+        assertThat(annotationRequest.getQualifier(), is(qualifier));
     }
 
     @Test

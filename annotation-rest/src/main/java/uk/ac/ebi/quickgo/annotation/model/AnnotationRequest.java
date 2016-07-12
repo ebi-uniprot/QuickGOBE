@@ -82,7 +82,7 @@ public class AnnotationRequest {
         filterMap.put(QUALIFIER, qualifier);
     }
 
-    public String getQualifter(){
+    public String getQualifier() {
         return filterMap.get(QUALIFIER);
     }
 
