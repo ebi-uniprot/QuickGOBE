@@ -153,7 +153,8 @@ public class AnnotationRequest {
         filterMap.put(GO_ID,goId);
     }
 
-    @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*")
+    @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*",
+            message = "At least one 'GO Id' value is invalid: ${validatedValue}")
     public String getGoId(){
         return filterMap.get(GO_ID);
     }
