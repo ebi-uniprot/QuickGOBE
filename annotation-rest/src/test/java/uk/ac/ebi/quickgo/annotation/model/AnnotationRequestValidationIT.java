@@ -270,12 +270,13 @@ public class AnnotationRequestValidationIT {
         String[] ecoIds = {"ECO:9", "xxx:0000888", "-"};
 
         Arrays.stream(ecoIds).forEach(
-                validIds -> {
-                    annotationRequest.setEcoId(validIds);
+                validId -> {
+                    annotationRequest.setEcoId(validId);
 
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     printConstraintViolations(violations);
-
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one invalid 'ECO identifier' value is invalid: " + validId));
                     assertThat(violations, hasSize(1));
                 }
         );
