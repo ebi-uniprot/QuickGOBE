@@ -7,6 +7,7 @@ import com.google.common.base.Strings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import org.springframework.batch.item.ItemProcessor;
 
@@ -25,6 +26,12 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.c
 public class AnnotationDocumentConverter implements ItemProcessor<Annotation, AnnotationDocument> {
     static final int DEFAULT_TAXON = 0;
 
+    private final AtomicLong documentCounter;
+
+    AnnotationDocumentConverter() {
+        documentCounter = new AtomicLong(0L);
+    }
+
     @Override public AnnotationDocument process(Annotation annotation) throws Exception {
         if (annotation == null) {
             throw new DocumentReaderException("Annotation object is null");
@@ -34,6 +41,7 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
 
         AnnotationDocument doc = new AnnotationDocument();
 
+        doc.id = Long.toString(documentCounter.getAndIncrement());
         doc.geneProductId = constructGeneProductId(annotation);
         doc.qualifier = annotation.qualifier;
         doc.goId = annotation.goId;

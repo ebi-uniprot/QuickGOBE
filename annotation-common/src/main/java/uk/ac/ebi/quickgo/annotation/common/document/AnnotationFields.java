@@ -59,6 +59,7 @@ public class AnnotationFields {
         public static final String ECO_ID = storeAndGet(VALUES, AnnotationFields.ECO_ID);
         public static final String QUALIFIER   = storeAndGet(VALUES, AnnotationFields.QUALIFIER);
         public static final String REFERENCE_SEARCH = storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
+        public static final String GENEPRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);

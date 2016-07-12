@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.*;
@@ -11,6 +11,7 @@ import javax.validation.constraints.Pattern;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ECO_ID;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
@@ -70,12 +71,12 @@ public class AnnotationRequest {
      * @return
      */
     public void setReference(String reference){
-        filterMap.put(AnnotationFields.REFERENCE_SEARCH, reference);
+        filterMap.put(REFERENCE_SEARCH, reference);
     }
 
     //todo create validation pattern @Pattern(regexp = "")
     public String getReference(){
-        return filterMap.get(AnnotationFields.REFERENCE_SEARCH);
+        return filterMap.get(REFERENCE_SEARCH);
     }
 
 
@@ -90,6 +91,22 @@ public class AnnotationRequest {
     public String getAspect() {
         return filterMap.get(ASPECT_FIELD);
     }
+
+    /**
+     * Gene Product IDs, in CSV format.
+     */
+
+    public void setGpId(String listOfGeneProductIDs){
+        if(listOfGeneProductIDs != null) {
+            filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
+        }
+    }
+
+    @GeneProductIDList
+    public String getGpId(){
+        return filterMap.get(GENE_PRODUCT_ID);
+    }
+
 
     /**
      * The older evidence codes
@@ -142,9 +159,9 @@ public class AnnotationRequest {
     }
 
     @Pattern(regexp = "[0-9]+(,[0-9]+)*",
-            message = "At least one invalid 'Taxonomic identifier' value is invalid: ${validatedValue}")
+            message = "At least one 'Taxonomic identifier' value is invalid: ${validatedValue}")
     public String getTaxon() {
-        return filterMap.get(AnnotationFields.TAXON_ID);
+        return filterMap.get(TAXON_ID);
     }
 
     /**
@@ -181,9 +198,15 @@ public class AnnotationRequest {
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
-        Stream.of(targetFields)
-                .map(this::createSimpleFilter)
-                .forEach(f ->f.ifPresent(filterRequests::add));
+        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
+        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
+        createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
+        createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
+        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
+        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
+        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
+
+        createSimpleFilter(GENE_PRODUCT_ID).ifPresent(filterRequests::add);
 
         return filterRequests;
     }
