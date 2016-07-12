@@ -48,10 +48,6 @@ final class ResponseVerifier {
         return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
     }
 
-    static ResultMatcher messageExists(String message){
-        return jsonPath("$.messages", Matchers.hasItem(is(message)));
-    }
-
     static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {
         String path = String.format(RESULTS_CONTENT_BY_INDEX, resultIndex);
 
