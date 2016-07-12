@@ -16,12 +16,14 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
     public static final String SOLR_FIELD_SEPARATOR = ":";
 
     static final String CROSS_CORE_JOIN_SYNTAX = "{!join from=%s to=%s fromIndex=%s} %s";
+    static final String FACET_ANALYTICS_ID = "json.facet";
 
-    private static final String FACET_ANALYTICS_ID = "json.facet";
     private static final int MIN_COUNT_TO_DISPLAY_FACET = 1;
 
     private final String requestHandler;
     private final SolrQueryStringSanitizer queryStringSanitizer;
+
+    private AggregateConverter<String> aggregateConverter;
 
     public SolrQueryConverter(String requestHandler) {
         Preconditions.checkArgument(requestHandler != null && !requestHandler.trim().isEmpty(),
@@ -29,6 +31,9 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
 
         this.requestHandler = requestHandler;
         this.queryStringSanitizer = new SolrQueryStringSanitizer();
+
+        //TODO:change this, use dependency injection
+        aggregateConverter = new AggregateToStringConverter();
     }
 
     @Override public String visit(FieldQuery query) {
@@ -113,48 +118,11 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
             request.getProjectedFields().forEach(field -> solrQuery.addField(field.getField()));
         }
 
-        if (!request.getAggregates().isEmpty()) {
-            solrQuery.setParam(FACET_ANALYTICS_ID, mockJsonFacet());
+        if (aggregateConverter != null && request.getAggregate() != null) {
+            solrQuery.setParam(FACET_ANALYTICS_ID, aggregateConverter.convert(request.getAggregate()));
         }
 
-        {
-            return solrQuery;
-        }
-    }
-
-    private static final String STATS_PREFIX = "stats";
-
-//    private String convertAggregates(List<Aggregate> aggregates) {
-//        StringBuilder jsonFacet = new StringBuilder("json.facet={");
-//
-//        for (Aggregate aggregate : aggregates) {
-//            jsonFacet.append(aggregate.getName()).append(":");
-//
-//            Set<AggregateField> aggFields = aggregate.getFields();
-//
-//            if(!aggFields.isEmpty()) {
-//                jsonFacet.append(":");
-//                for (AggregateField aggField : aggFields) {
-//                    jsonFacet.append(aggField)
-//                }
-//            }
-//        }
-//        jsonFacet.append("}");
-//    }
-
-    private String mockJsonFacet() {
-        return "{\n" +
-                "            unique_annotations:\"unique(id)\",\n" +
-                "            unique_geneProductId:\"unique(geneProductId)\",\n" +
-                "            stats_dbSubset:{\n" +
-                "              field:dbSubset,\n" +
-                "              type:terms,\n" +
-                "              facet:{\n" +
-                "                  unique_id:\"unique(id)\",\n" +
-                "                  unique_geneProductID:\"unique(geneProductId)\"\n" +
-                "              }\n" +
-                "          }\n" +
-                "}";
+        return solrQuery;
     }
 
     private int calculateRowsFromPage(int page, int numRows) {
