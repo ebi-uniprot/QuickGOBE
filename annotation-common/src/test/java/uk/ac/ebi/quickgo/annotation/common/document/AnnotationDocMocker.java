@@ -51,7 +51,7 @@ public class AnnotationDocMocker {
         // (in solrconfig.xml this is set automatically as a UUID)
         doc.id = geneProductId + "-" + System.nanoTime();
 
-        doc.goId = "GO:0003824";
+        doc.goId = "GO:0006810";
         doc.ecoId = "ECO:0000323";
         doc.qualifier = "involved_in";
         doc.goEvidence = "IDA";
