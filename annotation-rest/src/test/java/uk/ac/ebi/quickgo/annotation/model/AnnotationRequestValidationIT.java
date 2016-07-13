@@ -311,7 +311,7 @@ public class AnnotationRequestValidationIT {
 
                     assertThat(violations, hasSize(1));
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one invalid 'GO Id' value is invalid: " + id));
+                            is("At least one 'GO Id' value is invalid: " + id));
                 }
         );
     }
