@@ -31,6 +31,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSI
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.Searchable.GENEPRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE;
@@ -64,9 +65,14 @@ public class AnnotationControllerIT {
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxon";
     private static final String WITHFROM_PARAM= "withFrom";
+    private static final String GO_ID_PARAM = "goId";
 
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
     private static final String RESOURCE_URL = "/QuickGO/services/annotation";
+    private static final String VALID_GO_ID = "GO:0003824";
+    private static final String UNAVAILABLE_GO_ID = "GO:0009871";
+    private static final String INVALID_GO_ID = "GO:1";
+
     //Test data
     private static final String EXISTING_ECO_ID1 = "ECO:0000256";
     private static final String EXISTING_ECO_ID2 = "ECO:0000323";  //exists
@@ -114,9 +120,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
-
 
     @Test
     public void lookupAnnotationFilterByMultipleAssignedBySuccessfully() throws Exception {
@@ -139,7 +144,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
     }
 
     @Test
@@ -166,7 +171,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
     }
 
     @Test
@@ -196,7 +201,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
 
     @Test
@@ -226,9 +231,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
-
 
     @Test
     public void lookupAnnotationFilterByMultipleTaxonIdsSuccessfully() throws Exception {
@@ -253,7 +257,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
     }
 
     @Test
@@ -467,6 +471,57 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(0).geneProductId, 1))
                 .andExpect(itemExistsExpectedTimes(ASSIGNED_BY, genericDocs.get(1).assignedBy, 1));
     }
+    //---------- Gene Ontology Id
+
+    @Test
+    public void successfullyLookupAnnotationsByGoId() throws Exception {
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, VALID_GO_ID));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(itemExistsExpectedTimes(GO_ID, VALID_GO_ID, 3));
+    }
+
+    @Test
+    public void successfullyLookupAnnotationsByGoIdCaseInsensitive() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, VALID_GO_ID.toLowerCase()));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(itemExistsExpectedTimes(GO_ID, VALID_GO_ID, 3));
+    }
+
+    @Test
+    public void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, UNAVAILABLE_GO_ID));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+
+    @Test
+    public void incorrectFormattedGoIdCausesError() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, INVALID_GO_ID));
+
+        response.andExpect(status().isBadRequest())
+                .andExpect(contentTypeToBeJson());
+    }
+
     //---------- Page related tests.
 
     //---------- ECO ID

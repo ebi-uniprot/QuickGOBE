@@ -14,6 +14,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ECO_
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
@@ -36,6 +37,7 @@ public class AnnotationRequest {
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
+
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] targetFields = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
             QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID};
@@ -165,6 +167,20 @@ public class AnnotationRequest {
     }
 
     /**
+     * List of Gene Ontology ids in CSV format
+     * @param goId
+     */
+    public void setGoId(String goId){
+        filterMap.put(GO_ID,goId);
+    }
+
+    @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*",
+            message = "At least one 'GO Id' value is invalid: ${validatedValue}")
+    public String getGoId(){
+        return filterMap.get(GO_ID);
+    }
+
+    /**
      * Will receive a list of eco ids thus: EcoId=ECO:0000256,ECO:0000323
      * @param ecoId
      */
@@ -201,6 +217,16 @@ public class AnnotationRequest {
         Stream.of(targetFields)
                 .map(this::createSimpleFilter)
                 .forEach(f ->f.ifPresent(filterRequests::add));
+        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
+        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
+        createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
+        createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
+        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
+        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
+        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
+        createSimpleFilter(GO_ID).ifPresent(filterRequests::add);
+
+        createSimpleFilter(GENE_PRODUCT_ID).ifPresent(filterRequests::add);
 
         return filterRequests;
     }

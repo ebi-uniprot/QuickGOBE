@@ -262,6 +262,61 @@ public class AnnotationRequestValidationIT {
                         .collect(Collectors.joining(", "))));
     }
 
+
+    //GO ID PARAMETER
+
+    @Test
+    public void goIdIsValid() {
+        String[] goIds = {"GO:0003824", "GO:0009999", "GO:0003333"};
+
+        Arrays.stream(goIds).forEach(
+                id -> {
+                    annotationRequest.setGoId(id);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
+                }
+        );
+    }
+
+
+    @Test
+    public void mixedCaseGoIdIsValid() {
+        String[] goIds = {"GO:0003824", "gO:0003824", "Go:0003824"};
+
+        Arrays.stream(goIds).forEach(
+                mixedCaseId -> {
+                    annotationRequest.setGoId(mixedCaseId);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
+                }
+        );
+    }
+
+    @Test
+    public void goIdIsInvalid() {
+        String[] invalidGoIds = {"GO:4", "xxx:0009999", "-"};
+
+        Arrays.stream(invalidGoIds).forEach(
+                id -> {
+                    annotationRequest.setGoId(id);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(1));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'GO Id' value is invalid: " + id));
+                }
+        );
+    }
+
+
     //ECO PARAMETER
 
     @Test
