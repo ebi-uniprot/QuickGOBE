@@ -53,18 +53,15 @@ public class AnnotationFields {
         private static final Set<String> VALUES = new HashSet<>();
 
         static {
-            storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
-            storeAndGet(VALUES, AnnotationFields.WITH_FROM_SEARCH);
-            storeAndGet(VALUES, AnnotationFields.TAXON_ID);
-            storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
-            storeAndGet(VALUES, AnnotationFields.QUALIFIER);
-            storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
-            storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
-            storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
-            storeAndGet(VALUES, AnnotationFields.TAXON_ID);
-            storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
-            storeAndGet(VALUES, AnnotationFields.QUALIFIER);
-            storeAndGet(VALUES, AnnotationFields.GO_ID);
+            storeAndGet(VALUES, ASSIGNED_BY);
+            storeAndGet(VALUES, WITH_FROM_SEARCH);
+            storeAndGet(VALUES, TAXON_ID);
+            storeAndGet(VALUES, GO_EVIDENCE);
+            storeAndGet(VALUES, QUALIFIER);
+            storeAndGet(VALUES, REFERENCE_SEARCH);
+            storeAndGet(VALUES, GENE_PRODUCT_ID);
+            storeAndGet(VALUES, QUALIFIER);
+            storeAndGet(VALUES, GO_ID);
         }
 
         public static boolean isSearchable(String field) {
