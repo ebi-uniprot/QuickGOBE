@@ -217,16 +217,6 @@ public class AnnotationRequest {
         Stream.of(targetFields)
                 .map(this::createSimpleFilter)
                 .forEach(f ->f.ifPresent(filterRequests::add));
-        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
-        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
-        createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
-        createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
-        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
-        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
-        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
-        createSimpleFilter(GO_ID).ifPresent(filterRequests::add);
-
-        createSimpleFilter(GENE_PRODUCT_ID).ifPresent(filterRequests::add);
 
         return filterRequests;
     }
