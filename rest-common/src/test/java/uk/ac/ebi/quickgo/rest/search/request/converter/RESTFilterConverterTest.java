@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -161,6 +162,7 @@ public class RESTFilterConverterTest {
             configMap.put(RESOURCE_FORMAT, resource);
             configMap.put(BODY_PATH, bodyPath);
             configMap.put(LOCAL_FIELD, localField);
+            configMap.put(TIMEOUT, "2000");
             config.setProperties(configMap);
 
             return config;
@@ -253,6 +255,95 @@ public class RESTFilterConverterTest {
             String resource = "/QuickGO/services/go/terms/{id}/complete";
             configMap.put(RESOURCE_FORMAT, resource);
             return configMap;
+        }
+    }
+
+    public static class ValidatingInstantiationParameters {
+        private FilterConfig filterConfig;
+
+        private RestOperations restOperationsMock;
+
+        @Before
+        public void setUp() {
+            this.filterConfig = new FilterConfig();
+            this.filterConfig.setProperties(new HashMap<>());
+            this.restOperationsMock = mock(RestOperations.class);
+        }
+
+        @Test
+        public void successfullyCreateFilterConfigContainingMandatoryParameters() {
+            addConfigParam(HOST, "host");
+            addConfigParam(RESOURCE_FORMAT, "resource format");
+            addConfigParam(BODY_PATH, "body path");
+            addConfigParam(LOCAL_FIELD, "local field");
+            addConfigParam(TIMEOUT, "1000");
+
+            new RESTFilterConverter(filterConfig, restOperationsMock);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void nullFilterConfigCausesException() {
+            new RESTFilterConverter(null, restOperationsMock);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void nullRestOperationsFilterConfigCausesException() {
+            new RESTFilterConverter(filterConfig, null);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void noHostCausesInstantiationException() {
+            addConfigParam(RESOURCE_FORMAT, "resource format");
+            addConfigParam(BODY_PATH, "body path");
+            addConfigParam(LOCAL_FIELD, "local field");
+            addConfigParam(TIMEOUT, "1000");
+
+            new RESTFilterConverter(filterConfig, restOperationsMock);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void noResourceFormatCausesInstantiationException() {
+            addConfigParam(HOST, "host");
+            addConfigParam(BODY_PATH, "body path");
+            addConfigParam(LOCAL_FIELD, "local field");
+            addConfigParam(TIMEOUT, "1000");
+
+            new RESTFilterConverter(filterConfig, restOperationsMock);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void noBodyPathCausesInstantiationException() {
+            addConfigParam(HOST, "host");
+            addConfigParam(RESOURCE_FORMAT, "resource format");
+            addConfigParam(LOCAL_FIELD, "local field");
+            addConfigParam(TIMEOUT, "1000");
+
+            new RESTFilterConverter(filterConfig, restOperationsMock);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void noLocalFieldCausesInstantiationException() {
+            addConfigParam(HOST, "host");
+            addConfigParam(RESOURCE_FORMAT, "resource format");
+            addConfigParam(BODY_PATH, "body path");
+            addConfigParam(TIMEOUT, "1000");
+
+            new RESTFilterConverter(filterConfig, restOperationsMock);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void noNumericalTimeoutCausesInstantiationException() {
+            addConfigParam(HOST, "host");
+            addConfigParam(RESOURCE_FORMAT, "resource format");
+            addConfigParam(BODY_PATH, "body path");
+            addConfigParam(LOCAL_FIELD, "local field");
+            addConfigParam(TIMEOUT, "THIS IS NOT A NUMBER");
+
+            new RESTFilterConverter(filterConfig, restOperationsMock);
+        }
+
+        private void addConfigParam(String name, String value) {
+            filterConfig.getProperties().put(name, value);
         }
     }
 

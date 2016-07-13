@@ -33,6 +33,7 @@ class RESTFilterConverter implements FilterConverter {
     static final String RESOURCE_FORMAT = "resourceFormat";
     static final String BODY_PATH = "responseBodyPath";
     static final String LOCAL_FIELD = "localField";
+    static final String TIMEOUT = "timeout";
 
     private static final Logger LOGGER = getLogger(RESTFilterConverter.class);
     private static final String COMMA = ",";
@@ -43,13 +44,12 @@ class RESTFilterConverter implements FilterConverter {
             HTTP_HOST_PREFIX + "(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(:[0-9]+)?");
     private static final Pattern HOSTNAME_REGEX = Pattern.compile(
             HTTP_HOST_PREFIX + "([a-zA-Z0-9](?:(?:[a-zA-Z0-9-]*|(?<!-)\\.(?![-.]))*[a-zA-Z0-9]+)?)(:[0-9]+)?");
-
-    // todo: this should be externally configurable (add a property to yaml, and if not present use default?)
-    private static final int TIMEOUT_MILLIS = 2000;
     private static final String FAILED_REST_FETCH_PREFIX = "Failed to fetch REST response";
+    private static final int DEFAULT_TIMEOUT_MILLIS = 2000;
 
     private final FilterConfig filterConfig;
     private final RestOperations restOperations;
+    private int timeoutMillis;
 
     RESTFilterConverter(FilterConfig filterConfig, RestOperations restOperations) {
         Preconditions.checkArgument(filterConfig != null, "FilterConfig cannot be null");
@@ -62,6 +62,8 @@ class RESTFilterConverter implements FilterConverter {
         checkMandatoryProperty(RESOURCE_FORMAT);
         checkMandatoryProperty(BODY_PATH);
         checkMandatoryProperty(LOCAL_FIELD);
+
+        initialiseTimeout();
     }
 
     @Override public QuickGOQuery transform(FilterRequest request) {
@@ -69,13 +71,12 @@ class RESTFilterConverter implements FilterConverter {
 
         // create REST request executor
         RESTRequesterImpl.Builder restRequesterBuilder = createRestRequesterBuilder();
-        request.getProperties().entrySet().stream()
-                .forEach(entry ->
-                        restRequesterBuilder.addRequestParameter(
-                                entry.getKey(),
-                                entry.getValue().stream()
-                                        .collect(Collectors.joining(COMMA)))
-                );
+        request.getProperties().entrySet().forEach(entry ->
+                restRequesterBuilder.addRequestParameter(
+                        entry.getKey(),
+                        entry.getValue().stream()
+                                .collect(Collectors.joining(COMMA)))
+        );
 
         // apply request and store results
         JsonPath jsonPath = JsonPath.compile(filterConfig.getProperties().get(BODY_PATH));
@@ -137,6 +138,24 @@ class RESTFilterConverter implements FilterConverter {
         return RESTRequesterImpl.newBuilder(restOperations, buildResourceTemplate(filterConfig));
     }
 
+    private void initialiseTimeout() {
+        if (filterConfig.getProperties().containsKey(TIMEOUT)) {
+            boolean validTimeout = true;
+            String timeoutValue = filterConfig.getProperties().get(TIMEOUT);
+            try {
+                timeoutMillis = Integer.parseInt(timeoutValue);
+            } catch (NumberFormatException nfe) {
+                validTimeout = false;
+            }
+            Preconditions
+                    .checkArgument(validTimeout, "FilterConfig's 'TIMEOUT' property must be a number: " + timeoutValue);
+        } else {
+            timeoutMillis = DEFAULT_TIMEOUT_MILLIS;
+            LOGGER.debug("No " + TIMEOUT + " property specified in yaml configuration. RESTFilterConverter will use " +
+                    "default timeout of: " + timeoutMillis);
+        }
+    }
+
     private void throwRetrievalException(String errorMessage, Exception e) {
         LOGGER.error(errorMessage, e);
         throw new RetrievalException(errorMessage, e);
@@ -162,7 +181,7 @@ class RESTFilterConverter implements FilterConverter {
             throws ExecutionException, InterruptedException, TimeoutException {
         return restRequester
                 .get(String.class)
-                .get(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+                .get(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     static class InvalidHostNameException extends RuntimeException {
