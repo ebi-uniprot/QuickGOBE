@@ -732,7 +732,7 @@ public abstract class OBOControllerIT {
     }
 
     private static String asCSV(String... values) {
-        return Arrays.asList(values).stream().collect(Collectors.joining(","));
+        return Arrays.stream(values).collect(Collectors.joining(","));
     }
 
     private void setupSimpleRelationshipChain() {

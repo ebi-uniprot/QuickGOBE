@@ -392,7 +392,7 @@ public abstract class OBOController<T extends OBOTerm> {
                 .setPageParameters(page, limit);
 
         if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
-            ontologyRetrievalConfig.getSearchReturnedFields().stream()
+            ontologyRetrievalConfig.getSearchReturnedFields()
                     .forEach(builder::addProjectedField);
         }
 
