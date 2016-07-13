@@ -12,6 +12,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSI
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
@@ -161,6 +162,20 @@ public class AnnotationRequest {
         return filterMap.get(TAXON_ID);
     }
 
+    /**
+     * List of Gene Ontology ids in CSV format
+     * @param goId
+     */
+    public void setGoId(String goId){
+        filterMap.put(GO_ID,goId);
+    }
+
+    @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*",
+            message = "At least one 'GO Id' value is invalid: ${validatedValue}")
+    public String getGoId(){
+        return filterMap.get(GO_ID);
+    }
+
     public int getLimit() {
         return limit;
     }
@@ -188,6 +203,7 @@ public class AnnotationRequest {
         createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
         createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
         createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
+        createSimpleFilter(GO_ID).ifPresent(filterRequests::add);
 
         createSimpleFilter(GENE_PRODUCT_ID).ifPresent(filterRequests::add);
 
