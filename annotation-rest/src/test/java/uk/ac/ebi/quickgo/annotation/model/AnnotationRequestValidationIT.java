@@ -362,6 +362,6 @@ public class AnnotationRequestValidationIT {
     }
 
     private void printConstraintViolations(Set<ConstraintViolation<AnnotationRequest>> violations) {
-        violations.stream().forEach(System.out::println);
+        violations.forEach(System.out::println);
     }
 }
