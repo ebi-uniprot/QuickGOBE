@@ -471,6 +471,8 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(0).geneProductId, 1))
                 .andExpect(itemExistsExpectedTimes(ASSIGNED_BY, genericDocs.get(1).assignedBy, 1));
     }
+
+
     //---------- Gene Ontology Id
 
     @Test
@@ -522,8 +524,6 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson());
     }
 
-    //---------- Page related tests.
-
     //---------- ECO ID
 
 
@@ -569,8 +569,6 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(ECO_ID, NOTEXISTS_ECO_ID3, 0));
     }
 
-    //---------- Limit related tests.
-
     @Test
     public void filterByNonExistentEcoIdReturnsZeroResults() throws Exception {
         ResultActions response = mockMvc.perform(
@@ -581,6 +579,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(0));
     }
+
+    //---------- Page related tests.
 
     @Test
     public void retrievesSecondPageOfAllEntriesRequest() throws Exception {
