@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import org.springframework.test.web.servlet.ResultMatcher;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -20,8 +20,8 @@ final class StatsResponseVerifier {
 
     private StatsResponseVerifier() {}
 
-    static ResultMatcher totalHitsInGroup(String groupName, long hits) {
-        String hitsInGroupText = "%s[?(@.%s==%s)].%s";
+    static ResultMatcher totalHitsInGroup(String groupName, int hits) {
+        String hitsInGroupText = "%s[?(@.%s=='%s')].%s";
 
         return jsonPath(
                 format(hitsInGroupText, ResponseVerifier.RESULTS, GROUP_NAME_TAG, groupName, TOTAL_GROUP_HITS_TAG)
