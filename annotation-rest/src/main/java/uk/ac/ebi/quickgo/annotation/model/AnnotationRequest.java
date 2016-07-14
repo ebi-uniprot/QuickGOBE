@@ -189,7 +189,7 @@ public class AnnotationRequest {
     }
 
     @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*",
-            message = "At least one invalid 'ECO identifier' value is invalid: ${validatedValue}")
+            message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
     public String getEcoId(){
         return filterMap.get(ECO_ID);
     }
