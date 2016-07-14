@@ -39,7 +39,7 @@ public class AnnotationRequest {
     private static final String COMMA = ",";
 
     private static final String ASPECT_FIELD = "aspect";
-    private static final String[] targetFields = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
+    private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
             QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID};
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
@@ -214,7 +214,7 @@ public class AnnotationRequest {
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
-        Stream.of(targetFields)
+        Stream.of(TARGET_FIELDS)
                 .map(this::createSimpleFilter)
                 .forEach(f ->f.ifPresent(filterRequests::add));
 
