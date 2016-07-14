@@ -53,8 +53,6 @@ public class AnnotationControllerIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
-    private static final int NUMBER_OF_GENERIC_DOCS = 3;
-
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
     private static final String GO_EVIDENCE_PARAM = "goEvidence";
     private static final String REF_PARAM = "reference";
@@ -66,20 +64,18 @@ public class AnnotationControllerIT {
     private static final String TAXON_ID_PARAM = "taxon";
     private static final String WITHFROM_PARAM= "withFrom";
     private static final String GO_ID_PARAM = "goId";
-
     private static final String UNAVAILABLE_ASSIGNED_BY = "ZZZZZ";
     private static final String RESOURCE_URL = "/QuickGO/services/annotation";
     private static final String VALID_GO_ID = "GO:0003824";
     private static final String UNAVAILABLE_GO_ID = "GO:0009871";
     private static final String INVALID_GO_ID = "GO:1";
-
-    //Test data
     private static final String EXISTING_ECO_ID1 = "ECO:0000256";
     private static final String EXISTING_ECO_ID2 = "ECO:0000323";  //exists
     private static final String NOTEXISTS_ECO_ID3 = "ECO:0000888";  //doesn't exist
+    private static final String REFERENCE_ID = "GO_REF:0000002";
+    private static final int NUM_RESULTS = 6;
+    private static final int NUMBER_OF_GENERIC_DOCS = 3;
 
-    final static String REFERENCE_ID = "GO_REF:0000002";
-    public static final int NUM_RESULTS = 6;
     private MockMvc mockMvc;
     private List<AnnotationDocument> genericDocs;
     @Autowired
