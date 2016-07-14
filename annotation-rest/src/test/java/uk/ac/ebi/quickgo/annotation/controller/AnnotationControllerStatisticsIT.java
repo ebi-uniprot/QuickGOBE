@@ -5,14 +5,17 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +48,11 @@ public class AnnotationControllerStatisticsIT {
 
     private static final String RESOURCE_URL = "/QuickGO/services/annotation";
 
-    private static final int NUMBER_OF_GENERIC_DOCS = 3;
+    private static final int NUMBER_OF_GENERIC_DOCS = 6;
 
     private MockMvc mockMvc;
 
-    private List<AnnotationDocument> genericDocs;
+    private List<AnnotationDocument> savedDocs;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -65,15 +68,20 @@ public class AnnotationControllerStatisticsIT {
                 webAppContextSetup(webApplicationContext)
                 .build();
 
-        genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
-        repository.save(genericDocs);
+        savedDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
+        repository.save(savedDocs);
     }
 
     //--------------------- Annotation based stats ---------------------//
     //----------- Ontology ID -----------//
-    @Ignore
+    private static <T, D extends QuickGODocument> Set<T> selectValuesFromDocs(
+            Collection<D> documents,
+            Function<D, T> docTransformation) {
+        return documents.stream().map(docTransformation).collect(Collectors.toSet());
+    }
+
     @Test
-    public void searchResultOf6DocumentsWithATotalOfThreeOntologyIdsReturnsResponseWith3OntologyIdStats()
+    public void searchResultOfMultipleDocsWithATotalOf3OntologyIdsReturnsResponseWith3OntologyIdStats()
             throws Exception {
 
         AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
@@ -82,7 +90,11 @@ public class AnnotationControllerStatisticsIT {
 
         String group = "annotation";
         String type = AnnotationFields.GO_ID;
-        String[] keys = {"GO:0016020", "GO:0016021", "GO:0005737"};
+
+        Set<String> savedGOIds = selectValuesFromDocs(savedDocs, doc -> doc.goId);
+        savedGOIds.add(extraDoc.goId);
+
+        String[] keys = savedGOIds.toArray(new String[savedGOIds.size()]);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/stats"));
 
@@ -90,7 +102,7 @@ public class AnnotationControllerStatisticsIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
-                .andExpect(totalHitsInGroup(group, 4))
+                .andExpect(totalHitsInGroup(group, NUMBER_OF_GENERIC_DOCS + 1))
                 .andExpect(keysInTypeWithinGroup(group, type, keys));
     }
 

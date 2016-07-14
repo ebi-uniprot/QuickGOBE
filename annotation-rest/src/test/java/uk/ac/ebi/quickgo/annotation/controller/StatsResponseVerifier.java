@@ -38,9 +38,13 @@ final class StatsResponseVerifier {
      * @return a {@link ResultMatcher} that checks for the given inputs
      */
     static ResultMatcher keysInTypeWithinGroup(String group, String type, String[] keys) {
-        String valuesInTypeForGroup = "%s..[?(@.%s==%s)]..%s";
+        String valuesInTypeForGroup = "%s[?(@.%s=='%s')]..[?(@.%s=='%s')]..%s";
         return jsonPath(
-                format(valuesInTypeForGroup, ResponseVerifier.RESULTS, TYPE_NAME_TAG, type, KEY_NAME_TAG),
+                format(valuesInTypeForGroup,
+                        ResponseVerifier.RESULTS,
+                        GROUP_NAME_TAG, group,
+                        TYPE_NAME_TAG, type,
+                        KEY_NAME_TAG),
                 containsInAnyOrder(keys)
         );
     }
