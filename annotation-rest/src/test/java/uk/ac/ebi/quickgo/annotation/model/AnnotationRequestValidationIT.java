@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,6 +20,8 @@ import static org.hamcrest.Matchers.hasSize;
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes={AnnotationRequestConfig.class})
 public class AnnotationRequestValidationIT {
     private static final String[] VALID_ASSIGNED_BY_PARMS = {"ASPGD", "ASPGD,Agbase", "ASPGD_,Agbase",
             "ASPGD,Agbase_", "ASPGD,Agbase", "BHF-UCL,Agbase", "Roslin_Institute,BHF-UCL,Agbase"};
@@ -28,14 +32,16 @@ public class AnnotationRequestValidationIT {
     private static final String[] VALID_GO_EVIDENCE = {"IEA,IBD,IC"};
     private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
 
+    private static final String[] VALID_GENE_PRODUCT_ID  = {"A0A000","A0A003"};
+    private static final String[] INVALID_GENE_PRODUCT_ID = {"99999","&12345"};
+
+    @Autowired
     private Validator validator;
+
     private AnnotationRequest annotationRequest;
 
     @Before
     public void setUp() throws Exception {
-        ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
-        validator = vf.getValidator();
-
         annotationRequest = new AnnotationRequest();
     }
 
@@ -49,11 +55,8 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void allAssignedByValuesAreValid() {
-        String assignedByValues = Arrays.stream(VALID_ASSIGNED_BY_PARMS)
-                .collect(Collectors.joining(","));
-
+        String assignedByValues = gimmeCSV(VALID_ASSIGNED_BY_PARMS);
         annotationRequest.setAssignedBy(assignedByValues);
-
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -108,9 +111,7 @@ public class AnnotationRequestValidationIT {
     @Test
     public void nullAspectIsValid() {
         String aspect = null;
-
         annotationRequest.setAspect(aspect);
-
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -181,7 +182,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
+                is("At least one 'Taxonomic identifier' value is invalid: " + taxId));
     }
 
     @Test
@@ -195,7 +196,7 @@ public class AnnotationRequestValidationIT {
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     assertThat(violations, hasSize(is(1)));
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one invalid 'Taxonomic identifier' value is invalid: " + invalidValue));
+                            is("At least one 'Taxonomic identifier' value is invalid: " + invalidValue));
                 }
         );
     }
@@ -227,7 +228,145 @@ public class AnnotationRequestValidationIT {
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(is(1)));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
+                is("At least one 'Taxonomic identifier' value is invalid: " + taxId));
+    }
+
+
+    //GENE PRODUCT ID
+    @Test
+    public void allGeneProductValuesAreValid() {
+        String geneProductIdValues = gimmeCSV(VALID_GENE_PRODUCT_ID);
+        annotationRequest.setGpId(geneProductIdValues);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void geneProductIDValidationIsCaseSensitive() {
+        String geneProductIdValues = (gimmeCSV(VALID_GENE_PRODUCT_ID)).toLowerCase();
+        annotationRequest.setGpId(geneProductIdValues);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one 'Gene Product ID' value is invalid: " +
+                        (Arrays.stream(VALID_GENE_PRODUCT_ID).collect(Collectors.joining(", "))).toLowerCase()));
+    }
+
+    @Test
+    public void allGeneProductValuesAreInvalid() {
+        String geneProductIdValues = gimmeCSV(INVALID_GENE_PRODUCT_ID);
+        annotationRequest.setGpId(geneProductIdValues);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one 'Gene Product ID' value is invalid: " + Arrays.stream(INVALID_GENE_PRODUCT_ID)
+                        .collect(Collectors.joining(", "))));
+    }
+
+
+    //GO ID PARAMETER
+
+    @Test
+    public void goIdIsValid() {
+        String[] goIds = {"GO:0003824", "GO:0009999", "GO:0003333"};
+
+        Arrays.stream(goIds).forEach(
+                id -> {
+                    annotationRequest.setGoId(id);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
+                }
+        );
+    }
+
+
+    @Test
+    public void mixedCaseGoIdIsValid() {
+        String[] goIds = {"GO:0003824", "gO:0003824", "Go:0003824"};
+
+        Arrays.stream(goIds).forEach(
+                mixedCaseId -> {
+                    annotationRequest.setGoId(mixedCaseId);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
+                }
+        );
+    }
+
+    @Test
+    public void goIdIsInvalid() {
+        String[] invalidGoIds = {"GO:4", "xxx:0009999", "-"};
+
+        Arrays.stream(invalidGoIds).forEach(
+                id -> {
+                    annotationRequest.setGoId(id);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(1));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'GO Id' value is invalid: " + id));
+                }
+        );
+    }
+
+
+    //ECO PARAMETER
+
+    @Test
+    public void ecoIdIsValid() {
+        String[] ecoIds = {"ECO:0000256", "ECO:0000888", "ECO:0000777"};
+
+        Arrays.stream(ecoIds).forEach(
+                validIds -> {
+                    annotationRequest.setEcoId(validIds);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
+                }
+        );
+    }
+
+    @Test
+    public void mixedCaseEcoIdIsValid() {
+        String[] ecoIds = {"ECO:0000256", "EcO:0000256", "eCO:0000256"};
+
+        Arrays.stream(ecoIds).forEach(
+                mixedCaseId -> {
+                    annotationRequest.setEcoId(mixedCaseId);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
+                }
+        );
+    }
+
+
+    @Test
+    public void ecoIdIsInvalid() {
+        String[] ecoIds = {"ECO:9", "xxx:0000888", "-"};
+
+        Arrays.stream(ecoIds).forEach(
+                validId -> {
+                    annotationRequest.setEcoId(validId);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'ECO identifier' value is invalid: " + validId));
+                    assertThat(violations, hasSize(1));
+                }
+        );
     }
 
     //PAGE PARAMETER
@@ -290,5 +429,9 @@ public class AnnotationRequestValidationIT {
 
     private void printConstraintViolations(Set<ConstraintViolation<AnnotationRequest>> violations) {
         violations.stream().forEach(System.out::println);
+    }
+
+    private String gimmeCSV(String... values) {
+        return Arrays.stream(values).collect(Collectors.joining(","));
     }
 }

@@ -26,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createAnnotationDoc;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 
 /**
@@ -82,7 +83,7 @@ public class AnnotationControllerJoinsIT {
                 .andExpect(pageInfoExists())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
 
     @Test
