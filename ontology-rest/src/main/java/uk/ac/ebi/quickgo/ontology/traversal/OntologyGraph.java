@@ -42,7 +42,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
         Preconditions.checkArgument(relationships != null, "Relationships to add to the graph cannot be null");
 
         // populate graph with edges, whilst recording the vertices
-        relationships.stream().forEach(
+        relationships.forEach(
                 oEdge -> {
                     if (!ontology.containsVertex(oEdge.child)) {
                         ontology.addVertex(oEdge.child);
@@ -207,12 +207,10 @@ public class OntologyGraph implements OntologyGraphTraversal {
         List<OntologyRelationship> successors = new ArrayList<>();
 
         fromVertices.forEach(
-                from -> {
-                    Set<OntologyRelationship> outgoingEdgesOfV = ontology.outgoingEdgesOf(from);
-                    outgoingEdgesOfV.stream()
-                            .filter(e -> relations.contains(e.relationship) && toVertices.contains(e.parent))
-                            .forEach(successors::add);
-                }
+                from ->
+                        ontology.outgoingEdgesOf(from).stream()
+                                .filter(e -> relations.contains(e.relationship) && toVertices.contains(e.parent))
+                                .forEach(successors::add)
         );
 
         return successors;
