@@ -31,7 +31,6 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         if (termOptional.isPresent()) {
             OntologyDocument doc = new OntologyDocument();
             GenericTerm term = termOptional.get();
-            doc.ancestors = extractAncestors(term);
             doc.considers = extractConsidersAsList(term);
             doc.id = term.getId();
             doc.isObsolete = term.isObsolete();
@@ -130,18 +129,6 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(g.getId()))
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(g.getName()))
                                     .buildString())
-                    .collect(Collectors.toList());
-        } else {
-            return null;
-        }
-    }
-
-    protected List<String> extractAncestors(GenericTerm term) {
-        if (!isEmpty(term.getAncestors())) {
-            return term.getAncestors()
-                    .stream() // ancestors is a list of parent ids for this term?
-                    .map(
-                            a -> a.getParent().getId())
                     .collect(Collectors.toList());
         } else {
             return null;

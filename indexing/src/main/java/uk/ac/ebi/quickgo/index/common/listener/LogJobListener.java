@@ -9,7 +9,7 @@ import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.StepExecution;
 
 /**
- * Log statistics of the indexing job.
+ * Log statistics of a QuickGO job.
  *
  * Created 03/12/15
  * @author Edd
@@ -19,11 +19,11 @@ public class LogJobListener implements JobExecutionListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogJobListener.class);
 
     @Override public void beforeJob(JobExecution jobExecution) {
-        LOGGER.info("QuickGO indexing starting.");
+        LOGGER.info("Starting QuickGO job '{}'.", jobExecution.getJobInstance().getJobName());
     }
 
     @Override public void afterJob(JobExecution jobExecution) {
-        LOGGER.info("QuickGO indexing complete.\n");
+        LOGGER.info("Completed QuickGO job '{}'.\n", jobExecution.getJobInstance().getJobName());
 
         // compute duration
         Duration.between(jobExecution.getEndTime().toInstant(), jobExecution.getStartTime().toInstant());

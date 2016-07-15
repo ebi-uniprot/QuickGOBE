@@ -35,6 +35,9 @@ public class OBOTerm {
     // list of term IDs that are ancestors of this term
     public List<String> ancestors;
 
+    // list of term IDs that are descendants of this term
+    public List<String> descendants;
+
     public List<Synonym> synonyms;
 
     // a term ID that replaces this one

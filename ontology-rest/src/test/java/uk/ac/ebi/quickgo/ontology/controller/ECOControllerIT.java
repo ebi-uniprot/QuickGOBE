@@ -28,7 +28,7 @@ public class ECOControllerIT extends OBOControllerIT {
     }
 
     @Override protected List<OntologyDocument> createNDocs(int n) {
-        return IntStream.range(0, n)
+        return IntStream.range(1, n + 1)
                 .mapToObj(i -> OntologyDocMocker.createECODoc(createId(i), "eco doc name " + i)).collect
                 (Collectors.toList());
     }

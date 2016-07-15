@@ -5,16 +5,17 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -31,6 +33,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createECODoc;
@@ -51,17 +54,27 @@ public class OntologyServiceImplTest {
     private OntologyRepository repositoryMock;
     private GODocConverter goDocumentConverterMock;
     private ECODocConverter ecoDocumentConverterMock;
+    private OntologyGraphTraversal ontologyTraversalMock;
 
     @Before
     public void setUp() throws Exception {
         repositoryMock = mock(OntologyRepository.class);
         goDocumentConverterMock = mock(GODocConverter.class);
         ecoDocumentConverterMock = mock(ECODocConverter.class);
+        ontologyTraversalMock = mock(OntologyGraphTraversal.class);
 
         goOntologyService = new OntologyServiceImpl<>
-                (repositoryMock, goDocumentConverterMock, OntologyType.GO, new SolrQueryStringSanitizer());
+                (repositoryMock,
+                        goDocumentConverterMock,
+                        OntologyType.GO,
+                        new SolrQueryStringSanitizer(),
+                        ontologyTraversalMock);
         ecoOntologyService = new OntologyServiceImpl<>
-                (repositoryMock, ecoDocumentConverterMock, OntologyType.ECO, new SolrQueryStringSanitizer());
+                (repositoryMock,
+                        ecoDocumentConverterMock,
+                        OntologyType.ECO,
+                        new SolrQueryStringSanitizer(),
+                        ontologyTraversalMock);
     }
 
     @Test
@@ -69,7 +82,7 @@ public class OntologyServiceImplTest {
         // create any OntologyServiceImpl to test its document conversion method
         OntologyServiceImpl<GOTerm> ontologyServiceSpy =
                 new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO,
-                        new SolrQueryStringSanitizer());
+                        new SolrQueryStringSanitizer(), ontologyTraversalMock);
 
         List<GOTerm> goTerms = ontologyServiceSpy.convertDocs(Collections.emptyList());
         assertThat(goTerms.size(), is(0));
@@ -77,23 +90,32 @@ public class OntologyServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void nullRepoProducesIllegalArgumentException() {
-        new OntologyServiceImpl<>(null, goDocumentConverterMock, OntologyType.GO, new SolrQueryStringSanitizer());
+        new OntologyServiceImpl<>(null, goDocumentConverterMock, OntologyType.GO, new SolrQueryStringSanitizer(),
+                ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullConverterProducesIllegalArgumentException() {
-        new OntologyServiceImpl<>(repositoryMock, null, OntologyType.GO, new SolrQueryStringSanitizer());
+        new OntologyServiceImpl<>(repositoryMock, null, OntologyType.GO, new SolrQueryStringSanitizer(),
+                ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullDocTypeProducesIllegalArgumentException() {
         new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, null,
-                new SolrQueryStringSanitizer());
+                new SolrQueryStringSanitizer(), ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullQueryStringSanitizerProducesIllegalArgumentException() {
-        new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO, null);
+        new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO, null,
+                ontologyTraversalMock);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullOntologyTraversalProducesIllegalArgumentException() {
+        new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO, new
+                SolrQueryStringSanitizer(), null);
     }
 
     public class GOServiceTests {
@@ -144,7 +166,7 @@ public class OntologyServiceImplTest {
             Page<OntologyDocument> firstPage =
                     new PageImpl<>(firstResultSet, firstPageable, realDocCount);
 
-            when(repositoryMock.findAllByOntologyType(OntologyType.GO.name(),firstPageable)).thenReturn(firstPage);
+            when(repositoryMock.findAllByOntologyType(OntologyType.GO.name(), firstPageable)).thenReturn(firstPage);
 
             when(goDocumentConverterMock.convert(any(OntologyDocument.class))).thenReturn(createGOTerm("stub"));
 
@@ -280,6 +302,164 @@ public class OntologyServiceImplTest {
             assertThat(expectedGoTerm.id, is(equalTo(id)));
         }
 
+        @Test
+        public void findsEmptyAncestorsForMissingTerm() {
+            Set<String> ids = idsViaOntologyService("GO:0000001").stream().collect(Collectors.toSet());
+            when(ontologyTraversalMock.ancestors(ids)).thenReturn(Collections.emptyList());
+            List<GOTerm> ancestors = goOntologyService.findAncestorsInfoByOntologyId(asList(ids));
+            assertThat(ancestors.size(), is(0));
+        }
+
+        @Test
+        public void findsAncestorsForTerm() {
+            String id = "GO:0000001";
+            List<String> myAncestors = singletonList("GO:0000002");
+
+            OntologyDocument doc = createGODoc(id, "name1");
+            GOTerm term = createGOTerm(id);
+
+            when(repositoryMock
+                    .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
+                    .thenReturn(singletonList(doc));
+            when(goDocumentConverterMock.convert(doc)).thenReturn(term);
+            when(ontologyTraversalMock.ancestors(singleton(id))).thenReturn(myAncestors);
+
+            List<GOTerm> ancestors = goOntologyService.findAncestorsInfoByOntologyId(singletonList(id));
+
+            assertThat(ancestors.size(), is(1));
+            assertThat(ancestors.get(0).ancestors, is(myAncestors));
+        }
+
+        @Test
+        public void findsAncestorsForTermWithRelation() {
+            String id = "GO:0000001";
+            List<String> myAncestors = singletonList("GO:0000002");
+
+            OntologyDocument doc = createGODoc(id, "name1");
+            GOTerm term = createGOTerm(id);
+
+            when(repositoryMock
+                    .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
+                    .thenReturn(singletonList(doc));
+            when(goDocumentConverterMock.convert(doc)).thenReturn(term);
+            when(ontologyTraversalMock.ancestors(singleton(id), OntologyRelationType.CAPABLE_OF))
+                    .thenReturn(myAncestors);
+
+            List<GOTerm> ancestors =
+                    goOntologyService.findAncestorsInfoByOntologyId(singletonList(id), OntologyRelationType.CAPABLE_OF);
+
+            assertThat(ancestors.size(), is(1));
+            assertThat(ancestors.get(0).ancestors, is(myAncestors));
+        }
+
+        @Test
+        public void findsEmptyDescendantsForMissingTerm() {
+            Set<String> ids = idsViaOntologyService("GO:0000001").stream().collect(Collectors.toSet());
+            when(ontologyTraversalMock.descendants(ids)).thenReturn(Collections.emptyList());
+            List<GOTerm> descendants = goOntologyService.findDescendantsInfoByOntologyId(asList(ids));
+            assertThat(descendants.size(), is(0));
+        }
+
+        @Test
+        public void findsDescendantsForTerm() {
+            String id = "GO:0000001";
+            List<String> myDescendants = singletonList("GO:0000002");
+
+            OntologyDocument doc = createGODoc(id, "name1");
+            GOTerm term = createGOTerm(id);
+
+            when(repositoryMock
+                    .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
+                    .thenReturn(singletonList(doc));
+            when(goDocumentConverterMock.convert(doc)).thenReturn(term);
+            when(ontologyTraversalMock.descendants(singleton(id)))
+                    .thenReturn(myDescendants);
+
+            List<GOTerm> descendants = goOntologyService
+                    .findDescendantsInfoByOntologyId(singletonList(id));
+
+            assertThat(descendants.size(), is(1));
+            assertThat(descendants.get(0).descendants, is(myDescendants));
+        }
+
+        @Test
+        public void findsDescendantsForTermWithRelation() {
+            String id = "GO:0000001";
+            List<String> myDescendants = singletonList("GO:0000002");
+
+            OntologyDocument doc = createGODoc(id, "name1");
+            GOTerm term = createGOTerm(id);
+
+            when(repositoryMock
+                    .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
+                    .thenReturn(singletonList(doc));
+            when(goDocumentConverterMock.convert(doc)).thenReturn(term);
+            when(ontologyTraversalMock.descendants(singleton(id), OntologyRelationType.CAPABLE_OF))
+                    .thenReturn(myDescendants);
+
+            List<GOTerm> descendants = goOntologyService
+                    .findDescendantsInfoByOntologyId(singletonList(id), OntologyRelationType.CAPABLE_OF);
+
+            assertThat(descendants.size(), is(1));
+            assertThat(descendants.get(0).descendants, is(myDescendants));
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void illegalArgumentWhenFindingPathsForZeroFromTerms() {
+            Set<String> fromIds = Collections.emptySet();
+            Set<String> toIds = idsViaOntologyService("GO:0000001").stream().collect(Collectors.toSet());
+            doThrow(IllegalArgumentException.class).when(ontologyTraversalMock).paths(fromIds, toIds);
+            goOntologyService.paths(fromIds, toIds);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void illegalArgumentWhenFindingPathsForZeroToTerms() {
+            Set<String> fromIds = idsViaOntologyService("GO:0000001").stream().collect(Collectors.toSet());
+            Set<String> toIds = Collections.emptySet();
+            doThrow(IllegalArgumentException.class).when(ontologyTraversalMock).paths(fromIds, toIds);
+            goOntologyService.paths(fromIds, toIds);
+        }
+
+        @Test
+        public void findsEmptyPathsForMissingTerm() {
+            Set<String> fromIds = idsViaOntologyService("GO:0000001").stream().collect(Collectors.toSet());
+            Set<String> toIds = idsViaOntologyService("GO:0000002").stream().collect(Collectors.toSet());
+
+            when(ontologyTraversalMock.paths(fromIds, toIds)).thenReturn(Collections.emptyList());
+            List<List<OntologyRelationship>> paths = goOntologyService.paths(fromIds, toIds);
+
+            assertThat(paths.size(), is(0));
+        }
+
+        @Test
+        public void findsPathsForTerm() {
+            String child = "GO:0000001";
+            String parent = "GO:0000002";
+            Set<String> fromIds = idsViaOntologyService(child).stream().collect(Collectors.toSet());
+            Set<String> toIds = idsViaOntologyService(parent).stream().collect(Collectors.toSet());
+
+            when(ontologyTraversalMock.paths(fromIds, toIds)).thenReturn(Collections.singletonList(Collections
+                    .singletonList(new OntologyRelationship(child, parent, OntologyRelationType.IS_A))));
+            List<List<OntologyRelationship>> paths = goOntologyService.paths(fromIds, toIds);
+
+            assertThat(paths.size(), is(1));
+        }
+
+        @Test
+        public void findsPathsForTermWithRelation() {
+            String child = "GO:0000001";
+            String parent = "GO:0000002";
+            Set<String> fromIds = idsViaOntologyService(child).stream().collect(Collectors.toSet());
+            Set<String> toIds = idsViaOntologyService(parent).stream().collect(Collectors.toSet());
+
+            when(ontologyTraversalMock.paths(fromIds, toIds, OntologyRelationType.IS_A))
+                    .thenReturn(Collections.singletonList(Collections
+                            .singletonList(new OntologyRelationship(child, parent, OntologyRelationType.IS_A))));
+            List<List<OntologyRelationship>> paths = goOntologyService.paths(fromIds, toIds, OntologyRelationType.IS_A);
+
+            assertThat(paths.size(), is(1));
+        }
+
         private List<String> idsViaOntologyService(String... ids) {
             return goOntologyService.buildIdList(Arrays.asList(ids));
         }
@@ -335,6 +515,7 @@ public class OntologyServiceImplTest {
             when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(ecoId));
 
             List<ECOTerm> ecoTerms = ecoOntologyService.findCoreInfoByOntologyId(singletonList(ecoId));
+
             assertThat(ecoTerms, is(not(nullValue())));
             assertThat(ecoTerms.size(), is(1));
 
@@ -433,8 +614,169 @@ public class OntologyServiceImplTest {
             assertThat(expectedTerm.id, is(equalTo(id)));
         }
 
+        @Test
+        public void findsEmptyAncestorsForMissingTerm() {
+            Set<String> ids = idsViaOntologyService("ECO:0000001").stream().collect(Collectors.toSet());
+            when(ontologyTraversalMock.ancestors(ids)).thenReturn(Collections.emptyList());
+            List<ECOTerm> ancestors = ecoOntologyService.findAncestorsInfoByOntologyId(asList(ids));
+            assertThat(ancestors.size(), is(0));
+        }
+
+        @Test
+        public void findsAncestorsForTerm() {
+            String id = "ECO:0000001";
+            List<String> myAncestors = singletonList("ECO:0000002");
+
+            OntologyDocument doc = createECODoc(id, "name1");
+            ECOTerm term = createECOTerm(id);
+
+            when(repositoryMock
+                    .findCoreAttrByTermId(OntologyType.ECO.name(), idsViaOntologyService(id)))
+                    .thenReturn(singletonList(doc));
+            when(ecoDocumentConverterMock.convert(doc)).thenReturn(term);
+            when(ontologyTraversalMock.ancestors(singleton(id))).thenReturn(myAncestors);
+
+            List<ECOTerm> ancestors = ecoOntologyService.findAncestorsInfoByOntologyId(singletonList(id));
+
+            assertThat(ancestors.size(), is(1));
+            assertThat(ancestors.get(0).ancestors, is(myAncestors));
+        }
+
+        @Test
+        public void findsAncestorsForTermWithRelation() {
+            String id = "ECO:0000001";
+            List<String> myAncestors = singletonList("ECO:0000002");
+
+            OntologyDocument doc = createECODoc(id, "name1");
+            ECOTerm term = createECOTerm(id);
+
+            when(repositoryMock
+                    .findCoreAttrByTermId(OntologyType.ECO.name(), idsViaOntologyService(id)))
+                    .thenReturn(singletonList(doc));
+            when(ecoDocumentConverterMock.convert(doc)).thenReturn(term);
+            when(ontologyTraversalMock.ancestors(singleton(id), OntologyRelationType.CAPABLE_OF))
+                    .thenReturn(myAncestors);
+
+            List<ECOTerm> ancestors = ecoOntologyService
+                    .findAncestorsInfoByOntologyId(singletonList(id), OntologyRelationType.CAPABLE_OF);
+
+            assertThat(ancestors.size(), is(1));
+            assertThat(ancestors.get(0).ancestors, is(myAncestors));
+        }
+
+        @Test
+        public void findsEmptyDescendantsForMissingTerm() {
+            Set<String> ids = idsViaOntologyService("ECO:0000001").stream().collect(Collectors.toSet());
+            when(ontologyTraversalMock.descendants(ids)).thenReturn(Collections.emptyList());
+            List<ECOTerm> descendants = ecoOntologyService.findDescendantsInfoByOntologyId(asList(ids));
+            assertThat(descendants.size(), is(0));
+        }
+
+        @Test
+        public void findsDescendantsForTerm() {
+            String id = "ECO:0000001";
+            List<String> myDescendants = singletonList("ECO:0000002");
+
+            OntologyDocument doc = createECODoc(id, "name1");
+            ECOTerm term = createECOTerm(id);
+
+            when(repositoryMock
+                    .findCoreAttrByTermId(OntologyType.ECO.name(), idsViaOntologyService(id)))
+                    .thenReturn(singletonList(doc));
+            when(ecoDocumentConverterMock.convert(doc)).thenReturn(term);
+            when(ontologyTraversalMock.descendants(singleton(id))).thenReturn(myDescendants);
+
+            List<ECOTerm> descendants = ecoOntologyService.findDescendantsInfoByOntologyId(singletonList(id));
+
+            assertThat(descendants.size(), is(1));
+            assertThat(descendants.get(0).descendants, is(myDescendants));
+        }
+
+        @Test
+        public void findsDescendantsForTermWithRelation() {
+            String id = "ECO:0000001";
+            List<String> myDescendants = singletonList("ECO:0000002");
+
+            OntologyDocument doc = createECODoc(id, "name1");
+            ECOTerm term = createECOTerm(id);
+
+            when(repositoryMock
+                    .findCoreAttrByTermId(OntologyType.ECO.name(), idsViaOntologyService(id)))
+                    .thenReturn(singletonList(doc));
+            when(ecoDocumentConverterMock.convert(doc)).thenReturn(term);
+            when(ontologyTraversalMock.descendants(singleton(id), OntologyRelationType.CAPABLE_OF))
+                    .thenReturn(myDescendants);
+
+            List<ECOTerm> descendants = ecoOntologyService.findDescendantsInfoByOntologyId(singletonList(id),
+                    OntologyRelationType.CAPABLE_OF);
+
+            assertThat(descendants.size(), is(1));
+            assertThat(descendants.get(0).descendants, is(myDescendants));
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void illegalArgumentWhenFindingPathsForZeroFromTerms() {
+            Set<String> fromIds = Collections.emptySet();
+            Set<String> toIds = idsViaOntologyService("ECO:0000001").stream().collect(Collectors.toSet());
+            doThrow(IllegalArgumentException.class).when(ontologyTraversalMock).paths(fromIds, toIds);
+            ecoOntologyService.paths(fromIds, toIds);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void illegalArgumentWhenFindingPathsForZeroToTerms() {
+            Set<String> fromIds = idsViaOntologyService("ECO:0000001").stream().collect(Collectors.toSet());
+            Set<String> toIds = Collections.emptySet();
+            doThrow(IllegalArgumentException.class).when(ontologyTraversalMock).paths(fromIds, toIds);
+            ecoOntologyService.paths(fromIds, toIds);
+        }
+
+        @Test
+        public void findsEmptyPathsForMissingTerm() {
+            Set<String> fromIds = idsViaOntologyService("ECO:0000001").stream().collect(Collectors.toSet());
+            Set<String> toIds = idsViaOntologyService("ECO:0000002").stream().collect(Collectors.toSet());
+
+            when(ontologyTraversalMock.paths(fromIds, toIds)).thenReturn(Collections.emptyList());
+            List<List<OntologyRelationship>> paths = ecoOntologyService.paths(fromIds, toIds);
+
+            assertThat(paths.size(), is(0));
+        }
+
+        @Test
+        public void findsPathsForTerm() {
+            String child = "ECO:0000001";
+            String parent = "ECO:0000002";
+            Set<String> fromIds = idsViaOntologyService(child).stream().collect(Collectors.toSet());
+            Set<String> toIds = idsViaOntologyService(parent).stream().collect(Collectors.toSet());
+
+            when(ontologyTraversalMock.paths(fromIds, toIds)).thenReturn(Collections.singletonList(Collections
+                    .singletonList(new OntologyRelationship(child, parent, OntologyRelationType.IS_A))));
+            List<List<OntologyRelationship>> paths = ecoOntologyService.paths(fromIds, toIds);
+
+            assertThat(paths.size(), is(1));
+        }
+
+        @Test
+        public void findsPathsForTermWithRelation() {
+            String child = "ECO:0000001";
+            String parent = "ECO:0000002";
+            Set<String> fromIds = idsViaOntologyService(child).stream().collect(Collectors.toSet());
+            Set<String> toIds = idsViaOntologyService(parent).stream().collect(Collectors.toSet());
+
+            when(ontologyTraversalMock.paths(fromIds, toIds, OntologyRelationType.IS_A))
+                    .thenReturn(Collections.singletonList(Collections
+                            .singletonList(new OntologyRelationship(child, parent, OntologyRelationType.IS_A))));
+            List<List<OntologyRelationship>> paths =
+                    ecoOntologyService.paths(fromIds, toIds, OntologyRelationType.IS_A);
+
+            assertThat(paths.size(), is(1));
+        }
+
         private List<String> idsViaOntologyService(String... ids) {
             return ecoOntologyService.buildIdList(Arrays.asList(ids));
         }
+    }
+
+    private static <ItemType> List<ItemType> asList(Collection<ItemType> items) {
+        return items.stream().collect(Collectors.toList());
     }
 }

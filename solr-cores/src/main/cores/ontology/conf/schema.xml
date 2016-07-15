@@ -36,7 +36,6 @@
     <field name="usage" type="string" indexed="false" stored="true"/>
     <field name="subset" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="children" type="string" indexed="false" stored="true" multiValued="true"/>
-    <field name="ancestor" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="synonym" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="synonymName" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
 
