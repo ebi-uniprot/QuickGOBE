@@ -200,6 +200,20 @@ public class OntologyGraph implements OntologyGraphTraversal {
         return ancestorEdgesMap.get(vertex);
     }
 
+    /**
+     * <p>
+     * Finds the outgoing, i.e., successor, edges originating from a {@link Collection} of starting vertices,
+     * whose target vertices must be in a specified {@link Collection} of vertices, and whose target vertices
+     * are reached by a specified {@link Set} of {@link OntologyRelationType}s.
+     * <p>
+     * Note that in this context, an edge is the formal name of an {@link OntologyRelationship}.
+     * @param fromVertices the starting vertices
+     * @param toVertices the target vertices
+     * @param relations the edge labels over which starting vertices can reach target vertices
+     * @return the {@link List} of {@link OntologyRelationship} instances defining the edges between {@code
+     * fromVertices}
+     *         to {@code toVertices} via {@code relations}
+     */
     private List<OntologyRelationship> successorEdges(
             Collection<String> fromVertices,
             Collection<String> toVertices,
