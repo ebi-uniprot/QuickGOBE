@@ -234,7 +234,7 @@ public class AnnotationRequestValidationIT {
     @Test
     public void validGeneProductTypeValuesDontCauseAnError(){
         String validIds = "complex,rna,protein";
-        annotationRequest.setGeneProductType(validIds);
+        annotationRequest.setGpType(validIds);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -242,7 +242,7 @@ public class AnnotationRequestValidationIT {
     @Test
     public void validGeneProductTypeNotCaseSensitive(){
         String validIds = "comPlex,rnA,pRotein";
-        annotationRequest.setGeneProductType(validIds);
+        annotationRequest.setGpType(validIds);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -253,7 +253,7 @@ public class AnnotationRequestValidationIT {
 
         Arrays.stream(invalidGeneProductTypes).forEach(
                 invalidValue -> {
-                    annotationRequest.setGeneProductType(invalidValue);
+                    annotationRequest.setGpType(invalidValue);
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     assertThat(violations, hasSize(is(1)));
                     assertThat(violations.iterator().next().getMessage(),
