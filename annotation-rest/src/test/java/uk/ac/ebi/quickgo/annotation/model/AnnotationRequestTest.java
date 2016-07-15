@@ -73,6 +73,21 @@ public class AnnotationRequestTest {
 
         assertThat(annotationRequest.getAspect(), is(aspect));
     }
+
+    @Test
+    public void setAndGetGeneProductID() {
+        String geneProductID = "A0A000";
+        annotationRequest.setGpId(geneProductID);
+        assertThat(annotationRequest.getGpId(), is(geneProductID));
+    }
+
+    @Test
+    public void setAndGetMultipleGeneProductIDs() {
+        String geneProductID = "A0A000,A0A001";
+        annotationRequest.setGpId(geneProductID);
+        assertThat(annotationRequest.getGpId(), is(geneProductID));
+    }
+
     @Test
     public void setAndGetEvidence(){
         String EVIDENCE_IEA = "IEA";
@@ -115,4 +130,12 @@ public class AnnotationRequestTest {
         annotationRequest.setReference(ONE_GOREF);
         assertThat(annotationRequest.getReference(), is(ONE_GOREF));
     }
+
+    @Test
+    public void setAndGetECOId() {
+        String ecoId = "ECO:0000256";
+        annotationRequest.setEcoId(ecoId);
+        assertThat(annotationRequest.getEcoId(), is(ecoId));
+    }
+
 }

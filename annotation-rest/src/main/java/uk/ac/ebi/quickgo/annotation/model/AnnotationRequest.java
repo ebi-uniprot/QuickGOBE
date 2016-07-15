@@ -1,12 +1,23 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.*;
+import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ECO_ID;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 
@@ -27,6 +38,10 @@ public class AnnotationRequest {
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
+
+    private static final String ASPECT_FIELD = "aspect";
+    private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID};
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -59,16 +74,14 @@ public class AnnotationRequest {
      * @return
      */
     public void setReference(String reference){
-        filterMap.put(AnnotationFields.REFERENCE_SEARCH, reference);
+        filterMap.put(REFERENCE_SEARCH, reference);
     }
 
     //todo create validation pattern @Pattern(regexp = "")
     public String getReference(){
-        return filterMap.get(AnnotationFields.REFERENCE_SEARCH);
+        return filterMap.get(REFERENCE_SEARCH);
     }
 
-    //TODO:change the way the field is referenced
-    private static final String ASPECT_FIELD = "aspect";
 
     public void setAspect(String aspect) {
         if (aspect != null) {
@@ -81,6 +94,22 @@ public class AnnotationRequest {
     public String getAspect() {
         return filterMap.get(ASPECT_FIELD);
     }
+
+    /**
+     * Gene Product IDs, in CSV format.
+     */
+
+    public void setGpId(String listOfGeneProductIDs){
+        if(listOfGeneProductIDs != null) {
+            filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
+        }
+    }
+
+    @GeneProductIDList
+    public String getGpId(){
+        return filterMap.get(GENE_PRODUCT_ID);
+    }
+
 
     /**
      * The older evidence codes
@@ -135,7 +164,35 @@ public class AnnotationRequest {
     @Pattern(regexp = "[0-9]+(,[0-9]+)*",
             message = "At least one 'Taxonomic identifier' value is invalid: ${validatedValue}")
     public String getTaxon() {
-        return filterMap.get(AnnotationFields.TAXON_ID);
+        return filterMap.get(TAXON_ID);
+    }
+
+    /**
+     * List of Gene Ontology ids in CSV format
+     * @param goId
+     */
+    public void setGoId(String goId){
+        filterMap.put(GO_ID,goId);
+    }
+
+    @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*",
+            message = "At least one 'GO Id' value is invalid: ${validatedValue}")
+    public String getGoId(){
+        return filterMap.get(GO_ID);
+    }
+
+    /**
+     * Will receive a list of eco ids thus: EcoId=ECO:0000256,ECO:0000323
+     * @param ecoId
+     */
+    public void setEcoId(String ecoId) {
+        filterMap.put(ECO_ID,ecoId);
+    }
+
+    @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*",
+            message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
+    public String getEcoId(){
+        return filterMap.get(ECO_ID);
     }
 
     public void setGpType(String geneProductType){
@@ -169,14 +226,10 @@ public class AnnotationRequest {
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
-        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
-        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
-        createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
-        createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
-        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
-        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
-        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
-        createSimpleFilter(DB_OBJECT_TYPE).ifPresent(filterRequests::add);
+        Stream.of(TARGET_FIELDS)
+                .map(this::createSimpleFilter)
+                .forEach(f ->f.ifPresent(filterRequests::add));
+
         return filterRequests;
     }
 
