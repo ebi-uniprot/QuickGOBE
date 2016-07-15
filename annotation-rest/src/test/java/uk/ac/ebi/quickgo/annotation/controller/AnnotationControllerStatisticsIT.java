@@ -78,7 +78,7 @@ public class AnnotationControllerStatisticsIT {
 
     //----------- Ontology ID -----------//
     @Test
-    public void ontologyStatsForMultipleDocsContaining1OntologyIdReturns1OntologyIdStat() throws Exception {
+    public void ontologyStatsForAllDocsContaining1OntologyIdReturns1OntologyIdStat() throws Exception {
         Set<String> savedGOIds = selectValuesFromDocs(savedDocs, doc -> doc.goId);
         assertThat(savedGOIds, hasSize(1));
 
@@ -97,7 +97,7 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
-    public void ontologyStatsForMultipleDocsContaining2OntologyIdsReturns2OntologyIdStats()
+    public void ontologyStatsForAllDocsContaining2OntologyIdsReturns2OntologyIdStats()
             throws Exception {
 
         AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
@@ -120,6 +120,12 @@ public class AnnotationControllerStatisticsIT {
                 .andExpect(totalHitsInGroup(GENE_PRODUCT_GROUP, NUMBER_OF_GENERIC_DOCS + 1))
                 .andExpect(keysInTypeWithinGroup(ANNOTATION_GROUP, type, asArray(savedGOIds)))
                 .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, type, asArray(savedGOIds)));
+    }
+
+    // todo
+    @Test
+    public void ontologyStatsForFilteredDocsContaining2OntologyIdsReturns2OntologyIdStats() {
+
     }
 
     private String[] asArray(Collection<String> elements) {
