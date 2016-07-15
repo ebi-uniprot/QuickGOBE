@@ -1,12 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
 
 import com.google.common.base.Preconditions;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,23 +17,33 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class StatsRequestConverterImpl implements StatsRequestConverter {
+
+    static final String DEFAULT_GLOBAL_AGGREGATE_NAME = "global";
+
     @Override public Aggregate convert(Collection<AnnotationRequest.StatsRequest> statsRequests) {
-        Preconditions.checkArgument(statsRequests != null, "Stats request collection cannot be null");
+        Preconditions.checkArgument(
+                statsRequests != null && statsRequests.size() > 0,
+                "Stats request collection cannot be null or empty");
 
-        return createDefaultStatsAggregate();
-    }
+        Map<String, Aggregate> nestedAggregateMap = new HashMap<>();
+        Aggregate globalAggregate = new Aggregate(DEFAULT_GLOBAL_AGGREGATE_NAME);
 
-    private Aggregate createDefaultStatsAggregate() {
-        Aggregate globalAggregate = new Aggregate("global");
-        globalAggregate.addField(AnnotationFields.ID, AggregateFunction.UNIQUE);
-        globalAggregate.addField(AnnotationFields.GENE_PRODUCT_ID, AggregateFunction.UNIQUE);
+        statsRequests.forEach(request -> {
+            globalAggregate.addField(request.getGroupField(), AggregateFunction.UNIQUE);
+            request.getTypes().forEach(type -> {
+                if (!nestedAggregateMap.containsKey(type)) {
+                    nestedAggregateMap.put(type, new Aggregate(type));
+                }
 
-        Aggregate goIdType = new Aggregate(AnnotationFields.GO_ID);
-        goIdType.addField(AnnotationFields.ID, AggregateFunction.UNIQUE);
-        goIdType.addField(AnnotationFields.GENE_PRODUCT_ID, AggregateFunction.UNIQUE);
+                Aggregate aggregateForType = nestedAggregateMap.get(type);
+                aggregateForType.addField(request.getGroupField(), AggregateFunction.UNIQUE);
+            });
+        });
 
-        globalAggregate.addNestedAggregate(goIdType);
+        // add all values of map as nested aggregates to global aggregate
+        nestedAggregateMap.values().forEach(globalAggregate::addNestedAggregate);
 
         return globalAggregate;
     }
+
 }
