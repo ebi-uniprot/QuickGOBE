@@ -27,13 +27,9 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
-
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE;
+import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.QUALIFIER;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
 
 /**
@@ -62,7 +58,7 @@ public class AnnotationControllerIT {
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxon";
-    private static final String WITHFROM_PARAM= "withFrom";
+    private static final String WITHFROM_PARAM = "withFrom";
     private static final String GO_ID_PARAM = "goId";
 
     //Test Data
@@ -94,10 +90,7 @@ public class AnnotationControllerIT {
 
         genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
         repository.save(genericDocs);
-//        genericDocs = createAlternativeGenericDocs(NUMBER_OF_GENERIC_DOCS);
-//        repository.save(genericDocs);
     }
-
 
     //ASSIGNED BY
     @Test
@@ -322,7 +315,7 @@ public class AnnotationControllerIT {
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2 ))
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
                 .andExpect(itemExistsExpectedTimes(GO_EVIDENCE_FIELD, goEvidenceCode1, 1))
                 .andExpect(itemExistsExpectedTimes(GO_EVIDENCE_FIELD, goEvidenceCode2, 1))
@@ -394,7 +387,7 @@ public class AnnotationControllerIT {
         String uniprotGp = "A1E959";
         String intactGp = "EBI-10043081";
         String rnaGp = "URS00000064B1_559292";
-        repository.save( AnnotationDocMocker.createAnnotationDoc(uniprotGp));
+        repository.save(AnnotationDocMocker.createAnnotationDoc(uniprotGp));
         repository.save(AnnotationDocMocker.createAnnotationDoc(intactGp));
         repository.save(AnnotationDocMocker.createAnnotationDoc(rnaGp));
         StringJoiner sj = new StringJoiner(",");
@@ -407,7 +400,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
-
 
     @Test
     public void filterByGeneProductUsingInvalidIDFailsValidation() throws Exception {
@@ -433,7 +425,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-
     @Test
     public void filterByThreeGeneProductIdsTwoOfWhichExistToEnsureTheyAreReturned() throws Exception {
         String geneProductId = "Z0Z000";
@@ -451,7 +442,6 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(1).geneProductId, 1));
     }
 
-
     @Test
     public void filterByGeneProductIDAndAssignedBySuccessfully() throws Exception {
         ResultActions response = mockMvc.perform(
@@ -467,7 +457,6 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(0).geneProductId, 1))
                 .andExpect(itemExistsExpectedTimes(ASSIGNED_BY, genericDocs.get(1).assignedBy, 1));
     }
-
 
     //---------- Gene Ontology Id
 
@@ -510,7 +499,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-
     @Test
     public void incorrectFormattedGoIdCausesError() throws Exception {
         ResultActions response = mockMvc.perform(
@@ -521,7 +509,6 @@ public class AnnotationControllerIT {
     }
 
     //---------- ECO ID
-
 
     @Test
     public void filterAnnotationsUsingSingleEcoIdReturnsResults() throws Exception {
@@ -611,7 +598,6 @@ public class AnnotationControllerIT {
                 );
     }
 
-
     @Test
     public void pageRequestEqualToAvailablePagesReturns200() throws Exception {
         ResultActions response = mockMvc.perform(
@@ -655,33 +641,33 @@ public class AnnotationControllerIT {
 
     //---------- withFrom related tests.
     @Test
-    public void successfulLookupWithFromForSingleId()throws Exception {
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro:IPR015421"));
+    public void successfulLookupWithFromForSingleId() throws Exception {
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro:IPR015421"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015421"));
+                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"));
 
     }
 
     @Test
-    public void successfulLookupWithFromForMultipleValues()throws Exception {
+    public void successfulLookupWithFromForMultipleValues() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM,
                 "InterPro:IPR015421,InterPro:IPR015422"));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015421"))
-                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015422"));
+                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"))
+                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015422"));
 
     }
 
-
     @Test
-    public void searchingForUnknownWithFromBringsBackNoResults()throws Exception {
+    public void searchingForUnknownWithFromBringsBackNoResults() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "XXX:54321"));
 
         response.andExpect(status().isOk())
@@ -689,29 +675,27 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-
     @Test
-    public void successfulLookupWithFromUsingDatabaseNameOnly()throws Exception {
+    public void successfulLookupWithFromUsingDatabaseNameOnly() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro"));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015421"))
-                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015422"));
+                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"))
+                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015422"));
     }
 
-
     @Test
-    public void successfulLookupWithFromUsingDatabaseIdOnly()throws Exception {
+    public void successfulLookupWithFromUsingDatabaseIdOnly() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "IPR015421"));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM,"InterPro:IPR015421"));
+                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"));
     }
 
     //---------- Limit related tests.
@@ -912,19 +896,9 @@ public class AnnotationControllerIT {
                         (Collectors.toList());
     }
 
-//    private List<AnnotationDocument> createAlternativeGenericDocs(int n) {
-//        return IntStream.range(0, n)
-//                .mapToObj(i -> AnnotationDocMocker.createAlternativeAnnotationDoc(createAlternativeId(i))).collect
-//                        (Collectors.toList());
-//    }
-
     private String createId(int idNum) {
         return String.format("A0A%03d", idNum);
     }
-
-//    private String createAlternativeId(int idNum) {
-//        return String.format("B0A%03d", idNum);
-//    }
 
     private int totalPages(int totalEntries, int resultsPerPage) {
         return (int) Math.ceil(totalEntries / resultsPerPage) + 1;
