@@ -9,16 +9,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ECO_ID;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
-
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -40,7 +31,7 @@ public class AnnotationRequest {
 
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
-            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID};
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, DB_SUBSET};
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -192,6 +183,16 @@ public class AnnotationRequest {
             message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
     public String getEcoId(){
         return filterMap.get(ECO_ID);
+    }
+
+    public void setGpSubset(String gpSubset){
+        filterMap.put(DB_SUBSET, gpSubset);
+    }
+
+    @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
+            message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
+    public String getGpSubset(){
+        return filterMap.get(DB_SUBSET);
     }
 
     public int getLimit() {
