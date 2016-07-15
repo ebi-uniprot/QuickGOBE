@@ -1,15 +1,20 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_FIELD;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_IDS;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
 /**
  *

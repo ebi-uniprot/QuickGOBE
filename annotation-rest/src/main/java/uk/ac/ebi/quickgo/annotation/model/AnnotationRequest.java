@@ -1,20 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.*;
+import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.TAXON_ID;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.WITH_FROM_SEARCH;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.QUALIFIER;
-
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -71,15 +67,14 @@ public class AnnotationRequest {
      * @param reference
      * @return
      */
-    public void setReference(String reference){
+    public void setReference(String reference) {
         filterMap.put(REFERENCE_SEARCH, reference);
     }
 
     //todo create validation pattern @Pattern(regexp = "")
-    public String getReference(){
+    public String getReference() {
         return filterMap.get(REFERENCE_SEARCH);
     }
-
 
     public void setAspect(String aspect) {
         if (aspect != null) {
@@ -97,14 +92,14 @@ public class AnnotationRequest {
      * Gene Product IDs, in CSV format.
      */
 
-    public void setGpId(String listOfGeneProductIDs){
-        if(listOfGeneProductIDs != null) {
+    public void setGpId(String listOfGeneProductIDs) {
+        if (listOfGeneProductIDs != null) {
             filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
         }
     }
 
     @GeneProductIDList
-    public String getGpId(){
+    public String getGpId() {
         return filterMap.get(GENE_PRODUCT_ID);
     }
 
@@ -128,7 +123,7 @@ public class AnnotationRequest {
      * NOT, enables etc
      * @param qualifier
      */
-    public void setQualifier(String qualifier){
+    public void setQualifier(String qualifier) {
         filterMap.put(QUALIFIER, qualifier);
     }
 
@@ -142,7 +137,7 @@ public class AnnotationRequest {
      * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
      * @param withFrom comma separated with/from values
      */
-    public void setWithFrom(String withFrom){
+    public void setWithFrom(String withFrom) {
         filterMap.put(WITH_FROM_SEARCH, withFrom);
     }
 
@@ -150,7 +145,7 @@ public class AnnotationRequest {
      * Return a list of with/from values, separated by commas
      * @return String containing comma separated list of with/From values.
      */
-    public  String getWithFrom(){
+    public String getWithFrom() {
         return filterMap.get(WITH_FROM_SEARCH);
     }
 
@@ -168,13 +163,13 @@ public class AnnotationRequest {
      * List of Gene Ontology ids in CSV format
      * @param goId
      */
-    public void setGoId(String goId){
-        filterMap.put(GO_ID,goId);
+    public void setGoId(String goId) {
+        filterMap.put(GO_ID, goId);
     }
 
     @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*",
             message = "At least one 'GO Id' value is invalid: ${validatedValue}")
-    public String getGoId(){
+    public String getGoId() {
         return filterMap.get(GO_ID);
     }
 
@@ -183,12 +178,12 @@ public class AnnotationRequest {
      * @param ecoId
      */
     public void setEcoId(String ecoId) {
-        filterMap.put(ECO_ID,ecoId);
+        filterMap.put(ECO_ID, ecoId);
     }
 
     @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*",
             message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
-    public String getEcoId(){
+    public String getEcoId() {
         return filterMap.get(ECO_ID);
     }
 
@@ -228,21 +223,6 @@ public class AnnotationRequest {
         }
     }
 
-    /**
-     * E.g. DOI, DOI:10.1002/adsc.201200590, GO_REF, PMID, PMID:12882977, Reactome, Reactome:R-RNO-912619,
-     * GO_REF:0000037 etc
-     * @param reference
-     * @return
-     */
-//    public void setReference(String reference) {
-//        filterMap.put(AnnotationFields.REFERENCE_SEARCH, reference);
-//    }
-//
-//    //todo create validation pattern @Pattern(regexp = "")
-//    public String getReference() {
-//        return filterMap.get(AnnotationFields.REFERENCE_SEARCH);
-//    }
-
     public int getLimit() {
         return limit;
     }
@@ -259,7 +239,7 @@ public class AnnotationRequest {
         this.page = page;
     }
 
-    public List<FilterRequest> createRequestFilters() {
+    public List<FilterRequest> createFilterRequests() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
         Stream.of(TARGET_FIELDS)
