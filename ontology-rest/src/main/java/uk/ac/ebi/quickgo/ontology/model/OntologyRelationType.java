@@ -1,7 +1,12 @@
-package uk.ac.ebi.quickgo.ontology.traversal;
+package uk.ac.ebi.quickgo.ontology.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
 
 /**
  * This {@code enum} defines the ontology relationships that are valid for use in QuickGO's source files.
@@ -27,16 +32,24 @@ public enum OntologyRelationType {
     CAPABLE_OF("CO", "capable_of"),
     CAPABLE_OF_PART_OF("CP", "capable_of_part_of");
 
-    private static final Map<String, OntologyRelationType> shortNameToValueMap = new HashMap<>();
+    private final String shortName;
+    private final String longName;
 
+    private static final Map<String, OntologyRelationType> shortNameToValueMap = new HashMap<>();
+    private static final Map<String, OntologyRelationType> longNameToValueMap = new HashMap<>();
     static {
         for (OntologyRelationType value : OntologyRelationType.values()) {
             shortNameToValueMap.put(value.getShortName(), value);
+            longNameToValueMap.put(value.getLongName(), value);
         }
     }
 
-    private final String shortName;
-    private final String longName;
+    // keep these variables below the above 'static' block
+    public static final String DEFAULT_TRAVERSAL_TYPES_CSV = "is_a,part_of,occurs_in,regulates";
+    public static final List<OntologyRelationType> DEFAULT_TRAVERSAL_TYPES =
+            asList(DEFAULT_TRAVERSAL_TYPES_CSV.split(",")).stream()
+                    .map(OntologyRelationType::getByLongName)
+                    .collect(Collectors.toList());
 
     OntologyRelationType(String shortName, String longName) {
         this.shortName = shortName;
@@ -47,15 +60,24 @@ public enum OntologyRelationType {
         return shortName;
     }
 
+    @JsonValue
     public String getLongName() {
         return longName;
     }
 
-    public static OntologyRelationType getByShortName(String shortName) {
-        if (shortNameToValueMap.containsKey(shortName)) {
-            return shortNameToValueMap.get(shortName);
+    public static OntologyRelationType getByShortName(String name) {
+        if (shortNameToValueMap.containsKey(name)) {
+            return shortNameToValueMap.get(name);
         } else {
-            throw new IllegalArgumentException("Unknown OntologyRelation: " + shortName);
+            throw new IllegalArgumentException("Unknown OntologyRelationType: " + name);
+        }
+    }
+
+    public static OntologyRelationType getByLongName(String name) {
+        if (longNameToValueMap.containsKey(name)) {
+            return longNameToValueMap.get(name);
+        } else {
+            throw new IllegalArgumentException("Unknown OntologyRelationType: " + name);
         }
     }
 

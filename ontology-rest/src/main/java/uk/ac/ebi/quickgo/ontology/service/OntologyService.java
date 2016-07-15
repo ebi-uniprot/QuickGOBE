@@ -3,11 +3,13 @@ package uk.ac.ebi.quickgo.ontology.service;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.List;
-import org.springframework.data.domain.Pageable;
+import java.util.Set;
 
 /**
  * Service layer for retrieving results from an underlying searchable data store.
@@ -81,4 +83,43 @@ public interface OntologyService<T extends OBOTerm> {
      * chosen information
      */
     List<T> findAnnotationGuideLinesInfoByOntologyId(List<String> ids);
+
+    /**
+     * Find the list of paths between two sets of vertices in a graph, navigable via
+     * a specified set of relations.
+     *
+     * @param startingIds the starting ids from which returned paths must start
+     * @param endingIds the ending ids from which returned paths end
+     * @param relations a varargs value containing the relationships over which paths can only travel.
+     *                  By omitting a {@code relation} value, all paths will be returned.
+     * @return a list of paths from {@code startingIds} to {@code endingIds} via {@code relations}
+     */
+    List<List<OntologyRelationship>> paths(
+            Set<String> startingIds,
+            Set<String> endingIds,
+            OntologyRelationType... relations);
+
+    /**
+     * Find the set of ancestor vertices reachable from a list of ids, {@code ids}, navigable via a specified
+     * set of relations.
+     *
+     * @param ids a {@link List} of ids whose ancestors one is interested in
+     * @param relations a varargs value containing the relationships over which paths can only travel.
+     *                  By omitting a {@code relation} value, all paths will be returned.
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
+     */
+    List<T> findAncestorsInfoByOntologyId(List<String> ids, OntologyRelationType... relations);
+
+    /**
+     * Find the set of descendant ids reachable from a specified list of ids, {@code ids}, navigable via a specified
+     * set of relations.
+     *
+     * @param ids a {@link List} ids whose descendants one is interested in
+     * @param relations a varargs value containing the relationships over which paths can only travel.
+     *                  By omitting a {@code relation} value, all paths will be returned.
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
+     */
+    List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations);
 }

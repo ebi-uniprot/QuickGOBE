@@ -1,7 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,6 +66,11 @@ public class OntologyGraphConfig {
     @Bean
     public OntologyGraph ontologyGraph() {
         return new OntologyGraph();
+    }
+
+    @Bean
+    public OntologyGraphTraversal ontologyGraphTraversal(OntologyGraph ontologyGraph) {
+        return ontologyGraph;
     }
 
     @Bean

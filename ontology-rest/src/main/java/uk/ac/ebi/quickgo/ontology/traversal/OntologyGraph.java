@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+
+import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.jgrapht.DirectedGraph;
@@ -35,8 +39,10 @@ public class OntologyGraph implements OntologyGraphTraversal {
     }
 
     public void addRelationships(Collection<? extends OntologyRelationship> relationships) {
+        Preconditions.checkArgument(relationships != null, "Relationships to add to the graph cannot be null");
+
         // populate graph with edges, whilst recording the vertices
-        relationships.stream().forEach(
+        relationships.forEach(
                 oEdge -> {
                     if (!ontology.containsVertex(oEdge.child)) {
                         ontology.addVertex(oEdge.child);
@@ -53,15 +59,27 @@ public class OntologyGraph implements OntologyGraphTraversal {
     }
 
     @Override
-    public List<List<OntologyRelationship>> paths(String v1, String v2, OntologyRelationType... relations) {
+    public List<List<OntologyRelationship>> paths(
+            Set<String> startingVertices,
+            Set<String> endingVertices,
+            OntologyRelationType... relations) {
+
+        Preconditions.checkArgument(!isNullOrEmpty(startingVertices), "Starting vertices cannot be null/empty.");
+        Preconditions.checkArgument(!isNullOrEmpty(endingVertices), "Ending vertices cannot be null/empty.");
+
         Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
 
-        if (v1.equals(v2)) {
-            throw new IllegalArgumentException("Cannot find paths between vertex and itself: " + v1);
+        Set<String> startEndIntersection = new HashSet<>(startingVertices);
+        startEndIntersection.retainAll(endingVertices);
+        if (!startEndIntersection.isEmpty()) {
+            throw new IllegalArgumentException("Cannot find paths intersecting start/end vertex sets:\n"
+                    + "\tstarting vertices: " + startingVertices
+                    + "\tending vertices: " + endingVertices);
         }
 
         List<List<OntologyRelationship>> interestingPaths = new ArrayList<>();
-        List<OntologyRelationship> immediateSuccessors = successorEdges(v1, v2, relationsSet);
+
+        List<OntologyRelationship> immediateSuccessors = successorEdges(startingVertices, endingVertices, relationsSet);
         if (immediateSuccessors.size() > 0) {
             immediateSuccessors.stream()
                     .map(Collections::singletonList)
@@ -69,7 +87,8 @@ public class OntologyGraph implements OntologyGraphTraversal {
         }
 
         AllDirectedPaths<String, OntologyRelationship> allPaths = new AllDirectedPaths<>(ontology);
-        List<GraphPath<String, OntologyRelationship>> v1v2Paths = allPaths.getAllPaths(v1, v2, true, null);
+        List<GraphPath<String, OntologyRelationship>> v1v2Paths =
+                allPaths.getAllPaths(startingVertices, endingVertices, true, null);
         List<GraphPath<String, OntologyRelationship>> invalidPaths = new ArrayList<>();
 
         for (GraphPath<String, OntologyRelationship> path : v1v2Paths) {
@@ -87,30 +106,36 @@ public class OntologyGraph implements OntologyGraphTraversal {
     }
 
     @Override
-    public Set<String> ancestors(String base, OntologyRelationType... relations) {
+    public List<String> ancestors(Set<String> baseVertices, OntologyRelationType... relations) {
+        Preconditions.checkArgument(!isNullOrEmpty(baseVertices), "Base vertices cannot be null/empty.");
+
         Set<String> ancestorsFound = new HashSet<>();
         if (relations.length == 0) {
             relations = new OntologyRelationType[1];
             relations[0] = OntologyRelationType.UNDEFINED;
         }
 
-        for (OntologyRelationship relation : getAncestorEdges(base)) {
-            if (relation.relationship.hasTransitiveType(relations)) {
-                ancestorsFound.add(relation.parent);
+        for (String base : baseVertices) {
+            for (OntologyRelationship relation : getAncestorEdges(base)) {
+                if (relation.relationship.hasTransitiveType(relations)) {
+                    ancestorsFound.add(relation.parent);
+                }
             }
         }
 
-        return ancestorsFound;
+        return ancestorsFound.stream().collect(Collectors.toList());
     }
 
     @Override
-    public Set<String> descendants(String top, OntologyRelationType... relations) {
+    public List<String> descendants(Set<String> topVertices, OntologyRelationType... relations) {
+        Preconditions.checkArgument(!isNullOrEmpty(topVertices), "Top vertices cannot be null/empty.");
+
         Set<String> descendantsFound = new HashSet<>();
-        descendantsFound.add(top); // as with ancestors, include itself (indicating IDENTITY relationship)
+        descendantsFound.addAll(topVertices); // as with ancestors, include itself (indicating IDENTITY relationship)
 
         Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
-        descendants(top, descendantsFound, relationsSet);
-        return descendantsFound;
+        descendants(topVertices, descendantsFound, relationsSet);
+        return descendantsFound.stream().collect(Collectors.toList());
     }
 
     @Override public int hashCode() {
@@ -136,7 +161,8 @@ public class OntologyGraph implements OntologyGraphTraversal {
                 that.ancestorEdgesMap == null;
     }
 
-    private static String getOppositeVertex(Graph<String, OntologyRelationship> graph, OntologyRelationship edge, String vertex) {
+    private static String getOppositeVertex(Graph<String, OntologyRelationship> graph, OntologyRelationship edge,
+            String vertex) {
         String source = graph.getEdgeSource(edge);
         String target = graph.getEdgeTarget(edge);
         if (vertex.equals(source)) {
@@ -145,8 +171,12 @@ public class OntologyGraph implements OntologyGraphTraversal {
             return source;
         } else {
             throw new IllegalArgumentException(
-                    "No such vertex: " + vertex);
+                    "No such graph vertex: " + vertex);
         }
+    }
+
+    private boolean isNullOrEmpty(Collection<?> collection) {
+        return collection == null || collection.isEmpty();
     }
 
     private Set<OntologyRelationship> getAncestorEdges(String vertex) {
@@ -170,13 +200,32 @@ public class OntologyGraph implements OntologyGraphTraversal {
         return ancestorEdgesMap.get(vertex);
     }
 
-    private List<OntologyRelationship> successorEdges(String from, String to, Set<OntologyRelationType> relations) {
+    /**
+     * <p>
+     * Finds the outgoing, i.e., successor, edges originating from a {@link Collection} of starting vertices,
+     * whose target vertices must be in a specified {@link Collection} of vertices, and whose target vertices
+     * are reached by a specified {@link Set} of {@link OntologyRelationType}s.
+     * <p>
+     * Note that in this context, an edge is the formal name of an {@link OntologyRelationship}.
+     * @param fromVertices the starting vertices
+     * @param toVertices the target vertices
+     * @param relations the edge labels over which starting vertices can reach target vertices
+     * @return the {@link List} of {@link OntologyRelationship} instances defining the edges between {@code
+     * fromVertices}
+     *         to {@code toVertices} via {@code relations}
+     */
+    private List<OntologyRelationship> successorEdges(
+            Collection<String> fromVertices,
+            Collection<String> toVertices,
+            Set<OntologyRelationType> relations) {
         List<OntologyRelationship> successors = new ArrayList<>();
 
-        Set<OntologyRelationship> outgoingEdgesOfV = ontology.outgoingEdgesOf(from);
-        outgoingEdgesOfV.stream()
-                .filter(e -> relations.contains(e.relationship) && e.parent.equals(to))
-                .forEach(successors::add);
+        fromVertices.forEach(
+                from ->
+                        ontology.outgoingEdgesOf(from).stream()
+                                .filter(e -> relations.contains(e.relationship) && toVertices.contains(e.parent))
+                                .forEach(successors::add)
+        );
 
         return successors;
     }
@@ -200,12 +249,13 @@ public class OntologyGraph implements OntologyGraphTraversal {
         return relatives;
     }
 
-    private void descendants(String top, Set<String> currentDescendants, Set<OntologyRelationType> relations) {
-        Set<String> parents = getRelatives(top, ontology.incomingEdgesOf(top), relations);
+    private void descendants(Set<String> topVertices, Set<String> currentDescendants, Set<OntologyRelationType>
+            relations) {
+        for (String top : topVertices) {
+            Set<String> descendants = getRelatives(top, ontology.incomingEdgesOf(top), relations);
 
-        for (String parent : parents) {
-            currentDescendants.add(parent);
-            descendants(parent, currentDescendants, relations);
+            currentDescendants.addAll(descendants);
+            descendants(descendants, currentDescendants, relations);
         }
     }
 }

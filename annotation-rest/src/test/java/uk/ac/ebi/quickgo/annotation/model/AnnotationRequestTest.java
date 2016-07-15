@@ -1,20 +1,15 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.rest.ParameterException;
-import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_FIELD;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_IDS;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
 /**
  *
@@ -26,6 +21,9 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIO
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequestTest {
+
+    //AssignedBy values
+    private static final String UNI_PROT = "UniProt";
 
     private AnnotationRequest annotationRequest;
 
@@ -61,7 +59,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetWithFrom() {
+    public void setAndGetWithFrom(){
         String WITH_FROM = "RGD:1623038";
         annotationRequest.setWithFrom(WITH_FROM);
         assertThat(annotationRequest.getWithFrom(), is(WITH_FROM));
@@ -77,21 +75,35 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetEvidence() {
+    public void setAndGetGeneProductID() {
+        String geneProductID = "A0A000";
+        annotationRequest.setGpId(geneProductID);
+        assertThat(annotationRequest.getGpId(), is(geneProductID));
+    }
+
+    @Test
+    public void setAndGetMultipleGeneProductIDs() {
+        String geneProductID = "A0A000,A0A001";
+        annotationRequest.setGpId(geneProductID);
+        assertThat(annotationRequest.getGpId(), is(geneProductID));
+    }
+
+    @Test
+    public void setAndGetEvidence(){
         String EVIDENCE_IEA = "IEA";
         annotationRequest.setGoEvidence(EVIDENCE_IEA);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_IEA));
     }
 
     @Test
-    public void setAndGetEvidenceMulti() {
+    public void setAndGetEvidenceMulti(){
         String EVIDENCE_MULTI = "IEA,IBD";
         annotationRequest.setGoEvidence(EVIDENCE_MULTI);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
     }
 
     @Test
-    public void setAndGetEvidenceMultiInLowerCase() {
+    public void setAndGetEvidenceMultiInLowerCase(){
         String EVIDENCE_MULTI = "iea,ibd";
         annotationRequest.setGoEvidence(EVIDENCE_MULTI);
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
@@ -188,4 +200,12 @@ public class AnnotationRequestTest {
         annotationRequest.setReference(ONE_GOREF);
         assertThat(annotationRequest.getReference(), is(ONE_GOREF));
     }
+
+    @Test
+    public void setAndGetECOId() {
+        String ecoId = "ECO:0000256";
+        annotationRequest.setEcoId(ecoId);
+        assertThat(annotationRequest.getEcoId(), is(ecoId));
+    }
+
 }

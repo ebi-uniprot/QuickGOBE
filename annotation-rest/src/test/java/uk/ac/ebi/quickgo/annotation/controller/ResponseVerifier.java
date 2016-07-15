@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
+import org.hamcrest.Matchers;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
@@ -11,6 +12,7 @@ import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -22,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * service is working as expected.
  */
 final class ResponseVerifier {
-    public static final String GENEPRODUCT_ID_FIELD = "geneProductId";
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
     public static final String GO_ID_FIELD = "goId";
     public static final String QUALIFIER = "qualifier";
@@ -55,6 +56,10 @@ final class ResponseVerifier {
 
     static ResultMatcher valueOccursInCollection(String fieldName, String value) {
         return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
+    }
+
+    static ResultMatcher messageExists(String message){
+        return jsonPath("$.messages", Matchers.hasItem(is(message)));
     }
 
     static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {

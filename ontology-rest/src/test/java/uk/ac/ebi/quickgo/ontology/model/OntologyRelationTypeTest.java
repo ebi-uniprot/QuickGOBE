@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.traversal;
+package uk.ac.ebi.quickgo.ontology.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +10,7 @@ import org.junit.runners.Parameterized;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType.*;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
 
 /**
  * Validate that ontology relationships are retrieved correctly.
@@ -24,11 +24,28 @@ public class OntologyRelationTypeTest {
      * Tests the ability to lookup relationships based on their short names
      */
     public static class LookupTest {
+        private static final String COMMA = ",";
+
         @Test
-        public void validRelationshipsCanBeRetrieved() {
+        public void validRelationshipsCanBeRetrievedByShortName() {
             for (OntologyRelationType relation : OntologyRelationType.values()) {
                 OntologyRelationType relationRetrieved = OntologyRelationType.getByShortName(relation.getShortName());
                 assertThat(relationRetrieved, is(relation));
+            }
+        }
+
+        @Test
+        public void validRelationshipsCanBeRetrievedByLongName() {
+            for (OntologyRelationType relation : OntologyRelationType.values()) {
+                OntologyRelationType relationRetrieved = OntologyRelationType.getByLongName(relation.getLongName());
+                assertThat(relationRetrieved, is(relation));
+            }
+        }
+
+        @Test
+        public void ensureDefaultTraversalTypesAreValid() {
+            for (String traversalType : DEFAULT_TRAVERSAL_TYPES_CSV.split(COMMA)) {
+                OntologyRelationType.getByLongName(traversalType);
             }
         }
 

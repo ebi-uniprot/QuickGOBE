@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.common.document;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Class to create stubbed {@link AnnotationDocument} instances.
@@ -10,7 +11,23 @@ import java.util.Arrays;
  */
 public class AnnotationDocMocker {
 
-    public static final String REF2 = "GO_REF:0000002";
+    public static final String GO_ID= "GO:0003824";
+    public static final String ECO_ID = "ECO:0000256";
+    public static final String QUALIFIER = "enables";
+    public static final String GO_EVIDENCE = "IEA";
+    public static final String REFERENCE = "GO_REF:0000002";
+    public static final List<String> WITH_FROM = Arrays.asList("InterPro:IPR015421", "InterPro:IPR015422");
+    public static final int INTERACTING_TAXON_ID = 35758;
+    public static final String ASSIGNED_BY = "InterPro";
+    public static final List<String> EXTENSIONS = Arrays.asList(
+            "results_in_development_of(UBERON:0001675),acts_on_population_of(CL:0000032)",
+            "results_in_development_of(UBERON:0006000)");
+    public static final String OBJECT_SYMBOL = "moeA5";
+    public static final String OBJECT_TYPE = "protein";
+    public static final String SUB_SET = "TrEMBL";
+    public static final int TAXON_ID = 12345;
+
+
 
     private AnnotationDocMocker() {}
 
@@ -23,49 +40,20 @@ public class AnnotationDocMocker {
         // (in solrconfig.xml this is set automatically as a UUID)
         doc.id = geneProductId + "-" + System.nanoTime();
 
-        doc.goId = "GO:0003824";
-        doc.ecoId = "ECO:0000256";
-        doc.qualifier = "enables";
-        doc.goEvidence = "IEA";
-        doc.reference = REF2;
-        doc.withFrom = Arrays.asList("InterPro:IPR015421", "InterPro:IPR015422");
-        doc.interactingTaxonId = 35758;
-        doc.assignedBy = "InterPro";
-        doc.extensions = Arrays.asList(
-                "results_in_development_of(UBERON:0001675),acts_on_population_of(CL:0000032)",
-                "results_in_development_of(UBERON:0006000)"
-        );
+        doc.goId = GO_ID;
+        doc.ecoId = ECO_ID;
+        doc.qualifier = QUALIFIER;
+        doc.goEvidence = GO_EVIDENCE;
+        doc.reference = REFERENCE;
+        doc.withFrom = WITH_FROM;
+        doc.interactingTaxonId = INTERACTING_TAXON_ID;
+        doc.assignedBy = ASSIGNED_BY;
+        doc.extensions = EXTENSIONS;
+        doc.dbObjectSymbol = OBJECT_SYMBOL;
+        doc.dbObjectType = OBJECT_TYPE;
+        doc.dbSubset = SUB_SET;
+        doc.taxonId = TAXON_ID;
 
-        doc.dbObjectSymbol = "moeA5";
-        doc.dbObjectType = "protein";
-        doc.dbSubset = "TrEMBL";
-        doc.taxonId = 12345;
-
-        return doc;
-    }
-
-    public static AnnotationDocument createAnnotationDocUniqueData(String geneProductId) {
-        AnnotationDocument doc = new AnnotationDocument();
-        doc.geneProductId = geneProductId;
-
-        // automatically compute a document identifier,
-        // to overcome non-uniqueness of all other annotation fields
-        // (in solrconfig.xml this is set automatically as a UUID)
-        doc.id = geneProductId + "-" + System.nanoTime();
-
-        doc.goId = "GO:0003824";
-        doc.ecoId = "ECO:0000323";
-        doc.qualifier = "involved_in";
-        doc.goEvidence = "IDA";
-        doc.reference = "GO_REF:0000038";
-        doc.withFrom = Arrays.asList("InterPro:IPR015421","InterPro:IPR015422");
-        doc.interactingTaxonId = 35758;
-        doc.assignedBy = "UniProt";
-        doc.extensions = Arrays.asList("occurs_in(CL:1000428)");
-        doc.dbObjectSymbol = "A0A000";
-        doc.dbObjectType = "complex";
-        doc.dbSubset = "TrEMBL";
-        doc.taxonId = 99999;
         return doc;
     }
 }

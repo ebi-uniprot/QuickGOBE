@@ -1,13 +1,15 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
-import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
+import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
+import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyGraphConfig;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 
@@ -26,15 +28,16 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.ontology.service"})
-@Import({OntologyRepoConfig.class})
+@Import({OntologyRepoConfig.class, OntologyGraphConfig.class})
 public class ServiceConfig {
     @Bean
-    public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository) {
+    public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository, OntologyGraphTraversal ontologyGraphTraversal) {
         return new OntologyServiceImpl<>(
                 ontologyRepository,
                 goDocumentConverter(),
                 OntologyType.GO,
-                queryStringSanitizer());
+                queryStringSanitizer(),
+                ontologyGraphTraversal);
     }
 
     private GODocConverter goDocumentConverter() {
@@ -42,12 +45,13 @@ public class ServiceConfig {
     }
 
     @Bean
-    public OntologyService<ECOTerm> ecoOntologyService(OntologyRepository ontologyRepository) {
+    public OntologyService<ECOTerm> ecoOntologyService(OntologyRepository ontologyRepository, OntologyGraphTraversal ontologyGraphTraversal) {
         return new OntologyServiceImpl<>(
                 ontologyRepository,
                 ecoDocConverter(),
                 OntologyType.ECO,
-                queryStringSanitizer());
+                queryStringSanitizer(),
+                ontologyGraphTraversal);
     }
 
     private ECODocConverter ecoDocConverter() {

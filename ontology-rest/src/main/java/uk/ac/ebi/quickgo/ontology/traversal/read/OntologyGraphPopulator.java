@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationship;
 
 import java.util.List;
 import org.slf4j.Logger;

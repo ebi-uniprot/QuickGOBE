@@ -31,12 +31,12 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         if (termOptional.isPresent()) {
             OntologyDocument doc = new OntologyDocument();
             GenericTerm term = termOptional.get();
-            doc.ancestors = extractAncestors(term);
             doc.considers = extractConsidersAsList(term);
             doc.id = term.getId();
             doc.isObsolete = term.isObsolete();
             doc.comment = term.getComment();
             doc.definition = term.getDefinition();
+            doc.definitionXrefs = extractDefinitionXrefs(term);
             doc.history = extractHistory(term);
             doc.name = term.getName();
             doc.ontologyType = term.getOntologyType();
@@ -56,7 +56,15 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         } else {
             return Optional.empty();
         }
+    }
 
+    protected List<String> extractDefinitionXrefs(GenericTerm term) {
+        return term.getDefinitionXrefs().stream()
+                .map(xref -> FlatFieldBuilder.newFlatField()
+                        .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getDb()))
+                        .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getId()))
+                .buildString())
+                .collect(Collectors.toList());
     }
 
     private List<String> extractSubsets(GenericTerm term) {
@@ -121,18 +129,6 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(g.getId()))
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(g.getName()))
                                     .buildString())
-                    .collect(Collectors.toList());
-        } else {
-            return null;
-        }
-    }
-
-    protected List<String> extractAncestors(GenericTerm term) {
-        if (!isEmpty(term.getAncestors())) {
-            return term.getAncestors()
-                    .stream() // ancestors is a list of parent ids for this term?
-                    .map(
-                            a -> a.getParent().getId())
                     .collect(Collectors.toList());
         } else {
             return null;

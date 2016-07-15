@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import org.junit.Before;
 import org.junit.Test;

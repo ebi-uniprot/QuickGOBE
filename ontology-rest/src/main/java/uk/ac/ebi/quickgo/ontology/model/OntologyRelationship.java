@@ -1,19 +1,22 @@
-package uk.ac.ebi.quickgo.ontology.traversal;
+package uk.ac.ebi.quickgo.ontology.model;
 
 import org.jgrapht.graph.DefaultEdge;
 
 /**
- * This class represents the components of an ontology graph:child vertices,
+ * This class represents the components of an ontology graph: child vertices,
  * parent vertices and the edges that relate these vertices.
  *
  * Created 18/05/16
  * @author Edd
  */
-public class OntologyRelationship extends LabelledEdge<String> {
+public class OntologyRelationship extends DefaultEdge {
+    public String child;
+    public String parent;
     public OntologyRelationType relationship;
 
     public OntologyRelationship(String child, String parent, OntologyRelationType relationship) {
-        super(child, parent, relationship);
+        this.child = child;
+        this.parent = parent;
         this.relationship = relationship;
     }
 
@@ -89,24 +92,5 @@ public class OntologyRelationship extends LabelledEdge<String> {
         }
 
         return new OntologyRelationship(child.child, parent.parent, mergedType);
-    }
-}
-
-/**
- * Class representing labelled edges, required by the JGraphT library.
- * The class is encapsulated in the same file, because it is currently
- * not required by any other class.
- * <p>
- * @param <V> the edge type.
- */
-class LabelledEdge<V> extends DefaultEdge {
-    public V child;
-    public V parent;
-    public String relation;
-
-    LabelledEdge(V child, V v2, OntologyRelationType relation) {
-        this.child = child;
-        this.parent = v2;
-        this.relation = relation.getShortName();
     }
 }

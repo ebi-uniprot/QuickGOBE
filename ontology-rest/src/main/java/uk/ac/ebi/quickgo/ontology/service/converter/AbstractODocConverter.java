@@ -29,6 +29,7 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
             new HistoryFieldConverter();
     private final static XRefsFieldConverter XREFS_FIELD_CONVERTER =
             new XRefsFieldConverter();
+    private final static DefinitionConverter DEFINITION_CONVERTER = new DefinitionConverter();
 
     public abstract T convert(OntologyDocument ontologyDocument);
 
@@ -36,14 +37,13 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
         term.id = ontologyDocument.id;
         term.name = ontologyDocument.name;
         term.consider = ontologyDocument.considers;
-        term.definition = ontologyDocument.definition;
         term.isObsolete = ontologyDocument.isObsolete;
         term.replacedBy = ontologyDocument.replacedBy;
         term.comment = ontologyDocument.comment;
         term.children = ontologyDocument.children;
-        term.ancestors = ontologyDocument.ancestors;
         term.secondaryIds = ontologyDocument.secondaryIds;
         term.subsets = ontologyDocument.subsets;
+        term.definition = DEFINITION_CONVERTER.apply(ontologyDocument);
         term.synonyms = SYNONYMS_FIELD_CONVERTER.convertFieldList(ontologyDocument.synonyms);
         term.history = HISTORY_FIELD_CONVERTER.convertFieldList(ontologyDocument.history);
         term.xRefs = XREFS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xrefs);
