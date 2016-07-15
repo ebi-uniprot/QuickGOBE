@@ -130,4 +130,12 @@ public class AnnotationRequestTest {
         annotationRequest.setReference(ONE_GOREF);
         assertThat(annotationRequest.getReference(), is(ONE_GOREF));
     }
+
+    @Test
+    public void setAndGetECOId() {
+        String ecoId = "ECO:0000256";
+        annotationRequest.setEcoId(ecoId);
+        assertThat(annotationRequest.getEcoId(), is(ecoId));
+    }
+
 }

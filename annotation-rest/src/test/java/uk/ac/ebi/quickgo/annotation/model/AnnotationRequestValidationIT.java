@@ -317,6 +317,58 @@ public class AnnotationRequestValidationIT {
     }
 
 
+    //ECO PARAMETER
+
+    @Test
+    public void ecoIdIsValid() {
+        String[] ecoIds = {"ECO:0000256", "ECO:0000888", "ECO:0000777"};
+
+        Arrays.stream(ecoIds).forEach(
+                validIds -> {
+                    annotationRequest.setEcoId(validIds);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
+                }
+        );
+    }
+
+    @Test
+    public void mixedCaseEcoIdIsValid() {
+        String[] ecoIds = {"ECO:0000256", "EcO:0000256", "eCO:0000256"};
+
+        Arrays.stream(ecoIds).forEach(
+                mixedCaseId -> {
+                    annotationRequest.setEcoId(mixedCaseId);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+
+                    assertThat(violations, hasSize(0));
+                }
+        );
+    }
+
+
+    @Test
+    public void ecoIdIsInvalid() {
+        String[] ecoIds = {"ECO:9", "xxx:0000888", "-"};
+
+        Arrays.stream(ecoIds).forEach(
+                validId -> {
+                    annotationRequest.setEcoId(validId);
+
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'ECO identifier' value is invalid: " + validId));
+                    assertThat(violations, hasSize(1));
+                }
+        );
+    }
+
     //PAGE PARAMETER
     @Test
     public void negativePageValueIsInvalid() {

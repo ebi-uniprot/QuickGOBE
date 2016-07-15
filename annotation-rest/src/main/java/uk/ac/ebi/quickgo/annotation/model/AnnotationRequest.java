@@ -4,11 +4,13 @@ import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.*;
+import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ECO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_EVIDENCE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.REFERENCE_SEARCH;
@@ -37,6 +39,8 @@ public class AnnotationRequest {
     private static final String COMMA = ",";
 
     private static final String ASPECT_FIELD = "aspect";
+    private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID};
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -176,6 +180,20 @@ public class AnnotationRequest {
         return filterMap.get(GO_ID);
     }
 
+    /**
+     * Will receive a list of eco ids thus: EcoId=ECO:0000256,ECO:0000323
+     * @param ecoId
+     */
+    public void setEcoId(String ecoId) {
+        filterMap.put(ECO_ID,ecoId);
+    }
+
+    @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*",
+            message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
+    public String getEcoId(){
+        return filterMap.get(ECO_ID);
+    }
+
     public int getLimit() {
         return limit;
     }
@@ -196,16 +214,9 @@ public class AnnotationRequest {
     public List<FilterRequest> createRequestFilters() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
-        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
-        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
-        createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
-        createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
-        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
-        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
-        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
-        createSimpleFilter(GO_ID).ifPresent(filterRequests::add);
-
-        createSimpleFilter(GENE_PRODUCT_ID).ifPresent(filterRequests::add);
+        Stream.of(TARGET_FIELDS)
+                .map(this::createSimpleFilter)
+                .forEach(f ->f.ifPresent(filterRequests::add));
 
         return filterRequests;
     }
