@@ -91,6 +91,22 @@ public class OntologyGraphTest {
         public void addingEmptyRelationshipsDoesNotThrowException() {
             ontologyGraph.addRelationships(Collections.emptyList());
         }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void findingPathsWithEmptyStartAndEndVerticesThrowsException() {
+            ontologyGraph.paths(
+                    Collections.emptySet(),
+                    Collections.emptySet()
+            );
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void findingPathsWithNullStartAndEndVerticesThrowsException() {
+            ontologyGraph.paths(
+                    null,
+                    null
+            );
+        }
     }
 
     public class PathTests {
