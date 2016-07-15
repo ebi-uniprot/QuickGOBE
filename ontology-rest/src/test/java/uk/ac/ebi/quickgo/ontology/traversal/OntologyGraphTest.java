@@ -28,10 +28,19 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
 public class OntologyGraphTest {
 
     private OntologyGraph ontologyGraph;
+    private OntologyRelationship v1_CO_v2;
+    private OntologyRelationship v1_CP_v2;
+    private OntologyRelationship v2_OI_v3;
+    private OntologyRelationship v2_IA_v3;
 
     @Before
     public void setUp() {
         ontologyGraph = new OntologyGraph();
+
+        v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
+        v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
+        v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
+        v2_IA_v3 = createRelationship(id("2"), id("3"), OntologyRelationType.IS_A);
     }
 
     private OntologyRelationship createRelationship(String child, String parent, OntologyRelationType relation) {
@@ -48,6 +57,16 @@ public class OntologyGraphTest {
 
     private String id(String id) {return "GO:" + id;}
 
+    private void setupGraphWith3SimpleRelationships() {
+        ontologyGraph.addRelationships(
+                asList(
+                        v1_CO_v2,
+                        v1_CP_v2,
+                        v2_OI_v3
+                )
+        );
+    }
+
     public class GraphLifecycleTests {
         @Test
         public void initialisedGraphContainsNothing() {
@@ -57,13 +76,8 @@ public class OntologyGraphTest {
 
         @Test
         public void addingRelationshipsSucceeds() {
-            ontologyGraph.addRelationships(
-                    asList(
-                            createRelationship(id("1"), id("2"), CAPABLE_OF),
-                            createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF),
-                            createRelationship(id("2"), id("3"), CONSIDER)
-                    )
-            );
+            setupGraphWith3SimpleRelationships();
+
             assertThat(ontologyGraph.getVertices().size(), is(3));
             assertThat(ontologyGraph.getEdges().size(), is(3));
         }
@@ -80,6 +94,7 @@ public class OntologyGraphTest {
     }
 
     public class PathTests {
+
         @Test(expected = IllegalArgumentException.class)
         public void findingPathsBetweenSameVertexThrowsException() {
             ontologyGraph.paths(
@@ -127,16 +142,7 @@ public class OntologyGraphTest {
 
         @Test
         public void findAllPathsBetween1LevelOfAncestorsViaAllRelations() {
-            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
-            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
-            ontologyGraph.addRelationships(
-                    asList(
-                            v1_CO_v2,
-                            v1_CP_v2,
-                            v2_OI_v3
-                    )
-            );
+            setupGraphWith3SimpleRelationships();
 
             List<List<OntologyRelationship>> paths = ontologyGraph.paths(
                     ids("1"),
@@ -150,16 +156,7 @@ public class OntologyGraphTest {
 
         @Test
         public void findAllPathsBetween1LevelOfAncestorsVia1Relation() {
-            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
-            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
-            ontologyGraph.addRelationships(
-                    asList(
-                            v1_CO_v2,
-                            v1_CP_v2,
-                            v2_OI_v3
-                    )
-            );
+            setupGraphWith3SimpleRelationships();
 
             List<List<OntologyRelationship>> paths = ontologyGraph.paths(
                     ids("1"),
@@ -173,16 +170,7 @@ public class OntologyGraphTest {
 
         @Test
         public void findAllPathsBetween2LevelsOfAncestorsViaAllRelations() {
-            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
-            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
-            ontologyGraph.addRelationships(
-                    asList(
-                            v1_CO_v2,
-                            v1_CP_v2,
-                            v2_OI_v3
-                    )
-            );
+            setupGraphWith3SimpleRelationships();
 
             List<List<OntologyRelationship>> paths = ontologyGraph.paths(
                     ids("1"),
@@ -196,13 +184,7 @@ public class OntologyGraphTest {
 
         @Test
         public void findZeroPathsBetween2LevelsOfAncestorsVia1Relation() {
-            ontologyGraph.addRelationships(
-                    asList(
-                            createRelationship(id("1"), id("2"), CAPABLE_OF),
-                            createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF),
-                            createRelationship(id("2"), id("3"), OCCURS_IN)
-                    )
-            );
+            setupGraphWith3SimpleRelationships();
 
             List<List<OntologyRelationship>> paths = ontologyGraph.paths(
                     ids("1"),
@@ -215,11 +197,7 @@ public class OntologyGraphTest {
 
         @Test
         public void findAllPathsBetween2LevelsOfAncestorsVia2Relations() {
-            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
-            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
-
-            ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+            setupGraphWith3SimpleRelationships();
 
             List<List<OntologyRelationship>> paths = ontologyGraph.paths(
                     ids("1"),
@@ -344,11 +322,7 @@ public class OntologyGraphTest {
 
         @Test
         public void findAncestorsViaAllRelations() {
-            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
-            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OntologyRelationType.IS_A);
-
-            ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+            ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_IA_v3));
 
             List<String> ancestors = ontologyGraph.ancestors(ids("1"));
 
@@ -357,11 +331,7 @@ public class OntologyGraphTest {
 
         @Test
         public void findAncestorsVia1Relation() {
-            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
-            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
-
-            ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+            setupGraphWith3SimpleRelationships();
 
             List<String> ancestors = ontologyGraph.ancestors(ids("1"), CAPABLE_OF_PART_OF);
 
@@ -451,12 +421,12 @@ public class OntologyGraphTest {
 
         @Test
         public void findDescendantsViaAllRelations() {
-            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 =
-                    createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
-            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
-
-            ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+            //            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
+            //            OntologyRelationship v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
+            //            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
+            //
+            //            ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+            setupGraphWith3SimpleRelationships();
 
             List<String> ancestors = ontologyGraph.descendants(ids("3"));
 
@@ -465,11 +435,12 @@ public class OntologyGraphTest {
 
         @Test
         public void findDescendantsVia1Relation() {
-            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            OntologyRelationship v1_CP_v2 =createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
-            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
-
-            ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+            //            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
+            //            OntologyRelationship v1_CP_v2 =createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
+            //            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
+            //
+            //            ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
+            setupGraphWith3SimpleRelationships();
 
             List<String> ancestors = ontologyGraph.descendants(ids("3"), OCCURS_IN);
 
