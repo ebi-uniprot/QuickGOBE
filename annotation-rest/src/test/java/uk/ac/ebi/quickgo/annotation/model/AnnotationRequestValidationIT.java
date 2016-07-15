@@ -181,7 +181,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
+                is("At least one 'Taxonomic identifier' value is invalid: " + taxId));
     }
 
     @Test
@@ -195,7 +195,7 @@ public class AnnotationRequestValidationIT {
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     assertThat(violations, hasSize(is(1)));
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one invalid 'Taxonomic identifier' value is invalid: " + invalidValue));
+                            is("At least one 'Taxonomic identifier' value is invalid: " + invalidValue));
                 }
         );
     }
@@ -227,7 +227,7 @@ public class AnnotationRequestValidationIT {
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(is(1)));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one invalid 'Taxonomic identifier' value is invalid: " + taxId));
+                is("At least one 'Taxonomic identifier' value is invalid: " + taxId));
     }
 
     //GENE PRODUCT TYPE PARAMETER
