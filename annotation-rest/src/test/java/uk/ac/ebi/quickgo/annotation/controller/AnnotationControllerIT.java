@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -60,6 +61,8 @@ public class AnnotationControllerIT {
     private static final String TAXON_ID_PARAM = "taxon";
     private static final String WITHFROM_PARAM = "withFrom";
     private static final String GO_ID_PARAM = "goId";
+    private static final String GP_SUBSET_PARAM = "gpSubset";
+
 
     //Test Data
     private static final String NOTEXISTS_ASSIGNED_BY = "ZZZZZ";
@@ -890,6 +893,72 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
+    //----- Gene Product Subset ---------------------//
+
+    @Test
+    public void filterBySingleGeneProductSubsetReturnsDocuments() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
+                AnnotationDocMocker.SUB_SET));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+
+    @Test
+    public void filterByMultipleGeneProductSubsetReturnsDocuments() throws Exception {
+
+        AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        docA.dbSubset = "BHF-UCL";
+        repository.save(docA);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
+                gimmeCSV(AnnotationDocMocker.SUB_SET, docA.dbSubset)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
+    }
+
+
+    @Test
+    public void filterByMultipleGeneProductSubsetInMultipleParametersReturnsDocuments() throws Exception {
+
+        AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        docA.dbSubset = "BHF-UCL";
+        repository.save(docA);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
+                AnnotationDocMocker.SUB_SET).param(GP_SUBSET_PARAM, docA.dbSubset));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
+    }
+
+
+    @Test
+    public void filterByUnavailableGeneProductSubsetReturnsZeroDocuments() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM, "AAA"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0))
+                .andExpect(fieldsInAllResultsExist(0));
+    }
+
+    //----- Setup data ---------------------//
+
     private List<AnnotationDocument> createGenericDocs(int n) {
         return IntStream.range(0, n)
                 .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i))).collect
@@ -902,5 +971,9 @@ public class AnnotationControllerIT {
 
     private int totalPages(int totalEntries, int resultsPerPage) {
         return (int) Math.ceil(totalEntries / resultsPerPage) + 1;
+    }
+
+    private String gimmeCSV(String... values) {
+        return Arrays.stream(values).collect(Collectors.joining(","));
     }
 }
