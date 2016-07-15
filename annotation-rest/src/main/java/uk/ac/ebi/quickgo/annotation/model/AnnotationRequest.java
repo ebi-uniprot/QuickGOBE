@@ -138,13 +138,13 @@ public class AnnotationRequest {
         return filterMap.get(AnnotationFields.TAXON_ID);
     }
 
-    void setGeneProductType(String geneProductType){
+    public void setGpType(String geneProductType){
         filterMap.put(DB_OBJECT_TYPE, geneProductType);
     }
 
-    @Pattern(regexp = "((?i)(complex|rna|protein),?){1,3}",
+    @Pattern(regexp = "^(?i)(complex|rna|protein)(,(?i)(complex|rna|protein)){0,2}",
             message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
-    String getGeneProductType(){
+    public String getGpType(){
         return filterMap.get(DB_OBJECT_TYPE);
     }
 
@@ -176,8 +176,7 @@ public class AnnotationRequest {
         createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
         createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
         createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
-
-
+        createSimpleFilter(DB_OBJECT_TYPE).ifPresent(filterRequests::add);
         return filterRequests;
     }
 
