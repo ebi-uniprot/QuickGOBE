@@ -58,7 +58,6 @@ public class AnnotationControllerIT {
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxon";
-    private static final String WITHFROM_PARAM = "withFrom";
     private static final String GO_ID_PARAM = "goId";
     private static final String WITHFROM_PARAM= "withFrom";
     private static final String GENE_PRODUCT_TYPE_PARAM = "gpType";
