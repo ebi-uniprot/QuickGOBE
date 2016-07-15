@@ -27,6 +27,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,6 +51,8 @@ public class AnnotationControllerStatisticsIT {
     private static final String RESOURCE_URL = "/QuickGO/services/annotation";
 
     private static final int NUMBER_OF_GENERIC_DOCS = 6;
+    private static final String ANNOTATION_GROUP = "annotation";
+    private static final String GENE_PRODUCT_GROUP = "geneProduct";
 
     private MockMvc mockMvc;
 
@@ -72,29 +76,13 @@ public class AnnotationControllerStatisticsIT {
         repository.save(savedDocs);
     }
 
-    //--------------------- Annotation based stats ---------------------//
     //----------- Ontology ID -----------//
-    private static <T, D extends QuickGODocument> Set<T> selectValuesFromDocs(
-            Collection<D> documents,
-            Function<D, T> docTransformation) {
-        return documents.stream().map(docTransformation).collect(Collectors.toSet());
-    }
-
     @Test
-    public void searchResultOfMultipleDocsWithATotalOf3OntologyIdsReturnsResponseWith3OntologyIdStats()
-            throws Exception {
-
-        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
-        extraDoc.goId = "GO:0016020";
-        repository.save(extraDoc);
-
-        String group = "annotation";
-        String type = AnnotationFields.GO_ID;
-
+    public void ontologyStatsForMultipleDocsContaining1OntologyIdReturns1OntologyIdStat() throws Exception {
         Set<String> savedGOIds = selectValuesFromDocs(savedDocs, doc -> doc.goId);
-        savedGOIds.add(extraDoc.goId);
+        assertThat(savedGOIds, hasSize(1));
 
-        String[] keys = savedGOIds.toArray(new String[savedGOIds.size()]);
+        String type = AnnotationFields.GO_ID;
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/stats"));
 
@@ -102,8 +90,46 @@ public class AnnotationControllerStatisticsIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
-                .andExpect(totalHitsInGroup(group, NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(keysInTypeWithinGroup(group, type, keys));
+                .andExpect(totalHitsInGroup(ANNOTATION_GROUP, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalHitsInGroup(GENE_PRODUCT_GROUP, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(keysInTypeWithinGroup(ANNOTATION_GROUP, type, asArray(savedGOIds)))
+                .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, type, asArray(savedGOIds)));
+    }
+
+    @Test
+    public void ontologyStatsForMultipleDocsContaining2OntologyIdsReturns2OntologyIdStats()
+            throws Exception {
+
+        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc.goId = "GO:0016020";
+        repository.save(extraDoc);
+
+        Set<String> savedGOIds = selectValuesFromDocs(savedDocs, doc -> doc.goId);
+        savedGOIds.add(extraDoc.goId);
+        assertThat(savedGOIds, hasSize(2));
+
+        String type = AnnotationFields.GO_ID;
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/stats"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(totalHitsInGroup(ANNOTATION_GROUP, NUMBER_OF_GENERIC_DOCS + 1))
+                .andExpect(totalHitsInGroup(GENE_PRODUCT_GROUP, NUMBER_OF_GENERIC_DOCS + 1))
+                .andExpect(keysInTypeWithinGroup(ANNOTATION_GROUP, type, asArray(savedGOIds)))
+                .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, type, asArray(savedGOIds)));
+    }
+
+    private String[] asArray(Collection<String> elements) {
+        return elements.stream().toArray(String[]::new);
+    }
+
+    private static <T, D extends QuickGODocument> Set<T> selectValuesFromDocs(
+            Collection<D> documents,
+            Function<D, T> docTransformation) {
+        return documents.stream().map(docTransformation).collect(Collectors.toSet());
     }
 
     private List<AnnotationDocument> createGenericDocs(int n) {
