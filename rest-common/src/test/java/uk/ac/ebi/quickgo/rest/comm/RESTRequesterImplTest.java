@@ -89,14 +89,22 @@ public class RESTRequesterImplTest {
 
     @Test
     public void addingRequestParamsResultsInTheseParamsBeingUsed() {
-        addRequestParameter("param1", "value1");
-        when(restTemplateMock.getForObject(SERVICE_ENDPOINT, FakeDTO.class, requestParameters))
-                .thenReturn(new FakeDTO("value"));
+        String param1 = "param1";
+        String value1 = "value1";
+        String url = SERVICE_ENDPOINT + "/something-else";
+
+        RestTemplate restTemplateMock = mock(RestTemplate.class);
+        RESTRequesterImpl.Builder requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock,
+                url);
+        Map<String, String> requestParameters = new HashMap<>();
+
+        requesterBuilder.addRequestParameter(param1, value1);
+        requestParameters.put(param1, value1);
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
         requester.get(restTemplateMock, FakeDTO.class);
-        verify(restTemplateMock, times(1)).getForObject(SERVICE_ENDPOINT, FakeDTO.class, requestParameters);
+        verify(restTemplateMock, times(1)).getForObject(url, FakeDTO.class, requestParameters);
     }
 
     @Test
