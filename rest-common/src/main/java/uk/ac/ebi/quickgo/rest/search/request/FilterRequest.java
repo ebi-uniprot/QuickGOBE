@@ -16,7 +16,15 @@ public class FilterRequest {
     private final Map<String, List<String>> properties;
 
     private FilterRequest(Builder builder) {
-        this.properties = builder.properties;
+        this.properties = Collections.unmodifiableMap(builder.properties);
+    }
+
+    /**
+     * Get all of the properties associated with this filter request.
+     * @return the properties of this filter request.
+     */
+    public Map<String, List<String>> getProperties() {
+        return properties;
     }
 
     /**
@@ -61,6 +69,24 @@ public class FilterRequest {
      */
     public Set<String> getSignature() {
         return this.properties.keySet();
+    }
+
+    @Override public int hashCode() {
+        return properties != null ? properties.hashCode() : 0;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        FilterRequest that = (FilterRequest) o;
+
+        return properties != null ? properties.equals(that.properties) : that.properties == null;
+
     }
 
     public static class Builder {

@@ -28,6 +28,9 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.DEFINITION)
     public String definition;
 
+    @Field(OntologyFields.DEFINITION_XREFS)
+    public List<String> definitionXrefs;
+
     @Field(OntologyFields.COMMENT)
     public String comment;
 
@@ -55,9 +58,6 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.CHILDREN)
     public List<String> children;
 
-    @Field(OntologyFields.ANCESTOR)
-    public List<String> ancestors;
-
     @Field(OntologyFields.ASPECT)
     public String aspect;
 
@@ -78,6 +78,7 @@ public class OntologyDocument implements QuickGODocument {
 
     @Field(OntologyFields.XRELATION)
     public List<String> xRelations;
+
 
     @Override
     public String getUniqueName() {
@@ -136,9 +137,6 @@ public class OntologyDocument implements QuickGODocument {
         if (children != null ? !children.equals(that.children) : that.children != null) {
             return false;
         }
-        if (ancestors != null ? !ancestors.equals(that.ancestors) : that.ancestors != null) {
-            return false;
-        }
         if (aspect != null ? !aspect.equals(that.aspect) : that.aspect != null) {
             return false;
         }
@@ -178,7 +176,6 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
         result = 31 * result + (considers != null ? considers.hashCode() : 0);
         result = 31 * result + (children != null ? children.hashCode() : 0);
-        result = 31 * result + (ancestors != null ? ancestors.hashCode() : 0);
         result = 31 * result + (aspect != null ? aspect.hashCode() : 0);
         result = 31 * result + (history != null ? history.hashCode() : 0);
         result = 31 * result + (xrefs != null ? xrefs.hashCode() : 0);
@@ -205,7 +202,6 @@ public class OntologyDocument implements QuickGODocument {
                 ", replacedBy='" + replacedBy + '\'' +
                 ", considers=" + considers +
                 ", children=" + children +
-                ", ancestors=" + ancestors +
                 ", aspect=" + aspect +
                 ", history=" + history +
                 ", xrefs=" + xrefs +

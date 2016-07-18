@@ -31,20 +31,23 @@
         <!-- dependency version numbers -->
         <spring.framework.version>4.2.6.RELEASE</spring.framework.version>
         <spring.boot.starter>1.3.5.RELEASE</spring.boot.starter>
-
-        <!--<spring-data-solr.version>1.5.0.RELEASE</spring-data-solr.version>-->
+        <spring-batch-test.version>3.0.7.RELEASE</spring-batch-test.version>
         <spring-data-solr.version>2.0.2.RELEASE</spring-data-solr.version>
+        <javax.validation.version>1.1.0.Final</javax.validation.version>
+        <hibernate-validator.version>5.2.4.Final</hibernate-validator.version>
+
+        <solr.version>5.5.0</solr.version>
+
+        <jackson.version>2.5.4</jackson.version>
         <json-path.version>2.0.0</json-path.version>
+
         <slf4j.version>1.7.12</slf4j.version>
         <logback.version>1.1.3</logback.version>
-        <!--<jackson.version>2.6.6</jackson.version>-->
-        <jackson.version>2.5.4</jackson.version>
 
         <junit.version>4.12</junit.version>
         <junit-hierarchicalcontextrunner.version>4.12.1</junit-hierarchicalcontextrunner.version>
         <hamcrest.version>1.3</hamcrest.version>
         <mockito-version>1.9.5</mockito-version>
-        <solr.version>5.5.0</solr.version>
 
         <springfox-swagger2.version>2.2.2</springfox-swagger2.version>
 
@@ -54,6 +57,12 @@
         <failsafe-version>2.18.1</failsafe-version>
         <jacoco.version>0.7.5.201505241946</jacoco.version>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
+
+        <!-- jmeter default properties -->
+        <jmeter-maven-plugin.version>1.10.1</jmeter-maven-plugin.version>
+        <jmeter-analysis-maven-plugin.version>1.0.6</jmeter-analysis-maven-plugin.version>
+        <jmeter.min.jvm.mem>1024</jmeter.min.jvm.mem>
+        <jmeter.max.jvm.mem>2048</jmeter.max.jvm.mem>
     </properties>
 
     <repositories>
@@ -177,9 +186,29 @@
                 <version>${spring.boot.starter}</version>
             </dependency>
             <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-batch</artifactId>
+                <version>${spring.boot.starter}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-solr</artifactId>
                 <version>${spring-data-solr.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.framework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>${javax.validation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate-validator.version}</version>
             </dependency>
 
             <!-- REST API documentation -->
@@ -218,7 +247,6 @@
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -385,6 +413,58 @@
                             </fileset>
                         </filesets>
                     </configuration>
+                </plugin>
+
+                <!-- jmeter REST performance analysis plugins -->
+                <plugin>
+                    <groupId>com.lazerycode.jmeter</groupId>
+                    <artifactId>jmeter-maven-plugin</artifactId>
+                    <version>${jmeter-maven-plugin.version}</version>
+
+                    <configuration>
+                        <testResultsTimestamp>false</testResultsTimestamp>
+                        <overrideRootLogLevel>DEBUG</overrideRootLogLevel>
+                        <suppressJMeterOutput>false</suppressJMeterOutput>
+                        <ignoreResultFailures>true</ignoreResultFailures>
+
+                        <jMeterProcessJVMSettings>
+                            <xms>${jmeter.min.jvm.mem}</xms>
+                            <xmx>${jmeter.max.jvm.mem}</xmx>
+                            <arguments>
+                                <argument>-Xprof</argument>
+                                <argument>-Xfuture</argument>
+                            </arguments>
+                        </jMeterProcessJVMSettings>
+                    </configuration>
+
+                    <executions>
+                        <execution>
+                            <id>jmeter-tests</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jmeter</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>com.lazerycode.jmeter</groupId>
+                    <artifactId>jmeter-analysis-maven-plugin</artifactId>
+                    <version>${jmeter-analysis-maven-plugin.version}</version>
+                    <configuration>
+                        <source>${project.build.directory}/jmeter/results/*.jtl</source>
+                        <targetDirectory>${project.build.directory}/jmeter/analysis</targetDirectory>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>create-html-report</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>analyze</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

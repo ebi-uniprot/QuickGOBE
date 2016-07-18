@@ -1,10 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import com.google.common.base.Preconditions;
 import java.util.*;
+import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
@@ -25,6 +27,13 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 public class AnnotationRequest {
     public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
     public static final int MAX_ENTRIES_PER_PAGE = 100;
+
+    static final String USAGE_FIELD = "usage";
+    static final String USAGE_IDS = "usageIds";
+    static final String USAGE_RELATIONSHIPS = "usageRelationships";
+    private static final String ASPECT_FIELD = "aspect";
+    private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID};
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
@@ -77,17 +86,14 @@ public class AnnotationRequest {
      * @param reference
      * @return
      */
-    public void setReference(String reference){
-        filterMap.put(AnnotationFields.REFERENCE_SEARCH, reference);
+    public void setReference(String reference) {
+        filterMap.put(REFERENCE_SEARCH, reference);
     }
 
     //todo create validation pattern @Pattern(regexp = "")
-    public String getReference(){
-        return filterMap.get(AnnotationFields.REFERENCE_SEARCH);
+    public String getReference() {
+        return filterMap.get(REFERENCE_SEARCH);
     }
-
-    //TODO:change the way the field is referenced
-    private static final String ASPECT_FIELD = "aspect";
 
     public void setAspect(String aspect) {
         if (aspect != null) {
@@ -102,6 +108,21 @@ public class AnnotationRequest {
     }
 
     /**
+     * Gene Product IDs, in CSV format.
+     */
+
+    public void setGpId(String listOfGeneProductIDs) {
+        if (listOfGeneProductIDs != null) {
+            filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
+        }
+    }
+
+    @GeneProductIDList
+    public String getGpId() {
+        return filterMap.get(GENE_PRODUCT_ID);
+    }
+
+    /**
      * The older evidence codes
      * E.g. IEA, IBA, IBD etc. See <a href="http://geneontology.org/page/guide-go-evidence-codes">Guide QuickGO
      * evidence codes</a>
@@ -111,15 +132,21 @@ public class AnnotationRequest {
         filterMap.put(GO_EVIDENCE, evidence);
     }
 
+    @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
+            message = "At least one 'GO Evidence' value is invalid: ${validatedValue}")
+    public String getGoEvidence() {
+        return filterMap.get(GO_EVIDENCE);
+    }
+
     /**
      * NOT, enables etc
      * @param qualifier
      */
-    public void setQualifier(String qualifier){
+    public void setQualifier(String qualifier) {
         filterMap.put(QUALIFIER, qualifier);
     }
 
-    public String getQualifter(){
+    public String getQualifier() {
         return filterMap.get(QUALIFIER);
     }
 
@@ -129,7 +156,7 @@ public class AnnotationRequest {
      * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
      * @param withFrom comma separated with/from values
      */
-    public void setWithFrom(String withFrom){
+    public void setWithFrom(String withFrom) {
         filterMap.put(WITH_FROM_SEARCH, withFrom);
     }
 
@@ -137,14 +164,8 @@ public class AnnotationRequest {
      * Return a list of with/from values, separated by commas
      * @return String containing comma separated list of with/From values.
      */
-    public  String getWithFrom(){
+    public String getWithFrom() {
         return filterMap.get(WITH_FROM_SEARCH);
-    }
-
-    @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
-            message = "At least one 'GO Evidence' value is invalid: ${validatedValue}")
-    public String getGoEvidence() {
-        return filterMap.get(GO_EVIDENCE);
     }
 
     public void setTaxon(String taxId) {
@@ -152,9 +173,73 @@ public class AnnotationRequest {
     }
 
     @Pattern(regexp = "[0-9]+(,[0-9]+)*",
-            message = "At least one invalid 'Taxonomic identifier' value is invalid: ${validatedValue}")
+            message = "At least one 'Taxonomic identifier' value is invalid: ${validatedValue}")
     public String getTaxon() {
-        return filterMap.get(AnnotationFields.TAXON_ID);
+        return filterMap.get(TAXON_ID);
+    }
+
+    /**
+     * List of Gene Ontology ids in CSV format
+     * @param goId
+     */
+    public void setGoId(String goId) {
+        filterMap.put(GO_ID, goId);
+    }
+
+    @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*",
+            message = "At least one 'GO Id' value is invalid: ${validatedValue}")
+    public String getGoId() {
+        return filterMap.get(GO_ID);
+    }
+
+    /**
+     * Will receive a list of eco ids thus: EcoId=ECO:0000256,ECO:0000323
+     * @param ecoId
+     */
+    public void setEcoId(String ecoId) {
+        filterMap.put(ECO_ID, ecoId);
+    }
+
+    @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*",
+            message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
+    public String getEcoId() {
+        return filterMap.get(ECO_ID);
+    }
+
+    @Pattern(regexp = "^exact|slim|descendants$", flags = Pattern.Flag.CASE_INSENSITIVE, message = "Invalid usage: " +
+            "${validatedValue})")
+    public String getUsage() {
+        return filterMap.get(USAGE_FIELD);
+    }
+
+    public void setUsage(String usage) {
+        if (usage != null) {
+            filterMap.put(USAGE_FIELD, usage.toLowerCase());
+        }
+    }
+
+    @Pattern(regexp = "GO:[0-9]+(,GO:[0-9]+)*", flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "Invalid GO IDs specified: ${validatedValue})")
+    public String getUsageIds() {
+        return filterMap.get(USAGE_IDS);
+    }
+
+    public void setUsageIds(String usageIds) {
+        if (usageIds != null) {
+            filterMap.put(USAGE_IDS, usageIds.toLowerCase());
+        }
+    }
+
+    @Pattern(regexp = "(is_a|part_of|occurs_in|regulates)(,is_a|part_of|occurs_in|regulates)*",
+            flags = Pattern.Flag.CASE_INSENSITIVE)
+    public String getUsageRelationships() {
+        return filterMap.get(USAGE_RELATIONSHIPS);
+    }
+
+    public void setUsageRelationships(String usageRelationships) {
+        if (usageRelationships != null) {
+            filterMap.put(USAGE_RELATIONSHIPS, usageRelationships.toLowerCase());
+        }
     }
 
     public int getLimit() {
@@ -173,16 +258,16 @@ public class AnnotationRequest {
         this.page = page;
     }
 
-    public List<FilterRequest> createRequestFilters() {
+    public List<FilterRequest> createFilterRequests() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
-        createSimpleFilter(ASPECT_FIELD).ifPresent(filterRequests::add);
-        createSimpleFilter(ASSIGNED_BY).ifPresent(filterRequests::add);
-        createSimpleFilter(TAXON_ID).ifPresent(filterRequests::add);
-        createSimpleFilter(GO_EVIDENCE).ifPresent(filterRequests::add);
-        createSimpleFilter(REFERENCE_SEARCH).ifPresent(filterRequests::add);
-        createSimpleFilter(QUALIFIER).ifPresent(filterRequests::add);
-        createSimpleFilter(WITH_FROM_SEARCH).ifPresent(filterRequests::add);
+        Stream.of(TARGET_FIELDS)
+                .map(this::createSimpleFilter)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(filterRequests::add);
+
+        createUsageFilter().ifPresent(filterRequests::add);
 
         return filterRequests;
     }
@@ -193,6 +278,28 @@ public class AnnotationRequest {
             FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
             requestBuilder.addProperty(key, filterMap.get(key).split(COMMA));
             request = Optional.of(requestBuilder.build());
+        } else {
+            request = Optional.empty();
+        }
+
+        return request;
+    }
+
+    private Optional<FilterRequest> createUsageFilter() {
+        Optional<FilterRequest> request;
+        FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
+        if (filterMap.containsKey(USAGE_FIELD)) {
+            if (filterMap.containsKey(USAGE_IDS)) {
+                filterBuilder
+                        .addProperty(USAGE_FIELD, filterMap.get(USAGE_FIELD))
+                        .addProperty(USAGE_IDS, filterMap.get(USAGE_IDS));
+            } else {
+                throw new ParameterException("Annotation usage requires 'usageIds' to be set.");
+            }
+
+            filterBuilder.addProperty(USAGE_RELATIONSHIPS, filterMap.get(USAGE_RELATIONSHIPS));
+
+            request = Optional.of(filterBuilder.build());
         } else {
             request = Optional.empty();
         }

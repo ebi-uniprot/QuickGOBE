@@ -4,7 +4,11 @@ import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,12 +29,10 @@ import org.springframework.web.context.WebApplicationContext;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.AnyOf.anyOf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -55,8 +57,12 @@ public abstract class OBOControllerIT {
 
     private static final String SEARCH_ENDPOINT = "search";
     private static final String TERMS_ENDPOINT = "terms";
+    private static final String ANCESTORS_ENDPOINT = "ancestors";
+    private static final String DESCENDANTS_ENDPOINT = "descendants";
+    private static final String PATHS_ENDPOINT = "paths";
     private static final String QUERY_PARAM = "query";
     private static final String PAGE_PARAM = "page";
+    private static final String RELATIONS_PARAM = "relations";
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
@@ -64,17 +70,22 @@ public abstract class OBOControllerIT {
     @Autowired
     protected OntologyRepository ontologyRepository;
 
+    @Autowired
+    protected OntologyGraph ontologyGraph;
+
     MockMvc mockMvc;
 
     private String resourceUrl;
     private String validId;
     private String validIdsCSV;
     private List<String> validIdList;
+    private List<OntologyRelationship> relationships;
+    private int relationshipChainLength;
+    private String validRelation;
+    private String invalidRelation;
 
     @Before
     public void setup() {
-        ontologyRepository.deleteAll();
-
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .build();
 
@@ -87,7 +98,10 @@ public abstract class OBOControllerIT {
         validIdsCSV = basicDocs.stream().map(doc -> doc.id).collect(Collectors.joining(","));
         validIdList = Arrays.asList(validIdsCSV.split(COMMA));
 
+        ontologyRepository.deleteAll();
         ontologyRepository.save(basicDocs);
+
+        setupSimpleRelationshipChain();
     }
 
     @Test
@@ -304,7 +318,6 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.results").isArray());
     }
 
-
     @Test
     public void negativePageRequestOfAllEntriesRequestReturns400() throws Exception {
         ontologyRepository.deleteAll();
@@ -388,6 +401,219 @@ public abstract class OBOControllerIT {
         expectCompleteFieldsInResults(response, validIdList)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canFetchAllAncestorsFrom1Term() throws Exception {
+        String lowestChild = relationships.get(0).child;
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(lowestChild) + "/" + ANCESTORS_ENDPOINT));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results[0].ancestors", hasSize(10)));
+    }
+
+    @Test
+    public void canFetchAllAncestorsFrom2Terms() throws Exception {
+        String bottom = relationships.get(0).child;
+        String secondBottom = relationships.get(1).child;
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(asCSV(bottom, secondBottom)) + "/" + ANCESTORS_ENDPOINT));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(2))
+                .andExpect(jsonPath("$.results[0].ancestors", hasSize(10)))
+                .andExpect(jsonPath("$.results[1].ancestors", hasSize(9)));
+    }
+
+    @Test
+    public void canFetchAllAncestorsFromRelation() throws Exception {
+        String bottom = relationships.get(0).child;
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(bottom) + "/" + ANCESTORS_ENDPOINT)
+                        .param(RELATIONS_PARAM, validRelation));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results[0].ancestors", hasSize(10)));
+    }
+
+    @Test
+    public void invalidAncestorsProduces400AndErrorMessage() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(invalidId()) + "/" + ANCESTORS_ENDPOINT));
+
+        expectInvalidIdError(response, invalidId());
+    }
+
+    @Test
+    public void invalidAncestorsRelationProduces400AndErrorMessage() throws Exception {
+        String bottom = relationships.get(0).child;
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(bottom) + "/" + ANCESTORS_ENDPOINT)
+                        .param(RELATIONS_PARAM, invalidRelation));
+
+        expectInvalidRelationError(response, invalidRelation);
+    }
+
+    @Test
+    public void canFetchAllDescendantsFrom1Term() throws Exception {
+        int relCount = relationships.size();
+        String highestParent = relationships.get(relCount - 1).parent;
+
+        ontologyRepository.deleteAll();
+        createAndSaveDocs(relCount + 1);
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(highestParent) + "/" + DESCENDANTS_ENDPOINT));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results[0].descendants", hasSize(10)));
+    }
+
+    @Test
+    public void canFetchAllDescendantsFrom2Terms() throws Exception {
+        int relCount = relationships.size();
+        String top = relationships.get(relCount - 1).parent;
+        String secondTop = relationships.get(relCount - 2).parent;
+
+        ontologyRepository.deleteAll();
+        createAndSaveDocs(relCount + 1);
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(asCSV(top, secondTop)) + "/" + DESCENDANTS_ENDPOINT));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(2))
+                .andExpect(jsonPath("$.results[0].descendants", hasSize(9)))
+                .andExpect(jsonPath("$.results[1].descendants", hasSize(10)));
+    }
+
+    @Test
+    public void canFetchAllDescendantsFromRelation() throws Exception {
+        int relCount = relationships.size();
+        String highestParent = relationships.get(relCount - 1).parent;
+
+        ontologyRepository.deleteAll();
+        createAndSaveDocs(relCount + 1);
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(highestParent) + "/" + DESCENDANTS_ENDPOINT)
+                        .param(RELATIONS_PARAM, validRelation));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results[0].descendants", hasSize(10)));
+    }
+
+    @Test
+    public void invalidDescendantsProduces400AndErrorMessage() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(invalidId()) + "/" + DESCENDANTS_ENDPOINT));
+
+        expectInvalidIdError(response, invalidId());
+    }
+
+    @Test
+    public void invalidDescendantsRelationProduces400AndErrorMessage() throws Exception {
+        String highestParent = relationships.get(relationships.size() - 1).parent;
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(highestParent) + "/" + DESCENDANTS_ENDPOINT)
+                        .param(RELATIONS_PARAM, invalidRelation));
+
+        expectInvalidRelationError(response, invalidRelation);
+    }
+
+    @Test
+    public void canFetchAllPathsFrom1Term() throws Exception {
+        String bottomChild = relationships.get(0).child;
+        String highestParent = relationships.get(relationships.size() - 1).parent;
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(bottomChild) + "/" + PATHS_ENDPOINT + "/" + highestParent));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void canFetchAllPathsFrom2Terms() throws Exception {
+        String bottom = relationships.get(0).child;
+        String secondBottom = relationships.get(1).child;
+        String highest = relationships.get(relationships.size() - 1).parent;
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(asCSV(bottom, secondBottom) + "/" + PATHS_ENDPOINT + "/" + highest)));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(2))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void canFetchAllPathsTo2Terms() throws Exception {
+        String bottom = relationships.get(0).child;
+
+        String top = relationships.get(relationships.size() - 1).parent;
+        String secondTop = relationships.get(relationships.size() - 2).parent;
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(bottom) + "/" + PATHS_ENDPOINT + "/" + asCSV(top, secondTop)));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(2))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void canFetchAllPathsFrom1TermWithRelation() throws Exception {
+        String bottomChild = relationships.get(0).child;
+        String highestParent = relationships.get(relationships.size() - 1).parent;
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(bottomChild) + "/" + PATHS_ENDPOINT + "/" + highestParent)
+                        .param(RELATIONS_PARAM, validRelation));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void invalidStartPathsProduces400AndErrorMessage() throws Exception {
+        String highest = relationships.get(relationships.size() - 1).parent;
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(invalidId()) + "/" + PATHS_ENDPOINT + "/" + highest));
+
+        expectInvalidIdError(response, invalidId());
+    }
+
+    @Test
+    public void invalidEndPathsProduces400AndErrorMessage() throws Exception {
+        String bottom = relationships.get(0).child;
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(bottom) + "/" + PATHS_ENDPOINT + "/" + invalidId()));
+
+        expectInvalidIdError(response, invalidId());
+    }
+
+    @Test
+    public void invalidPathsRelationProduces400AndErrorMessage() throws Exception {
+        String bottomChild = relationships.get(0).child;
+        String highestParent = relationships.get(relationships.size() - 1).parent;
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURL(bottomChild) + "/" + PATHS_ENDPOINT + "/" + highestParent)
+                        .param(RELATIONS_PARAM, invalidRelation));
+
+        expectInvalidRelationError(response, invalidRelation);
     }
 
     protected abstract String getResourceURL();
@@ -477,6 +703,14 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.messages", hasItem(containsString("Provided ID: '" + id + "'"))));
     }
 
+    protected ResultActions expectInvalidRelationError(ResultActions result, String relation) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.url", is(requestUrl(result))))
+                .andExpect(jsonPath("$.messages", hasItem(
+                        containsString("Unknown relationship requested: '" + relation + "'"))));
+    }
+
     protected ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
         return result
                 .andDo(print())
@@ -497,11 +731,40 @@ public abstract class OBOControllerIT {
         return result;
     }
 
+    private static String asCSV(String... values) {
+        return Arrays.stream(values).collect(Collectors.joining(","));
+    }
+
+    private void setupSimpleRelationshipChain() {
+        setupSimpleRelationshipChain(10);
+    }
+
+    private void setupSimpleRelationshipChain(int idCount) {
+        List<OntologyRelationship> simpleRelationships = new ArrayList<>();
+
+        List<OntologyDocument> fakeDocuments = createNDocs(idCount);
+        OntologyRelationType validRelationType = OntologyRelationType.IS_A;
+        for (int i = 0; i < fakeDocuments.size() - 1; i++) {
+            simpleRelationships.add(
+                    new OntologyRelationship(
+                            fakeDocuments.get(i).id,                        // child
+                            fakeDocuments.get(i + 1).id,                    // parent
+                            validRelationType));                            // relationship
+        }
+
+        relationships = simpleRelationships;
+        relationshipChainLength = idCount;
+        validRelation = OntologyRelationType.IS_A.getLongName();
+        invalidRelation = "this-does-not-exist";
+        ontologyGraph.addRelationships(simpleRelationships);
+    }
+
     private String requestUrl(ResultActions resultActions) {
         return resultActions.andReturn().getRequest().getRequestURL().toString();
     }
 
     private void createAndSaveDocs(int n) {
         ontologyRepository.save(createNDocs(n));
+        setupSimpleRelationshipChain(n);
     }
 }
