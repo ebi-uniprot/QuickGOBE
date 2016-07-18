@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.common.validator.DbXRefEntity;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
@@ -33,6 +34,9 @@ public class DbXRefLoader {
     private final Logger logger = LoggerFactory.getLogger(DbXRefLoader.class);
     private final String path;
 
+    private static final boolean POSTGRES = true;
+    protected boolean compress = true;
+
     public DbXRefLoader(String path) {
         this.path = path;
     }
@@ -58,7 +62,8 @@ public class DbXRefLoader {
                     .skip(1)    //header
                     .map(line -> line.split(COL_DELIMITER))
                     .map(fields -> new DbXRefEntity(fields[COL_DATABASE], fields[COL_ENTITY_TYPE],
-                            fields[COL_ENTITY_TYPE_NAME], fields[COL_LOCAL_ID_SYNTAX], fields[COL_URL_SYNTAX]))
+                            fields[COL_ENTITY_TYPE_NAME], directRead(fields[COL_LOCAL_ID_SYNTAX]),
+                            fields[COL_URL_SYNTAX]))
                     .collect(toList());
 
         } catch (Exception e) {
@@ -69,5 +74,85 @@ public class DbXRefLoader {
         }
 
     }
+
+    public String directRead(String input)  {
+        StringBuilder field = new StringBuilder();
+        List<String> data = new ArrayList<String>();
+        String line;
+        data.clear();
+        boolean isNull = false;
+
+        int count = 0;
+//        line = rd.readLine();
+        if (input == null) {
+//            eof = true;
+            return "";
+        }
+
+//        field.setLength(0);
+        boolean escape = false;
+
+        while (count < input.length()) {
+            char ch = input.charAt(count);
+            if (escape) {
+                if (ch == 't') {
+                    field.append('\t');
+                }
+                else if (ch == 'n') {
+                    field.append('\n');
+                }
+                else if (ch == 'N') {
+                    isNull = true;
+                }
+                else if (ch == '\\') {
+                    field.append('\\');
+                }
+                escape = false;
+            }
+            // Not currently escaped
+            else {
+                if (ch == '\\' && POSTGRES) {
+                    escape = true;
+                }
+                //Neither escaped nor postgres
+                else {
+                    if (ch == '\t') {
+                        if (isNull) {
+                            data.add(null);
+                        }
+                        else {
+                            //data.add(field.toString());
+                            return field.toString();
+                        }
+//                        field.setLength(0);
+                        isNull = false;
+                    }
+                    else {
+                        field.append(ch);
+                    }
+                }
+
+            }
+            count++;
+
+//            if (count == line.length() && escape) {
+//                line = rd.readLine();
+//                if (line == null) {
+//                    break;
+//                }
+//                count = 0;
+//                escape = false;
+//            }
+        }
+
+//        if (isNull){
+//            data.add(null);
+//        }
+//        else {
+//            data.add(field.toString());
+//        }
+        return field.toString();
+    }
+
 
 }
