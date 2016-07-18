@@ -30,7 +30,7 @@ public class DbXRefEntity {
                 "The regex for the validation of ids from " + database + " is null and therefore invalid");
         this.database = database;
         this.entityType = entityType;
-        this.idValidationPattern = Pattern.compile(idValidationPattern);
+        this.idValidationPattern = Pattern.compile(idValidationPattern, Pattern.CASE_INSENSITIVE);
         this.entityTypeName = entityTypeName;
         this.databaseURL = databaseURL;
     }
