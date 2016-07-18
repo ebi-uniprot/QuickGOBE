@@ -88,14 +88,13 @@ public class RESTRequesterImplTest {
     }
 
     @Test
-    public void addingRequestParamsResultsInTheseParamsBeingUsed() {
+    public void addingRequestParamsResultsInTheseParamsBeingUsed() throws ExecutionException, InterruptedException {
         String param1 = "param1";
         String value1 = "value1";
         String url = SERVICE_ENDPOINT + "/something-else";
 
         RestTemplate restTemplateMock = mock(RestTemplate.class);
-        RESTRequesterImpl.Builder requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock,
-                url);
+        RESTRequesterImpl.Builder requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock, url);
         Map<String, String> requestParameters = new HashMap<>();
 
         requesterBuilder.addRequestParameter(param1, value1);
@@ -103,7 +102,9 @@ public class RESTRequesterImplTest {
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
-        requester.get(restTemplateMock, FakeDTO.class);
+        CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class);
+        completableFuture.get();
+
         verify(restTemplateMock, times(1)).getForObject(url, FakeDTO.class, requestParameters);
     }
 
