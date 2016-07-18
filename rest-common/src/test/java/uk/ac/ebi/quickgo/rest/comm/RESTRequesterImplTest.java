@@ -98,14 +98,21 @@ public class RESTRequesterImplTest {
     }
 
     @Test
-    public void resettingURLResultsInNewURLBeingAccessed() {
+    public void resettingURLResultsInNewURLBeingAccessed() throws ExecutionException, InterruptedException {
         String newURL = "new url";
+        String dtoValue = "value";
+        when(restTemplateMock.getForObject(newURL, FakeDTO.class, requestParameters))
+                .thenReturn(new FakeDTO(dtoValue));
+
         requesterBuilder.resetURL(newURL);
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
-        requester.get(restTemplateMock, FakeDTO.class);
+        CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class);
+        FakeDTO fakeDTO = completableFuture.get();
+
         verify(restTemplateMock, times(1)).getForObject(newURL, FakeDTO.class, requestParameters);
+        assertThat(fakeDTO.value, is(dtoValue));
     }
 
     @Test
