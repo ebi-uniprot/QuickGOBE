@@ -89,6 +89,8 @@ public class RESTRequesterImplTest {
 
     @Test
     public void addingRequestParamsResultsInTheseParamsBeingUsed() {
+        when(restTemplateMock.getForObject(SERVICE_ENDPOINT, FakeDTO.class, requestParameters))
+                .thenReturn(new FakeDTO("value"));
         addRequestParameter("param1", "value1");
 
         RESTRequesterImpl requester = requesterBuilder.build();
