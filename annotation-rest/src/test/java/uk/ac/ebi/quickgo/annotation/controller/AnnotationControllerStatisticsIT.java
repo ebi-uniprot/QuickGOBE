@@ -82,7 +82,7 @@ public class AnnotationControllerStatisticsIT {
         Set<String> savedGOIds = selectValuesFromDocs(savedDocs, doc -> doc.goId);
         assertThat(savedGOIds, hasSize(1));
 
-        String type = AnnotationFields.GO_ID_INDEXED_ORIGINAL;
+        String type = AnnotationFields.GO_ID;
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/stats"));
 
@@ -108,7 +108,7 @@ public class AnnotationControllerStatisticsIT {
         savedGOIds.add(extraDoc.goId);
         assertThat(savedGOIds, hasSize(2));
 
-        String type = AnnotationFields.GO_ID_INDEXED_ORIGINAL;
+        String type = AnnotationFields.GO_ID;
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/stats"));
 

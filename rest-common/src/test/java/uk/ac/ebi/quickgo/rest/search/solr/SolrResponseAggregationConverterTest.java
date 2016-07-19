@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.results.Aggregation;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
+import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,7 +38,10 @@ public class SolrResponseAggregationConverterTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Mock
-    private SolrResponse response;
+    private SolrResponse responseMock;
+
+    @Mock
+    private ServiceRetrievalConfig serviceRetrievalConfigMock;
 
     private SolrResponseAggregationConverter converter;
     private SolrFacet aggFacet;
@@ -46,33 +50,33 @@ public class SolrResponseAggregationConverterTest {
     public void setUp() throws Exception {
         aggFacet = new SolrFacet();
 
-        converter = new SolrResponseAggregationConverter();
+        converter = new SolrResponseAggregationConverter(serviceRetrievalConfigMock);
 
         addFacetsToResponse(aggFacet);
     }
 
     @Test
     public void conversionOfNullSolrResponseThrowsException() throws Exception {
-        response = null;
+        responseMock = null;
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot convert null Solr response to an aggregation");
 
-        converter.convert(response);
+        converter.convert(responseMock);
     }
 
     @Test
     public void solrResponseWithNoFacetsConvertsToNullAggregate() throws Exception {
-        when(response.getResponse()).thenReturn(new NamedList<>());
+        when(responseMock.getResponse()).thenReturn(new NamedList<>());
 
-        Aggregation agg = converter.convert(response);
+        Aggregation agg = converter.convert(responseMock);
 
         assertThat(agg, is(nullValue()));
     }
 
     @Test
     public void solrResponseWithNonAggregatedFacetConvertToNullAggregate() throws Exception {
-        Aggregation agg = converter.convert(response);
+        Aggregation agg = converter.convert(responseMock);
 
         assertThat(agg, is(nullValue()));
     }
@@ -82,7 +86,7 @@ public class SolrResponseAggregationConverterTest {
         SolrAggregationResult result = new SolrAggregationResult("id", AggregateFunction.COUNT, 3);
         aggFacet.addFunction(result);
 
-        Aggregation agg = converter.convert(response);
+        Aggregation agg = converter.convert(responseMock);
 
         assertThat(agg, is(notNullValue()));
     }
@@ -92,7 +96,7 @@ public class SolrResponseAggregationConverterTest {
         SolrBucket bucket = new SolrBucket("goId");
         aggFacet.addBucket(bucket);
 
-        Aggregation agg = converter.convert(response);
+        Aggregation agg = converter.convert(responseMock);
 
         assertThat(agg, is(nullValue()));
     }
@@ -103,7 +107,7 @@ public class SolrResponseAggregationConverterTest {
         SolrBucket bucket = new SolrBucket(aggTypeGoId);
         aggFacet.addBucket(bucket);
 
-        Aggregation agg = converter.convert(response);
+        Aggregation agg = converter.convert(responseMock);
 
         assertThat(agg, is(notNullValue()));
     }
@@ -126,7 +130,7 @@ public class SolrResponseAggregationConverterTest {
 
         aggFacet.addFunction(uniqueAnnIdResult);
 
-        Aggregation agg = converter.convert(response);
+        Aggregation agg = converter.convert(responseMock);
 
         Set<AggregationResult> aggregationResults = agg.getAggregationResults();
 
@@ -147,7 +151,7 @@ public class SolrResponseAggregationConverterTest {
 
         aggFacet.addBucket(bucket);
 
-        Aggregation agg = converter.convert(response);
+        Aggregation agg = converter.convert(responseMock);
 
         Set<Aggregation> retrievedNestedAggregations = agg.getNestedAggregations();
         assertThat(retrievedNestedAggregations, hasSize(1));
@@ -177,7 +181,7 @@ public class SolrResponseAggregationConverterTest {
 
         aggFacet.addBucket(bucket);
 
-        Aggregation agg = converter.convert(response);
+        Aggregation agg = converter.convert(responseMock);
 
         Set<Aggregation> retrievedNestedAggregations = agg.getNestedAggregations();
         assertThat(retrievedNestedAggregations, hasSize(1));
@@ -197,7 +201,7 @@ public class SolrResponseAggregationConverterTest {
         NamedList<Object> queryResponse = new NamedList<>();
         queryResponse.add(FACETS_MARKER, facet.facetValues);
 
-        when(response.getResponse()).thenReturn(queryResponse);
+        when(responseMock.getResponse()).thenReturn(queryResponse);
     }
 
     private void checkBucketValues(Collection<AggregationBucket> actualBuckets, Collection<String> bucketValues) {

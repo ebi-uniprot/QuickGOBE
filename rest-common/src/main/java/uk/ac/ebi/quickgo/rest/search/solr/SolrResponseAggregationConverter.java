@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.results.Aggregation;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
+import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
@@ -12,11 +13,7 @@ import org.apache.solr.common.util.NamedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.AGG_TYPE_PREFIX;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKETS_ID;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKET_FIELD_ID;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.FACETS_MARKER;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.GLOBAL_ID;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
 
 /**
  * Converts the facet/analytics section of a {@link SolrResponse} into an {@link Aggregation}.
@@ -57,6 +54,11 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.GLOBAL_ID
  */
 public class SolrResponseAggregationConverter implements AggregationConverter<SolrResponse, Aggregation> {
     private static final Logger logger = LoggerFactory.getLogger(SolrResponseAggregationConverter.class);
+    private final Map<String, String> fieldNameTransformationMap;
+
+    public SolrResponseAggregationConverter(ServiceRetrievalConfig serviceRetrievalConfig) {
+        fieldNameTransformationMap = serviceRetrievalConfig.repo2DomainFieldMap();
+    }
 
     @Override public Aggregation convert(SolrResponse response) {
         Preconditions.checkArgument(response != null, "Cannot convert null Solr response to an aggregation");
@@ -94,7 +96,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
             String name = SolrAggregationHelper.fieldNameExtractor(field);
 
             if (AGG_TYPE_PREFIX.equals(prefix)) {
-                Aggregation nestedAggregation = new Aggregation(name);
+                Aggregation nestedAggregation = new Aggregation(responseFieldName2DomainFieldName(name));
                 aggregation.addNestedAggregation(nestedAggregation);
 
                 NamedList nestedFacets = (NamedList) value;
@@ -108,11 +110,17 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
             }
         } else if (BUCKETS_ID.equals(field)) {
             List<NamedList<?>> buckets = (List<NamedList<?>>) value;
-            buckets.stream()
-                    .forEach(bucket -> convertBucket((NamedList<?>) bucket, aggregation));
+            buckets.forEach(bucket -> convertBucket((NamedList<?>) bucket, aggregation));
         } else {
             logger.debug("Did not process field: {} with value: {}", field, value);
         }
+    }
+
+    private String responseFieldName2DomainFieldName(String name) {
+        if (fieldNameTransformationMap.containsKey(name)) {
+            return fieldNameTransformationMap.get(name);
+        }
+        return name;
     }
 
     private void convertBucket(NamedList<?> facetBucket, Aggregation aggregation) {

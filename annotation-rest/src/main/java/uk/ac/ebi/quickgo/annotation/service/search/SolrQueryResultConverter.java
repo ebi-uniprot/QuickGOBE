@@ -26,16 +26,19 @@ class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<Annotati
     private final AnnotationDocConverter annotationDocConverter;
 
     public SolrQueryResultConverter(DocumentObjectBinder documentObjectBinder,
-            AnnotationDocConverter annotationDocConverter){
+            AnnotationDocConverter annotationDocConverter,
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig) {
         super();
 
         Preconditions.checkArgument(documentObjectBinder != null, "Document Object Binder cannot be null");
-        Preconditions.checkArgument(annotationDocConverter != null, "Gene product document converter cannot be null");
+        Preconditions.checkArgument(annotationDocConverter != null, "Annotation document converter cannot be null");
+        Preconditions.checkArgument(annotationRetrievalConfig != null,
+                "Annotation retrieval configuration cannot be null");
 
         this.documentObjectBinder = documentObjectBinder;
         this.annotationDocConverter = annotationDocConverter;
 
-        this.setAggregationConverter(new SolrResponseAggregationConverter());
+        this.setAggregationConverter(new SolrResponseAggregationConverter(annotationRetrievalConfig));
     }
 
     /**
