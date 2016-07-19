@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
@@ -42,13 +43,13 @@ public class AnnotationRequest {
      * At the moment the definition of the list is hardcoded because we only have need to display annotation and
      * gene product statistics on a subset of types.
      *
-     * Note: We can in the future change this from a hard coded implementation, ot something that is decided by the
+     * Note: We can in the future change this from a hard coded implementation, to something that is decided by the
      * client.
      */
     private static List<StatsRequest> DEFAULT_STATS_REQUESTS;
 
     static  {
-        List<String> statsTypes = Arrays.asList(GO_ID);
+        List<String> statsTypes = Arrays.asList(GO_ID_INDEXED_ORIGINAL);
 
         StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
         StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);

@@ -1,13 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import uk.ac.ebi.quickgo.annotation.model.*;
-import uk.ac.ebi.quickgo.rest.search.*;
+import uk.ac.ebi.quickgo.rest.search.AggregateSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverterFactory;
-import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
+import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.Aggregation;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
+import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.*;
@@ -17,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static uk.ac.ebi.quickgo.rest.search.AggregateFunction.*;
+import static uk.ac.ebi.quickgo.rest.search.AggregateFunction.UNIQUE;
 
 /**
  * Service that collects distribution statistics of annotations and gene products throughout a given set of annotation
@@ -34,12 +37,12 @@ public class AnnotationStatisticsService implements StatisticsService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final RequestConverterFactory converterFactory;
+    private final FilterConverterFactory converterFactory;
     private final SearchService<Annotation> searchService;
     private final StatsRequestConverter converter;
 
     @Autowired
-    public AnnotationStatisticsService(RequestConverterFactory converterFactory,
+    public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
             StatsRequestConverter converter) {
         this.converterFactory = converterFactory;
@@ -69,7 +72,7 @@ public class AnnotationStatisticsService implements StatisticsService {
 
         BasicSearchQueryTemplate.Builder basicBuilder = basicTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(request.createRequestFilters().stream()
+                .setFilters(request.createFilterRequests().stream()
                         .map(converterFactory::convert)
                         .collect(Collectors.toSet()))
                 .setPage(FIRST_PAGE)
