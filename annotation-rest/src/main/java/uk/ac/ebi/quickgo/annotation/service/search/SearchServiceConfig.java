@@ -75,7 +75,7 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ControllerValidationHelper validationHelper(){
+    public ControllerValidationHelper validationHelper() {
         return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
     }
 
@@ -122,7 +122,6 @@ public class SearchServiceConfig {
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
-
 
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 
