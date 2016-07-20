@@ -12,14 +12,15 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 interface SearchQueryRequestBuilder {
 
     /**
-     * Builds a QueryRequest tailored to searching.
-     * @return
+     * Builds a {@link QueryRequest} tailored to searching.
+     * @return corresponding {@link QueryRequest} for searching
      */
     QueryRequest build();
 
     /**
-     * Returns a new instance of
-     * @return
+     * Returns a new {@link QueryRequest.uk.ac.ebi.quickgo.rest.search.query.QueryRequest.Builder} instance
+     * to be used to build a new {@link QueryRequest}
+     * @return a new {@link QueryRequest.uk.ac.ebi.quickgo.rest.search.query.QueryRequest.Builder} instance
      */
     QueryRequest.Builder builder();
 }
