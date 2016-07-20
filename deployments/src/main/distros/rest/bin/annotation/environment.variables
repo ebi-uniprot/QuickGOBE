@@ -1,11 +1,11 @@
 # ================ ARTIFACT INFO ================
 ARTIFACT_GROUP="uk.ac.ebi.quickgo"
-ARTIFACT_ID="geneproduct-rest"
+ARTIFACT_ID="annotation-rest"
 ARTIFACT_VERSION="0.0.1-SNAPSHOT"
 
 # ================ ADDRESS INFO ================
-PORT="8081"
-JXM_REMOTE_PORT="9091"
+PORT="8080"
+JXM_REMOTE_PORT="9090"
 CONTEXT_PATH="/QuickGO/services"
 
 # ================ JVM OPTIONS ================
