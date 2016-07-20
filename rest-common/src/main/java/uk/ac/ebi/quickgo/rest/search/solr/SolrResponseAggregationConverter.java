@@ -57,6 +57,8 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
     private final Map<String, String> fieldNameTransformationMap;
 
     public SolrResponseAggregationConverter(ServiceRetrievalConfig serviceRetrievalConfig) {
+        Preconditions.checkArgument(serviceRetrievalConfig != null, "ServiceRetrievalConfig cannot be null");
+
         fieldNameTransformationMap = serviceRetrievalConfig.repo2DomainFieldMap();
     }
 

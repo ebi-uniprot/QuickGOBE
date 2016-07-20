@@ -56,6 +56,14 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
+    public void creationWithNullServiceRetrievalConfigCausesException() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("ServiceRetrievalConfig cannot be null");
+
+        new SolrResponseAggregationConverter(null);
+    }
+
+    @Test
     public void conversionOfNullSolrResponseThrowsException() throws Exception {
         responseMock = null;
 
