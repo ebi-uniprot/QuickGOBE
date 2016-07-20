@@ -9,4 +9,4 @@ search:
         properties: {fromTable: ontology, fromAttribute: id, toTable: annotation, toAttribute: id}
       - signature: goIds,relations,usage
         execution: REST_COMM
-        properties: {ip: 123.456.789, resourceFormat: endpoint, localField: goId, timeout: 4000}
+        properties: {ip: 123.456.789, resourceFormat: endpoint, localField: goId, timeout: 2000}
