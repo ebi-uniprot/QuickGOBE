@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -49,10 +50,12 @@ public class AnnotationControllerStatisticsIT {
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     private static final String RESOURCE_URL = "/QuickGO/services/annotation";
+    private static final String STATS_ENDPOINT = RESOURCE_URL + "/stats";
 
     private static final int NUMBER_OF_GENERIC_DOCS = 6;
     private static final String ANNOTATION_GROUP = "annotation";
     private static final String GENE_PRODUCT_GROUP = "geneProduct";
+    private static final String TAXON_PARAM = "taxon";
 
     private MockMvc mockMvc;
 
@@ -84,7 +87,7 @@ public class AnnotationControllerStatisticsIT {
 
         String type = AnnotationFields.GO_ID;
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/stats"));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -99,7 +102,6 @@ public class AnnotationControllerStatisticsIT {
     @Test
     public void ontologyStatsForAllDocsContaining2OntologyIdsReturns2OntologyIdStats()
             throws Exception {
-
         AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
         extraDoc.goId = "GO:0016020";
         repository.save(extraDoc);
@@ -110,7 +112,7 @@ public class AnnotationControllerStatisticsIT {
 
         String type = AnnotationFields.GO_ID;
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/stats"));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -122,10 +124,37 @@ public class AnnotationControllerStatisticsIT {
                 .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, type, asArray(savedGOIds)));
     }
 
-    // todo
     @Test
-    public void ontologyStatsForFilteredDocsContaining2OntologyIdsReturns2OntologyIdStats() {
+    public void ontologyStatsForFilteredDocsContaining2OntologyIdsReturns2OntologyIdStats() throws Exception {
+        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc1.goId = "GO:1111111";
+        extraDoc1.geneProductId = "AAAAAA";
+        extraDoc1.taxonId = 42;
+        repository.save(extraDoc1);
 
+        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc2.goId = "GO:2222222";
+        extraDoc2.taxonId = 42;
+        extraDoc2.geneProductId = "BBBBBB";
+        repository.save(extraDoc2);
+
+        List<String> relevantGOIds = asList(extraDoc1.goId, extraDoc2.goId);
+
+        String type = AnnotationFields.GO_ID;
+
+        ResultActions response = mockMvc.perform(
+                get(STATS_ENDPOINT)
+                        .param(TAXON_PARAM, "42")
+        );
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(totalHitsInGroup(ANNOTATION_GROUP, 2))
+                .andExpect(totalHitsInGroup(GENE_PRODUCT_GROUP, 2))
+                .andExpect(keysInTypeWithinGroup(ANNOTATION_GROUP, type, asArray(relevantGOIds)))
+                .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, type, asArray(relevantGOIds)));
     }
 
     private String[] asArray(Collection<String> elements) {
