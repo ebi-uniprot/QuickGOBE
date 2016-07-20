@@ -14,5 +14,5 @@ search:
           resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
           localField: goId_join,
           responseBodyPath: "$.results[*].descendants[*]",
-          timeout: 4000
+          timeout: 2000
         }
