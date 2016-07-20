@@ -10,8 +10,9 @@ search:
       - signature: usageIds,usageRelationships,usage
         execution: REST_COMM
         properties: {
-          ip: localhost,
+          ip: "http://ves-hx-c2:8082",
           resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
           localField: goId_join,
-          responseBodyPath: "$.results[*].descendants[*]"
+          responseBodyPath: "$.results[*].descendants[*]",
+          timeout: 4000
         }
