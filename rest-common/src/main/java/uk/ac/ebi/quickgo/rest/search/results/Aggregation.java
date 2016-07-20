@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
+import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
 
 import com.google.common.base.Preconditions;
 import java.util.LinkedHashSet;
@@ -134,8 +134,8 @@ public class Aggregation {
     }
 
     /**
-     * Indicates whther the aggregation, at the moment of the method call, has any buckets associated to it.
-     * @return
+     * Indicates whether the aggregation, at the moment of the method call, has any buckets associated to it.
+     * @return boolean indicating whether or not the aggration has associated buckets
      */
     public boolean hasBuckets() {
         return !buckets.isEmpty();
