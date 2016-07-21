@@ -105,6 +105,18 @@ public abstract class OBOControllerIT {
     }
 
     @Test
+    public void whenNoGraphDataExistsForTermWeCanStillRetrieveOtherTermInfo() throws Exception {
+        ontologyGraph.resetGraph();
+
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId)));
+
+        expectBasicFieldsInResults(response, singletonList(validId))
+                .andExpect(jsonPath("$.results.*.id", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void canRetrieveCoreAttrByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validId)));
 
@@ -686,6 +698,7 @@ public abstract class OBOControllerIT {
         return expectCoreFields(result, id, path)
                 .andExpect(jsonPath(path + "children").exists())
                 .andExpect(jsonPath(path + "secondaryIds").exists())
+                .andExpect(jsonPath(path + "descendants").exists())
                 .andExpect(jsonPath(path + "history").exists())
                 .andExpect(jsonPath(path + "xRefs").exists())
                 .andExpect(jsonPath(path + "xRelations").exists())

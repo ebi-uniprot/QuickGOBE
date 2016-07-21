@@ -22,12 +22,15 @@ import org.jgrapht.graph.DirectedMultigraph;
  * @author Edd
  */
 public class OntologyGraph implements OntologyGraphTraversal {
-    private final DirectedGraph<String, OntologyRelationship> ontology;
+    private DirectedGraph<String, OntologyRelationship> ontology;
     private Map<String, Set<OntologyRelationship>> ancestorEdgesMap = new HashMap<>();
 
     public OntologyGraph() {
-        ontology =
-                new DirectedMultigraph<>(new ClassBasedEdgeFactory<>(OntologyRelationship.class));
+        ontology = createNewOntologyGraph();
+    }
+
+    private DirectedMultigraph<String, OntologyRelationship> createNewOntologyGraph() {
+        return new DirectedMultigraph<>(new ClassBasedEdgeFactory<>(OntologyRelationship.class));
     }
 
     public Set<OntologyRelationship> getEdges() {
@@ -56,6 +59,14 @@ public class OntologyGraph implements OntologyGraphTraversal {
                             new OntologyRelationship(oEdge.child, oEdge.parent, oEdge.relationship));
                 }
         );
+    }
+
+    /**
+     * Removes all known graph content.
+     */
+    public void resetGraph() {
+        ontology = createNewOntologyGraph();
+        ancestorEdgesMap = new HashMap<>();
     }
 
     @Override

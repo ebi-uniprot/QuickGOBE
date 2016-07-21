@@ -14,13 +14,17 @@ import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.slf4j.Logger;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import static java.util.Collections.singleton;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Service to query information from the {@link OntologyRepository}
@@ -30,6 +34,8 @@ import static java.util.Collections.singleton;
  * @author Edd
  */
 public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T> {
+    private static final Logger LOGGER = getLogger(OntologyServiceImpl.class);
+
     private OntologyGraphTraversal ontologyTraversal;
     private QueryStringSanitizer queryStringSanitizer;
     private OntologyRepository ontologyRepository;
@@ -69,7 +75,9 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override public List<T> findCompleteInfoByOntologyId(List<String> ids) {
-        return convertDocs(ontologyRepository.findCompleteByTermId(ontologyType, buildIdList(ids)));
+        return convertDocsToCoreData(ontologyRepository.findCompleteByTermId(ontologyType, buildIdList(ids)))
+                .map(this::insertDescendants)
+                .collect(Collectors.toList());
     }
 
     @Override public List<T> findCoreInfoByOntologyId(List<String> ids) {
@@ -102,29 +110,14 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override public List<T> findAncestorsInfoByOntologyId(List<String> ids, OntologyRelationType... relations) {
-        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
-                .stream()
-                .map(term -> {
-                    term.ancestors = ontologyTraversal.ancestors(singleton(term.id), relations);
-                    return term;
-                })
+        return convertDocsWithoutTraversalData(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
+                .map(term -> this.insertAncestors(term, relations))
                 .collect(Collectors.toList());
     }
 
     @Override public List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations) {
-        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
-                .stream()
-                .map(term -> {
-                    term.descendants = ontologyTraversal.descendants(singleton(term.id), relations);
-                    return term;
-                })
-                .collect(Collectors.toList());
-    }
-
-    List<T> convertDocs(List<OntologyDocument> docs) {
-        return docs.stream()
-                .map(converter::convert)
-                .map(this::insertAncestors)
+        return convertDocsWithoutTraversalData(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
+                .map(term -> this.insertDescendants(term, relations))
                 .collect(Collectors.toList());
     }
 
@@ -134,8 +127,46 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return ids.stream().map(queryStringSanitizer::sanitize).collect(Collectors.toList());
     }
 
-    private int calculatePageNumber(int oneBasedPageNum) {
-        return oneBasedPageNum - 1;
+    List<T> convertDocs(List<OntologyDocument> docs) {
+        return convertDocsToCoreData(docs).collect(Collectors.toList());
+    }
+
+    private Stream<T> convertDocsWithoutTraversalData(List<OntologyDocument> docs) {
+        return docs.stream()
+                .map(converter::convert);
+    }
+
+    private Stream<T> convertDocsToCoreData(List<OntologyDocument> docs) {
+        return convertDocsWithoutTraversalData(docs)
+                .map(this::insertAncestors);
+    }
+
+    private T insertAncestors(T term, OntologyRelationType... relations) {
+        List<String> ancestors;
+        try {
+            ancestors = ontologyTraversal.ancestors(singleton(term.id), relations);
+        } catch (Exception e) {
+            LOGGER.debug("Could not fetch ancestors for term: " + term.id + " with relationships: "
+                    + Stream.of(relations).map(OntologyRelationType::getShortName).collect(Collectors.joining(",")), e);
+            ancestors = Collections.unmodifiableList(Collections.emptyList());
+        }
+        term.ancestors = ancestors;
+
+        return term;
+    }
+
+    private T insertDescendants(T term, OntologyRelationType... relations) {
+        List<String> descendants;
+        try {
+            descendants = ontologyTraversal.descendants(singleton(term.id), relations);
+        } catch (Exception e) {
+            LOGGER.debug("Could not fetch descendants for term: " + term.id + " with relationships: "
+                    + Stream.of(relations).map(OntologyRelationType::getShortName).collect(Collectors.joining(",")), e);
+            descendants = Collections.unmodifiableList(Collections.emptyList());
+        }
+        term.descendants = descendants;
+
+        return term;
     }
 
     private QueryResult<T> buildQueryResult(org.springframework.data.domain.Page<OntologyDocument> pagedResult,
@@ -147,13 +178,13 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         List<T> entryHits = pagedResult.getContent().stream()
                 .map(converter::convert)
                 .map(this::insertAncestors)
+                .map(this::insertDescendants)
                 .collect(Collectors.toList());
 
         return new QueryResult.Builder<>(totalNumberOfHits, entryHits).withPageInfo(pageInfo).build();
     }
 
-    private T insertAncestors(T term) {
-        term.ancestors = ontologyTraversal.ancestors(singleton(term.id));
-        return term;
+    private int calculatePageNumber(int oneBasedPageNum) {
+        return oneBasedPageNum - 1;
     }
 }
