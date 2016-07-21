@@ -138,7 +138,7 @@ public class AnnotationRequestTest {
 
         annotationRequest.setUsageIds(usageIds);
 
-        assertThat(annotationRequest.getUsageIds(), is(usageIds.toLowerCase()));
+        assertThat(annotationRequest.getUsageIds(), is(usageIds.toUpperCase()));
     }
 
     @Test
@@ -160,7 +160,7 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(USAGE_FIELD, usage.toLowerCase())
-                .addProperty(USAGE_IDS, usageId.toLowerCase())
+                .addProperty(USAGE_IDS, usageId.toUpperCase())
                 .addProperty(USAGE_RELATIONSHIPS)
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
@@ -180,7 +180,7 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.createFilterRequests(),
                 contains(FilterRequest.newBuilder()
                         .addProperty(USAGE_FIELD, usage.toLowerCase())
-                        .addProperty(USAGE_IDS, usageId.toLowerCase())
+                        .addProperty(USAGE_IDS, usageId.toUpperCase())
                         .addProperty(USAGE_RELATIONSHIPS, relationships.toLowerCase())
                         .build()));
     }

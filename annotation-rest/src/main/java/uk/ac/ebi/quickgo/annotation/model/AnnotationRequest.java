@@ -227,7 +227,7 @@ public class AnnotationRequest {
 
     public void setUsageIds(String usageIds) {
         if (usageIds != null) {
-            filterMap.put(USAGE_IDS, usageIds.toLowerCase());
+            filterMap.put(USAGE_IDS, usageIds.toUpperCase());
         }
     }
 
