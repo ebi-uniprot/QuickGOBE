@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.index.ontology.converter;
 
-
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
@@ -52,6 +51,8 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
                 doc.replacedBy = replacedBy.get(0).getId();
             }
 
+            doc.replaces = extractReplacesList(term);
+
             return Optional.of(doc);
         } else {
             return Optional.empty();
@@ -63,7 +64,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
                 .map(xref -> FlatFieldBuilder.newFlatField()
                         .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getDb()))
                         .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getId()))
-                .buildString())
+                        .buildString())
                 .collect(Collectors.toList());
     }
 
@@ -91,6 +92,19 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         if (!isEmpty(term.consider())) {
             return term.consider().stream()
                     .map(GenericTerm::getId)
+                    .collect(Collectors.toList());
+        } else {
+            return null;
+        }
+    }
+
+    protected List<String> extractReplacesList(GenericTerm term) {
+        if (!isEmpty(term.getReplaces())) {
+            return term.getReplaces().stream()
+                    .map(replace -> FlatFieldBuilder.newFlatField()
+                            .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getChild().getId()))
+                            .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getTypeof().getFormalCode()))
+                            .buildString())
                     .collect(Collectors.toList());
         } else {
             return null;
