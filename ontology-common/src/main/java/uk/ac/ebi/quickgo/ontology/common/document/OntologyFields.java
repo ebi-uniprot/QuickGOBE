@@ -20,6 +20,7 @@ public class OntologyFields {
     public final static String IS_OBSOLETE = "isObsolete";
     public final static String CONSIDER = "consider";
     public final static String REPLACED_BY = "replacedBy";
+    public final static String REPLACES = "replaces";
     public final static String DEFINITION = "definition";
     public final static String DEFINITION_XREFS = "definitionXref";
     public final static String COMMENT = "comment";
@@ -53,6 +54,7 @@ public class OntologyFields {
         public static final String IS_OBSOLETE = storeAndGet(VALUES, OntologyFields.IS_OBSOLETE);
         public static final String CONSIDER = storeAndGet(VALUES, OntologyFields.CONSIDER);
         public static final String REPLACED_BY = storeAndGet(VALUES, OntologyFields.REPLACED_BY);
+        public static final String REPLACES = storeAndGet(VALUES, OntologyFields.REPLACES);
         public static final String DEFINITION = storeAndGet(VALUES, OntologyFields.DEFINITION);
         public static final String COMMENT = storeAndGet(VALUES, OntologyFields.COMMENT);
         public static final String ASPECT = storeAndGet(VALUES, OntologyFields.ASPECT);

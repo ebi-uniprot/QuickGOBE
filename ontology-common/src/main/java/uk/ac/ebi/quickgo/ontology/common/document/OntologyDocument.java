@@ -52,6 +52,9 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.REPLACED_BY)
     public String replacedBy;
 
+    @Field(OntologyFields.REPLACES)
+    public List<String> replaces;
+
     @Field(OntologyFields.CONSIDER)
     public List<String> considers;
 
@@ -131,6 +134,9 @@ public class OntologyDocument implements QuickGODocument {
         if (replacedBy != null ? !replacedBy.equals(that.replacedBy) : that.replacedBy != null) {
             return false;
         }
+        if (replaces != null ? !replaces.equals(that.replaces) : that.replaces != null) {
+            return false;
+        }
         if (considers != null ? !considers.equals(that.considers) : that.considers != null) {
             return false;
         }
@@ -174,6 +180,7 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (synonymNames != null ? synonymNames.hashCode() : 0);
         result = 31 * result + (subsets != null ? subsets.hashCode() : 0);
         result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
+        result = 31 * result + (replaces != null ? replaces.hashCode() : 0);
         result = 31 * result + (considers != null ? considers.hashCode() : 0);
         result = 31 * result + (children != null ? children.hashCode() : 0);
         result = 31 * result + (aspect != null ? aspect.hashCode() : 0);
@@ -200,6 +207,7 @@ public class OntologyDocument implements QuickGODocument {
                 ", synonymNames=" + synonymNames +
                 ", subsets=" + subsets +
                 ", replacedBy='" + replacedBy + '\'' +
+                ", replaces='" + replaces +
                 ", considers=" + considers +
                 ", children=" + children +
                 ", aspect=" + aspect +
