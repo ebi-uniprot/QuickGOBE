@@ -59,7 +59,7 @@ public class AnnotationControllerIT {
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxon";
     private static final String GO_ID_PARAM = "goId";
-    private static final String WITHFROM_PARAM= "withFrom";
+    private static final String WITHFROM_PARAM = "withFrom";
     private static final String GENE_PRODUCT_TYPE_PARAM = "gpType";
 
     //Test Data
@@ -891,7 +891,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-
     //----- Tests for GeneProductType ---------------------//
 
     @Test
@@ -900,24 +899,38 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM,
                 "protein"));
 
-        //Gene Product type is indexed but not stored, so it will not be returned as part of annotation
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(3))
-                .andExpect(fieldsInAllResultsExist(3));
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
 
-
     @Test
-    public void filterByGeneProductTypesSingleParameterReturnsMatchingDocuments() throws Exception {
+    public void filterBySingleGeneProductTypeOfRnaReturnsMatchingDocument() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.dbObjectType = "rna";
         repository.save(doc);
 
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM, "RNA"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
+
+    @Test
+    public void filterAnnotationsByTwoGeneProductTypesAsOneParameterReturnsMatchingDocuments() throws Exception {
+
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.dbObjectType = "complex";
+        repository.save(doc);
+
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM,
-                "protein").param(GENE_PRODUCT_TYPE_PARAM,"rna"));
+                "protein,complex"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -927,15 +940,14 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByGeneProductTypesMultipleParametersReturnsMatchingDocuments() throws Exception {
+    public void filterAnnotationsByTwoGeneProductTypesAsTwoParametersReturnsMatchingDocuments() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.dbObjectType = "complex";
         repository.save(doc);
 
-
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM,
-                "protein").param(GENE_PRODUCT_TYPE_PARAM,"complex"));
+                "protein").param(GENE_PRODUCT_TYPE_PARAM, "complex"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -943,7 +955,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(4))
                 .andExpect(fieldsInAllResultsExist(4));
     }
-
 
     @Test
     public void filterByNonExistentGeneProductTypeReturnsNothing() throws Exception {
@@ -952,16 +963,13 @@ public class AnnotationControllerIT {
         doc.dbObjectType = "complex";
         repository.save(doc);
 
-
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM,"rna"));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM, "rna"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(0))
-                .andExpect(fieldsInAllResultsExist(0));
+                .andExpect(totalNumOfResults(0));
     }
-
 
     //----- Create Test Data ---------------------//
     private List<AnnotationDocument> createGenericDocs(int n) {
