@@ -146,8 +146,9 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         try {
             ancestors = ontologyTraversal.ancestors(singleton(term.id), relations);
         } catch (Exception e) {
-            LOGGER.debug("Could not fetch ancestors for term: " + term.id + " with relationships: "
-                    + Stream.of(relations).map(OntologyRelationType::getShortName).collect(Collectors.joining(",")), e);
+            LOGGER.debug("Could not fetch ancestors for term: [" + term.id + "] with relationships: ["
+                    + Stream.of(relations).map(OntologyRelationType::getLongName).collect(Collectors.joining(","))
+                    + "]");
             ancestors = Collections.unmodifiableList(Collections.emptyList());
         }
         term.ancestors = ancestors;
@@ -160,8 +161,9 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         try {
             descendants = ontologyTraversal.descendants(singleton(term.id), relations);
         } catch (Exception e) {
-            LOGGER.debug("Could not fetch descendants for term: " + term.id + " with relationships: "
-                    + Stream.of(relations).map(OntologyRelationType::getShortName).collect(Collectors.joining(",")), e);
+            LOGGER.debug("Could not fetch descendants for term: [" + term.id + "] with relationships: ["
+                    + Stream.of(relations).map(OntologyRelationType::getLongName).collect(Collectors.joining(",")) +
+                    "]");
             descendants = Collections.unmodifiableList(Collections.emptyList());
         }
         term.descendants = descendants;
