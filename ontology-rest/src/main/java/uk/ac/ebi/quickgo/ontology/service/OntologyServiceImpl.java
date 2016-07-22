@@ -17,6 +17,7 @@ import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -35,6 +36,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T> {
     private static final Logger LOGGER = getLogger(OntologyServiceImpl.class);
+    private final AncestorFetcher ancestorFetcher = new AncestorFetcher();
+    private final DescendantFetcher descendantFetcher = new DescendantFetcher();
 
     private OntologyGraphTraversal ontologyTraversal;
     private QueryStringSanitizer queryStringSanitizer;
@@ -75,33 +78,39 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override public List<T> findCompleteInfoByOntologyId(List<String> ids) {
-        return convertDocsToCoreData(ontologyRepository.findCompleteByTermId(ontologyType, buildIdList(ids)))
+        return convertDocs(ontologyRepository.findCompleteByTermId(ontologyType, buildIdList(ids)))
                 .map(this::insertDescendants)
                 .collect(Collectors.toList());
     }
 
     @Override public List<T> findCoreInfoByOntologyId(List<String> ids) {
-        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)));
+        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
+                .collect(Collectors.toList());
     }
 
     @Override public List<T> findHistoryInfoByOntologyId(List<String> ids) {
-        return convertDocs(ontologyRepository.findHistoryByTermId(ontologyType, buildIdList(ids)));
+        return convertDocs(ontologyRepository.findHistoryByTermId(ontologyType, buildIdList(ids)))
+                .collect(Collectors.toList());
     }
 
     @Override public List<T> findXRefsInfoByOntologyId(List<String> ids) {
-        return convertDocs(ontologyRepository.findXRefsByTermId(ontologyType, buildIdList(ids)));
+        return convertDocs(ontologyRepository.findXRefsByTermId(ontologyType, buildIdList(ids)))
+                .collect(Collectors.toList());
     }
 
     @Override public List<T> findTaxonConstraintsInfoByOntologyId(List<String> ids) {
-        return convertDocs(ontologyRepository.findTaxonConstraintsByTermId(ontologyType, buildIdList(ids)));
+        return convertDocs(ontologyRepository.findTaxonConstraintsByTermId(ontologyType, buildIdList(ids)))
+                .collect(Collectors.toList());
     }
 
     @Override public List<T> findXORelationsInfoByOntologyId(List<String> ids) {
-        return convertDocs(ontologyRepository.findXOntologyRelationsByTermId(ontologyType, buildIdList(ids)));
+        return convertDocs(ontologyRepository.findXOntologyRelationsByTermId(ontologyType, buildIdList(ids)))
+                .collect(Collectors.toList());
     }
 
     @Override public List<T> findAnnotationGuideLinesInfoByOntologyId(List<String> ids) {
-        return convertDocs(ontologyRepository.findAnnotationGuidelinesByTermId(ontologyType, buildIdList(ids)));
+        return convertDocs(ontologyRepository.findAnnotationGuidelinesByTermId(ontologyType, buildIdList(ids)))
+                .collect(Collectors.toList());
     }
 
     @Override public List<List<OntologyRelationship>> paths(Set<String> startingIds, Set<String> endingIds,
@@ -116,7 +125,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override public List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations) {
-        return convertDocsWithoutTraversalData(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
+        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
                 .map(term -> this.insertDescendants(term, relations))
                 .collect(Collectors.toList());
     }
@@ -127,48 +136,66 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return ids.stream().map(queryStringSanitizer::sanitize).collect(Collectors.toList());
     }
 
-    List<T> convertDocs(List<OntologyDocument> docs) {
-        return convertDocsToCoreData(docs).collect(Collectors.toList());
+    /**
+     * <p>Converts a specified list of {@link OntologyDocument}s into a {@link Stream}
+     * of {@link T} instances.
+     *
+     * <p>Note that the ancestors of each term is added to the {@link OntologyDocument}s.
+     *
+     * @param docs the list od {@link OntologyDocument}s to convert
+     * @return a {@link Stream} of {@link T} instances
+     */
+    Stream<T> convertDocs(List<OntologyDocument> docs) {
+        return convertDocsWithoutTraversalData(docs)
+                .map(this::insertAncestors);
     }
 
+    /**
+     * <p>Converts a specified list of {@link OntologyDocument}s into a {@link Stream}
+     * of {@link T} instances.
+     *
+     * <p>No ontology graph data is added to the {@link OntologyDocument}s.
+     *
+     * @param docs the list od {@link OntologyDocument}s to convert
+     * @return a {@link Stream} of {@link T} instances
+     */
     private Stream<T> convertDocsWithoutTraversalData(List<OntologyDocument> docs) {
         return docs.stream()
                 .map(converter::convert);
     }
 
-    private Stream<T> convertDocsToCoreData(List<OntologyDocument> docs) {
-        return convertDocsWithoutTraversalData(docs)
-                .map(this::insertAncestors);
-    }
-
     private T insertAncestors(T term, OntologyRelationType... relations) {
-        List<String> ancestors;
-        try {
-            ancestors = ontologyTraversal.ancestors(singleton(term.id), relations);
-        } catch (Exception e) {
-            LOGGER.debug("Could not fetch ancestors for term: [" + term.id + "] with relationships: ["
-                    + Stream.of(relations).map(OntologyRelationType::getLongName).collect(Collectors.joining(","))
-                    + "]");
-            ancestors = Collections.unmodifiableList(Collections.emptyList());
-        }
-        term.ancestors = ancestors;
-
+        term.ancestors = getRelatives(ancestorFetcher, term, relations);
         return term;
     }
 
     private T insertDescendants(T term, OntologyRelationType... relations) {
-        List<String> descendants;
-        try {
-            descendants = ontologyTraversal.descendants(singleton(term.id), relations);
-        } catch (Exception e) {
-            LOGGER.debug("Could not fetch descendants for term: [" + term.id + "] with relationships: ["
-                    + Stream.of(relations).map(OntologyRelationType::getLongName).collect(Collectors.joining(",")) +
-                    "]");
-            descendants = Collections.unmodifiableList(Collections.emptyList());
-        }
-        term.descendants = descendants;
-
+        term.descendants = getRelatives(descendantFetcher, term, relations);
         return term;
+    }
+
+    /**
+     * Fetch the relatives of a specified {@code term}, via the specified {@code relations}.
+     * The specification of the traversal function is provided as parameter, {@code traversalFunction}.
+     * Specifically, this can either be ancestors, or descendants.
+     *
+     * @param traversalFunction the function used to traverse the ontology graph
+     * @param term the starting {@code term}
+     * @param relations the relationship types that can be navigated
+     * @return a list of term ids that are the relatives of {@code term}
+     */
+    private List<String> getRelatives(
+            BiFunction<T, OntologyRelationType[], List<String>> traversalFunction,
+            T term,
+            OntologyRelationType[] relations) {
+        try {
+            return traversalFunction.apply(term, relations);
+        } catch (Exception e) {
+            LOGGER.debug("Could not fetch relatives for: [" + term.id + "] with relationships: ["
+                    + Stream.of(relations).map(OntologyRelationType::getLongName).collect(Collectors.joining(","))
+                    + "]. Exception message was: " + e.getMessage());
+            return Collections.unmodifiableList(Collections.emptyList());
+        }
     }
 
     private QueryResult<T> buildQueryResult(org.springframework.data.domain.Page<OntologyDocument> pagedResult,
@@ -188,5 +215,17 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
 
     private int calculatePageNumber(int oneBasedPageNum) {
         return oneBasedPageNum - 1;
+    }
+
+    private class AncestorFetcher implements BiFunction<T, OntologyRelationType[], List<String>> {
+        @Override public List<String> apply(T term, OntologyRelationType[] relations) {
+            return ontologyTraversal.ancestors(singleton(term.id), relations);
+        }
+    }
+
+    private class DescendantFetcher implements BiFunction<T, OntologyRelationType[], List<String>> {
+        @Override public List<String> apply(T term, OntologyRelationType[] relations) {
+            return ontologyTraversal.descendants(singleton(term.id), relations);
+        }
     }
 }
