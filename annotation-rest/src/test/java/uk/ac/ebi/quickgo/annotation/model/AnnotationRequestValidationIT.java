@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.hasSize;
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={AnnotationRequestConfig.class})
+@ContextConfiguration(classes = {AnnotationRequestConfig.class})
 public class AnnotationRequestValidationIT {
     private static final String[] VALID_ASSIGNED_BY_PARMS = {"ASPGD", "ASPGD,Agbase", "ASPGD_,Agbase",
             "ASPGD,Agbase_", "ASPGD,Agbase", "BHF-UCL,Agbase", "Roslin_Institute,BHF-UCL,Agbase"};
@@ -32,8 +32,8 @@ public class AnnotationRequestValidationIT {
     private static final String[] VALID_GO_EVIDENCE = {"IEA,IBD,IC"};
     private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
 
-    private static final String[] VALID_GENE_PRODUCT_ID  = {"A0A000","A0A003"};
-    private static final String[] INVALID_GENE_PRODUCT_ID = {"99999","&12345"};
+    private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
+    private static final String[] INVALID_GENE_PRODUCT_ID = {"99999", "&12345"};
 
     @Autowired
     private Validator validator;
@@ -231,7 +231,6 @@ public class AnnotationRequestValidationIT {
                 is("At least one 'Taxonomic identifier' value is invalid: " + taxId));
     }
 
-
     //GENE PRODUCT ID
     @Test
     public void allGeneProductValuesAreValid() {
@@ -262,7 +261,6 @@ public class AnnotationRequestValidationIT {
                         .collect(Collectors.joining(", "))));
     }
 
-
     //GO ID PARAMETER
 
     @Test
@@ -280,7 +278,6 @@ public class AnnotationRequestValidationIT {
                 }
         );
     }
-
 
     @Test
     public void mixedCaseGoIdIsValid() {
@@ -316,7 +313,6 @@ public class AnnotationRequestValidationIT {
         );
     }
 
-
     //ECO PARAMETER
 
     @Test
@@ -351,7 +347,6 @@ public class AnnotationRequestValidationIT {
         );
     }
 
-
     @Test
     public void ecoIdIsInvalid() {
         String[] ecoIds = {"ECO:9", "xxx:0000888", "-"};
@@ -371,20 +366,18 @@ public class AnnotationRequestValidationIT {
 
     //GENE PRODUCT TYPE PARAMETER
     @Test
-    public void validGeneProductTypeValuesDontCauseAnError(){
+    public void validGeneProductTypeValuesDontCauseAnError() {
         String validIds = "complex,rna,protein";
         annotationRequest.setGpType(validIds);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
-
     @Test
-    public void validGeneProductTypeNotCaseSensitive(){
+    public void setGpTypeNotCaseSensitive() {
         String validIds = "comPlex,rnA,pRotein";
         annotationRequest.setGpType(validIds);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
-
 
     @Test
     public void invalidGeneProductTypesCauseError() {
@@ -400,8 +393,6 @@ public class AnnotationRequestValidationIT {
                 }
         );
     }
-
-
 
     //PAGE PARAMETER
     @Test
