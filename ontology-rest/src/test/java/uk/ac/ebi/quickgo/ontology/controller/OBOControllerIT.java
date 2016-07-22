@@ -63,6 +63,7 @@ public abstract class OBOControllerIT {
     private static final String QUERY_PARAM = "query";
     private static final String PAGE_PARAM = "page";
     private static final String RELATIONS_PARAM = "relations";
+    private static final int RELATIONSHIP_CHAIN_LENGTH = 10;
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
@@ -80,7 +81,6 @@ public abstract class OBOControllerIT {
     private String validIdsCSV;
     private List<String> validIdList;
     private List<OntologyRelationship> relationships;
-    private int relationshipChainLength;
     private String validRelation;
     private String invalidRelation;
 
@@ -106,11 +106,13 @@ public abstract class OBOControllerIT {
 
     @Test
     public void whenNoGraphDataExistsForTermWeCanStillRetrieveOtherTermInfo() throws Exception {
-        ontologyGraph.resetGraph();
+        List<OntologyDocument> docsWithGraphIds = createNDocs(RELATIONSHIP_CHAIN_LENGTH + 1);
+        OntologyDocument validDocWithNoGraphData = docsWithGraphIds.get(docsWithGraphIds.size() - 1);
+        ontologyRepository.save(validDocWithNoGraphData);
 
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validId)));
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validDocWithNoGraphData.id)));
 
-        expectBasicFieldsInResults(response, singletonList(validId))
+        expectBasicFieldsInResults(response, singletonList(validDocWithNoGraphData.id))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -749,7 +751,7 @@ public abstract class OBOControllerIT {
     }
 
     private void setupSimpleRelationshipChain() {
-        setupSimpleRelationshipChain(10);
+        setupSimpleRelationshipChain(RELATIONSHIP_CHAIN_LENGTH);
     }
 
     private void setupSimpleRelationshipChain(int idCount) {
@@ -766,7 +768,6 @@ public abstract class OBOControllerIT {
         }
 
         relationships = simpleRelationships;
-        relationshipChainLength = idCount;
         validRelation = OntologyRelationType.IS_A.getLongName();
         invalidRelation = "this-does-not-exist";
         ontologyGraph.addRelationships(simpleRelationships);
