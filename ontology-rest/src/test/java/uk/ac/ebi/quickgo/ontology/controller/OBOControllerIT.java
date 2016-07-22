@@ -693,7 +693,8 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "taxonConstraints").exists())
                 .andExpect(jsonPath(path + "consider").exists())
                 .andExpect(jsonPath(path + "subsets").exists())
-                .andExpect(jsonPath(path + "replacedBy").exists());
+                .andExpect(jsonPath(path + "replacedBy").exists())
+                .andExpect(jsonPath(path + "replaces").exists());
     }
 
     protected ResultActions expectInvalidIdError(ResultActions result, String id) throws Exception {

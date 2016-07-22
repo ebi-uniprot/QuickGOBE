@@ -20,7 +20,7 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
 public final class OntologyDocMocker {
     public static final int FLAT_FIELD_DEPTH = 0;
 
-    private OntologyDocMocker(){}
+    private OntologyDocMocker() {}
 
     public static OntologyDocument createGODoc(String id, String name) {
         OntologyDocument od = createOBODoc(id, name);
@@ -195,6 +195,14 @@ public final class OntologyDocMocker {
                 .addField(newFlatFieldLeaf("http://www.pinkun.com"))
                 .buildString()
         );
+
+        // replaces
+        //format: goTermId|relationType
+        od.replaces = new ArrayList<>();
+        od.replaces.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("GO:1111111"))
+                .addField(newFlatFieldLeaf("replacedBy"))
+                .buildString());
 
         return od;
     }
