@@ -9,6 +9,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
+import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.ECO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GENE_PRODUCT_ID;
@@ -41,7 +42,7 @@ public class AnnotationRequest {
 
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
-            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, DB_OBJECT_TYPE};
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE};
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -89,7 +90,7 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = CASE_INSENSITIVE,
             message = "At least one 'Aspect' value is invalid: ${validatedValue}")
     public String getAspect() {
         return filterMap.get(ASPECT_FIELD);
@@ -196,13 +197,13 @@ public class AnnotationRequest {
     }
 
     public void setGpType(String geneProductType){
-        filterMap.put(DB_OBJECT_TYPE, geneProductType);
+        filterMap.put(GENE_PRODUCT_TYPE, geneProductType.toLowerCase());
     }
 
-    @Pattern(regexp = "^(?i)(complex|rna|protein)(,(?i)(complex|rna|protein)){0,2}",
+    @Pattern(regexp = "^(complex|rna|protein)(,(complex|rna|protein)){0,2}", flags = CASE_INSENSITIVE,
             message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
     public String getGpType(){
-        return filterMap.get(DB_OBJECT_TYPE);
+        return filterMap.get(GENE_PRODUCT_TYPE);
     }
 
 
