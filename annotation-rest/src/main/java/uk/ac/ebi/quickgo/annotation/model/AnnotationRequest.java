@@ -10,6 +10,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
+import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 
 /**
@@ -187,7 +188,7 @@ public class AnnotationRequest {
         return filterMap.get(ECO_ID);
     }
 
-    @Pattern(regexp = "^exact|slim|descendants$", flags = Pattern.Flag.CASE_INSENSITIVE, message = "Invalid usage: " +
+    @Pattern(regexp = "^exact|slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
             "${validatedValue})")
     public String getUsage() {
         return filterMap.get(USAGE_FIELD);
@@ -199,7 +200,7 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "GO:[0-9]+(,GO:[0-9]+)*", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "GO:[0-9]+(,GO:[0-9]+)*", flags = CASE_INSENSITIVE,
             message = "Invalid GO IDs specified: ${validatedValue})")
     public String getUsageIds() {
         return filterMap.get(USAGE_IDS);
@@ -212,7 +213,7 @@ public class AnnotationRequest {
     }
 
     @Pattern(regexp = "(is_a|part_of|occurs_in|regulates)(,is_a|part_of|occurs_in|regulates)*",
-            flags = Pattern.Flag.CASE_INSENSITIVE)
+            flags = CASE_INSENSITIVE)
     public String getUsageRelationships() {
         return filterMap.get(USAGE_RELATIONSHIPS);
     }
