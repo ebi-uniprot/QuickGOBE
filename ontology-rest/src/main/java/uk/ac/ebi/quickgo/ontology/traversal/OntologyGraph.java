@@ -26,8 +26,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
     private Map<String, Set<OntologyRelationship>> ancestorEdgesMap = new HashMap<>();
 
     public OntologyGraph() {
-        ontology =
-                new DirectedMultigraph<>(new ClassBasedEdgeFactory<>(OntologyRelationship.class));
+        ontology = new DirectedMultigraph<>(new ClassBasedEdgeFactory<>(OntologyRelationship.class));
     }
 
     public Set<OntologyRelationship> getEdges() {
