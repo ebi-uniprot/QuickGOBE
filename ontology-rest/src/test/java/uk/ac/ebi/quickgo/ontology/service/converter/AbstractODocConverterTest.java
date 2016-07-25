@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createGODoc;
@@ -56,11 +57,6 @@ public class AbstractODocConverterTest {
     }
 
     @Test
-    public void convertsConsidersWithoutError() {
-        assertThat(oboTermFromValidGODoc.consider, is(validGODoc.considers));
-    }
-
-    @Test
     public void convertsChildrenWithoutError() {
         assertThat(oboTermFromValidGODoc.children, is(validGODoc.children));
     }
@@ -73,6 +69,16 @@ public class AbstractODocConverterTest {
     @Test
     public void convertsReplacedByWithoutError() {
         assertThat(oboTermFromValidGODoc.replacedBy, is(validGODoc.replacedBy));
+    }
+
+    @Test
+    public void convertsReplacements() throws Exception {
+        assertThat(oboTermFromValidGODoc.replacements, hasSize(validGODoc.replacements.size()));
+    }
+
+    @Test
+    public void convertsReplacedBy() throws Exception {
+        assertThat(oboTermFromValidGODoc.replaces, hasSize(validGODoc.replaces.size()));
     }
 
     @Test
@@ -103,5 +109,4 @@ public class AbstractODocConverterTest {
         assertThat(term.id, is("id field"));
         assertThat(term.name, is(nullValue()));
     }
-
 }
