@@ -168,7 +168,7 @@ public class AnnotationRequest {
         filterMap.put(GO_ID, goId);
     }
 
-    @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*",
+    @Pattern(regexp = "go:[0-9]{7}(,go:[0-9]{7})*", flags = CASE_INSENSITIVE,
             message = "At least one 'GO Id' value is invalid: ${validatedValue}")
     public String getGoId() {
         return filterMap.get(GO_ID);
@@ -182,7 +182,7 @@ public class AnnotationRequest {
         filterMap.put(ECO_ID, ecoId);
     }
 
-    @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*",
+    @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*", flags = CASE_INSENSITIVE,
             message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
     public String getEcoId() {
         return filterMap.get(ECO_ID);
