@@ -34,45 +34,22 @@ public class GenericTermToODocConverterTest {
 
     // considers
     @Test
-    public void extractsNoConsideredWhenNull() {
-        when(term.consider()).thenReturn(null);
+    public void extractsNoRelationsWhenNull() {
+        List<TermRelation> relations = null;
 
-        assertThat(converter.extractConsidersAsList(term), is(nullValue()));
+        assertThat(converter.extractRelations(relations), is(nullValue()));
     }
 
     @Test
-    public void extractsConsidersWhenExist() {
-        GenericTerm mockConsider = mock(GenericTerm.class);
-        String considerId = "id2";
-        when(mockConsider.getId()).thenReturn(considerId);
-        ArrayList<GenericTerm> toConsider = new ArrayList<>();
-        toConsider.add(mockConsider);
-
-        when(term.consider()).thenReturn(toConsider);
-        List<String> considersStrList = converter.extractConsidersAsList(term);
-        assertThat(considersStrList, is(not(nullValue())));
-        assertThat(considersStrList.size(), is(1));
-        assertThat(considersStrList.get(0), is(considerId));
-    }
-
-    //replaces
-    @Test
-    public void extractsNoReplacesWhenNull() {
-        when(term.getReplaces()).thenReturn(null);
-
-        assertThat(converter.extractReplacesList(term), is(nullValue()));
-    }
-
-    @Test
-    public void extractsAConsiderRelationWithinReplacesSection() {
+    public void extractsAConsiderRelationFromRelationsCollection() {
         RelationType relation = RelationType.CONSIDER;
         String replaceId = "id2";
 
         TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
 
-        when(term.getReplaces()).thenReturn(Collections.singletonList(mockReplace));
+        Collection<TermRelation> relations = Collections.singletonList(mockReplace);
 
-        List<String> replacesStrList = converter.extractReplacesList(term);
+        List<String> replacesStrList = converter.extractRelations(relations);
         assertThat(replacesStrList.size(), is(1));
 
         String replaceStr = replacesStrList.get(0);
@@ -81,21 +58,22 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractsAReplacedByRelationWithinReplacesSection() {
+    public void extractsAReplacedByRelationWithinRelationsCollection() {
         RelationType relation = RelationType.REPLACEDBY;
         String replaceId = "id2";
 
         TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
 
-        when(term.getReplaces()).thenReturn(Collections.singletonList(mockReplace));
+        Collection<TermRelation> relations = Collections.singletonList(mockReplace);
 
-        List<String> replacesStrList = converter.extractReplacesList(term);
+        List<String> replacesStrList = converter.extractRelations(relations);
         assertThat(replacesStrList.size(), is(1));
 
         String replaceStr = replacesStrList.get(0);
         assertThat(replaceStr, containsString(replaceId));
         assertThat(replaceStr, containsString(relation.getFormalCode()));
     }
+
 
     private TermRelation mockReplaceRelation(String replacedTermId, RelationType relation) {
         GenericTerm replacedTerm = mock(GenericTerm.class);

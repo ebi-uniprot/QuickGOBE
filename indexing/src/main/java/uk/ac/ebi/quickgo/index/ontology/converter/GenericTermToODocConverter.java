@@ -4,12 +4,10 @@ import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.generic.Synonym;
+import uk.ac.ebi.quickgo.model.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -30,7 +28,6 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         if (termOptional.isPresent()) {
             OntologyDocument doc = new OntologyDocument();
             GenericTerm term = termOptional.get();
-            doc.considers = extractConsidersAsList(term);
             doc.id = term.getId();
             doc.isObsolete = term.isObsolete();
             doc.comment = term.getComment();
@@ -51,7 +48,8 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
                 doc.replacedBy = replacedBy.get(0).getId();
             }
 
-            doc.replaces = extractReplacesList(term);
+            doc.replaces = extractRelations(term.getReplaces());
+            doc.replacements = extractRelations(term.getReplacements());
 
             return Optional.of(doc);
         } else {
@@ -88,19 +86,9 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         return null;
     }
 
-    protected List<String> extractConsidersAsList(GenericTerm term) {
-        if (!isEmpty(term.consider())) {
-            return term.consider().stream()
-                    .map(GenericTerm::getId)
-                    .collect(Collectors.toList());
-        } else {
-            return null;
-        }
-    }
-
-    protected List<String> extractReplacesList(GenericTerm term) {
-        if (!isEmpty(term.getReplaces())) {
-            return term.getReplaces().stream()
+    protected List<String> extractRelations(Collection<TermRelation> replaceList) {
+        if (!isEmpty(replaceList)) {
+            return replaceList.stream()
                     .map(replace -> FlatFieldBuilder.newFlatField()
                             .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getChild().getId()))
                             .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getTypeof().getFormalCode()))
