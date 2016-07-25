@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.common.document;
 
-import uk.ac.ebi.quickgo.common.converter.FlatField;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 
@@ -77,7 +76,6 @@ public final class OntologyDocMocker {
                 .buildString());
         od.isObsolete = true;
         od.replacedBy = "GO:0000002";
-        od.considers = Arrays.asList("GO:0000003", "GO:0000004");
         od.comment = "Note that protein targeting encompasses the transport of the protein to " +
                 "the specified location, and may also include additional steps such as protein processing.";
         od.children = Arrays.asList("GO:0000011", "GO:0000012");
@@ -199,11 +197,20 @@ public final class OntologyDocMocker {
         // replaces
         //format: goTermId|relationType
         od.replaces = new ArrayList<>();
-        od.replaces.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
-                .addField(newFlatFieldLeaf("GO:1111111"))
-                .addField(newFlatFieldLeaf("replacedBy"))
-                .buildString());
+        od.replaces.add(createFlatRelation("GO:1111111", "replacedBy"));
+
+        od.replacements = new ArrayList<>();
+        od.replacements.add(createFlatRelation(od.replacedBy, "replacedBy"));
+        od.replacements.add(createFlatRelation("GO:0000003", "consider"));
+        od.replacements.add(createFlatRelation("GO:0000004", "consider"));
 
         return od;
+    }
+
+    private static String createFlatRelation(String id, String relationType) {
+        return newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("GO:1111111"))
+                .addField(newFlatFieldLeaf("replacedBy"))
+                .buildString();
     }
 }
