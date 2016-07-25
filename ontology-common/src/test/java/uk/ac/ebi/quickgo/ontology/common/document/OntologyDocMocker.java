@@ -209,8 +209,8 @@ public final class OntologyDocMocker {
 
     private static String createFlatRelation(String id, String relationType) {
         return newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
-                .addField(newFlatFieldLeaf("GO:1111111"))
-                .addField(newFlatFieldLeaf("replacedBy"))
+                .addField(newFlatFieldLeaf(id))
+                .addField(newFlatFieldLeaf(relationType))
                 .buildString();
     }
 }
