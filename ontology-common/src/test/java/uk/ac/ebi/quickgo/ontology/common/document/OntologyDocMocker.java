@@ -197,10 +197,10 @@ public final class OntologyDocMocker {
         // replaces
         //format: goTermId|relationType
         od.replaces = new ArrayList<>();
-        od.replaces.add(createFlatRelation("GO:1111111", "replacedBy"));
+        od.replaces.add(createFlatRelation("GO:1111111", "replaced_by"));
 
         od.replacements = new ArrayList<>();
-        od.replacements.add(createFlatRelation(od.replacedBy, "replacedBy"));
+        od.replacements.add(createFlatRelation(od.replacedBy, "replaced_by"));
         od.replacements.add(createFlatRelation("GO:0000003", "consider"));
         od.replacements.add(createFlatRelation("GO:0000004", "consider"));
 
