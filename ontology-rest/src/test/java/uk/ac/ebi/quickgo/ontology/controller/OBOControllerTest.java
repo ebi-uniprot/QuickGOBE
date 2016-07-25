@@ -50,21 +50,21 @@ public class OBOControllerTest {
 
     @Test
     public void termsResponseForNullListContainsZeroResults() {
-        ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getTermsResponse(null);
+        ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getResultsResponse(null);
         assertThat(termsResponse.getBody().getNumberOfHits(), is(0L));
         assertThat(termsResponse.getBody().getResults(), is(empty()));
     }
 
     @Test
     public void termsResponseForEmptyListContainsZeroResults() {
-        ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getTermsResponse(Collections.emptyList());
+        ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getResultsResponse(Collections.emptyList());
         assertThat(termsResponse.getBody().getNumberOfHits(), is(0L));
         assertThat(termsResponse.getBody().getResults(), is(empty()));
     }
 
     @Test
     public void termsResponseForListOfOneContainsOneResult() {
-        ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getTermsResponse(Collections
+        ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getResultsResponse(Collections
                 .singletonList(new FakeOBOTerm()));
         assertThat(termsResponse.getBody().getNumberOfHits(), is(1L));
         assertThat(termsResponse.getBody().getResults().size(), is(1));

@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.web.client.RestOperations;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -34,17 +35,24 @@ public class FilterConverterFactoryTest {
     private FilterConfigRetrieval filterConfigRetrievalMock;
     @Mock
     private FilterConfig filterConfigMock;
+    @Mock
+    private RestOperations restOperationsMock;
 
-    private RequestConverterFactory converter;
+    private FilterConverterFactory converter;
 
     @Before
     public void setUp() {
-        this.converter = new RequestConverterFactory(filterConfigRetrievalMock);
+        this.converter = new FilterConverterFactory(filterConfigRetrievalMock, restOperationsMock);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullRestOperationsThrowsException() {
+        new FilterConverterFactory(filterConfigRetrievalMock, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullConfigRetrievalThrowsException() {
-        new RequestConverterFactory(null);
+        new FilterConverterFactory(null, restOperationsMock);
     }
 
     // simple request -> QuickGOQuery tests

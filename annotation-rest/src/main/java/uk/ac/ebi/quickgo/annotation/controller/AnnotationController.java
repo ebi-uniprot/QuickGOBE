@@ -2,16 +2,17 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverterFactory;
+import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,19 +83,19 @@ public class AnnotationController {
     private final SearchService<Annotation> annotationSearchService;
 
     private final BasicSearchQueryTemplate queryTemplate;
-    private final RequestConverterFactory converterFactory;
+    private final FilterConverterFactory converterFactory;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
-            RequestConverterFactory converterFactory) {
+            FilterConverterFactory converterFactory) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
                 ".AnnotationCompositeRetrievalConfig instance passed to the constructor of AnnotationController " +
                 "should not be null.");
-        checkArgument(converterFactory != null, "The ConverterFactory cannot be null.");
+        checkArgument(converterFactory != null, "The FilterConverterFactory cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
@@ -119,8 +120,9 @@ public class AnnotationController {
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(request.createRequestFilters().stream()
+                .setFilters(request.createFilterRequests().stream()
                         .map(converterFactory::convert)
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toSet()))
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit())

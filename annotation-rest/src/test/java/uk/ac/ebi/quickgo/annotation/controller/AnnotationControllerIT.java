@@ -243,7 +243,8 @@ public class AnnotationControllerIT {
                         .param(TAXON_ID_PARAM, String.valueOf(taxonId1))
                         .param(TAXON_ID_PARAM, String.valueOf(taxonId2)));
 
-        response.andExpect(status().isOk())
+        response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))

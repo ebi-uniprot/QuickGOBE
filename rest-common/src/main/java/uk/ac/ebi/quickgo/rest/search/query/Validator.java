@@ -6,6 +6,7 @@ package uk.ac.ebi.quickgo.rest.search.query;
  * Time: 14:15
  * Created with IntelliJ IDEA.
  */
+// todo: where is this used? If not used, it should be removed.
 @FunctionalInterface
 public interface Validator<T> {
 

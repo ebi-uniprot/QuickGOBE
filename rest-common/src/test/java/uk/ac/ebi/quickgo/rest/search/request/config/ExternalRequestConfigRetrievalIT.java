@@ -82,7 +82,9 @@ public class ExternalRequestConfigRetrievalIT {
     private FilterConfig createStubUsageSignature() {
         Map<String, String> map = new HashMap<>();
         map.put("ip", "123.456.789");
-        map.put("endpoint", "endpoint");
+        map.put("resourceFormat", "endpoint");
+        map.put("localField", "goId");
+        map.put("timeout", "4000");
 
         return FilterUtil.createExecutionConfigWithProps("goIds,relations,usage", ExecutionType.REST_COMM, map);
     }
