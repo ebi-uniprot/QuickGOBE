@@ -72,7 +72,7 @@
     <field name="goId" type="lowercase" indexed="true" stored="true" multiValued="false"/>
     <field name="geneProductId" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="goId_join" type="string" indexed="true" stored="false" multiValued="false"/>
-    <field name="dbObjectType" type="string" indexed="true" stored="false" multiValued="false"/>
+    <field name="geneProductType" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="dbObjectSymbol" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="dbSubset" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="goEvidence" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
