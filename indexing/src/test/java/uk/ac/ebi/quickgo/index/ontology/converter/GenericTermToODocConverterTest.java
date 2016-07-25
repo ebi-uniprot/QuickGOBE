@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.model.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.*;
-import java.util.regex.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by edd on 22/12/2015.
+ * Tests the behaviour of the {@link GenericTermToODocConverter} class.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class GenericTermToODocConverterTest {
@@ -54,6 +53,59 @@ public class GenericTermToODocConverterTest {
         assertThat(considersStrList, is(not(nullValue())));
         assertThat(considersStrList.size(), is(1));
         assertThat(considersStrList.get(0), is(considerId));
+    }
+
+    //replaces
+    @Test
+    public void extractsNoReplacesWhenNull() {
+        when(term.getReplaces()).thenReturn(null);
+
+        assertThat(converter.extractReplacesList(term), is(nullValue()));
+    }
+
+    @Test
+    public void extractsAConsiderRelationWithinReplacesSection() {
+        RelationType relation = RelationType.CONSIDER;
+        String replaceId = "id2";
+
+        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+
+        when(term.getReplaces()).thenReturn(Collections.singletonList(mockReplace));
+
+        List<String> replacesStrList = converter.extractReplacesList(term);
+        assertThat(replacesStrList.size(), is(1));
+
+        String replaceStr = replacesStrList.get(0);
+        assertThat(replaceStr, containsString(replaceId));
+        assertThat(replaceStr, containsString(relation.getFormalCode()));
+    }
+
+    @Test
+    public void extractsAReplacedByRelationWithinReplacesSection() {
+        RelationType relation = RelationType.REPLACEDBY;
+        String replaceId = "id2";
+
+        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+
+        when(term.getReplaces()).thenReturn(Collections.singletonList(mockReplace));
+
+        List<String> replacesStrList = converter.extractReplacesList(term);
+        assertThat(replacesStrList.size(), is(1));
+
+        String replaceStr = replacesStrList.get(0);
+        assertThat(replaceStr, containsString(replaceId));
+        assertThat(replaceStr, containsString(relation.getFormalCode()));
+    }
+
+    private TermRelation mockReplaceRelation(String replacedTermId, RelationType relation) {
+        GenericTerm replacedTerm = mock(GenericTerm.class);
+        when(replacedTerm.getId()).thenReturn(replacedTermId);
+
+        TermRelation mockReplace = mock(TermRelation.class);
+        when(mockReplace.getChild()).thenReturn(replacedTerm);
+        when(mockReplace.getTypeof()).thenReturn(relation);
+
+        return mockReplace;
     }
 
     // history

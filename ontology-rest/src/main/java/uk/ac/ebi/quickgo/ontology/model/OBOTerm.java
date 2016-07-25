@@ -43,6 +43,9 @@ public class OBOTerm {
     // a term ID that replaces this one
     public String replacedBy;
 
+    // indicates all ontology terms that are effectively or can be replaced by the this term
+    public List<Replace> replaces;
+
     // each term can be in one or more subsets; these are used for two purposes: slims and term usage constraints.
     // Slim subsets have names of the form "goslim_xxx", while usage constraint subsets have names like "gocheck_xxx".
     public List<String> subsets;
@@ -116,5 +119,11 @@ public class OBOTerm {
     public static class Definition implements FieldType {
         public String text;
         public List<XRef> xrefs;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Replace implements FieldType {
+        public String id;
+        public String type;
     }
 }
