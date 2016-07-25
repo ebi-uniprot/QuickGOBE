@@ -28,10 +28,6 @@ public class OBOTerm {
 
     public String comment;
 
-    // list of term IDs to consider when replacing
-    // TODO confirm with Tony S
-    public List<String> consider;
-
     // list of term IDs that are ancestors of this term
     public List<String> ancestors;
 
@@ -45,6 +41,10 @@ public class OBOTerm {
 
     // indicates all ontology terms that are effectively or can be replaced by the this term
     public List<Replace> replaces;
+
+    // Contains a list of ontology terms that either replace the current term, or that can be considered as a
+    // replacement
+    public List<Replace> replacements;
 
     // each term can be in one or more subsets; these are used for two purposes: slims and term usage constraints.
     // Slim subsets have names of the form "goslim_xxx", while usage constraint subsets have names like "gocheck_xxx".
