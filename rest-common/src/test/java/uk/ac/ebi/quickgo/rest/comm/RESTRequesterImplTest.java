@@ -88,24 +88,42 @@ public class RESTRequesterImplTest {
     }
 
     @Test
-    public void addingRequestParamsResultsInTheseParamsBeingUsed() {
-        addRequestParameter("param1", "value1");
+    public void addingRequestParamsResultsInTheseParamsBeingUsed() throws ExecutionException, InterruptedException {
+        String param1 = "param1";
+        String value1 = "value1";
+        String url = SERVICE_ENDPOINT + "/something-else";
+
+        RestTemplate restTemplateMock = mock(RestTemplate.class);
+        RESTRequesterImpl.Builder requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock, url);
+        Map<String, String> requestParameters = new HashMap<>();
+
+        requesterBuilder.addRequestParameter(param1, value1);
+        requestParameters.put(param1, value1);
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
-        requester.get(restTemplateMock, FakeDTO.class);
-        verify(restTemplateMock, times(1)).getForObject(SERVICE_ENDPOINT, FakeDTO.class, requestParameters);
+        CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class);
+        completableFuture.get();
+
+        verify(restTemplateMock, times(1)).getForObject(url, FakeDTO.class, requestParameters);
     }
 
     @Test
-    public void resettingURLResultsInNewURLBeingAccessed() {
+    public void resettingURLResultsInNewURLBeingAccessed() throws ExecutionException, InterruptedException {
         String newURL = "new url";
+        String dtoValue = "value";
+        when(restTemplateMock.getForObject(newURL, FakeDTO.class, requestParameters))
+                .thenReturn(new FakeDTO(dtoValue));
+
         requesterBuilder.resetURL(newURL);
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
-        requester.get(restTemplateMock, FakeDTO.class);
+        CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class);
+        FakeDTO fakeDTO = completableFuture.get();
+
         verify(restTemplateMock, times(1)).getForObject(newURL, FakeDTO.class, requestParameters);
+        assertThat(fakeDTO.value, is(dtoValue));
     }
 
     @Test

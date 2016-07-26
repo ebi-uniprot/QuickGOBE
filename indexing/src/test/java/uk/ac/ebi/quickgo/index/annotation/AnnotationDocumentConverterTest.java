@@ -168,7 +168,7 @@ public class AnnotationDocumentConverterTest {
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.dbObjectType, is(nullValue()));
+        assertThat(doc.geneProductType, is(nullValue()));
     }
 
     @Test
@@ -178,7 +178,7 @@ public class AnnotationDocumentConverterTest {
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.dbObjectType, is(value));
+        assertThat(doc.geneProductType, is(value));
     }
 
     // annotation properties: db object symbol
