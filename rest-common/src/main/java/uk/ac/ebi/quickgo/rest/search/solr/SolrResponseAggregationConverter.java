@@ -156,7 +156,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
         if (number instanceof Double) {
             convertedValue = (double) number;
         } else if (number instanceof Integer) {
-            convertedValue = (double) (int) number;
+            convertedValue = ((Integer)number).doubleValue();
         } else {
             throw new IllegalArgumentException("Unable to convert number: " + number);
         }
