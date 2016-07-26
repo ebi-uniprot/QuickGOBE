@@ -64,16 +64,16 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
 
     @Override public Aggregation convert(SolrResponse response) {
         Preconditions.checkArgument(response != null, "Cannot convert null Solr response to an aggregation");
-        NamedList<?> facetResponse = extractFacetsFromResponse(response);
+        NamedList<?> aggregateResponse = extractAggregationsFromResponse(response);
 
         Aggregation globalAgg = null;
 
-        if(facetResponse != null && facetResponse.size() > 0) {
+        if (aggregateResponse != null && aggregateResponse.size() > 0) {
             globalAgg = new Aggregation(GLOBAL_ID);
 
-            convertAggregateFacets(facetResponse, globalAgg);
+            convertSolrAggregationsToDomainAggregations(aggregateResponse, globalAgg);
 
-            if(!globalAgg.isPopulated()) {
+            if (!globalAgg.isPopulated()) {
                 globalAgg = null;
             }
         }
@@ -81,34 +81,37 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
         return globalAgg;
     }
 
-    private NamedList<?> extractFacetsFromResponse(SolrResponse response) {
-        return (NamedList<?>) response.getResponse().get(FACETS_MARKER);
+    /**
+     * Extracts the section of the {@link SolrResponse} that is used specifically for the aggregation.
+     *
+     * @param response the native Solr resposne
+     * @return The data structure used to store the aggregation results
+     */
+    private NamedList<?> extractAggregationsFromResponse(SolrResponse response) {
+        return (NamedList<?>) response.getResponse().get(AGGREGATIONS_MARKER);
     }
 
-    private void convertAggregateFacets(NamedList<?> facetData, Aggregation aggregation) {
+    private void convertSolrAggregationsToDomainAggregations(NamedList<?> facetData, Aggregation aggregation) {
         for (Map.Entry<String, ?> facetDataEntry : facetData) {
-            convertFacetValue(facetDataEntry.getKey(), facetDataEntry.getValue(), aggregation);
+            convertAggregateValue(facetDataEntry.getKey(), facetDataEntry.getValue(), aggregation);
         }
     }
 
-    private void convertFacetValue(String field, Object value, Aggregation aggregation) {
+    /**
+     * Converts an element found within a {@link NamedList} into an value that makes sense within an
+     * {@link Aggregation}
+     */
+    private void convertAggregateValue(String field, Object value, Aggregation aggregation) {
         String prefix = SolrAggregationHelper.fieldPrefixExtractor(field);
 
         if (!prefix.isEmpty()) {
             String name = SolrAggregationHelper.fieldNameExtractor(field);
 
             if (AGG_TYPE_PREFIX.equals(prefix)) {
-                Aggregation nestedAggregation = new Aggregation(responseFieldName2DomainFieldName(name));
+                Aggregation nestedAggregation = createNestedAggregation(name, value);
                 aggregation.addNestedAggregation(nestedAggregation);
-
-                NamedList nestedFacets = (NamedList) value;
-                convertAggregateFacets(nestedFacets, nestedAggregation);
             } else {
-                AggregateFunction function = AggregateFunction.typeOf(prefix);
-
-                double hits = convertToDouble(value);
-
-                aggregation.addAggregationResult(function, name, hits);
+                addAggregationFunctionToAggregation(prefix, name, value, aggregation);
             }
         } else if (BUCKETS_ID.equals(field)) {
             List<NamedList<?>> buckets = (List<NamedList<?>>) value;
@@ -116,6 +119,40 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
         } else {
             logger.debug("Did not process field: {} with value: {}", field, value);
         }
+    }
+
+    /**
+     * Creates a nested {@link Aggregation} based on the provided {@code nestedFacets}.
+     *
+     * @param name the name of the aggregation
+     * @param nestedFacets the values used to populate the newly created {@link Aggregation}
+     * @return creates a new {@link Aggregation} base on the method arguments
+     */
+    private Aggregation createNestedAggregation(String name, Object nestedFacets) {
+        Aggregation nestedAggregation = new Aggregation(responseFieldName2DomainFieldName(name));
+
+        convertSolrAggregationsToDomainAggregations((NamedList) nestedFacets, nestedAggregation);
+
+        return nestedAggregation;
+    }
+
+    /**
+     * Converts the raw types retrieve from the Solr response into an
+     * {@link uk.ac.ebi.quickgo.rest.search.results.AggregationResult} that is added to the {@code aggregation}.
+     *
+     * @param functionText the aggregation function expressed as a string
+     * @param field the name of the field that was aggregated
+     * @param hitsObject the result of the application of the function defined in {@code functionText} to the
+     * aggregation field defined in {@code field}.
+     * @param aggregation the aggregation where the aggragetion result will be added to.
+     */
+    private void addAggregationFunctionToAggregation(String functionText, String field, Object hitsObject,
+            Aggregation aggregation) {
+        AggregateFunction function = AggregateFunction.typeOf(functionText);
+
+        double hits = convertToDouble(hitsObject);
+
+        aggregation.addAggregationResult(function, field, hits);
     }
 
     private String responseFieldName2DomainFieldName(String name) {
@@ -156,7 +193,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
         if (number instanceof Double) {
             convertedValue = (double) number;
         } else if (number instanceof Integer) {
-            convertedValue = ((Integer)number).doubleValue();
+            convertedValue = ((Integer) number).doubleValue();
         } else {
             throw new IllegalArgumentException("Unable to convert number: " + number);
         }

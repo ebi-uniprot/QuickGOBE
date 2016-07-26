@@ -21,7 +21,7 @@ class SolrAggregationHelper {
     static final String BUCKETS_ID = "buckets";
     static final String BUCKET_FIELD_ID = "val";
 
-    static final String FACETS_MARKER = "facets";
+    static final String AGGREGATIONS_MARKER = "facets";
     static final String FACET_MARKER = "facet";
     static final String FACET_TYPE_TERM = "terms";
 

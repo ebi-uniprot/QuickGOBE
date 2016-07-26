@@ -27,7 +27,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKETS_ID;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKET_FIELD_ID;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.FACETS_MARKER;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.AGGREGATIONS_MARKER;
 
 /**
  * Tests the behaviour of the {@link SolrResponseAggregationConverter} class.
@@ -44,15 +44,15 @@ public class SolrResponseAggregationConverterTest {
     private ServiceRetrievalConfig serviceRetrievalConfigMock;
 
     private SolrResponseAggregationConverter converter;
-    private SolrFacet aggFacet;
+    private SolrAggregate solrAggregate;
 
     @Before
     public void setUp() throws Exception {
-        aggFacet = new SolrFacet();
+        solrAggregate = new SolrAggregate();
 
         converter = new SolrResponseAggregationConverter(serviceRetrievalConfigMock);
 
-        addFacetsToResponse(aggFacet);
+        addFacetsToResponse(solrAggregate);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithNoFacetsConvertsToNullAggregate() throws Exception {
+    public void solrResponseWithNoAggregatesConvertsToNullAggregation() throws Exception {
         when(responseMock.getResponse()).thenReturn(new NamedList<>());
 
         Aggregation agg = converter.convert(responseMock);
@@ -83,16 +83,16 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithNonAggregatedFacetConvertToNullAggregate() throws Exception {
+    public void solrResponseWithNonAggregatesConvertToNullAggregation() throws Exception {
         Aggregation agg = converter.convert(responseMock);
 
         assertThat(agg, is(nullValue()));
     }
 
     @Test
-    public void solrResponseWithAggregatedFunctionInFacetConvertssToANonNullAggregate() throws Exception {
+    public void solrResponseWithAggregatedFunctionConvertsToANonNullAggregation() throws Exception {
         SolrAggregationResult result = new SolrAggregationResult("id", AggregateFunction.COUNT, 3);
-        aggFacet.addFunction(result);
+        solrAggregate.addFunction(result);
 
         Aggregation agg = converter.convert(responseMock);
 
@@ -100,9 +100,9 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithNonAggregatedBucketInGlobalFacetConvertsToANullAggregate() throws Exception {
+    public void solrResponseWithNonAggregatedBucketInGlobalAggregateConvertsToANullAggregation() throws Exception {
         SolrBucket bucket = new SolrBucket("goId");
-        aggFacet.addBucket(bucket);
+        solrAggregate.addBucket(bucket);
 
         Aggregation agg = converter.convert(responseMock);
 
@@ -110,10 +110,10 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithAggregatedBucketInGlobalFacetConvertToANonNullAggregate() throws Exception {
+    public void solrResponseWithAggregatedBucketInGlobalAggregateConvertToANonNullAggregation() throws Exception {
         String aggTypeGoId = SolrAggregationHelper.aggregatePrefixWithTypeTitle("goId");
         SolrBucket bucket = new SolrBucket(aggTypeGoId);
-        aggFacet.addBucket(bucket);
+        solrAggregate.addBucket(bucket);
 
         Aggregation agg = converter.convert(responseMock);
 
@@ -128,7 +128,7 @@ public class SolrResponseAggregationConverterTest {
 
         SolrAggregationResult countGpIdResult = new SolrAggregationResult(gpIdField, countFunc, aggGpIdHits);
 
-        aggFacet.addFunction(countGpIdResult);
+        solrAggregate.addFunction(countGpIdResult);
 
         AggregateFunction uniqueFunc = AggregateFunction.UNIQUE;
         String annIdField = "annotationId";
@@ -136,7 +136,7 @@ public class SolrResponseAggregationConverterTest {
 
         SolrAggregationResult uniqueAnnIdResult = new SolrAggregationResult(annIdField, uniqueFunc, aggAnnIdHits);
 
-        aggFacet.addFunction(uniqueAnnIdResult);
+        solrAggregate.addFunction(uniqueAnnIdResult);
 
         Aggregation agg = converter.convert(responseMock);
 
@@ -157,7 +157,7 @@ public class SolrResponseAggregationConverterTest {
         bucket.addValueAndAggResults(bucketValue1);
         bucket.addValueAndAggResults(bucketValue2);
 
-        aggFacet.addBucket(bucket);
+        solrAggregate.addBucket(bucket);
 
         Aggregation agg = converter.convert(responseMock);
 
@@ -187,7 +187,7 @@ public class SolrResponseAggregationConverterTest {
         SolrBucket bucket = new SolrBucket(aggTypeGoId);
         bucket.addValueAndAggResults(bucketValue1, result);
 
-        aggFacet.addBucket(bucket);
+        solrAggregate.addBucket(bucket);
 
         Aggregation agg = converter.convert(responseMock);
 
@@ -205,9 +205,9 @@ public class SolrResponseAggregationConverterTest {
         assertThat(retrievedBucket.getAggregationResult(countFunc, field).isPresent(), is(true));
     }
 
-    private void addFacetsToResponse(SolrFacet facet) {
+    private void addFacetsToResponse(SolrAggregate facet) {
         NamedList<Object> queryResponse = new NamedList<>();
-        queryResponse.add(FACETS_MARKER, facet.facetValues);
+        queryResponse.add(AGGREGATIONS_MARKER, facet.facetValues);
 
         when(responseMock.getResponse()).thenReturn(queryResponse);
     }
@@ -225,10 +225,10 @@ public class SolrResponseAggregationConverterTest {
     /**
      * Facade to represent an {@link Aggregation} in a native Solr response.
      */
-    private class SolrFacet {
+    private class SolrAggregate {
         private final NamedList<Object> facetValues;
 
-        public SolrFacet() {
+        public SolrAggregate() {
             facetValues = new NamedList<>();
         }
 
