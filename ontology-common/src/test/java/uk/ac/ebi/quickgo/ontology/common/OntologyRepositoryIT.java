@@ -98,12 +98,6 @@ public class OntologyRepositoryIT {
         results.forEach(doc -> assertThat(copyAsCoreDoc(doc), is(equalTo(doc))));
     }
 
-    private List<String> buildIdList(String... ids) {
-        return Arrays.stream(ids)
-                .map(QueryUtils::solrEscape)
-                .collect(Collectors.toList());
-    }
-
     @Test
     public void retrievesReplacesField() {
         String id = "GO:0000001";
@@ -318,5 +312,11 @@ public class OntologyRepositoryIT {
         coreDoc.synonyms = document.synonyms;
         coreDoc.aspect = document.aspect;
         return coreDoc;
+    }
+
+    private List<String> buildIdList(String... ids) {
+        return Arrays.stream(ids)
+                .map(QueryUtils::solrEscape)
+                .collect(Collectors.toList());
     }
 }
