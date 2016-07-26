@@ -14,19 +14,19 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 
 /**
- * Tests the behaviour of the {@link Aggregation} class.
+ * Tests the behaviour of the {@link AggregateResponse} class.
  *
  * Note: tests dealing with {@link AggregationResult} are tested in {@link AggregationResultsManager}.
  */
-public class AggregationTest {
+public class AggregateResponseTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private Aggregation aggregation;
+    private AggregateResponse aggregation;
 
     @Before
     public void setUp() throws Exception {
-        aggregation = new Aggregation("agg");
+        aggregation = new AggregateResponse("agg");
     }
 
     @Test
@@ -36,7 +36,7 @@ public class AggregationTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Name cannot be null or empty");
 
-        new Aggregation(name);
+        new AggregateResponse(name);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class AggregationTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Name cannot be null or empty");
 
-        new Aggregation(name);
+        new AggregateResponse(name);
     }
 
     @Test
@@ -86,7 +86,7 @@ public class AggregationTest {
 
     @Test
     public void addingNullNestedAggregateThrowsException() throws Exception {
-        Aggregation nestedAggregation = null;
+        AggregateResponse nestedAggregation = null;
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Nested aggregation cannot be null");
@@ -96,11 +96,11 @@ public class AggregationTest {
 
     @Test
     public void nestedAggregateGetsAddedToStoredAggregates() throws Exception {
-        Aggregation nestedAggregation = new Aggregation("nestedAggregation");
+        AggregateResponse nestedAggregation = new AggregateResponse("nestedAggregation");
 
         aggregation.addNestedAggregation(nestedAggregation);
 
-        Set<Aggregation> retrievedAggregates = aggregation.getNestedAggregations();
+        Set<AggregateResponse> retrievedAggregates = aggregation.getNestedAggregations();
 
         assertThat(retrievedAggregates, hasSize(1));
         assertThat(retrievedAggregates, contains(nestedAggregation));
@@ -115,7 +115,7 @@ public class AggregationTest {
     @Test
     public void aggregationWithANestedAggregationsReturnsTrueWhenQueriedAboutThePresenceOfNestedAggregations()
             throws Exception {
-        Aggregation nestedAggregation = new Aggregation("nestedAggregation");
+        AggregateResponse nestedAggregation = new AggregateResponse("nestedAggregation");
         aggregation.addNestedAggregation(nestedAggregation);
 
         assertThat(aggregation.hasNestedAggregations(), is(true));
@@ -150,7 +150,7 @@ public class AggregationTest {
     @Test
     public void aggregationWithANestingAndNoResultAndNoBucketsReturnsTrueWhenQueriedIfItsPopulated()
             throws Exception {
-        Aggregation nestedAggregation = new Aggregation("nestedAggregation");
+        AggregateResponse nestedAggregation = new AggregateResponse("nestedAggregation");
         aggregation.addNestedAggregation(nestedAggregation);
 
         assertThat(aggregation.isPopulated(), is(true));

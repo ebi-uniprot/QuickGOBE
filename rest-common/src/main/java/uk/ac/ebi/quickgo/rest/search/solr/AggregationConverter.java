@@ -1,13 +1,13 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
-import uk.ac.ebi.quickgo.rest.search.results.Aggregation;
+import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
 
 /**
- * Converts a Solr response into an {@link Aggregation} data structure that the domain understands.
+ * Converts a Solr response into an {@link AggregateResponse} data structure that the domain understands.
  *
  * @author Ricardo Antunes
  */
-interface AggregationConverter<T, S extends Aggregation> {
+interface AggregationConverter<T, S extends AggregateResponse> {
 
     S convert(T response);
 }

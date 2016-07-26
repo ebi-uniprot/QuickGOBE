@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
-import uk.ac.ebi.quickgo.rest.search.results.Aggregation;
+import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
 
 /**
- * Converts the facet/analytics section of a {@link SolrResponse} into an {@link Aggregation}.
+ * Converts the facet/analytics section of a {@link SolrResponse} into an {@link AggregateResponse}.
  * <p/>
  * Note: At the moment of writing this code there was no direct support for Solr's new JSON facet search in SolrJ. So
  * it was necessary to create a customized solution to extract the aggregation results from the response.
@@ -52,7 +52,7 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
  *
  * @author Ricardo Antunes
  */
-public class SolrResponseAggregationConverter implements AggregationConverter<SolrResponse, Aggregation> {
+public class SolrResponseAggregationConverter implements AggregationConverter<SolrResponse, AggregateResponse> {
     private static final Logger logger = LoggerFactory.getLogger(SolrResponseAggregationConverter.class);
     private final Map<String, String> fieldNameTransformationMap;
 
@@ -62,14 +62,14 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
         fieldNameTransformationMap = serviceRetrievalConfig.repo2DomainFieldMap();
     }
 
-    @Override public Aggregation convert(SolrResponse response) {
+    @Override public AggregateResponse convert(SolrResponse response) {
         Preconditions.checkArgument(response != null, "Cannot convert null Solr response to an aggregation");
         NamedList<?> aggregateResponse = extractAggregationsFromResponse(response);
 
-        Aggregation globalAgg = null;
+        AggregateResponse globalAgg = null;
 
         if (aggregateResponse != null && aggregateResponse.size() > 0) {
-            globalAgg = new Aggregation(GLOBAL_ID);
+            globalAgg = new AggregateResponse(GLOBAL_ID);
 
             convertSolrAggregationsToDomainAggregations(aggregateResponse, globalAgg);
 
@@ -91,7 +91,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
         return (NamedList<?>) response.getResponse().get(AGGREGATIONS_MARKER);
     }
 
-    private void convertSolrAggregationsToDomainAggregations(NamedList<?> facetData, Aggregation aggregation) {
+    private void convertSolrAggregationsToDomainAggregations(NamedList<?> facetData, AggregateResponse aggregation) {
         for (Map.Entry<String, ?> facetDataEntry : facetData) {
             convertAggregateValue(facetDataEntry.getKey(), facetDataEntry.getValue(), aggregation);
         }
@@ -99,16 +99,16 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
 
     /**
      * Converts an element found within a {@link NamedList} into an value that makes sense within an
-     * {@link Aggregation}
+     * {@link AggregateResponse}
      */
-    private void convertAggregateValue(String field, Object value, Aggregation aggregation) {
+    private void convertAggregateValue(String field, Object value, AggregateResponse aggregation) {
         String prefix = SolrAggregationHelper.fieldPrefixExtractor(field);
 
         if (!prefix.isEmpty()) {
             String name = SolrAggregationHelper.fieldNameExtractor(field);
 
             if (AGG_TYPE_PREFIX.equals(prefix)) {
-                Aggregation nestedAggregation = createNestedAggregation(name, value);
+                AggregateResponse nestedAggregation = createNestedAggregation(name, value);
                 aggregation.addNestedAggregation(nestedAggregation);
             } else {
                 addAggregationFunctionToAggregation(prefix, name, value, aggregation);
@@ -122,14 +122,14 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
     }
 
     /**
-     * Creates a nested {@link Aggregation} based on the provided {@code nestedFacets}.
+     * Creates a nested {@link AggregateResponse} based on the provided {@code nestedFacets}.
      *
      * @param name the name of the aggregation
-     * @param nestedFacets the values used to populate the newly created {@link Aggregation}
-     * @return creates a new {@link Aggregation} base on the method arguments
+     * @param nestedFacets the values used to populate the newly created {@link AggregateResponse}
+     * @return creates a new {@link AggregateResponse} base on the method arguments
      */
-    private Aggregation createNestedAggregation(String name, Object nestedFacets) {
-        Aggregation nestedAggregation = new Aggregation(responseFieldName2DomainFieldName(name));
+    private AggregateResponse createNestedAggregation(String name, Object nestedFacets) {
+        AggregateResponse nestedAggregation = new AggregateResponse(responseFieldName2DomainFieldName(name));
 
         convertSolrAggregationsToDomainAggregations((NamedList) nestedFacets, nestedAggregation);
 
@@ -147,7 +147,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
      * @param aggregation the aggregation where the aggragetion result will be added to.
      */
     private void addAggregationFunctionToAggregation(String functionText, String field, Object hitsObject,
-            Aggregation aggregation) {
+            AggregateResponse aggregation) {
         AggregateFunction function = AggregateFunction.typeOf(functionText);
 
         double hits = convertToDouble(hitsObject);
@@ -162,7 +162,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
         return name;
     }
 
-    private void convertBucket(NamedList<?> facetBucket, Aggregation aggregation) {
+    private void convertBucket(NamedList<?> facetBucket, AggregateResponse aggregation) {
         AggregationBucket aggBucket = new AggregationBucket((String) facetBucket.get(BUCKET_FIELD_ID));
         aggregation.addBucket(aggBucket);
 

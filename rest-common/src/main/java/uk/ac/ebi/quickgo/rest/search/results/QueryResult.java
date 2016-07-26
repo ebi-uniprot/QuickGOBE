@@ -12,10 +12,10 @@ public class QueryResult<T> {
     private final PageInfo pageInfo;
     private final Facet facet;
     private final List<DocHighlight> highlighting;
-    private final Aggregation aggregation;
+    private final AggregateResponse aggregation;
 
     private QueryResult(long numberOfHits, List<T> results, PageInfo pageInfo, Facet facet,
-            List<DocHighlight> highlighting, Aggregation aggregation) {
+            List<DocHighlight> highlighting, AggregateResponse aggregation) {
         Preconditions.checkArgument(numberOfHits >= 0, "Total number of hits can not be negative: " + numberOfHits);
         Preconditions.checkArgument(results != null, "Results list can not be null");
         Preconditions.checkArgument(results.size() <= numberOfHits,
@@ -63,7 +63,7 @@ public class QueryResult<T> {
      *
      * @return the aggregation result
      */
-    public Aggregation getAggregation() {
+    public AggregateResponse getAggregation() {
         return aggregation;
     }
 
@@ -129,7 +129,7 @@ public class QueryResult<T> {
         private PageInfo pageInfo;
         private Facet facets;
         private Set<DocHighlight> highlights;
-        private Aggregation aggregation;
+        private AggregateResponse aggregation;
 
         public Builder(long hits, List<T> results) {
             this.numberOfHits = hits;
@@ -162,7 +162,7 @@ public class QueryResult<T> {
             return this;
         }
 
-        public Builder<T> withAggregation(Aggregation aggregation) {
+        public Builder<T> withAggregation(AggregateResponse aggregation) {
             this.aggregation = aggregation;
 
             return this;

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
-import uk.ac.ebi.quickgo.rest.search.results.Aggregation;
+import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
@@ -77,14 +77,14 @@ public class SolrResponseAggregationConverterTest {
     public void solrResponseWithNoAggregatesConvertsToNullAggregation() throws Exception {
         when(responseMock.getResponse()).thenReturn(new NamedList<>());
 
-        Aggregation agg = converter.convert(responseMock);
+        AggregateResponse agg = converter.convert(responseMock);
 
         assertThat(agg, is(nullValue()));
     }
 
     @Test
     public void solrResponseWithNonAggregatesConvertToNullAggregation() throws Exception {
-        Aggregation agg = converter.convert(responseMock);
+        AggregateResponse agg = converter.convert(responseMock);
 
         assertThat(agg, is(nullValue()));
     }
@@ -94,7 +94,7 @@ public class SolrResponseAggregationConverterTest {
         SolrAggregationResult result = new SolrAggregationResult("id", AggregateFunction.COUNT, 3);
         solrAggregate.addFunction(result);
 
-        Aggregation agg = converter.convert(responseMock);
+        AggregateResponse agg = converter.convert(responseMock);
 
         assertThat(agg, is(notNullValue()));
     }
@@ -104,7 +104,7 @@ public class SolrResponseAggregationConverterTest {
         SolrBucket bucket = new SolrBucket("goId");
         solrAggregate.addBucket(bucket);
 
-        Aggregation agg = converter.convert(responseMock);
+        AggregateResponse agg = converter.convert(responseMock);
 
         assertThat(agg, is(nullValue()));
     }
@@ -115,7 +115,7 @@ public class SolrResponseAggregationConverterTest {
         SolrBucket bucket = new SolrBucket(aggTypeGoId);
         solrAggregate.addBucket(bucket);
 
-        Aggregation agg = converter.convert(responseMock);
+        AggregateResponse agg = converter.convert(responseMock);
 
         assertThat(agg, is(notNullValue()));
     }
@@ -138,7 +138,7 @@ public class SolrResponseAggregationConverterTest {
 
         solrAggregate.addFunction(uniqueAnnIdResult);
 
-        Aggregation agg = converter.convert(responseMock);
+        AggregateResponse agg = converter.convert(responseMock);
 
         Set<AggregationResult> aggregationResults = agg.getAggregationResults();
 
@@ -159,12 +159,12 @@ public class SolrResponseAggregationConverterTest {
 
         solrAggregate.addBucket(bucket);
 
-        Aggregation agg = converter.convert(responseMock);
+        AggregateResponse agg = converter.convert(responseMock);
 
-        Set<Aggregation> retrievedNestedAggregations = agg.getNestedAggregations();
+        Set<AggregateResponse> retrievedNestedAggregations = agg.getNestedAggregations();
         assertThat(retrievedNestedAggregations, hasSize(1));
 
-        Aggregation goIdAggregation = retrievedNestedAggregations.iterator().next();
+        AggregateResponse goIdAggregation = retrievedNestedAggregations.iterator().next();
 
         Set<AggregationBucket> retrievedBuckets = goIdAggregation.getBuckets();
 
@@ -189,12 +189,12 @@ public class SolrResponseAggregationConverterTest {
 
         solrAggregate.addBucket(bucket);
 
-        Aggregation agg = converter.convert(responseMock);
+        AggregateResponse agg = converter.convert(responseMock);
 
-        Set<Aggregation> retrievedNestedAggregations = agg.getNestedAggregations();
+        Set<AggregateResponse> retrievedNestedAggregations = agg.getNestedAggregations();
         assertThat(retrievedNestedAggregations, hasSize(1));
 
-        Aggregation goIdAggregation = retrievedNestedAggregations.iterator().next();
+        AggregateResponse goIdAggregation = retrievedNestedAggregations.iterator().next();
 
         Set<AggregationBucket> retrievedBuckets = goIdAggregation.getBuckets();
 
@@ -223,7 +223,7 @@ public class SolrResponseAggregationConverterTest {
     }
 
     /**
-     * Facade to represent an {@link Aggregation} in a native Solr response.
+     * Facade to represent an {@link AggregateResponse} in a native Solr response.
      */
     private class SolrAggregate {
         private final NamedList<Object> facetValues;

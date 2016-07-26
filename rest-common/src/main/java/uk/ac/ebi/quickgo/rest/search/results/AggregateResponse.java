@@ -20,7 +20,7 @@ import java.util.Set;
  *     field that can be calculated within the response's ability, example: sum(field1) or unique(field2)</li>
  *     <li>A set of {@link AggregationBucket}: Each bucket represents a distinct value of the field being
  *     aggregated upon, as well as any {@link AggregationResult} applied to the bucket value</li>
- *     <li>A set of {@link Aggregation#nestedAggregations}: A nested aggregation is a drilled down view of the main
+ *     <li>A set of {@link AggregateResponse#nestedAggregations}: A nested aggregation is a drilled down view of the main
  *     aggregation. This means that it tries to retrieve metrics on a different aggregate field, but always based on
  *     the result of the current aggregation</li>
  * </ul>
@@ -58,13 +58,13 @@ import java.util.Set;
  *
  * @author Ricardo Antunes
  */
-public class Aggregation {
+public class AggregateResponse {
     private final String name;
     private final AggregationResultsManager aggregationResultsManager;
-    private final Set<Aggregation> nestedAggregations;
+    private final Set<AggregateResponse> nestedAggregations;
     private final Set<AggregationBucket> buckets;
 
-    public Aggregation(String name) {
+    public AggregateResponse(String name) {
         Preconditions.checkArgument(name != null && !name.trim().isEmpty(), "Name cannot be null or empty");
 
         this.name = name;
@@ -102,7 +102,7 @@ public class Aggregation {
      *
      * @param aggregation an aggregation
      */
-    public void addNestedAggregation(Aggregation aggregation) {
+    public void addNestedAggregation(AggregateResponse aggregation) {
         Preconditions.checkArgument(aggregation != null, "Nested aggregation cannot be null");
         nestedAggregations.add(aggregation);
     }
@@ -153,7 +153,7 @@ public class Aggregation {
      *
      * @return a set of the nested aggregations.
      */
-    public Set<Aggregation> getNestedAggregations() {
+    public Set<AggregateResponse> getNestedAggregations() {
         return nestedAggregations;
     }
 

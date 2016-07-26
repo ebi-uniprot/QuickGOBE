@@ -23,7 +23,7 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
     private QueryResultHighlightingConverter<SolrDocumentList, Map<String, Map<String, List<String>>>>
             queryResultHighlightingConverter;
 
-    private AggregationConverter<SolrResponse, Aggregation> aggregationConverter;
+    private AggregationConverter<SolrResponse, AggregateResponse> aggregationConverter;
 
     @Override public QueryResult<T> convert(QueryResponse toConvert, QueryRequest request) {
         Preconditions.checkArgument(toConvert != null, "Query response cannot be null");
@@ -63,7 +63,7 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
             highlights = queryResultHighlightingConverter.convertResultHighlighting(solrResults, resultHighlights);
         }
 
-        Aggregation aggregation = null;
+        AggregateResponse aggregation = null;
 
         if (aggregationConverter != null) {
             aggregation = aggregationConverter.convert(toConvert);
@@ -140,7 +140,7 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
         }
     }
 
-    protected void setAggregationConverter(AggregationConverter<SolrResponse, Aggregation> aggregationConverter) {
+    protected void setAggregationConverter(AggregationConverter<SolrResponse, AggregateResponse> aggregationConverter) {
         if (aggregationConverter != null) {
             this.aggregationConverter = aggregationConverter;
         }

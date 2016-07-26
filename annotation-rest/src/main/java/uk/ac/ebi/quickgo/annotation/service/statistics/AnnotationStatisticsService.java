@@ -8,7 +8,7 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
-import uk.ac.ebi.quickgo.rest.search.results.Aggregation;
+import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -57,7 +57,7 @@ public class AnnotationStatisticsService implements StatisticsService {
 
         QueryResult<Annotation> annotationQueryResult = searchService.findByQuery(queryRequest);
 
-        Aggregation globalAggregation = annotationQueryResult.getAggregation();
+        AggregateResponse globalAggregation = annotationQueryResult.getAggregation();
 
         List<StatisticsGroup> statsGroups = statsRequest.stream()
                 .map(req -> convertResponse(globalAggregation, req))
@@ -83,7 +83,7 @@ public class AnnotationStatisticsService implements StatisticsService {
                 .build();
     }
 
-    private StatisticsGroup convertResponse(Aggregation globalAggregation, AnnotationRequest.StatsRequest statsRequest) {
+    private StatisticsGroup convertResponse(AggregateResponse globalAggregation, AnnotationRequest.StatsRequest statsRequest) {
         StatisticsConverter converter =
                 new StatisticsConverter(statsRequest.getGroupName(), statsRequest.getGroupField());
 
@@ -105,13 +105,13 @@ public class AnnotationStatisticsService implements StatisticsService {
      * @param groupField the name of the groupField the count was made upon
      * @return an object containing the global counts of things that are of interest
      */
-    private long extractCount(Aggregation globalAggregation, String groupField) {
+    private long extractCount(AggregateResponse globalAggregation, String groupField) {
         return globalAggregation.getAggregationResult(UNIQUE, groupField)
                 .map(agg -> (long) agg.getResult()).orElse(NO_COUNT_FOR_GROUP_ERROR);
     }
 
     /**
-     * Converts a collection of {@link Aggregation} data retrieved from a {@link QueryResult}, into a
+     * Converts a collection of {@link AggregateResponse} data retrieved from a {@link QueryResult}, into a
      * {@link StatisticsGroup}, that can be presented to the client.
      * </p>
      * This class is capable of creating a single {@link StatisticsGroup} per call to the
@@ -126,7 +126,7 @@ public class AnnotationStatisticsService implements StatisticsService {
             this.groupField = groupField;
         }
 
-        StatisticsGroup convert(Collection<Aggregation> aggregations, long totalHits) {
+        StatisticsGroup convert(Collection<AggregateResponse> aggregations, long totalHits) {
             StatisticsGroup statsGroup = new StatisticsGroup(groupName, totalHits);
 
             aggregations.stream()
@@ -136,7 +136,7 @@ public class AnnotationStatisticsService implements StatisticsService {
             return statsGroup;
         }
 
-        private StatisticsByType createStatsType(Aggregation aggregation, long totalHits) {
+        private StatisticsByType createStatsType(AggregateResponse aggregation, long totalHits) {
             StatisticsByType type = new StatisticsByType(aggregation.getName());
 
             Set<AggregationBucket> buckets = aggregation.getBuckets();
