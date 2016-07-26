@@ -252,7 +252,6 @@ public class GenericTermToODocConverterTest {
         assertThat(document.ontologyType, is("GO"));
         assertThat(document.secondaryIds, contains("sec1", "sec2"));
         assertThat(document.subsets, contains("goslim_generic", "goslim_yeast"));
-        assertThat(document.replacedBy, is("replacement1"));
     }
 
     @Test
@@ -266,7 +265,6 @@ public class GenericTermToODocConverterTest {
         assertThat(document.name, is(nullValue()));
         assertThat(document.ontologyType, is(nullValue()));
         assertThat(document.secondaryIds, is(nullValue()));
-        assertThat(document.replacedBy, is(nullValue()));
     }
 
     // empty optional conversion
