@@ -19,17 +19,19 @@ public class DbXRefLoaderTest {
 
 	private static final String NOWHERE_CANTFIND = "OVER/RAINBOW";
 	private static final String FIND_IT_HERE = "src/test/resources/DB_XREFS_ENTITIES.dat.gz";
+	private static final boolean CASE_SENSITIVE_MATCHING  = false;
 
 	@Test
 	public void loadFileUnsuccessfully(){
-		DbXRefLoader dbXRefLoader = new DbXRefLoader(NOWHERE_CANTFIND, false);
+
+		DbXRefLoader dbXRefLoader = new DbXRefLoader(NOWHERE_CANTFIND, CASE_SENSITIVE_MATCHING );
 		List<GeneProductDbXRefIDFormat> list = dbXRefLoader.load();
 		assertThat(list, hasSize(0));
 	}
 
 	@Test
 	public void loadFileSuccessfully(){
-		DbXRefLoader dbXRefLoader = new DbXRefLoader(FIND_IT_HERE, false);
+		DbXRefLoader dbXRefLoader = new DbXRefLoader(FIND_IT_HERE, CASE_SENSITIVE_MATCHING );
 		List<GeneProductDbXRefIDFormat> list = dbXRefLoader.load();
 		assertThat(list, hasSize(119));
 		assertThat(list.get(0).toString(), is("GeneProductXrefEntity{database='AGI_LocusCode', " +
