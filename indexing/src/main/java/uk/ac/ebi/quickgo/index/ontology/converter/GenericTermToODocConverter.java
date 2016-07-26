@@ -1,16 +1,13 @@
 package uk.ac.ebi.quickgo.index.ontology.converter;
 
-
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.generic.Synonym;
+import uk.ac.ebi.quickgo.model.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,7 +28,6 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         if (termOptional.isPresent()) {
             OntologyDocument doc = new OntologyDocument();
             GenericTerm term = termOptional.get();
-            doc.considers = extractConsidersAsList(term);
             doc.id = term.getId();
             doc.isObsolete = term.isObsolete();
             doc.comment = term.getComment();
@@ -47,10 +43,8 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
             doc.xrefs = extractXRefs(term);
             doc.xRelations = extractXRelationsAsList(term);
 
-            ArrayList<GenericTerm> replacedBy = term.replacedBy();
-            if (replacedBy != null && replacedBy.size() > 0) {
-                doc.replacedBy = replacedBy.get(0).getId();
-            }
+            doc.replaces = extractReplaces(term);
+            doc.replacements = extractReplacements(term);
 
             return Optional.of(doc);
         } else {
@@ -63,7 +57,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
                 .map(xref -> FlatFieldBuilder.newFlatField()
                         .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getDb()))
                         .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getId()))
-                .buildString())
+                        .buildString())
                 .collect(Collectors.toList());
     }
 
@@ -87,10 +81,21 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         return null;
     }
 
-    protected List<String> extractConsidersAsList(GenericTerm term) {
-        if (!isEmpty(term.consider())) {
-            return term.consider().stream()
-                    .map(GenericTerm::getId)
+    private List<String> extractReplacements(GenericTerm term) {
+        return extractReplaceElementsFromRelations(term.getReplacements());
+    }
+
+    private List<String> extractReplaces(GenericTerm term) {
+        return extractReplaceElementsFromRelations(term.getReplaces());
+    }
+
+    protected List<String> extractReplaceElementsFromRelations(Collection<TermRelation> replaceList) {
+        if (!isEmpty(replaceList)) {
+            return replaceList.stream()
+                    .map(replace -> FlatFieldBuilder.newFlatField()
+                            .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getChild().getId()))
+                            .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getTypeof().getFormalCode()))
+                            .buildString())
                     .collect(Collectors.toList());
         } else {
             return null;

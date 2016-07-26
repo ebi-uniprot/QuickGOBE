@@ -49,11 +49,11 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.SUBSET)
     public List<String> subsets;
 
-    @Field(OntologyFields.REPLACED_BY)
-    public String replacedBy;
+    @Field(OntologyFields.REPLACEMENTS)
+    public List<String> replacements;
 
-    @Field(OntologyFields.CONSIDER)
-    public List<String> considers;
+    @Field(OntologyFields.REPLACES)
+    public List<String> replaces;
 
     @Field(OntologyFields.CHILDREN)
     public List<String> children;
@@ -128,10 +128,10 @@ public class OntologyDocument implements QuickGODocument {
         if (subsets != null ? !subsets.equals(that.subsets) : that.subsets != null) {
             return false;
         }
-        if (replacedBy != null ? !replacedBy.equals(that.replacedBy) : that.replacedBy != null) {
+        if (replaces != null ? !replaces.equals(that.replaces) : that.replaces != null) {
             return false;
         }
-        if (considers != null ? !considers.equals(that.considers) : that.considers != null) {
+        if (replacements != null ? !replacements.equals(that.replacements) : that.replacements != null) {
             return false;
         }
         if (children != null ? !children.equals(that.children) : that.children != null) {
@@ -173,8 +173,8 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (synonyms != null ? synonyms.hashCode() : 0);
         result = 31 * result + (synonymNames != null ? synonymNames.hashCode() : 0);
         result = 31 * result + (subsets != null ? subsets.hashCode() : 0);
-        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
-        result = 31 * result + (considers != null ? considers.hashCode() : 0);
+        result = 31 * result + (replaces != null ? replaces.hashCode() : 0);
+        result = 31 * result + (replacements != null ? replacements.hashCode() : 0);
         result = 31 * result + (children != null ? children.hashCode() : 0);
         result = 31 * result + (aspect != null ? aspect.hashCode() : 0);
         result = 31 * result + (history != null ? history.hashCode() : 0);
@@ -199,8 +199,8 @@ public class OntologyDocument implements QuickGODocument {
                 ", synonyms=" + synonyms +
                 ", synonymNames=" + synonymNames +
                 ", subsets=" + subsets +
-                ", replacedBy='" + replacedBy + '\'' +
-                ", considers=" + considers +
+                ", replaces='" + replaces +
+                ", replacements=" + replacements +
                 ", children=" + children +
                 ", aspect=" + aspect +
                 ", history=" + history +

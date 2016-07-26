@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.model.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.*;
-import java.util.regex.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by edd on 22/12/2015.
+ * Tests the behaviour of the {@link GenericTermToODocConverter} class.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class GenericTermToODocConverterTest {
@@ -35,25 +34,91 @@ public class GenericTermToODocConverterTest {
 
     // considers
     @Test
-    public void extractsNoConsideredWhenNull() {
-        when(term.consider()).thenReturn(null);
+    public void extractsNoReplaceElementsWhenRelationsIsNull() {
+        List<TermRelation> relations = null;
 
-        assertThat(converter.extractConsidersAsList(term), is(nullValue()));
+        assertThat(converter.extractReplaceElementsFromRelations(relations), is(nullValue()));
     }
 
     @Test
-    public void extractsConsidersWhenExist() {
-        GenericTerm mockConsider = mock(GenericTerm.class);
-        String considerId = "id2";
-        when(mockConsider.getId()).thenReturn(considerId);
-        ArrayList<GenericTerm> toConsider = new ArrayList<>();
-        toConsider.add(mockConsider);
+    public void extractsAConsiderReplaceElementFromRelationsCollection() {
+        RelationType relation = RelationType.CONSIDER;
+        String replaceId = "id2";
 
-        when(term.consider()).thenReturn(toConsider);
-        List<String> considersStrList = converter.extractConsidersAsList(term);
-        assertThat(considersStrList, is(not(nullValue())));
-        assertThat(considersStrList.size(), is(1));
-        assertThat(considersStrList.get(0), is(considerId));
+        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+
+        Collection<TermRelation> relations = Collections.singletonList(mockReplace);
+
+        List<String> replacesStrList = converter.extractReplaceElementsFromRelations(relations);
+        assertThat(replacesStrList.size(), is(1));
+
+        String replaceStr = replacesStrList.get(0);
+        assertThat(replaceStr, containsString(replaceId));
+        assertThat(replaceStr, containsString(relation.getFormalCode()));
+    }
+
+    @Test
+    public void extractsAReplacedByReplaceElementWithinRelationsCollection() {
+        RelationType relation = RelationType.REPLACEDBY;
+        String replaceId = "id2";
+
+        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+
+        Collection<TermRelation> relations = Collections.singletonList(mockReplace);
+
+        List<String> replacesStrList = converter.extractReplaceElementsFromRelations(relations);
+        assertThat(replacesStrList.size(), is(1));
+
+        String replaceStr = replacesStrList.get(0);
+        assertThat(replaceStr, containsString(replaceId));
+        assertThat(replaceStr, containsString(relation.getFormalCode()));
+    }
+
+    @Test
+    public void convertsATermWith2RelationsInReplacesSectionIntoDocWith2ReplacementElementsInReplacesSection() {
+        TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
+        TermRelation considerModk = mockReplaceRelation("id3", RelationType.CONSIDER);
+
+        List<TermRelation> relations = Arrays.asList(replacedByMock, considerModk);
+
+        GenericTerm toConvert = mock(GenericTerm.class);
+        when(toConvert.getReplaces()).thenReturn(relations);
+
+        Optional<OntologyDocument> expectedDocOptional = converter.apply(Optional.of(toConvert));
+        assertThat(expectedDocOptional.isPresent(), is(true));
+
+        OntologyDocument expectedDoc = expectedDocOptional.get();
+
+        assertThat(expectedDoc.replaces, hasSize(relations.size()));
+    }
+
+    @Test
+    public void convertsATermWith2RelationsInReplacementsSectionIntoDocWith2ReplacementElementsInReplacementsSection() {
+        TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
+        TermRelation considerModk = mockReplaceRelation("id3", RelationType.CONSIDER);
+
+        List<TermRelation> relations = Arrays.asList(replacedByMock, considerModk);
+
+        GenericTerm toConvert = mock(GenericTerm.class);
+        when(toConvert.getReplacements()).thenReturn(relations);
+
+        Optional<OntologyDocument> expectedDocOptional = converter.apply(Optional.of(toConvert));
+        assertThat(expectedDocOptional.isPresent(), is(true));
+
+        OntologyDocument expectedDoc = expectedDocOptional.get();
+
+        assertThat(expectedDoc.replacements, hasSize(relations.size()));
+    }
+
+    private TermRelation mockReplaceRelation(String replacedTermId, RelationType relation) {
+        GenericTerm replacedTerm = mock(GenericTerm.class);
+        when(replacedTerm.getId()).thenReturn(replacedTermId);
+
+        TermRelation mockReplace = mock(TermRelation.class);
+        when(mockReplace.getChild()).thenReturn(replacedTerm);
+        when(mockReplace.getTypeof()).thenReturn(relation);
+
+        return mockReplace;
     }
 
     // history
@@ -187,7 +252,6 @@ public class GenericTermToODocConverterTest {
         assertThat(document.ontologyType, is("GO"));
         assertThat(document.secondaryIds, contains("sec1", "sec2"));
         assertThat(document.subsets, contains("goslim_generic", "goslim_yeast"));
-        assertThat(document.replacedBy, is("replacement1"));
     }
 
     @Test
@@ -201,7 +265,6 @@ public class GenericTermToODocConverterTest {
         assertThat(document.name, is(nullValue()));
         assertThat(document.ontologyType, is(nullValue()));
         assertThat(document.secondaryIds, is(nullValue()));
-        assertThat(document.replacedBy, is(nullValue()));
     }
 
     // empty optional conversion
