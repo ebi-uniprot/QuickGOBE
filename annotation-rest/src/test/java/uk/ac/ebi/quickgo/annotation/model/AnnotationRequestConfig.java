@@ -36,7 +36,7 @@ public class AnnotationRequestConfig {
     @Bean
     public EntityValidation geneProductValidator() {
         DbXRefEntity testEntity = new DbXRefEntity(TARGET_DB, ENTITY_TYPE_ID, ENTITY_TYPE_NAME,
-                UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX, DB_URL);
+                UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX, DB_URL, false);
         return EntityValidation.createWithData(Arrays.asList(testEntity));
     }
 

@@ -16,7 +16,7 @@ import static org.hamcrest.core.Is.is;
  *         Created with IntelliJ IDEA.
  */
 public class DbXRefEntityTest {
-
+	private static final boolean CASE_SENSITIVE_MATCHING  = false;
 	private static final String database = "UniProtKB";
 	private static final String entityType = "PR:000000001";
 	private static final String entityTypeName = "protein";
@@ -28,44 +28,53 @@ public class DbXRefEntityTest {
 
 	@Before
 	public void setup(){
-		dbXrefEntity = new DbXRefEntity(database, entityType, entityTypeName, idValidationPattern, dbURL);
+		dbXrefEntity = new DbXRefEntity(database, entityType, entityTypeName, idValidationPattern, dbURL, CASE_SENSITIVE_MATCHING);
 	}
 
 	@Test
 	public void validId(){
 		assertThat(dbXrefEntity.matches("A0A000"), is(true));
+		assertThat(dbXrefEntity.matches("a0A000"), is(true));
 	}
 
 	@Test
 	public void inValidId(){
-		assertThat(dbXrefEntity.matches("99999"), is(false));
+		assertThat(dbXrefEntity.matches("99999"), is(CASE_SENSITIVE_MATCHING));
 	}
 
 	@Test
 	public void exceptionThrownIfDatabaseIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		new DbXRefEntity(null, entityType, entityTypeName, idValidationPattern, dbURL);
+		new DbXRefEntity(null, entityType, entityTypeName, idValidationPattern, dbURL, CASE_SENSITIVE_MATCHING);
 	}
 
 	@Test
 	public void exceptionThrownIfEntityTypeIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		new DbXRefEntity(database, null, entityTypeName, idValidationPattern, dbURL);
+		new DbXRefEntity(database, null, entityTypeName, idValidationPattern, dbURL, CASE_SENSITIVE_MATCHING);
 	}
 
 	@Test
 	public void exceptionThrownIfIdValidationPatternIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		new DbXRefEntity(database, entityType, entityTypeName, null, dbURL);
+		new DbXRefEntity(database, entityType, entityTypeName, null, dbURL, CASE_SENSITIVE_MATCHING);
 	}
 
 	@Test
 	public void exceptionNotThrownIfEntityTypeNameIsNull(){
-		new DbXRefEntity(database, entityType, null, idValidationPattern, dbURL);
+		new DbXRefEntity(database, entityType, null, idValidationPattern, dbURL, CASE_SENSITIVE_MATCHING);
 	}
 
 	@Test
 	public void exceptionNotThrownIfDbURLIsNull(){
-		new DbXRefEntity(database, entityType, entityTypeName, idValidationPattern, null);
+		new DbXRefEntity(database, entityType, entityTypeName, idValidationPattern, null, CASE_SENSITIVE_MATCHING);
+	}
+
+	@Test
+	public void validationCanBeMadeCaseSensitive(){
+		boolean matchingIsCaseSensitive = true;
+		dbXrefEntity = new DbXRefEntity(database, entityType, entityTypeName, idValidationPattern, dbURL, matchingIsCaseSensitive);
+		assertThat(dbXrefEntity.matches("A0A000"), is(true));
+		assertThat(dbXrefEntity.matches("a0A000"), is(false));
 	}
 }
