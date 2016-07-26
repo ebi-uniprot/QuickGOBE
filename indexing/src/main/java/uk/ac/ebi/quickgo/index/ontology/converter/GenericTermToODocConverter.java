@@ -48,8 +48,8 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
                 doc.replacedBy = replacedBy.get(0).getId();
             }
 
-            doc.replaces = extractRelations(term.getReplaces());
-            doc.replacements = extractRelations(term.getReplacements());
+            doc.replaces = extractReplaces(term);
+            doc.replacements = extractReplacements(term);
 
             return Optional.of(doc);
         } else {
@@ -84,6 +84,14 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         }
 
         return null;
+    }
+
+    private List<String> extractReplacements(GenericTerm term) {
+        return extractRelations(term.getReplacements());
+    }
+
+    private List<String> extractReplaces(GenericTerm term) {
+        return extractRelations(term.getReplaces());
     }
 
     protected List<String> extractRelations(Collection<TermRelation> replaceList) {
