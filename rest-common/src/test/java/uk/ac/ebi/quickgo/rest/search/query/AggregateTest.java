@@ -29,7 +29,7 @@ public class AggregateTest {
     @Test
     public void nullFieldInConstructorThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create aggregate with null field");
+        thrown.expectMessage("Cannot create aggregate with null name");
 
         new Aggregate(null);
     }
