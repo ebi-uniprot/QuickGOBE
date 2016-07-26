@@ -49,9 +49,6 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.SUBSET)
     public List<String> subsets;
 
-    @Field(OntologyFields.REPLACED_BY)
-    public String replacedBy;
-
     @Field(OntologyFields.REPLACEMENTS)
     public List<String> replacements;
 
@@ -131,9 +128,6 @@ public class OntologyDocument implements QuickGODocument {
         if (subsets != null ? !subsets.equals(that.subsets) : that.subsets != null) {
             return false;
         }
-        if (replacedBy != null ? !replacedBy.equals(that.replacedBy) : that.replacedBy != null) {
-            return false;
-        }
         if (replaces != null ? !replaces.equals(that.replaces) : that.replaces != null) {
             return false;
         }
@@ -179,7 +173,6 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (synonyms != null ? synonyms.hashCode() : 0);
         result = 31 * result + (synonymNames != null ? synonymNames.hashCode() : 0);
         result = 31 * result + (subsets != null ? subsets.hashCode() : 0);
-        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
         result = 31 * result + (replaces != null ? replaces.hashCode() : 0);
         result = 31 * result + (replacements != null ? replacements.hashCode() : 0);
         result = 31 * result + (children != null ? children.hashCode() : 0);
@@ -206,7 +199,6 @@ public class OntologyDocument implements QuickGODocument {
                 ", synonyms=" + synonyms +
                 ", synonymNames=" + synonymNames +
                 ", subsets=" + subsets +
-                ", replacedBy='" + replacedBy + '\'' +
                 ", replaces='" + replaces +
                 ", replacements=" + replacements +
                 ", children=" + children +

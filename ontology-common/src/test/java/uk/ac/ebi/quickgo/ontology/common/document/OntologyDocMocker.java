@@ -75,7 +75,6 @@ public final class OntologyDocMocker {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("21494263"))
                 .buildString());
         od.isObsolete = true;
-        od.replacedBy = "GO:0000002";
         od.comment = "Note that protein targeting encompasses the transport of the protein to " +
                 "the specified location, and may also include additional steps such as protein processing.";
         od.children = Arrays.asList("GO:0000011", "GO:0000012");
@@ -200,7 +199,7 @@ public final class OntologyDocMocker {
         od.replaces.add(createFlatRelation("GO:1111111", "replaced_by"));
 
         od.replacements = new ArrayList<>();
-        od.replacements.add(createFlatRelation(od.replacedBy, "replaced_by"));
+        od.replacements.add(createFlatRelation("GO:0000002", "replaced_by"));
         od.replacements.add(createFlatRelation("GO:0000003", "consider"));
         od.replacements.add(createFlatRelation("GO:0000004", "consider"));
 
