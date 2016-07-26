@@ -15,7 +15,7 @@ public class AggregateFunctionRequest {
 
     public AggregateFunctionRequest(String field, AggregateFunction function) {
         Preconditions.checkArgument(field != null && !field.trim().isEmpty(), "Field cannot be null or empty");
-        Preconditions.checkArgument(function != null, "Aggregate function cannot be null");
+        Preconditions.checkArgument(function != null, "AggregateRequest function cannot be null");
 
         this.function = function;
         this.field = field;

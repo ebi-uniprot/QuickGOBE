@@ -13,7 +13,7 @@ public class QueryRequest {
     private final List<QuickGOQuery> filters;
     private final List<FieldProjection> projectedFields;
     private final List<FieldHighlight> highlightedFields;
-    private final Aggregate aggregate;
+    private final AggregateRequest aggregate;
     private final String highlightStartDelim;
     private final String highlightEndDelim;
 
@@ -23,7 +23,7 @@ public class QueryRequest {
             List<QuickGOQuery> filters,
             List<FieldProjection> projectedFields,
             List<FieldHighlight> highlightedFields,
-            Aggregate aggregate,
+            AggregateRequest aggregate,
             String highlightStartDelim,
             String highlightEndDelim) {
         this.query = query;
@@ -65,7 +65,7 @@ public class QueryRequest {
         return projectedFields;
     }
 
-    public Aggregate getAggregate() {
+    public AggregateRequest getAggregate() {
         return aggregate;
     }
 
@@ -84,7 +84,7 @@ public class QueryRequest {
         private Set<QuickGOQuery> filters;
         private Set<FieldProjection> projectedFields;
         private Set<FieldHighlight> highlightedFields;
-        private Aggregate aggregate;
+        private AggregateRequest aggregate;
         private String highlightStartDelim;
         private String highlightEndDelim;
 
@@ -127,7 +127,7 @@ public class QueryRequest {
             return this;
         }
 
-        public Builder setAggregate(Aggregate aggregate) {
+        public Builder setAggregate(AggregateRequest aggregate) {
             this.aggregate = aggregate;
 
             return this;

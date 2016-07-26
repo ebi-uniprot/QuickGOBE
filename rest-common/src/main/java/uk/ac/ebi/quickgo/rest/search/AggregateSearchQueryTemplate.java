@@ -1,12 +1,9 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
+import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 
 import com.google.common.base.Preconditions;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * Reduces the amount of boiler plate code necessary to setup the mandatory elements to configure a
@@ -16,10 +13,10 @@ import java.util.Set;
  */
 public class AggregateSearchQueryTemplate {
     /**
-     * Creates a builder that is capable of creating a {@link QueryRequest} that holds {@link Aggregate} definitions.
+     * Creates a builder that is capable of creating a {@link QueryRequest} that holds {@link AggregateRequest} definitions.
      *
      * @param compositeBuilder the builder to create is based on definitions that have been setup by this builder
-     * @return a builder capable of creating a {@link QueryRequest} with {@link Aggregate} definitions
+     * @return a builder capable of creating a {@link QueryRequest} with {@link AggregateRequest} definitions
      * @throws IllegalArgumentException if the {@param compositeBuilder} is null
      */
     public Builder newBuilder(SearchQueryRequestBuilder compositeBuilder) {
@@ -29,7 +26,7 @@ public class AggregateSearchQueryTemplate {
 
     public static class Builder implements SearchQueryRequestBuilder {
         private final QueryRequest.Builder compositeBuilder;
-        private Aggregate aggregate;
+        private AggregateRequest aggregate;
 
         public Builder(SearchQueryRequestBuilder builder) {
             compositeBuilder = builder.builder();
@@ -41,7 +38,7 @@ public class AggregateSearchQueryTemplate {
          * @param aggregate the aggregate to calculate
          * @return this {@link Builder} instance
          */
-        public Builder setAggregate(Aggregate aggregate) {
+        public Builder setAggregate(AggregateRequest aggregate) {
             this.aggregate = aggregate;
 
             return this;

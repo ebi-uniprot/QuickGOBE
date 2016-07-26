@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
-import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
+import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -22,7 +22,7 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
 /**
  * Tests the behaviour of the {@link AggregateToStringConverter} class.
  */
-public class AggregateToStringConverterTest {
+public class AggregateRequestToStringConverterTest {
     private static final AggregateFunction UNIQUE_FUNCTION = AggregateFunction.UNIQUE;
     private static final AggregateFunction COUNT_FUNCTION = AggregateFunction.COUNT;
 
@@ -35,13 +35,13 @@ public class AggregateToStringConverterTest {
 
     private AggregateToStringConverter converter;
 
-    private Aggregate aggregate;
+    private AggregateRequest aggregate;
 
     @Before
     public void setUp() throws Exception {
         converter = new AggregateToStringConverter();
 
-        aggregate = new Aggregate(GLOBAL_ID);
+        aggregate = new AggregateRequest(GLOBAL_ID);
     }
 
     @Test
@@ -120,7 +120,7 @@ public class AggregateToStringConverterTest {
     @Test
     public void nullAggregateThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Aggregate to convert cannot be null");
+        thrown.expectMessage("AggregateRequest to convert cannot be null");
 
         converter.convert(null);
     }
@@ -159,7 +159,7 @@ public class AggregateToStringConverterTest {
 
     @Test
     public void aggregateWithNestedAggregateIsConvertedIntoSolrSubFacet() throws Exception {
-        Aggregate goIDAggregate = new Aggregate(GO_ID_TYPE);
+        AggregateRequest goIDAggregate = new AggregateRequest(GO_ID_TYPE);
 
         aggregate.addNestedAggregate(goIDAggregate);
 
@@ -172,7 +172,7 @@ public class AggregateToStringConverterTest {
 
     @Test
     public void aggregateWithNestedAggregateWithFunctionsOnFieldsIsConvertedIntoSolrSubFacet() throws Exception {
-        Aggregate goIDAggregate = new Aggregate(GO_ID_TYPE);
+        AggregateRequest goIDAggregate = new AggregateRequest(GO_ID_TYPE);
         goIDAggregate.addField(GO_ID_TYPE, COUNT_FUNCTION);
 
         aggregate.addNestedAggregate(goIDAggregate);

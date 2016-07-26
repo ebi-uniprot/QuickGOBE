@@ -23,7 +23,7 @@ public class AggregationResultTest {
         double hits = 0;
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Aggregate function cannot be null.");
+        thrown.expectMessage("AggregateRequest function cannot be null.");
 
         new AggregationResult(func, name, hits);
     }
@@ -35,7 +35,7 @@ public class AggregationResultTest {
         double hits = 0;
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Aggregate field cannot be null or empty.");
+        thrown.expectMessage("AggregateRequest field cannot be null or empty.");
 
         new AggregationResult(func, name, hits);
     }
@@ -47,7 +47,7 @@ public class AggregationResultTest {
         double hits = 0;
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Aggregate field cannot be null or empty.");
+        thrown.expectMessage("AggregateRequest field cannot be null or empty.");
 
         new AggregationResult(func, name, hits);
     }

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
-import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
+import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 
 import com.google.common.base.Preconditions;
 import java.util.LinkedHashSet;
@@ -27,7 +27,7 @@ import java.util.Set;
  * <p/>
  * As an example, assume that the data source has a table/collection of orders, with the following fields:
  * order_item_id, quantity, cost.
- * Sending an {@link Aggregate} object, to the data store, with the following requests:
+ * Sending an {@link AggregateRequest} object, to the data store, with the following requests:
  * <ul>
  *     <li>provide the total cost of all orders</li>
  *     <li>aggregate on order_item_id</li>
@@ -52,7 +52,7 @@ import java.util.Set;
  *        ]
  * </pre>
  * <p/>
- * If {@link Aggregate} instances are attached to the
+ * If {@link AggregateRequest} instances are attached to the
  * {@link uk.ac.ebi.quickgo.rest.search.query.QueryRequest}, then the underlying data source will always return
  * aggregate specific data.
  *

@@ -20,14 +20,14 @@ import java.util.Set;
  *     name that can be calculated within table/collection used by the data-source, example: sum(field1) or unique
  *     (field2)
  *     </li>
- *     <li>A set of {@link Aggregate#nestedAggregates}: A nested aggregate represents the desire to provide further
+ *     <li>A set of {@link AggregateRequest#nestedAggregateRequests}: A nested aggregate represents the desire to provide further
  *     aggregation calculations based on a name that is different to that of the current aggregation. Think of it as
  *     a drilled down view of the current aggregation with results focused on another name
  *     </li>
  * </ul>
  * As an example, assume that the data source has a table/collection of orders, with the following aggregateFunctionRequests:
  * order_item_id, quantity, cost.
- * An {@link Aggregate} could hold the following requests:
+ * An {@link AggregateRequest} could hold the following requests:
  * <ul>
  *
  *     <li>provide the total cost of all orders</li>
@@ -42,7 +42,7 @@ import java.util.Set;
  *     aggregate:
  *         - name: query_result
  *         - aggregateFunctionRequests: [sum(cost)]
- *         - nestedAggregates: [
+ *         - nestedAggregateRequests: [
  *              - aggregate:
  *                  - name: order_item_id
  *                  - aggregateResults: [sum(quantity)]
@@ -50,17 +50,17 @@ import java.util.Set;
  *
  * @author Ricardo Antunes
  */
-public class Aggregate {
+public class AggregateRequest {
     private final String name;
     private final Set<AggregateFunctionRequest> aggregateFunctionRequests;
-    private final Set<Aggregate> nestedAggregates;
+    private final Set<AggregateRequest> nestedAggregateRequests;
 
-    public Aggregate(String name) {
+    public AggregateRequest(String name) {
         Preconditions.checkArgument(name != null, "Cannot create aggregate with null name");
         this.name = name;
 
         this.aggregateFunctionRequests = new HashSet<>();
-        this.nestedAggregates = new HashSet<>();
+        this.nestedAggregateRequests = new HashSet<>();
     }
 
     public String getName() {
@@ -71,17 +71,17 @@ public class Aggregate {
         return aggregateFunctionRequests;
     }
 
-    public Set<Aggregate> getNestedAggregates() {
-        return Collections.unmodifiableSet(nestedAggregates);
+    public Set<AggregateRequest> getNestedAggregateRequests() {
+        return Collections.unmodifiableSet(nestedAggregateRequests);
     }
 
     public void addField(String field, AggregateFunction function) {
         aggregateFunctionRequests.add(new AggregateFunctionRequest(field, function));
     }
 
-    public void addNestedAggregate(Aggregate aggregate) {
+    public void addNestedAggregate(AggregateRequest aggregate) {
         Preconditions.checkArgument(aggregate != null, "Cannot add null nested aggregate");
-        nestedAggregates.add(aggregate);
+        nestedAggregateRequests.add(aggregate);
     }
 
     @Override public boolean equals(Object o) {
@@ -92,7 +92,7 @@ public class Aggregate {
             return false;
         }
 
-        Aggregate aggregate = (Aggregate) o;
+        AggregateRequest aggregate = (AggregateRequest) o;
 
         if (!name.equals(aggregate.name)) {
             return false;
@@ -100,22 +100,22 @@ public class Aggregate {
         if (!aggregateFunctionRequests.equals(aggregate.aggregateFunctionRequests)) {
             return false;
         }
-        return nestedAggregates.equals(aggregate.nestedAggregates);
+        return nestedAggregateRequests.equals(aggregate.nestedAggregateRequests);
 
     }
 
     @Override public int hashCode() {
         int result = name.hashCode();
         result = 31 * result + aggregateFunctionRequests.hashCode();
-        result = 31 * result + nestedAggregates.hashCode();
+        result = 31 * result + nestedAggregateRequests.hashCode();
         return result;
     }
 
     @Override public String toString() {
-        return "Aggregate{" +
+        return "AggregateRequest{" +
                 "name='" + name + '\'' +
                 ", aggregateFunctionRequests=" + aggregateFunctionRequests +
-                ", nestedAggregates=" + nestedAggregates +
+                ", nestedAggregateRequests=" + nestedAggregateRequests +
                 '}';
     }
 }

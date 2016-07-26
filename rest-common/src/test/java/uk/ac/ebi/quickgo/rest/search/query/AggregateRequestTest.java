@@ -13,17 +13,17 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
 
 /**
- * Tests the behaviour of the {@link Aggregate} class.
+ * Tests the behaviour of the {@link AggregateRequest} class.
  */
-public class AggregateTest {
+public class AggregateRequestTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private Aggregate aggregate;
+    private AggregateRequest aggregate;
 
     @Before
     public void setUp() throws Exception {
-        aggregate = new Aggregate("field");
+        aggregate = new AggregateRequest("field");
     }
 
     @Test
@@ -31,7 +31,7 @@ public class AggregateTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot create aggregate with null name");
 
-        new Aggregate(null);
+        new AggregateRequest(null);
     }
 
     @Test
@@ -63,16 +63,16 @@ public class AggregateTest {
 
     @Test
     public void adding2NestedAggregatesStoresBoth() throws Exception {
-        Aggregate nestedAggregate1 = new Aggregate("field1");
-        Aggregate nestedAggregate2 = new Aggregate("field2");
+        AggregateRequest nestedAggregate1 = new AggregateRequest("field1");
+        AggregateRequest nestedAggregate2 = new AggregateRequest("field2");
 
         aggregate.addNestedAggregate(nestedAggregate1);
         aggregate.addNestedAggregate(nestedAggregate2);
 
-        Set<Aggregate> retrievedAggregates = aggregate.getNestedAggregates();
+        Set<AggregateRequest> retrievedAggregates = aggregate.getNestedAggregateRequests();
         assertThat(retrievedAggregates, hasSize(2));
 
-        Aggregate[] expectedAggregates = {nestedAggregate1, nestedAggregate2};
+        AggregateRequest[] expectedAggregates = {nestedAggregate1, nestedAggregate2};
 
         assertThat(retrievedAggregates, containsInAnyOrder(expectedAggregates));
     }

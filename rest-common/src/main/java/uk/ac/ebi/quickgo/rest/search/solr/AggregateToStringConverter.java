@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
-import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
+import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateFunctionRequest;
 
 import com.google.common.base.Preconditions;
@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.joining;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
 
 /**
- * Simple implementation of the {@link AggregateConverter}, that converts an {@link Aggregate} into a {@link String}
+ * Simple implementation of the {@link AggregateConverter}, that converts an {@link AggregateRequest} into a {@link String}
  * object.
  * <p/>
  * Note: At the time of writing this converter the SolrJ API did not have direct support for the JSON facet API. So
@@ -27,11 +27,11 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
     private static final String FACET_TYPE_FORMAT = "type" + NAME_TO_VALUE_SEPARATOR + "%s";
     private static final String FACET_FIELD_FORMAT = "field" + NAME_TO_VALUE_SEPARATOR + "%s";
 
-    @Override public String convert(Aggregate aggregate) {
-        Preconditions.checkArgument(aggregate != null, "Aggregate to convert cannot be null");
+    @Override public String convert(AggregateRequest aggregate) {
+        Preconditions.checkArgument(aggregate != null, "AggregateRequest to convert cannot be null");
 
         String aggFieldsText = convertAggregationFields(aggregate.getAggregateFunctionRequests().stream());
-        String nestedAggText = convertNestedAggregates(aggregate.getNestedAggregates().stream());
+        String nestedAggText = convertNestedAggregates(aggregate.getNestedAggregateRequests().stream());
 
         String finalText = Stream.of(aggFieldsText, nestedAggText)
                 .filter(text -> !text.isEmpty())
@@ -65,7 +65,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
     }
 
     /**
-     * Converts a stream of {@link AggregateFunctionRequest} stored within an {@link Aggregate} into a format Solr can understand.
+     * Converts a stream of {@link AggregateFunctionRequest} stored within an {@link AggregateRequest} into a format Solr can understand.
      *
      * @param fields aggregate fields to convert
      * @return a Solr String representation of the fields
@@ -109,17 +109,17 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
      * @param nestedAggregates the nested aggregates to convert
      * @return a Solr subfacet statement
      */
-    private String convertNestedAggregates(Stream<Aggregate> nestedAggregates) {
+    private String convertNestedAggregates(Stream<AggregateRequest> nestedAggregates) {
         return nestedAggregates.map(this::createSubFacet)
                 .collect(joining(DECLARATION_SEPARATOR));
     }
 
     /**
-     * Given a nested {@link Aggregate} convert it into a Solr subfacet declaration.
+     * Given a nested {@link AggregateRequest} convert it into a Solr subfacet declaration.
      * <p/>
      * For example:
      * <pre>
-     *    Aggregate: field=myField;
+     *    AggregateRequest: field=myField;
      *       AggregateFunctionRequest: field=myField2; aggregateFunction=COUNT;
      *    is converted into:
      *    agg_myField: {
@@ -134,7 +134,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
      * @param nestedAggregate the nested aggregate to convert
      * @return a String representation that Solr understands
      */
-    private String createSubFacet(Aggregate nestedAggregate) {
+    private String createSubFacet(AggregateRequest nestedAggregate) {
 
         Collection<AggregateFunctionRequest> fields = nestedAggregate.getAggregateFunctionRequests();
 

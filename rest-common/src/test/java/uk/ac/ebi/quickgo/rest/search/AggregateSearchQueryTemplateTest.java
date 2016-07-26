@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
+import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
@@ -50,7 +50,7 @@ public class AggregateSearchQueryTemplateTest {
 
         QueryRequest queryRequest = aggBuilder.build();
 
-        Aggregate retrievedAggregates = queryRequest.getAggregate();
+        AggregateRequest retrievedAggregates = queryRequest.getAggregate();
 
         assertThat(retrievedAggregates, is(nullValue()));
     }
@@ -64,7 +64,7 @@ public class AggregateSearchQueryTemplateTest {
 
         QueryRequest queryRequest = aggBuilder.build();
 
-        Aggregate retrievedAggregate = queryRequest.getAggregate();
+        AggregateRequest retrievedAggregate = queryRequest.getAggregate();
 
         assertThat(retrievedAggregate, is(nullValue()));
     }
@@ -73,13 +73,13 @@ public class AggregateSearchQueryTemplateTest {
     public void aggregateBuilderSetsAggregationConfigBuildsQueryRequestWithAggregationConfig() throws Exception {
         FakeBuilder compositeBuilder = prePopulatedFakeBuilder();
 
-        Aggregate expectedAggregate = new Aggregate("annotation");
+        AggregateRequest expectedAggregate = new AggregateRequest("annotation");
         AggregateSearchQueryTemplate.Builder aggBuilder = createBuilder(compositeBuilder);
         aggBuilder.setAggregate(expectedAggregate);
 
         QueryRequest queryRequest = aggBuilder.build();
 
-        Aggregate retrievedAggregate = queryRequest.getAggregate();
+        AggregateRequest retrievedAggregate = queryRequest.getAggregate();
 
         assertThat(retrievedAggregate, is(expectedAggregate));
     }

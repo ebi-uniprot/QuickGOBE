@@ -44,7 +44,7 @@ public class AggregateFunctionRequestTest {
         AggregateFunction function = null;
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Aggregate function cannot be null");
+        thrown.expectMessage("AggregateRequest function cannot be null");
 
         new AggregateFunctionRequest(field, function);
     }

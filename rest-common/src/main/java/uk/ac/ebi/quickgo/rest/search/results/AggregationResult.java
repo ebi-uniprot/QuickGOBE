@@ -22,8 +22,8 @@ public class AggregationResult {
     private final double result;
 
     AggregationResult(AggregateFunction function, String field, double result) {
-        Preconditions.checkArgument(function != null, "Aggregate function cannot be null.");
-        Preconditions.checkArgument(field != null && !field.trim().isEmpty(), "Aggregate field cannot be null or " +
+        Preconditions.checkArgument(function != null, "AggregateRequest function cannot be null.");
+        Preconditions.checkArgument(field != null && !field.trim().isEmpty(), "AggregateRequest field cannot be null or " +
                 "empty.");
 
         this.function = function;

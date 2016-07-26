@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
-import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
+import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateFunctionRequest;
 
 import java.util.ArrayList;
@@ -50,11 +50,11 @@ public class StatsRequestConverterImplTest {
     public void oneStatsRequestWithNoTypesMakeGlobalAggregateWithOneField() {
         useStatsRequest(new AnnotationRequest.StatsRequest("group1", "groupField1", Collections.emptyList()));
 
-        Aggregate aggregate = convertStats();
+        AggregateRequest aggregate = convertStats();
 
         assertThat(aggregate.getName(), is(DEFAULT_GLOBAL_AGGREGATE_NAME));
         assertThat(aggregate.getAggregateFunctionRequests(), contains(aggrField("groupField1")));
-        assertThat(aggregate.getNestedAggregates(), is(empty()));
+        assertThat(aggregate.getNestedAggregateRequests(), is(empty()));
     }
 
     @Test
@@ -62,13 +62,13 @@ public class StatsRequestConverterImplTest {
         useStatsRequest(new AnnotationRequest.StatsRequest("group1", "groupField1", Collections.emptyList()));
         useStatsRequest(new AnnotationRequest.StatsRequest("group2", "groupField2", Collections.emptyList()));
 
-        Aggregate aggregate = convertStats();
+        AggregateRequest aggregate = convertStats();
 
         assertThat(aggregate.getName(), is(DEFAULT_GLOBAL_AGGREGATE_NAME));
         assertThat(aggregate.getAggregateFunctionRequests(), containsInAnyOrder(
                 aggrField("groupField1"),
                 aggrField("groupField2")));
-        assertThat(aggregate.getNestedAggregates(), is(empty()));
+        assertThat(aggregate.getNestedAggregateRequests(), is(empty()));
     }
 
     @Test
@@ -80,22 +80,22 @@ public class StatsRequestConverterImplTest {
 
         useStatsRequest(new AnnotationRequest.StatsRequest(group, groupField, asList(type1, type2)));
 
-        Aggregate aggregate = convertStats();
+        AggregateRequest aggregate = convertStats();
 
         assertThat(aggregate.getName(), is(DEFAULT_GLOBAL_AGGREGATE_NAME));
         assertThat(aggregate.getAggregateFunctionRequests(), contains(aggrField(groupField)));
-        assertThat(aggregate.getNestedAggregates(), hasSize(2));
+        assertThat(aggregate.getNestedAggregateRequests(), hasSize(2));
 
-        Map<String, List<Aggregate>> nestedAggrMap = extractNestedAggregates(aggregate);
+        Map<String, List<AggregateRequest>> nestedAggrMap = extractNestedAggregates(aggregate);
         assertThat(nestedAggrMap.get(type1), hasSize(1));
         assertThat(nestedAggrMap.get(type2), hasSize(1));
-        Aggregate type1Aggregate = nestedAggrMap.get(type1).get(0);
-        Aggregate type2Aggregate = nestedAggrMap.get(type2).get(0);
+        AggregateRequest type1Aggregate = nestedAggrMap.get(type1).get(0);
+        AggregateRequest type2Aggregate = nestedAggrMap.get(type2).get(0);
 
         assertThat(type1Aggregate.getAggregateFunctionRequests(), contains(aggrField(groupField)));
-        assertThat(type1Aggregate.getNestedAggregates(), is(empty()));
+        assertThat(type1Aggregate.getNestedAggregateRequests(), is(empty()));
         assertThat(type2Aggregate.getAggregateFunctionRequests(), contains(aggrField(groupField)));
-        assertThat(type2Aggregate.getNestedAggregates(), is(empty()));
+        assertThat(type2Aggregate.getNestedAggregateRequests(), is(empty()));
     }
 
     @Test
@@ -112,39 +112,39 @@ public class StatsRequestConverterImplTest {
         useStatsRequest(new AnnotationRequest.StatsRequest(group1, groupField1, asList(type1, type2, type3)));
         useStatsRequest(new AnnotationRequest.StatsRequest(group2, groupField2, asList(type1, type3)));
 
-        Aggregate aggregate = convertStats();
+        AggregateRequest aggregate = convertStats();
 
         assertThat(aggregate.getName(), is(DEFAULT_GLOBAL_AGGREGATE_NAME));
         assertThat(aggregate.getAggregateFunctionRequests(), containsInAnyOrder(
                 aggrField(groupField1),
                 aggrField(groupField2)));
-        assertThat(aggregate.getNestedAggregates(), hasSize(3));
+        assertThat(aggregate.getNestedAggregateRequests(), hasSize(3));
 
-        Map<String, List<Aggregate>> nestedAggrMap = extractNestedAggregates(aggregate);
+        Map<String, List<AggregateRequest>> nestedAggrMap = extractNestedAggregates(aggregate);
         assertThat(nestedAggrMap.get(type1), hasSize(1));
         assertThat(nestedAggrMap.get(type2), hasSize(1));
         assertThat(nestedAggrMap.get(type3), hasSize(1));
-        Aggregate type1Aggregate = nestedAggrMap.get(type1).get(0);
-        Aggregate type2Aggregate = nestedAggrMap.get(type2).get(0);
-        Aggregate type3Aggregate = nestedAggrMap.get(type3).get(0);
+        AggregateRequest type1Aggregate = nestedAggrMap.get(type1).get(0);
+        AggregateRequest type2Aggregate = nestedAggrMap.get(type2).get(0);
+        AggregateRequest type3Aggregate = nestedAggrMap.get(type3).get(0);
 
         assertThat(type1Aggregate.getAggregateFunctionRequests(), containsInAnyOrder(aggrField(groupField1), aggrField(groupField2)));
-        assertThat(type1Aggregate.getNestedAggregates(), is(empty()));
+        assertThat(type1Aggregate.getNestedAggregateRequests(), is(empty()));
         assertThat(type2Aggregate.getAggregateFunctionRequests(), contains(aggrField(groupField1)));
-        assertThat(type2Aggregate.getNestedAggregates(), is(empty()));
+        assertThat(type2Aggregate.getNestedAggregateRequests(), is(empty()));
         assertThat(type3Aggregate.getAggregateFunctionRequests(), containsInAnyOrder(aggrField(groupField1), aggrField(groupField2)));
-        assertThat(type3Aggregate.getNestedAggregates(), is(empty()));
+        assertThat(type3Aggregate.getNestedAggregateRequests(), is(empty()));
     }
 
     private static AggregateFunctionRequest aggrField(String fieldName) {
         return new AggregateFunctionRequest(fieldName, AggregateFunction.UNIQUE);
     }
 
-    private Map<String, List<Aggregate>> extractNestedAggregates(Aggregate aggregate) {
-        return aggregate.getNestedAggregates().stream().collect(Collectors.groupingBy(Aggregate::getName));
+    private Map<String, List<AggregateRequest>> extractNestedAggregates(AggregateRequest aggregate) {
+        return aggregate.getNestedAggregateRequests().stream().collect(Collectors.groupingBy(AggregateRequest::getName));
     }
 
-    private Aggregate convertStats() {return converter.convert(statsRequests);}
+    private AggregateRequest convertStats() {return converter.convert(statsRequests);}
 
     private void useStatsRequest(AnnotationRequest.StatsRequest statsRequest) {
         this.statsRequests.add(statsRequest);
