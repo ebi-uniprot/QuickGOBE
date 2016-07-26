@@ -43,11 +43,6 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
             doc.xrefs = extractXRefs(term);
             doc.xRelations = extractXRelationsAsList(term);
 
-            ArrayList<GenericTerm> replacedBy = term.replacedBy();
-            if (replacedBy != null && replacedBy.size() > 0) {
-                doc.replacedBy = replacedBy.get(0).getId();
-            }
-
             doc.replaces = extractReplaces(term);
             doc.replacements = extractReplacements(term);
 
