@@ -43,7 +43,9 @@ public class SearchServiceConfig {
     @Value("${geneproduct.db.xref.valid.regexes}")
     String xrefValidationRegexFile;
 
-    @Value("${geneproduct.db.xref.valid.casesensitive}")
+    private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
+
+    @Value("${geneproduct.db.xref.valid.casesensitive:"+DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE+"}")
     boolean xrefValidationCaseSensitive;
 
     private static final String COMMA = ",";
