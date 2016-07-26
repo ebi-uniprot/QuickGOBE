@@ -43,6 +43,9 @@ public class SearchServiceConfig {
     @Value("${geneproduct.db.xref.valid.regexes}")
     String xrefValidationRegexFile;
 
+    @Value("${geneproduct.db.xref.valid.casesensitive}")
+    boolean xrefValidationCaseSensitive;
+
     private static final String COMMA = ",";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS = "id,geneProductId,qualifier,goId," +
             "goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extensions";
@@ -130,6 +133,6 @@ public class SearchServiceConfig {
     }
 
     private DbXRefLoader geneProductLoader() {
-        return new DbXRefLoader(this.xrefValidationRegexFile);
+        return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
 }

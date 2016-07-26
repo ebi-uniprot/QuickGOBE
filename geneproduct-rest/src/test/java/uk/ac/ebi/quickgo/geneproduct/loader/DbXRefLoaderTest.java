@@ -22,14 +22,14 @@ public class DbXRefLoaderTest {
 
 	@Test
 	public void loadFileUnsuccessfully(){
-		DbXRefLoader dbXRefLoader = new DbXRefLoader(NOWHERE_CANTFIND);
+		DbXRefLoader dbXRefLoader = new DbXRefLoader(NOWHERE_CANTFIND, false);
 		List<GeneProductDbXRefIDFormat> list = dbXRefLoader.load();
 		assertThat(list, hasSize(0));
 	}
 
 	@Test
 	public void loadFileSuccessfully(){
-		DbXRefLoader dbXRefLoader = new DbXRefLoader(FIND_IT_HERE);
+		DbXRefLoader dbXRefLoader = new DbXRefLoader(FIND_IT_HERE, false);
 		List<GeneProductDbXRefIDFormat> list = dbXRefLoader.load();
 		assertThat(list, hasSize(119));
 		assertThat(list.get(0).toString(), is("GeneProductXrefEntity{database='AGI_LocusCode', " +

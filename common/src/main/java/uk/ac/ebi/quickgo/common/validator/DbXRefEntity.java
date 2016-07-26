@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.common.validator;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 /**
  * The information for a single Database cross reference.
@@ -22,7 +23,7 @@ public class DbXRefEntity {
     private final String databaseURL;
 
     public DbXRefEntity(String database, String entityType, String entityTypeName,
-            String idValidationPattern, String databaseURL) {
+            String idValidationPattern, String databaseURL, boolean validationCaseSensitive) {
 
         checkArgument(database != null, "The database ID should not be null");
         checkArgument(entityType != null, "The entity type should not be null");
@@ -30,7 +31,7 @@ public class DbXRefEntity {
                 "The regex for the validation of ids from " + database + " is null and therefore invalid");
         this.database = database;
         this.entityType = entityType;
-        this.idValidationPattern = Pattern.compile(idValidationPattern, Pattern.CASE_INSENSITIVE);
+        this.idValidationPattern = Pattern.compile(idValidationPattern, validationCaseSensitive ? 0 : CASE_INSENSITIVE);
         this.entityTypeName = entityTypeName;
         this.databaseURL = databaseURL;
     }
