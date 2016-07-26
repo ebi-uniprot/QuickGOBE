@@ -34,14 +34,14 @@ public class GenericTermToODocConverterTest {
 
     // considers
     @Test
-    public void extractsNoRelationsWhenNull() {
+    public void extractsNoReplaceElementsWhenRelationsIsNull() {
         List<TermRelation> relations = null;
 
-        assertThat(converter.extractRelations(relations), is(nullValue()));
+        assertThat(converter.extractReplaceElementsFromRelations(relations), is(nullValue()));
     }
 
     @Test
-    public void extractsAConsiderRelationFromRelationsCollection() {
+    public void extractsAConsiderReplaceElementFromRelationsCollection() {
         RelationType relation = RelationType.CONSIDER;
         String replaceId = "id2";
 
@@ -49,7 +49,7 @@ public class GenericTermToODocConverterTest {
 
         Collection<TermRelation> relations = Collections.singletonList(mockReplace);
 
-        List<String> replacesStrList = converter.extractRelations(relations);
+        List<String> replacesStrList = converter.extractReplaceElementsFromRelations(relations);
         assertThat(replacesStrList.size(), is(1));
 
         String replaceStr = replacesStrList.get(0);
@@ -58,7 +58,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractsAReplacedByRelationWithinRelationsCollection() {
+    public void extractsAReplacedByReplaceElementWithinRelationsCollection() {
         RelationType relation = RelationType.REPLACEDBY;
         String replaceId = "id2";
 
@@ -66,7 +66,7 @@ public class GenericTermToODocConverterTest {
 
         Collection<TermRelation> relations = Collections.singletonList(mockReplace);
 
-        List<String> replacesStrList = converter.extractRelations(relations);
+        List<String> replacesStrList = converter.extractReplaceElementsFromRelations(relations);
         assertThat(replacesStrList.size(), is(1));
 
         String replaceStr = replacesStrList.get(0);
@@ -75,7 +75,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void convertsATermWith2RelationsInReplacesSectionIntoDocWith2RelationsInReplacesSection() {
+    public void convertsATermWith2RelationsInReplacesSectionIntoDocWith2ReplacementElementsInReplacesSection() {
         TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
         TermRelation considerModk = mockReplaceRelation("id3", RelationType.CONSIDER);
 
@@ -93,7 +93,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void convertsATermWith2RelationsInReplacementsSectionIntoDocWith2RelationsInReplacementsSection() {
+    public void convertsATermWith2RelationsInReplacementsSectionIntoDocWith2ReplacementElementsInReplacementsSection() {
         TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
         TermRelation considerModk = mockReplaceRelation("id3", RelationType.CONSIDER);
 

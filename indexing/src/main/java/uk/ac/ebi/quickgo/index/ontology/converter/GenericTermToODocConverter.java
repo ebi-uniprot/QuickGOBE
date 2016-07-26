@@ -87,14 +87,14 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     }
 
     private List<String> extractReplacements(GenericTerm term) {
-        return extractRelations(term.getReplacements());
+        return extractReplaceElementsFromRelations(term.getReplacements());
     }
 
     private List<String> extractReplaces(GenericTerm term) {
-        return extractRelations(term.getReplaces());
+        return extractReplaceElementsFromRelations(term.getReplaces());
     }
 
-    protected List<String> extractRelations(Collection<TermRelation> replaceList) {
+    protected List<String> extractReplaceElementsFromRelations(Collection<TermRelation> replaceList) {
         if (!isEmpty(replaceList)) {
             return replaceList.stream()
                     .map(replace -> FlatFieldBuilder.newFlatField()
