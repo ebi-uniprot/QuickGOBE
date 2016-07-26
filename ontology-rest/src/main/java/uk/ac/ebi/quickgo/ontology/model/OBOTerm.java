@@ -36,9 +36,6 @@ public class OBOTerm {
 
     public List<Synonym> synonyms;
 
-    // a term ID that replaces this one
-//    public String replacedBy;
-
     // indicates all ontology terms that are effectively or can be replaced by the this term
     public List<Replace> replaces;
 
