@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Tests the behaviour of the {@link AggregateField} class
+ * Tests the behaviour of the {@link AggregateFunctionRequest} class
  */
-public class AggregateFieldTest {
+public class AggregateFunctionRequestTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -24,7 +24,7 @@ public class AggregateFieldTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Field cannot be null or empty");
 
-        new AggregateField(field, function);
+        new AggregateFunctionRequest(field, function);
     }
 
     @Test
@@ -35,7 +35,7 @@ public class AggregateFieldTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Field cannot be null or empty");
 
-        new AggregateField(field, function);
+        new AggregateFunctionRequest(field, function);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class AggregateFieldTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Aggregate function cannot be null");
 
-        new AggregateField(field, function);
+        new AggregateFunctionRequest(field, function);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class AggregateFieldTest {
         String field = "field";
         AggregateFunction function = AggregateFunction.COUNT;
 
-        AggregateField aggField = new AggregateField(field, function);
+        AggregateFunctionRequest aggField = new AggregateFunctionRequest(field, function);
 
         assertThat(aggField.getField(), is(field));
         assertThat(aggField.getFunction(), is(function));

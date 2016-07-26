@@ -9,11 +9,11 @@ import com.google.common.base.Preconditions;
  *
  * @author Ricardo Antunes
  */
-public class AggregateField {
+public class AggregateFunctionRequest {
     private final AggregateFunction function;
     private final String field;
 
-    public AggregateField(String field, AggregateFunction function) {
+    public AggregateFunctionRequest(String field, AggregateFunction function) {
         Preconditions.checkArgument(field != null && !field.trim().isEmpty(), "Field cannot be null or empty");
         Preconditions.checkArgument(function != null, "Aggregate function cannot be null");
 
@@ -37,7 +37,7 @@ public class AggregateField {
             return false;
         }
 
-        AggregateField that = (AggregateField) o;
+        AggregateFunctionRequest that = (AggregateFunctionRequest) o;
 
         if (function != that.function) {
             return false;
@@ -53,7 +53,7 @@ public class AggregateField {
     }
 
     @Override public String toString() {
-        return "AggregateField{" +
+        return "AggregateFunctionRequest{" +
                 "function=" + function +
                 ", field='" + field + '\'' +
                 '}';

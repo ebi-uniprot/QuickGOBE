@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.query.Aggregate;
-import uk.ac.ebi.quickgo.rest.search.query.AggregateField;
+import uk.ac.ebi.quickgo.rest.search.query.AggregateFunctionRequest;
 
 import com.google.common.base.Preconditions;
 import java.util.Collection;
@@ -30,7 +30,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
     @Override public String convert(Aggregate aggregate) {
         Preconditions.checkArgument(aggregate != null, "Aggregate to convert cannot be null");
 
-        String aggFieldsText = convertAggregationFields(aggregate.getFields().stream());
+        String aggFieldsText = convertAggregationFields(aggregate.getAggregateFunctionRequests().stream());
         String nestedAggText = convertNestedAggregates(aggregate.getNestedAggregates().stream());
 
         String finalText = Stream.of(aggFieldsText, nestedAggText)
@@ -65,42 +65,42 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
     }
 
     /**
-     * Converts a stream of {@link AggregateField} stored within an {@link Aggregate} into a format Solr can understand.
+     * Converts a stream of {@link AggregateFunctionRequest} stored within an {@link Aggregate} into a format Solr can understand.
      *
      * @param fields aggregate fields to convert
      * @return a Solr String representation of the fields
      */
-    private String convertAggregationFields(Stream<AggregateField> fields) {
+    private String convertAggregationFields(Stream<AggregateFunctionRequest> fields) {
         return fields.map(this::createSolrAggregateFieldDeclaration)
                 .collect(joining(DECLARATION_SEPARATOR));
     }
 
     /**
-     * Given an {@link AggregateField} convert it into a solr aggregation declaration.
+     * Given an {@link AggregateFunctionRequest} convert it into a solr aggregation declaration.
      * <p/>
      * For example:
      * <pre>
-     *    AggregateField: field=myField; aggregateFunction=COUNT;
+     *    AggregateFunctionRequest: field=myField; aggregateFunction=COUNT;
      *    is converted into:
      *    count_myField:count(myField)
      * </pre>
-     * @param aggregateField the field to convert
+     * @param aggregateFunctionRequest the field to convert
      * @return a Solr representation of the aggregation field declaration
      */
-    private String createSolrAggregateFieldDeclaration(AggregateField aggregateField) {
-        return aggregateFieldTitle(aggregateField.getFunction(), aggregateField.getField())
+    private String createSolrAggregateFieldDeclaration(AggregateFunctionRequest aggregateFunctionRequest) {
+        return aggregateFieldTitle(aggregateFunctionRequest.getFunction(), aggregateFunctionRequest.getField())
                 + NAME_TO_VALUE_SEPARATOR
-                + convertAggregateFieldToText(aggregateField);
+                + convertAggregateFieldToText(aggregateFunctionRequest);
     }
 
     /**
-     * Converts an {@link AggregateField} into an aggregation statement that Solr understands.
+     * Converts an {@link AggregateFunctionRequest} into an aggregation statement that Solr understands.
      *
-     * @param aggregateField the aggregation field to convert
+     * @param aggregateFunctionRequest the aggregation field to convert
      * @return a Solr aggregation statement
      */
-    private String convertAggregateFieldToText(AggregateField aggregateField) {
-        return convertToSolrAggregation(aggregateField.getField(), aggregateField.getFunction());
+    private String convertAggregateFieldToText(AggregateFunctionRequest aggregateFunctionRequest) {
+        return convertToSolrAggregation(aggregateFunctionRequest.getField(), aggregateFunctionRequest.getFunction());
     }
 
     /**
@@ -120,7 +120,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
      * For example:
      * <pre>
      *    Aggregate: field=myField;
-     *       AggregateField: field=myField2; aggregateFunction=COUNT;
+     *       AggregateFunctionRequest: field=myField2; aggregateFunction=COUNT;
      *    is converted into:
      *    agg_myField: {
      *       type:terms
@@ -136,7 +136,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
      */
     private String createSubFacet(Aggregate nestedAggregate) {
 
-        Collection<AggregateField> fields = nestedAggregate.getFields();
+        Collection<AggregateFunctionRequest> fields = nestedAggregate.getAggregateFunctionRequests();
 
         String facetBlock = "";
 

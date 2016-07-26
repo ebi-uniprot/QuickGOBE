@@ -44,11 +44,11 @@ public class AggregateTest {
         aggregate.addField(goIdField, count);
         aggregate.addField(annIdField, count);
 
-        Set<AggregateField> retrievedFields = aggregate.getFields();
+        Set<AggregateFunctionRequest> retrievedFields = aggregate.getAggregateFunctionRequests();
         assertThat(retrievedFields, hasSize(2));
 
-        AggregateField[] expectedAggregates =
-                {new AggregateField(goIdField, count), new AggregateField(annIdField, count)};
+        AggregateFunctionRequest[] expectedAggregates =
+                {new AggregateFunctionRequest(goIdField, count), new AggregateFunctionRequest(annIdField, count)};
 
         assertThat(retrievedFields, containsInAnyOrder(expectedAggregates));
     }

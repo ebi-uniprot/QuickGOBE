@@ -8,30 +8,67 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Data-source representing which supported aggregation fields {@link AggregateFunction} should be executed over
- * the provided field.
+ * Data-source representing which supported aggregation aggregateFunctionRequests {@link AggregateFunction} should be executed over
+ * the provided name.
+ * <p/>
+ * An instance of an aggregate could have one or several of the following:
+ * <ul>
+ *     <li>The name of the aggregate. If the aggregate is based on a name, then the name is name of the name. If
+ *     the aggregate is based on whatever the query result is then the could be anything.</li>
+ *     <li>A set of {@link AggregateFunctionRequest}s: An AggregateFunctionRequest represents a call to an {@link AggregateFunction} on a
+ *     particular name. This name could be the aggregate name, or any other
+ *     name that can be calculated within table/collection used by the data-source, example: sum(field1) or unique
+ *     (field2)
+ *     </li>
+ *     <li>A set of {@link Aggregate#nestedAggregates}: A nested aggregate represents the desire to provide further
+ *     aggregation calculations based on a name that is different to that of the current aggregation. Think of it as
+ *     a drilled down view of the current aggregation with results focused on another name
+ *     </li>
+ * </ul>
+ * As an example, assume that the data source has a table/collection of orders, with the following aggregateFunctionRequests:
+ * order_item_id, quantity, cost.
+ * An {@link Aggregate} could hold the following requests:
+ * <ul>
+ *
+ *     <li>provide the total cost of all orders</li>
+ *     <li>aggregate on order_item_id</li>
+ *        <ul>
+ *            <li>sum the quantity of all items with the same order_item_id</li>
+ *        </ul>
+ *     </li>
+ * </ul>
+ * The object model would something similar to this:
+ * <pre>
+ *     aggregate:
+ *         - name: query_result
+ *         - aggregateFunctionRequests: [sum(cost)]
+ *         - nestedAggregates: [
+ *              - aggregate:
+ *                  - name: order_item_id
+ *                  - aggregateResults: [sum(quantity)]
+ * </pre>
  *
  * @author Ricardo Antunes
  */
 public class Aggregate {
-    private final String field;
-    private final Set<AggregateField> fields;
+    private final String name;
+    private final Set<AggregateFunctionRequest> aggregateFunctionRequests;
     private final Set<Aggregate> nestedAggregates;
 
-    public Aggregate(String field) {
-        Preconditions.checkArgument(field != null, "Cannot create aggregate with null field");
-        this.field = field;
+    public Aggregate(String name) {
+        Preconditions.checkArgument(name != null, "Cannot create aggregate with null name");
+        this.name = name;
 
-        this.fields = new HashSet<>();
+        this.aggregateFunctionRequests = new HashSet<>();
         this.nestedAggregates = new HashSet<>();
     }
 
     public String getName() {
-        return field;
+        return name;
     }
 
-    public Set<AggregateField> getFields() {
-        return fields;
+    public Set<AggregateFunctionRequest> getAggregateFunctionRequests() {
+        return aggregateFunctionRequests;
     }
 
     public Set<Aggregate> getNestedAggregates() {
@@ -39,7 +76,7 @@ public class Aggregate {
     }
 
     public void addField(String field, AggregateFunction function) {
-        fields.add(new AggregateField(field, function));
+        aggregateFunctionRequests.add(new AggregateFunctionRequest(field, function));
     }
 
     public void addNestedAggregate(Aggregate aggregate) {
@@ -57,10 +94,10 @@ public class Aggregate {
 
         Aggregate aggregate = (Aggregate) o;
 
-        if (!field.equals(aggregate.field)) {
+        if (!name.equals(aggregate.name)) {
             return false;
         }
-        if (!fields.equals(aggregate.fields)) {
+        if (!aggregateFunctionRequests.equals(aggregate.aggregateFunctionRequests)) {
             return false;
         }
         return nestedAggregates.equals(aggregate.nestedAggregates);
@@ -68,16 +105,16 @@ public class Aggregate {
     }
 
     @Override public int hashCode() {
-        int result = field.hashCode();
-        result = 31 * result + fields.hashCode();
+        int result = name.hashCode();
+        result = 31 * result + aggregateFunctionRequests.hashCode();
         result = 31 * result + nestedAggregates.hashCode();
         return result;
     }
 
     @Override public String toString() {
         return "Aggregate{" +
-                "field='" + field + '\'' +
-                ", fields=" + fields +
+                "name='" + name + '\'' +
+                ", aggregateFunctionRequests=" + aggregateFunctionRequests +
                 ", nestedAggregates=" + nestedAggregates +
                 '}';
     }
