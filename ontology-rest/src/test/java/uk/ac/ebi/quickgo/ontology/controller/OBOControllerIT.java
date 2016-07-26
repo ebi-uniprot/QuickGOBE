@@ -707,7 +707,6 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "annotationGuidelines").exists())
                 .andExpect(jsonPath(path + "taxonConstraints").exists())
                 .andExpect(jsonPath(path + "subsets").exists())
-                .andExpect(jsonPath(path + "replacedBy").exists())
                 .andExpect(jsonPath(path + "replacements").exists())
                 .andExpect(jsonPath(path + "replaces").exists());
     }

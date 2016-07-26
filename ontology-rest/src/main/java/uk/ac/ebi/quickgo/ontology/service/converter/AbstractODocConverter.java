@@ -38,7 +38,6 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
         term.id = ontologyDocument.id;
         term.name = ontologyDocument.name;
         term.isObsolete = ontologyDocument.isObsolete;
-        term.replacedBy = ontologyDocument.replacedBy;
         term.comment = ontologyDocument.comment;
         term.children = ontologyDocument.children;
         term.secondaryIds = ontologyDocument.secondaryIds;

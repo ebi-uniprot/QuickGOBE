@@ -67,11 +67,6 @@ public class AbstractODocConverterTest {
     }
 
     @Test
-    public void convertsReplacedByWithoutError() {
-        assertThat(oboTermFromValidGODoc.replacedBy, is(validGODoc.replacedBy));
-    }
-
-    @Test
     public void convertsReplacements() throws Exception {
         assertThat(oboTermFromValidGODoc.replacements, hasSize(validGODoc.replacements.size()));
     }
