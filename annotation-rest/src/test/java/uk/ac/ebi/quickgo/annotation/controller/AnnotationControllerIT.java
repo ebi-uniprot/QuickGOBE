@@ -911,7 +911,7 @@ public class AnnotationControllerIT {
     public void filterBySingleGeneProductTypeOfRnaReturnsMatchingDocument() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.dbObjectType = "rna";
+        doc.geneProductType = "rna";
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM, "RNA"));
@@ -927,7 +927,7 @@ public class AnnotationControllerIT {
     public void filterAnnotationsByTwoGeneProductTypesAsOneParameterReturnsMatchingDocuments() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.dbObjectType = "complex";
+        doc.geneProductType = "complex";
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM,
@@ -944,7 +944,7 @@ public class AnnotationControllerIT {
     public void filterAnnotationsByTwoGeneProductTypesAsTwoParametersReturnsMatchingDocuments() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.dbObjectType = "complex";
+        doc.geneProductType = "complex";
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM,
@@ -961,7 +961,7 @@ public class AnnotationControllerIT {
     public void filterByNonExistentGeneProductTypeReturnsNothing() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.dbObjectType = "complex";
+        doc.geneProductType = "complex";
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM, "rna"));
