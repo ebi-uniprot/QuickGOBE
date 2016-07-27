@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.ontology.converter;
 
+import uk.ac.ebi.quickgo.common.converter.FlatField;
 import uk.ac.ebi.quickgo.index.ontology.converter.GOTermToODocConverter;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.generic.RelationType;
@@ -19,6 +20,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -190,5 +193,47 @@ public class GOTermToODocConverterTest {
     public void extractsBlacklistWhenNotExists() {
         when(term.getBlacklist()).thenReturn(null);
         assertThat(converter.extractBlacklist(term), is(nullValue()));
+    }
+
+    @Test
+    public void extractingGoDiscussionsFromEmptyPlannedChangesListReturnsNull() throws Exception {
+        when(term.getPlannedChanges()).thenReturn(null);
+
+        assertThat(converter.extractGoDiscussions(term), is(nullValue()));
+    }
+
+    @Test
+    public void extracts1GoDiscussionsFrom1ElementPlannedChangesList() throws Exception {
+        String title = "Viral Processes";
+        String url = "http://wiki.geneontology.org/index.php/Virus_terms";
+
+        GOTerm.NamedURL plannedChange = new GOTerm.NamedURL(title, url);
+
+        when(term.getPlannedChanges()).thenReturn(Collections.singletonList(plannedChange));
+
+        List<String> expectedDiscussions = converter.extractGoDiscussions(term);
+        assertThat(expectedDiscussions, hasSize(1));
+
+        String expectedDiscussion = expectedDiscussions.get(0);
+        assertThat(expectedDiscussion, containsString(title));
+        assertThat(expectedDiscussion, containsString(url));
+    }
+
+    @Test
+    public void extracts2GoDiscussionsFrom2ElementPlannedChangesList() throws Exception {
+        String title1 = "Viral Processes";
+        String url1 = "http://wiki.geneontology.org/index.php/Virus_terms";
+
+        GOTerm.NamedURL plannedChange1 = new GOTerm.NamedURL(title1, url1);
+
+        String title2 = "signalling";
+        String url2 = "http://wiki.geneontology.org/index.php/Signaling";
+
+        GOTerm.NamedURL plannedChange2 = new GOTerm.NamedURL(title2, url2);
+
+        when(term.getPlannedChanges()).thenReturn(Arrays.asList(plannedChange1, plannedChange2));
+
+        List<String> expectedDiscussions = converter.extractGoDiscussions(term);
+        assertThat(expectedDiscussions, hasSize(2));
     }
 }
