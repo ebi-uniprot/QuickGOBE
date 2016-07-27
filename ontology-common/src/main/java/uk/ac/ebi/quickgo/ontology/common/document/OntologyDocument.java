@@ -79,6 +79,8 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.XRELATION)
     public List<String> xRelations;
 
+    @Field(OntologyFields.GO_DISCUSSIONS)
+    public List<String> goDiscussions;
 
     @Override
     public String getUniqueName() {
@@ -157,6 +159,11 @@ public class OntologyDocument implements QuickGODocument {
                 that.annotationGuidelines != null) {
             return false;
         }
+
+        if (goDiscussions != null ? !goDiscussions.equals(that.goDiscussions) : that.goDiscussions != null) {
+            return false;
+        }
+
         return !(xRelations != null ? !xRelations.equals(that.xRelations) : that.xRelations != null);
 
     }
@@ -183,6 +190,7 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (blacklist != null ? blacklist.hashCode() : 0);
         result = 31 * result + (annotationGuidelines != null ? annotationGuidelines.hashCode() : 0);
         result = 31 * result + (xRelations != null ? xRelations.hashCode() : 0);
+        result = 31 * result + (goDiscussions != null ? goDiscussions.hashCode() : 0);
         return result;
     }
 
@@ -209,6 +217,7 @@ public class OntologyDocument implements QuickGODocument {
                 ", blacklist=" + blacklist +
                 ", annotationGuidelines=" + annotationGuidelines +
                 ", xRelations=" + xRelations +
+                ", goDiscussions=" + goDiscussions +
                 '}';
     }
 }
