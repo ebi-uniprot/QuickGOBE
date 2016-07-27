@@ -30,6 +30,7 @@ public class AnnotationFields {
     public static final String GENE_PRODUCT_TYPE = "geneProductType";
     public static final String DB_SUBSET = "dbSubset";
     public static final String TAXON_ID = "taxonId";
+    public static final String TARGET_SET = "targetSet";
 
     /**
      * Annotation fields that are stored, and can therefore be retrieved.

@@ -58,6 +58,9 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.EXTENSION)
     public List<String> extensions;
 
+    @Field(AnnotationFields.TARGET_SET)
+    public List<String> targetSets;
+
     @Override public String getUniqueName() {
         return id;
     }

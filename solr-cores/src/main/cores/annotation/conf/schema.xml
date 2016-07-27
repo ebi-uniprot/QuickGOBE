@@ -85,6 +85,8 @@
     <field name="interactingTaxonId" type="int" indexed="false" stored="true" multiValued="false"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="extension" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="targetSets" type="string" indexed="true" stored="false" multiValued="true"/>
+
 
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->

@@ -12,10 +12,7 @@ import java.util.regex.Matcher;
 import org.springframework.batch.item.ItemProcessor;
 
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.COLON;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.EQUALS;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.PIPE;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*;
 
 /**
  * Converts an {@link Annotation} object into an {@link AnnotationDocument} object.
@@ -58,6 +55,7 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
         doc.dbObjectSymbol = propertiesMap.get(DB_OBJECT_SYMBOL);
         doc.geneProductType = propertiesMap.get(DB_OBJECT_TYPE);
         doc.taxonId = extractTaxonId(propertiesMap.get(TAXON_ID));
+        doc.targetSets = constructTargetSets(propertiesMap.get(TARGET_SET));
 
         return doc;
     }
@@ -94,7 +92,15 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
         return value == null ? null : Arrays.asList(value.split(PIPE));
     }
 
+    private List<String> createNullableListFromCommaSeparatedValue(String value) {
+        return value == null ? null : Arrays.asList(splitValue(value, COMMA));
+    }
+
     private String constructGeneProductId(Annotation annotation) {
         return annotation.db + COLON + annotation.dbObjectId;
+    }
+
+    private List<String> constructTargetSets(String value) {
+        return createNullableListFromCommaSeparatedValue(value);
     }
 }
