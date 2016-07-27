@@ -23,8 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class GeneProductDbXRefIDFormats {
 
     private final Map<GeneProductDbXRefIDFormats.Key, GeneProductDbXRefIDFormat> geneProductXrefEntities;
-    static final Key[] targetDBs = new Key[]{ new Key("UniProtKB","PR:000000001"), new Key("IntAct","GO:0043234"),
-            new Key("RNAcentral","CHEBI:33697")};
+    private static final Key[] TARGET_DBS = new Key[]{new Key("UniProtKB", "PR:000000001"),
+            new Key("IntAct", "GO:0043234"),
+            new Key("RNAcentral", "CHEBI:33697")};
 
     private GeneProductDbXRefIDFormats(Map<Key, GeneProductDbXRefIDFormat> geneProductXrefEntities) {
         checkArgument(geneProductXrefEntities != null, "Gene product xref entities map cannot be null");
@@ -40,11 +41,13 @@ public class GeneProductDbXRefIDFormats {
     public boolean isValidId(String id) {
 
         //If we haven't managed to load the validation regular expressions then pass everything
-        if (geneProductXrefEntities.size()==0) {
+        if (geneProductXrefEntities.size() == 0) {
             return true;
         }
-        for(Key dbKey : targetDBs){
-            if(this.geneProductXrefEntities.get(dbKey).matches(id)) return true;
+        for (Key dbKey : TARGET_DBS) {
+            if (this.geneProductXrefEntities.get(dbKey).matches(id)) {
+                return true;
+            }
         }
 
         //no matches
@@ -62,7 +65,7 @@ public class GeneProductDbXRefIDFormats {
 
         Map<Key, GeneProductDbXRefIDFormat> mappedEntities = new HashMap<>();
 
-        for(GeneProductDbXRefIDFormat entity : entities) {
+        for (GeneProductDbXRefIDFormat entity : entities) {
             GeneProductDbXRefIDFormats.Key key = new GeneProductDbXRefIDFormats.Key(entity.getDatabase(), entity
                     .getEntityType());
             mappedEntities.put(key, entity);
