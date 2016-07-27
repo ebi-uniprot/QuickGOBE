@@ -33,7 +33,8 @@ public class AnnotationRequest {
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
-            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE};
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE,
+            TARGET_SET};
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
@@ -234,6 +235,17 @@ public class AnnotationRequest {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
 
+    /**
+     * Filter by Target Sets e.g. BHF-UCK, KRUK, Parkinsons etc
+     * @return
+     */
+    public void setTargetSet(String targetSets){
+        filterMap.put(TARGET_SET, targetSets.toLowerCase());
+    }
+
+    public String getTargetSet(){
+        return filterMap.get(TARGET_SET);
+    }
 
     public int getLimit() {
         return limit;

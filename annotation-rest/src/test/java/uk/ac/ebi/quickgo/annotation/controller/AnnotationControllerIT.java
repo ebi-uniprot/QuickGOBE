@@ -61,6 +61,7 @@ public class AnnotationControllerIT {
     private static final String GO_ID_PARAM = "goId";
     private static final String WITHFROM_PARAM = "withFrom";
     private static final String GENE_PRODUCT_TYPE_PARAM = "gpType";
+    private static final String TARGET_SET_PARAM = "targetSet";
 
     //Test Data
     private static final String NOTEXISTS_ASSIGNED_BY = "ZZZZZ";
@@ -965,6 +966,31 @@ public class AnnotationControllerIT {
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM, "rna"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    //----- Target Sets
+
+    @Test
+    public void filterByTargetSetReturnsMatchingDocuments() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "KRUK"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByNonExistentTargetSetReturnsNoDocuments() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "CLAP"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
