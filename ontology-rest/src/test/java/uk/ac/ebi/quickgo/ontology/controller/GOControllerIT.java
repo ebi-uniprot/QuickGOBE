@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -36,6 +37,16 @@ public class GOControllerIT extends OBOControllerIT {
 
         expectBasicFieldsInResults(response, Arrays.asList(GO_0000001, GO_0000002))
                 .andExpect(jsonPath("$.results.*.blacklist", hasSize(2)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveGoDiscussions() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(GO_0000001 + "/complete")));
+
+        expectBasicFieldsInResults(response, Collections.singletonList(GO_0000001))
+                .andExpect(jsonPath("$.results.*.goDiscussions", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
