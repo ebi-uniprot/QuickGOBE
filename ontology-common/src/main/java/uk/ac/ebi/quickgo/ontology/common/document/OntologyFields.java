@@ -41,6 +41,7 @@ public class OntologyFields {
     public final static String EXACT_NAME = "exact_name";
     public final static String EXACT_SYNONYM = "exact_synonym";
     public final static String GO_DISCUSSIONS = "goDiscussions";
+    public final static String CREDITS = "credits";
 
     /**
      * Ontology fields that are stored, and can therefore be retrieved.
@@ -71,6 +72,7 @@ public class OntologyFields {
         public static final String DEFINITION_XREF = storeAndGet(VALUES, OntologyFields.DEFINITION_XREFS);
         public static final String ANCESTOR = storeAndGet(VALUES, OntologyFields.ANCESTOR);
         public static final String GO_DISCUSSIONS = storeAndGet(VALUES, OntologyFields.GO_DISCUSSIONS);
+        public static final String CREDITS = storeAndGet(VALUES, OntologyFields.CREDITS);
 
         public static boolean isRetrievable(String field) {
             return VALUES.contains(field);

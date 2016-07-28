@@ -82,6 +82,9 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.GO_DISCUSSIONS)
     public List<String> goDiscussions;
 
+    @Field(OntologyFields.CREDITS)
+    public List<String> credits;
+
     @Override
     public String getUniqueName() {
         return this.id;
@@ -164,6 +167,10 @@ public class OntologyDocument implements QuickGODocument {
             return false;
         }
 
+        if (credits != null ? !credits.equals(that.credits) : that.credits != null) {
+            return false;
+        }
+
         return !(xRelations != null ? !xRelations.equals(that.xRelations) : that.xRelations != null);
 
     }
@@ -191,6 +198,7 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (annotationGuidelines != null ? annotationGuidelines.hashCode() : 0);
         result = 31 * result + (xRelations != null ? xRelations.hashCode() : 0);
         result = 31 * result + (goDiscussions != null ? goDiscussions.hashCode() : 0);
+        result = 31 * result + (credits != null ? credits.hashCode() : 0);
         return result;
     }
 
@@ -218,6 +226,7 @@ public class OntologyDocument implements QuickGODocument {
                 ", annotationGuidelines=" + annotationGuidelines +
                 ", xRelations=" + xRelations +
                 ", goDiscussions=" + goDiscussions +
+                ", credits=" + credits +
                 '}';
     }
 }
