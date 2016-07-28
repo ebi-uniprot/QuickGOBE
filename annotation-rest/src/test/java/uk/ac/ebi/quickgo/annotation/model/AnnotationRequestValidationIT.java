@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.*;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
@@ -552,7 +553,4 @@ public class AnnotationRequestValidationIT {
         violations.forEach(System.out::println);
     }
 
-    private String toCSV(String... values) {
-        return Arrays.stream(values).collect(Collectors.joining(","));
-    }
 }

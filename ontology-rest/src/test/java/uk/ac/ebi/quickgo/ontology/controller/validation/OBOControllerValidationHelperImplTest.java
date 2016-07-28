@@ -5,7 +5,6 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
+import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES;
 
 /**
@@ -67,8 +67,10 @@ public class OBOControllerValidationHelperImplTest {
         OntologyRelationType validRelation0 = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.get(0);
         OntologyRelationType validRelation1 = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.get(1);
 
-        List<OntologyRelationType> validRelations = validator.validateRelationTypes(
-                relationsToCSV(validRelation0, validRelation1));
+//        List<OntologyRelationType> validRelations = validator.validateRelationTypes(
+//                relationsToCSV(validRelation0, validRelation1));
+        List<OntologyRelationType> validRelations = validator.validateRelationTypes(toCSV
+                        (validRelation0.getLongName(), validRelation1.getLongName()));
 
         assertThat(validRelations, containsInAnyOrder(validRelation0, validRelation1));
     }
@@ -81,10 +83,8 @@ public class OBOControllerValidationHelperImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void checkValidationWorksFor2InvalidRelations() {
         validator.validateRelationTypes(
-                relationsToCSV(invalidRelationships.get(0), invalidRelationships.get(1)));
+                toCSV(invalidRelationships.get(0).getLongName(), invalidRelationships.get(1)
+                        .getLongName()));
     }
 
-    private String relationsToCSV(OntologyRelationType... relations) {
-        return asList(relations).stream().map(OntologyRelationType::getLongName).collect(Collectors.joining(","));
-    }
 }
