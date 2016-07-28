@@ -953,8 +953,7 @@ public class AnnotationControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(0))
-                .andExpect(fieldsInAllResultsExist(0));
+                .andExpect(totalNumOfResults(0));
     }
 
     //----- Setup data ---------------------//
