@@ -917,7 +917,7 @@ public class AnnotationControllerIT {
         repository.save(docA);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
-                gimmeCSV(AnnotationDocMocker.SUB_SET, docA.dbSubset)));
+                toCSV(AnnotationDocMocker.SUB_SET, docA.dbSubset)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -973,7 +973,7 @@ public class AnnotationControllerIT {
         return (int) Math.ceil(totalEntries / resultsPerPage) + 1;
     }
 
-    private String gimmeCSV(String... values) {
+    private String toCSV(String... values) {
         return Arrays.stream(values).collect(Collectors.joining(","));
     }
 }
