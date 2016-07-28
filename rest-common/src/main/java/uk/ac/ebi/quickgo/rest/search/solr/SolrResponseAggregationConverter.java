@@ -50,6 +50,18 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
  * }
  * </pre>
  *
+ * Notes:
+ * <br/>
+ * &nbsp;&nbsp;&nbsp;Within an aggregate Solr response:
+ * <ul>
+ *     <li>A nested aggregate will be identified by "agg_" prefixed to the field
+ *     name, e.g. agg_goId.</li>
+ *     <li>An aggregation result will be identified by the name of the aggregation function followed by the name of
+ *     the field, e.g. unique_geneProductID</li>
+ * </ul>
+ *
+ *
+ *
  * @author Ricardo Antunes
  */
 public class SolrResponseAggregationConverter implements AggregationConverter<SolrResponse, AggregateResponse> {
@@ -102,23 +114,63 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
      * {@link AggregateResponse}
      */
     private void convertAggregateValue(String field, Object value, AggregateResponse aggregation) {
-        String prefix = SolrAggregationHelper.fieldPrefixExtractor(field);
+        String fieldPrefix = SolrAggregationHelper.fieldPrefixExtractor(field);
 
-        if (!prefix.isEmpty()) {
+        if (!fieldPrefix.isEmpty()) {
             String name = SolrAggregationHelper.fieldNameExtractor(field);
 
-            if (AGG_TYPE_PREFIX.equals(prefix)) {
+            if (isNestedAggregate(fieldPrefix)) {
                 AggregateResponse nestedAggregation = createNestedAggregation(name, value);
                 aggregation.addNestedAggregation(nestedAggregation);
+            } else if (isAggregateFunction(fieldPrefix)) {
+                addAggregationFunctionToAggregation(fieldPrefix, name, value, aggregation);
             } else {
-                addAggregationFunctionToAggregation(prefix, name, value, aggregation);
+                logger.debug("Unable to process field:{}, with prefix:{}", field, fieldPrefix);
             }
-        } else if (BUCKETS_ID.equals(field)) {
+        } else if (isFieldBucket(field)) {
             List<NamedList<?>> buckets = (List<NamedList<?>>) value;
             buckets.forEach(bucket -> convertBucket((NamedList<?>) bucket, aggregation));
         } else {
             logger.debug("Did not process field: {} with value: {}", field, value);
         }
+    }
+
+    /**
+     * Determines whether the prefix found within the field name represents a nested aggregate.
+     *
+     * @param fieldPrefix the prefix found within the Solr field name
+     * @return true if the field prefix represents a nested aggregate, false otherwise.
+     */
+    private boolean isNestedAggregate(String fieldPrefix) {
+        return (AGG_TYPE_PREFIX.equals(fieldPrefix));
+    }
+
+    /**
+     * Determines whether the prefix found within the field name represents an aggregate function.
+     *
+     * @param fieldPrefix the prefix found within the Solr field name
+     * @return true if the field prefix represents an aggregate function, false otherwise.
+     */
+    private boolean isAggregateFunction(String fieldPrefix) {
+        boolean isAggregateFunction = true;
+
+        try {
+            AggregateFunction.typeOf(fieldPrefix);
+        } catch (IllegalArgumentException e) {
+            isAggregateFunction = false;
+        }
+
+        return isAggregateFunction;
+    }
+
+    /**
+     * Indicates whether the {@code field} represents a marker for a Solr bucket within an aggregation result.
+     *
+     * @param field the name of the field
+     * @return true if the field name represents a bucket, false otherwise
+     */
+    private boolean isFieldBucket(String field) {
+        return BUCKETS_ID.equals(field);
     }
 
     /**
