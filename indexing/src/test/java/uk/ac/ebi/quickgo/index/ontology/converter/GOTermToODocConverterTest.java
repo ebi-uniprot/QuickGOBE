@@ -10,10 +10,7 @@ import uk.ac.ebi.quickgo.model.ontology.go.GOTermBlacklist;
 import uk.ac.ebi.quickgo.model.ontology.go.TaxonConstraint;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -169,7 +166,9 @@ public class GOTermToODocConverterTest {
         when(goTermBlacklist.getEntityType()).thenReturn("protein");
         when(goTermBlacklist.getTaxonId()).thenReturn(441771);
         when(goTermBlacklist.getProteinAc()).thenReturn("A5I1R9");
-        when(goTermBlacklist.getReason()).thenReturn("1 NOT-qualified manual annotation exists with evidence code ECO:0000318 from this reference: GO_REF:0000033");
+        when(goTermBlacklist.getReason()).thenReturn(
+                "1 NOT-qualified manual annotation exists with evidence code ECO:0000318 from this reference: " +
+                        "GO_REF:0000033");
         when(goTermBlacklist.getMethodId()).thenReturn("IPR1234567");
 
         when(term.getBlacklist()).thenReturn(Collections.singletonList(goTermBlacklist));
@@ -184,7 +183,10 @@ public class GOTermToODocConverterTest {
         assertThat(blacklistConStrList.get(0).contains("protein"), is(true));
         assertThat(blacklistConStrList.get(0).contains("441771"), is(true));
         assertThat(blacklistConStrList.get(0).contains("A5I1R9"), is(true));
-        assertThat(blacklistConStrList.get(0).contains("1 NOT-qualified manual annotation exists with evidence code ECO:0000318 from this reference: GO_REF:0000033"), is(true));
+        assertThat(blacklistConStrList.get(0).contains(
+                "1 NOT-qualified manual annotation exists with evidence code ECO:0000318 from this reference: " +
+                        "GO_REF:0000033"),
+                is(true));
         assertThat(blacklistConStrList.get(0).contains("IPR1234567"), is(true));
 
     }
@@ -235,5 +237,15 @@ public class GOTermToODocConverterTest {
 
         List<String> expectedDiscussions = converter.extractGoDiscussions(term);
         assertThat(expectedDiscussions, hasSize(2));
+
+        assertThat(goDiscussionExists(plannedChange1, expectedDiscussions), is(true));
+        assertThat(goDiscussionExists(plannedChange2, expectedDiscussions), is(true));
+    }
+
+    private boolean goDiscussionExists(GOTerm.NamedURL goDiscussion, Collection<String> expectedGoDiscussions) {
+        return expectedGoDiscussions.stream()
+                .filter(expectedDiscussionText -> expectedDiscussionText.contains(goDiscussion.getTitle()) &&
+                        expectedDiscussionText.contains(goDiscussion.getUrl()))
+                .findFirst().isPresent();
     }
 }
