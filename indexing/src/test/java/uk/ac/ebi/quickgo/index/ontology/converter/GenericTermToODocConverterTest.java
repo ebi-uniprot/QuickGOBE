@@ -454,7 +454,8 @@ public class GenericTermToODocConverterTest {
                 .findFirst().isPresent();
     }
 
-    private <T> T extractFieldFromDocument(Optional<OntologyDocument> docOpt, Function<OntologyDocument, T> extractor) {
+    public static <T> T extractFieldFromDocument(Optional<OntologyDocument> docOpt, Function<OntologyDocument, T>
+            extractor) {
         return extractor.apply(docOpt.get());
     }
 }
