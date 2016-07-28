@@ -53,6 +53,16 @@ public final class OntologyDocMocker {
                 .addField(newFlatFieldLeaf("IER12346"))
                 .buildString());
 
+        od.goDiscussions = new ArrayList<>();
+        od.goDiscussions.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("Viral Processes"))
+                .addField(newFlatFieldLeaf("http://wiki.geneontology.org/index.php/Virus_terms"))
+                .buildString());
+        od.goDiscussions.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("signalling"))
+                .addField(newFlatFieldLeaf("http://wiki.geneontology.org/index.php/Signaling"))
+                .buildString());
+
         return od;
     }
 

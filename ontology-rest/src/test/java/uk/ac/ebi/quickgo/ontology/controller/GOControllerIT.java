@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -16,6 +17,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.ontology.controller.OBOController.COMPLETE_SUB_RESOURCE;
+import static uk.ac.ebi.quickgo.ontology.controller.OBOController.CONSTRAINTS_SUB_RESOURCE;
 
 /**
  * Tests the {@link GOController} class. All tests for GO
@@ -32,10 +35,21 @@ public class GOControllerIT extends OBOControllerIT {
 
     @Test
     public void canRetrieveBlacklistByIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(GO_0000001 + COMMA + GO_0000002) + "/constraints"));
+        ResultActions response = mockMvc.perform(get(
+                buildTermsURLWithSubResource(asCSV(GO_0000001, GO_0000002), CONSTRAINTS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, Arrays.asList(GO_0000001, GO_0000002))
                 .andExpect(jsonPath("$.results.*.blacklist", hasSize(2)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveGoDiscussions() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(GO_0000001, COMPLETE_SUB_RESOURCE)));
+
+        expectBasicFieldsInResults(response, Collections.singletonList(GO_0000001))
+                .andExpect(jsonPath("$.results.*.goDiscussions", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
