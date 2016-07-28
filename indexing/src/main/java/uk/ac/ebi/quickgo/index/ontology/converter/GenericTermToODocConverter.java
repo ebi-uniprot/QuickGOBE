@@ -68,7 +68,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         return extractedCredits;
     }
 
-    protected List<String> extractDefinitionXrefs(GenericTerm term) {
+    private List<String> extractDefinitionXrefs(GenericTerm term) {
         return term.getDefinitionXrefs().stream()
                 .map(xref -> FlatFieldBuilder.newFlatField()
                         .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getDb()))
@@ -105,7 +105,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         return extractReplaceElementsFromRelations(term.getReplaces());
     }
 
-    protected List<String> extractReplaceElementsFromRelations(Collection<TermRelation> replaceList) {
+    private List<String> extractReplaceElementsFromRelations(Collection<TermRelation> replaceList) {
         if (!isEmpty(replaceList)) {
             return replaceList.stream()
                     .map(replace -> FlatFieldBuilder.newFlatField()
@@ -121,7 +121,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: id|term|namespace|url|relation
      */
-    protected List<String> extractXRelationsAsList(GenericTerm term) {
+    private List<String> extractXRelationsAsList(GenericTerm term) {
         if (!isEmpty(term.getCrossOntologyRelations())) {
             return term.getCrossOntologyRelations().stream()
                     .map(
@@ -141,7 +141,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: code|id|name
      */
-    protected List<String> extractXRefs(GenericTerm term) {
+    private List<String> extractXRefs(GenericTerm term) {
         if (!isEmpty(term.getXrefs())) {
             return term.getXrefs().stream()
                     .map(
@@ -159,7 +159,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: name|timestamp|action|category|text
      */
-    protected List<String> extractHistory(GenericTerm term) {
+    private List<String> extractHistory(GenericTerm term) {
         if (term.getHistory() != null && !isEmpty(term.getHistory().getHistoryAll())) {
             return term.getHistory().getHistoryAll().stream()
                     .map(
@@ -176,7 +176,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         }
     }
 
-    protected List<String> extractSynonymNames(GenericTerm term) {
+    private List<String> extractSynonymNames(GenericTerm term) {
         if (!isEmpty(term.getSynonyms())) {
             return term.getSynonyms().stream()
 
@@ -189,7 +189,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: synonymName|synonymType
      */
-    protected List<String> extractSynonyms(GenericTerm term) {
+    private List<String> extractSynonyms(GenericTerm term) {
         if (!isEmpty(term.getSynonyms())) {
             return term.getSynonyms().stream()
                     .map(
