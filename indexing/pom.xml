@@ -19,7 +19,6 @@
     <properties>
         <commons-collections.version>3.2.1</commons-collections.version>
         <quickgo-sources.version>1.0</quickgo-sources.version>
-        <spring-batch-test.version>3.0.7.RELEASE</spring-batch-test.version>
     </properties>
 
     <dependencies>
@@ -91,7 +90,6 @@
         <dependency>
             <groupId>org.springframework.batch</groupId>
             <artifactId>spring-batch-test</artifactId>
-            <version>${spring-batch-test.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

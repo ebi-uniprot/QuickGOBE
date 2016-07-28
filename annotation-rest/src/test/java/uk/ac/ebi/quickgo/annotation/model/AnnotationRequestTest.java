@@ -1,19 +1,24 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_FIELD;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_IDS;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
 /**
  *
- * Test methods and structure of AnnotationRequest
+ * Tests methods and structure of AnnotationRequest
  *
  * @author Tony Wardell
  * Date: 29/04/2016
@@ -109,23 +114,93 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
     }
 
-
     @Test
     public void setAndGetTaxon() {
         String taxonId = "1";
+
         annotationRequest.setTaxon(taxonId);
+
         assertThat(annotationRequest.getTaxon(), is(taxonId));
     }
 
     @Test
-    public void setAndGetQualifier(){
-        String qualifier = "NOT";
-        annotationRequest.setQualifier((qualifier));
-        assertThat(annotationRequest.getQualifter(), is(qualifier));
+    public void setAndGetUsage() {
+        String usage = "exact";
+
+        annotationRequest.setUsage(usage);
+
+        assertThat(annotationRequest.getUsage(), is(usage));
     }
 
     @Test
-    public void setAndGetReference(){
+    public void setAndGetUsageIds() {
+        String usageIds = "GO:0000001,GO:0000002";
+
+        annotationRequest.setUsageIds(usageIds);
+
+        assertThat(annotationRequest.getUsageIds(), is(usageIds.toUpperCase()));
+    }
+
+    @Test
+    public void setAndGetUsageRelationships() {
+        String usageRelationships = "iS_,paRt_of";
+
+        annotationRequest.setUsageRelationships(usageRelationships);
+
+        assertThat(annotationRequest.getUsageRelationships(), is(usageRelationships.toLowerCase()));
+    }
+
+    @Test
+    public void createsFilterWithCaseInsensitiveUsageAndUsageIds() {
+        String usage = "descEndants";
+        String usageId = "GO:0000001";
+
+        annotationRequest.setUsage(usage);
+        annotationRequest.setUsageIds(usageId);
+
+        FilterRequest request = FilterRequest.newBuilder()
+                .addProperty(USAGE_FIELD, usage.toLowerCase())
+                .addProperty(USAGE_IDS, usageId.toUpperCase())
+                .addProperty(USAGE_RELATIONSHIPS)
+                .build();
+        assertThat(annotationRequest.createFilterRequests(),
+                contains(request));
+    }
+
+    @Test
+    public void createsFilterWithCaseInsensitiveUsageAndUsageIdsAndUsageRelationships() {
+        String usage = "deSCendants";
+        String usageId = "GO:0000001";
+        String relationships = "is_A";
+
+        annotationRequest.setUsage(usage);
+        annotationRequest.setUsageIds(usageId);
+        annotationRequest.setUsageRelationships(relationships);
+
+        assertThat(annotationRequest.createFilterRequests(),
+                contains(FilterRequest.newBuilder()
+                        .addProperty(USAGE_FIELD, usage.toLowerCase())
+                        .addProperty(USAGE_IDS, usageId.toUpperCase())
+                        .addProperty(USAGE_RELATIONSHIPS, relationships.toLowerCase())
+                        .build()));
+    }
+
+    @Test(expected = ParameterException.class)
+    public void cannotCreateFilterWithUsageAndNoUsageIds() {
+        annotationRequest.setUsage("descendants");
+
+        annotationRequest.createFilterRequests();
+    }
+
+    @Test
+    public void setAndGetQualifier() {
+        String qualifier = "NOT";
+        annotationRequest.setQualifier(qualifier);
+        assertThat(annotationRequest.getQualifier(), is(qualifier));
+    }
+
+    @Test
+    public void setAndGetReference() {
         String ONE_GOREF = "GO_REF:123456";
         annotationRequest.setReference(ONE_GOREF);
         assertThat(annotationRequest.getReference(), is(ONE_GOREF));

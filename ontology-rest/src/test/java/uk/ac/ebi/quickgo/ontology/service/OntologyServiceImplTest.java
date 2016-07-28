@@ -84,7 +84,7 @@ public class OntologyServiceImplTest {
                 new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO,
                         new SolrQueryStringSanitizer(), ontologyTraversalMock);
 
-        List<GOTerm> goTerms = ontologyServiceSpy.convertDocs(Collections.emptyList());
+        List<GOTerm> goTerms = ontologyServiceSpy.convertDocs(Collections.emptyList()).collect(Collectors.toList());
         assertThat(goTerms.size(), is(0));
     }
 

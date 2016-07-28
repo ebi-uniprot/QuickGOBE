@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
+
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,7 +23,7 @@ import static org.hamcrest.Matchers.hasSize;
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={AnnotationRequestConfig.class})
+@ContextConfiguration(classes = {AnnotationRequestConfig.class})
 public class AnnotationRequestValidationIT {
     private static final String[] VALID_ASSIGNED_BY_PARMS = {"ASPGD", "ASPGD,Agbase", "ASPGD_,Agbase",
             "ASPGD,Agbase_", "ASPGD,Agbase", "BHF-UCL,Agbase", "Roslin_Institute,BHF-UCL,Agbase"};
@@ -32,6 +34,8 @@ public class AnnotationRequestValidationIT {
     private static final String[] VALID_GO_EVIDENCE = {"IEA,IBD,IC"};
     private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
 
+    private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
+    private static final String[] INVALID_GENE_PRODUCT_ID = {"99999", "&12345"};
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
     private static final String[] INVALID_GENE_PRODUCT_ID = {"99999", "&12345"};
     private static final String[] VALID_GENE_PRODUCT_SUBSET =
@@ -245,11 +249,7 @@ public class AnnotationRequestValidationIT {
     public void geneProductIDValidationIsCaseSensitive() {
         String geneProductIdValues = (gimmeCSV(VALID_GENE_PRODUCT_ID)).toLowerCase();
         annotationRequest.setGpId(geneProductIdValues);
-        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
-        assertThat(violations, hasSize(1));
-        assertThat(violations.iterator().next().getMessage(),
-                is("At least one 'Gene Product ID' value is invalid: " +
-                        (Arrays.stream(VALID_GENE_PRODUCT_ID).collect(Collectors.joining(", "))).toLowerCase()));
+        assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
@@ -366,6 +366,36 @@ public class AnnotationRequestValidationIT {
         );
     }
 
+    //GENE PRODUCT TYPE PARAMETER
+    @Test
+    public void validGeneProductTypeValuesDontCauseAnError() {
+        String validIds = "complex,rna,protein";
+        annotationRequest.setGpType(validIds);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void setGpTypeNotCaseSensitive() {
+        String validIds = "comPlex,rnA,pRotein";
+        annotationRequest.setGpType(validIds);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void invalidGeneProductTypesCauseError() {
+        String[] invalidGeneProductTypes = {"xxx", "000", "..."};
+
+        Arrays.stream(invalidGeneProductTypes).forEach(
+                invalidValue -> {
+                    annotationRequest.setGpType(invalidValue);
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    assertThat(violations, hasSize(is(1)));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'Gene Product Type' value is invalid: " + invalidValue));
+                }
+        );
+    }
+
     //GENE PRODUCT SUBSET PARAMETER
 
     @Test
@@ -450,8 +480,79 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
+    // descendant parameters
+    @Test
+    public void usageValueIsValid() {
+        String usage = "exact";
+
+        annotationRequest.setUsage(usage);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void usageValueIsInvalid() {
+        String usage = "thisDoesNotExistAsAValidUsage";
+
+        annotationRequest.setUsage(usage);
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void usageIdIsValid() {
+        String usageIds = "GO:0000001";
+
+        annotationRequest.setUsageIds(usageIds);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void usageIdsAreValid() {
+        String usageIds = "GO:0000001,GO:0000002";
+
+        annotationRequest.setUsageIds(usageIds);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void usageIdsAreInvalid() {
+        String usageIds = "GO:000000abc";
+
+        annotationRequest.setUsageIds(usageIds);
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void usageRelationshipIsValid() {
+        String usageRelationships = "is_a";
+
+        annotationRequest.setUsageRelationships(usageRelationships);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void usageRelationshipIsInvalid() {
+        String usageRelationships = "thisDoesNotExist";
+
+        annotationRequest.setUsageRelationships(usageRelationships);
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test(expected = ParameterException.class)
+    public void cannotCreateFilterWithUsageAndNoUsageIds() {
+        annotationRequest.setUsage("descendants");
+
+        annotationRequest.createFilterRequests();
+    }
+
     private void printConstraintViolations(Set<ConstraintViolation<AnnotationRequest>> violations) {
-        violations.stream().forEach(System.out::println);
+        violations.forEach(System.out::println);
     }
 
     private String gimmeCSV(String... values) {

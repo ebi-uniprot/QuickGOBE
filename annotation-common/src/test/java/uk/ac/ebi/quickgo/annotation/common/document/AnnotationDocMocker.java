@@ -50,7 +50,7 @@ public class AnnotationDocMocker {
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;
         doc.dbObjectSymbol = OBJECT_SYMBOL;
-        doc.dbObjectType = OBJECT_TYPE;
+        doc.geneProductType = OBJECT_TYPE;
         doc.dbSubset = SUB_SET;
         doc.taxonId = TAXON_ID;
 

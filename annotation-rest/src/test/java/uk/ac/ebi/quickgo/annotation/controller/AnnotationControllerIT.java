@@ -59,8 +59,9 @@ public class AnnotationControllerIT {
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxon";
-    private static final String WITHFROM_PARAM = "withFrom";
     private static final String GO_ID_PARAM = "goId";
+    private static final String WITHFROM_PARAM = "withFrom";
+    private static final String GENE_PRODUCT_TYPE_PARAM = "gpType";
     private static final String GP_SUBSET_PARAM = "gpSubset";
 
 
@@ -245,7 +246,8 @@ public class AnnotationControllerIT {
                         .param(TAXON_ID_PARAM, String.valueOf(taxonId1))
                         .param(TAXON_ID_PARAM, String.valueOf(taxonId2)));
 
-        response.andExpect(status().isOk())
+        response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
@@ -893,6 +895,87 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
+    //----- Tests for GeneProductType ---------------------//
+
+    @Test
+    public void filterByGeneProductTypeReturnsMatchingDocuments() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM,
+                "protein"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterBySingleGeneProductTypeOfRnaReturnsMatchingDocument() throws Exception {
+
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.geneProductType = "rna";
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM, "RNA"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
+
+    @Test
+    public void filterAnnotationsByTwoGeneProductTypesAsOneParameterReturnsMatchingDocuments() throws Exception {
+
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.geneProductType = "complex";
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM,
+                "protein,complex"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(4))
+                .andExpect(fieldsInAllResultsExist(4));
+    }
+
+    @Test
+    public void filterAnnotationsByTwoGeneProductTypesAsTwoParametersReturnsMatchingDocuments() throws Exception {
+
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.geneProductType = "complex";
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM,
+                "protein").param(GENE_PRODUCT_TYPE_PARAM, "complex"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(4))
+                .andExpect(fieldsInAllResultsExist(4));
+    }
+
+    @Test
+    public void filterByNonExistentGeneProductTypeReturnsNothing() throws Exception {
+
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.geneProductType = "complex";
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM, "rna"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    //----- Create Test Data ---------------------//
     //----- Gene Product Subset ---------------------//
 
     @Test

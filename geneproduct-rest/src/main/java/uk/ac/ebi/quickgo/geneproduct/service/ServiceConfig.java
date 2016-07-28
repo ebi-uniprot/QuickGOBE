@@ -41,6 +41,11 @@ public class ServiceConfig {
     @Value("${geneproduct.db.xref.valid.regexes}")
     private String xrefValidationRegexFile;
 
+    private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
+
+    @Value("${geneproduct.db.xref.valid.casesensitive:"+DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE+"}")
+    boolean xrefValidationCaseSensitive;
+
     @Bean
     public GeneProductService goGeneProductService(GeneProductRepository geneProductRepository) {
         return new GeneProductServiceImpl(
@@ -73,7 +78,7 @@ public class ServiceConfig {
     }
 
     private DbXRefLoader geneProductLoader() {
-        return new DbXRefLoader(this.xrefValidationRegexFile);
+        return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
 
 }
