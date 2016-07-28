@@ -33,13 +33,10 @@ public class AnnotationRequestValidationIT {
 
     private static final String[] VALID_GO_EVIDENCE = {"IEA,IBD,IC"};
     private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
-
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
     private static final String[] INVALID_GENE_PRODUCT_ID = {"99999", "&12345"};
-    private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
-    private static final String[] INVALID_GENE_PRODUCT_ID = {"99999", "&12345"};
-    private static final String[] VALID_GENE_PRODUCT_SUBSET =
-            {"BHF-UCL", "Exosome", "KRUK", "ParkinsonsUK-UCL", "ReferenceGenome"};
+    private static final String[] VALID_GENE_PRODUCT_SUBSET ={"BHF-UCL", "Exosome", "KRUK", "ParkinsonsUK-UCL",
+            "ReferenceGenome"};
 
     @Autowired
     private Validator validator;
@@ -61,7 +58,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void allAssignedByValuesAreValid() {
-        String assignedByValues = gimmeCSV(VALID_ASSIGNED_BY_PARMS);
+        String assignedByValues = toCSV(VALID_ASSIGNED_BY_PARMS);
         annotationRequest.setAssignedBy(assignedByValues);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -240,21 +237,21 @@ public class AnnotationRequestValidationIT {
     //GENE PRODUCT ID
     @Test
     public void allGeneProductValuesAreValid() {
-        String geneProductIdValues = gimmeCSV(VALID_GENE_PRODUCT_ID);
+        String geneProductIdValues = toCSV(VALID_GENE_PRODUCT_ID);
         annotationRequest.setGpId(geneProductIdValues);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void geneProductIDValidationIsCaseSensitive() {
-        String geneProductIdValues = (gimmeCSV(VALID_GENE_PRODUCT_ID)).toLowerCase();
+        String geneProductIdValues = (toCSV(VALID_GENE_PRODUCT_ID)).toLowerCase();
         annotationRequest.setGpId(geneProductIdValues);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void allGeneProductValuesAreInvalid() {
-        String geneProductIdValues = gimmeCSV(INVALID_GENE_PRODUCT_ID);
+        String geneProductIdValues = toCSV(INVALID_GENE_PRODUCT_ID);
         annotationRequest.setGpId(geneProductIdValues);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(1));
@@ -400,7 +397,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void setGpSubsetSuccessfully() {
-        String geneProductSubsetValues = gimmeCSV(VALID_GENE_PRODUCT_SUBSET);
+        String geneProductSubsetValues = toCSV(VALID_GENE_PRODUCT_SUBSET);
         annotationRequest.setGpSubset(geneProductSubsetValues);
         assertThat(validator.validate(annotationRequest),hasSize(0));
     }
@@ -555,7 +552,7 @@ public class AnnotationRequestValidationIT {
         violations.forEach(System.out::println);
     }
 
-    private String gimmeCSV(String... values) {
+    private String toCSV(String... values) {
         return Arrays.stream(values).collect(Collectors.joining(","));
     }
 }
