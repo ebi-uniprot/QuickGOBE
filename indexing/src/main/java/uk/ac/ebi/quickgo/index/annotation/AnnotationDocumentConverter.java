@@ -81,19 +81,15 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
     }
 
     private List<String> constructExtensions(Annotation annotation) {
-        return createNullableListFromPipeSeparatedValue(annotation.annotationExtension);
+        return createNullableListFromDelimitedValues(annotation.annotationExtension, PIPE);
     }
 
     private List<String> constructWithFrom(Annotation annotation) {
-        return createNullableListFromPipeSeparatedValue(annotation.with);
+        return createNullableListFromDelimitedValues(annotation.with, PIPE);
     }
 
-    private List<String> createNullableListFromPipeSeparatedValue(String value) {
-        return value == null ? null : Arrays.asList(value.split(PIPE));
-    }
-
-    private List<String> createNullableListFromCommaSeparatedValue(String value) {
-        return value == null ? null : Arrays.asList(splitValue(value, COMMA));
+    private List<String> createNullableListFromDelimitedValues(String value, String delimiter) {
+        return value == null ? null : Arrays.asList(splitValue(value, delimiter));
     }
 
     private String constructGeneProductId(Annotation annotation) {
@@ -101,6 +97,6 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
     }
 
     private List<String> constructTargetSets(String value) {
-        return createNullableListFromCommaSeparatedValue(value);
+        return createNullableListFromDelimitedValues(value, COMMA);
     }
 }
