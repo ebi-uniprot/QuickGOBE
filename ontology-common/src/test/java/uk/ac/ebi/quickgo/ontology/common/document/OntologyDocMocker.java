@@ -63,6 +63,13 @@ public final class OntologyDocMocker {
                 .addField(newFlatFieldLeaf("http://wiki.geneontology.org/index.php/Signaling"))
                 .buildString());
 
+        od.credits = new ArrayList<>();
+        od.credits.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("BHF"))
+                .addField(newFlatFieldLeaf("http://www.ucl.ac.uk/cardiovasculargeneontology/"))
+                .buildString());
+
+
         return od;
     }
 
