@@ -22,7 +22,7 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
  * <p>
  * @author Ricardo Antunes
  */
-public class GoDiscussionConverter implements FieldConverter<GOTerm.GoDiscussion> {
+class GoDiscussionConverter implements FieldConverter<GOTerm.GoDiscussion> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoDiscussionConverter.class);
     private static final int FIELD_COUNT = 2;
 
