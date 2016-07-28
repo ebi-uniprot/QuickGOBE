@@ -13,8 +13,8 @@ import java.util.Set;
  * <p/>
  * An instance of an aggregate could have one or several of the following:
  * <ul>
- *     <li>The name of the aggregate. If the aggregate is based on a name, then the name is name of the name. If
- *     the aggregate is based on whatever the query result is then the could be anything.</li>
+ *     <li>A name: If the aggregate is based on a field, then name is the field's name. If the aggregate is based on a
+ *     query result then the name could be anything.</li>
  *     <li>A set of {@link AggregateFunctionRequest}s: An AggregateFunctionRequest represents a call to an {@link AggregateFunction} on a
  *     particular name. This name could be the aggregate name, or any other
  *     name that can be calculated within table/collection used by the data-source, example: sum(field1) or unique
