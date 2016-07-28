@@ -12,10 +12,7 @@ import java.util.regex.Matcher;
 import org.springframework.batch.item.ItemProcessor;
 
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.COLON;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.EQUALS;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.PIPE;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*;
 
 /**
  * Converts an {@link Annotation} object into an {@link AnnotationDocument} object.
@@ -58,6 +55,7 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
         doc.dbObjectSymbol = propertiesMap.get(DB_OBJECT_SYMBOL);
         doc.geneProductType = propertiesMap.get(DB_OBJECT_TYPE);
         doc.taxonId = extractTaxonId(propertiesMap.get(TAXON_ID));
+        doc.targetSets = constructTargetSets(propertiesMap.get(TARGET_SET));
 
         return doc;
     }
@@ -83,18 +81,22 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
     }
 
     private List<String> constructExtensions(Annotation annotation) {
-        return createNullableListFromPipeSeparatedValue(annotation.annotationExtension);
+        return createNullableListFromDelimitedValues(annotation.annotationExtension, PIPE);
     }
 
     private List<String> constructWithFrom(Annotation annotation) {
-        return createNullableListFromPipeSeparatedValue(annotation.with);
+        return createNullableListFromDelimitedValues(annotation.with, PIPE);
     }
 
-    private List<String> createNullableListFromPipeSeparatedValue(String value) {
-        return value == null ? null : Arrays.asList(value.split(PIPE));
+    private List<String> createNullableListFromDelimitedValues(String value, String delimiter) {
+        return value == null ? null : Arrays.asList(splitValue(value, delimiter));
     }
 
     private String constructGeneProductId(Annotation annotation) {
         return annotation.db + COLON + annotation.dbObjectId;
+    }
+
+    private List<String> constructTargetSets(String value) {
+        return createNullableListFromDelimitedValues(value, COMMA);
     }
 }
