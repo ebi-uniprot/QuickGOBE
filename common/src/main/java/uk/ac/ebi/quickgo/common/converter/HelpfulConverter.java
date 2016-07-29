@@ -1,7 +1,9 @@
 package uk.ac.ebi.quickgo.common.converter;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A useful class for converting stuff.
@@ -20,6 +22,14 @@ public class HelpfulConverter {
      */
 
     public static String toCSV(String... values) {
-        return Arrays.stream(values).collect(Collectors.joining(","));
+        return toCSV(Arrays.stream(values));
+    }
+
+    public static String toCSV(List<String> values) {
+        return toCSV(values.stream());
+    }
+
+    public static String toCSV(Stream<String> stream){
+        return stream.collect(Collectors.joining(","));
     }
 }
