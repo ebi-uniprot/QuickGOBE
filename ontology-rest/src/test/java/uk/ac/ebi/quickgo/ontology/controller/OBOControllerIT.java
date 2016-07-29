@@ -93,8 +93,8 @@ public abstract class OBOControllerIT {
         assertThat(basicDocs.size(), is(greaterThan(1)));
 
         validId = basicDocs.get(0).id;
-        validIdsCSV = basicDocs.stream().map(doc -> doc.id).collect(Collectors.joining(","));
-        validIdList = Arrays.asList(validIdsCSV.split(COMMA));
+        validIdList =  basicDocs.stream().map(doc -> doc.id).collect(Collectors.toList());
+        validIdsCSV = toCSV(validIdList);
 
         ontologyRepository.deleteAll();
         ontologyRepository.save(basicDocs);
