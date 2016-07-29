@@ -310,7 +310,7 @@ public class AnnotationControllerRESTIT {
         List<String> args = new ArrayList<>();
         for (int i = 0; i < requiredArgsCount; i++) {
             if (i < arguments.length) {
-                args.add(arguments[i].toLowerCase());
+                args.add(arguments[i]);
             } else {
                 args.add("");
             }

@@ -15,16 +15,21 @@ public class GODocConverter extends AbstractODocConverter<GOTerm> {
     private final static BlackListFieldConverter BLACKLIST_FIELD_CONVERTER =
             new BlackListFieldConverter();
 
+    private final static GoDiscussionConverter GO_DISCUSSION_CONVERTER =
+            new GoDiscussionConverter();
+
     @Override public GOTerm convert(OntologyDocument ontologyDocument) {
         GOTerm goTerm = new GOTerm();
         addCommonFields(ontologyDocument, goTerm);
         goTerm.aspect = ontologyDocument.aspect != null ?
                 Aspect.fromShortName(ontologyDocument.aspect) : null;
         goTerm.usage = ontologyDocument.usage != null ?
-                GOTerm.Usage.fromFullName(ontologyDocument.usage): null;
+                GOTerm.Usage.fromFullName(ontologyDocument.usage) : null;
         goTerm.subsets = ontologyDocument.subsets;
 
         goTerm.blacklist = BLACKLIST_FIELD_CONVERTER.convertFieldList(ontologyDocument.blacklist);
+        goTerm.goDiscussions = GO_DISCUSSION_CONVERTER.convertFieldList(ontologyDocument.goDiscussions);
+
         return goTerm;
     }
 }

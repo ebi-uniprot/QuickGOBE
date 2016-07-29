@@ -20,6 +20,8 @@ public class AnnotationParsingHelper {
     static final String DB_OBJECT_SUBSET = "db_subset";
     static final String DB_OBJECT_SYMBOL = "db_object_symbol";
     static final String DB_OBJECT_TYPE = "db_object_type";
+    static final String TARGET_SET = "target_set";
+
 
     // string regex representations
     private static final String DB_COLON_REF_FORMAT = "[A-Za-z0-9_\\.-]+(:[A-Za-z0-9_\\.-]+){1,}";

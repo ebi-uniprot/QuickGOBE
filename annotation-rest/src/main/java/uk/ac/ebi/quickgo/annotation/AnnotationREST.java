@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.annotation;
 
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.controller.CORSFilter;
+import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,7 +23,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @SpringBootApplication(exclude = {SolrRepositoriesAutoConfiguration.class})
 @ComponentScan({"uk.ac.ebi.quickgo.annotation.controller", "uk.ac.ebi.quickgo.rest"})
-@Import({SearchServiceConfig.class})
+@Import({SearchServiceConfig.class, SwaggerConfig.class, CORSFilter.class})
 public class AnnotationREST {
 
     /**

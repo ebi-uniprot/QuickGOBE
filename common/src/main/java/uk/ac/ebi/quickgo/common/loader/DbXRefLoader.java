@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.common.validator.DbXRefEntity;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
@@ -33,12 +32,15 @@ public class DbXRefLoader {
     private static final String COL_DELIMITER = "\t";
     private final Logger logger = LoggerFactory.getLogger(DbXRefLoader.class);
     private final String path;
+    private final boolean caseSensitive;
 
+    public DbXRefLoader(String path, boolean caseSensitive) {
     private static final boolean POSTGRES = true;
     protected boolean compress = true;
 
     public DbXRefLoader(String path) {
         this.path = path;
+        this.caseSensitive = caseSensitive;
     }
 
     /**
@@ -62,8 +64,8 @@ public class DbXRefLoader {
                     .skip(1)    //header
                     .map(line -> line.split(COL_DELIMITER))
                     .map(fields -> new DbXRefEntity(fields[COL_DATABASE], fields[COL_ENTITY_TYPE],
-                            fields[COL_ENTITY_TYPE_NAME], directRead(fields[COL_LOCAL_ID_SYNTAX]),
-                            fields[COL_URL_SYNTAX]))
+                            fields[COL_ENTITY_TYPE_NAME], fields[COL_LOCAL_ID_SYNTAX], fields[COL_URL_SYNTAX],
+                            caseSensitive))
                     .collect(toList());
 
         } catch (Exception e) {

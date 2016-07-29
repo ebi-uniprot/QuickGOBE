@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -62,4 +63,8 @@ public class GODocConverterTest {
         assertThat(term.name, is(nullValue()));
     }
 
+    @Test
+    public void convertsGoDiscussionsWithoutError() throws Exception {
+        assertThat(goTerm.goDiscussions, hasSize(2));
+    }
 }
