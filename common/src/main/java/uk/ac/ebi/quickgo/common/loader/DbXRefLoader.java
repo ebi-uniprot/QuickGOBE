@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.common.validator.DbXRefEntity;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
@@ -33,12 +34,11 @@ public class DbXRefLoader {
     private final Logger logger = LoggerFactory.getLogger(DbXRefLoader.class);
     private final String path;
     private final boolean caseSensitive;
-
-    public DbXRefLoader(String path, boolean caseSensitive) {
     private static final boolean POSTGRES = true;
     protected boolean compress = true;
 
-    public DbXRefLoader(String path) {
+    public DbXRefLoader(String path, boolean caseSensitive) {
+
         this.path = path;
         this.caseSensitive = caseSensitive;
     }
@@ -52,6 +52,8 @@ public class DbXRefLoader {
      *
      * If the file cannot be loaded supply the client with an empty list, as we will continue without
      * validation, rather than end the process.
+     *
+     * Use directRead(fields[COL_LOCAL_ID_SYNTAX])?
      * @return a list of GeneProductDbXRefIDFormat instances that hold the validation regular expressions.
      */
     public List<DbXRefEntity> load() {
