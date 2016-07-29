@@ -77,7 +77,8 @@ public class GOTermToODocConverterTest {
         GenericTerm childTermMock = mock(GenericTerm.class);
         when(childTermMock.getId()).thenReturn("child1");
 
-        TermRelation childRel = new TermRelation(childTermMock, term, RelationType.ISA);
+        RelationType parentChildRelationType = RelationType.ISA;
+        TermRelation childRel = new TermRelation(childTermMock, term, parentChildRelationType);
         List<TermRelation> children = Collections.singletonList(childRel);
 
         when(term.getChildren()).thenReturn(children);
@@ -86,7 +87,8 @@ public class GOTermToODocConverterTest {
         List<String> extractedChildren = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.children);
 
         assertThat(extractedChildren, hasSize(1));
-        assertThat(extractedChildren.get(0).contains("child1"), is(true));
+        assertThat(extractedChildren,
+                hasItems(containsString("child1"), containsString(parentChildRelationType.getFormalCode())));
     }
 
     @Test
