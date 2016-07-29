@@ -70,9 +70,6 @@ public class AnnotationControllerIT {
     private static final String ECO_ID2 = "ECO:0000323";
     private static final String NOTEXISTS_ECO_ID3 = "ECO:0000888";
 
-    //Configuration
-    private static final int NUMBER_OF_GENERIC_DOCS = 3;
-
     private MockMvc mockMvc;
     private List<AnnotationDocument> genericDocs;
     @Autowired
@@ -88,8 +85,8 @@ public class AnnotationControllerIT {
         mockMvc = MockMvcBuilders.
                 webAppContextSetup(webApplicationContext)
                 .build();
-
-        genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
+        final int numberOfGenericDocs = 3;
+        genericDocs = createGenericDocs(numberOfGenericDocs);
         repository.save(genericDocs);
     }
 
@@ -267,11 +264,10 @@ public class AnnotationControllerIT {
         String goEvidenceCode = "IEA";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, goEvidenceCode));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
                 .andExpect(atLeastOneResultHasItem(GO_EVIDENCE_FIELD, goEvidenceCode));
     }
 
@@ -283,8 +279,8 @@ public class AnnotationControllerIT {
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
                 .andExpect(atLeastOneResultHasItem(GO_EVIDENCE_FIELD, goEvidenceCode.toUpperCase()));
     }
 
@@ -314,14 +310,13 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM, "IEA,BSS,AWE,PEG"));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
+                .andExpect(totalNumOfResults(5))
+                .andExpect(fieldsInAllResultsExist(5))
                 .andExpect(itemExistsExpectedTimes(GO_EVIDENCE_FIELD, goEvidenceCode1, 1))
                 .andExpect(itemExistsExpectedTimes(GO_EVIDENCE_FIELD, goEvidenceCode2, 1))
-                .andExpect(itemExistsExpectedTimes(GO_EVIDENCE_FIELD, goEvidenceCode, NUMBER_OF_GENERIC_DOCS));
+                .andExpect(itemExistsExpectedTimes(GO_EVIDENCE_FIELD, goEvidenceCode, 3));
     }
 
     @Test
@@ -341,12 +336,11 @@ public class AnnotationControllerIT {
         String qualifier = "enables";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM, qualifier));
-
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
                 .andExpect(valueOccurInField(QUALIFIER, qualifier));
 
     }
@@ -396,11 +390,10 @@ public class AnnotationControllerIT {
         sj.add(uniprotGp).add(intactGp).add(rnaGp);
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GP_PARAM, sj.toString()));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, uniprotGp, 1))
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, intactGp, 1))
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, rnaGp, 1));
@@ -418,11 +411,10 @@ public class AnnotationControllerIT {
         sj.add(uniprotGp).add(intactGp).add(rnaGp);
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GP_PARAM, sj.toString()));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, uniprotGp, 1))
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, intactGp, 1))
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, rnaGp, 1));
@@ -492,26 +484,24 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_ID_PARAM, AnnotationDocMocker.GO_ID));
-
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(GO_ID, AnnotationDocMocker.GO_ID, NUMBER_OF_GENERIC_DOCS));
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
+                .andExpect(itemExistsExpectedTimes(GO_ID, AnnotationDocMocker.GO_ID, 3));
     }
 
     @Test
     public void successfullyLookupAnnotationsByGoIdCaseInsensitive() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_ID_PARAM, AnnotationDocMocker.GO_ID.toLowerCase()));
-
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(GO_ID, AnnotationDocMocker.GO_ID, NUMBER_OF_GENERIC_DOCS));
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
+                .andExpect(itemExistsExpectedTimes(GO_ID, AnnotationDocMocker.GO_ID, 3));
     }
 
     @Test
@@ -541,11 +531,10 @@ public class AnnotationControllerIT {
     public void filterAnnotationsUsingSingleEcoIdReturnsResults() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
                 .andExpect(atLeastOneResultHasItem(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID));
     }
 
@@ -559,12 +548,11 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID + ","
                         + doc.ecoId + "," + NOTEXISTS_ECO_ID3));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
+                .andExpect(totalNumOfResults(4))
                 .andExpect(fieldsInAllResultsExist(4))
-                .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID, 3))
                 .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, doc.ecoId, 1))
                 .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, NOTEXISTS_ECO_ID3, 0));
     }
@@ -579,12 +567,11 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID)
                         .param(ECO_ID_PARAM, doc.ecoId).param(ECO_ID_PARAM, NOTEXISTS_ECO_ID3));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(4))
+                .andExpect(fieldsInAllResultsExist(4))
+                .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID, 3))
                 .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, doc.ecoId, 1))
                 .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, NOTEXISTS_ECO_ID3, 0));
     }
@@ -629,14 +616,13 @@ public class AnnotationControllerIT {
     public void pageRequestEqualToAvailablePagesReturns200() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(PAGE_PARAM, "1"));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
                 .andExpect(
                         pageInfoMatches(
                                 1,
-                                totalPages(NUMBER_OF_GENERIC_DOCS, DEFAULT_ENTRIES_PER_PAGE),
+                                totalPages(3, DEFAULT_ENTRIES_PER_PAGE),
                                 DEFAULT_ENTRIES_PER_PAGE)
                 );
     }
@@ -671,11 +657,10 @@ public class AnnotationControllerIT {
     public void successfulLookupWithFromForSingleId() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro:IPR015421"));
-
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
                 .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"));
 
     }
@@ -684,10 +669,9 @@ public class AnnotationControllerIT {
     public void successfulLookupWithFromForMultipleValues() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM,
                 "InterPro:IPR015421,InterPro:IPR015422"));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
                 .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"))
                 .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015422"));
 
@@ -705,11 +689,10 @@ public class AnnotationControllerIT {
     @Test
     public void successfulLookupWithFromUsingDatabaseNameOnly() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "InterPro"));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
                 .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"))
                 .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015422"));
     }
@@ -717,11 +700,10 @@ public class AnnotationControllerIT {
     @Test
     public void successfulLookupWithFromUsingDatabaseIdOnly() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM, "IPR015421"));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
                 .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"));
     }
 
@@ -741,9 +723,8 @@ public class AnnotationControllerIT {
     public void limitForPageWithinMaximumAllowed() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(LIMIT_PARAM, "100"));
-
         response.andExpect(status().isOk())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(3))
                 .andExpect(pageInfoMatches(1, 1, 100));
     }
 
@@ -777,13 +758,12 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
                 AnnotationDocMocker.REFERENCE));
-
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS));
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, 3));
     }
 
     @Test
@@ -815,12 +795,11 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
                 AnnotationDocMocker.REFERENCE + "," + docA.reference + "," + docB.reference));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(5))
+                .andExpect(fieldsInAllResultsExist(5))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, 3))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docB.reference, 1));
     }
@@ -838,12 +817,11 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM,
                 AnnotationDocMocker.REFERENCE).param(REF_PARAM, docA.reference).param(REF_PARAM, docB.reference));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(5))
+                .andExpect(fieldsInAllResultsExist(5))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, 3))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docB.reference, 1));
     }
@@ -852,14 +830,13 @@ public class AnnotationControllerIT {
     public void filterByReferenceDbOnlyReturnsDocumentsWithReferencesThatStartWithThatDb() throws Exception {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "GO_REF"));
-
         //This one shouldn't be found
         AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
         docA.reference = "PMID:0000002";
         repository.save(docA);
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS));
+                .andExpect(totalNumOfResults(3));
     }
 
     @Test
@@ -875,13 +852,12 @@ public class AnnotationControllerIT {
         AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
         docA.reference = "PMID:0000002";
         repository.save(docA);
-
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "0000002"));
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(4))
+                .andExpect(fieldsInAllResultsExist(4))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, 3))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1));
     }
 
@@ -897,12 +873,11 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM, "0000002")
                 .param(REF_PARAM, "0000003"));
-
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(totalNumOfResults(5))
+                .andExpect(fieldsInAllResultsExist(5))
+                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, 3))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE, docB.reference, 1));
     }
@@ -924,12 +899,11 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM,
                 "protein"));
-
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3));
     }
 
     @Test
