@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
 
 /**
@@ -434,7 +435,7 @@ public abstract class OBOControllerIT {
         String secondBottom = relationships.get(1).child;
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURLWithSubResource(asCSV(bottom, secondBottom), ANCESTORS_SUB_RESOURCE)));
+                get(buildTermsURLWithSubResource(toCSV(bottom, secondBottom), ANCESTORS_SUB_RESOURCE)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(2))
@@ -500,7 +501,7 @@ public abstract class OBOControllerIT {
         createAndSaveDocs(relCount + 1);
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURLWithSubResource(asCSV(top, secondTop), DESCENDANTS_SUB_RESOURCE)));
+                get(buildTermsURLWithSubResource(toCSV(top, secondTop), DESCENDANTS_SUB_RESOURCE)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(2))
@@ -564,7 +565,7 @@ public abstract class OBOControllerIT {
         String highest = relationships.get(relationships.size() - 1).parent;
 
         ResultActions response = mockMvc.perform(
-                get(buildPathsURL(asCSV(bottom, secondBottom), highest)));
+                get(buildPathsURL(toCSV(bottom, secondBottom), highest)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(2))
@@ -579,7 +580,7 @@ public abstract class OBOControllerIT {
         String secondTop = relationships.get(relationships.size() - 2).parent;
 
         ResultActions response = mockMvc.perform(
-                get(buildPathsURL(bottom, asCSV(top, secondTop))));
+                get(buildPathsURL(bottom, toCSV(top, secondTop))));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(2))
@@ -756,10 +757,6 @@ public abstract class OBOControllerIT {
         }
 
         return result;
-    }
-
-    static String asCSV(String... values) {
-        return Arrays.stream(values).collect(Collectors.joining(","));
     }
 
     private void setupSimpleRelationshipChain() {
