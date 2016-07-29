@@ -30,7 +30,7 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
     private final static XRefsFieldConverter XREFS_FIELD_CONVERTER =
             new XRefsFieldConverter();
     private final static DefinitionConverter DEFINITION_CONVERTER = new DefinitionConverter();
-    private final static ReplaceConverter REPLACES_CONVERTER = new ReplaceConverter();
+    private final static RelationConverter RELATION_FIELD_CONVERTER = new RelationConverter();
     private final static CreditsFieldConverter CREDITS_FIELD_CONVERTER = new CreditsFieldConverter();
 
     public abstract T convert(OntologyDocument ontologyDocument);
@@ -40,7 +40,6 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
         term.name = ontologyDocument.name;
         term.isObsolete = ontologyDocument.isObsolete;
         term.comment = ontologyDocument.comment;
-        term.children = ontologyDocument.children;
         term.secondaryIds = ontologyDocument.secondaryIds;
         term.subsets = ontologyDocument.subsets;
         term.definition = DEFINITION_CONVERTER.apply(ontologyDocument);
@@ -50,8 +49,10 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
         term.taxonConstraints = TAXON_CONSTRAINTS_FIELD_CONVERTER.convertFieldList(ontologyDocument.taxonConstraints);
         term.xRelations = XORELATIONS_FIELD_CONVERTER.convertFieldList(ontologyDocument.xRelations);
         term.annotationGuidelines = AG_FIELD_CONVERTER.convertFieldList(ontologyDocument.annotationGuidelines);
-        term.replaces = REPLACES_CONVERTER.convertFieldList(ontologyDocument.replaces);
-        term.replacements = REPLACES_CONVERTER.convertFieldList(ontologyDocument.replacements);
         term.credits = CREDITS_FIELD_CONVERTER.convertFieldList(ontologyDocument.credits);
+
+        term.children = RELATION_FIELD_CONVERTER.convertFieldList(ontologyDocument.children);
+        term.replaces = RELATION_FIELD_CONVERTER.convertFieldList(ontologyDocument.replaces);
+        term.replacements = RELATION_FIELD_CONVERTER.convertFieldList(ontologyDocument.replacements);
     }
 }
