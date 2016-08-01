@@ -45,11 +45,27 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
 
             doc.replaces = extractReplaces(term);
             doc.replacements = extractReplacements(term);
+            doc.credits = extractCredits(term);
 
             return Optional.of(doc);
         } else {
             return Optional.empty();
         }
+    }
+
+    private List<String> extractCredits(GenericTerm term) {
+        List<String> extractedCredits = null;
+
+        if (!isEmpty(term.getCredits())) {
+            extractedCredits = term.getCredits().stream()
+                    .map(credit -> FlatFieldBuilder.newFlatField()
+                            .addField(FlatFieldLeaf.newFlatFieldLeaf(credit.getCode()))
+                            .addField(FlatFieldLeaf.newFlatFieldLeaf(credit.getUrl()))
+                            .buildString())
+                    .collect(Collectors.toList());
+        }
+
+        return extractedCredits;
     }
 
     protected List<String> extractDefinitionXrefs(GenericTerm term) {

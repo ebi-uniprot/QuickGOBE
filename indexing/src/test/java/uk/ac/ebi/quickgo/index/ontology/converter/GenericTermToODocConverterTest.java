@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.model.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.*;
+import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -298,5 +299,59 @@ public class GenericTermToODocConverterTest {
         List<String> xrefsText = converter.extractDefinitionXrefs(term);
 
         assertThat(xrefsText, hasSize(0));
+    }
+
+    //credits
+    @Test
+    public void extractsNoCreditElementsWhenCreditsInTermIsNull() throws Exception {
+        when(term.getCredits()).thenReturn(null);
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedCredits = extractFieldFromDocument(docOpt.get(), (OntologyDocument doc) -> doc.credits);
+
+        assertThat(extractedCredits, is(nullValue()));
+    }
+
+    @Test
+    public void extractsNoCreditElementsWhenCreditsInTermIsEmpty() throws Exception {
+        when(term.getCredits()).thenReturn(Collections.emptyList());
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedCredits = extractFieldFromDocument(docOpt.get(), (OntologyDocument doc) -> doc.credits);
+
+        assertThat(extractedCredits, is(nullValue()));
+    }
+
+    @Test
+    public void extracts1CreditElementWhenCreditsInTermHas1Element() throws Exception {
+        String code1 = "BHF";
+        String url1 = "http://www.ucl.ac.uk/cardiovasculargeneontology/";
+
+        TermCredit credit1 = new TermCredit(code1, url1);
+
+        String code2 = "BHF1";
+        String url2 = "http://www.ucl.ac.uk/cardiovasculargeneontology/1";
+
+        TermCredit credit2 = new TermCredit(code2, url2);
+
+        when(term.getCredits()).thenReturn(Arrays.asList(credit1, credit2));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedCredits = extractFieldFromDocument(docOpt.get(), (OntologyDocument doc) -> doc.credits);
+
+        assertThat(extractedCredits, hasSize(2));
+        assertThat(creditExists(credit1, extractedCredits), is(true));
+        assertThat(creditExists(credit2, extractedCredits), is(true));
+    }
+
+    private boolean creditExists(TermCredit credit, Collection<String> extractedCredits) {
+        return extractedCredits.stream()
+                .filter(extractedCredit -> extractedCredit.contains(credit.getCode())
+                        && extractedCredit.contains(credit.getUrl()))
+                .findFirst().isPresent();
+    }
+
+    private <T> T extractFieldFromDocument(OntologyDocument doc, Function<OntologyDocument, T> extractor) {
+        return extractor.apply(doc);
     }
 }

@@ -15,8 +15,8 @@ public class GODocConverter extends AbstractODocConverter<GOTerm> {
     private final static BlackListFieldConverter BLACKLIST_FIELD_CONVERTER =
             new BlackListFieldConverter();
 
-    private final static GoDiscussionConverter GO_DISCUSSION_CONVERTER =
-            new GoDiscussionConverter();
+    private final static GODiscussionConverter GO_DISCUSSION_CONVERTER =
+            new GODiscussionConverter();
 
     @Override public GOTerm convert(OntologyDocument ontologyDocument) {
         GOTerm goTerm = new GOTerm();

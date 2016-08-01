@@ -213,6 +213,12 @@ public final class OntologyDocMocker {
         od.replacements.add(createFlatRelation("GO:0000003", "consider"));
         od.replacements.add(createFlatRelation("GO:0000004", "consider"));
 
+        od.credits = new ArrayList<>();
+        od.credits.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("BHF"))
+                .addField(newFlatFieldLeaf("http://www.ucl.ac.uk/cardiovasculargeneontology/"))
+                .buildString());
+
         return od;
     }
 

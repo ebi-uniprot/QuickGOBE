@@ -12,14 +12,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Tests the behaviour of the {@link GoDiscussionConverter} class.
+ * Tests the behaviour of the {@link GODiscussionConverter} class.
  */
-public class GoDiscussionConverterTest {
-    private GoDiscussionConverter converter;
+public class GODiscussionConverterTest {
+    private GODiscussionConverter converter;
 
     @Before
     public void setUp() throws Exception {
-        converter = new GoDiscussionConverter();
+        converter = new GODiscussionConverter();
     }
 
     @Test
@@ -29,21 +29,21 @@ public class GoDiscussionConverterTest {
 
         String goDiscussionText = createGoDiscussionText(title, url);
 
-        Optional<GOTerm.GoDiscussion> expectedGoDiscussionOpt = converter.apply(goDiscussionText);
+        Optional<GOTerm.GODiscussion> expectedGoDiscussionOpt = converter.apply(goDiscussionText);
 
         assertThat(expectedGoDiscussionOpt.isPresent(), is(true));
 
-        GOTerm.GoDiscussion expectedGoDiscussion = expectedGoDiscussionOpt.get();
+        GOTerm.GODiscussion expectedGODiscussion = expectedGoDiscussionOpt.get();
 
-        assertThat(expectedGoDiscussion.title, is(title));
-        assertThat(expectedGoDiscussion.url, is(url));
+        assertThat(expectedGODiscussion.title, is(title));
+        assertThat(expectedGODiscussion.url, is(url));
     }
 
     @Test
     public void returnsEmptyOptionalWhenTextBasedGoDiscussionHasWrongNumberOfFields() throws Exception {
         String wrongTextFormatGoDiscussion = "Wrong format";
 
-        Optional<GOTerm.GoDiscussion> expectedGoDiscussionOpt = converter.apply(wrongTextFormatGoDiscussion);
+        Optional<GOTerm.GODiscussion> expectedGoDiscussionOpt = converter.apply(wrongTextFormatGoDiscussion);
 
         assertThat(expectedGoDiscussionOpt.isPresent(), is(false));
     }
