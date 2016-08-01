@@ -46,10 +46,21 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
         }
     }
 
+    private List<String> extractChildren(GOTerm goTerm) {
+        if (!isEmpty(goTerm.getChildren())) {
+            return goTerm.getChildren().stream()
+                    .map(
+                            t -> t.getChild().getId())
+                    .collect(Collectors.toList());
+        } else {
+            return null;
+        }
+    }
+
     /*
      * format: description|url
      */
-    protected List<String> extractAnnGuidelines(GOTerm goTerm) {
+    private List<String> extractAnnGuidelines(GOTerm goTerm) {
         if (!isEmpty(goTerm.getGuidelines())) {
             return goTerm.getGuidelines().stream()
                     .map(
@@ -66,7 +77,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
     /*
      * format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2
      */
-    protected List<String> extractTaxonConstraints(GOTerm goTerm) {
+    private List<String> extractTaxonConstraints(GOTerm goTerm) {
         if (!isEmpty(goTerm.getTaxonConstraints())) {
             return goTerm.getTaxonConstraints().stream()
                     .map(t -> {
@@ -94,7 +105,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
     /*
      * format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|methodId
      */
-    protected List<String> extractBlacklist(GOTerm goTerm) {
+    private List<String> extractBlacklist(GOTerm goTerm) {
         if (!isEmpty(goTerm.getBlacklist())) {
             return goTerm.getBlacklist().stream()
                     .map(
@@ -115,7 +126,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
         }
     }
 
-    protected List<String> extractGoDiscussions(GOTerm goTerm) {
+    private List<String> extractGoDiscussions(GOTerm goTerm) {
         if (!isEmpty(goTerm.getPlannedChanges())) {
             return goTerm.getPlannedChanges().stream()
                     .map(change -> newFlatField()

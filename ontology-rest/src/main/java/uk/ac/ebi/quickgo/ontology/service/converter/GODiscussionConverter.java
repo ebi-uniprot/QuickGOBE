@@ -13,7 +13,7 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
 
 /**
  * Defines the conversion of a {@link String} representing GO discussion information, to a
- * corresponding {@link uk.ac.ebi.quickgo.ontology.model.GOTerm.GoDiscussion} instance.
+ * corresponding {@link GOTerm.GODiscussion} instance.
  * <p>
  * A {@link String} representation is of the form:
  * <ul>
@@ -22,17 +22,17 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
  * <p>
  * @author Ricardo Antunes
  */
-public class GoDiscussionConverter implements FieldConverter<GOTerm.GoDiscussion> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GoDiscussionConverter.class);
+class GODiscussionConverter implements FieldConverter<GOTerm.GODiscussion> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GODiscussionConverter.class);
     private static final int FIELD_COUNT = 2;
 
-    @Override public Optional<GOTerm.GoDiscussion> apply(String fieldStr) {
+    @Override public Optional<GOTerm.GODiscussion> apply(String fieldStr) {
         List<FlatField> fields = newFlatField().parse(fieldStr).getFields();
 
-        Optional<GOTerm.GoDiscussion> goDiscussionOpt;
+        Optional<GOTerm.GODiscussion> goDiscussionOpt;
 
         if (fields.size() == FIELD_COUNT) {
-            GOTerm.GoDiscussion discussion = new GOTerm.GoDiscussion();
+            GOTerm.GODiscussion discussion = new GOTerm.GODiscussion();
             discussion.title = cleanFieldValue(fields.get(0).buildString());
             discussion.url = cleanFieldValue(fields.get(1).buildString());
 

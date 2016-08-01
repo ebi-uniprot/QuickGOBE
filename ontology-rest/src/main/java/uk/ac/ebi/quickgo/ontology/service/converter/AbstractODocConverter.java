@@ -31,6 +31,7 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
             new XRefsFieldConverter();
     private final static DefinitionConverter DEFINITION_CONVERTER = new DefinitionConverter();
     private final static ReplaceConverter REPLACES_CONVERTER = new ReplaceConverter();
+    private final static CreditsFieldConverter CREDITS_FIELD_CONVERTER = new CreditsFieldConverter();
 
     public abstract T convert(OntologyDocument ontologyDocument);
 
@@ -50,5 +51,6 @@ abstract class AbstractODocConverter<T extends OBOTerm> implements OntologyDocCo
         term.annotationGuidelines = AG_FIELD_CONVERTER.convertFieldList(ontologyDocument.annotationGuidelines);
         term.replaces = REPLACES_CONVERTER.convertFieldList(ontologyDocument.replaces);
         term.replacements = REPLACES_CONVERTER.convertFieldList(ontologyDocument.replacements);
+        term.credits = CREDITS_FIELD_CONVERTER.convertFieldList(ontologyDocument.credits);
     }
 }
