@@ -87,7 +87,6 @@ public final class OntologyDocMocker {
         od.isObsolete = true;
         od.comment = "Note that protein targeting encompasses the transport of the protein to " +
                 "the specified location, and may also include additional steps such as protein processing.";
-        od.children = Arrays.asList("GO:0000011", "GO:0000012");
         od.synonymNames = Arrays.asList("creatine anabolism", "crayola testarossa");
         od.secondaryIds = Arrays.asList("GO:0000003", "GO:0000004");
         od.subsets = Arrays.asList("goslim_pombe",

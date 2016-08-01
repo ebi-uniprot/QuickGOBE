@@ -34,7 +34,6 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
             doc.annotationGuidelines = extractAnnGuidelines(term);
             doc.aspect = term.getAspect() == null ?
                     null : term.getAspect().text;
-            doc.children = extractChildren(term);
             doc.taxonConstraints = extractTaxonConstraints(term);
             doc.usage = term.getUsage() == null ?
                     null : term.getUsage().getText();
@@ -44,17 +43,6 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
             return Optional.of(doc);
         } else {
             return Optional.empty();
-        }
-    }
-
-    protected List<String> extractChildren(GOTerm goTerm) {
-        if (!isEmpty(goTerm.getChildren())) {
-            return goTerm.getChildren().stream()
-                    .map(
-                            t -> t.getChild().getId())
-                    .collect(Collectors.toList());
-        } else {
-            return null;
         }
     }
 

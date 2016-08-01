@@ -1,10 +1,5 @@
 package uk.ac.ebi.quickgo.index.ontology.converter;
 
-import uk.ac.ebi.quickgo.common.converter.FlatField;
-import uk.ac.ebi.quickgo.index.ontology.converter.GOTermToODocConverter;
-import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
-import uk.ac.ebi.quickgo.model.ontology.generic.RelationType;
-import uk.ac.ebi.quickgo.model.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTermBlacklist;
 import uk.ac.ebi.quickgo.model.ontology.go.TaxonConstraint;
@@ -63,30 +58,6 @@ public class GOTermToODocConverterTest {
     public void extractsAnnGuideLinesWhenNotExists() {
         when(term.getGuidelines()).thenReturn(null);
         assertThat(converter.extractAnnGuidelines(term), is(nullValue()));
-    }
-
-    // children
-    @Test
-    public void extractsChildrenWhenExists() {
-        GenericTerm childTermMock = mock(GenericTerm.class);
-        when(childTermMock.getId()).thenReturn("child1");
-
-        TermRelation childRel = new TermRelation(childTermMock, term, RelationType.ISA);
-        List<TermRelation> children = Collections.singletonList(childRel);
-
-        when(term.getChildren()).thenReturn(children);
-
-        List<String> childrenStrList = converter.extractChildren(term);
-        assertThat(childrenStrList, is(not(nullValue())));
-        assertThat(childrenStrList.size(), is(1));
-        assertThat(childrenStrList.get(0).contains("child1"), is(true));
-        System.out.println(childrenStrList.get(0));
-    }
-
-    @Test
-    public void extractsChildrenWhenNotExists() {
-        when(term.getChildren()).thenReturn(null);
-        assertThat(converter.extractChildren(term), is(nullValue()));
     }
 
     // taxon constraints

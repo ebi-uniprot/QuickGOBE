@@ -55,9 +55,6 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.REPLACES)
     public List<String> replaces;
 
-    @Field(OntologyFields.CHILDREN)
-    public List<String> children;
-
     @Field(OntologyFields.ASPECT)
     public String aspect;
 
@@ -136,9 +133,6 @@ public class OntologyDocument implements QuickGODocument {
         if (replacements != null ? !replacements.equals(that.replacements) : that.replacements != null) {
             return false;
         }
-        if (children != null ? !children.equals(that.children) : that.children != null) {
-            return false;
-        }
         if (aspect != null ? !aspect.equals(that.aspect) : that.aspect != null) {
             return false;
         }
@@ -182,7 +176,6 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (subsets != null ? subsets.hashCode() : 0);
         result = 31 * result + (replaces != null ? replaces.hashCode() : 0);
         result = 31 * result + (replacements != null ? replacements.hashCode() : 0);
-        result = 31 * result + (children != null ? children.hashCode() : 0);
         result = 31 * result + (aspect != null ? aspect.hashCode() : 0);
         result = 31 * result + (history != null ? history.hashCode() : 0);
         result = 31 * result + (xrefs != null ? xrefs.hashCode() : 0);
@@ -209,7 +202,6 @@ public class OntologyDocument implements QuickGODocument {
                 ", subsets=" + subsets +
                 ", replaces='" + replaces +
                 ", replacements=" + replacements +
-                ", children=" + children +
                 ", aspect=" + aspect +
                 ", history=" + history +
                 ", xrefs=" + xrefs +
