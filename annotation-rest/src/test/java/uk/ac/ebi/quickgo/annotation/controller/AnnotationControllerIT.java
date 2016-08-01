@@ -389,6 +389,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByUniProtKBAndIntactAndRNACentralGeneProductIDSuccessfully() throws Exception {
+        repository.deleteAll();
         String uniprotGp = "A1E959";
         String intactGp = "EBI-10043081";
         String rnaGp = "URS00000064B1_559292";
@@ -402,8 +403,34 @@ public class AnnotationControllerIT {
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, uniprotGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, intactGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, rnaGp, 1));
+    }
+
+    @Test
+    public void filterByUniProtKBAndIntactAndRNACentralGeneProductIDCaseInsensitiveSuccessfully() throws Exception {
+        repository.deleteAll();
+        String uniprotGp = "A1E959".toLowerCase();
+        String intactGp = "EBI-10043081".toLowerCase();
+        String rnaGp = "URS00000064B1_559292".toLowerCase();
+        repository.save(AnnotationDocMocker.createAnnotationDoc(uniprotGp));
+        repository.save(AnnotationDocMocker.createAnnotationDoc(intactGp));
+        repository.save(AnnotationDocMocker.createAnnotationDoc(rnaGp));
+        StringJoiner sj = new StringJoiner(",");
+        sj.add(uniprotGp).add(intactGp).add(rnaGp);
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GP_PARAM, sj.toString()));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, uniprotGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, intactGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, rnaGp, 1));
     }
 
     @Test
