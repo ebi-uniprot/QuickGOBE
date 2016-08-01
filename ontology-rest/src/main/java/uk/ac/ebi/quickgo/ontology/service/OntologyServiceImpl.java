@@ -79,7 +79,6 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
 
     @Override public List<T> findCompleteInfoByOntologyId(List<String> ids) {
         return convertDocs(ontologyRepository.findCompleteByTermId(ontologyType, buildIdList(ids)))
-                .map(this::insertDescendants)
                 .collect(Collectors.toList());
     }
 
@@ -119,7 +118,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override public List<T> findAncestorsInfoByOntologyId(List<String> ids, OntologyRelationType... relations) {
-        return convertDocsWithoutTraversalData(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
+        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
                 .map(term -> this.insertAncestors(term, relations))
                 .collect(Collectors.toList());
     }
@@ -140,26 +139,12 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
      * <p>Converts a specified list of {@link OntologyDocument}s into a {@link Stream}
      * of {@link T} instances.
      *
-     * <p>Note that the ancestors of each term is added to the {@link OntologyDocument}s.
-     *
-     * @param docs the list od {@link OntologyDocument}s to convert
-     * @return a {@link Stream} of {@link T} instances
-     */
-    Stream<T> convertDocs(List<OntologyDocument> docs) {
-        return convertDocsWithoutTraversalData(docs)
-                .map(this::insertAncestors);
-    }
-
-    /**
-     * <p>Converts a specified list of {@link OntologyDocument}s into a {@link Stream}
-     * of {@link T} instances.
-     *
      * <p>No ontology graph data is added to the {@link OntologyDocument}s.
      *
      * @param docs the list od {@link OntologyDocument}s to convert
      * @return a {@link Stream} of {@link T} instances
      */
-    private Stream<T> convertDocsWithoutTraversalData(List<OntologyDocument> docs) {
+    private Stream<T> convertDocs(List<OntologyDocument> docs) {
         return docs.stream()
                 .map(converter::convert);
     }
