@@ -63,6 +63,7 @@ public class AnnotationFields {
         public static final String GO_ID = storeAndGet(VALUES, AnnotationFields.GO_ID);
         public static final String GENEPRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
         public static final String GENE_PRODUCT_TYPE = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_TYPE);
+        public static final String DB_SUBSET = storeAndGet(VALUES, AnnotationFields.DB_SUBSET);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);

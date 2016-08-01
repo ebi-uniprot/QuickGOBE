@@ -21,7 +21,7 @@ public class GOTerm extends OBOTerm {
     public Usage usage;
 
     public List<BlacklistItem> blacklist;
-    public List<GoDiscussion> goDiscussions;
+    public List<GODiscussion> goDiscussions;
 
     public enum Usage {
         UNRESTRICTED("Unrestricted", "U"),
@@ -73,7 +73,7 @@ public class GOTerm extends OBOTerm {
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class GoDiscussion implements FieldType {
+    public static class GODiscussion implements FieldType {
         public String title;
         public String url;
     }

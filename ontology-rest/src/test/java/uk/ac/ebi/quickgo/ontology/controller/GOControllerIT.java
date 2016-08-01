@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.COMPLETE_SUB_RESOURCE;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.CONSTRAINTS_SUB_RESOURCE;
 
@@ -36,7 +37,7 @@ public class GOControllerIT extends OBOControllerIT {
     @Test
     public void canRetrieveBlacklistByIds() throws Exception {
         ResultActions response = mockMvc.perform(get(
-                buildTermsURLWithSubResource(asCSV(GO_0000001, GO_0000002), CONSTRAINTS_SUB_RESOURCE)));
+                buildTermsURLWithSubResource(toCSV(GO_0000001, GO_0000002), CONSTRAINTS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, Arrays.asList(GO_0000001, GO_0000002))
                 .andExpect(jsonPath("$.results.*.blacklist", hasSize(2)))

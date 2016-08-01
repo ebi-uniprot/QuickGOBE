@@ -33,7 +33,7 @@ public class AnnotationRequest {
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
-            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE};
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE, DB_SUBSET};
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
@@ -234,6 +234,16 @@ public class AnnotationRequest {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
 
+
+    public void setGpSubset(String gpSubset){
+        filterMap.put(DB_SUBSET, gpSubset);
+    }
+
+    @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
+            message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
+    public String getGpSubset(){
+        return filterMap.get(DB_SUBSET);
+    }
 
     public int getLimit() {
         return limit;
