@@ -655,8 +655,7 @@ public abstract class OBOControllerIT {
 
     protected ResultActions expectCoreFields(ResultActions result, String id, String path) throws Exception {
         return expectBasicFields(result, id, path)
-                .andExpect(jsonPath(path + "synonyms").exists())
-                .andExpect(jsonPath(path + "ancestors").exists());
+                .andExpect(jsonPath(path + "synonyms").exists());
     }
 
     protected ResultActions expectBasicFields(ResultActions result, String id, String path) throws Exception {
@@ -713,7 +712,6 @@ public abstract class OBOControllerIT {
         return expectCoreFields(result, id, path)
                 .andExpect(jsonPath(path + "children").exists())
                 .andExpect(jsonPath(path + "secondaryIds").exists())
-                .andExpect(jsonPath(path + "descendants").exists())
                 .andExpect(jsonPath(path + "history").exists())
                 .andExpect(jsonPath(path + "xRefs").exists())
                 .andExpect(jsonPath(path + "xRelations").exists())
