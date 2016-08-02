@@ -13,6 +13,9 @@ import static uk.ac.ebi.quickgo.rest.search.query.CompositeQuery.QueryOp;
 public abstract class QuickGOQuery {
     public abstract <T> T accept(QueryVisitor<T> visitor);
 
+    // todo: change and/or definition to allow user to construct x OR y OR z, rather than ((x OR y) OR z).
+    // semantically no different, but performance wise, involves parsing a very large nested braced query for large
+    // con/disjunctions.
     public QuickGOQuery and(QuickGOQuery query) {
         Preconditions.checkArgument(query != null, "Query to AND against is null");
 
