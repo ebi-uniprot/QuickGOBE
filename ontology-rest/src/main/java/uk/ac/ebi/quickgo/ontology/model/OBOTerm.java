@@ -37,18 +37,18 @@ public class OBOTerm {
     public List<Synonym> synonyms;
 
     // indicates all ontology terms that are effectively or can be replaced by the this term
-    public List<Replace> replaces;
+    public List<Relation> replaces;
 
     // Contains a list of ontology terms that either replace the current term, or that can be considered as a
     // replacement
-    public List<Replace> replacements;
+    public List<Relation> replacements;
 
     // each term can be in one or more subsets; these are used for two purposes: slims and term usage constraints.
     // Slim subsets have names of the form "goslim_xxx", while usage constraint subsets have names like "gocheck_xxx".
     public List<String> subsets;
 
-    // list of term IDs that are children of this term
-    public List<String> children;
+    // list of relations indicating the child ids as well as their relationship with the parent
+    public List<Relation> children;
 
     public List<String> secondaryIds;
 
@@ -122,10 +122,11 @@ public class OBOTerm {
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class Replace implements FieldType {
+    public static class Relation implements FieldType {
         public String id;
         public String type;
     }
+
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Credit implements FieldType {

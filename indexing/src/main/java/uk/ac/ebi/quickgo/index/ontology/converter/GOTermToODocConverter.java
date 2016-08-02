@@ -47,15 +47,20 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
         }
     }
 
-    private List<String> extractChildren(GOTerm goTerm) {
+    protected List<String> extractChildren(GOTerm goTerm) {
+        List<String> children = null;
+
         if (!isEmpty(goTerm.getChildren())) {
             return goTerm.getChildren().stream()
                     .map(
-                            t -> t.getChild().getId())
+                            relation -> newFlatField()
+                                    .addField(newFlatFieldLeaf(relation.getChild().getId()))
+                                    .addField(newFlatFieldLeaf(relation.getTypeof().getFormalCode()))
+                                    .buildString())
                     .collect(Collectors.toList());
-        } else {
-            return null;
         }
+
+        return children;
     }
 
     /*

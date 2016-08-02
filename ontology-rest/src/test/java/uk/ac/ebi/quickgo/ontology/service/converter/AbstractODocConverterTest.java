@@ -57,7 +57,7 @@ public class AbstractODocConverterTest {
 
     @Test
     public void convertsChildrenWithoutError() {
-        assertThat(oboTermFromValidGODoc.children, is(validGODoc.children));
+        assertThat(oboTermFromValidGODoc.children, hasSize(validGODoc.children.size()));
     }
 
     @Test
@@ -87,12 +87,12 @@ public class AbstractODocConverterTest {
 
     @Test
     public void convertsSynonymsWithoutError() {
-        assertThat(oboTermFromValidGODoc.synonyms.size(), is(validGODoc.synonyms.size()));
+        assertThat(oboTermFromValidGODoc.synonyms, hasSize(validGODoc.synonyms.size()));
     }
 
     @Test
     public void convertsCreditsWithoutError() {
-        assertThat(oboTermFromValidGODoc.credits.size(), is(validGODoc.credits.size()));
+        assertThat(oboTermFromValidGODoc.credits, hasSize(validGODoc.credits.size()));
     }
 
     /**

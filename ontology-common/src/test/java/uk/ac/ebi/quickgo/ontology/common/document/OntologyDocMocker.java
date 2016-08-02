@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import javax.management.relation.RelationType;
 
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatFieldFromDepth;
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
@@ -87,7 +88,17 @@ public final class OntologyDocMocker {
         od.isObsolete = true;
         od.comment = "Note that protein targeting encompasses the transport of the protein to " +
                 "the specified location, and may also include additional steps such as protein processing.";
-        od.children = Arrays.asList("GO:0000011", "GO:0000012");
+        od.children = new ArrayList<>();
+        od.children.add(FlatFieldBuilder.newFlatField()
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0000011"))
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("is_a"))
+                .buildString());
+
+        od.children.add(FlatFieldBuilder.newFlatField()
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("GO:0000012"))
+                .addField(FlatFieldLeaf.newFlatFieldLeaf("part_of"))
+                .buildString());
+
         od.synonymNames = Arrays.asList("creatine anabolism", "crayola testarossa");
         od.secondaryIds = Arrays.asList("GO:0000003", "GO:0000004");
         od.subsets = Arrays.asList("goslim_pombe",

@@ -13,38 +13,38 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Tests the behaviour of the {@link ReplaceConverter} class.
+ * Tests the behaviour of the {@link RelationConverter} class.
  */
-public class ReplacesConverterTest {
-    private ReplaceConverter converter;
+public class RelationConverterTest {
+    private RelationConverter converter;
 
     @Before
     public void setUp() throws Exception {
-        converter = new ReplaceConverter();
+        converter = new RelationConverter();
     }
 
     @Test
-    public void emptyReplaceStringIsConvertedToEmptyOptional() throws Exception {
+    public void emptyRelationStringIsConvertedToEmptyOptional() throws Exception {
         String toConvert = "";
 
-        Optional<OBOTerm.Replace> convertedOptional = converter.apply(toConvert);
+        Optional<OBOTerm.Relation> convertedOptional = converter.apply(toConvert);
 
         assertThat(convertedOptional.isPresent(), is(false));
     }
 
     @Test
-    public void replaceStringWithJustIdIsConvertedIntoEmptyOptional() throws Exception {
+    public void relationStringWithJustIdIsConvertedIntoEmptyOptional() throws Exception {
         String toConvert = "id1";
 
-        Optional<OBOTerm.Replace> convertedOptional = converter.apply(toConvert);
+        Optional<OBOTerm.Relation> convertedOptional = converter.apply(toConvert);
 
         assertThat(convertedOptional.isPresent(), is(false));
     }
 
     @Test
-    public void replaceStringWithIdAndTypeIsConvertedIntoPopulatedReplaceOptional() throws Exception {
+    public void relationStringWithIdAndTypeIsConvertedIntoPopulatedRelationOptional() throws Exception {
         String goTermId = "id1";
-        String relationType = "replacedBy";
+        String relationType = "relationType";
 
         String toConvert = FlatFieldBuilder.newFlatField()
                 .addField(FlatFieldLeaf.newFlatFieldLeaf(goTermId))
@@ -52,12 +52,12 @@ public class ReplacesConverterTest {
                 .buildString();
 
 
-        Optional<OBOTerm.Replace> convertedOptional = converter.apply(toConvert);
+        Optional<OBOTerm.Relation> convertedOptional = converter.apply(toConvert);
 
-        OBOTerm.Replace expectedReplace = convertedOptional.get();
+        OBOTerm.Relation expectedRelation = convertedOptional.get();
 
-        assertThat(expectedReplace, is(notNullValue()));
-        assertThat(expectedReplace.id, is(goTermId));
-        assertThat(expectedReplace.type, is(relationType));
+        assertThat(expectedRelation, is(notNullValue()));
+        assertThat(expectedRelation.id, is(goTermId));
+        assertThat(expectedRelation.type, is(relationType));
     }
 }
