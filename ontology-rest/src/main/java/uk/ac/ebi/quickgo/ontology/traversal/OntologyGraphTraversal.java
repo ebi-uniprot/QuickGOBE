@@ -48,6 +48,7 @@ public interface OntologyGraphTraversal {
      * @param relations the relations that a parent vertex has with its child
      * @return a set of {@link OntologyRelationship} relationships between the {@code baseVertex} and the retrieved
      * parent vertices
+     * @throws IllegalArgumentException if the {@code baseVertex} is null, empty or does not exist in the graph
      */
     Set<OntologyRelationship> parents(String baseVertex, OntologyRelationType... relations);
 
@@ -71,6 +72,7 @@ public interface OntologyGraphTraversal {
      * @param relations the relations that a child vertex has with its parent
      * @return a set of {@link OntologyRelationship} relationships between the {@code topVertex} and the retrieved
      * child vertices
+     * @throws IllegalArgumentException if the {@code topVertex} is null, empty or does not exist in the graph
      */
     Set<OntologyRelationship> children(String topVertex, OntologyRelationType... relations);
 }
