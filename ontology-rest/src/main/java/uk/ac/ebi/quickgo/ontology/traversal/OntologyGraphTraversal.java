@@ -40,6 +40,18 @@ public interface OntologyGraphTraversal {
     List<String> ancestors(Set<String> baseVertices, OntologyRelationType... relations);
 
     /**
+     * Finds a set of all the parent vertices of the {@code baseVertex} that fulfill the provided {@code relations}.
+     * <p/>
+     * <b>Note:</b> If no relations are provided, it is assumed that all relations will be searched for.
+     *
+     * @param baseVertex the vertex whose parents are to be retrieved
+     * @param relations the relations that a parent vertex has with its child
+     * @return a set of {@link OntologyRelationship} relationships between the {@code baseVertex} and the retrieved
+     * parent vertices
+     */
+    Set<OntologyRelationship> parents(String baseVertex, OntologyRelationType... relations);
+
+    /**
      * Find the set of descendant vertices reachable from a top vertex, navigable via a specified
      * set of relations.
      *
@@ -49,4 +61,16 @@ public interface OntologyGraphTraversal {
      * @return the list of descendant vertices.
      */
     List<String> descendants(Set<String> topVertices, OntologyRelationType... relations);
+
+    /**
+     * Finds a set of all the child vertices of the {@code topVertex} that fulfill the provided {@code relations}.
+     * <p/>
+     * <b>Note:</b> If no relations are provided, it is assumed that all relations will be searched for.
+     *
+     * @param topVertex the vertex whose children are to be retrieved
+     * @param relations the relations that a child vertex has with its parent
+     * @return a set of {@link OntologyRelationship} relationships between the {@code topVertex} and the retrieved
+     * child vertices
+     */
+    Set<OntologyRelationship> children(String topVertex, OntologyRelationType... relations);
 }
