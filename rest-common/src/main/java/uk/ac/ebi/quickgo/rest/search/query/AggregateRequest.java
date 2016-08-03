@@ -8,25 +8,24 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Data-source representing which supported aggregation aggregateFunctionRequests {@link AggregateFunction} should be executed over
- * the provided name.
+ * Data-source representing which supported aggregation aggregateFunctionRequests {@link AggregateFunction} should be
+ * executed over the provided name.
  * <p/>
  * An instance of an aggregate could have one or several of the following:
  * <ul>
  *     <li>A name: If the aggregate is based on a field, then name is the field's name. If the aggregate is based on a
  *     query result then the name could be anything.</li>
- *     <li>A set of {@link AggregateFunctionRequest}s: An AggregateFunctionRequest represents a call to an {@link AggregateFunction} on a
- *     particular name. This name could be the aggregate name, or any other
- *     name that can be calculated within table/collection used by the data-source, example: sum(field1) or unique
- *     (field2)
+ *     <li>A set of {@link AggregateFunctionRequest}s: An AggregateFunctionRequest represents a call to an
+ *     {@link AggregateFunction} on a particular name. This name could be the aggregate name, or any other name that can
+ *     be calculated within table/collection used by the data-source, example: sum(field1) or unique(field2)
  *     </li>
- *     <li>A set of {@link AggregateRequest#nestedAggregateRequests}: A nested aggregate represents the desire to provide further
- *     aggregation calculations based on a name that is different to that of the current aggregation. Think of it as
- *     a drilled down view of the current aggregation with results focused on another name
+ *     <li>A set of {@link AggregateRequest#nestedAggregateRequests}: A nested aggregate represents the desire to
+ *     provide further aggregation calculations based on a name that is different to that of the current aggregation.
+ *     Think of it as a drilled down view of the current aggregation with results focused on another name.
  *     </li>
  * </ul>
- * As an example, assume that the data source has a table/collection of orders, with the following aggregateFunctionRequests:
- * order_item_id, quantity, cost.
+ * As an example, assume that the data source has a table/collection of orders, with the following
+ * aggregateFunctionRequests: order_item_id, quantity, cost.
  * An {@link AggregateRequest} could hold the following requests:
  * <ul>
  *
