@@ -20,7 +20,9 @@ public abstract class QuickGOQuery {
      * @return a query representing the overall disjunction of queries
      */
     public static QuickGOQuery generalisedOr(QuickGOQuery... queries) {
-        Preconditions.checkArgument(queries != null && queries.length > 1,
+        Preconditions.checkArgument(queries != null &&
+                        arrayHasNoNullElements(queries) &&
+                        queries.length > 1,
                 "Queries to compose cannot be null or empty");
         return new CompositeQuery(Sets.newHashSet(queries), QueryOp.OR);
     }
@@ -32,7 +34,9 @@ public abstract class QuickGOQuery {
      * @return a query representing the overall conjunction of queries
      */
     public static QuickGOQuery generalisedAnd(QuickGOQuery... queries) {
-        Preconditions.checkArgument(queries != null && queries.length > 1,
+        Preconditions.checkArgument(queries != null &&
+                        arrayHasNoNullElements(queries) &&
+                        queries.length > 1,
                 "Queries to compose cannot be null or empty");
         return new CompositeQuery(Sets.newHashSet(queries), QueryOp.AND);
     }
@@ -61,18 +65,22 @@ public abstract class QuickGOQuery {
 
     public abstract <T> T accept(QueryVisitor<T> visitor);
 
-    public QuickGOQuery and(QuickGOQuery... query) {
-        Preconditions.checkArgument(query != null, "Query to AND against cannot be null or empty");
+    public QuickGOQuery and(QuickGOQuery... queriesToAnd) {
+        Preconditions.checkArgument(queriesToAnd != null &&
+                arrayHasNoNullElements(queriesToAnd) &&
+                queriesToAnd.length > 0, "Query to AND against cannot be null or empty");
 
-        Set<QuickGOQuery> queries = aggregateQueries(this, query);
+        Set<QuickGOQuery> queries = aggregateQueries(this, queriesToAnd);
 
         return new CompositeQuery(queries, QueryOp.AND);
     }
 
-    public QuickGOQuery or(QuickGOQuery... query) {
-        Preconditions.checkArgument(query != null && query.length > 0, "Query to OR against cannot be null or empty");
+    public QuickGOQuery or(QuickGOQuery... queriesToOr) {
+        Preconditions.checkArgument(queriesToOr != null &&
+                arrayHasNoNullElements(queriesToOr) &&
+                queriesToOr.length > 0, "Query to OR against cannot be null or empty");
 
-        Set<QuickGOQuery> queries = aggregateQueries(this, query);
+        Set<QuickGOQuery> queries = aggregateQueries(this, queriesToOr);
 
         return new CompositeQuery(queries, QueryOp.OR);
     }
@@ -93,5 +101,15 @@ public abstract class QuickGOQuery {
         aggregate.add(originalQuery);
         Collections.addAll(aggregate, queries);
         return aggregate;
+    }
+
+    private static <T> boolean arrayHasNoNullElements(T[] array) {
+        for (T element : array) {
+            if (element == null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
