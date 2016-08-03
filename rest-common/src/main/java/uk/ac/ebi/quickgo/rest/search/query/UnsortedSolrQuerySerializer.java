@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * @author Edd
  */
 public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
-    private static final String TERMS_LOCAL_PARAMS_QUERY_FORMAT = "({!terms f=%s} %s)";
+    static final String TERMS_LOCAL_PARAMS_QUERY_FORMAT = "({!terms f=%s} %s)";
 
     private final SolrQueryStringSanitizer queryStringSanitizer;
     private final SortedSolrQuerySerializer sortedQuerySerializer;

@@ -127,9 +127,7 @@ public class SortedSolrQuerySerializerTest {
     @Test
     public void visitTransforms3OrQueriesToString() {
         FieldQuery query1 = new FieldQuery("field1", "value1");
-
         FieldQuery query2 = new FieldQuery("field2", "value2");
-
         FieldQuery query3 = new FieldQuery("field3", "value3");
 
         QuickGOQuery compositeQuery = query1.or(query2, query3);
@@ -137,15 +135,18 @@ public class SortedSolrQuerySerializerTest {
         String queryString = serializer.visit((CompositeQuery) compositeQuery);
         System.out.println(queryString);
 
-        assertThat(queryString, is("((field1:value1) OR (field2:value2) OR (field3:value3))"));
+        assertThat(queryString, is(
+                String.format("((%s:%s) OR (%s:%s) OR (%s:%s))",
+                        query1.field(), query1.value(),
+                        query2.field(), query2.value(),
+                        query3.field(), query3.value())
+        ));
     }
 
     @Test
     public void visitTransforms3AndQueriesToString() {
         FieldQuery query1 = new FieldQuery("field1", "value1");
-
         FieldQuery query2 = new FieldQuery("field2", "value2");
-
         FieldQuery query3 = new FieldQuery("field3", "value3");
 
         QuickGOQuery compositeQuery = query1.and(query2, query3);
@@ -153,7 +154,12 @@ public class SortedSolrQuerySerializerTest {
         String queryString = serializer.visit((CompositeQuery) compositeQuery);
         System.out.println(queryString);
 
-        assertThat(queryString, is("((field1:value1) AND (field2:value2) AND (field3:value3))"));
+        assertThat(queryString, is(
+                String.format("((%s:%s) AND (%s:%s) AND (%s:%s))",
+                        query1.field(), query1.value(),
+                        query2.field(), query2.value(),
+                        query3.field(), query3.value())
+        ));
     }
 
     private String buildFieldQueryString(String field, String value) {
