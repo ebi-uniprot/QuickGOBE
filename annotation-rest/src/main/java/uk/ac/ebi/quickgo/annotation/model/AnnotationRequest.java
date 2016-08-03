@@ -12,6 +12,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
+import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 
 /**
@@ -34,7 +35,7 @@ public class AnnotationRequest {
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
-            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID};
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE, DB_SUBSET};
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
@@ -102,7 +103,7 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = CASE_INSENSITIVE,
             message = "At least one 'Aspect' value is invalid: ${validatedValue}")
     public String getAspect() {
         return filterMap.get(ASPECT_FIELD);
@@ -187,7 +188,7 @@ public class AnnotationRequest {
         filterMap.put(GO_ID, goId);
     }
 
-    @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*",
+    @Pattern(regexp = "go:[0-9]{7}(,go:[0-9]{7})*", flags = CASE_INSENSITIVE,
             message = "At least one 'GO Id' value is invalid: ${validatedValue}")
     public String getGoId() {
         return filterMap.get(GO_ID);
@@ -201,13 +202,13 @@ public class AnnotationRequest {
         filterMap.put(ECO_ID, ecoId);
     }
 
-    @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*",
+    @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*", flags = CASE_INSENSITIVE,
             message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
     public String getEcoId() {
         return filterMap.get(ECO_ID);
     }
 
-    @Pattern(regexp = "^exact|slim|descendants$", flags = Pattern.Flag.CASE_INSENSITIVE, message = "Invalid usage: " +
+    @Pattern(regexp = "^exact|slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
             "${validatedValue})")
     public String getUsage() {
         return filterMap.get(USAGE_FIELD);
@@ -219,7 +220,7 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "GO:[0-9]+(,GO:[0-9]+)*", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "GO:[0-9]+(,GO:[0-9]+)*", flags = CASE_INSENSITIVE,
             message = "Invalid GO IDs specified: ${validatedValue})")
     public String getUsageIds() {
         return filterMap.get(USAGE_IDS);
@@ -232,7 +233,7 @@ public class AnnotationRequest {
     }
 
     @Pattern(regexp = "(is_a|part_of|occurs_in|regulates)(,is_a|part_of|occurs_in|regulates)*",
-            flags = Pattern.Flag.CASE_INSENSITIVE)
+            flags = CASE_INSENSITIVE)
     public String getUsageRelationships() {
         return filterMap.get(USAGE_RELATIONSHIPS);
     }
@@ -241,6 +242,27 @@ public class AnnotationRequest {
         if (usageRelationships != null) {
             filterMap.put(USAGE_RELATIONSHIPS, usageRelationships.toLowerCase());
         }
+    }
+
+    public void setGpType(String geneProductType){
+        filterMap.put(GENE_PRODUCT_TYPE, geneProductType.toLowerCase());
+    }
+
+    @Pattern(regexp = "^(complex|rna|protein)(,(complex|rna|protein)){0,2}", flags = CASE_INSENSITIVE,
+            message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
+    public String getGpType(){
+        return filterMap.get(GENE_PRODUCT_TYPE);
+    }
+
+
+    public void setGpSubset(String gpSubset){
+        filterMap.put(DB_SUBSET, gpSubset);
+    }
+
+    @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
+            message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
+    public String getGpSubset(){
+        return filterMap.get(DB_SUBSET);
     }
 
     public int getLimit() {

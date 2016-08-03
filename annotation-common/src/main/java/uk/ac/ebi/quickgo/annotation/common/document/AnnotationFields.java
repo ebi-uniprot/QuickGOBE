@@ -28,9 +28,10 @@ public class AnnotationFields {
     public final static String ASSIGNED_BY = "assignedBy";
     public final static String EXTENSION = "extension";
     public static final String DB_OBJECT_SYMBOL = "dbObjectSymbol";
-    public static final String DB_OBJECT_TYPE = "dbObjectType";
+    public static final String GENE_PRODUCT_TYPE = "geneProductType";
     public static final String DB_SUBSET = "dbSubset";
     public static final String TAXON_ID = "taxonId";
+    public static final String TARGET_SET = "targetSet";
 
     /**
      * Annotation fields that are stored, and can therefore be retrieved.
@@ -64,6 +65,8 @@ public class AnnotationFields {
         public static final String GO_ID_INDEXED_ORIGINAL =
                 storeAndGet(VALUES, AnnotationFields.GO_ID_INDEXED_ORIGINAL);
         public static final String GENEPRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
+        public static final String GENE_PRODUCT_TYPE = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_TYPE);
+        public static final String DB_SUBSET = storeAndGet(VALUES, AnnotationFields.DB_SUBSET);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);

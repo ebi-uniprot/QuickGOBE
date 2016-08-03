@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.model.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.*;
-import java.util.regex.Matcher;
+import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by edd on 22/12/2015.
+ * Tests the behaviour of the {@link GenericTermToODocConverter} class.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class GenericTermToODocConverterTest {
@@ -33,27 +33,175 @@ public class GenericTermToODocConverterTest {
         when(term.getId()).thenReturn(TERM_ID);
     }
 
-    // considers
+    //replacements
     @Test
-    public void extractsNoConsideredWhenNull() {
-        when(term.consider()).thenReturn(null);
+    public void extractsNoReplacementsWhenGenericTermHasNullReplacements() {
+        when(term.getReplacements()).thenReturn(null);
 
-        assertThat(converter.extractConsidersAsList(term), is(nullValue()));
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedReplacement = extractFieldFromDocument(docOpt,
+                (OntologyDocument doc) -> doc.replacements);
+
+        assertThat(extractedReplacement, is(nullValue()));
     }
 
     @Test
-    public void extractsConsidersWhenExist() {
-        GenericTerm mockConsider = mock(GenericTerm.class);
-        String considerId = "id2";
-        when(mockConsider.getId()).thenReturn(considerId);
-        ArrayList<GenericTerm> toConsider = new ArrayList<>();
-        toConsider.add(mockConsider);
+    public void extractsAConsiderWhenGenericTermHasReplacementsWithAConsider() {
+        RelationType relation = RelationType.CONSIDER;
+        String replaceId = "id2";
 
-        when(term.consider()).thenReturn(toConsider);
-        List<String> considersStrList = converter.extractConsidersAsList(term);
-        assertThat(considersStrList, is(not(nullValue())));
-        assertThat(considersStrList.size(), is(1));
-        assertThat(considersStrList.get(0), is(considerId));
+        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+        when(term.getReplacements()).thenReturn(Collections.singletonList(mockReplace));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedReplacements = extractFieldFromDocument(docOpt,
+                (OntologyDocument doc) -> doc.replacements);
+
+        assertThat(extractedReplacements, hasSize(1));
+
+        assertThat(extractedReplacements,
+                hasItems(containsString(replaceId), containsString(relation.getFormalCode())));
+    }
+
+    @Test
+    public void extractsAReplacedByWhenGenericTermHasReplacementsWithReplacedBy() {
+        RelationType relation = RelationType.REPLACEDBY;
+        String replaceId = "id2";
+
+        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+        when(term.getReplacements()).thenReturn(Collections.singletonList(mockReplace));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedReplacements =
+                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replacements);
+
+        assertThat(extractedReplacements, hasSize(1));
+
+        assertThat(extractedReplacements,
+                hasItems(containsString(replaceId), containsString(relation.getFormalCode())));
+    }
+
+    @Test
+    public void extracts2ReplacementsWhenGenericTermHas2Replacements() {
+        TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
+        TermRelation considerMock = mockReplaceRelation("id3", RelationType.CONSIDER);
+
+        List<TermRelation> relations = Arrays.asList(replacedByMock, considerMock);
+
+        when(term.getReplacements()).thenReturn(relations);
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedReplacements =
+                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replacements);
+
+        assertThat(extractedReplacements, hasSize(relations.size()));
+    }
+
+    @Test
+    public void convertsATermWith2RelationsInReplacementsSectionIntoDocWith2ReplacementElementsInReplacementsSection() {
+        TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
+        TermRelation considerModk = mockReplaceRelation("id3", RelationType.CONSIDER);
+
+        List<TermRelation> relations = Arrays.asList(replacedByMock, considerModk);
+
+        GenericTerm toConvert = mock(GenericTerm.class);
+        when(toConvert.getReplacements()).thenReturn(relations);
+
+        Optional<OntologyDocument> expectedDocOptional = converter.apply(Optional.of(toConvert));
+        assertThat(expectedDocOptional.isPresent(), is(true));
+
+        OntologyDocument expectedDoc = expectedDocOptional.get();
+
+        assertThat(expectedDoc.replacements, hasSize(relations.size()));
+    }
+
+    //replaces
+    @Test
+    public void extractsNoReplacesWhenGenericTermHasNullReplaces() {
+        when(term.getReplacements()).thenReturn(null);
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedReplacement = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
+
+        assertThat(extractedReplacement, is(nullValue()));
+    }
+
+    @Test
+    public void extractsAConsiderWhenGenericTermHasReplacesWithAConsider() {
+        RelationType relation = RelationType.CONSIDER;
+        String replaceId = "id2";
+
+        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+        when(term.getReplaces()).thenReturn(Collections.singletonList(mockReplace));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedReplacements = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
+
+        assertThat(extractedReplacements, hasSize(1));
+
+        assertThat(extractedReplacements,
+                hasItems(containsString(replaceId), containsString(relation.getFormalCode())));
+    }
+
+    @Test
+    public void extractsAReplacedByWhenGenericTermHasReplacesWithReplacedBy() {
+        RelationType relation = RelationType.REPLACEDBY;
+        String replaceId = "id2";
+
+        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+        when(term.getReplaces()).thenReturn(Collections.singletonList(mockReplace));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedReplacements = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
+
+        assertThat(extractedReplacements, hasSize(1));
+
+        assertThat(extractedReplacements,
+                hasItems(containsString(replaceId), containsString(relation.getFormalCode())));
+    }
+
+    @Test
+    public void extracts2ReplacesWhenGenericTermHas2Replaces() {
+        TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
+        TermRelation considerMock = mockReplaceRelation("id3", RelationType.CONSIDER);
+
+        List<TermRelation> relations = Arrays.asList(replacedByMock, considerMock);
+
+        when(term.getReplaces()).thenReturn(relations);
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedReplacements = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
+
+        assertThat(extractedReplacements, hasSize(relations.size()));
+    }
+
+    @Test
+    public void convertsATermWith2RelationsInReplacesSectionIntoDocWith2ReplacementElementsInReplacesSection() {
+        TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
+        TermRelation considerModk = mockReplaceRelation("id3", RelationType.CONSIDER);
+
+        List<TermRelation> relations = Arrays.asList(replacedByMock, considerModk);
+
+        GenericTerm toConvert = mock(GenericTerm.class);
+        when(toConvert.getReplaces()).thenReturn(relations);
+
+        Optional<OntologyDocument> expectedDocOptional = converter.apply(Optional.of(toConvert));
+        assertThat(expectedDocOptional.isPresent(), is(true));
+
+        OntologyDocument expectedDoc = expectedDocOptional.get();
+
+        assertThat(expectedDoc.replaces, hasSize(relations.size()));
+    }
+
+    private TermRelation mockReplaceRelation(String replacedTermId, RelationType relation) {
+        GenericTerm replacedTerm = mock(GenericTerm.class);
+        when(replacedTerm.getId()).thenReturn(replacedTermId);
+
+        TermRelation mockReplace = mock(TermRelation.class);
+        when(mockReplace.getChild()).thenReturn(replacedTerm);
+        when(mockReplace.getTypeof()).thenReturn(relation);
+
+        return mockReplace;
     }
 
     // history
@@ -72,16 +220,21 @@ public class GenericTermToODocConverterTest {
 
         when(termOntologyHistory.getHistoryAll()).thenReturn(Collections.singletonList(auditRecord));
 
-        List<String> historyStrList = converter.extractHistory(term);
-        assertThat(historyStrList, is(not(nullValue())));
-        assertThat(historyStrList.size(), is(1));
-        assertThat(historyStrList.get(0).contains("text"), is(true));
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedHistory = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.history);
+
+        assertThat(extractedHistory, hasSize(1));
+        assertThat(extractedHistory, hasItems(containsString("text")));
     }
 
     @Test
     public void extractHistoryWhenNotExists() {
         when(term.getHistory()).thenReturn(null);
-        assertThat(converter.extractHistory(term), is(nullValue()));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedHistory = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.history);
+
+        assertThat(extractedHistory, is(nullValue()));
     }
 
     // xrelations
@@ -95,16 +248,23 @@ public class GenericTermToODocConverterTest {
         when(xrelationMock.getRelation()).thenReturn("relation");
 
         when(term.getCrossOntologyRelations()).thenReturn(Collections.singletonList(xrelationMock));
-        List<String> xrelationStrList = converter.extractXRelationsAsList(term);
-        assertThat(xrelationStrList, is(not(nullValue())));
-        assertThat(xrelationStrList.size(), is(1));
-        assertThat(xrelationStrList.get(0).contains("otherNamespace"), is(true));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedXRelations = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.xRelations);
+
+        assertThat(extractedXRelations, is(not(nullValue())));
+        assertThat(extractedXRelations, hasSize(1));
+        assertThat(extractedXRelations, hasItems(containsString("otherNamespace")));
     }
 
     @Test
     public void extractXRelationsWhenNotExist() {
         when(term.getCrossOntologyRelations()).thenReturn(null);
-        assertThat(converter.extractXRelationsAsList(term), is(nullValue()));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedXRelations = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.xRelations);
+
+        assertThat(extractedXRelations, is(nullValue()));
     }
 
     // xrefs
@@ -114,18 +274,24 @@ public class GenericTermToODocConverterTest {
         when(namedXRef.getName()).thenReturn("name");
         when(namedXRef.getDb()).thenReturn("db");
         when(namedXRef.getId()).thenReturn("id");
+
         when(term.getXrefs()).thenReturn(Collections.singletonList(namedXRef));
 
-        List<String> xrefStrList = converter.extractXRefs(term);
-        assertThat(xrefStrList, is(not(nullValue())));
-        assertThat(xrefStrList.size(), is(1));
-        assertThat(xrefStrList.get(0).contains("db"), is(true));
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedXrefs = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.xrefs);
+
+        assertThat(extractedXrefs, hasSize(1));
+        assertThat(extractedXrefs, hasItems(containsString("db")));
     }
 
     @Test
     public void extractXrefsWhenNotExist() {
         when(term.getXrefs()).thenReturn(null);
-        assertThat(converter.extractXRefs(term), is(nullValue()));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedXrefs = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.xrefs);
+
+        assertThat(extractedXrefs, is(nullValue()));
     }
 
     // synonyms
@@ -138,25 +304,24 @@ public class GenericTermToODocConverterTest {
         when(term.getSynonyms()).thenReturn(Collections.singletonList(synonym));
 
         // check doc.synonyms
-        List<String> synonyms = converter.extractSynonyms(term);
-        assertThat(synonyms, is(not(nullValue())));
-        assertThat(synonyms.size(), is(1));
-        assertThat(synonyms.get(0).contains("name1"), is(true));
-        assertThat(synonyms.get(0).contains("type1"), is(true));
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedSynonyms = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.synonyms);
 
-        // check doc.synonymNames
-        List<String> synonymNames = converter.extractSynonymNames(term);
-        assertThat(synonymNames, is(not(nullValue())));
-        assertThat(synonymNames.size(), is(1));
-        assertThat(synonymNames.get(0).contains("name1"), is(true));
-        assertThat(synonymNames.get(0).contains("type1"), is(false));
+        assertThat(extractedSynonyms, hasSize(1));
+        assertThat(extractedSynonyms, hasItems(containsString("name1"), containsString("type1")));
     }
 
     @Test
     public void extractSynonymsWhenNotExist() {
         when(term.getSynonyms()).thenReturn(null);
-        assertThat(converter.extractSynonyms(term), is(nullValue()));
-        assertThat(converter.extractSynonymNames(term), is(nullValue()));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedSynonyms = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.synonyms);
+        List<String> extractedSynonymNames =
+                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.synonymNames);
+
+        assertThat(extractedSynonyms, is(nullValue()));
+        assertThat(extractedSynonymNames, is(nullValue()));
     }
 
     // simple fields
@@ -187,7 +352,6 @@ public class GenericTermToODocConverterTest {
         assertThat(document.ontologyType, is("GO"));
         assertThat(document.secondaryIds, contains("sec1", "sec2"));
         assertThat(document.subsets, contains("goslim_generic", "goslim_yeast"));
-        assertThat(document.replacedBy, is("replacement1"));
     }
 
     @Test
@@ -201,7 +365,6 @@ public class GenericTermToODocConverterTest {
         assertThat(document.name, is(nullValue()));
         assertThat(document.ontologyType, is(nullValue()));
         assertThat(document.secondaryIds, is(nullValue()));
-        assertThat(document.replacedBy, is(nullValue()));
     }
 
     // empty optional conversion
@@ -222,18 +385,77 @@ public class GenericTermToODocConverterTest {
 
         when(term.getDefinitionXrefs()).thenReturn(Collections.singletonList(xref));
 
-        List<String> xrefsText = converter.extractDefinitionXrefs(term);
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedDefinitionXrefs =
+                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.definitionXrefs);
 
-        assertThat(xrefsText, hasSize(1));
-        assertThat(xrefsText, hasItems(containsString(db1), containsString(id1)));
+        assertThat(extractedDefinitionXrefs, hasSize(1));
+        assertThat(extractedDefinitionXrefs, hasItems(containsString(db1), containsString(id1)));
     }
 
     @Test
     public void extractionOfEmptyDefinitionXrefListReturnsEmptyList() throws Exception {
         when(term.getDefinitionXrefs()).thenReturn(Collections.emptyList());
 
-        List<String> xrefsText = converter.extractDefinitionXrefs(term);
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedDefinitionXrefs =
+                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.definitionXrefs);
 
-        assertThat(xrefsText, hasSize(0));
+        assertThat(extractedDefinitionXrefs, hasSize(0));
+    }
+
+    //credits
+    @Test
+    public void extractsNoCreditElementsWhenCreditsInTermIsNull() throws Exception {
+        when(term.getCredits()).thenReturn(null);
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedCredits = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.credits);
+
+        assertThat(extractedCredits, is(nullValue()));
+    }
+
+    @Test
+    public void extractsNoCreditElementsWhenCreditsInTermIsEmpty() throws Exception {
+        when(term.getCredits()).thenReturn(Collections.emptyList());
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedCredits = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.credits);
+
+        assertThat(extractedCredits, is(nullValue()));
+    }
+
+    @Test
+    public void extracts1CreditElementWhenCreditsInTermHas1Element() throws Exception {
+        String code1 = "BHF";
+        String url1 = "http://www.ucl.ac.uk/cardiovasculargeneontology/";
+
+        TermCredit credit1 = new TermCredit(code1, url1);
+
+        String code2 = "BHF1";
+        String url2 = "http://www.ucl.ac.uk/cardiovasculargeneontology/1";
+
+        TermCredit credit2 = new TermCredit(code2, url2);
+
+        when(term.getCredits()).thenReturn(Arrays.asList(credit1, credit2));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedCredits = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.credits);
+
+        assertThat(extractedCredits, hasSize(2));
+        assertThat(creditExists(credit1, extractedCredits), is(true));
+        assertThat(creditExists(credit2, extractedCredits), is(true));
+    }
+
+    private boolean creditExists(TermCredit credit, Collection<String> extractedCredits) {
+        return extractedCredits.stream()
+                .filter(extractedCredit -> extractedCredit.contains(credit.getCode())
+                        && extractedCredit.contains(credit.getUrl()))
+                .findFirst().isPresent();
+    }
+
+    public static <T> T extractFieldFromDocument(Optional<OntologyDocument> docOpt, Function<OntologyDocument, T>
+            extractor) {
+        return extractor.apply(docOpt.get());
     }
 }

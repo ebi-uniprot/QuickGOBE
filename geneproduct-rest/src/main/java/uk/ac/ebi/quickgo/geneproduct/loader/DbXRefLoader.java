@@ -25,6 +25,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class DbXRefLoader {
 
+    private final boolean caseSensitive;
     private Logger logger = LoggerFactory.getLogger(DbXRefLoader.class);
 
     private static final int COL_DATABASE = 0;
@@ -35,8 +36,9 @@ public class DbXRefLoader {
     private static final String COL_DELIMITER = "\t";
     private String path;
 
-    public DbXRefLoader(String path) {
+    public DbXRefLoader(String path, boolean caseSensitive) {
         this.path = path;
+        this.caseSensitive = caseSensitive;
     }
 
     /**
@@ -60,7 +62,8 @@ public class DbXRefLoader {
                     .skip(1)    //header
                     .map(line -> line.split(COL_DELIMITER))
                     .map(fields -> new GeneProductDbXRefIDFormat(fields[COL_DATABASE], fields[COL_ENTITY_TYPE],
-                            fields[COL_ENTITY_TYPE_NAME], fields[COL_LOCAL_ID_SYNTAX], fields[COL_URL_SYNTAX]))
+                            fields[COL_ENTITY_TYPE_NAME], fields[COL_LOCAL_ID_SYNTAX], fields[COL_URL_SYNTAX],
+                            caseSensitive))
                     .collect(toList());
 
         } catch (Exception e) {

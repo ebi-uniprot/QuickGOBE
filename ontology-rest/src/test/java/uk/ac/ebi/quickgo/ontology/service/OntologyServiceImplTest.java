@@ -77,17 +77,6 @@ public class OntologyServiceImplTest {
                         ontologyTraversalMock);
     }
 
-    @Test
-    public void convertsEmptyDocList() {
-        // create any OntologyServiceImpl to test its document conversion method
-        OntologyServiceImpl<GOTerm> ontologyServiceSpy =
-                new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO,
-                        new SolrQueryStringSanitizer(), ontologyTraversalMock);
-
-        List<GOTerm> goTerms = ontologyServiceSpy.convertDocs(Collections.emptyList());
-        assertThat(goTerms.size(), is(0));
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void nullRepoProducesIllegalArgumentException() {
         new OntologyServiceImpl<>(null, goDocumentConverterMock, OntologyType.GO, new SolrQueryStringSanitizer(),

@@ -24,7 +24,7 @@ public class AnnotationDocMocker {
             "results_in_development_of(UBERON:0006000)");
     public static final String OBJECT_SYMBOL = "moeA5";
     public static final String OBJECT_TYPE = "protein";
-    public static final String SUB_SET = "TrEMBL";
+    public static final String SUB_SET = "KRUK";
     public static final int TAXON_ID = 12345;
 
 
@@ -50,7 +50,7 @@ public class AnnotationDocMocker {
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;
         doc.dbObjectSymbol = OBJECT_SYMBOL;
-        doc.dbObjectType = OBJECT_TYPE;
+        doc.geneProductType = OBJECT_TYPE;
         doc.dbSubset = SUB_SET;
         doc.taxonId = TAXON_ID;
 

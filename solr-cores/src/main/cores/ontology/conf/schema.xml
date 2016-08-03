@@ -27,8 +27,8 @@
     <field name="name" type="text_ignorecase" indexed="true" stored="true"/>
     <field name="secondaryId" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="isObsolete" type="boolean" indexed="false" stored="true"/>
-    <field name="consider" type="string" indexed="false" stored="true" multiValued="true"/>
-    <field name="replacedBy" type="string" indexed="false" stored="true"/>
+    <field name="replacements" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="replaces" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="definition" type="text_ignorecase" indexed="true" stored="true"/>
     <field name="definitionXref" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="comment" type="string" indexed="false" stored="true"/>
@@ -45,6 +45,8 @@
     <field name="xRelation" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="taxonConstraint" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="blacklist" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="goDiscussions" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="credits" type="string" indexed="false" stored="true" multiValued="true"/>
 
     <!-- autocomplete search fields -->
     <field name="edge_name" type="text_edge" indexed="true" stored="true" multiValued="false"/>
