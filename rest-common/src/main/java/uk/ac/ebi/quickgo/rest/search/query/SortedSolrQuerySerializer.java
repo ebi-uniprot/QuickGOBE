@@ -9,6 +9,11 @@ import static uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter.CROSS_CORE_
 import static uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter.SOLR_FIELD_SEPARATOR;
 
 /**
+ * <p>This class defines an algorithm for serializing {@link QuickGOQuery}s into a corresponding
+ * Solr query String. The implementation creates a corresponding String query that returns
+ * results in the expected order of relevance, where Solr scoring is performed on all subclasses
+ * of {@link QuickGOQuery}.
+ *
  * Created 02/08/16
  * @author Edd
  */

@@ -17,8 +17,43 @@ public class UnsortedSolrQuerySerializerTest {
         this.serializer = new UnsortedSolrQuerySerializer();
     }
 
+    // all tests in sortedsolrqueryserializer
+    // include nested tests to guarantee term query being used
+
     @Test
-    public void visitTransformsTwoDisjunctionQueryOnSameFieldsToString() {
+    public void visitTransformsOneDisjuctionQueryToString() {
+        FieldQuery term1 = new FieldQuery("field1", "value1");
+
+        String queryString = serializer.visit(term1);
+        System.out.println(queryString);
+    }
+
+    @Test
+    public void visitTransformsComplexCompositeToString() {
+        FieldQuery term1 = new FieldQuery("field1", "value1");
+        FieldQuery term2 = new FieldQuery("field1", "value2");
+
+        CompositeQuery compositeAndQuery = new CompositeQuery(asSet(term1, term2), CompositeQuery.QueryOp.AND);
+        CompositeQuery compositeORQuery = new CompositeQuery(asSet(term1, term2), CompositeQuery.QueryOp.OR);
+
+        CompositeQuery compositeQuery = new CompositeQuery(asSet(compositeAndQuery, compositeORQuery), CompositeQuery.QueryOp.AND);
+
+        String queryString = serializer.visit(compositeQuery);
+        System.out.println(queryString);
+    }
+
+    @Test
+    public void visitTransformsTwoConjunctionQueriesOnSameFieldsToString() {
+        FieldQuery term1 = new FieldQuery("field1", "value1");
+        FieldQuery term2 = new FieldQuery("field1", "value2");
+        CompositeQuery compositeQuery = new CompositeQuery(asSet(term1, term2), CompositeQuery.QueryOp.AND);
+
+        String queryString = serializer.visit(compositeQuery);
+        System.out.println(queryString);
+    }
+
+    @Test
+    public void visitTransformsTwoDisjunctionQueriesOnSameFieldsToString() {
         FieldQuery term1 = new FieldQuery("field1", "value1");
         FieldQuery term2 = new FieldQuery("field1", "value2");
         CompositeQuery compositeQuery = new CompositeQuery(asSet(term1, term2), CompositeQuery.QueryOp.OR);
@@ -28,7 +63,7 @@ public class UnsortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransformsThreeDisjunctionQueryOnSameFieldsToString() {
+    public void visitTransformsThreeDisjunctionQueriesOnSameFieldsToString() {
         FieldQuery term1 = new FieldQuery("field1", "value1");
         FieldQuery term2 = new FieldQuery("field1", "value2");
         FieldQuery term3 = new FieldQuery("field1", "value3");

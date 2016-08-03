@@ -28,7 +28,7 @@ public class SortedSolrQuerySerializerTest {
 
         String queryString = serializer.visit(fieldQuery);
 
-        assertThat(queryString, is(buildFieldQuery(field, value)));
+        assertThat(queryString, is(buildFieldQueryString(field, value)));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class SortedSolrQuerySerializerTest {
 
         String queryString = serializer.visit(fieldQuery);
 
-        assertThat(queryString, is(buildFieldQuery(field, escapedValue)));
+        assertThat(queryString, is(buildFieldQueryString(field, escapedValue)));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class SortedSolrQuerySerializerTest {
         String fromFilterValue = "molecular_function";
         QuickGOQuery fromFilter = QuickGOQuery.createQuery(fromFilterField, fromFilterValue);
 
-        String fromFilterString = buildFieldQuery(fromFilterField, fromFilterValue);
+        String fromFilterString = buildFieldQueryString(fromFilterField, fromFilterValue);
 
         JoinQuery query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute,
                 fromFilter);
@@ -124,7 +124,39 @@ public class SortedSolrQuerySerializerTest {
                 joinFromTable, fromFilterString)));
     }
 
-    private String buildFieldQuery(String field, String value) {
+    @Test
+    public void visitTransforms3OrQueriesToString() {
+        FieldQuery query1 = new FieldQuery("field1", "value1");
+
+        FieldQuery query2 = new FieldQuery("field2", "value2");
+
+        FieldQuery query3 = new FieldQuery("field3", "value3");
+
+        QuickGOQuery compositeQuery = query1.or(query2, query3);
+
+        String queryString = serializer.visit((CompositeQuery) compositeQuery);
+        System.out.println(queryString);
+
+        assertThat(queryString, is("((field1:value1) OR (field2:value2) OR (field3:value3))"));
+    }
+
+    @Test
+    public void visitTransforms3AndQueriesToString() {
+        FieldQuery query1 = new FieldQuery("field1", "value1");
+
+        FieldQuery query2 = new FieldQuery("field2", "value2");
+
+        FieldQuery query3 = new FieldQuery("field3", "value3");
+
+        QuickGOQuery compositeQuery = query1.and(query2, query3);
+
+        String queryString = serializer.visit((CompositeQuery) compositeQuery);
+        System.out.println(queryString);
+
+        assertThat(queryString, is("((field1:value1) AND (field2:value2) AND (field3:value3))"));
+    }
+
+    private String buildFieldQueryString(String field, String value) {
         return "(" + field + SolrQueryConverter.SOLR_FIELD_SEPARATOR + value + ")";
     }
 
