@@ -34,7 +34,6 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
             doc.annotationGuidelines = extractAnnGuidelines(term);
             doc.aspect = term.getAspect() == null ?
                     null : term.getAspect().text;
-            doc.children = extractChildren(term);
             doc.taxonConstraints = extractTaxonConstraints(term);
             doc.usage = term.getUsage() == null ?
                     null : term.getUsage().getText();

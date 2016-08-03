@@ -71,34 +71,6 @@ public class GOTermToODocConverterTest {
         assertThat(extractedAnnGuidelines, is(nullValue()));
     }
 
-    // children
-    @Test
-    public void extractsChildrenWhenExists() {
-        GenericTerm childTermMock = mock(GenericTerm.class);
-        when(childTermMock.getId()).thenReturn("child1");
-
-        TermRelation childRel = new TermRelation(childTermMock, term, RelationType.ISA);
-        List<TermRelation> children = Collections.singletonList(childRel);
-
-        when(term.getChildren()).thenReturn(children);
-
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
-        List<String> extractedChildren = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.children);
-
-        assertThat(extractedChildren, hasSize(1));
-        assertThat(extractedChildren.get(0).contains("child1"), is(true));
-    }
-
-    @Test
-    public void extractsChildrenWhenNotExists() {
-        when(term.getChildren()).thenReturn(null);
-
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
-        List<String> extractedChildren = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.children);
-
-        assertThat(extractedChildren, is(nullValue()));
-    }
-
     // taxon constraints
     @Test
     public void extractsTaxonConstraintsWhenExists() {

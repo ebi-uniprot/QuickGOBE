@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * @author Ricardo Antunes
  */
-public class ReplaceConverter implements FieldConverter<OBOTerm.Replace> {
+class ReplaceConverter implements FieldConverter<OBOTerm.Replace> {
     private static final Logger logger = LoggerFactory.getLogger(ReplaceConverter.class);
 
     private static final int FIELD_COUNT = 2;

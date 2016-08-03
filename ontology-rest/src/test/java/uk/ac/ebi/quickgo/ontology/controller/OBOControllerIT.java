@@ -9,7 +9,6 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Before;
@@ -54,8 +53,6 @@ public abstract class OBOControllerIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
-    static final String COMMA = ",";
 
     private static final String QUERY_PARAM = "query";
     private static final String PAGE_PARAM = "page";
@@ -527,6 +524,15 @@ public abstract class OBOControllerIT {
     }
 
     @Test
+    public void canFetchChildrenFromTerm() throws Exception {
+        ResultActions response = mockMvc.perform( get(buildTermsURL()));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(validIdList.size()))
+                .andExpect(jsonPath("$.results.*.children").exists());
+    }
+
+    @Test
     public void invalidDescendantsProduces400AndErrorMessage() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(invalidId(), DESCENDANTS_SUB_RESOURCE)));
@@ -710,7 +716,6 @@ public abstract class OBOControllerIT {
 
     protected ResultActions expectCompleteFields(ResultActions result, String id, String path) throws Exception {
         return expectCoreFields(result, id, path)
-                .andExpect(jsonPath(path + "children").exists())
                 .andExpect(jsonPath(path + "secondaryIds").exists())
                 .andExpect(jsonPath(path + "history").exists())
                 .andExpect(jsonPath(path + "xRefs").exists())
@@ -780,6 +785,8 @@ public abstract class OBOControllerIT {
         invalidRelation = "this-does-not-exist";
         ontologyGraph.addRelationships(simpleRelationships);
     }
+
+
 
     private String requestUrl(ResultActions resultActions) {
         return resultActions.andReturn().getRequest().getRequestURL().toString();
