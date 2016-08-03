@@ -141,7 +141,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
      *
      * <p>No ontology graph data is added to the {@link OntologyDocument}s.
      *
-     * @param docs the list od {@link OntologyDocument}s to convert
+     * @param docs the list od {@link OntologyDocument}s to convertRelation
      * @return a {@link Stream} of {@link T} instances
      */
     private Stream<T> convertDocs(List<OntologyDocument> docs) {
@@ -161,7 +161,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
             Set<OntologyRelationship> childrenEdges = ontologyTraversal.children(term.id);
 
             term.children = childrenEdges.stream()
-                    .map(this::convert)
+                    .map(this::convertRelation)
                     .collect(Collectors.toList());
         } catch (IllegalArgumentException e) {
             LOGGER.info("Could not fetch children for: [" + term.id + "]. Exception message was: " + e.getMessage());
@@ -173,10 +173,10 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     /**
      * Converts an edge {@link OntologyRelationType} into an {@link uk.ac.ebi.quickgo.ontology.model.OBOTerm.Relation}.
      *
-     * @param oRel the ontology relationship to convert
+     * @param oRel the ontology relationship to convertRelation
      * @return an ontology relation understandable by the client
      */
-    private OBOTerm.Relation convert(OntologyRelationship oRel) {
+    private OBOTerm.Relation convertRelation(OntologyRelationship oRel) {
         OBOTerm.Relation relation = new OBOTerm.Relation();
         relation.id = oRel.child;
         relation.relation = oRel.relationship;
