@@ -20,6 +20,10 @@ public class ECOControllerIT extends OBOControllerIT {
     private static final String ECO_0000001 = "ECO:0000001";
     private static final String ECO_0000002 = "ECO:0000002";
 
+    @Override protected OntologyDocument createBasicDoc(String id, String name) {
+        return OntologyDocMocker.createECODoc(id, name);
+    }
+
     @Override
     protected List<OntologyDocument> createBasicDocs() {
         return Arrays.asList(
@@ -33,7 +37,8 @@ public class ECOControllerIT extends OBOControllerIT {
                 (Collectors.toList());
     }
 
-    private String createId(int idNum) {
+    @Override
+    protected String createId(int idNum) {
         return String.format("ECO:%07d", idNum);
     }
 

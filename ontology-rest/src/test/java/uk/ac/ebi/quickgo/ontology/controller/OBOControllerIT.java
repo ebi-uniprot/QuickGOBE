@@ -3,12 +3,14 @@ package uk.ac.ebi.quickgo.ontology.controller;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Before;
@@ -69,7 +71,7 @@ public abstract class OBOControllerIT {
     @Autowired
     protected OntologyGraph ontologyGraph;
 
-    MockMvc mockMvc;
+    protected MockMvc mockMvc;
 
     private String resourceUrl;
     private String validId;
@@ -90,7 +92,7 @@ public abstract class OBOControllerIT {
         assertThat(basicDocs.size(), is(greaterThan(1)));
 
         validId = basicDocs.get(0).id;
-        validIdList =  basicDocs.stream().map(doc -> doc.id).collect(Collectors.toList());
+        validIdList = basicDocs.stream().map(doc -> doc.id).collect(Collectors.toList());
         validIdsCSV = toCSV(validIdList);
 
         ontologyRepository.deleteAll();
@@ -108,6 +110,26 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validDocWithNoGraphData.id)));
 
         expectBasicFieldsInResults(response, singletonList(validDocWithNoGraphData.id))
+                .andExpect(jsonPath("$.results.*.id", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveOntologyViaSecondaryId() throws Exception {
+        ontologyRepository.deleteAll();
+
+        String primaryId = createId(1);
+        String secondaryId = createId(2);
+
+        OntologyDocument doc = createBasicDoc(primaryId, "name");
+        doc.secondaryIds = Collections.singletonList(secondaryId);
+
+        ontologyRepository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(buildTermsURL(secondaryId)));
+
+        expectCoreFieldsInResults(response, singletonList(primaryId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -525,7 +547,7 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canFetchChildrenFromTerm() throws Exception {
-        ResultActions response = mockMvc.perform( get(buildTermsURL()));
+        ResultActions response = mockMvc.perform(get(buildTermsURL()));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(validIdList.size()))
@@ -639,6 +661,8 @@ public abstract class OBOControllerIT {
 
     protected abstract String getResourceURL();
 
+    protected abstract OntologyDocument createBasicDoc(String id, String name);
+
     /**
      * Create a basic document to be stored in the repository.
      * It must be a valid document, with a valid document ID.
@@ -654,6 +678,8 @@ public abstract class OBOControllerIT {
     protected abstract String idMissingInRepository();
 
     protected abstract String invalidId();
+
+    protected abstract String createId(int idNum);
 
     protected ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
         return expectCoreFields(result, id, "$.");
@@ -785,8 +811,6 @@ public abstract class OBOControllerIT {
         invalidRelation = "this-does-not-exist";
         ontologyGraph.addRelationships(simpleRelationships);
     }
-
-
 
     private String requestUrl(ResultActions resultActions) {
         return resultActions.andReturn().getRequest().getRequestURL().toString();

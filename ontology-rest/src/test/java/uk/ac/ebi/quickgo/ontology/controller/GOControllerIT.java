@@ -67,13 +67,18 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(jsonPath("$.usage").value("Unrestricted"));
     }
 
+    @Override protected OntologyDocument createBasicDoc(String id, String name) {
+        return OntologyDocMocker.createGODoc(id, name);
+    }
+
     @Override protected List<OntologyDocument> createNDocs(int n) {
         return IntStream.range(1, n + 1)
                 .mapToObj(i -> OntologyDocMocker.createGODoc(createId(i), "go doc name " + i)).collect
                         (Collectors.toList());
     }
 
-    private String createId(int idNum) {
+    @Override
+    protected String createId(int idNum) {
         return String.format("GO:%07d", idNum);
     }
 
