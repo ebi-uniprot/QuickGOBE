@@ -1,25 +1,24 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
-import com.google.common.base.Preconditions;
-import com.jayway.jsonpath.JsonPath;
-import net.minidev.json.JSONArray;
-import org.slf4j.Logger;
-import org.springframework.web.client.RestOperations;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
+import com.google.common.base.Preconditions;
+import com.jayway.jsonpath.JsonPath;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import net.minidev.json.JSONArray;
+import org.slf4j.Logger;
+import org.springframework.web.client.RestOperations;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -83,9 +82,11 @@ class RESTFilterConverter implements FilterConverter {
         // apply request and store results
         JsonPath jsonPath = JsonPath.compile(filterConfig.getProperties().get(BODY_PATH));
         try {
-            List<QuickGOQuery> queries = extractValues(fetchResults(restRequesterBuilder.build()), jsonPath)
-                    .map(value -> QuickGOQuery.createQuery(filterConfig.getProperties().get(LOCAL_FIELD), value))
-                    .collect(Collectors.toList());
+            Set<QuickGOQuery> queries = retrieveThenConvertResponse(
+                    fetchResults(restRequesterBuilder.build()),
+                    jsonPath,
+                    responseString -> QuickGOQuery
+                            .createQuery(filterConfig.getProperties().get(LOCAL_FIELD), responseString));
 
             return QuickGOQuery.generalisedOr(queries.toArray(new QuickGOQuery[queries.size()]));
 
@@ -164,15 +165,17 @@ class RESTFilterConverter implements FilterConverter {
                 "FilterConfig must have mandatory field: " + mandatoryProperty);
     }
 
-    private Stream<String> extractValues(String responseBody, JsonPath jsonPath) {
-        Set<String> results = new HashSet<>();
+    private <T> Set<T> retrieveThenConvertResponse(String responseBody,
+            JsonPath jsonPath,
+            Function<String, T> converter) {
+        Set<T> results = new HashSet<>();
         if (jsonPath.isDefinite()) {
-            results.add(jsonPath.read(responseBody));
+            results.add(converter.apply(jsonPath.read(responseBody)));
         } else {
             ((JSONArray) jsonPath.read(responseBody)).iterator()
-                    .forEachRemaining(value -> results.add(value.toString()));
+                    .forEachRemaining(s -> results.add(converter.apply(s.toString())));
         }
-        return results.stream();
+        return results;
     }
 
     private String fetchResults(RESTRequesterImpl restRequester)
