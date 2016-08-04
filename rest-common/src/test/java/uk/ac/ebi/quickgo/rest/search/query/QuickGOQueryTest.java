@@ -2,7 +2,10 @@ package uk.ac.ebi.quickgo.rest.search.query;
 
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -40,14 +43,20 @@ public class QuickGOQueryTest {
         QuickGOQuery.generalisedAnd();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generalisedOrWith1QueryOnlyCausesException() {
-        QuickGOQuery.generalisedOr(new FieldQuery("field1", "value1"));
+    @Test
+    public void generalisedOrWith1QueryReturnsThatQuery() {
+        FieldQuery originalQuery = new FieldQuery("field1", "value1");
+        QuickGOQuery quickGOQuery = QuickGOQuery.generalisedOr(originalQuery);
+
+        assertThat(quickGOQuery, is(originalQuery));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void generalisedAndWith1QueryOnlyCausesException() {
-        QuickGOQuery.generalisedAnd(new FieldQuery("field1", "value1"));
+    @Test
+    public void generalisedAndWith1QueryReturnsThatQuery() {
+        FieldQuery originalQuery = new FieldQuery("field1", "value1");
+        QuickGOQuery quickGOQuery = QuickGOQuery.generalisedAnd(originalQuery);
+
+        assertThat(quickGOQuery, is(originalQuery));
     }
 
     @Test

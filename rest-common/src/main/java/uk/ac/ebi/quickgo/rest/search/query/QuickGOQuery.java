@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.rest.search.query;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
-
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -21,10 +20,13 @@ public abstract class QuickGOQuery {
      */
     public static QuickGOQuery generalisedOr(QuickGOQuery... queries) {
         Preconditions.checkArgument(queries != null &&
-                        arrayHasNoNullElements(queries) &&
-                        queries.length > 1,
-                "Queries to compose cannot be null or empty");
-        return new CompositeQuery(Sets.newHashSet(queries), QueryOp.OR);
+                        arrayHasNoNullElements(queries),
+                "Queries to compose cannot be null");
+        if (queries.length == 1) {
+            return queries[0];
+        } else {
+            return new CompositeQuery(Sets.newHashSet(queries), QueryOp.OR);
+        }
     }
 
     /**
@@ -35,10 +37,13 @@ public abstract class QuickGOQuery {
      */
     public static QuickGOQuery generalisedAnd(QuickGOQuery... queries) {
         Preconditions.checkArgument(queries != null &&
-                        arrayHasNoNullElements(queries) &&
-                        queries.length > 1,
-                "Queries to compose cannot be null or empty");
-        return new CompositeQuery(Sets.newHashSet(queries), QueryOp.AND);
+                        arrayHasNoNullElements(queries),
+                "Queries to compose cannot be null");
+        if (queries.length == 1) {
+            return queries[0];
+        } else {
+            return new CompositeQuery(Sets.newHashSet(queries), QueryOp.AND);
+        }
     }
 
     public static QuickGOQuery createQuery(String field, String value) {
