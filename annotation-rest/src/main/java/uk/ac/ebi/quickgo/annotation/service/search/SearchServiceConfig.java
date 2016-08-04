@@ -11,6 +11,7 @@ import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
 import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
@@ -84,7 +85,8 @@ public class SearchServiceConfig {
 
     @Bean
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
-        return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
+        return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER, new UnsortedSolrQuerySerializer());
+        //        return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
     }
 
     /**

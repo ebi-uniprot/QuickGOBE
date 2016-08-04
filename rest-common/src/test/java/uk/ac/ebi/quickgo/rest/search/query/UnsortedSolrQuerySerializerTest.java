@@ -206,22 +206,24 @@ public class UnsortedSolrQuerySerializerTest {
             ));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void transformingTwoOrsWhereOneClauseIsAnAndLeadsToException() {
+        @Test
+        public void visitTransformsTwoOrsWhereOneClauseIsAnAndToString() {
             FieldQuery query1 = new FieldQuery("field1", "value1");
             FieldQuery query2 = new FieldQuery("field1", "value2");
 
-            QuickGOQuery orQuery = query1.and(query2);
+            QuickGOQuery andQuery = query1.and(query2);
 
             FieldQuery otherQuery = new FieldQuery("field2", "value3");
 
-            QuickGOQuery compositeQuery = otherQuery.or(orQuery);
+            QuickGOQuery compositeQuery = otherQuery.or(andQuery);
 
-            serializer.visit((CompositeQuery) compositeQuery);
+            String queryString = serializer.visit((CompositeQuery) compositeQuery);
+
+            assertThat(queryString, is("((field2:value3) OR ((field1:value1) AND (field1:value2)))"));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void transformingTwoOrsWhereOneClauseIsAnOrLeadsToException() {
+        @Test
+        public void visitTransformsTwoOrsWhereOneClauseIsAnOrToString() {
             FieldQuery query1 = new FieldQuery("field1", "value1");
             FieldQuery query2 = new FieldQuery("field1", "value2");
 
@@ -231,7 +233,24 @@ public class UnsortedSolrQuerySerializerTest {
 
             QuickGOQuery compositeQuery = otherQuery.or(orQuery);
 
-            serializer.visit((CompositeQuery) compositeQuery);
+            String queryString = serializer.visit((CompositeQuery) compositeQuery);
+
+            assertThat(queryString, is("((field2:value3) OR ({!terms f=field1}value1,value2))"));
+        }
+
+        @Test
+        public void canTransformOrOfFieldAndAnotherCompositeOr() {
+            QuickGOQuery innerOr = QuickGOQuery.generalisedOr(
+                    new FieldQuery("field1", "value1"),
+                    new FieldQuery("field1", "value2"));
+            QuickGOQuery compositeOr = QuickGOQuery.generalisedOr(
+                    new FieldQuery("field3", "value3"),
+                    innerOr
+            );
+
+            String queryString = serializer.visit((CompositeQuery) compositeOr);
+
+            System.out.println(queryString);
         }
     }
 }

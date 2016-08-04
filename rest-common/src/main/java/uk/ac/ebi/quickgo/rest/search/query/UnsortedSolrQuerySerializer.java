@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * @author Edd
  */
 public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
-    static final String TERMS_LOCAL_PARAMS_QUERY_FORMAT = "({!terms f=%s} %s)";
+    static final String TERMS_LOCAL_PARAMS_QUERY_FORMAT = "({!terms f=%s}%s)";
 
     private final SolrQueryStringSanitizer queryStringSanitizer;
     private final SortedSolrQuerySerializer sortedQuerySerializer;
@@ -61,11 +61,19 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
                         .map(q -> q.accept(this))
                         .collect(Collectors.joining(operatorText, "(", ")"));
             } else {
-                NestedOrSerializer nestedOrSerializer = new NestedOrSerializer();
-                String termsCSV = queries.stream()
-                        .map(q -> q.accept(nestedOrSerializer))
-                        .collect(Collectors.joining(","));
-                return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, nestedOrSerializer.field, termsCSV);
+                try {
+                    // assume all queries in this OR are on the same field, and proceed to construct a terms query
+                    NestedOrSerializer nestedOrSerializer = new NestedOrSerializer();
+                    String termsCSV = queries.stream()
+                            .map(q -> q.accept(nestedOrSerializer))
+                            .collect(Collectors.joining(","));
+                    return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, nestedOrSerializer.field, termsCSV);
+                } catch (IllegalArgumentException iae) {
+                    // otherwise, re-use the default sorted serializer
+                    return queries.stream()
+                            .map(q -> q.accept(this))
+                            .collect(Collectors.joining(operatorText, "(", ")"));
+                }
             }
         }
     }
