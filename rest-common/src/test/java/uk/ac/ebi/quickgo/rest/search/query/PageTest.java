@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import uk.ac.ebi.quickgo.rest.search.query.Page;
-
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -15,31 +15,54 @@ import static org.hamcrest.core.Is.is;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class PageTest {
-    @Mock
-    private uk.ac.ebi.quickgo.rest.search.query.QueryVisitor visitorMock;
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-    @Test(expected = IllegalArgumentException.class)
+    @Mock
+    private QueryVisitor visitorMock;
+
+    @Test
     public void negativePageNumberThrowsException() throws Exception {
         int pageNumber = -1;
         int pageSize = 1;
 
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Page number must be greater than 0");
+
         new Page(pageNumber, pageSize);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void negativePageResultSizeThrowsException() throws Exception {
+    @Test
+    public void zeroPageNumberThrowsException() throws Exception {
         int pageNumber = 0;
+        int pageSize = 1;
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Page number must be greater than 0");
+
+        new Page(pageNumber, pageSize);
+    }
+
+    @Test
+    public void negativePageResultSizeThrowsException() throws Exception {
+        int pageNumber = 1;
         int pageSize = -1;
 
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Page result size cannot be less than 0");
+
         new Page(pageNumber, pageSize);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void zeroPageResultSizeThrowsException() throws Exception {
-        int pageNumber = 0;
+    @Test
+    public void zeroPageResultSizeIsAccepted() throws Exception {
+        int pageNumber = 1;
         int pageSize = 0;
 
-        new Page(pageNumber, pageSize);
+        Page page = new Page(pageNumber, pageSize);
+
+        assertThat(page.getPageNumber(), is(pageNumber));
+        assertThat(page.getPageSize(), is(pageSize));
     }
 
     @Test

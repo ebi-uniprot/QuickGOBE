@@ -42,14 +42,17 @@ public class AbstractSolrQueryResultConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        converter = new AbstractSolrQueryResultConverter<String>(new SolrQueryResultHighlightingConverter(
-                highlightedFieldNameMap)) {
+        converter = new AbstractSolrQueryResultConverter<String>() {
+
             @Override protected List<String> convertResults(SolrDocumentList results) {
                 return results.stream()
                         .map(SolrDocument::toString)
                         .collect(Collectors.toList());
             }
         };
+
+        converter.setQueryResultHighlightingConverter(new SolrQueryResultHighlightingConverter(
+                highlightedFieldNameMap));
     }
 
     @Test

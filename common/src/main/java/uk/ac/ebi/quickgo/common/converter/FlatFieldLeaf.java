@@ -8,7 +8,7 @@ import static java.util.Objects.nonNull;
 /**
  * A flat field representing a {@link String} value. These are stored
  * within a (possibly nested) list of {@link FlatField}s inside the
- * {@FlatFieldBuilder} class.
+ * {@link FlatFieldBuilder} class.
  *
  * Created 26/11/15
  * @author Edd
