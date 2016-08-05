@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
+import java.util.StringJoiner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -199,11 +200,20 @@ public class UnsortedSolrQuerySerializerTest {
             System.out.println(queryString);
 
             assertThat(queryString, is(
-                    "((" + otherQuery.field() + ":" + otherQuery.value() + ") AND " +
-                            String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT,
-                                    query1.field(),
-                                    query1.value() + "," + query2.value()) + ")"
+                    "(" +
+                            buildTermsQuery(otherQuery.field(), otherQuery.value()) +
+                            " AND " +
+                            buildTermsQuery(query1.field(), query1.value(), query2.value()) +
+                            ")"
             ));
+        }
+
+        private String buildTermsQuery(String field, String... values) {
+            StringJoiner stringJoiner = new StringJoiner(",");
+            for (String value : values) {
+                stringJoiner.add(value);
+            }
+            return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
         }
 
         @Test
@@ -219,7 +229,15 @@ public class UnsortedSolrQuerySerializerTest {
 
             String queryString = serializer.visit((CompositeQuery) compositeQuery);
 
-            assertThat(queryString, is("((field2:value3) OR ((field1:value1) AND (field1:value2)))"));
+            assertThat(queryString, is(
+                    "(" +
+                            buildTermsQuery(otherQuery.field(), otherQuery.value()) +
+                            " OR (" +
+                            buildTermsQuery(query1.field(), query1.value()) +
+                            " AND " +
+                            buildTermsQuery(query2.field(), query2.value()) +
+                            "))"
+            ));
         }
 
         @Test
@@ -235,7 +253,12 @@ public class UnsortedSolrQuerySerializerTest {
 
             String queryString = serializer.visit((CompositeQuery) compositeQuery);
 
-            assertThat(queryString, is("((field2:value3) OR ({!terms f=field1}value1,value2))"));
+            assertThat(queryString, is(
+                    "(" +
+                            buildTermsQuery(otherQuery.field(), otherQuery.value()) +
+                            " OR " +
+                            buildTermsQuery(query1.field(), query1.value(), query2.value())
+                            + ")"));
         }
 
         @Test

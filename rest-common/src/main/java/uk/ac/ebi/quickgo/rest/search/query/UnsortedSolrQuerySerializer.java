@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * has value id1 OR id2 OR ....".
  *
  * <p>Specifically, this class decorates the {@link SortedSolrQuerySerializer} with
- * specific behaviour for {@link CompositeQuery}s containing ORs.
+ * specific behaviour for {@link CompositeQuery}s containing ORs and {@link FieldQuery}s.
  *
  *
  * Created 02/08/16
@@ -80,7 +80,7 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
 
     @Override
     public String visit(FieldQuery query) {
-        return sortedQuerySerializer.visit(query);
+        return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, query.field(), query.value());
     }
 
     @Override
@@ -117,7 +117,7 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
             } else {
                 field = query.field();
             }
-            return queryStringSanitizer.sanitize(query.value());
+            return query.value();
         }
 
         @Override
