@@ -98,18 +98,21 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     }
 
     private List<String> extractReplacements(GenericTerm term) {
-        return extractReplaceElementsFromRelations(term.getReplacements());
+        return extractReplaceElementsFromRelations(term.getReplacements(),
+                (TermRelation relation) -> relation.getParent().getId());
     }
 
     private List<String> extractReplaces(GenericTerm term) {
-        return extractReplaceElementsFromRelations(term.getReplaces());
+        return extractReplaceElementsFromRelations(term.getReplaces(),
+                (TermRelation relation) -> relation.getChild().getId());
     }
 
-    private List<String> extractReplaceElementsFromRelations(Collection<TermRelation> replaceList) {
+    private List<String> extractReplaceElementsFromRelations(Collection<TermRelation> replaceList,
+            Function<TermRelation, String> replaceIdExtractor) {
         if (!isEmpty(replaceList)) {
             return replaceList.stream()
                     .map(replace -> FlatFieldBuilder.newFlatField()
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getChild().getId()))
+                            .addField(FlatFieldLeaf.newFlatFieldLeaf(replaceIdExtractor.apply(replace)))
                             .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getTypeof().getFormalCode()))
                             .buildString())
                     .collect(Collectors.toList());
