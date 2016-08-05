@@ -25,7 +25,9 @@ public abstract class QuickGOQuery {
         if (queries.length == 1) {
             return queries[0];
         } else {
-            return new CompositeQuery(Sets.newHashSet(queries), QueryOp.OR);
+            Set<QuickGOQuery> queriesSet = new LinkedHashSet<>();
+            Collections.addAll(queriesSet, queries);
+            return new CompositeQuery(queriesSet, QueryOp.OR);
         }
     }
 

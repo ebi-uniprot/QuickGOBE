@@ -19,6 +19,9 @@ import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,8 +88,30 @@ public class SearchServiceConfig {
 
     @Bean
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
-        return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER, new UnsortedSolrQuerySerializer());
-        //                return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
+        Set<String> termsQueryCompatibleFields = Stream.of(
+                "goId",
+                "qualifier",
+                //                "geneProductId",   // this one has a "complex" analyser -- well, not really, but
+                // something that requires prior knowledge in order to accurately construct indexed values,
+                // compatible with a terms query
+                "goId_join",
+                "geneProductType",
+                "dbObjectSymbol",
+                "dbSubset",
+                "goEvidence",
+                "ecoId",
+                "reference",
+                "referenceSearch",
+                "withFrom",
+                "withFromSearch",
+                "taxonId",
+                "interactingTaxonId",
+                "assignedBy",
+                "extension").collect(Collectors.toSet());
+
+        return new SolrQueryConverter(
+                SOLR_ANNOTATION_QUERY_REQUEST_HANDLER,
+                new UnsortedSolrQuerySerializer(termsQueryCompatibleFields));
     }
 
     /**

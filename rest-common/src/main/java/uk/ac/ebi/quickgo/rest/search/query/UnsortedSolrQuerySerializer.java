@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.rest.search.query;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * <p>This class defines an algorithm for serializing {@link QuickGOQuery}s into a corresponding
@@ -29,28 +28,10 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
     private final SortedSolrQuerySerializer sortedQuerySerializer;
     private final Set<String> termsQueryCompatibleFields;
 
-    public UnsortedSolrQuerySerializer() {
+    public UnsortedSolrQuerySerializer(Set<String> termsQueryCompatibleFields) {
         this.sortedQuerySerializer = new SortedSolrQuerySerializer();
-        this.termsQueryCompatibleFields = Stream.of(
-                "goId",
-                "qualifier",
-                //                "geneProductId",   // this one has a "complex" analyser -- well, not really, but
-                // something that requires prior knowledge in order to accurately construct indexed values,
-                // compatible with a terms query
-                "goId_join",
-                "geneProductType",
-                "dbObjectSymbol",
-                "dbSubset",
-                "goEvidence",
-                "ecoId",
-                "reference",
-                "referenceSearch",
-                "withFrom",
-                "withFromSearch",
-                "taxonId",
-                "interactingTaxonId",
-                "assignedBy",
-                "extension").collect(Collectors.toSet());
+
+        this.termsQueryCompatibleFields = termsQueryCompatibleFields;
     }
 
     @Override
@@ -64,11 +45,11 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
 
     /**
      * Handles {@link CompositeQuery} instances identically to the behaviour in
-     * {@link SortedSolrQuerySerializer}, except for when handling disjunctions (ORs). In this case,
-     * it is required that the disjunction is only <b>one</b> level deep. This is because a
-     * Solr "LocalParams" terms query is created, which allows one to perform a more performant
-     * disjunction directly on the index, by passing any scoring. This becomes important if one
-     * constructs a query with many (e.g., thousands) of disjunctions.
+     * {@link SortedSolrQuerySerializer}, except for when handling disjunctions (ORs). If
+     * all of the queries associated with the disjunction are {@link FieldQuery}s, and
+     * each are on the same field, then a Solr "LocalParams" terms query is created, which is a
+     * more performant disjunction performed directly on the index, by-passing any scoring.
+     * This becomes important if one constructs a query with many (e.g., thousands) of disjunctions.
      *
      * @param query the {@link CompositeQuery} which is to be serialized
      * @return the serialized String representation of the supplied {@code query}
@@ -89,14 +70,23 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
                         .map(q -> q.accept(this))
                         .collect(Collectors.joining(operatorText, "(", ")"));
             } else {
-                try {
-                    // assume all queries in this OR are on the same field, and proceed to construct a terms query
-                    NestedOrSerializer nestedOrSerializer = new NestedOrSerializer();
-                    String termsCSV = queries.stream()
-                            .map(q -> q.accept(nestedOrSerializer))
-                            .collect(Collectors.joining(","));
-                    return buildTermsQuery(nestedOrSerializer.field, termsCSV);
-                } catch (IllegalArgumentException iae) {
+                // assume all queries in this OR are on the same field, and proceed to construct a terms query
+                NestedOrSerializer nestedOrSerializer = new NestedOrSerializer();
+
+                StringJoiner termsValuesJoiner = new StringJoiner(",");
+                boolean allTransformed = true;
+                for (QuickGOQuery q : queries) {
+                    TermQueryTransformationResult transformResult = q.accept(nestedOrSerializer);
+                    if (transformResult.successful) {
+                        termsValuesJoiner.add(transformResult.value);
+                    } else {
+                        allTransformed = false;
+                        break;
+                    }
+                }
+                if (allTransformed) {
+                    return buildTermsQuery(nestedOrSerializer.field, termsValuesJoiner.toString());
+                } else {
                     // otherwise, re-use the default sorted serializer
                     return queries.stream()
                             .map(q -> q.accept(this))
@@ -106,20 +96,33 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         }
     }
 
+    private class TermQueryTransformationResult {
+        private static final String DEFAULT_TRANSFORMATION_VALUE = "TransformationFailed";
+
+        TermQueryTransformationResult(boolean successful, String value) {
+            this.successful = successful;
+            this.value = value;
+        }
+
+        TermQueryTransformationResult(boolean successful) {
+            this(successful, DEFAULT_TRANSFORMATION_VALUE);
+        }
+
+        boolean successful;
+        String value;
+    }
+
     /**
      * The serializer that handles nested {@link CompositeQuery}s involving ORs, referred to in
      * {@link UnsortedSolrQuerySerializer#visit(uk.ac.ebi.quickgo.rest.search.query.CompositeQuery)}.
      * Specifically, this OR serializer, handles (visits) only simple {@link FieldQuery} instances. No
      * other {@link QuickGOQuery} subclass is handled.
      */
-    private class NestedOrSerializer implements QueryVisitor<String> {
-
-        private static final String VISITOR_IMPLEMENTATION_NOT_PROVIDED_ERROR_FORMAT =
-                "UnsortedSolrQuerySerializer does not handle nested %s instances in a disjunction";
+    private class NestedOrSerializer implements QueryVisitor<TermQueryTransformationResult> {
         private String field;
 
         @Override
-        public String visit(FieldQuery query) {
+        public TermQueryTransformationResult visit(FieldQuery query) {
             if (isTermsQueryCompatible(query)) {
                 if (field != null && !field.equals(query.field())) {
                     throw new IllegalArgumentException(
@@ -127,36 +130,31 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
                 } else {
                     field = query.field();
                 }
-                return query.value();
+                return new TermQueryTransformationResult(true, query.value());
             } else {
-                throw new IllegalArgumentException("this fieldquery is not termsable");
+                return new TermQueryTransformationResult(false);
             }
         }
 
         @Override
-        public String visit(CompositeQuery query) {
-            throw new IllegalArgumentException(
-                    String.format(VISITOR_IMPLEMENTATION_NOT_PROVIDED_ERROR_FORMAT, "CompositeQuery"));
+        public TermQueryTransformationResult visit(CompositeQuery query) {
+            return new TermQueryTransformationResult(false);
         }
 
         @Override
-        public String visit(NoFieldQuery query) {
-            throw new IllegalArgumentException(
-                    String.format(VISITOR_IMPLEMENTATION_NOT_PROVIDED_ERROR_FORMAT, "NoFieldQuery"));
+        public TermQueryTransformationResult visit(NoFieldQuery query) {
+            return new TermQueryTransformationResult(false);
         }
 
         @Override
-        public String visit(AllQuery query) {
-            throw new IllegalArgumentException(
-                    String.format(VISITOR_IMPLEMENTATION_NOT_PROVIDED_ERROR_FORMAT, "AllQuery"));
+        public TermQueryTransformationResult visit(AllQuery query) {
+            return new TermQueryTransformationResult(false);
         }
 
         @Override
-        public String visit(JoinQuery query) {
-            throw new IllegalArgumentException(
-                    String.format(VISITOR_IMPLEMENTATION_NOT_PROVIDED_ERROR_FORMAT, "JoinQuery"));
+        public TermQueryTransformationResult visit(JoinQuery query) {
+            return new TermQueryTransformationResult(false);
         }
-
     }
 
     @Override
