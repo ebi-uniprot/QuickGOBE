@@ -50,7 +50,7 @@ public class AnnotationRequest {
     private static List<StatsRequest> DEFAULT_STATS_REQUESTS;
 
     static  {
-        List<String> statsTypes = Arrays.asList(GO_ID_INDEXED_ORIGINAL);
+        List<String> statsTypes = Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID);
 
         StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
         StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);
