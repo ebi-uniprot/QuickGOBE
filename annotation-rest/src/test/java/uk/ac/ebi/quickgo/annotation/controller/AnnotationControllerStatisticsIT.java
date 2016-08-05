@@ -86,7 +86,7 @@ public class AnnotationControllerStatisticsIT {
     public void statsForAllDocsContaining1OntologyIdReturns1OntologyIdStat() throws Exception {
         Set<String> savedGOIds = selectValuesFromDocs(savedDocs, doc -> doc.goId);
 
-        String type = AnnotationFields.GO_ID;
+        String type = AnnotationFields.GO_ID_INDEXED_ORIGINAL;
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
 
@@ -103,7 +103,7 @@ public class AnnotationControllerStatisticsIT {
         Set<String> savedGOIds = selectValuesFromDocs(savedDocs, doc -> doc.goId);
         savedGOIds.add(extraDoc.goId);
 
-        String type = AnnotationFields.GO_ID;
+        String type = AnnotationFields.GO_ID_INDEXED_ORIGINAL;
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
 
@@ -124,7 +124,7 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantGOIds = asList(extraDoc1.goId, extraDoc2.goId);
 
-        String type = AnnotationFields.GO_ID;
+        String type = AnnotationFields.GO_ID_INDEXED_ORIGINAL;
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
