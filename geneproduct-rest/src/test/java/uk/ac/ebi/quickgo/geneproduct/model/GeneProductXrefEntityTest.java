@@ -31,12 +31,13 @@ public class GeneProductXrefEntityTest {
 	@Before
 	public void setup(){
 		geneProductXrefEntity = new GeneProductDbXRefIDFormat(database, entityType, entityTypeName,
-				idValidationPattern, dbURL);
+				idValidationPattern, dbURL, false);
 	}
 
 	@Test
 	public void validId(){
 		assertThat(geneProductXrefEntity.matches("A0A000"), is(true));
+		assertThat(geneProductXrefEntity.matches("a0A000"), is(true));
 	}
 
 	@Test
@@ -47,28 +48,37 @@ public class GeneProductXrefEntityTest {
 	@Test
 	public void exceptionThrownIfDatabaseIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		new GeneProductDbXRefIDFormat(null, entityType, entityTypeName, idValidationPattern, dbURL);
+		new GeneProductDbXRefIDFormat(null, entityType, entityTypeName, idValidationPattern, dbURL, false);
 	}
 
 	@Test
 	public void exceptionThrownIfEntityTypeIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		new GeneProductDbXRefIDFormat(database, null, entityTypeName, idValidationPattern, dbURL);
+		new GeneProductDbXRefIDFormat(database, null, entityTypeName, idValidationPattern, dbURL, false);
 	}
 
 	@Test
 	public void exceptionThrownIfIdValidationPatternIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		new GeneProductDbXRefIDFormat(database, entityType, entityTypeName, null, dbURL);
+		new GeneProductDbXRefIDFormat(database, entityType, entityTypeName, null, dbURL, false);
 	}
 
 	@Test
 	public void exceptionNotThrownIfEntityTypeNameIsNull(){
-		new GeneProductDbXRefIDFormat(database, entityType, null, idValidationPattern, dbURL);
+		new GeneProductDbXRefIDFormat(database, entityType, null, idValidationPattern, dbURL, false);
 	}
 
 	@Test
 	public void exceptionNotThrownIfDbURLIsNull(){
-		new GeneProductDbXRefIDFormat(database, entityType, entityTypeName, idValidationPattern, null);
+		new GeneProductDbXRefIDFormat(database, entityType, entityTypeName, idValidationPattern, null, false);
+	}
+
+	@Test
+	public void validationCanBeMadeCaseSensitive(){
+		GeneProductDbXRefIDFormat geneProductXrefEntity = new GeneProductDbXRefIDFormat(database, entityType,
+				entityTypeName,
+				idValidationPattern, dbURL, true);
+		assertThat(geneProductXrefEntity.matches("A0A000"), is(true));
+		assertThat(geneProductXrefEntity.matches("a0A000"), is(false));
 	}
 }

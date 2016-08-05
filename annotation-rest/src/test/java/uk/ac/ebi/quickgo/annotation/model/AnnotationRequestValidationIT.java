@@ -18,12 +18,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.*;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={AnnotationRequestConfig.class})
+@ContextConfiguration(classes = {AnnotationRequestConfig.class})
 public class AnnotationRequestValidationIT {
     private static final String[] VALID_ASSIGNED_BY_PARMS = {"ASPGD", "ASPGD,Agbase", "ASPGD_,Agbase",
             "ASPGD,Agbase_", "ASPGD,Agbase", "BHF-UCL,Agbase", "Roslin_Institute,BHF-UCL,Agbase"};
@@ -33,9 +34,10 @@ public class AnnotationRequestValidationIT {
 
     private static final String[] VALID_GO_EVIDENCE = {"IEA,IBD,IC"};
     private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
-
-    private static final String[] VALID_GENE_PRODUCT_ID  = {"A0A000","A0A003"};
-    private static final String[] INVALID_GENE_PRODUCT_ID = {"99999","&12345"};
+    private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
+    private static final String[] INVALID_GENE_PRODUCT_ID = {"99999", "&12345"};
+    private static final String[] VALID_GENE_PRODUCT_SUBSET ={"BHF-UCL", "Exosome", "KRUK", "ParkinsonsUK-UCL",
+            "ReferenceGenome"};
 
     @Autowired
     private Validator validator;
@@ -57,7 +59,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void allAssignedByValuesAreValid() {
-        String assignedByValues = gimmeCSV(VALID_ASSIGNED_BY_PARMS);
+        String assignedByValues = toCSV(VALID_ASSIGNED_BY_PARMS);
         annotationRequest.setAssignedBy(assignedByValues);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -233,29 +235,24 @@ public class AnnotationRequestValidationIT {
                 is("At least one 'Taxonomic identifier' value is invalid: " + taxId));
     }
 
-
     //GENE PRODUCT ID
     @Test
     public void allGeneProductValuesAreValid() {
-        String geneProductIdValues = gimmeCSV(VALID_GENE_PRODUCT_ID);
+        String geneProductIdValues = toCSV(VALID_GENE_PRODUCT_ID);
         annotationRequest.setGpId(geneProductIdValues);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void geneProductIDValidationIsCaseSensitive() {
-        String geneProductIdValues = (gimmeCSV(VALID_GENE_PRODUCT_ID)).toLowerCase();
+        String geneProductIdValues = (toCSV(VALID_GENE_PRODUCT_ID)).toLowerCase();
         annotationRequest.setGpId(geneProductIdValues);
-        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
-        assertThat(violations, hasSize(1));
-        assertThat(violations.iterator().next().getMessage(),
-                is("At least one 'Gene Product ID' value is invalid: " +
-                        (Arrays.stream(VALID_GENE_PRODUCT_ID).collect(Collectors.joining(", "))).toLowerCase()));
+        assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void allGeneProductValuesAreInvalid() {
-        String geneProductIdValues = gimmeCSV(INVALID_GENE_PRODUCT_ID);
+        String geneProductIdValues = toCSV(INVALID_GENE_PRODUCT_ID);
         annotationRequest.setGpId(geneProductIdValues);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(1));
@@ -263,7 +260,6 @@ public class AnnotationRequestValidationIT {
                 is("At least one 'Gene Product ID' value is invalid: " + Arrays.stream(INVALID_GENE_PRODUCT_ID)
                         .collect(Collectors.joining(", "))));
     }
-
 
     //GO ID PARAMETER
 
@@ -282,7 +278,6 @@ public class AnnotationRequestValidationIT {
                 }
         );
     }
-
 
     @Test
     public void mixedCaseGoIdIsValid() {
@@ -318,7 +313,6 @@ public class AnnotationRequestValidationIT {
         );
     }
 
-
     //ECO PARAMETER
 
     @Test
@@ -353,7 +347,6 @@ public class AnnotationRequestValidationIT {
         );
     }
 
-
     @Test
     public void ecoIdIsInvalid() {
         String[] ecoIds = {"ECO:9", "xxx:0000888", "-"};
@@ -370,6 +363,62 @@ public class AnnotationRequestValidationIT {
                 }
         );
     }
+
+    //GENE PRODUCT TYPE PARAMETER
+    @Test
+    public void validGeneProductTypeValuesDontCauseAnError() {
+        String validIds = "complex,rna,protein";
+        annotationRequest.setGpType(validIds);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void setGpTypeNotCaseSensitive() {
+        String validIds = "comPlex,rnA,pRotein";
+        annotationRequest.setGpType(validIds);
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void invalidGeneProductTypesCauseError() {
+        String[] invalidGeneProductTypes = {"xxx", "000", "..."};
+
+        Arrays.stream(invalidGeneProductTypes).forEach(
+                invalidValue -> {
+                    annotationRequest.setGpType(invalidValue);
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    assertThat(violations, hasSize(is(1)));
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'Gene Product Type' value is invalid: " + invalidValue));
+                }
+        );
+    }
+
+    //GENE PRODUCT SUBSET PARAMETER
+
+    @Test
+    public void setGpSubsetSuccessfully() {
+        String geneProductSubsetValues = toCSV(VALID_GENE_PRODUCT_SUBSET);
+        annotationRequest.setGpSubset(geneProductSubsetValues);
+        assertThat(validator.validate(annotationRequest),hasSize(0));
+    }
+
+    @Test
+    public void invalidGpSubsetValuesResultInError() {
+        String[] subsets = {"9999", "Reference:Genome", "*"};
+
+        Arrays.stream(subsets).forEach(
+                validId -> {
+                    annotationRequest.setGpSubset(validId);
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    printConstraintViolations(violations);
+                    assertThat(violations.iterator().next().getMessage(),
+                            is("At least one 'Gene Product Subset identifier' value is invalid: " + validId));
+                    assertThat(violations, hasSize(1));
+                }
+        );
+    }
+
 
     //PAGE PARAMETER
     @Test
@@ -504,7 +553,4 @@ public class AnnotationRequestValidationIT {
         violations.forEach(System.out::println);
     }
 
-    private String gimmeCSV(String... values) {
-        return Arrays.stream(values).collect(Collectors.joining(","));
-    }
 }

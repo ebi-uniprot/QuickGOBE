@@ -32,9 +32,12 @@ public class DbXRefLoader {
     private static final String COL_DELIMITER = "\t";
     private final Logger logger = LoggerFactory.getLogger(DbXRefLoader.class);
     private final String path;
+    private final boolean caseSensitive;
 
-    public DbXRefLoader(String path) {
+    public DbXRefLoader(String path, boolean caseSensitive) {
+
         this.path = path;
+        this.caseSensitive = caseSensitive;
     }
 
     /**
@@ -58,7 +61,8 @@ public class DbXRefLoader {
                     .skip(1)    //header
                     .map(line -> line.split(COL_DELIMITER))
                     .map(fields -> new DbXRefEntity(fields[COL_DATABASE], fields[COL_ENTITY_TYPE],
-                            fields[COL_ENTITY_TYPE_NAME], fields[COL_LOCAL_ID_SYNTAX], fields[COL_URL_SYNTAX]))
+                            fields[COL_ENTITY_TYPE_NAME], fields[COL_LOCAL_ID_SYNTAX], fields[COL_URL_SYNTAX],
+                            caseSensitive))
                     .collect(toList());
 
         } catch (Exception e) {

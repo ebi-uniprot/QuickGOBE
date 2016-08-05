@@ -47,13 +47,28 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAV
  * @author Edd
  */
 public abstract class OBOController<T extends OBOTerm> {
+    static final String TERMS_RESOURCE = "terms";
+    static final String SEARCH_RESOUCE = "search";
+
+    static final String COMPLETE_SUB_RESOURCE = "complete";
+    static final String HISTORY_SUB_RESOURCE = "history";
+    static final String XREFS_SUB_RESOURCE = "xrefs";
+    static final String CONSTRAINTS_SUB_RESOURCE = "constraints";
+    static final String XRELATIONS_SUB_RESOURCE = "xontologyrelations";
+    static final String GUIDELINES_SUB_RESOURCE = "guidelines";
+    static final String ANCESTORS_SUB_RESOURCE = "ancestors";
+    static final String DESCENDANTS_SUB_RESOURCE = "descendants";
+    static final String PATHS_SUB_RESOURCE = "paths";
+
     static final int MAX_PAGE_RESULTS = 100;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
+
     private static final String COMMA = ",";
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
-    private static final String TERMS = "terms";
+
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
@@ -95,7 +110,8 @@ public abstract class OBOController<T extends OBOTerm> {
      *          if the page number is invalid
      */
     @ApiOperation(value = "Get all information on all terms and page through the results")
-    @RequestMapping(value = "/" + TERMS, method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/" + TERMS_RESOURCE, method = {RequestMethod.GET},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
@@ -117,7 +133,8 @@ public abstract class OBOController<T extends OBOTerm> {
     @ApiOperation(value = "Get core information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, ancestors, synonyms, " +
                     "aspect and usage.")
-    @RequestMapping(value = TERMS + "/{ids}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds
                 (ids)));
@@ -136,7 +153,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get complete information about a (CSV) list of terms based on their ids",
             notes = "All fields will be populated providing they have a value.")
-    @RequestMapping(value = TERMS + "/{ids}/complete", method = RequestMethod.GET,
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + COMPLETE_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(
@@ -156,7 +173,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get history information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, history.")
-    @RequestMapping(value = TERMS + "/{ids}/history", method = RequestMethod.GET,
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + HISTORY_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(
@@ -176,7 +193,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get cross-reference information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, xRefs.")
-    @RequestMapping(value = TERMS + "/{ids}/xrefs", method = RequestMethod.GET,
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + XREFS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(
@@ -196,7 +213,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get taxonomy constraint information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, taxonConstraints.")
-    @RequestMapping(value = TERMS + "/{ids}/constraints", method = RequestMethod.GET,
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CONSTRAINTS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(
@@ -216,7 +233,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get cross ontology relationship information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, xRelations.")
-    @RequestMapping(value = TERMS + "/{ids}/xontologyrelations", method = RequestMethod.GET,
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + XRELATIONS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(
@@ -236,7 +253,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get annotation guideline information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, annotationGuidelines.")
-    @RequestMapping(value = TERMS + "/{ids}/guidelines", method = RequestMethod.GET,
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + GUIDELINES_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService
@@ -252,7 +269,8 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Searches a simple user query, e.g., query=apopto",
             notes = "If possible, response fields include: id, name, definition, isObsolete")
-    @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/" + SEARCH_RESOUCE, method = {RequestMethod.GET},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(
             @RequestParam(value = "query") String query,
             @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
@@ -276,7 +294,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return a result instance containing the ancestors
      */
     @ApiOperation(value = "Retrieves the ancestors of specified ontology terms")
-    @RequestMapping(value = TERMS + "/{ids}/ancestors", method = RequestMethod.GET,
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + ANCESTORS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findAncestors(
             @PathVariable(value = "ids") String ids,
@@ -294,7 +312,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return a result containing the descendants
      */
     @ApiOperation(value = "Retrieves the descendants of specified ontology terms")
-    @RequestMapping(value = TERMS + "/{ids}/descendants", method = RequestMethod.GET,
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + DESCENDANTS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findDescendants(
             @PathVariable(value = "ids") String ids,
@@ -314,7 +332,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Retrieves the paths between two specified sets of ontology terms. Each path is " +
             "formed from a list of (term, relationship, term) triples.")
-    @RequestMapping(value = TERMS + "/{ids}/paths/{toIds}", method = RequestMethod.GET,
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + PATHS_SUB_RESOURCE + "/{toIds}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<List<OntologyRelationship>>> findPaths(
             @PathVariable(value = "ids") String ids,

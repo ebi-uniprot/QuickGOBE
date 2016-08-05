@@ -24,12 +24,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * service is working as expected.
  */
 final class ResponseVerifier {
+    public static final String GENEPRODUCT_ID_FIELD = "geneProductId";
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
     public static final String GO_ID_FIELD = "goId";
+    public static final String RESULTS = "results";
     public static final String QUALIFIER = "qualifier";
 
     private static final String ERROR_MESSAGE = "messages";
-    private static final String RESULTS = "results";
     private static final String RESULTS_CONTENT_BY_INDEX = RESULTS + "[%d].";
 
     private ResponseVerifier() {}

@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
 
 /**
@@ -147,4 +148,11 @@ public class BasicSearchQueryTemplateTest {
 
         assertThat(page.getPageSize(), is(size));
     }
+
+    @Test
+    public void requestingSearchTemplateBuilderReturnsTheBuilder() throws Exception {
+        assertThat(builder.builder(), is(notNullValue()));
+    }
+
+
 }

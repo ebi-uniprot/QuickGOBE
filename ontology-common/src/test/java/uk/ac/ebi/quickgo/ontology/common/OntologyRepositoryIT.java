@@ -98,16 +98,11 @@ public class OntologyRepositoryIT {
         results.forEach(doc -> assertThat(copyAsCoreDoc(doc), is(equalTo(doc))));
     }
 
-    private List<String> buildIdList(String... ids) {
-        return Arrays.stream(ids)
-                .map(QueryUtils::solrEscape)
-                .collect(Collectors.toList());
-    }
-
     @Test
-    public void retrievesAllFields() {
+    public void retrievesReplacesField() {
         String id = "GO:0000001";
-        ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
+        OntologyDocument doc = OntologyDocMocker.createGODoc(id, "GO name 1");
+        ontologyRepository.save(doc);
 
         List<OntologyDocument> resultList =
                 ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), buildIdList(id));
@@ -116,8 +111,23 @@ public class OntologyRepositoryIT {
         assertThat(resultList.size(), is(1));
 
         OntologyDocument ontologyDocument = resultList.get(0);
-        assertThat(ontologyDocument.name, is(notNullValue()));
-        assertThat(ontologyDocument.considers, is(notNullValue()));
+        assertThat(ontologyDocument.replaces, hasSize(doc.replaces.size()));
+    }
+
+    @Test
+    public void retrievesReplacementField() {
+        String id = "GO:0000001";
+        OntologyDocument doc = OntologyDocMocker.createGODoc(id, "GO name 1");
+        ontologyRepository.save(doc);
+
+        List<OntologyDocument> resultList =
+                ontologyRepository.findCompleteByTermId(OntologyType.GO.name(), buildIdList(id));
+
+        assertThat(resultList, is(notNullValue()));
+        assertThat(resultList.size(), is(1));
+
+        OntologyDocument ontologyDocument = resultList.get(0);
+        assertThat(ontologyDocument.replacements, hasSize(doc.replacements.size()));
     }
 
     @Test
@@ -302,5 +312,11 @@ public class OntologyRepositoryIT {
         coreDoc.synonyms = document.synonyms;
         coreDoc.aspect = document.aspect;
         return coreDoc;
+    }
+
+    private List<String> buildIdList(String... ids) {
+        return Arrays.stream(ids)
+                .map(QueryUtils::solrEscape)
+                .collect(Collectors.toList());
     }
 }

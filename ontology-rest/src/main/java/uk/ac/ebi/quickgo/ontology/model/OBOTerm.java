@@ -28,10 +28,6 @@ public class OBOTerm {
 
     public String comment;
 
-    // list of term IDs to consider when replacing
-    // TODO confirm with Tony S
-    public List<String> consider;
-
     // list of term IDs that are ancestors of this term
     public List<String> ancestors;
 
@@ -40,15 +36,19 @@ public class OBOTerm {
 
     public List<Synonym> synonyms;
 
-    // a term ID that replaces this one
-    public String replacedBy;
+    // indicates all ontology terms that are effectively or can be replaced by the this term
+    public List<Replace> replaces;
+
+    // Contains a list of ontology terms that either replace the current term, or that can be considered as a
+    // replacement
+    public List<Replace> replacements;
 
     // each term can be in one or more subsets; these are used for two purposes: slims and term usage constraints.
     // Slim subsets have names of the form "goslim_xxx", while usage constraint subsets have names like "gocheck_xxx".
     public List<String> subsets;
 
     // list of term IDs that are children of this term
-    public List<String> children;
+    public List<Relation> children;
 
     public List<String> secondaryIds;
 
@@ -59,7 +59,10 @@ public class OBOTerm {
     public List<XORelation> xRelations;
 
     public List<AnnotationGuideLine> annotationGuidelines;
+
     public List<TaxonConstraint> taxonConstraints;
+
+    public List<Credit> credits;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Synonym implements FieldType {
@@ -116,5 +119,23 @@ public class OBOTerm {
     public static class Definition implements FieldType {
         public String text;
         public List<XRef> xrefs;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Replace implements FieldType {
+        public String id;
+        public String type;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Relation implements FieldType {
+        public String id;
+        public OntologyRelationType relation;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Credit implements FieldType {
+        public String code;
+        public String url;
     }
 }

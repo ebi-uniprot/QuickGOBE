@@ -32,13 +32,13 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
             OntologyDocument doc = ontologyDocument.get();
 
             doc.annotationGuidelines = extractAnnGuidelines(term);
-            doc.aspect = term.getAspect() == null?
+            doc.aspect = term.getAspect() == null ?
                     null : term.getAspect().text;
-            doc.children = extractChildren(term);
             doc.taxonConstraints = extractTaxonConstraints(term);
-            doc.usage = term.getUsage() == null?
+            doc.usage = term.getUsage() == null ?
                     null : term.getUsage().getText();
             doc.blacklist = extractBlacklist(term);
+            doc.goDiscussions = extractGoDiscussions(term);
 
             return Optional.of(doc);
         } else {
@@ -46,7 +46,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
         }
     }
 
-    protected List<String> extractChildren(GOTerm goTerm) {
+    private List<String> extractChildren(GOTerm goTerm) {
         if (!isEmpty(goTerm.getChildren())) {
             return goTerm.getChildren().stream()
                     .map(
@@ -60,7 +60,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
     /*
      * format: description|url
      */
-    protected List<String> extractAnnGuidelines(GOTerm goTerm) {
+    private List<String> extractAnnGuidelines(GOTerm goTerm) {
         if (!isEmpty(goTerm.getGuidelines())) {
             return goTerm.getGuidelines().stream()
                     .map(
@@ -69,13 +69,15 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
                                     .addField(newFlatFieldLeaf(t.getUrl()))
                                     .buildString())
                     .collect(Collectors.toList());
-        } else return null;
+        } else {
+            return null;
+        }
     }
 
     /*
      * format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2
      */
-    protected List<String> extractTaxonConstraints(GOTerm goTerm) {
+    private List<String> extractTaxonConstraints(GOTerm goTerm) {
         if (!isEmpty(goTerm.getTaxonConstraints())) {
             return goTerm.getTaxonConstraints().stream()
                     .map(t -> {
@@ -95,13 +97,15 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
                                 .buildString();
                     })
                     .collect(Collectors.toList());
-        } else return null;
+        } else {
+            return null;
+        }
     }
 
     /*
      * format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|methodId
      */
-    protected List<String> extractBlacklist(GOTerm goTerm){
+    private List<String> extractBlacklist(GOTerm goTerm) {
         if (!isEmpty(goTerm.getBlacklist())) {
             return goTerm.getBlacklist().stream()
                     .map(
@@ -117,6 +121,21 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
                                     .addField(newFlatFieldLeaf(t.getMethodId()))
                                     .buildString())
                     .collect(Collectors.toList());
-        } else return null;
+        } else {
+            return null;
+        }
+    }
+
+    private List<String> extractGoDiscussions(GOTerm goTerm) {
+        if (!isEmpty(goTerm.getPlannedChanges())) {
+            return goTerm.getPlannedChanges().stream()
+                    .map(change -> newFlatField()
+                            .addField(newFlatFieldLeaf(change.getTitle()))
+                            .addField(newFlatFieldLeaf(change.getUrl()))
+                            .buildString())
+                    .collect(Collectors.toList());
+        } else {
+            return null;
+        }
     }
 }

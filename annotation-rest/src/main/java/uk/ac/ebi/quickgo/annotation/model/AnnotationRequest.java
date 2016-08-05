@@ -1,15 +1,18 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
+import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
+import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 
 /**
@@ -32,10 +35,28 @@ public class AnnotationRequest {
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
-            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID};
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE, DB_SUBSET};
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
+
+    /**
+     * At the moment the definition of the list is hardcoded because we only have need to display annotation and
+     * gene product statistics on a subset of types.
+     *
+     * Note: We can in the future change this from a hard coded implementation, to something that is decided by the
+     * client.
+     */
+    private static List<StatsRequest> DEFAULT_STATS_REQUESTS;
+
+    static  {
+        List<String> statsTypes = Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID);
+
+        StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
+        StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);
+
+        DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
+    }
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -82,7 +103,7 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = CASE_INSENSITIVE,
             message = "At least one 'Aspect' value is invalid: ${validatedValue}")
     public String getAspect() {
         return filterMap.get(ASPECT_FIELD);
@@ -167,7 +188,7 @@ public class AnnotationRequest {
         filterMap.put(GO_ID, goId);
     }
 
-    @Pattern(regexp = "(?i)go:[0-9]{7}(,go:[0-9]{7})*",
+    @Pattern(regexp = "go:[0-9]{7}(,go:[0-9]{7})*", flags = CASE_INSENSITIVE,
             message = "At least one 'GO Id' value is invalid: ${validatedValue}")
     public String getGoId() {
         return filterMap.get(GO_ID);
@@ -181,13 +202,13 @@ public class AnnotationRequest {
         filterMap.put(ECO_ID, ecoId);
     }
 
-    @Pattern(regexp = "(?i)ECO:[0-9]{7}(,ECO:[0-9]{7})*",
+    @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*", flags = CASE_INSENSITIVE,
             message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
     public String getEcoId() {
         return filterMap.get(ECO_ID);
     }
 
-    @Pattern(regexp = "^exact|slim|descendants$", flags = Pattern.Flag.CASE_INSENSITIVE, message = "Invalid usage: " +
+    @Pattern(regexp = "^exact|slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
             "${validatedValue})")
     public String getUsage() {
         return filterMap.get(USAGE_FIELD);
@@ -199,7 +220,7 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "GO:[0-9]+(,GO:[0-9]+)*", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "GO:[0-9]+(,GO:[0-9]+)*", flags = CASE_INSENSITIVE,
             message = "Invalid GO IDs specified: ${validatedValue})")
     public String getUsageIds() {
         return filterMap.get(USAGE_IDS);
@@ -212,7 +233,7 @@ public class AnnotationRequest {
     }
 
     @Pattern(regexp = "(is_a|part_of|occurs_in|regulates)(,is_a|part_of|occurs_in|regulates)*",
-            flags = Pattern.Flag.CASE_INSENSITIVE)
+            flags = CASE_INSENSITIVE)
     public String getUsageRelationships() {
         return filterMap.get(USAGE_RELATIONSHIPS);
     }
@@ -221,6 +242,27 @@ public class AnnotationRequest {
         if (usageRelationships != null) {
             filterMap.put(USAGE_RELATIONSHIPS, usageRelationships.toLowerCase());
         }
+    }
+
+    public void setGpType(String geneProductType){
+        filterMap.put(GENE_PRODUCT_TYPE, geneProductType.toLowerCase());
+    }
+
+    @Pattern(regexp = "^(complex|rna|protein)(,(complex|rna|protein)){0,2}", flags = CASE_INSENSITIVE,
+            message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
+    public String getGpType(){
+        return filterMap.get(GENE_PRODUCT_TYPE);
+    }
+
+
+    public void setGpSubset(String gpSubset){
+        filterMap.put(DB_SUBSET, gpSubset);
+    }
+
+    @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
+            message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
+    public String getGpSubset(){
+        return filterMap.get(DB_SUBSET);
     }
 
     public int getLimit() {
@@ -286,5 +328,42 @@ public class AnnotationRequest {
         }
 
         return request;
+    }
+
+    public List<StatsRequest> createStatsRequests() {
+        return DEFAULT_STATS_REQUESTS;
+    }
+
+    /**
+     * Defines which statistics the client would like to to retrieve.
+     */
+    public static class StatsRequest {
+        private final String groupName;
+        private final String groupField;
+        private final List<String> types;
+
+        public StatsRequest(String groupName, String groupField, List<String> types) {
+            Preconditions.checkArgument(groupName != null && !groupName.trim().isEmpty(),
+                    "Statistics group name cannot be null or empty");
+            Preconditions.checkArgument(groupField != null && !groupName.trim().isEmpty(),
+                    "Statistics group field cannot be null or empty");
+            Preconditions.checkArgument(types != null, "Types collection cannot be null or empty");
+
+            this.groupName = groupName;
+            this.groupField = groupField;
+            this.types = types;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public String getGroupField() {
+            return groupField;
+        }
+
+        public Collection<String> getTypes() {
+            return Collections.unmodifiableList(types);
+        }
     }
 }

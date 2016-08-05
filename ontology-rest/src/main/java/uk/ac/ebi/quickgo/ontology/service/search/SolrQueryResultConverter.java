@@ -30,7 +30,6 @@ public class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<O
             GODocConverter goDocConverter,
             ECODocConverter ecoDocConverter,
             Map<String, String> fieldNameMap) {
-        super(new SolrQueryResultHighlightingConverter(fieldNameMap));
 
         Preconditions.checkArgument(documentObjectBinder != null, "Document Object Binder can not be null");
         Preconditions.checkArgument(goDocConverter != null, "Go document converter can not be null");
@@ -39,6 +38,8 @@ public class SolrQueryResultConverter extends AbstractSolrQueryResultConverter<O
         this.documentObjectBinder = documentObjectBinder;
         this.goDocConverter = goDocConverter;
         this.ecoDocConverter = ecoDocConverter;
+
+        this.setQueryResultHighlightingConverter(new SolrQueryResultHighlightingConverter(fieldNameMap));
     }
 
     @Override protected List<OBOTerm> convertResults(SolrDocumentList results) {

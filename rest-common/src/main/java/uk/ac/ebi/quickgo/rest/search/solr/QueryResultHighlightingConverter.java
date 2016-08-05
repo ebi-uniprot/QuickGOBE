@@ -23,7 +23,7 @@ public interface QueryResultHighlightingConverter<R, H> {
      *
      * @param results the results of a query
      * @param resultHighlights highlighting specific information from query results
-     * @return
+     * @return a {@link List} of {@link DocHighlight} instances showing highlighting details
      */
     List<DocHighlight> convertResultHighlighting(
             R results,

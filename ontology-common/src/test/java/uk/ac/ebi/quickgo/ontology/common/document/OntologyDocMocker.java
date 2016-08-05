@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.common.document;
 
-import uk.ac.ebi.quickgo.common.converter.FlatField;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 
@@ -20,7 +19,7 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
 public final class OntologyDocMocker {
     public static final int FLAT_FIELD_DEPTH = 0;
 
-    private OntologyDocMocker(){}
+    private OntologyDocMocker() {}
 
     public static OntologyDocument createGODoc(String id, String name) {
         OntologyDocument od = createOBODoc(id, name);
@@ -54,6 +53,16 @@ public final class OntologyDocMocker {
                 .addField(newFlatFieldLeaf("IER12346"))
                 .buildString());
 
+        od.goDiscussions = new ArrayList<>();
+        od.goDiscussions.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("Viral Processes"))
+                .addField(newFlatFieldLeaf("http://wiki.geneontology.org/index.php/Virus_terms"))
+                .buildString());
+        od.goDiscussions.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("signalling"))
+                .addField(newFlatFieldLeaf("http://wiki.geneontology.org/index.php/Signaling"))
+                .buildString());
+
         return od;
     }
 
@@ -76,11 +85,8 @@ public final class OntologyDocMocker {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("21494263"))
                 .buildString());
         od.isObsolete = true;
-        od.replacedBy = "GO:0000002";
-        od.considers = Arrays.asList("GO:0000003", "GO:0000004");
         od.comment = "Note that protein targeting encompasses the transport of the protein to " +
                 "the specified location, and may also include additional steps such as protein processing.";
-        od.children = Arrays.asList("GO:0000011", "GO:0000012");
         od.synonymNames = Arrays.asList("creatine anabolism", "crayola testarossa");
         od.secondaryIds = Arrays.asList("GO:0000003", "GO:0000004");
         od.subsets = Arrays.asList("goslim_pombe",
@@ -196,6 +202,29 @@ public final class OntologyDocMocker {
                 .buildString()
         );
 
+        // replaces
+        //format: goTermId|relationType
+        od.replaces = new ArrayList<>();
+        od.replaces.add(createFlatRelation("GO:1111111", "replaced_by"));
+
+        od.replacements = new ArrayList<>();
+        od.replacements.add(createFlatRelation("GO:0000002", "replaced_by"));
+        od.replacements.add(createFlatRelation("GO:0000003", "consider"));
+        od.replacements.add(createFlatRelation("GO:0000004", "consider"));
+
+        od.credits = new ArrayList<>();
+        od.credits.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf("BHF"))
+                .addField(newFlatFieldLeaf("http://www.ucl.ac.uk/cardiovasculargeneontology/"))
+                .buildString());
+
         return od;
+    }
+
+    private static String createFlatRelation(String id, String relationType) {
+        return newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                .addField(newFlatFieldLeaf(id))
+                .addField(newFlatFieldLeaf(relationType))
+                .buildString();
     }
 }
