@@ -79,6 +79,8 @@ class RESTFilterConverter implements FilterConverter {
                                 .collect(Collectors.joining(COMMA)))
         );
 
+        QuickGOQuery nothingMatchesQuery = QuickGOQuery.createAllQuery().not();
+
         // apply request and store results
         JsonPath jsonPath = JsonPath.compile(filterConfig.getProperties().get(BODY_PATH));
         try {
@@ -88,8 +90,11 @@ class RESTFilterConverter implements FilterConverter {
                     responseString -> QuickGOQuery
                             .createQuery(filterConfig.getProperties().get(LOCAL_FIELD), responseString));
 
-            return QuickGOQuery.generalisedOr(queries.toArray(new QuickGOQuery[queries.size()]));
+            if (queries.size() > 0) {
+                return QuickGOQuery.generalisedOr(queries.toArray(new QuickGOQuery[queries.size()]));
+            }
 
+            return nothingMatchesQuery;
         } catch (ExecutionException e) {
             throwRetrievalException(FAILED_REST_FETCH_PREFIX, e);
         } catch (InterruptedException e) {
@@ -99,7 +104,7 @@ class RESTFilterConverter implements FilterConverter {
             throwRetrievalException(FAILED_REST_FETCH_PREFIX + " due to a timeout whilst waiting for response", e);
         }
 
-        return QuickGOQuery.createAllQuery().not();
+        return nothingMatchesQuery;
     }
 
     static String buildResourceTemplate(FilterConfig config) {
