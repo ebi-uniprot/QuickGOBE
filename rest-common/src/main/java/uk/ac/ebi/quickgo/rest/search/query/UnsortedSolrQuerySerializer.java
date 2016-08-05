@@ -1,9 +1,8 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
-
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * <p>This class defines an algorithm for serializing {@link QuickGOQuery}s into a corresponding
@@ -26,12 +25,29 @@ import java.util.stream.Collectors;
 public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
     static final String TERMS_LOCAL_PARAMS_QUERY_FORMAT = "({!terms f=%s}%s)";
 
-    private final SolrQueryStringSanitizer queryStringSanitizer;
     private final SortedSolrQuerySerializer sortedQuerySerializer;
+    private final Set<String> termsQueryCompatibleFields;
 
     public UnsortedSolrQuerySerializer() {
-        this.queryStringSanitizer = new SolrQueryStringSanitizer();
         this.sortedQuerySerializer = new SortedSolrQuerySerializer();
+        this.termsQueryCompatibleFields = Stream.of(
+                "goId",
+                "qualifier",
+                //                "geneProductId",
+                "goId_join",
+                "geneProductType",
+                "dbObjectSymbol",
+                "dbSubset",
+                "goEvidence",
+                "ecoId",
+                "reference",
+                "referenceSearch",
+                "withFrom",
+                "withFromSearch",
+                "taxonId",
+                "interactingTaxonId",
+                "assignedBy",
+                "extension").collect(Collectors.toSet());
     }
 
     /**
@@ -80,7 +96,11 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
 
     @Override
     public String visit(FieldQuery query) {
-        return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, query.field(), query.value());
+        if (isTermsQueryCompatible(query)) {
+            return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, query.field(), query.value());
+        } else {
+            return sortedQuerySerializer.visit(query);
+        }
     }
 
     @Override
@@ -112,12 +132,17 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
 
         @Override
         public String visit(FieldQuery query) {
-            if (field != null && !field.equals(query.field())) {
-                throw new IllegalArgumentException("Fields must all be the same. Encountered: " + field + ", and " + query.field());
+            if (isTermsQueryCompatible(query)) {
+                if (field != null && !field.equals(query.field())) {
+                    throw new IllegalArgumentException(
+                            "Fields must all be the same. Encountered: " + field + ", and " + query.field());
+                } else {
+                    field = query.field();
+                }
+                return query.value();
             } else {
-                field = query.field();
+                throw new IllegalArgumentException("this fieldquery is not termsable");
             }
-            return query.value();
         }
 
         @Override
@@ -142,6 +167,14 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         public String visit(JoinQuery query) {
             throw new IllegalArgumentException(
                     String.format(VISITOR_IMPLEMENTATION_NOT_PROVIDED_ERROR_FORMAT, "JoinQuery"));
+        }
+    }
+
+    private boolean isTermsQueryCompatible(FieldQuery query) {
+        if (termsQueryCompatibleFields.contains(query.field())) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

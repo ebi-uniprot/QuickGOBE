@@ -86,7 +86,7 @@ public class SearchServiceConfig {
     @Bean
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
         return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER, new UnsortedSolrQuerySerializer());
-        //        return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
+        //                return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
     }
 
     /**
