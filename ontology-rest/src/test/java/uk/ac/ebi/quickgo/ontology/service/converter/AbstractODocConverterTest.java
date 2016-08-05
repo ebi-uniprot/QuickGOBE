@@ -56,11 +56,6 @@ public class AbstractODocConverterTest {
     }
 
     @Test
-    public void convertsChildrenWithoutError() {
-        assertThat(oboTermFromValidGODoc.children, is(validGODoc.children));
-    }
-
-    @Test
     public void convertsCommentWithoutError() {
         assertThat(oboTermFromValidGODoc.comment, is(validGODoc.comment));
     }

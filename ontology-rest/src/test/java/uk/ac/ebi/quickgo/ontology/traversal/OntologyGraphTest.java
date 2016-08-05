@@ -10,7 +10,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -539,6 +542,146 @@ public class OntologyGraphTest {
 
             List<String> ancestors = ontologyGraph.descendants(ids("4"), HAS_PART);
             assertThat(ancestors, containsInAnyOrder(id("4"), id("3"), id("2")));
+        }
+    }
+
+    public class ChildrenTests {
+        private final String parentId = id("1");
+
+        private final OntologyRelationship grandParentIsA = createRelationship(parentId, id("0"), IS_A);
+        private final OntologyRelationship childIsA = createRelationship(id("2"), parentId, IS_A);
+        private final OntologyRelationship childHasPart1 = createRelationship(id("3"), parentId, HAS_PART);
+        private final OntologyRelationship childHasPart2 = createRelationship(id("4"), parentId, HAS_PART);
+        private final OntologyRelationship childRegulates = createRelationship(id("5"), parentId, REGULATES);
+        private final OntologyRelationship grandChildIsA = createRelationship(id("6"), id("2"), IS_A);
+
+        @Before
+        public void populateOntology() {
+            ontologyGraph.addRelationships(asList(
+                    grandParentIsA,
+                    childIsA,
+                    childHasPart1,
+                    childHasPart2,
+                    childRegulates,
+                    grandChildIsA
+            ));
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void findingChildrenWithANullVertexThrowsException() throws Exception {
+            ontologyGraph.children(null);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void findingChildrenWithAEmptyVertexThrowsException() throws Exception {
+            ontologyGraph.children("");
+        }
+
+        @Test
+        public void finds1IsAChildOfParent1() throws Exception {
+            Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId, IS_A);
+
+            assertThat(expectedChildren, contains(childIsA));
+        }
+
+        @Test
+        public void finds2HasPartChildrenOfParent1() throws Exception {
+            Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId, HAS_PART);
+
+            assertThat(expectedChildren, containsInAnyOrder(childHasPart1, childHasPart2));
+        }
+
+        @Test
+        public void findsAllChildrenOfParent1WithoutAnyRelationshipsSetAsArguments() throws Exception {
+            Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId);
+
+            assertThat(expectedChildren, containsInAnyOrder(childHasPart1, childHasPart2, childIsA, childRegulates));
+        }
+
+        @Test
+        public void doesNotFindGrandParentOfParentWhenSearchingForChildren() throws Exception {
+            Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId);
+
+            assertThat(expectedChildren, hasSize(4));
+            assertThat(expectedChildren, not(hasItem(grandParentIsA)));
+        }
+
+        @Test
+        public void doesNotFindGrandChildOfParentWhenSearchingForChildren() throws Exception {
+            Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId);
+
+            assertThat(expectedChildren, hasSize(4));
+            assertThat(expectedChildren, not(hasItem(grandChildIsA)));
+        }
+    }
+
+    public class ParentTests {
+        private final String childId = id("1");
+
+        private final OntologyRelationship parentIsA = createRelationship(childId, id("2"), IS_A);
+        private final OntologyRelationship parentHasPart1 = createRelationship(childId, id("3"), HAS_PART);
+        private final OntologyRelationship parentHasPart2 = createRelationship(childId, id("4"), HAS_PART);
+        private final OntologyRelationship parentRegulates = createRelationship(childId, id("5"), REGULATES);
+        private final OntologyRelationship childIsA = createRelationship(id("6"), childId, REGULATES);
+        private final OntologyRelationship grandParentHasPart = createRelationship(id("7"), id("3"), REGULATES);
+
+        @Before
+        public void populateOntology() {
+            ontologyGraph.addRelationships(asList(
+                    parentIsA,
+                    parentHasPart1,
+                    parentHasPart2,
+                    parentRegulates,
+                    childIsA,
+                    grandParentHasPart
+            ));
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void findingParentsWithANullVertexThrowsException() throws Exception {
+            ontologyGraph.parents(null);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void findingParentsWithAnEmptyVertexThrowsException() throws Exception {
+            ontologyGraph.parents("");
+        }
+
+        @Test
+        public void finds1IsAParentOfChild1() throws Exception {
+            Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId, IS_A);
+
+            assertThat(expectedParents, contains(parentIsA));
+        }
+
+        @Test
+        public void finds2HasPartParentsOfChild1() throws Exception {
+            Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId, HAS_PART);
+
+            assertThat(expectedParents, containsInAnyOrder(parentHasPart1, parentHasPart2));
+        }
+
+        @Test
+        public void findsAllParentsOfChild1WithoutAnyRelationshipsSetAsArguments() throws Exception {
+            Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId);
+
+            assertThat(expectedParents, containsInAnyOrder(parentIsA, parentHasPart1, parentHasPart2, parentRegulates));
+        }
+
+        @Test
+        public void doesNotFindChildOfChild1WhenSearchingForParents() throws Exception {
+            Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId);
+
+            assertThat(expectedParents, hasSize(4));
+            assertThat(expectedParents, not(hasItem(childIsA)));
+        }
+
+        @Test
+        public void doesNotFinGrandParentOfChildWhenSearchingForParents() throws Exception {
+            Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId);
+
+            assertThat(expectedParents, hasSize(4));
+            assertThat(expectedParents, not(hasItem(grandParentHasPart)));
         }
     }
 }

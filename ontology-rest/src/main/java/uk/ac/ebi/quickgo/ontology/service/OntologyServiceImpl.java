@@ -141,12 +141,47 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
      *
      * <p>No ontology graph data is added to the {@link OntologyDocument}s.
      *
-     * @param docs the list od {@link OntologyDocument}s to convert
+     * @param docs the list od {@link OntologyDocument}s to convertRelation
      * @return a {@link Stream} of {@link T} instances
      */
     private Stream<T> convertDocs(List<OntologyDocument> docs) {
         return docs.stream()
-                .map(converter::convert);
+                .map(converter::convert)
+                .map(this::insertChildren);
+    }
+
+    /**
+     * Looks up the children of the {@code term} and adds them to the term.
+     *
+     * @param term
+     * @return
+     */
+    private T insertChildren(T term) {
+        try {
+            Set<OntologyRelationship> childrenEdges = ontologyTraversal.children(term.id);
+
+            term.children = childrenEdges.stream()
+                    .map(this::convertRelation)
+                    .collect(Collectors.toList());
+        } catch (IllegalArgumentException e) {
+            LOGGER.info("Could not fetch children for: [" + term.id + "]. Exception message was: " + e.getMessage());
+        }
+
+        return term;
+    }
+
+    /**
+     * Converts an edge {@link OntologyRelationType} into an {@link uk.ac.ebi.quickgo.ontology.model.OBOTerm.Relation}.
+     *
+     * @param oRel the ontology relationship to convertRelation
+     * @return an ontology relation understandable by the client
+     */
+    private OBOTerm.Relation convertRelation(OntologyRelationship oRel) {
+        OBOTerm.Relation relation = new OBOTerm.Relation();
+        relation.id = oRel.child;
+        relation.relation = oRel.relationship;
+
+        return relation;
     }
 
     private T insertAncestors(T term, OntologyRelationType... relations) {
@@ -176,7 +211,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         try {
             return traversalFunction.apply(term, relations);
         } catch (Exception e) {
-            LOGGER.debug("Could not fetch relatives for: [" + term.id + "] with relationships: ["
+            LOGGER.info("Could not fetch relatives for: [" + term.id + "] with relationships: ["
                     + Stream.of(relations).map(OntologyRelationType::getLongName).collect(Collectors.joining(","))
                     + "]. Exception message was: " + e.getMessage());
             return Collections.unmodifiableList(Collections.emptyList());
@@ -191,8 +226,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
 
         List<T> entryHits = pagedResult.getContent().stream()
                 .map(converter::convert)
-                .map(this::insertAncestors)
-                .map(this::insertDescendants)
+                .map(this::insertChildren)
                 .collect(Collectors.toList());
 
         return new QueryResult.Builder<>(totalNumberOfHits, entryHits).withPageInfo(pageInfo).build();

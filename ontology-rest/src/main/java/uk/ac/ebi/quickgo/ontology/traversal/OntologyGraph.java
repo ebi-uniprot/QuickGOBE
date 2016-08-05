@@ -125,6 +125,17 @@ public class OntologyGraph implements OntologyGraphTraversal {
         return ancestorsFound.stream().collect(Collectors.toList());
     }
 
+    @Override public Set<OntologyRelationship> parents(String baseVertex, OntologyRelationType... relations) {
+        Preconditions.checkArgument(baseVertex != null && !baseVertex.trim().isEmpty(),
+                "Base vertex cannot be null or empty");
+
+        Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
+
+        return ontology.outgoingEdgesOf(baseVertex).stream()
+                .filter(ontologyRelationship -> relationsSet.contains(ontologyRelationship.relationship))
+                .collect(Collectors.toSet());
+    }
+
     @Override
     public List<String> descendants(Set<String> topVertices, OntologyRelationType... relations) {
         Preconditions.checkArgument(!isNullOrEmpty(topVertices), "Top vertices cannot be null/empty.");
@@ -135,6 +146,17 @@ public class OntologyGraph implements OntologyGraphTraversal {
         Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
         descendants(topVertices, descendantsFound, relationsSet);
         return descendantsFound.stream().collect(Collectors.toList());
+    }
+
+    @Override public Set<OntologyRelationship> children(String topVertex, OntologyRelationType... relations) {
+        Preconditions.checkArgument(topVertex != null && !topVertex.trim().isEmpty(),
+                "Top vertex cannot be null or empty");
+
+        Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
+
+        return ontology.incomingEdgesOf(topVertex).stream()
+                .filter(ontologyRelationship -> relationsSet.contains(ontologyRelationship.relationship))
+                .collect(Collectors.toSet());
     }
 
     @Override public int hashCode() {
