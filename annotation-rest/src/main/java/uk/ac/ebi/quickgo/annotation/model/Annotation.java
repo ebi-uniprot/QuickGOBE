@@ -100,7 +100,7 @@ public class Annotation {
                 ", qualifier='" + qualifier + '\'' +
                 ", goId='" + goId + '\'' +
                 ", goEvidence='" + goEvidence + '\'' +
-                ", ecoId='" + ecoId + '\'' +
+                ", evidenceCode='" + ecoId + '\'' +
                 ", reference='" + reference + '\'' +
                 ", withFrom=" + withFrom +
                 ", taxonId=" + taxonId +

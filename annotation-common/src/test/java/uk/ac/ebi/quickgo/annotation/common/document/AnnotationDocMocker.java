@@ -41,7 +41,7 @@ public class AnnotationDocMocker {
         doc.id = geneProductId + "-" + System.nanoTime();
 
         doc.goId = GO_ID;
-        doc.ecoId = ECO_ID;
+        doc.evidenceCode = ECO_ID;
         doc.qualifier = QUALIFIER;
         doc.goEvidence = GO_EVIDENCE;
         doc.reference = REFERENCE;
