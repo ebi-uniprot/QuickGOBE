@@ -208,14 +208,6 @@ public class UnsortedSolrQuerySerializerTest {
             ));
         }
 
-        private String buildTermsQuery(String field, String... values) {
-            StringJoiner stringJoiner = new StringJoiner(",");
-            for (String value : values) {
-                stringJoiner.add(value);
-            }
-            return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
-        }
-
         @Test
         public void visitTransformsTwoOrsWhereOneClauseIsAnAndToString() {
             FieldQuery query1 = new FieldQuery("field1", "value1");
@@ -274,6 +266,14 @@ public class UnsortedSolrQuerySerializerTest {
             String queryString = serializer.visit((CompositeQuery) compositeOr);
 
             System.out.println(queryString);
+        }
+
+        private String buildTermsQuery(String field, String... values) {
+            StringJoiner stringJoiner = new StringJoiner(",");
+            for (String value : values) {
+                stringJoiner.add(value);
+            }
+            return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
         }
     }
 }

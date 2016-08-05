@@ -269,12 +269,7 @@ public class AnnotationRequest {
         Optional<FilterRequest> request;
         if (filterMap.containsKey(key)) {
             FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
-            String[] userValues = filterMap.get(key).split(COMMA);
-            String[] normalisedValues = new String[userValues.length];
-            for (int i = 0; i < userValues.length; i++) {
-                normalisedValues[i] = userValues[i].toLowerCase();
-            }
-            requestBuilder.addProperty(key, normalisedValues);
+            requestBuilder.addProperty(key, filterMap.get(key).split(COMMA));
             request = Optional.of(requestBuilder.build());
         } else {
             request = Optional.empty();

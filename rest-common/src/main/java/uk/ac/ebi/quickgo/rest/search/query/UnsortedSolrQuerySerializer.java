@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,9 +15,9 @@ import java.util.stream.Stream;
  * large numbers of Solr documents by an indexed value, e.g. "find me all documents whose field1
  * has value id1 OR id2 OR ....".
  *
- * <p>Specifically, this class decorates the {@link SortedSolrQuerySerializer} with
- * specific behaviour for {@link CompositeQuery}s containing ORs and {@link FieldQuery}s.
- *
+ * <p>Specifically, this class defines specific behaviour for {@link CompositeQuery}s containing ORs and
+ * defers control to {@link SortedSolrQuerySerializer} otherwise.
+ * {@link FieldQuery}s.
  *
  * Created 02/08/16
  *
@@ -33,7 +34,9 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         this.termsQueryCompatibleFields = Stream.of(
                 "goId",
                 "qualifier",
-                //                "geneProductId",
+                //                "geneProductId",   // this one has a "complex" analyser -- well, not really, but
+                // something that requires prior knowledge in order to accurately construct indexed values,
+                // compatible with a terms query
                 "goId_join",
                 "geneProductType",
                 "dbObjectSymbol",
@@ -48,6 +51,15 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
                 "interactingTaxonId",
                 "assignedBy",
                 "extension").collect(Collectors.toSet());
+    }
+
+    @Override
+    public String visit(FieldQuery query) {
+        if (isTermsQueryCompatible(query)) {
+            return buildTermsQuery(query.field(), query.value());
+        } else {
+            return sortedQuerySerializer.visit(query);
+        }
     }
 
     /**
@@ -83,7 +95,7 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
                     String termsCSV = queries.stream()
                             .map(q -> q.accept(nestedOrSerializer))
                             .collect(Collectors.joining(","));
-                    return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, nestedOrSerializer.field, termsCSV);
+                    return buildTermsQuery(nestedOrSerializer.field, termsCSV);
                 } catch (IllegalArgumentException iae) {
                     // otherwise, re-use the default sorted serializer
                     return queries.stream()
@@ -94,30 +106,6 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         }
     }
 
-    @Override
-    public String visit(FieldQuery query) {
-        if (isTermsQueryCompatible(query)) {
-            return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, query.field(), query.value());
-        } else {
-            return sortedQuerySerializer.visit(query);
-        }
-    }
-
-    @Override
-    public String visit(NoFieldQuery query) {
-        return sortedQuerySerializer.visit(query);
-    }
-
-    @Override
-    public String visit(AllQuery query) {
-        return sortedQuerySerializer.visit(query);
-    }
-
-    @Override
-    public String visit(JoinQuery query) {
-        return sortedQuerySerializer.visit(query);
-    }
-
     /**
      * The serializer that handles nested {@link CompositeQuery}s involving ORs, referred to in
      * {@link UnsortedSolrQuerySerializer#visit(uk.ac.ebi.quickgo.rest.search.query.CompositeQuery)}.
@@ -125,9 +113,9 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
      * other {@link QuickGOQuery} subclass is handled.
      */
     private class NestedOrSerializer implements QueryVisitor<String> {
+
         private static final String VISITOR_IMPLEMENTATION_NOT_PROVIDED_ERROR_FORMAT =
                 "UnsortedSolrQuerySerializer does not handle nested %s instances in a disjunction";
-
         private String field;
 
         @Override
@@ -168,13 +156,33 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
             throw new IllegalArgumentException(
                     String.format(VISITOR_IMPLEMENTATION_NOT_PROVIDED_ERROR_FORMAT, "JoinQuery"));
         }
+
+    }
+
+    @Override
+    public String visit(NoFieldQuery query) {
+        return sortedQuerySerializer.visit(query);
+    }
+
+    @Override
+    public String visit(AllQuery query) {
+        return sortedQuerySerializer.visit(query);
+    }
+
+    @Override
+    public String visit(JoinQuery query) {
+        return sortedQuerySerializer.visit(query);
+    }
+
+    private String buildTermsQuery(String field, String... values) {
+        StringJoiner stringJoiner = new StringJoiner(",");
+        for (String value : values) {
+            stringJoiner.add(value.toLowerCase());
+        }
+        return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
     }
 
     private boolean isTermsQueryCompatible(FieldQuery query) {
-        if (termsQueryCompatibleFields.contains(query.field())) {
-            return true;
-        } else {
-            return false;
-        }
+        return termsQueryCompatibleFields.contains(query.field());
     }
 }
