@@ -48,13 +48,22 @@ public class SearchServiceConfig {
 
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
     private static final String COMMA = ",";
-    private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS = "id,geneProductId,qualifier,goId," +
-            "goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extensions";
+    private static final String DEFAULT_ANNOTATION_TERMS_QUERY_COMPATIBLE_FIELDS =
+            "goId,qualifier,geneProductType,dbObjectSymbol,dbSubset,goEvidence,ecoId," +
+                    "reference,referenceSearch,withFrom,withFromSearch,taxonId,interactingTaxonId,assignedBy,extension";
+    private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS =
+            "id,geneProductId,qualifier,goId,goEvidence," +
+                    "ecoId,reference,withFrom,taxonId,assignedBy,extensions";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
+
     @Value("${geneproduct.db.xref.valid.regexes}")
     String xrefValidationRegexFile;
     @Value("${geneproduct.db.xref.valid.casesensitive:" + DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE + "}")
     boolean xrefValidationCaseSensitive;
+
+    @Value("${annotation.terms.query.compatible.fields:" +
+            DEFAULT_ANNOTATION_TERMS_QUERY_COMPATIBLE_FIELDS + "}")
+    private String termsQueryCompatibleFields;
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -80,36 +89,18 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ControllerValidationHelper validationHelper(){
+    public ControllerValidationHelper validationHelper() {
         return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
     }
 
     @Bean
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
-        Set<String> termsQueryCompatibleFields = Stream.of(
-                "goId",
-                "qualifier",
-                //                "geneProductId",   // this one has a "complex" analyser -- well, not really, but
-                // something that requires prior knowledge in order to accurately construct indexed values,
-                // compatible with a terms query
-                "goId_join",
-                "geneProductType",
-                "dbObjectSymbol",
-                "dbSubset",
-                "goEvidence",
-                "ecoId",
-                "reference",
-                "referenceSearch",
-                "withFrom",
-                "withFromSearch",
-                "taxonId",
-                "interactingTaxonId",
-                "assignedBy",
-                "extension").collect(Collectors.toSet());
+        Set<String> termsQueryCompatibleFieldsSet =
+                Stream.of(termsQueryCompatibleFields.split(COMMA)).collect(Collectors.toSet());
 
         return new SolrQueryConverter(
                 SOLR_ANNOTATION_QUERY_REQUEST_HANDLER,
-                new UnsortedSolrQuerySerializer(termsQueryCompatibleFields));
+                new UnsortedSolrQuerySerializer(termsQueryCompatibleFieldsSet));
     }
 
     /**
