@@ -215,7 +215,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
     }
 
     private void convertBucket(NamedList<?> facetBucket, AggregateResponse aggregation) {
-        AggregationBucket aggBucket = new AggregationBucket((String) facetBucket.get(BUCKET_FIELD_ID));
+        AggregationBucket aggBucket = new AggregationBucket(String.valueOf(facetBucket.get(BUCKET_FIELD_ID)));
         aggregation.addBucket(aggBucket);
 
         for (Map.Entry<String, ?> bucketEntry : facetBucket) {
