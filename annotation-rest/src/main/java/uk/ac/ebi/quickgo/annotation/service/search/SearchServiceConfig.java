@@ -44,19 +44,17 @@ import org.springframework.data.solr.core.SolrTemplate;
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
 
-    @Value("${geneproduct.db.xref.valid.regexes}")
-    String xrefValidationRegexFile;
+    public static final int MAX_PAGE_RESULTS = 100;
 
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
-
-    @Value("${geneproduct.db.xref.valid.casesensitive:"+DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE+"}")
-    boolean xrefValidationCaseSensitive;
-
     private static final String COMMA = ",";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS = "id,geneProductId,qualifier,goId," +
             "goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extensions";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
-    public static final int MAX_PAGE_RESULTS = 100;
+    @Value("${geneproduct.db.xref.valid.regexes}")
+    String xrefValidationRegexFile;
+    @Value("${geneproduct.db.xref.valid.casesensitive:" + DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE + "}")
+    boolean xrefValidationCaseSensitive;
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -153,9 +151,6 @@ public class SearchServiceConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-
-    public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
-
     @Bean
     public EntityValidation geneProductValidator() {
         return EntityValidation.createWithData(geneProductLoader().load());
@@ -164,4 +159,6 @@ public class SearchServiceConfig {
     private DbXRefLoader geneProductLoader() {
         return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
+
+    public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 }
