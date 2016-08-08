@@ -11,6 +11,7 @@ import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
 import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
@@ -18,6 +19,9 @@ import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,19 +44,26 @@ import org.springframework.data.solr.core.SolrTemplate;
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
 
-    @Value("${geneproduct.db.xref.valid.regexes}")
-    String xrefValidationRegexFile;
+    public static final int MAX_PAGE_RESULTS = 100;
 
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
+    private static final String COMMA = ",";
+    private static final String DEFAULT_ANNOTATION_TERMS_QUERY_COMPATIBLE_FIELDS =
+            "goId,qualifier,geneProductType,dbObjectSymbol,dbSubset,goEvidence,ecoId," +
+                    "reference,referenceSearch,withFrom,withFromSearch,taxonId,interactingTaxonId,assignedBy,extension";
+    private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS =
+            "id,geneProductId,qualifier,goId,goEvidence," +
+                    "ecoId,reference,withFrom,taxonId,assignedBy,extensions";
+    private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
 
-    @Value("${geneproduct.db.xref.valid.casesensitive:"+DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE+"}")
+    @Value("${geneproduct.db.xref.valid.regexes}")
+    String xrefValidationRegexFile;
+    @Value("${geneproduct.db.xref.valid.casesensitive:" + DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE + "}")
     boolean xrefValidationCaseSensitive;
 
-    private static final String COMMA = ",";
-    private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS = "id,geneProductId,qualifier,goId," +
-            "goEvidence,ecoId,reference,withFrom,taxonId,assignedBy,extensions";
-    private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
-    public static final int MAX_PAGE_RESULTS = 100;
+    @Value("${annotation.terms.query.compatible.fields:" +
+            DEFAULT_ANNOTATION_TERMS_QUERY_COMPATIBLE_FIELDS + "}")
+    private String termsQueryCompatibleFields;
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -78,13 +89,18 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ControllerValidationHelper validationHelper(){
+    public ControllerValidationHelper validationHelper() {
         return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
     }
 
     @Bean
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
-        return new SolrQueryConverter(SOLR_ANNOTATION_QUERY_REQUEST_HANDLER);
+        Set<String> termsQueryCompatibleFieldsSet =
+                Stream.of(termsQueryCompatibleFields.split(COMMA)).collect(Collectors.toSet());
+
+        return new SolrQueryConverter(
+                SOLR_ANNOTATION_QUERY_REQUEST_HANDLER,
+                new UnsortedSolrQuerySerializer(termsQueryCompatibleFieldsSet));
     }
 
     /**
@@ -126,9 +142,6 @@ public class SearchServiceConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-
-    public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
-
     @Bean
     public EntityValidation geneProductValidator() {
         return EntityValidation.createWithData(geneProductLoader().load());
@@ -137,4 +150,6 @@ public class SearchServiceConfig {
     private DbXRefLoader geneProductLoader() {
         return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
+
+    public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 }

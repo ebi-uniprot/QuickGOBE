@@ -14,12 +14,12 @@
  *     require extra processing, usually in the form of a join between two tables/collections, or querying other
  *     services for the required information</li>
  * </ul>
- * The {@link uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverter} is the class responsible for deciding
+ * The {@link uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter} is the class responsible for deciding
  * how a
  * {@link uk.ac.ebi.quickgo.rest.search.request.FilterRequest} is to be processed. Note that the factory does not do
  * the actual processing, it delegates this task to
- * {@link uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverter}.
- * There exist several implementations of the {@link uk.ac.ebi.quickgo.rest.search.request.converter.RequestConverter
+ * {@link uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter}.
+ * There exist several implementations of the {@link uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter
  * } interface,
  * each one tries to obtain the required information in a different way, e.g. contact another service, create a join
  * between two tables/collections or create a simple filter query. Any extra configuration required by the converter

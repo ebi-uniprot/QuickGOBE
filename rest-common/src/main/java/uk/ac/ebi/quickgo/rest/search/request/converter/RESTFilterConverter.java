@@ -9,11 +9,11 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 import com.google.common.base.Preconditions;
 import com.jayway.jsonpath.JsonPath;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.minidev.json.JSONArray;
@@ -25,7 +25,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * <p>Defines the conversion of a {@link FilterRequest} representing a REST request
  * to a corresponding {@link QuickGOQuery}.
- *
+ * <p>
  * Created by Edd on 05/06/2016.
  */
 class RESTFilterConverter implements FilterConverter {
@@ -66,7 +66,8 @@ class RESTFilterConverter implements FilterConverter {
         initialiseTimeout();
     }
 
-    @Override public QuickGOQuery transform(FilterRequest request) {
+    @Override
+    public QuickGOQuery transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
 
         // create REST request executor
@@ -78,19 +79,22 @@ class RESTFilterConverter implements FilterConverter {
                                 .collect(Collectors.joining(COMMA)))
         );
 
+        QuickGOQuery nothingMatchesQuery = QuickGOQuery.createAllQuery().not();
+
         // apply request and store results
         JsonPath jsonPath = JsonPath.compile(filterConfig.getProperties().get(BODY_PATH));
         try {
-            Optional<QuickGOQuery> compositeQuery =
-                    extractValues(fetchResults(restRequesterBuilder.build()), jsonPath).stream()
-                            .map(value -> QuickGOQuery
-                                    .createQuery(filterConfig.getProperties().get(LOCAL_FIELD), value))
-                            .reduce(QuickGOQuery::or);
+            Set<QuickGOQuery> queries = retrieveThenConvertResponse(
+                    fetchResults(restRequesterBuilder.build()),
+                    jsonPath,
+                    responseString -> QuickGOQuery
+                            .createQuery(filterConfig.getProperties().get(LOCAL_FIELD), responseString));
 
-            if (compositeQuery.isPresent()) {
-                return compositeQuery.get();
+            if (queries.size() > 0) {
+                return QuickGOQuery.generalisedOr(queries.toArray(new QuickGOQuery[queries.size()]));
             }
 
+            return nothingMatchesQuery;
         } catch (ExecutionException e) {
             throwRetrievalException(FAILED_REST_FETCH_PREFIX, e);
         } catch (InterruptedException e) {
@@ -100,7 +104,7 @@ class RESTFilterConverter implements FilterConverter {
             throwRetrievalException(FAILED_REST_FETCH_PREFIX + " due to a timeout whilst waiting for response", e);
         }
 
-        return QuickGOQuery.createAllQuery().not();
+        return nothingMatchesQuery;
     }
 
     static String buildResourceTemplate(FilterConfig config) {
@@ -166,13 +170,15 @@ class RESTFilterConverter implements FilterConverter {
                 "FilterConfig must have mandatory field: " + mandatoryProperty);
     }
 
-    private Set<String> extractValues(String responseBody, JsonPath jsonPath) {
-        Set<String> results = new HashSet<>();
+    private <T> Set<T> retrieveThenConvertResponse(String responseBody,
+            JsonPath jsonPath,
+            Function<String, T> converter) {
+        Set<T> results = new HashSet<>();
         if (jsonPath.isDefinite()) {
-            results.add(jsonPath.read(responseBody));
+            results.add(converter.apply(jsonPath.read(responseBody)));
         } else {
             ((JSONArray) jsonPath.read(responseBody)).iterator()
-                    .forEachRemaining(value -> results.add(value.toString()));
+                    .forEachRemaining(s -> results.add(converter.apply(s.toString())));
         }
         return results;
     }

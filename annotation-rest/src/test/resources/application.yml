@@ -12,6 +12,6 @@ search:
         properties: {
           ip: localhost,
           resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
-          localField: goId_join,
+          localField: goId,
           responseBodyPath: "$.results[*].descendants[*]"
         }

@@ -12,7 +12,7 @@ search:
         properties: {
           ip: "http://ves-hx-c2:8082",
           resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
-          localField: goId_join,
+          localField: goId,
           responseBodyPath: "$.results[*].descendants[*]",
           timeout: 2000
         }
