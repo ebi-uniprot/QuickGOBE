@@ -35,7 +35,8 @@ public class AnnotationRequest {
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
-            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, EVIDENCE_CODE, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE, DB_SUBSET};
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, EVIDENCE_CODE, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE,
+            DB_SUBSET};
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
@@ -49,8 +50,9 @@ public class AnnotationRequest {
      */
     private static List<StatsRequest> DEFAULT_STATS_REQUESTS;
 
-    static  {
-        List<String> statsTypes = Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE);
+    static {
+        List<String> statsTypes =
+                Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE, ASSIGNED_BY);
 
         StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
         StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);
@@ -244,24 +246,23 @@ public class AnnotationRequest {
         }
     }
 
-    public void setGpType(String geneProductType){
+    public void setGpType(String geneProductType) {
         filterMap.put(GENE_PRODUCT_TYPE, geneProductType.toLowerCase());
     }
 
     @Pattern(regexp = "^(complex|rna|protein)(,(complex|rna|protein)){0,2}", flags = CASE_INSENSITIVE,
             message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
-    public String getGpType(){
+    public String getGpType() {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
 
-
-    public void setGpSubset(String gpSubset){
+    public void setGpSubset(String gpSubset) {
         filterMap.put(DB_SUBSET, gpSubset);
     }
 
     @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
             message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
-    public String getGpSubset(){
+    public String getGpSubset() {
         return filterMap.get(DB_SUBSET);
     }
 
