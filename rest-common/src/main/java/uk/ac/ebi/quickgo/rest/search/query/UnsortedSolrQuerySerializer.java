@@ -12,11 +12,12 @@ import java.util.stream.Collectors;
  *
  * <p>A reason for using this implementation would be for improved performance when searching for
  * large numbers of Solr documents by an indexed value, e.g. "find me all documents whose field1
- * has value id1 OR id2 OR ....".
+ * has value id1 OR id2 OR ....", i.e., a large disjunction.
  *
- * <p>Specifically, this class defines specific behaviour for {@link CompositeQuery}s containing ORs and
- * defers control to {@link SortedSolrQuerySerializer} otherwise.
- * {@link FieldQuery}s.
+ * <p>Specifically, this class produces queries that use the "LocalParams" style of query, as documented here:
+ * <ul>
+ *     <li>https://cwiki.apache.org/confluence/display/solr/Other+Parsers#OtherParsers-TermsQueryParser</li>
+ * </ul>
  *
  * Created 02/08/16
  *
