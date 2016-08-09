@@ -22,8 +22,6 @@ class AnnotationMocker {
         annotation.assignedBy = "IntAct";
         annotation.annotationExtension = "occurs_in(CL:1000428)";
         annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein|db_object_type=protein|target_set=BHF-UCL,Exosome,KRUK";
-        annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein|target_set=BHF-UCL,Exosome,KRUK";
-
         return annotation;
     }
 }
