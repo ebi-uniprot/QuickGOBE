@@ -1017,6 +1017,32 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
 
+
+    @Test
+    public void filterByAlternateTargetSetReturnsMatchingDocuments() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "BHF-UCL"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByTwoTargetSetValuesReturnsMatchingDocuments() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "KRUK,BHF-UCL"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+
     @Test
     public void filterByNonExistentTargetSetReturnsNoDocuments() throws Exception {
 
@@ -1028,69 +1054,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    //----- Create Test Data ---------------------//
-    //----- Gene Product Subset ---------------------//
-
-    @Test
-    public void filterBySingleGeneProductSubsetReturnsDocuments() throws Exception {
-
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
-                AnnotationDocMocker.SUB_SET));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
-    }
-
-
-    @Test
-    public void filterByMultipleGeneProductSubsetReturnsDocuments() throws Exception {
-
-        AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        docA.dbSubset = "BHF-UCL";
-        repository.save(docA);
-
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
-                toCSV(AnnotationDocMocker.SUB_SET, docA.dbSubset)));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
-    }
-
-
-    @Test
-    public void filterByMultipleGeneProductSubsetInMultipleParametersReturnsDocuments() throws Exception {
-
-        AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        docA.dbSubset = "BHF-UCL";
-        repository.save(docA);
-
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
-                AnnotationDocMocker.SUB_SET).param(GP_SUBSET_PARAM, docA.dbSubset));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
-    }
-
-
-    @Test
-    public void filterByUnavailableGeneProductSubsetReturnsZeroDocuments() throws Exception {
-
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM, "AAA"));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(0));
-    }
 
     //----- Setup data ---------------------//
 
