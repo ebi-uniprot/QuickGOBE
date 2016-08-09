@@ -43,7 +43,7 @@ public class AnnotationDocumentConverterTest {
         annotation.ecoId = "ECO:0000353";
         annotation.assignedBy = "IntAct";
         annotation.annotationExtension = "occurs_in(CL:1000428)";
-        annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";
+        annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein|db_object_type=protein|target_set=BHF-UCL,Exosome,KRUK";
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -53,6 +53,7 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.assignedBy, is(annotation.assignedBy));
         assertThat(doc.qualifier, is(annotation.qualifier));
         assertThat(doc.reference, is(annotation.dbReferences));
+        assertThat(doc.targetSets, contains("BHF-UCL","Exosome","KRUK"));
     }
 
     // interacting taxon
@@ -239,6 +240,15 @@ public class AnnotationDocumentConverterTest {
 
         assertThat(doc.extensions, containsInAnyOrder("x,y","z"));
     }
+
+    // annotation properties: target sets
+    @Test
+    public void convertsEmptyTargetSetToNullValue() throws Exception {
+        annotation.annotationProperties = "db_object_symbol=moeA5|db_object_type=protein";
+        AnnotationDocument doc = converter.process(annotation);
+        assertThat(doc.targetSets, is(nullValue()));
+    }
+
 
     private String constructGeneProductId(Annotation annotation) {return annotation.db + ":" + annotation.dbObjectId;}
 

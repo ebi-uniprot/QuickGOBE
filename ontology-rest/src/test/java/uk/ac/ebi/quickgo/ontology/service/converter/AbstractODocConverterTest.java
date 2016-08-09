@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -43,22 +42,17 @@ public class AbstractODocConverterTest {
      */
     @Test
     public void convertsIdWithoutError() {
-        assertThat(oboTermFromValidGODoc.id, is(equalTo("id1")));
+        assertThat(oboTermFromValidGODoc.id, is("id1"));
     }
 
     @Test
     public void convertsNameWithoutError() {
-        assertThat(oboTermFromValidGODoc.name, is(equalTo("name1")));
+        assertThat(oboTermFromValidGODoc.name, is("name1"));
     }
 
     @Test
     public void convertsSecondaryIdsWithoutError() {
         assertThat(oboTermFromValidGODoc.secondaryIds, is(validGODoc.secondaryIds));
-    }
-
-    @Test
-    public void convertsChildrenWithoutError() {
-        assertThat(oboTermFromValidGODoc.children, is(validGODoc.children));
     }
 
     @Test
@@ -88,7 +82,12 @@ public class AbstractODocConverterTest {
 
     @Test
     public void convertsSynonymsWithoutError() {
-        assertThat(oboTermFromValidGODoc.synonyms.size(), is(equalTo(2)));
+        assertThat(oboTermFromValidGODoc.synonyms.size(), is(validGODoc.synonyms.size()));
+    }
+
+    @Test
+    public void convertsCreditsWithoutError() {
+        assertThat(oboTermFromValidGODoc.credits.size(), is(validGODoc.credits.size()));
     }
 
     /**

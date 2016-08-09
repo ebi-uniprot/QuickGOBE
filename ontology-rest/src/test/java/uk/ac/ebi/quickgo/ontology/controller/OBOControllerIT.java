@@ -3,13 +3,14 @@ package uk.ac.ebi.quickgo.ontology.controller;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Before;
@@ -38,6 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
+import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
 
 /**
  * Performs common tests on REST controllers that derive from {@link OBOController}.
@@ -53,16 +56,10 @@ public abstract class OBOControllerIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
-    static final String COMMA = ",";
-
-    private static final String SEARCH_ENDPOINT = "search";
-    private static final String TERMS_ENDPOINT = "terms";
-    private static final String ANCESTORS_ENDPOINT = "ancestors";
-    private static final String DESCENDANTS_ENDPOINT = "descendants";
-    private static final String PATHS_ENDPOINT = "paths";
     private static final String QUERY_PARAM = "query";
     private static final String PAGE_PARAM = "page";
     private static final String RELATIONS_PARAM = "relations";
+
     private static final int RELATIONSHIP_CHAIN_LENGTH = 10;
 
     @Autowired
@@ -74,7 +71,7 @@ public abstract class OBOControllerIT {
     @Autowired
     protected OntologyGraph ontologyGraph;
 
-    MockMvc mockMvc;
+    protected MockMvc mockMvc;
 
     private String resourceUrl;
     private String validId;
@@ -95,8 +92,8 @@ public abstract class OBOControllerIT {
         assertThat(basicDocs.size(), is(greaterThan(1)));
 
         validId = basicDocs.get(0).id;
-        validIdsCSV = basicDocs.stream().map(doc -> doc.id).collect(Collectors.joining(","));
-        validIdList = Arrays.asList(validIdsCSV.split(COMMA));
+        validIdList = basicDocs.stream().map(doc -> doc.id).collect(Collectors.toList());
+        validIdsCSV = toCSV(validIdList);
 
         ontologyRepository.deleteAll();
         ontologyRepository.save(basicDocs);
@@ -113,6 +110,26 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validDocWithNoGraphData.id)));
 
         expectBasicFieldsInResults(response, singletonList(validDocWithNoGraphData.id))
+                .andExpect(jsonPath("$.results.*.id", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveOntologyViaSecondaryId() throws Exception {
+        ontologyRepository.deleteAll();
+
+        String primaryId = createId(1);
+        String secondaryId = createId(2);
+
+        OntologyDocument doc = createBasicDoc(primaryId, "name");
+        doc.secondaryIds = Collections.singletonList(secondaryId);
+
+        ontologyRepository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(buildTermsURL(secondaryId)));
+
+        expectCoreFieldsInResults(response, singletonList(primaryId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -139,8 +156,8 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCompletebyOneId() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/complete"));
+    public void canRetrieveCompleteByOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, COMPLETE_SUB_RESOURCE)));
 
         expectCompleteFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.history", hasSize(1)))
@@ -149,8 +166,8 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCompletebyTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/complete"));
+    public void canRetrieveCompleteByTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, COMPLETE_SUB_RESOURCE)));
 
         expectCompleteFieldsInResults(response, validIdList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
@@ -159,8 +176,8 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveHistorybyOneId() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/history"));
+    public void canRetrieveHistoryByOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, HISTORY_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.history", hasSize(1)))
@@ -169,8 +186,8 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveHistorybyTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/history"));
+    public void canRetrieveHistoryByTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, HISTORY_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, validIdList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
@@ -179,8 +196,8 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveXRefsbyOneId() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/xrefs"));
+    public void canRetrieveXRefsByOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, XREFS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.xRefs", hasSize(1)))
@@ -189,8 +206,8 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveXRefsbyTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/xrefs"));
+    public void canRetrieveXRefsByTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, XREFS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, validIdList)
                 .andExpect(jsonPath("$.results.*.xRefs", hasSize(2)))
@@ -199,8 +216,8 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveTaxonConstraintsbyOneId() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/constraints"));
+    public void canRetrieveTaxonConstraintsByOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, CONSTRAINTS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.taxonConstraints", hasSize(1)))
@@ -209,8 +226,9 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveTaxonConstraintsbyTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/constraints"));
+    public void canRetrieveTaxonConstraintsByTwoIds() throws Exception {
+        ResultActions response =
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, CONSTRAINTS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, validIdList)
                 .andExpect(jsonPath("$.results.*.taxonConstraints", hasSize(2)))
@@ -219,8 +237,8 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveAnnotationGuideLinesbyOneId() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/guidelines"));
+    public void canRetrieveAnnotationGuideLinesByOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, GUIDELINES_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.annotationGuidelines", hasSize(1)))
@@ -229,8 +247,9 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveAnnotationGuideLinesbyTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/guidelines"));
+    public void canRetrieveAnnotationGuideLinesByTwoIds() throws Exception {
+        ResultActions response =
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, GUIDELINES_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, validIdList)
                 .andExpect(jsonPath("$.results.*.annotationGuidelines", hasSize(2)))
@@ -239,8 +258,8 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveXORelsbyOneId() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validId) + "/xontologyrelations"));
+    public void canRetrieveXORelsByOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, XRELATIONS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.xRelations", hasSize(1)))
@@ -249,8 +268,9 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveXORelsbyTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV) + "/xontologyrelations"));
+    public void canRetrieveXORelsByTwoIds() throws Exception {
+        ResultActions response =
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, XRELATIONS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, validIdList)
                 .andExpect(jsonPath("$.results.*.xRelations", hasSize(2)))
@@ -291,7 +311,7 @@ public abstract class OBOControllerIT {
     @Test
     public void searchesForTermSuccessfullyAndReceivesValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(resourceUrl + "/" + SEARCH_ENDPOINT)
+                get(buildSearchURL())
                         .param(QUERY_PARAM, validId));
 
         expectResultsInfoExists(response)
@@ -302,7 +322,7 @@ public abstract class OBOControllerIT {
     @Test
     public void searchesForInvalidIdAndReceivesZeroValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(resourceUrl + "/" + SEARCH_ENDPOINT)
+                get(buildSearchURL())
                         .param(QUERY_PARAM, invalidId()));
 
         expectResultsInfoExists(response)
@@ -313,7 +333,7 @@ public abstract class OBOControllerIT {
     @Test
     public void searchesForMissingIdAndReceivesZeroValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(resourceUrl + "/" + SEARCH_ENDPOINT)
+                get(buildSearchURL())
                         .param(QUERY_PARAM, idMissingInRepository()));
 
         expectResultsInfoExists(response)
@@ -324,7 +344,7 @@ public abstract class OBOControllerIT {
     @Test
     public void searchesForFieldThatDoesNotExistAndReceivesZeroValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(resourceUrl + "/" + SEARCH_ENDPOINT)
+                get(buildSearchURL())
                         .param(QUERY_PARAM, "fieldDoesNotExist:sandwiches"));
 
         expectResultsInfoExists(response)
@@ -340,7 +360,7 @@ public abstract class OBOControllerIT {
         createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
 
         mockMvc.perform(
-                get(resourceUrl + "/" + TERMS_ENDPOINT)
+                get(buildTermsURL())
                         .param(PAGE_PARAM, "-1"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -354,7 +374,7 @@ public abstract class OBOControllerIT {
         createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
 
         mockMvc.perform(
-                get(resourceUrl + "/" + TERMS_ENDPOINT)
+                get(buildTermsURL())
                         .param(PAGE_PARAM, String.valueOf(existingPages + 1)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -368,7 +388,7 @@ public abstract class OBOControllerIT {
         createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
 
         ResultActions response = mockMvc.perform(
-                get(resourceUrl + "/" + TERMS_ENDPOINT)
+                get(buildTermsURL())
                         .param(PAGE_PARAM, "1"));
 
         expectResultsInfoExists(response)
@@ -384,7 +404,7 @@ public abstract class OBOControllerIT {
         createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
 
         ResultActions response = mockMvc.perform(
-                get(resourceUrl + "/" + TERMS_ENDPOINT)
+                get(buildTermsURL())
                         .param(PAGE_PARAM, "2"));
 
         expectResultsInfoExists(response)
@@ -400,7 +420,7 @@ public abstract class OBOControllerIT {
         createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
 
         ResultActions response = mockMvc.perform(
-                get(resourceUrl + "/" + TERMS_ENDPOINT)
+                get(buildTermsURL())
                         .param(PAGE_PARAM, String.valueOf(existingPages - 1)));
 
         expectResultsInfoExists(response)
@@ -421,7 +441,7 @@ public abstract class OBOControllerIT {
     public void canFetchAllAncestorsFrom1Term() throws Exception {
         String lowestChild = relationships.get(0).child;
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(lowestChild) + "/" + ANCESTORS_ENDPOINT));
+                get(buildTermsURLWithSubResource(lowestChild, ANCESTORS_SUB_RESOURCE)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(1))
@@ -434,7 +454,7 @@ public abstract class OBOControllerIT {
         String secondBottom = relationships.get(1).child;
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(asCSV(bottom, secondBottom)) + "/" + ANCESTORS_ENDPOINT));
+                get(buildTermsURLWithSubResource(toCSV(bottom, secondBottom), ANCESTORS_SUB_RESOURCE)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(2))
@@ -447,7 +467,7 @@ public abstract class OBOControllerIT {
         String bottom = relationships.get(0).child;
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(bottom) + "/" + ANCESTORS_ENDPOINT)
+                get(buildTermsURLWithSubResource(bottom, ANCESTORS_SUB_RESOURCE))
                         .param(RELATIONS_PARAM, validRelation));
 
         response.andDo(print())
@@ -458,7 +478,7 @@ public abstract class OBOControllerIT {
     @Test
     public void invalidAncestorsProduces400AndErrorMessage() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(invalidId()) + "/" + ANCESTORS_ENDPOINT));
+                get(buildTermsURLWithSubResource(invalidId(), ANCESTORS_SUB_RESOURCE)));
 
         expectInvalidIdError(response, invalidId());
     }
@@ -468,7 +488,7 @@ public abstract class OBOControllerIT {
         String bottom = relationships.get(0).child;
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(bottom) + "/" + ANCESTORS_ENDPOINT)
+                get(buildTermsURLWithSubResource(bottom, ANCESTORS_SUB_RESOURCE))
                         .param(RELATIONS_PARAM, invalidRelation));
 
         expectInvalidRelationError(response, invalidRelation);
@@ -483,7 +503,7 @@ public abstract class OBOControllerIT {
         createAndSaveDocs(relCount + 1);
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(highestParent) + "/" + DESCENDANTS_ENDPOINT));
+                get(buildTermsURLWithSubResource(highestParent, DESCENDANTS_SUB_RESOURCE)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(1))
@@ -500,7 +520,7 @@ public abstract class OBOControllerIT {
         createAndSaveDocs(relCount + 1);
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(asCSV(top, secondTop)) + "/" + DESCENDANTS_ENDPOINT));
+                get(buildTermsURLWithSubResource(toCSV(top, secondTop), DESCENDANTS_SUB_RESOURCE)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(2))
@@ -517,7 +537,7 @@ public abstract class OBOControllerIT {
         createAndSaveDocs(relCount + 1);
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(highestParent) + "/" + DESCENDANTS_ENDPOINT)
+                get(buildTermsURLWithSubResource(highestParent, DESCENDANTS_SUB_RESOURCE))
                         .param(RELATIONS_PARAM, validRelation));
 
         response.andDo(print())
@@ -526,9 +546,18 @@ public abstract class OBOControllerIT {
     }
 
     @Test
+    public void canFetchChildrenFromTerm() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL()));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(validIdList.size()))
+                .andExpect(jsonPath("$.results.*.children").exists());
+    }
+
+    @Test
     public void invalidDescendantsProduces400AndErrorMessage() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(invalidId()) + "/" + DESCENDANTS_ENDPOINT));
+                get(buildTermsURLWithSubResource(invalidId(), DESCENDANTS_SUB_RESOURCE)));
 
         expectInvalidIdError(response, invalidId());
     }
@@ -538,7 +567,7 @@ public abstract class OBOControllerIT {
         String highestParent = relationships.get(relationships.size() - 1).parent;
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(highestParent) + "/" + DESCENDANTS_ENDPOINT)
+                get(buildTermsURLWithSubResource(highestParent, DESCENDANTS_SUB_RESOURCE))
                         .param(RELATIONS_PARAM, invalidRelation));
 
         expectInvalidRelationError(response, invalidRelation);
@@ -550,7 +579,7 @@ public abstract class OBOControllerIT {
         String highestParent = relationships.get(relationships.size() - 1).parent;
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(bottomChild) + "/" + PATHS_ENDPOINT + "/" + highestParent));
+                get(buildPathsURL(bottomChild, highestParent)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(1))
@@ -564,7 +593,7 @@ public abstract class OBOControllerIT {
         String highest = relationships.get(relationships.size() - 1).parent;
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(asCSV(bottom, secondBottom) + "/" + PATHS_ENDPOINT + "/" + highest)));
+                get(buildPathsURL(toCSV(bottom, secondBottom), highest)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(2))
@@ -579,7 +608,7 @@ public abstract class OBOControllerIT {
         String secondTop = relationships.get(relationships.size() - 2).parent;
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(bottom) + "/" + PATHS_ENDPOINT + "/" + asCSV(top, secondTop)));
+                get(buildPathsURL(bottom, toCSV(top, secondTop))));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(2))
@@ -592,7 +621,7 @@ public abstract class OBOControllerIT {
         String highestParent = relationships.get(relationships.size() - 1).parent;
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(bottomChild) + "/" + PATHS_ENDPOINT + "/" + highestParent)
+                get(buildPathsURL(bottomChild, highestParent))
                         .param(RELATIONS_PARAM, validRelation));
 
         response.andDo(print())
@@ -604,7 +633,7 @@ public abstract class OBOControllerIT {
     public void invalidStartPathsProduces400AndErrorMessage() throws Exception {
         String highest = relationships.get(relationships.size() - 1).parent;
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(invalidId()) + "/" + PATHS_ENDPOINT + "/" + highest));
+                get(buildPathsURL(invalidId(), highest)));
 
         expectInvalidIdError(response, invalidId());
     }
@@ -613,7 +642,7 @@ public abstract class OBOControllerIT {
     public void invalidEndPathsProduces400AndErrorMessage() throws Exception {
         String bottom = relationships.get(0).child;
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(bottom) + "/" + PATHS_ENDPOINT + "/" + invalidId()));
+                get(buildPathsURL(bottom, invalidId())));
 
         expectInvalidIdError(response, invalidId());
     }
@@ -624,13 +653,15 @@ public abstract class OBOControllerIT {
         String highestParent = relationships.get(relationships.size() - 1).parent;
 
         ResultActions response = mockMvc.perform(
-                get(buildTermsURL(bottomChild) + "/" + PATHS_ENDPOINT + "/" + highestParent)
+                get(buildPathsURL(bottomChild, highestParent))
                         .param(RELATIONS_PARAM, invalidRelation));
 
         expectInvalidRelationError(response, invalidRelation);
     }
 
     protected abstract String getResourceURL();
+
+    protected abstract OntologyDocument createBasicDoc(String id, String name);
 
     /**
      * Create a basic document to be stored in the repository.
@@ -648,14 +679,15 @@ public abstract class OBOControllerIT {
 
     protected abstract String invalidId();
 
+    protected abstract String createId(int idNum);
+
     protected ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
         return expectCoreFields(result, id, "$.");
     }
 
     protected ResultActions expectCoreFields(ResultActions result, String id, String path) throws Exception {
         return expectBasicFields(result, id, path)
-                .andExpect(jsonPath(path + "synonyms").exists())
-                .andExpect(jsonPath(path + "ancestors").exists());
+                .andExpect(jsonPath(path + "synonyms").exists());
     }
 
     protected ResultActions expectBasicFields(ResultActions result, String id, String path) throws Exception {
@@ -669,11 +701,23 @@ public abstract class OBOControllerIT {
     }
 
     protected String buildTermsURL() {
-        return getResourceURL() + "/" + TERMS_ENDPOINT;
+        return getResourceURL() + "/" + TERMS_RESOURCE;
     }
 
     protected String buildTermsURL(String id) {
-        return getResourceURL() + "/" + TERMS_ENDPOINT + "/" + id;
+        return getResourceURL() + "/" + TERMS_RESOURCE + "/" + id;
+    }
+
+    protected String buildTermsURLWithSubResource(String id, String subResource) {
+        return buildTermsURL(id) + "/" + subResource;
+    }
+
+    protected String buildSearchURL() {
+        return resourceUrl + "/" + SEARCH_RESOUCE;
+    }
+
+    protected String buildPathsURL(String terms1, String terms2) {
+        return buildTermsURL(terms1) + "/" + PATHS_SUB_RESOURCE + "/" + terms2;
     }
 
     protected ResultActions expectCoreFieldsInResults(ResultActions result, List<String> ids) throws Exception {
@@ -698,9 +742,7 @@ public abstract class OBOControllerIT {
 
     protected ResultActions expectCompleteFields(ResultActions result, String id, String path) throws Exception {
         return expectCoreFields(result, id, path)
-                .andExpect(jsonPath(path + "children").exists())
                 .andExpect(jsonPath(path + "secondaryIds").exists())
-                .andExpect(jsonPath(path + "descendants").exists())
                 .andExpect(jsonPath(path + "history").exists())
                 .andExpect(jsonPath(path + "xRefs").exists())
                 .andExpect(jsonPath(path + "xRelations").exists())
@@ -708,7 +750,8 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath(path + "taxonConstraints").exists())
                 .andExpect(jsonPath(path + "subsets").exists())
                 .andExpect(jsonPath(path + "replacements").exists())
-                .andExpect(jsonPath(path + "replaces").exists());
+                .andExpect(jsonPath(path + "replaces").exists())
+                .andExpect(jsonPath(path + "credits").exists());
     }
 
     protected ResultActions expectInvalidIdError(ResultActions result, String id) throws Exception {
@@ -744,10 +787,6 @@ public abstract class OBOControllerIT {
         }
 
         return result;
-    }
-
-    private static String asCSV(String... values) {
-        return Arrays.stream(values).collect(Collectors.joining(","));
     }
 
     private void setupSimpleRelationshipChain() {

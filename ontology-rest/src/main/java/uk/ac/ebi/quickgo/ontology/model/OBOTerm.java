@@ -48,7 +48,7 @@ public class OBOTerm {
     public List<String> subsets;
 
     // list of term IDs that are children of this term
-    public List<String> children;
+    public List<Relation> children;
 
     public List<String> secondaryIds;
 
@@ -59,7 +59,10 @@ public class OBOTerm {
     public List<XORelation> xRelations;
 
     public List<AnnotationGuideLine> annotationGuidelines;
+
     public List<TaxonConstraint> taxonConstraints;
+
+    public List<Credit> credits;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Synonym implements FieldType {
@@ -122,5 +125,17 @@ public class OBOTerm {
     public static class Replace implements FieldType {
         public String id;
         public String type;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Relation implements FieldType {
+        public String id;
+        public OntologyRelationType relation;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Credit implements FieldType {
+        public String code;
+        public String url;
     }
 }

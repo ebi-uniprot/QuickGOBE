@@ -31,6 +31,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.QUALIFIER;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
+import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 
 /**
  * RESTful end point for Annotations
@@ -61,6 +62,8 @@ public class AnnotationControllerIT {
     private static final String GO_ID_PARAM = "goId";
     private static final String WITHFROM_PARAM = "withFrom";
     private static final String GENE_PRODUCT_TYPE_PARAM = "gpType";
+    private static final String GP_SUBSET_PARAM = "gpSubset";
+
     private static final String TARGET_SET_PARAM = "targetSet";
 
     //Test Data
@@ -387,6 +390,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByUniProtKBAndIntactAndRNACentralGeneProductIDSuccessfully() throws Exception {
+        repository.deleteAll();
         String uniprotGp = "A1E959";
         String intactGp = "EBI-10043081";
         String rnaGp = "URS00000064B1_559292";
@@ -400,8 +404,34 @@ public class AnnotationControllerIT {
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, uniprotGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, intactGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, rnaGp, 1));
+    }
+
+    @Test
+    public void filterByUniProtKBAndIntactAndRNACentralGeneProductIDCaseInsensitiveSuccessfully() throws Exception {
+        repository.deleteAll();
+        String uniprotGp = "A1E959".toLowerCase();
+        String intactGp = "EBI-10043081".toLowerCase();
+        String rnaGp = "URS00000064B1_559292".toLowerCase();
+        repository.save(AnnotationDocMocker.createAnnotationDoc(uniprotGp));
+        repository.save(AnnotationDocMocker.createAnnotationDoc(intactGp));
+        repository.save(AnnotationDocMocker.createAnnotationDoc(rnaGp));
+        StringJoiner sj = new StringJoiner(",");
+        sj.add(uniprotGp).add(intactGp).add(rnaGp);
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GP_PARAM, sj.toString()));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, uniprotGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, intactGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, rnaGp, 1));
     }
 
     @Test
@@ -999,6 +1029,71 @@ public class AnnotationControllerIT {
     }
 
     //----- Create Test Data ---------------------//
+    //----- Gene Product Subset ---------------------//
+
+    @Test
+    public void filterBySingleGeneProductSubsetReturnsDocuments() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
+                AnnotationDocMocker.SUB_SET));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+
+    @Test
+    public void filterByMultipleGeneProductSubsetReturnsDocuments() throws Exception {
+
+        AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        docA.dbSubset = "BHF-UCL";
+        repository.save(docA);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
+                toCSV(AnnotationDocMocker.SUB_SET, docA.dbSubset)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
+    }
+
+
+    @Test
+    public void filterByMultipleGeneProductSubsetInMultipleParametersReturnsDocuments() throws Exception {
+
+        AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        docA.dbSubset = "BHF-UCL";
+        repository.save(docA);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
+                AnnotationDocMocker.SUB_SET).param(GP_SUBSET_PARAM, docA.dbSubset));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
+    }
+
+
+    @Test
+    public void filterByUnavailableGeneProductSubsetReturnsZeroDocuments() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM, "AAA"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    //----- Setup data ---------------------//
+
     private List<AnnotationDocument> createGenericDocs(int n) {
         return IntStream.range(0, n)
                 .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i))).collect

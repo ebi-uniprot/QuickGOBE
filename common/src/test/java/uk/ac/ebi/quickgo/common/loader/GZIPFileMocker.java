@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.common.loader;
 
 import java.io.*;
 import java.util.zip.GZIPOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * To test the GZIPFiles class, create a gzip'd file with known test in a temporary location.
@@ -12,18 +14,18 @@ import java.util.zip.GZIPOutputStream;
  * Time: 15:38
  * Created with IntelliJ IDEA.
  */
-public class GZIPFileMocker{
+class GZIPFileMocker {
+    private static final Logger logger = LoggerFactory.getLogger(GZIPFileMocker.class);
 
-    public static final String TEXT = "Mary had a little lamb, it's fleece was white as snow";
+    static final String TEXT = "Mary had a little lamb, it's fleece was white as snow";
 
-    public static final File createTestFile(){
-
+    static File createTestFile() {
         BufferedWriter bufferedWriter = null;
         File temp = null;
+
         try {
 
             temp = File.createTempFile("temp-file-name", "txt.gz");
-
 
             //Construct the BufferedWriter object
             bufferedWriter = new BufferedWriter(
@@ -34,20 +36,15 @@ public class GZIPFileMocker{
             // from the input file to the GZIP output file
             bufferedWriter.write(TEXT);
             bufferedWriter.newLine();
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
+            logger.error("Error: ", e);
+        } finally {
             //Close the BufferedWrter
             if (bufferedWriter != null) {
                 try {
                     bufferedWriter.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Error: ", e);
                 }
             }
         }

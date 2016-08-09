@@ -45,6 +45,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
 
             doc.replaces = extractReplaces(term);
             doc.replacements = extractReplacements(term);
+            doc.credits = extractCredits(term);
 
             return Optional.of(doc);
         } else {
@@ -52,7 +53,22 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         }
     }
 
-    protected List<String> extractDefinitionXrefs(GenericTerm term) {
+    private List<String> extractCredits(GenericTerm term) {
+        List<String> extractedCredits = null;
+
+        if (!isEmpty(term.getCredits())) {
+            extractedCredits = term.getCredits().stream()
+                    .map(credit -> FlatFieldBuilder.newFlatField()
+                            .addField(FlatFieldLeaf.newFlatFieldLeaf(credit.getCode()))
+                            .addField(FlatFieldLeaf.newFlatFieldLeaf(credit.getUrl()))
+                            .buildString())
+                    .collect(Collectors.toList());
+        }
+
+        return extractedCredits;
+    }
+
+    private List<String> extractDefinitionXrefs(GenericTerm term) {
         return term.getDefinitionXrefs().stream()
                 .map(xref -> FlatFieldBuilder.newFlatField()
                         .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getDb()))
@@ -82,18 +98,21 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     }
 
     private List<String> extractReplacements(GenericTerm term) {
-        return extractReplaceElementsFromRelations(term.getReplacements());
+        return extractReplaceElementsFromRelations(term.getReplacements(),
+                (TermRelation relation) -> relation.getParent().getId());
     }
 
     private List<String> extractReplaces(GenericTerm term) {
-        return extractReplaceElementsFromRelations(term.getReplaces());
+        return extractReplaceElementsFromRelations(term.getReplaces(),
+                (TermRelation relation) -> relation.getChild().getId());
     }
 
-    protected List<String> extractReplaceElementsFromRelations(Collection<TermRelation> replaceList) {
+    private List<String> extractReplaceElementsFromRelations(Collection<TermRelation> replaceList,
+            Function<TermRelation, String> replaceIdExtractor) {
         if (!isEmpty(replaceList)) {
             return replaceList.stream()
                     .map(replace -> FlatFieldBuilder.newFlatField()
-                            .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getChild().getId()))
+                            .addField(FlatFieldLeaf.newFlatFieldLeaf(replaceIdExtractor.apply(replace)))
                             .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getTypeof().getFormalCode()))
                             .buildString())
                     .collect(Collectors.toList());
@@ -105,7 +124,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: id|term|namespace|url|relation
      */
-    protected List<String> extractXRelationsAsList(GenericTerm term) {
+    private List<String> extractXRelationsAsList(GenericTerm term) {
         if (!isEmpty(term.getCrossOntologyRelations())) {
             return term.getCrossOntologyRelations().stream()
                     .map(
@@ -125,7 +144,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: code|id|name
      */
-    protected List<String> extractXRefs(GenericTerm term) {
+    private List<String> extractXRefs(GenericTerm term) {
         if (!isEmpty(term.getXrefs())) {
             return term.getXrefs().stream()
                     .map(
@@ -143,7 +162,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: name|timestamp|action|category|text
      */
-    protected List<String> extractHistory(GenericTerm term) {
+    private List<String> extractHistory(GenericTerm term) {
         if (term.getHistory() != null && !isEmpty(term.getHistory().getHistoryAll())) {
             return term.getHistory().getHistoryAll().stream()
                     .map(
@@ -160,7 +179,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
         }
     }
 
-    protected List<String> extractSynonymNames(GenericTerm term) {
+    private List<String> extractSynonymNames(GenericTerm term) {
         if (!isEmpty(term.getSynonyms())) {
             return term.getSynonyms().stream()
 
@@ -173,7 +192,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
     /*
      * format: synonymName|synonymType
      */
-    protected List<String> extractSynonyms(GenericTerm term) {
+    private List<String> extractSynonyms(GenericTerm term) {
         if (!isEmpty(term.getSynonyms())) {
             return term.getSynonyms().stream()
                     .map(

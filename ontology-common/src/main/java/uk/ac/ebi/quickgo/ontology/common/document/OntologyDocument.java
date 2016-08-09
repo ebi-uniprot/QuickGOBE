@@ -55,9 +55,6 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.REPLACES)
     public List<String> replaces;
 
-    @Field(OntologyFields.CHILDREN)
-    public List<String> children;
-
     @Field(OntologyFields.ASPECT)
     public String aspect;
 
@@ -79,6 +76,11 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.XRELATION)
     public List<String> xRelations;
 
+    @Field(OntologyFields.GO_DISCUSSIONS)
+    public List<String> goDiscussions;
+
+    @Field(OntologyFields.CREDITS)
+    public List<String> credits;
 
     @Override
     public String getUniqueName() {
@@ -134,9 +136,6 @@ public class OntologyDocument implements QuickGODocument {
         if (replacements != null ? !replacements.equals(that.replacements) : that.replacements != null) {
             return false;
         }
-        if (children != null ? !children.equals(that.children) : that.children != null) {
-            return false;
-        }
         if (aspect != null ? !aspect.equals(that.aspect) : that.aspect != null) {
             return false;
         }
@@ -157,6 +156,15 @@ public class OntologyDocument implements QuickGODocument {
                 that.annotationGuidelines != null) {
             return false;
         }
+
+        if (goDiscussions != null ? !goDiscussions.equals(that.goDiscussions) : that.goDiscussions != null) {
+            return false;
+        }
+
+        if (credits != null ? !credits.equals(that.credits) : that.credits != null) {
+            return false;
+        }
+
         return !(xRelations != null ? !xRelations.equals(that.xRelations) : that.xRelations != null);
 
     }
@@ -175,7 +183,6 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (subsets != null ? subsets.hashCode() : 0);
         result = 31 * result + (replaces != null ? replaces.hashCode() : 0);
         result = 31 * result + (replacements != null ? replacements.hashCode() : 0);
-        result = 31 * result + (children != null ? children.hashCode() : 0);
         result = 31 * result + (aspect != null ? aspect.hashCode() : 0);
         result = 31 * result + (history != null ? history.hashCode() : 0);
         result = 31 * result + (xrefs != null ? xrefs.hashCode() : 0);
@@ -183,6 +190,8 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (blacklist != null ? blacklist.hashCode() : 0);
         result = 31 * result + (annotationGuidelines != null ? annotationGuidelines.hashCode() : 0);
         result = 31 * result + (xRelations != null ? xRelations.hashCode() : 0);
+        result = 31 * result + (goDiscussions != null ? goDiscussions.hashCode() : 0);
+        result = 31 * result + (credits != null ? credits.hashCode() : 0);
         return result;
     }
 
@@ -201,7 +210,6 @@ public class OntologyDocument implements QuickGODocument {
                 ", subsets=" + subsets +
                 ", replaces='" + replaces +
                 ", replacements=" + replacements +
-                ", children=" + children +
                 ", aspect=" + aspect +
                 ", history=" + history +
                 ", xrefs=" + xrefs +
@@ -209,6 +217,8 @@ public class OntologyDocument implements QuickGODocument {
                 ", blacklist=" + blacklist +
                 ", annotationGuidelines=" + annotationGuidelines +
                 ", xRelations=" + xRelations +
+                ", goDiscussions=" + goDiscussions +
+                ", credits=" + credits +
                 '}';
     }
 }

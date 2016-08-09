@@ -35,6 +35,7 @@ public class DbXRefLoader {
     private final boolean caseSensitive;
 
     public DbXRefLoader(String path, boolean caseSensitive) {
+
         this.path = path;
         this.caseSensitive = caseSensitive;
     }
