@@ -18,7 +18,15 @@ public class ConversionContext {
         return properties;
     }
 
-    public void setProperties(Map<Object, Object> properties) {
+    void setProperties(Map<Object, Object> properties) {
         this.properties = properties;
+    }
+
+    // todo: test this
+    public ConversionContext merge(ConversionContext context) {
+        ConversionContext conversionContext = new ConversionContext();
+        conversionContext.getProperties().putAll(this.getProperties());
+        conversionContext.getProperties().putAll(context.getProperties());
+        return conversionContext;
     }
 }
