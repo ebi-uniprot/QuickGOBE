@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.comm;
 
+import java.util.Optional;
+
 /**
  * Created 09/08/16
  * @author Edd
@@ -12,8 +14,8 @@ public class ConvertedResponse<V> {
         return convertedValue;
     }
 
-    public ConversionContext getConversionContext() {
-        return conversionContext;
+    public Optional<ConversionContext> getConversionContext() {
+        return Optional.of(conversionContext);
     }
 
     public void setConvertedValue(V convertedValue) {
@@ -22,5 +24,12 @@ public class ConvertedResponse<V> {
 
     public void setConversionContext(ConversionContext conversionContext) {
         this.conversionContext = conversionContext;
+    }
+
+    public static <T> ConvertedResponse<T> simpleConvertedResponse(T convertedValue) {
+        ConvertedResponse<T> response = new ConvertedResponse<>();
+        response.setConvertedValue(convertedValue);
+        response.setConversionContext(null);
+        return response;
     }
 }
