@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
+import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
 import uk.ac.ebi.quickgo.rest.controller.FilterRequestConfig;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
@@ -34,7 +35,9 @@ public class FilterConverterFactory {
         this.restOperations = restOperations;
     }
 
-    public QuickGOQuery convert(FilterRequest request) { // add context parameter to save a context, which includes a
+    public ConvertedResponse<QuickGOQuery> convert(FilterRequest request) { // add context parameter to save a
+        // context, which
+        // includes a
         // map of Map<FilterConfig, value>
         Optional<FilterConfig> configOpt = filterConfigRetrieval.getBySignature(request.getSignature());
         if (configOpt.isPresent()) {

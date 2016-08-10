@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
+import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
@@ -8,6 +9,8 @@ import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static uk.ac.ebi.quickgo.rest.comm.ConvertedResponse.simpleConvertedResponse;
 
 /**
  * Defines the conversion of a simple request to a corresponding {@link QuickGOQuery}.
@@ -32,7 +35,7 @@ class SimpleFilterConverter implements FilterConverter {
      * @param request the client request
      * @return a {@link QuickGOQuery} corresponding to a join query, representing the original client request
      */
-    @Override public QuickGOQuery transform(FilterRequest request) {
+    @Override public ConvertedResponse<QuickGOQuery> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
         Preconditions.checkArgument(request.getValues().size() == 1,
                 "FilterRequest should contain only 1 property for application to a SimpleRequestConverter, " +
@@ -40,11 +43,11 @@ class SimpleFilterConverter implements FilterConverter {
 
         Stream<String> values = request.getValues().stream().flatMap(Collection::stream);
 
-        return values
-                .map(value -> QuickGOQuery
+        return simpleConvertedResponse(
+                values.map(value -> QuickGOQuery
                         .createQuery(request.getSignature().stream().collect(Collectors.joining()), value))
-                .reduce(QuickGOQuery::or)
-                .orElseThrow(() -> new IllegalStateException("Unable to create SimpleRequestConverter using: " +
-                        request + " and " + filterConfig));
+                        .reduce(QuickGOQuery::or)
+                        .orElseThrow(() -> new IllegalStateException("Unable to create SimpleRequestConverter using: " +
+                                request + " and " + filterConfig)));
     }
 }

@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
+import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
@@ -11,5 +12,5 @@ import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
  * @author Edd
  */
 @FunctionalInterface interface FilterConverter {
-    QuickGOQuery transform(FilterRequest request);
+    ConvertedResponse<QuickGOQuery> transform(FilterRequest request);
 }

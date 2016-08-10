@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
+import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
@@ -8,6 +9,7 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static uk.ac.ebi.quickgo.rest.comm.ConvertedResponse.simpleConvertedResponse;
 
 /**
  * Defines the conversion of a join request to a corresponding {@link QuickGOQuery}.
@@ -54,18 +56,20 @@ class JoinFilterConverter implements FilterConverter {
      * @param request the client request
      * @return a {@link QuickGOQuery} corresponding to a join query, representing the original client request
      */
-    @Override public QuickGOQuery transform(FilterRequest request) {
+    @Override public ConvertedResponse<QuickGOQuery> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "ClientRequest cannot be null");
 
         if (request.getValues().isEmpty()) {
-            return QuickGOQuery.createJoinQuery(fromTable, fromAttribute, toTable, toAttribute);
+            return simpleConvertedResponse(
+                    QuickGOQuery.createJoinQuery(fromTable, fromAttribute, toTable, toAttribute));
         } else {
-            return QuickGOQuery.createJoinQueryWithFilter(
-                    fromTable,
-                    fromAttribute,
-                    toTable,
-                    toAttribute,
-                    new SimpleFilterConverter(filterConfig).transform(request));
+            return simpleConvertedResponse(
+                    QuickGOQuery.createJoinQueryWithFilter(
+                            fromTable,
+                            fromAttribute,
+                            toTable,
+                            toAttribute,
+                            new SimpleFilterConverter(filterConfig).transform(request).getConvertedValue()));
         }
     }
 

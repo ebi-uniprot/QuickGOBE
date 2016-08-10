@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
+import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
 import uk.ac.ebi.quickgo.rest.comm.ResponseConverter;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.springframework.web.client.RestOperations;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static uk.ac.ebi.quickgo.rest.comm.ConvertedResponse.simpleConvertedResponse;
 
 /**
  * <p>Defines the conversion of a {@link FilterRequest} representing a REST request
@@ -51,6 +53,7 @@ class RESTFilterConverter implements FilterConverter {
     private final FilterConfig filterConfig;
     private final RestOperations restOperations;
     private int timeoutMillis;
+    private static final QuickGOQuery FILTER_EVERYTHING = QuickGOQuery.createAllQuery().not();
 
     RESTFilterConverter(FilterConfig filterConfig, RestOperations restOperations) {
         Preconditions.checkArgument(filterConfig != null, "FilterConfig cannot be null");
@@ -67,7 +70,7 @@ class RESTFilterConverter implements FilterConverter {
         initialiseTimeout();
     }
 
-    @Override public QuickGOQuery transform(FilterRequest request) {
+    @Override public ConvertedResponse<QuickGOQuery> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
 
         RESTRequesterImpl.Builder restRequesterBuilder = initRequestBuilder(request);
@@ -76,13 +79,12 @@ class RESTFilterConverter implements FilterConverter {
             Class<?> restResponseType = createResponseType();
             ResponseConverter<ResponseType, QuickGOQuery> converter = createConverter();
             ResponseType results = (ResponseType) fetchResults(restRequesterBuilder.build(), restResponseType);
-            return converter.convert(results).getConvertedValue();
-
+            return converter.convert(results);
         } catch (Exception e) {
             throwRetrievalException(FAILED_REST_FETCH_PREFIX + " due to: '" + e.getClass().getSimpleName() + "'", e);
         }
 
-        return QuickGOQuery.createAllQuery().not();
+        return simpleConvertedResponse(FILTER_EVERYTHING);
     }
 
     static String buildResourceTemplate(FilterConfig config) {
