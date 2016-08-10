@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
+import uk.ac.ebi.quickgo.rest.comm.ConversionContext;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
@@ -11,9 +12,10 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 
 /**
  * Provides RESTful endpoints for retrieving Gene Ontology (GO) Annotations to gene products.
@@ -84,24 +86,29 @@ public class AnnotationController {
 
     private final BasicSearchQueryTemplate queryTemplate;
     private final FilterConverterFactory converterFactory;
+    private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
-            FilterConverterFactory converterFactory) {
+            FilterConverterFactory converterFactory,
+            ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
                 ".AnnotationCompositeRetrievalConfig instance passed to the constructor of AnnotationController " +
                 "should not be null.");
         checkArgument(converterFactory != null, "The FilterConverterFactory cannot be null.");
+        checkArgument(resultTransformerChain != null,
+                "The ResultTransformerChain<QueryResult<Annotation>> cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
 
         this.converterFactory = converterFactory;
         this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
+        this.resultTransformerChain = resultTransformerChain;
     }
 
     /**
@@ -112,25 +119,38 @@ public class AnnotationController {
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest request,
             BindingResult bindingResult) {
 
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);
         }
 
         validationHelper.validateRequestedResults(request.getLimit());
 
-        // create context to store info
+        Set<QuickGOQuery> filterQueries = new HashSet<>();
+        Set<ConversionContext> conversionContexts = new HashSet<>();
+        extractFilterQueryInfo(request, filterQueries, conversionContexts);
+
+        ConversionContext conversionContext = conversionContexts.stream().reduce
+                (new ConversionContext(), ConversionContext::merge);
+
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(request.createFilterRequests().stream()
-                        .map(converterFactory::convert)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet()))
+                .setFilters(filterQueries)
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit())
                 .build();
 
-        // rest call needs to tell me a result, which i can retain for use in transformer
+        return searchAndTransform(queryRequest, annotationSearchService, resultTransformerChain, conversionContext);
+    }
 
-        return search(queryRequest, annotationSearchService); // pass queryresulttransformer in
+    private void extractFilterQueryInfo(
+            AnnotationRequest request,
+            Set<QuickGOQuery> filterQueries,
+            Set<ConversionContext> conversionContexts) {
+        request.createFilterRequests().stream()
+                .map(converterFactory::convert)
+                .forEach(convertedResponse -> {
+                    filterQueries.add(convertedResponse.getConvertedValue());
+                    convertedResponse.getConversionContext().ifPresent(conversionContexts::add);
+                });
     }
 }
