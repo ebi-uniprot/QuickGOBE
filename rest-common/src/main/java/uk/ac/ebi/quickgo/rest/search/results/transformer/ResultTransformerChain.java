@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.rest.comm;
+package uk.ac.ebi.quickgo.rest.search.results.transformer;
+
+import uk.ac.ebi.quickgo.rest.comm.ConversionContext;
 
 import java.util.List;
 
