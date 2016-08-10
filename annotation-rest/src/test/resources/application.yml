@@ -7,11 +7,19 @@ search:
       - signature: aspect
         execution: JOIN
         properties: {fromTable: ontology, fromAttribute: id_join, toTable: annotation, toAttribute: goId_join}
-      - signature: usageIds,usageRelationships,usage
+      - signature: usageIds,usageRelationships,descendants
         execution: REST_COMM
         properties: {
           ip: localhost,
           resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
-          localField: goId_join,
+          localField: goId,
+          responseBodyPath: "$.results[*].descendants[*]"
+        }
+      - signature: usageIds,usageRelationships,slim
+        execution: REST_COMM
+        properties: {
+          ip: localhost,
+          resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
+          localField: goId,
           responseBodyPath: "$.results[*].descendants[*]"
         }

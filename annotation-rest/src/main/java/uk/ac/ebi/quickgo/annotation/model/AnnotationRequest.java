@@ -294,7 +294,8 @@ public class AnnotationRequest {
         if (filterMap.containsKey(USAGE_FIELD)) {
             if (filterMap.containsKey(USAGE_IDS)) {
                 filterBuilder
-                        .addProperty(USAGE_FIELD, filterMap.get(USAGE_FIELD))
+                        //                        .addProperty(USAGE_FIELD, filterMap.get(USAGE_FIELD))
+                        .addProperty(filterMap.get(USAGE_FIELD))
                         .addProperty(USAGE_IDS, filterMap.get(USAGE_IDS));
             } else {
                 throw new ParameterException("Annotation usage requires 'usageIds' to be set.");

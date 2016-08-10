@@ -118,6 +118,7 @@ public class AnnotationController {
 
         validationHelper.validateRequestedResults(request.getLimit());
 
+        // create context to store info
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
                 .setFilters(request.createFilterRequests().stream()
@@ -128,6 +129,8 @@ public class AnnotationController {
                 .setPageSize(request.getLimit())
                 .build();
 
-        return search(queryRequest, annotationSearchService);
+        // rest call needs to tell me a result, which i can retain for use in transformer
+
+        return search(queryRequest, annotationSearchService); // pass queryresulttransformer in
     }
 }
