@@ -138,7 +138,6 @@ public class AnnotationControllerStatisticsIT {
     @Test
     public void statsForAllDocsContaining1TaxonIdReturns1TaxonIdStat() throws Exception {
         Set<String> savedTaxonIds = selectValuesFromDocs(savedDocs, doc -> String.valueOf(doc.taxonId));
-        assertThat(savedTaxonIds, hasSize(1));
 
         String type = AnnotationFields.TAXON_ID;
 
@@ -155,7 +154,6 @@ public class AnnotationControllerStatisticsIT {
 
         Set<String> savedTaxonIds = selectValuesFromDocs(savedDocs, doc -> String.valueOf(doc.taxonId));
         savedTaxonIds.add(String.valueOf(extraDoc.taxonId));
-        assertThat(savedTaxonIds, hasSize(2));
 
         String type = AnnotationFields.TAXON_ID;
 
@@ -190,6 +188,59 @@ public class AnnotationControllerStatisticsIT {
         assertStatsResponse(response, type, 2, relevantTaxonIds);
     }
 
+    //----------- Reference -----------//
+    @Test
+    public void statsForAllDocsContaining1ReferenceIdReturns1ReferenceIdStat() throws Exception {
+        Set<String> savedReferences = selectValuesFromDocs(savedDocs, doc -> doc.reference);
+
+        String type = AnnotationFields.REFERENCE;
+
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        assertStatsResponse(response, type, NUMBER_OF_GENERIC_DOCS, savedReferences);
+    }
+
+    @Test
+    public void statsForAllDocsContaining2ReferencesReturns2ReferenceStats() throws Exception {
+        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc.reference = "PMID:19864465";
+        repository.save(extraDoc);
+
+        Set<String> savedReferences = selectValuesFromDocs(savedDocs, doc -> doc.reference);
+        savedReferences.add(extraDoc.reference);
+
+        String type = AnnotationFields.REFERENCE;
+
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        assertStatsResponse(response, type, NUMBER_OF_GENERIC_DOCS + 1, savedReferences);
+    }
+
+    @Test
+    public void statsForFilteredDocsContaining2RefernecesReturns2ReferenceStats() throws Exception {
+        String filteringGoId = "GO:9999999";
+
+        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc1.goId = filteringGoId;
+        extraDoc1.reference = "PMID:19864465";
+        repository.save(extraDoc1);
+
+        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        extraDoc2.goId = filteringGoId;
+        extraDoc2.reference = "GO_REF:0000020";
+        repository.save(extraDoc2);
+
+        List<String> relevantReferenceIds = asList(extraDoc1.reference, extraDoc2.reference);
+
+        String type = AnnotationFields.REFERENCE;
+
+        ResultActions response = mockMvc.perform(
+                get(STATS_ENDPOINT)
+                        .param(GO_ID_PARAM, filteringGoId)
+        );
+
+        assertStatsResponse(response, type, 2, relevantReferenceIds);
+    }
 
     private void assertStatsResponse(ResultActions response, String statsType, int totalHits,
             Collection<String> statsValues) throws Exception {
