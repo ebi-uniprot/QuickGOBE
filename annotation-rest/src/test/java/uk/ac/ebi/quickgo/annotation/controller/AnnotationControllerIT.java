@@ -7,7 +7,7 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -32,7 +32,6 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.QUALIFIER;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 
 /**
  * RESTful end point for Annotations
@@ -1018,19 +1017,6 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
 
-
-    @Test
-    public void filterByAlternateTargetSetReturnsMatchingDocuments() throws Exception {
-
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "BHF-UCL"));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
-    }
-
     @Test
     public void filterByTwoTargetSetValuesReturnsMatchingDocuments() throws Exception {
 
@@ -1047,7 +1033,7 @@ public class AnnotationControllerIT {
     public void filterByNewTargetSetValueReturnsMatchingDocuments() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.targetSet = Arrays.asList("Parkinsons");
+        doc.targetSet = Collections.singletonList("Parkinsons");
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "Parkinsons"));
@@ -1059,12 +1045,11 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1));
     }
 
-
     @Test
     public void filterByTargetSetCaseInsensitiveReturnsMatchingDocuments() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.targetSet = Arrays.asList("parkinsons");
+        doc.targetSet = Collections.singletonList("parkinsons");
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "PARKINSONS"));
@@ -1076,8 +1061,6 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1));
     }
 
-
-
     @Test
     public void filterByNonExistentTargetSetReturnsNoDocuments() throws Exception {
 
@@ -1088,7 +1071,6 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(0));
     }
-
 
     //----- Setup data ---------------------//
 
