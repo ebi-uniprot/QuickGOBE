@@ -8,25 +8,30 @@ import java.util.Map;
  * @author Edd
  */
 public class ConversionContext {
-    private Map<Object, Object> properties;
+    private Map<Class<?>, Object> properties;
 
     public ConversionContext() {
         properties = new HashMap<>();
     }
 
-    public Map<Object, Object> getProperties() {
+    public <T> void put(Class<T> key, T value) {
+        properties.put(key, value);
+    }
+
+    public <T> T get(Class<T> key) {
+        return key.cast(properties.get(key));
+    }
+
+    private Map<Class<?>, Object> getProperties() {
         return properties;
     }
 
-    void setProperties(Map<Object, Object> properties) {
-        this.properties = properties;
-    }
-
-    // todo: test this
     public ConversionContext merge(ConversionContext context) {
         ConversionContext conversionContext = new ConversionContext();
+
         conversionContext.getProperties().putAll(this.getProperties());
         conversionContext.getProperties().putAll(context.getProperties());
+
         return conversionContext;
     }
 }

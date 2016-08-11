@@ -17,8 +17,6 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
-import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.OntologyResponseConverter
-        .ONTOLOGY_RESPONSE_CONTEXT_KEY;
 
 /**
  * Created 10/08/16
@@ -123,13 +121,12 @@ public class OntologyResponseConverterTest {
         assertThat(extractContextProperties(convertedResponse), hasEntry(desc3, asList(id1, id2)));
     }
 
-    @SuppressWarnings(value = "unchecked")
     private Map<String, List<String>> extractContextProperties(ConvertedResponse<QuickGOQuery> convertedResponse) {
-        return (Map<String, List<String>>) convertedResponse
-                .getConversionContext()
-                .map(t -> t.getProperties()
-                        .get(ONTOLOGY_RESPONSE_CONTEXT_KEY))
+        OntologyResponseConverter.SlimmingConversionInfo conversionInfo = convertedResponse.getConversionContext()
+                .map(t -> t.get(OntologyResponseConverter.SlimmingConversionInfo.class))
                 .orElseThrow(IllegalStateException::new);
+
+        return conversionInfo.getInfo();
     }
 
     private void addResponseDescendant(String termId, String descendantId) {
