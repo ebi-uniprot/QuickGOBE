@@ -49,7 +49,7 @@ public class Annotation {
         if (taxonId != that.taxonId) {
             return false;
         }
-        if (!id.equals(that.id)) {
+        if (id != null ? !id.equals(that.id) : that.id != null) {
             return false;
         }
         if (geneProductId != null ? !geneProductId.equals(that.geneProductId) : that.geneProductId != null) {
@@ -76,12 +76,15 @@ public class Annotation {
         if (assignedBy != null ? !assignedBy.equals(that.assignedBy) : that.assignedBy != null) {
             return false;
         }
-        return extensions != null ? extensions.equals(that.extensions) : that.extensions == null;
+        if (extensions != null ? !extensions.equals(that.extensions) : that.extensions != null) {
+            return false;
+        }
+        return slimmedGoIds != null ? slimmedGoIds.equals(that.slimmedGoIds) : that.slimmedGoIds == null;
 
     }
 
     @Override public int hashCode() {
-        int result = id.hashCode();
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (geneProductId != null ? geneProductId.hashCode() : 0);
         result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
         result = 31 * result + (goId != null ? goId.hashCode() : 0);
@@ -92,6 +95,7 @@ public class Annotation {
         result = 31 * result + taxonId;
         result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
         result = 31 * result + (extensions != null ? extensions.hashCode() : 0);
+        result = 31 * result + (slimmedGoIds != null ? slimmedGoIds.hashCode() : 0);
         return result;
     }
 
@@ -108,6 +112,8 @@ public class Annotation {
                 ", taxonId=" + taxonId +
                 ", assignedBy='" + assignedBy + '\'' +
                 ", extensions=" + extensions +
+                ", slimmedGoIds=" + slimmedGoIds +
                 '}';
     }
+
 }
