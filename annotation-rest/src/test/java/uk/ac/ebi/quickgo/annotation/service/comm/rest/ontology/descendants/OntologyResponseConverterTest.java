@@ -101,8 +101,6 @@ public class OntologyResponseConverterTest {
         addResponseDescendant(id1, desc1);
         ConvertedResponse<QuickGOQuery> convertedResponse = converter.convert(response);
 
-        assertThat(extractContextProperties(convertedResponse), is(true));
-
         assertThat(extractContextProperties(convertedResponse), hasEntry(desc1, singletonList(id1)));
     }
 
@@ -119,8 +117,6 @@ public class OntologyResponseConverterTest {
         addResponseDescendant(id1, desc3);
         addResponseDescendant(id2, desc3);
         ConvertedResponse<QuickGOQuery> convertedResponse = converter.convert(response);
-
-        assertThat(extractContextProperties(convertedResponse), is(true));
 
         assertThat(extractContextProperties(convertedResponse), hasEntry(desc1, singletonList(id1)));
         assertThat(extractContextProperties(convertedResponse), hasEntry(desc2, singletonList(id1)));
