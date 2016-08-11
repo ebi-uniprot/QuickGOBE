@@ -34,6 +34,8 @@ public class Annotation {
 
     public List<String> extensions;
 
+    public List<String> slimmedGoIds;
+
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;

@@ -17,13 +17,11 @@ import java.util.*;
  */
 public class OntologyResponseConverter implements ResponseConverter<OntologyResponse, QuickGOQuery> {
 
-    public static final String ONTOLOGY_RESPONSE_CONTEXT_KEY = "ontology-response";
-
     @Override public ConvertedResponse<QuickGOQuery> convert(OntologyResponse response) {
         ConvertedResponse<QuickGOQuery> convertedResponse = new ConvertedResponse<>();
         ConversionContext context = new ConversionContext();
 
-        Map<String, List<String>> descendantToTermMap = new HashMap<>();
+        SlimmingConversionInfo conversionInfo = new SlimmingConversionInfo();
 
         QuickGOQuery filterEverything = QuickGOQuery.createAllQuery().not();
         if (response.getResults() != null) {
@@ -31,14 +29,14 @@ public class OntologyResponseConverter implements ResponseConverter<OntologyResp
             for (OntologyResponse.Result result : response.getResults()) {
                 for (String desc : result.getDescendants()) {
                     queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
-                    if (!descendantToTermMap.containsKey(desc)) {
-                        descendantToTermMap.put(desc, new ArrayList<>());
+                    if (!conversionInfo.descendantToTermMap.containsKey(desc)) {
+                        conversionInfo.descendantToTermMap.put(desc, new ArrayList<>());
                     }
-                    descendantToTermMap.get(desc).add(result.getId());
+                    conversionInfo.descendantToTermMap.get(desc).add(result.getId());
                 }
             }
 
-            context.getProperties().put(ONTOLOGY_RESPONSE_CONTEXT_KEY, descendantToTermMap);
+            context.put(SlimmingConversionInfo.class, conversionInfo);
 
             convertedResponse.setConvertedValue(
                     queries.stream()
@@ -51,5 +49,13 @@ public class OntologyResponseConverter implements ResponseConverter<OntologyResp
         convertedResponse.setConversionContext(context);
 
         return convertedResponse;
+    }
+
+    public static class SlimmingConversionInfo {
+        private Map<String, List<String>> descendantToTermMap = new HashMap<>();
+
+        public Map<String, List<String>> getInfo() {
+            return descendantToTermMap;
+        }
     }
 }
