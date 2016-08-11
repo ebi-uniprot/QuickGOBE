@@ -52,7 +52,7 @@ public class AnnotationDocMocker {
         doc.dbObjectSymbol = OBJECT_SYMBOL;
         doc.geneProductType = OBJECT_TYPE;
         doc.taxonId = TAXON_ID;
-        doc.targetSet = TARGET_SET;
+        doc.targetSets = TARGET_SET;
 
         return doc;
     }

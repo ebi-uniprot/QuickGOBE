@@ -59,7 +59,7 @@ public class AnnotationDocument implements QuickGODocument {
     public List<String> extensions;
 
     @Field(AnnotationFields.TARGET_SET)
-    public List<String> targetSet;
+    public List<String> targetSets;
 
     @Override public String getUniqueName() {
         return id;

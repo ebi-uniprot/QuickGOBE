@@ -1033,7 +1033,7 @@ public class AnnotationControllerIT {
     public void filterByNewTargetSetValueReturnsMatchingDocuments() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.targetSet = Collections.singletonList("Parkinsons");
+        doc.targetSets = Collections.singletonList("Parkinsons");
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "Parkinsons"));
@@ -1049,7 +1049,7 @@ public class AnnotationControllerIT {
     public void filterByTargetSetCaseInsensitiveReturnsMatchingDocuments() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.targetSet = Collections.singletonList("parkinsons");
+        doc.targetSets = Collections.singletonList("parkinsons");
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "PARKINSONS"));
