@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.rest.comm;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created 09/08/16
@@ -18,8 +19,13 @@ public class ConversionContext {
         properties.put(key, value);
     }
 
-    public <T> T get(Class<T> key) {
-        return key.cast(properties.get(key));
+    public <T> Optional<T> get(Class<T> key) {
+        T value = key.cast(properties.get(key));
+        if (value == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(value);
+        }
     }
 
     private Map<Class<?>, Object> getProperties() {

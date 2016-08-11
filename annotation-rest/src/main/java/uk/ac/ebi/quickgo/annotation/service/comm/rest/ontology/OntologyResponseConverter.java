@@ -29,10 +29,7 @@ public class OntologyResponseConverter implements ResponseConverter<OntologyResp
             for (OntologyResponse.Result result : response.getResults()) {
                 for (String desc : result.getDescendants()) {
                     queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
-                    if (!conversionInfo.descendantToTermMap.containsKey(desc)) {
-                        conversionInfo.descendantToTermMap.put(desc, new ArrayList<>());
-                    }
-                    conversionInfo.descendantToTermMap.get(desc).add(result.getId());
+                    conversionInfo.addOriginal2SlimmedGOIdMapping(desc, result.getId());
                 }
             }
 
@@ -53,6 +50,13 @@ public class OntologyResponseConverter implements ResponseConverter<OntologyResp
 
     public static class SlimmingConversionInfo {
         private Map<String, List<String>> descendantToTermMap = new HashMap<>();
+
+        public void addOriginal2SlimmedGOIdMapping(String originalGOId, String slimmedGOId) {
+            if (!descendantToTermMap.containsKey(originalGOId)) {
+                descendantToTermMap.put(originalGOId, new ArrayList<>());
+            }
+            descendantToTermMap.get(originalGOId).add(slimmedGOId);
+        }
 
         public Map<String, List<String>> getInfo() {
             return descendantToTermMap;

@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.rest.comm;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 
 /**
@@ -22,8 +22,8 @@ public class ConversionContextTest {
 
     @Test
     public void canFetchingFromEmptyContextFindsNull() {
-        FakeEntity retrievedEntity = context.get(FakeEntity.class);
-        assertThat(retrievedEntity, is(nullValue()));
+        Optional<FakeEntity> fakeEntity = context.get(FakeEntity.class);
+        assertThat(fakeEntity, is(Optional.empty()));
     }
 
     @Test
@@ -32,7 +32,7 @@ public class ConversionContextTest {
         entity.value = "something interesting";
         context.put(FakeEntity.class, entity);
 
-        FakeEntity retrievedEntity = context.get(FakeEntity.class);
+        FakeEntity retrievedEntity = context.get(FakeEntity.class).orElse(new FakeEntity());
         assertThat(retrievedEntity, is(entity));
     }
 
@@ -49,10 +49,11 @@ public class ConversionContextTest {
 
         ConversionContext mergedContext = context.merge(anotherContext);
 
-        FakeEntity retrievedFakeEntity = mergedContext.get(FakeEntity.class);
+        FakeEntity retrievedFakeEntity = mergedContext.get(FakeEntity.class).orElse(new FakeEntity());
         assertThat(retrievedFakeEntity, is(fakeEntity));
 
-        AnotherFakeEntity retrievedAnotherFakeEntity = mergedContext.get(AnotherFakeEntity.class);
+        AnotherFakeEntity retrievedAnotherFakeEntity =
+                mergedContext.get(AnotherFakeEntity.class).orElse(new AnotherFakeEntity());
         assertThat(retrievedAnotherFakeEntity, is(anotherFakeEntity));
     }
 

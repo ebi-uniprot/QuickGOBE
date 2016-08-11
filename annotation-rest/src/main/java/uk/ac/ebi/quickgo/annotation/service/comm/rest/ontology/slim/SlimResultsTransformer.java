@@ -17,7 +17,10 @@ public class SlimResultsTransformer implements ResultTransformer<QueryResult<Ann
     @Override
     public QueryResult<Annotation> transform(QueryResult<Annotation> queryResult, ConversionContext conversionContext) {
         OntologyResponseConverter.SlimmingConversionInfo conversionInfo =
-                conversionContext.get(OntologyResponseConverter.SlimmingConversionInfo.class);
+                conversionContext
+                        .get(OntologyResponseConverter.SlimmingConversionInfo.class)
+                        .orElse(new OntologyResponseConverter.SlimmingConversionInfo());
+
         Map<String, List<String>> descendantToTermMap = conversionInfo.getInfo();
 
         List<Annotation> results = queryResult.getResults();

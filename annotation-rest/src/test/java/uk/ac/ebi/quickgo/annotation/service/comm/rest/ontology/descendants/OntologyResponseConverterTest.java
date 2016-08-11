@@ -123,7 +123,8 @@ public class OntologyResponseConverterTest {
 
     private Map<String, List<String>> extractContextProperties(ConvertedResponse<QuickGOQuery> convertedResponse) {
         OntologyResponseConverter.SlimmingConversionInfo conversionInfo = convertedResponse.getConversionContext()
-                .map(t -> t.get(OntologyResponseConverter.SlimmingConversionInfo.class))
+                .map(t -> t.get(OntologyResponseConverter.SlimmingConversionInfo.class).orElse(new
+                        OntologyResponseConverter.SlimmingConversionInfo()))
                 .orElseThrow(IllegalStateException::new);
 
         return conversionInfo.getInfo();
