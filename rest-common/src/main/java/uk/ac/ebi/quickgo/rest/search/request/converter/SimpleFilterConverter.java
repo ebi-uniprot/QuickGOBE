@@ -43,11 +43,28 @@ class SimpleFilterConverter implements FilterConverter {
 
         Stream<String> values = request.getValues().stream().flatMap(Collection::stream);
 
-        return simpleConvertedResponse(
-                values.map(value -> QuickGOQuery
-                        .createQuery(request.getSignature().stream().collect(Collectors.joining()), value))
-                        .reduce(QuickGOQuery::or)
-                        .orElseThrow(() -> new IllegalStateException("Unable to create SimpleRequestConverter using: " +
-                                request + " and " + filterConfig)));
+        return simpleConvertedResponse(getQuickGOQuery(request, values));
+    }
+
+    /**
+     * Computes the {@link QuickGOQuery} corresponding to for the specified {@link FilterRequest} and {@code values}.
+     *
+     * <p>Note: inlining this method, as parameter to another method, lead to compilation failure, due to:
+     * <ul>
+     *     <li>http://stackoverflow.com/questions/25523375/java8-lambdas-and-exceptions</li>
+     *     <li>https://bugs.openjdk.java.net/browse/JDK-8054569</li>
+     * </ul>
+     *
+     * @param request the filter request
+     * @param values the values, whose combination with the filter details, enable creation of a
+     *        corresponding {@link QuickGOQuery}
+     * @return the corresponding {@link QuickGOQuery}
+     */
+    private QuickGOQuery getQuickGOQuery(FilterRequest request, Stream<String> values) {
+        return values.map(value -> QuickGOQuery
+                .createQuery(request.getSignature().stream().collect(Collectors.joining()), value))
+                .reduce(QuickGOQuery::or)
+                .orElseThrow(() -> new IllegalStateException("Unable to create SimpleRequestConverter using: " +
+                        request + " and " + filterConfig));
     }
 }

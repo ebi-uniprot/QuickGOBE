@@ -101,14 +101,14 @@ public class JoinFilterConverterTest {
         initialiseConverter();
 
         FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
-        QuickGOQuery resultingQuery = converter.transform(request);
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
         QuickGOQuery expectedQuery =
                 QuickGOQuery.createJoinQueryWithFilter(
                         FROM_TABLE_VALUE,
                         FROM_ATTRIBUTE_VALUE,
                         TO_TABLE_VALUE,
                         TO_ATTRIBUTE_VALUE,
-                        new SimpleFilterConverter(filterConfig).transform(request));
+                        new SimpleFilterConverter(filterConfig).transform(request).getConvertedValue());
 
         assertThat(resultingQuery, is(expectedQuery));
     }

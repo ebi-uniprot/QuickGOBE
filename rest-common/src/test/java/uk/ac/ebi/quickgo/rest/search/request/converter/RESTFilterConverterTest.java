@@ -70,7 +70,7 @@ public class RESTFilterConverterTest {
 
             RESTFilterConverter converter = createConverter(config);
 
-            QuickGOQuery query = converter.transform(filter);
+            QuickGOQuery query = converter.transform(filter).getConvertedValue();
 
             assertThat(query, is(QuickGOQuery.createQuery(field, restValue)));
         }
@@ -104,7 +104,7 @@ public class RESTFilterConverterTest {
 
             RESTFilterConverter converter = createConverter(config);
 
-            QuickGOQuery query = converter.transform(filter);
+            QuickGOQuery query = converter.transform(filter).getConvertedValue();
 
             assertThat(query, is(
                     QuickGOQuery.createQuery(field, restValue2)
