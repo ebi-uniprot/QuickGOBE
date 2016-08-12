@@ -11,13 +11,13 @@ import static org.hamcrest.core.Is.is;
  * Created 11/08/16
  * @author Edd
  */
-public class ConversionContextTest {
+public class QueryContextTest {
 
-    private ConversionContext context;
+    private QueryContext context;
 
     @Before
     public void setUp() {
-        context = new ConversionContext();
+        context = new QueryContext();
     }
 
     @Test
@@ -30,7 +30,7 @@ public class ConversionContextTest {
     public void canPutAndGetFromContext() {
         FakeEntity entity = new FakeEntity();
         entity.value = "something interesting";
-        context.put(FakeEntity.class, entity);
+        context.save(FakeEntity.class, entity);
 
         FakeEntity retrievedEntity = context.get(FakeEntity.class).orElse(new FakeEntity());
         assertThat(retrievedEntity, is(entity));
@@ -40,14 +40,14 @@ public class ConversionContextTest {
     public void canMergeTwoContextsIntoOne() {
         FakeEntity fakeEntity = new FakeEntity();
         fakeEntity.value = "something interesting";
-        context.put(FakeEntity.class, fakeEntity);
+        context.save(FakeEntity.class, fakeEntity);
 
-        ConversionContext anotherContext = new ConversionContext();
+        QueryContext anotherContext = new QueryContext();
         AnotherFakeEntity anotherFakeEntity = new AnotherFakeEntity();
         anotherFakeEntity.anotherValue = "something interesting";
-        anotherContext.put(AnotherFakeEntity.class, anotherFakeEntity);
+        anotherContext.save(AnotherFakeEntity.class, anotherFakeEntity);
 
-        ConversionContext mergedContext = context.merge(anotherContext);
+        QueryContext mergedContext = context.merge(anotherContext);
 
         FakeEntity retrievedFakeEntity = mergedContext.get(FakeEntity.class).orElse(new FakeEntity());
         assertThat(retrievedFakeEntity, is(fakeEntity));

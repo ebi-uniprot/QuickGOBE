@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.comm.ConversionContext;
+import uk.ac.ebi.quickgo.rest.comm.QueryContext;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
@@ -65,19 +65,40 @@ public final class SearchDispatcher {
         return response;
     }
 
-    // todo: test
+    /**
+     * Dispatch a {@link QueryRequest} to a {@link SearchService} and handle its responses
+     * appropriately.
+     * <ul>
+     *      <li>If the request is {@code null} a {@link ResponseEntity} denoting an HTTP
+     *          {@code BAD REQUEST (400)}, is returned</li>
+     *     <li>If the service responds successfully, a {@link ResponseEntity} is returned
+     *         containing the {@link QueryResult}.</li>
+     *     <li>If an error occurs when processing the response, a
+     *     {@link ResponseEntity}, denoting an HTTP {@code INTERNAL SERVER ERROR (500)}, is
+     *      returned</li>
+     * </ul>
+     *
+     * @param request the request
+     * @param searchService the service in which to search
+     * @param transformer the transformations to apply to the results
+     * @param context data made available to the result transformations
+     * @param <T> the type of object being returned
+     * @return the response
+     *
+     */
     public static <T> ResponseEntity<QueryResult<T>> searchAndTransform(
             QueryRequest request,
             SearchService<T> searchService,
             ResultTransformerChain<QueryResult<T>> transformer,
-            ConversionContext context) {
+            QueryContext context) {
         ResponseEntity<QueryResult<T>> response;
 
         if (request == null) {
             response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
             try {
-                QueryResult<T> queryResult = transformer.transformChain(searchService.findByQuery(request), context);
+                QueryResult<T> queryResult = transformer.applyTransformations(searchService.findByQuery(request),
+                        context);
                 response = new ResponseEntity<>(queryResult, HttpStatus.OK);
             } catch (RetrievalException e) {
                 LOGGER.error(createErrorMessage(request), e);

@@ -8,28 +8,28 @@ import java.util.Optional;
  */
 public class ConvertedResponse<V> {
     private V convertedValue;
-    private ConversionContext conversionContext;
+    private QueryContext queryContext;
 
     public V getConvertedValue() {
         return convertedValue;
     }
 
-    public Optional<ConversionContext> getConversionContext() {
-        return Optional.of(conversionContext);
+    public Optional<QueryContext> getQueryContext() {
+        return Optional.of(queryContext);
     }
 
     public void setConvertedValue(V convertedValue) {
         this.convertedValue = convertedValue;
     }
 
-    public void setConversionContext(ConversionContext conversionContext) {
-        this.conversionContext = conversionContext;
+    public void setQueryContext(QueryContext queryContext) {
+        this.queryContext = queryContext;
     }
 
     public static <T> ConvertedResponse<T> simpleConvertedResponse(T convertedValue) {
         ConvertedResponse<T> response = new ConvertedResponse<>();
         response.setConvertedValue(convertedValue);
-        response.setConversionContext(null);
+        response.setQueryContext(null);
         return response;
     }
 }
