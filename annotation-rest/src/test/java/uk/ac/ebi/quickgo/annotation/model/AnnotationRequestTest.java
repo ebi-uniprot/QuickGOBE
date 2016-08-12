@@ -12,7 +12,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_FIELD;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_IDS;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
@@ -26,9 +25,6 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIO
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequestTest {
-
-    //AssignedBy values
-    private static final String UNI_PROT = "UniProt";
 
     private AnnotationRequest annotationRequest;
 
@@ -159,7 +155,7 @@ public class AnnotationRequestTest {
         annotationRequest.setUsageIds(usageId);
 
         FilterRequest request = FilterRequest.newBuilder()
-                .addProperty(USAGE_FIELD, usage.toLowerCase())
+                .addProperty(usage.toLowerCase())
                 .addProperty(USAGE_IDS, usageId.toUpperCase())
                 .addProperty(USAGE_RELATIONSHIPS)
                 .build();
@@ -179,7 +175,7 @@ public class AnnotationRequestTest {
 
         assertThat(annotationRequest.createFilterRequests(),
                 contains(FilterRequest.newBuilder()
-                        .addProperty(USAGE_FIELD, usage.toLowerCase())
+                        .addProperty(usage.toLowerCase())
                         .addProperty(USAGE_IDS, usageId.toUpperCase())
                         .addProperty(USAGE_RELATIONSHIPS, relationships.toLowerCase())
                         .build()));
