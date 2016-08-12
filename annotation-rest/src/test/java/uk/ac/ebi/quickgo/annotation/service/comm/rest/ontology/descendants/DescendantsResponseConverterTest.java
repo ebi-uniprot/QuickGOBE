@@ -1,8 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.OntologyResponse;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.OntologyResponseConverter;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsResponseConverter;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingConversionInfo;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyResponse;
 import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
@@ -22,15 +23,15 @@ import static org.hamcrest.core.Is.is;
  * Created 10/08/16
  * @author Edd
  */
-public class OntologyResponseConverterTest {
+public class DescendantsResponseConverterTest {
     private OntologyResponse response;
-    private OntologyResponseConverter converter;
+    private DescendantsResponseConverter converter;
 
     @Before
     public void setUp() {
         response = new OntologyResponse();
         response.setResults(new ArrayList<>());
-        converter = new OntologyResponseConverter();
+        converter = new DescendantsResponseConverter();
     }
 
     @Test
@@ -122,9 +123,9 @@ public class OntologyResponseConverterTest {
     }
 
     private Map<String, List<String>> extractContextProperties(ConvertedResponse<QuickGOQuery> convertedResponse) {
-        OntologyResponseConverter.SlimmingConversionInfo conversionInfo = convertedResponse.getConversionContext()
-                .map(t -> t.get(OntologyResponseConverter.SlimmingConversionInfo.class).orElse(new
-                        OntologyResponseConverter.SlimmingConversionInfo()))
+        SlimmingConversionInfo conversionInfo = convertedResponse.getQueryContext()
+                .map(t -> t.get(SlimmingConversionInfo.class)
+                        .orElse(new SlimmingConversionInfo()))
                 .orElseThrow(IllegalStateException::new);
 
         return conversionInfo.getInfo();

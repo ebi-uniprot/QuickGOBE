@@ -1,25 +1,30 @@
-package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology;
+package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.OntologyResponse;
-import uk.ac.ebi.quickgo.rest.comm.ConversionContext;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyResponse;
 import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
+import uk.ac.ebi.quickgo.rest.comm.QueryContext;
 import uk.ac.ebi.quickgo.rest.comm.ResponseConverter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Converts a response to a quickgoquery
+ * This class is responsible for converting an ontology model containing GO id descendant information, to a
+ * {@link ConvertedResponse}. This result encapsulates a {@link QuickGOQuery} applicable to filtering the annotation
+ * core data, by these descendants. Additionally, this process records slimming information consisting of original
+ * GO ids and their mappings to slimmed up GO ids; this is stored within an instance of {@link SlimmingConversionInfo}
+ * available from the {@link ConvertedResponse}'s {@link QueryContext}.
  *
  * Created 09/08/16
  * @author Edd
  */
-public class OntologyResponseConverter implements ResponseConverter<OntologyResponse, QuickGOQuery> {
+public class DescendantsResponseConverter implements ResponseConverter<OntologyResponse, QuickGOQuery> {
 
     @Override public ConvertedResponse<QuickGOQuery> convert(OntologyResponse response) {
         ConvertedResponse<QuickGOQuery> convertedResponse = new ConvertedResponse<>();
-        ConversionContext context = new ConversionContext();
+        QueryContext context = new QueryContext();
 
         SlimmingConversionInfo conversionInfo = new SlimmingConversionInfo();
 
@@ -33,7 +38,7 @@ public class OntologyResponseConverter implements ResponseConverter<OntologyResp
                 }
             }
 
-            context.put(SlimmingConversionInfo.class, conversionInfo);
+            context.save(SlimmingConversionInfo.class, conversionInfo);
 
             convertedResponse.setConvertedValue(
                     queries.stream()
@@ -43,23 +48,8 @@ public class OntologyResponseConverter implements ResponseConverter<OntologyResp
             convertedResponse.setConvertedValue(filterEverything);
         }
 
-        convertedResponse.setConversionContext(context);
+        convertedResponse.setQueryContext(context);
 
         return convertedResponse;
-    }
-
-    public static class SlimmingConversionInfo {
-        private Map<String, List<String>> descendantToTermMap = new HashMap<>();
-
-        public void addOriginal2SlimmedGOIdMapping(String originalGOId, String slimmedGOId) {
-            if (!descendantToTermMap.containsKey(originalGOId)) {
-                descendantToTermMap.put(originalGOId, new ArrayList<>());
-            }
-            descendantToTermMap.get(originalGOId).add(slimmedGOId);
-        }
-
-        public Map<String, List<String>> getInfo() {
-            return descendantToTermMap;
-        }
     }
 }

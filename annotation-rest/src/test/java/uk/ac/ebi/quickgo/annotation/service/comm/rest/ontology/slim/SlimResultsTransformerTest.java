@@ -1,8 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.slim;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.OntologyResponseConverter;
-import uk.ac.ebi.quickgo.rest.comm.ConversionContext;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingConversionInfo;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
+import uk.ac.ebi.quickgo.rest.comm.QueryContext;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.ArrayList;
@@ -21,16 +22,16 @@ import static org.hamcrest.core.Is.is;
 public class SlimResultsTransformerTest {
 
     private SlimResultsTransformer transformer;
-    private ConversionContext context;
+    private QueryContext context;
     private ArrayList<Annotation> results;
-    private OntologyResponseConverter.SlimmingConversionInfo conversionInfo;
+    private SlimmingConversionInfo conversionInfo;
 
     @Before
     public void setUp() {
-        conversionInfo = new OntologyResponseConverter.SlimmingConversionInfo();
+        conversionInfo = new SlimmingConversionInfo();
         transformer = new SlimResultsTransformer();
-        context = new ConversionContext();
-        context.put(OntologyResponseConverter.SlimmingConversionInfo.class, conversionInfo);
+        context = new QueryContext();
+        context.save(SlimmingConversionInfo.class, conversionInfo);
         results = new ArrayList<>();
     }
 

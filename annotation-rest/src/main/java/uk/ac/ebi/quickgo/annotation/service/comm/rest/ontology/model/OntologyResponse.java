@@ -1,10 +1,18 @@
-package uk.ac.ebi.quickgo.annotation.service.comm.rest;
+package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model;
 
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 
 import java.util.List;
 
 /**
+ * Represents part of the model corresponding to the response available from the resource:
+ *
+ * <ul>
+ *     <li>/go/terms/{term}/descendants</li>
+ * </ul>
+ *
+ * Currently, this model captures the parts reached by the JSON path expression, "$.results.descendants".
+ *
  * Created 09/08/16
  * @author Edd
  */

@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.annotation.service.search;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.slim.SlimResultsTransformer;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
 import uk.ac.ebi.quickgo.common.validator.EntityValidation;
