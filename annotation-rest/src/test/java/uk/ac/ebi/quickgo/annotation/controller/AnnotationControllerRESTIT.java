@@ -3,9 +3,12 @@ package uk.ac.ebi.quickgo.annotation.controller;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyResponse;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,6 +78,9 @@ public class AnnotationControllerRESTIT {
 
     private MockMvc mockMvc;
     private MockRestServiceServer mockRestServiceServer;
+    private final ObjectMapper objectMapper;
+
+    public AnnotationControllerRESTIT() {objectMapper = new ObjectMapper();}
 
     @Before
     public void setUp() throws Exception {
@@ -235,7 +241,7 @@ public class AnnotationControllerRESTIT {
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(valuesOccurInErrorMessage(FAILED_REST_FETCH_PREFIX));
+                .andExpect(valueStartingWithOccursInErrorMessage(FAILED_REST_FETCH_PREFIX));
     }
 
     @Test
@@ -253,7 +259,7 @@ public class AnnotationControllerRESTIT {
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(valuesOccurInErrorMessage(FAILED_REST_FETCH_PREFIX));
+                .andExpect(valueStartingWithOccursInErrorMessage(FAILED_REST_FETCH_PREFIX));
     }
 
     @Test
@@ -271,7 +277,7 @@ public class AnnotationControllerRESTIT {
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(valuesOccurInErrorMessage(FAILED_REST_FETCH_PREFIX));
+                .andExpect(valueStartingWithOccursInErrorMessage(FAILED_REST_FETCH_PREFIX));
     }
 
     @Test
@@ -289,7 +295,7 @@ public class AnnotationControllerRESTIT {
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(valuesOccurInErrorMessage(FAILED_REST_FETCH_PREFIX));
+                .andExpect(valueStartingWithOccursInErrorMessage(FAILED_REST_FETCH_PREFIX));
     }
 
     @After
@@ -325,7 +331,6 @@ public class AnnotationControllerRESTIT {
 
         String termIdsCSV = termIds.stream().collect(Collectors.joining(COMMA));
         String relationsCSV = usageRelations.stream().collect(Collectors.joining(COMMA));
-        String descendantsCSV = descendants.stream().collect(Collectors.joining(COMMA));
 
         expectRestCallSuccess(
                 GET,
@@ -333,7 +338,27 @@ public class AnnotationControllerRESTIT {
                         DESCENDANTS_RESOURCE_FORMAT,
                         termIdsCSV,
                         relationsCSV),
-                "{ results : [ { descendants : [" + descendantsCSV + "] } ]}");
+                constructResponseObject(termIds, descendants));
+    }
+
+    private String constructResponseObject(List<String> termIds,
+            List<String> descendants) {
+        OntologyResponse response = new OntologyResponse();
+        List<OntologyResponse.Result> results = new ArrayList<>();
+
+        termIds.forEach(t -> {
+            OntologyResponse.Result result = new OntologyResponse.Result();
+            result.setId(t);
+            result.setDescendants(descendants);
+            results.add(result);
+        });
+
+        response.setResults(results);
+        try {
+            return objectMapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Problem constructing mocked REST response:", e);
+        }
     }
 
     private void expectRestCallSuccess(HttpMethod method, String url, String response) {

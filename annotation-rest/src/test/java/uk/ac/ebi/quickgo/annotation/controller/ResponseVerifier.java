@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -36,6 +37,10 @@ final class ResponseVerifier {
 
     static ResultMatcher valuesOccurInErrorMessage(String... values) {
         return jsonPath(ERROR_MESSAGE, contains(values));
+    }
+
+    static ResultMatcher valueStartingWithOccursInErrorMessage(String value) {
+        return jsonPath(ERROR_MESSAGE, hasItem(startsWith(value)));
     }
 
     static ResultMatcher valuesOccurInField(String fieldName, String... values) {
@@ -62,7 +67,7 @@ final class ResponseVerifier {
         return jsonPath("$.messages", Matchers.hasItem(is(message)));
     }
 
-    static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {
+    private static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {
         String path = String.format(RESULTS_CONTENT_BY_INDEX, resultIndex);
 
         return new CompositeResultMatcher().addMatcher(jsonPath(path + "id").exists())

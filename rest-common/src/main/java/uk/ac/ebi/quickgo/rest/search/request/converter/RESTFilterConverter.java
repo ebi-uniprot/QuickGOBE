@@ -186,6 +186,7 @@ class RESTFilterConverter implements FilterConverter {
             throws ExecutionException, InterruptedException, TimeoutException {
         return restRequester
                 .get(responseType)
+                //                .get(String.class)
                 .get(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
