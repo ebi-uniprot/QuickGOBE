@@ -26,8 +26,7 @@ public class SlimResultsTransformer implements ResultTransformer<QueryResult<Ann
 
         Map<String, List<String>> descendantToTermMap = conversionInfo.getInfo();
 
-        List<Annotation> results = queryResult.getResults();
-        results.stream()
+        queryResult.getResults().stream()
                 .filter(result -> descendantToTermMap.containsKey(result.goId))
                 .forEach(result -> result.slimmedGoIds = descendantToTermMap.get(result.goId));
 

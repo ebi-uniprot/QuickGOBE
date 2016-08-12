@@ -26,7 +26,11 @@ public class ConvertedResponse<V> {
      * @return the {@link QueryContext} containing meta-information associated with the conversion
      */
     public Optional<QueryContext> getQueryContext() {
-        return Optional.of(queryContext);
+        if (queryContext == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(queryContext);
+        }
     }
 
     /**
