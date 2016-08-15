@@ -65,13 +65,13 @@ public class SlimResultsTransformerTest {
         assertThat(transformedResults.getResults().size(), is(1));
         Annotation transformedAnnotation = transformedResults.getResults().get(0);
         assertThat(transformedAnnotation.goId, is("goId1"));
-        assertThat(transformedAnnotation.slimmedGoIds, contains("slimmedId1"));
+        assertThat(transformedAnnotation.slimmedIds, contains("slimmedId1"));
     }
 
     private void addAnnotationToResults(String goId, String... slimmedGOIds) {
         Annotation annotation = new Annotation();
         annotation.goId = goId;
-        annotation.slimmedGoIds = Arrays.asList(slimmedGOIds);
+        annotation.slimmedIds = Arrays.asList(slimmedGOIds);
         results.add(annotation);
     }
 

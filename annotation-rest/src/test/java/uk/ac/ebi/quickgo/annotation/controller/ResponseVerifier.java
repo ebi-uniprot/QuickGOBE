@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 final class ResponseVerifier {
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
     public static final String GO_ID_FIELD = "goId";
+    public static final String SLIMMED_ID_FIELD = "slimmedIds";
     public static final String QUALIFIER = "qualifier";
 
     private static final String ERROR_MESSAGE = "messages";
@@ -47,6 +48,10 @@ final class ResponseVerifier {
         return jsonPath(RESULTS + ".*." + fieldName, contains(values));
     }
 
+    static <T> ResultMatcher valuesOccurInField(String fieldName, List<T> match) {
+        return jsonPath(RESULTS + ".*." + fieldName, is(match));
+    }
+
     static ResultMatcher atLeastOneResultHasItem(String fieldName, String value) {
         return jsonPath(RESULTS + ".*." + fieldName, hasItem(value));
     }
@@ -63,7 +68,7 @@ final class ResponseVerifier {
         return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
     }
 
-    static ResultMatcher messageExists(String message){
+    static ResultMatcher messageExists(String message) {
         return jsonPath("$.messages", Matchers.hasItem(is(message)));
     }
 
@@ -123,7 +128,7 @@ final class ResponseVerifier {
         private final List<ResultMatcher> matchers = new ArrayList<>();
 
         @Override public void match(MvcResult result) throws Exception {
-            matchers.stream().forEach(matcher -> {
+            matchers.forEach(matcher -> {
                 try {
                     matcher.match(result);
                 } catch (Exception e) {

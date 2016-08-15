@@ -34,7 +34,7 @@ public class Annotation {
 
     public List<String> extensions;
 
-    public List<String> slimmedGoIds;
+    public List<String> slimmedIds;
 
     @Override public boolean equals(Object o) {
         if (this == o) {
@@ -79,7 +79,7 @@ public class Annotation {
         if (extensions != null ? !extensions.equals(that.extensions) : that.extensions != null) {
             return false;
         }
-        return slimmedGoIds != null ? slimmedGoIds.equals(that.slimmedGoIds) : that.slimmedGoIds == null;
+        return slimmedIds != null ? slimmedIds.equals(that.slimmedIds) : that.slimmedIds == null;
 
     }
 
@@ -95,7 +95,7 @@ public class Annotation {
         result = 31 * result + taxonId;
         result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
         result = 31 * result + (extensions != null ? extensions.hashCode() : 0);
-        result = 31 * result + (slimmedGoIds != null ? slimmedGoIds.hashCode() : 0);
+        result = 31 * result + (slimmedIds != null ? slimmedIds.hashCode() : 0);
         return result;
     }
 
@@ -112,7 +112,7 @@ public class Annotation {
                 ", taxonId=" + taxonId +
                 ", assignedBy='" + assignedBy + '\'' +
                 ", extensions=" + extensions +
-                ", slimmedGoIds=" + slimmedGoIds +
+                ", slimmedIds=" + slimmedIds +
                 '}';
     }
 
