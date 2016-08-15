@@ -3,15 +3,15 @@ package uk.ac.ebi.quickgo.rest.comm;
 import java.util.Optional;
 
 /**
- * Represents the result of a conversion, encapsulating the original converted value,
+ * Represents the result of a filter conversion, encapsulating the original converted value,
  * in addition to the meta-information associated with the conversion process.
  *
  * Created 09/08/16
  * @author Edd
  */
-public class ConvertedResponse<V> {
+public class ConvertedFilter<V> {
     private V convertedValue;
-    private QueryContext queryContext;
+    private FilterContext filterContext;
 
     /**
      * Retrieves the value converted
@@ -23,13 +23,13 @@ public class ConvertedResponse<V> {
 
     /**
      * Retrieves the meta-information associated with the conversion
-     * @return the {@link QueryContext} containing meta-information associated with the conversion
+     * @return the {@link FilterContext} containing meta-information associated with the conversion
      */
-    public Optional<QueryContext> getQueryContext() {
-        if (queryContext == null) {
+    public Optional<FilterContext> getFilterContext() {
+        if (filterContext == null) {
             return Optional.empty();
         } else {
-            return Optional.of(queryContext);
+            return Optional.of(filterContext);
         }
     }
 
@@ -43,24 +43,24 @@ public class ConvertedResponse<V> {
 
     /** Sets the meta-information associated with the conversion
      *
-     * @param queryContext the meta-information associated with the conversion
+     * @param filterContext the meta-information associated with the conversion
      */
-    public void setQueryContext(QueryContext queryContext) {
-        this.queryContext = queryContext;
+    public void setFilterContext(FilterContext filterContext) {
+        this.filterContext = filterContext;
     }
 
     /**
-     * A convenience method used to create a {@link ConvertedResponse} that has no
+     * A convenience method used to create a {@link ConvertedFilter} that has no
      * meta-information associated with it.
      *
      * @param convertedValue the converted value
      * @param <T> the type of the converted value
      * @return the converted response
      */
-    public static <T> ConvertedResponse<T> simpleConvertedResponse(T convertedValue) {
-        ConvertedResponse<T> response = new ConvertedResponse<>();
+    public static <T> ConvertedFilter<T> simpleConvertedResponse(T convertedValue) {
+        ConvertedFilter<T> response = new ConvertedFilter<>();
         response.setConvertedValue(convertedValue);
-        response.setQueryContext(null);
+        response.setFilterContext(null);
         return response;
     }
 }

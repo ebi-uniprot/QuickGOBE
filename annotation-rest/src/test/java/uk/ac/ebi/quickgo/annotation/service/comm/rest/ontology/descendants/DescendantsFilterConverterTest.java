@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsResponseConverter;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingConversionInfo;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyResponse;
-import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
+import uk.ac.ebi.quickgo.rest.comm.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
 import java.util.ArrayList;
@@ -23,15 +23,15 @@ import static org.hamcrest.core.Is.is;
  * Created 10/08/16
  * @author Edd
  */
-public class DescendantsResponseConverterTest {
-    private OntologyResponse response;
-    private DescendantsResponseConverter converter;
+public class DescendantsFilterConverterTest {
+    private ConvertedOntologyFilter response;
+    private DescendantsFilterConverter converter;
 
     @Before
     public void setUp() {
-        response = new OntologyResponse();
+        response = new ConvertedOntologyFilter();
         response.setResults(new ArrayList<>());
-        converter = new DescendantsResponseConverter();
+        converter = new DescendantsFilterConverter();
     }
 
     @Test
@@ -40,9 +40,9 @@ public class DescendantsResponseConverterTest {
         String desc1 = "desc1";
 
         addResponseDescendant(id1, desc1);
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
+        ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedResponse.getConvertedValue(), is(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
+        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
     }
 
     @Test
@@ -55,9 +55,9 @@ public class DescendantsResponseConverterTest {
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id2, desc2);
 
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
+        ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedResponse.getConvertedValue(), is(
+        assertThat(convertedFilter.getConvertedValue(), is(
                 QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)
                         .or(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc2))));
     }
@@ -71,25 +71,25 @@ public class DescendantsResponseConverterTest {
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id2, desc1);
 
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
+        ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedResponse.getConvertedValue(), is(
+        assertThat(convertedFilter.getConvertedValue(), is(
                 QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
     }
 
     @Test
     public void nullResultsMeansFilterEverything() {
         response.setResults(null);
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
+        ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedResponse.getConvertedValue(), is(QuickGOQuery.createAllQuery().not()));
+        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createAllQuery().not()));
     }
 
     @Test
     public void emptyResultsMeansFilterEverything() {
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
+        ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedResponse.getConvertedValue(), is(QuickGOQuery.createAllQuery().not()));
+        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createAllQuery().not()));
     }
 
     @Test
@@ -98,9 +98,9 @@ public class DescendantsResponseConverterTest {
         String desc1 = "desc1";
 
         addResponseDescendant(id1, desc1);
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
+        ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(extractContextProperties(convertedResponse), hasEntry(desc1, singletonList(id1)));
+        assertThat(extractContextProperties(convertedFilter), hasEntry(desc1, singletonList(id1)));
     }
 
     @Test
@@ -115,15 +115,15 @@ public class DescendantsResponseConverterTest {
         addResponseDescendant(id1, desc2);
         addResponseDescendant(id1, desc3);
         addResponseDescendant(id2, desc3);
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
+        ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(extractContextProperties(convertedResponse), hasEntry(desc1, singletonList(id1)));
-        assertThat(extractContextProperties(convertedResponse), hasEntry(desc2, singletonList(id1)));
-        assertThat(extractContextProperties(convertedResponse), hasEntry(desc3, asList(id1, id2)));
+        assertThat(extractContextProperties(convertedFilter), hasEntry(desc1, singletonList(id1)));
+        assertThat(extractContextProperties(convertedFilter), hasEntry(desc2, singletonList(id1)));
+        assertThat(extractContextProperties(convertedFilter), hasEntry(desc3, asList(id1, id2)));
     }
 
-    private Map<String, List<String>> extractContextProperties(ConvertedResponse<QuickGOQuery> convertedResponse) {
-        SlimmingConversionInfo conversionInfo = convertedResponse.getQueryContext()
+    private Map<String, List<String>> extractContextProperties(ConvertedFilter<QuickGOQuery> convertedFilter) {
+        SlimmingConversionInfo conversionInfo = convertedFilter.getFilterContext()
                 .map(t -> t.get(SlimmingConversionInfo.class)
                         .orElse(new SlimmingConversionInfo()))
                 .orElseThrow(IllegalStateException::new);
@@ -132,14 +132,14 @@ public class DescendantsResponseConverterTest {
     }
 
     private void addResponseDescendant(String termId, String descendantId) {
-        for (OntologyResponse.Result result : response.getResults()) {
+        for (ConvertedOntologyFilter.Result result : response.getResults()) {
             if (result.getId().equals(termId)) {
                 result.getDescendants().add(descendantId);
                 return;
             }
         }
 
-        OntologyResponse.Result newResult = new OntologyResponse.Result();
+        ConvertedOntologyFilter.Result newResult = new ConvertedOntologyFilter.Result();
         newResult.setId(termId);
         List<String> descList = new ArrayList<>();
         descList.add(descendantId);

@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
-import uk.ac.ebi.quickgo.rest.comm.QueryContext;
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
@@ -126,11 +126,11 @@ public class AnnotationController {
         validationHelper.validateRequestedResults(request.getLimit());
 
         Set<QuickGOQuery> filterQueries = new HashSet<>();
-        Set<QueryContext> queryContexts = new HashSet<>();
-        extractFilterQueryInfo(request, filterQueries, queryContexts);
+        Set<FilterContext> filterContexts = new HashSet<>();
+        extractFilterQueryInfo(request, filterQueries, filterContexts);
 
-        QueryContext queryContext = queryContexts.stream().reduce
-                (new QueryContext(), QueryContext::merge);
+        FilterContext filterContext = filterContexts.stream().reduce
+                (new FilterContext(), FilterContext::merge);
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
@@ -139,18 +139,18 @@ public class AnnotationController {
                 .setPageSize(request.getLimit())
                 .build();
 
-        return searchAndTransform(queryRequest, annotationSearchService, resultTransformerChain, queryContext);
+        return searchAndTransform(queryRequest, annotationSearchService, resultTransformerChain, filterContext);
     }
 
     private void extractFilterQueryInfo(
             AnnotationRequest request,
             Set<QuickGOQuery> filterQueries,
-            Set<QueryContext> queryContexts) {
+            Set<FilterContext> filterContexts) {
         request.createFilterRequests().stream()
                 .map(converterFactory::convert)
                 .forEach(convertedResponse -> {
                     filterQueries.add(convertedResponse.getConvertedValue());
-                    convertedResponse.getQueryContext().ifPresent(queryContexts::add);
+                    convertedResponse.getFilterContext().ifPresent(filterContexts::add);
                 });
     }
 }

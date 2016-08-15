@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.results.transformer;
 
-import uk.ac.ebi.quickgo.rest.comm.QueryContext;
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class ResultTransformerChain<R> {
     /**
      * Adds a new transformer to the chain of transformations
      * @param resultTransformer a transformation to be applied during
-     * {@link #applyTransformations(Object, QueryContext)}.
+     * {@link #applyTransformations(Object, FilterContext)}.
      */
     public void addTransformer(ResultTransformer<R> resultTransformer) {
         this.transformers.add(resultTransformer);
@@ -34,13 +34,13 @@ public class ResultTransformerChain<R> {
      * Apply the recorded list of {@link ResultTransformer}s to the specified result.
      *
      * @param result the result to transform
-     * @param queryContext additional context information available during the result transformations
+     * @param filterContext additional context information available during the result transformations
      * @return the transformed result of type {@code R}
      */
-    public R applyTransformations(R result, QueryContext queryContext) {
+    public R applyTransformations(R result, FilterContext filterContext) {
         R transformation = result;
         for (ResultTransformer<R> transformer : transformers) {
-            transformation = transformer.transform(result, queryContext);
+            transformation = transformer.transform(result, filterContext);
         }
         return transformation;
     }

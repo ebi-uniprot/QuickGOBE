@@ -16,10 +16,10 @@ import java.util.Optional;
  * Created 09/08/16
  * @author Edd
  */
-public class QueryContext {
+public class FilterContext {
     private Map<Class<?>, Object> properties;
 
-    public QueryContext() {
+    public FilterContext() {
         properties = new HashMap<>();
     }
 
@@ -52,17 +52,17 @@ public class QueryContext {
     }
 
     /**
-     * Combine this {@link QueryContext} with another
-     * @param context the {@link QueryContext} to merge
-     * @return the merged {@link QueryContext}
+     * Combine this {@link FilterContext} with another
+     * @param context the {@link FilterContext} to merge
+     * @return the merged {@link FilterContext}
      */
-    public QueryContext merge(QueryContext context) {
-        QueryContext queryContext = new QueryContext();
+    public FilterContext merge(FilterContext context) {
+        FilterContext filterContext = new FilterContext();
 
-        queryContext.getProperties().putAll(this.getProperties());
-        queryContext.getProperties().putAll(context.getProperties());
+        filterContext.getProperties().putAll(this.getProperties());
+        filterContext.getProperties().putAll(context.getProperties());
 
-        return queryContext;
+        return filterContext;
     }
 
     private Map<Class<?>, Object> getProperties() {

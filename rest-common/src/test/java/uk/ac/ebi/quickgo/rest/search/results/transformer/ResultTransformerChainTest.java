@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.results.transformer;
 
-import uk.ac.ebi.quickgo.rest.comm.QueryContext;
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class ResultTransformerChainTest {
     private ResultTransformer<FakeResult> transformer2;
 
     @Mock
-    private QueryContext context;
+    private FilterContext context;
 
     private ResultTransformerChain<FakeResult> transformerChain;
     private FakeResult originalResult;

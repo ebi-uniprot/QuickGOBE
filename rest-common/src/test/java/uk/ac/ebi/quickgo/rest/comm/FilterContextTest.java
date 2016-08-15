@@ -11,13 +11,13 @@ import static org.hamcrest.core.Is.is;
  * Created 11/08/16
  * @author Edd
  */
-public class QueryContextTest {
+public class FilterContextTest {
 
-    private QueryContext context;
+    private FilterContext context;
 
     @Before
     public void setUp() {
-        context = new QueryContext();
+        context = new FilterContext();
     }
 
     @Test
@@ -42,12 +42,12 @@ public class QueryContextTest {
         fakeEntity.value = "something interesting";
         context.save(FakeEntity.class, fakeEntity);
 
-        QueryContext anotherContext = new QueryContext();
+        FilterContext anotherContext = new FilterContext();
         AnotherFakeEntity anotherFakeEntity = new AnotherFakeEntity();
         anotherFakeEntity.anotherValue = "something interesting";
         anotherContext.save(AnotherFakeEntity.class, anotherFakeEntity);
 
-        QueryContext mergedContext = context.merge(anotherContext);
+        FilterContext mergedContext = context.merge(anotherContext);
 
         FakeEntity retrievedFakeEntity = mergedContext.get(FakeEntity.class).orElse(new FakeEntity());
         assertThat(retrievedFakeEntity, is(fakeEntity));

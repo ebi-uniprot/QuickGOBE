@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.slim;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingConversionInfo;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
-import uk.ac.ebi.quickgo.rest.comm.QueryContext;
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import static org.hamcrest.core.Is.is;
 public class SlimResultsTransformerTest {
 
     private SlimResultsTransformer transformer;
-    private QueryContext context;
+    private FilterContext context;
     private ArrayList<Annotation> results;
     private SlimmingConversionInfo conversionInfo;
 
@@ -30,7 +30,7 @@ public class SlimResultsTransformerTest {
     public void setUp() {
         conversionInfo = new SlimmingConversionInfo();
         transformer = new SlimResultsTransformer();
-        context = new QueryContext();
+        context = new FilterContext();
         context.save(SlimmingConversionInfo.class, conversionInfo);
         results = new ArrayList<>();
     }

@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.annotation.controller;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyResponse;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
@@ -559,11 +559,11 @@ public class AnnotationControllerRESTIT {
     }
 
     private String constructResponseObject(List<String> termIds, List<String> descendants) {
-        OntologyResponse response = new OntologyResponse();
-        List<OntologyResponse.Result> results = new ArrayList<>();
+        ConvertedOntologyFilter response = new ConvertedOntologyFilter();
+        List<ConvertedOntologyFilter.Result> results = new ArrayList<>();
 
         termIds.forEach(t -> {
-            OntologyResponse.Result result = new OntologyResponse.Result();
+            ConvertedOntologyFilter.Result result = new ConvertedOntologyFilter.Result();
             result.setId(t);
             result.setDescendants(descendants);
             results.add(result);

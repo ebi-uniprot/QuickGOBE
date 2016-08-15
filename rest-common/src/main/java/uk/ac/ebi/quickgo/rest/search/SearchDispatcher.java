@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.comm.QueryContext;
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
@@ -90,7 +90,7 @@ public final class SearchDispatcher {
             QueryRequest request,
             SearchService<T> searchService,
             ResultTransformerChain<QueryResult<T>> transformer,
-            QueryContext context) {
+            FilterContext context) {
         ResponseEntity<QueryResult<T>> response;
 
         if (request == null) {

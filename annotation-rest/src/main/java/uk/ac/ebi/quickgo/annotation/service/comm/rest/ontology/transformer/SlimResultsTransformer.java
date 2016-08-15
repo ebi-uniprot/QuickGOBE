@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingConversionInfo;
-import uk.ac.ebi.quickgo.rest.comm.QueryContext;
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformer;
 
@@ -18,9 +18,9 @@ import java.util.Map;
  */
 public class SlimResultsTransformer implements ResultTransformer<QueryResult<Annotation>> {
     @Override
-    public QueryResult<Annotation> transform(QueryResult<Annotation> queryResult, QueryContext queryContext) {
+    public QueryResult<Annotation> transform(QueryResult<Annotation> queryResult, FilterContext filterContext) {
         SlimmingConversionInfo conversionInfo =
-                queryContext
+                filterContext
                         .get(SlimmingConversionInfo.class)
                         .orElse(new SlimmingConversionInfo());
 

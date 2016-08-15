@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
-import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
+import uk.ac.ebi.quickgo.rest.comm.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.ac.ebi.quickgo.rest.comm.ConvertedResponse.simpleConvertedResponse;
+import static uk.ac.ebi.quickgo.rest.comm.ConvertedFilter.simpleConvertedResponse;
 
 /**
  * Defines the conversion of a simple request to a corresponding {@link QuickGOQuery}.
@@ -35,7 +35,7 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
      * @param request the client request
      * @return a {@link QuickGOQuery} corresponding to a join query, representing the original client request
      */
-    @Override public ConvertedResponse<QuickGOQuery> transform(FilterRequest request) {
+    @Override public ConvertedFilter<QuickGOQuery> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
         Preconditions.checkArgument(request.getValues().size() == 1,
                 "FilterRequest should contain only 1 property for application to a SimpleRequestConverter, " +

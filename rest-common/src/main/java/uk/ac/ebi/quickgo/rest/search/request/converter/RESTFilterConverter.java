@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
-import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
+import uk.ac.ebi.quickgo.rest.comm.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.springframework.web.client.RestOperations;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.ac.ebi.quickgo.rest.comm.ConvertedResponse.simpleConvertedResponse;
+import static uk.ac.ebi.quickgo.rest.comm.ConvertedFilter.simpleConvertedResponse;
 
 /**
  * <p>Defines the conversion of a {@link FilterRequest} representing a REST request
@@ -69,7 +69,7 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
         initialiseTimeout();
     }
 
-    @Override public ConvertedResponse<QuickGOQuery> transform(FilterRequest request) {
+    @Override public ConvertedFilter<QuickGOQuery> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
 
         RESTRequesterImpl.Builder restRequesterBuilder = initRequestBuilder(request);
