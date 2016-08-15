@@ -35,10 +35,7 @@ public class FilterConverterFactory {
         this.restOperations = restOperations;
     }
 
-    public ConvertedResponse<QuickGOQuery> convert(FilterRequest request) { // add context parameter to save a
-        // context, which
-        // includes a
-        // map of Map<FilterConfig, value>
+    public ConvertedResponse<QuickGOQuery> convert(FilterRequest request) {
         Optional<FilterConfig> configOpt = filterConfigRetrieval.getBySignature(request.getSignature());
         if (configOpt.isPresent()) {
             FilterConfig filterConfig = configOpt.get();
