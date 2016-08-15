@@ -42,6 +42,7 @@ public class FlatFieldBuilder extends FlatField {
             "(?<=" + LEVEL_SEPARATOR_START_REGEX + ")|" +
                     "(?=" + LEVEL_SEPARATOR_END_REGEX + ")|" +
                     VALUE_SEPARATOR_REGEX;
+
     private List<FlatField> fields;
 
     private FlatFieldBuilder() {
@@ -52,37 +53,67 @@ public class FlatFieldBuilder extends FlatField {
         return new FlatFieldBuilder();
     }
 
-    public static FlatFieldBuilder parse(String str) {
-        List<String> values = Arrays.asList(str.split(STRING_BREAKDOWN_REGEX));
-
+    /**
+     * Converts a string representation of a flat field into a {@link FlatField}} instance.
+     *
+     * @param flatFieldText text representing a flat field
+     * @return an
+     */
+    public static FlatField parse(String flatFieldText) {
+        List<String> values = Arrays.asList(flatFieldText.split(STRING_BREAKDOWN_REGEX));
+        LOGGER.debug("flatFieldText: [{}], has been broken down into {}", flatFieldText, values);
         FlatFieldBuilder builder;
 
         if (!values.isEmpty() && values.get(0).equals(LEVEL_SEPARATOR_START)) {
-            builder = parse(values.subList(1, values.size()).iterator(), newFlatField());
+            builder = parse(values.subList(1, values.size()).iterator(), newFlatField(), 0);
         } else {
-            builder = parse(values.iterator(), newFlatField());
+            builder = parse(values.iterator(), newFlatField(), 0);
         }
 
         return builder;
     }
 
-    private static FlatFieldBuilder parse(Iterator<String> valuesIt, FlatFieldBuilder builder) {
+    /**
+     * Recursively constructs a {@link FlatField} by consuming the elements within the {@code valuesIt}.
+     *
+     * @param valuesIt the text representation that is to be converted into a {@link FlatField}
+     * @param builder the builder that will create the {@link FlatField}
+     * @param level indicates teh level the builder is currently at (used for debugging purposes)
+     * @return the {@link FlatField} that represents the conversion of the {@code valuesIt}
+     */
+    private static FlatFieldBuilder parse(Iterator<String> valuesIt, FlatFieldBuilder builder, int level) {
         if (!valuesIt.hasNext()) {
             return builder;
         } else {
             String value = valuesIt.next();
 
             if (value.startsWith(LEVEL_SEPARATOR_START)) {
-                builder.addField(parse(valuesIt, newFlatField()));
+                LOGGER.debug("{}{}", printTab(level), LEVEL_SEPARATOR_START);
+                builder.addField(parse(valuesIt, newFlatField(), level + 1));
             } else if (value.endsWith(LEVEL_SEPARATOR_END)) {
-                //ignore the end character, no processing needed
+                LOGGER.debug("{}{}", printTab(--level), LEVEL_SEPARATOR_END);
+                /*
+                 * End level character means that no more parsing is required at this level. Processing should
+                 * continue one level up
+                 */
                 return builder;
             } else {
+                LOGGER.debug("{}{}", printTab(level), value);
                 builder.addField(newFlatFieldLeaf(value));
             }
 
-            return parse(valuesIt, builder);
+            return parse(valuesIt, builder, level);
         }
+    }
+
+    private static String printTab(int level) {
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < level; i++) {
+            builder.append("\t");
+        }
+
+        return builder.toString();
     }
 
     public FlatFieldBuilder addField(FlatField field) {
