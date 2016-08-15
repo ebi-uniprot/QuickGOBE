@@ -12,7 +12,7 @@ search:
         properties: {
           ip: localhost,
           resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyResponse",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsResponseConverter"
         }
       - signature: usageIds,usageRelationships,slim
@@ -20,6 +20,6 @@ search:
         properties: {
           ip: localhost,
           resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyResponse",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsResponseConverter"
         }
