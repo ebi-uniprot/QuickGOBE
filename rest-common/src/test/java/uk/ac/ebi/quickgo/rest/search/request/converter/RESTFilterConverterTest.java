@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
-import uk.ac.ebi.quickgo.rest.comm.ResponseConverter;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -415,9 +414,9 @@ public class RESTFilterConverterTest {
         }
     }
 
-    static class FakeResponseConverter implements ResponseConverter<FakeResponse, QuickGOQuery> {
+    static class FakeResponseConverter implements FilterConverter<FakeResponse, QuickGOQuery> {
 
-        @Override public ConvertedResponse<QuickGOQuery> convert(FakeResponse response) {
+        @Override public ConvertedResponse<QuickGOQuery> transform(FakeResponse response) {
             List<QuickGOQuery> queries = new ArrayList<>();
             response.results.forEach(r -> queries.add(QuickGOQuery.createQuery(r.resultField, r.resultValue)));
 

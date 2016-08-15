@@ -4,8 +4,8 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyResponse;
 import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
 import uk.ac.ebi.quickgo.rest.comm.QueryContext;
-import uk.ac.ebi.quickgo.rest.comm.ResponseConverter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,9 +20,9 @@ import java.util.Set;
  * Created 09/08/16
  * @author Edd
  */
-public class DescendantsResponseConverter implements ResponseConverter<OntologyResponse, QuickGOQuery> {
+public class DescendantsResponseConverter implements FilterConverter<OntologyResponse, QuickGOQuery> {
 
-    @Override public ConvertedResponse<QuickGOQuery> convert(OntologyResponse response) {
+    @Override public ConvertedResponse<QuickGOQuery> transform(OntologyResponse response) {
         ConvertedResponse<QuickGOQuery> convertedResponse = new ConvertedResponse<>();
         QueryContext context = new QueryContext();
 

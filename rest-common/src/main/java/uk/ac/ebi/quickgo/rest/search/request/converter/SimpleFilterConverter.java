@@ -17,7 +17,7 @@ import static uk.ac.ebi.quickgo.rest.comm.ConvertedResponse.simpleConvertedRespo
  *
  * Created by Edd on 05/06/2016.
  */
-class SimpleFilterConverter implements FilterConverter {
+class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery> {
 
     private final FilterConfig filterConfig;
 

@@ -11,6 +11,6 @@ import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
  * Created 16/06/16
  * @author Edd
  */
-@FunctionalInterface interface FilterConverter {
-    ConvertedResponse<QuickGOQuery> transform(FilterRequest request);
+@FunctionalInterface public interface FilterConverter<R, T> {
+    ConvertedResponse<T> transform(R request);
 }

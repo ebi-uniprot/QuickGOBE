@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.comm.ConvertedResponse;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
-import uk.ac.ebi.quickgo.rest.comm.ResponseConverter;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -29,7 +28,7 @@ import static uk.ac.ebi.quickgo.rest.comm.ConvertedResponse.simpleConvertedRespo
  *
  * Created by Edd on 05/06/2016.
  */
-class RESTFilterConverter implements FilterConverter {
+class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery> {
     static final String HOST = "ip";
     static final String RESOURCE_FORMAT = "resourceFormat";
     static final String BODY_PATH = "responseBodyPath";
@@ -77,9 +76,9 @@ class RESTFilterConverter implements FilterConverter {
 
         try {
             Class<?> restResponseType = createResponseType();
-            ResponseConverter<ResponseType, QuickGOQuery> converter = createConverter();
+            FilterConverter<ResponseType, QuickGOQuery> converter = createConverter();
             ResponseType results = (ResponseType) fetchResults(restRequesterBuilder.build(), restResponseType);
-            return converter.convert(results);
+            return converter.transform(results);
         } catch (Exception e) {
             throwRetrievalException(FAILED_REST_FETCH_PREFIX + " due to: '" + e.getClass().getSimpleName() + "'", e);
         }
@@ -133,14 +132,14 @@ class RESTFilterConverter implements FilterConverter {
         }
     }
 
-    private ResponseConverter<ResponseType, QuickGOQuery> createConverter()
+    private FilterConverter<ResponseType, QuickGOQuery> createConverter()
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
                    InstantiationException {
         String converterClassName = filterConfig.getProperties().get(RESPONSE_CONVERTER_CLASS);
         Class<?> converterClass = ClassLoader.getSystemClassLoader().loadClass(converterClassName);
 
         Constructor<?> declaredConstructor = converterClass.getDeclaredConstructor();
-        return (ResponseConverter<ResponseType, QuickGOQuery>) declaredConstructor.newInstance();
+        return (FilterConverter<ResponseType, QuickGOQuery>) declaredConstructor.newInstance();
     }
 
     private RESTRequesterImpl.Builder initRequestBuilder(FilterRequest request) {

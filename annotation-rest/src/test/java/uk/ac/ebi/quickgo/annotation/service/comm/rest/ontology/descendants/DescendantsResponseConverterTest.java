@@ -40,7 +40,7 @@ public class DescendantsResponseConverterTest {
         String desc1 = "desc1";
 
         addResponseDescendant(id1, desc1);
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.convert(response);
+        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
 
         assertThat(convertedResponse.getConvertedValue(), is(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
     }
@@ -55,7 +55,7 @@ public class DescendantsResponseConverterTest {
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id2, desc2);
 
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.convert(response);
+        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
 
         assertThat(convertedResponse.getConvertedValue(), is(
                 QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)
@@ -71,7 +71,7 @@ public class DescendantsResponseConverterTest {
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id2, desc1);
 
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.convert(response);
+        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
 
         assertThat(convertedResponse.getConvertedValue(), is(
                 QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
@@ -80,14 +80,14 @@ public class DescendantsResponseConverterTest {
     @Test
     public void nullResultsMeansFilterEverything() {
         response.setResults(null);
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.convert(response);
+        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
 
         assertThat(convertedResponse.getConvertedValue(), is(QuickGOQuery.createAllQuery().not()));
     }
 
     @Test
     public void emptyResultsMeansFilterEverything() {
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.convert(response);
+        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
 
         assertThat(convertedResponse.getConvertedValue(), is(QuickGOQuery.createAllQuery().not()));
     }
@@ -98,7 +98,7 @@ public class DescendantsResponseConverterTest {
         String desc1 = "desc1";
 
         addResponseDescendant(id1, desc1);
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.convert(response);
+        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
 
         assertThat(extractContextProperties(convertedResponse), hasEntry(desc1, singletonList(id1)));
     }
@@ -115,7 +115,7 @@ public class DescendantsResponseConverterTest {
         addResponseDescendant(id1, desc2);
         addResponseDescendant(id1, desc3);
         addResponseDescendant(id2, desc3);
-        ConvertedResponse<QuickGOQuery> convertedResponse = converter.convert(response);
+        ConvertedResponse<QuickGOQuery> convertedResponse = converter.transform(response);
 
         assertThat(extractContextProperties(convertedResponse), hasEntry(desc1, singletonList(id1)));
         assertThat(extractContextProperties(convertedResponse), hasEntry(desc2, singletonList(id1)));

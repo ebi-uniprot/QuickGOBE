@@ -16,7 +16,7 @@ import static uk.ac.ebi.quickgo.rest.comm.ConvertedResponse.simpleConvertedRespo
  *
  * Created by Edd on 05/06/2016.
  */
-class JoinFilterConverter implements FilterConverter {
+class JoinFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery> {
 
     static final String FROM_TABLE_NAME = "fromTable";
     static final String FROM_ATTRIBUTE_NAME = "fromAttribute";
