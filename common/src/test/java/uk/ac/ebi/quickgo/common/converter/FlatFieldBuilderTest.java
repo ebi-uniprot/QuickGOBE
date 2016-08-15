@@ -4,8 +4,6 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.*;
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
@@ -184,7 +182,7 @@ public class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("3")).buildString();
         System.out.println(origStr);
 
-        FlatFieldBuilder flatFieldBuilderParsed = parse(origStr);
+        FlatField flatFieldBuilderParsed = parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
         System.out.println(parsedStr);
 
@@ -204,7 +202,7 @@ public class FlatFieldBuilderTest {
                 .buildString();
         System.out.println(origStr);
 
-        FlatFieldBuilder flatFieldBuilder = parse(origStr);
+        FlatField flatFieldBuilder = parse(origStr);
         assertThat(origFlatFieldBuilder.getFields().size(), is(flatFieldBuilder.getFields().size()));
         assertThat(origFlatFieldBuilder.getFields().size(), is(6));
     }
@@ -225,7 +223,7 @@ public class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("3"));
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
-        FlatFieldBuilder flatFieldBuilderParsed = parse(origStr);
+        FlatField flatFieldBuilderParsed = parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
         assertThat(parsedStr, is(origStr));
@@ -249,7 +247,7 @@ public class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C"));
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
-        FlatFieldBuilder flatFieldBuilderParsed = parse(origStr);
+        FlatField flatFieldBuilderParsed = parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
         assertThat(parsedStr, is(origStr));
@@ -283,7 +281,7 @@ public class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C"));
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
-        FlatFieldBuilder flatFieldBuilderParsed = parse(origStr);
+        FlatField flatFieldBuilderParsed = parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
         assertThat(parsedStr, is(origStr));
@@ -302,7 +300,7 @@ public class FlatFieldBuilderTest {
                 .buildString();
         System.out.println(ff1Str);
 
-        FlatFieldBuilder ff2FromFf1Model = parse(ff1Str);
+        FlatField ff2FromFf1Model = parse(ff1Str);
         String ff2FromFf1Str = ff2FromFf1Model.buildString();
         System.out.println(ff2FromFf1Str);
 
@@ -321,7 +319,7 @@ public class FlatFieldBuilderTest {
                 .buildString();
         System.out.println(ff1Str);
 
-        FlatFieldBuilder ff2FromFf1Model = parse(ff1Str);
+        FlatField ff2FromFf1Model = parse(ff1Str);
         String ff2FromFf1Str = ff2FromFf1Model.buildString();
         System.out.println(ff2FromFf1Str);
 
