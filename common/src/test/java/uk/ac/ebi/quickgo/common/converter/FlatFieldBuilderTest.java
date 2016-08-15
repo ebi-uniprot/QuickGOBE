@@ -3,10 +3,12 @@ package uk.ac.ebi.quickgo.common.converter;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.*;
+import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
+import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Created 26/11/15
@@ -14,23 +16,164 @@ import static org.hamcrest.core.IsNull.notNullValue;
  */
 public class FlatFieldBuilderTest {
     @Test
-    public void createFlatFieldBuilder() {
+    public void createStringUsingEmptyFlatField() throws Exception {
+        FlatField emptyFlatField = newFlatField();
 
-        String flatField = FlatFieldBuilder.newFlatField()
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("1"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("2"))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("a"))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("b")))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("3")).buildString();
-        assertThat(flatField, is(notNullValue()));
-        assertThat(flatField.contains("1"), is(true));
-        assertThat(flatField.contains("2"), is(true));
-        assertThat(flatField.contains("a"), is(true));
-        assertThat(flatField.contains("b"), is(true));
-        assertThat(flatField.contains("3"), is(true));
-        System.out.println(flatField);
+        String actualString = emptyFlatField.buildString();
+
+        assertThat(actualString, is("[]"));
+    }
+
+    @Test
+    public void createStringUsingFlatFieldWith1Value() throws Exception {
+        FlatField flatField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"));
+
+        String actualString = flatField.buildString();
+
+        assertThat(actualString, is("[level1:A]"));
+    }
+
+    @Test
+    public void createStringUsingFlatFieldWith2ValuesAtLevel1() throws Exception {
+        FlatField flatField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"));
+
+        String actualString = flatField.buildString();
+
+        assertThat(actualString, is("[level1:A|level1:B]"));
+    }
+
+    @Test
+    public void createStringUsingFlatFieldWith2Values1AtEachLevel() throws Exception {
+        FlatField flatField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("level2:A")));
+
+        String actualString = flatField.buildString();
+
+        assertThat(actualString, is("[level1:A|[level2:A]]"));
+    }
+
+    @Test
+    public void createStringWithFlatFieldWith2ValuesAtFirstLevelAnd1ValueAtSecondLevel() throws Exception {
+        FlatField flatField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("level2:A")))
+                .addField(newFlatFieldLeaf("level1:B"));
+
+        String actualString = flatField.buildString();
+
+        assertThat(actualString, is("[level1:A|[level2:A]|level1:B]"));
+    }
+
+    @Test
+    public void createStringUsingFlatFieldWith2ValuesAtSecondLevelAnd1ValueAtFirstLevel() throws Exception {
+        FlatField flatField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("level2:A"))
+                        .addField(newFlatFieldLeaf("level2:B")));
+
+        String actualString = flatField.buildString();
+
+        assertThat(actualString, is("[level1:A|[level2:A|level2:B]]"));
+    }
+
+    @Test
+    public void createStringUsingFlatFieldWith3LevelDepthWith1ValueEach() throws Exception {
+        FlatField flatField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("level2:A"))
+                        .addField(newFlatField()
+                                .addField(newFlatFieldLeaf("level3:A"))));
+
+        String actualString = flatField.buildString();
+
+        assertThat(actualString, is("[level1:A|[level2:A|[level3:A]]]"));
+    }
+
+    @Test
+    public void createsFlatFieldFromEmptyString() throws Exception {
+        FlatField actualFlatField = parse("[]");
+
+        assertThat(actualFlatField, is(newFlatField()));
+    }
+
+    @Test
+    public void createsFlatFieldFromStringWith1ValueAtLevel1() throws Exception {
+        FlatField actualFlatField = parse("[level1:A]");
+
+        FlatField expectedField = newFlatField().addField(newFlatFieldLeaf("level1:A"));
+
+        assertThat(actualFlatField, is(expectedField));
+    }
+
+    @Test
+    public void createsFlatFieldFromStringWith2ValuesAtLevel1() throws Exception {
+        FlatField actualFlatField = parse("[level1:A|level1:B]");
+
+        FlatField expectedField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"));
+
+        assertThat(actualFlatField, is(expectedField));
+    }
+
+    @Test
+    public void createsFlatFieldFromStringWith1ValueAtLevel1And1ValueAtLevel2() throws Exception {
+        FlatField actualFlatField = parse("[level1:A|[level2:A]]");
+
+        FlatField expectedField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("level2:A")));
+
+        assertThat(actualFlatField, is(expectedField));
+    }
+
+    @Test
+    public void createsFlatFieldFromStringWith2ValuesAtLevel1And1ValueAtLevel2() throws Exception {
+        FlatField actualFlatField = parse("[level1:A|[level2:A]|level1:B]");
+
+        FlatField expectedField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("level2:A")))
+                .addField(newFlatFieldLeaf("level1:B"));
+
+        assertThat(actualFlatField, is(expectedField));
+    }
+
+    @Test
+    public void createsFlatFieldFromStringWith1ValueAtLevel1And2ValuesAtLevel2() throws Exception {
+        FlatField actualFlatField = parse("[level1:A|[level2:A|level2:B]]");
+
+        FlatField expectedField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("level2:A"))
+                        .addField(newFlatFieldLeaf("level2:B")));
+
+        assertThat(actualFlatField, is(expectedField));
+    }
+
+    @Test
+    public void createsFlatFieldFromStringWith3Levels1ValueForEachLevel() throws Exception {
+        FlatField actualFlatField = parse("[level1:A|[level2:A|[level3:A]]]");
+
+        FlatField expectedField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("level2:A"))
+                        .addField(newFlatField()
+                                .addField(newFlatFieldLeaf("level3:A"))));
+
+        assertThat(actualFlatField, is(expectedField));
     }
 
     @Test
@@ -41,11 +184,11 @@ public class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("3")).buildString();
         System.out.println(origStr);
 
-        FlatFieldBuilder flatFieldBuilderParsed = FlatFieldBuilder.newFlatField().parse(origStr);
+        FlatFieldBuilder flatFieldBuilderParsed = parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
         System.out.println(parsedStr);
 
-        assertThat(origStr, is(equalTo(parsedStr)));
+        assertThat(origStr, is(parsedStr));
     }
 
     @Test
@@ -61,8 +204,8 @@ public class FlatFieldBuilderTest {
                 .buildString();
         System.out.println(origStr);
 
-        FlatFieldBuilder flatFieldBuilder = FlatFieldBuilder.newFlatField().parse(origStr);
-        assertThat(origFlatFieldBuilder.getFields().size(), is(equalTo(flatFieldBuilder.getFields().size())));
+        FlatFieldBuilder flatFieldBuilder = parse(origStr);
+        assertThat(origFlatFieldBuilder.getFields().size(), is(flatFieldBuilder.getFields().size()));
         assertThat(origFlatFieldBuilder.getFields().size(), is(6));
     }
 
@@ -82,10 +225,10 @@ public class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("3"));
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
-        FlatFieldBuilder flatFieldBuilderParsed = FlatFieldBuilder.newFlatField().parse(origStr);
+        FlatFieldBuilder flatFieldBuilderParsed = parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
-        assertThat(parsedStr, is(equalTo(parsedStr)));
+        assertThat(parsedStr, is(origStr));
 
         System.out.println(parsedStr);
     }
@@ -106,10 +249,10 @@ public class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C"));
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
-        FlatFieldBuilder flatFieldBuilderParsed = FlatFieldBuilder.newFlatField().parse(origStr);
+        FlatFieldBuilder flatFieldBuilderParsed = parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
-        assertThat(parsedStr, is(equalTo(parsedStr)));
+        assertThat(parsedStr, is(origStr));
 
         System.out.println(parsedStr);
     }
@@ -140,214 +283,12 @@ public class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C"));
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
-        FlatFieldBuilder flatFieldBuilderParsed = FlatFieldBuilder.newFlatField().parse(origStr);
+        FlatFieldBuilder flatFieldBuilderParsed = parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
 
-        assertThat(parsedStr, is(equalTo(parsedStr)));
+        assertThat(parsedStr, is(origStr));
 
         System.out.println(parsedStr);
-    }
-
-    @Test
-    public void parseFirstLevelOfFlatString() {
-        FlatFieldBuilder flatFieldBuilderOrig = FlatFieldBuilder.newFlatField()
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:A"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:A"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:B"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:C")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:B")))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:D"))
-                                        .addField(FlatFieldBuilder.newFlatField()
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:A"))
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:B")))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:E")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C")))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C"));
-        String origStr = flatFieldBuilderOrig.buildString(); // serialise
-        System.out.println(origStr);
-
-        FlatFieldBuilder shallowVersion = FlatFieldBuilder.newFlatField().parseToDepth(origStr, 0);
-
-        String shallowVersionAsStr = shallowVersion.buildString();
-        System.out.println(shallowVersionAsStr);
-
-        assertThat(origStr, is(equalTo(shallowVersionAsStr)));
-    }
-
-    @Test
-    public void parseShallowFlatFieldAndCompareWithOriginal() {
-        FlatFieldBuilder flatFieldBuilderOrig = FlatFieldBuilder.newFlatField()
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:A"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:A"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:B"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:C")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:B")))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:D"))
-                                        .addField(FlatFieldBuilder.newFlatField()
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:A"))
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:B")))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:E")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C")))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C"));
-        String origStr = flatFieldBuilderOrig.buildString(); // serialise
-        System.out.println(origStr);
-
-        FlatFieldBuilder shallowVersion = FlatFieldBuilder.newFlatField().parseToDepth(origStr, 0);
-
-        String shallowVersionAsStr = shallowVersion.buildString();
-        FlatFieldBuilder flatFieldBuilderFromShallow = FlatFieldBuilder.newFlatField().parse(shallowVersionAsStr);
-
-        assertThat(flatFieldBuilderOrig, is(equalTo(flatFieldBuilderFromShallow)));
-    }
-
-    @Test
-    public void flatFieldsFromDifferentDepthsAreDifferent() {
-        String fromDepth0 = FlatFieldBuilder.newFlatField()
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("1"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf(""))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("3")).buildString();
-        String fromDepth1 = FlatFieldBuilder.newFlatFieldFromDepth(1)
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("1"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf(""))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("3")).buildString();
-        System.out.println(fromDepth0);
-        System.out.println(fromDepth1);
-        assertThat(fromDepth0, is(not(equalTo(fromDepth1))));
-    }
-
-    @Test
-    public void nestedFlatFieldsFromDifferentDepthsAreDifferent() {
-        String fromDepth0 = FlatFieldBuilder.newFlatFieldFromDepth(1)
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:A"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:A"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:B"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:C")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:B")))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:D"))
-                                        .addField(FlatFieldBuilder.newFlatField()
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:A"))
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:B")))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:E")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C")))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C")).buildString();
-        String fromDepth1 = FlatFieldBuilder.newFlatField()
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:A"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:A"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:B"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:C")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:B")))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:D"))
-                                        .addField(FlatFieldBuilder.newFlatField()
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:A"))
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:B")))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:E")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C")))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C")).buildString();
-        System.out.println(fromDepth0);
-        System.out.println(fromDepth1);
-        assertThat(fromDepth0, is(not(equalTo(fromDepth1))));
-    }
-
-    @Test
-    public void flatFieldsFromSameNonZeroDepthAreEqual() {
-        String fromDepth0 = FlatFieldBuilder.newFlatFieldFromDepth(2)
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("1"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf(""))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("3")).buildString();
-        String fromDepth1 = FlatFieldBuilder.newFlatFieldFromDepth(2)
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("1"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf(""))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("3")).buildString();
-        System.out.println(fromDepth0);
-        System.out.println(fromDepth1);
-        assertThat(fromDepth0, is(equalTo(fromDepth1)));
-    }
-
-    @Test
-    public void nestedFlatFieldsFromSameDepthsAreEqual() {
-        String fromDepth0 = FlatFieldBuilder.newFlatFieldFromDepth(1)
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:A"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:A"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:B"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:C")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:B")))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:D"))
-                                        .addField(FlatFieldBuilder.newFlatField()
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:A"))
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:B")))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:E")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C")))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C")).buildString();
-        String fromDepth1 = FlatFieldBuilder.newFlatFieldFromDepth(1)
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:A"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:A"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:B"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:C")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:B")))
-                .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:D"))
-                                        .addField(FlatFieldBuilder.newFlatField()
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:A"))
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:B")))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:E")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C")))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C")).buildString();
-        System.out.println(fromDepth0);
-        System.out.println(fromDepth1);
-        assertThat(fromDepth0, is(equalTo(fromDepth1)));
     }
 
     @Test
@@ -361,7 +302,7 @@ public class FlatFieldBuilderTest {
                 .buildString();
         System.out.println(ff1Str);
 
-        FlatFieldBuilder ff2FromFf1Model = FlatFieldBuilder.newFlatField().parse(ff1Str);
+        FlatFieldBuilder ff2FromFf1Model = parse(ff1Str);
         String ff2FromFf1Str = ff2FromFf1Model.buildString();
         System.out.println(ff2FromFf1Str);
 
@@ -380,7 +321,7 @@ public class FlatFieldBuilderTest {
                 .buildString();
         System.out.println(ff1Str);
 
-        FlatFieldBuilder ff2FromFf1Model = FlatFieldBuilder.newFlatField().parse(ff1Str);
+        FlatFieldBuilder ff2FromFf1Model = parse(ff1Str);
         String ff2FromFf1Str = ff2FromFf1Model.buildString();
         System.out.println(ff2FromFf1Str);
 

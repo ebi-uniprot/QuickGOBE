@@ -1,11 +1,11 @@
 package uk.ac.ebi.quickgo.common.converter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.stream.Collectors.joining;
+import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
  * Used to build a {@link String} representation of a field that has nested sub-fields.
@@ -19,80 +19,70 @@ import org.slf4j.LoggerFactory;
  * @author Edd
  */
 public class FlatFieldBuilder extends FlatField {
+    public static final String VALUE_SEPARATOR = "|";
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(FlatFieldBuilder.class);
 
-    // add more separators to allow handling deeper nesting
-    private static final String[] SEPARATORS = new String[]{
-            "\t",
-            "|||",
-            "^^^",
-            "%%%",
-            ":::",
-            "£££"
-    };
-    // regexes for elements of SEPARATORS
-    private static final String[] SEPARATOR_REGEXES = new String[]{
-            "\t",
-            "\\|\\|\\|",
-            "\\^\\^\\^",
-            "%%%",
-            ":::",
-            "£££"
-    };
+    private static final String LEVEL_SEPARATOR_START = "[";
+    private static final String LEVEL_SEPARATOR_START_REGEX = "\\" + LEVEL_SEPARATOR_START;
+    private static final String LEVEL_SEPARATOR_END = "]";
+    private static final String LEVEL_SEPARATOR_END_REGEX = "\\" + LEVEL_SEPARATOR_END;
+    private static final String VALUE_SEPARATOR_REGEX = "\\|";
 
+    /**
+     * A regular expression used to breakdown the string fed to {@link FlatFieldBuilder#parse(String)}, that splits the
+     * string on:
+     * <ul>
+     *     <li>{@link FlatFieldBuilder#LEVEL_SEPARATOR_START}</li>
+     *     <li>{@link FlatFieldBuilder#LEVEL_SEPARATOR_END}</li>
+     *     <li>{@link FlatFieldBuilder#VALUE_SEPARATOR}</li>
+     * </ul>
+     */
+    private static final String STRING_BREAKDOWN_REGEX =
+            "(?<=" + LEVEL_SEPARATOR_START_REGEX + ")|" +
+                    "(?=" + LEVEL_SEPARATOR_END_REGEX + ")|" +
+                    VALUE_SEPARATOR_REGEX;
     private List<FlatField> fields;
-    private int depth;
 
-    private FlatFieldBuilder(int depth) {
+    private FlatFieldBuilder() {
         fields = new ArrayList<>();
-        this.depth = depth;
     }
 
     public static FlatFieldBuilder newFlatField() {
-        return new FlatFieldBuilder(0);
+        return new FlatFieldBuilder();
     }
 
-    public static FlatFieldBuilder newFlatFieldFromDepth(int depth) {
-        return new FlatFieldBuilder(depth);
-    }
+    public static FlatFieldBuilder parse(String str) {
+        List<String> values = Arrays.asList(str.split(STRING_BREAKDOWN_REGEX));
 
-    public FlatFieldBuilder parse(String str) {
-        return parse(str, depth, SEPARATORS.length - 1);
-    }
+        FlatFieldBuilder builder;
 
-    public FlatFieldBuilder parseToDepth(String str, int max) {
-        return parse(str, depth, max);
-    }
-
-    private FlatFieldBuilder parse(String flatStr, int startLevel, int maxLevel) {
-        if (maxLevel >= SEPARATORS.length) {
-            IllegalArgumentException exception = new IllegalArgumentException(
-                    "FlatFieldBuilder maximum depth specified is greater than known number" +
-                            " of delimiters (" + SEPARATORS.length + ")");
-            LOGGER.error("Cannot newInstance FlatFieldBuilder: ", exception);
-            throw exception;
+        if (!values.isEmpty() && values.get(0).equals(LEVEL_SEPARATOR_START)) {
+            builder = parse(values.subList(1, values.size()).iterator(), newFlatField());
+        } else {
+            builder = parse(values.iterator(), newFlatField());
         }
 
-        ArrayList<String> components = new ArrayList<>();
-        if (flatStr.startsWith(SEPARATORS[startLevel])) {
-            components.add("");
-        }
-        components.addAll(Arrays.asList(flatStr.split(SEPARATOR_REGEXES[startLevel])));
-        if (flatStr.endsWith(SEPARATORS[startLevel])) {
-            components.add("");
-        }
+        return builder;
+    }
 
-        FlatFieldBuilder flatField = new FlatFieldBuilder(startLevel);
+    private static FlatFieldBuilder parse(Iterator<String> valuesIt, FlatFieldBuilder builder) {
+        if (!valuesIt.hasNext()) {
+            return builder;
+        } else {
+            String value = valuesIt.next();
 
-        components.stream().forEach(f -> {
-            if (startLevel + 1 < SEPARATORS.length && startLevel < maxLevel && f.contains(SEPARATORS[startLevel + 1])) {
-                flatField.addField(parse(f, startLevel + 1, SEPARATORS.length - 1));
+            if (value.startsWith(LEVEL_SEPARATOR_START)) {
+                builder.addField(parse(valuesIt, newFlatField()));
+            } else if (value.endsWith(LEVEL_SEPARATOR_END)) {
+                //ignore the end character, no processing needed
+                return builder;
             } else {
-                flatField.addField(FlatFieldLeaf.newFlatFieldLeaf(f));
+                builder.addField(newFlatFieldLeaf(value));
             }
-        });
-        return flatField;
+
+            return parse(valuesIt, builder);
+        }
     }
 
     public FlatFieldBuilder addField(FlatField field) {
@@ -106,21 +96,10 @@ public class FlatFieldBuilder extends FlatField {
     }
 
     @Override
-    protected String buildStringFromDepth(int level) {
-        StringJoiner sj = new StringJoiner(SEPARATORS[level]);
-        fields.stream().forEach(f ->
-                sj.add(f.buildStringFromDepth(level + 1))
-        );
-        return sj.toString();
-    }
-
-    @Override
     public String buildString() {
-        StringJoiner sj = new StringJoiner(SEPARATORS[depth]);
-        fields.stream().forEach(f ->
-                sj.add(f.buildStringFromDepth(depth + 1))
-        );
-        return sj.toString();
+        return fields.stream()
+                .map(FlatField::buildString)
+                .collect(joining(VALUE_SEPARATOR, "[", "]"));
     }
 
     @Override public boolean equals(Object o) {

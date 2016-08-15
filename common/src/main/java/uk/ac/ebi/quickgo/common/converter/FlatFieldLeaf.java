@@ -34,10 +34,6 @@ public class FlatFieldLeaf extends FlatField {
         return new FlatFieldLeaf("");
     }
 
-    @Override protected String buildStringFromDepth(int level) {
-        return buildString();
-    }
-
     @Override public List<FlatField> getFields() {
         return EMPTY_LIST;
     }
