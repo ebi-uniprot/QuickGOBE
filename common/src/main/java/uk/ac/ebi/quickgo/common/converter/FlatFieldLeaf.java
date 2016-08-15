@@ -14,7 +14,8 @@ import static java.util.Objects.nonNull;
  * @author Edd
  */
 public class FlatFieldLeaf extends FlatField {
-    private static final String PRINTED_NULL_STRING = "";
+    private static final String PRINTED_NULL_STRING = " ";
+
     private String value;
     private final static List<FlatField> EMPTY_LIST = Collections.unmodifiableList(Collections.emptyList());
 
@@ -31,7 +32,7 @@ public class FlatFieldLeaf extends FlatField {
     }
 
     public static FlatFieldLeaf newFlatFieldLeaf() {
-        return new FlatFieldLeaf("");
+        return new FlatFieldLeaf(PRINTED_NULL_STRING);
     }
 
     @Override public List<FlatField> getFields() {
