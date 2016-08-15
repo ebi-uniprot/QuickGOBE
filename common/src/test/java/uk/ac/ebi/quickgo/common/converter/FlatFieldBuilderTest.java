@@ -296,8 +296,7 @@ public class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf(null));
-        String ff1Str = ff1Model
-                .buildString();
+        String ff1Str = ff1Model.buildString();
         System.out.println(ff1Str);
 
         FlatField ff2FromFf1Model = parse(ff1Str);

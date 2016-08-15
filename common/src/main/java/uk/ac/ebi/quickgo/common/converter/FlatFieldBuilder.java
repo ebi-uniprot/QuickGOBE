@@ -99,7 +99,7 @@ public class FlatFieldBuilder extends FlatField {
                 return builder;
             } else {
                 LOGGER.debug("{}{}", printTab(level), value);
-                builder.addField(newFlatFieldLeaf(value));
+                builder.addField(newFlatFieldLeaf(value.trim()));
             }
 
             return parse(valuesIt, builder, level);
