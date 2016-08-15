@@ -125,32 +125,46 @@ public class AnnotationController {
 
         validationHelper.validateRequestedResults(request.getLimit());
 
-        Set<QuickGOQuery> filterQueries = new HashSet<>();
-        Set<FilterContext> filterContexts = new HashSet<>();
-        extractFilterQueryInfo(request, filterQueries, filterContexts);
-
-        FilterContext filterContext = filterContexts.stream().reduce
-                (new FilterContext(), FilterContext::merge);
+        FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(filterQueries)
+                .setFilters(filterQueryInfo.getFilterQueries())
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit())
                 .build();
 
-        return searchAndTransform(queryRequest, annotationSearchService, resultTransformerChain, filterContext);
+        return searchAndTransform(queryRequest, annotationSearchService, resultTransformerChain,
+                filterQueryInfo.getFilterContext());
     }
 
-    private void extractFilterQueryInfo(
-            AnnotationRequest request,
-            Set<QuickGOQuery> filterQueries,
-            Set<FilterContext> filterContexts) {
+    private FilterQueryInfo extractFilterQueryInfo(
+            AnnotationRequest request) {
+        Set<QuickGOQuery> filterQueries = new HashSet<>();
+        Set<FilterContext> filterContexts = new HashSet<>();
+
         request.createFilterRequests().stream()
                 .map(converterFactory::convert)
                 .forEach(convertedResponse -> {
                     filterQueries.add(convertedResponse.getConvertedValue());
                     convertedResponse.getFilterContext().ifPresent(filterContexts::add);
                 });
+
+        return new FilterQueryInfo() {
+            @Override public Set<QuickGOQuery> getFilterQueries() {
+                return filterQueries;
+            }
+
+            @Override public FilterContext getFilterContext() {
+                return filterContexts.stream().reduce(new FilterContext(), FilterContext::merge);
+            }
+        };
+
+    }
+
+    private interface FilterQueryInfo {
+        Set<QuickGOQuery> getFilterQueries();
+
+        FilterContext getFilterContext();
     }
 }
