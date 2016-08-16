@@ -32,7 +32,7 @@ public class SortedSolrQuerySerializer implements QueryVisitor<String> {
         CompositeQuery.QueryOp operator = query.queryOperator();
         Set<QuickGOQuery> queries = query.queries();
 
-        if (queries.size() == 1 && operator.equals(CompositeQuery.QueryOp.NOT)) {
+        if (queries.size() == 1 && operator == CompositeQuery.QueryOp.NOT) {
             String singletonQuery = queries.iterator().next().accept(this);
             return CompositeQuery.QueryOp.NOT + " (" + singletonQuery + ")";
         } else {
