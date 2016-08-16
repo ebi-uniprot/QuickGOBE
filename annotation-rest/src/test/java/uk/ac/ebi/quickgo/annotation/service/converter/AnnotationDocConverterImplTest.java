@@ -69,7 +69,7 @@ public class AnnotationDocConverterImplTest {
     @Test
     public void convertECOIdSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.ecoId, is(ECO_ID));
+        assertThat(model.evidenceCode, is(ECO_ID));
     }
 
     @Test
