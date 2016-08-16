@@ -43,6 +43,7 @@ public class AnnotationRequest {
             GO_ID_UNSORTED,
             QUALIFIER_UNSORTED,
             REFERENCE_SEARCH,
+            TARGET_SET_UNSORTED,
             TAXON_ID_UNSORTED,
             WITH_FROM_SEARCH
     };
@@ -244,6 +245,18 @@ public class AnnotationRequest {
             message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
     public String getGpType() {
         return filterMap.get(GENE_PRODUCT_TYPE_UNSORTED);
+    }
+
+    /**
+     * Filter by Target Sets e.g. BHF-UCK, KRUK, Parkinsons etc
+     * @return
+     */
+    public void setTargetSet(String targetSet){
+        filterMap.put(TARGET_SET_UNSORTED, targetSet);
+    }
+
+    public String getTargetSet(){
+        return filterMap.get(TARGET_SET_UNSORTED);
     }
 
     public void setGpSubset(String gpSubset) {

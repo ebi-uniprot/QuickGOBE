@@ -76,6 +76,7 @@ public class AnnotationFields {
         public static final String GENE_PRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
         public static final String GENE_PRODUCT_TYPE = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_TYPE);
         public static final String DB_SUBSET = storeAndGet(VALUES, AnnotationFields.DB_SUBSET);
+        public static final String TARGET_SET = storeAndGet(VALUES, AnnotationFields.TARGET_SET);
 
         public final static String ASSIGNED_BY_UNSORTED = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY_UNSORTED);
         public final static String ECO_ID_UNSORTED = storeAndGet(VALUES, AnnotationFields.ECO_ID_UNSORTED);
