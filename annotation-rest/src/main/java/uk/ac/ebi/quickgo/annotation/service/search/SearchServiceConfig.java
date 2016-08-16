@@ -10,7 +10,8 @@ import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
-import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.results.config.FieldNameTransformer;
+import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
@@ -68,7 +69,8 @@ public class SearchServiceConfig {
 
         SolrQueryResultConverter resultConverter = new SolrQueryResultConverter(
                 new DocumentObjectBinder(),
-                new AnnotationDocConverterImpl());
+                new AnnotationDocConverterImpl(),
+                annotationRetrievalConfig);
 
         return new SolrRequestRetrieval<>(
                 annotationTemplate.getSolrClient(),
@@ -78,7 +80,7 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ControllerValidationHelper validationHelper(){
+    public ControllerValidationHelper validationHelper() {
         return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS);
     }
 
@@ -96,13 +98,13 @@ public class SearchServiceConfig {
     @Bean
     public AnnotationCompositeRetrievalConfig annotationRetrievalConfig(
             @Value("${search.return.fields:" + DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS + "}") String
-                    annotationSearchSolrReturnedFields) {
+                    annotationSearchSolrReturnedFields,
+            FieldNameTransformer fieldNameTransformer) {
 
         return new AnnotationCompositeRetrievalConfig() {
 
-            //Not called
             @Override public Map<String, String> repo2DomainFieldMap() {
-                return null;
+                return fieldNameTransformer.getTransformations();
             }
 
             @Override public List<String> getSearchReturnedFields() {
@@ -125,7 +127,6 @@ public class SearchServiceConfig {
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
-
 
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 

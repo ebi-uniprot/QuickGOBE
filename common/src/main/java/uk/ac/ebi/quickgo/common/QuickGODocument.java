@@ -6,11 +6,9 @@ package uk.ac.ebi.quickgo.common;
  */
 public interface QuickGODocument {
     /**
-     * Returns a unique name with which one can identify a document. This is not used
-     * by the repository layer, but is used during logging to help compute statistics
-     * or identify errors.
+     * Returns a unique name with which one can identify a document.
      *
-     * @return
+     * @return a unique document name
      */
     String getUniqueName();
 }

@@ -7,7 +7,7 @@ import com.google.common.base.Preconditions;
  *
  * Note: This query should only be used if the data source that it is  being queried against has a default field set.
  */
-class NoFieldQuery extends QuickGOQuery {
+public class NoFieldQuery extends QuickGOQuery {
     private final String value;
 
     public NoFieldQuery(String value) {

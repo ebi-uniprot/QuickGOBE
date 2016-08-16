@@ -7,7 +7,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Ricardo Antunes
  */
-class JoinQuery extends QuickGOQuery {
+public class JoinQuery extends QuickGOQuery {
     private String joinFromAttribute;
     private String joinFromTable;
     private String joinToAttribute;
@@ -28,7 +28,7 @@ class JoinQuery extends QuickGOQuery {
      * @param joinToTable The table where the join points to
      * @param joinToAttribute a join attribute that exists within the {@param joinToTable}
      */
-    JoinQuery(String joinFromTable, String joinFromAttribute, String joinToTable, String joinToAttribute) {
+    public JoinQuery(String joinFromTable, String joinFromAttribute, String joinToTable, String joinToAttribute) {
         checkNullOrEmpty(joinFromTable, "Join From Table cannot be null or empty");
         checkNullOrEmpty(joinFromAttribute, "Join From Attribute cannot be null or empty");
         checkNullOrEmpty(joinToTable, "Join To Table cannot be null or empty");
@@ -56,7 +56,7 @@ class JoinQuery extends QuickGOQuery {
      * @param joinToAttribute a join attribute that exists within the {@param joinToTable}
      * @param fromFilter a fromFilter to be executed on the {@param joinToTable}
      */
-    JoinQuery(String joinFromTable, String joinFromAttribute, String joinToTable, String joinToAttribute,
+    public JoinQuery(String joinFromTable, String joinFromAttribute, String joinToTable, String joinToAttribute,
             QuickGOQuery fromFilter) {
         this(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
 
@@ -73,23 +73,23 @@ class JoinQuery extends QuickGOQuery {
         return visitor.visit(this);
     }
 
-    String getJoinFromAttribute() {
+    public String getJoinFromAttribute() {
         return joinFromAttribute;
     }
 
-    String getJoinFromTable() {
+    public String getJoinFromTable() {
         return joinFromTable;
     }
 
-    String getJoinToAttribute() {
+    public String getJoinToAttribute() {
         return joinToAttribute;
     }
 
-    String getJoinToTable() {
+    public String getJoinToTable() {
         return joinToTable;
     }
 
-    QuickGOQuery getFromFilter() {
+    public QuickGOQuery getFromFilter() {
         return fromFilter;
     }
 

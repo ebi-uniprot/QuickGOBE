@@ -1,9 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
+import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.stream.Stream;
 import javax.validation.constraints.Max;
@@ -38,6 +40,24 @@ public class AnnotationRequest {
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
+
+    /**
+     * At the moment the definition of the list is hardcoded because we only have need to display annotation and
+     * gene product statistics on a subset of types.
+     *
+     * Note: We can in the future change this from a hard coded implementation, to something that is decided by the
+     * client.
+     */
+    private static List<StatsRequest> DEFAULT_STATS_REQUESTS;
+
+    static  {
+        List<String> statsTypes = Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE);
+
+        StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
+        StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);
+
+        DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
+    }
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -320,5 +340,42 @@ public class AnnotationRequest {
         }
 
         return request;
+    }
+
+    public List<StatsRequest> createStatsRequests() {
+        return DEFAULT_STATS_REQUESTS;
+    }
+
+    /**
+     * Defines which statistics the client would like to to retrieve.
+     */
+    public static class StatsRequest {
+        private final String groupName;
+        private final String groupField;
+        private final List<String> types;
+
+        public StatsRequest(String groupName, String groupField, List<String> types) {
+            Preconditions.checkArgument(groupName != null && !groupName.trim().isEmpty(),
+                    "Statistics group name cannot be null or empty");
+            Preconditions.checkArgument(groupField != null && !groupName.trim().isEmpty(),
+                    "Statistics group field cannot be null or empty");
+            Preconditions.checkArgument(types != null, "Types collection cannot be null or empty");
+
+            this.groupName = groupName;
+            this.groupField = groupField;
+            this.types = types;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public String getGroupField() {
+            return groupField;
+        }
+
+        public Collection<String> getTypes() {
+            return Collections.unmodifiableList(types);
+        }
     }
 }

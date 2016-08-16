@@ -2,7 +2,9 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
@@ -16,6 +18,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -85,11 +88,14 @@ public class AnnotationController {
     private final BasicSearchQueryTemplate queryTemplate;
     private final FilterConverterFactory converterFactory;
 
+    private final StatisticsService statsService;
+
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
-            FilterConverterFactory converterFactory) {
+            FilterConverterFactory converterFactory,
+            StatisticsService statsService) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
@@ -102,6 +108,8 @@ public class AnnotationController {
 
         this.converterFactory = converterFactory;
         this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
+
+        this.statsService = statsService;
     }
 
     /**
@@ -112,7 +120,7 @@ public class AnnotationController {
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest request,
             BindingResult bindingResult) {
 
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);
         }
 
@@ -129,5 +137,23 @@ public class AnnotationController {
                 .build();
 
         return search(queryRequest, annotationSearchService);
+    }
+
+    /**
+     * Return statistics based on the search result.
+     *
+     * The statistics are subdivided into two areas, each with
+     * @return a {@link QueryResult} instance containing the results of the search
+     */
+    @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(@Valid AnnotationRequest request,
+            BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            throw new ParameterBindingException(bindingResult);
+        }
+
+        QueryResult<StatisticsGroup> stats = statsService.calculate(request);
+        return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 }
