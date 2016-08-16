@@ -215,7 +215,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsTwoOrsWithinAndToString() {
+        public void visitTransformsTwoOrsOnDifferentFieldsWithinAndToString() {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
 
