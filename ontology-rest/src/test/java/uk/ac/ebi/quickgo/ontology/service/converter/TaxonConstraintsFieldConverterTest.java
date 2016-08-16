@@ -133,7 +133,7 @@ public class TaxonConstraintsFieldConverterTest {
         List<OBOTerm.Literature> expectedCitations = expectedTaxCons.citations;
         assertThat(expectedCitations, hasSize(2));
 
-        List<String> expectedCitationIds = extractAttrbiuteFromConstraints(expectedCitations, (OBOTerm.Literature
+        List<String> expectedCitationIds = extractAttributeFromConstraints(expectedCitations, (OBOTerm.Literature
                 lit) -> lit.id);
 
         assertThat(expectedCitationIds, contains(CITATION_ID1, CITATION_ID2));
@@ -167,7 +167,7 @@ public class TaxonConstraintsFieldConverterTest {
         List<OBOTerm.TaxonConstraint> taxonConstraints = converter.convertFieldList(rawTaxonConstraints);
         assertThat(taxonConstraints.size(), is(2));
 
-        List<String> expectedAncestorIds = extractAttrbiuteFromConstraints(taxonConstraints,
+        List<String> expectedAncestorIds = extractAttributeFromConstraints(taxonConstraints,
                 (OBOTerm.TaxonConstraint constraint) -> constraint.ancestorId);
 
         assertThat(expectedAncestorIds, containsInAnyOrder(ANCESTOR_ID, ancestorId2));
@@ -182,7 +182,7 @@ public class TaxonConstraintsFieldConverterTest {
         assertThat(result.isPresent(), is(false));
     }
 
-    private <S,T> List<T> extractAttrbiuteFromConstraints(Collection<S> constraints,
+    private <S,T> List<T> extractAttributeFromConstraints(Collection<S> constraints,
             Function<S, T> attributeExtractor) {
         return constraints.stream()
                 .map(attributeExtractor)
