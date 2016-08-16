@@ -79,18 +79,21 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
     public String visit(CompositeQuery query) {
         CompositeQuery.QueryOp operator = query.queryOperator();
         Set<QuickGOQuery> queries = query.queries();
+        String operatorText = " " + operator.name() + " ";
 
-        if (queries.size() == 1 && operator.equals(CompositeQuery.QueryOp.NOT)) {
-            String singletonQuery = queries.iterator().next().accept(this);
-            return CompositeQuery.QueryOp.NOT + " (" + singletonQuery + ")";
-        } else {
-            String operatorText = " " + operator.name() + " ";
-
-            if (operator.equals(CompositeQuery.QueryOp.AND)) {
+        switch (operator) {
+            case NOT:
+                if (queries.size() == 1) {
+                    String singletonQuery = queries.iterator().next().accept(this);
+                    return CompositeQuery.QueryOp.NOT + " (" + singletonQuery + ")";
+                } else {
+                    throw new IllegalStateException("NOT queries can only be applied to 1 query; received " + queries);
+                }
+            case AND:
                 return queries.stream()
                         .map(q -> q.accept(this))
                         .collect(Collectors.joining(operatorText, "(", ")"));
-            } else {
+            case OR:
                 // assume all queries in this OR are on the same field, and proceed to construct a terms query
                 NestedOrSerializer nestedOrSerializer = new NestedOrSerializer();
 
@@ -105,6 +108,7 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
                         break;
                     }
                 }
+
                 if (allTransformed) {
                     return buildTermsQuery(nestedOrSerializer.field, termsValuesJoiner.toString());
                 } else {
@@ -113,7 +117,11 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
                             .map(q -> q.accept(this))
                             .collect(Collectors.joining(operatorText, "(", ")"));
                 }
-            }
+            default:
+                String errorMessage = "UnsortedSolrQuerySerializer.visit(CompositeQuery) " +
+                        "cannot process the supplied  query: " + query;
+                LOGGER.error(errorMessage);
+                throw new IllegalStateException(errorMessage);
         }
     }
 
