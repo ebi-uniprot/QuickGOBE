@@ -43,6 +43,13 @@ public class UnsortedSolrQuerySerializerTest {
         this.serializer = new UnsortedSolrQuerySerializer(termsQueryCompatibleFields);
     }
 
+    public class Initialization {
+        @Test(expected = IllegalArgumentException.class)
+        public void initWithNullSetOfFieldsThatAreTermsQueryCompatibleCausesIllegalArgumentException() {
+            new UnsortedSolrQuerySerializer(null);
+        }
+    }
+
     public class TransformationsWithFieldsIncompatibleWithTermsQuery {
         @Test
         public void visitTransformsFieldQueryToString() throws Exception {

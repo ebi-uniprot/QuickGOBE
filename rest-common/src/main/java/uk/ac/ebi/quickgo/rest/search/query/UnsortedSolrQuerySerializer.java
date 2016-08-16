@@ -1,8 +1,12 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
+import com.google.common.base.Preconditions;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * <p>This class defines an algorithm for serializing {@link QuickGOQuery}s into a corresponding
@@ -25,11 +29,19 @@ import java.util.stream.Collectors;
  */
 public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
     static final String TERMS_LOCAL_PARAMS_QUERY_FORMAT = "({!terms f=%s}%s)";
-
+    private static final Logger LOGGER = getLogger(UnsortedSolrQuerySerializer.class);
     private final SortedSolrQuerySerializer sortedQuerySerializer;
     private final Set<String> termsQueryCompatibleFields;
 
     public UnsortedSolrQuerySerializer(Set<String> termsQueryCompatibleFields) {
+        Preconditions.checkArgument(termsQueryCompatibleFields != null,
+                "The Set<String> of termsQueryCompatibleFields cannot be null");
+
+        if (termsQueryCompatibleFields.isEmpty()) {
+            LOGGER.warn("The Set<String> of termsQueryCompatibleFields is empty: " +
+                    "no Solr Terms Queries, e.g., {!terms f=field}fieldValue, will be created");
+        }
+
         this.sortedQuerySerializer = new SortedSolrQuerySerializer();
 
         this.termsQueryCompatibleFields = termsQueryCompatibleFields;
@@ -42,6 +54,14 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         } else {
             return sortedQuerySerializer.visit(query);
         }
+    }
+
+    private String buildTermsQuery(String field, String... values) {
+        StringJoiner stringJoiner = new StringJoiner(",");
+        for (String value : values) {
+            stringJoiner.add(value.toLowerCase());
+        }
+        return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
     }
 
     /**
@@ -97,20 +117,22 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         }
     }
 
+    private boolean isTermsQueryCompatible(FieldQuery query) {
+        return termsQueryCompatibleFields.contains(query.field());
+    }
+
     private class TermQueryTransformationResult {
         private static final String DEFAULT_TRANSFORMATION_VALUE = "TransformationFailed";
+        boolean successful;
+        String value;
 
         TermQueryTransformationResult(boolean successful, String value) {
             this.successful = successful;
             this.value = value;
         }
-
         TermQueryTransformationResult(boolean successful) {
             this(successful, DEFAULT_TRANSFORMATION_VALUE);
         }
-
-        boolean successful;
-        String value;
     }
 
     /**
@@ -173,15 +195,4 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         return sortedQuerySerializer.visit(query);
     }
 
-    private String buildTermsQuery(String field, String... values) {
-        StringJoiner stringJoiner = new StringJoiner(",");
-        for (String value : values) {
-            stringJoiner.add(value.toLowerCase());
-        }
-        return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
-    }
-
-    private boolean isTermsQueryCompatible(FieldQuery query) {
-        return termsQueryCompatibleFields.contains(query.field());
-    }
 }
