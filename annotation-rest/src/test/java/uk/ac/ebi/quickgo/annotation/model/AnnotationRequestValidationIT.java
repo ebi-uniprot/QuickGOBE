@@ -358,7 +358,7 @@ public class AnnotationRequestValidationIT {
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     printConstraintViolations(violations);
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one 'ECO identifier' value is invalid: " + validId));
+                            is("At least one 'Evidence code identifier' value is invalid: " + validId));
                     assertThat(violations, hasSize(1));
                 }
         );
