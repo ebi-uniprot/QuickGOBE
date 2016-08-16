@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 import static uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
 import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.TERMS_LOCAL_PARAMS_QUERY_FORMAT;
 
@@ -175,7 +177,7 @@ public class UnsortedSolrQuerySerializerTest {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
 
-            QuickGOQuery compositeQuery = query1.or(query2);
+            QuickGOQuery compositeQuery = or(query1, query2);
 
             String queryString = serializer.visit((CompositeQuery) compositeQuery);
             System.out.println(queryString);
@@ -193,7 +195,7 @@ public class UnsortedSolrQuerySerializerTest {
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
             FieldQuery query3 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value3");
 
-            QuickGOQuery compositeQuery = query1.or(query2, query3);
+            QuickGOQuery compositeQuery = or(query1, query2, query3);
 
             String queryString = serializer.visit((CompositeQuery) compositeQuery);
             System.out.println(queryString);
@@ -210,11 +212,11 @@ public class UnsortedSolrQuerySerializerTest {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
 
-            QuickGOQuery orQuery = query1.or(query2);
+            QuickGOQuery orQuery = or(query1, query2);
 
             FieldQuery otherQuery = new FieldQuery(TERMS_COMPATIBLE_FIELD_2, "value3");
 
-            QuickGOQuery compositeQuery = otherQuery.and(orQuery);
+            QuickGOQuery compositeQuery = and(otherQuery, orQuery);
 
             String queryString = serializer.visit((CompositeQuery) compositeQuery);
             System.out.println(queryString);
@@ -233,11 +235,11 @@ public class UnsortedSolrQuerySerializerTest {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
 
-            QuickGOQuery andQuery = query1.and(query2);
+            QuickGOQuery andQuery = and(query1, query2);
 
             FieldQuery otherQuery = new FieldQuery(TERMS_COMPATIBLE_FIELD_2, "value3");
 
-            QuickGOQuery compositeQuery = otherQuery.or(andQuery);
+            QuickGOQuery compositeQuery = or(otherQuery, andQuery);
 
             String queryString = serializer.visit((CompositeQuery) compositeQuery);
 
@@ -257,11 +259,11 @@ public class UnsortedSolrQuerySerializerTest {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
 
-            QuickGOQuery orQuery = query1.or(query2);
+            QuickGOQuery orQuery = or(query1, query2);
 
             FieldQuery otherQuery = new FieldQuery(TERMS_COMPATIBLE_FIELD_2, "value3");
 
-            QuickGOQuery compositeQuery = otherQuery.or(orQuery);
+            QuickGOQuery compositeQuery = or(otherQuery, orQuery);
 
             String queryString = serializer.visit((CompositeQuery) compositeQuery);
 
@@ -277,11 +279,11 @@ public class UnsortedSolrQuerySerializerTest {
         public void canTransformOrOfFieldAndAnotherCompositeOr() {
             FieldQuery innerQuery1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery innerQuery2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
-            QuickGOQuery innerOr = QuickGOQuery.generalisedOr(
+            QuickGOQuery innerOr = or(
                     innerQuery1,
                     innerQuery2);
             FieldQuery query3 = new FieldQuery(TERMS_COMPATIBLE_FIELD_3, "value3");
-            QuickGOQuery compositeOr = QuickGOQuery.generalisedOr(
+            QuickGOQuery compositeOr = or(
                     query3,
                     innerOr
             );

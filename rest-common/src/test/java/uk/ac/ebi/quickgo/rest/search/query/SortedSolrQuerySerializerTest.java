@@ -6,6 +6,8 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 import static uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
 
 /**
@@ -130,7 +132,7 @@ public class SortedSolrQuerySerializerTest {
         FieldQuery query2 = new FieldQuery("field2", "value2");
         FieldQuery query3 = new FieldQuery("field3", "value3");
 
-        QuickGOQuery compositeQuery = query1.or(query2, query3);
+        QuickGOQuery compositeQuery = or(query1, query2, query3);
 
         String queryString = serializer.visit((CompositeQuery) compositeQuery);
         System.out.println(queryString);
@@ -149,7 +151,7 @@ public class SortedSolrQuerySerializerTest {
         FieldQuery query2 = new FieldQuery("field2", "value2");
         FieldQuery query3 = new FieldQuery("field3", "value3");
 
-        QuickGOQuery compositeQuery = query1.and(query2, query3);
+        QuickGOQuery compositeQuery = and(query1, query2, query3);
 
         String queryString = serializer.visit((CompositeQuery) compositeQuery);
         System.out.println(queryString);
