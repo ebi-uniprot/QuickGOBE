@@ -7,6 +7,10 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.TermQueryTransformationResult
+        .failedTransformationResult;
+import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.TermQueryTransformationResult
+        .successfulTransformationResult;
 
 /**
  * <p>This class defines an algorithm for serializing {@link QuickGOQuery}s into a corresponding
@@ -64,6 +68,72 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
     }
 
+    private boolean isTermsQueryCompatible(FieldQuery query) {
+        return termsQueryCompatibleFields.contains(query.field());
+    }
+
+    static class TermQueryTransformationResult {
+        static final String FAILED_TRANSFORMATION_VALUE = "TransformationFailed";
+        boolean successful;
+        String value;
+
+        private TermQueryTransformationResult(boolean successful, String value) {
+            this.successful = successful;
+            this.value = value;
+        }
+
+        static TermQueryTransformationResult successfulTransformationResult(String value) {
+            return new TermQueryTransformationResult(true, value);
+        }
+
+        static TermQueryTransformationResult failedTransformationResult() {
+            return new TermQueryTransformationResult(false, TermQueryTransformationResult.FAILED_TRANSFORMATION_VALUE);
+        }
+    }
+    /**
+     * The serializer that handles nested {@link CompositeQuery}s involving ORs, referred to in
+     * {@link UnsortedSolrQuerySerializer#visit(uk.ac.ebi.quickgo.rest.search.query.CompositeQuery)}.
+     * Specifically, this OR serializer, handles (visits) only simple {@link FieldQuery} instances. No
+     * other {@link QuickGOQuery} subclass is handled.
+     */
+    private class NestedOrSerializer implements QueryVisitor<TermQueryTransformationResult> {
+        private String field;
+
+        @Override
+        public TermQueryTransformationResult visit(FieldQuery query) {
+            if (isTermsQueryCompatible(query)) {
+                if (field != null && !field.equals(query.field())) {
+                    return failedTransformationResult();
+                } else {
+                    field = query.field();
+                    return successfulTransformationResult(query.value());
+                }
+            } else {
+                return failedTransformationResult();
+            }
+        }
+
+        @Override
+        public TermQueryTransformationResult visit(CompositeQuery query) {
+            return failedTransformationResult();
+        }
+
+        @Override
+        public TermQueryTransformationResult visit(NoFieldQuery query) {
+            return failedTransformationResult();
+        }
+
+        @Override
+        public TermQueryTransformationResult visit(AllQuery query) {
+            return failedTransformationResult();
+        }
+
+        @Override
+        public TermQueryTransformationResult visit(JoinQuery query) {
+            return failedTransformationResult();
+        }
+    }
+
     /**
      * Handles {@link CompositeQuery} instances identically to the behaviour in
      * {@link SortedSolrQuerySerializer}, except for when handling disjunctions (ORs). If
@@ -119,72 +189,9 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
                 }
             default:
                 String errorMessage = "UnsortedSolrQuerySerializer.visit(CompositeQuery) " +
-                        "cannot process the supplied  query: " + query;
+                        "cannot process the supplied query: " + query;
                 LOGGER.error(errorMessage);
                 throw new IllegalStateException(errorMessage);
-        }
-    }
-
-    private boolean isTermsQueryCompatible(FieldQuery query) {
-        return termsQueryCompatibleFields.contains(query.field());
-    }
-
-    private class TermQueryTransformationResult {
-        private static final String DEFAULT_TRANSFORMATION_VALUE = "TransformationFailed";
-        boolean successful;
-        String value;
-
-        TermQueryTransformationResult(boolean successful, String value) {
-            this.successful = successful;
-            this.value = value;
-        }
-        TermQueryTransformationResult(boolean successful) {
-            this(successful, DEFAULT_TRANSFORMATION_VALUE);
-        }
-    }
-
-    /**
-     * The serializer that handles nested {@link CompositeQuery}s involving ORs, referred to in
-     * {@link UnsortedSolrQuerySerializer#visit(uk.ac.ebi.quickgo.rest.search.query.CompositeQuery)}.
-     * Specifically, this OR serializer, handles (visits) only simple {@link FieldQuery} instances. No
-     * other {@link QuickGOQuery} subclass is handled.
-     */
-    private class NestedOrSerializer implements QueryVisitor<TermQueryTransformationResult> {
-        private String field;
-
-        @Override
-        public TermQueryTransformationResult visit(FieldQuery query) {
-            if (isTermsQueryCompatible(query)) {
-                if (field != null && !field.equals(query.field())) {
-                    throw new IllegalArgumentException(
-                            "Fields must all be the same. Encountered: " + field + ", and " + query.field());
-                } else {
-                    field = query.field();
-                }
-                return new TermQueryTransformationResult(true, query.value());
-            } else {
-                return new TermQueryTransformationResult(false);
-            }
-        }
-
-        @Override
-        public TermQueryTransformationResult visit(CompositeQuery query) {
-            return new TermQueryTransformationResult(false);
-        }
-
-        @Override
-        public TermQueryTransformationResult visit(NoFieldQuery query) {
-            return new TermQueryTransformationResult(false);
-        }
-
-        @Override
-        public TermQueryTransformationResult visit(AllQuery query) {
-            return new TermQueryTransformationResult(false);
-        }
-
-        @Override
-        public TermQueryTransformationResult visit(JoinQuery query) {
-            return new TermQueryTransformationResult(false);
         }
     }
 
