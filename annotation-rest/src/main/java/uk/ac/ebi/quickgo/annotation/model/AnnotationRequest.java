@@ -32,8 +32,20 @@ public class AnnotationRequest {
     static final String USAGE_IDS = "usageIds";
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
     private static final String ASPECT_FIELD = "aspect";
-    private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
-            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE, DB_SUBSET};
+    private static final String[] TARGET_FIELDS = new String[]{
+            ASPECT_FIELD,
+            ASSIGNED_BY_UNSORTED,
+            DB_SUBSET_UNSORTED,
+            ECO_ID_UNSORTED,
+            GENE_PRODUCT_ID_UNSORTED,
+            GENE_PRODUCT_TYPE_UNSORTED,
+            GO_EVIDENCE_UNSORTED,
+            GO_ID_UNSORTED,
+            QUALIFIER_UNSORTED,
+            REFERENCE_SEARCH,
+            TAXON_ID_UNSORTED,
+            WITH_FROM_SEARCH
+    };
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
@@ -52,14 +64,14 @@ public class AnnotationRequest {
      */
     public void setAssignedBy(String assignedBy) {
         if (assignedBy != null) {
-            filterMap.put(ASSIGNED_BY, assignedBy);
+            filterMap.put(ASSIGNED_BY_UNSORTED, assignedBy);
         }
     }
 
     @Pattern(regexp = "^[A-Za-z][A-Za-z\\-_]+(,[A-Za-z][A-Za-z\\-_]+)*",
             message = "At least one 'Assigned By' value is invalid: ${validatedValue}")
     public String getAssignedBy() {
-        return filterMap.get(ASSIGNED_BY);
+        return filterMap.get(ASSIGNED_BY_UNSORTED);
     }
 
     /**
@@ -95,13 +107,13 @@ public class AnnotationRequest {
 
     public void setGpId(String listOfGeneProductIDs) {
         if (listOfGeneProductIDs != null) {
-            filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
+            filterMap.put(GENE_PRODUCT_ID_UNSORTED, listOfGeneProductIDs);
         }
     }
 
     @GeneProductIDList
     public String getGpId() {
-        return filterMap.get(GENE_PRODUCT_ID);
+        return filterMap.get(GENE_PRODUCT_ID_UNSORTED);
     }
 
     /**
@@ -111,13 +123,13 @@ public class AnnotationRequest {
      * @param evidence the evidence code
      */
     public void setGoEvidence(String evidence) {
-        filterMap.put(GO_EVIDENCE, evidence);
+        filterMap.put(GO_EVIDENCE_UNSORTED, evidence);
     }
 
     @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
             message = "At least one 'GO Evidence' value is invalid: ${validatedValue}")
     public String getGoEvidence() {
-        return filterMap.get(GO_EVIDENCE);
+        return filterMap.get(GO_EVIDENCE_UNSORTED);
     }
 
     /**
@@ -125,11 +137,11 @@ public class AnnotationRequest {
      * @param qualifier
      */
     public void setQualifier(String qualifier) {
-        filterMap.put(QUALIFIER, qualifier);
+        filterMap.put(QUALIFIER_UNSORTED, qualifier);
     }
 
     public String getQualifier() {
-        return filterMap.get(QUALIFIER);
+        return filterMap.get(QUALIFIER_UNSORTED);
     }
 
     /**
@@ -151,13 +163,13 @@ public class AnnotationRequest {
     }
 
     public void setTaxon(String taxId) {
-        filterMap.put(TAXON_ID, taxId);
+        filterMap.put(TAXON_ID_UNSORTED, taxId);
     }
 
     @Pattern(regexp = "[0-9]+(,[0-9]+)*",
             message = "At least one 'Taxonomic identifier' value is invalid: ${validatedValue}")
     public String getTaxon() {
-        return filterMap.get(TAXON_ID);
+        return filterMap.get(TAXON_ID_UNSORTED);
     }
 
     /**
@@ -165,13 +177,13 @@ public class AnnotationRequest {
      * @param goId
      */
     public void setGoId(String goId) {
-        filterMap.put(GO_ID, goId);
+        filterMap.put(GO_ID_UNSORTED, goId);
     }
 
     @Pattern(regexp = "go:[0-9]{7}(,go:[0-9]{7})*", flags = CASE_INSENSITIVE,
             message = "At least one 'GO Id' value is invalid: ${validatedValue}")
     public String getGoId() {
-        return filterMap.get(GO_ID);
+        return filterMap.get(GO_ID_UNSORTED);
     }
 
     /**
@@ -179,13 +191,13 @@ public class AnnotationRequest {
      * @param ecoId
      */
     public void setEcoId(String ecoId) {
-        filterMap.put(ECO_ID, ecoId);
+        filterMap.put(ECO_ID_UNSORTED, ecoId);
     }
 
     @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*", flags = CASE_INSENSITIVE,
             message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
     public String getEcoId() {
-        return filterMap.get(ECO_ID);
+        return filterMap.get(ECO_ID_UNSORTED);
     }
 
     @Pattern(regexp = "^exact|slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
@@ -224,25 +236,24 @@ public class AnnotationRequest {
         }
     }
 
-    public void setGpType(String geneProductType){
-        filterMap.put(GENE_PRODUCT_TYPE, geneProductType.toLowerCase());
+    public void setGpType(String geneProductType) {
+        filterMap.put(GENE_PRODUCT_TYPE_UNSORTED, geneProductType.toLowerCase());
     }
 
     @Pattern(regexp = "^(complex|rna|protein)(,(complex|rna|protein)){0,2}", flags = CASE_INSENSITIVE,
             message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
-    public String getGpType(){
-        return filterMap.get(GENE_PRODUCT_TYPE);
+    public String getGpType() {
+        return filterMap.get(GENE_PRODUCT_TYPE_UNSORTED);
     }
 
-
-    public void setGpSubset(String gpSubset){
-        filterMap.put(DB_SUBSET, gpSubset);
+    public void setGpSubset(String gpSubset) {
+        filterMap.put(DB_SUBSET_UNSORTED, gpSubset);
     }
 
     @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
             message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
-    public String getGpSubset(){
-        return filterMap.get(DB_SUBSET);
+    public String getGpSubset() {
+        return filterMap.get(DB_SUBSET_UNSORTED);
     }
 
     public int getLimit() {

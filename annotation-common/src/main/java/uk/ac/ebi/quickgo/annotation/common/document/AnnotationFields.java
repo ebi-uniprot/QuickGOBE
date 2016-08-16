@@ -12,25 +12,37 @@ import java.util.Set;
  */
 public class AnnotationFields {
 
-    // all fields from annotations's schema.xml
-    public final static String ID = "id";
-    public final static String GENE_PRODUCT_ID = "geneProductId";
+    // fields from annotations's schema.xml
+    public final static String ASSIGNED_BY = "assignedBy";
     public final static String QUALIFIER = "qualifier";
+    public static final String DB_OBJECT_SYMBOL = "dbObjectSymbol";
+    public static final String DB_SUBSET = "dbSubset";
+    public final static String ECO_ID = "ecoId";
+    public final static String EXTENSION = "extension";
+    public final static String GENE_PRODUCT_ID = "geneProductId";
+    public static final String GENE_PRODUCT_TYPE = "geneProductType";
     public final static String GO_ID = "goId";
     public final static String GO_EVIDENCE = "goEvidence";
-    public final static String ECO_ID = "ecoId";
-    public final static String REFERENCE = "reference";
-    public final static String REFERENCE_SEARCH = "referenceSearch";
-    public final static String WITH_FROM = "withFrom";
-    public final static String WITH_FROM_SEARCH = "withFromSearch";
+    public final static String ID = "id";
     public final static String INTERACTING_TAXON_ID = "interactingTaxonId";
-    public final static String ASSIGNED_BY = "assignedBy";
-    public final static String EXTENSION = "extension";
-    public static final String DB_OBJECT_SYMBOL = "dbObjectSymbol";
-    public static final String GENE_PRODUCT_TYPE = "geneProductType";
-    public static final String DB_SUBSET = "dbSubset";
-    public static final String TAXON_ID = "taxonId";
+    public final static String REFERENCE = "reference";
     public static final String TARGET_SET = "targetSet";
+    public static final String TAXON_ID = "taxonId";
+    public final static String WITH_FROM = "withFrom";
+
+    public final static String REFERENCE_SEARCH = "referenceSearch";
+    public final static String WITH_FROM_SEARCH = "withFromSearch";
+
+    public final static String ASSIGNED_BY_UNSORTED = "assignedBy_unsorted";
+    public final static String ECO_ID_UNSORTED = "ecoId_unsorted";
+    public static final String DB_SUBSET_UNSORTED = "dbSubset_unsorted";
+    public final static String GO_EVIDENCE_UNSORTED = "goEvidence_unsorted";
+    public final static String GO_ID_UNSORTED = "goId_unsorted";
+    public static final String GENE_PRODUCT_ID_UNSORTED = "geneProductId_unsorted";
+    public static final String GENE_PRODUCT_TYPE_UNSORTED = "geneProductType_unsorted";
+    public static final String QUALIFIER_UNSORTED = "qualifier_unsorted";
+    public static final String TAXON_ID_UNSORTED = "taxonId_unsorted";
+    public static final String TARGET_SET_UNSORTED = "targetSet_unsorted";
 
     /**
      * Annotation fields that are stored, and can therefore be retrieved.
@@ -58,12 +70,25 @@ public class AnnotationFields {
         public static final String TAXON_ID = storeAndGet(VALUES, AnnotationFields.TAXON_ID);
         public static final String GO_EVIDENCE = storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
         public static final String ECO_ID = storeAndGet(VALUES, AnnotationFields.ECO_ID);
-        public static final String QUALIFIER   = storeAndGet(VALUES, AnnotationFields.QUALIFIER);
+        public static final String QUALIFIER = storeAndGet(VALUES, AnnotationFields.QUALIFIER);
         public static final String REFERENCE_SEARCH = storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
         public static final String GO_ID = storeAndGet(VALUES, AnnotationFields.GO_ID);
-        public static final String GENEPRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
+        public static final String GENE_PRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
         public static final String GENE_PRODUCT_TYPE = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_TYPE);
         public static final String DB_SUBSET = storeAndGet(VALUES, AnnotationFields.DB_SUBSET);
+
+        public final static String ASSIGNED_BY_UNSORTED = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY_UNSORTED);
+        public final static String ECO_ID_UNSORTED = storeAndGet(VALUES, AnnotationFields.ECO_ID_UNSORTED);
+        public final static String GO_EVIDENCE_UNSORTED = storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE_UNSORTED);
+        public final static String GO_ID_UNSORTED = storeAndGet(VALUES, AnnotationFields.GO_ID_UNSORTED);
+        public static final String DB_SUBSET_UNSORTED = storeAndGet(VALUES, AnnotationFields.DB_SUBSET_UNSORTED);
+        public static final String GENE_PRODUCT_ID_UNSORTED =
+                storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID_UNSORTED);
+        public static final String GENE_PRODUCT_TYPE_UNSORTED =
+                storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_TYPE_UNSORTED);
+        public static final String QUALIFIER_UNSORTED = storeAndGet(VALUES, AnnotationFields.QUALIFIER_UNSORTED);
+        public static final String TAXON_ID_UNSORTED = storeAndGet(VALUES, AnnotationFields.TAXON_ID_UNSORTED);
+        public static final String TARGET_SET_UNSORTED = storeAndGet(VALUES, AnnotationFields.TARGET_SET_UNSORTED);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);

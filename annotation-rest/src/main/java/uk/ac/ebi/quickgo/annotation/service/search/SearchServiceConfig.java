@@ -49,8 +49,9 @@ public class SearchServiceConfig {
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
     private static final String COMMA = ",";
     private static final String DEFAULT_UNSORTED_QUERY_FIELDS =
-            "goId,qualifier,geneProductType,dbObjectSymbol,dbSubset,goEvidence,ecoId," +
-                    "reference,referenceSearch,withFrom,withFromSearch,taxonId,interactingTaxonId,assignedBy,extension";
+            "assignedBy_unsorted,dbSubset_unsorted,ecoId_unsorted,goEvidence_unsorted," +
+                    "goId_unsorted,geneProductId_unsorted,geneProductType_unsorted," +
+                    "qualifier_unsorted,targetSet_unsorted,taxonId_unsorted";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS =
             "id,geneProductId,qualifier,goId,goEvidence," +
                     "ecoId,reference,withFrom,taxonId,assignedBy,extensions";
