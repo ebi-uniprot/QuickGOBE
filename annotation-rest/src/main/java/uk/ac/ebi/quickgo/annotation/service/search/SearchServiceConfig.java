@@ -48,7 +48,7 @@ public class SearchServiceConfig {
 
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
     private static final String COMMA = ",";
-    private static final String DEFAULT_ANNOTATION_TERMS_QUERY_COMPATIBLE_FIELDS =
+    private static final String DEFAULT_UNSORTED_QUERY_FIELDS =
             "goId,qualifier,geneProductType,dbObjectSymbol,dbSubset,goEvidence,ecoId," +
                     "reference,referenceSearch,withFrom,withFromSearch,taxonId,interactingTaxonId,assignedBy,extension";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS =
@@ -62,8 +62,8 @@ public class SearchServiceConfig {
     boolean xrefValidationCaseSensitive;
 
     @Value("${annotation.terms.query.compatible.fields:" +
-            DEFAULT_ANNOTATION_TERMS_QUERY_COMPATIBLE_FIELDS + "}")
-    private String termsQueryCompatibleFields;
+            DEFAULT_UNSORTED_QUERY_FIELDS + "}")
+    private String fieldsThatCanBeUnsorted;
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -95,12 +95,12 @@ public class SearchServiceConfig {
 
     @Bean
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
-        Set<String> termsQueryCompatibleFieldsSet =
-                Stream.of(termsQueryCompatibleFields.split(COMMA)).collect(Collectors.toSet());
+        Set<String> unsortedFields =
+                Stream.of(fieldsThatCanBeUnsorted.split(COMMA)).collect(Collectors.toSet());
 
         return new SolrQueryConverter(
                 SOLR_ANNOTATION_QUERY_REQUEST_HANDLER,
-                new UnsortedSolrQuerySerializer(termsQueryCompatibleFieldsSet));
+                new UnsortedSolrQuerySerializer(unsortedFields));
     }
 
     /**
