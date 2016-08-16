@@ -180,6 +180,20 @@ public class UnsortedSolrQuerySerializerTest {
     public class TransformationsToTermsQueries {
 
         @Test
+        public void visitTransformsOneQueryToTermsQueryString() {
+            FieldQuery query = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
+
+            String queryString = serializer.visit(query);
+            System.out.println(queryString);
+
+            assertThat(queryString, is(
+                    String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT,
+                            query.field(),
+                            query.value())
+            ));
+        }
+
+        @Test
         public void visitTransformsTwoOrsOnSameFieldToTermsQueryString() {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
