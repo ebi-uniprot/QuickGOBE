@@ -28,6 +28,7 @@ public class FlatFieldBuilder extends FlatField {
     private static final String LEVEL_SEPARATOR_END = "]";
     private static final String LEVEL_SEPARATOR_END_REGEX = "\\" + LEVEL_SEPARATOR_END;
     private static final String VALUE_SEPARATOR_REGEX = "\\|";
+    private static final String TAB = "\t";
 
     /**
      * A regular expression used to breakdown the string fed to {@link FlatFieldBuilder#parse(String)}, that splits the
@@ -110,7 +111,7 @@ public class FlatFieldBuilder extends FlatField {
         StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < level; i++) {
-            builder.append("\t");
+            builder.append(TAB);
         }
 
         return builder.toString();
