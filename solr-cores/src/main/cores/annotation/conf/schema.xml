@@ -126,7 +126,7 @@
     <field name="qualifier_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="qualifier" dest="qualifier_unsorted"/>
 
-    <field name="targetSet_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
+    <field name="targetSet_unsorted" type="lowercase" indexed="true" stored="false" multiValued="true"/>
     <copyField source="targetSet" dest="targetSet_unsorted"/>
 
     <field name="taxonId_unsorted" type="int" indexed="true" stored="false" multiValued="false"/>
