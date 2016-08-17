@@ -33,7 +33,7 @@ public class FacetedSearchQueryTemplate {
         private final QueryRequest.Builder compositeBuilder;
         private final Set<String> facets;
 
-        public Builder(SearchQueryRequestBuilder builder) {
+        private Builder(SearchQueryRequestBuilder builder) {
             this.compositeBuilder = builder.builder();
             this.facets = new HashSet<>();
         }

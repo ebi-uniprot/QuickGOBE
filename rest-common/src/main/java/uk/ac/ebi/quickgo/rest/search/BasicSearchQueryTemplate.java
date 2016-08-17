@@ -44,7 +44,7 @@ public class BasicSearchQueryTemplate {
         private int page;
         private int pageSize;
 
-        public Builder(List<String> returnedFields) {
+        private Builder(List<String> returnedFields) {
             this.returnedFields = new LinkedHashSet<>(returnedFields);
 
             page = DEFAULT_PAGE_NUMBER;
