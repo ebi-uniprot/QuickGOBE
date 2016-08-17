@@ -28,7 +28,7 @@ public class FacetedSearchQueryTemplateTest {
     @Test
     public void newBuilderInheritsDefinitionsFromFakeBuilder() throws Exception {
         QuickGOQuery query = QuickGOQuery.createQuery("field","value");
-        FacetedSearchQueryTemplate.Builder builder = searchTemplate.newBuilder(new FakeBuilder(query));
+        FacetedSearchQueryTemplate.Builder builder = searchTemplate.newBuilder(new FakeCompositeBuilder(query));
 
         QueryRequest request = builder.build();
 
@@ -38,7 +38,7 @@ public class FacetedSearchQueryTemplateTest {
 
     @Test
     public void newBuilderCreatesQueryRequestWithNoFacets() throws Exception {
-        FacetedSearchQueryTemplate.Builder builder = searchTemplate.newBuilder(new FakeBuilder());
+        FacetedSearchQueryTemplate.Builder builder = searchTemplate.newBuilder(new FakeCompositeBuilder());
 
         QueryRequest request = builder.build();
 
@@ -48,7 +48,7 @@ public class FacetedSearchQueryTemplateTest {
     @Test
     public void addedFacetToBuilderCreatesQueryRequestWith1Facet() throws Exception {
         String facetField = "field";
-        FacetedSearchQueryTemplate.Builder builder = searchTemplate.newBuilder(new FakeBuilder());
+        FacetedSearchQueryTemplate.Builder builder = searchTemplate.newBuilder(new FakeCompositeBuilder());
         builder.addFacets(facetField);
 
         QueryRequest request = builder.build();
@@ -65,7 +65,7 @@ public class FacetedSearchQueryTemplateTest {
         String facetField1 = "field1";
         String facetField2 = "field2";
 
-        FacetedSearchQueryTemplate.Builder builder = searchTemplate.newBuilder(new FakeBuilder());
+        FacetedSearchQueryTemplate.Builder builder = searchTemplate.newBuilder(new FakeCompositeBuilder());
         builder.addFacets(facetField1, facetField2);
 
         QueryRequest request = builder.build();
@@ -78,23 +78,4 @@ public class FacetedSearchQueryTemplateTest {
         assertThat(actualFacets, containsInAnyOrder(expectedFacet1, expectedFacet2));
     }
 
-    private final class FakeBuilder implements SearchQueryRequestBuilder {
-        private QuickGOQuery query;
-
-        FakeBuilder() {
-            query = QuickGOQuery.createAllQuery();
-        }
-
-        FakeBuilder(QuickGOQuery query) {
-            this.query = query;
-        }
-
-        @Override public QueryRequest build() {
-            return builder().build();
-        }
-
-        @Override public QueryRequest.Builder builder() {
-            return new QueryRequest.Builder(query);
-        }
-    }
 }
