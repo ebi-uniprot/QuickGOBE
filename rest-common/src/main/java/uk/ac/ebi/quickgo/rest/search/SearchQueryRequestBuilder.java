@@ -18,9 +18,9 @@ interface SearchQueryRequestBuilder {
     QueryRequest build();
 
     /**
-     * Returns a new {@link QueryRequest.uk.ac.ebi.quickgo.rest.search.query.QueryRequest.Builder} instance
+     * Returns a new {@link QueryRequest.Builder} instance
      * to be used to build a new {@link QueryRequest}
-     * @return a new {@link QueryRequest.uk.ac.ebi.quickgo.rest.search.query.QueryRequest.Builder} instance
+     * @return a new {@link QueryRequest.Builder} instance
      */
     QueryRequest.Builder builder();
 }
