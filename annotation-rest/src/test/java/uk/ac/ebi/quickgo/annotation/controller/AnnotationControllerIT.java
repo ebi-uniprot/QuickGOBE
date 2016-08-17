@@ -32,7 +32,6 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.QUALIFIER;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 
 /**
  * RESTful end point for Annotations
@@ -219,12 +218,13 @@ public class AnnotationControllerIT {
         repository.save(document);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(TAXON_ID_PARAM, "2"));
+                get(RESOURCE_URL + "/search").param(TAXON_ID_PARAM, Integer.toString(taxonId)));
 
-        response.andExpect(status().isOk())
+        response.andDo(print()).andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valuesOccursInField(TAXON_ID, taxonId))
                 .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
 
@@ -244,15 +244,35 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param(TAXON_ID_PARAM, String.valueOf(taxonId1))
-                        .param(TAXON_ID_PARAM, String.valueOf(taxonId2)));
+                        .param(TAXON_ID_PARAM, Integer.toString(taxonId1))
+                        .param(TAXON_ID_PARAM, Integer.toString(taxonId2)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
+                .andExpect(valuesOccursInField(TAXON_ID, taxonId1, taxonId2))
                 .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
+    }
+
+    @Test
+    public void lookupWhereTaxonIdIsZeroWillNotShowTaxonIdBecauseThisMeansInvalid() throws Exception {
+        String geneProductId = "P99999";
+        int taxonId = 0;
+
+        AnnotationDocument document = createDocWithTaxonId(geneProductId, taxonId);
+        repository.save(document);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldDoesNotExist(TAXON_ID))
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
 
     @Test

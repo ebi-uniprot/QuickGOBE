@@ -43,6 +43,14 @@ final class ResponseVerifier {
         return jsonPath(RESULTS + ".*." + fieldName, contains(values));
     }
 
+    static ResultMatcher valuesOccursInField(String fieldName, Integer... values) {
+        return jsonPath(RESULTS + ".*." + fieldName, contains(values));
+    }
+
+    static ResultMatcher fieldDoesNotExist(String fieldName) {
+        return jsonPath(RESULTS + ".*." + fieldName).doesNotExist();
+    }
+
     static ResultMatcher atLeastOneResultHasItem(String fieldName, String value) {
         return jsonPath(RESULTS + ".*." + fieldName, hasItem(value));
     }
