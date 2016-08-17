@@ -13,11 +13,11 @@ import org.junit.runner.RunWith;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.unsortedNameFor;
 import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.TERMS_LOCAL_PARAMS_QUERY_FORMAT;
+import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.unsortedNameFor;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
 
 /**
@@ -182,6 +182,8 @@ public class UnsortedSolrQuerySerializerTest {
 
     public class TransformationsToTermsQueries {
 
+        private static final String UNSORTED_FIELD_SUFFIX = "_unsorted";
+
         @Test
         public void visitTransformsOneQueryToTermsQueryString() {
             FieldQuery query = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
@@ -313,6 +315,24 @@ public class UnsortedSolrQuerySerializerTest {
                     buildTermsQuery(innerQuery1.field(), innerQuery1.value(), innerQuery2.value()) +
                     ")"));
             System.out.println(queryString);
+        }
+
+        @Test
+        public void canCreateUnsortedFieldName() {
+            String field = "field";
+            assertThat(unsortedNameFor(field), is(field + UNSORTED_FIELD_SUFFIX));
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void unsortedFieldNameForNullValueCausesException() {
+            String field = null;
+            unsortedNameFor(field);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void unsortedFieldNameForEmptyValueCausesException() {
+            String field = "";
+            unsortedNameFor(field);
         }
 
         String buildTermsQuery(String field, String... values) {

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.storeAndGet;
-import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.unsortedNameFor;
 
 /**
  * The fields of an annotation document.
@@ -58,32 +57,19 @@ public class AnnotationFields {
         private static final Set<String> VALUES = new HashSet<>();
 
         public static final String ASSIGNED_BY = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
-        public static final String WITH_FROM_SEARCH = storeAndGet(VALUES, AnnotationFields.WITH_FROM_SEARCH);
-        public static final String TAXON_ID = storeAndGet(VALUES, AnnotationFields.TAXON_ID);
+        public static final String DB_SUBSET = storeAndGet(VALUES, AnnotationFields.DB_SUBSET);
+        public static final String EVIDENCE_CODE = storeAndGet(VALUES, AnnotationFields.EVIDENCE_CODE);
+        public static final String GENE_PRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
+        public static final String GENE_PRODUCT_TYPE = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_TYPE);
         public static final String GO_EVIDENCE = storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
-        public static final String ECO_ID = storeAndGet(VALUES, AnnotationFields.EVIDENCE_CODE);
-        public static final String QUALIFIER = storeAndGet(VALUES, AnnotationFields.QUALIFIER);
-        public static final String REFERENCE_SEARCH = storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
         public static final String GO_ID = storeAndGet(VALUES, AnnotationFields.GO_ID);
         public static final String GO_ID_INDEXED_ORIGINAL =
                 storeAndGet(VALUES, AnnotationFields.GO_ID_INDEXED_ORIGINAL);
-        public static final String GENE_PRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
-        public static final String GENE_PRODUCT_TYPE = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_TYPE);
-        public static final String DB_SUBSET = storeAndGet(VALUES, AnnotationFields.DB_SUBSET);
+        public static final String QUALIFIER = storeAndGet(VALUES, AnnotationFields.QUALIFIER);
+        public static final String REFERENCE_SEARCH = storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
         public static final String TARGET_SET = storeAndGet(VALUES, AnnotationFields.TARGET_SET);
-
-        static {
-            VALUES.add(unsortedNameFor(AnnotationFields.ASSIGNED_BY));
-            VALUES.add(unsortedNameFor(AnnotationFields.EVIDENCE_CODE));
-            VALUES.add(unsortedNameFor(AnnotationFields.DB_SUBSET));
-            VALUES.add(unsortedNameFor(AnnotationFields.GO_EVIDENCE));
-            VALUES.add(unsortedNameFor(AnnotationFields.GO_ID));
-            VALUES.add(unsortedNameFor(AnnotationFields.GENE_PRODUCT_ID));
-            VALUES.add(unsortedNameFor(AnnotationFields.GENE_PRODUCT_TYPE));
-            VALUES.add(unsortedNameFor(AnnotationFields.QUALIFIER));
-            VALUES.add(unsortedNameFor(AnnotationFields.TAXON_ID));
-            VALUES.add(unsortedNameFor(AnnotationFields.TARGET_SET));
-        }
+        public static final String TAXON_ID = storeAndGet(VALUES, AnnotationFields.TAXON_ID);
+        public static final String WITH_FROM_SEARCH = storeAndGet(VALUES, AnnotationFields.WITH_FROM_SEARCH);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);

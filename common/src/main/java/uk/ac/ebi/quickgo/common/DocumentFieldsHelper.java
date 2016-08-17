@@ -4,27 +4,12 @@ import com.google.common.base.Preconditions;
 import java.util.Set;
 
 /**
- * This class contains methods that aid the representation of documents, and
- * constructing field names according to (internal) naming conventions.
+ * This class contains methods that aid the representation of documents and their fields.
  *
  * Created 17/08/16
  * @author Edd
  */
 public final class DocumentFieldsHelper {
-    private static final String UNSORTED_FIELD_SUFFIX = "_unsorted";
-
-    /**
-     * Create the unsorted field name used in an underlying repository.
-     *
-     * @param field the field, for which we want the corresponding unsorted field name
-     * @return the corresponding unsorted field name for {@code field}
-     */
-    public static String unsortedNameFor(String field) {
-        Preconditions.checkArgument(field != null && !field.isEmpty(), "Supplied Field cannot be null or empty");
-
-        return field + UNSORTED_FIELD_SUFFIX;
-    }
-
     /**
      * Add a specified {@link String} value to a set, and return that value.
      *
