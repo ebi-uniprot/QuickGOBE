@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -32,9 +31,8 @@ public class ECOController extends OBOController<ECOTerm> {
     @Autowired
     public ECOController(OntologyService<ECOTerm> ecoOntologyService,
             SearchService<OBOTerm> ontologySearchService,
-            SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
-        super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig);
+        super(ecoOntologyService, ontologySearchService, ontologyRetrievalConfig);
     }
 
     @Override
