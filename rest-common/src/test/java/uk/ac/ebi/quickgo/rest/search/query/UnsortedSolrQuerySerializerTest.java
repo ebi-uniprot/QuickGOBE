@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.unsortedNameFor;
 import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
@@ -187,9 +188,7 @@ public class UnsortedSolrQuerySerializerTest {
             System.out.println(queryString);
 
             assertThat(queryString, is(
-                    String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT,
-                            query.field(),
-                            query.value())
+                    buildTermsQuery(query.field(), query.value())
             ));
         }
 
@@ -204,9 +203,7 @@ public class UnsortedSolrQuerySerializerTest {
             System.out.println(queryString);
 
             assertThat(queryString, is(
-                    String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT,
-                            query1.field(),
-                            query1.value() + "," + query2.value())
+                    buildTermsQuery(query1.field(), query1.value(), query2.value())
             ));
         }
 
@@ -222,9 +219,7 @@ public class UnsortedSolrQuerySerializerTest {
             System.out.println(queryString);
 
             assertThat(queryString, is(
-                    String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT,
-                            query1.field(),
-                            query1.value() + "," + query2.value() + "," + query3.value())
+                    buildTermsQuery(query1.field(), query1.value(), query2.value(), query3.value())
             ));
         }
 
@@ -323,7 +318,7 @@ public class UnsortedSolrQuerySerializerTest {
             for (String value : values) {
                 stringJoiner.add(value);
             }
-            return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
+            return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, unsortedNameFor(field), stringJoiner.toString());
         }
     }
 }

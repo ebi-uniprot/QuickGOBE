@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.storeAndGet;
+import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.unsortedNameFor;
+
 /**
  * The fields of an annotation document.
  *
@@ -29,20 +32,8 @@ public class AnnotationFields {
     public static final String TARGET_SET = "targetSet";
     public static final String TAXON_ID = "taxonId";
     public final static String WITH_FROM = "withFrom";
-
     public final static String REFERENCE_SEARCH = "referenceSearch";
     public final static String WITH_FROM_SEARCH = "withFromSearch";
-
-    public final static String ASSIGNED_BY_UNSORTED = "assignedBy_unsorted";
-    public final static String ECO_ID_UNSORTED = "ecoId_unsorted";
-    public static final String DB_SUBSET_UNSORTED = "dbSubset_unsorted";
-    public final static String GO_EVIDENCE_UNSORTED = "goEvidence_unsorted";
-    public final static String GO_ID_UNSORTED = "goId_unsorted";
-    public static final String GENE_PRODUCT_ID_UNSORTED = "geneProductId_unsorted";
-    public static final String GENE_PRODUCT_TYPE_UNSORTED = "geneProductType_unsorted";
-    public static final String QUALIFIER_UNSORTED = "qualifier_unsorted";
-    public static final String TAXON_ID_UNSORTED = "taxonId_unsorted";
-    public static final String TARGET_SET_UNSORTED = "targetSet_unsorted";
 
     /**
      * Annotation fields that are stored, and can therefore be retrieved.
@@ -78,18 +69,18 @@ public class AnnotationFields {
         public static final String DB_SUBSET = storeAndGet(VALUES, AnnotationFields.DB_SUBSET);
         public static final String TARGET_SET = storeAndGet(VALUES, AnnotationFields.TARGET_SET);
 
-        public final static String ASSIGNED_BY_UNSORTED = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY_UNSORTED);
-        public final static String ECO_ID_UNSORTED = storeAndGet(VALUES, AnnotationFields.ECO_ID_UNSORTED);
-        public final static String GO_EVIDENCE_UNSORTED = storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE_UNSORTED);
-        public final static String GO_ID_UNSORTED = storeAndGet(VALUES, AnnotationFields.GO_ID_UNSORTED);
-        public static final String DB_SUBSET_UNSORTED = storeAndGet(VALUES, AnnotationFields.DB_SUBSET_UNSORTED);
-        public static final String GENE_PRODUCT_ID_UNSORTED =
-                storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID_UNSORTED);
-        public static final String GENE_PRODUCT_TYPE_UNSORTED =
-                storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_TYPE_UNSORTED);
-        public static final String QUALIFIER_UNSORTED = storeAndGet(VALUES, AnnotationFields.QUALIFIER_UNSORTED);
-        public static final String TAXON_ID_UNSORTED = storeAndGet(VALUES, AnnotationFields.TAXON_ID_UNSORTED);
-        public static final String TARGET_SET_UNSORTED = storeAndGet(VALUES, AnnotationFields.TARGET_SET_UNSORTED);
+        static {
+            VALUES.add(unsortedNameFor(AnnotationFields.ASSIGNED_BY));
+            VALUES.add(unsortedNameFor(AnnotationFields.ECO_ID));
+            VALUES.add(unsortedNameFor(AnnotationFields.DB_SUBSET));
+            VALUES.add(unsortedNameFor(AnnotationFields.GO_EVIDENCE));
+            VALUES.add(unsortedNameFor(AnnotationFields.GO_ID));
+            VALUES.add(unsortedNameFor(AnnotationFields.GENE_PRODUCT_ID));
+            VALUES.add(unsortedNameFor(AnnotationFields.GENE_PRODUCT_TYPE));
+            VALUES.add(unsortedNameFor(AnnotationFields.QUALIFIER));
+            VALUES.add(unsortedNameFor(AnnotationFields.TAXON_ID));
+            VALUES.add(unsortedNameFor(AnnotationFields.TARGET_SET));
+        }
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);
@@ -98,10 +89,5 @@ public class AnnotationFields {
         public static Set<String> searchableFields() {
             return Collections.unmodifiableSet(VALUES);
         }
-    }
-
-    private static String storeAndGet(Set<String> values, String value) {
-        values.add(value);
-        return value;
     }
 }

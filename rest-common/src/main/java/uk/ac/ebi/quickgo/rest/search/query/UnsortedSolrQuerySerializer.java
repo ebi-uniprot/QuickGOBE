@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.unsortedNameFor;
 import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.TermQueryTransformationResult
         .failedTransformationResult;
 import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.TermQueryTransformationResult
@@ -65,7 +66,7 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         for (String value : values) {
             stringJoiner.add(value.toLowerCase());
         }
-        return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
+        return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, unsortedNameFor(field), stringJoiner.toString());
     }
 
     private boolean isTermsQueryCompatible(FieldQuery query) {
