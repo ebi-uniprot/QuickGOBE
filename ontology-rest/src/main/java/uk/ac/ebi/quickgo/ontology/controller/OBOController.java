@@ -7,36 +7,34 @@ import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationH
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRequest;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
-import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
-import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
-import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.*;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
 
 /**
@@ -48,7 +46,7 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAV
  */
 public abstract class OBOController<T extends OBOTerm> {
     static final String TERMS_RESOURCE = "terms";
-    static final String SEARCH_RESOUCE = "search";
+    static final String SEARCH_RESOURCE = "search";
 
     static final String COMPLETE_SUB_RESOURCE = "complete";
     static final String HISTORY_SUB_RESOURCE = "history";
@@ -64,31 +62,25 @@ public abstract class OBOController<T extends OBOTerm> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
 
-    private static final String COMMA = ",";
-    private static final String COLON = ":";
-    private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
-    private static final String DEFAULT_PAGE_NUMBER = "1";
+    public static final String DEFAULT_PAGE_NUMBER = "1";
 
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
-    private final StringToQuickGOQueryConverter ontologyQueryConverter;
-    private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
     private final OBOControllerValidationHelper validationHelper;
+
+    private final BasicSearchQueryTemplate queryTemplate;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
-            SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
-        Preconditions.checkArgument(ontologyService != null, "Ontology service cannot be null");
-        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
-        Preconditions.checkArgument(searchableField != null, "Ontology searchable field cannot be null");
-        Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
+        checkArgument(ontologyService != null, "Ontology service cannot be null");
+        checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
+        checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
-        this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
-        this.ontologyRetrievalConfig = ontologyRetrievalConfig;
         this.validationHelper = new OBOControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
+        this.queryTemplate = new BasicSearchQueryTemplate(ontologyRetrievalConfig.getSearchReturnedFields());
     }
 
     /**
@@ -136,8 +128,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
-        return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds
-                (ids)));
+        return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -263,28 +254,28 @@ public abstract class OBOController<T extends OBOTerm> {
     /**
      * Search for an ontology term via its identifier, or a generic query search
      *
-     * @param query the query to search against
-     * @param limit the amount of queries to return
+     * @param request a container for all the possible input parameters a client can submit to the endpoint
      * @return a {@link QueryResult} instance containing the results of the search
      */
     @ApiOperation(value = "Searches a simple user query, e.g., query=apopto",
             notes = "If possible, response fields include: id, name, definition, isObsolete")
-    @RequestMapping(value = "/" + SEARCH_RESOUCE, method = {RequestMethod.GET},
+    @RequestMapping(value = "/" + SEARCH_RESOURCE, method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(
-            @RequestParam(value = "query") String query,
-            @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
-            @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
+    public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(@Valid OntologyRequest request,
+            BindingResult bindingResult) {
 
-        validationHelper.validateRequestedResults(limit);
+        if (bindingResult.hasErrors()) {
+            throw new ParameterBindingException(bindingResult);
+        }
 
-        QueryRequest request = buildRequest(
-                query,
-                limit,
-                page,
-                ontologyQueryConverter);
+        QueryRequest queryRequest = queryTemplate.newBuilder()
+                .setQuery(request.createQuery())
+                .setFilters(Collections.singleton(ontologyTypeFilterQuery()))
+                .setPage(request.getPage())
+                .setPageSize(request.getLimit())
+                .build();
 
-        return SearchDispatcher.search(request, ontologySearchService);
+        return SearchDispatcher.search(queryRequest, ontologySearchService);
     }
 
     /**
@@ -397,37 +388,13 @@ public abstract class OBOController<T extends OBOTerm> {
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 
-    private QueryRequest buildRequest(String query,
-            int limit,
-            int page,
-            StringToQuickGOQueryConverter converter) {
-
-        QuickGOQuery userQuery = converter.convert(query);
-        QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
-
-        QueryRequest.Builder builder = new QueryRequest
-                .Builder(restrictedUserQuery)
-                .setPageParameters(page, limit);
-
-        if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
-            ontologyRetrievalConfig.getSearchReturnedFields()
-                    .forEach(builder::addProjectedField);
-        }
-
-        return builder.build();
-    }
-
     /**
-     * Given a {@link QuickGOQuery}, create a composite {@link QuickGOQuery} by
-     * performing a conjunction with another query, which restricts all results
+     * Create a {@link QuickGOQuery} that restricts all results
      * to be of a type corresponding to that provided by {@link #getOntologyType()}.
      *
-     * @param query the query that is constrained
-     * @return the new constrained query
+     * @return a query that filters the result bu the ontology type
      */
-    private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
-        return query.and(
-                ontologyQueryConverter.convert(
-                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + getOntologyType().name()));
+    private QuickGOQuery ontologyTypeFilterQuery() {
+        return QuickGOQuery.createQuery(OntologyFields.Searchable.ONTOLOGY_TYPE, getOntologyType().name());
     }
 }

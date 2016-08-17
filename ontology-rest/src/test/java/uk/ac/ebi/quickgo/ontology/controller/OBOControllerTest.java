@@ -45,7 +45,7 @@ public class OBOControllerTest {
 
     @Before
     public void setUp() {
-        this.controller = createOBOController(ontologyService, searchService, searchableField, retrievalConfig);
+        this.controller = createOBOController(ontologyService, searchService, retrievalConfig);
     }
 
     @Test
@@ -73,29 +73,23 @@ public class OBOControllerTest {
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullOntologyService() {
         createOBOController(
-                null, searchService, searchableField, retrievalConfig);
+                null, searchService, retrievalConfig);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullSearchService() {
-        createOBOController(ontologyService, null, searchableField, retrievalConfig);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullSearchableField() {
-        createOBOController(ontologyService, searchService, null, retrievalConfig);
+        createOBOController(ontologyService, null, retrievalConfig);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullRetrievalConfig() {
-        createOBOController(ontologyService, searchService, searchableField, null);
+        createOBOController(ontologyService, searchService, null);
     }
 
     private static OBOController<FakeOBOTerm> createOBOController(
             final OntologyService<FakeOBOTerm> ontologyService, final SearchService<OBOTerm> searchService,
-            final SearchableField searchableField,
             final SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig) {
-        return new OBOController<FakeOBOTerm>(ontologyService, searchService, searchableField, retrievalConfig) {
+        return new OBOController<FakeOBOTerm>(ontologyService, searchService, retrievalConfig) {
             @Override protected Predicate<String> idValidator() {
                 return id -> ID_FORMAT.matcher(id).matches();
             }
@@ -107,5 +101,4 @@ public class OBOControllerTest {
     }
 
     private static class FakeOBOTerm extends OBOTerm {}
-
 }

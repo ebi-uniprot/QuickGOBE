@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.ontology.controller;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -335,17 +334,6 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(
                 get(buildSearchURL())
                         .param(QUERY_PARAM, idMissingInRepository()));
-
-        expectResultsInfoExists(response)
-                .andExpect(jsonPath("$.numberOfHits").value(0))
-                .andExpect(jsonPath("$.results").isArray());
-    }
-
-    @Test
-    public void searchesForFieldThatDoesNotExistAndReceivesZeroValidResults() throws Exception {
-        ResultActions response = mockMvc.perform(
-                get(buildSearchURL())
-                        .param(QUERY_PARAM, "fieldDoesNotExist:sandwiches"));
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.numberOfHits").value(0))
@@ -713,7 +701,7 @@ public abstract class OBOControllerIT {
     }
 
     protected String buildSearchURL() {
-        return resourceUrl + "/" + SEARCH_RESOUCE;
+        return resourceUrl + "/" + SEARCH_RESOURCE;
     }
 
     protected String buildPathsURL(String terms1, String terms2) {

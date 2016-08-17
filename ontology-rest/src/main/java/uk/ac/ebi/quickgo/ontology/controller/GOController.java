@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
@@ -32,9 +31,8 @@ public class GOController extends OBOController<GOTerm> {
     @Autowired
     public GOController(OntologyService<GOTerm> goOntologyService,
             SearchService<OBOTerm> ontologySearchService,
-            SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
-        super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig);
+        super(goOntologyService, ontologySearchService, ontologyRetrievalConfig);
     }
 
     @Override
