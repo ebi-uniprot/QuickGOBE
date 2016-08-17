@@ -18,7 +18,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.*;
+import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
@@ -36,7 +36,7 @@ public class AnnotationRequestValidationIT {
     private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
     private static final String[] INVALID_GENE_PRODUCT_ID = {"99999", "&12345"};
-    private static final String[] VALID_GENE_PRODUCT_SUBSET ={"BHF-UCL", "Exosome", "KRUK", "ParkinsonsUK-UCL",
+    private static final String[] VALID_GENE_PRODUCT_SUBSET = {"BHF-UCL", "Exosome", "KRUK", "ParkinsonsUK-UCL",
             "ReferenceGenome"};
 
     @Autowired
@@ -395,12 +395,11 @@ public class AnnotationRequestValidationIT {
     }
 
     //GENE PRODUCT SUBSET PARAMETER
-
     @Test
     public void setGpSubsetSuccessfully() {
         String geneProductSubsetValues = toCSV(VALID_GENE_PRODUCT_SUBSET);
         annotationRequest.setGpSubset(geneProductSubsetValues);
-        assertThat(validator.validate(annotationRequest),hasSize(0));
+        assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
@@ -418,7 +417,6 @@ public class AnnotationRequestValidationIT {
                 }
         );
     }
-
 
     //PAGE PARAMETER
     @Test

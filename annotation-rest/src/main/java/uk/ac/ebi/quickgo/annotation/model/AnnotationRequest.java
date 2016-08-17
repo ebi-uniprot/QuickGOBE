@@ -256,20 +256,19 @@ public class AnnotationRequest {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
 
-    public void setGpSubset(String gpSubset) {
     /**
      * Filter by Target Sets e.g. BHF-UCK, KRUK, Parkinsons etc
      * @return
      */
-    public void setTargetSet(String targetSet){
+    public void setTargetSet(String targetSet) {
         filterMap.put(TARGET_SET, targetSet);
     }
 
-    public String getTargetSet(){
+    public String getTargetSet() {
         return filterMap.get(TARGET_SET);
     }
 
-    public void setGpSubset(String gpSubset){
+    public void setGpSubset(String gpSubset) {
         filterMap.put(DB_SUBSET, gpSubset);
     }
 
