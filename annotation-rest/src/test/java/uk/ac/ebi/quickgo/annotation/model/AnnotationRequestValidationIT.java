@@ -313,15 +313,15 @@ public class AnnotationRequestValidationIT {
         );
     }
 
-    //ECO PARAMETER
+    //EVIDENCE CODE PARAMETER
 
     @Test
-    public void ecoIdIsValid() {
+    public void evidenceCodeIsValid() {
         String[] ecoIds = {"ECO:0000256", "ECO:0000888", "ECO:0000777"};
 
         Arrays.stream(ecoIds).forEach(
                 validIds -> {
-                    annotationRequest.setEcoId(validIds);
+                    annotationRequest.setEvidenceCode(validIds);
 
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     printConstraintViolations(violations);
@@ -332,12 +332,12 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void mixedCaseEcoIdIsValid() {
+    public void mixedCaseEvidenceCodeIsValid() {
         String[] ecoIds = {"ECO:0000256", "EcO:0000256", "eCO:0000256"};
 
         Arrays.stream(ecoIds).forEach(
                 mixedCaseId -> {
-                    annotationRequest.setEcoId(mixedCaseId);
+                    annotationRequest.setEvidenceCode(mixedCaseId);
 
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     printConstraintViolations(violations);
@@ -348,17 +348,17 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void ecoIdIsInvalid() {
+    public void evidenceCodeIsInvalid() {
         String[] ecoIds = {"ECO:9", "xxx:0000888", "-"};
 
         Arrays.stream(ecoIds).forEach(
                 validId -> {
-                    annotationRequest.setEcoId(validId);
+                    annotationRequest.setEvidenceCode(validId);
 
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     printConstraintViolations(violations);
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one 'ECO identifier' value is invalid: " + validId));
+                            is("At least one 'Evidence code identifier' value is invalid: " + validId));
                     assertThat(violations, hasSize(1));
                 }
         );

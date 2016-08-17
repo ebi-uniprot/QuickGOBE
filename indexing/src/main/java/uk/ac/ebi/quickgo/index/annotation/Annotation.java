@@ -14,7 +14,7 @@ public class Annotation {
     String qualifier;
     String goId;
     String dbReferences;
-    String ecoId;
+    String evidenceCode;
     String with;
     String interactingTaxonId;
     String assignedBy;
@@ -28,7 +28,7 @@ public class Annotation {
                 ", qualifier='" + qualifier + '\'' +
                 ", goId='" + goId + '\'' +
                 ", dbReferences='" + dbReferences + '\'' +
-                ", ecoId='" + ecoId + '\'' +
+                ", evidenceCode='" + evidenceCode + '\'' +
                 ", with='" + with + '\'' +
                 ", interactingTaxonId='" + interactingTaxonId + '\'' +
                 ", assignedBy='" + assignedBy + '\'' +
@@ -62,7 +62,7 @@ public class Annotation {
         if (dbReferences != null ? !dbReferences.equals(that.dbReferences) : that.dbReferences != null) {
             return false;
         }
-        if (ecoId != null ? !ecoId.equals(that.ecoId) : that.ecoId != null) {
+        if (evidenceCode != null ? !evidenceCode.equals(that.evidenceCode) : that.evidenceCode != null) {
             return false;
         }
         if (with != null ? !with.equals(that.with) : that.with != null) {
@@ -90,7 +90,7 @@ public class Annotation {
         result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
         result = 31 * result + (goId != null ? goId.hashCode() : 0);
         result = 31 * result + (dbReferences != null ? dbReferences.hashCode() : 0);
-        result = 31 * result + (ecoId != null ? ecoId.hashCode() : 0);
+        result = 31 * result + (evidenceCode != null ? evidenceCode.hashCode() : 0);
         result = 31 * result + (with != null ? with.hashCode() : 0);
         result = 31 * result + (interactingTaxonId != null ? interactingTaxonId.hashCode() : 0);
         result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);

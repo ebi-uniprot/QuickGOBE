@@ -69,7 +69,7 @@ public class AnnotationDocConverterImplTest {
     @Test
     public void convertECOIdSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.ecoId, is(ECO_ID));
+        assertThat(model.evidenceCode, is(ECO_ID));
     }
 
     @Test
@@ -122,7 +122,7 @@ public class AnnotationDocConverterImplTest {
         doc.qualifier = QUALIFIER;
         doc.goId = GO_ID;
         doc.taxonId = TAXON_ID;
-        doc.ecoId = ECO_ID;
+        doc.evidenceCode = ECO_ID;
         doc.withFrom = WITH_FROM;
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;

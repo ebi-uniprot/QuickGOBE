@@ -40,8 +40,8 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.GO_EVIDENCE)
     public String goEvidence;
 
-    @Field(AnnotationFields.ECO_ID)
-    public String ecoId;
+    @Field(AnnotationFields.EVIDENCE_CODE)
+    public String evidenceCode;
 
     @Field(AnnotationFields.REFERENCE)
     public String reference;

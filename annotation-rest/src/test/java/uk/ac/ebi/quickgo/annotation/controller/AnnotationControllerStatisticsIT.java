@@ -33,7 +33,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.GO_ID_FIELD;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
@@ -241,6 +240,61 @@ public class AnnotationControllerStatisticsIT {
 
         assertStatsResponse(response, type, 2, relevantReferenceIds);
     }
+
+    //----------- Evidence code -----------//
+    @Test
+    public void statsForAllDocsContaining1EvidenceCodeReturns1EvidenceCodeStat() throws Exception {
+        Set<String> savedEcoEvidenceCodes = selectValuesFromDocs(savedDocs, doc -> doc.evidenceCode);
+
+        String type = AnnotationFields.EVIDENCE_CODE;
+
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        assertStatsResponse(response, type, NUMBER_OF_GENERIC_DOCS, savedEcoEvidenceCodes);
+    }
+
+    @Test
+    public void statsForAllDocsContaining2evidenceCodesReturns2EvidenceCodeStats() throws Exception {
+        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc.evidenceCode = "ECO:0000888";
+        repository.save(extraDoc);
+
+        Set<String> savedEvidenceCodes = selectValuesFromDocs(savedDocs, doc -> doc.evidenceCode);
+        savedEvidenceCodes.add(extraDoc.evidenceCode);
+
+        String type = AnnotationFields.EVIDENCE_CODE;
+
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        assertStatsResponse(response, type, NUMBER_OF_GENERIC_DOCS + 1, savedEvidenceCodes);
+    }
+
+    @Test
+    public void statsForFilteredDocsContaining2EvidenceCodesReturns2EvidenceCodesStats() throws Exception {
+        String filteringGoId = "GO:9999999";
+
+        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc1.goId = filteringGoId;
+        extraDoc1.evidenceCode = "ECO:0000888";
+        repository.save(extraDoc1);
+
+        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        extraDoc2.goId = filteringGoId;
+        extraDoc2.evidenceCode = "ECO:0000777";
+        repository.save(extraDoc2);
+
+        List<String> relevantEvidenceCodes = asList(extraDoc1.evidenceCode, extraDoc2.evidenceCode);
+
+        String type = AnnotationFields.EVIDENCE_CODE;
+
+        ResultActions response = mockMvc.perform(
+                get(STATS_ENDPOINT)
+                        .param(GO_ID_PARAM, filteringGoId)
+        );
+
+        assertStatsResponse(response, type, 2, relevantEvidenceCodes);
+    }
+
 
     private void assertStatsResponse(ResultActions response, String statsType, int totalHits,
             Collection<String> statsValues) throws Exception {

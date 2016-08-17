@@ -71,7 +71,7 @@ final class ResponseVerifier {
                 .addMatcher(jsonPath(path + "qualifier").exists())
                 .addMatcher(jsonPath(path + "goId").exists())
                 .addMatcher(jsonPath(path + "goEvidence").exists())
-                .addMatcher(jsonPath(path + "ecoId").exists())
+                .addMatcher(jsonPath(path + "evidenceCode").exists())
                 .addMatcher(jsonPath(path + "reference").exists())
                 .addMatcher(jsonPath(path + "withFrom").exists())
                 .addMatcher(jsonPath(path + "taxonId").exists())

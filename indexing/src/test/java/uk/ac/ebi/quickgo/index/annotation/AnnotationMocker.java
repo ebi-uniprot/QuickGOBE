@@ -17,7 +17,7 @@ class AnnotationMocker {
         annotation.qualifier = "enables";
         annotation.goId = "GO:0000977";
         annotation.interactingTaxonId = "taxon:12345";
-        annotation.ecoId = "ECO:0000353";
+        annotation.evidenceCode = "ECO:0000353";
         annotation.with = "GO:0036376,GO:1990573";
         annotation.assignedBy = "IntAct";
         annotation.annotationExtension = "occurs_in(CL:1000428)";
