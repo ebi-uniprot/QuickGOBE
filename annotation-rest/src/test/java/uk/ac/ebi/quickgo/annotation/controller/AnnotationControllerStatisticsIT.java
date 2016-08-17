@@ -4,10 +4,10 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -28,12 +28,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.GO_ID_FIELD;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
@@ -84,13 +82,7 @@ public class AnnotationControllerStatisticsIT {
     //----------- Ontology ID -----------//
     @Test
     public void statsForAllDocsContaining1OntologyIdReturns1OntologyIdStat() throws Exception {
-        Set<String> savedGOIds = selectValuesFromDocs(savedDocs, doc -> doc.goId);
-
-        String type = AnnotationFields.GO_ID;
-
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
-
-        assertStatsResponse(response, type, NUMBER_OF_GENERIC_DOCS, savedGOIds);
+        executesAndAssertsCalculatedStatsForAttribute(GO_ID, savedDocs, doc -> doc.goId);
     }
 
     @Test
@@ -100,14 +92,10 @@ public class AnnotationControllerStatisticsIT {
         extraDoc.goId = "GO:0016020";
         repository.save(extraDoc);
 
-        Set<String> savedGOIds = selectValuesFromDocs(savedDocs, doc -> doc.goId);
-        savedGOIds.add(extraDoc.goId);
+        List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
+        savedDocsPlusOne.add(extraDoc);
 
-        String type = AnnotationFields.GO_ID;
-
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
-
-        assertStatsResponse(response, type, NUMBER_OF_GENERIC_DOCS + 1, savedGOIds);
+        executesAndAssertsCalculatedStatsForAttribute(GO_ID, savedDocsPlusOne, doc -> doc.goId);
     }
 
     @Test
@@ -124,7 +112,7 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantGOIds = asList(extraDoc1.goId, extraDoc2.goId);
 
-        String type = AnnotationFields.GO_ID;
+        String type = GO_ID;
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
@@ -137,13 +125,8 @@ public class AnnotationControllerStatisticsIT {
     //----------- Taxon ID -----------//
     @Test
     public void statsForAllDocsContaining1TaxonIdReturns1TaxonIdStat() throws Exception {
-        Set<String> savedTaxonIds = selectValuesFromDocs(savedDocs, doc -> String.valueOf(doc.taxonId));
-
-        String type = AnnotationFields.TAXON_ID;
-
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
-
-        assertStatsResponse(response, type, NUMBER_OF_GENERIC_DOCS, savedTaxonIds);
+        executesAndAssertsCalculatedStatsForAttribute(TAXON_ID, savedDocs,
+                doc -> String.valueOf(doc.taxonId));
     }
 
     @Test
@@ -152,14 +135,10 @@ public class AnnotationControllerStatisticsIT {
         extraDoc.taxonId = 7890;
         repository.save(extraDoc);
 
-        Set<String> savedTaxonIds = selectValuesFromDocs(savedDocs, doc -> String.valueOf(doc.taxonId));
-        savedTaxonIds.add(String.valueOf(extraDoc.taxonId));
+        List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
+        savedDocsPlusOne.add(extraDoc);
 
-        String type = AnnotationFields.TAXON_ID;
-
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
-
-        assertStatsResponse(response, type, NUMBER_OF_GENERIC_DOCS + 1, savedTaxonIds);
+        executesAndAssertsCalculatedStatsForAttribute(TAXON_ID, savedDocsPlusOne, doc -> String.valueOf(doc.taxonId));
     }
 
     @Test
@@ -178,7 +157,7 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantTaxonIds = asList(String.valueOf(extraDoc1.taxonId), String.valueOf(extraDoc2.taxonId));
 
-        String type = AnnotationFields.TAXON_ID;
+        String type = TAXON_ID;
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
@@ -191,13 +170,7 @@ public class AnnotationControllerStatisticsIT {
     //----------- Reference -----------//
     @Test
     public void statsForAllDocsContaining1ReferenceIdReturns1ReferenceIdStat() throws Exception {
-        Set<String> savedReferences = selectValuesFromDocs(savedDocs, doc -> doc.reference);
-
-        String type = AnnotationFields.REFERENCE;
-
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
-
-        assertStatsResponse(response, type, NUMBER_OF_GENERIC_DOCS, savedReferences);
+        executesAndAssertsCalculatedStatsForAttribute(REFERENCE, savedDocs, doc -> doc.reference);
     }
 
     @Test
@@ -206,14 +179,10 @@ public class AnnotationControllerStatisticsIT {
         extraDoc.reference = "PMID:19864465";
         repository.save(extraDoc);
 
-        Set<String> savedReferences = selectValuesFromDocs(savedDocs, doc -> doc.reference);
-        savedReferences.add(extraDoc.reference);
+        List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
+        savedDocsPlusOne.add(extraDoc);
 
-        String type = AnnotationFields.REFERENCE;
-
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
-
-        assertStatsResponse(response, type, NUMBER_OF_GENERIC_DOCS + 1, savedReferences);
+        executesAndAssertsCalculatedStatsForAttribute(REFERENCE, savedDocsPlusOne, doc -> doc.reference);
     }
 
     @Test
@@ -232,7 +201,7 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantReferenceIds = asList(extraDoc1.reference, extraDoc2.reference);
 
-        String type = AnnotationFields.REFERENCE;
+        String type = REFERENCE;
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
@@ -241,6 +210,114 @@ public class AnnotationControllerStatisticsIT {
 
         assertStatsResponse(response, type, 2, relevantReferenceIds);
     }
+
+    //----------- Evidence code -----------//
+    @Test
+    public void statsForAllDocsContaining1EvidenceCodeReturns1EvidenceCodeStat() throws Exception {
+        executesAndAssertsCalculatedStatsForAttribute(EVIDENCE_CODE, savedDocs, doc -> doc.evidenceCode);
+    }
+
+    @Test
+    public void statsForAllDocsContaining2evidenceCodesReturns2EvidenceCodeStats() throws Exception {
+        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc.evidenceCode = "ECO:0000888";
+        repository.save(extraDoc);
+
+        List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
+        savedDocsPlusOne.add(extraDoc);
+
+        executesAndAssertsCalculatedStatsForAttribute(EVIDENCE_CODE, savedDocsPlusOne, doc -> doc.evidenceCode);
+    }
+
+    @Test
+    public void statsForFilteredDocsContaining2EvidenceCodesReturns2EvidenceCodesStats() throws Exception {
+        String filteringGoId = "GO:9999999";
+
+        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc1.goId = filteringGoId;
+        extraDoc1.evidenceCode = "ECO:0000888";
+        repository.save(extraDoc1);
+
+        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        extraDoc2.goId = filteringGoId;
+        extraDoc2.evidenceCode = "ECO:0000777";
+        repository.save(extraDoc2);
+
+        List<String> relevantEvidenceCodes = asList(extraDoc1.evidenceCode, extraDoc2.evidenceCode);
+
+        String type = EVIDENCE_CODE;
+
+        ResultActions response = mockMvc.perform(
+                get(STATS_ENDPOINT)
+                        .param(GO_ID_PARAM, filteringGoId)
+        );
+
+        assertStatsResponse(response, type, 2, relevantEvidenceCodes);
+    }
+
+    //----------- Assigned by -----------//
+    @Test
+    public void statsForAllDocsContaining1AssignedByReturns1AssignedByStat() throws Exception {
+        executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY, savedDocs, doc -> doc.assignedBy);
+    }
+
+    @Test
+    public void statsForAllDocsContaining2AssignedByReturns2AssignedByStats() throws Exception {
+        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc.assignedBy = "Agbase";
+        repository.save(extraDoc);
+
+        List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
+        savedDocsPlusOne.add(extraDoc);
+
+        executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY, savedDocsPlusOne, doc -> doc.assignedBy);
+    }
+
+    @Test
+    public void statsForFilteredDocsContaining2AssignedByReturns2AssignedByStats() throws Exception {
+        String filteringGoId = "GO:9999999";
+
+        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc1.goId = filteringGoId;
+        extraDoc1.assignedBy = "Agbase";
+        repository.save(extraDoc1);
+
+        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        extraDoc2.goId = filteringGoId;
+        extraDoc2.assignedBy = "Roslin_Institute";
+        repository.save(extraDoc2);
+
+        List<String> relevantAssignedBy = asList(extraDoc1.assignedBy, extraDoc2.assignedBy);
+
+        String type = ASSIGNED_BY;
+
+        ResultActions response = mockMvc.perform(
+                get(STATS_ENDPOINT)
+                        .param(GO_ID_PARAM, filteringGoId)
+        );
+
+        assertStatsResponse(response, type, 2, relevantAssignedBy);
+    }
+
+    /**
+     * Extracts all values of a given attribute, within all saved document, and then checks to see if the statistics run
+     * on that attribute are correct.
+     *
+     * @param attribute the attribute to run statistics on
+     * @param docs a collection of docs that the stats will be run on
+     * @param extractAttributeValuesFromDoc a function to extract the values of {@code statsType} from the saved
+     * documents
+     * @throws Exception if an error occurs whilst saving or retrieving documents
+     */
+    private void executesAndAssertsCalculatedStatsForAttribute(String attribute, Collection<AnnotationDocument> docs,
+            Function<AnnotationDocument, String> extractAttributeValuesFromDoc) throws Exception {
+        Set<String> extractedAttributeValues = selectValuesFromDocs(docs, extractAttributeValuesFromDoc);
+
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues);
+    }
+
 
     private void assertStatsResponse(ResultActions response, String statsType, int totalHits,
             Collection<String> statsValues) throws Exception {

@@ -36,7 +36,7 @@ public class AnnotationValidator implements Validator<Annotation> {
         checkQualifier(annotation);
         checkIsNullOrEmpty(annotation.goId, COLUMN_GO_ID.getName());
         checkIsNullOrEmpty(annotation.dbReferences, COLUMN_DB_REFERENCES.getName());
-        checkIsNullOrEmpty(annotation.ecoId, COLUMN_ECO.getName());
+        checkIsNullOrEmpty(annotation.evidenceCode, COLUMN_EVIDENCE_CODE.getName());
         checkIsNullOrEmpty(annotation.assignedBy, COLUMN_ASSIGNED_BY.getName());
 
         // optional fields

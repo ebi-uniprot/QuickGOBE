@@ -1,13 +1,12 @@
 package uk.ac.ebi.quickgo.ontology.common.document;
 
-import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatFieldFromDepth;
+import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -17,8 +16,6 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
  * @author Edd
  */
 public final class OntologyDocMocker {
-    public static final int FLAT_FIELD_DEPTH = 0;
-
     private OntologyDocMocker() {}
 
     public static OntologyDocument createGODoc(String id, String name) {
@@ -30,7 +27,7 @@ public final class OntologyDocMocker {
         // example blacklist
         // format: goId|category|entityType|entityId|taxonId|ancestorGoId|reason|methodId
         od.blacklist = new ArrayList<>();
-        od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.blacklist.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0000001"))
                 .addField(newFlatFieldLeaf("NOT-qualified manual"))
                 .addField(newFlatFieldLeaf("protein"))
@@ -41,7 +38,7 @@ public final class OntologyDocMocker {
                 .addField(newFlatFieldLeaf("1 NOT-qualified manual etc"))
                 .addField(newFlatFieldLeaf("IER12345"))
                 .buildString());
-        od.blacklist.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.blacklist.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0000001"))
                 .addField(newFlatFieldLeaf("IS-qualified manual"))
                 .addField(newFlatFieldLeaf("protein"))
@@ -54,11 +51,11 @@ public final class OntologyDocMocker {
                 .buildString());
 
         od.goDiscussions = new ArrayList<>();
-        od.goDiscussions.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.goDiscussions.add(newFlatField()
                 .addField(newFlatFieldLeaf("Viral Processes"))
                 .addField(newFlatFieldLeaf("http://wiki.geneontology.org/index.php/Virus_terms"))
                 .buildString());
-        od.goDiscussions.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.goDiscussions.add(newFlatField()
                 .addField(newFlatFieldLeaf("signalling"))
                 .addField(newFlatFieldLeaf("http://wiki.geneontology.org/index.php/Signaling"))
                 .buildString());
@@ -80,7 +77,7 @@ public final class OntologyDocMocker {
         od.definition = "The chemical reactions and pathways involving creatine (N-(aminoiminomethyl)" +
                 "-N-methylglycine), a compound synthesized from the amino acids arginine, glycine, and methionine " +
                 "that occurs in muscle.";
-        od.definitionXrefs = Collections.singletonList(FlatFieldBuilder.newFlatField()
+        od.definitionXrefs = Collections.singletonList(newFlatField()
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("PMID"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("21494263"))
                 .buildString());
@@ -98,13 +95,13 @@ public final class OntologyDocMocker {
         // example synonyms
         od.synonyms = new ArrayList<>();
         od.synonyms.add(
-                newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                newFlatField()
                         .addField(newFlatFieldLeaf("creatine anabolism"))
                         .addField(newFlatFieldLeaf("exact"))
                         .buildString()
         );
         od.synonyms.add(
-                newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                newFlatField()
                         .addField(newFlatFieldLeaf("crayola testarossa"))
                         .addField(newFlatFieldLeaf("inprecise"))
                         .buildString()
@@ -113,7 +110,7 @@ public final class OntologyDocMocker {
         // example history
         od.history = new ArrayList<>();
         od.history.add(
-                newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                newFlatField()
                         .addField(newFlatFieldLeaf("Gonna do something like it's ... "))
                         .addField(newFlatFieldLeaf("11:59, 31 Dec, 1999"))
                         .addField(newFlatFieldLeaf("PARTY!"))
@@ -122,7 +119,7 @@ public final class OntologyDocMocker {
                         .buildString()
         );
         od.history.add(
-                newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+                newFlatField()
                         .addField(newFlatFieldLeaf("History name"))
                         .addField(newFlatFieldLeaf("Tuesday next week"))
                         .addField(newFlatFieldLeaf("PARTY!"))
@@ -133,12 +130,12 @@ public final class OntologyDocMocker {
 
         // example xrefs
         od.xrefs = new ArrayList<>();
-        od.xrefs.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.xrefs.add(newFlatField()
                 .addField(newFlatFieldLeaf("InterPro"))
                 .addField(newFlatFieldLeaf("IPR031034"))
                 .addField(newFlatFieldLeaf("Creatinine amidohydrolase"))
                 .buildString());
-        od.xrefs.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.xrefs.add(newFlatField()
                 .addField(newFlatFieldLeaf("AnotherXref"))
                 .addField(newFlatFieldLeaf("IPR031035"))
                 .addField(newFlatFieldLeaf("Pickled Onions"))
@@ -147,25 +144,25 @@ public final class OntologyDocMocker {
         // example taxonomy constraints
         // format: ancestorId|ancestorName|relationship|taxId|taxIdType|taxName|pubMedId1&pubMedId2|blacklist
         od.taxonConstraints = new ArrayList<>();
-        od.taxonConstraints.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.taxonConstraints.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0005623"))
                 .addField(newFlatFieldLeaf("cell"))
                 .addField(newFlatFieldLeaf("only_in_taxon"))
                 .addField(newFlatFieldLeaf("131567"))
                 .addField(newFlatFieldLeaf("NCBITaxon"))
                 .addField(newFlatFieldLeaf("cellular organisms"))
-                .addField(newFlatFieldFromDepth(3)
+                .addField(newFlatField()
                         .addField(newFlatFieldLeaf("PMID:00000001"))
                         .addField(newFlatFieldLeaf("PMID:00000002")))
                 .buildString());
-        od.taxonConstraints.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.taxonConstraints.add(newFlatField()
                 .addField(newFlatFieldLeaf("GO:0005624"))
                 .addField(newFlatFieldLeaf("cell"))
                 .addField(newFlatFieldLeaf("only_in_taxon"))
                 .addField(newFlatFieldLeaf("131568"))
                 .addField(newFlatFieldLeaf("NCBITaxon"))
                 .addField(newFlatFieldLeaf("cellular organisms"))
-                .addField(newFlatFieldFromDepth(3)
+                .addField(newFlatField()
                         .addField(newFlatFieldLeaf("PMID:00000003"))
                         .addField(newFlatFieldLeaf("PMID:00000004")))
                 .buildString());
@@ -173,14 +170,14 @@ public final class OntologyDocMocker {
         // example xontology relations
         // format: xId|xTerm|xNamespace|xUrl|xRelation
         od.xRelations = new ArrayList<>();
-        od.xRelations.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.xRelations.add(newFlatField()
                 .addField(newFlatFieldLeaf("CHEBI:16919"))
                 .addField(newFlatFieldLeaf("creatine"))
                 .addField(newFlatFieldLeaf("CHEBI"))
                 .addField(newFlatFieldLeaf("http://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:16919"))
                 .addField(newFlatFieldLeaf("has_participant"))
                 .buildString());
-        od.xRelations.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.xRelations.add(newFlatField()
                 .addField(newFlatFieldLeaf("CHEBI:16920"))
                 .addField(newFlatFieldLeaf("creatiney"))
                 .addField(newFlatFieldLeaf("CHEBI"))
@@ -191,12 +188,12 @@ public final class OntologyDocMocker {
         // annotation guidelines
         // format: description|url
         od.annotationGuidelines = new ArrayList<>();
-        od.annotationGuidelines.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.annotationGuidelines.add(newFlatField()
                 .addField(newFlatFieldLeaf("description 0"))
                 .addField(newFlatFieldLeaf("http://www.guardian.co.uk"))
                 .buildString()
         );
-        od.annotationGuidelines.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.annotationGuidelines.add(newFlatField()
                 .addField(newFlatFieldLeaf("description 1"))
                 .addField(newFlatFieldLeaf("http://www.pinkun.com"))
                 .buildString()
@@ -213,7 +210,7 @@ public final class OntologyDocMocker {
         od.replacements.add(createFlatRelation("GO:0000004", "consider"));
 
         od.credits = new ArrayList<>();
-        od.credits.add(newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        od.credits.add(newFlatField()
                 .addField(newFlatFieldLeaf("BHF"))
                 .addField(newFlatFieldLeaf("http://www.ucl.ac.uk/cardiovasculargeneontology/"))
                 .buildString());
@@ -222,7 +219,7 @@ public final class OntologyDocMocker {
     }
 
     private static String createFlatRelation(String id, String relationType) {
-        return newFlatFieldFromDepth(FLAT_FIELD_DEPTH)
+        return newFlatField()
                 .addField(newFlatFieldLeaf(id))
                 .addField(newFlatFieldLeaf(relationType))
                 .buildString();

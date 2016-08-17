@@ -35,8 +35,8 @@ public class AnnotationRequest {
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
-            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, ECO_ID, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE, DB_SUBSET,
-            TARGET_SET};
+            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, EVIDENCE_CODE, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE,
+            DB_SUBSET, TARGET_SET};
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
@@ -50,8 +50,9 @@ public class AnnotationRequest {
      */
     private static List<StatsRequest> DEFAULT_STATS_REQUESTS;
 
-    static  {
-        List<String> statsTypes = Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE);
+    static {
+        List<String> statsTypes =
+                Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE, ASSIGNED_BY);
 
         StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
         StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);
@@ -196,17 +197,17 @@ public class AnnotationRequest {
     }
 
     /**
-     * Will receive a list of eco ids thus: EcoId=ECO:0000256,ECO:0000323
-     * @param ecoId
+     * Will receive a list of eco ids thus: evidenceCode=ECO:0000256,ECO:0000323
+     * @param evidenceCode
      */
-    public void setEcoId(String ecoId) {
-        filterMap.put(ECO_ID, ecoId);
+    public void setEvidenceCode(String evidenceCode) {
+        filterMap.put(EVIDENCE_CODE, evidenceCode);
     }
 
     @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*", flags = CASE_INSENSITIVE,
-            message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
-    public String getEcoId() {
-        return filterMap.get(ECO_ID);
+            message = "At least one 'Evidence code identifier' value is invalid: ${validatedValue}")
+    public String getEvidenceCode() {
+        return filterMap.get(EVIDENCE_CODE);
     }
 
     @Pattern(regexp = "^exact|slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
@@ -245,13 +246,13 @@ public class AnnotationRequest {
         }
     }
 
-    public void setGpType(String geneProductType){
+    public void setGpType(String geneProductType) {
         filterMap.put(GENE_PRODUCT_TYPE, geneProductType.toLowerCase());
     }
 
     @Pattern(regexp = "^(complex|rna|protein)(,(complex|rna|protein)){0,2}", flags = CASE_INSENSITIVE,
             message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
-    public String getGpType(){
+    public String getGpType() {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
 
@@ -259,21 +260,21 @@ public class AnnotationRequest {
      * Filter by Target Sets e.g. BHF-UCK, KRUK, Parkinsons etc
      * @return
      */
-    public void setTargetSet(String targetSet){
+    public void setTargetSet(String targetSet) {
         filterMap.put(TARGET_SET, targetSet);
     }
 
-    public String getTargetSet(){
+    public String getTargetSet() {
         return filterMap.get(TARGET_SET);
     }
 
-    public void setGpSubset(String gpSubset){
+    public void setGpSubset(String gpSubset) {
         filterMap.put(DB_SUBSET, gpSubset);
     }
 
     @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
             message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
-    public String getGpSubset(){
+    public String getGpSubset() {
         return filterMap.get(DB_SUBSET);
     }
 

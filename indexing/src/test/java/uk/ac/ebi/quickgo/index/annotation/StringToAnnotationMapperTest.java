@@ -46,7 +46,7 @@ public class StringToAnnotationMapperTest {
         tokens[COLUMN_QUALIFIER.getPosition()] = null;
         tokens[COLUMN_GO_ID.getPosition()] = null;
         tokens[COLUMN_DB_REFERENCES.getPosition()] = null;
-        tokens[COLUMN_ECO.getPosition()] = null;
+        tokens[COLUMN_EVIDENCE_CODE.getPosition()] = null;
         tokens[COLUMN_WITH.getPosition()] = null;
         tokens[COLUMN_INTERACTING_TAXON_ID.getPosition()] = null;
         tokens[COLUMN_DATE.getPosition()] = null;
@@ -70,7 +70,7 @@ public class StringToAnnotationMapperTest {
         tokens[COLUMN_QUALIFIER.getPosition()] = "enables";
         tokens[COLUMN_GO_ID.getPosition()] = "GO:0000977";
         tokens[COLUMN_DB_REFERENCES.getPosition()] = "PMID:12871976";
-        tokens[COLUMN_ECO.getPosition()] = "ECO:0000353";
+        tokens[COLUMN_EVIDENCE_CODE.getPosition()] = "ECO:0000353";
         tokens[COLUMN_WITH.getPosition()] = "GO:0036376,GO:1990573";
         tokens[COLUMN_INTERACTING_TAXON_ID.getPosition()] = null;
         tokens[COLUMN_DATE.getPosition()] = "20150122";
@@ -94,7 +94,7 @@ public class StringToAnnotationMapperTest {
         tokens[COLUMN_QUALIFIER.getPosition()] = "enables     ";
         tokens[COLUMN_GO_ID.getPosition()] = "GO:0000977    ";
         tokens[COLUMN_DB_REFERENCES.getPosition()] = "PMID:12871976";
-        tokens[COLUMN_ECO.getPosition()] = "ECO:0000353  ";
+        tokens[COLUMN_EVIDENCE_CODE.getPosition()] = "ECO:0000353  ";
         tokens[COLUMN_WITH.getPosition()] = "  GO:0036376,GO:1990573";
         tokens[COLUMN_INTERACTING_TAXON_ID.getPosition()] = null;
         tokens[COLUMN_DATE.getPosition()] = "  20150122";
@@ -115,7 +115,7 @@ public class StringToAnnotationMapperTest {
         assertThat(annotation.qualifier, is(trim(tokens[COLUMN_QUALIFIER.getPosition()])));
         assertThat(annotation.goId, is(trim(tokens[COLUMN_GO_ID.getPosition()])));
         assertThat(annotation.dbReferences, is(trim(tokens[COLUMN_DB_REFERENCES.getPosition()])));
-        assertThat(annotation.ecoId, is(trim(tokens[COLUMN_ECO.getPosition()])));
+        assertThat(annotation.evidenceCode, is(trim(tokens[COLUMN_EVIDENCE_CODE.getPosition()])));
         assertThat(annotation.with, is(trim(tokens[COLUMN_WITH.getPosition()])));
         assertThat(annotation.interactingTaxonId, is(trim(tokens[COLUMN_INTERACTING_TAXON_ID.getPosition()])));
         assertThat(annotation.assignedBy, is(trim(tokens[COLUMN_ASSIGNED_BY.getPosition()])));

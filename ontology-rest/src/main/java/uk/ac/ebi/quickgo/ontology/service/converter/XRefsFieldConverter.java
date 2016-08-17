@@ -32,7 +32,7 @@ class XRefsFieldConverter implements FieldConverter<OBOTerm.XRef> {
 
     @Override public Optional<OBOTerm.XRef> apply(String fieldsStr) {
 
-        List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
+        List<FlatField> fields = FlatFieldBuilder.parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.XRef xref = new OBOTerm.XRef();
             xref.dbCode = cleanFieldValue(fields.get(0).buildString());

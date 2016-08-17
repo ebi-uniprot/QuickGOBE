@@ -36,7 +36,7 @@ public enum Columns {
     COLUMN_QUALIFIER(2, "Qualifier"),
     COLUMN_GO_ID(3, "GO ID"),
     COLUMN_DB_REFERENCES(4, "DB References"),
-    COLUMN_ECO(5, "Evidence Code"),
+    COLUMN_EVIDENCE_CODE(5, "Evidence Code"),
     COLUMN_WITH(6, "With"),
     COLUMN_INTERACTING_TAXON_ID(7, "Interacting Taxonomy ID"),
     COLUMN_DATE(8, "Date"),
