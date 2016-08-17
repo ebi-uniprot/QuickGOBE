@@ -22,7 +22,7 @@ public class Annotation {
 
     public String goEvidence;
 
-    public String ecoId;
+    public String evidenceCode;
 
     public String reference;
 
@@ -62,7 +62,7 @@ public class Annotation {
         if (goEvidence != null ? !goEvidence.equals(that.goEvidence) : that.goEvidence != null) {
             return false;
         }
-        if (ecoId != null ? !ecoId.equals(that.ecoId) : that.ecoId != null) {
+        if (evidenceCode != null ? !evidenceCode.equals(that.evidenceCode) : that.evidenceCode != null) {
             return false;
         }
         if (reference != null ? !reference.equals(that.reference) : that.reference != null) {
@@ -84,7 +84,7 @@ public class Annotation {
         result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
         result = 31 * result + (goId != null ? goId.hashCode() : 0);
         result = 31 * result + (goEvidence != null ? goEvidence.hashCode() : 0);
-        result = 31 * result + (ecoId != null ? ecoId.hashCode() : 0);
+        result = 31 * result + (evidenceCode != null ? evidenceCode.hashCode() : 0);
         result = 31 * result + (reference != null ? reference.hashCode() : 0);
         result = 31 * result + (withFrom != null ? withFrom.hashCode() : 0);
         result = 31 * result + taxonId;
@@ -100,7 +100,7 @@ public class Annotation {
                 ", qualifier='" + qualifier + '\'' +
                 ", goId='" + goId + '\'' +
                 ", goEvidence='" + goEvidence + '\'' +
-                ", ecoId='" + ecoId + '\'' +
+                ", evidenceCode='" + evidenceCode + '\'' +
                 ", reference='" + reference + '\'' +
                 ", withFrom=" + withFrom +
                 ", taxonId=" + taxonId +

@@ -13,14 +13,13 @@ import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
+import java.io.File;
 import java.util.Iterator;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
-
-import java.io.File;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -60,8 +59,8 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
      * Creates and returns {@link OntologyDocument} instances corresponding to
      * each known GO / ECO term.
      *
-     * @return
-     * @throws Exception
+     * @return an {@link OntologyDocument} corresponding to each known GO / ECO term
+     * @throws Exception exception indicating an error during reading
      */
     @Override public OntologyDocument read() throws Exception {
         if (goTermIterator.hasNext()) {
@@ -93,7 +92,7 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
     /**
      * Open both Gene and Evidence Code ontologies. These will be used as data
      * sources for indexing to Solr.
-     * @param executionContext
+     * @param executionContext the {@link ExecutionContext} used whilst performing an opening action
      */
     @Override public void open(ExecutionContext executionContext) {
         super.open(executionContext);

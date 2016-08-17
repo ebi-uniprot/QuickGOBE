@@ -1,9 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
+import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.stream.Stream;
 import javax.validation.constraints.Max;
@@ -36,7 +38,7 @@ public class AnnotationRequest {
             ASPECT_FIELD,
             ASSIGNED_BY,
             DB_SUBSET,
-            ECO_ID,
+            EVIDENCE_CODE,
             GENE_PRODUCT_ID,
             GENE_PRODUCT_TYPE,
             GO_EVIDENCE,
@@ -50,6 +52,25 @@ public class AnnotationRequest {
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
+
+    /**
+     * At the moment the definition of the list is hardcoded because we only have need to display annotation and
+     * gene product statistics on a subset of types.
+     *
+     * Note: We can in the future change this from a hard coded implementation, to something that is decided by the
+     * client.
+     */
+    private static List<StatsRequest> DEFAULT_STATS_REQUESTS;
+
+    static {
+        List<String> statsTypes =
+                Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE, ASSIGNED_BY);
+
+        StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
+        StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);
+
+        DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
+    }
 
     @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
@@ -188,17 +209,17 @@ public class AnnotationRequest {
     }
 
     /**
-     * Will receive a list of eco ids thus: EcoId=ECO:0000256,ECO:0000323
-     * @param ecoId
+     * Will receive a list of eco ids thus: evidenceCode=ECO:0000256,ECO:0000323
+     * @param evidenceCode
      */
-    public void setEcoId(String ecoId) {
-        filterMap.put(ECO_ID, ecoId);
+    public void setEvidenceCode(String evidenceCode) {
+        filterMap.put(EVIDENCE_CODE, evidenceCode);
     }
 
     @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*", flags = CASE_INSENSITIVE,
-            message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
-    public String getEcoId() {
-        return filterMap.get(ECO_ID);
+            message = "At least one 'Evidence code identifier' value is invalid: ${validatedValue}")
+    public String getEvidenceCode() {
+        return filterMap.get(EVIDENCE_CODE);
     }
 
     @Pattern(regexp = "^exact|slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
@@ -251,11 +272,11 @@ public class AnnotationRequest {
      * Filter by Target Sets e.g. BHF-UCK, KRUK, Parkinsons etc
      * @return
      */
-    public void setTargetSet(String targetSet){
+    public void setTargetSet(String targetSet) {
         filterMap.put(TARGET_SET, targetSet);
     }
 
-    public String getTargetSet(){
+    public String getTargetSet() {
         return filterMap.get(TARGET_SET);
     }
 
@@ -332,5 +353,42 @@ public class AnnotationRequest {
         }
 
         return request;
+    }
+
+    public List<StatsRequest> createStatsRequests() {
+        return DEFAULT_STATS_REQUESTS;
+    }
+
+    /**
+     * Defines which statistics the client would like to to retrieve.
+     */
+    public static class StatsRequest {
+        private final String groupName;
+        private final String groupField;
+        private final List<String> types;
+
+        public StatsRequest(String groupName, String groupField, List<String> types) {
+            Preconditions.checkArgument(groupName != null && !groupName.trim().isEmpty(),
+                    "Statistics group name cannot be null or empty");
+            Preconditions.checkArgument(groupField != null && !groupName.trim().isEmpty(),
+                    "Statistics group field cannot be null or empty");
+            Preconditions.checkArgument(types != null, "Types collection cannot be null or empty");
+
+            this.groupName = groupName;
+            this.groupField = groupField;
+            this.types = types;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public String getGroupField() {
+            return groupField;
+        }
+
+        public Collection<String> getTypes() {
+            return Collections.unmodifiableList(types);
+        }
     }
 }

@@ -12,6 +12,8 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
 import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer;
+import uk.ac.ebi.quickgo.rest.search.results.config.FieldNameTransformer;
+import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
@@ -49,12 +51,12 @@ public class SearchServiceConfig {
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
     private static final String COMMA = ",";
     private static final String DEFAULT_UNSORTED_QUERY_FIELDS =
-            "assignedBy_unsorted,dbSubset_unsorted,ecoId_unsorted,goEvidence_unsorted," +
+            "assignedBy_unsorted,dbSubset_unsorted,evidenceCode_unsorted,goEvidence_unsorted," +
                     "goId_unsorted,geneProductId_unsorted,geneProductType_unsorted," +
                     "qualifier_unsorted,targetSet_unsorted,taxonId_unsorted";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS =
             "id,geneProductId,qualifier,goId,goEvidence," +
-                    "ecoId,reference,withFrom,taxonId,assignedBy,extensions";
+                    "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
 
     @Value("${geneproduct.db.xref.valid.regexes}")
@@ -80,7 +82,8 @@ public class SearchServiceConfig {
 
         SolrQueryResultConverter resultConverter = new SolrQueryResultConverter(
                 new DocumentObjectBinder(),
-                new AnnotationDocConverterImpl());
+                new AnnotationDocConverterImpl(),
+                annotationRetrievalConfig);
 
         return new SolrRequestRetrieval<>(
                 annotationTemplate.getSolrClient(),
@@ -113,13 +116,13 @@ public class SearchServiceConfig {
     @Bean
     public AnnotationCompositeRetrievalConfig annotationRetrievalConfig(
             @Value("${search.return.fields:" + DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS + "}") String
-                    annotationSearchSolrReturnedFields) {
+                    annotationSearchSolrReturnedFields,
+            FieldNameTransformer fieldNameTransformer) {
 
         return new AnnotationCompositeRetrievalConfig() {
 
-            //Not called
             @Override public Map<String, String> repo2DomainFieldMap() {
-                return null;
+                return fieldNameTransformer.getTransformations();
             }
 
             @Override public List<String> getSearchReturnedFields() {

@@ -1,4 +1,7 @@
-package uk.ac.ebi.quickgo.rest.search.query;
+package uk.ac.ebi.quickgo.rest.search.solr;
+
+import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
+import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
@@ -12,11 +15,13 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
     static final String SOLR_FIELD_SEPARATOR = ":";
 
     static final String CROSS_CORE_JOIN_SYNTAX = "{!join from=%s to=%s fromIndex=%s} %s";
+    static final String FACET_ANALYTICS_ID = "json.facet";
 
     private static final int MIN_COUNT_TO_DISPLAY_FACET = 1;
 
     private final String requestHandler;
     private final QueryVisitor<String> solrQuerySerializer;
+    private final AggregateConverter<String> aggregateConverter;
 
     public SolrQueryConverter(String requestHandler) {
         this(requestHandler, new SortedSolrQuerySerializer());
@@ -29,7 +34,8 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
                 "null");
 
         this.requestHandler = requestHandler;
-        this.solrQuerySerializer = solrQuerySerializer;
+        this.queryStringSanitizer = new SolrQueryStringSanitizer();
+        this.aggregateConverter = new AggregateToStringConverter();
     }
 
     @Override public SolrQuery convert(QueryRequest request) {
@@ -71,6 +77,10 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
 
         if (!request.getProjectedFields().isEmpty()) {
             request.getProjectedFields().forEach(field -> solrQuery.addField(field.getField()));
+        }
+
+        if (aggregateConverter != null && request.getAggregate() != null) {
+            solrQuery.setParam(FACET_ANALYTICS_ID, aggregateConverter.convert(request.getAggregate()));
         }
 
         return solrQuery;

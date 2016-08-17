@@ -61,7 +61,7 @@ public class AnnotationValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void nullEcoEvidenceThrowsException() throws Exception {
-        annotation.ecoId = null;
+        annotation.evidenceCode = null;
         validator.validate(annotation);
     }
 

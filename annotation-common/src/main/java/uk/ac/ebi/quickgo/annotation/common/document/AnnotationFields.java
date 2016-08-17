@@ -20,12 +20,13 @@ public class AnnotationFields {
     public final static String QUALIFIER = "qualifier";
     public static final String DB_OBJECT_SYMBOL = "dbObjectSymbol";
     public static final String DB_SUBSET = "dbSubset";
-    public final static String ECO_ID = "ecoId";
+    public final static String EVIDENCE_CODE = "evidenceCode";
     public final static String EXTENSION = "extension";
     public final static String GENE_PRODUCT_ID = "geneProductId";
     public static final String GENE_PRODUCT_TYPE = "geneProductType";
-    public final static String GO_ID = "goId";
     public final static String GO_EVIDENCE = "goEvidence";
+    public final static String GO_ID = "goId";
+    public final static String GO_ID_INDEXED_ORIGINAL = "goId_join";
     public final static String ID = "id";
     public final static String INTERACTING_TAXON_ID = "interactingTaxonId";
     public final static String REFERENCE = "reference";
@@ -64,6 +65,8 @@ public class AnnotationFields {
         public static final String QUALIFIER = storeAndGet(VALUES, AnnotationFields.QUALIFIER);
         public static final String REFERENCE_SEARCH = storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
         public static final String GO_ID = storeAndGet(VALUES, AnnotationFields.GO_ID);
+        public static final String GO_ID_INDEXED_ORIGINAL =
+                storeAndGet(VALUES, AnnotationFields.GO_ID_INDEXED_ORIGINAL);
         public static final String GENE_PRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
         public static final String GENE_PRODUCT_TYPE = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_TYPE);
         public static final String DB_SUBSET = storeAndGet(VALUES, AnnotationFields.DB_SUBSET);

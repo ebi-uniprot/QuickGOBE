@@ -8,7 +8,7 @@ import java.util.Set;
  * Represents a query that is a result of a logical operation (i.e. AND, OR, NOT), of one or more
  * {@link QuickGOQuery}.
  */
-class CompositeQuery extends QuickGOQuery {
+public class CompositeQuery extends QuickGOQuery {
     private QueryOp queryOperator;
 
     private Set<QuickGOQuery> queries;

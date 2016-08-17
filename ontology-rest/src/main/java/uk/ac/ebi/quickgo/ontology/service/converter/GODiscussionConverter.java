@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.ontology.service.converter;
 
 import uk.ac.ebi.quickgo.common.converter.FieldConverter;
 import uk.ac.ebi.quickgo.common.converter.FlatField;
+import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 
 import java.util.List;
@@ -27,7 +28,7 @@ class GODiscussionConverter implements FieldConverter<GOTerm.GODiscussion> {
     private static final int FIELD_COUNT = 2;
 
     @Override public Optional<GOTerm.GODiscussion> apply(String fieldStr) {
-        List<FlatField> fields = newFlatField().parse(fieldStr).getFields();
+        List<FlatField> fields = FlatFieldBuilder.parse(fieldStr).getFields();
 
         Optional<GOTerm.GODiscussion> goDiscussionOpt;
 
