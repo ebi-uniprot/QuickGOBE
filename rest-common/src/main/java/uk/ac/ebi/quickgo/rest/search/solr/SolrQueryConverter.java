@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
-import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import com.google.common.base.Preconditions;
@@ -12,9 +11,9 @@ import org.apache.solr.client.solrj.SolrQuery;
  * Converts a {@link QueryRequest} into a {@link SolrQuery} object.
  */
 public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
-    static final String SOLR_FIELD_SEPARATOR = ":";
+    public static final String SOLR_FIELD_SEPARATOR = ":";
+    public static final String CROSS_CORE_JOIN_SYNTAX = "{!join from=%s to=%s fromIndex=%s} %s";
 
-    static final String CROSS_CORE_JOIN_SYNTAX = "{!join from=%s to=%s fromIndex=%s} %s";
     static final String FACET_ANALYTICS_ID = "json.facet";
 
     private static final int MIN_COUNT_TO_DISPLAY_FACET = 1;
@@ -34,7 +33,7 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
                 "null");
 
         this.requestHandler = requestHandler;
-        this.queryStringSanitizer = new SolrQueryStringSanitizer();
+        this.solrQuerySerializer = solrQuerySerializer;
         this.aggregateConverter = new AggregateToStringConverter();
     }
 

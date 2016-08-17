@@ -187,15 +187,10 @@
        destination field is to use the dynamic field syntax.
        copyField also supports a maxChars to copy setting.  -->
 
-    <!--Field used in cross-core joins with other the ontology collection-->
-    <copyField source="goId" dest="goId_join"/>
-
     <!-- <copyField source="*_t" dest="text" maxChars="3000"/> -->
 
     <!-- copy name to alphaNameSort, a field designed for sorting by name -->
     <!-- <copyField source="name" dest="alphaNameSort"/> -->
-
-    <copyField source="reference" dest="referenceSearch"/>
 
     <fieldType name="reference_ignorecase" class="solr.TextField" positionIncrementGap="100">
         <analyzer type="index">
@@ -209,9 +204,6 @@
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
-
-
-    <copyField source="withFrom" dest="withFromSearch"/>
 
     <!-- Be able to search for database references in the form database:id, with by database, id or combined -->
     <fieldType name="database_ignorecase" class="solr.TextField" positionIncrementGap="100">

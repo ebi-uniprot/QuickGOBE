@@ -61,7 +61,7 @@ public class AnnotationFields {
         public static final String WITH_FROM_SEARCH = storeAndGet(VALUES, AnnotationFields.WITH_FROM_SEARCH);
         public static final String TAXON_ID = storeAndGet(VALUES, AnnotationFields.TAXON_ID);
         public static final String GO_EVIDENCE = storeAndGet(VALUES, AnnotationFields.GO_EVIDENCE);
-        public static final String ECO_ID = storeAndGet(VALUES, AnnotationFields.ECO_ID);
+        public static final String ECO_ID = storeAndGet(VALUES, AnnotationFields.EVIDENCE_CODE);
         public static final String QUALIFIER = storeAndGet(VALUES, AnnotationFields.QUALIFIER);
         public static final String REFERENCE_SEARCH = storeAndGet(VALUES, AnnotationFields.REFERENCE_SEARCH);
         public static final String GO_ID = storeAndGet(VALUES, AnnotationFields.GO_ID);
@@ -74,7 +74,7 @@ public class AnnotationFields {
 
         static {
             VALUES.add(unsortedNameFor(AnnotationFields.ASSIGNED_BY));
-            VALUES.add(unsortedNameFor(AnnotationFields.ECO_ID));
+            VALUES.add(unsortedNameFor(AnnotationFields.EVIDENCE_CODE));
             VALUES.add(unsortedNameFor(AnnotationFields.DB_SUBSET));
             VALUES.add(unsortedNameFor(AnnotationFields.GO_EVIDENCE));
             VALUES.add(unsortedNameFor(AnnotationFields.GO_ID));

@@ -5,8 +5,8 @@ import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
-import static uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter.SOLR_FIELD_SEPARATOR;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.SOLR_FIELD_SEPARATOR;
 
 /**
  * <p>This class defines an algorithm for serializing {@link QuickGOQuery}s into a corresponding

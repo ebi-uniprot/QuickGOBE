@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
+import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,7 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
-import static uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
 
 /**
  * Created 02/08/16

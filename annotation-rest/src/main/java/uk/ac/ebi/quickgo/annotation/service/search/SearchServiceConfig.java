@@ -10,7 +10,6 @@ import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
-import uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer;
 import uk.ac.ebi.quickgo.rest.search.results.config.FieldNameTransformer;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
