@@ -31,7 +31,7 @@ class TaxonConstraintsFieldConverter implements FieldConverter<OBOTerm.TaxonCons
     private static final int FIELD_COUNT = 7;
 
     @Override public Optional<OBOTerm.TaxonConstraint> apply(String fieldsStr) {
-        List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
+        List<FlatField> fields = FlatFieldBuilder.parse(fieldsStr).getFields();
 
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.TaxonConstraint taxonConstraint = new OBOTerm.TaxonConstraint();

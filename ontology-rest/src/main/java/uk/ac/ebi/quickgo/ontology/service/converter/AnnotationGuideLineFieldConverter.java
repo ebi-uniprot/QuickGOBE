@@ -27,7 +27,7 @@ class AnnotationGuideLineFieldConverter implements FieldConverter<OBOTerm.Annota
     private static final int FIELD_COUNT = 2;
 
     @Override public Optional<OBOTerm.AnnotationGuideLine> apply(String fieldsStr) {
-        List<FlatField> fields = FlatFieldBuilder.newFlatField().parse(fieldsStr).getFields();
+        List<FlatField> fields = FlatFieldBuilder.parse(fieldsStr).getFields();
 
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.AnnotationGuideLine ag = new OBOTerm.AnnotationGuideLine();

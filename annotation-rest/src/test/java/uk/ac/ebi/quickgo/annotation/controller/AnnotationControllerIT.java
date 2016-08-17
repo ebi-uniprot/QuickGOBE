@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -63,6 +64,7 @@ public class AnnotationControllerIT {
     private static final String WITHFROM_PARAM = "withFrom";
     private static final String GENE_PRODUCT_TYPE_PARAM = "gpType";
     private static final String GP_SUBSET_PARAM = "gpSubset";
+    private static final String TARGET_SET_PARAM = "targetSet";
 
     //Test Data
     private static final String NOTEXISTS_ASSIGNED_BY = "ZZZZZ";
@@ -1004,14 +1006,12 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    //----- Create Test Data ---------------------//
-    //----- Gene Product Subset ---------------------//
+    //----- Target Sets
 
     @Test
-    public void filterBySingleGeneProductSubsetReturnsDocuments() throws Exception {
+    public void filterByTargetSetReturnsMatchingDocuments() throws Exception {
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
-                AnnotationDocMocker.SUB_SET));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "KRUK"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1021,43 +1021,53 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByMultipleGeneProductSubsetReturnsDocuments() throws Exception {
+    public void filterByTwoTargetSetValuesReturnsMatchingDocuments() throws Exception {
 
-        AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        docA.dbSubset = "BHF-UCL";
-        repository.save(docA);
-
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
-                toCSV(AnnotationDocMocker.SUB_SET, docA.dbSubset)));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "KRUK,BHF-UCL"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
 
     @Test
-    public void filterByMultipleGeneProductSubsetInMultipleParametersReturnsDocuments() throws Exception {
+    public void filterByNewTargetSetValueReturnsMatchingDocuments() throws Exception {
 
-        AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        docA.dbSubset = "BHF-UCL";
-        repository.save(docA);
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.targetSets = Collections.singletonList("Parkinsons");
+        repository.save(doc);
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
-                AnnotationDocMocker.SUB_SET).param(GP_SUBSET_PARAM, docA.dbSubset));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "Parkinsons"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
     }
 
     @Test
-    public void filterByUnavailableGeneProductSubsetReturnsZeroDocuments() throws Exception {
+    public void filterByTargetSetCaseInsensitiveReturnsMatchingDocuments() throws Exception {
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM, "AAA"));
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.targetSets = Collections.singletonList("parkinsons");
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "PARKINSONS"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
+
+    @Test
+    public void filterByNonExistentTargetSetReturnsNoDocuments() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "CLAP"));
 
         response.andDo(print())
                 .andExpect(status().isOk())

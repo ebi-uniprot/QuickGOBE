@@ -30,7 +30,7 @@ class XORelationsFieldConverter implements FieldConverter<OBOTerm.XORelation> {
 
     @Override public Optional<OBOTerm.XORelation> apply(String fieldsStr) {
 
-        List<FlatField> fields = FlatFieldBuilder.newFlatField().parse(fieldsStr).getFields();
+        List<FlatField> fields = FlatFieldBuilder.parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.XORelation xORel = new OBOTerm.XORelation();
             xORel.id = cleanFieldValue(fields.get(0).buildString());

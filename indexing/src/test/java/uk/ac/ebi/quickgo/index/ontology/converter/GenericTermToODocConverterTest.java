@@ -48,9 +48,10 @@ public class GenericTermToODocConverterTest {
     @Test
     public void extractsAConsiderWhenGenericTermHasReplacementsWithAConsider() {
         RelationType relation = RelationType.CONSIDER;
-        String replaceId = "id2";
+        String replacedByTermId = "id2";
+        String replacedWithTermId = "id3";
 
-        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+        TermRelation mockReplace = mockReplaceRelation(replacedByTermId, replacedWithTermId, relation);
         when(term.getReplacements()).thenReturn(Collections.singletonList(mockReplace));
 
         Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
@@ -60,15 +61,16 @@ public class GenericTermToODocConverterTest {
         assertThat(extractedReplacements, hasSize(1));
 
         assertThat(extractedReplacements,
-                hasItems(containsString(replaceId), containsString(relation.getFormalCode())));
+                hasItems(containsString(replacedWithTermId), containsString(relation.getFormalCode())));
     }
 
     @Test
     public void extractsAReplacedByWhenGenericTermHasReplacementsWithReplacedBy() {
         RelationType relation = RelationType.REPLACEDBY;
-        String replaceId = "id2";
+        String replacedByTermId = "id2";
+        String replacedWithTermId = "id2";
 
-        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+        TermRelation mockReplace = mockReplaceRelation(replacedByTermId, replacedWithTermId, relation);
         when(term.getReplacements()).thenReturn(Collections.singletonList(mockReplace));
 
         Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
@@ -78,13 +80,13 @@ public class GenericTermToODocConverterTest {
         assertThat(extractedReplacements, hasSize(1));
 
         assertThat(extractedReplacements,
-                hasItems(containsString(replaceId), containsString(relation.getFormalCode())));
+                hasItems(containsString(replacedByTermId), containsString(relation.getFormalCode())));
     }
 
     @Test
     public void extracts2ReplacementsWhenGenericTermHas2Replacements() {
-        TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
-        TermRelation considerMock = mockReplaceRelation("id3", RelationType.CONSIDER);
+        TermRelation replacedByMock = mockReplaceRelation("id2", "id3", RelationType.REPLACEDBY);
+        TermRelation considerMock = mockReplaceRelation("id4", "id5", RelationType.CONSIDER);
 
         List<TermRelation> relations = Arrays.asList(replacedByMock, considerMock);
 
@@ -99,10 +101,10 @@ public class GenericTermToODocConverterTest {
 
     @Test
     public void convertsATermWith2RelationsInReplacementsSectionIntoDocWith2ReplacementElementsInReplacementsSection() {
-        TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
-        TermRelation considerModk = mockReplaceRelation("id3", RelationType.CONSIDER);
+        TermRelation replacedByMock = mockReplaceRelation("id2", "id3", RelationType.REPLACEDBY);
+        TermRelation considerMock = mockReplaceRelation("id4", "id5", RelationType.CONSIDER);
 
-        List<TermRelation> relations = Arrays.asList(replacedByMock, considerModk);
+        List<TermRelation> relations = Arrays.asList(replacedByMock, considerMock);
 
         GenericTerm toConvert = mock(GenericTerm.class);
         when(toConvert.getReplacements()).thenReturn(relations);
@@ -129,56 +131,58 @@ public class GenericTermToODocConverterTest {
     @Test
     public void extractsAConsiderWhenGenericTermHasReplacesWithAConsider() {
         RelationType relation = RelationType.CONSIDER;
-        String replaceId = "id2";
+        String replacedWithTermId = "id2";
+        String replacedByTermId = "id3";
 
-        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+        TermRelation mockReplace = mockReplaceRelation(replacedWithTermId, replacedByTermId, relation);
         when(term.getReplaces()).thenReturn(Collections.singletonList(mockReplace));
 
         Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
-        List<String> extractedReplacements = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
+        List<String> extractedReplaces = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
 
-        assertThat(extractedReplacements, hasSize(1));
+        assertThat(extractedReplaces, hasSize(1));
 
-        assertThat(extractedReplacements,
-                hasItems(containsString(replaceId), containsString(relation.getFormalCode())));
+        assertThat(extractedReplaces,
+                hasItems(containsString(replacedWithTermId), containsString(relation.getFormalCode())));
     }
 
     @Test
     public void extractsAReplacedByWhenGenericTermHasReplacesWithReplacedBy() {
         RelationType relation = RelationType.REPLACEDBY;
-        String replaceId = "id2";
+        String replacedWIthTermId = "id2";
+        String replacedByTermId = "id2";
 
-        TermRelation mockReplace = mockReplaceRelation(replaceId, relation);
+        TermRelation mockReplace = mockReplaceRelation(replacedWIthTermId, replacedByTermId, relation);
         when(term.getReplaces()).thenReturn(Collections.singletonList(mockReplace));
 
         Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
-        List<String> extractedReplacements = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
+        List<String> extractedReplaces = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
 
-        assertThat(extractedReplacements, hasSize(1));
+        assertThat(extractedReplaces, hasSize(1));
 
-        assertThat(extractedReplacements,
-                hasItems(containsString(replaceId), containsString(relation.getFormalCode())));
+        assertThat(extractedReplaces,
+                hasItems(containsString(replacedWIthTermId), containsString(relation.getFormalCode())));
     }
 
     @Test
     public void extracts2ReplacesWhenGenericTermHas2Replaces() {
-        TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
-        TermRelation considerMock = mockReplaceRelation("id3", RelationType.CONSIDER);
+        TermRelation replacedByMock = mockReplaceRelation("id2", "id3", RelationType.REPLACEDBY);
+        TermRelation considerMock = mockReplaceRelation("id4", "id5", RelationType.CONSIDER);
 
         List<TermRelation> relations = Arrays.asList(replacedByMock, considerMock);
 
         when(term.getReplaces()).thenReturn(relations);
 
         Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
-        List<String> extractedReplacements = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
+        List<String> extractedReplaces = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
 
-        assertThat(extractedReplacements, hasSize(relations.size()));
+        assertThat(extractedReplaces, hasSize(relations.size()));
     }
 
     @Test
     public void convertsATermWith2RelationsInReplacesSectionIntoDocWith2ReplacementElementsInReplacesSection() {
-        TermRelation replacedByMock = mockReplaceRelation("id2", RelationType.REPLACEDBY);
-        TermRelation considerModk = mockReplaceRelation("id3", RelationType.CONSIDER);
+        TermRelation replacedByMock = mockReplaceRelation("id2", "id3", RelationType.REPLACEDBY);
+        TermRelation considerModk = mockReplaceRelation("id4", "id5", RelationType.CONSIDER);
 
         List<TermRelation> relations = Arrays.asList(replacedByMock, considerModk);
 
@@ -193,12 +197,16 @@ public class GenericTermToODocConverterTest {
         assertThat(expectedDoc.replaces, hasSize(relations.size()));
     }
 
-    private TermRelation mockReplaceRelation(String replacedTermId, RelationType relation) {
-        GenericTerm replacedTerm = mock(GenericTerm.class);
-        when(replacedTerm.getId()).thenReturn(replacedTermId);
+    private TermRelation mockReplaceRelation(String leftTermId, String rightTermId, RelationType relation) {
+        GenericTerm leftTerm = mock(GenericTerm.class);
+        when(leftTerm.getId()).thenReturn(leftTermId);
+
+        GenericTerm rightTerm = mock(GenericTerm.class);
+        when(rightTerm.getId()).thenReturn(rightTermId);
 
         TermRelation mockReplace = mock(TermRelation.class);
-        when(mockReplace.getChild()).thenReturn(replacedTerm);
+        when(mockReplace.getChild()).thenReturn(leftTerm);
+        when(mockReplace.getParent()).thenReturn(rightTerm);
         when(mockReplace.getTypeof()).thenReturn(relation);
 
         return mockReplace;

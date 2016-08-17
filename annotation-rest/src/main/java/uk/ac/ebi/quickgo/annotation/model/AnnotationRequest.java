@@ -36,7 +36,7 @@ public class AnnotationRequest {
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
             QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, EVIDENCE_CODE, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE,
-            DB_SUBSET};
+            DB_SUBSET, TARGET_SET};
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final String COMMA = ",";
@@ -257,6 +257,19 @@ public class AnnotationRequest {
     }
 
     public void setGpSubset(String gpSubset) {
+    /**
+     * Filter by Target Sets e.g. BHF-UCK, KRUK, Parkinsons etc
+     * @return
+     */
+    public void setTargetSet(String targetSet){
+        filterMap.put(TARGET_SET, targetSet);
+    }
+
+    public String getTargetSet(){
+        return filterMap.get(TARGET_SET);
+    }
+
+    public void setGpSubset(String gpSubset){
         filterMap.put(DB_SUBSET, gpSubset);
     }
 
