@@ -2,11 +2,10 @@ package uk.ac.ebi.quickgo.client.model.ontology;
 
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
+import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
 import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER;
 
 /**
@@ -19,26 +18,21 @@ public class OntologyRequest {
     static final int DEFAULT_ENTRIES_PER_PAGE = 25;
     static final int MAX_ENTRIES_PER_PAGE = 100;
 
-    @Min(value = 1, message = "Page number cannot be less than 1")
-    private int page = DEFAULT_PAGE_NUMBER;
-
-    @Min(value = 0, message = "Number of results per page cannot be less than 0")
-    @Max(value = MAX_ENTRIES_PER_PAGE,
-            message = "Number of results per page cannot be greater than " + MAX_ENTRIES_PER_PAGE)
-    private int limit = DEFAULT_ENTRIES_PER_PAGE;
-
-    @NotNull(message = "Query cannot be null")
-    @Size(min = 1, message = "Query cannot be empty")
-    private String query;
-
     private boolean useHighlighting;
 
+    private int page = DEFAULT_PAGE_NUMBER;
+
+    private int limit = DEFAULT_ENTRIES_PER_PAGE;
+
     private String[] facets;
+
+    private String query;
 
     private String filterByAspect;
 
     private String filterByType;
 
+    @Min(value = 1, message = "Page number cannot be less than 1")
     public int getPage() {
         return page;
     }
@@ -47,6 +41,9 @@ public class OntologyRequest {
         this.page = page;
     }
 
+    @Min(value = 0, message = "Number of results per page cannot be less than 0")
+    @Max(value = MAX_ENTRIES_PER_PAGE,
+            message = "Number of results per page cannot be greater than " + MAX_ENTRIES_PER_PAGE)
     public int getLimit() {
         return limit;
     }
@@ -55,6 +52,8 @@ public class OntologyRequest {
         this.limit = limit;
     }
 
+    @NotNull(message = "Query cannot be null")
+    @Size(min = 1, message = "Query cannot be empty")
     public String getQuery() {
         return query;
     }
@@ -79,6 +78,8 @@ public class OntologyRequest {
         this.facets = facets;
     }
 
+    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = CASE_INSENSITIVE,
+            message = "Provided aspect is invalid: ${validatedValue}")
     public String getFilterByAspect() {
         return filterByAspect;
     }
@@ -87,6 +88,8 @@ public class OntologyRequest {
         this.filterByAspect = filterByAspect;
     }
 
+    @Pattern(regexp = "go|eco", flags = CASE_INSENSITIVE,
+            message = "Provided ontology type is invalid: ${validatedValue}")
     public String getFilterByType() {
         return filterByType;
     }
