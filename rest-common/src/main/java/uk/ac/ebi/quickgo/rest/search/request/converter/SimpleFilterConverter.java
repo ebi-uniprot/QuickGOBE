@@ -6,8 +6,10 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import com.google.common.base.Preconditions;
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 /**
  * Defines the conversion of a simple request to a corresponding {@link QuickGOQuery}.
@@ -38,13 +40,12 @@ class SimpleFilterConverter implements FilterConverter {
                 "FilterRequest should contain only 1 property for application to a SimpleRequestConverter, " +
                         "instead it contained " + request.getValues().size());
 
-        Stream<String> values = request.getValues().stream().flatMap(Collection::stream);
-
-        return values
+        Set<QuickGOQuery> collect = request.getValues().stream()
+                .flatMap(Collection::stream)
                 .map(value -> QuickGOQuery
                         .createQuery(request.getSignature().stream().collect(Collectors.joining()), value))
-                .reduce(QuickGOQuery::or)
-                .orElseThrow(() -> new IllegalStateException("Unable to create SimpleRequestConverter using: " +
-                        request + " and " + filterConfig));
+                .collect(Collectors.toSet());
+
+        return or(collect.toArray(new QuickGOQuery[collect.size()]));
     }
 }
