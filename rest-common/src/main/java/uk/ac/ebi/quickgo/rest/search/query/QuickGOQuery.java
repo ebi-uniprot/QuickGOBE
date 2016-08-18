@@ -11,34 +11,46 @@ import static uk.ac.ebi.quickgo.rest.search.query.CompositeQuery.QueryOp;
  * Representation of a domain Query.
  */
 public abstract class QuickGOQuery {
-    public abstract <T> T accept(QueryVisitor<T> visitor);
-
-    public QuickGOQuery and(QuickGOQuery query) {
-        Preconditions.checkArgument(query != null, "Query to AND against is null");
-
-        Set<QuickGOQuery> queries = aggregateQueries(this, query);
-
-        return new CompositeQuery(queries, QueryOp.AND);
+    /**
+     * Performs a generalised disjunction (OR) over the supplied queries.
+     *
+     * @param queries queries to be placed into an OR query
+     * @return a query representing the overall disjunction of queries
+     */
+    public static QuickGOQuery or(QuickGOQuery... queries) {
+        Preconditions.checkArgument(queries != null && arrayHasNoNullElements(queries),
+                "Queries to compose cannot be null");
+        if (queries.length == 1) {
+            return queries[0];
+        } else {
+            Set<QuickGOQuery> queriesSet = new LinkedHashSet<>();
+            Collections.addAll(queriesSet, queries);
+            return new CompositeQuery(queriesSet, QueryOp.OR);
+        }
     }
 
-    public QuickGOQuery or(QuickGOQuery query) {
-        Preconditions.checkArgument(query != null, "Query to OR against is null");
-
-        Set<QuickGOQuery> queries = aggregateQueries(this, query);
-
-        return new CompositeQuery(queries, QueryOp.OR);
+    /**
+     * Performs a generalised conjunction (AND) over the supplied queries.
+     *
+     * @param queries queries to be placed into an OR query
+     * @return a query representing the overall conjunction of queries
+     */
+    public static QuickGOQuery and(QuickGOQuery... queries) {
+        Preconditions.checkArgument(queries != null && arrayHasNoNullElements(queries),
+                "Queries to compose cannot be null");
+        if (queries.length == 1) {
+            return queries[0];
+        } else {
+            Set<QuickGOQuery> queriesSet = new LinkedHashSet<>();
+            Collections.addAll(queriesSet, queries);
+            return new CompositeQuery(queriesSet, QueryOp.AND);
+        }
     }
 
-    public QuickGOQuery not() {
-        return new CompositeQuery(Collections.singleton(this), QueryOp.NOT);
-    }
+    public static QuickGOQuery not(QuickGOQuery query) {
+        Preconditions.checkArgument(query != null);
 
-    private Set<QuickGOQuery> aggregateQueries(QuickGOQuery query1, QuickGOQuery query2) {
-        Set<QuickGOQuery> queries = new LinkedHashSet<>();
-        queries.add(query1);
-        queries.add(query2);
-
-        return queries;
+        return new CompositeQuery(Collections.singleton(query), QueryOp.NOT);
     }
 
     public static QuickGOQuery createQuery(String field, String value) {
@@ -61,5 +73,17 @@ public abstract class QuickGOQuery {
     public static QuickGOQuery createJoinQueryWithFilter(String joinFromTable, String joinFromAttribute,
             String joinToTable, String joinToAttribute, QuickGOQuery filter) {
         return new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, filter);
+    }
+
+    public abstract <T> T accept(QueryVisitor<T> visitor);
+
+    private static <T> boolean arrayHasNoNullElements(T[] array) {
+        for (T element : array) {
+            if (element == null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
