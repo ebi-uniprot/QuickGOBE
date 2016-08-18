@@ -276,15 +276,15 @@ public class AnnotationRequest {
 
     /**
      * Will receive a list of eco ids thus: EcoId=ECO:0000256,ECO:0000323
-     * @param ecoId
+     * @param evidenceCode
      */
-    public void setEcoId(String ecoId) {
-        filterMap.put(ECO_ID, ecoId);
+    public void setEvidenceCode(String evidenceCode) {
+        filterMap.put(ECO_ID, evidenceCode);
     }
 
     @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*", flags = CASE_INSENSITIVE,
-            message = "At least one 'ECO identifier' value is invalid: ${validatedValue}")
-    public String getEcoId() {
+            message = "At least one 'Evidence code' value is invalid: ${validatedValue}")
+    public String getEvidenceCode() {
         return filterMap.get(ECO_ID);
     }
 
