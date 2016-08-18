@@ -114,8 +114,9 @@ public class AnnotationController {
      * Search for an Annotations based on their attributes
      * @return a {@link QueryResult} instance containing the results of the search
      */
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Annotation result set has been filtered according to " +
-            "the provided attribute values"),
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Annotation result set has been filtered according to " +
+                    "the provided attribute values"),
             @ApiResponse(code = 500, message = "Internal server error occurred whilst searching for " +
                     "matching annotations", response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
@@ -123,7 +124,7 @@ public class AnnotationController {
     @ApiOperation(value = "Search for all annotations that match the filter criteria provided by the client.")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(
-    @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
+            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);
