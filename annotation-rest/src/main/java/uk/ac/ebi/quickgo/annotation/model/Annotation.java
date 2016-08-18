@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
 /**
@@ -33,6 +34,11 @@ public class Annotation {
     public String assignedBy;
 
     public List<String> extensions;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    public int getTaxonId() {
+        return taxonId;
+    }
 
     @Override public boolean equals(Object o) {
         if (this == o) {
