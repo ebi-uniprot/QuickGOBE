@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import uk.ac.ebi.quickgo.rest.controller.response.NoFacetNoHighlightNoAggregateQueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,15 +10,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 /**
- * Created by rantunes on 19/08/16.
+ * Configures how the response to the client should be handled.
+ *
+ * @author Ricardo Antunes
  */
-@Configuration
-class ResponseConfig {
+@Configuration class ResponseConfig {
     @Primary
     @Bean
     static ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.setMixIns(Collections.singletonMap(QueryResult.class, QueryResultMixin.class));
+        mapper.setMixIns(Collections.singletonMap(QueryResult.class, NoFacetNoHighlightNoAggregateQueryResult.class));
 
         return mapper;
     }
