@@ -2,10 +2,8 @@ package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Preconditions;
+import java.util.*;
 
 /**
  * Captures meta-information found during the processing of, {@link DescendantsFilterConverter#transform};
@@ -16,9 +14,16 @@ import java.util.Map;
  * @author Edd
  */
 public class SlimmingConversionInfo {
-    private Map<String, List<String>> descendantToTermMap = new HashMap<>();
+    private final Map<String, List<String>> descendantToTermMap;
+
+    public SlimmingConversionInfo() {
+        this.descendantToTermMap = new HashMap<>();
+    }
 
     public void addOriginal2SlimmedGOIdMapping(String originalGOId, String slimmedGOId) {
+        Preconditions.checkArgument(slimmedGOId != null && !slimmedGOId.isEmpty(),
+                "Original GO id cannot be mapped to null / empty slimmed GO id");
+
         if (!descendantToTermMap.containsKey(originalGOId)) {
             descendantToTermMap.put(originalGOId, new ArrayList<>());
         }
@@ -26,6 +31,6 @@ public class SlimmingConversionInfo {
     }
 
     public Map<String, List<String>> getInfo() {
-        return descendantToTermMap;
+        return Collections.unmodifiableMap(descendantToTermMap);
     }
 }
