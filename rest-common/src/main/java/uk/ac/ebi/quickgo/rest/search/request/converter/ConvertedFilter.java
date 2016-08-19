@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.rest.comm;
+package uk.ac.ebi.quickgo.rest.search.request.converter;
+
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 
 import java.util.Optional;
 

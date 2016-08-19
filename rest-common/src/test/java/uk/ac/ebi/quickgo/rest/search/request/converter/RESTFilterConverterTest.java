@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
-import uk.ac.ebi.quickgo.rest.comm.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;

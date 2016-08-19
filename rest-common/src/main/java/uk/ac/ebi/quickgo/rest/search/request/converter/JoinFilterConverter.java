@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
-import uk.ac.ebi.quickgo.rest.comm.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
@@ -9,7 +8,7 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static uk.ac.ebi.quickgo.rest.comm.ConvertedFilter.simpleConvertedResponse;
+import static uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter.simpleConvertedResponse;
 
 /**
  * Defines the conversion of a join request to a corresponding {@link QuickGOQuery}.

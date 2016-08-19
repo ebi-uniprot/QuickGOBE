@@ -2,9 +2,9 @@ package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
-import uk.ac.ebi.quickgo.rest.comm.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter;
 
 import java.util.HashSet;

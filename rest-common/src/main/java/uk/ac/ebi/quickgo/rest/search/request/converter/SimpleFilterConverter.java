@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
-import uk.ac.ebi.quickgo.rest.comm.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
@@ -11,8 +10,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.ac.ebi.quickgo.rest.comm.ConvertedFilter.simpleConvertedResponse;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
+import static uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter.simpleConvertedResponse;
 
 /**
  * Defines the conversion of a simple request to a corresponding {@link QuickGOQuery}.

@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
-import uk.ac.ebi.quickgo.rest.comm.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
@@ -20,8 +19,8 @@ import org.slf4j.Logger;
 import org.springframework.web.client.RestOperations;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.ac.ebi.quickgo.rest.comm.ConvertedFilter.simpleConvertedResponse;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
+import static uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter.simpleConvertedResponse;
 
 /**
  * <p>Defines the conversion of a {@link FilterRequest} representing a REST request
