@@ -476,14 +476,33 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
-    // descendant parameters
+    // usage parameters
     @Test
-    public void usageValueIsValid() {
-        String usage = "exact";
+    public void descendantsUsageIsValid() {
+        String usage = "descendants";
 
         annotationRequest.setUsage(usage);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void slimUsageIsValid() {
+        String usage = "slim";
+
+        annotationRequest.setUsage(usage);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void exactUsageIsValid() {
+        // rather than specifying exact, user should just filter by GO Id.
+        String usage = "exact";
+
+        annotationRequest.setUsage(usage);
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test

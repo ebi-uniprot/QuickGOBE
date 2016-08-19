@@ -222,7 +222,7 @@ public class AnnotationRequest {
         return filterMap.get(EVIDENCE_CODE);
     }
 
-    @Pattern(regexp = "^exact|slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
+    @Pattern(regexp = "^slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
             "${validatedValue})")
     public String getUsage() {
         return filterMap.get(USAGE_FIELD);
