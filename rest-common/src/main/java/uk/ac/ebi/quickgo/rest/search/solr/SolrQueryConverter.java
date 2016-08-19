@@ -1,73 +1,40 @@
-package uk.ac.ebi.quickgo.rest.search.query;
+package uk.ac.ebi.quickgo.rest.search.solr;
 
-import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
+import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrQuery;
 
 /**
  * Converts a {@link QueryRequest} into a {@link SolrQuery} object.
  */
-public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestConverter<SolrQuery> {
+public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
     public static final String SOLR_FIELD_SEPARATOR = ":";
+    public static final String CROSS_CORE_JOIN_SYNTAX = "{!join from=%s to=%s fromIndex=%s} %s";
 
-    static final String CROSS_CORE_JOIN_SYNTAX = "{!join from=%s to=%s fromIndex=%s} %s";
+    static final String FACET_ANALYTICS_ID = "json.facet";
 
     private static final int MIN_COUNT_TO_DISPLAY_FACET = 1;
 
     private final String requestHandler;
-    private final SolrQueryStringSanitizer queryStringSanitizer;
+    private final QueryVisitor<String> solrQuerySerializer;
+    private final AggregateConverter<String> aggregateConverter;
 
     public SolrQueryConverter(String requestHandler) {
+        this(requestHandler, new SortedSolrQuerySerializer());
+    }
+
+    public SolrQueryConverter(String requestHandler, QueryVisitor<String> solrQuerySerializer) {
         Preconditions.checkArgument(requestHandler != null && !requestHandler.trim().isEmpty(),
                 "Request handler name cannot be null or empty");
+        Preconditions.checkArgument(solrQuerySerializer != null, "The Solr query serializer (QueryVisitor) cannot be " +
+                "null");
 
         this.requestHandler = requestHandler;
-        this.queryStringSanitizer = new SolrQueryStringSanitizer();
-    }
-
-    @Override public String visit(FieldQuery query) {
-        return "(" + query.field() + SOLR_FIELD_SEPARATOR + queryStringSanitizer.sanitize(query.value()) + ")";
-    }
-
-    @Override public String visit(CompositeQuery query) {
-        CompositeQuery.QueryOp operator = query.queryOperator();
-        Set<QuickGOQuery> queries = query.queries();
-
-        if (queries.size() == 1 && operator.equals(CompositeQuery.QueryOp.NOT)) {
-            String singletonQuery = queries.iterator().next().accept(this);
-            return CompositeQuery.QueryOp.NOT + " (" + singletonQuery + ")";
-        } else {
-            String operatorText = " " + operator.name() + " ";
-
-            return queries.stream()
-                    .map(q -> q.accept(this))
-                    .collect(Collectors.joining(operatorText, "(", ")"));
-        }
-    }
-
-    @Override public String visit(NoFieldQuery query) {
-        return "(" + queryStringSanitizer.sanitize(query.getValue()) + ")";
-    }
-
-    @Override public String visit(AllQuery query) {
-        return "*:*";
-    }
-
-    @Override public String visit(JoinQuery query) {
-        String fromFilterString;
-
-        if (query.getFromFilter() != null) {
-            fromFilterString = query.getFromFilter().accept(this);
-        } else {
-            fromFilterString = "";
-        }
-
-        return String.format(CROSS_CORE_JOIN_SYNTAX, query.getJoinFromAttribute(), query.getJoinToAttribute(),
-                query.getJoinFromTable(), fromFilterString);
+        this.solrQuerySerializer = solrQuerySerializer;
+        this.aggregateConverter = new AggregateToStringConverter();
     }
 
     @Override public SolrQuery convert(QueryRequest request) {
@@ -75,7 +42,7 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
 
         final SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.setQuery(request.getQuery().accept(this));
+        solrQuery.setQuery(request.getQuery().accept(solrQuerySerializer));
         solrQuery.setRequestHandler(requestHandler);
 
         Page page = request.getPage();
@@ -89,7 +56,7 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
 
         if (!filterQueries.isEmpty()) {
             List<String> solrFilters = filterQueries.stream()
-                    .map(fq -> fq.accept(this))
+                    .map(fq -> fq.accept(solrQuerySerializer))
                     .collect(Collectors.toList());
 
             solrQuery.setFilterQueries(solrFilters.toArray(new String[solrFilters.size()]));
@@ -102,13 +69,17 @@ public class SolrQueryConverter implements QueryVisitor<String>, QueryRequestCon
 
         if (!request.getHighlightedFields().isEmpty()) {
             solrQuery.setHighlight(true);
-            request.getHighlightedFields().stream().forEach(field -> solrQuery.addHighlightField(field.getField()));
+            request.getHighlightedFields().forEach(field -> solrQuery.addHighlightField(field.getField()));
             solrQuery.setHighlightSimplePre(request.getHighlightStartDelim());
             solrQuery.setHighlightSimplePost(request.getHighlightEndDelim());
         }
 
         if (!request.getProjectedFields().isEmpty()) {
             request.getProjectedFields().forEach(field -> solrQuery.addField(field.getField()));
+        }
+
+        if (aggregateConverter != null && request.getAggregate() != null) {
+            solrQuery.setParam(FACET_ANALYTICS_ID, aggregateConverter.convert(request.getAggregate()));
         }
 
         return solrQuery;

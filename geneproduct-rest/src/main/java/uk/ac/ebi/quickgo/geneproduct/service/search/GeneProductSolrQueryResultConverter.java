@@ -29,14 +29,15 @@ public class GeneProductSolrQueryResultConverter extends AbstractSolrQueryResult
 
     public GeneProductSolrQueryResultConverter(DocumentObjectBinder documentObjectBinder,
             GeneProductDocConverter geneProductDocConverter,
-            Map<String, String> fieldNameMap){
-        super(new SolrQueryResultHighlightingConverter(fieldNameMap));
+            Map<String, String> fieldNameMap) {
 
         Preconditions.checkArgument(documentObjectBinder != null, "Document Object Binder cannot be null");
         Preconditions.checkArgument(geneProductDocConverter != null, "Gene product document converter cannot be null");
 
         this.documentObjectBinder = documentObjectBinder;
         this.geneProductDocConverter = geneProductDocConverter;
+
+        this.setQueryResultHighlightingConverter(new SolrQueryResultHighlightingConverter(fieldNameMap));
     }
 
     @Override protected List<GeneProduct> convertResults(SolrDocumentList results) {

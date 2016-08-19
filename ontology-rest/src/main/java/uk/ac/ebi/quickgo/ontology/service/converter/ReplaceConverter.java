@@ -27,7 +27,7 @@ class ReplaceConverter implements FieldConverter<OBOTerm.Replace> {
     private static final int FIELD_COUNT = 2;
 
     @Override public Optional<OBOTerm.Replace> apply(String replaceString) {
-        List<FlatField> fields = FlatFieldBuilder.newFlatField().parse(replaceString).getFields();
+        List<FlatField> fields = FlatFieldBuilder.parse(replaceString).getFields();
 
         if(fields.size() == FIELD_COUNT) {
             OBOTerm.Replace replace = new OBOTerm.Replace();

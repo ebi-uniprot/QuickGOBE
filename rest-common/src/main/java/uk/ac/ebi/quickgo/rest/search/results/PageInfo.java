@@ -15,7 +15,7 @@ public class PageInfo {
         Preconditions.checkArgument(currentPage >= 0, "Current page can not be negative: " + currentPage);
         Preconditions.checkArgument(totalPages >= currentPage, "Current page can not be larger than total amount of " +
                 "pages: [current: " + currentPage + ", total: " + totalPages + "]");
-        Preconditions.checkArgument(resultsPerPage > 0, "Results per page can not be less than 1: " +resultsPerPage);
+        Preconditions.checkArgument(resultsPerPage >= 0, "Results per page can not be less than 0: " + resultsPerPage);
 
         this.totalPages = totalPages;
         this.currentPage = currentPage;

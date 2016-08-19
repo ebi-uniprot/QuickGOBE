@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
@@ -37,6 +38,9 @@ public class SolrQueryResultConverterTest {
     @Mock
     private SolrDocumentList mockResults;
 
+    @Mock
+    private SearchServiceConfig.AnnotationCompositeRetrievalConfig mockAnnotationCompositeRetrievalConfig;
+
     private List<AnnotationDocument> solrTermDocs;
 
     private AnnotationDocument mockAnnotationDocument;
@@ -53,7 +57,7 @@ public class SolrQueryResultConverterTest {
         solrTermDocs = new ArrayList<>();
         when(mockBinder.getBeans(AnnotationDocument.class, mockResults)).thenReturn(solrTermDocs);
         when(mockDocConverter.convert(mockAnnotationDocument)).thenReturn(mockAnnotation);
-        converter = new SolrQueryResultConverter(mockBinder, mockDocConverter);
+        converter = new SolrQueryResultConverter(mockBinder, mockDocConverter, mockAnnotationCompositeRetrievalConfig);
 
 
     }
@@ -73,7 +77,8 @@ public class SolrQueryResultConverterTest {
         solrTermDocs.add(mockAnnotationDocument);
         mockResults.addAll(Arrays.asList(new SolrDocument(), new SolrDocument()));
 
-        SolrQueryResultConverter converter = new SolrQueryResultConverter(mockBinder, mockDocConverter);
+        SolrQueryResultConverter converter = new SolrQueryResultConverter(mockBinder, mockDocConverter,
+                mockAnnotationCompositeRetrievalConfig);
         List<Annotation> domainObjs = converter.convertResults(mockResults);
         assertThat(domainObjs, hasSize(2));
     }

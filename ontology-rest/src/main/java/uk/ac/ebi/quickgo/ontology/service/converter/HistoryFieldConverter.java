@@ -27,7 +27,7 @@ class HistoryFieldConverter implements FieldConverter<OBOTerm.History> {
     private static final int FIELD_COUNT = 5;
 
     @Override public Optional<OBOTerm.History> apply(String fieldsStr) {
-        List<FlatField> fields = FlatFieldBuilder.newFlatField().parse(fieldsStr).getFields();
+        List<FlatField> fields = FlatFieldBuilder.parse(fieldsStr).getFields();
 
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.History historicalInfo = new OBOTerm.History();

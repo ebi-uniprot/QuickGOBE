@@ -23,6 +23,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.createQuery;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 import static uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverter.*;
 
 /**
@@ -62,7 +64,7 @@ public class RESTFilterConverterTest {
 
             QuickGOQuery query = converter.transform(filter);
 
-            assertThat(query, is(QuickGOQuery.createQuery(field, restValue)));
+            assertThat(query, is(createQuery(field, restValue)));
         }
 
         @Test
@@ -89,8 +91,9 @@ public class RESTFilterConverterTest {
             QuickGOQuery query = converter.transform(filter);
 
             assertThat(query, is(
-                    QuickGOQuery.createQuery(field, restValue2)
-                            .or(QuickGOQuery.createQuery(field, restValue1))));
+                    or(
+                            createQuery(field, restValue2),
+                            createQuery(field, restValue1))));
         }
 
         @Test(expected = RetrievalException.class)

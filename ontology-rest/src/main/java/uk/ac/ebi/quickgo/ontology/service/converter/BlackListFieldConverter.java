@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.ontology.service.converter;
 
 import uk.ac.ebi.quickgo.common.converter.FieldConverter;
 import uk.ac.ebi.quickgo.common.converter.FlatField;
+import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 
 import java.util.List;
@@ -30,7 +31,7 @@ class BlackListFieldConverter implements FieldConverter<GOTerm.BlacklistItem> {
 
     @Override public Optional<GOTerm.BlacklistItem> apply(String fieldsStr) {
 
-        List<FlatField> fields = newFlatField().parse(fieldsStr).getFields();
+        List<FlatField> fields = FlatFieldBuilder.parse(fieldsStr).getFields();
 
         if (fields.size() == FIELD_COUNT) {
             GOTerm.BlacklistItem blacklistItem = new GOTerm.BlacklistItem();

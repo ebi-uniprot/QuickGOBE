@@ -12,6 +12,11 @@ search:
         properties: {
           ip: localhost,
           resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
-          localField: goId_join,
+          localField: goId,
           responseBodyPath: "$.results[*].descendants[*]"
         }
+model:
+  repo2domainFieldNameTransformations:
+    transformations: {
+      goId_join: goId
+    }

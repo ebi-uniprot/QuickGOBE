@@ -31,7 +31,7 @@ public class StringToAnnotationMapper implements FieldSetMapper<Annotation> {
         annotation.qualifier = trimIfNotNull(fieldSet.readString(COLUMN_QUALIFIER.getPosition()));
         annotation.goId = trimIfNotNull(fieldSet.readString(COLUMN_GO_ID.getPosition()));
         annotation.dbReferences = trimIfNotNull(fieldSet.readString(COLUMN_DB_REFERENCES.getPosition()));
-        annotation.ecoId = trimIfNotNull(fieldSet.readString(COLUMN_ECO.getPosition()));
+        annotation.evidenceCode = trimIfNotNull(fieldSet.readString(COLUMN_EVIDENCE_CODE.getPosition()));
         annotation.with = trimIfNotNull(fieldSet.readString(COLUMN_WITH.getPosition()));
         annotation.interactingTaxonId = trimIfNotNull(fieldSet.readString(COLUMN_INTERACTING_TAXON_ID.getPosition()));
         annotation.assignedBy = trimIfNotNull(fieldSet.readString(COLUMN_ASSIGNED_BY.getPosition()));
