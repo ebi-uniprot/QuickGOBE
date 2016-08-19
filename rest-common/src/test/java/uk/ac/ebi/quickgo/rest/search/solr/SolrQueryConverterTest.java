@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.rest.search.query;
+package uk.ac.ebi.quickgo.rest.search.solr;
+
+import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.junit.Before;
@@ -11,7 +13,7 @@ import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
-import static uk.ac.ebi.quickgo.rest.search.query.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
 
 /**
  * Tests the implementations of the {@link SolrQueryConverter} implementation.
@@ -37,123 +39,13 @@ public class SolrQueryConverterTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void nullSerializerInConstructorThrowsException() throws Exception {
+        converter = new SolrQueryConverter("validValue", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void nullQueryRequestThrowsException() throws Exception {
         converter.convert(null);
-    }
-
-    @Test
-    public void visitTransformsFieldQueryToString() throws Exception {
-        String field = "field1";
-        String value = "value1";
-        FieldQuery fieldQuery = new FieldQuery(field, value);
-
-        String queryString = converter.visit(fieldQuery);
-
-        assertThat(queryString, is(buildFieldQuery(field, value)));
-    }
-
-    @Test
-    public void visitTransformsNoFieldQueryToString() throws Exception {
-        String value = "value1";
-        NoFieldQuery noFieldQuery = new NoFieldQuery(value);
-
-        String queryString = converter.visit(noFieldQuery);
-
-        assertThat(queryString, is(buildValueOnlyQuery(value)));
-    }
-
-    @Test
-    public void visitTransformsFieldQueryWithSolrReservedCharacterToString() throws Exception {
-        String field = "field1";
-        String value = "prefix:value1";
-        String escapedValue = "prefix\\:value1";
-
-        FieldQuery fieldQuery = new FieldQuery(field, value);
-
-        String queryString = converter.visit(fieldQuery);
-
-        assertThat(queryString, is(buildFieldQuery(field, escapedValue)));
-    }
-
-    @Test
-    public void visitTransformsCompositeQueryToString() throws Exception {
-        CompositeQuery complexQuery = createComplexQuery();
-
-        String queryString = converter.visit(complexQuery);
-
-        String expectedQuery = "(((field1:value1) AND (field2:value2)) OR (field3:value3))";
-        assertThat(queryString, is(expectedQuery));
-    }
-
-    private CompositeQuery createComplexQuery() {
-        FieldQuery query1 = new FieldQuery("field1", "value1");
-        FieldQuery query2 = new FieldQuery("field2", "value2");
-
-        CompositeQuery andQuery = new CompositeQuery(asSet(query1, query2), CompositeQuery.QueryOp.AND);
-
-        FieldQuery query3 = new FieldQuery("field3", "value3");
-
-        return new CompositeQuery(asSet(andQuery, query3), CompositeQuery.QueryOp.OR);
-    }
-
-    @Test
-    public void visitTransformsAllQueryToString() {
-        AllQuery allQuery = new AllQuery();
-
-        String queryString = converter.visit(allQuery);
-
-        String expectedQuery = "*:*";
-        assertThat(queryString, is(expectedQuery));
-    }
-
-    @Test
-    public void visitTransformsNegatedAllQueryToString() {
-        CompositeQuery nothingQuery =
-                new CompositeQuery(asSet(QuickGOQuery.createAllQuery()), CompositeQuery.QueryOp.NOT);
-
-        String queryString = converter.visit(nothingQuery);
-
-        String expectedQuery = "NOT (*:*)";
-        assertThat(queryString, is(expectedQuery));
-    }
-
-    @Test
-    public void visitTransformsJoinQueryWithNoFromFilterToString() {
-        String joinFromTable = "annotation";
-        String joinFromAttribute = "id";
-        String joinToTable = "ontology";
-        String joinToAttribute = "id";
-
-        String fromFilterString = "";
-
-        JoinQuery query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
-
-        String solrJoinString = converter.visit(query);
-
-        assertThat(solrJoinString, is(String.format(CROSS_CORE_JOIN_SYNTAX, joinFromAttribute, joinToAttribute,
-                joinFromTable, fromFilterString)));
-    }
-
-    @Test
-    public void visitTransformsJoinQueryWithAFromFilterToString() {
-        String joinFromTable = "annotation";
-        String joinFromAttribute = "id";
-        String joinToTable = "ontology";
-        String joinToAttribute = "id";
-
-        String fromFilterField = "aspect";
-        String fromFilterValue = "molecular_function";
-        QuickGOQuery fromFilter = QuickGOQuery.createQuery(fromFilterField, fromFilterValue);
-
-        String fromFilterString = buildFieldQuery(fromFilterField, fromFilterValue);
-
-        JoinQuery query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute,
-                fromFilter);
-
-        String solrJoinString = converter.visit(query);
-
-        assertThat(solrJoinString, is(String.format(CROSS_CORE_JOIN_SYNTAX, joinFromAttribute, joinToAttribute,
-                joinFromTable, fromFilterString)));
     }
 
     @Test
@@ -328,9 +220,5 @@ public class SolrQueryConverterTest {
 
     private String buildFieldQuery(String field, String value) {
         return "(" + field + SolrQueryConverter.SOLR_FIELD_SEPARATOR + value + ")";
-    }
-
-    private String buildValueOnlyQuery(String value) {
-        return "(" + value + ")";
     }
 }

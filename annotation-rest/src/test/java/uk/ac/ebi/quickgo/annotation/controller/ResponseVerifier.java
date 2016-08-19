@@ -25,13 +25,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * service is working as expected.
  */
 final class ResponseVerifier {
+    public static final String GENEPRODUCT_ID_FIELD = "geneProductId";
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
     public static final String GO_ID_FIELD = "goId";
     public static final String SLIMMED_ID_FIELD = "slimmedIds";
+    public static final String RESULTS = "results";
     public static final String QUALIFIER = "qualifier";
 
     private static final String ERROR_MESSAGE = "messages";
-    private static final String RESULTS = "results";
     private static final String RESULTS_CONTENT_BY_INDEX = RESULTS + "[%d].";
 
     private ResponseVerifier() {}
@@ -50,6 +51,14 @@ final class ResponseVerifier {
 
     static <T> ResultMatcher valuesOccurInField(String fieldName, List<T> match) {
         return jsonPath(RESULTS + ".*." + fieldName, is(match));
+    }
+
+    static ResultMatcher valuesOccursInField(String fieldName, Integer... values) {
+        return jsonPath(RESULTS + ".*." + fieldName, contains(values));
+    }
+
+    static ResultMatcher fieldDoesNotExist(String fieldName) {
+        return jsonPath(RESULTS + ".*." + fieldName).doesNotExist();
     }
 
     static ResultMatcher atLeastOneResultHasItem(String fieldName, String value) {
@@ -80,7 +89,7 @@ final class ResponseVerifier {
                 .addMatcher(jsonPath(path + "qualifier").exists())
                 .addMatcher(jsonPath(path + "goId").exists())
                 .addMatcher(jsonPath(path + "goEvidence").exists())
-                .addMatcher(jsonPath(path + "ecoId").exists())
+                .addMatcher(jsonPath(path + "evidenceCode").exists())
                 .addMatcher(jsonPath(path + "reference").exists())
                 .addMatcher(jsonPath(path + "withFrom").exists())
                 .addMatcher(jsonPath(path + "taxonId").exists())

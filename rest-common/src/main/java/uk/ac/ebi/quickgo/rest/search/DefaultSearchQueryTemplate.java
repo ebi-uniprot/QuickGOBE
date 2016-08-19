@@ -219,6 +219,10 @@ public class DefaultSearchQueryTemplate {
                         filterQueries);
             }
         }
+
+        @Override public QueryRequest.Builder builder() {
+            return null;
+        }
     }
 
 }

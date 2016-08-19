@@ -23,3 +23,8 @@ search:
           responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }
+model:
+  repo2domainFieldNameTransformations:
+    transformations: {
+      goId_join: goId
+    }

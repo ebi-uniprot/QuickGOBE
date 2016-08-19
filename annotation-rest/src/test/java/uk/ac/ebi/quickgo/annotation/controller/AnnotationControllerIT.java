@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -31,7 +32,6 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.QUALIFIER;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 
 /**
  * RESTful end point for Annotations
@@ -55,7 +55,7 @@ public class AnnotationControllerIT {
     private static final String REF_PARAM = "reference";
     private static final String QUALIFIER_PARAM = "qualifier";
     private static final String GP_PARAM = "gpId";
-    private static final String ECO_ID_PARAM = "ecoId";
+    private static final String EVIDENCE_CODE_PARAM = "evidenceCode";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxon";
@@ -63,7 +63,7 @@ public class AnnotationControllerIT {
     private static final String WITHFROM_PARAM = "withFrom";
     private static final String GENE_PRODUCT_TYPE_PARAM = "gpType";
     private static final String GP_SUBSET_PARAM = "gpSubset";
-
+    private static final String TARGET_SET_PARAM = "targetSet";
 
     //Test Data
     private static final String NOTEXISTS_ASSIGNED_BY = "ZZZZZ";
@@ -218,12 +218,14 @@ public class AnnotationControllerIT {
         repository.save(document);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(TAXON_ID_PARAM, "2"));
+                get(RESOURCE_URL + "/search").param(TAXON_ID_PARAM, Integer.toString(taxonId)));
 
-        response.andExpect(status().isOk())
+        response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valuesOccursInField(TAXON_ID, taxonId))
                 .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
 
@@ -243,15 +245,35 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param(TAXON_ID_PARAM, String.valueOf(taxonId1))
-                        .param(TAXON_ID_PARAM, String.valueOf(taxonId2)));
+                        .param(TAXON_ID_PARAM, Integer.toString(taxonId1))
+                        .param(TAXON_ID_PARAM, Integer.toString(taxonId2)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
+                .andExpect(valuesOccursInField(TAXON_ID, taxonId1, taxonId2))
                 .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
+    }
+
+    @Test
+    public void lookupWhereTaxonIdIsZeroWillNotShowTaxonIdBecauseThisMeansInvalid() throws Exception {
+        String geneProductId = "P99999";
+        int taxonId = 0;
+
+        AnnotationDocument document = createDocWithTaxonId(geneProductId, taxonId);
+        repository.save(document);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldDoesNotExist(TAXON_ID))
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
     }
 
     @Test
@@ -540,64 +562,67 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson());
     }
 
-    //---------- ECO ID
+    //---------- EVIDENCE CODE
 
     @Test
-    public void filterAnnotationsUsingSingleEcoIdReturnsResults() throws Exception {
+    public void filterAnnotationsUsingSingleEvidenceCodeReturnsResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID));
+                get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM, AnnotationDocMocker.ECO_ID));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(atLeastOneResultHasItem(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID));
+                .andExpect(atLeastOneResultHasItem(EVIDENCE_CODE_PARAM, AnnotationDocMocker.ECO_ID));
     }
 
     @Test
-    public void filterAnnotationsUsingMultipleEcoIdsInSingleParameterProducesMixedResults() throws Exception {
+    public void filterAnnotationsUsingMultipleEvidenceCodesInSingleParameterProducesMixedResults() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("B0A000");
-        doc.ecoId = ECO_ID2;
+        doc.evidenceCode = ECO_ID2;
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID + ","
-                        + doc.ecoId + "," + NOTEXISTS_ECO_ID3));
+                get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM, AnnotationDocMocker.ECO_ID + ","
+                        + doc.evidenceCode + "," + NOTEXISTS_ECO_ID3));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
                 .andExpect(fieldsInAllResultsExist(4))
-                .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID, NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, doc.ecoId, 1))
-                .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, NOTEXISTS_ECO_ID3, 0));
+                .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, AnnotationDocMocker.ECO_ID,
+                        NUMBER_OF_GENERIC_DOCS))
+                .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, doc.evidenceCode, 1))
+                .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, NOTEXISTS_ECO_ID3, 0));
     }
 
     @Test
-    public void filterAnnotationsUsingMultipleEcoIdsAsIndependentParametersProducesMixedResults() throws Exception {
+    public void filterAnnotationsUsingMultipleEvidenceCodesAsIndependentParametersProducesMixedResults()
+            throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("B0A000");
-        doc.ecoId = ECO_ID2;
+        doc.evidenceCode = ECO_ID2;
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID)
-                        .param(ECO_ID_PARAM, doc.ecoId).param(ECO_ID_PARAM, NOTEXISTS_ECO_ID3));
+                get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM, AnnotationDocMocker.ECO_ID)
+                        .param(EVIDENCE_CODE_PARAM, doc.evidenceCode).param(EVIDENCE_CODE_PARAM, NOTEXISTS_ECO_ID3));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, AnnotationDocMocker.ECO_ID, NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, doc.ecoId, 1))
-                .andExpect(itemExistsExpectedTimes(ECO_ID_PARAM, NOTEXISTS_ECO_ID3, 0));
+                .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, AnnotationDocMocker.ECO_ID,
+                        NUMBER_OF_GENERIC_DOCS))
+                .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, doc.evidenceCode, 1))
+                .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, NOTEXISTS_ECO_ID3, 0));
     }
 
     @Test
-    public void filterByNonExistentEcoIdReturnsZeroResults() throws Exception {
+    public void filterByNonExistentEvidenceCodeReturnsZeroResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ECO_ID_PARAM, NOTEXISTS_ECO_ID3));
+                get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM, NOTEXISTS_ECO_ID3));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1002,14 +1027,12 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    //----- Create Test Data ---------------------//
-    //----- Gene Product Subset ---------------------//
+    //----- Target Sets
 
     @Test
-    public void filterBySingleGeneProductSubsetReturnsDocuments() throws Exception {
+    public void filterByTargetSetReturnsMatchingDocuments() throws Exception {
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
-                AnnotationDocMocker.SUB_SET));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "KRUK"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1018,47 +1041,54 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
 
-
     @Test
-    public void filterByMultipleGeneProductSubsetReturnsDocuments() throws Exception {
+    public void filterByTwoTargetSetValuesReturnsMatchingDocuments() throws Exception {
 
-        AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        docA.dbSubset = "BHF-UCL";
-        repository.save(docA);
-
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
-                toCSV(AnnotationDocMocker.SUB_SET, docA.dbSubset)));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "KRUK,BHF-UCL"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
 
-
     @Test
-    public void filterByMultipleGeneProductSubsetInMultipleParametersReturnsDocuments() throws Exception {
+    public void filterByNewTargetSetValueReturnsMatchingDocuments() throws Exception {
 
-        AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        docA.dbSubset = "BHF-UCL";
-        repository.save(docA);
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.targetSets = Collections.singletonList("Parkinsons");
+        repository.save(doc);
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM,
-                AnnotationDocMocker.SUB_SET).param(GP_SUBSET_PARAM, docA.dbSubset));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "Parkinsons"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
     }
 
+    @Test
+    public void filterByTargetSetCaseInsensitiveReturnsMatchingDocuments() throws Exception {
+
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.targetSets = Collections.singletonList("parkinsons");
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "PARKINSONS"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
 
     @Test
-    public void filterByUnavailableGeneProductSubsetReturnsZeroDocuments() throws Exception {
+    public void filterByNonExistentTargetSetReturnsNoDocuments() throws Exception {
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM, "AAA"));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM, "CLAP"));
 
         response.andDo(print())
                 .andExpect(status().isOk())

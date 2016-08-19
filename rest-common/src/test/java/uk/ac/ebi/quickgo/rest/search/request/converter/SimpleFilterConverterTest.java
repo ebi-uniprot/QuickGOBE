@@ -12,6 +12,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 /**
  * Created 06/06/16
@@ -67,7 +68,9 @@ public class SimpleFilterConverterTest {
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
 
         QuickGOQuery expectedQuery =
-                QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_1).or(QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_2));
+                or(
+                        QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_1),
+                        QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_2));
 
         assertThat(resultingQuery, is(expectedQuery));
     }

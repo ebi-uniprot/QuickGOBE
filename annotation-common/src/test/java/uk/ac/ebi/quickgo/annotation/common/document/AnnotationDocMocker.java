@@ -24,8 +24,8 @@ public class AnnotationDocMocker {
             "results_in_development_of(UBERON:0006000)");
     public static final String OBJECT_SYMBOL = "moeA5";
     public static final String OBJECT_TYPE = "protein";
-    public static final String SUB_SET = "KRUK";
     public static final int TAXON_ID = 12345;
+    public static final List<String> TARGET_SET = Arrays.asList("KRUK","BHF-UCL","Exosome");
 
 
 
@@ -41,7 +41,7 @@ public class AnnotationDocMocker {
         doc.id = geneProductId + "-" + System.nanoTime();
 
         doc.goId = GO_ID;
-        doc.ecoId = ECO_ID;
+        doc.evidenceCode = ECO_ID;
         doc.qualifier = QUALIFIER;
         doc.goEvidence = GO_EVIDENCE;
         doc.reference = REFERENCE;
@@ -51,8 +51,8 @@ public class AnnotationDocMocker {
         doc.extensions = EXTENSIONS;
         doc.dbObjectSymbol = OBJECT_SYMBOL;
         doc.geneProductType = OBJECT_TYPE;
-        doc.dbSubset = SUB_SET;
         doc.taxonId = TAXON_ID;
+        doc.targetSets = TARGET_SET;
 
         return doc;
     }

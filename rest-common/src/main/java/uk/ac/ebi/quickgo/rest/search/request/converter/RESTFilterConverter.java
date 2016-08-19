@@ -25,7 +25,7 @@ import static uk.ac.ebi.quickgo.rest.comm.ConvertedFilter.simpleConvertedRespons
 /**
  * <p>Defines the conversion of a {@link FilterRequest} representing a REST request
  * to a corresponding {@link QuickGOQuery}.
- *
+ * <p>
  * Created by Edd on 05/06/2016.
  */
 class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery> {
@@ -185,7 +185,6 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
             throws ExecutionException, InterruptedException, TimeoutException {
         return restRequester
                 .get(responseType)
-                //                .get(String.class)
                 .get(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 

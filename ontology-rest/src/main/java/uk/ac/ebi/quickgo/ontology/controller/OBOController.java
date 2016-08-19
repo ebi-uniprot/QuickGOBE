@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 
 /**
  * Abstract controller defining common end-points of an OBO related
@@ -426,7 +427,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return the new constrained query
      */
     private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
-        return query.and(
+        return and(query,
                 ontologyQueryConverter.convert(
                         OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + getOntologyType().name()));
     }
