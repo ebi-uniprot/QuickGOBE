@@ -150,9 +150,9 @@ public class AnnotationController {
 
         request.createFilterRequests().stream()
                 .map(converterFactory::convert)
-                .forEach(convertedResponse -> {
-                    filterQueries.add(convertedResponse.getConvertedValue());
-                    convertedResponse.getFilterContext().ifPresent(filterContexts::add);
+                .forEach(convertedFilter -> {
+                    filterQueries.add(convertedFilter.getConvertedValue());
+                    convertedFilter.getFilterContext().ifPresent(filterContexts::add);
                 });
 
         return new FilterQueryInfo() {
