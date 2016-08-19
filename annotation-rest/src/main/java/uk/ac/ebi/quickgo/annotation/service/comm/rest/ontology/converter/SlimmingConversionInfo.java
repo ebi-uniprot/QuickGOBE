@@ -21,6 +21,8 @@ public class SlimmingConversionInfo {
     }
 
     public void addOriginal2SlimmedGOIdMapping(String originalGOId, String slimmedGOId) {
+        Preconditions.checkArgument(originalGOId != null && !originalGOId.isEmpty(),
+                "Original GO id cannot be null / empty");
         Preconditions.checkArgument(slimmedGOId != null && !slimmedGOId.isEmpty(),
                 "Original GO id (" + originalGOId + ") cannot be mapped to null / empty slimmed GO id");
 

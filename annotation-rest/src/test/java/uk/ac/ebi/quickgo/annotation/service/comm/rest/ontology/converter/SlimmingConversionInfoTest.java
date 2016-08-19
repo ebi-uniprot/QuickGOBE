@@ -23,6 +23,22 @@ public class SlimmingConversionInfoTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void cannotAddNullOriginalId() {
+        String src = null;
+        String dest = "dest";
+
+        conversionInfo.addOriginal2SlimmedGOIdMapping(src, dest);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotAddEmptyOriginalId() {
+        String src = "";
+        String dest = "dest";
+
+        conversionInfo.addOriginal2SlimmedGOIdMapping(src, dest);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void cannotAddNullOriginal2SlimmedId() {
         String src = "src";
         String dest = null;
