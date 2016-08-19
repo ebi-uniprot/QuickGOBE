@@ -7,13 +7,11 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
@@ -419,12 +417,12 @@ public class RESTFilterConverterTest {
     static class FakeResponseConverter implements FilterConverter<FakeResponse, QuickGOQuery> {
 
         @Override public ConvertedFilter<QuickGOQuery> transform(FakeResponse response) {
-            List<QuickGOQuery> queries = new ArrayList<>();
-            response.results.forEach(r -> queries.add(QuickGOQuery.createQuery(r.resultField, r.resultValue)));
+            Set<QuickGOQuery> queries = response.results.stream()
+                    .map(r -> QuickGOQuery.createQuery(r.resultField, r.resultValue))
+                    .collect(Collectors.toSet());
+            QuickGOQuery orQuery = or(queries.toArray(new QuickGOQuery[queries.size()]));
 
-            ConvertedFilter<QuickGOQuery> convertedFilter = new ConvertedFilter<>();
-            queries.stream().reduce(QuickGOQuery::or).ifPresent(convertedFilter::setConvertedValue);
-            return convertedFilter;
+            return new ConvertedFilter<>(orQuery);
         }
     }
 }

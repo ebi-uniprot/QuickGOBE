@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 
+import com.google.common.base.Preconditions;
 import java.util.Optional;
 
 /**
@@ -14,6 +15,18 @@ import java.util.Optional;
 public class ConvertedFilter<V> {
     private V convertedValue;
     private FilterContext filterContext;
+
+    public ConvertedFilter(V convertedValue) {
+        this(convertedValue, null);
+    }
+
+    public ConvertedFilter(V convertedValue, FilterContext filterContext) {
+        Preconditions.checkArgument(convertedValue != null, "Cannot create a ConvertedFilter without supplying a " +
+                "non-null value");
+
+        this.convertedValue = convertedValue;
+        this.filterContext = filterContext;
+    }
 
     /**
      * Retrieves the value converted
@@ -33,36 +46,5 @@ public class ConvertedFilter<V> {
         } else {
             return Optional.of(filterContext);
         }
-    }
-
-    /**
-     * Sets the converted value
-     * @param convertedValue the converted value
-     */
-    public void setConvertedValue(V convertedValue) {
-        this.convertedValue = convertedValue;
-    }
-
-    /** Sets the meta-information associated with the conversion
-     *
-     * @param filterContext the meta-information associated with the conversion
-     */
-    public void setFilterContext(FilterContext filterContext) {
-        this.filterContext = filterContext;
-    }
-
-    /**
-     * A convenience method used to create a {@link ConvertedFilter} that has no
-     * meta-information associated with it.
-     *
-     * @param convertedValue the converted value
-     * @param <T> the type of the converted value
-     * @return the converted response
-     */
-    public static <T> ConvertedFilter<T> simpleConvertedResponse(T convertedValue) {
-        ConvertedFilter<T> response = new ConvertedFilter<>();
-        response.setConvertedValue(convertedValue);
-        response.setFilterContext(null);
-        return response;
     }
 }

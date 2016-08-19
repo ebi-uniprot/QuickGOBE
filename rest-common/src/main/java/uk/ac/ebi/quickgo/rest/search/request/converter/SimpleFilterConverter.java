@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
-import static uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter.simpleConvertedResponse;
 
 /**
  * Defines the conversion of a simple request to a corresponding {@link QuickGOQuery}.
@@ -44,7 +43,7 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
 
         Stream<String> values = request.getValues().stream().flatMap(Collection::stream);
 
-        return simpleConvertedResponse(getQuickGOQuery(request, values));
+        return new ConvertedFilter<>(getQuickGOQuery(request, values));
     }
 
     /**

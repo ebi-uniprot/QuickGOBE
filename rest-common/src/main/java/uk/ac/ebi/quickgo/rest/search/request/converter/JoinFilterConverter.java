@@ -8,7 +8,6 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter.simpleConvertedResponse;
 
 /**
  * Defines the conversion of a join request to a corresponding {@link QuickGOQuery}.
@@ -59,10 +58,10 @@ class JoinFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
         Preconditions.checkArgument(request != null, "ClientRequest cannot be null");
 
         if (request.getValues().isEmpty()) {
-            return simpleConvertedResponse(
+            return new ConvertedFilter<>(
                     QuickGOQuery.createJoinQuery(fromTable, fromAttribute, toTable, toAttribute));
         } else {
-            return simpleConvertedResponse(
+            return new ConvertedFilter<>(
                     QuickGOQuery.createJoinQueryWithFilter(
                             fromTable,
                             fromAttribute,

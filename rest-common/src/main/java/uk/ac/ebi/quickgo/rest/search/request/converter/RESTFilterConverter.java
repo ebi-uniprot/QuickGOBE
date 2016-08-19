@@ -20,7 +20,6 @@ import org.springframework.web.client.RestOperations;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
-import static uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter.simpleConvertedResponse;
 
 /**
  * <p>Defines the conversion of a {@link FilterRequest} representing a REST request
@@ -83,7 +82,7 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
             throwRetrievalException(FAILED_REST_FETCH_PREFIX + " due to: '" + e.getClass().getSimpleName() + "'", e);
         }
 
-        return simpleConvertedResponse(FILTER_EVERYTHING);
+        return new ConvertedFilter<>(FILTER_EVERYTHING);
     }
 
     static String buildResourceTemplate(FilterConfig config) {

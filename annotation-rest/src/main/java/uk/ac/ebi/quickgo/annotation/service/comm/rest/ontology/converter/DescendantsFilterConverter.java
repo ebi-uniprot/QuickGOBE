@@ -25,14 +25,15 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 public class DescendantsFilterConverter implements FilterConverter<ConvertedOntologyFilter, QuickGOQuery> {
 
     @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
-        ConvertedFilter<QuickGOQuery> convertedFilter = new ConvertedFilter<>();
-        FilterContext context = new FilterContext();
+        ConvertedFilter<QuickGOQuery> convertedFilter;
 
         SlimmingConversionInfo conversionInfo = new SlimmingConversionInfo();
 
         QuickGOQuery filterEverything = not(QuickGOQuery.createAllQuery());
         if (response.getResults() != null) {
             Set<QuickGOQuery> queries = new HashSet<>();
+            FilterContext context = new FilterContext();
+
             for (ConvertedOntologyFilter.Result result : response.getResults()) {
                 for (String desc : result.getDescendants()) {
                     queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
@@ -42,15 +43,14 @@ public class DescendantsFilterConverter implements FilterConverter<ConvertedOnto
 
             context.save(SlimmingConversionInfo.class, conversionInfo);
 
-            convertedFilter.setConvertedValue(
+            convertedFilter = new ConvertedFilter<>(
                     queries.stream()
                             .reduce(QuickGOQuery::or)
-                            .orElse(filterEverything));
+                            .orElse(filterEverything),
+                    context);
         } else {
-            convertedFilter.setConvertedValue(filterEverything);
+            convertedFilter = new ConvertedFilter<>(filterEverything);
         }
-
-        convertedFilter.setFilterContext(context);
 
         return convertedFilter;
     }
