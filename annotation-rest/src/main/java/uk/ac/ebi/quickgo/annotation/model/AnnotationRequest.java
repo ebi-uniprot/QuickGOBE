@@ -32,11 +32,14 @@ public class AnnotationRequest {
     public static final int MAX_ENTRIES_PER_PAGE = 100;
     public static final int MIN_ENTRIES_PER_PAGE = 0;
 
+    public static final int DEFAULT_PAGE_NUMBER = 1;
     public static final int MIN_PAGE_NUMBER = 1;
 
     static final String USAGE_FIELD = "usage";
     static final String USAGE_IDS = "usageIds";
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
+
+    private static final String COMMA = ",";
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{
             ASPECT_FIELD,
@@ -54,13 +57,7 @@ public class AnnotationRequest {
             WITH_FROM_SEARCH
     };
 
-    private static final int DEFAULT_PAGE_NUMBER = 1;
-    private static final String COMMA = ",";
 
-    @ApiModelProperty(
-            value = "Number of results per page.",
-            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
-    @Min(MIN_ENTRIES_PER_PAGE) @Max(MAX_ENTRIES_PER_PAGE)
     /**
      * At the moment the definition of the list is hardcoded because we only have need to display annotation and
      * gene product statistics on a subset of types.
@@ -79,6 +76,7 @@ public class AnnotationRequest {
 
         DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
     }
+
 
     @ApiModelProperty(
             value = "Number of results per page.",
