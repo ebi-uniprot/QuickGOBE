@@ -10,6 +10,8 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter;
 import java.util.HashSet;
 import java.util.Set;
 
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
+
 /**
  * This class is responsible for converting an ontology model containing GO id descendant information, to a
  * {@link ConvertedFilter}. This result encapsulates a {@link QuickGOQuery} applicable to filtering the annotation
@@ -28,7 +30,7 @@ public class DescendantsFilterConverter implements FilterConverter<ConvertedOnto
 
         SlimmingConversionInfo conversionInfo = new SlimmingConversionInfo();
 
-        QuickGOQuery filterEverything = QuickGOQuery.createAllQuery().not();
+        QuickGOQuery filterEverything = not(QuickGOQuery.createAllQuery());
         if (response.getResults() != null) {
             Set<QuickGOQuery> queries = new HashSet<>();
             for (ConvertedOntologyFilter.Result result : response.getResults()) {

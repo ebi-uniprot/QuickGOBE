@@ -97,7 +97,7 @@ public class AnnotationController {
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
             FilterConverterFactory converterFactory,
-            ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain) {
+            ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
             StatisticsService statsService) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");

@@ -21,6 +21,7 @@ import org.springframework.web.client.RestOperations;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.rest.comm.ConvertedFilter.simpleConvertedResponse;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 
 /**
  * <p>Defines the conversion of a {@link FilterRequest} representing a REST request
@@ -52,7 +53,7 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
     private final FilterConfig filterConfig;
     private final RestOperations restOperations;
     private int timeoutMillis;
-    private static final QuickGOQuery FILTER_EVERYTHING = QuickGOQuery.createAllQuery().not();
+    private static final QuickGOQuery FILTER_EVERYTHING = not(QuickGOQuery.createAllQuery());
 
     RESTFilterConverter(FilterConfig filterConfig, RestOperations restOperations) {
         Preconditions.checkArgument(filterConfig != null, "FilterConfig cannot be null");

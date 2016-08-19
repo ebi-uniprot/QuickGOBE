@@ -18,6 +18,8 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 /**
  * Created 10/08/16
@@ -58,8 +60,8 @@ public class DescendantsFilterConverterTest {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(
-                QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)
-                        .or(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc2))));
+                or(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1),
+                        QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc2))));
     }
 
     @Test
@@ -82,14 +84,14 @@ public class DescendantsFilterConverterTest {
         response.setResults(null);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createAllQuery().not()));
+        assertThat(convertedFilter.getConvertedValue(), is(not(QuickGOQuery.createAllQuery())));
     }
 
     @Test
     public void emptyResultsMeansFilterEverything() {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createAllQuery().not()));
+        assertThat(convertedFilter.getConvertedValue(), is(not(QuickGOQuery.createAllQuery())));
     }
 
     @Test

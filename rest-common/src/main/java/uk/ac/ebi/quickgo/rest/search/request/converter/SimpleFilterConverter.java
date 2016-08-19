@@ -9,10 +9,10 @@ import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
+import java.util.stream.Stream;
 
 import static uk.ac.ebi.quickgo.rest.comm.ConvertedFilter.simpleConvertedResponse;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 /**
  * Defines the conversion of a simple request to a corresponding {@link QuickGOQuery}.
@@ -69,6 +69,6 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
                         .createQuery(request.getSignature().stream().collect(Collectors.joining()), value))
                 .collect(Collectors.toSet());
 
-        return or(collect.toArray(new QuickGOQuery[queries.size()]));
+        return or(queries.toArray(new QuickGOQuery[queries.size()]));
     }
 }
