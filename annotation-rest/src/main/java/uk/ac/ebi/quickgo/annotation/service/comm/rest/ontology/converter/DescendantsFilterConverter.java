@@ -30,7 +30,6 @@ public class DescendantsFilterConverter implements FilterConverter<ConvertedOnto
 
         SlimmingConversionInfo conversionInfo = new SlimmingConversionInfo();
 
-        QuickGOQuery filterEverything = not(QuickGOQuery.createAllQuery());
         if (response.getResults() != null && !response.getResults().isEmpty()) {
             Set<QuickGOQuery> queries = new HashSet<>();
             FilterContext context = new FilterContext();
@@ -48,7 +47,7 @@ public class DescendantsFilterConverter implements FilterConverter<ConvertedOnto
                     or(queries.toArray(new QuickGOQuery[queries.size()])),
                     context);
         } else {
-            convertedFilter = new ConvertedFilter<>(filterEverything);
+            convertedFilter = new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
         }
 
         return convertedFilter;
