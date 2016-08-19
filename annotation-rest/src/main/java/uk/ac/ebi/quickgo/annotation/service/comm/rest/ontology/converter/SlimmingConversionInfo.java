@@ -1,11 +1,17 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * Captures meta-information found during the processing of, {@link DescendantsFilterConverter#transform};
+ * mapping GO ids to their ancestor GO ids. This provides the information necessary for
+ * transforming results as defined in {@link SlimResultsTransformer}.
+ *
  * Created 12/08/16
  * @author Edd
  */
