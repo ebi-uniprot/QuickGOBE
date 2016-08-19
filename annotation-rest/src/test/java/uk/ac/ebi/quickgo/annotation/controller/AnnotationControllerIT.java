@@ -52,18 +52,18 @@ public class AnnotationControllerIT {
 
     //Parameter names
     private static final String ASSIGNED_BY_PARAM = "assignedBy";
-    private static final String GO_EVIDENCE_PARAM = "goEvidence";
+    private static final String GO_EVIDENCE_PARAM = "goIdEvidence";
     private static final String REF_PARAM = "reference";
     private static final String QUALIFIER_PARAM = "qualifier";
-    private static final String GP_PARAM = "gpId";
+    private static final String GP_PARAM = "geneProductId";
     private static final String EVIDENCE_CODE_PARAM = "evidenceCode";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
-    private static final String TAXON_ID_PARAM = "taxon";
+    private static final String TAXON_ID_PARAM = "taxonId";
     private static final String GO_ID_PARAM = "goId";
     private static final String WITHFROM_PARAM = "withFrom";
-    private static final String GENE_PRODUCT_TYPE_PARAM = "gpType";
-    private static final String GP_SUBSET_PARAM = "gpSubset";
+    private static final String GENE_PRODUCT_TYPE_PARAM = "geneProductType";
+    private static final String GP_SUBSET_PARAM = "geneProductSubset";
     private static final String TARGET_SET_PARAM = "targetSet";
 
     //Test Data
