@@ -8,6 +8,9 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformer;
 
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Transforms {@link QueryResult}s of {@link Annotation}s according to slimmed information recorded in
@@ -17,12 +20,21 @@ import java.util.Map;
  *
  */
 public class SlimResultsTransformer implements ResultTransformer<QueryResult<Annotation>> {
+
+    private static final SlimmingConversionInfo EMPTY_SLIMMING_INFO =
+            new SlimmingConversionInfo();
+
+    private static final Logger LOGGER = getLogger(SlimResultsTransformer.class);
+
     @Override
     public QueryResult<Annotation> transform(QueryResult<Annotation> queryResult, FilterContext filterContext) {
         SlimmingConversionInfo conversionInfo =
                 filterContext
                         .get(SlimmingConversionInfo.class)
-                        .orElse(new SlimmingConversionInfo());
+                        .orElseGet(() -> {
+                            LOGGER.warn("Transformation of filterContext was found to be empty, but should never be");
+                            return EMPTY_SLIMMING_INFO;
+                        });
 
         Map<String, List<String>> descendantToTermMap = conversionInfo.getInfo();
 
