@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 /**
  * This class is responsible for converting an ontology model containing GO id descendant information, to a
@@ -30,7 +31,7 @@ public class DescendantsFilterConverter implements FilterConverter<ConvertedOnto
         SlimmingConversionInfo conversionInfo = new SlimmingConversionInfo();
 
         QuickGOQuery filterEverything = not(QuickGOQuery.createAllQuery());
-        if (response.getResults() != null) {
+        if (response.getResults() != null && !response.getResults().isEmpty()) {
             Set<QuickGOQuery> queries = new HashSet<>();
             FilterContext context = new FilterContext();
 
@@ -44,9 +45,7 @@ public class DescendantsFilterConverter implements FilterConverter<ConvertedOnto
             context.save(SlimmingConversionInfo.class, conversionInfo);
 
             convertedFilter = new ConvertedFilter<>(
-                    queries.stream()
-                            .reduce(QuickGOQuery::or)
-                            .orElse(filterEverything),
+                    or(queries.toArray(new QuickGOQuery[queries.size()])),
                     context);
         } else {
             convertedFilter = new ConvertedFilter<>(filterEverything);
