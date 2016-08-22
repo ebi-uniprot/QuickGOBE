@@ -65,7 +65,7 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
         checkMandatoryProperty(RESPONSE_CLASS);
         checkMandatoryProperty(RESPONSE_CONVERTER_CLASS);
 
-        initialiseTimeout();
+        this.timeoutMillis = loadTimeout();
     }
 
     @Override public ConvertedFilter<QuickGOQuery> transform(FilterRequest request) {
@@ -152,22 +152,25 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
         return restRequesterBuilder;
     }
 
-    private void initialiseTimeout() {
+    private int loadTimeout() {
+        int timeout = DEFAULT_TIMEOUT_MILLIS;
+
         if (filterConfig.getProperties().containsKey(TIMEOUT)) {
             boolean validTimeout = true;
             String timeoutValue = filterConfig.getProperties().get(TIMEOUT);
             try {
-                timeoutMillis = Integer.parseInt(timeoutValue);
+                timeout = Integer.parseInt(timeoutValue);
             } catch (NumberFormatException nfe) {
                 validTimeout = false;
             }
             Preconditions
                     .checkArgument(validTimeout, "FilterConfig's 'TIMEOUT' property must be a number: " + timeoutValue);
         } else {
-            timeoutMillis = DEFAULT_TIMEOUT_MILLIS;
-            LOGGER.debug("No " + TIMEOUT + " property specified in yaml configuration. RESTFilterConverter will use " +
+            LOGGER.debug("No " + TIMEOUT + " property specified in yml configuration. RESTFilterConverter will use " +
                     "default timeout of: " + timeoutMillis);
         }
+
+        return timeout;
     }
 
     private void throwRetrievalException(String errorMessage, Exception e) {
