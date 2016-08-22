@@ -57,7 +57,6 @@ public class AnnotationRequest {
             WITH_FROM_SEARCH
     };
 
-
     /**
      * At the moment the definition of the list is hardcoded because we only have need to display annotation and
      * gene product statistics on a subset of types.
@@ -77,7 +76,6 @@ public class AnnotationRequest {
         DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
     }
 
-
     @ApiModelProperty(
             value = "Number of results per page.",
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
@@ -96,7 +94,8 @@ public class AnnotationRequest {
      */
     @ApiModelProperty(
             value = "Filter annotation by the ontology to which the associated GO term belongs. Accepts comma " +
-                    "separated values. Alloweable values are: biological_process,molecular_function,cellular_component",
+                    "separated values. Accepts comma separated values.",
+            allowableValues = "biological_process,molecular_function,cellular_component",
             example = "biological_process,molecular_function")
     private String aspect;
 
@@ -145,32 +144,34 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Indicates how the GO terms within the annotations should be used. Is used in conjunction with " +
                     "'usageRelationships'.",
-            allowableValues = "descendants, slim",
+            allowableValues = "descendants,slim",
             example = "descendants")
     private String usage;
 
     @ApiModelProperty(
             value = "The relationship between the provided 'goId' identifiers and the GO identifiers " +
-                    "found within the annotations. If the relationship is fulfilled the annotation is selected",
-            allowableValues = "is_a," +
-                    "is_a/part_of/occurs_in, " +
-                    "is_a/part_of/occurs_in/regulates",
-            example = "descendants")
+                    "found within the annotations. If the relationship is fulfilled, the annotation is selected." +
+                    "Allows comma separated values.",
+            allowableValues = "is_a,part_of,occurs_in,regulates",
+            example = "is_a,part_of")
     private String usageRelationships;
 
     @ApiModelProperty(
-            value = "The type of gene product found within an annotation. Allowable values are: protein, RNA, complexes" +
-                    "Accepts comma separated values.",
+            value = "The type of gene product found within an annotation. Accepts comma separated values.",
+            allowableValues = "protein,RNA,complexes.",
             example = "protein,RNA")
     private String geneProductType;
 
-    //TODO find suitable description
     @ApiModelProperty(
-            value = "Find suitable description. Accepts comma separated values.")
+            value = "A set of gene products that have been identified as being of interest to a certain group. " +
+                    "Accepts comma separated values.",
+            example = "KRUK,BHF-UCL,Exosome")
     private String targetSet;
 
     @ApiModelProperty(
-            value = "Find suitable description. Accepts comma separated values.")
+            value = "The name of a database specific to gene products. Accepts comma separated values.",
+            example = "TrEMBL"
+    )
     private String geneProductSubset;
 
     @ApiModelProperty(
