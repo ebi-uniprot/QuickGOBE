@@ -54,7 +54,7 @@ public class AnnotationControllerStatisticsIT {
     private static final int NUMBER_OF_GENERIC_DOCS = 6;
     private static final String ANNOTATION_GROUP = "annotation";
     private static final String GENE_PRODUCT_GROUP = "geneProduct";
-    private static final String TAXON_PARAM = "taxon";
+    private static final String TAXON_PARAM = "taxonId";
     private static final String GO_ID_PARAM = "goId";
 
     private MockMvc mockMvc;

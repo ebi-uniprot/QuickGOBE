@@ -49,7 +49,7 @@
         <hamcrest.version>1.3</hamcrest.version>
         <mockito-version>1.9.5</mockito-version>
 
-        <springfox-swagger2.version>2.2.2</springfox-swagger2.version>
+        <springfox-swagger2.version>2.5.0</springfox-swagger2.version>
 
         <!-- plugin version numbers -->
         <compiler.version>3.3</compiler.version>

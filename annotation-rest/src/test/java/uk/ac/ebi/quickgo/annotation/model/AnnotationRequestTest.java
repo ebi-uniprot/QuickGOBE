@@ -78,45 +78,45 @@ public class AnnotationRequestTest {
     @Test
     public void setAndGetGeneProductID() {
         String geneProductID = "A0A000";
-        annotationRequest.setGpId(geneProductID);
-        assertThat(annotationRequest.getGpId(), is(geneProductID));
+        annotationRequest.setGeneProductId(geneProductID);
+        assertThat(annotationRequest.getGeneProductId(), is(geneProductID));
     }
 
     @Test
     public void setAndGetMultipleGeneProductIDs() {
         String geneProductID = "A0A000,A0A001";
-        annotationRequest.setGpId(geneProductID);
-        assertThat(annotationRequest.getGpId(), is(geneProductID));
+        annotationRequest.setGeneProductId(geneProductID);
+        assertThat(annotationRequest.getGeneProductId(), is(geneProductID));
     }
 
     @Test
     public void setAndGetEvidence(){
         String EVIDENCE_IEA = "IEA";
-        annotationRequest.setGoEvidence(EVIDENCE_IEA);
-        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_IEA));
+        annotationRequest.setGoIdEvidence(EVIDENCE_IEA);
+        assertThat(annotationRequest.getGoIdEvidence(), is(EVIDENCE_IEA));
     }
 
     @Test
     public void setAndGetEvidenceMulti(){
         String EVIDENCE_MULTI = "IEA,IBD";
-        annotationRequest.setGoEvidence(EVIDENCE_MULTI);
-        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
+        annotationRequest.setGoIdEvidence(EVIDENCE_MULTI);
+        assertThat(annotationRequest.getGoIdEvidence(), is(EVIDENCE_MULTI));
     }
 
     @Test
     public void setAndGetEvidenceMultiInLowerCase(){
         String EVIDENCE_MULTI = "iea,ibd";
-        annotationRequest.setGoEvidence(EVIDENCE_MULTI);
-        assertThat(annotationRequest.getGoEvidence(), is(EVIDENCE_MULTI));
+        annotationRequest.setGoIdEvidence(EVIDENCE_MULTI);
+        assertThat(annotationRequest.getGoIdEvidence(), is(EVIDENCE_MULTI));
     }
 
     @Test
     public void setAndGetTaxon() {
         String taxonId = "1";
 
-        annotationRequest.setTaxon(taxonId);
+        annotationRequest.setTaxonId(taxonId);
 
-        assertThat(annotationRequest.getTaxon(), is(taxonId));
+        assertThat(annotationRequest.getTaxonId(), is(taxonId));
     }
 
     @Test

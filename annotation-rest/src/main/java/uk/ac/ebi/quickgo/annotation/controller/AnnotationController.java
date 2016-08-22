@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
+import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
@@ -18,12 +19,19 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
 import java.util.HashSet;
 import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -120,9 +128,17 @@ public class AnnotationController {
      * Search for an Annotations based on their attributes
      * @return a {@link QueryResult} instance containing the results of the search
      */
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Annotation result set has been filtered according to " +
+                    "the provided attribute values"),
+            @ApiResponse(code = 500, message = "Internal server error occurred whilst searching for " +
+                    "matching annotations", response = ResponseExceptionHandler.ErrorInfo.class),
+            @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
+                    "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
+    @ApiOperation(value = "Search for all annotations that match the filter criteria provided by the client.")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest request,
-            BindingResult bindingResult) {
+    public ResponseEntity<QueryResult<Annotation>> annotationLookup(
+            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);
@@ -179,9 +195,17 @@ public class AnnotationController {
      * The statistics are subdivided into two areas, each with
      * @return a {@link QueryResult} instance containing the results of the search
      */
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Statistics have been calculated for the annotation result set " +
+                    "obtained from the application of the filter parameters"),
+            @ApiResponse(code = 500, message = "Internal server error occurred whilst producing statistics",
+                    response = ResponseExceptionHandler.ErrorInfo.class),
+            @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
+                    "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
+    @ApiOperation(value = "Generate statistic on the annotation result set obtained from applying the filters.")
     @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(@Valid AnnotationRequest request,
-            BindingResult bindingResult) {
+    public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
+            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);

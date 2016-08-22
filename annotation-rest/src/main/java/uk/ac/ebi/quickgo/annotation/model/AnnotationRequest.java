@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import com.google.common.base.Preconditions;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
 import java.util.stream.Stream;
 import javax.validation.constraints.Max;
@@ -29,10 +30,16 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 public class AnnotationRequest {
     public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
     public static final int MAX_ENTRIES_PER_PAGE = 100;
+    public static final int MIN_ENTRIES_PER_PAGE = 0;
+
+    public static final int DEFAULT_PAGE_NUMBER = 1;
+    public static final int MIN_PAGE_NUMBER = 1;
 
     static final String USAGE_FIELD = "usage";
     static final String USAGE_IDS = "usageIds";
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
+
+    private static final String COMMA = ",";
     private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{
             ASPECT_FIELD,
@@ -49,9 +56,6 @@ public class AnnotationRequest {
             TARGET_SET,
             WITH_FROM_SEARCH
     };
-
-    private static final int DEFAULT_PAGE_NUMBER = 1;
-    private static final String COMMA = ",";
 
     /**
      * At the moment the definition of the list is hardcoded because we only have need to display annotation and
@@ -72,11 +76,109 @@ public class AnnotationRequest {
         DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
     }
 
-    @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
+    @ApiModelProperty(
+            value = "Number of results per page.",
+            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
+    @Min(MIN_ENTRIES_PER_PAGE) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @Min(1)
+    @ApiModelProperty(
+            value = "Page number of the result set to display.",
+            allowableValues = "range[" + MIN_PAGE_NUMBER + ",max_result_set_size]")
+    @Min(MIN_PAGE_NUMBER)
     private int page = DEFAULT_PAGE_NUMBER;
+
+    /*
+     * TODO: These state variables are only here until springfox can get the @ApiModelProperty to work with our POJO.
+     * When the fix is in place we can move the @ApiModelProperty definitions to the getters
+     */
+    @ApiModelProperty(
+            value = "Filter annotation by the ontology to which the associated GO term belongs. Accepts comma " +
+                    "separated values. Accepts comma separated values.",
+            allowableValues = "biological_process,molecular_function,cellular_component",
+            example = "biological_process,molecular_function")
+    private String aspect;
+
+    @ApiModelProperty(value = "The database which made the annotation. Accepts comma separated values.",
+            example = "BHF-UCL,Ensembl")
+    private String assignedBy;
+
+    @ApiModelProperty(
+            value = "Identifier of a literature or database reference, cited as an authority " +
+                    "for the attribution of the GO ID. It is also possible to filter just by the database type. " +
+                    "Format: DB:Reference. Accepts comma separated values.",
+            example = "PMID:2676709")
+    private String reference;
+
+    @ApiModelProperty(
+            value = "Unique identifier of a gene product present within an annotation. Accepts comma separated " +
+                    "values.", example = "P99999,URS00000064B1_559292")
+    private String geneProductId;
+
+    @ApiModelProperty(
+            value = "Evidence code used to indicate how the annotation is supported. Accepts comma separated values.",
+            example = "ECO:0000255,ECO:0000305")
+    private String evidenceCode;
+
+    @ApiModelProperty(
+            value = "The GO identifier attributed to an annotation. Accepts comma separated values.",
+            example = "GO:0030533,GO:0070125")
+    private String goId;
+
+    @ApiModelProperty(
+            value = "Flags that modify the interpretation of an annotation. Accepts comma separated values.",
+            example = "enables,involved_in")
+    private String qualifier;
+
+    @ApiModelProperty(
+            value = "Holds additional identifiers for an annotation. Accepts comma separated values.",
+            example = "GO:0030533,P63328")
+    private String withFrom;
+
+    @ApiModelProperty(
+            value = "The taxonomic identifier of the species encoding the gene product associated to an annotation. " +
+                    "Accepts comma separated values.",
+            example = "35758,1310605")
+    private String taxonId;
+
+    @ApiModelProperty(
+            value = "Indicates how the GO terms within the annotations should be used. Is used in conjunction with " +
+                    "'usageRelationships'.",
+            allowableValues = "descendants,slim",
+            example = "descendants")
+    private String usage;
+
+    @ApiModelProperty(
+            value = "The relationship between the provided 'goId' identifiers and the GO identifiers " +
+                    "found within the annotations. If the relationship is fulfilled, the annotation is selected." +
+                    "Allows comma separated values.",
+            allowableValues = "is_a,part_of,occurs_in,regulates",
+            example = "is_a,part_of")
+    private String usageRelationships;
+
+    @ApiModelProperty(
+            value = "The type of gene product found within an annotation. Accepts comma separated values.",
+            allowableValues = "protein,RNA,complexes.",
+            example = "protein,RNA")
+    private String geneProductType;
+
+    @ApiModelProperty(
+            value = "A set of gene products that have been identified as being of interest to a certain group. " +
+                    "Accepts comma separated values.",
+            example = "KRUK,BHF-UCL,Exosome")
+    private String targetSet;
+
+    @ApiModelProperty(
+            value = "The name of a database specific to gene products. Accepts comma separated values.",
+            example = "TrEMBL"
+    )
+    private String geneProductSubset;
+
+    @ApiModelProperty(
+            value = "Gene ontology evidence codes of the 'goId's found within the annotations. Accepts comma " +
+                    "separated values.",
+            example = "EXP,IDA")
+    private String goIdEvidence;
 
     private final Map<String, String> filterMap = new HashMap<>();
 
@@ -127,14 +229,14 @@ public class AnnotationRequest {
      * Gene Product IDs, in CSV format.
      */
 
-    public void setGpId(String listOfGeneProductIDs) {
+    public void setGeneProductId(String listOfGeneProductIDs) {
         if (listOfGeneProductIDs != null) {
             filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
         }
     }
 
     @GeneProductIDList
-    public String getGpId() {
+    public String getGeneProductId() {
         return filterMap.get(GENE_PRODUCT_ID);
     }
 
@@ -144,13 +246,13 @@ public class AnnotationRequest {
      * evidence codes</a>
      * @param evidence the evidence code
      */
-    public void setGoEvidence(String evidence) {
+    public void setGoIdEvidence(String evidence) {
         filterMap.put(GO_EVIDENCE, evidence);
     }
 
     @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
             message = "At least one 'GO Evidence' value is invalid: ${validatedValue}")
-    public String getGoEvidence() {
+    public String getGoIdEvidence() {
         return filterMap.get(GO_EVIDENCE);
     }
 
@@ -184,13 +286,13 @@ public class AnnotationRequest {
         return filterMap.get(WITH_FROM_SEARCH);
     }
 
-    public void setTaxon(String taxId) {
+    public void setTaxonId(String taxId) {
         filterMap.put(TAXON_ID, taxId);
     }
 
     @Pattern(regexp = "[0-9]+(,[0-9]+)*",
             message = "At least one 'Taxonomic identifier' value is invalid: ${validatedValue}")
-    public String getTaxon() {
+    public String getTaxonId() {
         return filterMap.get(TAXON_ID);
     }
 
@@ -258,13 +360,13 @@ public class AnnotationRequest {
         }
     }
 
-    public void setGpType(String geneProductType) {
+    public void setGeneProductType(String geneProductType) {
         filterMap.put(GENE_PRODUCT_TYPE, geneProductType.toLowerCase());
     }
 
     @Pattern(regexp = "^(complex|rna|protein)(,(complex|rna|protein)){0,2}", flags = CASE_INSENSITIVE,
             message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
-    public String getGpType() {
+    public String getGeneProductType() {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
 
@@ -280,13 +382,13 @@ public class AnnotationRequest {
         return filterMap.get(TARGET_SET);
     }
 
-    public void setGpSubset(String gpSubset) {
-        filterMap.put(DB_SUBSET, gpSubset);
+    public void setGeneProductSubset(String geneProductSubset) {
+        filterMap.put(DB_SUBSET, geneProductSubset);
     }
 
     @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
             message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
-    public String getGpSubset() {
+    public String getGeneProductSubset() {
         return filterMap.get(DB_SUBSET);
     }
 
