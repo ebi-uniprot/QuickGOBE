@@ -74,7 +74,7 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
         RESTRequesterImpl.Builder restRequesterBuilder = initRequestBuilder(request);
 
         try {
-            Class<?> restResponseType = createResponseType();
+            Class<?> restResponseType = loadResponseType();
             FilterConverter<ResponseType, QuickGOQuery> converter = createConverter();
             ResponseType results = (ResponseType) fetchResults(restRequesterBuilder.build(), restResponseType);
             return converter.transform(results);
@@ -120,7 +120,7 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
         return RESTRequesterImpl.newBuilder(restOperations, buildResourceTemplate(filterConfig));
     }
 
-    private Class<?> createResponseType() {
+    private Class<?> loadResponseType() {
         String responseClassName = filterConfig.getProperties().get(RESPONSE_CLASS);
         try {
             return ClassLoader.getSystemClassLoader().loadClass(responseClassName);
