@@ -30,7 +30,7 @@ public class DescendantsFilterConverter implements FilterConverter<ConvertedOnto
 
         SlimmingConversionInfo conversionInfo = new SlimmingConversionInfo();
 
-        if (response.getResults() != null && !response.getResults().isEmpty()) {
+        if (response.getResults() != null && atLeastOneDescendantExists(response)) {
             Set<QuickGOQuery> queries = new HashSet<>();
             FilterContext context = new FilterContext();
 
@@ -51,5 +51,12 @@ public class DescendantsFilterConverter implements FilterConverter<ConvertedOnto
         }
 
         return convertedFilter;
+    }
+
+    private boolean atLeastOneDescendantExists(ConvertedOntologyFilter response) {
+        return response.getResults().stream()
+                .filter(r -> !r.getDescendants().isEmpty())
+                .findFirst()
+                .isPresent();
     }
 }
