@@ -56,7 +56,7 @@ public class SlimResultsTransformerTest {
     }
 
     @Test
-    public void resultThatMatchesSlimTermInContextIsTransformed() {
+    public void oneResultThatMatchesOneSlimTermInContextIsTransformed() {
         String goId1 = "goId1";
         String slimmedId1 = "slimmedId1";
 
@@ -70,6 +70,25 @@ public class SlimResultsTransformerTest {
         Annotation transformedAnnotation = transformedResults.getResults().get(0);
         assertThat(transformedAnnotation.goId, is(goId1));
         assertThat(transformedAnnotation.slimmedIds, contains(slimmedId1));
+    }
+
+    @Test
+    public void oneResultThatMatchesTwoSlimTermsInContextIsTransformed() {
+        String goId1 = "goId1";
+        String slimmedId1 = "slimmedId1";
+        String slimmedId2 = "slimmedId2";
+
+        addAnnotationToResults(goId1);
+        addKnownMapping(goId1, slimmedId1);
+        addKnownMapping(goId1, slimmedId2);
+
+        QueryResult<Annotation> queryResult = createQueryResult();
+        QueryResult<Annotation> transformedResults = transformer.transform(queryResult, context);
+
+        assertThat(transformedResults.getResults(), hasSize(1));
+        Annotation transformedAnnotation = transformedResults.getResults().get(0);
+        assertThat(transformedAnnotation.goId, is(goId1));
+        assertThat(transformedAnnotation.slimmedIds, contains(slimmedId1, slimmedId2));
     }
 
     @Test
