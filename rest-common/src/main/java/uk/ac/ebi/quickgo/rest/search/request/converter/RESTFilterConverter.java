@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.springframework.web.client.RestOperations;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 
 /**
  * <p>Defines the conversion of a {@link FilterRequest} representing a REST request
@@ -51,7 +50,6 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
     private final FilterConfig filterConfig;
     private final RestOperations restOperations;
     private int timeoutMillis;
-    private static final QuickGOQuery FILTER_EVERYTHING = not(QuickGOQuery.createAllQuery());
 
     RESTFilterConverter(FilterConfig filterConfig, RestOperations restOperations) {
         Preconditions.checkArgument(filterConfig != null, "FilterConfig cannot be null");
@@ -79,10 +77,10 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
             ResponseType results = (ResponseType) fetchResults(restRequesterBuilder.build(), restResponseType);
             return converter.transform(results);
         } catch (Exception e) {
-            throwRetrievalException(FAILED_REST_FETCH_PREFIX + " due to: '" + e.getClass().getSimpleName() + "'", e);
+            String errorMessage = FAILED_REST_FETCH_PREFIX + " due to: '" + e.getClass().getSimpleName() + "'";
+            LOGGER.error(errorMessage, e);
+            throw new RetrievalException(errorMessage, e);
         }
-
-        return new ConvertedFilter<>(FILTER_EVERYTHING);
     }
 
     static String buildResourceTemplate(FilterConfig config) {
@@ -171,11 +169,6 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
         }
 
         return timeout;
-    }
-
-    private void throwRetrievalException(String errorMessage, Exception e) {
-        LOGGER.error(errorMessage, e);
-        throw new RetrievalException(errorMessage, e);
     }
 
     private void checkMandatoryProperty(String mandatoryProperty) {
