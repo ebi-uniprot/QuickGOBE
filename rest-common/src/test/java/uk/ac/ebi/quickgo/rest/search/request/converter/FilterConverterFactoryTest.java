@@ -66,7 +66,7 @@ public class FilterConverterFactoryTest {
                 .thenReturn(Optional.of(filterConfigMock));
         when(filterConfigMock.getExecution()).thenReturn(SIMPLE);
 
-        QuickGOQuery resultingQuery = converter.convert(request);
+        QuickGOQuery resultingQuery = converter.convert(request).getConvertedValue();
         QuickGOQuery expectedQuery = QuickGOQuery.createQuery(field, value);
 
         assertThat(resultingQuery, is(expectedQuery));
@@ -107,7 +107,7 @@ public class FilterConverterFactoryTest {
         configPropertiesMap.put(TO_ATTRIBUTE_NAME, toAttribute);
         when(filterConfigMock.getProperties()).thenReturn(configPropertiesMap);
 
-        QuickGOQuery resultingQuery = converter.convert(request);
+        QuickGOQuery resultingQuery = converter.convert(request).getConvertedValue();
         QuickGOQuery expectedQuery = QuickGOQuery.createJoinQueryWithFilter(
                 fromTable,
                 fromAttribute,

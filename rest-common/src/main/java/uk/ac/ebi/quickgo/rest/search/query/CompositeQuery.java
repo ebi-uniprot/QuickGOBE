@@ -48,18 +48,18 @@ public class CompositeQuery extends QuickGOQuery {
             return false;
         }
 
-        CompositeQuery query = (CompositeQuery) o;
+        CompositeQuery that = (CompositeQuery) o;
 
-        if (queryOperator != query.queryOperator) {
+        if (queryOperator != that.queryOperator) {
             return false;
         }
-        return queries.equals(query.queries);
+        return queries != null ? queries.equals(that.queries) : that.queries == null;
 
     }
 
     @Override public int hashCode() {
-        int result = queryOperator.hashCode();
-        result = 31 * result + queries.hashCode();
+        int result = queryOperator != null ? queryOperator.hashCode() : 0;
+        result = 31 * result + (queries != null ? queries.hashCode() : 0);
         return result;
     }
 

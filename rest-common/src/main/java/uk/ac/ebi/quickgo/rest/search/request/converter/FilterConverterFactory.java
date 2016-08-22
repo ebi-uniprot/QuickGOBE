@@ -34,7 +34,7 @@ public class FilterConverterFactory {
         this.restOperations = restOperations;
     }
 
-    public QuickGOQuery convert(FilterRequest request) {
+    public ConvertedFilter<QuickGOQuery> convert(FilterRequest request) {
         Optional<FilterConfig> configOpt = filterConfigRetrieval.getBySignature(request.getSignature());
         if (configOpt.isPresent()) {
             FilterConfig filterConfig = configOpt.get();

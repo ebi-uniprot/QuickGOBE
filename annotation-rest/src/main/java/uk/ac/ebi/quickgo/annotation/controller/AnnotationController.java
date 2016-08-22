@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
@@ -13,9 +14,10 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 
 /**
  * Provides RESTful endpoints for retrieving Gene Ontology (GO) Annotations to gene products.
@@ -87,7 +89,7 @@ public class AnnotationController {
 
     private final BasicSearchQueryTemplate queryTemplate;
     private final FilterConverterFactory converterFactory;
-
+    private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
 
     @Autowired
@@ -95,6 +97,7 @@ public class AnnotationController {
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
             FilterConverterFactory converterFactory,
+            ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
             StatisticsService statsService) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
@@ -102,14 +105,15 @@ public class AnnotationController {
                 ".AnnotationCompositeRetrievalConfig instance passed to the constructor of AnnotationController " +
                 "should not be null.");
         checkArgument(converterFactory != null, "The FilterConverterFactory cannot be null.");
+        checkArgument(resultTransformerChain != null,
+                "The ResultTransformerChain<QueryResult<Annotation>> cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
-
         this.converterFactory = converterFactory;
         this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
-
         this.statsService = statsService;
+        this.resultTransformerChain = resultTransformerChain;
     }
 
     /**
@@ -126,17 +130,47 @@ public class AnnotationController {
 
         validationHelper.validateRequestedResults(request.getLimit());
 
+        FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
+
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(request.createFilterRequests().stream()
-                        .map(converterFactory::convert)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet()))
+                .setFilters(filterQueryInfo.getFilterQueries())
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit())
                 .build();
 
-        return search(queryRequest, annotationSearchService);
+        return searchAndTransform(queryRequest, annotationSearchService, resultTransformerChain,
+                filterQueryInfo.getFilterContext());
+    }
+
+    private FilterQueryInfo extractFilterQueryInfo(
+            AnnotationRequest request) {
+        Set<QuickGOQuery> filterQueries = new HashSet<>();
+        Set<FilterContext> filterContexts = new HashSet<>();
+
+        request.createFilterRequests().stream()
+                .map(converterFactory::convert)
+                .forEach(convertedFilter -> {
+                    filterQueries.add(convertedFilter.getConvertedValue());
+                    convertedFilter.getFilterContext().ifPresent(filterContexts::add);
+                });
+
+        return new FilterQueryInfo() {
+            @Override public Set<QuickGOQuery> getFilterQueries() {
+                return filterQueries;
+            }
+
+            @Override public FilterContext getFilterContext() {
+                return filterContexts.stream().reduce(new FilterContext(), FilterContext::merge);
+            }
+        };
+
+    }
+
+    private interface FilterQueryInfo {
+        Set<QuickGOQuery> getFilterQueries();
+
+        FilterContext getFilterContext();
     }
 
     /**
