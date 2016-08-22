@@ -14,7 +14,7 @@ import static java.util.Arrays.asList;
  *
  * Created by Edd on 05/06/2016.
  */
-class JoinFilterConverter implements FilterConverter {
+class JoinFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery> {
 
     static final String FROM_TABLE_NAME = "fromTable";
     static final String FROM_ATTRIBUTE_NAME = "fromAttribute";
@@ -54,18 +54,20 @@ class JoinFilterConverter implements FilterConverter {
      * @param request the client request
      * @return a {@link QuickGOQuery} corresponding to a join query, representing the original client request
      */
-    @Override public QuickGOQuery transform(FilterRequest request) {
+    @Override public ConvertedFilter<QuickGOQuery> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "ClientRequest cannot be null");
 
         if (request.getValues().isEmpty()) {
-            return QuickGOQuery.createJoinQuery(fromTable, fromAttribute, toTable, toAttribute);
+            return new ConvertedFilter<>(
+                    QuickGOQuery.createJoinQuery(fromTable, fromAttribute, toTable, toAttribute));
         } else {
-            return QuickGOQuery.createJoinQueryWithFilter(
-                    fromTable,
-                    fromAttribute,
-                    toTable,
-                    toAttribute,
-                    new SimpleFilterConverter(filterConfig).transform(request));
+            return new ConvertedFilter<>(
+                    QuickGOQuery.createJoinQueryWithFilter(
+                            fromTable,
+                            fromAttribute,
+                            toTable,
+                            toAttribute,
+                            new SimpleFilterConverter(filterConfig).transform(request).getConvertedValue()));
         }
     }
 

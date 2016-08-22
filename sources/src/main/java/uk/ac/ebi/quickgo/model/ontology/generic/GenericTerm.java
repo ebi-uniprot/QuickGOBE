@@ -523,7 +523,6 @@ public class GenericTerm implements Comparable<GenericTerm> {
     }
 
     public int getCode() {
-        // TODO Auto-generated method stub
         return 0;
     }
 

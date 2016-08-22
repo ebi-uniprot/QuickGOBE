@@ -56,7 +56,7 @@ public class SimpleFilterConverterTest {
     @Test
     public void transformsRequestWithSingleValueIntoAQuickGOQuery() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(FIELD1, FIELD_VALUE_1).build();
-        QuickGOQuery resultingQuery = converter.transform(request);
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
         QuickGOQuery expectedQuery = QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_1);
 
         assertThat(resultingQuery, is(expectedQuery));
@@ -65,7 +65,7 @@ public class SimpleFilterConverterTest {
     @Test
     public void transformsRequestWithMultipleValuesIntoAQuickGOQuery() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(FIELD1, FIELD_VALUE_1, FIELD_VALUE_2).build();
-        QuickGOQuery resultingQuery = converter.transform(request);
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
 
         QuickGOQuery expectedQuery =
                 or(

@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.storeAndGet;
+
 /**
  * The fields of an ontology document.
  *
@@ -103,10 +105,5 @@ public class OntologyFields {
         public static Set<String> searchableFields() {
             return Collections.unmodifiableSet(VALUES);
         }
-    }
-    
-    private static String storeAndGet(Set<String> values, String value) {
-        values.add(value);
-        return value;
     }
 }

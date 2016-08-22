@@ -323,7 +323,7 @@ public class AnnotationRequest {
         return filterMap.get(EVIDENCE_CODE);
     }
 
-    @Pattern(regexp = "^exact|slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
+    @Pattern(regexp = "^slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
             "${validatedValue})")
     public String getUsage() {
         return filterMap.get(USAGE_FIELD);
@@ -440,7 +440,7 @@ public class AnnotationRequest {
         if (filterMap.containsKey(USAGE_FIELD)) {
             if (filterMap.containsKey(USAGE_IDS)) {
                 filterBuilder
-                        .addProperty(USAGE_FIELD, filterMap.get(USAGE_FIELD))
+                        .addProperty(filterMap.get(USAGE_FIELD))
                         .addProperty(USAGE_IDS, filterMap.get(USAGE_IDS));
             } else {
                 throw new ParameterException("Annotation usage requires 'usageIds' to be set.");

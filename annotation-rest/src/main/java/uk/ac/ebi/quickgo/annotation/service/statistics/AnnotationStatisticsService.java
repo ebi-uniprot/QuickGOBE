@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
@@ -74,6 +75,7 @@ public class AnnotationStatisticsService implements StatisticsService {
                 .setQuery(QuickGOQuery.createAllQuery())
                 .setFilters(request.createFilterRequests().stream()
                         .map(converterFactory::convert)
+                        .map(ConvertedFilter::getConvertedValue)
                         .collect(Collectors.toSet()))
                 .setPage(FIRST_PAGE)
                 .setPageSize(RESULTS_PER_PAGE);

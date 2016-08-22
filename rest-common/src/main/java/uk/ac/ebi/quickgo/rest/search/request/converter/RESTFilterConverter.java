@@ -1,27 +1,24 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
+import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import com.google.common.base.Preconditions;
-import com.jayway.jsonpath.JsonPath;
-import java.util.HashSet;
-import java.util.Set;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import net.minidev.json.JSONArray;
 import org.slf4j.Logger;
 import org.springframework.web.client.RestOperations;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 
 /**
  * <p>Defines the conversion of a {@link FilterRequest} representing a REST request
@@ -29,12 +26,14 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
  * <p>
  * Created by Edd on 05/06/2016.
  */
-class RESTFilterConverter implements FilterConverter {
+class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery> {
     static final String HOST = "ip";
     static final String RESOURCE_FORMAT = "resourceFormat";
     static final String BODY_PATH = "responseBodyPath";
     static final String LOCAL_FIELD = "localField";
     static final String TIMEOUT = "timeout";
+    static final String RESPONSE_CLASS = "responseClass";
+    static final String RESPONSE_CONVERTER_CLASS = "responseConverter";
 
     private static final Logger LOGGER = getLogger(RESTFilterConverter.class);
     private static final String COMMA = ",";
@@ -61,51 +60,27 @@ class RESTFilterConverter implements FilterConverter {
 
         checkMandatoryProperty(HOST);
         checkMandatoryProperty(RESOURCE_FORMAT);
-        checkMandatoryProperty(BODY_PATH);
-        checkMandatoryProperty(LOCAL_FIELD);
+        checkMandatoryProperty(RESPONSE_CLASS);
+        checkMandatoryProperty(RESPONSE_CONVERTER_CLASS);
 
-        initialiseTimeout();
+        this.timeoutMillis = loadTimeout();
     }
 
-    @Override
-    public QuickGOQuery transform(FilterRequest request) {
+    @Override public ConvertedFilter<QuickGOQuery> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
 
-        // create REST request executor
-        RESTRequesterImpl.Builder restRequesterBuilder = createRestRequesterBuilder();
-        request.getProperties().entrySet().forEach(entry ->
-                restRequesterBuilder.addRequestParameter(
-                        entry.getKey(),
-                        entry.getValue().stream()
-                                .collect(Collectors.joining(COMMA)))
-        );
+        RESTRequesterImpl.Builder restRequesterBuilder = initRequestBuilder(request);
 
-        QuickGOQuery nothingMatchesQuery = not(QuickGOQuery.createAllQuery());
-
-        // apply request and store results
-        JsonPath jsonPath = JsonPath.compile(filterConfig.getProperties().get(BODY_PATH));
         try {
-            Set<QuickGOQuery> queries = retrieveThenConvertResponse(
-                    fetchResults(restRequesterBuilder.build()),
-                    jsonPath,
-                    responseString -> QuickGOQuery
-                            .createQuery(filterConfig.getProperties().get(LOCAL_FIELD), responseString));
-
-            if (queries.size() > 0) {
-                return QuickGOQuery.or(queries.toArray(new QuickGOQuery[queries.size()]));
-            }
-
-            return nothingMatchesQuery;
-        } catch (ExecutionException e) {
-            throwRetrievalException(FAILED_REST_FETCH_PREFIX, e);
-        } catch (InterruptedException e) {
-            throwRetrievalException(
-                    FAILED_REST_FETCH_PREFIX + " due to an interruption whilst waiting for response", e);
-        } catch (TimeoutException e) {
-            throwRetrievalException(FAILED_REST_FETCH_PREFIX + " due to a timeout whilst waiting for response", e);
+            Class<?> restResponseType = loadResponseType();
+            FilterConverter<ResponseType, QuickGOQuery> converter = createConverter();
+            ResponseType results = (ResponseType) fetchResults(restRequesterBuilder.build(), restResponseType);
+            return converter.transform(results);
+        } catch (Exception e) {
+            String errorMessage = FAILED_REST_FETCH_PREFIX + " due to: '" + e.getClass().getSimpleName() + "'";
+            LOGGER.error(errorMessage, e);
+            throw new RetrievalException(errorMessage, e);
         }
-
-        return nothingMatchesQuery;
     }
 
     static String buildResourceTemplate(FilterConfig config) {
@@ -143,27 +118,57 @@ class RESTFilterConverter implements FilterConverter {
         return RESTRequesterImpl.newBuilder(restOperations, buildResourceTemplate(filterConfig));
     }
 
-    private void initialiseTimeout() {
+    private Class<?> loadResponseType() {
+        String responseClassName = filterConfig.getProperties().get(RESPONSE_CLASS);
+        try {
+            return ClassLoader.getSystemClassLoader().loadClass(responseClassName);
+        } catch (ClassNotFoundException e) {
+            String errorMessage = "Could not load REST response type class: " + responseClassName;
+            LOGGER.error(errorMessage, e);
+            throw new IllegalStateException(errorMessage, e);
+        }
+    }
+
+    private FilterConverter<ResponseType, QuickGOQuery> createConverter()
+            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
+                   InstantiationException {
+        String converterClassName = filterConfig.getProperties().get(RESPONSE_CONVERTER_CLASS);
+        Class<?> converterClass = ClassLoader.getSystemClassLoader().loadClass(converterClassName);
+
+        Constructor<?> declaredConstructor = converterClass.getDeclaredConstructor();
+        return (FilterConverter<ResponseType, QuickGOQuery>) declaredConstructor.newInstance();
+    }
+
+    private RESTRequesterImpl.Builder initRequestBuilder(FilterRequest request) {
+        RESTRequesterImpl.Builder restRequesterBuilder = createRestRequesterBuilder();
+        request.getProperties().entrySet().forEach(entry ->
+                restRequesterBuilder.addRequestParameter(
+                        entry.getKey(),
+                        entry.getValue().stream()
+                                .collect(Collectors.joining(COMMA)))
+        );
+        return restRequesterBuilder;
+    }
+
+    private int loadTimeout() {
+        int timeout = DEFAULT_TIMEOUT_MILLIS;
+
         if (filterConfig.getProperties().containsKey(TIMEOUT)) {
             boolean validTimeout = true;
             String timeoutValue = filterConfig.getProperties().get(TIMEOUT);
             try {
-                timeoutMillis = Integer.parseInt(timeoutValue);
+                timeout = Integer.parseInt(timeoutValue);
             } catch (NumberFormatException nfe) {
                 validTimeout = false;
             }
             Preconditions
                     .checkArgument(validTimeout, "FilterConfig's 'TIMEOUT' property must be a number: " + timeoutValue);
         } else {
-            timeoutMillis = DEFAULT_TIMEOUT_MILLIS;
-            LOGGER.debug("No " + TIMEOUT + " property specified in yaml configuration. RESTFilterConverter will use " +
+            LOGGER.debug("No " + TIMEOUT + " property specified in yml configuration. RESTFilterConverter will use " +
                     "default timeout of: " + timeoutMillis);
         }
-    }
 
-    private void throwRetrievalException(String errorMessage, Exception e) {
-        LOGGER.error(errorMessage, e);
-        throw new RetrievalException(errorMessage, e);
+        return timeout;
     }
 
     private void checkMandatoryProperty(String mandatoryProperty) {
@@ -171,23 +176,10 @@ class RESTFilterConverter implements FilterConverter {
                 "FilterConfig must have mandatory field: " + mandatoryProperty);
     }
 
-    private <T> Set<T> retrieveThenConvertResponse(String responseBody,
-            JsonPath jsonPath,
-            Function<String, T> converter) {
-        Set<T> results = new HashSet<>();
-        if (jsonPath.isDefinite()) {
-            results.add(converter.apply(jsonPath.read(responseBody)));
-        } else {
-            ((JSONArray) jsonPath.read(responseBody)).iterator()
-                    .forEachRemaining(s -> results.add(converter.apply(s.toString())));
-        }
-        return results;
-    }
-
-    private String fetchResults(RESTRequesterImpl restRequester)
+    private <R> R fetchResults(RESTRequesterImpl restRequester, Class<R> responseType)
             throws ExecutionException, InterruptedException, TimeoutException {
         return restRequester
-                .get(String.class)
+                .get(responseType)
                 .get(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 

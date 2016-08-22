@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.service.search;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
 import uk.ac.ebi.quickgo.common.validator.EntityValidation;
@@ -11,7 +12,9 @@ import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
 import uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.config.FieldNameTransformer;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
@@ -146,6 +149,15 @@ public class SearchServiceConfig {
     }
 
     @Bean
+    public ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain() {
+        ResultTransformerChain<QueryResult<Annotation>> transformerChain = new ResultTransformerChain<>();
+        transformerChain.addTransformer(new SlimResultsTransformer());
+        return transformerChain;
+    }
+
+    public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
+
+    @Bean
     public EntityValidation geneProductValidator() {
         return EntityValidation.createWithData(geneProductLoader().load());
     }
@@ -153,6 +165,4 @@ public class SearchServiceConfig {
     private DbXRefLoader geneProductLoader() {
         return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
-
-    public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 }

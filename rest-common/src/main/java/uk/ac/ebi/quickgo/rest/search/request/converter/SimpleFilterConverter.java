@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
@@ -16,7 +17,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
  *
  * Created by Edd on 05/06/2016.
  */
-class SimpleFilterConverter implements FilterConverter {
+class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery> {
 
     private final FilterConfig filterConfig;
 
@@ -34,18 +35,38 @@ class SimpleFilterConverter implements FilterConverter {
      * @param request the client request
      * @return a {@link QuickGOQuery} corresponding to a join query, representing the original client request
      */
-    @Override public QuickGOQuery transform(FilterRequest request) {
+    @Override public ConvertedFilter<QuickGOQuery> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
         Preconditions.checkArgument(request.getValues().size() == 1,
                 "FilterRequest should contain only 1 property for application to a SimpleRequestConverter, " +
                         "instead it contained " + request.getValues().size());
 
-        Set<QuickGOQuery> collect = request.getValues().stream()
+        Stream<String> values = request.getValues().stream().flatMap(Collection::stream);
+
+        return new ConvertedFilter<>(getQuickGOQuery(request, values));
+    }
+
+    /**
+     * Computes the {@link QuickGOQuery} corresponding to for the specified {@link FilterRequest} and {@code values}.
+     *
+     * <p>Note: inlining this method, as parameter to another method, lead to compilation failure, due to:
+     * <ul>
+     *     <li>http://stackoverflow.com/questions/25523375/java8-lambdas-and-exceptions</li>
+     *     <li>https://bugs.openjdk.java.net/browse/JDK-8054569</li>
+     * </ul>
+     *
+     * @param request the filter request
+     * @param values the values, whose combination with the filter details, enable creation of a
+     *        corresponding {@link QuickGOQuery}
+     * @return the corresponding {@link QuickGOQuery}
+     */
+    private QuickGOQuery getQuickGOQuery(FilterRequest request, Stream<String> values) {
+        Set<QuickGOQuery> queries = request.getValues().stream()
                 .flatMap(Collection::stream)
                 .map(value -> QuickGOQuery
                         .createQuery(request.getSignature().stream().collect(Collectors.joining()), value))
                 .collect(Collectors.toSet());
 
-        return or(collect.toArray(new QuickGOQuery[collect.size()]));
+        return or(queries.toArray(new QuickGOQuery[queries.size()]));
     }
 }
