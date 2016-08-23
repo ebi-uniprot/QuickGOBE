@@ -121,7 +121,7 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
     private Class<?> loadResponseType() {
         String responseClassName = filterConfig.getProperties().get(RESPONSE_CLASS);
         try {
-            return ClassLoader.getSystemClassLoader().loadClass(responseClassName);
+            return Class.forName(responseClassName);
         } catch (ClassNotFoundException e) {
             String errorMessage = "Could not load REST response type class: " + responseClassName;
             LOGGER.error(errorMessage, e);
@@ -133,7 +133,7 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
                    InstantiationException {
         String converterClassName = filterConfig.getProperties().get(RESPONSE_CONVERTER_CLASS);
-        Class<?> converterClass = ClassLoader.getSystemClassLoader().loadClass(converterClassName);
+        Class<?> converterClass = Class.forName(converterClassName);
 
         Constructor<?> declaredConstructor = converterClass.getDeclaredConstructor();
         return (FilterConverter<ResponseType, QuickGOQuery>) declaredConstructor.newInstance();
