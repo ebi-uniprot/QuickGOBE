@@ -67,7 +67,7 @@ public class AnnotationControllerJoinsIT {
             throws Exception {
         String geneProductId = "P99999";
         String goId = "GO:0003870";
-        String aspect = "cellular_component";
+        String aspect = "component";
 
         AnnotationDocument annotationDoc = createAnnotationDocWithGoId(geneProductId, goId);
         annotationRepository.save(annotationDoc);
@@ -92,8 +92,8 @@ public class AnnotationControllerJoinsIT {
             throws Exception {
         String geneProductId = "P99999";
         String goId = "GO:0003870";
-        String ontologyAspect = "molecular_function";
-        String queryAspect = "cellular_component";
+        String ontologyAspect = "function";
+        String queryAspect = "component";
 
         AnnotationDocument annotationDoc = createAnnotationDocWithGoId(geneProductId, goId);
         annotationRepository.save(annotationDoc);

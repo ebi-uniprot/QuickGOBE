@@ -95,8 +95,8 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Filter annotation by the ontology to which the associated GO term belongs. Accepts comma " +
                     "separated values. Accepts comma separated values.",
-            allowableValues = "biological_process,molecular_function,cellular_component",
-            example = "biological_process,molecular_function")
+            allowableValues = "process,function,component",
+            example = "process,function")
     private String aspect;
 
     @ApiModelProperty(value = "The database which made the annotation. Accepts comma separated values.",
@@ -219,7 +219,7 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = CASE_INSENSITIVE,
+    @Pattern(regexp = "process|function|component", flags = CASE_INSENSITIVE,
             message = "At least one 'Aspect' value is invalid: ${validatedValue}")
     public String getAspect() {
         return filterMap.get(ASPECT_FIELD);
