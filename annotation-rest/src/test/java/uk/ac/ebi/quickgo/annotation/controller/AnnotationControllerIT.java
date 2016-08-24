@@ -54,13 +54,13 @@ public class AnnotationControllerIT {
     private static final String GO_EVIDENCE_PARAM = "goIdEvidence";
     private static final String REF_PARAM = "reference";
     private static final String QUALIFIER_PARAM = "qualifier";
-    private static final String GP_PARAM = "geneProductId";
     private static final String EVIDENCE_CODE_PARAM = "evidenceCode";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String TAXON_ID_PARAM = "taxonId";
     private static final String GO_ID_PARAM = "goId";
     private static final String WITHFROM_PARAM = "withFrom";
+    private static final String GENE_PRODUCT_ID_PARAM = "geneProductId";
     private static final String GENE_PRODUCT_TYPE_PARAM = "geneProductType";
     private static final String GP_SUBSET_PARAM = "geneProductSubset";
     private static final String TARGET_SET_PARAM = "targetSet";
@@ -266,7 +266,7 @@ public class AnnotationControllerIT {
         repository.save(document);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM, geneProductId));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -395,11 +395,29 @@ public class AnnotationControllerIT {
     @Test
     public void filterByGeneProductIDSuccessfully() throws Exception {
         String geneProductId = "A1E959";
+        String fullGeneProductId = "UniProtKB:" + geneProductId;
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(fullGeneProductId);
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM, geneProductId));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, fullGeneProductId, 1));
+    }
+
+    @Test
+    public void filterByFullyQualifiedUniProtGeneProductIDSuccessfully() throws Exception {
+        String geneProductId = "UniProtKB:A1E959";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM, geneProductId));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -421,7 +439,7 @@ public class AnnotationControllerIT {
         StringJoiner sj = new StringJoiner(",");
         sj.add(uniprotGp).add(intactGp).add(rnaGp);
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GP_PARAM, sj.toString()));
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM, sj.toString()));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -444,7 +462,7 @@ public class AnnotationControllerIT {
         StringJoiner sj = new StringJoiner(",");
         sj.add(uniprotGp).add(intactGp).add(rnaGp);
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GP_PARAM, sj.toString()));
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM, sj.toString()));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -462,7 +480,7 @@ public class AnnotationControllerIT {
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GP_PARAM, invalidGeneProductID));
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM, invalidGeneProductID));
 
         response.andExpect(status().isBadRequest());
     }
@@ -471,7 +489,7 @@ public class AnnotationControllerIT {
     public void filterByValidIdThatDoesNotExistExpectZeroResultsButNoError() throws Exception {
         String geneProductId = "Z0Z000";
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId));
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM, geneProductId));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -483,9 +501,9 @@ public class AnnotationControllerIT {
     public void filterByThreeGeneProductIdsTwoOfWhichExistToEnsureTheyAreReturned() throws Exception {
         String geneProductId = "Z0Z000";
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GP_PARAM, geneProductId)
-                        .param(GP_PARAM, genericDocs.get(0).geneProductId)
-                        .param(GP_PARAM, genericDocs.get(1).geneProductId));
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM, geneProductId)
+                        .param(GENE_PRODUCT_ID_PARAM, genericDocs.get(0).geneProductId)
+                        .param(GENE_PRODUCT_ID_PARAM, genericDocs.get(1).geneProductId));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -500,7 +518,7 @@ public class AnnotationControllerIT {
     public void filterByGeneProductIDAndAssignedBySuccessfully() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param(GP_PARAM, genericDocs.get(0).geneProductId)
+                        .param(GENE_PRODUCT_ID_PARAM, genericDocs.get(0).geneProductId)
                         .param(ASSIGNED_BY, genericDocs.get(0).assignedBy));
 
         response.andDo(print())

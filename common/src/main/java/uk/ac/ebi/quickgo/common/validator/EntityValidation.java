@@ -19,11 +19,12 @@ import static com.google.common.base.Preconditions.checkArgument;
  *         Created with IntelliJ IDEA.
  */
 public class EntityValidation {
-
     // Default list of databases and entity types to validate against.
-    private static final Key[] targetDBs = new Key[]{new Key("UniProtKB", "PR:000000001"), new Key("IntAct",
-            "GO:0043234"),
+    private static final Key[] targetDBs = new Key[]{
+            new Key("UniProtKB", "PR:000000001"),
+            new Key("IntAct", "GO:0043234"),
             new Key("RNAcentral", "CHEBI:33697")};
+
     // A list of entries loaded from 'DB_XREFS_ENTITIES.dat.gz' keyed by database and entity type id.
     private final Map<EntityValidation.Key, DbXRefEntity> entityList;
 
@@ -59,14 +60,14 @@ public class EntityValidation {
      * @return true if the id is valid, false otherwise
      */
     public boolean isValidId(String id) {
-
-        //If we haven't managed to load the validation regular expressions then pass everything
+        // If we haven't managed to load the validation regular expressions, then pass everything
         if (entityList.size() == 0) {
             return true;
         }
+
         for (Key dbKey : targetDBs) {
             DbXRefEntity entity = this.entityList.get(dbKey);
-            if (null == entity) {
+            if (entity == null) {
                 continue;
             }
             if (entity.matches(id)) {
@@ -74,14 +75,13 @@ public class EntityValidation {
             }
         }
 
-        //no matches
+        // no matches
         return false;
     }
 
     /**
-     * Key class holds the variables we need to lookup up the validating regex
+     * Key class holds the variables we need to lookup the validating regex
      */
-
     private static class Key {
         final String database;
         final String entityType;

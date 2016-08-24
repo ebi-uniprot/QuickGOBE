@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.common.validator;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintValidator;
@@ -20,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Time: 13:32
  * Created with IntelliJ IDEA.
  */
-
 public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList, String> {
-
     private static final String MESSAGE = "At least one 'Gene Product ID' value is invalid: %s";
 
     @Autowired
