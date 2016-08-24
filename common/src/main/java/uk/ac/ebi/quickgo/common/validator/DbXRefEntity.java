@@ -22,6 +22,7 @@ public class DbXRefEntity {
     private final String entityTypeName;
     private final Pattern idValidationPattern;
     private final String databaseURL;
+    private final boolean validationCaseSensitive;
 
     public DbXRefEntity(
             String database,
@@ -37,15 +38,20 @@ public class DbXRefEntity {
                 "The regex for the validation of ids from " + database + " is null and therefore invalid");
         this.database = database;
         this.entityType = entityType;
-        this.idValidationPattern = Pattern.compile(idValidationPattern, validationCaseSensitive ? 0 : CASE_INSENSITIVE);
+        this.validationCaseSensitive = validationCaseSensitive;
+        this.idValidationPattern =
+                Pattern.compile(idValidationPattern, this.validationCaseSensitive ? 0 : CASE_INSENSITIVE);
         this.entityTypeName = entityTypeName;
         this.databaseURL = databaseURL;
     }
 
     /**
-     * Does the argument match the regular expression that determines validity of the entity?
-     * @param id the gene product id to be checked
-     * @return true if the gene product id is positively matched to the validation regular expression.3
+     * This method checks whether the supplied {@code id} matches the regular expression
+     * that determines a valid entity.
+     *
+     * @param id the gene product id to be checked. This can be either the qualified (e.g., UniProtKB:Q12345),
+     *           or unqualified value (e.g., Q12345)
+     * @return true if the gene product id is a valid identifier according to this {@link DbXRefEntity}.
      */
     public boolean matches(String id) {
         String[] idComponents = id.split(COLON, 2);
@@ -55,7 +61,8 @@ public class DbXRefEntity {
                 return idValidationPattern.matcher(idComponents[0]).matches();
             case 2:
                 return idValidationPattern.matcher(idComponents[1]).matches() &&
-                        idComponents[0].equalsIgnoreCase(database);
+                        (validationCaseSensitive ?
+                                 idComponents[0].equals(database) : idComponents[0].equalsIgnoreCase(database));
             default:
                 return false;
         }

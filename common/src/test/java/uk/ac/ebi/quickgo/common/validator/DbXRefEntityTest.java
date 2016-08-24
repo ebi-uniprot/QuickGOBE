@@ -100,5 +100,7 @@ public class DbXRefEntityTest {
 		dbXrefEntity = new DbXRefEntity(database, entityType, entityTypeName, idValidationPattern, dbURL, matchingIsCaseSensitive);
 		assertThat(dbXrefEntity.matches("A0A000"), is(true));
 		assertThat(dbXrefEntity.matches("a0A000"), is(false));
-	}
+        assertThat(dbXrefEntity.matches("UniProtKB:A0A000"), is(true));
+        assertThat(dbXrefEntity.matches("uniProtkb:a0a000"), is(false));
+    }
 }
