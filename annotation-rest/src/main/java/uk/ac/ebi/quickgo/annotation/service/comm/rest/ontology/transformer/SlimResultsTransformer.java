@@ -33,12 +33,15 @@ public class SlimResultsTransformer implements ResultTransformer<QueryResult<Ann
                         .get(SlimmingConversionInfo.class)
                         .orElse(EMPTY_SLIMMING_INFO);
 
-        LOGGER.info("Transforming results to include slimming information");
         Map<String, List<String>> descendantToTermMap = conversionInfo.getInfo();
 
-        queryResult.getResults().stream()
-                .filter(result -> descendantToTermMap.containsKey(result.goId))
-                .forEach(result -> result.slimmedIds = descendantToTermMap.get(result.goId));
+        if (!descendantToTermMap.isEmpty()) {
+            LOGGER.info("Transforming results to include slimmed IDs");
+            queryResult.getResults().stream()
+                    .filter(result -> descendantToTermMap.containsKey(result.goId))
+                    .forEach(result -> result.slimmedIds = descendantToTermMap.get(result.goId));
+        }
+
 
         return queryResult;
     }
