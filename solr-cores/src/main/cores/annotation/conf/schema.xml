@@ -76,7 +76,7 @@
     <field name="dbSubset" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="evidenceCode" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="extension" type="string" indexed="false" stored="true" multiValued="true"/>
-    <field name="geneProductId" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
+    <field name="geneProductId" type="database_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="geneProductType" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="goEvidence" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="goId" type="lowercase" indexed="true" stored="true" multiValued="false"/>
