@@ -29,18 +29,15 @@ public class Annotation {
 
     public List<String> withFrom;
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public int taxonId;
 
     public String assignedBy;
 
     public List<String> extensions;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public List<String> slimmedIds;
-
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    public int getTaxonId() {
-        return taxonId;
-    }
 
     @Override public boolean equals(Object o) {
         if (this == o) {

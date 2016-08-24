@@ -131,6 +131,7 @@ public class AnnotationControllerRESTIT {
                 .andExpect(pageInfoExists())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(fieldDoesNotExist(SLIMMED_ID_FIELD))
                 .andExpect(valuesOccurInField(GO_ID_FIELD, goId(3)));
     }
 
@@ -158,6 +159,7 @@ public class AnnotationControllerRESTIT {
                 .andExpect(pageInfoExists())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
+                .andExpect(fieldDoesNotExist(SLIMMED_ID_FIELD))
                 .andExpect(valuesOccurInField(GO_ID_FIELD, goId(2), goId(3)));
     }
 
@@ -179,6 +181,7 @@ public class AnnotationControllerRESTIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(pageInfoExists())
+                .andExpect(fieldDoesNotExist(SLIMMED_ID_FIELD))
                 .andExpect(totalNumOfResults(0));
     }
 
@@ -202,6 +205,7 @@ public class AnnotationControllerRESTIT {
                 .andExpect(pageInfoExists())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(fieldDoesNotExist(SLIMMED_ID_FIELD))
                 .andExpect(valuesOccurInField(GO_ID_FIELD, goId(3)));
     }
 
@@ -226,6 +230,7 @@ public class AnnotationControllerRESTIT {
                 .andExpect(pageInfoExists())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
+                .andExpect(fieldDoesNotExist(SLIMMED_ID_FIELD))
                 .andExpect(valuesOccurInField(GO_ID_FIELD, goId(3), goId(4)));
     }
 
