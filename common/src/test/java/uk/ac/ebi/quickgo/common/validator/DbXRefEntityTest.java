@@ -46,6 +46,11 @@ public class DbXRefEntityTest {
 		assertThat(dbXrefEntity.matches("UniProtKB:A0A000"), is(true));
 	}
 
+    @Test
+    public void invalidIdWhenExactMatchButNonMatchingDatabase() {
+        assertThat(dbXrefEntity.matches("UnirotKB:A0A000"), is(false));
+    }
+
 	@Test
 	public void validIdWhenCaseInsensitiveMatchIncludingDatabase() {
 		assertThat(dbXrefEntity.matches("uniProtkb:a0a000"), is(true));
@@ -57,9 +62,9 @@ public class DbXRefEntityTest {
 	}
 
 	@Test
-	public void isValidId() {
-		assertThat(dbXrefEntity.matches("99999"), is(CASE_SENSITIVE_MATCHING));
-	}
+    public void isInvalidId() {
+        assertThat(dbXrefEntity.matches("99999"), is(false));
+    }
 
 	@Test
 	public void exceptionThrownIfDatabaseIsNull(){
