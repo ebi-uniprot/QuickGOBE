@@ -31,11 +31,9 @@ public class SlimResultsTransformer implements ResultTransformer<QueryResult<Ann
         SlimmingConversionInfo conversionInfo =
                 filterContext
                         .get(SlimmingConversionInfo.class)
-                        .orElseGet(() -> {
-                            LOGGER.warn("Transformation of filterContext was found to be empty, but should never be");
-                            return EMPTY_SLIMMING_INFO;
-                        });
+                        .orElse(EMPTY_SLIMMING_INFO);
 
+        LOGGER.info("Transforming results to include slimming information");
         Map<String, List<String>> descendantToTermMap = conversionInfo.getInfo();
 
         queryResult.getResults().stream()
