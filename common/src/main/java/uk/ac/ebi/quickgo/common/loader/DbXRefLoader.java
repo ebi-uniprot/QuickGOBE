@@ -12,15 +12,10 @@ import org.slf4j.LoggerFactory;
 import static java.util.stream.Collectors.toList;
 
 /**
- *
  * Read the file in the specified directory, and pass back the contents as a list.
  *
- *
  * @author Tony Wardell
- *         Date: 18/04/2016
- *         Time: 14:06
- *         Created with IntelliJ IDEA.
- *
+ * Date: 18/04/2016
  */
 public class DbXRefLoader {
 
@@ -35,7 +30,6 @@ public class DbXRefLoader {
     private final boolean caseSensitive;
 
     public DbXRefLoader(String path, boolean caseSensitive) {
-
         this.path = path;
         this.caseSensitive = caseSensitive;
     }
@@ -52,26 +46,27 @@ public class DbXRefLoader {
      * @return a list of GeneProductDbXRefIDFormat instances that hold the validation regular expressions.
      */
     public List<DbXRefEntity> load() {
-
         try {
-
             Path path = FileSystems.getDefault().getPath(this.path);
 
             return GZIPFiles.lines(path)
-                    .skip(1)    //header
+                    .skip(1)    // header
                     .map(line -> line.split(COL_DELIMITER))
-                    .map(fields -> new DbXRefEntity(fields[COL_DATABASE], fields[COL_ENTITY_TYPE],
-                            fields[COL_ENTITY_TYPE_NAME], fields[COL_LOCAL_ID_SYNTAX], fields[COL_URL_SYNTAX],
-                            caseSensitive))
+                    .map(fields ->
+                            new DbXRefEntity(
+                                    fields[COL_DATABASE],
+                                    fields[COL_ENTITY_TYPE],
+                                    fields[COL_ENTITY_TYPE_NAME],
+                                    fields[COL_LOCAL_ID_SYNTAX],
+                                    fields[COL_URL_SYNTAX],
+                                    caseSensitive))
                     .collect(toList());
 
         } catch (Exception e) {
             logger.error("DbXRefLoader failed to load file " + this.path + ", the source of validation regexes to " +
                     "validate gene product IDs. Gene Product ID validation will not take place", e);
-
             return Collections.emptyList();
         }
-
     }
 
 }

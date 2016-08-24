@@ -32,13 +32,32 @@ public class DbXRefEntityTest {
 	}
 
 	@Test
-	public void validId(){
+	public void validIdWhenExactMatch() {
 		assertThat(dbXrefEntity.matches("A0A000"), is(true));
+	}
+
+	@Test
+	public void validIdWhenCaseInsensitiveMatch() {
 		assertThat(dbXrefEntity.matches("a0A000"), is(true));
 	}
 
 	@Test
-	public void inValidId(){
+	public void validIdWhenExactMatchIncludingDatabase() {
+		assertThat(dbXrefEntity.matches("UniProtKB:A0A000"), is(true));
+	}
+
+	@Test
+	public void validIdWhenCaseInsensitiveMatchIncludingDatabase() {
+		assertThat(dbXrefEntity.matches("uniProtkb:a0a000"), is(true));
+	}
+
+	@Test
+	public void validIdWhenExactMatchIncludingDatabaseWithEntityColons() {
+		assertThat(dbXrefEntity.matches("uniProtkb:a0a000:PRO_0123456789"), is(true));
+	}
+
+	@Test
+	public void isValidId() {
 		assertThat(dbXrefEntity.matches("99999"), is(CASE_SENSITIVE_MATCHING));
 	}
 

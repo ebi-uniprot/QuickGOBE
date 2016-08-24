@@ -155,8 +155,6 @@ public class SearchServiceConfig {
         return transformerChain;
     }
 
-    public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
-
     @Bean
     public EntityValidation geneProductValidator() {
         return EntityValidation.createWithData(geneProductLoader().load());
@@ -165,4 +163,6 @@ public class SearchServiceConfig {
     private DbXRefLoader geneProductLoader() {
         return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
+
+    public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}
 }

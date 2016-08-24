@@ -25,8 +25,6 @@ public class EntityValidationTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private List<DbXRefEntity> listOfFormats;
-
 	private EntityValidation dbXrefEntities;
 
 	@Mock
@@ -40,7 +38,7 @@ public class EntityValidationTest {
 
 	@Before
 	public void setup(){
-		listOfFormats = new ArrayList<>();
+		List<DbXRefEntity> listOfFormats = new ArrayList<>();
 		listOfFormats.add(rnaCentralEntity);
 		listOfFormats.add(intactEntity);
 		listOfFormats.add(uniprotEntity);
