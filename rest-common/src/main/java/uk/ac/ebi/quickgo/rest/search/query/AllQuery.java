@@ -19,6 +19,6 @@ public class AllQuery extends QuickGOQuery {
     }
 
     @Override public int hashCode() {
-        return super.hashCode();
+        return this.getClass().getName().hashCode();
     }
 }
