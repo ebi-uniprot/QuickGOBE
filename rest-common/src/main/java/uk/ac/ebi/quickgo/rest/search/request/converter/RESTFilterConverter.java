@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.rest.search.request.converter;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
@@ -22,11 +21,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * <p>Defines the conversion of a {@link FilterRequest} representing a REST request
- * to a corresponding {@link QuickGOQuery}.
- * <p>
+ * to a corresponding instance of type {@code T}.
+ *
  * Created by Edd on 05/06/2016.
  */
-class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery> {
+class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
     static final String HOST = "ip";
     static final String RESOURCE_FORMAT = "resourceFormat";
     static final String BODY_PATH = "responseBodyPath";
@@ -66,14 +65,14 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
         this.timeoutMillis = loadTimeout();
     }
 
-    @Override public ConvertedFilter<QuickGOQuery> transform(FilterRequest request) {
+    @Override public ConvertedFilter<T> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
 
         RESTRequesterImpl.Builder restRequesterBuilder = initRequestBuilder(request);
 
         try {
             Class<?> restResponseType = loadResponseType();
-            FilterConverter<ResponseType, QuickGOQuery> converter = createConverter();
+            FilterConverter<ResponseType, T> converter = createConverter();
             ResponseType results = (ResponseType) fetchResults(restRequesterBuilder.build(), restResponseType);
             return converter.transform(results);
         } catch (Exception e) {
@@ -129,14 +128,14 @@ class RESTFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery
         }
     }
 
-    private FilterConverter<ResponseType, QuickGOQuery> createConverter()
+    private FilterConverter<ResponseType, T> createConverter()
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
                    InstantiationException {
         String converterClassName = filterConfig.getProperties().get(RESPONSE_CONVERTER_CLASS);
         Class<?> converterClass = Class.forName(converterClassName);
 
         Constructor<?> declaredConstructor = converterClass.getDeclaredConstructor();
-        return (FilterConverter<ResponseType, QuickGOQuery>) declaredConstructor.newInstance();
+        return (FilterConverter<ResponseType, T>) declaredConstructor.newInstance();
     }
 
     private RESTRequesterImpl.Builder initRequestBuilder(FilterRequest request) {

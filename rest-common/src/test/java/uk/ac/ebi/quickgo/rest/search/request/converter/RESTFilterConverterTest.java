@@ -66,7 +66,7 @@ public class RESTFilterConverterTest {
                     .addProperty(id, "anything")
                     .build();
 
-            RESTFilterConverter converter = createConverter(config);
+            RESTFilterConverter<QuickGOQuery> converter = createConverter(config);
 
             QuickGOQuery query = converter.transform(filter).getConvertedValue();
 
@@ -100,7 +100,7 @@ public class RESTFilterConverterTest {
                     .addProperty(id, "anything")
                     .build();
 
-            RESTFilterConverter converter = createConverter(config);
+            RESTFilterConverter<QuickGOQuery> converter = createConverter(config);
 
             QuickGOQuery query = converter.transform(filter).getConvertedValue();
 
@@ -226,8 +226,8 @@ public class RESTFilterConverterTest {
             return config;
         }
 
-        private RESTFilterConverter createConverter(FilterConfig config) {
-            return new RESTFilterConverter(config, mock(RestTemplate.class)) {
+        private RESTFilterConverter<QuickGOQuery> createConverter(FilterConfig config) {
+            return new RESTFilterConverter<QuickGOQuery>(config, mock(RestTemplate.class)) {
                 @Override
                 RESTRequesterImpl.Builder createRestRequesterBuilder() {
                     return restRequestBuilderMock;

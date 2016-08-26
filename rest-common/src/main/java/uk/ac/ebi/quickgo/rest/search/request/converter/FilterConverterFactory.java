@@ -40,7 +40,7 @@ public class FilterConverterFactory {
             FilterConfig filterConfig = configOpt.get();
             switch (filterConfig.getExecution()) {
                 case REST_COMM:
-                    return new RESTFilterConverter(filterConfig, restOperations).transform(request);
+                    return new RESTFilterConverter<QuickGOQuery>(filterConfig, restOperations).transform(request);
                 case SIMPLE:
                     return new SimpleFilterConverter(filterConfig).transform(request);
                 case JOIN:
