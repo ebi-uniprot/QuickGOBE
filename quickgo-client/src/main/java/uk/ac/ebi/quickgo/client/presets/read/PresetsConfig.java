@@ -5,6 +5,10 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.RawAssignedByPreset;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.RawAssignedByPresetValidator;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.StringToAssignedByMapper;
+import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
+import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,6 +32,7 @@ import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.InputStreamResource;
@@ -43,6 +48,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 @Configuration
+@ComponentScan({"uk.ac.ebi.quickgo.rest"})
 @EnableBatchProcessing
 public class PresetsConfig {
 
@@ -50,7 +56,7 @@ public class PresetsConfig {
     private static final String PRESET_LOADING_JOB_NAME = "PresetReadingJob";
     private static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     private static final String TAB = "\t";
-
+    private static final int SKIP_LIMIT = 0;
     @Autowired
     private JobBuilderFactory jobBuilders;
     @Autowired
@@ -62,23 +68,30 @@ public class PresetsConfig {
     @Value("${assignedBy.preset.header.lines:1}")
     private int assignedByHeaderLines;
 
-    private static final int SKIP_LIMIT = 0;
-
     @Bean
     public CompositePreset presets() {
         return new CompositePreset();
     }
 
     @Bean
-    public Job presetsBuildJob(CompositePreset preset) {
+    public Job presetsBuildJob(CompositePreset preset, RESTFilterConverterFactory converterFactory) {
         return jobBuilders.get(PRESET_LOADING_JOB_NAME)
-                .start(assignedByPresetBuildStep(preset))
+                .start(assignedByPresetBuildStep(preset, converterFactory))
                 .listener(logJobListener())
                 .build();
     }
 
     @Bean
-    public Step assignedByPresetBuildStep(CompositePreset preset) {
+    public SearchableDocumentFields searchableDocumentFields() {
+        return new NoSearchablePresetDocumentFields();
+    }
+
+    @Bean
+    static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    private Step assignedByPresetBuildStep(CompositePreset preset, RESTFilterConverterFactory converterFactory) {
         FlatFileItemReader<RawAssignedByPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
         itemReader.setLinesToSkip(assignedByHeaderLines);
 
@@ -87,8 +100,7 @@ public class PresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawAssignedByPreset>reader(rawPresetMultiFileReader(assignedByResources, itemReader))
-                .processor(compositeItemProcessor(assignedByValidator(), assignedByRelevancyFetcher()))
-                // can add transformer too to get most relevant 10 assigned bys.
+                .processor(compositeItemProcessor(assignedByValidator(), assignedByRelevancyFetcher(converterFactory)))
                 .writer(list -> list.forEach(rawPreset ->
                         preset.assignedBy
                                 .presets
@@ -96,11 +108,6 @@ public class PresetsConfig {
                 ))
                 .listener(new LogStepListener())
                 .build();
-    }
-
-    @Bean
-    static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
     }
 
     private <S, T> ItemProcessor<S, T> compositeItemProcessor(ItemProcessor<?, ?>... delegates) {
@@ -160,8 +167,12 @@ public class PresetsConfig {
         return new RawAssignedByPresetValidator();
     }
 
-    private ItemProcessor<RawAssignedByPreset, RawAssignedByPreset> assignedByRelevancyFetcher() {
-        return new RawAssignedByPresetTopN();
+    private ItemProcessor<RawAssignedByPreset, RawAssignedByPreset> assignedByRelevancyFetcher
+            (RESTFilterConverterFactory converterFactory) {
+        FilterRequest assignedBy = FilterRequest.newBuilder().addProperty("assignedBy").build();
+        ConvertedFilter<List<String>> convert = converterFactory.convert(assignedBy);
+
+        return new RawAssignedByPresetTopN(assignedByName -> convert.getConvertedValue().contains(assignedByName));
     }
 
     /**
@@ -173,6 +184,16 @@ public class PresetsConfig {
      */
     private <T> void setResourceComparator(MultiResourceItemReader<T> reader) {
         reader.setComparator((o1, o2) -> 0);
+    }
+
+    private static class NoSearchablePresetDocumentFields implements SearchableDocumentFields {
+        @Override public boolean isDocumentSearchable(String field) {
+            return false;
+        }
+
+        @Override public Stream<String> searchableDocumentFields() {
+            return Stream.empty();
+        }
     }
 
     private static class GZIPResource extends InputStreamResource implements Resource {

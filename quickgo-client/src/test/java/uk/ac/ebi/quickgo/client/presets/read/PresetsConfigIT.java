@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThan;
@@ -25,6 +26,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 @ContextConfiguration(
         classes = {PresetsConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
+@WebAppConfiguration
 public class PresetsConfigIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
