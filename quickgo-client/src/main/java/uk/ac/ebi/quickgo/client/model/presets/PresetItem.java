@@ -19,4 +19,11 @@ public class PresetItem {
 
     public String name;
     public String description;
+
+    @Override public String toString() {
+        return "PresetItem{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

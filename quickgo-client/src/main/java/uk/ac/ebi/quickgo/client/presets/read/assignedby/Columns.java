@@ -5,7 +5,9 @@ package uk.ac.ebi.quickgo.client.presets.read.assignedby;
  * @author Edd
  */
 public enum Columns {
-    COLUMN_DB(0, "database");
+    COLUMN_DATABASE(0, "database"),
+    COLUMN_NAME(1, "name"),
+    COLUMN_URL(2, "url");
 
     private int position;
     private String columnName;

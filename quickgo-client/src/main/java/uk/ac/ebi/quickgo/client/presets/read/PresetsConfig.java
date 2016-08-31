@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.client.presets.read;
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.RawAssignedByPreset;
+import uk.ac.ebi.quickgo.client.presets.read.assignedby.RawAssignedByPresetValidator;
+import uk.ac.ebi.quickgo.client.presets.read.assignedby.StringToAssignedByMapper;
 
 import java.io.IOException;
 import java.util.List;
@@ -85,13 +87,14 @@ public class PresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawAssignedByPreset>reader(rawPresetMultiFileReader(assignedByResources, itemReader))
-                .processor(compositeItemProcessor(assignedByValidator()))
+                .processor(compositeItemProcessor(assignedByValidator(), assignedByRelevancyFetcher()))
                 // can add transformer too to get most relevant 10 assigned bys.
-                // add log step listener to report progress of a step
                 .writer(list -> list.forEach(rawPreset ->
                         preset.assignedBy
                                 .presets
-                                .add(new PresetItem(rawPreset.name, rawPreset.description))))
+                                .add(new PresetItem(rawPreset.name, rawPreset.description))
+                ))
+                .listener(new LogStepListener())
                 .build();
     }
 
@@ -146,7 +149,7 @@ public class PresetsConfig {
     }
 
     private FieldSetMapper<RawAssignedByPreset> rawAssignedByPresetFieldSetMapper() {
-        return null;
+        return new StringToAssignedByMapper();
     }
 
     private JobExecutionListener logJobListener() {
@@ -154,7 +157,11 @@ public class PresetsConfig {
     }
 
     private ItemProcessor<RawAssignedByPreset, RawAssignedByPreset> assignedByValidator() {
-        return null;
+        return new RawAssignedByPresetValidator();
+    }
+
+    private ItemProcessor<RawAssignedByPreset, RawAssignedByPreset> assignedByRelevancyFetcher() {
+        return new RawAssignedByPresetTopN();
     }
 
     /**

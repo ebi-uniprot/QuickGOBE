@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,5 +8,15 @@ import java.util.List;
  * @author Edd
  */
 public class AssignedByPresets {
-    public List<PresetItem> presets;
+    public final List<PresetItem> presets;
+
+    AssignedByPresets() {
+        presets = new ArrayList<>();
+    }
+
+    @Override public String toString() {
+        return "AssignedByPresets{" +
+                "presets=" + presets +
+                '}';
+    }
 }

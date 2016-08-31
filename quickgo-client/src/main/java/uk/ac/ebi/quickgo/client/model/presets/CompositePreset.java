@@ -5,5 +5,15 @@ package uk.ac.ebi.quickgo.client.model.presets;
  * @author Edd
  */
 public class CompositePreset {
-    public AssignedByPresets assignedBy;
+    public final AssignedByPresets assignedBy;
+
+    public CompositePreset() {
+        assignedBy = new AssignedByPresets();
+    }
+
+    @Override public String toString() {
+        return "CompositePreset{" +
+                "assignedBy=" + assignedBy +
+                '}';
+    }
 }
