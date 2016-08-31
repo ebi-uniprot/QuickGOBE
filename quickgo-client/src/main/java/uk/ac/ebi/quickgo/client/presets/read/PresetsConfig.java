@@ -126,8 +126,8 @@ public class PresetsConfig {
             reader.setDelegate(itemReader);
         } catch (IOException e) {
             LOGGER.error(
-                    "Failed to load preset information for [ " + Stream.of(resources) + ". " +
-                            "No corresponding preset information will be available.", e);
+                    "Failed to load preset information for " + Stream.of(resources) + ". " +
+                            "No corresponding information for this preset will be available.", e);
         }
 
         return reader;
