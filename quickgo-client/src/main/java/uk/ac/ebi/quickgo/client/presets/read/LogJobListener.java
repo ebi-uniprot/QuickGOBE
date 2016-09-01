@@ -39,10 +39,10 @@ public class LogJobListener implements JobExecutionListener {
         LOGGER.info("=====================================================");
         LOGGER.info("              QuickGO Job Statistics                 ");
         LOGGER.info("Job name      : {}", jobExecution.getJobInstance().getJobName());
-        LOGGER.info("Exit status   : {}", jobExecution.getExitStatus().getExitCode());
         LOGGER.info("Start time    : {}", jobExecution.getStartTime());
         LOGGER.info("End time      : {}", jobExecution.getEndTime());
         LOGGER.info("Duration      : {}", duration);
+        LOGGER.info("Exit status   : {}", jobExecution.getExitStatus().getExitCode());
 
         long skipCount = 0L;
         long readSkips = 0L;
@@ -56,8 +56,8 @@ public class LogJobListener implements JobExecutionListener {
             readSkips += execution.getReadSkipCount();
             readCount += execution.getReadCount();
             processingSkips += execution.getProcessSkipCount();
-            writeCount += execution.getWriteCount();
             skipCount += execution.getSkipCount();
+            writeCount += execution.getWriteCount();
         }
 
         LOGGER.info("Read count    : {}", readCount);

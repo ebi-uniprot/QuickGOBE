@@ -22,12 +22,12 @@ public class LogStepListener implements StepExecutionListener {
         LOGGER.info("=====================================================");
         LOGGER.info("              QuickGO Step Statistics                 ");
         LOGGER.info("Step name     : {}", stepExecution.getStepName());
-        LOGGER.info("Exit status   : {}", stepExecution.getExitStatus().getExitCode());
         LOGGER.info("Read count    : {}", stepExecution.getReadCount());
         LOGGER.info("Write count   : {}", stepExecution.getWriteCount());
         LOGGER.info("Skip count    : {} ({} read / {} processing /{} write)", stepExecution.getSkipCount(),
                 stepExecution.getReadSkipCount(), stepExecution.getProcessSkipCount(),
                 stepExecution.getWriteSkipCount());
+        LOGGER.info("Exit status   : {}", stepExecution.getExitStatus().getExitCode());
         LOGGER.info("=====================================================");
         return stepExecution.getExitStatus();
     }
