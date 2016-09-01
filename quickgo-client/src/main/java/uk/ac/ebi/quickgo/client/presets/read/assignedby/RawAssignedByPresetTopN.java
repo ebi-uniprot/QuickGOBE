@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.client.presets.read;
-
-import uk.ac.ebi.quickgo.client.presets.read.assignedby.RawAssignedByPreset;
+package uk.ac.ebi.quickgo.client.presets.read.assignedby;
 
 import java.util.function.Predicate;
 import org.springframework.batch.item.ItemProcessor;
