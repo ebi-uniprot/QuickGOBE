@@ -5,15 +5,15 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
 import org.springframework.validation.BindException;
 
-import static uk.ac.ebi.quickgo.client.presets.read.assignedby.Columns.COLUMN_DATABASE;
-import static uk.ac.ebi.quickgo.client.presets.read.assignedby.Columns.COLUMN_NAME;
-import static uk.ac.ebi.quickgo.client.presets.read.assignedby.Columns.numColumns;
+import static uk.ac.ebi.quickgo.client.presets.read.assignedby.DBColumns.COLUMN_DATABASE;
+import static uk.ac.ebi.quickgo.client.presets.read.assignedby.DBColumns.COLUMN_NAME;
+import static uk.ac.ebi.quickgo.client.presets.read.assignedby.DBColumns.numColumns;
 
 /**
  * Created 31/08/16
  * @author Edd
  */
-public class StringToAssignedByMapper implements FieldSetMapper<RawAssignedByPreset> {
+class StringToAssignedByMapper implements FieldSetMapper<RawAssignedByPreset> {
     @Override public RawAssignedByPreset mapFieldSet(FieldSet fieldSet) throws BindException {
         if (fieldSet == null) {
             throw new IllegalArgumentException("Provided field set is null");

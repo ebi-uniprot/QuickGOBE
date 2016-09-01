@@ -13,8 +13,8 @@ import java.util.List;
 public class AssignedByRelevancyResponseConverter implements FilterConverter<AssignedByRelevancyResponseType,
         List<String>> {
 
-    @Override public ConvertedFilter<List<String>> transform(AssignedByRelevancyResponseType request) {
-        List<String> values = request.terms.assignedBy;
+    @Override public ConvertedFilter<List<String>> transform(AssignedByRelevancyResponseType response) {
+        List<String> values = response.terms.assignedBy;
         List<String> keysWithOutCounts = new ArrayList<>();
         for (int i = 0; i < values.size() - 1; i += 2) {
             keysWithOutCounts.add(values.get(i));

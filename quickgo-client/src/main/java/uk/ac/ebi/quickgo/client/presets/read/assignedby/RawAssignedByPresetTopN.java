@@ -9,11 +9,11 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Created 31/08/16
  * @author Edd
  */
-public class RawAssignedByPresetTopN implements ItemProcessor<RawAssignedByPreset, RawAssignedByPreset> {
+class RawAssignedByPresetTopN implements ItemProcessor<RawAssignedByPreset, RawAssignedByPreset> {
     private static final RawAssignedByPreset INSIGNIFICANT_PRESET = null;
     private final Predicate<String> presetChecker;
 
-    public RawAssignedByPresetTopN(Predicate<String> presetChecker) {
+    RawAssignedByPresetTopN(Predicate<String> presetChecker) {
         checkArgument(presetChecker != null, "The Predicate<RawAssignedByPreset> presetChecker cannot be null");
         this.presetChecker = presetChecker;
     }
