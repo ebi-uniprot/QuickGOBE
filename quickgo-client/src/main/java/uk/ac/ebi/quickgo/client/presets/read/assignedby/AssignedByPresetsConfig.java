@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 
+import static java.util.Arrays.asList;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.fileReader;
@@ -34,16 +35,21 @@ import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.rawPrese
 public class AssignedByPresetsConfig {
     private static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     private static final String ASSIGNED_BY = "assignedBy";
+    private static final String ASSIGNED_BY_DEFAULTS = "UniProtKB";
 
     @Value("#{'${assignedBy.preset.source:}'.split(',')}")
     private Resource[] assignedByResources;
     @Value("${assignedBy.preset.header.lines:1}")
     private int assignedByHeaderLines;
+    @Value("#{'${assignedBy.preset.defaults:" + ASSIGNED_BY_DEFAULTS + "}'.split(',')}")
+    private String[] assignedByDefaults;
 
     @Bean
-    public Step assignedByStep(StepBuilderFactory stepBuilderFactory, Integer chunkSize, CompositePreset presets,
-            RESTFilterConverterFactory
-                    converterFactory) {
+    public Step assignedByStep(
+            StepBuilderFactory stepBuilderFactory,
+            Integer chunkSize,
+            CompositePreset presets,
+            RESTFilterConverterFactory converterFactory) {
         FlatFileItemReader<RawAssignedByPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
         itemReader.setLinesToSkip(assignedByHeaderLines);
 
@@ -55,11 +61,12 @@ public class AssignedByPresetsConfig {
                 .processor(compositeItemProcessor(
                         assignedByValidator(),
                         assignedByRelevancyFetcher(converterFactory)))
-                .writer(list -> list.forEach(rawPreset ->
-                        presets.assignedBy
-                                .presets
-                                .add(new PresetItem(rawPreset.name, rawPreset.description))
-                ))
+                .writer(rawItemList -> {
+                    rawItemList.forEach(rawItem -> {
+                        presets.assignedBy.addPreset(
+                                new PresetItem(rawItem.name, rawItem.description, rawItem.relevancy));
+                    });
+                })
                 .listener(new LogStepListener())
                 .build();
     }
@@ -72,12 +79,17 @@ public class AssignedByPresetsConfig {
         return new RawAssignedByPresetValidator();
     }
 
-    private ItemProcessor<RawAssignedByPreset, RawAssignedByPreset> assignedByRelevancyFetcher
-            (RESTFilterConverterFactory converterFactory) {
-        FilterRequest assignedBy = FilterRequest.newBuilder().addProperty(ASSIGNED_BY).build();
-        ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(assignedBy);
+    private ItemProcessor<RawAssignedByPreset, RawAssignedByPreset> assignedByRelevancyFetcher(
+            RESTFilterConverterFactory converterFactory) {
+        FilterRequest assignedByRequest = FilterRequest.newBuilder().addProperty(ASSIGNED_BY).build();
 
-        return new RawAssignedByPresetTopN(
-                assignedByName -> convertedFilter.getConvertedValue().contains(assignedByName));
+        List<String> relevantAssignedByPresets;
+        try {
+            ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(assignedByRequest);
+            relevantAssignedByPresets = convertedFilter.getConvertedValue();
+        } catch (Exception e) {
+            relevantAssignedByPresets = asList(assignedByDefaults);
+        }
+        return new RawAssignedByPresetRelevanceChecker(relevantAssignedByPresets);
     }
 }

@@ -28,7 +28,9 @@ public class PresetsConfig {
     public static final int SKIP_LIMIT = 0;
 
     @Bean
-    public Job presetsBuildJob(JobBuilderFactory jobBuilderFactory, Step assignedByStep) {
+    public Job presetsBuildJob(
+            JobBuilderFactory jobBuilderFactory,
+            Step assignedByStep) {
         return jobBuilderFactory.get(PRESET_LOADING_JOB_NAME)
                 .start(assignedByStep)
                 .listener(logJobListener())
@@ -44,7 +46,6 @@ public class PresetsConfig {
         @Override public boolean isDocumentSearchable(String field) {
             return false;
         }
-
         @Override public Stream<String> searchableDocumentFields() {
             return Stream.empty();
         }

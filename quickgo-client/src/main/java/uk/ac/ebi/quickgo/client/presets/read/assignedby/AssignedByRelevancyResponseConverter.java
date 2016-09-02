@@ -10,8 +10,8 @@ import java.util.List;
  * Created 31/08/16
  * @author Edd
  */
-public class AssignedByRelevancyResponseConverter implements FilterConverter<AssignedByRelevancyResponseType,
-        List<String>> {
+public class AssignedByRelevancyResponseConverter
+        implements FilterConverter<AssignedByRelevancyResponseType, List<String>> {
 
     @Override public ConvertedFilter<List<String>> transform(AssignedByRelevancyResponseType response) {
         List<String> values = response.terms.assignedBy;

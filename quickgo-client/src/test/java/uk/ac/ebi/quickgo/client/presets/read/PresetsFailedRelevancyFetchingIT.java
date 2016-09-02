@@ -1,7 +1,9 @@
 package uk.ac.ebi.quickgo.client.presets.read;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -9,14 +11,17 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
+import static uk.ac.ebi.quickgo.client.presets.read.MockRESTConfig.FAILED_FETCHING;
+import static uk.ac.ebi.quickgo.client.presets.read.MockRESTConfig.UNIPROT_KB;
 
 /**
  * Created 31/08/16
@@ -24,10 +29,11 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {PresetsConfig.class, JobTestRunnerConfig.class},
+        classes = {PresetsConfig.class, MockRESTConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
 @WebAppConfiguration
-public class PresetsConfigIT {
+@ActiveProfiles(profiles = FAILED_FETCHING)
+public class PresetsFailedRelevancyFetchingIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
@@ -35,13 +41,15 @@ public class PresetsConfigIT {
     private CompositePreset preset;
 
     @Test
-    public void runAssignedByPresetLoading() throws Exception {
-        assertThat(preset.assignedBy.presets, hasSize((0)));
+    public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() throws Exception {
+        assertThat(preset.assignedBy.getPresets(), hasSize(0));
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(preset.assignedBy.presets, hasSize(greaterThan(0)));
+        assertThat(
+                preset.assignedBy.getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
+                contains(UNIPROT_KB));
     }
 }

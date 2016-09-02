@@ -1,29 +1,48 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
-import com.google.common.base.Preconditions;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Created 30/08/16
  * @author Edd
  */
 public class PresetItem {
-    public PresetItem(String name, String description) {
-        Preconditions.checkArgument(name != null && !name.isEmpty(), "Preset name cannot be null or empty");
-        Preconditions.checkArgument(
+    private final String name;
+    private final String description;
+    private final Integer relevancy;
+
+    public PresetItem(String name, String description, Integer relevancy) {
+        checkArgument(name != null && !name.isEmpty(), "Preset name cannot be null or empty");
+        checkArgument(
                 description != null && !description.isEmpty(),
                 "Preset description cannot be null or empty");
+        checkArgument(relevancy != null, "Integer relevancy cannot be null");
 
         this.name = name;
         this.description = description;
+        this.relevancy = relevancy;
     }
 
-    public String name;
-    public String description;
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    @JsonIgnore
+    public Integer getRelevancy() {
+        return relevancy;
+    }
 
     @Override public String toString() {
         return "PresetItem{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", relevancy=" + relevancy +
                 '}';
     }
 }
