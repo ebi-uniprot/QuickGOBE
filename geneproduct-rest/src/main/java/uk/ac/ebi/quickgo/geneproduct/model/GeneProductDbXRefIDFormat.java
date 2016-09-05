@@ -15,6 +15,7 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
  *         Time: 13:52
  *         Created with IntelliJ IDEA.
  */
+@Deprecated
 public class GeneProductDbXRefIDFormat {
     //E.g. UniProtKB
     private final String database;

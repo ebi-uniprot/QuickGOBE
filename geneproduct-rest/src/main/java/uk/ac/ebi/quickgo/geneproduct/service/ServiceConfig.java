@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
 
+import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
+import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.loader.DbXRefLoader;
-import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXRefIDFormats;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
@@ -13,7 +13,6 @@ import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
 
-import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -71,10 +70,8 @@ public class ServiceConfig {
         return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
     }
 
-    private Predicate<String> idValidator() {
-        GeneProductDbXRefIDFormats
-                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load());
-        return dbXrefEntities::isValidId;
+    private DbXRefEntityValidation idValidator() {
+        return DbXRefEntityValidation.createWithData(geneProductLoader().load());
     }
 
     private DbXRefLoader geneProductLoader() {

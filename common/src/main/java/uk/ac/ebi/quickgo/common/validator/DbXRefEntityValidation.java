@@ -4,21 +4,22 @@ import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * This class allows the ids of entities (genes, proteins etc) to be validated. The id is validated against one or
- * more entity definitions, each of which is defined by a database - ids are valid in terms of the database they are
- * sourced from. An id is confirmed to be valid by successfully matching a regular expression defined for the
- * combination of database and entity type.
+ * Validate DB Xref id. The id is validated against one or more entity definitions, each of which is defined by a
+ * database - ids are valid in terms of the database they are sourced from. An id is confirmed to be valid by
+ * successfully matching a regular expression defined for the combination of database and entity type.
  *
  * @author Tony Wardell
  *         Date: 18/04/2016
  *         Time: 13:36
  *         Created with IntelliJ IDEA.
  */
-public class EntityValidation {
+public class DbXRefEntityValidation implements Predicate<String> {
+
     // Default list of databases and entity types to validate against.
     private static final Key[] targetDBs = new Key[]{
             new Key("UniProtKB", "PR:000000001"),
@@ -26,9 +27,9 @@ public class EntityValidation {
             new Key("RNAcentral", "CHEBI:33697")};
 
     // A list of entries loaded from 'DB_XREFS_ENTITIES.dat.gz' keyed by database and entity type id.
-    private final Map<EntityValidation.Key, DbXRefEntity> entityList;
+    private final Map<DbXRefEntityValidation.Key, DbXRefEntity> entityList;
 
-    private EntityValidation(Map<Key, DbXRefEntity> entityList) {
+    private DbXRefEntityValidation(Map<Key, DbXRefEntity> entityList) {
         checkArgument(entityList != null, "Gene product xref entities map cannot be null");
 
         this.entityList = entityList;
@@ -39,19 +40,19 @@ public class EntityValidation {
      * @param entities A list of regex expressions specified by database and usage.
      * @return an instance EntryValidation populated with the entities passed to the method.
      */
-    public static EntityValidation createWithData(List<DbXRefEntity> entities) {
+    public static DbXRefEntityValidation createWithData(List<DbXRefEntity> entities) {
         Preconditions.checkArgument(entities != null, "The list of GeneProductDbXRefIDFormat entities is null, which " +
                 "is illegal");
 
         Map<Key, DbXRefEntity> mappedEntities = new HashMap<>();
 
         for (DbXRefEntity entity : entities) {
-            EntityValidation.Key key = new EntityValidation.Key(entity.getDatabase(), entity
+            DbXRefEntityValidation.Key key = new DbXRefEntityValidation.Key(entity.getDatabase(), entity
                     .getEntityType());
             mappedEntities.put(key, entity);
         }
 
-        return new EntityValidation(mappedEntities);
+        return new DbXRefEntityValidation(mappedEntities);
     }
 
     /**
@@ -59,7 +60,7 @@ public class EntityValidation {
      * @param id The gene product ID passed in from the client
      * @return true if the id is valid, false otherwise
      */
-    public boolean isValidId(String id) {
+    public boolean test(String id) {
         // If we haven't managed to load the validation regular expressions, then pass everything
         if (entityList.size() == 0) {
             return true;

@@ -21,6 +21,7 @@ import java.util.List;
  *         Time: 14:04
  *         Created with IntelliJ IDEA.
  */
+@Deprecated
 @RunWith(MockitoJUnitRunner.class)
 public class GeneProductDbXRefIDFormatsTest {
 	@Rule

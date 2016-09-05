@@ -1,6 +1,6 @@
-package uk.ac.ebi.quickgo.geneproduct.loader;
+package uk.ac.ebi.quickgo.common.loader;
 
-import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXRefIDFormat;
+import uk.ac.ebi.quickgo.common.validator.DbXRefEntity;
 
 import java.util.List;
 import org.junit.Test;
@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.hasSize;
  *         Time: 09:27
  *         Created with IntelliJ IDEA.
  */
-@Deprecated
 public class DbXRefLoaderTest {
 
 	private static final String NOWHERE_CANTFIND = "OVER/RAINBOW";
@@ -26,14 +25,14 @@ public class DbXRefLoaderTest {
 	public void loadFileUnsuccessfully(){
 
 		DbXRefLoader dbXRefLoader = new DbXRefLoader(NOWHERE_CANTFIND, CASE_SENSITIVE_MATCHING );
-		List<GeneProductDbXRefIDFormat> list = dbXRefLoader.load();
+		List<DbXRefEntity> list = dbXRefLoader.load();
 		assertThat(list, hasSize(0));
 	}
 
 	@Test
 	public void loadFileSuccessfully(){
 		DbXRefLoader dbXRefLoader = new DbXRefLoader(FIND_IT_HERE, CASE_SENSITIVE_MATCHING );
-		List<GeneProductDbXRefIDFormat> list = dbXRefLoader.load();
+		List<DbXRefEntity> list = dbXRefLoader.load();
 		assertThat(list, hasSize(119));
 		assertThat(list.get(0).toString(), is("GeneProductXrefEntity{database='AGI_LocusCode', " +
 				"entityType='SO:0000704', entityTypeName='gene', idValidationPattern=A[Tt][MmCc0-5][Gg][0-9]{5}(\\\\" +

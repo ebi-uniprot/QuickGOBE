@@ -23,6 +23,7 @@ import static java.util.stream.Collectors.toList;
  *         Created with IntelliJ IDEA.
  *
  */
+@Deprecated
 public class DbXRefLoader {
 
     private final boolean caseSensitive;

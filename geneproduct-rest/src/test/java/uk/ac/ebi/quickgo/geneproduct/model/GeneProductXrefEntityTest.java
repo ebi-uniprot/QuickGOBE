@@ -14,6 +14,7 @@ import static org.hamcrest.core.Is.is;
  *         Time: 13:50
  *         Created with IntelliJ IDEA.
  */
+@Deprecated
 public class GeneProductXrefEntityTest {
 
 	@Rule

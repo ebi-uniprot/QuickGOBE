@@ -21,11 +21,11 @@ import static org.mockito.Mockito.when;
  *         Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EntityValidationTest {
+public class DbXRefEntityValidationTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private EntityValidation dbXrefEntities;
+	private DbXRefEntityValidation dbXrefEntities;
 
 	@Mock
 	private DbXRefEntity rnaCentralEntity;
@@ -56,37 +56,37 @@ public class EntityValidationTest {
 		when(uniprotEntity.matches("A0A000")).thenReturn(true);
 		when(uniprotEntity.matches("999999")).thenReturn(false);
 
-		dbXrefEntities = EntityValidation.createWithData(listOfFormats);
+		dbXrefEntities = DbXRefEntityValidation.createWithData(listOfFormats);
 	}
 
 	@Test
 	public void isValidId(){
-		assertThat(dbXrefEntities.isValidId("A0A000"), is(true));
+		assertThat(dbXrefEntities.test("A0A000"), is(true));
 	}
 
 	@Test
 	public void isValidRNACentralID(){
-		assertThat(dbXrefEntities.isValidId("71URS0000000001_733"), is(true));
+		assertThat(dbXrefEntities.test("71URS0000000001_733"), is(true));
 	}
 
 	@Test
 	public void isValidIntActID(){
-		assertThat(dbXrefEntities.isValidId("EBI-11166735"), is(true));
+		assertThat(dbXrefEntities.test("EBI-11166735"), is(true));
 	}
 
 	@Test
 	public void invalidDatabaseAndTypeName(){
-		assertThat(dbXrefEntities.isValidId("ABC"), is(false));
+		assertThat(dbXrefEntities.test("ABC"), is(false));
 	}
 
 	@Test
 	public void isInvalidId(){
-		assertThat(dbXrefEntities.isValidId("9999"), is(false));
+		assertThat(dbXrefEntities.test("9999"), is(false));
 	}
 
 	@Test
 	public void throwsErrorIfEntitiesIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		dbXrefEntities = EntityValidation.createWithData(null);
+		dbXrefEntities = DbXRefEntityValidation.createWithData(null);
 	}
 }

@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *         Time: 13:36
  *         Created with IntelliJ IDEA.
  */
+@Deprecated
 public class GeneProductDbXRefIDFormats {
 
     private final Map<GeneProductDbXRefIDFormats.Key, GeneProductDbXRefIDFormat> geneProductXrefEntities;

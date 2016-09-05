@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.contains;
  * Time: 09:59
  * Created with IntelliJ IDEA.
  */
+@Deprecated
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {GeneProductREST.class})
 @WebAppConfiguration
