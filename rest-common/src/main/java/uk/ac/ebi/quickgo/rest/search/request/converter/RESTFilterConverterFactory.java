@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
 import uk.ac.ebi.quickgo.rest.controller.FilterRequestConfig;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
@@ -13,6 +14,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 
 /**
+ * <p>A generic factory to be used for performing arbitrary REST calls, whose details (including
+ * address) are specified in a {@link FilterRequest}, and subsequently retrieving
+ * instantiated instances that represent the response.
+ *
+ * <p>This class differs from {@link FilterConverterFactory} in that it can return any instance/response type,
+ * whereas {@link FilterConverterFactory} returns specifically {@link QuickGOQuery} instances.
+ *
  * Created 31/08/16
  * @author Edd
  */

@@ -40,7 +40,7 @@ public class PresetsConfig {
     }
 
     @Bean
-    public SearchableDocumentFields noSearchableDocumentFields() {
+    public SearchableDocumentFields searchableDocumentFields() {
         return new NoSearchablePresetDocumentFields();
     }
 
