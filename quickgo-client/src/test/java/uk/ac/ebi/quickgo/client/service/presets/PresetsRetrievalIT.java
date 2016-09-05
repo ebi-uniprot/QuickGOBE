@@ -28,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {QuickGOREST.class})
 @WebAppConfiguration
-
 public class PresetsRetrievalIT {
     private static final String RESOURCE_URL = "/QuickGO/internal/presets";
 
