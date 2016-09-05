@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
+ * Provides common Spring Batch job configuration details and methods used when populating preset information.
+ *
  * Created 01/09/16
  * @author Edd
  */

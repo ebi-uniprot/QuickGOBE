@@ -21,6 +21,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfig.TAB;
 
 /**
+ * Defines helper methods used when reading and populating preset information via Spring Batch.
+ *
+ * @see PresetsConfig
+ *
  * Created 01/09/16
  * @author Edd
  */

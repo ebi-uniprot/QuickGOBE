@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.client.presets.read.assignedby;
 
 /**
+ * Represents the columns of the source file used for assigned by information.
+ *
  * Created 30/08/16
  * @author Edd
  */

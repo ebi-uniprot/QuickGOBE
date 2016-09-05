@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.client.presets.read;
 
+import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
 
@@ -14,7 +15,8 @@ import org.springframework.context.annotation.Import;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.logJobListener;
 
 /**
- *
+ * Exposes a Spring Batch {@link Job} that, when run, will read and populate a {@link CompositePreset}
+ * instance, which provides user information about all preset data for QuickGO filtering.
  *
  * Created 18/05/16
  * @author Edd

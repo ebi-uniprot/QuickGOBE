@@ -27,6 +27,8 @@ import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.fileRead
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.rawPresetMultiFileReader;
 
 /**
+ * Exposes the {@link Step} bean that is used to read and populate information relating to the assignedBy preset data.
+ *
  * Created 01/09/16
  * @author Edd
  */

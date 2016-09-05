@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Defines the transformation of a {@link AssignedByRelevancyResponseType} instance to
+ * an ordered list of {@link String}s, representing
+ *
  * Created 31/08/16
  * @author Edd
  */
