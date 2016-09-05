@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
 /**
+ * Represents preset information relating to different aspects of QuickGO.
+ *
  * Created 30/08/16
  * @author Edd
  */

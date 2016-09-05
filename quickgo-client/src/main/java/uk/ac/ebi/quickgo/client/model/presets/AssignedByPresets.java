@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * Represents preset information relating to valid and relevant "assigned by" values.
+ *
  * Created 30/08/16
  * @author Edd
  */
