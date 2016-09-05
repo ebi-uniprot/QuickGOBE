@@ -10,6 +10,10 @@ import static uk.ac.ebi.quickgo.client.presets.read.assignedby.DBColumns.COLUMN_
 import static uk.ac.ebi.quickgo.client.presets.read.assignedby.DBColumns.numColumns;
 
 /**
+ * Class responsible for mapping a {@link FieldSet} representing a database entity used
+ * for the assignedBy presets, to a corresponding instance of {@link RawAssignedByPreset}
+ * encapsulating this information.
+ *
  * Created 31/08/16
  * @author Edd
  */
