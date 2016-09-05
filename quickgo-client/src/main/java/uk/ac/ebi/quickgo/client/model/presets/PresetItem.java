@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
+ * Represents a specific preset datum
+ *
  * Created 30/08/16
  * @author Edd
  */
