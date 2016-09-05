@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.client.presets.read.assignedby;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
 
+import static uk.ac.ebi.quickgo.client.presets.read.PresetsValidationHelper.checkIsNullOrEmpty;
+
 /**
  * Validates the assignedBy values being read in from flat-files.
  *
@@ -20,9 +22,4 @@ class RawAssignedByPresetValidator implements ItemProcessor<RawAssignedByPreset,
         return rawAssignedByPreset;
     }
 
-    public void checkIsNullOrEmpty(String value) {
-        if (value == null || value.isEmpty()) {
-            throw new ValidationException("Value cannot be null or empty");
-        }
-    }
 }
