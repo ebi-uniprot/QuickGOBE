@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Defines the transformation of a {@link AssignedByRelevancyResponseType} instance to
- * an ordered list of {@link String}s, representing
+ * a list of {@link String}s, representing preset names in descending order (from high to low).
  *
  * Created 31/08/16
  * @author Edd
