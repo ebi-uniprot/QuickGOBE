@@ -58,7 +58,7 @@ public class SearchServiceConfig {
                     "qualifier_unsorted,targetSet_unsorted,taxonId_unsorted";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS =
             "id,geneProductId,qualifier,goId,goEvidence," +
-                    "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions";
+                    "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions,dbObjectSymbol";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
 
     @Value("${geneproduct.db.xref.valid.regexes}")

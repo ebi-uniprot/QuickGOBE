@@ -39,6 +39,8 @@ public class Annotation {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public List<String> slimmedIds;
 
+    public String symbol;
+
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -82,7 +84,10 @@ public class Annotation {
         if (extensions != null ? !extensions.equals(that.extensions) : that.extensions != null) {
             return false;
         }
-        return slimmedIds != null ? slimmedIds.equals(that.slimmedIds) : that.slimmedIds == null;
+        if (slimmedIds != null ? !slimmedIds.equals(that.slimmedIds) : that.slimmedIds != null) {
+            return false;
+        }
+        return symbol != null ? symbol.equals(that.symbol) : that.symbol == null;
 
     }
 
@@ -99,6 +104,7 @@ public class Annotation {
         result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
         result = 31 * result + (extensions != null ? extensions.hashCode() : 0);
         result = 31 * result + (slimmedIds != null ? slimmedIds.hashCode() : 0);
+        result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
         return result;
     }
 
@@ -116,6 +122,7 @@ public class Annotation {
                 ", assignedBy='" + assignedBy + '\'' +
                 ", extensions=" + extensions +
                 ", slimmedIds=" + slimmedIds +
+                ", symbol='" + symbol + '\'' +
                 '}';
     }
 }
