@@ -60,6 +60,7 @@ public class DbXRefEntityValidation implements Predicate<String> {
      * @param id The gene product ID passed in from the client
      * @return true if the id is valid, false otherwise
      */
+    @Override
     public boolean test(String id) {
         // If we haven't managed to load the validation regular expressions, then pass everything
         if (entityList.size() == 0) {
