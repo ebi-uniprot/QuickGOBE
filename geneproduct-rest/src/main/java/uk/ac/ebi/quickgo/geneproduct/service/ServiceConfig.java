@@ -37,13 +37,11 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.M
 @Import({GeneProductRepoConfig.class})
 public class ServiceConfig {
 
-    @Value("${geneproduct.db.xref.valid.regexes}")
-    private String xrefValidationRegexFile;
-
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
-
     @Value("${geneproduct.db.xref.valid.casesensitive:"+DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE+"}")
     boolean xrefValidationCaseSensitive;
+    @Value("${geneproduct.db.xref.valid.regexes}")
+    private String xrefValidationRegexFile;
 
     @Bean
     public GeneProductService goGeneProductService(GeneProductRepository geneProductRepository) {
@@ -51,6 +49,11 @@ public class ServiceConfig {
                 serviceHelper(),
                 geneProductRepository,
                 geneProductDocConverter());
+    }
+
+    @Bean
+    public ControllerValidationHelper geneProductValidator() {
+        return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
     }
 
     private ServiceHelper serviceHelper() {
@@ -63,11 +66,6 @@ public class ServiceConfig {
 
     private QueryStringSanitizer queryStringSanitizer() {
         return new SolrQueryStringSanitizer();
-    }
-
-    @Bean
-    public ControllerValidationHelper geneProductValidator() {
-        return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
     }
 
     private DbXRefEntityValidation idValidator() {
