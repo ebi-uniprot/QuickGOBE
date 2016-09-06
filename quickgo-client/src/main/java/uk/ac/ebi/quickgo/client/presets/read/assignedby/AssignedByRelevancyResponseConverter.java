@@ -6,6 +6,8 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Defines the transformation of a {@link AssignedByRelevancyResponseType} instance to
  * a list of {@link String}s, representing preset names in descending order (from high to low).
@@ -17,11 +19,17 @@ public class AssignedByRelevancyResponseConverter
         implements FilterConverter<AssignedByRelevancyResponseType, List<String>> {
 
     @Override public ConvertedFilter<List<String>> transform(AssignedByRelevancyResponseType response) {
-        List<String> values = response.terms.assignedBy;
+        checkArgument(response != null, "Response cannot be null");
+
         List<String> keysWithOutCounts = new ArrayList<>();
-        for (int i = 0; i < values.size() - 1; i += 2) {
-            keysWithOutCounts.add(values.get(i));
+
+        if (response.terms != null && response.terms.assignedBy != null) {
+            List<String> values = response.terms.assignedBy;
+            for (int i = 0; i < values.size() - 1; i += 2) {
+                keysWithOutCounts.add(values.get(i));
+            }
         }
+
         return new ConvertedFilter<>(keysWithOutCounts);
     }
 }
