@@ -17,4 +17,9 @@ public class PresetsValidationHelperTest {
     public void checkIsNullOrEmptyProducesExceptionOnEmptyValue() {
         PresetsValidationHelper.checkIsNullOrEmpty("");
     }
+
+    @Test
+    public void checkIsNullOrEmptyIsFalseForNonNullOrEmptyValue() {
+        PresetsValidationHelper.checkIsNullOrEmpty("valid value");
+    }
 }
