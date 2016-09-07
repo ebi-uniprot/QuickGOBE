@@ -23,6 +23,8 @@ public class Annotation {
 
     public String goEvidence;
 
+    public String goAspect;
+
     public String evidenceCode;
 
     public String reference;
@@ -67,6 +69,9 @@ public class Annotation {
         if (goEvidence != null ? !goEvidence.equals(that.goEvidence) : that.goEvidence != null) {
             return false;
         }
+        if (goAspect != null ? !goAspect.equals(that.goAspect) : that.goAspect != null) {
+            return false;
+        }
         if (evidenceCode != null ? !evidenceCode.equals(that.evidenceCode) : that.evidenceCode != null) {
             return false;
         }
@@ -92,6 +97,7 @@ public class Annotation {
         result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
         result = 31 * result + (goId != null ? goId.hashCode() : 0);
         result = 31 * result + (goEvidence != null ? goEvidence.hashCode() : 0);
+        result = 31 * result + (goAspect != null ? goAspect.hashCode() : 0);
         result = 31 * result + (evidenceCode != null ? evidenceCode.hashCode() : 0);
         result = 31 * result + (reference != null ? reference.hashCode() : 0);
         result = 31 * result + (withFrom != null ? withFrom.hashCode() : 0);
@@ -109,6 +115,7 @@ public class Annotation {
                 ", qualifier='" + qualifier + '\'' +
                 ", goId='" + goId + '\'' +
                 ", goEvidence='" + goEvidence + '\'' +
+                ", goAspect='" + goAspect + '\'' +
                 ", evidenceCode='" + evidenceCode + '\'' +
                 ", reference='" + reference + '\'' +
                 ", withFrom=" + withFrom +
