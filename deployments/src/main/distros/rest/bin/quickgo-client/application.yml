@@ -1,0 +1,12 @@
+## ================= Searching for preset relevancy =================
+search:
+  external:
+    filterConfigs:
+      - signature: assignedBy
+        execution: REST_COMM
+        properties: {
+          ip: "localhost:8082",
+          resourceFormat: "/solr/annotation/terms?q=*%3A*&wt=json&indent=true&terms.fl=assignedBy",
+          responseClass: "uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByRelevancyResponseType",
+          responseConverter: "uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByRelevancyResponseConverter"
+        }

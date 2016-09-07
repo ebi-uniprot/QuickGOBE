@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.client;
 
+import uk.ac.ebi.quickgo.client.presets.read.PresetsConfig;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
 
@@ -22,7 +23,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
         "uk.ac.ebi.quickgo.client.controller",
         "uk.ac.ebi.quickgo.rest"
 })
-@Import({SearchServiceConfig.class, SwaggerConfig.class})
+@Import({SearchServiceConfig.class, SwaggerConfig.class, PresetsConfig.class})
 public class QuickGOREST {
 
     /**
