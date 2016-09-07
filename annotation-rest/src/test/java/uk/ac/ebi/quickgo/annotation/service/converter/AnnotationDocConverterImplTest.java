@@ -32,7 +32,7 @@ public class AnnotationDocConverterImplTest {
     private static final List<String> WITH_FROM = Arrays.asList("GO:0036376", "GO:1990573");
     private static final String ASSIGNED_BY = "InterPro";
     private static final List<String> EXTENSIONS = Arrays.asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429)");
-    private static final String DB_OBJECT_SYMBOL = "moeA5";
+    private static final String SYMBOL = "moeA5";
 
     private static final AnnotationDocument DOCUMENT = createStubDocument();
 
@@ -119,7 +119,7 @@ public class AnnotationDocConverterImplTest {
     @Test
     public void convertSymbolSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.symbol, is(DB_OBJECT_SYMBOL));
+        assertThat(model.symbol, is(SYMBOL));
     }
 
     private static AnnotationDocument createStubDocument() {
@@ -133,7 +133,7 @@ public class AnnotationDocConverterImplTest {
         doc.withFrom = WITH_FROM;
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;
-        doc.dbObjectSymbol = DB_OBJECT_SYMBOL;
+        doc.symbol = SYMBOL;
 
         return doc;
     }
