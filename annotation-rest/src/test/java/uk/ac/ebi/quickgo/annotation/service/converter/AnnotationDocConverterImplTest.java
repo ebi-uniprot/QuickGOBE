@@ -32,6 +32,7 @@ public class AnnotationDocConverterImplTest {
     private static final List<String> WITH_FROM = Arrays.asList("GO:0036376", "GO:1990573");
     private static final String ASSIGNED_BY = "InterPro";
     private static final List<String> EXTENSIONS = Arrays.asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429)");
+    private static final String GO_ASPECT = "cellular_component";
 
     private static final AnnotationDocument DOCUMENT = createStubDocument();
 
@@ -115,6 +116,21 @@ public class AnnotationDocConverterImplTest {
         assertThat(model.assignedBy, is(ASSIGNED_BY));
     }
 
+    @Test
+    public void convertNullAspectSuccessfully() {
+        AnnotationDocument doc = new AnnotationDocument();
+        doc.goAspect = null;
+
+        Annotation model = docConverter.convert(doc);
+        assertThat(model.goAspect, is(nullValue()));
+    }
+
+    @Test
+    public void convertAspectSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.goAspect, is(GO_ASPECT));
+    }
+
     private static AnnotationDocument createStubDocument() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.id = ID;
@@ -126,6 +142,7 @@ public class AnnotationDocConverterImplTest {
         doc.withFrom = WITH_FROM;
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;
+        doc.goAspect = GO_ASPECT;
 
         return doc;
     }
