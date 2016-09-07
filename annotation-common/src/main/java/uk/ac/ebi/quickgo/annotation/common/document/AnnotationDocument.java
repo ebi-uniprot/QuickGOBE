@@ -61,6 +61,9 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.TARGET_SET)
     public List<String> targetSets;
 
+    @Field(AnnotationFields.GO_ASPECT)
+    public String goAspect;
+
     @Override public String getUniqueName() {
         return id;
     }
