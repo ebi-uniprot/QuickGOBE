@@ -12,13 +12,14 @@ import java.util.stream.Collectors;
  * Created 30/08/16
  * @author Edd
  */
-public class AssignedByPresets {
+public class AssignedByPresets implements PresetItems {
     private final List<PresetItem> presets;
 
     AssignedByPresets() {
         presets = new ArrayList<>();
     }
 
+    @Override
     public Collection<PresetItem> getPresets() {
         return Collections.unmodifiableCollection(
                 presets.stream()
@@ -26,6 +27,7 @@ public class AssignedByPresets {
                         .collect(Collectors.toList()));
     }
 
+    @Override
     public void addPreset(PresetItem presetItem) {
         presets.add(presetItem);
     }
