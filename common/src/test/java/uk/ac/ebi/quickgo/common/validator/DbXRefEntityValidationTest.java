@@ -1,6 +1,7 @@
-package uk.ac.ebi.quickgo.geneproduct.model;
+package uk.ac.ebi.quickgo.common.validator;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,8 +14,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-
 /**
  * @author Tony Wardell
  *         Date: 19/04/2016
@@ -22,26 +21,24 @@ import java.util.List;
  *         Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class GeneProductDbXRefIDFormatsTest {
+public class DbXRefEntityValidationTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private List<GeneProductDbXRefIDFormat> listOfFormats;
-
-	private GeneProductDbXRefIDFormats dbXrefEntities;
+	private DbXRefEntityValidation dbXrefEntities;
 
 	@Mock
-	private GeneProductDbXRefIDFormat rnaCentralEntity;
+	private DbXRefEntity rnaCentralEntity;
 
 	@Mock
-	private GeneProductDbXRefIDFormat intactEntity;
+	private DbXRefEntity intactEntity;
 
 	@Mock
-	private GeneProductDbXRefIDFormat uniprotEntity;
+	private DbXRefEntity uniprotEntity;
 
 	@Before
 	public void setup(){
-		listOfFormats = new ArrayList<>();
+		List<DbXRefEntity> listOfFormats = new ArrayList<>();
 		listOfFormats.add(rnaCentralEntity);
 		listOfFormats.add(intactEntity);
 		listOfFormats.add(uniprotEntity);
@@ -59,37 +56,37 @@ public class GeneProductDbXRefIDFormatsTest {
 		when(uniprotEntity.matches("A0A000")).thenReturn(true);
 		when(uniprotEntity.matches("999999")).thenReturn(false);
 
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(listOfFormats);
+		dbXrefEntities = DbXRefEntityValidation.createWithData(listOfFormats);
 	}
 
 	@Test
 	public void isValidId(){
-		assertThat(dbXrefEntities.isValidId("A0A000"), is(true));
+		assertThat(dbXrefEntities.test("A0A000"), is(true));
 	}
 
 	@Test
 	public void isValidRNACentralID(){
-		assertThat(dbXrefEntities.isValidId("71URS0000000001_733"), is(true));
+		assertThat(dbXrefEntities.test("71URS0000000001_733"), is(true));
 	}
 
 	@Test
 	public void isValidIntActID(){
-		assertThat(dbXrefEntities.isValidId("EBI-11166735"), is(true));
+		assertThat(dbXrefEntities.test("EBI-11166735"), is(true));
 	}
 
 	@Test
 	public void invalidDatabaseAndTypeName(){
-		assertThat(dbXrefEntities.isValidId("ABC"), is(false));
+		assertThat(dbXrefEntities.test("ABC"), is(false));
 	}
 
 	@Test
 	public void isInvalidId(){
-		assertThat(dbXrefEntities.isValidId("9999"), is(false));
+		assertThat(dbXrefEntities.test("9999"), is(false));
 	}
 
 	@Test
 	public void throwsErrorIfEntitiesIsNull(){
 		thrown.expect(IllegalArgumentException.class);
-		dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(null);
+		dbXrefEntities = DbXRefEntityValidation.createWithData(null);
 	}
 }
