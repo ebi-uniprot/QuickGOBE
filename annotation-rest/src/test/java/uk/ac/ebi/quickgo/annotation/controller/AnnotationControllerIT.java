@@ -66,12 +66,12 @@ public class AnnotationControllerIT {
     private static final String TARGET_SET_PARAM = "targetSet";
 
     //Test Data
-    private static final String NOTEXISTS_ASSIGNED_BY = "ZZZZZ";
+    private static final String MISSING_ASSIGNED_BY = "ZZZZZ";
     private static final String RESOURCE_URL = "/QuickGO/services/annotation";
-    private static final String NOTEXISTS_GO_ID = "GO:0009871";
+    private static final String MISSING_GO_ID = "GO:0009871";
     private static final String INVALID_GO_ID = "GO:1";
     private static final String ECO_ID2 = "ECO:0000323";
-    private static final String NOTEXISTS_ECO_ID3 = "ECO:0000888";
+    private static final String MISSING_ECO_ID = "ECO:0000888";
 
     //Configuration
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
@@ -170,7 +170,7 @@ public class AnnotationControllerIT {
     @Test
     public void lookupAnnotationFilterByInvalidAssignedBy() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, NOTEXISTS_ASSIGNED_BY));
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, MISSING_ASSIGNED_BY));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -186,7 +186,7 @@ public class AnnotationControllerIT {
         repository.save(document);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, NOTEXISTS_ASSIGNED_BY + ","
+                get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM, MISSING_ASSIGNED_BY + ","
                         + assignedBy));
 
         response.andDo(print())
@@ -563,7 +563,7 @@ public class AnnotationControllerIT {
     public void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, NOTEXISTS_GO_ID));
+                get(RESOURCE_URL + "/search").param(GO_ID_PARAM, MISSING_GO_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -603,7 +603,7 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM, AnnotationDocMocker.ECO_ID + ","
-                        + doc.evidenceCode + "," + NOTEXISTS_ECO_ID3));
+                        + doc.evidenceCode + "," + MISSING_ECO_ID));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -612,7 +612,7 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, AnnotationDocMocker.ECO_ID,
                         NUMBER_OF_GENERIC_DOCS))
                 .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, doc.evidenceCode, 1))
-                .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, NOTEXISTS_ECO_ID3, 0));
+                .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, MISSING_ECO_ID, 0));
     }
 
     @Test
@@ -625,7 +625,7 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM, AnnotationDocMocker.ECO_ID)
-                        .param(EVIDENCE_CODE_PARAM, doc.evidenceCode).param(EVIDENCE_CODE_PARAM, NOTEXISTS_ECO_ID3));
+                        .param(EVIDENCE_CODE_PARAM, doc.evidenceCode).param(EVIDENCE_CODE_PARAM, MISSING_ECO_ID));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -634,13 +634,13 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, AnnotationDocMocker.ECO_ID,
                         NUMBER_OF_GENERIC_DOCS))
                 .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, doc.evidenceCode, 1))
-                .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, NOTEXISTS_ECO_ID3, 0));
+                .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM, MISSING_ECO_ID, 0));
     }
 
     @Test
     public void filterByNonExistentEvidenceCodeReturnsZeroResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM, NOTEXISTS_ECO_ID3));
+                get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM, MISSING_ECO_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
