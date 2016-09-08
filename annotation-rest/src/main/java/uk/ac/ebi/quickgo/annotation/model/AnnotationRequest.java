@@ -40,9 +40,8 @@ public class AnnotationRequest {
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
 
     private static final String COMMA = ",";
-    private static final String ASPECT_FIELD = "aspect";
     private static final String[] TARGET_FIELDS = new String[]{
-            ASPECT_FIELD,
+            GO_ASPECT,
             ASSIGNED_BY,
             DB_SUBSET,
             EVIDENCE_CODE,
@@ -215,14 +214,14 @@ public class AnnotationRequest {
 
     public void setAspect(String aspect) {
         if (aspect != null) {
-            filterMap.put(ASPECT_FIELD, aspect.toLowerCase());
+            filterMap.put(GO_ASPECT, aspect.toLowerCase());
         }
     }
 
     @Pattern(regexp = "process|function|component", flags = CASE_INSENSITIVE,
             message = "At least one 'Aspect' value is invalid: ${validatedValue}")
     public String getAspect() {
-        return filterMap.get(ASPECT_FIELD);
+        return filterMap.get(GO_ASPECT);
     }
 
     /**
