@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -64,6 +65,7 @@ public class AnnotationControllerIT {
     private static final String GENE_PRODUCT_TYPE_PARAM = "geneProductType";
     private static final String GP_SUBSET_PARAM = "geneProductSubset";
     private static final String TARGET_SET_PARAM = "targetSet";
+    private static final String GO_ASPECT_PARAM = "aspect";
 
     //Test Data
     private static final String NOTEXISTS_ASSIGNED_BY = "ZZZZZ";
@@ -1112,6 +1114,58 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(0));
+    }
+
+    //---------- GO Aspect related tests.
+
+    @Test
+    public void filterAnnotationsByGoAspectSuccessfully() throws Exception {
+        String goAspect = AnnotationDocMocker.GO_ASPECT;
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ASPECT_PARAM, goAspect));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterAnnotationsByInvertedCaseGoEvidenceCodeSuccessfully() throws Exception {
+        String goAspect = StringUtils.swapCase(AnnotationDocMocker.GO_ASPECT);
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ASPECT_PARAM, goAspect));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterAnnotationsByInvalidGoAspectReturnsError() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ASPECT_PARAM, "ZZZ"));
+
+        response.andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void filterWithAspectMolecularFunctionReturnsAnnotationsWithMolecularFunction() throws Exception {
+        String goAspect = "molecular_function";
+
+        AnnotationDocument annoDoc1 = AnnotationDocMocker.createAnnotationDoc(createId(999));
+        annoDoc1.goAspect = goAspect;
+        repository.save(annoDoc1);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GO_ASPECT_PARAM, goAspect));
+
+        response.andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
     }
 
     //----- Setup data ---------------------//

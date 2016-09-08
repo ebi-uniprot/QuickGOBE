@@ -214,11 +214,11 @@ public class AnnotationRequest {
 
     public void setAspect(String aspect) {
         if (aspect != null) {
-            filterMap.put(GO_ASPECT, aspect.toLowerCase());
+            filterMap.put(GO_ASPECT, aspect);
         }
     }
 
-    @Pattern(regexp = "process|function|component", flags = CASE_INSENSITIVE,
+    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = CASE_INSENSITIVE,
             message = "At least one 'Aspect' value is invalid: ${validatedValue}")
     public String getAspect() {
         return filterMap.get(GO_ASPECT);
