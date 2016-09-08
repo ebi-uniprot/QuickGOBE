@@ -200,7 +200,7 @@ public class AnnotationDocumentConverterTest {
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.dbObjectSymbol, is(nullValue()));
+        assertThat(doc.symbol, is(nullValue()));
     }
 
     @Test
@@ -210,7 +210,7 @@ public class AnnotationDocumentConverterTest {
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.dbObjectSymbol, is(value));
+        assertThat(doc.symbol, is(value));
     }
 
     // annotation properties: db subset

@@ -22,8 +22,8 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.QUALIFIER)
     public String qualifier;
 
-    @Field(AnnotationFields.DB_OBJECT_SYMBOL)
-    public String dbObjectSymbol;
+    @Field(AnnotationFields.SYMBOL)
+    public String symbol;
 
     @Field(AnnotationFields.GENE_PRODUCT_TYPE)
     public String geneProductType;

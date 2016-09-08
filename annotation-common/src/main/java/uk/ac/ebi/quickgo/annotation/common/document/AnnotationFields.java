@@ -17,7 +17,7 @@ public class AnnotationFields {
     // fields from annotations's schema.xml
     public final static String ASSIGNED_BY = "assignedBy";
     public final static String QUALIFIER = "qualifier";
-    public static final String DB_OBJECT_SYMBOL = "dbObjectSymbol";
+    public static final String SYMBOL = "symbol";
     public static final String DB_SUBSET = "dbSubset";
     public final static String EVIDENCE_CODE = "evidenceCode";
     public final static String EXTENSION = "extension";

@@ -72,7 +72,7 @@
 
     <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="dbObjectSymbol" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="symbol" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="dbSubset" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="evidenceCode" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="extension" type="string" indexed="false" stored="true" multiValued="true"/>
@@ -103,8 +103,8 @@
     <field name="assignedBy_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="assignedBy" dest="assignedBy_unsorted"/>
 
-    <field name="dbObjectSymbol_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
-    <copyField source="dbObjectSymbol" dest="dbObjectSymbol_unsorted"/>
+    <field name="symbol_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
+    <copyField source="symbol" dest="symbol_unsorted"/>
 
     <field name="dbSubset_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="dbSubset" dest="dbSubset_unsorted"/>

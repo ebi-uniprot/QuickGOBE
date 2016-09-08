@@ -32,6 +32,7 @@ public class AnnotationDocConverterImplTest {
     private static final List<String> WITH_FROM = Arrays.asList("GO:0036376", "GO:1990573");
     private static final String ASSIGNED_BY = "InterPro";
     private static final List<String> EXTENSIONS = Arrays.asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429)");
+    private static final String SYMBOL = "moeA5";
     private static final String GO_ASPECT = "cellular_component";
 
     private static final AnnotationDocument DOCUMENT = createStubDocument();
@@ -117,6 +118,12 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
+    public void convertSymbolSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.symbol, is(SYMBOL));
+    }
+
+    @Test
     public void convertNullAspectSuccessfully() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.goAspect = null;
@@ -142,6 +149,7 @@ public class AnnotationDocConverterImplTest {
         doc.withFrom = WITH_FROM;
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;
+        doc.symbol = SYMBOL;
         doc.goAspect = GO_ASPECT;
 
         return doc;

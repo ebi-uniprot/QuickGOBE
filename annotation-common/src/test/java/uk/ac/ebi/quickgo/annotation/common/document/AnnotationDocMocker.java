@@ -23,7 +23,7 @@ public class AnnotationDocMocker {
     public static final List<String> EXTENSIONS = asList(
             "results_in_development_of(UBERON:0001675),acts_on_population_of(CL:0000032)",
             "results_in_development_of(UBERON:0006000)");
-    public static final String OBJECT_SYMBOL = "moeA5";
+    public static final String SYMBOL = "moeA5";
     public static final String OBJECT_TYPE = "protein";
     public static final int TAXON_ID = 12345;
     public static final List<String> TARGET_SET = asList("KRUK", "BHF-UCL", "Exosome");
@@ -50,7 +50,7 @@ public class AnnotationDocMocker {
         doc.interactingTaxonId = INTERACTING_TAXON_ID;
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;
-        doc.dbObjectSymbol = OBJECT_SYMBOL;
+        doc.symbol = SYMBOL;
         doc.geneProductType = OBJECT_TYPE;
         doc.taxonId = TAXON_ID;
         doc.targetSets = TARGET_SET;
