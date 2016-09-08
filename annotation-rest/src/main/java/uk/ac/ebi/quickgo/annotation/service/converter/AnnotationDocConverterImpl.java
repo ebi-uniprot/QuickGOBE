@@ -25,6 +25,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         annotation.evidenceCode = annotationDocument.evidenceCode;
         annotation.reference = annotationDocument.reference;
         annotation.taxonId = annotationDocument.taxonId;
+        annotation.symbol = annotationDocument.symbol;
         annotation.assignedBy = annotationDocument.assignedBy;
 
         annotation.targetSets = asUnmodifiableList(annotationDocument.targetSets);

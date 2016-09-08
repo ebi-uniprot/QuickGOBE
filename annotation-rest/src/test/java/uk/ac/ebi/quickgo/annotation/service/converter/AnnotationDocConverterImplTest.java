@@ -32,7 +32,8 @@ public class AnnotationDocConverterImplTest {
     private static final List<String> WITH_FROM = asList("GO:0036376", "GO:1990573");
     private static final String ASSIGNED_BY = "InterPro";
     private static final List<String> EXTENSIONS = asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429)");
-    public static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
+    private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
+    private static final String SYMBOL = "moeA5";
 
     private static final AnnotationDocument DOCUMENT = createStubDocument();
 
@@ -117,6 +118,12 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
+    public void convertSymbolSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.symbol, is(SYMBOL));
+    }
+
+    @Test
     public void convertsTargetSetsSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
         assertThat(model.targetSets, is(TARGET_SETS));
@@ -134,6 +141,7 @@ public class AnnotationDocConverterImplTest {
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;
         doc.targetSets = TARGET_SETS;
+        doc.symbol = SYMBOL;
 
         return doc;
     }

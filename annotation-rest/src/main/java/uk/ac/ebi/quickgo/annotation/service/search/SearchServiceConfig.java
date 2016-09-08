@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
-import uk.ac.ebi.quickgo.common.validator.EntityValidation;
+import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
@@ -58,7 +58,7 @@ public class SearchServiceConfig {
                     "qualifier_unsorted,targetSet_unsorted,taxonId_unsorted";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS =
             "id,geneProductId,qualifier,goId,goEvidence," +
-                    "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions";
+                    "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions,symbol";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
 
     @Value("${geneproduct.db.xref.valid.regexes}")
@@ -156,8 +156,8 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public EntityValidation geneProductValidator() {
-        return EntityValidation.createWithData(geneProductLoader().load());
+    public DbXRefEntityValidation geneProductValidator() {
+        return DbXRefEntityValidation.createWithData(geneProductLoader().load());
     }
 
     private DbXRefLoader geneProductLoader() {

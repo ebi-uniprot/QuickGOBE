@@ -23,11 +23,11 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
     private static final String MESSAGE = "At least one 'Gene Product ID' value is invalid: %s";
 
     @Autowired
-    EntityValidation xRefFormats;
+    DbXRefEntityValidation xRefFormats;
     private Predicate<String> idValidator;
 
     @Override public void initialize(GeneProductIDList constraintAnnotation) {
-        idValidator = xRefFormats::isValidId;
+        idValidator = xRefFormats::test;
     }
 
     @Override public boolean isValid(String s, ConstraintValidatorContext context) {

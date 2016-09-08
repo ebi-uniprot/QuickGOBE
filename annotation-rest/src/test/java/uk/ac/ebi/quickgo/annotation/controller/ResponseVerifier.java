@@ -95,6 +95,7 @@ final class ResponseVerifier {
                 .addMatcher(jsonPath(path + "taxonId").exists())
                 .addMatcher(jsonPath(path + "assignedBy").exists())
                 .addMatcher(jsonPath(path + "targetSets").exists())
+                .addMatcher(jsonPath(path + "symbol").exists())
                 .addMatcher(jsonPath(path + "extensions").exists());
     }
 
