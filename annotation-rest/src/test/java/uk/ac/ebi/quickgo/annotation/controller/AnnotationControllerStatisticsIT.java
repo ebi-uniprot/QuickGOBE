@@ -32,6 +32,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
+import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.GO_ID_PARAM;
+import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.TAXON_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
@@ -54,8 +56,6 @@ public class AnnotationControllerStatisticsIT {
     private static final int NUMBER_OF_GENERIC_DOCS = 6;
     private static final String ANNOTATION_GROUP = "annotation";
     private static final String GENE_PRODUCT_GROUP = "geneProduct";
-    private static final String TAXON_PARAM = "taxonId";
-    private static final String GO_ID_PARAM = "goId";
 
     private MockMvc mockMvc;
 
@@ -116,7 +116,7 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
-                        .param(TAXON_PARAM, "42")
+                        .param(TAXON_ID_PARAM.getName(), "42")
         );
 
         assertStatsResponse(response, type, 2, relevantGOIds);
@@ -161,7 +161,7 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
-                        .param(GO_ID_PARAM, filteringGoId)
+                        .param(GO_ID_PARAM.getName(), filteringGoId)
         );
 
         assertStatsResponse(response, type, 2, relevantTaxonIds);
@@ -205,7 +205,7 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
-                        .param(GO_ID_PARAM, filteringGoId)
+                        .param(GO_ID_PARAM.getName(), filteringGoId)
         );
 
         assertStatsResponse(response, type, 2, relevantReferenceIds);
@@ -249,7 +249,7 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
-                        .param(GO_ID_PARAM, filteringGoId)
+                        .param(GO_ID_PARAM.getName(), filteringGoId)
         );
 
         assertStatsResponse(response, type, 2, relevantEvidenceCodes);
@@ -293,7 +293,7 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
-                        .param(GO_ID_PARAM, filteringGoId)
+                        .param(GO_ID_PARAM.getName(), filteringGoId)
         );
 
         assertStatsResponse(response, type, 2, relevantAssignedBy);
