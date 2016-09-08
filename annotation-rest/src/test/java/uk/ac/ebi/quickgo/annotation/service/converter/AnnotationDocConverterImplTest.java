@@ -3,13 +3,13 @@ package uk.ac.ebi.quickgo.annotation.service.converter;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
-import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,9 +29,10 @@ public class AnnotationDocConverterImplTest {
     private static final String GO_ID = "GO:0000977";
     private static final int TAXON_ID = 2;
     private static final String ECO_ID = "ECO:0000353";
-    private static final List<String> WITH_FROM = Arrays.asList("GO:0036376", "GO:1990573");
+    private static final List<String> WITH_FROM = asList("GO:0036376", "GO:1990573");
     private static final String ASSIGNED_BY = "InterPro";
-    private static final List<String> EXTENSIONS = Arrays.asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429)");
+    private static final List<String> EXTENSIONS = asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429)");
+    private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
     private static final String SYMBOL = "moeA5";
 
     private static final AnnotationDocument DOCUMENT = createStubDocument();
@@ -122,6 +123,12 @@ public class AnnotationDocConverterImplTest {
         assertThat(model.symbol, is(SYMBOL));
     }
 
+    @Test
+    public void convertsTargetSetsSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.targetSets, is(TARGET_SETS));
+    }
+
     private static AnnotationDocument createStubDocument() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.id = ID;
@@ -133,6 +140,7 @@ public class AnnotationDocConverterImplTest {
         doc.withFrom = WITH_FROM;
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;
+        doc.targetSets = TARGET_SETS;
         doc.symbol = SYMBOL;
 
         return doc;
