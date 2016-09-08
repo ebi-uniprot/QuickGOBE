@@ -84,7 +84,7 @@
     <field name="interactingTaxonId" type="int" indexed="false" stored="true" multiValued="false"/>
     <field name="qualifier" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="reference" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="targetSet" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <field name="targetSet" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
     <field name="taxonId" type="int" indexed="true" stored="true" multiValued="false"/>
     <field name="withFrom" type="string" indexed="true" stored="true" multiValued="true"/>
 
