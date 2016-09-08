@@ -3,13 +3,13 @@ package uk.ac.ebi.quickgo.annotation.service.converter;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
-import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -138,6 +138,12 @@ public class AnnotationDocConverterImplTest {
         assertThat(model.goAspect, is(GO_ASPECT));
     }
 
+    @Test
+    public void convertsTargetSetsSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.targetSets, is(TARGET_SETS));
+    }
+
     private static AnnotationDocument createStubDocument() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.id = ID;
@@ -149,6 +155,7 @@ public class AnnotationDocConverterImplTest {
         doc.withFrom = WITH_FROM;
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;
+        doc.targetSets = TARGET_SETS;
         doc.symbol = SYMBOL;
         doc.goAspect = GO_ASPECT;
 
