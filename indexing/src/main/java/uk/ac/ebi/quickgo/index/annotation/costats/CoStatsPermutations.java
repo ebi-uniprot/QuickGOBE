@@ -9,6 +9,7 @@ import java.util.*;
  * Date: 26/11/2015
  * Time: 11:59
  * Created with IntelliJ IDEA.
+ *
  * Holds all the data need to calculate a co-occurrence stat data point
  */
 public class CoStatsPermutations {
@@ -28,7 +29,7 @@ public class CoStatsPermutations {
 	private String currentGeneProduct;
 
 	//Constructor
-	CoStatsPermutations() {
+	public CoStatsPermutations() {
 		termBatch = new HashSet<>();
 		termToTermOverlapMatrix = new TreeMap<>();
 		geneProductList = new HashSet<>();
