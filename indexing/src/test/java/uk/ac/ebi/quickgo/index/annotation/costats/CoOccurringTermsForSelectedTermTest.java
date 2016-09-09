@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.common.costats;
+package uk.ac.ebi.quickgo.index.annotation.costats;
+
+import uk.ac.ebi.quickgo.common.costats.CoOccurringTerm;
 
 import java.util.Iterator;
 import org.junit.Test;
@@ -41,7 +43,7 @@ public class CoOccurringTermsForSelectedTermTest {
         verify(coOccurringTerm, times(4)).calculateProbabilityRatio(2f,10f);
         verify(coOccurringTerm, times(4)).calculateProbabilitySimilarityRatio(2f);
 
-       Iterator<CoOccurrenceStat> it = cootfst.highestSimilarity();
+       Iterator<CoOccurringTerm> it = cootfst.highestSimilarity();
         int itCounter = 0;
         while(it.hasNext()){
             it.next();
