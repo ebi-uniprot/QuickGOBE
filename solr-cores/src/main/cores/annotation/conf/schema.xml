@@ -79,6 +79,7 @@
     <field name="geneProductId" type="database_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="geneProductType" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="goEvidence" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
+    <field name="goAspect" type="text_ignorecase" indexed="true" stored="false" multiValued="false"/>
     <field name="goId" type="lowercase" indexed="true" stored="true" multiValued="false"/>
     <field name="interactingTaxonId" type="int" indexed="false" stored="true" multiValued="false"/>
     <field name="qualifier" type="string" indexed="false" stored="true" multiValued="false"/>

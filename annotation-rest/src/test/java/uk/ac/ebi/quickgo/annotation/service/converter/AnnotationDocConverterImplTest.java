@@ -34,6 +34,7 @@ public class AnnotationDocConverterImplTest {
     private static final List<String> EXTENSIONS = asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429)");
     private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
     private static final String SYMBOL = "moeA5";
+    private static final String GO_ASPECT = "cellular_component";
 
     private static final AnnotationDocument DOCUMENT = createStubDocument();
 
@@ -124,6 +125,21 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
+    public void convertNullAspectSuccessfully() {
+        AnnotationDocument doc = new AnnotationDocument();
+        doc.goAspect = null;
+
+        Annotation model = docConverter.convert(doc);
+        assertThat(model.goAspect, is(nullValue()));
+    }
+
+    @Test
+    public void convertAspectSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.goAspect, is(GO_ASPECT));
+    }
+
+    @Test
     public void convertsTargetSetsSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
         assertThat(model.targetSets, is(TARGET_SETS));
@@ -142,6 +158,7 @@ public class AnnotationDocConverterImplTest {
         doc.extensions = EXTENSIONS;
         doc.targetSets = TARGET_SETS;
         doc.symbol = SYMBOL;
+        doc.goAspect = GO_ASPECT;
 
         return doc;
     }

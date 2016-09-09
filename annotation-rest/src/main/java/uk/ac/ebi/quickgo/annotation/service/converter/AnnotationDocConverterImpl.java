@@ -22,6 +22,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         annotation.qualifier = annotationDocument.qualifier;
         annotation.goId = annotationDocument.goId;
         annotation.goEvidence = annotationDocument.goEvidence;
+        annotation.goAspect = annotationDocument.goAspect;
         annotation.evidenceCode = annotationDocument.evidenceCode;
         annotation.reference = annotationDocument.reference;
         annotation.taxonId = annotationDocument.taxonId;

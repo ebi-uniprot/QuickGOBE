@@ -21,6 +21,7 @@ public class AnnotationParsingHelper {
     static final String DB_OBJECT_SYMBOL = "db_object_symbol";
     static final String DB_OBJECT_TYPE = "db_object_type";
     static final String TARGET_SET = "target_set";
+    static final String GO_ASPECT = "go_aspect";
 
 
     // string regex representations
