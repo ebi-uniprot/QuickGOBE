@@ -1,12 +1,13 @@
-package uk.ac.ebi.quickgo.client.presets.read.assignedby;
+package uk.ac.ebi.quickgo.client.presets.read.ff;
 
 /**
- * Represents the columns of the source file used for assigned by information.
+ * Represents the columns of the source file {@code DB_XREFS.dat.gz}, containing
+ * database cross-reference information.
  *
  * Created 30/08/16
  * @author Edd
  */
-enum DBColumns {
+public enum DBColumns {
     COLUMN_DATABASE(0, "database"),
     COLUMN_NAME(1, "name"),
     COLUMN_URL(2, "url");

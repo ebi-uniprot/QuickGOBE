@@ -4,6 +4,10 @@ import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
+import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPreset;
+import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPresetRelevanceChecker;
+import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPresetValidator;
+import uk.ac.ebi.quickgo.client.presets.read.ff.StringToRawNamedPresetMapper;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
@@ -52,14 +56,14 @@ public class AssignedByPresetsConfig {
             Integer chunkSize,
             CompositePreset presets,
             RESTFilterConverterFactory converterFactory) {
-        FlatFileItemReader<RawAssignedByPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
+        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
         itemReader.setLinesToSkip(assignedByHeaderLines);
 
         return stepBuilderFactory.get(ASSIGNED_BY_LOADING_STEP_NAME)
-                .<RawAssignedByPreset, RawAssignedByPreset>chunk(chunkSize)
+                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawAssignedByPreset>reader(rawPresetMultiFileReader(assignedByResources, itemReader))
+                .<RawNamedPreset>reader(rawPresetMultiFileReader(assignedByResources, itemReader))
                 .processor(compositeItemProcessor(
                         assignedByValidator(),
                         assignedByRelevancyFetcher(converterFactory)))
@@ -73,15 +77,15 @@ public class AssignedByPresetsConfig {
                 .build();
     }
 
-    private FieldSetMapper<RawAssignedByPreset> rawAssignedByPresetFieldSetMapper() {
-        return new StringToAssignedByMapper();
+    private FieldSetMapper<RawNamedPreset> rawAssignedByPresetFieldSetMapper() {
+        return new StringToRawNamedPresetMapper();
     }
 
-    private ItemProcessor<RawAssignedByPreset, RawAssignedByPreset> assignedByValidator() {
-        return new RawAssignedByPresetValidator();
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByValidator() {
+        return new RawNamedPresetValidator();
     }
 
-    private ItemProcessor<RawAssignedByPreset, RawAssignedByPreset> assignedByRelevancyFetcher(
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByRelevancyFetcher(
             RESTFilterConverterFactory converterFactory) {
         FilterRequest assignedByRequest = FilterRequest.newBuilder().addProperty(ASSIGNED_BY).build();
 
@@ -92,6 +96,6 @@ public class AssignedByPresetsConfig {
         } catch (Exception e) {
             relevantAssignedByPresets = asList(assignedByDefaults);
         }
-        return new RawAssignedByPresetRelevanceChecker(relevantAssignedByPresets);
+        return new RawNamedPresetRelevanceChecker(relevantAssignedByPresets);
     }
 }

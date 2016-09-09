@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.client.presets.read.assignedby;
+package uk.ac.ebi.quickgo.client.presets.read.ff;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -8,20 +8,20 @@ import org.springframework.batch.item.file.transform.IncorrectTokenCountExceptio
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.client.presets.read.assignedby.DBColumns.COLUMN_DATABASE;
-import static uk.ac.ebi.quickgo.client.presets.read.assignedby.DBColumns.COLUMN_NAME;
-import static uk.ac.ebi.quickgo.client.presets.read.assignedby.DBColumns.numColumns;
+import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.COLUMN_DATABASE;
+import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.COLUMN_NAME;
+import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.numColumns;
 
 /**
  * Created 05/09/16
  * @author Edd
  */
-public class StringToAssignedByMapperTest {
-    private StringToAssignedByMapper mapper;
+public class StringToRawNamedPresetMapperTest {
+    private StringToRawNamedPresetMapper mapper;
 
     @Before
     public void setUp() {
-        this.mapper = new StringToAssignedByMapper();
+        this.mapper = new StringToRawNamedPresetMapper();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -45,7 +45,7 @@ public class StringToAssignedByMapperTest {
 
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
-        RawAssignedByPreset preset = mapper.mapFieldSet(fieldSet);
+        RawNamedPreset preset = mapper.mapFieldSet(fieldSet);
 
         assertThat(preset.name, is(tokens[COLUMN_DATABASE.getPosition()]));
         assertThat(preset.description, is(tokens[COLUMN_NAME.getPosition()]));
@@ -59,7 +59,7 @@ public class StringToAssignedByMapperTest {
 
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
-        RawAssignedByPreset preset = mapper.mapFieldSet(fieldSet);
+        RawNamedPreset preset = mapper.mapFieldSet(fieldSet);
 
         assertThat(preset.name, is(tokens[COLUMN_DATABASE.getPosition()]));
         assertThat(preset.description, is(tokens[COLUMN_NAME.getPosition()]));
@@ -73,7 +73,7 @@ public class StringToAssignedByMapperTest {
 
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
-        RawAssignedByPreset preset = mapper.mapFieldSet(fieldSet);
+        RawNamedPreset preset = mapper.mapFieldSet(fieldSet);
 
         assertThat(preset.name, is(tokens[COLUMN_DATABASE.getPosition()].trim()));
         assertThat(preset.description, is(tokens[COLUMN_NAME.getPosition()].trim()));

@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.client.presets.read.assignedby;
+package uk.ac.ebi.quickgo.client.presets.read.ff;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,12 +12,12 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * Created 05/09/16
  * @author Edd
  */
-public class RawAssignedByPresetValidatorTest {
-    private RawAssignedByPresetValidator validator;
+public class RawNamedPresetValidatorTest {
+    private RawNamedPresetValidator validator;
 
     @Before
     public void setUp() {
-        this.validator = new RawAssignedByPresetValidator();
+        this.validator = new RawNamedPresetValidator();
     }
 
     @Test(expected = ValidationException.class)
@@ -27,24 +27,24 @@ public class RawAssignedByPresetValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void nullNameIsInvalid() throws Exception {
-        RawAssignedByPreset value = new RawAssignedByPreset();
+        RawNamedPreset value = new RawNamedPreset();
         value.name = null;
         validator.process(value);
     }
 
     @Test(expected = ValidationException.class)
     public void emptyNameIsInvalid() throws Exception {
-        RawAssignedByPreset value = new RawAssignedByPreset();
+        RawNamedPreset value = new RawNamedPreset();
         value.name = "";
         validator.process(value);
     }
 
     @Test
     public void nonEmptyNameIsValid() throws Exception {
-        RawAssignedByPreset value = new RawAssignedByPreset();
+        RawNamedPreset value = new RawNamedPreset();
         value.name = "valid name";
 
-        RawAssignedByPreset processedValue = validator.process(value);
+        RawNamedPreset processedValue = validator.process(value);
         assertThat(processedValue, is(notNullValue()));
     }
 }

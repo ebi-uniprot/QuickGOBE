@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.client.presets.read.assignedby;
+package uk.ac.ebi.quickgo.client.presets.read.ff;
 
 import java.util.List;
 import org.junit.Before;
@@ -14,15 +14,15 @@ import static org.junit.Assert.assertThat;
  * Created 01/09/16
  * @author Edd
  */
-public class RawAssignedByPresetRelevanceCheckerTest {
+public class RawNamedPresetRelevanceCheckerTest {
     private static final String UNIPARC = "UniParc";
     private static final String UNIPROT = "UniProt";
     private final static List<String> UNIPROT_OR_UNIPARC = asList(UNIPROT, UNIPARC);
-    private RawAssignedByPresetRelevanceChecker relevanceChecker;
+    private RawNamedPresetRelevanceChecker relevanceChecker;
 
     @Before
     public void setUp() {
-        this.relevanceChecker = new RawAssignedByPresetRelevanceChecker(UNIPROT_OR_UNIPARC);
+        this.relevanceChecker = new RawNamedPresetRelevanceChecker(UNIPROT_OR_UNIPARC);
     }
 
     @Test
@@ -36,8 +36,8 @@ public class RawAssignedByPresetRelevanceCheckerTest {
         assertThat(relevanceChecker.process(assignedBy(UNIPROT)).name, is(UNIPROT));
     }
 
-    private RawAssignedByPreset assignedBy(String name) {
-        RawAssignedByPreset preset = new RawAssignedByPreset();
+    private RawNamedPreset assignedBy(String name) {
+        RawNamedPreset preset = new RawNamedPreset();
         preset.name = name;
         return preset;
     }
