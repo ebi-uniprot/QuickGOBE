@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.common.costats.CoOccurrenceStat;
+import uk.ac.ebi.quickgo.common.costats.CoOccurringTerm;
 import uk.ac.ebi.quickgo.index.annotation.costats.*;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
@@ -85,22 +85,22 @@ public class AnnotationConfig {
     ItemProcessor<Annotation, Annotation> coStatsAll;
 
     @Autowired
-    ItemProcessor<String, List<CoOccurrenceStat>> coStatsManualItemProcessor;
+    ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor;
 
     @Autowired
-    ItemProcessor<String, List<CoOccurrenceStat>> coStatsAllItemProcessor;
+    ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor;
 
     @Autowired
     ItemReader<String> coStatsManualItemReader;
 
     @Autowired
-    ItemWriter<List<CoOccurrenceStat>> coStatManualFlatFileWriter;
+    ItemWriter<List<CoOccurringTerm>> coStatManualFlatFileWriter;
 
     @Autowired
     ItemReader<String> coStatsAllItemReader;
 
     @Autowired
-    ItemWriter<List<CoOccurrenceStat>> coStatsAllFlatFileWriter;
+    ItemWriter<List<CoOccurringTerm>> coStatsAllFlatFileWriter;
 
     @Bean
     public Job annotationJob() {
@@ -140,10 +140,10 @@ public class AnnotationConfig {
     @Bean
     public Step coStatsManualSummarizationStep() {
         return stepBuilders.get(COSTATS_MANUAL_COMPLETION_STEP_NAME)
-                .<String, List<CoOccurrenceStat>>chunk(chunkSize)
+                .<String, List<CoOccurringTerm>>chunk(chunkSize)
                 .<Annotation>reader(coStatsManualItemReader)
-                .processor(coStatsManualItemProcessor)
-                .<List<CoOccurrenceStat>>writer(coStatManualFlatFileWriter)
+                .<CoOccurringTerm>processor(coStatsManualItemProcessor)
+                .<List<CoOccurringTerm>>writer(coStatManualFlatFileWriter)
                 .listener(logStepListener())
                 .build();
     }
@@ -151,10 +151,10 @@ public class AnnotationConfig {
     @Bean
     public Step coStatsAllSummarizationStep() {
         return stepBuilders.get(COSTATS_ALL_COMPLETION_STEP_NAME)
-                .<String, List<CoOccurrenceStat>>chunk(chunkSize)
+                .<String, List<CoOccurringTerm>>chunk(chunkSize)
                 .<Annotation>reader(coStatsAllItemReader)
-                .processor(coStatsAllItemProcessor)
-                .<List<CoOccurrenceStat>>writer(coStatsAllFlatFileWriter)
+                .<CoOccurringTerm>processor(coStatsAllItemProcessor)
+                .<CoOccurringTerm>writer(coStatsAllFlatFileWriter)
                 .listener(logStepListener())
                 .listener(skipLogListener())
                 .build();
