@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
 
+import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
+import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.loader.DbXRefLoader;
-import uk.ac.ebi.quickgo.geneproduct.model.GeneProductDbXRefIDFormats;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
@@ -13,7 +13,6 @@ import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
 
-import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -38,13 +37,11 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.M
 @Import({GeneProductRepoConfig.class})
 public class ServiceConfig {
 
-    @Value("${geneproduct.db.xref.valid.regexes}")
-    private String xrefValidationRegexFile;
-
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
-
     @Value("${geneproduct.db.xref.valid.casesensitive:"+DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE+"}")
     boolean xrefValidationCaseSensitive;
+    @Value("${geneproduct.db.xref.valid.regexes}")
+    private String xrefValidationRegexFile;
 
     @Bean
     public GeneProductService goGeneProductService(GeneProductRepository geneProductRepository) {
@@ -52,6 +49,11 @@ public class ServiceConfig {
                 serviceHelper(),
                 geneProductRepository,
                 geneProductDocConverter());
+    }
+
+    @Bean
+    public ControllerValidationHelper geneProductValidator() {
+        return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
     }
 
     private ServiceHelper serviceHelper() {
@@ -66,15 +68,8 @@ public class ServiceConfig {
         return new SolrQueryStringSanitizer();
     }
 
-    @Bean
-    public ControllerValidationHelper geneProductValidator() {
-        return new ControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
-    }
-
-    private Predicate<String> idValidator() {
-        GeneProductDbXRefIDFormats
-                dbXrefEntities = GeneProductDbXRefIDFormats.createWithData(geneProductLoader().load());
-        return dbXrefEntities::isValidId;
+    private DbXRefEntityValidation idValidator() {
+        return DbXRefEntityValidation.createWithData(geneProductLoader().load());
     }
 
     private DbXRefLoader geneProductLoader() {
