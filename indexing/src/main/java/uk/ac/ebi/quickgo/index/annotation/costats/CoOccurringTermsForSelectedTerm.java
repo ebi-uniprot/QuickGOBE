@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.common.costats;
+package uk.ac.ebi.quickgo.index.annotation.costats;
+
+import uk.ac.ebi.quickgo.common.costats.CoOccurringTerm;
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
@@ -67,11 +69,11 @@ public class CoOccurringTermsForSelectedTerm {
     /**
      * @return an iterator that makes available the list of co-occurring terms, in descending order of the similarity
      */
-    public Iterator<CoOccurrenceStat> highestSimilarity() {
+    public Iterator<CoOccurringTerm> highestSimilarity() {
 
         statsTerms.sort(new SignificanceSorter());
 
-        return new Iterator<CoOccurrenceStat>() {
+        return new Iterator<CoOccurringTerm>() {
 
             Iterator<CoOccurringTerm> navIterator = statsTerms.iterator();
 
@@ -81,12 +83,8 @@ public class CoOccurringTermsForSelectedTerm {
             }
 
             @Override
-            public CoOccurrenceStat next() {
-                CoOccurringTerm next = navIterator.next();
-                CoOccurrenceStat coOccurrenceStat = new CoOccurrenceStat(next.getTarget(),
-                        next.getComparedTerm(), next.getProbabilityRatio(), next.getSimilarityRatio(),
-                        next.getTogether(), next.getCompared());
-                return coOccurrenceStat;
+            public CoOccurringTerm next() {
+                return navIterator.next();
             }
         };
     }
