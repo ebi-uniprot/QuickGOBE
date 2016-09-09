@@ -16,7 +16,7 @@ import org.springframework.batch.item.ItemProcessor;
  * For the contents of the termToTermOverlapMatrix calculate co-occurrence statistics
  * A version of CoStatsSummarizer from Beta
  */
-public class CoStatsItemProcessor implements ItemProcessor<String, List<CoOccurrenceStat>>{
+public class CoStatsItemProcessor implements ItemProcessor<String, List<CoOccurringTerm>>{
 
 	//This is the count of all gene products for the term. We hold this figure separately as it is used many times.
 	private final Map<String, HitCount> termGPCount;
@@ -40,7 +40,7 @@ public class CoStatsItemProcessor implements ItemProcessor<String, List<CoOccurr
 	 * Read each line in the term to term matrix for the selected term. For each calculate a CoStat instance.
 	 *
 	 */
-	public List<CoOccurrenceStat> process(String goTerm){
+	public List<CoOccurringTerm> process(String goTerm){
 		return resultsForOneGoTerm(calculateCoStatsForTerm(goTerm));
 	}
 
@@ -70,12 +70,12 @@ public class CoStatsItemProcessor implements ItemProcessor<String, List<CoOccurr
 
 	}
 
-	private List<CoOccurrenceStat> resultsForOneGoTerm(CoOccurringTermsForSelectedTerm coOccurringTermsForSelectedTerm) {
+	private List<CoOccurringTerm> resultsForOneGoTerm(CoOccurringTermsForSelectedTerm coOccurringTermsForSelectedTerm) {
 
-		List<CoOccurrenceStat> results = new ArrayList<>();
+		List<CoOccurringTerm> results = new ArrayList<>();
 
 		//Get iterator of compared terms, ordered by significance ratio descending
-		Iterator<CoOccurrenceStat> descendingIt = coOccurringTermsForSelectedTerm.highestSimilarity();
+		Iterator<CoOccurringTerm> descendingIt = coOccurringTermsForSelectedTerm.highestSimilarity();
 
 		while (descendingIt.hasNext()) {
 			results.add(descendingIt.next());
