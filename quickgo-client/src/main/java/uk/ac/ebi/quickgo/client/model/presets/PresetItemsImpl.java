@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Represents preset information relating to valid and relevant "assigned by" values.
+ * Represents preset information relating to valid and relevant {@link PresetItem} instances.
  *
  * Created 30/08/16
  * @author Edd
  */
-public class AssignedByPresets implements PresetItems {
+public class PresetItemsImpl implements PresetItems {
     private final List<PresetItem> presets;
 
-    AssignedByPresets() {
+    PresetItemsImpl() {
         presets = new ArrayList<>();
     }
 
