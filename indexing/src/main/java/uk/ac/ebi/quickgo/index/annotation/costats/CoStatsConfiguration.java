@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.costats;
 
-import uk.ac.ebi.quickgo.common.costats.CoOccurrenceStat;
+import uk.ac.ebi.quickgo.common.costats.CoOccurringTerm;
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
 
 import java.io.File;
@@ -11,6 +11,10 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
+import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
+import org.springframework.batch.item.file.transform.FieldExtractor;
+import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +30,9 @@ import org.springframework.core.io.Resource;
 @Configuration
 public class CoStatsConfiguration {
 
+    public static final String[] FF_COL_NAMES = {"target", "comparedTerm", "probabilityRatio", "similarityRatio",
+            "together", "compared"};
+    public static final String DELIMITER = "\t";
     @Value("${indexing.annotation.source}")
     private Resource[] resources;
 
@@ -52,7 +59,7 @@ public class CoStatsConfiguration {
 
 
     @Bean
-    ItemProcessor<String, List<CoOccurrenceStat>> coStatsManualItemProcessor(){
+    ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor(){
         CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(
                 coStatsPermutationsMan.totalOfAnnotatedGeneProducts(),
                 coStatsPermutationsMan.termGPCount(),
@@ -63,7 +70,7 @@ public class CoStatsConfiguration {
 
 
     @Bean
-    ItemProcessor<String, List<CoOccurrenceStat>> coStatsAllItemProcessor(){
+    ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor(){
         CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(
                 coStatsPermutationsAll.totalOfAnnotatedGeneProducts(),
                 coStatsPermutationsAll.termGPCount(),
@@ -84,22 +91,15 @@ public class CoStatsConfiguration {
 
 
     @Bean
-    ItemWriter<List<CoOccurrenceStat>> coStatManualFlatFileWriter() {
-        return createFlatFileWriter("CoStatsManual" );
+    ItemWriter<List<CoOccurringTerm>> coStatManualFlatFileWriter() {
+        return listItemFlatFileWriter("CoStatsManual" );
     }
 
     @Bean
-    ItemWriter<List<CoOccurrenceStat>> coStatsAllFlatFileWriter() {
-        return createFlatFileWriter("CoStatsAll" );
+    ItemWriter<List<CoOccurringTerm>> coStatsAllFlatFileWriter() {
+        return listItemFlatFileWriter("CoStatsAll" );
     }
 
-    private ItemWriter<List<CoOccurrenceStat>> createFlatFileWriter(String fileName) {
-        FlatFileItemWriter<List<CoOccurrenceStat>> ffw = new FlatFileItemWriter<>();
-        File file = new File(getFilePath(), fileName );
-        Resource outputFile = new FileSystemResource(file);
-        ffw.setResource(outputFile);
-        return ffw;
-    }
 
     public String getFilePath() {
         String path;
@@ -109,5 +109,31 @@ public class CoStatsConfiguration {
             throw new RuntimeException("Failed to create path for Costats", e);
         }
         return path;
+    }
+
+    private ItemWriter<List<CoOccurringTerm>> listItemFlatFileWriter(String fileName) {
+        ItemWriter<List<CoOccurringTerm>> listWriter = new ListItemWriter<>(flatFileWriter(fileName));
+        return listWriter;
+    }
+
+    private ItemWriter<CoOccurringTerm> flatFileWriter(String fileName) {FlatFileItemWriter<CoOccurringTerm> ffw = new FlatFileItemWriter<>();
+        ffw.setLineAggregator(lineAggregator());
+        File file = new File(getFilePath(), fileName );
+        Resource outputFile = new FileSystemResource(file);
+        ffw.setResource(outputFile);
+        return ffw;
+    }
+
+    private FieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor(){
+        BeanWrapperFieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor();
+        beanWrapperFieldExtractor.setNames(FF_COL_NAMES);
+        return beanWrapperFieldExtractor;
+    }
+
+    private LineAggregator<CoOccurringTerm> lineAggregator(){
+        DelimitedLineAggregator<CoOccurringTerm> delimitedLineAggregator = new DelimitedLineAggregator<>();
+        delimitedLineAggregator.setDelimiter(DELIMITER);
+        delimitedLineAggregator.setFieldExtractor(beanWrapperFieldExtractor());
+        return delimitedLineAggregator;
     }
 }
