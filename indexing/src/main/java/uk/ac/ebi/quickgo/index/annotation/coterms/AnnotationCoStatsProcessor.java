@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
 
+import com.google.common.base.Preconditions;
 import java.util.function.Predicate;
 import org.springframework.batch.item.ItemProcessor;
 
@@ -22,8 +23,9 @@ public class AnnotationCoStatsProcessor implements ItemProcessor<Annotation, Ann
     private final CoStatsPermutations coStatsPermutations;
     private final Predicate<Annotation> toBeProcessed;
 
-    public AnnotationCoStatsProcessor(CoStatsPermutations coStatsPermutations,
-            Predicate<Annotation> toBeProcessed) {
+    public AnnotationCoStatsProcessor(CoStatsPermutations coStatsPermutations,Predicate<Annotation> toBeProcessed) {
+        Preconditions.checkArgument(coStatsPermutations!=null);
+        Preconditions.checkArgument(toBeProcessed!=null);
         this.coStatsPermutations = coStatsPermutations;
         this.toBeProcessed = toBeProcessed;
     }
