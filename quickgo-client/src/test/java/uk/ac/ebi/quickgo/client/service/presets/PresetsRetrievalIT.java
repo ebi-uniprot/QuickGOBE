@@ -14,8 +14,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,8 +46,18 @@ public class PresetsRetrievalIT {
     @Test
     public void canRetrieveAssignedByPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.assignedBy").exists())
                 .andExpect(jsonPath("$.assignedBy.presets.*", hasSize(1)));
+    }
+
+    @Test
+    public void canRetrieveReferencePresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reference").exists())
+                .andExpect(jsonPath("$.reference.presets.*", hasSize(greaterThan(0))));
     }
 }
