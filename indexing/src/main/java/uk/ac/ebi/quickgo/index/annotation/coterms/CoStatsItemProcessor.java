@@ -1,7 +1,5 @@
-package uk.ac.ebi.quickgo.index.annotation.costats;
+package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-
-import uk.ac.ebi.quickgo.common.costats.*;
 
 import com.google.common.base.Preconditions;
 import java.util.*;

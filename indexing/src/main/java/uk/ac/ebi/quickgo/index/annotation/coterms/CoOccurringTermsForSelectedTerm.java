@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.index.annotation.costats;
-
-import uk.ac.ebi.quickgo.common.costats.CoOccurringTerm;
+package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;

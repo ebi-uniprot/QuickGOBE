@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.common.costats;
+package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 /**
  * @author Tony Wardell

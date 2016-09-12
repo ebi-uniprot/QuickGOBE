@@ -1,10 +1,8 @@
-package uk.ac.ebi.quickgo.index.annotation.costats;
+package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
-import uk.ac.ebi.quickgo.index.annotation.costats.CoStatsPermutations;
 
-import java.nio.file.Path;
 import java.util.function.Predicate;
 import org.springframework.batch.item.ItemProcessor;
 
