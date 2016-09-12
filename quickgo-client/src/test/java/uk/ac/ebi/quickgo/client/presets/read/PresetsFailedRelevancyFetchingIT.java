@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.client.presets.read;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
 
 import java.util.stream.Collectors;
 import org.junit.Test;
@@ -20,8 +21,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
-import static uk.ac.ebi.quickgo.client.presets.read.MockRESTConfig.FAILED_FETCHING;
-import static uk.ac.ebi.quickgo.client.presets.read.MockRESTConfig.UNIPROT_KB;
+import static uk.ac.ebi.quickgo.client.presets.read.MockPresetDataConfig.FAILED_FETCHING;
+import static uk.ac.ebi.quickgo.client.presets.read.MockPresetDataConfig.UNIPROT_KB;
 
 /**
  * Created 31/08/16
@@ -29,7 +30,7 @@ import static uk.ac.ebi.quickgo.client.presets.read.MockRESTConfig.UNIPROT_KB;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {PresetsConfig.class, MockRESTConfig.class, JobTestRunnerConfig.class},
+        classes = {PresetsConfig.class, MockPresetDataConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
 @WebAppConfiguration
 @ActiveProfiles(profiles = FAILED_FETCHING)
@@ -44,7 +45,8 @@ public class PresetsFailedRelevancyFetchingIT {
     public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() throws Exception {
         assertThat(preset.assignedBy.getPresets(), hasSize(0));
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(AssignedByPresetsConfig.ASSIGNED_BY_LOADING_STEP_NAME);
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));

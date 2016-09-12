@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.client.presets.read;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
+import uk.ac.ebi.quickgo.client.presets.read.reference.ReferencePresetsConfig;
 import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
 
 import java.util.stream.Stream;
@@ -22,7 +23,7 @@ import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.logJobLi
  * @author Edd
  */
 @Configuration
-@Import({PresetsCommonConfig.class, AssignedByPresetsConfig.class})
+@Import({PresetsCommonConfig.class, AssignedByPresetsConfig.class, ReferencePresetsConfig.class})
 public class PresetsConfig {
 
     private static final String PRESET_LOADING_JOB_NAME = "PresetReadingJob";
@@ -32,9 +33,13 @@ public class PresetsConfig {
     @Bean
     public Job presetsBuildJob(
             JobBuilderFactory jobBuilderFactory,
-            Step assignedByStep) {
+            Step assignedByStep,
+            Step referenceGenericDbStep,
+            Step referenceSpecificDbStep) {
         return jobBuilderFactory.get(PRESET_LOADING_JOB_NAME)
                 .start(assignedByStep)
+                .next(referenceGenericDbStep)
+                .next(referenceSpecificDbStep)
                 .listener(logJobListener())
                 .build();
     }

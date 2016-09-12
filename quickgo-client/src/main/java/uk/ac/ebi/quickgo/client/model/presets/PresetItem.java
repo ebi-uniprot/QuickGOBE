@@ -11,6 +11,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @author Edd
  */
 public class PresetItem {
+    private static final int EQUAL_RELEVANCY = 0;
     private final String name;
     private final String description;
     private final Integer relevancy;
@@ -25,6 +26,10 @@ public class PresetItem {
         this.name = name;
         this.description = description;
         this.relevancy = relevancy;
+    }
+
+    public PresetItem(String name, String description) {
+        this(name, description, EQUAL_RELEVANCY);
     }
 
     public String getName() {

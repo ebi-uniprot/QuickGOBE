@@ -4,6 +4,9 @@ import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByRelevancyRespo
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -17,15 +20,27 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Provides configurable properties, beans, etc., used during tests.
+ *
  * Created 02/09/16
  * @author Edd
  */
 @Configuration
-public class MockRESTConfig {
-    static final AssignedByRelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
+public class MockPresetDataConfig {
+    private static final AssignedByRelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
+
+    static final String DOI = "DOI";
+    static final String ENSEMBL = "ENSEMBL";
+    static final String REACTOME = "REACTOME";
+    static final List<String> GO_REFS_FROM_RESOURCE =
+            Stream.of(
+                    "GO_REF:0000037",
+                    "GO_REF:0000039",
+                    "GO_REF:0000002",
+                    "GO_REF:0000104"
+            ).collect(Collectors.toList());
 
     static final String UNIPROT_KB = "UniProtKB";
-    static final String ENSEMBL = "ENSEMBL";
     static final String SUCCESSFUL_FETCHING = "successfulFetching";
     static final String FAILED_FETCHING = "failedFetching";
 

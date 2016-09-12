@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPreset;
 import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.presets.read.ff.StringToRawNamedPresetMapper;
 
+import java.util.Set;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -33,54 +34,91 @@ import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.rawPrese
 @Configuration
 @Import({PresetsCommonConfig.class})
 public class ReferencePresetsConfig {
-    private static final String REFERENCE_LOADING_STEP_NAME = "ReferenceGenericDBReadingStep";
-    private static final String REFERENCE = "reference";
-    private static final String REFERENCE_DEFAULTS = "UniProtKB";
+    public static final String CORE_REFERENCE_DB_LOADING_STEP_NAME = "GenericReferenceDBReadingStep";
+    public static final String SPECIFIC_REFERENCE_LOADING_STEP_NAME = "SpecificReferenceReadingStep";
+    private static final String REFERENCE_DB_DEFAULTS = "DOI,GO_REF,PMID,REACTOME";
+    private static final String REFERENCE_SPECIFIC_DB_DEFAULTS =
+            "0000037,0000038,0000043,0000045,0000039,0000040,0000044,0000046,0000003,0000041,0000020,0000002," +
+                    "0000042,0000019,0000035,0000049,0000104,0000108";
+    private static final RawNamedPreset INVALID_PRESET = null;
+    private static final String GO_REF_FORMAT = "GO_REF:%s";
 
     @Value("#{'${reference.db.preset.source:}'.split(',')}")
     private Resource[] dbResources;
     @Value("${reference.db.preset.header.lines:1}")
     private int dbHeaderLines;
-    @Value("#{'${reference.preset.defaults:" + REFERENCE_DEFAULTS + "}'.split(',')}")
-    private String[] dbDefaults;
+    @Value("#{'${reference.db.preset.defaults:" + REFERENCE_DB_DEFAULTS + "}'.split(',')}")
+    private Set<String> dbDefaults;
 
     @Value("#{'${reference.specific.db.preset.source:}'.split(',')}")
     private Resource[] specificResources;
     @Value("${reference.db.preset.header.lines:1}")
     private int specificDBHeaderLines;
-    @Value("#{'${reference.preset.defaults:" + REFERENCE_DEFAULTS + "}'.split(',')}")
-    private String[] specificDBDefaults;
+    @Value("#{'${reference.specific.db.preset.defaults:" + REFERENCE_SPECIFIC_DB_DEFAULTS + "}'.split(',')}")
+    private Set<String> specificDBDefaults;
 
     @Bean
     public Step referenceGenericDbStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePreset presets) {
-        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
+        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(dbHeaderLines);
 
-        return stepBuilderFactory.get(REFERENCE_LOADING_STEP_NAME)
+        return stepBuilderFactory.get(CORE_REFERENCE_DB_LOADING_STEP_NAME)
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(dbResources, itemReader))
                 .processor(compositeItemProcessor(
-                        assignedByValidator()))
+                        rawPresetValidator(),
+                        rawPresetFilter(dbDefaults)))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
                     presets.references.addPreset(
-                            new PresetItem(rawItem.name, rawItem.description, rawItem.relevancy));
+                            new PresetItem(rawItem.name, rawItem.description));
                 }))
                 .listener(new LogStepListener())
                 .build();
     }
 
-    // todo: specificReference
+    @Bean
+    public Step referenceSpecificDbStep(
+            StepBuilderFactory stepBuilderFactory,
+            Integer chunkSize,
+            CompositePreset presets) {
+        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
+        itemReader.setLinesToSkip(dbHeaderLines);
 
-    private FieldSetMapper<RawNamedPreset> rawAssignedByPresetFieldSetMapper() {
+        return stepBuilderFactory.get(SPECIFIC_REFERENCE_LOADING_STEP_NAME)
+                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
+                .faultTolerant()
+                .skipLimit(SKIP_LIMIT)
+                .<RawNamedPreset>reader(rawPresetMultiFileReader(specificResources, itemReader))
+                .processor(compositeItemProcessor(
+                        rawPresetValidator(),
+                        rawPresetFilter(specificDBDefaults)))
+                .writer(rawItemList -> rawItemList.forEach(rawItem -> {
+                    presets.references.addPreset(
+                            new PresetItem(buildGORefID(rawItem.name), rawItem.description));
+                }))
+                .listener(new LogStepListener())
+                .build();
+    }
+
+    private String buildGORefID(String name) {
+        return String.format(GO_REF_FORMAT, name);
+    }
+
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetFilter(Set<String> validPresetNames) {
+        return rawNamedPreset ->
+                validPresetNames.contains(rawNamedPreset.name) ? rawNamedPreset : INVALID_PRESET;
+    }
+
+    private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
         return new StringToRawNamedPresetMapper();
     }
 
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByValidator() {
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
         return new RawNamedPresetValidator();
     }
 }

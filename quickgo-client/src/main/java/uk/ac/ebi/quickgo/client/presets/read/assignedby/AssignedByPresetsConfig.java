@@ -39,7 +39,7 @@ import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.rawPrese
 @Configuration
 @Import({PresetsCommonConfig.class})
 public class AssignedByPresetsConfig {
-    private static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
+    public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     private static final String ASSIGNED_BY = "assignedBy";
     private static final String ASSIGNED_BY_DEFAULTS = "UniProtKB";
 
