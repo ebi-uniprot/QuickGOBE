@@ -145,6 +145,12 @@ public class AnnotationDocConverterImplTest {
         assertThat(model.goAspect, is(GO_ASPECT));
     }
 
+    @Test
+    public void convertsTargetSetsSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.targetSets, is(TARGET_SETS));
+    }
+
     private static AnnotationDocument createStubDocument() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.id = ID;
