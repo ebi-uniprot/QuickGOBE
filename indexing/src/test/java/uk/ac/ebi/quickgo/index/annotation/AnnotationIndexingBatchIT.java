@@ -27,6 +27,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_JOB_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsConfiguration.COSTATS_ALL_COMPLETION_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsConfiguration.COSTATS_MANUAL_COMPLETION_STEP_NAME;
 
 /**
  * Tests whether Spring Batch is correctly wired up to run the annotation indexing.
@@ -54,13 +56,12 @@ public class AnnotationIndexingBatchIT {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         assertThat(jobExecution.getJobInstance().getJobName(), is(ANNOTATION_INDEXING_JOB_NAME));
 
-        BatchStatus status = jobExecution.getStatus();
-        assertThat(status, is(BatchStatus.COMPLETED));
-
-        List<StepExecution> jobsSingleStepAsList =
-                jobExecution.getStepExecutions().stream().filter(step -> step.getStepName().equals
-                        (ANNOTATION_INDEXING_STEP_NAME)).collect(Collectors.toList());
+        List<StepExecution> jobsSingleStepAsList = jobExecution.getStepExecutions()
+                .stream()
+                .filter(step -> step.getStepName().equals (ANNOTATION_INDEXING_STEP_NAME))
+                .collect(Collectors.toList());
         assertThat(jobsSingleStepAsList, hasSize(1));
+
         StepExecution indexingStep = jobsSingleStepAsList.get(0);
 
         assertThat(indexingStep.getReadCount(), is(6));
@@ -77,6 +78,41 @@ public class AnnotationIndexingBatchIT {
                 "IntAct:EBI-8801830",
                 "IntAct:EBI-10043082"
         ));
+
+
+        List<StepExecution> jobsSingleStepAsList2 = jobExecution.getStepExecutions()
+                .stream()
+                .filter(step -> step.getStepName().equals (COSTATS_MANUAL_COMPLETION_STEP_NAME))
+                .collect(Collectors.toList());
+        assertThat(jobsSingleStepAsList2, hasSize(1));
+
+
+        StepExecution cotermsManualStep = jobsSingleStepAsList2.get(0);
+
+        assertThat(cotermsManualStep.getReadCount(), is(4));
+        assertThat(cotermsManualStep.getReadSkipCount(), is(0));
+        assertThat(cotermsManualStep.getProcessSkipCount(), is(0));
+        assertThat(cotermsManualStep.getWriteCount(), is(4));
+
+//        List<String> writtenAnnotationDocGeneProductIds =
+//                getGeneProductIdsFromAnnotationDocuments(annotationRepository.findAll());
+//
+//        assertThat(writtenAnnotationDocGeneProductIds, containsInAnyOrder(
+//                "IntAct:EBI-10043081",
+//                "IntAct:EBI-10205244",
+//                "IntAct:EBI-8801830",
+//                "IntAct:EBI-10043082"
+//        ));
+
+        List<StepExecution> jobsSingleStepAsList3 = jobExecution.getStepExecutions()
+                .stream()
+                .filter(step -> step.getStepName().equals (COSTATS_ALL_COMPLETION_STEP_NAME))
+                .collect(Collectors.toList());
+        assertThat(jobsSingleStepAsList3, hasSize(1));
+
+
+        BatchStatus status = jobExecution.getStatus();
+        assertThat(status, is(BatchStatus.COMPLETED));
     }
 
     private List<String> getGeneProductIdsFromAnnotationDocuments(Iterable<AnnotationDocument> repoDocsWritten) {
