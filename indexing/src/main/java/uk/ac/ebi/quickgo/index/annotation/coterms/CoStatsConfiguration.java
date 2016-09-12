@@ -38,45 +38,61 @@ public class CoStatsConfiguration {
     public static final String COSTATS_MANUAL_COMPLETION_STEP_NAME = "costatsManualSummarizationStep";
     public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
 
-    public static ItemProcessor<Annotation, Annotation> coStatsManual(CoStatsPermutations coStatsPermutationsMan){
+    @Bean
+    CoStatsPermutations coStatsPermutationsMan(){
+        return new CoStatsPermutations();
+    }
+
+    @Bean
+    CoStatsPermutations coStatsPermutationsAll(){
+        return new CoStatsPermutations();
+    }
+
+    @Bean
+    public ItemProcessor<Annotation, Annotation> coStatsManual(CoStatsPermutations coStatsPermutationsMan){
         Predicate<Annotation> toBeProcessed = t -> !"IEA".equals(t.evidenceCode);
         return new AnnotationCoStatsProcessor(coStatsPermutationsMan, toBeProcessed);
     }
 
-
-    public static ItemProcessor<Annotation, Annotation> coStatsAll(CoStatsPermutations coStatsPermutations){
+    @Bean
+    public ItemProcessor<Annotation, Annotation> coStatsAll(CoStatsPermutations coStatsPermutationsAll){
         Predicate<Annotation> toBeProcessed = t -> true;
-        return new AnnotationCoStatsProcessor(coStatsPermutations, toBeProcessed);
+        return new AnnotationCoStatsProcessor(coStatsPermutationsAll, toBeProcessed);
     }
 
+    @Bean
+    public CoTermsStepExecutionListener coTermsStepExecutionListener(CoStatsPermutations coStatsPermutationsAll,
+            CoStatsPermutations coStatsPermutationsMan){
+        return new CoTermsStepExecutionListener(coStatsPermutationsAll, coStatsPermutationsMan);
 
+    }
 
-    public static ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor(CoStatsPermutations coStatsPermutations){
+    @Bean
+    public static ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor(CoStatsPermutations coStatsPermutationsMan){
         CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(
-                coStatsPermutations.totalOfAnnotatedGeneProducts(),
-                coStatsPermutations.termGPCount(),
-                coStatsPermutations.termToTermOverlapMatrix());
+                coStatsPermutationsMan.totalOfAnnotatedGeneProducts(),
+                coStatsPermutationsMan.termGPCount(),
+                coStatsPermutationsMan.termToTermOverlapMatrix());
 
         return coStatsItemProcessor;
     }
 
-
-
-    public static ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor(CoStatsPermutations coStatsPermutations){
+    @Bean
+    public static ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor(CoStatsPermutations coStatsPermutationsAll){
         CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(
-                coStatsPermutations.totalOfAnnotatedGeneProducts(),
-                coStatsPermutations.termGPCount(),
-                coStatsPermutations.termToTermOverlapMatrix());
-
+                coStatsPermutationsAll.totalOfAnnotatedGeneProducts(),
+                coStatsPermutationsAll.termGPCount(),
+                coStatsPermutationsAll.termToTermOverlapMatrix());
         return coStatsItemProcessor;
     }
 
-    public static ItemReader<String> coStatsManualItemReader(CoStatsPermutations coStatsPermutationsMan){
+    @Bean
+    public ItemReader<String> coStatsManualItemReader(CoStatsPermutations coStatsPermutationsMan){
         return new CoStatsForTermItemReader(coStatsPermutationsMan);
     }
 
-
-    public static ItemReader<String> coStatsAllItemReader(CoStatsPermutations coStatsPermutationsAll){
+    @Bean
+    public ItemReader<String> coStatsAllItemReader(CoStatsPermutations coStatsPermutationsAll){
         return new CoStatsForTermItemReader(coStatsPermutationsAll);
     }
 
