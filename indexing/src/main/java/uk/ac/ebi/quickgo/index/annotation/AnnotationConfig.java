@@ -37,8 +37,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.data.solr.core.SolrTemplate;
 
-import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsConfiguration.COSTATS_ALL_COMPLETION_STEP_NAME;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsConfiguration.COSTATS_MANUAL_COMPLETION_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsConfiguration.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.TAB;
 
 /**
@@ -78,36 +77,39 @@ public class AnnotationConfig {
     @Autowired
     private StepBuilderFactory stepBuilders;
 
-    @Autowired
-    ItemProcessor<Annotation, Annotation> coStatsManual;
+//    @Autowired
+//    ItemProcessor<Annotation, Annotation> coStatsManual;
 
-    @Autowired
-    ItemProcessor<Annotation, Annotation> coStatsAll;
+//    @Autowired
+//    ItemProcessor<Annotation, Annotation> coStatsAll;
 
-    @Autowired
-    ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor;
+//    @Autowired
+//    ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor;
 
-    @Autowired
-    ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor;
+//    @Autowired
+//    ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor;
 
-    @Autowired
-    ItemReader<String> coStatsManualItemReader;
+//    @Autowired
+//    ItemReader<String> coStatsManualItemReader;
 
     @Autowired
     ItemWriter<List<CoOccurringTerm>> coStatManualFlatFileWriter;
 
-    @Autowired
-    ItemReader<String> coStatsAllItemReader;
+//    @Autowired
+//    ItemReader<String> coStatsAllItemReader;
 
     @Autowired
     ItemWriter<List<CoOccurringTerm>> coStatsAllFlatFileWriter;
+
+    private CoStatsPermutations coStatsPermutationsMan = new CoStatsPermutations();
+    private CoStatsPermutations coStatsPermutationsAll = new CoStatsPermutations();
 
     @Bean
     public Job annotationJob() {
         return jobBuilders.get(ANNOTATION_INDEXING_JOB_NAME)
                 .start(annotationIndexingStep())
-                .start(coStatsManualSummarizationStep())
-                .start(coStatsAllSummarizationStep())
+                .next(coStatsManualSummarizationStep())
+                .next(coStatsAllSummarizationStep())
                 .listener(logJobListener())
                 // commit the documents to the solr server
                 .listener(new JobExecutionListener() {
@@ -141,8 +143,8 @@ public class AnnotationConfig {
     public Step coStatsManualSummarizationStep() {
         return stepBuilders.get(COSTATS_MANUAL_COMPLETION_STEP_NAME)
                 .<String, List<CoOccurringTerm>>chunk(chunkSize)
-                .<Annotation>reader(coStatsManualItemReader)
-                .<CoOccurringTerm>processor(coStatsManualItemProcessor)
+                .<Annotation>reader(coStatsManualItemReader(coStatsPermutationsMan))
+                .<CoOccurringTerm>processor(coStatsManualItemProcessor(coStatsPermutationsMan))
                 .<List<CoOccurringTerm>>writer(coStatManualFlatFileWriter)
                 .listener(logStepListener())
                 .build();
@@ -152,8 +154,8 @@ public class AnnotationConfig {
     public Step coStatsAllSummarizationStep() {
         return stepBuilders.get(COSTATS_ALL_COMPLETION_STEP_NAME)
                 .<String, List<CoOccurringTerm>>chunk(chunkSize)
-                .<Annotation>reader(coStatsAllItemReader)
-                .<CoOccurringTerm>processor(coStatsAllItemProcessor)
+                .<Annotation>reader(coStatsAllItemReader(coStatsPermutationsAll))
+                .<CoOccurringTerm>processor(coStatsAllItemProcessor(coStatsPermutationsAll))
                 .<CoOccurringTerm>writer(coStatsAllFlatFileWriter)
                 .listener(logStepListener())
                 .listener(skipLogListener())
@@ -227,8 +229,8 @@ public class AnnotationConfig {
     ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor() {
         List<ItemProcessor<Annotation, ?>> processors = new ArrayList<>();
         processors.add(annotationValidator());
-        processors.add(coStatsManual);
-        processors.add(coStatsAll);
+        processors.add(coStatsManual(coStatsPermutationsMan));
+        processors.add(coStatsAll(coStatsPermutationsAll));
         processors.add(annotationDocConverter());
 
         CompositeItemProcessor<Annotation, AnnotationDocument> compositeProcessor = new CompositeItemProcessor<>();
