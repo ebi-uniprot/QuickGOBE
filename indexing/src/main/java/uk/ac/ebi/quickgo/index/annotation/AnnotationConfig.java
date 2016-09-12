@@ -77,32 +77,33 @@ public class AnnotationConfig {
     @Autowired
     private StepBuilderFactory stepBuilders;
 
-//    @Autowired
-//    ItemProcessor<Annotation, Annotation> coStatsManual;
+    @Autowired
+    ItemProcessor<Annotation, Annotation> coStatsManual;
 
-//    @Autowired
-//    ItemProcessor<Annotation, Annotation> coStatsAll;
+    @Autowired
+    ItemProcessor<Annotation, Annotation> coStatsAll;
 
-//    @Autowired
-//    ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor;
+    @Autowired
+    ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor;
 
-//    @Autowired
-//    ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor;
+    @Autowired
+    ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor;
 
-//    @Autowired
-//    ItemReader<String> coStatsManualItemReader;
+    @Autowired
+    ItemReader<String> coStatsManualItemReader;
 
     @Autowired
     ItemWriter<List<CoOccurringTerm>> coStatManualFlatFileWriter;
 
-//    @Autowired
-//    ItemReader<String> coStatsAllItemReader;
+    @Autowired
+    ItemReader<String> coStatsAllItemReader;
+
+    @Autowired
+    StepExecutionListener coTermsStepExecutionListener;
 
     @Autowired
     ItemWriter<List<CoOccurringTerm>> coStatsAllFlatFileWriter;
 
-    private CoStatsPermutations coStatsPermutationsMan = new CoStatsPermutations();
-    private CoStatsPermutations coStatsPermutationsAll = new CoStatsPermutations();
 
     @Bean
     public Job annotationJob() {
@@ -132,6 +133,7 @@ public class AnnotationConfig {
                 .<Annotation>reader(annotationMultiFileReader())
                 .processor(annotationCompositeProcessor())
                 .<AnnotationDocument>writer(annotationSolrServerWriter())
+                .listener(coTermsStepExecutionListener)
                 .listener(logWriteRateListener())
                 .listener(logStepListener())
                 .listener(skipLogListener())
@@ -143,8 +145,8 @@ public class AnnotationConfig {
     public Step coStatsManualSummarizationStep() {
         return stepBuilders.get(COSTATS_MANUAL_COMPLETION_STEP_NAME)
                 .<String, List<CoOccurringTerm>>chunk(chunkSize)
-                .<Annotation>reader(coStatsManualItemReader(coStatsPermutationsMan))
-                .<CoOccurringTerm>processor(coStatsManualItemProcessor(coStatsPermutationsMan))
+                .<Annotation>reader(coStatsManualItemReader)
+                .<CoOccurringTerm>processor(coStatsManualItemProcessor)
                 .<List<CoOccurringTerm>>writer(coStatManualFlatFileWriter)
                 .listener(logStepListener())
                 .build();
@@ -154,8 +156,8 @@ public class AnnotationConfig {
     public Step coStatsAllSummarizationStep() {
         return stepBuilders.get(COSTATS_ALL_COMPLETION_STEP_NAME)
                 .<String, List<CoOccurringTerm>>chunk(chunkSize)
-                .<Annotation>reader(coStatsAllItemReader(coStatsPermutationsAll))
-                .<CoOccurringTerm>processor(coStatsAllItemProcessor(coStatsPermutationsAll))
+                .<Annotation>reader(coStatsAllItemReader)
+                .<CoOccurringTerm>processor(coStatsAllItemProcessor)
                 .<CoOccurringTerm>writer(coStatsAllFlatFileWriter)
                 .listener(logStepListener())
                 .listener(skipLogListener())
@@ -229,8 +231,8 @@ public class AnnotationConfig {
     ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor() {
         List<ItemProcessor<Annotation, ?>> processors = new ArrayList<>();
         processors.add(annotationValidator());
-        processors.add(coStatsManual(coStatsPermutationsMan));
-        processors.add(coStatsAll(coStatsPermutationsAll));
+        processors.add(coStatsManual);
+        processors.add(coStatsAll);
         processors.add(annotationDocConverter());
 
         CompositeItemProcessor<Annotation, AnnotationDocument> compositeProcessor = new CompositeItemProcessor<>();
