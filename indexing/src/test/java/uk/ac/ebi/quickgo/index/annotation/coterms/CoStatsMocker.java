@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.index.annotation.costats;
-
-import uk.ac.ebi.quickgo.common.costats.HitCount;
+package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import java.text.DecimalFormat;
 import java.util.*;

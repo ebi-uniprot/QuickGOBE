@@ -1,5 +1,4 @@
-package uk.ac.ebi.quickgo.index.annotation.costats;
-import uk.ac.ebi.quickgo.common.costats.HitCount;
+package uk.ac.ebi.quickgo.index.annotation.coterms;
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
 import uk.ac.ebi.quickgo.index.annotation.AnnotationMocker;
 

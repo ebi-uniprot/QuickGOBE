@@ -1,7 +1,4 @@
-package uk.ac.ebi.quickgo.index.annotation.costats;
-
-import uk.ac.ebi.quickgo.common.costats.CoOccurringTerm;
-import uk.ac.ebi.quickgo.common.costats.HitCount;
+package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import java.util.*;
 import org.junit.Test;
@@ -9,11 +6,11 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static uk.ac.ebi.quickgo.index.annotation.costats.CoStatsMocker.createMatrix;
-import static uk.ac.ebi.quickgo.index.annotation.costats.CoStatsMocker.df1;
-import static uk.ac.ebi.quickgo.index.annotation.costats.CoStatsMocker.df2;
-import static uk.ac.ebi.quickgo.index.annotation.costats.CoStatsMocker.makeGpHitCountForTerm;
-import static uk.ac.ebi.quickgo.index.annotation.costats.CoStatsMocker.makeTermList;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsMocker.createMatrix;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsMocker.df1;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsMocker.df2;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsMocker.makeGpHitCountForTerm;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsMocker.makeTermList;
 
 
 /**

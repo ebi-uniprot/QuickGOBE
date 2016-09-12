@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.annotation.costats;
+package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
 
