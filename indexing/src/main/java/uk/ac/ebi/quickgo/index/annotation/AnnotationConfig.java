@@ -4,8 +4,8 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.common.costats.CoOccurringTerm;
-import uk.ac.ebi.quickgo.index.annotation.costats.*;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoOccurringTerm;
+import uk.ac.ebi.quickgo.index.annotation.coterms.*;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
@@ -37,8 +37,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.data.solr.core.SolrTemplate;
 
-import static uk.ac.ebi.quickgo.index.annotation.costats.CoStatsConfiguration.COSTATS_ALL_COMPLETION_STEP_NAME;
-import static uk.ac.ebi.quickgo.index.annotation.costats.CoStatsConfiguration.COSTATS_MANUAL_COMPLETION_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsConfiguration.COSTATS_ALL_COMPLETION_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsConfiguration.COSTATS_MANUAL_COMPLETION_STEP_NAME;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.TAB;
 
 /**
