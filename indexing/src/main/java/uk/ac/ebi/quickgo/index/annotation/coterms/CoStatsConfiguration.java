@@ -3,17 +3,13 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Predicate;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemWriter;
-import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
-import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
-import org.springframework.batch.item.file.transform.FieldExtractor;
-import org.springframework.batch.item.file.transform.LineAggregator;
+import org.springframework.batch.item.file.transform.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,8 +28,9 @@ public class CoStatsConfiguration {
     public static final String[] FF_COL_NAMES = {"target", "comparedTerm", "probabilityRatio", "similarityRatio",
             "together", "compared"};
     public static final String DELIMITER = "\t";
-    @Value("${indexing.annotation.source}")
-    private Resource[] resources;
+
+    @Value("${indexing.coterms.dir}")
+    private String path;
 
     public static final String COSTATS_MANUAL_COMPLETION_STEP_NAME = "costatsManualSummarizationStep";
     public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
@@ -69,11 +66,7 @@ public class CoStatsConfiguration {
 
     @Bean
     public static ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor(CoStatsPermutations coStatsPermutationsMan){
-        CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(
-                coStatsPermutationsMan.totalOfAnnotatedGeneProducts(),
-                coStatsPermutationsMan.termGPCount(),
-                coStatsPermutationsMan.termToTermOverlapMatrix());
-
+        CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(coStatsPermutationsMan);
         return coStatsItemProcessor;
     }
 
@@ -108,25 +101,24 @@ public class CoStatsConfiguration {
     }
 
 
-    public String getFilePath() {
-        String path;
-        try {
-            path = resources[0].getFile().getPath();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create path for Costats", e);
-        }
-        return path;
+    public File getFilePath() {
+        File file = new File(path);
+            if(!file.exists()){
+                file.mkdir();
+            }
+            return file;
     }
 
-    private ItemWriter<List<CoOccurringTerm>> listItemFlatFileWriter(String fileName) {
-        ItemWriter<List<CoOccurringTerm>> listWriter = new ListItemWriter<>(flatFileWriter(fileName));
+    private ListItemWriter<CoOccurringTerm> listItemFlatFileWriter(String fileName) {
+        ListItemWriter<CoOccurringTerm> listWriter = new ListItemWriter<>(flatFileWriter(fileName));
+        listWriter.setLineAggregator(new PassThroughLineAggregator<>()); //this shouldn't do anything
         return listWriter;
     }
 
-    private ItemWriter<CoOccurringTerm> flatFileWriter(String fileName) {FlatFileItemWriter<CoOccurringTerm> ffw = new FlatFileItemWriter<>();
+    private FlatFileItemWriter<CoOccurringTerm> flatFileWriter(String fileName) {
+        FlatFileItemWriter<CoOccurringTerm> ffw = new FlatFileItemWriter<>();
         ffw.setLineAggregator(lineAggregator());
-        File file = new File(getFilePath(), fileName );
-        Resource outputFile = new FileSystemResource(file);
+        Resource outputFile = new FileSystemResource(new File(getFilePath(), fileName ));
         ffw.setResource(outputFile);
         return ffw;
     }
