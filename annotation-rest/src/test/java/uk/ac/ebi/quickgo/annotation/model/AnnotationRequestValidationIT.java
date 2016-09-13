@@ -552,11 +552,16 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void usageRelationshipIsInvalid() {
-        String usageRelationships = "thisDoesNotExist";
+        String invalidUsageRelationship = "invalid_relationship";
 
-        annotationRequest.setUsageRelationships(usageRelationships);
+        AnnotationRequest annotationRequest = new AnnotationRequest();
+        annotationRequest.setUsageRelationships(invalidUsageRelationship);
 
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is("At least one usage relationship is invalid: " + invalidUsageRelationship));
     }
 
     @Test(expected = ParameterException.class)

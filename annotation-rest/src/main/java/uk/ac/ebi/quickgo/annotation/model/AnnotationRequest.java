@@ -348,7 +348,8 @@ public class AnnotationRequest {
     }
 
     @Pattern(regexp = "(is_a|part_of|occurs_in|regulates)(,is_a|part_of|occurs_in|regulates)*",
-            flags = CASE_INSENSITIVE)
+            flags = CASE_INSENSITIVE,
+            message = "At least one usage relationship is invalid: ${validatedValue}")
     public String getUsageRelationships() {
         return filterMap.get(USAGE_RELATIONSHIPS);
     }
