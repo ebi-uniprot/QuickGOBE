@@ -74,9 +74,9 @@ public class AnnotationIndexingBatchIT {
 
         assertThat(writtenAnnotationDocGeneProductIds, containsInAnyOrder(
                 "IntAct:EBI-10043081",
+                "IntAct:EBI-10043081",
                 "IntAct:EBI-10205244",
-                "IntAct:EBI-8801830",
-                "IntAct:EBI-10043082"
+                "IntAct:EBI-8801830"
         ));
 
         //Manual CoStats
