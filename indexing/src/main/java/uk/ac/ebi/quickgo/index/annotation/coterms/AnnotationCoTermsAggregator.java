@@ -42,11 +42,9 @@ public class AnnotationCoTermsAggregator {
 	 * @param annotation input file containing annotations
 	 */
 	public void addRowToMatrix(Annotation annotation){
-
 		refreshIfNewGeneProduct(annotation);
 		updateTermBatchWithTermCount(annotation);
 		geneProductList.add(annotation.dbObjectId);
-
 	}
 
 	private void updateTermBatchWithTermCount(Annotation annotation) {
