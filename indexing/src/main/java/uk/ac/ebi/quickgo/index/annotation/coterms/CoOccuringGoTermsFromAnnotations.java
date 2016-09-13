@@ -18,12 +18,12 @@ import org.springframework.batch.item.ItemProcessor;
  *
  * Version of GPAFileToSummary from Beta
  */
-public class AnnotationCoTermsProcessor implements ItemProcessor<Annotation, Annotation> {
+public class CoOccuringGoTermsFromAnnotations implements ItemProcessor<Annotation, Annotation> {
 
     private final AnnotationCoTermsAggregator annotationCoTermsAggregator;
     private final Predicate<Annotation> toBeProcessed;
 
-    public AnnotationCoTermsProcessor(AnnotationCoTermsAggregator annotationCoTermsAggregator,Predicate<Annotation> toBeProcessed) {
+    public CoOccuringGoTermsFromAnnotations(AnnotationCoTermsAggregator annotationCoTermsAggregator,Predicate<Annotation> toBeProcessed) {
         Preconditions.checkArgument(annotationCoTermsAggregator !=null);
         Preconditions.checkArgument(toBeProcessed!=null);
         this.annotationCoTermsAggregator = annotationCoTermsAggregator;
