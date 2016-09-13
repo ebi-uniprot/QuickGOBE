@@ -81,16 +81,16 @@ public class AnnotationConfig {
     private StepBuilderFactory stepBuilders;
 
     @Autowired
-    ItemProcessor<Annotation, Annotation> coStatsManual;
+    ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsManual;
 
     @Autowired
-    ItemProcessor<Annotation, Annotation> coStatsAll;
+    ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsAll;
 
     @Autowired
-    ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor;
+    ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorManual;
 
     @Autowired
-    ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor;
+    ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorAll;
 
     @Autowired
     ItemReader<String> coStatsManualItemReader;
@@ -149,7 +149,7 @@ public class AnnotationConfig {
         return stepBuilders.get(COSTATS_MANUAL_COMPLETION_STEP_NAME)
                 .<String, List<CoOccurringTerm>>chunk(cotermsChunk)
                 .reader(coStatsManualItemReader)
-                .processor(coStatsManualItemProcessor)
+                .processor(coOccurringTermsStatsCalculatorManual)
                 .writer(coStatManualFlatFileWriter)
                 .listener(logStepListener())
                 .build();
@@ -160,7 +160,7 @@ public class AnnotationConfig {
         return stepBuilders.get(COSTATS_ALL_COMPLETION_STEP_NAME)
                 .<String, List<CoOccurringTerm>>chunk(cotermsChunk)
                 .reader(coStatsAllItemReader)
-                .processor(coStatsAllItemProcessor)
+                .processor(coOccurringTermsStatsCalculatorAll)
                 .writer(coStatsAllFlatFileWriter)
                 .listener(logStepListener())
                 .listener(skipLogListener())
@@ -234,8 +234,8 @@ public class AnnotationConfig {
     ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor() {
         List<ItemProcessor<Annotation, ?>> processors = new ArrayList<>();
         processors.add(annotationValidator());
-        processors.add(coStatsManual);
-        processors.add(coStatsAll);
+        processors.add(coOccuringGoTermsFromAnnotationsManual);
+        processors.add(coOccuringGoTermsFromAnnotationsAll);
         processors.add(annotationDocConverter());
 
         CompositeItemProcessor<Annotation, AnnotationDocument> compositeProcessor = new CompositeItemProcessor<>();
