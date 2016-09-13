@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 
 /**
@@ -49,4 +50,7 @@ public class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
         wrapped.update(executionContext);
     }
 
+    @Override public void setHeaderCallback(FlatFileHeaderCallback headerCallback) {
+        wrapped.setHeaderCallback(headerCallback);
+    }
 }
