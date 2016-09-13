@@ -35,10 +35,11 @@ public class CoOccurringTermsForSelectedTerm {
      * @param selected Total count of proteins annotated to selected term
      */
     public CoOccurringTermsForSelectedTerm(String target, float totalNumberGeneProducts, long selected) {
-        Preconditions.checkArgument(target!=null, "CoOccurringTermsForSelectedTerm target should not be null");
-        Preconditions.checkArgument(totalNumberGeneProducts!=0, "CoOccurringTermsForSelectedTerm totalNumberGeneProducts" +
-                " should not be zero");
-        Preconditions.checkArgument(selected!=0, "CoOccurringTermsForSelectedTerm target should not be zero");
+        Preconditions.checkArgument(target != null, "CoOccurringTermsForSelectedTerm target should not be null");
+        Preconditions
+                .checkArgument(totalNumberGeneProducts != 0, "CoOccurringTermsForSelectedTerm totalNumberGeneProducts" +
+                        " should not be zero");
+        Preconditions.checkArgument(selected != 0, "CoOccurringTermsForSelectedTerm target should not be zero");
         this.target = target;
         this.totalNumberGeneProducts = totalNumberGeneProducts;
         this.selected = selected;
@@ -49,7 +50,7 @@ public class CoOccurringTermsForSelectedTerm {
      * @param coOccurringTerm has all the required information to all the co-occurrence statistics to be calculated.
      */
     public void addAndCalculate(CoOccurringTerm coOccurringTerm) {
-        Preconditions.checkArgument(coOccurringTerm!=null, "CoOccurringTermsForSelectedTerm.addAndCalculate was " +
+        Preconditions.checkArgument(coOccurringTerm != null, "CoOccurringTermsForSelectedTerm.addAndCalculate was " +
                 "passed a CoOccurringTerm which was null");
         coOccurringTerm.calculateProbabilityRatio(this.selected, this.totalNumberGeneProducts);
         coOccurringTerm.calculateProbabilitySimilarityRatio(this.selected);
@@ -86,7 +87,6 @@ public class CoOccurringTermsForSelectedTerm {
             }
         };
     }
-
 
     private class SignificanceSorter implements Comparator<CoOccurringTerm> {
 

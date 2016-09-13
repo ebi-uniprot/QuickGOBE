@@ -37,72 +37,75 @@ public class CoTermConfiguration {
     public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
 
     @Bean
-    AnnotationCoTermsAggregator annotationCoTermsAggregatorMan(){
+    AnnotationCoTermsAggregator annotationCoTermsAggregatorMan() {
         return new AnnotationCoTermsAggregator();
     }
 
     @Bean
-    AnnotationCoTermsAggregator annotationCoTermsAggregatorAll(){
+    AnnotationCoTermsAggregator annotationCoTermsAggregatorAll() {
         return new AnnotationCoTermsAggregator();
     }
 
     @Bean
-    public ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsManual(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
+    public ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsManual(
+            AnnotationCoTermsAggregator annotationCoTermsAggregatorMan) {
         Predicate<Annotation> toBeProcessed = t -> !"IEA".equals(t.evidenceCode);
         return new CoOccuringGoTermsFromAnnotations(annotationCoTermsAggregatorMan, toBeProcessed);
     }
 
     @Bean
-    public ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsAll(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
+    public ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsAll(
+            AnnotationCoTermsAggregator annotationCoTermsAggregatorAll) {
         Predicate<Annotation> toBeProcessed = t -> true;
         return new CoOccuringGoTermsFromAnnotations(annotationCoTermsAggregatorAll, toBeProcessed);
     }
 
     @Bean
-    public CoTermsStepExecutionListener coTermsStepExecutionListener(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll,
-            AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
+    public CoTermsStepExecutionListener coTermsStepExecutionListener(
+            AnnotationCoTermsAggregator annotationCoTermsAggregatorAll,
+            AnnotationCoTermsAggregator annotationCoTermsAggregatorMan) {
         return new CoTermsStepExecutionListener(annotationCoTermsAggregatorAll, annotationCoTermsAggregatorMan);
 
     }
 
     @Bean
-    public static ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorManual(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
+    public static ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorManual(
+            AnnotationCoTermsAggregator annotationCoTermsAggregatorMan) {
         return new CoOccurringTermsStatsCalculator(annotationCoTermsAggregatorMan);
     }
 
     @Bean
-    public static ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorAll(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
+    public static ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorAll(
+            AnnotationCoTermsAggregator annotationCoTermsAggregatorAll) {
         return new CoOccurringTermsStatsCalculator(annotationCoTermsAggregatorAll);
     }
 
     @Bean
-    public ItemReader<String> coStatsManualItemReader(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
+    public ItemReader<String> coStatsManualItemReader(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan) {
         return new CoStatsForTermItemReader(annotationCoTermsAggregatorMan);
     }
 
     @Bean
-    public ItemReader<String> coStatsAllItemReader(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
+    public ItemReader<String> coStatsAllItemReader(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll) {
         return new CoStatsForTermItemReader(annotationCoTermsAggregatorAll);
     }
 
-
     @Bean
     ItemWriter<List<CoOccurringTerm>> coStatManualFlatFileWriter() {
-        return listItemFlatFileWriter("CoStatsManual" );
+        return listItemFlatFileWriter("CoStatsManual");
     }
 
     @Bean
     ItemWriter<List<CoOccurringTerm>> coStatsAllFlatFileWriter() {
-        return listItemFlatFileWriter("CoStatsAll" );
+        return listItemFlatFileWriter("CoStatsAll");
     }
-
 
     private File getFilePath() {
         File file = new File(path);
-            if(!file.exists()){
-                file.mkdir();
-            }
-            return file;
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        return file;
     }
 
     private ListItemWriter<CoOccurringTerm> listItemFlatFileWriter(String fileName) {
@@ -114,21 +117,21 @@ public class CoTermConfiguration {
     private FlatFileItemWriter<CoOccurringTerm> flatFileWriter(String fileName) {
         FlatFileItemWriter<CoOccurringTerm> ffw = new FlatFileItemWriter<>();
         ffw.setLineAggregator(lineAggregator());
-        Resource outputFile = new FileSystemResource(new File(getFilePath(), fileName ));
+        Resource outputFile = new FileSystemResource(new File(getFilePath(), fileName));
         ffw.setResource(outputFile);
         FlatFileHeaderCallback headerCallBack = new CoTermsFlatFileHeaderCallBack();
         ffw.setHeaderCallback(headerCallBack);
         return ffw;
     }
 
-    private LineAggregator<CoOccurringTerm> lineAggregator(){
+    private LineAggregator<CoOccurringTerm> lineAggregator() {
         DelimitedLineAggregator<CoOccurringTerm> delimitedLineAggregator = new DelimitedLineAggregator<>();
         delimitedLineAggregator.setDelimiter(DELIMITER);
         delimitedLineAggregator.setFieldExtractor(beanWrapperFieldExtractor());
         return delimitedLineAggregator;
     }
 
-    private BeanWrapperFieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor(){
+    private BeanWrapperFieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor() {
         BeanWrapperFieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
         beanWrapperFieldExtractor.setNames(FF_COL_NAMES);
         return beanWrapperFieldExtractor;

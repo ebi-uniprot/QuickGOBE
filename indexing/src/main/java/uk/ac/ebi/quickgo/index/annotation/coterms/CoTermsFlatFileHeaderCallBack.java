@@ -15,7 +15,6 @@ class CoTermsFlatFileHeaderCallBack implements FlatFileHeaderCallback {
     private static final String COL_HEADER = "Source Term|Compared Term|Probability Ratio|Significance Ratio|Together" +
             " (Overlap)|Compared count";
 
-
     @Override public void writeHeader(Writer writer) throws IOException {
         writer.write(COL_HEADER);
 

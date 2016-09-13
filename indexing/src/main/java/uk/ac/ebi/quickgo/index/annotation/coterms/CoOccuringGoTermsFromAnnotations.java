@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
 
 import com.google.common.base.Preconditions;
@@ -23,9 +22,10 @@ public class CoOccuringGoTermsFromAnnotations implements ItemProcessor<Annotatio
     private final AnnotationCoTermsAggregator annotationCoTermsAggregator;
     private final Predicate<Annotation> toBeProcessed;
 
-    public CoOccuringGoTermsFromAnnotations(AnnotationCoTermsAggregator annotationCoTermsAggregator,Predicate<Annotation> toBeProcessed) {
-        Preconditions.checkArgument(annotationCoTermsAggregator !=null);
-        Preconditions.checkArgument(toBeProcessed!=null);
+    public CoOccuringGoTermsFromAnnotations(AnnotationCoTermsAggregator annotationCoTermsAggregator,
+            Predicate<Annotation> toBeProcessed) {
+        Preconditions.checkArgument(annotationCoTermsAggregator != null);
+        Preconditions.checkArgument(toBeProcessed != null);
         this.annotationCoTermsAggregator = annotationCoTermsAggregator;
         this.toBeProcessed = toBeProcessed;
     }
@@ -33,7 +33,7 @@ public class CoOccuringGoTermsFromAnnotations implements ItemProcessor<Annotatio
     @Override
     public Annotation process(Annotation annotation) throws Exception {
 
-        if(toBeProcessed.test(annotation)){
+        if (toBeProcessed.test(annotation)) {
             annotationCoTermsAggregator.addRowToMatrix(annotation);
         }
 

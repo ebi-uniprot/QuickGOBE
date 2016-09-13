@@ -9,7 +9,7 @@ import org.springframework.batch.item.ItemReader;
  * Time: 15:38
  * Created with IntelliJ IDEA.
  */
-class CoStatsForTermItemReader implements ItemReader<String>{
+class CoStatsForTermItemReader implements ItemReader<String> {
 
     private final AnnotationCoTermsAggregator annotationCoTermsAggregator;
     private Iterator<String> termsIt;
@@ -20,11 +20,11 @@ class CoStatsForTermItemReader implements ItemReader<String>{
     }
 
     @Override public String read() throws Exception {
-        if(termsIt==null) {
+        if (termsIt == null) {
             termsIt = annotationCoTermsAggregator.getTermToTermOverlapMatrix().keySet().iterator();
         }
 
-        if(termsIt.hasNext()){
+        if (termsIt.hasNext()) {
             return termsIt.next();
         }
 
