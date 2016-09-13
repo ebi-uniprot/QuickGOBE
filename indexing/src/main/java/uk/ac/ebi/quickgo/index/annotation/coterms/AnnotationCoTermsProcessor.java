@@ -18,15 +18,15 @@ import org.springframework.batch.item.ItemProcessor;
  *
  * Version of GPAFileToSummary from Beta
  */
-public class AnnotationCoStatsProcessor implements ItemProcessor<Annotation, Annotation> {
+public class AnnotationCoTermsProcessor implements ItemProcessor<Annotation, Annotation> {
 
-    private final CoStatsPermutations coStatsPermutations;
+    private final AnnotationCoTermsAggregator annotationCoTermsAggregator;
     private final Predicate<Annotation> toBeProcessed;
 
-    public AnnotationCoStatsProcessor(CoStatsPermutations coStatsPermutations,Predicate<Annotation> toBeProcessed) {
-        Preconditions.checkArgument(coStatsPermutations!=null);
+    public AnnotationCoTermsProcessor(AnnotationCoTermsAggregator annotationCoTermsAggregator,Predicate<Annotation> toBeProcessed) {
+        Preconditions.checkArgument(annotationCoTermsAggregator !=null);
         Preconditions.checkArgument(toBeProcessed!=null);
-        this.coStatsPermutations = coStatsPermutations;
+        this.annotationCoTermsAggregator = annotationCoTermsAggregator;
         this.toBeProcessed = toBeProcessed;
     }
 
@@ -34,7 +34,7 @@ public class AnnotationCoStatsProcessor implements ItemProcessor<Annotation, Ann
     public Annotation process(Annotation annotation) throws Exception {
 
         if(toBeProcessed.test(annotation)){
-            coStatsPermutations.addRowToMatrix(annotation);
+            annotationCoTermsAggregator.addRowToMatrix(annotation);
         }
 
         return annotation;
