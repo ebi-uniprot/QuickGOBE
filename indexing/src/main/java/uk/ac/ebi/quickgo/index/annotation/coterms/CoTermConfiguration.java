@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -117,13 +118,9 @@ public class CoTermConfiguration {
         ffw.setLineAggregator(lineAggregator());
         Resource outputFile = new FileSystemResource(new File(getFilePath(), fileName ));
         ffw.setResource(outputFile);
+        FlatFileHeaderCallback headerCallBack = new CoTermsFlatFileHeaderCallBack();
+        ffw.setHeaderCallback(headerCallBack);
         return ffw;
-    }
-
-    private FieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor(){
-        BeanWrapperFieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor();
-        beanWrapperFieldExtractor.setNames(FF_COL_NAMES);
-        return beanWrapperFieldExtractor;
     }
 
     private LineAggregator<CoOccurringTerm> lineAggregator(){
@@ -131,5 +128,11 @@ public class CoTermConfiguration {
         delimitedLineAggregator.setDelimiter(DELIMITER);
         delimitedLineAggregator.setFieldExtractor(beanWrapperFieldExtractor());
         return delimitedLineAggregator;
+    }
+
+    private FieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor(){
+        BeanWrapperFieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor();
+        beanWrapperFieldExtractor.setNames(FF_COL_NAMES);
+        return beanWrapperFieldExtractor;
     }
 }
