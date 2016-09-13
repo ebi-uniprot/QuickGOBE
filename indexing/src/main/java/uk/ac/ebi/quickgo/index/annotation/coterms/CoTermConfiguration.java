@@ -130,8 +130,8 @@ public class CoTermConfiguration {
         return delimitedLineAggregator;
     }
 
-    private FieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor(){
-        BeanWrapperFieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor();
+    private BeanWrapperFieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor(){
+        BeanWrapperFieldExtractor<CoOccurringTerm> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
         beanWrapperFieldExtractor.setNames(FF_COL_NAMES);
         return beanWrapperFieldExtractor;
     }
