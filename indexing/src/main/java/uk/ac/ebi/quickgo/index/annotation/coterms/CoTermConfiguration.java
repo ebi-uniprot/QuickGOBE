@@ -67,14 +67,12 @@ public class CoTermConfiguration {
 
     @Bean
     public static ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorManual(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
-        CoOccurringTermsStatsCalculator coOccurringTermsStatsCalculator = new CoOccurringTermsStatsCalculator(annotationCoTermsAggregatorMan);
-        return coOccurringTermsStatsCalculator;
+        return new CoOccurringTermsStatsCalculator(annotationCoTermsAggregatorMan);
     }
 
     @Bean
     public static ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorAll(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
-        CoOccurringTermsStatsCalculator coOccurringTermsStatsCalculator = new CoOccurringTermsStatsCalculator(annotationCoTermsAggregatorAll);
-        return coOccurringTermsStatsCalculator;
+        return new CoOccurringTermsStatsCalculator(annotationCoTermsAggregatorAll);
     }
 
     @Bean
