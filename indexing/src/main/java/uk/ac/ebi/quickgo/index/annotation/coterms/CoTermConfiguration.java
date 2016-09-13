@@ -46,15 +46,15 @@ public class CoTermConfiguration {
     }
 
     @Bean
-    public ItemProcessor<Annotation, Annotation> coStatsManual(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
+    public ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsManual(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
         Predicate<Annotation> toBeProcessed = t -> !"IEA".equals(t.evidenceCode);
-        return new AnnotationCoTermsProcessor(annotationCoTermsAggregatorMan, toBeProcessed);
+        return new CoOccuringGoTermsFromAnnotations(annotationCoTermsAggregatorMan, toBeProcessed);
     }
 
     @Bean
-    public ItemProcessor<Annotation, Annotation> coStatsAll(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
+    public ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsAll(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
         Predicate<Annotation> toBeProcessed = t -> true;
-        return new AnnotationCoTermsProcessor(annotationCoTermsAggregatorAll, toBeProcessed);
+        return new CoOccuringGoTermsFromAnnotations(annotationCoTermsAggregatorAll, toBeProcessed);
     }
 
     @Bean
@@ -65,18 +65,15 @@ public class CoTermConfiguration {
     }
 
     @Bean
-    public static ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
-        CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(annotationCoTermsAggregatorMan);
-        return coStatsItemProcessor;
+    public static ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorManual(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
+        CoOccurringTermsStatsCalculator coOccurringTermsStatsCalculator = new CoOccurringTermsStatsCalculator(annotationCoTermsAggregatorMan);
+        return coOccurringTermsStatsCalculator;
     }
 
     @Bean
-    public static ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
-        CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(
-                annotationCoTermsAggregatorAll.totalOfAnnotatedGeneProducts(),
-                annotationCoTermsAggregatorAll.termGPCount(),
-                annotationCoTermsAggregatorAll.termToTermOverlapMatrix());
-        return coStatsItemProcessor;
+    public static ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorAll(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
+        CoOccurringTermsStatsCalculator coOccurringTermsStatsCalculator = new CoOccurringTermsStatsCalculator(annotationCoTermsAggregatorAll);
+        return coOccurringTermsStatsCalculator;
     }
 
     @Bean
