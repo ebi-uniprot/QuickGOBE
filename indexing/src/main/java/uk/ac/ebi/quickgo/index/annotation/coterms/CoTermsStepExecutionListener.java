@@ -13,7 +13,7 @@ import org.springframework.batch.core.StepExecutionListener;
 public class CoTermsStepExecutionListener implements StepExecutionListener {
 
     private AnnotationCoTermsAggregator all;
-    AnnotationCoTermsAggregator manual;
+    private AnnotationCoTermsAggregator manual;
 
     public CoTermsStepExecutionListener(AnnotationCoTermsAggregator all,
             AnnotationCoTermsAggregator manual) {

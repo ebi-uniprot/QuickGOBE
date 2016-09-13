@@ -88,7 +88,7 @@ public class CoOccurringTermsForSelectedTerm {
     }
 
 
-    class SignificanceSorter implements Comparator<CoOccurringTerm> {
+    private class SignificanceSorter implements Comparator<CoOccurringTerm> {
 
         @Override
         public int compare(CoOccurringTerm o1, CoOccurringTerm o2) {

@@ -15,7 +15,7 @@ import org.springframework.batch.item.file.FlatFileItemWriter;
  * Time: 16:47
  * Created with IntelliJ IDEA.
  */
-public class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
+class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
 
     private FlatFileItemWriter<T> wrapped;
 

@@ -26,9 +26,9 @@ import org.springframework.core.io.Resource;
 @Configuration
 public class CoTermConfiguration {
 
-    public static final String[] FF_COL_NAMES = {"target", "comparedTerm", "probabilityRatio", "similarityRatio",
+    private static final String[] FF_COL_NAMES = {"target", "comparedTerm", "probabilityRatio", "similarityRatio",
             "together", "compared"};
-    public static final String DELIMITER = "\t";
+    private static final String DELIMITER = "\t";
 
     @Value("${indexing.coterms.dir}")
     private String path;
@@ -97,7 +97,7 @@ public class CoTermConfiguration {
     }
 
 
-    public File getFilePath() {
+    private File getFilePath() {
         File file = new File(path);
             if(!file.exists()){
                 file.mkdir();

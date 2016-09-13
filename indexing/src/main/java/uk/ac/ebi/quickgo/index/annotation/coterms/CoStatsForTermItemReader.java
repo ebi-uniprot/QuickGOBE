@@ -9,10 +9,10 @@ import org.springframework.batch.item.ItemReader;
  * Time: 15:38
  * Created with IntelliJ IDEA.
  */
-public class CoStatsForTermItemReader implements ItemReader<String>{
+class CoStatsForTermItemReader implements ItemReader<String>{
 
     private final AnnotationCoTermsAggregator annotationCoTermsAggregator;
-    Iterator<String> termsIt;
+    private Iterator<String> termsIt;
 
     public CoStatsForTermItemReader(AnnotationCoTermsAggregator annotationCoTermsAggregator) {
         this.annotationCoTermsAggregator = annotationCoTermsAggregator;
