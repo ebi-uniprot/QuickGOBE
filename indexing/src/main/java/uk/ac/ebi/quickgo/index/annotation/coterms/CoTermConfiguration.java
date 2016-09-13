@@ -23,7 +23,7 @@ import org.springframework.core.io.Resource;
  * Created with IntelliJ IDEA.
  */
 @Configuration
-public class CoStatsConfiguration {
+public class CoTermConfiguration {
 
     public static final String[] FF_COL_NAMES = {"target", "comparedTerm", "probabilityRatio", "similarityRatio",
             "together", "compared"};
@@ -36,57 +36,57 @@ public class CoStatsConfiguration {
     public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
 
     @Bean
-    CoStatsPermutations coStatsPermutationsMan(){
-        return new CoStatsPermutations();
+    AnnotationCoTermsAggregator coStatsPermutationsMan(){
+        return new AnnotationCoTermsAggregator();
     }
 
     @Bean
-    CoStatsPermutations coStatsPermutationsAll(){
-        return new CoStatsPermutations();
+    AnnotationCoTermsAggregator coStatsPermutationsAll(){
+        return new AnnotationCoTermsAggregator();
     }
 
     @Bean
-    public ItemProcessor<Annotation, Annotation> coStatsManual(CoStatsPermutations coStatsPermutationsMan){
+    public ItemProcessor<Annotation, Annotation> coStatsManual(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
         Predicate<Annotation> toBeProcessed = t -> !"IEA".equals(t.evidenceCode);
-        return new AnnotationCoStatsProcessor(coStatsPermutationsMan, toBeProcessed);
+        return new AnnotationCoTermsProcessor(annotationCoTermsAggregatorMan, toBeProcessed);
     }
 
     @Bean
-    public ItemProcessor<Annotation, Annotation> coStatsAll(CoStatsPermutations coStatsPermutationsAll){
+    public ItemProcessor<Annotation, Annotation> coStatsAll(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
         Predicate<Annotation> toBeProcessed = t -> true;
-        return new AnnotationCoStatsProcessor(coStatsPermutationsAll, toBeProcessed);
+        return new AnnotationCoTermsProcessor(annotationCoTermsAggregatorAll, toBeProcessed);
     }
 
     @Bean
-    public CoTermsStepExecutionListener coTermsStepExecutionListener(CoStatsPermutations coStatsPermutationsAll,
-            CoStatsPermutations coStatsPermutationsMan){
-        return new CoTermsStepExecutionListener(coStatsPermutationsAll, coStatsPermutationsMan);
+    public CoTermsStepExecutionListener coTermsStepExecutionListener(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll,
+            AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
+        return new CoTermsStepExecutionListener(annotationCoTermsAggregatorAll, annotationCoTermsAggregatorMan);
 
     }
 
     @Bean
-    public static ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor(CoStatsPermutations coStatsPermutationsMan){
-        CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(coStatsPermutationsMan);
+    public static ItemProcessor<String, List<CoOccurringTerm>> coStatsManualItemProcessor(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
+        CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(annotationCoTermsAggregatorMan);
         return coStatsItemProcessor;
     }
 
     @Bean
-    public static ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor(CoStatsPermutations coStatsPermutationsAll){
+    public static ItemProcessor<String, List<CoOccurringTerm>> coStatsAllItemProcessor(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
         CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(
-                coStatsPermutationsAll.totalOfAnnotatedGeneProducts(),
-                coStatsPermutationsAll.termGPCount(),
-                coStatsPermutationsAll.termToTermOverlapMatrix());
+                annotationCoTermsAggregatorAll.totalOfAnnotatedGeneProducts(),
+                annotationCoTermsAggregatorAll.termGPCount(),
+                annotationCoTermsAggregatorAll.termToTermOverlapMatrix());
         return coStatsItemProcessor;
     }
 
     @Bean
-    public ItemReader<String> coStatsManualItemReader(CoStatsPermutations coStatsPermutationsMan){
-        return new CoStatsForTermItemReader(coStatsPermutationsMan);
+    public ItemReader<String> coStatsManualItemReader(AnnotationCoTermsAggregator annotationCoTermsAggregatorMan){
+        return new CoStatsForTermItemReader(annotationCoTermsAggregatorMan);
     }
 
     @Bean
-    public ItemReader<String> coStatsAllItemReader(CoStatsPermutations coStatsPermutationsAll){
-        return new CoStatsForTermItemReader(coStatsPermutationsAll);
+    public ItemReader<String> coStatsAllItemReader(AnnotationCoTermsAggregator annotationCoTermsAggregatorAll){
+        return new CoStatsForTermItemReader(annotationCoTermsAggregatorAll);
     }
 
 
