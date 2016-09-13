@@ -14,7 +14,7 @@ import org.springframework.batch.item.ItemProcessor;
  * For the contents of the termToTermOverlapMatrix calculate co-occurrence statistics
  * A version of CoStatsSummarizer from Beta
  */
-public class CoStatsItemProcessor implements ItemProcessor<String, List<CoOccurringTerm>>{
+public class CoOccurringTermsStatsCalculator implements ItemProcessor<String, List<CoOccurringTerm>>{
 
 	//This is the count of all gene products for the term. We hold this figure separately as it is used many times.
 	private Map<String, HitCount> termGPCount;
@@ -27,14 +27,14 @@ public class CoStatsItemProcessor implements ItemProcessor<String, List<CoOccurr
 	private AnnotationCoTermsAggregator annotationCoTermsAggregator;
 
 	//Constructor
-	public CoStatsItemProcessor(long geneProductCount, Map<String, HitCount> termGPCount, Map<String,
+	public CoOccurringTermsStatsCalculator(long geneProductCount, Map<String, HitCount> termGPCount, Map<String,
 			Map<String, HitCount>> termToTermOverlapMatrix) {
 		this.geneProductCount = geneProductCount;
 		this.termGPCount = termGPCount;
         this.termToTermOverlapMatrix = termToTermOverlapMatrix;
 	}
 
-	public CoStatsItemProcessor(AnnotationCoTermsAggregator annotationCoTermsAggregator) {
+	public CoOccurringTermsStatsCalculator(AnnotationCoTermsAggregator annotationCoTermsAggregator) {
  		this.annotationCoTermsAggregator = annotationCoTermsAggregator;
 		this.geneProductCount = 0;
 		this.termGPCount = null;
