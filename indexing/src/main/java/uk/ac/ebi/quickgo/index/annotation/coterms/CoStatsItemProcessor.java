@@ -17,13 +17,14 @@ import org.springframework.batch.item.ItemProcessor;
 public class CoStatsItemProcessor implements ItemProcessor<String, List<CoOccurringTerm>>{
 
 	//This is the count of all gene products for the term. We hold this figure separately as it is used many times.
-	private final Map<String, HitCount> termGPCount;
+	private Map<String, HitCount> termGPCount;
 
     //Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
-    private final Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
+    private Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
 
 	//Total number of unique gene products that have annotations
-	private final long geneProductCount;
+	private long geneProductCount;
+	private AnnotationCoTermsAggregator annotationCoTermsAggregator;
 
 	//Constructor
 	public CoStatsItemProcessor(long geneProductCount, Map<String, HitCount> termGPCount, Map<String,
@@ -33,12 +34,26 @@ public class CoStatsItemProcessor implements ItemProcessor<String, List<CoOccurr
         this.termToTermOverlapMatrix = termToTermOverlapMatrix;
 	}
 
+	public CoStatsItemProcessor(AnnotationCoTermsAggregator annotationCoTermsAggregator) {
+ 		this.annotationCoTermsAggregator = annotationCoTermsAggregator;
+		this.geneProductCount = 0;
+		this.termGPCount = null;
+		this.termToTermOverlapMatrix = null;
+	}
 
-	/**
+    /**
 	 * Read each line in the term to term matrix for the selected term. For each calculate a CoStat instance.
 	 *
 	 */
 	public List<CoOccurringTerm> process(String goTerm){
+
+		//One time operation
+		if(termToTermOverlapMatrix==null){
+			this.geneProductCount = annotationCoTermsAggregator.totalOfAnnotatedGeneProducts();
+			this.termGPCount = annotationCoTermsAggregator.termGPCount();
+			this.termToTermOverlapMatrix = annotationCoTermsAggregator.termToTermOverlapMatrix();
+		}
+
 		return resultsForOneGoTerm(calculateCoStatsForTerm(goTerm));
 	}
 
@@ -48,6 +63,7 @@ public class CoStatsItemProcessor implements ItemProcessor<String, List<CoOccurr
 	 * @return coStatsForTerm
 	 */
 	private CoOccurringTermsForSelectedTerm calculateCoStatsForTerm(String target) {
+
 		Preconditions.checkArgument(null!=target, "Target passed to calculateCoStatsForTerm should not be null");
 
 		Map<String, HitCount> coocurringTermsForTarget = termToTermOverlapMatrix.get(target);
