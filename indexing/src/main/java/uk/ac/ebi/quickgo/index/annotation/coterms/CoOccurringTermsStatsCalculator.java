@@ -26,14 +26,6 @@ public class CoOccurringTermsStatsCalculator implements ItemProcessor<String, Li
 	private long geneProductCount;
 	private AnnotationCoTermsAggregator annotationCoTermsAggregator;
 
-	//Constructor
-	public CoOccurringTermsStatsCalculator(long geneProductCount, Map<String, HitCount> termGPCount, Map<String,
-			Map<String, HitCount>> termToTermOverlapMatrix) {
-		this.geneProductCount = geneProductCount;
-		this.termGPCount = termGPCount;
-        this.termToTermOverlapMatrix = termToTermOverlapMatrix;
-	}
-
 	public CoOccurringTermsStatsCalculator(AnnotationCoTermsAggregator annotationCoTermsAggregator) {
  		this.annotationCoTermsAggregator = annotationCoTermsAggregator;
 		this.geneProductCount = 0;
@@ -66,13 +58,13 @@ public class CoOccurringTermsStatsCalculator implements ItemProcessor<String, Li
 
 		Preconditions.checkArgument(null!=target, "Target passed to calculateCoStatsForTerm should not be null");
 
-		Map<String, HitCount> coocurringTermsForTarget = termToTermOverlapMatrix.get(target);
+		Map<String, HitCount> co_occurringTermsForTarget = termToTermOverlapMatrix.get(target);
 		CoOccurringTermsForSelectedTerm
 				coOccurringTermsForSelectedTerm = new CoOccurringTermsForSelectedTerm(target, geneProductCount, termGPCount.get(target).hits);
 
-		for (String comparedTerm : coocurringTermsForTarget.keySet()) {
+		for (String comparedTerm : co_occurringTermsForTarget.keySet()) {
 
-			final long comparedTermCoHitsWithTarget = coocurringTermsForTarget.get(comparedTerm).hits;
+			final long comparedTermCoHitsWithTarget = co_occurringTermsForTarget.get(comparedTerm).hits;
 			final long comparedTermTotalHits = termGPCount.get(comparedTerm).hits;
 
 			CoOccurringTerm coStatsTerm = new CoOccurringTerm(target, comparedTerm,	comparedTermTotalHits,
