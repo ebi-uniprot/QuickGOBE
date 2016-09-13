@@ -8,6 +8,7 @@ package uk.ac.ebi.quickgo.client.presets.read.ff;
  * @author Edd
  */
 public class RawNamedPreset {
+    public String id;
     public String name;
     public String description;
     public Integer relevancy;

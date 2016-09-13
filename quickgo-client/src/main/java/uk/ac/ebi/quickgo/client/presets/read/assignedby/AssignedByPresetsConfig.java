@@ -4,10 +4,7 @@ import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
-import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPresetRelevanceChecker;
-import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPresetValidator;
-import uk.ac.ebi.quickgo.client.presets.read.ff.StringToRawNamedPresetMapper;
+import uk.ac.ebi.quickgo.client.presets.read.ff.*;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
@@ -29,6 +26,7 @@ import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.rawPresetMultiFileReader;
+import static uk.ac.ebi.quickgo.client.presets.read.ff.SourceColumnsFactory.Source.DB_COLUMNS;
 
 /**
  * Exposes the {@link Step} bean that is used to read and populate information relating to the assignedBy preset data.
@@ -78,7 +76,7 @@ public class AssignedByPresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawAssignedByPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper();
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(DB_COLUMNS));
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByValidator() {

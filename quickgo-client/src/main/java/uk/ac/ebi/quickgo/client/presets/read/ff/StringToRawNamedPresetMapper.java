@@ -5,9 +5,8 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
 import org.springframework.validation.BindException;
 
-import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.COLUMN_DATABASE;
-import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.COLUMN_NAME;
-import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.numColumns;
+import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPresetColumnsBuilder.UNINITIALIZED_POSITION;
 
 /**
  * Class responsible for mapping a {@link FieldSet} that contains an entity with both
@@ -17,24 +16,55 @@ import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.numColumns;
  * @author Edd
  */
 public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPreset> {
+    private final RawNamedPresetColumns rawNamedPresetColumns;
+
+    public StringToRawNamedPresetMapper(RawNamedPresetColumns rawNamedPresetColumns) {
+        checkArgument(rawNamedPresetColumns != null, "RawPresetColumns cannot be null");
+
+        this.rawNamedPresetColumns = rawNamedPresetColumns;
+    }
+
     @Override public RawNamedPreset mapFieldSet(FieldSet fieldSet) throws BindException {
         if (fieldSet == null) {
             throw new IllegalArgumentException("Provided field set is null");
         }
 
-        if (fieldSet.getFieldCount() < numColumns()) {
-            throw new IncorrectTokenCountException("Incorrect number of columns, expected: " + numColumns() + "; " +
-                    "found: " + fieldSet.getFieldCount(), numColumns(), fieldSet.getFieldCount());
+        if (fieldSet.getFieldCount() < rawNamedPresetColumns.getMaxRequiredColumnCount()) {
+            throw new IncorrectTokenCountException(
+                    "Incorrect number of columns, expected: " + rawNamedPresetColumns.getMaxRequiredColumnCount() +
+                            "; " +
+                            "found: " + fieldSet.getFieldCount(), rawNamedPresetColumns.getMaxRequiredColumnCount(),
+                    fieldSet.getFieldCount());
         }
 
         RawNamedPreset rawPreset = new RawNamedPreset();
-        rawPreset.name = trimIfNotNull(fieldSet.readString(COLUMN_DATABASE.getPosition()));
-        rawPreset.description = trimIfNotNull(fieldSet.readString(COLUMN_NAME.getPosition()));
+        rawPreset.name = trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getNamePosition()));
+        rawPreset.description =
+                trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getDescriptionPosition()));
+        rawPreset.relevancy = extractRelevancy(fieldSet);
+        rawPreset.id = trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getIdPosition()));
 
         return rawPreset;
+    }
+
+    private int extractRelevancy(FieldSet fieldSet) {
+        if (rawNamedPresetColumns.getRelevancyPosition() > UNINITIALIZED_POSITION) {
+            return fieldSet.readInt(rawNamedPresetColumns.getRelevancyPosition());
+        } else {
+            return 0;
+        }
+    }
+
+    private String extractStringValue(FieldSet fieldSet, int position) {
+        if (position > UNINITIALIZED_POSITION) {
+            return fieldSet.readString(position);
+        } else {
+            return null;
+        }
     }
 
     private String trimIfNotNull(String value) {
         return value == null ? null : value.trim();
     }
+
 }

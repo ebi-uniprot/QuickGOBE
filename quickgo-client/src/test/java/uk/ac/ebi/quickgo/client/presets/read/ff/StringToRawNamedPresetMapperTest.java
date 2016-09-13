@@ -8,9 +8,6 @@ import org.springframework.batch.item.file.transform.IncorrectTokenCountExceptio
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.COLUMN_DATABASE;
-import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.COLUMN_NAME;
-import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.numColumns;
 
 /**
  * Created 05/09/16
@@ -18,10 +15,14 @@ import static uk.ac.ebi.quickgo.client.presets.read.ff.DBColumns.numColumns;
  */
 public class StringToRawNamedPresetMapperTest {
     private StringToRawNamedPresetMapper mapper;
+    private RawNamedPresetColumns presetColumns;
 
     @Before
     public void setUp() {
-        this.mapper = new StringToRawNamedPresetMapper();
+        this.presetColumns = RawNamedPresetColumnsBuilder.createWithNamePosition(0)
+                .withDescriptionPosition(1)
+                .build();
+        this.mapper = new StringToRawNamedPresetMapper(presetColumns);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -40,43 +41,47 @@ public class StringToRawNamedPresetMapperTest {
     @Test
     public void convertFieldSetWithNullValues() throws Exception {
         String[] tokens = new String[numColumns()];
-        tokens[COLUMN_DATABASE.getPosition()] = null;
-        tokens[COLUMN_NAME.getPosition()] = null;
+        tokens[presetColumns.getDescriptionPosition()] = null;
+        tokens[presetColumns.getNamePosition()] = null;
 
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
         RawNamedPreset preset = mapper.mapFieldSet(fieldSet);
 
-        assertThat(preset.name, is(tokens[COLUMN_DATABASE.getPosition()]));
-        assertThat(preset.description, is(tokens[COLUMN_NAME.getPosition()]));
+        assertThat(preset.name, is(tokens[presetColumns.getNamePosition()]));
+        assertThat(preset.description, is(tokens[presetColumns.getDescriptionPosition()]));
     }
 
     @Test
     public void convertFieldSetWithValidValues() throws Exception {
         String[] tokens = new String[numColumns()];
-        tokens[COLUMN_DATABASE.getPosition()] = "UniProt";
-        tokens[COLUMN_NAME.getPosition()] = "The Universal Protein Resource";
+        tokens[presetColumns.getNamePosition()] = "UniProt";
+        tokens[presetColumns.getDescriptionPosition()] = "The Universal Protein Resource";
 
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
         RawNamedPreset preset = mapper.mapFieldSet(fieldSet);
 
-        assertThat(preset.name, is(tokens[COLUMN_DATABASE.getPosition()]));
-        assertThat(preset.description, is(tokens[COLUMN_NAME.getPosition()]));
+        assertThat(preset.name, is(tokens[presetColumns.getNamePosition()]));
+        assertThat(preset.description, is(tokens[presetColumns.getDescriptionPosition()]));
     }
 
     @Test
     public void trimFieldsFromFieldSetWhenConverting() throws Exception {
         String[] tokens = new String[numColumns()];
-        tokens[COLUMN_DATABASE.getPosition()] = "  UniProt";
-        tokens[COLUMN_NAME.getPosition()] = "   The Universal Protein Resource   ";
+        tokens[presetColumns.getNamePosition()] = "  UniProt";
+        tokens[presetColumns.getDescriptionPosition()] = "   The Universal Protein Resource   ";
 
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
         RawNamedPreset preset = mapper.mapFieldSet(fieldSet);
 
-        assertThat(preset.name, is(tokens[COLUMN_DATABASE.getPosition()].trim()));
-        assertThat(preset.description, is(tokens[COLUMN_NAME.getPosition()].trim()));
+        assertThat(preset.name, is(tokens[presetColumns.getNamePosition()].trim()));
+        assertThat(preset.description, is(tokens[presetColumns.getDescriptionPosition()].trim()));
+    }
+
+    private int numColumns() {
+        return presetColumns.getMaxRequiredColumnCount();
     }
 
 }
