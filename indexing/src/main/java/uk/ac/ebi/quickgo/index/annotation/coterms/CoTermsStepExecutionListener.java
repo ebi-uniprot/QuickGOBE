@@ -12,11 +12,11 @@ import org.springframework.batch.core.StepExecutionListener;
  */
 public class CoTermsStepExecutionListener implements StepExecutionListener {
 
-    private CoStatsPermutations all;
-    CoStatsPermutations manual;
+    private AnnotationCoTermsAggregator all;
+    AnnotationCoTermsAggregator manual;
 
-    public CoTermsStepExecutionListener(CoStatsPermutations all,
-            CoStatsPermutations manual) {
+    public CoTermsStepExecutionListener(AnnotationCoTermsAggregator all,
+            AnnotationCoTermsAggregator manual) {
         this.all = all;
         this.manual = manual;
     }
