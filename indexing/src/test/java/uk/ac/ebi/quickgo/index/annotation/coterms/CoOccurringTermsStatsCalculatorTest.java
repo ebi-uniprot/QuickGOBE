@@ -26,7 +26,7 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoStatsMocker.makeTermL
  * compared = 2; // Number of gene products annotated by compared terms
  * all  = 2;     // Total number of unique gene products annotated by selected term
  */
-public class CoStatsItemProcessorTest {
+public class CoOccurringTermsStatsCalculatorTest {
 
 	@Test
 	public void calculateStatisticsSingleGoTermComparedWithItself(){
@@ -37,8 +37,9 @@ public class CoStatsItemProcessorTest {
         Map<String, HitCount> termGpCount = new HashMap<>();
         termGpCount.put(goTerm, new HitCount(2));
 
-        CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(geneProductCount, termGpCount, matrix);
-        List<CoOccurringTerm> results = coStatsItemProcessor.process(goTerm);
+        CoOccurringTermsStatsCalculator
+                coOccurringTermsStatsCalculator = new CoOccurringTermsStatsCalculator(geneProductCount, termGpCount, matrix);
+        List<CoOccurringTerm> results = coOccurringTermsStatsCalculator.process(goTerm);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getTarget(), is(goTerm));
@@ -64,8 +65,9 @@ public class CoStatsItemProcessorTest {
         Map<String, HitCount> termGpCount = makeGpHitCountForTerm(hitsPerTerm, selectedList, comparedList);
         Map<String, Map<String, HitCount>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
 
-        CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(geneProductCount, termGpCount, matrix);
-        List<CoOccurringTerm> results = coStatsItemProcessor.process(selected);
+        CoOccurringTermsStatsCalculator
+                coOccurringTermsStatsCalculator = new CoOccurringTermsStatsCalculator(geneProductCount, termGpCount, matrix);
+        List<CoOccurringTerm> results = coOccurringTermsStatsCalculator.process(selected);
         assertThat(results, hasSize(1));
 
         assertThat(results.get(0).getTarget(), is("GO:0000001"));
@@ -91,7 +93,8 @@ public class CoStatsItemProcessorTest {
         Map<String, HitCount> termGpCount = makeGpHitCountForTerm(hitsPerTerm, selectedList, comparedList);
         Map<String, Map<String, HitCount>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
 
-        CoStatsItemProcessor coStatsSummarizer = new CoStatsItemProcessor(geneProductCount, termGpCount, matrix);
+        CoOccurringTermsStatsCalculator
+                coStatsSummarizer = new CoOccurringTermsStatsCalculator(geneProductCount, termGpCount, matrix);
         List<CoOccurringTerm> results = coStatsSummarizer.process(selectedList.get(0));
 
         assertThat(results, hasSize(2));
@@ -120,8 +123,9 @@ public class CoStatsItemProcessorTest {
         Map<String, HitCount> termGpCount = new HashMap<>();
         termGpCount.put(goTerm, new HitCount(2));
 
-        CoStatsItemProcessor coStatsItemProcessor = new CoStatsItemProcessor(geneProductCount, termGpCount, matrix);
-        coStatsItemProcessor.process(null);
+        CoOccurringTermsStatsCalculator
+                coOccurringTermsStatsCalculator = new CoOccurringTermsStatsCalculator(geneProductCount, termGpCount, matrix);
+        coOccurringTermsStatsCalculator.process(null);
 
     }
 
