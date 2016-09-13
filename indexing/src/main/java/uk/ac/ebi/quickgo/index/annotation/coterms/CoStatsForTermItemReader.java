@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import com.google.common.base.Preconditions;
 import java.util.Iterator;
 import org.springframework.batch.item.ItemReader;
 
@@ -12,17 +11,17 @@ import org.springframework.batch.item.ItemReader;
  */
 public class CoStatsForTermItemReader implements ItemReader<String>{
 
-    private final CoStatsPermutations coStatsPermutations;
+    private final AnnotationCoTermsAggregator annotationCoTermsAggregator;
     Iterator<String> termsIt;
 
-    public CoStatsForTermItemReader(CoStatsPermutations coStatsPermutations) {
-        this.coStatsPermutations = coStatsPermutations;
+    public CoStatsForTermItemReader(AnnotationCoTermsAggregator annotationCoTermsAggregator) {
+        this.annotationCoTermsAggregator = annotationCoTermsAggregator;
 
     }
 
     @Override public String read() throws Exception {
         if(termsIt==null) {
-            termsIt = coStatsPermutations.getTermToTermOverlapMatrix().keySet().iterator();
+            termsIt = annotationCoTermsAggregator.getTermToTermOverlapMatrix().keySet().iterator();
         }
 
         if(termsIt.hasNext()){
