@@ -13,7 +13,7 @@ import java.util.List;
  * Calculate co-occurring statistics at the time the compared to term is added to the list.
  *
  *
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 13/11/2015
  * Time: 14:24
  * Created with IntelliJ IDEA.
@@ -31,8 +31,8 @@ public class CoOccurringTermsForSelectedTerm {
      * compared.
      * @param target GO Term id which is the term will compare against all the compared too terms(because they are
      * co-occurring)
-     * @param totalNumberGeneProducts
-     * @param selected
+     * @param totalNumberGeneProducts The total number of unique gene products processed
+     * @param selected Total count of proteins annotated to selected term
      */
     public CoOccurringTermsForSelectedTerm(String target, float totalNumberGeneProducts, long selected) {
         Preconditions.checkArgument(target!=null, "CoOccurringTermsForSelectedTerm target should not be null");
@@ -58,7 +58,7 @@ public class CoOccurringTermsForSelectedTerm {
 
     /**
      * The term id which co-occurs with all the co-occurring terms listed in this instance.
-     * @return
+     * @return term id
      */
     public String getTarget() {
         return target;
