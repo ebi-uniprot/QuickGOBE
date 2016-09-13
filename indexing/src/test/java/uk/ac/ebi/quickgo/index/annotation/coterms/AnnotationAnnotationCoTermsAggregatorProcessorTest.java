@@ -30,18 +30,18 @@ public class AnnotationAnnotationCoTermsAggregatorProcessorTest {
     @Test
     public void testAnnotationAddedToCoStatsIfPredicateAllows() throws Exception{
         Predicate<Annotation> toBeProcessed = t -> true;
-        AnnotationCoTermsProcessor annotationCoTermsProcessor = new AnnotationCoTermsProcessor
+        CoOccuringGoTermsFromAnnotations coOccuringGoTermsFromAnnotations = new CoOccuringGoTermsFromAnnotations
                 (annotationCoTermsAggregator, toBeProcessed);
-        annotationCoTermsProcessor.process(annotation);
+        coOccuringGoTermsFromAnnotations.process(annotation);
         verify(annotationCoTermsAggregator,times(1)).addRowToMatrix(annotation);
     }
 
     @Test
     public void testAnnotationNotAddedToCoStatsIfPredicateForbids() throws Exception{
         Predicate<Annotation> toBeProcessed = t -> false;
-        AnnotationCoTermsProcessor annotationCoTermsProcessor = new AnnotationCoTermsProcessor
+        CoOccuringGoTermsFromAnnotations coOccuringGoTermsFromAnnotations = new CoOccuringGoTermsFromAnnotations
                 (annotationCoTermsAggregator, toBeProcessed);
-        annotationCoTermsProcessor.process(annotation);
+        coOccuringGoTermsFromAnnotations.process(annotation);
         verify(annotationCoTermsAggregator,never()).addRowToMatrix(annotation);
     }
 }
