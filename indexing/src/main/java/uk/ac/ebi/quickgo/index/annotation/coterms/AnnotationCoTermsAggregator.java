@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
+
 import java.util.*;
 
 /**
@@ -13,102 +14,102 @@ import java.util.*;
  */
 public class AnnotationCoTermsAggregator {
 
-	//Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
-	private final Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
+    //Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
+    private final Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
 
-	//This is the count of all gene products for the term. We hold this figure separately as it is used many times.
-	private final Map<String, HitCount> termGPCount;
+    //This is the count of all gene products for the term. We hold this figure separately as it is used many times.
+    private final Map<String, HitCount> termGPCount;
 
-	//A unique list of all geneProducts - it exists so we can get a count of the total unique gene products
-	private final Set<String> geneProductList;
+    //A unique list of all geneProducts - it exists so we can get a count of the total unique gene products
+    private final Set<String> geneProductList;
 
-	//A set of all terms encountered for a Gene Product
-	private Set<String> termBatch;
+    //A set of all terms encountered for a Gene Product
+    private Set<String> termBatch;
 
-	private String currentGeneProduct;
+    private String currentGeneProduct;
 
-	//Constructor
-	public AnnotationCoTermsAggregator() {
-		termBatch = new HashSet<>();
-		termToTermOverlapMatrix = new TreeMap<>();
-		geneProductList = new HashSet<>();
-		termGPCount = new HashMap<>();
+    //Constructor
+    public AnnotationCoTermsAggregator() {
+        termBatch = new HashSet<>();
+        termToTermOverlapMatrix = new TreeMap<>();
+        geneProductList = new HashSet<>();
+        termGPCount = new HashMap<>();
 
-	}
+    }
 
-	/**
-	 * For each row of the GP Association file, create a list of terms, against which there is a list of all the
-	 * other terms that that term share a referenced gene product with.
-	 * @param annotation input file containing annotations
-	 */
-	public void addRowToMatrix(Annotation annotation){
-		refreshIfNewGeneProduct(annotation);
-		updateTermBatchWithTermCount(annotation);
-		geneProductList.add(annotation.dbObjectId);
-	}
-
-	private void updateTermBatchWithTermCount(Annotation annotation) {
-		termBatch.add(annotation.goId);
-	}
-
-	/**
-	 * Make it clear to the client this method needs calling to wrap up processing
+    /**
+     * For each row of the GP Association file, create a list of terms, against which there is a list of all the
+     * other terms that that term share a referenced gene product with.
+     * @param annotation input file containing annotations
      */
-	public void finish(){
-		updateCoTermsCount();
-	}
+    public void addRowToMatrix(Annotation annotation) {
+        refreshIfNewGeneProduct(annotation);
+        updateTermBatchWithTermCount(annotation);
+        geneProductList.add(annotation.dbObjectId);
+    }
 
-	private void refreshIfNewGeneProduct(Annotation annotation) {
-		if(currentGeneProduct!=null && !annotation.dbObjectId.equals(currentGeneProduct)){
-			updateCoTermsCount();
-            currentGeneProduct =  annotation.dbObjectId;
-			termBatch = new HashSet<>();
-			return;
-		}
+    private void updateTermBatchWithTermCount(Annotation annotation) {
+        termBatch.add(annotation.goId);
+    }
 
-		if(currentGeneProduct==null){
-			currentGeneProduct =  annotation.dbObjectId;
-		}
-	}
-
-	/**
-	 * Got to the end of the list of annotations for this gene product
-	 * Record which terms annotate the same gene products.
+    /**
+     * Make it clear to the client this method needs calling to wrap up processing
      */
-	private void updateCoTermsCount() {
+    public void finish() {
+        updateCoTermsCount();
+    }
+
+    private void refreshIfNewGeneProduct(Annotation annotation) {
+        if (currentGeneProduct != null && !annotation.dbObjectId.equals(currentGeneProduct)) {
+            updateCoTermsCount();
+            currentGeneProduct = annotation.dbObjectId;
+            termBatch = new HashSet<>();
+            return;
+        }
+
+        if (currentGeneProduct == null) {
+            currentGeneProduct = annotation.dbObjectId;
+        }
+    }
+
+    /**
+     * Got to the end of the list of annotations for this gene product
+     * Record which terms annotate the same gene products.
+     */
+    private void updateCoTermsCount() {
 
         for (String next : termBatch) {
             incrementCoTermsCount(next, termBatch);
             incrementCountForTerm(next);
         }
-	}
+    }
 
-	//Finally for every term, increment the count for this term
-	private void incrementCountForTerm(String term) {
-		HitCount hitCount = termGPCount.get(term);
-		if(hitCount == null){
+    //Finally for every term, increment the count for this term
+    private void incrementCountForTerm(String term) {
+        HitCount hitCount = termGPCount.get(term);
+        if (hitCount == null) {
             hitCount = new HitCount();
             termGPCount.put(term, hitCount);
         }
-		hitCount.hits++;
-	}
+        hitCount.hits++;
+    }
 
-	public Map<String, Map<String, HitCount>> getTermToTermOverlapMatrix() {
-		return termToTermOverlapMatrix;
-	}
+    public Map<String, Map<String, HitCount>> getTermToTermOverlapMatrix() {
+        return termToTermOverlapMatrix;
+    }
 
-	private void incrementCoTermsCount(String term, Set<String> co_occurringTerms) {
+    private void incrementCoTermsCount(String term, Set<String> co_occurringTerms) {
 
-		//Get the co-stats for this term
-		Map<String, HitCount> termCoTerms = termToTermOverlapMatrix.get(term);
+        //Get the co-stats for this term
+        Map<String, HitCount> termCoTerms = termToTermOverlapMatrix.get(term);
 
-		//Create if it doesn't exist.
-		if (termCoTerms == null) {
-			termCoTerms = new HashMap<>();
-			termToTermOverlapMatrix.put(term, termCoTerms);
-		}
+        //Create if it doesn't exist.
+        if (termCoTerms == null) {
+            termCoTerms = new HashMap<>();
+            termToTermOverlapMatrix.put(term, termCoTerms);
+        }
 
-		//Loop through all the terms we have encountered in this batch and update the quantities
+        //Loop through all the terms we have encountered in this batch and update the quantities
 
         for (String co_occurringTerm : co_occurringTerms) {
 
@@ -126,17 +127,17 @@ public class AnnotationCoTermsAggregator {
 
         }
 
-	}
+    }
 
-	public long totalOfAnnotatedGeneProducts() {
-		return geneProductList.size();
-	}
+    public long totalOfAnnotatedGeneProducts() {
+        return geneProductList.size();
+    }
 
-	public Map<String, HitCount> termGPCount() {
-		return termGPCount;
-	}
+    public Map<String, HitCount> termGPCount() {
+        return termGPCount;
+    }
 
-	public Map<String, Map<String, HitCount>> termToTermOverlapMatrix() {
-		return termToTermOverlapMatrix;
-	}
+    public Map<String, Map<String, HitCount>> termToTermOverlapMatrix() {
+        return termToTermOverlapMatrix;
+    }
 }
