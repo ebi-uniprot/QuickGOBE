@@ -1,8 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-
 import java.util.List;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.file.FlatFileItemWriter;
 
 /**
  * Custom Spring Batch writer can process a list produced by an item processor.
@@ -12,11 +14,11 @@ import org.springframework.batch.item.ItemWriter;
  * Time: 16:47
  * Created with IntelliJ IDEA.
  */
-public class ListItemWriter<T> implements ItemWriter<List<T>>{
+public class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
 
-    private ItemWriter<T> wrapped;
+    private FlatFileItemWriter<T> wrapped;
 
-    public ListItemWriter(ItemWriter<T> coOccurringTermItemWriter) {
+    public ListItemWriter(FlatFileItemWriter<T> coOccurringTermItemWriter) {
         wrapped = coOccurringTermItemWriter;
     }
 
@@ -25,4 +27,26 @@ public class ListItemWriter<T> implements ItemWriter<List<T>>{
             wrapped.write(subList);
         }
     }
+
+    @Override
+    public void close() {
+        wrapped.close();
+    }
+
+    /**
+     * Initialize the reader. This method may be called multiple times before
+     * close is called.
+     *
+     * @see ItemStream#open(ExecutionContext)
+     */
+    @Override
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+        wrapped.open(executionContext);
+    }
+
+    @Override
+    public void update(ExecutionContext executionContext) {
+        wrapped.update(executionContext);
+    }
+
 }
