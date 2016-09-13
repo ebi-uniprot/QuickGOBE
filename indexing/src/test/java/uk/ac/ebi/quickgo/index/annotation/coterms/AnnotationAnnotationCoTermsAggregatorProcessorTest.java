@@ -19,10 +19,10 @@ import static org.mockito.Mockito.verify;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AnnotationCoStatsProcessorTest {
+public class AnnotationAnnotationCoTermsAggregatorProcessorTest {
 
     @Mock
-    CoStatsPermutations coStatsPermutations;
+    AnnotationCoTermsAggregator annotationCoTermsAggregator;
 
     @Mock
     Annotation annotation;
@@ -30,18 +30,18 @@ public class AnnotationCoStatsProcessorTest {
     @Test
     public void testAnnotationAddedToCoStatsIfPredicateAllows() throws Exception{
         Predicate<Annotation> toBeProcessed = t -> true;
-        AnnotationCoStatsProcessor annotationCoStatsProcessor = new AnnotationCoStatsProcessor
-                (coStatsPermutations, toBeProcessed);
-        annotationCoStatsProcessor.process(annotation);
-        verify(coStatsPermutations,times(1)).addRowToMatrix(annotation);
+        AnnotationCoTermsProcessor annotationCoTermsProcessor = new AnnotationCoTermsProcessor
+                (annotationCoTermsAggregator, toBeProcessed);
+        annotationCoTermsProcessor.process(annotation);
+        verify(annotationCoTermsAggregator,times(1)).addRowToMatrix(annotation);
     }
 
     @Test
     public void testAnnotationNotAddedToCoStatsIfPredicateForbids() throws Exception{
         Predicate<Annotation> toBeProcessed = t -> false;
-        AnnotationCoStatsProcessor annotationCoStatsProcessor = new AnnotationCoStatsProcessor
-                (coStatsPermutations, toBeProcessed);
-        annotationCoStatsProcessor.process(annotation);
-        verify(coStatsPermutations,never()).addRowToMatrix(annotation);
+        AnnotationCoTermsProcessor annotationCoTermsProcessor = new AnnotationCoTermsProcessor
+                (annotationCoTermsAggregator, toBeProcessed);
+        annotationCoTermsProcessor.process(annotation);
+        verify(annotationCoTermsAggregator,never()).addRowToMatrix(annotation);
     }
 }

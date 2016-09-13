@@ -19,13 +19,13 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
  * Time: 16:26
  * Created with IntelliJ IDEA.
  */
-public class CoStatsPermutationsTest {
+public class AnnotationCoTermsAggregatorTest {
 
-    CoStatsPermutations coStatsPermutations;
+    AnnotationCoTermsAggregator annotationCoTermsAggregator;
 
     @Before
     public void setup(){
-        coStatsPermutations = new CoStatsPermutations();
+        annotationCoTermsAggregator = new AnnotationCoTermsAggregator();
     }
 
 	@Test
@@ -35,11 +35,11 @@ public class CoStatsPermutationsTest {
         Annotation annotation2 = AnnotationMocker.createValidAnnotation();
 
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(coStatsPermutations::addRowToMatrix);
-        coStatsPermutations.finish();
+        annotations.forEach(annotationCoTermsAggregator::addRowToMatrix);
+        annotationCoTermsAggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = coStatsPermutations.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = annotationCoTermsAggregator.getTermToTermOverlapMatrix();
 
         assertThat(matrix.keySet(), hasSize(1));
 
@@ -62,12 +62,12 @@ public class CoStatsPermutationsTest {
         annotation2.dbObjectId = "A0A000";
 
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(coStatsPermutations::addRowToMatrix);
+        annotations.forEach(annotationCoTermsAggregator::addRowToMatrix);
 
-        coStatsPermutations.finish();
+        annotationCoTermsAggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = coStatsPermutations.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = annotationCoTermsAggregator.getTermToTermOverlapMatrix();
 
         assertThat(matrix.keySet(), hasSize(2));
 
@@ -91,11 +91,11 @@ public class CoStatsPermutationsTest {
         Annotation annotation2 = AnnotationMocker.createValidAnnotation();
         annotation2.goId = "GO:0009999";
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(coStatsPermutations::addRowToMatrix);
-        coStatsPermutations.finish();
+        annotations.forEach(annotationCoTermsAggregator::addRowToMatrix);
+        annotationCoTermsAggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = coStatsPermutations.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = annotationCoTermsAggregator.getTermToTermOverlapMatrix();
 
         assertThat(matrix.keySet(), hasSize(2));
 
