@@ -152,15 +152,14 @@ public class CoOccurringTerm implements Comparable<CoOccurringTerm>{
 		return result;
 	}
 
-	@Override
-	public String toString() {
-		return "COOccurrenceStatsTerm{" +
-				"comparedTerm='" + comparedTerm + '\'' +
+	@Override public String toString() {
+		return "CoOccurringTerm{" +
+				"target='" + target + '\'' +
+				", comparedTerm='" + comparedTerm + '\'' +
 				", together=" + together +
 				", compared=" + compared +
 				", similarityRatio=" + similarityRatio +
 				", probabilityRatio=" + probabilityRatio +
 				'}';
 	}
-
 }
