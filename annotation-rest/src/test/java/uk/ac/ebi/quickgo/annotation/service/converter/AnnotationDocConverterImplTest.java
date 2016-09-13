@@ -125,12 +125,6 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
-    public void convertsTargetSetsSuccessfully() {
-        Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.targetSets, is(TARGET_SETS));
-    }
-
-    @Test
     public void convertNullAspectSuccessfully() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.goAspect = null;
@@ -143,6 +137,12 @@ public class AnnotationDocConverterImplTest {
     public void convertAspectSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
         assertThat(model.goAspect, is(GO_ASPECT));
+    }
+
+    @Test
+    public void convertsTargetSetsSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.targetSets, is(TARGET_SETS));
     }
 
     private static AnnotationDocument createStubDocument() {
