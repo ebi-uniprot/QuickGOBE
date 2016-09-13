@@ -59,6 +59,9 @@ public class AnnotationConfig {
     @Value("${indexing.annotation.chunk.size:500}")
     private int chunkSize;
 
+    @Value("${indexing.coterms.chunk.size:500}")
+    private int cotermsChunk;
+
     @Value("${indexing.annotation.header.lines:21}")
     private int headerLines;
 
@@ -144,10 +147,10 @@ public class AnnotationConfig {
     @Bean
     public Step coStatsManualSummarizationStep() {
         return stepBuilders.get(COSTATS_MANUAL_COMPLETION_STEP_NAME)
-                .<String, List<CoOccurringTerm>>chunk(chunkSize)
-                .<Annotation>reader(coStatsManualItemReader)
-                .<CoOccurringTerm>processor(coStatsManualItemProcessor)
-                .<List<CoOccurringTerm>>writer(coStatManualFlatFileWriter)
+                .<String, List<CoOccurringTerm>>chunk(cotermsChunk)
+                .reader(coStatsManualItemReader)
+                .processor(coStatsManualItemProcessor)
+                .writer(coStatManualFlatFileWriter)
                 .listener(logStepListener())
                 .build();
     }
@@ -155,10 +158,10 @@ public class AnnotationConfig {
     @Bean
     public Step coStatsAllSummarizationStep() {
         return stepBuilders.get(COSTATS_ALL_COMPLETION_STEP_NAME)
-                .<String, List<CoOccurringTerm>>chunk(chunkSize)
-                .<Annotation>reader(coStatsAllItemReader)
-                .<CoOccurringTerm>processor(coStatsAllItemProcessor)
-                .<CoOccurringTerm>writer(coStatsAllFlatFileWriter)
+                .<String, List<CoOccurringTerm>>chunk(cotermsChunk)
+                .reader(coStatsAllItemReader)
+                .processor(coStatsAllItemProcessor)
+                .writer(coStatsAllFlatFileWriter)
                 .listener(logStepListener())
                 .listener(skipLogListener())
                 .build();
