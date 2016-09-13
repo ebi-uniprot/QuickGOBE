@@ -9,9 +9,9 @@ import java.util.*;
  * Time: 11:59
  * Created with IntelliJ IDEA.
  *
- * Holds all the data need to calculate a co-occurrence stat data point
+ * Aggregates all the data need to calculate all co-occurrence stat data points
  */
-public class CoStatsPermutations {
+public class AnnotationCoTermsAggregator {
 
 	//Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
 	private final Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
@@ -28,7 +28,7 @@ public class CoStatsPermutations {
 	private String currentGeneProduct;
 
 	//Constructor
-	public CoStatsPermutations() {
+	public AnnotationCoTermsAggregator() {
 		termBatch = new HashSet<>();
 		termToTermOverlapMatrix = new TreeMap<>();
 		geneProductList = new HashSet<>();
