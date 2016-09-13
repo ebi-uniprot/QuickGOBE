@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.client.presets.read;
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
+import uk.ac.ebi.quickgo.client.presets.read.evidence.EvidencePresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.reference.ReferencePresetsConfig;
 
 import java.util.stream.Collectors;
@@ -84,5 +85,23 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(
                 preset.references.getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
                 is(GO_REFS_FROM_RESOURCE));
+    }
+
+    @Test
+    public void loadEvidencesPresets() throws Exception {
+        assertThat(preset.evidences.getPresets(), hasSize(0));
+
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(EvidencePresetsConfig.EVIDENCE_LOADING_STEP_NAME);
+        BatchStatus status = jobExecution.getStatus();
+
+        assertThat(status, is(BatchStatus.COMPLETED));
+        assertThat(preset.evidences.getPresets(), hasSize(22));
+
+        PresetItem firstPresetItem = preset.evidences.getPresets().stream().findFirst().orElse(null);
+        assertThat(firstPresetItem.getName(), is("All manual codes"));
+        assertThat(firstPresetItem.getId(), is("ECO:0000352"));
+        assertThat(firstPresetItem.getDescription(), is("evidence used in manual assertion"));
+        assertThat(firstPresetItem.getRelevancy(), is(1));
     }
 }

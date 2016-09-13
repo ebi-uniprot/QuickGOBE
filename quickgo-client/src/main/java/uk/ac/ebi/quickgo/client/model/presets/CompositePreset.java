@@ -9,10 +9,12 @@ package uk.ac.ebi.quickgo.client.model.presets;
 public class CompositePreset {
     public final PresetItemsImpl assignedBy;
     public final PresetItemsImpl references;
+    public final PresetItemsImpl evidences;
 
     public CompositePreset() {
         assignedBy = new PresetItemsImpl();
         references = new PresetItemsImpl();
+        evidences = new PresetItemsImpl();
     }
 
     @Override public String toString() {

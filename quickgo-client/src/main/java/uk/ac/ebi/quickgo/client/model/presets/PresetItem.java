@@ -15,21 +15,28 @@ public class PresetItem {
     private final String name;
     private final String description;
     private final Integer relevancy;
+    private final String id;
 
-    public PresetItem(String name, String description, Integer relevancy) {
+    public PresetItem(String id, String name, String description, Integer relevancy) {
+        checkArgument(id != null && !id.isEmpty(), "Preset id cannot be null or empty");
         checkArgument(name != null && !name.isEmpty(), "Preset name cannot be null or empty");
         checkArgument(
                 description != null && !description.isEmpty(),
                 "Preset description cannot be null or empty");
         checkArgument(relevancy != null, "Integer relevancy cannot be null");
 
+        this.id = id;
         this.name = name;
         this.description = description;
         this.relevancy = relevancy;
     }
 
     public PresetItem(String name, String description) {
-        this(name, description, EQUAL_RELEVANCY);
+        this(null, name, description, EQUAL_RELEVANCY);
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {
@@ -50,6 +57,7 @@ public class PresetItem {
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", relevancy=" + relevancy +
+                ", id='" + id + '\'' +
                 '}';
     }
 }
