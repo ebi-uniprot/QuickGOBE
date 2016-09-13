@@ -36,9 +36,9 @@ public class CoOccurringTermsForSelectedTerm {
      */
     public CoOccurringTermsForSelectedTerm(String target, float totalNumberGeneProducts, long selected) {
         Preconditions.checkArgument(target!=null, "CoOccurringTermsForSelectedTerm target should not be null");
-        Preconditions.checkArgument(totalNumberGeneProducts!=0, "CoOccurringTermsForSelectedTerm target should not be" +
-                " null");
-        Preconditions.checkArgument(selected!=0, "CoOccurringTermsForSelectedTerm target should not be null");
+        Preconditions.checkArgument(totalNumberGeneProducts!=0, "CoOccurringTermsForSelectedTerm totalNumberGeneProducts" +
+                " should not be zero");
+        Preconditions.checkArgument(selected!=0, "CoOccurringTermsForSelectedTerm target should not be zero");
         this.target = target;
         this.totalNumberGeneProducts = totalNumberGeneProducts;
         this.selected = selected;
