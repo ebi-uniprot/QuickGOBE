@@ -2,7 +2,10 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
+import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,6 +16,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.nullValue;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentConverter.DEFAULT_TAXON;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationMocker.createValidAnnotation;
+import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
 
 /**
  * Created 21/04/16
@@ -43,7 +47,14 @@ public class AnnotationDocumentConverterTest {
         annotation.evidenceCode = "ECO:0000353";
         annotation.assignedBy = "IntAct";
         annotation.annotationExtension = "occurs_in(CL:1000428)";
-        annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein|db_object_type=protein|target_set=BHF-UCL,Exosome,KRUK";
+        annotation.annotationProperties =
+                mergeKeyValuesPairs(
+                        buildKeyValuesPair(GO_EVIDENCE, "IEA"),
+                        buildKeyValuesPair(TAXON_ID, "35758"),
+                        buildKeyValuesPair(DB_OBJECT_SUBSET, "TrEMBL"),
+                        buildKeyValuesPair(DB_OBJECT_SYMBOL, "moeA5"),
+                        buildKeyValuesPair(DB_OBJECT_TYPE, "protein"),
+                        buildKeyValuesPair(TARGET_SET, "BHF-UCL", "Exosome", "KRUK"));
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -53,7 +64,7 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.assignedBy, is(annotation.assignedBy));
         assertThat(doc.qualifier, is(annotation.qualifier));
         assertThat(doc.reference, is(annotation.dbReferences));
-        assertThat(doc.targetSets, contains("BHF-UCL","Exosome","KRUK"));
+        assertThat(doc.targetSets, contains("BHF-UCL", "Exosome", "KRUK"));
     }
 
     // interacting taxon
@@ -125,7 +136,7 @@ public class AnnotationDocumentConverterTest {
     @Test
     public void convertsGOEvidenceAnnotationProperties() throws Exception {
         String evidence = "FIND_ME";
-        annotation.annotationProperties = "go_evidence=" + evidence;
+        annotation.annotationProperties = buildKeyValuesPair(GO_EVIDENCE, evidence);
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -145,7 +156,7 @@ public class AnnotationDocumentConverterTest {
     @Test
     public void convertsTaxonIdAnnotationProperties() throws Exception {
         int taxon = 12345;
-        annotation.annotationProperties = "taxon_id=" + taxon;
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ID, String.valueOf(taxon));
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -155,7 +166,7 @@ public class AnnotationDocumentConverterTest {
     @Test
     public void convertsInvalidTaxonIdAnnotationPropertiesToDefaultTaxon() throws Exception {
         String taxon = "12345a";
-        annotation.annotationProperties = "taxon_id=" + taxon;
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ID, taxon);
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -175,7 +186,7 @@ public class AnnotationDocumentConverterTest {
     @Test
     public void convertsDbObjectTypeAnnotationProperties() throws Exception {
         String value = "FINDME";
-        annotation.annotationProperties = "db_object_type=" + value;
+        annotation.annotationProperties = buildKeyValuesPair(DB_OBJECT_TYPE, value);
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -189,17 +200,17 @@ public class AnnotationDocumentConverterTest {
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.dbObjectSymbol, is(nullValue()));
+        assertThat(doc.symbol, is(nullValue()));
     }
 
     @Test
     public void convertsDbObjectSymbolAnnotationProperties() throws Exception {
         String value = "FINDME";
-        annotation.annotationProperties = "db_object_symbol=" + value;
+        annotation.annotationProperties = buildKeyValuesPair(DB_OBJECT_SYMBOL, value);
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.dbObjectSymbol, is(value));
+        assertThat(doc.symbol, is(value));
     }
 
     // annotation properties: db subset
@@ -215,7 +226,7 @@ public class AnnotationDocumentConverterTest {
     @Test
     public void convertsDbSubsetAnnotationProperties() throws Exception {
         String value = "FINDME";
-        annotation.annotationProperties = "db_subset=" + value;
+        annotation.annotationProperties = buildKeyValuesPair(DB_OBJECT_SUBSET, value);
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -238,18 +249,50 @@ public class AnnotationDocumentConverterTest {
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.extensions, containsInAnyOrder("x,y","z"));
+        assertThat(doc.extensions, containsInAnyOrder("x,y", "z"));
     }
 
     // annotation properties: target sets
     @Test
     public void convertsEmptyTargetSetToNullValue() throws Exception {
-        annotation.annotationProperties = "db_object_symbol=moeA5|db_object_type=protein";
+        annotation.annotationProperties = mergeKeyValuesPairs(
+                buildKeyValuesPair(DB_OBJECT_TYPE, "protein"),
+                buildKeyValuesPair(DB_OBJECT_SYMBOL, "moeA5"));
+
         AnnotationDocument doc = converter.process(annotation);
         assertThat(doc.targetSets, is(nullValue()));
     }
 
+    // annotation properties: go aspect
+    @Test
+    public void convertsNullGoAspectAnnotationPropertiesToNullValue() throws Exception {
+        annotation.annotationProperties = null;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.goAspect, is(nullValue()));
+    }
+
+    @Test
+    public void convertsGoAspectAnnotationProperties() throws Exception {
+        String value = "cellular_component";
+        annotation.annotationProperties = buildKeyValuesPair(GO_ASPECT, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.goAspect, is(value));
+    }
 
     private String constructGeneProductId(Annotation annotation) {return annotation.db + ":" + annotation.dbObjectId;}
 
+    private String buildKeyValuesPair(String key, String... values) {
+        return key + GOADataFileParsingHelper.EQUALS +
+                Arrays.stream(values)
+                        .collect(Collectors.joining(GOADataFileParsingHelper.COMMA));
+    }
+
+    private String mergeKeyValuesPairs(String... keyValuePairs) {
+        return Arrays.stream(keyValuePairs)
+                .collect(Collectors.joining(GOADataFileParsingHelper.PIPE));
+    }
 }

@@ -3,7 +3,8 @@ package uk.ac.ebi.quickgo.annotation.service.converter;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Concrete implementation of the {@link AnnotationDocConverter}.
@@ -21,19 +22,29 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         annotation.qualifier = annotationDocument.qualifier;
         annotation.goId = annotationDocument.goId;
         annotation.goEvidence = annotationDocument.goEvidence;
+        annotation.goAspect = annotationDocument.goAspect;
         annotation.evidenceCode = annotationDocument.evidenceCode;
         annotation.reference = annotationDocument.reference;
         annotation.taxonId = annotationDocument.taxonId;
-
+        annotation.symbol = annotationDocument.symbol;
         annotation.assignedBy = annotationDocument.assignedBy;
 
-        if(annotationDocument.withFrom != null) {
-            annotation.withFrom = new ArrayList<>(annotationDocument.withFrom);
+        annotation.targetSets = asUnmodifiableList(annotationDocument.targetSets);
+        annotation.withFrom = asUnmodifiableList(annotationDocument.withFrom);
+        annotation.extensions = asUnmodifiableList(annotationDocument.extensions);
+
+        return annotation;
+    }
+
+    private <T> List<T> asUnmodifiableList(List<T> list) {
+        List<T> unmodifiableList;
+
+        if (list != null) {
+            unmodifiableList = Collections.unmodifiableList(list);
+        } else {
+            unmodifiableList = null;
         }
 
-        if(annotationDocument.extensions != null) {
-            annotation.extensions = new ArrayList<>(annotationDocument.extensions);
-        }
-        return annotation;
+        return unmodifiableList;
     }
 }
