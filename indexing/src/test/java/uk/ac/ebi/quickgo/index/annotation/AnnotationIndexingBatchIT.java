@@ -79,38 +79,31 @@ public class AnnotationIndexingBatchIT {
                 "IntAct:EBI-10043082"
         ));
 
-
-        List<StepExecution> jobsSingleStepAsList2 = jobExecution.getStepExecutions()
+        //Manual CoStats
+        List<StepExecution> jobsSingleStepCoStatsManual = jobExecution.getStepExecutions()
                 .stream()
                 .filter(step -> step.getStepName().equals (COSTATS_MANUAL_COMPLETION_STEP_NAME))
                 .collect(Collectors.toList());
-        assertThat(jobsSingleStepAsList2, hasSize(1));
+        assertThat(jobsSingleStepCoStatsManual, hasSize(1));
+        StepExecution coTermsManualStep = jobsSingleStepCoStatsManual.get(0);
+        assertThat(coTermsManualStep.getReadCount(), is(4));
+        assertThat(coTermsManualStep.getReadSkipCount(), is(0));
+        assertThat(coTermsManualStep.getProcessSkipCount(), is(0));
+        assertThat(coTermsManualStep.getWriteCount(), is(4));
 
-
-        StepExecution cotermsManualStep = jobsSingleStepAsList2.get(0);
-
-        assertThat(cotermsManualStep.getReadCount(), is(4));
-        assertThat(cotermsManualStep.getReadSkipCount(), is(0));
-        assertThat(cotermsManualStep.getProcessSkipCount(), is(0));
-        assertThat(cotermsManualStep.getWriteCount(), is(4));
-
-//        List<String> writtenAnnotationDocGeneProductIds =
-//                getGeneProductIdsFromAnnotationDocuments(annotationRepository.findAll());
-//
-//        assertThat(writtenAnnotationDocGeneProductIds, containsInAnyOrder(
-//                "IntAct:EBI-10043081",
-//                "IntAct:EBI-10205244",
-//                "IntAct:EBI-8801830",
-//                "IntAct:EBI-10043082"
-//        ));
-
-        List<StepExecution> jobsSingleStepAsList3 = jobExecution.getStepExecutions()
+        //All Costats
+        List<StepExecution> jobsSingleStepCoStatsAll = jobExecution.getStepExecutions()
                 .stream()
                 .filter(step -> step.getStepName().equals (COSTATS_ALL_COMPLETION_STEP_NAME))
                 .collect(Collectors.toList());
-        assertThat(jobsSingleStepAsList3, hasSize(1));
+        assertThat(jobsSingleStepCoStatsAll, hasSize(1));
+        StepExecution coTermsAllStep = jobsSingleStepCoStatsAll.get(0);
+        assertThat(coTermsAllStep.getReadCount(), is(4));
+        assertThat(coTermsAllStep.getReadSkipCount(), is(0));
+        assertThat(coTermsAllStep.getProcessSkipCount(), is(0));
+        assertThat(coTermsAllStep.getWriteCount(), is(4));
 
-
+        //Has finished
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.COMPLETED));
     }
