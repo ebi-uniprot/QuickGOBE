@@ -1116,7 +1116,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterAnnotationsByInvertedCaseGoEvidenceCodeSuccessfully() throws Exception {
+    public void filterAnnotationsByInvertedCaseGoAspectSuccessfully() throws Exception {
         String goAspect = StringUtils.swapCase(AnnotationDocMocker.GO_ASPECT);
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_ASPECT_PARAM.getName(), goAspect));
