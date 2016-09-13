@@ -364,7 +364,7 @@ public class AnnotationControllerStatisticsIT {
         extraDoc2.goAspect = "cellular_component";
         repository.save(extraDoc2);
 
-        List<String> relevantAssignedBy = asList(extraDoc1.goAspect, extraDoc2.goAspect);
+        List<String> relevantAspect = asList(extraDoc1.goAspect, extraDoc2.goAspect);
 
         String type = GO_ASPECT_PARAM.getName();
 
@@ -373,7 +373,7 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_ID_PARAM.getName(), filteringGoId)
         );
 
-        assertStatsResponse(response, type, 2, relevantAssignedBy);
+        assertStatsResponse(response, type, 2, relevantAspect);
     }
 
     private String[] asArray(Collection<String> elements) {
