@@ -36,12 +36,12 @@ public class CoTermConfiguration {
     public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
 
     @Bean
-    AnnotationCoTermsAggregator coStatsPermutationsMan(){
+    AnnotationCoTermsAggregator annotationCoTermsAggregatorMan(){
         return new AnnotationCoTermsAggregator();
     }
 
     @Bean
-    AnnotationCoTermsAggregator coStatsPermutationsAll(){
+    AnnotationCoTermsAggregator annotationCoTermsAggregatorAll(){
         return new AnnotationCoTermsAggregator();
     }
 
