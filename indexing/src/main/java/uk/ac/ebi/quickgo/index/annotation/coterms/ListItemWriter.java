@@ -17,7 +17,7 @@ import org.springframework.batch.item.file.FlatFileItemWriter;
  */
 class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
 
-    private FlatFileItemWriter<T> wrapped;
+    private final FlatFileItemWriter<T> wrapped;
 
     public ListItemWriter(FlatFileItemWriter<T> coOccurringTermItemWriter) {
         wrapped = coOccurringTermItemWriter;

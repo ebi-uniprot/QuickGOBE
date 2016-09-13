@@ -22,9 +22,9 @@ public class CoOccurringTermsForSelectedTerm {
 
     private final String target;
     private final float totalNumberGeneProducts;
-    private long selected;
+    private final long selected;
 
-    private List<CoOccurringTerm> statsTerms = new ArrayList<>();
+    private final List<CoOccurringTerm> statsTerms = new ArrayList<>();
 
     /**
      * Create an instance of this class, initializing it the target term (against which all compared terms will be
@@ -73,7 +73,7 @@ public class CoOccurringTermsForSelectedTerm {
 
         return new Iterator<CoOccurringTerm>() {
 
-            Iterator<CoOccurringTerm> navIterator = statsTerms.iterator();
+            final Iterator<CoOccurringTerm> navIterator = statsTerms.iterator();
 
             @Override
             public boolean hasNext() {

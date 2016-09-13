@@ -12,10 +12,10 @@ import java.text.DecimalFormat;
  */
 public class CoOccurringTerm implements Comparable<CoOccurringTerm>{
 
-	private String target;
-	private String comparedTerm;
-	private long together;
-	private long compared;
+	private final String target;
+	private final String comparedTerm;
+	private final long together;
+	private final long compared;
 	private float similarityRatio;
 	private float probabilityRatio;
 

@@ -12,8 +12,8 @@ import org.springframework.batch.core.StepExecutionListener;
  */
 public class CoTermsStepExecutionListener implements StepExecutionListener {
 
-    private AnnotationCoTermsAggregator all;
-    private AnnotationCoTermsAggregator manual;
+    private final AnnotationCoTermsAggregator all;
+    private final AnnotationCoTermsAggregator manual;
 
     public CoTermsStepExecutionListener(AnnotationCoTermsAggregator all,
             AnnotationCoTermsAggregator manual) {
