@@ -21,7 +21,7 @@ public class CoOccurringTerm implements Comparable<CoOccurringTerm>{
 
 	/**
 	 * Create a permutation for the compared term.
-	 * @param target
+	 * @param target the id of the GO Term against which we will make co-occurring terms
 	 * @param comparedTerm term id for this statistics
 	 * @param compared count of gene products where compared term is annotated
 	 * @param together count of gene products where both selected and compared terms are annotated
@@ -39,7 +39,7 @@ public class CoOccurringTerm implements Comparable<CoOccurringTerm>{
 	 * <code>=#together/(#selected+#compared-#together)</code>
 	 * Probability of term here estimated as fraction of proteins annotated to term.
 	 * @param selected Total count of gene products annotated to selected term
-	 * @return
+	 * @return the calculated similarity ratio
 	 */
 	public float calculateProbabilitySimilarityRatio(float selected) {
 
@@ -62,7 +62,7 @@ public class CoOccurringTerm implements Comparable<CoOccurringTerm>{
 	 * <code>=(#together/selected)/(#compared/#all)</code>
 	 * Probability of term here estimated as fraction of proteins annotated to term.
 	 * @param selected Total count of gene products annotated to selected term
-	 * @return
+	 * @return the calculated probability ratio
 	 */
 	public float calculateProbabilityRatio(float selected, float all){
 
@@ -103,7 +103,7 @@ public class CoOccurringTerm implements Comparable<CoOccurringTerm>{
 
 	/**
 	 * The co-occurring term
-	 * @return
+	 * @return the GOTerm used as the compared too term
 	 */
 	public String getComparedTerm() {
 		return comparedTerm;
@@ -111,7 +111,7 @@ public class CoOccurringTerm implements Comparable<CoOccurringTerm>{
 
 	/**
 	 * Count of gene products where both selected and compared terms are annotated
-	 * @return
+	 * @return count
 	 */
 	public long getTogether() {
 		return together;
@@ -119,7 +119,7 @@ public class CoOccurringTerm implements Comparable<CoOccurringTerm>{
 
 	/**
 	 * Count of gene products where compared term is annotated
-	 * @return
+	 * @return count
 	 */
 	public long getCompared() {
 		return compared;
