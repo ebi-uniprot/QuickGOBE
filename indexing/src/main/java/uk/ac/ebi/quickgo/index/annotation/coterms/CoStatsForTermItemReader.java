@@ -13,6 +13,7 @@ import org.springframework.batch.item.ItemReader;
 public class CoStatsForTermItemReader implements ItemReader<String>{
 
     private final CoStatsPermutations coStatsPermutations;
+    Iterator<String> termsIt;
 
     public CoStatsForTermItemReader(CoStatsPermutations coStatsPermutations) {
         this.coStatsPermutations = coStatsPermutations;
@@ -20,7 +21,9 @@ public class CoStatsForTermItemReader implements ItemReader<String>{
     }
 
     @Override public String read() throws Exception {
-        Iterator<String> termsIt = coStatsPermutations.getTermToTermOverlapMatrix().keySet().iterator();
+        if(termsIt==null) {
+            termsIt = coStatsPermutations.getTermToTermOverlapMatrix().keySet().iterator();
+        }
 
         if(termsIt.hasNext()){
             return termsIt.next();
