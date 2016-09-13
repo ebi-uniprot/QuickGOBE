@@ -515,33 +515,6 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void usageIdIsValid() {
-        String usageIds = "GO:0000001";
-
-        annotationRequest.setUsageIds(usageIds);
-
-        assertThat(validator.validate(annotationRequest), hasSize(0));
-    }
-
-    @Test
-    public void usageIdsAreValid() {
-        String usageIds = "GO:0000001,GO:0000002";
-
-        annotationRequest.setUsageIds(usageIds);
-
-        assertThat(validator.validate(annotationRequest), hasSize(0));
-    }
-
-    @Test
-    public void usageIdsAreInvalid() {
-        String usageIds = "GO:000000abc";
-
-        annotationRequest.setUsageIds(usageIds);
-
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
-    }
-
-    @Test
     public void usageRelationshipIsValid() {
         String usageRelationships = "is_a";
 

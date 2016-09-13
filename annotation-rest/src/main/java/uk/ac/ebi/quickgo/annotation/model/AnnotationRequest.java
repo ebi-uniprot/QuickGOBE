@@ -36,7 +36,6 @@ public class AnnotationRequest {
     public static final int MIN_PAGE_NUMBER = 1;
 
     static final String USAGE_FIELD = "usage";
-    static final String USAGE_IDS = "usageIds";
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
 
     private static final String COMMA = ",";
@@ -48,7 +47,6 @@ public class AnnotationRequest {
             GENE_PRODUCT_ID,
             GENE_PRODUCT_TYPE,
             GO_EVIDENCE,
-            GO_ID,
             QUALIFIER,
             REFERENCE_SEARCH,
             TAXON_ID,
@@ -335,18 +333,6 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "GO:[0-9]+(,GO:[0-9]+)*", flags = CASE_INSENSITIVE,
-            message = "Invalid GO IDs specified: ${validatedValue})")
-    public String getUsageIds() {
-        return filterMap.get(USAGE_IDS);
-    }
-
-    public void setUsageIds(String usageIds) {
-        if (usageIds != null) {
-            filterMap.put(USAGE_IDS, usageIds.toUpperCase());
-        }
-    }
-
     @Pattern(regexp = "(is_a|part_of|occurs_in|regulates)(,is_a|part_of|occurs_in|regulates)*",
             flags = CASE_INSENSITIVE,
             message = "At least one usage relationship is invalid: ${validatedValue}")
@@ -438,20 +424,20 @@ public class AnnotationRequest {
     private Optional<FilterRequest> createUsageFilter() {
         Optional<FilterRequest> request;
         FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
+
         if (filterMap.containsKey(USAGE_FIELD)) {
-            if (filterMap.containsKey(USAGE_IDS)) {
+            if (filterMap.containsKey(GO_ID)) {
                 filterBuilder
                         .addProperty(filterMap.get(USAGE_FIELD))
-                        .addProperty(USAGE_IDS, filterMap.get(USAGE_IDS));
+                        .addProperty(GO_ID, filterMap.get(GO_ID));
+
+                filterBuilder.addProperty(USAGE_RELATIONSHIPS, filterMap.get(USAGE_RELATIONSHIPS));
+                request = Optional.of(filterBuilder.build());
             } else {
-                throw new ParameterException("Annotation usage requires 'usageIds' to be set.");
+                throw new ParameterException("Annotation usage requires 'goId' to be set.");
             }
-
-            filterBuilder.addProperty(USAGE_RELATIONSHIPS, filterMap.get(USAGE_RELATIONSHIPS));
-
-            request = Optional.of(filterBuilder.build());
         } else {
-            request = Optional.empty();
+            request = createSimpleFilter(GO_ID);
         }
 
         return request;
