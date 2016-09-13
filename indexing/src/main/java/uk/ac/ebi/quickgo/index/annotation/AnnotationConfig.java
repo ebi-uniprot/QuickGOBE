@@ -59,7 +59,7 @@ public class AnnotationConfig {
     @Value("${indexing.annotation.chunk.size:500}")
     private int chunkSize;
 
-    @Value("${indexing.coterms.chunk.size:500}")
+    @Value("${indexing.coterms.chunk.size:1}")
     private int cotermsChunk;
 
     @Value("${indexing.annotation.header.lines:21}")
