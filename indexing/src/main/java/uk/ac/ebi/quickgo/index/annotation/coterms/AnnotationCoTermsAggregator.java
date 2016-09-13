@@ -97,7 +97,7 @@ public class AnnotationCoTermsAggregator {
 		return termToTermOverlapMatrix;
 	}
 
-	private void incrementCoTermsCount(String term, Set<String> coocurringTerms) {
+	private void incrementCoTermsCount(String term, Set<String> co_occurringTerms) {
 
 		//Get the co-stats for this term
 		Map<String, HitCount> termCoTerms = termToTermOverlapMatrix.get(term);
@@ -110,15 +110,15 @@ public class AnnotationCoTermsAggregator {
 
 		//Loop through all the terms we have encountered in this batch and update the quantities
 
-        for (String coocurringTerm : coocurringTerms) {
+        for (String co_occurringTerm : co_occurringTerms) {
 
             //Get 'permanent' record for this term/term permutation
-            HitCount permutationHitCount = termCoTerms.get(coocurringTerm);
+            HitCount permutationHitCount = termCoTerms.get(co_occurringTerm);
 
             //Create if it doesn't exist.
             if (permutationHitCount == null) {
                 permutationHitCount = new HitCount();
-                termCoTerms.put(coocurringTerm, permutationHitCount);
+                termCoTerms.put(co_occurringTerm, permutationHitCount);
             }
 
             //Update it with a count of 'one' as this batch is for one gene protein and so the count must be one
