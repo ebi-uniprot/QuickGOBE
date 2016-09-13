@@ -12,7 +12,7 @@ import java.util.*;
  *
  * Aggregates all the data need to calculate all co-occurrence stat data points
  */
-public class AnnotationCoTermsAggregator {
+public class AnnotationCo_occurringTermsAggregator {
 
     //Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
     private final Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
@@ -29,7 +29,7 @@ public class AnnotationCoTermsAggregator {
     private String currentGeneProduct;
 
     //Constructor
-    public AnnotationCoTermsAggregator() {
+    public AnnotationCo_occurringTermsAggregator() {
         termBatch = new HashSet<>();
         termToTermOverlapMatrix = new TreeMap<>();
         geneProductList = new HashSet<>();

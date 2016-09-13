@@ -10,7 +10,7 @@ import org.springframework.batch.item.file.FlatFileHeaderCallback;
  * Time: 16:24
  * Created with IntelliJ IDEA.
  */
-class CoTermsFlatFileHeaderCallBack implements FlatFileHeaderCallback {
+class Co_occurringTermsFlatFileHeaderCallBack implements FlatFileHeaderCallback {
 
     private static final String COL_HEADER = "Source Term|Compared Term|Probability Ratio|Significance Ratio|Together" +
             " (Overlap)|Compared count";

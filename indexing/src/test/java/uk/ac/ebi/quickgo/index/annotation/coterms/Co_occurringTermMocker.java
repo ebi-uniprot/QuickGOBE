@@ -9,7 +9,7 @@ import java.util.*;
  * Time: 10:08
  * Created with IntelliJ IDEA.
  */
-public class CoStatsMocker {
+public class Co_occurringTermMocker {
 
     public static DecimalFormat df1 = new DecimalFormat("0000000");
     public static DecimalFormat df2 = new DecimalFormat("9000000");

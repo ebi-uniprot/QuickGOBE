@@ -19,10 +19,10 @@ import static org.mockito.Mockito.verify;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AnnotationAnnotationCoTermsAggregatorProcessorTest {
+public class AnnotationAnnotationCoOccurringTermsAggregatorProcessorTest {
 
     @Mock
-    AnnotationCoTermsAggregator annotationCoTermsAggregator;
+    AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
 
     @Mock
     Annotation annotation;
@@ -30,18 +30,18 @@ public class AnnotationAnnotationCoTermsAggregatorProcessorTest {
     @Test
     public void testAnnotationAddedToCoStatsIfPredicateAllows() throws Exception{
         Predicate<Annotation> toBeProcessed = t -> true;
-        CoOccuringGoTermsFromAnnotations coOccuringGoTermsFromAnnotations = new CoOccuringGoTermsFromAnnotations
-                (annotationCoTermsAggregator, toBeProcessed);
-        coOccuringGoTermsFromAnnotations.process(annotation);
-        verify(annotationCoTermsAggregator,times(1)).addRowToMatrix(annotation);
+        Co_occurringGoTermsFromAnnotations coOccurringGoTermsFromAnnotations = new Co_occurringGoTermsFromAnnotations
+                (annotationCoOccurringTermsAggregator, toBeProcessed);
+        coOccurringGoTermsFromAnnotations.process(annotation);
+        verify(annotationCoOccurringTermsAggregator,times(1)).addRowToMatrix(annotation);
     }
 
     @Test
     public void testAnnotationNotAddedToCoStatsIfPredicateForbids() throws Exception{
         Predicate<Annotation> toBeProcessed = t -> false;
-        CoOccuringGoTermsFromAnnotations coOccuringGoTermsFromAnnotations = new CoOccuringGoTermsFromAnnotations
-                (annotationCoTermsAggregator, toBeProcessed);
-        coOccuringGoTermsFromAnnotations.process(annotation);
-        verify(annotationCoTermsAggregator,never()).addRowToMatrix(annotation);
+        Co_occurringGoTermsFromAnnotations coOccurringGoTermsFromAnnotations = new Co_occurringGoTermsFromAnnotations
+                (annotationCoOccurringTermsAggregator, toBeProcessed);
+        coOccurringGoTermsFromAnnotations.process(annotation);
+        verify(annotationCoOccurringTermsAggregator,never()).addRowToMatrix(annotation);
     }
 }

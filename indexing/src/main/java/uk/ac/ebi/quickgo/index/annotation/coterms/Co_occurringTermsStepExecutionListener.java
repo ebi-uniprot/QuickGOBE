@@ -10,13 +10,13 @@ import org.springframework.batch.core.StepExecutionListener;
  * Time: 15:01
  * Created with IntelliJ IDEA.
  */
-public class CoTermsStepExecutionListener implements StepExecutionListener {
+public class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
 
-    private final AnnotationCoTermsAggregator all;
-    private final AnnotationCoTermsAggregator manual;
+    private final AnnotationCo_occurringTermsAggregator all;
+    private final AnnotationCo_occurringTermsAggregator manual;
 
-    public CoTermsStepExecutionListener(AnnotationCoTermsAggregator all,
-            AnnotationCoTermsAggregator manual) {
+    public Co_occurringTermsStepExecutionListener(AnnotationCo_occurringTermsAggregator all,
+            AnnotationCo_occurringTermsAggregator manual) {
         this.all = all;
         this.manual = manual;
     }

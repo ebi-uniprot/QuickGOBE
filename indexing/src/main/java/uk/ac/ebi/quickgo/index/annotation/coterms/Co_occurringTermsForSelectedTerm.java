@@ -18,13 +18,13 @@ import java.util.List;
  * Time: 14:24
  * Created with IntelliJ IDEA.
  */
-public class CoOccurringTermsForSelectedTerm {
+public class Co_occurringTermsForSelectedTerm {
 
     private final String target;
     private final float totalNumberGeneProducts;
     private final long selected;
 
-    private final List<CoOccurringTerm> statsTerms = new ArrayList<>();
+    private final List<Co_occurringTerm> statsTerms = new ArrayList<>();
 
     /**
      * Create an instance of this class, initializing it the target term (against which all compared terms will be
@@ -34,7 +34,7 @@ public class CoOccurringTermsForSelectedTerm {
      * @param totalNumberGeneProducts The total number of unique gene products processed
      * @param selected Total count of proteins annotated to selected term
      */
-    public CoOccurringTermsForSelectedTerm(String target, float totalNumberGeneProducts, long selected) {
+    public Co_occurringTermsForSelectedTerm(String target, float totalNumberGeneProducts, long selected) {
         Preconditions.checkArgument(target != null, "CoOccurringTermsForSelectedTerm target should not be null");
         Preconditions
                 .checkArgument(totalNumberGeneProducts != 0, "CoOccurringTermsForSelectedTerm totalNumberGeneProducts" +
@@ -49,7 +49,7 @@ public class CoOccurringTermsForSelectedTerm {
      * Add this term to the list of terms that annotate the same gene products as the target term.
      * @param coOccurringTerm has all the required information to all the co-occurrence statistics to be calculated.
      */
-    public void addAndCalculate(CoOccurringTerm coOccurringTerm) {
+    public void addAndCalculate(Co_occurringTerm coOccurringTerm) {
         Preconditions.checkArgument(coOccurringTerm != null, "CoOccurringTermsForSelectedTerm.addAndCalculate was " +
                 "passed a CoOccurringTerm which was null");
         coOccurringTerm.calculateProbabilityRatio(this.selected, this.totalNumberGeneProducts);
@@ -68,13 +68,13 @@ public class CoOccurringTermsForSelectedTerm {
     /**
      * @return an iterator that makes available the list of co-occurring terms, in descending order of the similarity
      */
-    public Iterator<CoOccurringTerm> highestSimilarity() {
+    public Iterator<Co_occurringTerm> highestSimilarity() {
 
         statsTerms.sort(new SignificanceSorter());
 
-        return new Iterator<CoOccurringTerm>() {
+        return new Iterator<Co_occurringTerm>() {
 
-            final Iterator<CoOccurringTerm> navIterator = statsTerms.iterator();
+            final Iterator<Co_occurringTerm> navIterator = statsTerms.iterator();
 
             @Override
             public boolean hasNext() {
@@ -82,16 +82,16 @@ public class CoOccurringTermsForSelectedTerm {
             }
 
             @Override
-            public CoOccurringTerm next() {
+            public Co_occurringTerm next() {
                 return navIterator.next();
             }
         };
     }
 
-    private class SignificanceSorter implements Comparator<CoOccurringTerm> {
+    private class SignificanceSorter implements Comparator<Co_occurringTerm> {
 
         @Override
-        public int compare(CoOccurringTerm o1, CoOccurringTerm o2) {
+        public int compare(Co_occurringTerm o1, Co_occurringTerm o2) {
             if (o1.getSimilarityRatio() == o2.getSimilarityRatio()) {
                 return 0;
             }

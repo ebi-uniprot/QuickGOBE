@@ -19,13 +19,13 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
  * Time: 16:26
  * Created with IntelliJ IDEA.
  */
-public class AnnotationCoTermsAggregatorTest {
+public class AnnotationCoOccurringTermsAggregatorTest {
 
-    AnnotationCoTermsAggregator annotationCoTermsAggregator;
+    AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
 
     @Before
     public void setup(){
-        annotationCoTermsAggregator = new AnnotationCoTermsAggregator();
+        annotationCoOccurringTermsAggregator = new AnnotationCo_occurringTermsAggregator();
     }
 
 	@Test
@@ -35,11 +35,11 @@ public class AnnotationCoTermsAggregatorTest {
         Annotation annotation2 = AnnotationMocker.createValidAnnotation();
 
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(annotationCoTermsAggregator::addRowToMatrix);
-        annotationCoTermsAggregator.finish();
+        annotations.forEach(annotationCoOccurringTermsAggregator::addRowToMatrix);
+        annotationCoOccurringTermsAggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = annotationCoTermsAggregator.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = annotationCoOccurringTermsAggregator.getTermToTermOverlapMatrix();
 
         assertThat(matrix.keySet(), hasSize(1));
 
@@ -62,12 +62,12 @@ public class AnnotationCoTermsAggregatorTest {
         annotation2.dbObjectId = "A0A000";
 
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(annotationCoTermsAggregator::addRowToMatrix);
+        annotations.forEach(annotationCoOccurringTermsAggregator::addRowToMatrix);
 
-        annotationCoTermsAggregator.finish();
+        annotationCoOccurringTermsAggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = annotationCoTermsAggregator.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = annotationCoOccurringTermsAggregator.getTermToTermOverlapMatrix();
 
         assertThat(matrix.keySet(), hasSize(2));
 
@@ -91,11 +91,11 @@ public class AnnotationCoTermsAggregatorTest {
         Annotation annotation2 = AnnotationMocker.createValidAnnotation();
         annotation2.goId = "GO:0009999";
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(annotationCoTermsAggregator::addRowToMatrix);
-        annotationCoTermsAggregator.finish();
+        annotations.forEach(annotationCoOccurringTermsAggregator::addRowToMatrix);
+        annotationCoOccurringTermsAggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = annotationCoTermsAggregator.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = annotationCoOccurringTermsAggregator.getTermToTermOverlapMatrix();
 
         assertThat(matrix.keySet(), hasSize(2));
 

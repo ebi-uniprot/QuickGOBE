@@ -13,7 +13,7 @@ import org.springframework.batch.item.ItemProcessor;
  * For the contents of the termToTermOverlapMatrix calculate co-occurrence statistics
  * A version of CoStatsSummarizer from Beta
  */
-public class CoOccurringTermsStatsCalculator implements ItemProcessor<String, List<CoOccurringTerm>> {
+public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, List<Co_occurringTerm>> {
 
     //This is the count of all gene products for the term. We hold this figure separately as it is used many times.
     private Map<String, HitCount> termGPCount;
@@ -23,10 +23,10 @@ public class CoOccurringTermsStatsCalculator implements ItemProcessor<String, Li
 
     //Total number of unique gene products that have annotations
     private long geneProductCount;
-    private AnnotationCoTermsAggregator annotationCoTermsAggregator;
+    private AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
 
-    public CoOccurringTermsStatsCalculator(AnnotationCoTermsAggregator annotationCoTermsAggregator) {
-        this.annotationCoTermsAggregator = annotationCoTermsAggregator;
+    public Co_occurringTermsStatsCalculator(AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator) {
+        this.annotationCoOccurringTermsAggregator = annotationCoOccurringTermsAggregator;
         this.geneProductCount = 0;
         this.termGPCount = null;
         this.termToTermOverlapMatrix = null;
@@ -36,13 +36,13 @@ public class CoOccurringTermsStatsCalculator implements ItemProcessor<String, Li
      * Read each line in the term to term matrix for the selected term. For each calculate a CoStat instance.
      *
      */
-    public List<CoOccurringTerm> process(String goTerm) {
+    public List<Co_occurringTerm> process(String goTerm) {
 
         //One time operation
         if (termToTermOverlapMatrix == null) {
-            this.geneProductCount = annotationCoTermsAggregator.totalOfAnnotatedGeneProducts();
-            this.termGPCount = annotationCoTermsAggregator.termGPCount();
-            this.termToTermOverlapMatrix = annotationCoTermsAggregator.termToTermOverlapMatrix();
+            this.geneProductCount = annotationCoOccurringTermsAggregator.totalOfAnnotatedGeneProducts();
+            this.termGPCount = annotationCoOccurringTermsAggregator.termGPCount();
+            this.termToTermOverlapMatrix = annotationCoOccurringTermsAggregator.termToTermOverlapMatrix();
         }
 
         return resultsForOneGoTerm(calculateCoStatsForTerm(goTerm));
@@ -54,21 +54,21 @@ public class CoOccurringTermsStatsCalculator implements ItemProcessor<String, Li
      * @param target The GO Term for which the co-occurrence statistics will be calculated.
      * @return coStatsForTerm
      */
-    private CoOccurringTermsForSelectedTerm calculateCoStatsForTerm(String target) {
+    private Co_occurringTermsForSelectedTerm calculateCoStatsForTerm(String target) {
 
         Preconditions.checkArgument(null != target, "Target passed to calculateCoStatsForTerm should not be null");
 
         Map<String, HitCount> co_occurringTermsForTarget = termToTermOverlapMatrix.get(target);
-        CoOccurringTermsForSelectedTerm
+        Co_occurringTermsForSelectedTerm
                 coOccurringTermsForSelectedTerm =
-                new CoOccurringTermsForSelectedTerm(target, geneProductCount, termGPCount.get(target).hits);
+                new Co_occurringTermsForSelectedTerm(target, geneProductCount, termGPCount.get(target).hits);
 
         for (String comparedTerm : co_occurringTermsForTarget.keySet()) {
 
             final long comparedTermCoHitsWithTarget = co_occurringTermsForTarget.get(comparedTerm).hits;
             final long comparedTermTotalHits = termGPCount.get(comparedTerm).hits;
 
-            CoOccurringTerm coStatsTerm = new CoOccurringTerm(target, comparedTerm, comparedTermTotalHits,
+            Co_occurringTerm coStatsTerm = new Co_occurringTerm(target, comparedTerm, comparedTermTotalHits,
                     comparedTermCoHitsWithTarget);
 
             coOccurringTermsForSelectedTerm.addAndCalculate(coStatsTerm);
@@ -77,12 +77,12 @@ public class CoOccurringTermsStatsCalculator implements ItemProcessor<String, Li
 
     }
 
-    private List<CoOccurringTerm> resultsForOneGoTerm(CoOccurringTermsForSelectedTerm coOccurringTermsForSelectedTerm) {
+    private List<Co_occurringTerm> resultsForOneGoTerm(Co_occurringTermsForSelectedTerm coOccurringTermsForSelectedTerm) {
 
-        List<CoOccurringTerm> results = new ArrayList<>();
+        List<Co_occurringTerm> results = new ArrayList<>();
 
         //Get iterator of compared terms, ordered by significance ratio descending
-        Iterator<CoOccurringTerm> descendingIt = coOccurringTermsForSelectedTerm.highestSimilarity();
+        Iterator<Co_occurringTerm> descendingIt = coOccurringTermsForSelectedTerm.highestSimilarity();
 
         while (descendingIt.hasNext()) {
             results.add(descendingIt.next());

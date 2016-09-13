@@ -10,7 +10,7 @@ import static junit.framework.TestCase.assertEquals;
  * Time: 13:52
  * Created with IntelliJ IDEA.
  */
-public class CoOccurringTermTest {
+public class Co_occurringTermTest {
 
 	@Test
 	public void successfullyCalculateCoOccurrenceStats(){
@@ -22,7 +22,7 @@ public class CoOccurringTermTest {
 		//From the coStats class.
 		long selected = 8L;
 
-		CoOccurringTerm coOccurringTerm = new CoOccurringTerm(targetTerm, comparedTerm, compared, together);
+		Co_occurringTerm coOccurringTerm = new Co_occurringTerm(targetTerm, comparedTerm, compared, together);
 		assertEquals( 33.33f , coOccurringTerm.calculateProbabilitySimilarityRatio(selected));
 
 		int all = 24;
@@ -36,7 +36,7 @@ public class CoOccurringTermTest {
 		long compared = 8L;
 		long together = 4L;
 
-		CoOccurringTerm coOccurringTerm = new CoOccurringTerm(targetTerm, comparedTerm, compared, together);
+		Co_occurringTerm coOccurringTerm = new Co_occurringTerm(targetTerm, comparedTerm, compared, together);
 		coOccurringTerm.calculateProbabilitySimilarityRatio(0L);
 	}
 
@@ -49,7 +49,7 @@ public class CoOccurringTermTest {
 
 		int all = 24;
 
-		CoOccurringTerm coOccurringTerm = new CoOccurringTerm(targetTerm, comparedTerm, compared, together);
+		Co_occurringTerm coOccurringTerm = new Co_occurringTerm(targetTerm, comparedTerm, compared, together);
 		coOccurringTerm.calculateProbabilityRatio(0l, all);
 	}
 
@@ -62,7 +62,7 @@ public class CoOccurringTermTest {
 		long together = 4L;
 		long selected = 8L;
 
-		CoOccurringTerm coOccurringTerm = new CoOccurringTerm(targetTerm, comparedTerm, compared, together);
+		Co_occurringTerm coOccurringTerm = new Co_occurringTerm(targetTerm, comparedTerm, compared, together);
 		coOccurringTerm.calculateProbabilityRatio(selected, 0);
 	}
 }

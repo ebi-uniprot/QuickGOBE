@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.index.annotation.coterms.CoOccurringTerm;
+import uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTerm;
 import uk.ac.ebi.quickgo.index.annotation.coterms.*;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.data.solr.core.SolrTemplate;
 
-import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermConfiguration.*;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermConfiguration.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.TAB;
 
 /**
@@ -48,7 +48,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.T
  */
 @Configuration
 @EnableBatchProcessing
-@Import({AnnotationRepoConfig.class, CoTermConfiguration.class})
+@Import({AnnotationRepoConfig.class, Co_occurringTermConfiguration.class})
 public class AnnotationConfig {
     static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
     static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
@@ -87,16 +87,16 @@ public class AnnotationConfig {
     ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsAll;
 
     @Autowired
-    ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorManual;
+    ItemProcessor<String, List<Co_occurringTerm>> coOccurringTermsStatsCalculatorManual;
 
     @Autowired
-    ItemProcessor<String, List<CoOccurringTerm>> coOccurringTermsStatsCalculatorAll;
+    ItemProcessor<String, List<Co_occurringTerm>> coOccurringTermsStatsCalculatorAll;
 
     @Autowired
     ItemReader<String> coStatsManualItemReader;
 
     @Autowired
-    ItemWriter<List<CoOccurringTerm>> coStatManualFlatFileWriter;
+    ItemWriter<List<Co_occurringTerm>> coStatManualFlatFileWriter;
 
     @Autowired
     ItemReader<String> coStatsAllItemReader;
@@ -105,7 +105,7 @@ public class AnnotationConfig {
     StepExecutionListener coTermsStepExecutionListener;
 
     @Autowired
-    ItemWriter<List<CoOccurringTerm>> coStatsAllFlatFileWriter;
+    ItemWriter<List<Co_occurringTerm>> coStatsAllFlatFileWriter;
 
 
     @Bean
@@ -147,7 +147,7 @@ public class AnnotationConfig {
     @Bean
     public Step coStatsManualSummarizationStep() {
         return stepBuilders.get(COSTATS_MANUAL_COMPLETION_STEP_NAME)
-                .<String, List<CoOccurringTerm>>chunk(cotermsChunk)
+                .<String, List<Co_occurringTerm>>chunk(cotermsChunk)
                 .reader(coStatsManualItemReader)
                 .processor(coOccurringTermsStatsCalculatorManual)
                 .writer(coStatManualFlatFileWriter)
@@ -158,7 +158,7 @@ public class AnnotationConfig {
     @Bean
     public Step coStatsAllSummarizationStep() {
         return stepBuilders.get(COSTATS_ALL_COMPLETION_STEP_NAME)
-                .<String, List<CoOccurringTerm>>chunk(cotermsChunk)
+                .<String, List<Co_occurringTerm>>chunk(cotermsChunk)
                 .reader(coStatsAllItemReader)
                 .processor(coOccurringTermsStatsCalculatorAll)
                 .writer(coStatsAllFlatFileWriter)

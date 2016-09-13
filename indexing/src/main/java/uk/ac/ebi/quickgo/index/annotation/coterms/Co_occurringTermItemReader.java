@@ -9,19 +9,19 @@ import org.springframework.batch.item.ItemReader;
  * Time: 15:38
  * Created with IntelliJ IDEA.
  */
-class CoStatsForTermItemReader implements ItemReader<String> {
+class Co_occurringTermItemReader implements ItemReader<String> {
 
-    private final AnnotationCoTermsAggregator annotationCoTermsAggregator;
+    private final AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
     private Iterator<String> termsIt;
 
-    public CoStatsForTermItemReader(AnnotationCoTermsAggregator annotationCoTermsAggregator) {
-        this.annotationCoTermsAggregator = annotationCoTermsAggregator;
+    public Co_occurringTermItemReader(AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator) {
+        this.annotationCoOccurringTermsAggregator = annotationCoOccurringTermsAggregator;
 
     }
 
     @Override public String read() throws Exception {
         if (termsIt == null) {
-            termsIt = annotationCoTermsAggregator.getTermToTermOverlapMatrix().keySet().iterator();
+            termsIt = annotationCoOccurringTermsAggregator.getTermToTermOverlapMatrix().keySet().iterator();
         }
 
         if (termsIt.hasNext()) {

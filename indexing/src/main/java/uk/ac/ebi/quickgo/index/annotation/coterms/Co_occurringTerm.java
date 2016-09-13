@@ -10,7 +10,7 @@ import java.text.DecimalFormat;
  * @author twardell
  *
  */
-public class CoOccurringTerm implements Comparable<CoOccurringTerm> {
+public class Co_occurringTerm implements Comparable<Co_occurringTerm> {
 
     private final String target;
     private final String comparedTerm;
@@ -26,7 +26,7 @@ public class CoOccurringTerm implements Comparable<CoOccurringTerm> {
      * @param compared count of gene products where compared term is annotated
      * @param together count of gene products where both selected and compared terms are annotated
      */
-    public CoOccurringTerm(String target, String comparedTerm, long compared, long together) {
+    public Co_occurringTerm(String target, String comparedTerm, long compared, long together) {
         this.target = target;
         this.comparedTerm = comparedTerm;
         this.compared = compared;
@@ -127,7 +127,7 @@ public class CoOccurringTerm implements Comparable<CoOccurringTerm> {
     }
 
     @Override
-    public int compareTo(CoOccurringTerm o) {
+    public int compareTo(Co_occurringTerm o) {
         if (this.getSimilarityRatio() == o.getSimilarityRatio()) {
             return 0;
         }
@@ -143,7 +143,7 @@ public class CoOccurringTerm implements Comparable<CoOccurringTerm> {
             return false;
         }
 
-        CoOccurringTerm that = (CoOccurringTerm) o;
+        Co_occurringTerm that = (Co_occurringTerm) o;
 
         if (Float.compare(that.together, together) != 0) {
             return false;

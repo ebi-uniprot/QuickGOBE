@@ -18,10 +18,10 @@ import static org.mockito.Mockito.verify;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CoOccurringTermsForSelectedTermTest {
+public class Co_occurringTermsForSelectedTermTest {
 
     @Mock
-    CoOccurringTerm coOccurringTerm;
+    Co_occurringTerm coOccurringTerm;
 
     @Test
     public void testCalculationCalledOnAllTerms(){
@@ -30,7 +30,7 @@ public class CoOccurringTermsForSelectedTermTest {
         float totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
 
-        CoOccurringTermsForSelectedTerm cootfst = new CoOccurringTermsForSelectedTerm(target,
+        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
 
         cootfst.addAndCalculate(coOccurringTerm);
@@ -41,7 +41,7 @@ public class CoOccurringTermsForSelectedTermTest {
         verify(coOccurringTerm, times(4)).calculateProbabilityRatio(2f,10f);
         verify(coOccurringTerm, times(4)).calculateProbabilitySimilarityRatio(2f);
 
-       Iterator<CoOccurringTerm> it = cootfst.highestSimilarity();
+       Iterator<Co_occurringTerm> it = cootfst.highestSimilarity();
         int itCounter = 0;
         while(it.hasNext()){
             it.next();
@@ -57,7 +57,7 @@ public class CoOccurringTermsForSelectedTermTest {
         float totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
 
-        CoOccurringTermsForSelectedTerm cootfst = new CoOccurringTermsForSelectedTerm(target,
+        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
 
         cootfst.addAndCalculate(null);
@@ -68,7 +68,7 @@ public class CoOccurringTermsForSelectedTermTest {
         String target = null;
         float totalNumberGeneProducts = 10;
         long selected = 2;
-        CoOccurringTermsForSelectedTerm cootfst = new CoOccurringTermsForSelectedTerm(target,
+        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
     }
 
@@ -77,7 +77,7 @@ public class CoOccurringTermsForSelectedTermTest {
         String target = "GO:00003824";
         float totalNumberGeneProducts = 0;
         long selected = 2;
-        CoOccurringTermsForSelectedTerm cootfst = new CoOccurringTermsForSelectedTerm(target,
+        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
     }
 
@@ -86,7 +86,7 @@ public class CoOccurringTermsForSelectedTermTest {
         String target = "GO:00003824";
         float totalNumberGeneProducts = 10;
         long selected = 0;
-        CoOccurringTermsForSelectedTerm cootfst = new CoOccurringTermsForSelectedTerm(target,
+        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
     }
 }
