@@ -23,11 +23,11 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
 
     //Total number of unique gene products that have annotations
     private long geneProductCount;
-    private AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
+    private AnnotationCo_occurringTermsAggregator aggregator;
 
     public Co_occurringTermsStatsCalculator(
-            AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator) {
-        this.annotationCoOccurringTermsAggregator = annotationCoOccurringTermsAggregator;
+            AnnotationCo_occurringTermsAggregator aggregator) {
+        this.aggregator = aggregator;
         this.geneProductCount = 0;
         this.termGPCount = null;
         this.termToTermOverlapMatrix = null;
@@ -41,9 +41,9 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
 
         //One time operation
         if (termToTermOverlapMatrix == null) {
-            this.geneProductCount = annotationCoOccurringTermsAggregator.getTotalOfAnnotatedGeneProducts();
-            this.termGPCount = annotationCoOccurringTermsAggregator.getGeneProductCounts();
-            this.termToTermOverlapMatrix = annotationCoOccurringTermsAggregator.getTermToTermOverlapMatrix();
+            this.geneProductCount = aggregator.getTotalOfAnnotatedGeneProducts();
+            this.termGPCount = aggregator.getGeneProductCounts();
+            this.termToTermOverlapMatrix = aggregator.getTermToTermOverlapMatrix();
         }
 
         return resultsForOneGoTerm(calculateCoStatsForTerm(goTerm));
