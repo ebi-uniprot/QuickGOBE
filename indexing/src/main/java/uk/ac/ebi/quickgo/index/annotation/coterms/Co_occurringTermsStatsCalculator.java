@@ -25,7 +25,8 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
     private long geneProductCount;
     private AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
 
-    public Co_occurringTermsStatsCalculator(AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator) {
+    public Co_occurringTermsStatsCalculator(
+            AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator) {
         this.annotationCoOccurringTermsAggregator = annotationCoOccurringTermsAggregator;
         this.geneProductCount = 0;
         this.termGPCount = null;
@@ -52,7 +53,8 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
      * Create a CoStatsForTerm instance for each compared term, and calculate the COOccurrenceStatsTerm based on the
      * values passed in.
      * @param target The GO Term for which the co-occurrence statistics will be calculated.
-     * @return coStatsForTerm
+     * @return Co_occurringTermsForSelectedTerm instance with co-occurring statistics calculated for every
+     * co-occurring term.
      */
     private Co_occurringTermsForSelectedTerm calculateCoStatsForTerm(String target) {
 
@@ -60,24 +62,19 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
 
         Map<String, HitCount> co_occurringTermsForTarget = termToTermOverlapMatrix.get(target);
         Co_occurringTermsForSelectedTerm
-                coOccurringTermsForSelectedTerm =
-                new Co_occurringTermsForSelectedTerm(target, geneProductCount, termGPCount.get(target).hits);
+                coTerms = new Co_occurringTermsForSelectedTerm(target, geneProductCount, termGPCount.get(target).hits);
 
         for (String comparedTerm : co_occurringTermsForTarget.keySet()) {
 
-            final long comparedTermCoHitsWithTarget = co_occurringTermsForTarget.get(comparedTerm).hits;
-            final long comparedTermTotalHits = termGPCount.get(comparedTerm).hits;
-
-            Co_occurringTerm coStatsTerm = new Co_occurringTerm(target, comparedTerm, comparedTermTotalHits,
-                    comparedTermCoHitsWithTarget);
-
-            coOccurringTermsForSelectedTerm.addAndCalculate(coStatsTerm);
+            coTerms.addAndCalculate(new Co_occurringTerm(target, comparedTerm, termGPCount.get(comparedTerm).hits,
+                            co_occurringTermsForTarget.get(comparedTerm).hits));
         }
-        return coOccurringTermsForSelectedTerm;
+        return coTerms;
 
     }
 
-    private List<Co_occurringTerm> resultsForOneGoTerm(Co_occurringTermsForSelectedTerm coOccurringTermsForSelectedTerm) {
+    private List<Co_occurringTerm> resultsForOneGoTerm(
+            Co_occurringTermsForSelectedTerm coOccurringTermsForSelectedTerm) {
 
         List<Co_occurringTerm> results = new ArrayList<>();
 
