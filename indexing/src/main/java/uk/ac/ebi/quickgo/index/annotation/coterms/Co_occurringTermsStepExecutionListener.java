@@ -16,11 +16,17 @@ public class Co_occurringTermsStepExecutionListener implements StepExecutionList
 
     private final AnnotationCo_occurringTermsAggregator all;
     private final AnnotationCo_occurringTermsAggregator manual;
+    private final Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual;
+    private final Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll;
 
     public Co_occurringTermsStepExecutionListener(AnnotationCo_occurringTermsAggregator all,
-            AnnotationCo_occurringTermsAggregator manual) {
+            AnnotationCo_occurringTermsAggregator manual,
+            Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual,
+            Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll) {
         this.all = all;
         this.manual = manual;
+        this.co_occurringTermsStatsCalculatorManual = co_occurringTermsStatsCalculatorManual;
+        this.co_occurringTermsStatsCalculatorAll = co_occurringTermsStatsCalculatorAll;
     }
 
     @Override
@@ -30,6 +36,7 @@ public class Co_occurringTermsStepExecutionListener implements StepExecutionList
 
     /**
      * Call finish() on the aggregation instances, so the last accumulating buckets can be processed.
+     * Call initialize on calculators so they have the data ready to calculate.
      * @param stepExecution
      * @return 'COMPLETED' once the aggregation code has finished processing.
      */
@@ -37,6 +44,8 @@ public class Co_occurringTermsStepExecutionListener implements StepExecutionList
     public ExitStatus afterStep(StepExecution stepExecution) {
         all.finish();
         manual.finish();
+        co_occurringTermsStatsCalculatorManual.initialize();
+        co_occurringTermsStatsCalculatorAll.initialize();
         return ExitStatus.COMPLETED;
     }
 }
