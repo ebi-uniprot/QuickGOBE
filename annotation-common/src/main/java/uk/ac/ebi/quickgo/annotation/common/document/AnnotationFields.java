@@ -17,7 +17,7 @@ public class AnnotationFields {
     // fields from annotations's schema.xml
     public final static String ASSIGNED_BY = "assignedBy";
     public final static String QUALIFIER = "qualifier";
-    public static final String DB_OBJECT_SYMBOL = "dbObjectSymbol";
+    public static final String SYMBOL = "symbol";
     public static final String DB_SUBSET = "dbSubset";
     public final static String EVIDENCE_CODE = "evidenceCode";
     public final static String EXTENSION = "extension";
@@ -34,6 +34,7 @@ public class AnnotationFields {
     public final static String WITH_FROM = "withFrom";
     public final static String REFERENCE_SEARCH = "referenceSearch";
     public final static String WITH_FROM_SEARCH = "withFromSearch";
+    public final static String GO_ASPECT = "goAspect";
 
     /**
      * Annotation fields that are stored, and can therefore be retrieved.
@@ -70,6 +71,7 @@ public class AnnotationFields {
         public static final String TARGET_SET = storeAndGet(VALUES, AnnotationFields.TARGET_SET);
         public static final String TAXON_ID = storeAndGet(VALUES, AnnotationFields.TAXON_ID);
         public static final String WITH_FROM_SEARCH = storeAndGet(VALUES, AnnotationFields.WITH_FROM_SEARCH);
+        public static final String GO_ASPECT = storeAndGet(VALUES, AnnotationFields.GO_ASPECT);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);
