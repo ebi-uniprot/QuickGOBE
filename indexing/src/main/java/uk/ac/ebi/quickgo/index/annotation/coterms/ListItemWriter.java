@@ -50,7 +50,8 @@ class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
         wrapped.update(executionContext);
     }
 
-    @Override public void setHeaderCallback(FlatFileHeaderCallback headerCallback) {
+    @Override
+    public void setHeaderCallback(FlatFileHeaderCallback headerCallback) {
         wrapped.setHeaderCallback(headerCallback);
     }
 }
