@@ -61,22 +61,25 @@ public class Co_occurringTermsConfiguration {
     }
 
     @Bean
-    public Co_occurringTermsStepExecutionListener coTermsStepExecutionListener(
+    public Co_occurringTermsStepExecutionListener coTermsEndOfAggregationListener(
             AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorAll,
-            AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorMan) {
+            AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorMan,
+            Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual,
+            Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll) {
         return new Co_occurringTermsStepExecutionListener(annotationCo_occurringTermsAggregatorAll,
-                annotationCo_occurringTermsAggregatorMan);
+                annotationCo_occurringTermsAggregatorMan, co_occurringTermsStatsCalculatorManual,
+                co_occurringTermsStatsCalculatorAll);
 
     }
 
     @Bean
-    public static ItemProcessor<String, List<Co_occurringTerm>> coOccurringTermsStatsCalculatorManual(
+    public Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual(
             AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorMan) {
         return new Co_occurringTermsStatsCalculator(annotationCo_occurringTermsAggregatorMan);
     }
 
     @Bean
-    public static ItemProcessor<String, List<Co_occurringTerm>> coOccurringTermsStatsCalculatorAll(
+    public Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll(
             AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorAll) {
         return new Co_occurringTermsStatsCalculator(annotationCo_occurringTermsAggregatorAll);
     }
