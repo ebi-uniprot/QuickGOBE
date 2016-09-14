@@ -87,10 +87,10 @@ public class AnnotationConfig {
     ItemProcessor<Annotation, Annotation> co_occurringGoTermsFromAnnotationsAll;
 
     @Autowired
-    ItemProcessor<String, List<Co_occurringTerm>> coOccurringTermsStatsCalculatorManual;
+    ItemProcessor<String, List<Co_occurringTerm>> co_occurringTermsStatsCalculatorManual;
 
     @Autowired
-    ItemProcessor<String, List<Co_occurringTerm>> coOccurringTermsStatsCalculatorAll;
+    ItemProcessor<String, List<Co_occurringTerm>> co_occurringTermsStatsCalculatorAll;
 
     @Autowired
     ItemReader<String> coStatsManualItemReader;
@@ -149,7 +149,7 @@ public class AnnotationConfig {
         return stepBuilders.get(COSTATS_MANUAL_COMPLETION_STEP_NAME)
                 .<String, List<Co_occurringTerm>>chunk(cotermsChunk)
                 .reader(coStatsManualItemReader)
-                .processor(coOccurringTermsStatsCalculatorManual)
+                .processor(co_occurringTermsStatsCalculatorManual)
                 .writer(coStatManualFlatFileWriter)
                 .listener(logStepListener())
                 .build();
@@ -160,7 +160,7 @@ public class AnnotationConfig {
         return stepBuilders.get(COSTATS_ALL_COMPLETION_STEP_NAME)
                 .<String, List<Co_occurringTerm>>chunk(cotermsChunk)
                 .reader(coStatsAllItemReader)
-                .processor(coOccurringTermsStatsCalculatorAll)
+                .processor(co_occurringTermsStatsCalculatorAll)
                 .writer(coStatsAllFlatFileWriter)
                 .listener(logStepListener())
                 .listener(skipLogListener())
