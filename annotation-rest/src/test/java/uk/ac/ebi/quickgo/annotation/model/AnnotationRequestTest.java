@@ -129,7 +129,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetUsageIds() {
+    public void setAndGetGoIds() {
         String usageIds = "GO:0000001,GO:0000002";
 
         annotationRequest.setGoId(usageIds);
@@ -147,7 +147,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void createsFilterWithCaseInsensitiveUsageAndUsageIds() {
+    public void createsFilterWithCaseInsensitiveUsageAndGoIds() {
         String usage = "descEndants";
         String goId = "GO:0000001";
 
@@ -164,7 +164,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void createsFilterWithCaseInsensitiveUsageAndUsageIdsAndUsageRelationships() {
+    public void createsFilterWithCaseInsensitiveUsageAndGoIdsAndUsageRelationships() {
         String usage = "deSCendants";
         String goId = "GO:0000001";
         String relationships = "is_A";
