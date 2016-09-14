@@ -78,4 +78,13 @@ public class PresetsRetrievalIT {
                 .andExpect(jsonPath("$.withFrom").exists())
                 .andExpect(jsonPath("$.withFrom.presets.*", hasSize(greaterThan(0))));
     }
+
+    @Test
+    public void canRetrieveGeneProductPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.geneProducts").exists())
+                .andExpect(jsonPath("$.geneProducts.presets.*", hasSize(greaterThan(0))));
+    }
 }

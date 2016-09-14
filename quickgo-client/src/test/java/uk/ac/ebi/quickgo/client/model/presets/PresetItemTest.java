@@ -15,20 +15,27 @@ public class PresetItemTest {
     private final static String VALID_NAME = "valid name";
     private final static String VALID_DESCRIPTION = "valid description";
     private final static Integer VALID_RELEVANCY = 0;
+    private final static String VALID_URL = "http://validurl.validity";
 
     @Test(expected = IllegalArgumentException.class)
     public void nullNameCausesException() {
-        new PresetItem(VALID_ID, null, VALID_DESCRIPTION, VALID_RELEVANCY);
+        new PresetItem(VALID_ID, null, VALID_DESCRIPTION, VALID_URL, VALID_RELEVANCY);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullDescriptionCausesException() {
-        new PresetItem(VALID_ID, VALID_NAME, null, VALID_RELEVANCY);
+        new PresetItem(VALID_ID, VALID_NAME, null, VALID_URL, VALID_RELEVANCY);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullRelevancyCausesException() {
-        new PresetItem(VALID_ID, VALID_NAME, VALID_DESCRIPTION, null);
+        new PresetItem(VALID_ID, VALID_NAME, VALID_DESCRIPTION, VALID_URL, null);
+    }
+
+    @Test
+    public void canCreateWithNullURL() {
+        PresetItem presetItem = new PresetItem(VALID_ID, VALID_NAME, VALID_DESCRIPTION, null, VALID_RELEVANCY);
+        assertThat(presetItem, is(notNullValue()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -43,15 +50,13 @@ public class PresetItemTest {
 
     @Test
     public void canCreateValidPreset() {
-        PresetItem presetItem = new PresetItem(VALID_ID, VALID_NAME, VALID_DESCRIPTION, VALID_RELEVANCY);
+        PresetItem presetItem = new PresetItem(VALID_ID, VALID_NAME, VALID_DESCRIPTION, VALID_URL, VALID_RELEVANCY);
         assertThat(presetItem, is(notNullValue()));
     }
 
     @Test
     public void canCreateWithNullId() {
-        PresetItem presetItem = new PresetItem(null, VALID_NAME, VALID_DESCRIPTION, VALID_RELEVANCY);
+        PresetItem presetItem = new PresetItem(null, VALID_NAME, VALID_DESCRIPTION, VALID_URL, VALID_RELEVANCY);
         assertThat(presetItem, is(notNullValue()));
     }
-
-
 }

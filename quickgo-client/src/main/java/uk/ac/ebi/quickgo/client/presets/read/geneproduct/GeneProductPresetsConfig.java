@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.client.presets.read.evidence;
+package uk.ac.ebi.quickgo.client.presets.read.geneproduct;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
@@ -9,7 +9,6 @@ import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.presets.read.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.presets.read.ff.StringToRawNamedPresetMapper;
 
-import java.util.Set;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -25,37 +24,33 @@ import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.rawPresetMultiFileReader;
-import static uk.ac.ebi.quickgo.client.presets.read.ff.SourceColumnsFactory.Source.ECO2GO_COLUMNS;
+import static uk.ac.ebi.quickgo.client.presets.read.ff.SourceColumnsFactory.Source.GENE_PRODUCT_COLUMNS;
 
 /**
- * Exposes the {@link Step} bean that is used to read and populate information relating to the evidence preset data.
+ * Exposes the {@link Step} bean that is used to read and populate information relating to the with/from preset data.
  *
  * Created 01/09/16
  * @author Edd
  */
 @Configuration
 @Import({PresetsCommonConfig.class})
-public class EvidencePresetsConfig {
-    public static final String EVIDENCE_LOADING_STEP_NAME = "EvidenceReadingStep";
-    private static final String EVIDENCE_DEFAULTS = "DOI,GO_REF,PMID,REACTOME";
-    private static final RawNamedPreset INVALID_PRESET = null;
+public class GeneProductPresetsConfig {
+    public static final String GENE_PRODUCT_LOADING_STEP_NAME = "GeneProductReadingStep";
 
-    @Value("#{'${evidence.preset.source:}'.split(',')}")
+    @Value("#{'${geneproduct.preset.source:}'.split(',')}")
     private Resource[] resources;
-    @Value("${evidence.preset.header.lines:1}")
+    @Value("${geneproduct.preset.header.lines:1}")
     private int headerLines;
-    @Value("#{'${evidence.preset.defaults:" + EVIDENCE_DEFAULTS + "}'.split(',')}")
-    private Set<String> defaults;
 
     @Bean
-    public Step evidenceStep(
+    public Step geneProductStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePreset presets) {
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(headerLines);
 
-        return stepBuilderFactory.get(EVIDENCE_LOADING_STEP_NAME)
+        return stepBuilderFactory.get(GENE_PRODUCT_LOADING_STEP_NAME)
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
@@ -63,7 +58,7 @@ public class EvidencePresetsConfig {
                 .processor(compositeItemProcessor(
                         rawPresetValidator()))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
-                    presets.evidences.addPreset(
+                    presets.geneProducts.addPreset(
                             new PresetItem(rawItem.id, rawItem.name, rawItem.description,
                                     rawItem.url, rawItem.relevancy));
                 }))
@@ -72,7 +67,7 @@ public class EvidencePresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(ECO2GO_COLUMNS));
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(GENE_PRODUCT_COLUMNS));
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {

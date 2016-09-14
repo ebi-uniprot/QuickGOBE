@@ -68,7 +68,8 @@ public class AssignedByPresetsConfig {
                 .writer(rawItemList -> {
                     rawItemList.forEach(rawItem -> {
                         presets.assignedBy.addPreset(
-                                new PresetItem(rawItem.id, rawItem.name, rawItem.description, rawItem.relevancy));
+                                new PresetItem(rawItem.id, rawItem.name, rawItem.description,
+                                        rawItem.url, rawItem.relevancy));
                     });
                 })
                 .listener(new LogStepListener())

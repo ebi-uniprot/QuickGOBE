@@ -11,12 +11,14 @@ public class CompositePreset {
     public final PresetItemsImpl references;
     public final PresetItemsImpl evidences;
     public final PresetItemsImpl withFrom;
+    public final PresetItemsImpl geneProducts;
 
     public CompositePreset() {
         assignedBy = new PresetItemsImpl();
         references = new PresetItemsImpl();
         evidences = new PresetItemsImpl();
         withFrom = new PresetItemsImpl();
+        geneProducts = new PresetItemsImpl();
     }
 
     @Override public String toString() {
@@ -25,6 +27,7 @@ public class CompositePreset {
                 ", references=" + references +
                 ", evidences=" + evidences +
                 ", withFrom=" + withFrom +
+                ", geneProducts=" + geneProducts +
                 '}';
     }
 }

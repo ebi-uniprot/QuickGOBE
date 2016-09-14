@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.client.presets.read;
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.evidence.EvidencePresetsConfig;
+import uk.ac.ebi.quickgo.client.presets.read.geneproduct.GeneProductPresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.reference.ReferencePresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.withFrom.WithFromPresetsConfig;
 import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
@@ -29,7 +30,8 @@ import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.logJobLi
         AssignedByPresetsConfig.class,
         ReferencePresetsConfig.class,
         EvidencePresetsConfig.class,
-        WithFromPresetsConfig.class})
+        WithFromPresetsConfig.class,
+        GeneProductPresetsConfig.class})
 public class PresetsConfig {
 
     private static final String PRESET_LOADING_JOB_NAME = "PresetReadingJob";
@@ -43,13 +45,15 @@ public class PresetsConfig {
             Step referenceGenericDbStep,
             Step referenceSpecificDbStep,
             Step evidenceStep,
-            Step withFromDbStep) {
+            Step withFromDbStep,
+            Step geneProductStep) {
         return jobBuilderFactory.get(PRESET_LOADING_JOB_NAME)
                 .start(assignedByStep)
                 .next(referenceGenericDbStep)
                 .next(referenceSpecificDbStep)
                 .next(evidenceStep)
                 .next(withFromDbStep)
+                .next(geneProductStep)
                 .listener(logJobListener())
                 .build();
     }

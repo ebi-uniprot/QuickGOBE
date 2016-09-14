@@ -18,6 +18,7 @@ class RawNamedPresetColumnsBuilder {
     private int namePosition;
     private int descriptionPosition;
     private int relevancyPosition;
+    private int urlPosition;
 
     private RawNamedPresetColumnsBuilder(int namePosition) {
         checkPosition(namePosition);
@@ -26,6 +27,7 @@ class RawNamedPresetColumnsBuilder {
         this.idPosition = UNINITIALIZED_POSITION;
         this.descriptionPosition = UNINITIALIZED_POSITION;
         this.relevancyPosition = UNINITIALIZED_POSITION;
+        this.urlPosition = UNINITIALIZED_POSITION;
     }
 
     public RawNamedPresetColumns build() {
@@ -54,6 +56,12 @@ class RawNamedPresetColumnsBuilder {
         return this;
     }
 
+    RawNamedPresetColumnsBuilder withURLPosition(int urlPosition) {
+        checkPosition(urlPosition);
+        this.urlPosition = urlPosition;
+        return this;
+    }
+
     private void checkPosition(int namePosition) {
         checkArgument(namePosition >= 0, "Name position must be greater than or equal to 0");
     }
@@ -62,17 +70,19 @@ class RawNamedPresetColumnsBuilder {
         static final int MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED = -1;
         private static final int DEFAULT_COLUMN_POSITION_NOT_INITIALIZED = 0;
         private int maxRequiredColumnPosition = MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED;
-
         private int idPosition;
+
         private int namePosition;
         private int descriptionPosition;
         private int relevancyPosition;
+        private final int urlPosition;
 
         private RawNamedPresetColumnsImpl(RawNamedPresetColumnsBuilder builder) {
             this.idPosition = builder.idPosition;
             this.namePosition = builder.namePosition;
             this.descriptionPosition = builder.descriptionPosition;
             this.relevancyPosition = builder.relevancyPosition;
+            this.urlPosition = builder.urlPosition;
         }
 
         @Override public int getIdPosition() {
@@ -89,6 +99,10 @@ class RawNamedPresetColumnsBuilder {
 
         @Override public int getRelevancyPosition() {
             return relevancyPosition;
+        }
+
+        @Override public int getURLPosition() {
+            return urlPosition;
         }
 
         @Override public int getMaxRequiredColumnCount() {

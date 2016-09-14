@@ -36,6 +36,13 @@ public class RawNamedPresetColumnsBuilderTest {
                 .withIdPosition(-1);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void creatingWithNegativeURLPositionCausesException() {
+        RawNamedPresetColumnsBuilder
+                .createWithNamePosition(0)
+                .withURLPosition(-1);
+    }
+
     @Test
     public void canCreateWithValidNamePosition() {
         int position = 0;
@@ -71,5 +78,15 @@ public class RawNamedPresetColumnsBuilderTest {
                 .withIdPosition(position)
                 .build();
         assertThat(presetColumns.getIdPosition(), is(position));
+    }
+
+    @Test
+    public void canCreateWithValidURLPosition() {
+        int position = 0;
+        RawNamedPresetColumns presetColumns = RawNamedPresetColumnsBuilder
+                .createWithNamePosition(0)
+                .withURLPosition(position)
+                .build();
+        assertThat(presetColumns.getURLPosition(), is(position));
     }
 }

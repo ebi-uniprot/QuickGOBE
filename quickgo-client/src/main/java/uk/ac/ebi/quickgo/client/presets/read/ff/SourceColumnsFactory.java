@@ -23,6 +23,12 @@ public class SourceColumnsFactory {
                         .withDescriptionPosition(1)
                         .withRelevancyPosition(3)
                         .build();
+            case GENE_PRODUCT_COLUMNS:
+                return RawNamedPresetColumnsBuilder
+                        .createWithNamePosition(0)
+                        .withDescriptionPosition(1)
+                        .withURLPosition(3)
+                        .build();
             default:
                 throw new IllegalStateException("Source type: " + source + " is not handled.");
         }
@@ -30,6 +36,7 @@ public class SourceColumnsFactory {
 
     public enum Source {
         DB_COLUMNS,
-        ECO2GO_COLUMNS
+        ECO2GO_COLUMNS,
+        GENE_PRODUCT_COLUMNS
     }
 }

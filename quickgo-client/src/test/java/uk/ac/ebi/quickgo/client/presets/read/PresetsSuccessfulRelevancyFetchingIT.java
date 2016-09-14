@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.evidence.EvidencePresetsConfig;
+import uk.ac.ebi.quickgo.client.presets.read.geneproduct.GeneProductPresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.reference.ReferencePresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.withFrom.WithFromPresetsConfig;
 
@@ -125,5 +126,24 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(lastPresetItem.getId(), is(PRESET_DICTY_BASE.getId()));
         assertThat(lastPresetItem.getDescription(), is(PRESET_DICTY_BASE.getDescription()));
         assertThat(lastPresetItem.getRelevancy(), is(PRESET_DICTY_BASE.getRelevancy()));
+    }
+
+    @Test
+    public void loadGeneProductPresets() throws Exception {
+        assertThat(preset.geneProducts.getPresets(), hasSize(0));
+
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(GeneProductPresetsConfig.GENE_PRODUCT_LOADING_STEP_NAME);
+        BatchStatus status = jobExecution.getStatus();
+
+        assertThat(status, is(BatchStatus.COMPLETED));
+        assertThat(preset.geneProducts.getPresets(), hasSize(5));
+
+        PresetItem firstPresetItem =
+                preset.geneProducts.getPresets().stream().findFirst().orElse(null);
+        assertThat(firstPresetItem.getName(), is(PRESET_BHF_UCL.getName()));
+        assertThat(firstPresetItem.getId(), is(PRESET_BHF_UCL.getId()));
+        assertThat(firstPresetItem.getDescription(), is(PRESET_BHF_UCL.getDescription()));
+        assertThat(firstPresetItem.getRelevancy(), is(PRESET_BHF_UCL.getRelevancy()));
     }
 }

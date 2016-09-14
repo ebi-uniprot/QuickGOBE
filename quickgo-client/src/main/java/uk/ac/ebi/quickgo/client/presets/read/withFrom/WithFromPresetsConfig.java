@@ -72,7 +72,8 @@ public class WithFromPresetsConfig {
                         setPresetRelevancy(defaults)))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
                     presets.withFrom.addPreset(
-                            new PresetItem(rawItem.id, rawItem.name, rawItem.description, rawItem.relevancy));
+                            new PresetItem(rawItem.id, rawItem.name, rawItem.description,
+                                    rawItem.url, rawItem.relevancy));
                 }))
                 .listener(new LogStepListener())
                 .build();

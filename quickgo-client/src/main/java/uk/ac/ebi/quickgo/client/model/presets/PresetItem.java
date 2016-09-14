@@ -16,23 +16,26 @@ public class PresetItem {
     private final String description;
     private final Integer relevancy;
     private final String id;
+    private final String url;
 
-    public PresetItem(String id, String name, String description, Integer relevancy) {
+    public PresetItem(String id, String name, String description, String url, Integer relevancy) {
         checkArgument(id == null || !id.isEmpty(), "Preset id cannot be empty");
         checkArgument(name != null && !name.isEmpty(), "Preset name cannot be null or empty");
         checkArgument(
                 description != null && !description.isEmpty(),
                 "Preset description cannot be null or empty");
+        checkArgument(url == null || !url.isEmpty(), "Preset url cannot be empty");
         checkArgument(relevancy != null, "Integer relevancy cannot be null");
 
         this.id = id;
         this.name = name;
         this.description = description;
         this.relevancy = relevancy;
+        this.url = url;
     }
 
     public PresetItem(String name, String description) {
-        this(null, name, description, EQUAL_RELEVANCY);
+        this(null, name, description, null, EQUAL_RELEVANCY);
     }
 
     public String getId() {
@@ -52,12 +55,17 @@ public class PresetItem {
         return relevancy;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
     @Override public String toString() {
         return "PresetItem{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", relevancy=" + relevancy +
                 ", id='" + id + '\'' +
+                ", url='" + url + '\'' +
                 '}';
     }
 }

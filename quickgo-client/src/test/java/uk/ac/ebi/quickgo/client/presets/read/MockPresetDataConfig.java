@@ -28,8 +28,6 @@ import static org.mockito.Mockito.when;
  */
 @Configuration
 public class MockPresetDataConfig {
-    private static final AssignedByRelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
-
     static final String DOI = "DOI";
     static final String ENSEMBL = "ENSEMBL";
     static final String REACTOME = "REACTOME";
@@ -40,10 +38,16 @@ public class MockPresetDataConfig {
                     "GO_REF:0000002",
                     "GO_REF:0000104"
             ).collect(Collectors.toList());
-
     static final String UNIPROT_KB = "UniProtKB";
     static final String SUCCESSFUL_FETCHING = "successfulFetching";
     static final String FAILED_FETCHING = "failedFetching";
+    /*
+     * Preset items information representing the most relevant, ECO:0000352 term.
+     */
+    static final PresetItem PRESET_ECO_32;
+    static final PresetItem PRESET_DICTY_BASE;
+    static final PresetItem PRESET_BHF_UCL;
+    private static final AssignedByRelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
 
     static {
         DEFAULT_RELEVANT_ASSIGNED_BYS = new AssignedByRelevancyResponseType();
@@ -53,6 +57,12 @@ public class MockPresetDataConfig {
         DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add("1000");
         DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add(ENSEMBL);
         DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add("100");
+
+        PRESET_ECO_32 = new PresetItem("ECO:0000352", "All manual codes", "evidence used in manual assertion", null, 1);
+        PRESET_BHF_UCL = new PresetItem(null, "BHF-UCL", "The set of Cardiovascular-associated proteins being " +
+                "prioritised for annotation by the Cardiovascular Gene Ontology Annotation Initiative located at " +
+                "University College London", "http://www.ucl.ac.uk/cardiovasculargeneontology", 0);
+        PRESET_DICTY_BASE = new PresetItem(null, "dictyBase", "dictyBase", null, 62);
     }
 
     @Bean @Profile(SUCCESSFUL_FETCHING)
@@ -80,16 +90,5 @@ public class MockPresetDataConfig {
                         isA(Class.class),
                         any(HashMap.class));
         return mockRestOperations;
-    }
-
-    /*
-     * Preset items information representing the most relevant, ECO:0000352 term.
-     */
-    static final PresetItem PRESET_ECO_32;
-    static final PresetItem PRESET_DICTY_BASE;
-
-    static {
-        PRESET_ECO_32 = new PresetItem("ECO:0000352", "All manual codes", "evidence used in manual assertion", 1);
-        PRESET_DICTY_BASE = new PresetItem(null, "dictyBase", "dictyBase", 62);
     }
 }
