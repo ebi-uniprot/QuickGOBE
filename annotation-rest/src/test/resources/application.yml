@@ -4,19 +4,19 @@
 search:
   external:
     filterConfigs:
-      - signature: usageIds,usageRelationships,descendants
+      - signature: goId,usageRelationships,descendants
         execution: REST_COMM
         properties: {
           ip: localhost,
-          resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
+          resourceFormat: "/QuickGO/services/go/terms/{goId}/descendants?relations={usageRelationships}",
           responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }
-      - signature: usageIds,usageRelationships,slim
+      - signature: goId,usageRelationships,slim
         execution: REST_COMM
         properties: {
           ip: localhost,
-          resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
+          resourceFormat: "/QuickGO/services/go/terms/{goId}/descendants?relations={usageRelationships}",
           responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
         }

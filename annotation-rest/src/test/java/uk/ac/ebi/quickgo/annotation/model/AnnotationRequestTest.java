@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_IDS;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
 /**
@@ -129,12 +129,12 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetUsageIds() {
+    public void setAndGetGoIds() {
         String usageIds = "GO:0000001,GO:0000002";
 
-        annotationRequest.setUsageIds(usageIds);
+        annotationRequest.setGoId(usageIds);
 
-        assertThat(annotationRequest.getUsageIds(), is(usageIds.toUpperCase()));
+        assertThat(annotationRequest.getGoId(), is(usageIds.toUpperCase()));
     }
 
     @Test
@@ -147,16 +147,16 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void createsFilterWithCaseInsensitiveUsageAndUsageIds() {
+    public void createsFilterWithCaseInsensitiveUsageAndGoIds() {
         String usage = "descEndants";
-        String usageId = "GO:0000001";
+        String goId = "GO:0000001";
 
         annotationRequest.setUsage(usage);
-        annotationRequest.setUsageIds(usageId);
+        annotationRequest.setGoId(goId);
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(usage.toLowerCase())
-                .addProperty(USAGE_IDS, usageId.toUpperCase())
+                .addProperty(GO_ID, goId.toUpperCase())
                 .addProperty(USAGE_RELATIONSHIPS)
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
@@ -164,19 +164,19 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void createsFilterWithCaseInsensitiveUsageAndUsageIdsAndUsageRelationships() {
+    public void createsFilterWithCaseInsensitiveUsageAndGoIdsAndUsageRelationships() {
         String usage = "deSCendants";
-        String usageId = "GO:0000001";
+        String goId = "GO:0000001";
         String relationships = "is_A";
 
         annotationRequest.setUsage(usage);
-        annotationRequest.setUsageIds(usageId);
+        annotationRequest.setGoId(goId);
         annotationRequest.setUsageRelationships(relationships);
 
         assertThat(annotationRequest.createFilterRequests(),
                 contains(FilterRequest.newBuilder()
                         .addProperty(usage.toLowerCase())
-                        .addProperty(USAGE_IDS, usageId.toUpperCase())
+                        .addProperty(GO_ID, goId.toUpperCase())
                         .addProperty(USAGE_RELATIONSHIPS, relationships.toLowerCase())
                         .build()));
     }
