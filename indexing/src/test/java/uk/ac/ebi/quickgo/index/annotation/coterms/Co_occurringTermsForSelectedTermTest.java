@@ -8,9 +8,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
+import static org.mockito.Mockito.when;
 /**
  * @author Tony Wardell
  * Date: 09/09/2016
@@ -49,6 +51,42 @@ public class Co_occurringTermsForSelectedTermTest {
         }
         assertThat(itCounter, equalTo(4));
     }
+
+
+    @Test
+    public void testHighestSimilaritySortingWorks(){
+
+        String target = "GO:00003824";
+        float totalNumberGeneProducts = 10;
+        long selected = 2;  //Total count of proteins annotated to selected term
+
+        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
+                totalNumberGeneProducts, selected);
+
+        Co_occurringTerm mock1 = mock(Co_occurringTerm.class, "One");
+        Co_occurringTerm mock2 = mock(Co_occurringTerm.class, "Two");
+        Co_occurringTerm mock3 = mock(Co_occurringTerm.class, "Three");
+        Co_occurringTerm mock4 = mock(Co_occurringTerm.class, "Four");
+
+        cootfst.addAndCalculate(mock1);
+        cootfst.addAndCalculate(mock2);
+        cootfst.addAndCalculate(mock3);
+        cootfst.addAndCalculate(mock4);
+
+        when(mock1.getSimilarityRatio()).thenReturn(3f);
+        when(mock2.getSimilarityRatio()).thenReturn(2f);
+        when(mock3.getSimilarityRatio()).thenReturn(5f);
+        when(mock4.getSimilarityRatio()).thenReturn(1f);
+
+        Iterator<Co_occurringTerm> it = cootfst.highestSimilarity();
+
+        assertThat(it.next().getSimilarityRatio(), is(5f));
+        assertThat(it.next().getSimilarityRatio(), is(3f));
+        assertThat(it.next().getSimilarityRatio(), is(2f));
+        assertThat(it.next().getSimilarityRatio(), is(1f));
+    }
+
+
 
     @Test(expected=IllegalArgumentException.class)
     public void passingNullToAddAndCalculateCausesException(){
