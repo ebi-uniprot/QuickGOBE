@@ -81,10 +81,10 @@ public class AnnotationConfig {
     private StepBuilderFactory stepBuilders;
 
     @Autowired
-    ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsManual;
+    ItemProcessor<Annotation, Annotation> co_occurringGoTermsFromAnnotationsManual;
 
     @Autowired
-    ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsAll;
+    ItemProcessor<Annotation, Annotation> co_occurringGoTermsFromAnnotationsAll;
 
     @Autowired
     ItemProcessor<String, List<Co_occurringTerm>> coOccurringTermsStatsCalculatorManual;
@@ -234,8 +234,8 @@ public class AnnotationConfig {
     ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor() {
         List<ItemProcessor<Annotation, ?>> processors = new ArrayList<>();
         processors.add(annotationValidator());
-        processors.add(coOccuringGoTermsFromAnnotationsManual);
-        processors.add(coOccuringGoTermsFromAnnotationsAll);
+        processors.add(co_occurringGoTermsFromAnnotationsManual);
+        processors.add(co_occurringGoTermsFromAnnotationsAll);
         processors.add(annotationDocConverter());
 
         CompositeItemProcessor<Annotation, AnnotationDocument> compositeProcessor = new CompositeItemProcessor<>();
