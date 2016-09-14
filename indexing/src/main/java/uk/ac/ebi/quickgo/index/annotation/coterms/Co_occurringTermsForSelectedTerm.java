@@ -24,7 +24,7 @@ public class Co_occurringTermsForSelectedTerm {
     private final float totalNumberGeneProducts;
     private final long selected;
 
-    private final List<Co_occurringTerm> statsTerms = new ArrayList<>();
+    private final List<Co_occurringTerm> co_occurringTerms = new ArrayList<>();
 
     /**
      * Create an instance of this class, initializing it the target term (against which all compared terms will be
@@ -54,7 +54,7 @@ public class Co_occurringTermsForSelectedTerm {
                 "passed a CoOccurringTerm which was null");
         coOccurringTerm.calculateProbabilityRatio(this.selected, this.totalNumberGeneProducts);
         coOccurringTerm.calculateProbabilitySimilarityRatio(this.selected);
-        statsTerms.add(coOccurringTerm);
+        co_occurringTerms.add(coOccurringTerm);
     }
 
     /**
@@ -70,11 +70,11 @@ public class Co_occurringTermsForSelectedTerm {
      */
     public Iterator<Co_occurringTerm> highestSimilarity() {
 
-        statsTerms.sort(new SignificanceSorter());
+        co_occurringTerms.sort(new SignificanceSorter());
 
         return new Iterator<Co_occurringTerm>() {
 
-            final Iterator<Co_occurringTerm> navIterator = statsTerms.iterator();
+            final Iterator<Co_occurringTerm> navIterator = co_occurringTerms.iterator();
 
             @Override
             public boolean hasNext() {
