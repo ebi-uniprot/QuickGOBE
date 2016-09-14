@@ -21,11 +21,11 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
  */
 public class AnnotationCoOccurringTermsAggregatorTest {
 
-    AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
+    AnnotationCo_occurringTermsAggregator aggregator;
 
     @Before
     public void setup(){
-        annotationCoOccurringTermsAggregator = new AnnotationCo_occurringTermsAggregator();
+        aggregator = new AnnotationCo_occurringTermsAggregator();
     }
 
 	@Test
@@ -35,11 +35,11 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         Annotation annotation2 = AnnotationMocker.createValidAnnotation();
 
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(annotationCoOccurringTermsAggregator::addRowToMatrix);
-        annotationCoOccurringTermsAggregator.finish();
+        annotations.forEach(aggregator::addRowToMatrix);
+        aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = annotationCoOccurringTermsAggregator.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = aggregator.getTermToTermOverlapMatrix();
 
         assertThat(matrix.keySet(), hasSize(1));
 
@@ -50,6 +50,11 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         //Is the only one
         HitCount hc = costats.get("GO:0000977");
         assertThat(hc.hits, is(1l));
+
+        assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1l));
+        assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(1));
+        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).hits, is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).hits, is(1L));
 
 	}
 
@@ -62,12 +67,12 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         annotation2.dbObjectId = "A0A000";
 
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(annotationCoOccurringTermsAggregator::addRowToMatrix);
+        annotations.forEach(aggregator::addRowToMatrix);
 
-        annotationCoOccurringTermsAggregator.finish();
+        aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = annotationCoOccurringTermsAggregator.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = aggregator.getTermToTermOverlapMatrix();
 
         assertThat(matrix.keySet(), hasSize(2));
 
@@ -81,6 +86,10 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         HitCount hc2 = costats2.get(annotation2.goId);
         assertThat(hc2.hits, is(1l));
 
+        assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(2l));
+        assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(2));
+        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).hits, is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).hits, is(1L));
     }
 
 
@@ -91,11 +100,11 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         Annotation annotation2 = AnnotationMocker.createValidAnnotation();
         annotation2.goId = "GO:0009999";
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(annotationCoOccurringTermsAggregator::addRowToMatrix);
-        annotationCoOccurringTermsAggregator.finish();
+        annotations.forEach(aggregator::addRowToMatrix);
+        aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = annotationCoOccurringTermsAggregator.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = aggregator.getTermToTermOverlapMatrix();
 
         assertThat(matrix.keySet(), hasSize(2));
 
@@ -112,6 +121,11 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         assertThat(hc2x1.hits, is(1l));
         HitCount hc2x2 = costats2.get(annotation1.goId);
         assertThat(hc2x2.hits, is(1l));
+
+        assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1l));
+        assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(2));
+        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).hits, is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).hits, is(1L));
     }
 
 
