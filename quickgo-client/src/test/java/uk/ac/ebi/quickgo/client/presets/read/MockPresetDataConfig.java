@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.client.presets.read;
 
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByRelevancyResponseType;
 
 import java.util.ArrayList;
@@ -82,12 +83,13 @@ public class MockPresetDataConfig {
     }
 
     /*
-     * Evidence preset item information representing the most relevant, ECO:0000352 term.
+     * Preset items information representing the most relevant, ECO:0000352 term.
      */
-    static class PresetECO_352 {
-        static final String name = "All manual codes";
-        static final String id = "ECO:0000352";
-        static final String description = "evidence used in manual assertion";
-        static final int relevancy = 1;
+    static final PresetItem PRESET_ECO_32;
+    static final PresetItem PRESET_DICTY_BASE;
+
+    static {
+        PRESET_ECO_32 = new PresetItem("ECO:0000352", "All manual codes", "evidence used in manual assertion", 1);
+        PRESET_DICTY_BASE = new PresetItem(null, "dictyBase", "dictyBase", 62);
     }
 }

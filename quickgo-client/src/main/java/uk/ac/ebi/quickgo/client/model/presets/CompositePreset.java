@@ -10,16 +10,21 @@ public class CompositePreset {
     public final PresetItemsImpl assignedBy;
     public final PresetItemsImpl references;
     public final PresetItemsImpl evidences;
+    public final PresetItemsImpl withFrom;
 
     public CompositePreset() {
         assignedBy = new PresetItemsImpl();
         references = new PresetItemsImpl();
         evidences = new PresetItemsImpl();
+        withFrom = new PresetItemsImpl();
     }
 
     @Override public String toString() {
         return "CompositePreset{" +
                 "assignedBy=" + assignedBy +
+                ", references=" + references +
+                ", evidences=" + evidences +
+                ", withFrom=" + withFrom +
                 '}';
     }
 }

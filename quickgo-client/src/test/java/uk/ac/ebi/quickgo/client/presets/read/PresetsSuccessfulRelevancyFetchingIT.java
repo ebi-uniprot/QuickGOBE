@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.evidence.EvidencePresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.reference.ReferencePresetsConfig;
+import uk.ac.ebi.quickgo.client.presets.read.withFrom.WithFromPresetsConfig;
 
 import java.util.stream.Collectors;
 import org.junit.Test;
@@ -101,9 +102,28 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(preset.evidences.getPresets(), hasSize(22));
 
         PresetItem firstPresetItem = preset.evidences.getPresets().stream().findFirst().orElse(null);
-        assertThat(firstPresetItem.getName(), is(PresetECO_352.name));
-        assertThat(firstPresetItem.getId(), is(PresetECO_352.id));
-        assertThat(firstPresetItem.getDescription(), is(PresetECO_352.description));
-        assertThat(firstPresetItem.getRelevancy(), is(PresetECO_352.relevancy));
+        assertThat(firstPresetItem.getName(), is(PRESET_ECO_32.getName()));
+        assertThat(firstPresetItem.getId(), is(PRESET_ECO_32.getId()));
+        assertThat(firstPresetItem.getDescription(), is(PRESET_ECO_32.getDescription()));
+        assertThat(firstPresetItem.getRelevancy(), is(PRESET_ECO_32.getRelevancy()));
+    }
+
+    @Test
+    public void loadWithFromPresets() throws Exception {
+        assertThat(preset.withFrom.getPresets(), hasSize(0));
+
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(WithFromPresetsConfig.WITH_FROM_DB_LOADING_STEP_NAME);
+        BatchStatus status = jobExecution.getStatus();
+
+        assertThat(status, is(BatchStatus.COMPLETED));
+        assertThat(preset.withFrom.getPresets(), hasSize(7));
+
+        PresetItem lastPresetItem =
+                preset.withFrom.getPresets().stream().reduce((first, second) -> second).orElse(null);
+        assertThat(lastPresetItem.getName(), is(PRESET_DICTY_BASE.getName()));
+        assertThat(lastPresetItem.getId(), is(PRESET_DICTY_BASE.getId()));
+        assertThat(lastPresetItem.getDescription(), is(PRESET_DICTY_BASE.getDescription()));
+        assertThat(lastPresetItem.getRelevancy(), is(PRESET_DICTY_BASE.getRelevancy()));
     }
 }
