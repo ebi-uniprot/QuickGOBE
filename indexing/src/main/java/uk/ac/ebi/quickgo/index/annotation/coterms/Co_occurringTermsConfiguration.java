@@ -37,58 +37,58 @@ public class Co_occurringTermsConfiguration {
     public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
 
     @Bean
-    AnnotationCo_occurringTermsAggregator annotationCoTermsAggregatorMan() {
+    AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorMan() {
         return new AnnotationCo_occurringTermsAggregator();
     }
 
     @Bean
-    AnnotationCo_occurringTermsAggregator annotationCoTermsAggregatorAll() {
+    AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorAll() {
         return new AnnotationCo_occurringTermsAggregator();
     }
 
     @Bean
-    public ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsManual(
-            AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregatorMan) {
+    public ItemProcessor<Annotation, Annotation> co_occuringGoTermsFromAnnotationsManual(
+            AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorMan) {
         Predicate<Annotation> toBeProcessed = t -> !"IEA".equals(t.evidenceCode);
-        return new Co_occurringGoTermsFromAnnotations(annotationCoOccurringTermsAggregatorMan, toBeProcessed);
+        return new Co_occurringGoTermsFromAnnotations(annotationCo_occurringTermsAggregatorMan, toBeProcessed);
     }
 
     @Bean
-    public ItemProcessor<Annotation, Annotation> coOccuringGoTermsFromAnnotationsAll(
-            AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregatorAll) {
+    public ItemProcessor<Annotation, Annotation> co_occuringGoTermsFromAnnotationsAll(
+            AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorAll) {
         Predicate<Annotation> toBeProcessed = t -> true;
-        return new Co_occurringGoTermsFromAnnotations(annotationCoOccurringTermsAggregatorAll, toBeProcessed);
+        return new Co_occurringGoTermsFromAnnotations(annotationCo_occurringTermsAggregatorAll, toBeProcessed);
     }
 
     @Bean
     public Co_occurringTermsStepExecutionListener coTermsStepExecutionListener(
-            AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregatorAll,
-            AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregatorMan) {
-        return new Co_occurringTermsStepExecutionListener(annotationCoOccurringTermsAggregatorAll,
-                annotationCoOccurringTermsAggregatorMan);
+            AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorAll,
+            AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorMan) {
+        return new Co_occurringTermsStepExecutionListener(annotationCo_occurringTermsAggregatorAll,
+                annotationCo_occurringTermsAggregatorMan);
 
     }
 
     @Bean
     public static ItemProcessor<String, List<Co_occurringTerm>> coOccurringTermsStatsCalculatorManual(
-            AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregatorMan) {
-        return new Co_occurringTermsStatsCalculator(annotationCoOccurringTermsAggregatorMan);
+            AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorMan) {
+        return new Co_occurringTermsStatsCalculator(annotationCo_occurringTermsAggregatorMan);
     }
 
     @Bean
     public static ItemProcessor<String, List<Co_occurringTerm>> coOccurringTermsStatsCalculatorAll(
-            AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregatorAll) {
-        return new Co_occurringTermsStatsCalculator(annotationCoOccurringTermsAggregatorAll);
+            AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorAll) {
+        return new Co_occurringTermsStatsCalculator(annotationCo_occurringTermsAggregatorAll);
     }
 
     @Bean
-    public ItemReader<String> coStatsManualItemReader(AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregatorMan) {
-        return new Co_occurringTermItemReader(annotationCoOccurringTermsAggregatorMan);
+    public ItemReader<String> coStatsManualItemReader(AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorMan) {
+        return new Co_occurringTermItemReader(annotationCo_occurringTermsAggregatorMan);
     }
 
     @Bean
-    public ItemReader<String> coStatsAllItemReader(AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregatorAll) {
-        return new Co_occurringTermItemReader(annotationCoOccurringTermsAggregatorAll);
+    public ItemReader<String> coStatsAllItemReader(AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorAll) {
+        return new Co_occurringTermItemReader(annotationCo_occurringTermsAggregatorAll);
     }
 
     @Bean
