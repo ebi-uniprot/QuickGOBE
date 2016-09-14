@@ -22,26 +22,35 @@ import static org.mockito.Mockito.verify;
 public class Co_occurringGoTermsFromAnnotationsTest {
 
     @Mock
-    AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
+    AnnotationCo_occurringTermsAggregator aggregator;
 
     @Mock
     Annotation annotation;
 
     @Test
-    public void testAnnotationAddedToCoStatsIfPredicateAllows() throws Exception{
+    public void annotationAddedToCoStatsIfPredicateAllows() throws Exception{
         Predicate<Annotation> toBeProcessed = t -> true;
-        Co_occurringGoTermsFromAnnotations coOccurringGoTermsFromAnnotations = new Co_occurringGoTermsFromAnnotations
-                (annotationCoOccurringTermsAggregator, toBeProcessed);
-        coOccurringGoTermsFromAnnotations.process(annotation);
-        verify(annotationCoOccurringTermsAggregator,times(1)).addRowToMatrix(annotation);
+        Co_occurringGoTermsFromAnnotations coTerms = new Co_occurringGoTermsFromAnnotations(aggregator, toBeProcessed);
+        coTerms.process(annotation);
+        verify(aggregator,times(1)).addRowToMatrix(annotation);
     }
 
     @Test
-    public void testAnnotationNotAddedToCoStatsIfPredicateForbids() throws Exception{
+    public void annotationNotAddedToCoStatsIfPredicateForbids() throws Exception{
         Predicate<Annotation> toBeProcessed = t -> false;
-        Co_occurringGoTermsFromAnnotations coOccurringGoTermsFromAnnotations = new Co_occurringGoTermsFromAnnotations
-                (annotationCoOccurringTermsAggregator, toBeProcessed);
-        coOccurringGoTermsFromAnnotations.process(annotation);
-        verify(annotationCoOccurringTermsAggregator,never()).addRowToMatrix(annotation);
+        Co_occurringGoTermsFromAnnotations coTerms = new Co_occurringGoTermsFromAnnotations(aggregator, toBeProcessed);
+        coTerms.process(annotation);
+        verify(aggregator,never()).addRowToMatrix(annotation);
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void exceptionThrownIfNullAggregatorPassedToConstructor(){
+        Predicate<Annotation> toBeProcessed = t -> true;
+        new Co_occurringGoTermsFromAnnotations(null, toBeProcessed);
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void exceptionThrownIfNullPredicatePassedToConstructor(){
+        new Co_occurringGoTermsFromAnnotations(aggregator, null);
     }
 }
