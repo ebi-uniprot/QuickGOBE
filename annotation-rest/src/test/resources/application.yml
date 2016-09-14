@@ -23,5 +23,6 @@ search:
 model:
   repo2domainFieldNameTransformations:
     transformations: {
-      goId_join: goId
+      goId_join: goId,
+      goAspect: aspect
     }
