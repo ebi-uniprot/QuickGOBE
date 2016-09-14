@@ -9,7 +9,6 @@ import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.presets.read.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.presets.read.ff.StringToRawNamedPresetMapper;
 
-import java.util.Set;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -37,15 +36,11 @@ import static uk.ac.ebi.quickgo.client.presets.read.ff.SourceColumnsFactory.Sour
 @Import({PresetsCommonConfig.class})
 public class EvidencePresetsConfig {
     public static final String EVIDENCE_LOADING_STEP_NAME = "EvidenceReadingStep";
-    private static final String EVIDENCE_DEFAULTS = "DOI,GO_REF,PMID,REACTOME";
-    private static final RawNamedPreset INVALID_PRESET = null;
 
     @Value("#{'${evidence.preset.source:}'.split(',')}")
     private Resource[] resources;
     @Value("${evidence.preset.header.lines:1}")
     private int headerLines;
-    @Value("#{'${evidence.preset.defaults:" + EVIDENCE_DEFAULTS + "}'.split(',')}")
-    private Set<String> defaults;
 
     @Bean
     public Step evidenceStep(
