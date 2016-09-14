@@ -125,12 +125,6 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
-    public void convertsTargetSetsSuccessfully() {
-        Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.targetSets, is(TARGET_SETS));
-    }
-
-    @Test
     public void convertNullAspectSuccessfully() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.goAspect = null;
