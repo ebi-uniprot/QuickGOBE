@@ -39,7 +39,11 @@ public class AnnotationRequest {
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
 
     private static final String COMMA = ",";
-    private static final String[] TARGET_FIELDS = new String[]{
+
+    /**
+     * indicates which fields should be looked at when creating filters
+     */
+    private static final String[] FILTER_REQUEST_FIELDS = new String[]{
             GO_ASPECT,
             ASSIGNED_BY,
             DB_SUBSET,
@@ -397,7 +401,7 @@ public class AnnotationRequest {
     public List<FilterRequest> createFilterRequests() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
-        Stream.of(TARGET_FIELDS)
+        Stream.of(FILTER_REQUEST_FIELDS)
                 .map(this::createSimpleFilter)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
