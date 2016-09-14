@@ -49,9 +49,9 @@ public class Co_occurringTermsStatsCalculatorTest {
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
-        Co_occurringTermsStatsCalculator
-                coOccurringTermsStatsCalculator = new Co_occurringTermsStatsCalculator(aggregator);
-        List<Co_occurringTerm> results = coOccurringTermsStatsCalculator.process(goTerm);
+        Co_occurringTermsStatsCalculator coTermsCalculator = new Co_occurringTermsStatsCalculator(aggregator);
+        coTermsCalculator.initialize();
+        List<Co_occurringTerm> results = coTermsCalculator.process(goTerm);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getTarget(), is(goTerm));
@@ -82,6 +82,7 @@ public class Co_occurringTermsStatsCalculatorTest {
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
         Co_occurringTermsStatsCalculator coTermsCalculator = new Co_occurringTermsStatsCalculator(aggregator);
+        coTermsCalculator.initialize();
         List<Co_occurringTerm> results = coTermsCalculator.process(selected);
         assertThat(results, hasSize(1));
 
@@ -112,9 +113,9 @@ public class Co_occurringTermsStatsCalculatorTest {
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
-        Co_occurringTermsStatsCalculator
-                coStatsSummarizer = new Co_occurringTermsStatsCalculator(aggregator);
-        List<Co_occurringTerm> results = coStatsSummarizer.process(selectedList.get(0));
+        Co_occurringTermsStatsCalculator coTermsCalculator = new Co_occurringTermsStatsCalculator(aggregator);
+        coTermsCalculator.initialize();
+        List<Co_occurringTerm> results = coTermsCalculator.process(selectedList.get(0));
 
         assertThat(results, hasSize(2));
 
