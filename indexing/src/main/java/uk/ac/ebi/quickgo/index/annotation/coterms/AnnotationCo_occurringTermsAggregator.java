@@ -10,22 +10,20 @@ import java.util.*;
  * Time: 11:59
  * Created with IntelliJ IDEA.
  *
- * Aggregates all the data need to calculate all co-occurrence stat data points
+ * Aggregates all the data need to calculate all co-occurrence stat data points.
  */
 public class AnnotationCo_occurringTermsAggregator {
 
-    //Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
     private final Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
-
-    //This is the count of all gene products for the term. We hold this figure separately as it is used many times.
     private final Map<String, HitCount> termGPCount;
 
-    //A unique list of all geneProducts - it exists so we can get a count of the total unique gene products
+    //A list of all unique geneProducts encountered - it exists so we can get a count of the total unique gene products.
     private final Set<String> geneProductList;
 
     //A set of all terms encountered for a Gene Product
     private Set<String> termBatch;
 
+    //The input file has annotations in gene product order, so we use this value to note changes in gene product.
     private String currentGeneProduct;
 
     //Constructor
@@ -48,10 +46,6 @@ public class AnnotationCo_occurringTermsAggregator {
         geneProductList.add(annotation.dbObjectId);
     }
 
-    private void updateTermBatchWithTermCount(Annotation annotation) {
-        termBatch.add(annotation.goId);
-    }
-
     /**
      * Make it clear to the client this method needs calling to wrap up processing
      */
@@ -59,17 +53,36 @@ public class AnnotationCo_occurringTermsAggregator {
         updateCoTermsCount();
     }
 
+    /**
+     * Number of unique gene products processed from Annotations
+     * @return unique gene product count
+     */
     public long getTotalOfAnnotatedGeneProducts() {
         return geneProductList.size();
     }
 
-    public Map<String, HitCount> getTermGPCount() {
+    /**
+     * This is the count of all unique gene products for terms encountered during processing. We hold this figure
+     * separately as it is used many times.
+     * @return map of GO terms to count of unique gene products for the term.
+     */
+    public Map<String, HitCount> getGeneProductCounts() {
         return termGPCount;
     }
 
+    /**
+     *  Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
+     * @return map of processed terms to all co-occurring terms, together with count of how many times they have
+     * co-occurred.
+     */
     public Map<String, Map<String, HitCount>> getTermToTermOverlapMatrix() {
         return termToTermOverlapMatrix;
     }
+
+    private void updateTermBatchWithTermCount(Annotation annotation) {
+        termBatch.add(annotation.goId);
+    }
+
     private void refreshIfNewGeneProduct(Annotation annotation) {
         if (currentGeneProduct != null && !annotation.dbObjectId.equals(currentGeneProduct)) {
             updateCoTermsCount();
@@ -95,7 +108,9 @@ public class AnnotationCo_occurringTermsAggregator {
         }
     }
 
-    //Finally for every term, increment the count for this term
+    /**
+     * Finally for every term, increment the count for this term
+     */
     private void incrementCountForTerm(String term) {
         HitCount hitCount = termGPCount.get(term);
         if (hitCount == null) {
