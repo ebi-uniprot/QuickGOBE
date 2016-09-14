@@ -42,7 +42,7 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
         //One time operation
         if (termToTermOverlapMatrix == null) {
             this.geneProductCount = annotationCoOccurringTermsAggregator.getTotalOfAnnotatedGeneProducts();
-            this.termGPCount = annotationCoOccurringTermsAggregator.getTermGPCount();
+            this.termGPCount = annotationCoOccurringTermsAggregator.getGeneProductCounts();
             this.termToTermOverlapMatrix = annotationCoOccurringTermsAggregator.getTermToTermOverlapMatrix();
         }
 
