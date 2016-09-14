@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AnnotationAnnotationCoOccurringTermsAggregatorProcessorTest {
+public class Co_occurringGoTermsFromAnnotationsTest {
 
     @Mock
     AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
