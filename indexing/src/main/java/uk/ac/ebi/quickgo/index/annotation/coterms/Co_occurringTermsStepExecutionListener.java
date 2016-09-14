@@ -23,7 +23,8 @@ public class Co_occurringTermsStepExecutionListener implements StepExecutionList
         this.manual = manual;
     }
 
-    @Override public void beforeStep(StepExecution stepExecution) {
+    @Override
+    public void beforeStep(StepExecution stepExecution) {
 
     }
 
@@ -32,7 +33,8 @@ public class Co_occurringTermsStepExecutionListener implements StepExecutionList
      * @param stepExecution
      * @return 'COMPLETED' once the aggregation code has finished processing.
      */
-    @Override public ExitStatus afterStep(StepExecution stepExecution) {
+    @Override
+    public ExitStatus afterStep(StepExecution stepExecution) {
         all.finish();
         manual.finish();
         return ExitStatus.COMPLETED;
