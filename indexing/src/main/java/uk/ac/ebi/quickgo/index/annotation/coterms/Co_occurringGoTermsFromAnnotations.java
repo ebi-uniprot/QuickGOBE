@@ -19,24 +19,22 @@ import org.springframework.batch.item.ItemProcessor;
  */
 public class Co_occurringGoTermsFromAnnotations implements ItemProcessor<Annotation, Annotation> {
 
-    private final AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
+    private final AnnotationCo_occurringTermsAggregator aggregator;
     private final Predicate<Annotation> toBeProcessed;
 
-    public Co_occurringGoTermsFromAnnotations(AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator,
+    public Co_occurringGoTermsFromAnnotations(AnnotationCo_occurringTermsAggregator aggregator,
             Predicate<Annotation> toBeProcessed) {
-        Preconditions.checkArgument(annotationCoOccurringTermsAggregator != null);
+        Preconditions.checkArgument(aggregator != null);
         Preconditions.checkArgument(toBeProcessed != null);
-        this.annotationCoOccurringTermsAggregator = annotationCoOccurringTermsAggregator;
+        this.aggregator = aggregator;
         this.toBeProcessed = toBeProcessed;
     }
 
     @Override
     public Annotation process(Annotation annotation) throws Exception {
-
         if (toBeProcessed.test(annotation)) {
-            annotationCoOccurringTermsAggregator.addRowToMatrix(annotation);
+            aggregator.addRowToMatrix(annotation);
         }
-
         return annotation;
     }
 }
