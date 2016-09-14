@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.data.solr.core.SolrTemplate;
 
-import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermConfiguration.*;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermsConfiguration.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.TAB;
 
 /**
@@ -48,7 +48,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.T
  */
 @Configuration
 @EnableBatchProcessing
-@Import({AnnotationRepoConfig.class, Co_occurringTermConfiguration.class})
+@Import({AnnotationRepoConfig.class, Co_occurringTermsConfiguration.class})
 public class AnnotationConfig {
     static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
     static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";

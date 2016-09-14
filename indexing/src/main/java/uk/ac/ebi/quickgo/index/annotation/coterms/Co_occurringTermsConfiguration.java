@@ -24,7 +24,7 @@ import org.springframework.core.io.Resource;
  * Created with IntelliJ IDEA.
  */
 @Configuration
-public class Co_occurringTermConfiguration {
+public class Co_occurringTermsConfiguration {
 
     private static final String[] FF_COL_NAMES = {"target", "comparedTerm", "probabilityRatio", "similarityRatio",
             "together", "compared"};
