@@ -4,6 +4,9 @@ import java.util.Iterator;
 import org.springframework.batch.item.ItemReader;
 
 /**
+ * Provide a list of all GO Terms for which co-occurrence has been determined ( which is all of them that have been
+ * processed, since at worst a GO Term will have a statistic for co-occurring with itself).
+ *
  * @author Tony Wardell
  * Date: 07/09/2016
  * Time: 15:38
@@ -11,17 +14,19 @@ import org.springframework.batch.item.ItemReader;
  */
 class Co_occurringTermItemReader implements ItemReader<String> {
 
-    private final AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator;
+    private final AnnotationCo_occurringTermsAggregator aggregator;
     private Iterator<String> termsIt;
 
     public Co_occurringTermItemReader(AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator) {
-        this.annotationCoOccurringTermsAggregator = annotationCoOccurringTermsAggregator;
+        this.aggregator = annotationCoOccurringTermsAggregator;
 
     }
 
     @Override public String read() throws Exception {
+
+        //Delay providing full list until aggregator has fully processed all records.
         if (termsIt == null) {
-            termsIt = annotationCoOccurringTermsAggregator.getTermToTermOverlapMatrix().keySet().iterator();
+            termsIt = aggregator.getTermToTermOverlapMatrix().keySet().iterator();
         }
 
         if (termsIt.hasNext()) {
