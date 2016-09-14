@@ -5,6 +5,8 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
 /**
+ * Listener to be activated when all annotations have been passed to the co-occurring term aggregation code.
+ *
  * @author Tony Wardell
  * Date: 12/09/2016
  * Time: 15:01
@@ -25,6 +27,11 @@ public class Co_occurringTermsStepExecutionListener implements StepExecutionList
 
     }
 
+    /**
+     * Call finish() on the aggregation instances, so the last accumulating buckets can be processed.
+     * @param stepExecution
+     * @return 'COMPLETED' once the aggregation code has finished processing.
+     */
     @Override public ExitStatus afterStep(StepExecution stepExecution) {
         all.finish();
         manual.finish();
