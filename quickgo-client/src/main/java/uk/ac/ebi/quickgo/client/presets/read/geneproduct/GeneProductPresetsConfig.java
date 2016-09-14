@@ -27,7 +27,7 @@ import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.rawPrese
 import static uk.ac.ebi.quickgo.client.presets.read.ff.SourceColumnsFactory.Source.GENE_PRODUCT_COLUMNS;
 
 /**
- * Exposes the {@link Step} bean that is used to read and populate information relating to the with/from preset data.
+ * Exposes the {@link Step} bean that is used to read and populate information relating to the gene product preset data.
  *
  * Created 01/09/16
  * @author Edd
