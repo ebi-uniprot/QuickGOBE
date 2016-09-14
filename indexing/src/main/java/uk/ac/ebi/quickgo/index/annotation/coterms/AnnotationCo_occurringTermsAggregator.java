@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
 
+import com.google.common.base.Preconditions;
 import java.util.*;
 
 /**
@@ -41,6 +42,9 @@ public class AnnotationCo_occurringTermsAggregator {
      * @param annotation input file containing annotations
      */
     public void addRowToMatrix(Annotation annotation) {
+
+        Preconditions.checkArgument(annotation!=null, "Null annotation passed to addRowToMatrix");
+
         refreshIfNewGeneProduct(annotation);
         updateTermBatchWithTermCount(annotation);
         geneProductList.add(annotation.dbObjectId);

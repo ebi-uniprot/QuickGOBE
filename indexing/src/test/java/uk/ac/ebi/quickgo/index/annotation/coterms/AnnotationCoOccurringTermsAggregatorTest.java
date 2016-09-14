@@ -128,6 +128,9 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).hits, is(1L));
     }
 
-
+    @Test(expected=IllegalArgumentException.class)
+    public void exceptionThrownIfNullAnnotationPassedToAddRowToMatrix(){
+        aggregator.addRowToMatrix(null);
+    }
 
 }
