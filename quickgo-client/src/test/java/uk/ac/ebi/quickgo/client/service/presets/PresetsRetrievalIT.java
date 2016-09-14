@@ -57,7 +57,16 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.reference").exists())
-                .andExpect(jsonPath("$.reference.presets.*", hasSize(greaterThan(0))));
+                .andExpect(jsonPath("$.references").exists())
+                .andExpect(jsonPath("$.references.presets.*", hasSize(greaterThan(0))));
+    }
+
+    @Test
+    public void canRetrieveEvidencePresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.evidences").exists())
+                .andExpect(jsonPath("$.evidences.presets.*", hasSize(greaterThan(0))));
     }
 }

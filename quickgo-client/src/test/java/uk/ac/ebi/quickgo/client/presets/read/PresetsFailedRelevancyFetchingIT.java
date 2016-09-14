@@ -25,6 +25,9 @@ import static uk.ac.ebi.quickgo.client.presets.read.MockPresetDataConfig.FAILED_
 import static uk.ac.ebi.quickgo.client.presets.read.MockPresetDataConfig.UNIPROT_KB;
 
 /**
+ * Tests the population of the preset relevancy information despite a failure in REST communication to an
+ * end-point that provides the relevancy ordering.
+ *
  * Created 31/08/16
  * @author Edd
  */

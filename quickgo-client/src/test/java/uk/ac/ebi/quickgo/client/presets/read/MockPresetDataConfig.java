@@ -80,4 +80,14 @@ public class MockPresetDataConfig {
                         any(HashMap.class));
         return mockRestOperations;
     }
+
+    /*
+     * Evidence preset item information representing the most relevant, ECO:0000352 term.
+     */
+    static class PresetECO_352 {
+        static final String name = "All manual codes";
+        static final String id = "ECO:0000352";
+        static final String description = "evidence used in manual assertion";
+        static final int relevancy = 1;
+    }
 }

@@ -18,7 +18,7 @@ public class PresetItem {
     private final String id;
 
     public PresetItem(String id, String name, String description, Integer relevancy) {
-        checkArgument(id != null && !id.isEmpty(), "Preset id cannot be null or empty");
+        checkArgument(id == null || !id.isEmpty(), "Preset id cannot be empty");
         checkArgument(name != null && !name.isEmpty(), "Preset name cannot be null or empty");
         checkArgument(
                 description != null && !description.isEmpty(),

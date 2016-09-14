@@ -17,11 +17,6 @@ public class PresetItemTest {
     private final static Integer VALID_RELEVANCY = 0;
 
     @Test(expected = IllegalArgumentException.class)
-    public void nullIdCausesException() {
-        new PresetItem(null, VALID_NAME, VALID_DESCRIPTION, VALID_RELEVANCY);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void nullNameCausesException() {
         new PresetItem(VALID_ID, null, VALID_DESCRIPTION, VALID_RELEVANCY);
     }
@@ -51,5 +46,12 @@ public class PresetItemTest {
         PresetItem presetItem = new PresetItem(VALID_ID, VALID_NAME, VALID_DESCRIPTION, VALID_RELEVANCY);
         assertThat(presetItem, is(notNullValue()));
     }
+
+    @Test
+    public void canCreateWithNullId() {
+        PresetItem presetItem = new PresetItem(null, VALID_NAME, VALID_DESCRIPTION, VALID_RELEVANCY);
+        assertThat(presetItem, is(notNullValue()));
+    }
+
 
 }

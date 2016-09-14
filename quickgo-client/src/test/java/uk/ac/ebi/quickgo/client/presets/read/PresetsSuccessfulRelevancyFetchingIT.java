@@ -27,6 +27,8 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 import static uk.ac.ebi.quickgo.client.presets.read.MockPresetDataConfig.*;
 
 /**
+ * Tests the population of preset information.
+ *
  * Created 31/08/16
  * @author Edd
  */
@@ -99,9 +101,9 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(preset.evidences.getPresets(), hasSize(22));
 
         PresetItem firstPresetItem = preset.evidences.getPresets().stream().findFirst().orElse(null);
-        assertThat(firstPresetItem.getName(), is("All manual codes"));
-        assertThat(firstPresetItem.getId(), is("ECO:0000352"));
-        assertThat(firstPresetItem.getDescription(), is("evidence used in manual assertion"));
-        assertThat(firstPresetItem.getRelevancy(), is(1));
+        assertThat(firstPresetItem.getName(), is(PresetECO_352.name));
+        assertThat(firstPresetItem.getId(), is(PresetECO_352.id));
+        assertThat(firstPresetItem.getDescription(), is(PresetECO_352.description));
+        assertThat(firstPresetItem.getRelevancy(), is(PresetECO_352.relevancy));
     }
 }
