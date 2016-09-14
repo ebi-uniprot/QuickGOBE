@@ -5,6 +5,8 @@ import java.io.Writer;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 
 /**
+ * Write the header to files that contain co-occurring terms and related statistics.
+ *
  * @author Tony Wardell
  * Date: 13/09/2016
  * Time: 16:24
