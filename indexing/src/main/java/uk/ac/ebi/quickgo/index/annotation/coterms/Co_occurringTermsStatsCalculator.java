@@ -28,9 +28,6 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
     public Co_occurringTermsStatsCalculator(
             AnnotationCo_occurringTermsAggregator aggregator) {
         this.aggregator = aggregator;
-        this.geneProductCount = 0;
-        this.termGPCount = null;
-        this.termToTermOverlapMatrix = null;
     }
 
     /**
@@ -38,15 +35,13 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
      *
      */
     public List<Co_occurringTerm> process(String goTerm) {
-
-        //One time operation
-        if (termToTermOverlapMatrix == null) {
-            this.geneProductCount = aggregator.getTotalOfAnnotatedGeneProducts();
-            this.termGPCount = aggregator.getGeneProductCounts();
-            this.termToTermOverlapMatrix = aggregator.getTermToTermOverlapMatrix();
-        }
-
         return resultsForOneGoTerm(calculateCoStatsForTerm(goTerm));
+    }
+
+    public void initialize() {
+        this.geneProductCount = aggregator.getTotalOfAnnotatedGeneProducts();
+        this.termGPCount = aggregator.getGeneProductCounts();
+        this.termToTermOverlapMatrix = aggregator.getTermToTermOverlapMatrix();
     }
 
     /**
