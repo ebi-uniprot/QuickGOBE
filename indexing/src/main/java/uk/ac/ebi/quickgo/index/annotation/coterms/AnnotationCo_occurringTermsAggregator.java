@@ -59,6 +59,17 @@ public class AnnotationCo_occurringTermsAggregator {
         updateCoTermsCount();
     }
 
+    public long getTotalOfAnnotatedGeneProducts() {
+        return geneProductList.size();
+    }
+
+    public Map<String, HitCount> getTermGPCount() {
+        return termGPCount;
+    }
+
+    public Map<String, Map<String, HitCount>> getTermToTermOverlapMatrix() {
+        return termToTermOverlapMatrix;
+    }
     private void refreshIfNewGeneProduct(Annotation annotation) {
         if (currentGeneProduct != null && !annotation.dbObjectId.equals(currentGeneProduct)) {
             updateCoTermsCount();
@@ -94,10 +105,6 @@ public class AnnotationCo_occurringTermsAggregator {
         hitCount.hits++;
     }
 
-    public Map<String, Map<String, HitCount>> getTermToTermOverlapMatrix() {
-        return termToTermOverlapMatrix;
-    }
-
     private void incrementCoTermsCount(String term, Set<String> co_occurringTerms) {
 
         //Get the co-stats for this term
@@ -126,18 +133,5 @@ public class AnnotationCo_occurringTermsAggregator {
             permutationHitCount.hits++;
 
         }
-
-    }
-
-    public long totalOfAnnotatedGeneProducts() {
-        return geneProductList.size();
-    }
-
-    public Map<String, HitCount> termGPCount() {
-        return termGPCount;
-    }
-
-    public Map<String, Map<String, HitCount>> termToTermOverlapMatrix() {
-        return termToTermOverlapMatrix;
     }
 }
