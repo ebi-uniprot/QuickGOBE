@@ -19,7 +19,7 @@
           </elementProp>
           <elementProp name="USERS" elementType="Argument">
             <stringProp name="Argument.name">USERS</stringProp>
-            <stringProp name="Argument.value">${__property(users,,100)}</stringProp>
+            <stringProp name="Argument.value">${__property(users,,30)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="PORT" elementType="Argument">
@@ -37,9 +37,14 @@
             <stringProp name="Argument.value">${__property(ramp,,10)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="LONGER_QUERY_RESPONSE_TIMEOUT" elementType="Argument">
-            <stringProp name="Argument.name">LONGER_QUERY_RESPONSE_TIMEOUT</stringProp>
-            <stringProp name="Argument.value">${__property(longer.query.response.timeout,,4000)}</stringProp>
+          <elementProp name="QUERY_RESPONSE_TIMEOUT" elementType="Argument">
+            <stringProp name="Argument.name">QUERY_RESPONSE_TIMEOUT</stringProp>
+            <stringProp name="Argument.value">${__property(lquery.response.timeout,,4000)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="STATS_RESPONSE_TIMEOUT" elementType="Argument">
+            <stringProp name="Argument.name">STATS_RESPONSE_TIMEOUT</stringProp>
+            <stringProp name="Argument.value">${__property(lquery.response.timeout,,7000)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="ENDPOINT_BASE" elementType="Argument">
@@ -76,14 +81,14 @@
         <stringProp name="HTTPSampler.concurrentPool">4</stringProp>
       </ConfigTestElement>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Single param single value filtering" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Single param single value filtering" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">5</stringProp>
+          <stringProp name="LoopController.loops">3</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
+        <stringProp name="ThreadGroup.num_threads">20</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -92,6 +97,11 @@
         <stringProp name="TestPlan.comments">Represents a user of the REST service who fetches annotation data by filtering on a single param using a single value</stringProp>
       </ThreadGroup>
       <hashTree>
+        <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
+          <stringProp name="ConstantTimer.delay">500</stringProp>
+          <stringProp name="RandomTimer.range">500.0</stringProp>
+        </GaussianRandomTimer>
+        <hashTree/>
         <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request timeout" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
@@ -99,7 +109,7 @@
           <stringProp name="HTTPSampler.domain"></stringProp>
           <stringProp name="HTTPSampler.port"></stringProp>
           <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-          <stringProp name="HTTPSampler.response_timeout">500</stringProp>
+          <stringProp name="HTTPSampler.response_timeout">${QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path"></stringProp>
@@ -1525,14 +1535,14 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Single param multi value filtering" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Single param multi value filtering" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">5</stringProp>
+          <stringProp name="LoopController.loops">3</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">${USERS}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
+        <stringProp name="ThreadGroup.num_threads">20</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -1541,6 +1551,11 @@
         <stringProp name="TestPlan.comments">Represents a user of the REST service who fetches annotation data by filtering on a single param using multiple values</stringProp>
       </ThreadGroup>
       <hashTree>
+        <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
+          <stringProp name="ConstantTimer.delay">2000</stringProp>
+          <stringProp name="RandomTimer.range">500.0</stringProp>
+        </GaussianRandomTimer>
+        <hashTree/>
         <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request timeout" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
@@ -1548,7 +1563,7 @@
           <stringProp name="HTTPSampler.domain"></stringProp>
           <stringProp name="HTTPSampler.port"></stringProp>
           <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-          <stringProp name="HTTPSampler.response_timeout">1000</stringProp>
+          <stringProp name="HTTPSampler.response_timeout">${QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path"></stringProp>
@@ -2205,7 +2220,7 @@
           </ResultCollector>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Search by reference (50 per line)" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Search by reference (50 per line)" enabled="false">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="reference" elementType="HTTPArgument">
@@ -3230,14 +3245,14 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Multiple param filtering" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Multiple param filtering" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
+          <stringProp name="LoopController.loops">3</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <stringProp name="ThreadGroup.num_threads">15</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -3246,6 +3261,11 @@
         <stringProp name="TestPlan.comments">Represents a user of the REST service who fetches annotation data by filtering on multi param</stringProp>
       </ThreadGroup>
       <hashTree>
+        <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
+          <stringProp name="ConstantTimer.delay">2000</stringProp>
+          <stringProp name="RandomTimer.range">500</stringProp>
+        </GaussianRandomTimer>
+        <hashTree/>
         <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request timeout" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
@@ -3253,7 +3273,7 @@
           <stringProp name="HTTPSampler.domain"></stringProp>
           <stringProp name="HTTPSampler.port"></stringProp>
           <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-          <stringProp name="HTTPSampler.response_timeout">2000</stringProp>
+          <stringProp name="HTTPSampler.response_timeout">${QUERY_RESPONSE_TIMEOUT}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path"></stringProp>
@@ -4241,10 +4261,10 @@
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
+          <stringProp name="LoopController.loops">3</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <stringProp name="ThreadGroup.num_threads">15</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
         <longProp name="ThreadGroup.start_time">1455621971000</longProp>
         <longProp name="ThreadGroup.end_time">1455621971000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -4253,6 +4273,11 @@
         <stringProp name="TestPlan.comments">Represents a user of the REST service who fetches annotation data by filtering on GO identifiers and applying a usage value, e.g. decendant, slim</stringProp>
       </ThreadGroup>
       <hashTree>
+        <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
+          <stringProp name="ConstantTimer.delay">2000</stringProp>
+          <stringProp name="RandomTimer.range">500</stringProp>
+        </GaussianRandomTimer>
+        <hashTree/>
         <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request timeout" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
