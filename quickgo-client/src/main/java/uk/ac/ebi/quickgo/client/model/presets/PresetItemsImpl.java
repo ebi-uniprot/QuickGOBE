@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * Created 30/08/16
  * @author Edd
  */
-public class PresetItemsImpl implements PresetItems {
+class PresetItemsImpl implements PresetItems {
     private final List<PresetItem> presets;
 
     PresetItemsImpl() {
@@ -33,7 +33,7 @@ public class PresetItemsImpl implements PresetItems {
     }
 
     @Override public String toString() {
-        return "AssignedByPresets{" +
+        return "PresetItemsImpl{" +
                 "presets=" + presets +
                 '}';
     }

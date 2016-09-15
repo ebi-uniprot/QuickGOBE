@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read.geneproduct;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPreset;
@@ -59,8 +59,11 @@ public class GeneProductPresetsConfig {
                         rawPresetValidator()))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
                     presets.geneProducts.addPreset(
-                            new PresetItem(rawItem.id, rawItem.name, rawItem.description,
-                                    rawItem.url, rawItem.relevancy));
+                            PresetItemBuilder.createWithName(rawItem.name)
+                                    .withDescription(rawItem.description)
+                                    .withUrl(rawItem.url)
+                                    .withRelevancy(rawItem.relevancy)
+                                    .build());
                 }))
                 .listener(new LogStepListener())
                 .build();

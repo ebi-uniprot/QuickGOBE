@@ -1,71 +1,25 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import static com.google.common.base.Preconditions.checkArgument;
+import java.util.List;
 
 /**
- * Represents a specific preset datum
+ * Represents a preset item DTO.
  *
- * Created 30/08/16
+ * Created 15/09/16
  * @author Edd
  */
-public class PresetItem {
-    private static final int EQUAL_RELEVANCY = 0;
-    private final String name;
-    private final String description;
-    private final Integer relevancy;
-    private final String id;
-    private final String url;
+public interface PresetItem {
+    String getId();
 
-    public PresetItem(String id, String name, String description, String url, Integer relevancy) {
-        checkArgument(id == null || !id.isEmpty(), "Preset id cannot be empty");
-        checkArgument(name != null && !name.isEmpty(), "Preset name cannot be null or empty");
-        checkArgument(
-                description != null && !description.isEmpty(),
-                "Preset description cannot be null or empty");
-        checkArgument(url == null || !url.isEmpty(), "Preset url cannot be empty");
-        checkArgument(relevancy != null, "Integer relevancy cannot be null");
+    String getName();
 
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.relevancy = relevancy;
-        this.url = url;
-    }
+    String getDescription();
 
-    public PresetItem(String name, String description) {
-        this(null, name, description, null, EQUAL_RELEVANCY);
-    }
+    @JsonIgnore Integer getRelevancy();
 
-    public String getId() {
-        return id;
-    }
+    String getUrl();
 
-    public String getName() {
-        return name;
-    }
+    List<String> getAssociations();
 
-    public String getDescription() {
-        return description;
-    }
-
-    @JsonIgnore
-    public Integer getRelevancy() {
-        return relevancy;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    @Override public String toString() {
-        return "PresetItem{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", relevancy=" + relevancy +
-                ", id='" + id + '\'' +
-                ", url='" + url + '\'' +
-                '}';
-    }
 }

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read.reference;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPreset;
@@ -77,7 +77,9 @@ public class ReferencePresetsConfig {
                         rawPresetFilter(dbDefaults)))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
                     presets.references.addPreset(
-                            new PresetItem(rawItem.name, rawItem.description));
+                            PresetItemBuilder.createWithName(rawItem.name)
+                                    .withDescription(rawItem.description)
+                                    .build());
                 }))
                 .listener(new LogStepListener())
                 .build();
@@ -101,7 +103,9 @@ public class ReferencePresetsConfig {
                         rawPresetFilter(specificDBDefaults)))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
                     presets.references.addPreset(
-                            new PresetItem(buildGORefID(rawItem.name), rawItem.description));
+                            PresetItemBuilder.createWithName(rawItem.name)
+                                    .withDescription(rawItem.description)
+                                    .build());
                 }))
                 .listener(new LogStepListener())
                 .build();

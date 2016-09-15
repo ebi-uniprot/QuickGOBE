@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read.assignedby;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.presets.read.ff.*;
@@ -68,8 +68,10 @@ public class AssignedByPresetsConfig {
                 .writer(rawItemList -> {
                     rawItemList.forEach(rawItem -> {
                         presets.assignedBy.addPreset(
-                                new PresetItem(rawItem.id, rawItem.name, rawItem.description,
-                                        rawItem.url, rawItem.relevancy));
+                                PresetItemBuilder.createWithName(rawItem.name)
+                                        .withDescription(rawItem.description)
+                                        .withRelevancy(rawItem.relevancy)
+                                        .build());
                     });
                 })
                 .listener(new LogStepListener())

@@ -7,11 +7,11 @@ package uk.ac.ebi.quickgo.client.model.presets;
  * @author Edd
  */
 public class CompositePreset {
-    public final PresetItemsImpl assignedBy;
-    public final PresetItemsImpl references;
-    public final PresetItemsImpl evidences;
-    public final PresetItemsImpl withFrom;
-    public final PresetItemsImpl geneProducts;
+    public final PresetItems assignedBy;
+    public final PresetItems references;
+    public final PresetItems evidences;
+    public final PresetItems withFrom;
+    public final PresetItems geneProducts;
 
     public CompositePreset() {
         assignedBy = new PresetItemsImpl();
