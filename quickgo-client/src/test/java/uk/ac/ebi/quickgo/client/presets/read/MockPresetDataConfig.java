@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByRelevancyResponseType;
 
 import java.util.ArrayList;
@@ -58,11 +59,26 @@ public class MockPresetDataConfig {
         DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add(ENSEMBL);
         DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add("100");
 
-        PRESET_ECO_32 = new PresetItem("ECO:0000352", "All manual codes", "evidence used in manual assertion", null, 1);
-        PRESET_BHF_UCL = new PresetItem(null, "BHF-UCL", "The set of Cardiovascular-associated proteins being " +
-                "prioritised for annotation by the Cardiovascular Gene Ontology Annotation Initiative located at " +
-                "University College London", "http://www.ucl.ac.uk/cardiovasculargeneontology", 0);
-        PRESET_DICTY_BASE = new PresetItem(null, "dictyBase", "dictyBase", null, 62);
+        PRESET_ECO_32 = PresetItemBuilder
+                .createWithName("All manual codes")
+                .withId("ECO:0000352")
+                .withDescription("evidence used in manual assertion")
+                .withRelevancy(1).build();
+
+        PRESET_BHF_UCL = PresetItemBuilder
+                .createWithName("BHF-UCL")
+                .withDescription(
+                        "The set of Cardiovascular-associated proteins being prioritised for annotation by the " +
+                                "Cardiovascular Gene Ontology Annotation Initiative located at University College " +
+                                "London")
+                .withUrl("http://www.ucl.ac.uk/cardiovasculargeneontology")
+                .build();
+
+        PRESET_DICTY_BASE = PresetItemBuilder
+                .createWithName("dictyBase")
+                .withDescription("dictyBase")
+                .withRelevancy(62)
+                .build();
     }
 
     @Bean @Profile(SUCCESSFUL_FETCHING)
