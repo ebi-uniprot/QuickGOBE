@@ -18,6 +18,9 @@ public class GODocConverter extends AbstractODocConverter<GOTerm> {
     private final static GODiscussionConverter GO_DISCUSSION_CONVERTER =
             new GODiscussionConverter();
 
+    private final static ExtendedXRefsFieldConverter PROTEIN_COMPLEX_CONVERTER =
+            new ExtendedXRefsFieldConverter();
+
     @Override public GOTerm convert(OntologyDocument ontologyDocument) {
         GOTerm goTerm = new GOTerm();
         addCommonFields(ontologyDocument, goTerm);
@@ -29,6 +32,7 @@ public class GODocConverter extends AbstractODocConverter<GOTerm> {
 
         goTerm.blacklist = BLACKLIST_FIELD_CONVERTER.convertFieldList(ontologyDocument.blacklist);
         goTerm.goDiscussions = GO_DISCUSSION_CONVERTER.convertFieldList(ontologyDocument.goDiscussions);
+        goTerm.proteinComplexes = PROTEIN_COMPLEX_CONVERTER.convertFieldList(ontologyDocument.proteinComplexes);
 
         return goTerm;
     }
