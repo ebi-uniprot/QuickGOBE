@@ -23,7 +23,7 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
     //A list of all unique geneProducts encountered - it exists so we can get a count of the total unique gene products.
     private final Set<String> geneProductList;
     private final Predicate<Annotation> toBeProcessed;
-    //A set of all terms encountered for a Gene Product
+    //A set of all terms encountered for a Gene Product. Therefore all these terms are co-occurring with each other.
     private Set<String> termBatch;
     //The input file has annotations in gene product order, so we use this value to note changes in gene product.
     private String currentGeneProduct;
@@ -38,30 +38,6 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
 
     }
 
-    /**
-     * For each row of the GP Association file, create a list of terms, against which there is a list of all the
-     * other terms that that term share a referenced gene product with.
-     * @param annotation input file containing annotations
-     */
-    @Override
-    public Annotation process(Annotation annotation) throws Exception {
-        Preconditions.checkArgument(annotation != null, "Null annotation passed to addRowToMatrix");
-        if (!toBeProcessed.test(annotation)) {
-            return annotation;
-        }
-
-        refreshIfNewGeneProduct(annotation);
-        updateTermBatchWithTermCount(annotation);
-        geneProductList.add(annotation.dbObjectId);
-        return annotation;
-    }
-
-    /**
-     * Make it clear to the client this method needs calling to wrap up processing
-     */
-    public void finish() {
-        updateCoTermsCount();
-    }
 
     /**
      * Number of unique gene products processed from Annotations
@@ -89,19 +65,49 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
         return termToTermOverlapMatrix;
     }
 
-    private void updateTermBatchWithTermCount(Annotation annotation) {
-        termBatch.add(annotation.goId);
-    }
-
-    private void refreshIfNewGeneProduct(Annotation annotation) {
-        if (currentGeneProduct != null && !annotation.dbObjectId.equals(currentGeneProduct)) {
-            updateCoTermsCount();
-            currentGeneProduct = annotation.dbObjectId;
-            termBatch = new HashSet<>();
-            return;
+    /**
+     * For each row of the GP Association file, create a list of terms, against which there is a list of all the
+     * other terms that that term share a referenced gene product with.
+     *
+     * @param annotation input file containing annotations
+     */
+    @Override
+    public Annotation process(Annotation annotation) throws Exception {
+        Preconditions.checkArgument(annotation != null, "Null annotation passed to process");
+        if (!toBeProcessed.test(annotation)) {
+            return annotation;
         }
 
-        if (currentGeneProduct == null) {
+        processTermBatchIfAnnotationGeneProductNotInCurrentBatch(annotation);
+        termBatch.add(annotation.goId);
+        geneProductList.add(annotation.dbObjectId); //set so each gp is only added once.
+        return annotation;
+    }
+
+    /**
+     * Make it clear to the client this method needs calling to wrap up processing
+     */
+    public void finish() {
+        increaseCountsForTermsInBatch();
+        termBatch = new HashSet<>(); //not required, however..
+    }
+
+
+    /**
+     * Test to the gene product from the just read annotation contains the saved (for batch) gene product.
+     * If it doesn't we have encountered annotations with a different gene product, so process the batch we have already
+     * created.
+     *
+     * @param annotation
+     */
+    private void processTermBatchIfAnnotationGeneProductNotInCurrentBatch(Annotation annotation) {
+        if (currentGeneProduct != null) {
+            if (!annotation.dbObjectId.equals(currentGeneProduct)) {
+                increaseCountsForTermsInBatch();
+                termBatch = new HashSet<>();
+                currentGeneProduct = annotation.dbObjectId;
+            }
+        }else{
             currentGeneProduct = annotation.dbObjectId;
         }
     }
@@ -110,42 +116,26 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
      * Got to the end of the list of annotations for this gene product
      * Record which terms annotate the same gene products.
      */
-    private void updateCoTermsCount() {
+    private void increaseCountsForTermsInBatch() {
 
-        for (String next : termBatch) {
-            incrementCoTermsCount(next, termBatch);
-            incrementCountForTerm(next);
+        for (String termId : termBatch) {
+            incrementCoTermsCount(termId);
+            incrementGeneProductCountForTerm(termId);
         }
     }
 
     /**
-     * Finally for every term, increment the count for this term
+     * For all terms encountered for gene product batch, add or increase hit count
+     * @param termId single term from batch
      */
-    private void incrementCountForTerm(String term) {
-        HitCount hitCount = termGPCount.get(term);
-        if (hitCount == null) {
-            hitCount = new HitCount();
-            termGPCount.put(term, hitCount);
-        }
-        hitCount.hits++;
-    }
+    private void incrementCoTermsCount(String termId) {
 
-    private void incrementCoTermsCount(String term, Set<String> co_occurringTerms) {
-
-        //Get the co-stats for this term
-        Map<String, HitCount> termCoTerms = termToTermOverlapMatrix.get(term);
-
-        //Create if it doesn't exist.
-        if (termCoTerms == null) {
-            termCoTerms = new HashMap<>();
-            termToTermOverlapMatrix.put(term, termCoTerms);
-        }
+        Map<String, HitCount> termCoTerms = getTermCoTerms(termId);
 
         //Loop through all the terms we have encountered in this batch and update the quantities
+        for (String co_occurringTerm : termBatch) {
 
-        for (String co_occurringTerm : co_occurringTerms) {
-
-            //Get 'permanent' record for this term/term permutation
+            //Get 'permanent' record for this termId/termId permutation
             HitCount permutationHitCount = termCoTerms.get(co_occurringTerm);
 
             //Create if it doesn't exist.
@@ -159,4 +149,38 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
 
         }
     }
+
+    /**
+     * Get the co-stats for this termId
+     *
+     * @param termId
+     * @return All terms that are co-occurring term to argument
+     */
+    private Map<String, HitCount> getTermCoTerms(String termId) {
+
+        //look in the store
+        Map<String, HitCount> termCoTerms = termToTermOverlapMatrix.get(termId);
+
+        //Create if it doesn't exist.
+        if (termCoTerms == null) {
+            termCoTerms = new HashMap<>();
+            termToTermOverlapMatrix.put(termId, termCoTerms);
+        }
+        return termCoTerms;
+    }
+
+
+    /**
+     * For every term, increment by one the count of gene products for this term
+     */
+    private void incrementGeneProductCountForTerm(String term) {
+        HitCount hitCount = termGPCount.get(term);
+        if (hitCount == null) {
+            hitCount = new HitCount();
+            termGPCount.put(term, hitCount);
+        }
+        hitCount.hits++;
+    }
+
+
 }
