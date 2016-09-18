@@ -45,13 +45,10 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
      */
     @Override
     public Annotation process(Annotation annotation) throws Exception {
-
+        Preconditions.checkArgument(annotation != null, "Null annotation passed to addRowToMatrix");
         if (!toBeProcessed.test(annotation)) {
             return annotation;
         }
-
-
-        Preconditions.checkArgument(annotation!=null, "Null annotation passed to addRowToMatrix");
 
         refreshIfNewGeneProduct(annotation);
         updateTermBatchWithTermCount(annotation);
