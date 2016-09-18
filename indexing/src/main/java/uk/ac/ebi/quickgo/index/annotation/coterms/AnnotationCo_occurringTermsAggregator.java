@@ -22,6 +22,7 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
 
     //A list of all unique geneProducts encountered - it exists so we can get a count of the total unique gene products.
     private final Set<String> geneProductList;
+    //Determines which annotations get processed.
     private final Predicate<Annotation> toBeProcessed;
     //A set of all terms encountered for a Gene Product. Therefore all these terms are co-occurring with each other.
     private Set<String> termBatch;
