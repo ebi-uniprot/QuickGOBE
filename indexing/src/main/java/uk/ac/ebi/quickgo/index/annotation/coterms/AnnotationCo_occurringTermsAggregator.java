@@ -1,9 +1,11 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import com.google.common.base.Preconditions;
+import org.springframework.batch.item.ItemProcessor;
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
 
-import com.google.common.base.Preconditions;
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * @author Tony Wardell
@@ -13,22 +15,22 @@ import java.util.*;
  *
  * Aggregates all the data need to calculate all co-occurrence stat data points.
  */
-public class AnnotationCo_occurringTermsAggregator {
+public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Annotation, Annotation> {
 
     private final Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
     private final Map<String, HitCount> termGPCount;
 
     //A list of all unique geneProducts encountered - it exists so we can get a count of the total unique gene products.
     private final Set<String> geneProductList;
-
+    private final Predicate<Annotation> toBeProcessed;
     //A set of all terms encountered for a Gene Product
     private Set<String> termBatch;
-
     //The input file has annotations in gene product order, so we use this value to note changes in gene product.
     private String currentGeneProduct;
 
     //Constructor
-    public AnnotationCo_occurringTermsAggregator() {
+    public AnnotationCo_occurringTermsAggregator(Predicate<Annotation> toBeProcessed) {
+        this.toBeProcessed = toBeProcessed;
         termBatch = new HashSet<>();
         termToTermOverlapMatrix = new TreeMap<>();
         geneProductList = new HashSet<>();
@@ -41,13 +43,20 @@ public class AnnotationCo_occurringTermsAggregator {
      * other terms that that term share a referenced gene product with.
      * @param annotation input file containing annotations
      */
-    public void addRowToMatrix(Annotation annotation) {
+    @Override
+    public Annotation process(Annotation annotation) throws Exception {
+
+        if (!toBeProcessed.test(annotation)) {
+            return annotation;
+        }
+
 
         Preconditions.checkArgument(annotation!=null, "Null annotation passed to addRowToMatrix");
 
         refreshIfNewGeneProduct(annotation);
         updateTermBatchWithTermCount(annotation);
         geneProductList.add(annotation.dbObjectId);
+        return annotation;
     }
 
     /**

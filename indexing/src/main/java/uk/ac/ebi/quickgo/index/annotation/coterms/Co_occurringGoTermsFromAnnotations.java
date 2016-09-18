@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import com.google.common.base.Preconditions;
+import org.springframework.batch.item.ItemProcessor;
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
 
-import com.google.common.base.Preconditions;
 import java.util.function.Predicate;
-import org.springframework.batch.item.ItemProcessor;
 
 /**
  * @author Tony Wardell
@@ -17,6 +17,7 @@ import org.springframework.batch.item.ItemProcessor;
  *
  * Version of GPAFileToSummary from Beta
  */
+@Deprecated
 public class Co_occurringGoTermsFromAnnotations implements ItemProcessor<Annotation, Annotation> {
 
     private final AnnotationCo_occurringTermsAggregator aggregator;
@@ -33,7 +34,7 @@ public class Co_occurringGoTermsFromAnnotations implements ItemProcessor<Annotat
     @Override
     public Annotation process(Annotation annotation) throws Exception {
         if (toBeProcessed.test(annotation)) {
-            aggregator.addRowToMatrix(annotation);
+            //aggregator.addRowToMatrix(annotation);
         }
         return annotation;
     }

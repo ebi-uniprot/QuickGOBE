@@ -1,12 +1,13 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
+
+import org.junit.Before;
+import org.junit.Test;
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
 import uk.ac.ebi.quickgo.index.annotation.AnnotationMocker;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -25,17 +26,19 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 
     @Before
     public void setup(){
-        aggregator = new AnnotationCo_occurringTermsAggregator();
+        aggregator = new AnnotationCo_occurringTermsAggregator(t -> true);
     }
 
 	@Test
-	public void calculateStatisticsForTwoRecordsWithTheSameGoTerm(){
+    public void calculateStatisticsForTwoRecordsWithTheSameGoTerm() throws Exception {
 
 		Annotation annotation1 = AnnotationMocker.createValidAnnotation();
         Annotation annotation2 = AnnotationMocker.createValidAnnotation();
 
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(aggregator::addRowToMatrix);
+        for (Annotation a : annotations) {
+            aggregator.process(a);
+        }
         aggregator.finish();
 
         //Now test
@@ -59,7 +62,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 	}
 
     @Test
-    public void calculateStatisticsForTwoRecordsWithTheDifferentGoTermsDifferentGeneProductSoNoCoStats(){
+    public void calculateStatisticsForTwoRecordsWithTheDifferentGoTermsDifferentGeneProductSoNoCoStats() throws Exception {
 
         Annotation annotation1 = AnnotationMocker.createValidAnnotation();
         Annotation annotation2 = AnnotationMocker.createValidAnnotation();
@@ -67,7 +70,9 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         annotation2.dbObjectId = "A0A000";
 
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(aggregator::addRowToMatrix);
+        for (Annotation a : annotations) {
+            aggregator.process(a);
+        }
 
         aggregator.finish();
 
@@ -94,13 +99,15 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 
 
     @Test
-    public void calculateStatisticsForTwoRecordsWithTheDifferentGoTermsSameGeneProduct(){
+    public void calculateStatisticsForTwoRecordsWithTheDifferentGoTermsSameGeneProduct() throws Exception {
 
         Annotation annotation1 = AnnotationMocker.createValidAnnotation();
         Annotation annotation2 = AnnotationMocker.createValidAnnotation();
         annotation2.goId = "GO:0009999";
         List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        annotations.forEach(aggregator::addRowToMatrix);
+        for (Annotation a : annotations) {
+            aggregator.process(a);
+        }
         aggregator.finish();
 
         //Now test
@@ -128,9 +135,39 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).hits, is(1L));
     }
 
+    @Test
+    public void zeroAnnotationsProcessedIfPredicateNotTrue() throws Exception {
+
+        Annotation annotation1 = AnnotationMocker.createValidAnnotation();
+        Annotation annotation2 = AnnotationMocker.createValidAnnotation();
+        annotation2.goId = "GO:0009999";
+        List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
+
+        AnnotationCo_occurringTermsAggregator aggregatorFalse = new AnnotationCo_occurringTermsAggregator(t -> false);
+        for (Annotation a : annotations) {
+            aggregatorFalse.process(a);
+        }
+        aggregatorFalse.finish();
+
+        //Now test
+        Map<String, Map<String, HitCount>> matrix = aggregatorFalse.getTermToTermOverlapMatrix();
+
+        assertThat(matrix.keySet(), hasSize(0));
+
+        assertThat(aggregatorFalse.getTotalOfAnnotatedGeneProducts(), is(0l));
+        assertThat(aggregatorFalse.getGeneProductCounts().keySet(), hasSize(0));
+
+    }
+
     @Test(expected=IllegalArgumentException.class)
-    public void exceptionThrownIfNullAnnotationPassedToAddRowToMatrix(){
-        aggregator.addRowToMatrix(null);
+    public void exceptionThrownIfNullAnnotationPassedToAddRowToMatrix() throws Exception {
+        aggregator.process(null);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void exceptionThrownIfNullPredicatePassedToConstructor() {
+        new AnnotationCo_occurringTermsAggregator(null);
     }
 
 }
