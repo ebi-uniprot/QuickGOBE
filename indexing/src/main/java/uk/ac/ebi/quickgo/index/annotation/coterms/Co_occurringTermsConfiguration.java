@@ -49,15 +49,14 @@ public class Co_occurringTermsConfiguration {
     @Bean
     public ItemProcessor<Annotation, Annotation> co_occurringGoTermsFromAnnotationsManual(
             AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorMan) {
-        Predicate<Annotation> toBeProcessed = t -> !"IEA".equals(t.evidenceCode);
-        return new Co_occurringGoTermsFromAnnotations(annotationCo_occurringTermsAggregatorMan, toBeProcessed);
+        return new Co_occurringGoTermsFromAnnotations(annotationCo_occurringTermsAggregatorMan,
+                t -> !"IEA".equals(t.evidenceCode));
     }
 
     @Bean
     public ItemProcessor<Annotation, Annotation> co_occurringGoTermsFromAnnotationsAll(
             AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorAll) {
-        Predicate<Annotation> toBeProcessed = t -> true;
-        return new Co_occurringGoTermsFromAnnotations(annotationCo_occurringTermsAggregatorAll, toBeProcessed);
+        return new Co_occurringGoTermsFromAnnotations(annotationCo_occurringTermsAggregatorAll, t -> true);
     }
 
     @Bean
