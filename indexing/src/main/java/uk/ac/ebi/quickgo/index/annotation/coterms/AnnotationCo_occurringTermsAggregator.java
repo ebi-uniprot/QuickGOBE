@@ -98,7 +98,7 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
      * If it doesn't we have encountered annotations with a different gene product, so process the batch we have already
      * created.
      *
-     * @param annotation
+     * @param annotation annotation to process
      */
     private void processTermBatchIfAnnotationGeneProductNotInCurrentBatch(Annotation annotation) {
         if (currentGeneProduct != null) {
@@ -119,7 +119,7 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
     private void increaseCountsForTermsInBatch() {
 
         for (String termId : termBatch) {
-            incrementCoTermsCount(termId);
+            incrementCountForCo_occurringTerms(termId);
             incrementGeneProductCountForTerm(termId);
         }
     }
@@ -128,7 +128,7 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
      * For all terms encountered for gene product batch, add or increase hit count
      * @param termId single term from batch
      */
-    private void incrementCoTermsCount(String termId) {
+    private void incrementCountForCo_occurringTerms(String termId) {
 
         Map<String, HitCount> termCoTerms = getTermCoTerms(termId);
 
