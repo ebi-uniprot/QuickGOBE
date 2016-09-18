@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 /**
- * @Author Tony Wardell
+ * @author Tony Wardell
  * Date: 26/11/2015
  * Time: 16:26
  * Created with IntelliJ IDEA.
