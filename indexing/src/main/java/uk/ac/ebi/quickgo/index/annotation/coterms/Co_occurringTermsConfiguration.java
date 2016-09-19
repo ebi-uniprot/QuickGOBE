@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
@@ -34,16 +35,6 @@ public class Co_occurringTermsConfiguration {
     @Value("${indexing.coterms.dir}")
     private String path;
 
-//    @Bean
-//    AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorMan() {
-//        return new AnnotationCo_occurringTermsAggregator();
-//    }
-//
-//    @Bean
-//    AnnotationCo_occurringTermsAggregator annotationCo_occurringTermsAggregatorAll() {
-//        return new AnnotationCo_occurringTermsAggregator();
-//    }
-
     @Bean
     public AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsManual() {
         return new AnnotationCo_occurringTermsAggregator(t -> !"IEA".equals(t.evidenceCode));
@@ -55,7 +46,7 @@ public class Co_occurringTermsConfiguration {
     }
 
     @Bean
-    public Co_occurringTermsStepExecutionListener coTermsEndOfAggregationListener(
+    public StepExecutionListener coTermsEndOfAggregationListener(
             AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsManual,
             AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsAll,
             Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual,
