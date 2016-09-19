@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -13,6 +15,9 @@ import org.springframework.batch.core.StepExecutionListener;
  * Created with IntelliJ IDEA.
  */
 public class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
+
+    // logger
+    private static final Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsStepExecutionListener.class);
 
     private final AnnotationCo_occurringTermsAggregator all;
     private final AnnotationCo_occurringTermsAggregator manual;
@@ -31,7 +36,6 @@ public class Co_occurringTermsStepExecutionListener implements StepExecutionList
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-
     }
 
     /**
@@ -46,6 +50,6 @@ public class Co_occurringTermsStepExecutionListener implements StepExecutionList
         manual.finish();
         co_occurringTermsStatsCalculatorManual.initialize();
         co_occurringTermsStatsCalculatorAll.initialize();
-        return ExitStatus.COMPLETED;
+        return stepExecution.getExitStatus();
     }
 }
