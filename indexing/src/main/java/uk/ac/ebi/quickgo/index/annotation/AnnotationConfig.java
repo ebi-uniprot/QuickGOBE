@@ -4,6 +4,7 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -124,9 +125,8 @@ public class AnnotationConfig {
                 .<Annotation>reader(annotationMultiFileReader())
                 .processor(annotationCompositeProcessor())
                 .<AnnotationDocument>writer(annotationSolrServerWriter())
-                .listener(coTermsStepExecutionListener)
                 .listener(logWriteRateListener())
-                .listener(logStepListener())
+                .listener(compositeStepExecutionListener())
                 .listener(skipLogListener())
                 .build();
     }
@@ -139,7 +139,7 @@ public class AnnotationConfig {
                 .reader(coStatsManualItemReader)
                 .processor(co_occurringTermsStatsCalculatorManual)
                 .writer(coStatManualFlatFileWriter)
-                .listener(logStepListener())
+                //.listener(logStepListener())
                 .build();
     }
 
@@ -150,7 +150,7 @@ public class AnnotationConfig {
                 .reader(coStatsAllItemReader)
                 .processor(co_occurringTermsStatsCalculatorAll)
                 .writer(coStatsAllFlatFileWriter)
-                .listener(logStepListener())
+                //.listener(logStepListener())
                 .listener(skipLogListener())
                 .build();
     }
@@ -163,7 +163,7 @@ public class AnnotationConfig {
         return new LogJobListener();
     }
 
-    private StepListener logStepListener() {
+    private StepExecutionListener logStepListener() {
         return new LogStepListener();
     }
 
@@ -235,5 +235,13 @@ public class AnnotationConfig {
     @Bean
     ItemWriter<AnnotationDocument> annotationSolrServerWriter() {
         return new SolrServerWriter<>(annotationTemplate.getSolrClient());
+    }
+
+    private StepExecutionListener compositeStepExecutionListener() {
+        CompositeStepExecutionListener compositeStepExecutionListener = new CompositeStepExecutionListener();
+        StepExecutionListener[] listeners = new StepExecutionListener[] { coTermsStepExecutionListener,
+                logStepListener()};
+        compositeStepExecutionListener.setListeners(listeners);
+        return compositeStepExecutionListener;
     }
 }
