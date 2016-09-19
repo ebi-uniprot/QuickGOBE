@@ -33,7 +33,6 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
         Preconditions.checkArgument(toBeProcessed != null, "Null predicate passed AnnotationCo_occurringTermsAggregator" +
                 " constructor");
 
-
         this.toBeProcessed = toBeProcessed;
         this.coTerms = new TermCoTerms();
         geneProductList = new HashSet<>();
@@ -135,6 +134,10 @@ class TermBatch {
     }
 
     uk.ac.ebi.quickgo.index.annotation.coterms.TermBatch termBatch(Annotation annotation) {
+
+        if (currentGeneProduct == null) {
+            currentGeneProduct = annotation.dbObjectId;
+        }
 
         if (!annotation.dbObjectId.equals(currentGeneProduct)) {
             TermBatch termBatch = new TermBatch();
