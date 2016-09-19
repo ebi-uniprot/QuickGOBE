@@ -103,5 +103,16 @@ public class PresetItemBuilder {
         @Override public List<String> getAssociations() {
             return associations;
         }
+
+        @Override public String toString() {
+            return "PresetItemImpl{" +
+                    "name='" + name + '\'' +
+                    ", description='" + description + '\'' +
+                    ", relevancy=" + relevancy +
+                    ", id='" + id + '\'' +
+                    ", url='" + url + '\'' +
+                    ", associations=" + associations +
+                    '}';
+        }
     }
 }
