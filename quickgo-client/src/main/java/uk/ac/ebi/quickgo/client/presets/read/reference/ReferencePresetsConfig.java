@@ -103,7 +103,7 @@ public class ReferencePresetsConfig {
                         rawPresetFilter(specificDBDefaults)))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
                     presets.references.addPreset(
-                            PresetItemBuilder.createWithName(rawItem.name)
+                            PresetItemBuilder.createWithName(buildGORefID(rawItem.name))
                                     .withDescription(rawItem.description)
                                     .build());
                 }))

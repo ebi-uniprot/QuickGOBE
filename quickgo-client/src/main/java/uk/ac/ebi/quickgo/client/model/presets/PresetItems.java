@@ -8,7 +8,7 @@ import java.util.Collection;
  * Created 07/09/16
  * @author Edd
  */
-interface PresetItems {
+public interface PresetItems {
     /**
      * Retrieve the {@link Collection} of {@link PresetItem}s.
      * @return the {@link Collection} of {@link PresetItem}s
