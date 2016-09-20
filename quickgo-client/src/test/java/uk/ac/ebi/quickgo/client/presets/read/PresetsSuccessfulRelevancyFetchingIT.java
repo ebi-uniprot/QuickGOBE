@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.client.presets.read.reference.ReferencePresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.slimsets.GOSlimSetPresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.withFrom.WithFromPresetsConfig;
 
+import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
@@ -157,14 +159,11 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(preset.goSlimSets.getPresets(), hasSize(5));
+        assertThat(preset.goSlimSets.getPresets(), hasSize(3));
 
-        PresetItem firstPresetItem =
-                preset.goSlimSets.getPresets().stream().findFirst().orElse(null);
-
-        assertThat(firstPresetItem.getName(), is(PRESET_BHF_UCL.getName()));
-        assertThat(firstPresetItem.getId(), is(PRESET_BHF_UCL.getId()));
-        assertThat(firstPresetItem.getDescription(), is(PRESET_BHF_UCL.getDescription()));
-        assertThat(firstPresetItem.getRelevancy(), is(PRESET_BHF_UCL.getRelevancy()));
+        List<PresetItem> presetItems = preset.goSlimSets.getPresets().stream().collect(Collectors.toList());
+        assertThat(presetItems.get(0), is(equalTo(PRESET_GO_SLIM_METAGENOMICS)));
+        assertThat(presetItems.get(1), is(equalTo(PRESET_GO_SLIM_POMBE)));
+        assertThat(presetItems.get(2), is(equalTo(PRESET_GO_SLIM_SYNAPSE)));
     }
 }

@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestOperations;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
@@ -48,6 +50,9 @@ public class MockPresetDataConfig {
     static final PresetItem PRESET_ECO_32;
     static final PresetItem PRESET_DICTY_BASE;
     static final PresetItem PRESET_BHF_UCL;
+    static final PresetItem PRESET_GO_SLIM_METAGENOMICS;
+    static final PresetItem PRESET_GO_SLIM_POMBE;
+    static final PresetItem PRESET_GO_SLIM_SYNAPSE;
     private static final AssignedByRelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
 
     static {
@@ -78,6 +83,21 @@ public class MockPresetDataConfig {
                 .createWithName("dictyBase")
                 .withDescription("dictyBase")
                 .withRelevancy(62)
+                .build();
+
+        PRESET_GO_SLIM_METAGENOMICS = PresetItemBuilder
+                .createWithName("goslim_metagenomics")
+                .withAssociations(asList("GO:0006259", "GO:0008233", "GO:0016740"))
+                .build();
+
+        PRESET_GO_SLIM_POMBE = PresetItemBuilder
+                .createWithName("goslim_pombe")
+                .withAssociations(asList("GO:0002181", "GO:0006355"))
+                .build();
+
+        PRESET_GO_SLIM_SYNAPSE = PresetItemBuilder
+                .createWithName("goslim_synapse")
+                .withAssociations(singletonList("GO:0004444"))
                 .build();
     }
 

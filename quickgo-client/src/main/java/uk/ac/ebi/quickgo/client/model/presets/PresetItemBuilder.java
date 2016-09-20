@@ -114,5 +114,43 @@ public class PresetItemBuilder {
                     ", associations=" + associations +
                     '}';
         }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            PresetItemImpl that = (PresetItemImpl) o;
+
+            if (name != null ? !name.equals(that.name) : that.name != null) {
+                return false;
+            }
+            if (description != null ? !description.equals(that.description) : that.description != null) {
+                return false;
+            }
+            if (relevancy != null ? !relevancy.equals(that.relevancy) : that.relevancy != null) {
+                return false;
+            }
+            if (id != null ? !id.equals(that.id) : that.id != null) {
+                return false;
+            }
+            if (url != null ? !url.equals(that.url) : that.url != null) {
+                return false;
+            }
+            return associations != null ? associations.equals(that.associations) : that.associations == null;
+        }
+
+        @Override public int hashCode() {
+            int result = name != null ? name.hashCode() : 0;
+            result = 31 * result + (description != null ? description.hashCode() : 0);
+            result = 31 * result + (relevancy != null ? relevancy.hashCode() : 0);
+            result = 31 * result + (id != null ? id.hashCode() : 0);
+            result = 31 * result + (url != null ? url.hashCode() : 0);
+            result = 31 * result + (associations != null ? associations.hashCode() : 0);
+            return result;
+        }
     }
 }
