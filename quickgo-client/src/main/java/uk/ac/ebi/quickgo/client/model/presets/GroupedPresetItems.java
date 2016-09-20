@@ -23,6 +23,7 @@ class GroupedPresetItems implements PresetItems {
                         .createWithName(groupedPresetEntry.getKey())
                         .withAssociations(groupedPresetEntry.getValue()))
                 .map(PresetItemBuilder::build)
+                .sorted((p1, p2) -> p1.getName().compareTo(p2.getName()))
                 .collect(Collectors.toList());
     }
 
