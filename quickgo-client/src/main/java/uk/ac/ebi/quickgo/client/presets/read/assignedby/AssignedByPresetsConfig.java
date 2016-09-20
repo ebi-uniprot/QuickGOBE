@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read.assignedby;
 
-import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItemBuilder;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
+import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.presets.read.ff.*;
@@ -52,11 +52,10 @@ public class AssignedByPresetsConfig {
     public Step assignedByStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
-            CompositePreset presets,
+            CompositePresetImpl presets,
             RESTFilterConverterFactory converterFactory) {
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
         itemReader.setLinesToSkip(assignedByHeaderLines);
-
         return stepBuilderFactory.get(ASSIGNED_BY_LOADING_STEP_NAME)
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
@@ -67,7 +66,7 @@ public class AssignedByPresetsConfig {
                         assignedByRelevancyFetcher(converterFactory)))
                 .writer(rawItemList -> {
                     rawItemList.forEach(rawItem -> {
-                        presets.assignedBy.addPreset(
+                        presets.assignedByBuilder.addPreset(
                                 PresetItemBuilder.createWithName(rawItem.name)
                                         .withDescription(rawItem.description)
                                         .withRelevancy(rawItem.relevancy)

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read.geneproduct;
 
-import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItemBuilder;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
+import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPreset;
@@ -46,7 +46,7 @@ public class GeneProductPresetsConfig {
     public Step geneProductStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
-            CompositePreset presets) {
+            CompositePresetImpl presets) {
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(headerLines);
 
@@ -58,7 +58,7 @@ public class GeneProductPresetsConfig {
                 .processor(compositeItemProcessor(
                         rawPresetValidator()))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
-                    presets.geneProducts.addPreset(
+                    presets.geneProductsBuilder.addPreset(
                             PresetItemBuilder.createWithName(rawItem.name)
                                     .withDescription(rawItem.description)
                                     .withUrl(rawItem.url)

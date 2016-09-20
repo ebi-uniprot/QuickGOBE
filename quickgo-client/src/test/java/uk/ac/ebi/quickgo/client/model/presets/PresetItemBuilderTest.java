@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
+import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
+
 import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Rule;

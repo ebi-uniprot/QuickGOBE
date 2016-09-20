@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read.slimsets;
 
-import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItemBuilder;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
+import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPreset;
@@ -48,7 +48,7 @@ public class GOSlimSetPresetsConfig {
     public Step goSlimSetStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
-            CompositePreset presets) {
+            CompositePresetImpl presets) {
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(headerLines);
 
@@ -61,7 +61,7 @@ public class GOSlimSetPresetsConfig {
                         rawPresetValidator(),
                         rawPresetFilter()))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
-                    presets.goSlimSets.addPreset(
+                    presets.goSlimSetsBuilder.addPreset(
                             PresetItemBuilder.createWithName(rawItem.name)
                                     .withId(rawItem.id)
                                     .build());

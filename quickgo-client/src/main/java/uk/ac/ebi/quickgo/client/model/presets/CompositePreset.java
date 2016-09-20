@@ -1,36 +1,19 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
 /**
- * Represents preset information relating to different aspects of QuickGO.
- *
- * Created 30/08/16
+ * Created 20/09/16
  * @author Edd
  */
-public class CompositePreset {
-    public final PresetItems assignedBy;
-    public final PresetItems references;
-    public final PresetItems evidences;
-    public final PresetItems withFrom;
-    public final PresetItems geneProducts;
-    public final PresetItems goSlimSets;
+public interface CompositePreset {
+    PresetItems getAssignedBy();
 
-    public CompositePreset() {
-        assignedBy = new PresetItemsImpl();
-        references = new PresetItemsImpl();
-        evidences = new PresetItemsImpl();
-        withFrom = new PresetItemsImpl();
-        geneProducts = new PresetItemsImpl();
-        goSlimSets = new GroupedPresetItemsImpl();
-    }
+    PresetItems getReferences();
 
-    @Override public String toString() {
-        return "CompositePreset{" +
-                "assignedBy=" + assignedBy +
-                ", references=" + references +
-                ", evidences=" + evidences +
-                ", withFrom=" + withFrom +
-                ", geneProducts=" + geneProducts +
-                ", goSlimSets=" + goSlimSets +
-                '}';
-    }
+    PresetItems getEvidences();
+
+    PresetItems getWithFrom();
+
+    PresetItems getGeneProducts();
+
+    PresetItems getGoSlimSets();
 }

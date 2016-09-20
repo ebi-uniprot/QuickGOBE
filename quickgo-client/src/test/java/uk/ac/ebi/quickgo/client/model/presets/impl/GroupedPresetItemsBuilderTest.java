@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.client.model.presets;
+package uk.ac.ebi.quickgo.client.model.presets.impl;
+
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,20 +20,20 @@ import static org.hamcrest.core.Is.is;
  * Created 19/09/16
  * @author Edd
  */
-public class GroupedPresetItemsImplTest {
+public class GroupedPresetItemsBuilderTest {
     private static final String NAME = "name";
     private static final String ID = "id";
-    private GroupedPresetItemsImpl groupedPresetItems;
+    private GroupedPresetItemsBuilder groupedPresetItems;
 
     @Before
     public void setUp() {
-        groupedPresetItems = new GroupedPresetItemsImpl();
+        groupedPresetItems = new GroupedPresetItemsBuilder();
     }
 
     @Test
     public void canAdd1AndRetrievePreset() {
         groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(1)).build());
-        Collection<PresetItem> presets = groupedPresetItems.getPresets();
+        Collection<PresetItem> presets = groupedPresetItems.build().getPresets();
 
         assertThat(presets, hasSize(1));
         PresetItem presetItem = presets.stream().findFirst().orElse(null);
@@ -43,9 +45,9 @@ public class GroupedPresetItemsImplTest {
     public void canAddGroupOf2PresetsAndRetrieveCorrectly() {
         groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(1)).build());
         groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(2)).build());
-        System.out.println(groupedPresetItems.getPresets());
+        System.out.println(groupedPresetItems.build().getPresets());
 
-        Map<String, PresetItem> resultsMap = buildResultsMap(groupedPresetItems.getPresets());
+        Map<String, PresetItem> resultsMap = buildResultsMap(groupedPresetItems.build().getPresets());
 
         assertThat(resultsMap.keySet(), contains(name(1)));
         assertThat(resultsMap.values().stream()
@@ -71,9 +73,9 @@ public class GroupedPresetItemsImplTest {
         groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(1)).build());
         groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(2)).build());
         groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(2)).withId(id(3)).build());
-        System.out.println(groupedPresetItems.getPresets());
+        System.out.println(groupedPresetItems.build().getPresets());
 
-        Map<String, PresetItem> resultsMap = buildResultsMap(groupedPresetItems.getPresets());
+        Map<String, PresetItem> resultsMap = buildResultsMap(groupedPresetItems.build().getPresets());
 
         assertThat(resultsMap.keySet(), containsInAnyOrder(name(1), name(2)));
         assertThat(resultsMap.get(name(1)).getAssociations(), containsInAnyOrder(id(1), id(2)));
@@ -88,7 +90,7 @@ public class GroupedPresetItemsImplTest {
         groupedPresetItems.addPreset(PresetItemBuilder.createWithName("C").withId(anyId()).build());
         groupedPresetItems.addPreset(PresetItemBuilder.createWithName("A").withId(anyId()).build());
 
-        Collection<PresetItem> presets = groupedPresetItems.getPresets();
+        Collection<PresetItem> presets = groupedPresetItems.build().getPresets();
 
         assertThat(presets.stream().map(PresetItem::getName).collect(Collectors.toList()),
                 contains("A", "B", "C"));

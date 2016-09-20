@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read;
 
-import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
 
 import java.util.stream.Collectors;
@@ -42,11 +42,11 @@ public class PresetsFailedRelevancyFetchingIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private CompositePreset preset;
+    private CompositePresetImpl preset;
 
     @Test
     public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() throws Exception {
-        assertThat(preset.assignedBy.getPresets(), hasSize(0));
+        assertThat(preset.getAssignedBy().getPresets(), hasSize(0));
 
         JobExecution jobExecution =
                 jobLauncherTestUtils.launchStep(AssignedByPresetsConfig.ASSIGNED_BY_LOADING_STEP_NAME);
@@ -54,7 +54,7 @@ public class PresetsFailedRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                preset.assignedBy.getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
+                preset.getAssignedBy().getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
                 contains(UNIPROT_KB));
     }
 }

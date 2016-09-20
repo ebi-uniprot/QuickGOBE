@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.client.presets.read;
 
-import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.evidence.EvidencePresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.geneproduct.GeneProductPresetsConfig;
@@ -14,13 +14,14 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.logJobListener;
 
 /**
- * Exposes a Spring Batch {@link Job} that, when run, will read and populate a {@link CompositePreset}
+ * Exposes a Spring Batch {@link Job} that, when run, will read and populate a {@link CompositePresetImpl}
  * instance, which provides user information about all preset data for QuickGO filtering.
  *
  * Created 18/05/16
@@ -34,6 +35,7 @@ import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.logJobLi
         WithFromPresetsConfig.class,
         GeneProductPresetsConfig.class,
         GOSlimSetPresetsConfig.class})
+@ComponentScan("uk.ac.ebi.quickgo.client.model.presets.impl")
 public class PresetsConfig {
 
     private static final String PRESET_LOADING_JOB_NAME = "PresetReadingJob";

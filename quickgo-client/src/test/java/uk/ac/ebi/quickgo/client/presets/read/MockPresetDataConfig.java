@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItemBuilder;
+import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByRelevancyResponseType;
 
 import java.util.ArrayList;

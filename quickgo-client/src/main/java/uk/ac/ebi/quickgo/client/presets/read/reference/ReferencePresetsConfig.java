@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read.reference;
 
-import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItemBuilder;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
+import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPreset;
@@ -63,7 +63,7 @@ public class ReferencePresetsConfig {
     public Step referenceGenericDbStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
-            CompositePreset presets) {
+            CompositePresetImpl presets) {
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(dbHeaderLines);
 
@@ -76,7 +76,7 @@ public class ReferencePresetsConfig {
                         rawPresetValidator(),
                         rawPresetFilter(dbDefaults)))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
-                    presets.references.addPreset(
+                    presets.referencesBuilder.addPreset(
                             PresetItemBuilder.createWithName(rawItem.name)
                                     .withDescription(rawItem.description)
                                     .build());
@@ -89,7 +89,7 @@ public class ReferencePresetsConfig {
     public Step referenceSpecificDbStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
-            CompositePreset presets) {
+            CompositePresetImpl presets) {
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(dbHeaderLines);
 
@@ -102,7 +102,7 @@ public class ReferencePresetsConfig {
                         rawPresetValidator(),
                         rawPresetFilter(specificDBDefaults)))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
-                    presets.references.addPreset(
+                    presets.referencesBuilder.addPreset(
                             PresetItemBuilder.createWithName(buildGORefID(rawItem.name))
                                     .withDescription(rawItem.description)
                                     .build());

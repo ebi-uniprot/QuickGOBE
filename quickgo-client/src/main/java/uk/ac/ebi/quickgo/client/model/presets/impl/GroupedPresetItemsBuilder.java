@@ -1,4 +1,7 @@
-package uk.ac.ebi.quickgo.client.model.presets;
+package uk.ac.ebi.quickgo.client.model.presets.impl;
+
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetItems;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,22 +30,15 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Created 19/09/16
  * @author Edd
  */
-class GroupedPresetItemsImpl implements PresetItems {
+public class GroupedPresetItemsBuilder implements ModifiablePresetItems {
     private final Map<String, List<String>> groupedPresetItems;
 
-    GroupedPresetItemsImpl() {
+    GroupedPresetItemsBuilder() {
         this.groupedPresetItems = new HashMap<>();
     }
 
-    @Override public Collection<PresetItem> getPresets() {
-        return groupedPresetItems.entrySet()
-                .stream()
-                .map(groupedPresetEntry -> PresetItemBuilder
-                        .createWithName(groupedPresetEntry.getKey())
-                        .withAssociations(groupedPresetEntry.getValue()))
-                .map(PresetItemBuilder::build)
-                .sorted((p1, p2) -> p1.getName().compareTo(p2.getName()))
-                .collect(Collectors.toList());
+    public PresetItems build() {
+        return new PresetItemsImpl(this);
     }
 
     @Override public void addPreset(PresetItem presetItem) {
@@ -57,5 +53,24 @@ class GroupedPresetItemsImpl implements PresetItems {
         }
 
         groupedPresetItems.get(presetItem.getName()).add(presetItem.getId());
+    }
+
+    private static class PresetItemsImpl implements PresetItems {
+        private final List<PresetItem> presets;
+
+        private PresetItemsImpl(GroupedPresetItemsBuilder builder) {
+            presets = Collections.unmodifiableList(builder.groupedPresetItems.entrySet()
+                    .stream()
+                    .map(groupedPresetEntry -> PresetItemBuilder
+                            .createWithName(groupedPresetEntry.getKey())
+                            .withAssociations(groupedPresetEntry.getValue()))
+                    .map(PresetItemBuilder::build)
+                    .sorted((p1, p2) -> p1.getName().compareTo(p2.getName()))
+                    .collect(Collectors.toList()));
+        }
+
+        @Override public List<PresetItem> getPresets() {
+            return presets;
+        }
     }
 }

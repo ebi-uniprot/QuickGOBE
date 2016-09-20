@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read.evidence;
 
-import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItemBuilder;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
+import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.presets.read.ff.RawNamedPreset;
@@ -46,7 +46,7 @@ public class EvidencePresetsConfig {
     public Step evidenceStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
-            CompositePreset presets) {
+            CompositePresetImpl presets) {
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(headerLines);
 
@@ -58,7 +58,7 @@ public class EvidencePresetsConfig {
                 .processor(compositeItemProcessor(
                         rawPresetValidator()))
                 .writer(rawItemList -> rawItemList.forEach(rawItem -> {
-                    presets.evidences.addPreset(
+                    presets.evidencesBuilder.addPreset(
                             PresetItemBuilder.createWithName(rawItem.name)
                                     .withId(rawItem.id)
                                     .withRelevancy(rawItem.relevancy)

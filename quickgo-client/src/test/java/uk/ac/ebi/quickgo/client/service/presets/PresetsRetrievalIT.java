@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.presets;
 
 import uk.ac.ebi.quickgo.client.QuickGOREST;
-import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Tests whether the {@link CompositePreset} instance is populated correctly at application startup.
+ * Tests whether the {@link CompositePresetImpl} instance is populated correctly at application startup.
  *
  * Created 05/09/16
  * @author Edd

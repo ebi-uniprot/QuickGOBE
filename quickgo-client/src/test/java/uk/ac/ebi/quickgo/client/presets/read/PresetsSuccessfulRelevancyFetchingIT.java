@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read;
 
-import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.evidence.EvidencePresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.geneproduct.GeneProductPresetsConfig;
@@ -48,11 +48,11 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private CompositePreset preset;
+    private CompositePresetImpl preset;
 
     @Test
     public void loadAssignedByPresetsAfterSuccessfulRESTInfoFetching() throws Exception {
-        assertThat(preset.assignedBy.getPresets(), hasSize(0));
+        assertThat(preset.getAssignedBy().getPresets(), hasSize(0));
 
         JobExecution jobExecution =
                 jobLauncherTestUtils.launchStep(AssignedByPresetsConfig.ASSIGNED_BY_LOADING_STEP_NAME);
@@ -60,14 +60,14 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                preset.assignedBy.getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
+                preset.getAssignedBy().getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
                 contains(UNIPROT_KB, ENSEMBL));
     }
 
     @Test
     @DirtiesContext
     public void loadGenericReferencePresetsAfterSuccessfulRESTInfoFetching() throws Exception {
-        assertThat(preset.references.getPresets(), hasSize(0));
+        assertThat(preset.getReferences().getPresets(), hasSize(0));
 
         JobExecution jobExecution =
                 jobLauncherTestUtils.launchStep(ReferencePresetsConfig.CORE_REFERENCE_DB_LOADING_STEP_NAME);
@@ -75,14 +75,14 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                preset.references.getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
+                preset.getReferences().getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
                 contains(DOI, REACTOME));
     }
 
     @Test
     @DirtiesContext
     public void loadSpecificReferencePresetsAfterSuccessfulRESTInfoFetching() throws Exception {
-        assertThat(preset.references.getPresets(), hasSize(0));
+        assertThat(preset.getReferences().getPresets(), hasSize(0));
 
         JobExecution jobExecution =
                 jobLauncherTestUtils.launchStep(ReferencePresetsConfig.SPECIFIC_REFERENCE_LOADING_STEP_NAME);
@@ -90,22 +90,22 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                preset.references.getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
+                preset.getReferences().getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
                 is(GO_REFS_FROM_RESOURCE));
     }
 
     @Test
     public void loadEvidencesPresets() throws Exception {
-        assertThat(preset.evidences.getPresets(), hasSize(0));
+        assertThat(preset.getEvidences().getPresets(), hasSize(0));
 
         JobExecution jobExecution =
                 jobLauncherTestUtils.launchStep(EvidencePresetsConfig.EVIDENCE_LOADING_STEP_NAME);
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(preset.evidences.getPresets(), hasSize(22));
+        assertThat(preset.getEvidences().getPresets(), hasSize(22));
 
-        PresetItem firstPresetItem = preset.evidences.getPresets().stream().findFirst().orElse(null);
+        PresetItem firstPresetItem = preset.getEvidences().getPresets().stream().findFirst().orElse(null);
         assertThat(firstPresetItem.getName(), is(PRESET_ECO_32.getName()));
         assertThat(firstPresetItem.getId(), is(PRESET_ECO_32.getId()));
         assertThat(firstPresetItem.getDescription(), is(PRESET_ECO_32.getDescription()));
@@ -114,17 +114,17 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
     @Test
     public void loadWithFromPresets() throws Exception {
-        assertThat(preset.withFrom.getPresets(), hasSize(0));
+        assertThat(preset.getWithFrom().getPresets(), hasSize(0));
 
         JobExecution jobExecution =
                 jobLauncherTestUtils.launchStep(WithFromPresetsConfig.WITH_FROM_DB_LOADING_STEP_NAME);
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(preset.withFrom.getPresets(), hasSize(7));
+        assertThat(preset.getWithFrom().getPresets(), hasSize(7));
 
         PresetItem lastPresetItem =
-                preset.withFrom.getPresets().stream().reduce((first, second) -> second).orElse(null);
+                preset.getWithFrom().getPresets().stream().reduce((first, second) -> second).orElse(null);
         assertThat(lastPresetItem.getName(), is(PRESET_DICTY_BASE.getName()));
         assertThat(lastPresetItem.getId(), is(PRESET_DICTY_BASE.getId()));
         assertThat(lastPresetItem.getDescription(), is(PRESET_DICTY_BASE.getDescription()));
@@ -133,17 +133,17 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
     @Test
     public void loadGeneProductPresets() throws Exception {
-        assertThat(preset.geneProducts.getPresets(), hasSize(0));
+        assertThat(preset.getGeneProducts().getPresets(), hasSize(0));
 
         JobExecution jobExecution =
                 jobLauncherTestUtils.launchStep(GeneProductPresetsConfig.GENE_PRODUCT_LOADING_STEP_NAME);
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(preset.geneProducts.getPresets(), hasSize(5));
+        assertThat(preset.getGeneProducts().getPresets(), hasSize(5));
 
         PresetItem firstPresetItem =
-                preset.geneProducts.getPresets().stream().findFirst().orElse(null);
+                preset.getGeneProducts().getPresets().stream().findFirst().orElse(null);
         assertThat(firstPresetItem.getName(), is(PRESET_BHF_UCL.getName()));
         assertThat(firstPresetItem.getId(), is(PRESET_BHF_UCL.getId()));
         assertThat(firstPresetItem.getDescription(), is(PRESET_BHF_UCL.getDescription()));
@@ -152,16 +152,16 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
     @Test
     public void loadGOSlimSetPresets() throws Exception {
-        assertThat(preset.goSlimSets.getPresets(), hasSize(0));
+        assertThat(preset.getGoSlimSets().getPresets(), hasSize(0));
 
         JobExecution jobExecution =
                 jobLauncherTestUtils.launchStep(GOSlimSetPresetsConfig.GO_SLIM_SET_LOADING_STEP_NAME);
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(preset.goSlimSets.getPresets(), hasSize(3));
+        assertThat(preset.getGoSlimSets().getPresets(), hasSize(3));
 
-        List<PresetItem> presetItems = preset.goSlimSets.getPresets().stream().collect(Collectors.toList());
+        List<PresetItem> presetItems = preset.getGoSlimSets().getPresets().stream().collect(Collectors.toList());
         assertThat(presetItems.get(0), is(equalTo(PRESET_GO_SLIM_METAGENOMICS)));
         assertThat(presetItems.get(1), is(equalTo(PRESET_GO_SLIM_POMBE)));
         assertThat(presetItems.get(2), is(equalTo(PRESET_GO_SLIM_SYNAPSE)));
