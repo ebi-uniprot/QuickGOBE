@@ -87,4 +87,13 @@ public class PresetsRetrievalIT {
                 .andExpect(jsonPath("$.geneProducts").exists())
                 .andExpect(jsonPath("$.geneProducts.presets.*", hasSize(greaterThan(0))));
     }
+
+    @Test
+    public void canRetrieveGOSlimSetsPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.goSlimSets").exists())
+                .andExpect(jsonPath("$.goSlimSets.presets.*", hasSize(greaterThan(0))));
+    }
 }
