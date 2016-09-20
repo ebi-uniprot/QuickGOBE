@@ -14,10 +14,8 @@ import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -36,8 +34,12 @@ public class Co_occurringTermsConfiguration {
     private static final String[] FF_COL_NAMES = {"target", "comparedTerm", "probabilityRatio", "similarityRatio",
             "together", "compared"};
     private static final String DELIMITER = "\t";
-    @Value("${indexing.coterms.dir}")
-    private String path;
+
+    @Value("${indexing.coterms.manual}")
+    private Resource manual;
+
+    @Value("${indexing.coterms.all}")
+    private Resource all;
 
     @Bean
     public AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsManual() {
@@ -85,34 +87,24 @@ public class Co_occurringTermsConfiguration {
 
     @Bean
     ItemWriter<List<Co_occurringTerm>> coStatManualFlatFileWriter() {
-        return listItemFlatFileWriter("CoStatsManual");
+        return listItemFlatFileWriter(manual);
     }
 
     @Bean
     ItemWriter<List<Co_occurringTerm>> coStatsAllFlatFileWriter() {
-        return listItemFlatFileWriter("CoStatsAll");
+        return listItemFlatFileWriter(all);
     }
 
-    private File getFilePath() {
-        File file = new File(path);
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        return file;
-    }
-
-    private ListItemWriter<Co_occurringTerm> listItemFlatFileWriter(String fileName) {
-        ListItemWriter<Co_occurringTerm> listWriter = new ListItemWriter<>(flatFileWriter(fileName));
+    private ListItemWriter<Co_occurringTerm> listItemFlatFileWriter(Resource outputFile) {
+        ListItemWriter<Co_occurringTerm> listWriter = new ListItemWriter<>(flatFileWriter(outputFile));
         listWriter.setLineAggregator(new PassThroughLineAggregator<>()); //this shouldn't do anything
         return listWriter;
     }
 
-    private FlatFileItemWriter<Co_occurringTerm> flatFileWriter(String fileName) {
+    private FlatFileItemWriter<Co_occurringTerm> flatFileWriter(Resource outputFile) {
         FlatFileItemWriter<Co_occurringTerm> ffw = new FlatFileItemWriter<>();
         ffw.setLineAggregator(lineAggregator());
-        final File filePath = getFilePath();
-        LOGGER.info("Write out co-occurring terms to {}", filePath.toString());
-        Resource outputFile = new FileSystemResource(new File(filePath, fileName));
+        LOGGER.info("Write out co-occurring terms to {}", outputFile.toString());
         ffw.setResource(outputFile);
         FlatFileHeaderCallback headerCallBack = new Co_occurringTermsFlatFileHeaderCallBack();
         ffw.setHeaderCallback(headerCallBack);
