@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -26,6 +28,8 @@ import java.util.List;
  */
 @Configuration
 public class Co_occurringTermsConfiguration {
+
+    Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsConfiguration.class);
 
     public static final String COSTATS_MANUAL_COMPLETION_STEP_NAME = "costatsManualSummarizationStep";
     public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
@@ -106,7 +110,9 @@ public class Co_occurringTermsConfiguration {
     private FlatFileItemWriter<Co_occurringTerm> flatFileWriter(String fileName) {
         FlatFileItemWriter<Co_occurringTerm> ffw = new FlatFileItemWriter<>();
         ffw.setLineAggregator(lineAggregator());
-        Resource outputFile = new FileSystemResource(new File(getFilePath(), fileName));
+        final File filePath = getFilePath();
+        LOGGER.info("Write out co-occurring terms to {}", filePath.toString());
+        Resource outputFile = new FileSystemResource(new File(filePath, fileName));
         ffw.setResource(outputFile);
         FlatFileHeaderCallback headerCallBack = new Co_occurringTermsFlatFileHeaderCallBack();
         ffw.setHeaderCallback(headerCallBack);
