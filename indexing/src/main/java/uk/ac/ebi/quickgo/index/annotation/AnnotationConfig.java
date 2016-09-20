@@ -139,7 +139,9 @@ public class AnnotationConfig {
                 .reader(coStatsManualItemReader)
                 .processor(co_occurringTermsStatsCalculatorManual)
                 .writer(coStatManualFlatFileWriter)
-                //.listener(logStepListener())
+                .listener(logStepListener())
+                .listener(logWriteRateListener(1000))
+                .listener(skipLogListener())
                 .build();
     }
 
@@ -150,13 +152,18 @@ public class AnnotationConfig {
                 .reader(coStatsAllItemReader)
                 .processor(co_occurringTermsStatsCalculatorAll)
                 .writer(coStatsAllFlatFileWriter)
-                //.listener(logStepListener())
+                .listener(logStepListener())
+                .listener(logWriteRateListener(1000))
                 .listener(skipLogListener())
                 .build();
     }
 
     private ItemWriteListener<QuickGODocument> logWriteRateListener() {
         return new ItemRateWriterListener<>(Instant.now());
+    }
+
+    private ItemWriteListener<QuickGODocument> logWriteRateListener(final int writeInterval) {
+        return new ItemRateWriterListener<>(Instant.now(), writeInterval);
     }
 
     private JobExecutionListener logJobListener() {
