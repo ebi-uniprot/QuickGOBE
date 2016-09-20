@@ -18,14 +18,14 @@ import static org.hamcrest.core.Is.is;
  * Created 19/09/16
  * @author Edd
  */
-public class GroupedPresetItemsTest {
-    public static final String NAME = "name";
-    public static final String ID = "id";
-    private GroupedPresetItems groupedPresetItems;
+public class GroupedPresetItemsImplTest {
+    private static final String NAME = "name";
+    private static final String ID = "id";
+    private GroupedPresetItemsImpl groupedPresetItems;
 
     @Before
     public void setUp() {
-        groupedPresetItems = new GroupedPresetItems();
+        groupedPresetItems = new GroupedPresetItemsImpl();
     }
 
     @Test
