@@ -20,7 +20,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
     private static final Logger LOGGER = getLogger(SolrServerWriter.class);
-    int writeRateDocumentInterval = 100000;
+    public static final int WRITE_RATE_DOCUMENT_INTERVAL = 100000;
+    int writeRateDocumentInterval;
     private final Instant startOfWriting;
     private AtomicInteger totalWriteCount = new AtomicInteger(0);
     private AtomicInteger deltaWriteCount = new AtomicInteger(0);
@@ -28,6 +29,7 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
 
     public ItemRateWriterListener(Instant now) {
         startOfWriting = startOfDelta = now;
+        writeRateDocumentInterval = WRITE_RATE_DOCUMENT_INTERVAL;
     }
 
     public ItemRateWriterListener(Instant now, final int writeInterval) {
