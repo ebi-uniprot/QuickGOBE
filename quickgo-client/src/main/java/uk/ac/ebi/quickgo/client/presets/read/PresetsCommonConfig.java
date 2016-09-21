@@ -37,11 +37,6 @@ public class PresetsCommonConfig {
         return chunkSize;
     }
 
-    //    @Bean
-    //    public CompositePresetImpl presets() {
-    //        return new CompositePresetImpl();
-    //    }
-
     @Bean
     static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();

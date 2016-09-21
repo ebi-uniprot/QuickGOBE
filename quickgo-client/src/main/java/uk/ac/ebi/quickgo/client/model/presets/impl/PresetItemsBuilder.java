@@ -3,13 +3,14 @@ package uk.ac.ebi.quickgo.client.model.presets.impl;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItems;
 
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Represents preset information relating to valid and relevant {@link PresetItem} instances.
+ * Creates simple preset information relating to valid and relevant {@link PresetItem} instances.
  *
  * Created 30/08/16
  * @author Edd
@@ -23,6 +24,8 @@ public class PresetItemsBuilder implements ModifiablePresetItems {
 
     @Override
     public void addPreset(PresetItem presetItem) {
+        Preconditions.checkArgument(presetItem != null, "PresetItem cannot be null");
+
         presets.add(presetItem);
     }
 

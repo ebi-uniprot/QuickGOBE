@@ -23,17 +23,17 @@ import static org.hamcrest.core.Is.is;
 public class GroupedPresetItemsBuilderTest {
     private static final String NAME = "name";
     private static final String ID = "id";
-    private GroupedPresetItemsBuilder groupedPresetItems;
+    private GroupedPresetItemsBuilder presetBuilder;
 
     @Before
     public void setUp() {
-        groupedPresetItems = new GroupedPresetItemsBuilder();
+        presetBuilder = new GroupedPresetItemsBuilder();
     }
 
     @Test
     public void canAdd1AndRetrievePreset() {
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(1)).build());
-        Collection<PresetItem> presets = groupedPresetItems.build().getPresets();
+        presetBuilder.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(1)).build());
+        Collection<PresetItem> presets = presetBuilder.build().getPresets();
 
         assertThat(presets, hasSize(1));
         PresetItem presetItem = presets.stream().findFirst().orElse(null);
@@ -43,11 +43,11 @@ public class GroupedPresetItemsBuilderTest {
 
     @Test
     public void canAddGroupOf2PresetsAndRetrieveCorrectly() {
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(1)).build());
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(2)).build());
-        System.out.println(groupedPresetItems.build().getPresets());
+        presetBuilder.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(1)).build());
+        presetBuilder.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(2)).build());
+        System.out.println(presetBuilder.build().getPresets());
 
-        Map<String, PresetItem> resultsMap = buildResultsMap(groupedPresetItems.build().getPresets());
+        Map<String, PresetItem> resultsMap = buildResultsMap(presetBuilder.build().getPresets());
 
         assertThat(resultsMap.keySet(), contains(name(1)));
         assertThat(resultsMap.values().stream()
@@ -70,12 +70,12 @@ public class GroupedPresetItemsBuilderTest {
 
     @Test
     public void canAddGroupOf2PresetsAndGroupOf1PresetsAndRetrieveCorrectly() {
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(1)).build());
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(2)).build());
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName(name(2)).withId(id(3)).build());
-        System.out.println(groupedPresetItems.build().getPresets());
+        presetBuilder.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(1)).build());
+        presetBuilder.addPreset(PresetItemBuilder.createWithName(name(1)).withId(id(2)).build());
+        presetBuilder.addPreset(PresetItemBuilder.createWithName(name(2)).withId(id(3)).build());
+        System.out.println(presetBuilder.build().getPresets());
 
-        Map<String, PresetItem> resultsMap = buildResultsMap(groupedPresetItems.build().getPresets());
+        Map<String, PresetItem> resultsMap = buildResultsMap(presetBuilder.build().getPresets());
 
         assertThat(resultsMap.keySet(), containsInAnyOrder(name(1), name(2)));
         assertThat(resultsMap.get(name(1)).getAssociations(), containsInAnyOrder(id(1), id(2)));
@@ -84,13 +84,13 @@ public class GroupedPresetItemsBuilderTest {
 
     @Test
     public void presetsAreReturnedInAlphabeticalOrder() {
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName("B").withId(anyId()).build());
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName("A").withId(anyId()).build());
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName("C").withId(anyId()).build());
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName("C").withId(anyId()).build());
-        groupedPresetItems.addPreset(PresetItemBuilder.createWithName("A").withId(anyId()).build());
+        presetBuilder.addPreset(PresetItemBuilder.createWithName("B").withId(anyId()).build());
+        presetBuilder.addPreset(PresetItemBuilder.createWithName("A").withId(anyId()).build());
+        presetBuilder.addPreset(PresetItemBuilder.createWithName("C").withId(anyId()).build());
+        presetBuilder.addPreset(PresetItemBuilder.createWithName("C").withId(anyId()).build());
+        presetBuilder.addPreset(PresetItemBuilder.createWithName("A").withId(anyId()).build());
 
-        Collection<PresetItem> presets = groupedPresetItems.build().getPresets();
+        Collection<PresetItem> presets = presetBuilder.build().getPresets();
 
         assertThat(presets.stream().map(PresetItem::getName).collect(Collectors.toList()),
                 contains("A", "B", "C"));
@@ -98,7 +98,7 @@ public class GroupedPresetItemsBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotAddPresetWithNullName() {
-        groupedPresetItems.addPreset(new FakeAbstractPresetItem() {
+        presetBuilder.addPreset(new FakePresetItem() {
             @Override public String getName() {
                 return null;
             }
@@ -107,7 +107,7 @@ public class GroupedPresetItemsBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotAddPresetWithEmptyName() {
-        groupedPresetItems.addPreset(new FakeAbstractPresetItem() {
+        presetBuilder.addPreset(new FakePresetItem() {
             @Override public String getName() {
                 return "";
             }
@@ -116,7 +116,7 @@ public class GroupedPresetItemsBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotAddPresetWithNullId() {
-        groupedPresetItems.addPreset(new FakeAbstractPresetItem() {
+        presetBuilder.addPreset(new FakePresetItem() {
             @Override public String getId() {
                 return null;
             }
@@ -125,7 +125,7 @@ public class GroupedPresetItemsBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotAddPresetWithEmptyId() {
-        groupedPresetItems.addPreset(new FakeAbstractPresetItem() {
+        presetBuilder.addPreset(new FakePresetItem() {
             @Override public String getId() {
                 return "";
             }
@@ -144,7 +144,7 @@ public class GroupedPresetItemsBuilderTest {
         return ID + Math.random();
     }
 
-    private static class FakeAbstractPresetItem implements PresetItem {
+    private static class FakePresetItem implements PresetItem {
         @Override public String getId() {
             return null;
         }

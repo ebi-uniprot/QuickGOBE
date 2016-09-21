@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * <p>Represents presets that are grouped by {@code name}. Each group is represented by a
+ * <p>Creates presets that are grouped by {@code name}. Each group is represented by a
  * single {@link PresetItem} whose {@code name} corresponds to the name added originally,
  * and whose {@code associations} are the {@code id}s of the original {@link PresetItem}s added.
  *
