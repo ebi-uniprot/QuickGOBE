@@ -21,15 +21,15 @@ public class AssignedByRelevancyResponseConverter
     @Override public ConvertedFilter<List<String>> transform(AssignedByRelevancyResponseType response) {
         checkArgument(response != null, "Response cannot be null");
 
-        List<String> keysWithOutCounts = new ArrayList<>();
+        List<String> keysWithoutCounts = new ArrayList<>();
 
         if (response.terms != null && response.terms.assignedBy != null) {
             List<String> values = response.terms.assignedBy;
             for (int i = 0; i < values.size() - 1; i += 2) {
-                keysWithOutCounts.add(values.get(i));
+                keysWithoutCounts.add(values.get(i));
             }
         }
 
-        return new ConvertedFilter<>(keysWithOutCounts);
+        return new ConvertedFilter<>(keysWithoutCounts);
     }
 }
