@@ -17,6 +17,7 @@ import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.item.support.CompositeItemProcessor;
+import org.springframework.batch.item.support.CompositeItemWriter;
 import org.springframework.batch.item.validator.ValidatingItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.item.validator.Validator;
@@ -124,7 +125,7 @@ public class AnnotationConfig {
                 .skip(ValidationException.class)
                 .<Annotation>reader(annotationMultiFileReader())
                 .processor(annotationCompositeProcessor())
-                .<AnnotationDocument>writer(annotationSolrServerWriter())
+                .<AnnotationDocument>writer(compositeAnnotationWriter())
                 .listener(logWriteRateListener())
                 .listener(compositeStepExecutionListener())
                 .listener(skipLogListener())
@@ -229,8 +230,6 @@ public class AnnotationConfig {
     ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor() {
         List<ItemProcessor<Annotation, ?>> processors = new ArrayList<>();
         processors.add(annotationValidator());
-        processors.add(co_occurringGoTermsFromAnnotationsManual);
-        processors.add(co_occurringGoTermsFromAnnotationsAll);
         processors.add(annotationDocConverter());
 
         CompositeItemProcessor<Annotation, AnnotationDocument> compositeProcessor = new CompositeItemProcessor<>();
@@ -243,6 +242,20 @@ public class AnnotationConfig {
     ItemWriter<AnnotationDocument> annotationSolrServerWriter() {
         return new SolrServerWriter<>(annotationTemplate.getSolrClient());
     }
+
+
+    @Bean
+    ItemWriter<AnnotationDocument> compositeAnnotationWriter() {
+        CompositeItemWriter<AnnotationDocument> compositeItemWriter = new CompositeItemWriter<>();
+        List<ItemWriter<? super AnnotationDocument>> writerList = new ArrayList<>();
+        writerList.add(annotationSolrServerWriter());
+        writerList.add(co_occurringGoTermsFromAnnotationsManual);
+        writerList.add(co_occurringGoTermsFromAnnotationsAll);
+
+        compositeItemWriter.setDelegates(writerList);
+        return compositeItemWriter;
+    }
+
 
     private StepExecutionListener compositeStepExecutionListener() {
         CompositeStepExecutionListener compositeStepExecutionListener = new CompositeStepExecutionListener();
