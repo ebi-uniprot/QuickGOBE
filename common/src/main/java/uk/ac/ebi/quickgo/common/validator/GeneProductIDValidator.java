@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Time: 13:32
  * Created with IntelliJ IDEA.
  */
-public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList, String> {
+public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList, String[]> {
     private static final String MESSAGE = "At least one 'Gene Product ID' value is invalid: %s";
 
     @Autowired
@@ -30,11 +30,11 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
         idValidator = xRefFormats::test;
     }
 
-    @Override public boolean isValid(String s, ConstraintValidatorContext context) {
-        if (s == null) {
+    @Override public boolean isValid(String[] geneProducts, ConstraintValidatorContext context) {
+        if (geneProducts == null) {
             return true;
         }
-        String invalid = Arrays.stream(s.split(",")).filter(idValidator.negate()).collect
+        String invalid = Arrays.stream(geneProducts).filter(idValidator.negate()).collect
                 (Collectors.joining(", "));
 
         if(invalid != null && invalid.isEmpty()){
