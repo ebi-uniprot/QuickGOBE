@@ -2,7 +2,10 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.annotation.Annotation;
+import uk.ac.ebi.quickgo.index.annotation.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.index.annotation.AnnotationMocker;
 
 import java.util.Arrays;
@@ -32,13 +35,10 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 	@Test
     public void calculateStatisticsForTwoRecordsWithTheSameGoTerm() throws Exception {
 
-		Annotation annotation1 = AnnotationMocker.createValidAnnotation();
-        Annotation annotation2 = AnnotationMocker.createValidAnnotation();
-
-        List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        for (Annotation a : annotations) {
-            aggregator.process(a);
-        }
+        AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
+        AnnotationDocument annotation2 = AnnotationDocMocker.createAnnotationDoc("A0A000");
+        List<AnnotationDocument> docs = Arrays.asList(annotation1, annotation2);
+        aggregator.write(docs);
         aggregator.finish();
 
         //Now test
@@ -46,12 +46,12 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 
         assertThat(matrix.keySet(), hasSize(1));
 
-        Map<String, HitCount> costats = matrix.get("GO:0000977");
+        Map<String, HitCount> costats = matrix.get("GO:0003824");
         assertThat(costats, is(notNullValue()));
         assertThat(costats.keySet(), hasSize(1));
 
         //Is the only one
-        HitCount hc = costats.get("GO:0000977");
+        HitCount hc = costats.get("GO:0003824");
         assertThat(hc.hits, is(1l));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1l));
@@ -62,18 +62,14 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 	}
 
     @Test
-    public void calculateStatisticsForTwoRecordsWithTheDifferentGoTermsDifferentGeneProductSoNoCoStats() throws Exception {
+    public void calculateStatisticsForTwoRecordsWithDifferentGoTermsAndDifferentGeneProductSoNoCoStats() throws
+                                                                                                       Exception {
 
-        Annotation annotation1 = AnnotationMocker.createValidAnnotation();
-        Annotation annotation2 = AnnotationMocker.createValidAnnotation();
+        AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
+        AnnotationDocument annotation2 = AnnotationDocMocker.createAnnotationDoc("A0A001");
         annotation2.goId = "GO:0009999";
-        annotation2.dbObjectId = "A0A000";
-
-        List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        for (Annotation a : annotations) {
-            aggregator.process(a);
-        }
-
+        List<AnnotationDocument> docs = Arrays.asList(annotation1, annotation2);
+        aggregator.write(docs);
         aggregator.finish();
 
         //Now test
@@ -101,13 +97,11 @@ public class AnnotationCoOccurringTermsAggregatorTest {
     @Test
     public void calculateStatisticsForTwoRecordsWithTheDifferentGoTermsSameGeneProduct() throws Exception {
 
-        Annotation annotation1 = AnnotationMocker.createValidAnnotation();
-        Annotation annotation2 = AnnotationMocker.createValidAnnotation();
+        AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
+        AnnotationDocument annotation2 = AnnotationDocMocker.createAnnotationDoc("A0A000");
         annotation2.goId = "GO:0009999";
-        List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-        for (Annotation a : annotations) {
-            aggregator.process(a);
-        }
+        List<AnnotationDocument> docs = Arrays.asList(annotation1, annotation2);
+        aggregator.write(docs);
         aggregator.finish();
 
         //Now test
@@ -138,16 +132,12 @@ public class AnnotationCoOccurringTermsAggregatorTest {
     @Test
     public void zeroAnnotationsProcessedIfPredicateNotTrue() throws Exception {
 
-        Annotation annotation1 = AnnotationMocker.createValidAnnotation();
-        Annotation annotation2 = AnnotationMocker.createValidAnnotation();
-        annotation2.goId = "GO:0009999";
-        List<Annotation> annotations = Arrays.asList(annotation1, annotation2);
-
+        AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
+        AnnotationDocument annotation2 = AnnotationDocMocker.createAnnotationDoc("A0A000");
         AnnotationCo_occurringTermsAggregator aggregatorFalse = new AnnotationCo_occurringTermsAggregator(t -> false);
-        for (Annotation a : annotations) {
-            aggregatorFalse.process(a);
-        }
-        aggregatorFalse.finish();
+        List<AnnotationDocument> docs = Arrays.asList(annotation1, annotation2);
+        aggregator.write(docs);
+        aggregator.finish();
 
         //Now test
         Map<String, Map<String, HitCount>> matrix = aggregatorFalse.getTermToTermOverlapMatrix();
@@ -161,7 +151,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void exceptionThrownIfNullAnnotationPassedToAddRowToMatrix() throws Exception {
-        aggregator.process(null);
+        aggregator.write(null);
     }
 
 
