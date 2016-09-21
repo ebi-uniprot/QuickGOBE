@@ -10,6 +10,7 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
 import java.util.List;
+import org.slf4j.Logger;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 
 import static java.util.Arrays.asList;
+import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.presets.read.PresetsConfigHelper.fileReader;
@@ -38,6 +40,7 @@ import static uk.ac.ebi.quickgo.client.presets.read.ff.SourceColumnsFactory.Sour
 @Configuration
 @Import({PresetsCommonConfig.class})
 public class AssignedByPresetsConfig {
+    private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     private static final String ASSIGNED_BY = "assignedBy";
     private static final String ASSIGNED_BY_DEFAULTS = "UniProtKB";
@@ -103,7 +106,8 @@ public class AssignedByPresetsConfig {
         try {
             ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(assignedByRequest);
             relevantAssignedByPresets = convertedFilter.getConvertedValue();
-        } catch (Exception e) {
+        } catch (IllegalStateException ise) {
+            LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", ise);
             relevantAssignedByPresets = asList(assignedByDefaults);
         }
         return new RawNamedPresetRelevanceChecker(relevantAssignedByPresets);
