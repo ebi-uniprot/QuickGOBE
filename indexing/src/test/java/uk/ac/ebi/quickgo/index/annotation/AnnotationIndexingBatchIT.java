@@ -64,10 +64,10 @@ public class AnnotationIndexingBatchIT {
 
         StepExecution indexingStep = jobsSingleStepAsList.get(0);
 
-        assertThat(indexingStep.getReadCount(), is(6));
+        assertThat(indexingStep.getReadCount(), is(7));
         assertThat(indexingStep.getReadSkipCount(), is(0));
         assertThat(indexingStep.getProcessSkipCount(), is(2));
-        assertThat(indexingStep.getWriteCount(), is(4));
+        assertThat(indexingStep.getWriteCount(), is(5));
 
         List<String> writtenAnnotationDocGeneProductIds =
                 getGeneProductIdsFromAnnotationDocuments(annotationRepository.findAll());
@@ -76,7 +76,8 @@ public class AnnotationIndexingBatchIT {
                 "IntAct:EBI-10043081",
                 "IntAct:EBI-10043081",
                 "IntAct:EBI-10205244",
-                "IntAct:EBI-8801830"
+                "IntAct:EBI-8801830",
+                "IntAct:EBI-10043089"
         ));
 
         //Manual CoStats
@@ -98,10 +99,10 @@ public class AnnotationIndexingBatchIT {
                 .collect(Collectors.toList());
         assertThat(jobsSingleStepCoStatsAll, hasSize(1));
         StepExecution coTermsAllStep = jobsSingleStepCoStatsAll.get(0);
-        assertThat(coTermsAllStep.getReadCount(), is(4));
+        assertThat(coTermsAllStep.getReadCount(), is(5));
         assertThat(coTermsAllStep.getReadSkipCount(), is(0));
         assertThat(coTermsAllStep.getProcessSkipCount(), is(0));
-        assertThat(coTermsAllStep.getWriteCount(), is(4));
+        assertThat(coTermsAllStep.getWriteCount(), is(5));
 
         //Has finished
         BatchStatus status = jobExecution.getStatus();
