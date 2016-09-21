@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.annotation.model.ArrayPattern.Flag.CASE_INSENSITIVE;
@@ -34,6 +35,20 @@ public class AnnotationRequest {
 
     public static final int DEFAULT_PAGE_NUMBER = 1;
     public static final int MIN_PAGE_NUMBER = 1;
+
+    static final int MAX_GENE_PRODUCT_IDS = 500;
+
+    //Names of the parameters in readable format
+    static final String ASSIGNED_BY_PARAM = "Assigned By";
+    static final String ASPECT_PARAM = "Aspect";
+    static final String GO_EVIDENCE_PARAM = "GO Evidence";
+    static final String TAXON_ID_PARAM = "Taxonomic identifier";
+    static final String GO_ID_PARAM = "GO Id";
+    static final String USAGE_RELATIONSHIP_PARAM = "Usage relationship";
+    static final String EVIDENCE_CODE_PARAM = "Evidence code identifier";
+    static final String GENE_PRODUCT_TYPE_PARAM = "Gene Product Type";
+    static final String GENE_PRODUCT_SUBSET_PARAM = "Gene Product Subset identifier";
+    static final String GENE_PRODUCT_PARAM = "Gene Product ID";
 
     static final String USAGE_FIELD = "usage";
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
@@ -191,7 +206,7 @@ public class AnnotationRequest {
         }
     }
 
-    @ArrayPattern(regexp = "^[A-Za-z][A-Za-z\\-_]+$", paramName = "Assigned By")
+    @ArrayPattern(regexp = "^[A-Za-z][A-Za-z\\-_]+$", paramName = ASSIGNED_BY_PARAM)
     public String[] getAssignedBy() {
         return filterMap.get(ASSIGNED_BY);
     }
@@ -218,7 +233,7 @@ public class AnnotationRequest {
     }
 
     @ArrayPattern(regexp = "^biological_process|molecular_function|cellular_component$", flags = CASE_INSENSITIVE,
-            paramName = "Aspect")
+            paramName = ASPECT_PARAM)
     public String[] getAspect() {
         return filterMap.get(GO_ASPECT);
     }
@@ -233,6 +248,7 @@ public class AnnotationRequest {
     }
 
     @GeneProductIDList
+    @Size(max = MAX_GENE_PRODUCT_IDS, message = "")
     public String[] getGeneProductId() {
         return filterMap.get(GENE_PRODUCT_ID);
     }
@@ -247,7 +263,7 @@ public class AnnotationRequest {
         filterMap.put(GO_EVIDENCE, evidence);
     }
 
-    @ArrayPattern(regexp = "^[A-Za-z]{2,3}$", paramName = "GO Evidence")
+    @ArrayPattern(regexp = "^[A-Za-z]{2,3}$", paramName = GO_EVIDENCE_PARAM)
     public String[] getGoIdEvidence() {
         return filterMap.get(GO_EVIDENCE);
     }
@@ -286,7 +302,7 @@ public class AnnotationRequest {
         filterMap.put(TAXON_ID, taxId);
     }
 
-    @ArrayPattern(regexp = "^[0-9]+$", paramName = "Taxonomic identifier")
+    @ArrayPattern(regexp = "^[0-9]+$", paramName = TAXON_ID_PARAM)
     public String[] getTaxonId() {
         return filterMap.get(TAXON_ID);
     }
@@ -299,7 +315,7 @@ public class AnnotationRequest {
         filterMap.put(GO_ID, goId);
     }
 
-    @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE, paramName = "GO Id")
+    @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE, paramName = GO_ID_PARAM)
     public String[] getGoId() {
         return filterMap.get(GO_ID);
     }
@@ -312,7 +328,7 @@ public class AnnotationRequest {
         filterMap.put(EVIDENCE_CODE, evidenceCode);
     }
 
-    @ArrayPattern(regexp = "^ECO:[0-9]{7}$", paramName = "Evidence code identifier", flags = CASE_INSENSITIVE)
+    @ArrayPattern(regexp = "^ECO:[0-9]{7}$", paramName = EVIDENCE_CODE_PARAM, flags = CASE_INSENSITIVE)
     public String[] getEvidenceCode() {
         return filterMap.get(EVIDENCE_CODE);
     }
@@ -330,7 +346,7 @@ public class AnnotationRequest {
     }
 
     @ArrayPattern(regexp = "^is_a|part_of|occurs_in|regulates$", flags = CASE_INSENSITIVE,
-            paramName = "Usage relationship")
+            paramName = USAGE_RELATIONSHIP_PARAM)
     public String[] getUsageRelationships() {
         return filterMap.get(USAGE_RELATIONSHIPS);
     }
@@ -348,8 +364,7 @@ public class AnnotationRequest {
         filterMap.put(GENE_PRODUCT_TYPE, geneProductType);
     }
 
-    @ArrayPattern(regexp = "^complex|rna|protein$", flags = CASE_INSENSITIVE,
-            paramName = "Gene Product Type")
+    @ArrayPattern(regexp = "^complex|rna|protein$", flags = CASE_INSENSITIVE, paramName = GENE_PRODUCT_TYPE_PARAM)
     public String[] getGeneProductType() {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
@@ -370,7 +385,7 @@ public class AnnotationRequest {
         filterMap.put(DB_SUBSET, geneProductSubset);
     }
 
-    @ArrayPattern(regexp = "^[A-Za-z-]+$", paramName = "Gene Product Subset identifier")
+    @ArrayPattern(regexp = "^[A-Za-z-]+$", paramName = GENE_PRODUCT_SUBSET_PARAM)
     public String[] getGeneProductSubset() {
         return filterMap.get(DB_SUBSET);
     }

@@ -19,6 +19,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static uk.ac.ebi.quickgo.annotation.AnnotationUtil.createGPId;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
@@ -74,7 +76,7 @@ public class AnnotationRequestValidationIT {
 
                     assertThat(violations, hasSize(1));
                     assertThat(violations.iterator().next().getMessage(),
-                            is(createErrorMessage("Assigned By", invalidValue)));
+                            is(createRegexErrorMessage(ASSIGNED_BY_PARAM, invalidValue)));
                 }
         );
     }
@@ -106,7 +108,7 @@ public class AnnotationRequestValidationIT {
                             (annotationRequest);
                     assertThat(violations, hasSize(1));
                     assertThat(violations.iterator().next().getMessage(),
-                            is(createErrorMessage("GO Evidence", invalidValue)));
+                            is(createRegexErrorMessage(GO_EVIDENCE_PARAM, invalidValue)));
                 }
         );
     }
@@ -155,7 +157,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(createErrorMessage("Aspect", aspect)));
+                is(createRegexErrorMessage(ASPECT_PARAM, aspect)));
     }
 
     @Test
@@ -185,7 +187,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(createErrorMessage("Taxonomic identifier", taxId)));
+                is(createRegexErrorMessage(TAXON_ID_PARAM, taxId)));
     }
 
     @Test
@@ -200,7 +202,7 @@ public class AnnotationRequestValidationIT {
                             (annotationRequest);
                     assertThat(violations, hasSize(is(1)));
                     assertThat(violations.iterator().next().getMessage(),
-                            is(createErrorMessage("Taxonomic identifier", invalidValue)));
+                            is(createRegexErrorMessage(TAXON_ID_PARAM, invalidValue)));
                 }
         );
     }
@@ -232,7 +234,7 @@ public class AnnotationRequestValidationIT {
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(is(1)));
         assertThat(violations.iterator().next().getMessage(),
-                is(createErrorMessage("Taxonomic identifier", taxId)));
+                is(createRegexErrorMessage(TAXON_ID_PARAM, taxId)));
     }
 
     //GENE PRODUCT ID
@@ -258,11 +260,22 @@ public class AnnotationRequestValidationIT {
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(createErrorMessage("Gene Product ID", INVALID_GENE_PRODUCT_ID)));
+                is(createRegexErrorMessage(GENE_PRODUCT_PARAM, INVALID_GENE_PRODUCT_ID)));
+    }
+
+    @Test
+    public void exceedingMaximumNumberOfGeneProductsIdentifiersSendsError() {
+        int numIds = AnnotationRequest.MAX_GENE_PRODUCT_IDS + 1;
+
+        String[] gpIds = generateGeneProductIds(numIds);
+
+        annotationRequest.setGeneProductId(gpIds);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(1));
     }
 
     //    GO ID PARAMETER
-
     @Test
     public void goIdIsValid() {
         String[] goIds = {"GO:0003824", "GO:0009999", "GO:0003333"};
@@ -310,7 +323,7 @@ public class AnnotationRequestValidationIT {
 
                     assertThat(violations, hasSize(1));
                     assertThat(violations.iterator().next().getMessage(),
-                            is(createErrorMessage("GO Id", id)));
+                            is(createRegexErrorMessage(GO_ID_PARAM, id)));
                 }
         );
     }
@@ -361,7 +374,7 @@ public class AnnotationRequestValidationIT {
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     printConstraintViolations(violations);
                     assertThat(violations.iterator().next().getMessage(),
-                            is(createErrorMessage("Evidence code identifier", inValidId)));
+                            is(createRegexErrorMessage(EVIDENCE_CODE_PARAM, inValidId)));
                     assertThat(violations, hasSize(1));
                 }
         );
@@ -392,7 +405,7 @@ public class AnnotationRequestValidationIT {
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     assertThat(violations, hasSize(is(1)));
                     assertThat(violations.iterator().next().getMessage(),
-                            is(createErrorMessage("Gene Product Type", invalidValue)));
+                            is(createRegexErrorMessage(GENE_PRODUCT_TYPE_PARAM, invalidValue)));
                 }
         );
     }
@@ -415,7 +428,7 @@ public class AnnotationRequestValidationIT {
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     printConstraintViolations(violations);
                     assertThat(violations.iterator().next().getMessage(),
-                            is(createErrorMessage("Gene Product Subset identifier", inValidId)));
+                            is(createRegexErrorMessage(GENE_PRODUCT_SUBSET_PARAM, inValidId)));
                     assertThat(violations, hasSize(1));
                 }
         );
@@ -537,7 +550,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(createErrorMessage("Usage relationship", invalidUsageRelationship)));
+                is(createRegexErrorMessage(USAGE_RELATIONSHIP_PARAM, invalidUsageRelationship)));
     }
 
     @Test(expected = ParameterException.class)
@@ -551,8 +564,18 @@ public class AnnotationRequestValidationIT {
         violations.forEach(System.out::println);
     }
 
-    private String createErrorMessage(String paramName, String... invalidItems) {
+    private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
         return String.format(ArrayPattern.ERROR_MSG, paramName, csvInvalidItems);
+    }
+
+    private String[] generateGeneProductIds(int numberOfIds) {
+        String[] gpIds = new String[numberOfIds];
+
+        for (int i = 0; i < numberOfIds; i++) {
+            gpIds[i] = createGPId(i);
+        }
+
+        return gpIds;
     }
 }
