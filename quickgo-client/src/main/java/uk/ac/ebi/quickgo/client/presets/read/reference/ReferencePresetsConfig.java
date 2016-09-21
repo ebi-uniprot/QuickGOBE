@@ -10,9 +10,11 @@ import uk.ac.ebi.quickgo.client.presets.read.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.presets.read.ff.StringToRawNamedPresetMapper;
 
 import java.util.Set;
+import java.util.function.Function;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,12 +77,7 @@ public class ReferencePresetsConfig {
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
                         rawPresetFilter(dbDefaults)))
-                .writer(rawItemList -> rawItemList.forEach(rawItem -> {
-                    presets.referencesBuilder.addPreset(
-                            PresetItemBuilder.createWithName(rawItem.name)
-                                    .withDescription(rawItem.description)
-                                    .build());
-                }))
+                .writer(rawPresetWriter(presets, Function.identity()))
                 .listener(new LogStepListener())
                 .build();
     }
@@ -101,14 +98,26 @@ public class ReferencePresetsConfig {
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
                         rawPresetFilter(specificDBDefaults)))
-                .writer(rawItemList -> rawItemList.forEach(rawItem -> {
-                    presets.referencesBuilder.addPreset(
-                            PresetItemBuilder.createWithName(buildGORefID(rawItem.name))
-                                    .withDescription(rawItem.description)
-                                    .build());
-                }))
+                .writer(rawPresetWriter(presets, this::buildGORefID))
                 .listener(new LogStepListener())
                 .build();
+    }
+
+    /**
+     * Write the list of {@link RawNamedPreset}s to the {@link CompositePresetImpl}
+     * @param presets the presets to write to
+     * @param nameTransformer a transformation function to apply to each preset name
+     * @return the corresponding {@link ItemWriter}
+     */
+    private ItemWriter<RawNamedPreset> rawPresetWriter(
+            CompositePresetImpl presets,
+            Function<String, String> nameTransformer) {
+        return rawItemList -> rawItemList.forEach(rawItem -> {
+            presets.referencesBuilder.addPreset(
+                    PresetItemBuilder.createWithName(nameTransformer.apply(rawItem.name))
+                            .withDescription(rawItem.description)
+                            .build());
+        });
     }
 
     private String buildGORefID(String name) {

@@ -12,6 +12,7 @@ import uk.ac.ebi.quickgo.client.presets.read.ff.StringToRawNamedPresetMapper;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,16 +58,25 @@ public class EvidencePresetsConfig {
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
                 .processor(compositeItemProcessor(
                         rawPresetValidator()))
-                .writer(rawItemList -> rawItemList.forEach(rawItem -> {
-                    presets.evidencesBuilder.addPreset(
-                            PresetItemBuilder.createWithName(rawItem.name)
-                                    .withId(rawItem.id)
-                                    .withRelevancy(rawItem.relevancy)
-                                    .withDescription(rawItem.description)
-                                    .build());
-                }))
+                .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
+    }
+
+    /**
+     * Write the list of {@link RawNamedPreset}s to the {@link CompositePresetImpl}
+     * @param presets the presets to write to
+     * @return the corresponding {@link ItemWriter}
+     */
+    private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
+        return rawItemList -> rawItemList.forEach(rawItem -> {
+            presets.evidencesBuilder.addPreset(
+                    PresetItemBuilder.createWithName(rawItem.name)
+                            .withId(rawItem.id)
+                            .withRelevancy(rawItem.relevancy)
+                            .withDescription(rawItem.description)
+                            .build());
+        });
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
