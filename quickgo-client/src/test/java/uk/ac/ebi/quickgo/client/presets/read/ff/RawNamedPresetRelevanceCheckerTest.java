@@ -27,16 +27,16 @@ public class RawNamedPresetRelevanceCheckerTest {
 
     @Test
     public void invalidItemIsFiltered() throws Exception {
-        assertThat(relevanceChecker.process(assignedBy("invalid")), is(nullValue()));
+        assertThat(relevanceChecker.process(createAssignedBy("invalid")), is(nullValue()));
     }
 
     @Test
     public void validItemIsNotFiltered() throws Exception {
-        assertThat(relevanceChecker.process(assignedBy(UNIPROT)), is(not(nullValue())));
-        assertThat(relevanceChecker.process(assignedBy(UNIPROT)).name, is(UNIPROT));
+        assertThat(relevanceChecker.process(createAssignedBy(UNIPROT)), is(not(nullValue())));
+        assertThat(relevanceChecker.process(createAssignedBy(UNIPROT)).name, is(UNIPROT));
     }
 
-    private RawNamedPreset assignedBy(String name) {
+    private RawNamedPreset createAssignedBy(String name) {
         RawNamedPreset preset = new RawNamedPreset();
         preset.name = name;
         return preset;

@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.presets.read;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetItems;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.evidence.EvidencePresetsConfig;
@@ -10,6 +11,7 @@ import uk.ac.ebi.quickgo.client.presets.read.slimsets.GOSlimSetPresetsConfig;
 import uk.ac.ebi.quickgo.client.presets.read.withFrom.WithFromPresetsConfig;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,7 +62,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                preset.getAssignedBy().getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
+                extractPresetValues(preset.getAssignedBy(), PresetItem::getName),
                 contains(UNIPROT_KB, ENSEMBL));
     }
 
@@ -75,7 +77,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                preset.getReferences().getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
+                extractPresetValues(preset.getReferences(), PresetItem::getName),
                 contains(DOI, REACTOME));
     }
 
@@ -90,7 +92,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                preset.getReferences().getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
+                extractPresetValues(preset.getReferences(), PresetItem::getName),
                 is(GO_REFS_FROM_RESOURCE));
     }
 
@@ -105,7 +107,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(preset.getEvidences().getPresets(), hasSize(22));
 
-        PresetItem firstPresetItem = preset.getEvidences().getPresets().stream().findFirst().orElse(null);
+        PresetItem firstPresetItem = extractFirstPreset(preset.getEvidences());
         assertThat(firstPresetItem.getName(), is(PRESET_ECO_32.getName()));
         assertThat(firstPresetItem.getId(), is(PRESET_ECO_32.getId()));
         assertThat(firstPresetItem.getDescription(), is(PRESET_ECO_32.getDescription()));
@@ -123,8 +125,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(preset.getWithFrom().getPresets(), hasSize(7));
 
-        PresetItem lastPresetItem =
-                preset.getWithFrom().getPresets().stream().reduce((first, second) -> second).orElse(null);
+        PresetItem lastPresetItem = extractLastPreset(preset.getWithFrom());
         assertThat(lastPresetItem.getName(), is(PRESET_DICTY_BASE.getName()));
         assertThat(lastPresetItem.getId(), is(PRESET_DICTY_BASE.getId()));
         assertThat(lastPresetItem.getDescription(), is(PRESET_DICTY_BASE.getDescription()));
@@ -142,8 +143,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(preset.getGeneProducts().getPresets(), hasSize(5));
 
-        PresetItem firstPresetItem =
-                preset.getGeneProducts().getPresets().stream().findFirst().orElse(null);
+        PresetItem firstPresetItem = extractFirstPreset(preset.getGeneProducts());
         assertThat(firstPresetItem.getName(), is(PRESET_BHF_UCL.getName()));
         assertThat(firstPresetItem.getId(), is(PRESET_BHF_UCL.getId()));
         assertThat(firstPresetItem.getDescription(), is(PRESET_BHF_UCL.getDescription()));
@@ -161,9 +161,25 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(preset.getGoSlimSets().getPresets(), hasSize(3));
 
-        List<PresetItem> presetItems = preset.getGoSlimSets().getPresets().stream().collect(Collectors.toList());
+        List<PresetItem> presetItems = extractPresets(preset.getGoSlimSets());
         assertThat(presetItems.get(0), is(equalTo(PRESET_GO_SLIM_METAGENOMICS)));
         assertThat(presetItems.get(1), is(equalTo(PRESET_GO_SLIM_POMBE)));
         assertThat(presetItems.get(2), is(equalTo(PRESET_GO_SLIM_SYNAPSE)));
+    }
+
+    private <T> List<T> extractPresetValues(PresetItems presets, Function<PresetItem, T> extractor) {
+        return presets.getPresets().stream().map(extractor).collect(Collectors.toList());
+    }
+
+    private List<PresetItem> extractPresets(PresetItems presets) {
+        return presets.getPresets().stream().collect(Collectors.toList());
+    }
+
+    private PresetItem extractFirstPreset(PresetItems presets) {
+        return presets.getPresets().stream().findFirst().orElse(null);
+    }
+
+    private PresetItem extractLastPreset(PresetItems presets) {
+        return presets.getPresets().stream().reduce((first, second) -> second).orElse(null);
     }
 }

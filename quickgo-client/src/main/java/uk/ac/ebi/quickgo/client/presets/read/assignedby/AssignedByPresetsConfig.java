@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.presets.read.LogStepListener;
 import uk.ac.ebi.quickgo.client.presets.read.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.presets.read.ff.*;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
@@ -43,7 +44,7 @@ public class AssignedByPresetsConfig {
     private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     private static final String ASSIGNED_BY = "assignedBy";
-    private static final String ASSIGNED_BY_DEFAULTS = "UniProtKB";
+    public static final String ASSIGNED_BY_DEFAULTS = "AgBase,BHF-UCL,CACAO,CGD,EcoCyc,UniProtKB";
 
     @Value("#{'${assignedBy.preset.source:}'.split(',')}")
     private Resource[] assignedByResources;
@@ -106,8 +107,8 @@ public class AssignedByPresetsConfig {
         try {
             ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(assignedByRequest);
             relevantAssignedByPresets = convertedFilter.getConvertedValue();
-        } catch (IllegalStateException ise) {
-            LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", ise);
+        } catch (RetrievalException | IllegalStateException e) {
+            LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", e);
             relevantAssignedByPresets = asList(assignedByDefaults);
         }
         return new RawNamedPresetRelevanceChecker(relevantAssignedByPresets);

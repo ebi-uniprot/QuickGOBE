@@ -1,9 +1,12 @@
 package uk.ac.ebi.quickgo.client.presets.read;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetItems;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.presets.read.assignedby.AssignedByPresetsConfig;
 
+import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,7 +57,12 @@ public class PresetsFailedRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                preset.getAssignedBy().getPresets().stream().map(PresetItem::getName).collect(Collectors.toList()),
+                extractPresetValues(preset.getAssignedBy(), PresetItem::getName),
                 contains(UNIPROT_KB));
     }
+
+    private <T> List<T> extractPresetValues(PresetItems presets, Function<PresetItem, T> extractor) {
+        return presets.getPresets().stream().map(extractor).collect(Collectors.toList());
+    }
+
 }
