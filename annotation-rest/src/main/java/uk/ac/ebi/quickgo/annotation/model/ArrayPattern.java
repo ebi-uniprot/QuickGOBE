@@ -153,7 +153,7 @@ import javax.validation.Payload;
                     }
                 }
 
-                if (!isValid) {
+                if (!isValid && context.getDefaultConstraintMessageTemplate().equals(ERROR_MSG)) {
                     context.disableDefaultConstraintViolation();
 
                     String invalidItemsText = invalidItems.stream().collect(Collectors.joining(","));
