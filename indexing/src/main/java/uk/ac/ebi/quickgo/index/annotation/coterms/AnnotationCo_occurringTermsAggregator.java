@@ -1,11 +1,12 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import com.google.common.base.Preconditions;
-import org.springframework.batch.item.ItemProcessor;
-import uk.ac.ebi.quickgo.index.annotation.Annotation;
+
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 
 import java.util.*;
 import java.util.function.Predicate;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * @author Tony Wardell
@@ -15,26 +16,26 @@ import java.util.function.Predicate;
  *
  * Aggregates all the data need to calculate all co-occurrence stat data points.
  */
-public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Annotation, Annotation> {
+public class AnnotationCo_occurringTermsAggregator implements ItemWriter<AnnotationDocument> {
 
     //A list of all unique geneProducts encountered - it exists so we can get a count of the total unique gene products.
     private final Set<String> geneProductList;
 
     //Determines which annotations get processed.
-    private final Predicate<Annotation> toBeProcessed;
+    private final Predicate<AnnotationDocument> toBeProcessed;
 
     private TermBatch termBatch;
-    private TermCoTerms coTerms;
+    private TermToTermOverlapMatrix overlapMatrix;
     private TermGPCount termGPCount;
 
     //Constructor
-    public AnnotationCo_occurringTermsAggregator(Predicate<Annotation> toBeProcessed) {
+    public AnnotationCo_occurringTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
 
         Preconditions.checkArgument(toBeProcessed != null, "Null predicate passed AnnotationCo_occurringTermsAggregator" +
                 " constructor");
 
         this.toBeProcessed = toBeProcessed;
-        this.coTerms = new TermCoTerms();
+        this.overlapMatrix = new TermToTermOverlapMatrix();
         geneProductList = new HashSet<>();
         termGPCount = new TermGPCount();
         termBatch = new TermBatch();
@@ -67,32 +68,34 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
      * co-occurred.
      */
     public Map<String, Map<String, HitCount>> getTermToTermOverlapMatrix() {
-        return coTerms.termToTermOverlapMatrix;
+        return overlapMatrix.termToTermOverlapMatrix;
     }
 
     /**
      * For each row of the GP Association file, create a list of terms, against which there is a list of all the
      * other terms that that term share a referenced gene product with.
      *
-     * @param annotation input file containing annotations
+     * @param items
      */
     @Override
-    public Annotation process(Annotation annotation) throws Exception {
+    public void write(List<? extends AnnotationDocument> items) throws Exception {
 
-        Preconditions.checkArgument(annotation != null, "Null annotation passed to process");
+        Preconditions.checkArgument(items != null, "Null annotation passed to process");
 
-        if (!toBeProcessed.test(annotation)) {
-            return annotation;
-        }
+        items.stream()
+                .filter(i -> this.toBeProcessed.test(i))
+                .forEach(i -> writeItem(i));
+    }
 
-        TermBatch tb2 = termBatch.termBatch(annotation);
+    private void writeItem(AnnotationDocument doc) {
+
+        TermBatch tb2 = termBatch.termBatch(doc);
         if (tb2 != termBatch) {
             increaseCountsForTermsInBatch();
             termBatch = tb2;
         }
 
-        geneProductList.add(annotation.dbObjectId); //set so each gp is only added once.
-        return annotation;
+        geneProductList.add(doc.geneProductId); //set so each gp is only added once.
     }
 
     /**
@@ -110,7 +113,7 @@ public class AnnotationCo_occurringTermsAggregator implements ItemProcessor<Anno
     private void increaseCountsForTermsInBatch() {
 
         for (String termId : termBatch.termsInBatch) {
-            coTerms.incrementCountForCo_occurringTerms(termId, termBatch.termsInBatch);
+            overlapMatrix.incrementCountForCo_occurringTerms(termId, termBatch.termsInBatch);
             termGPCount.incrementGeneProductCountForTerm(termId);
         }
     }
@@ -133,30 +136,30 @@ class TermBatch {
         termsInBatch.add(goId);
     }
 
-    uk.ac.ebi.quickgo.index.annotation.coterms.TermBatch termBatch(Annotation annotation) {
+    uk.ac.ebi.quickgo.index.annotation.coterms.TermBatch termBatch(AnnotationDocument doc) {
 
         if (currentGeneProduct == null) {
-            currentGeneProduct = annotation.dbObjectId;
+            currentGeneProduct = doc.geneProductId;
         }
 
-        if (!annotation.dbObjectId.equals(currentGeneProduct)) {
+        if (!doc.geneProductId.equals(currentGeneProduct)) {
             TermBatch termBatch = new TermBatch();
-            termBatch.currentGeneProduct = annotation.dbObjectId;
-            termBatch.add(annotation.goId);
+            termBatch.currentGeneProduct = doc.geneProductId;
+            termBatch.add(doc.goId);
             return termBatch;
         }
-        this.add(annotation.goId);
+        this.add(doc.goId);
         return this;
 
     }
 }
 
-class TermCoTerms {
+class TermToTermOverlapMatrix {
 
+    //Key =>target term, value=> map (key=>co-occurring term, value => HitCountForCo-occurrence
     final Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
 
-
-    public TermCoTerms() {
+    public TermToTermOverlapMatrix() {
         termToTermOverlapMatrix = new TreeMap<>();
     }
 
@@ -166,18 +169,18 @@ class TermCoTerms {
      */
     void incrementCountForCo_occurringTerms(String termId, Set<String> termsInBatch) {
 
-        Map<String, HitCount> termCoTerms = getTermCoTerms(termId);
+        Map<String, HitCount> co_occurringTerms = getCo_occurringTerms(termId);
 
         //Loop through all the terms we have encountered in this batch and update the quantities
         for (String co_occurringTerm : termsInBatch) {
 
             //Get 'permanent' record for this termId/termId permutation
-            HitCount permutationHitCount = termCoTerms.get(co_occurringTerm);
+            HitCount permutationHitCount = co_occurringTerms.get(co_occurringTerm);
 
             //Create if it doesn't exist.
             if (permutationHitCount == null) {
                 permutationHitCount = new HitCount();
-                termCoTerms.put(co_occurringTerm, permutationHitCount);
+                co_occurringTerms.put(co_occurringTerm, permutationHitCount);
             }
 
             //Update it with a count of 'one' as this batch is for one gene protein and so the count must be one
@@ -192,7 +195,7 @@ class TermCoTerms {
      * @param termId
      * @return All terms that are co-occurring term to argument
      */
-    private Map<String, HitCount> getTermCoTerms(String termId) {
+    private Map<String, HitCount> getCo_occurringTerms(String termId) {
 
         //look in the store
         Map<String, HitCount> termCoTerms = termToTermOverlapMatrix.get(termId);
