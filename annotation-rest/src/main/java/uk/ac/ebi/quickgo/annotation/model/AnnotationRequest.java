@@ -13,8 +13,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
-import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
+import static uk.ac.ebi.quickgo.annotation.model.ArrayPattern.Flag.CASE_INSENSITIVE;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -37,8 +37,6 @@ public class AnnotationRequest {
 
     static final String USAGE_FIELD = "usage";
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
-
-    private static final String COMMA = ",";
 
     /**
      * indicates which fields should be looked at when creating filters
@@ -102,7 +100,7 @@ public class AnnotationRequest {
 
     @ApiModelProperty(value = "The database which made the annotation. Accepts comma separated values.",
             example = "BHF-UCL,Ensembl")
-    private String assignedBy;
+    private String[] assignedBy;
 
     @ApiModelProperty(
             value = "Identifier of a literature or database reference, cited as an authority " +
@@ -181,21 +179,21 @@ public class AnnotationRequest {
             example = "EXP,IDA")
     private String goIdEvidence;
 
-    private final Map<String, String> filterMap = new HashMap<>();
+    private final Map<String, String[]> filterMap = new HashMap<>();
 
     /**
      *  E.g. ASPGD,Agbase,..
      *  In the format assignedBy=ASPGD,Agbase
      */
-    public void setAssignedBy(String assignedBy) {
+    public void setAssignedBy(String... assignedBy) {
         if (assignedBy != null) {
             filterMap.put(ASSIGNED_BY, assignedBy);
         }
     }
 
-    @Pattern(regexp = "^[A-Za-z][A-Za-z\\-_]+(,[A-Za-z][A-Za-z\\-_]+)*",
-            message = "At least one 'Assigned By' value is invalid: ${validatedValue}")
-    public String getAssignedBy() {
+    @ArrayPattern(regexp = "^[A-Za-z][A-Za-z\\-_]+$",
+            message = "At least one 'Assigned By' value is invalid: ")
+    public String[] getAssignedBy() {
         return filterMap.get(ASSIGNED_BY);
     }
 
@@ -205,39 +203,38 @@ public class AnnotationRequest {
      * @param reference
      * @return
      */
-    public void setReference(String reference) {
+    public void setReference(String... reference) {
         filterMap.put(REFERENCE_SEARCH, reference);
     }
 
     //todo create validation pattern @Pattern(regexp = "")
-    public String getReference() {
+    public String[] getReference() {
         return filterMap.get(REFERENCE_SEARCH);
     }
 
-    public void setAspect(String aspect) {
+    public void setAspect(String... aspect) {
         if (aspect != null) {
             filterMap.put(GO_ASPECT, aspect);
         }
     }
 
-    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = CASE_INSENSITIVE,
-            message = "At least one 'Aspect' value is invalid: ${validatedValue}")
-    public String getAspect() {
+    @ArrayPattern(regexp = "^biological_process|molecular_function|cellular_component$",
+            flags = CASE_INSENSITIVE, message = "At least one 'Aspect' value is invalid: ")
+    public String[] getAspect() {
         return filterMap.get(GO_ASPECT);
     }
 
     /**
      * Gene Product IDs, in CSV format.
      */
-
-    public void setGeneProductId(String listOfGeneProductIDs) {
+    public void setGeneProductId(String... listOfGeneProductIDs) {
         if (listOfGeneProductIDs != null) {
             filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
         }
     }
 
     @GeneProductIDList
-    public String getGeneProductId() {
+    public String[] getGeneProductId() {
         return filterMap.get(GENE_PRODUCT_ID);
     }
 
@@ -247,13 +244,12 @@ public class AnnotationRequest {
      * evidence codes</a>
      * @param evidence the evidence code
      */
-    public void setGoIdEvidence(String evidence) {
+    public void setGoIdEvidence(String... evidence) {
         filterMap.put(GO_EVIDENCE, evidence);
     }
 
-    @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
-            message = "At least one 'GO Evidence' value is invalid: ${validatedValue}")
-    public String getGoIdEvidence() {
+    @ArrayPattern(regexp = "^[A-Za-z]{2,3}$", message = "At least one 'GO Evidence' value is invalid: ")
+    public String[] getGoIdEvidence() {
         return filterMap.get(GO_EVIDENCE);
     }
 
@@ -261,11 +257,11 @@ public class AnnotationRequest {
      * NOT, enables etc
      * @param qualifier
      */
-    public void setQualifier(String qualifier) {
+    public void setQualifier(String... qualifier) {
         filterMap.put(QUALIFIER, qualifier);
     }
 
-    public String getQualifier() {
+    public String[] getQualifier() {
         return filterMap.get(QUALIFIER);
     }
 
@@ -275,7 +271,7 @@ public class AnnotationRequest {
      * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
      * @param withFrom comma separated with/from values
      */
-    public void setWithFrom(String withFrom) {
+    public void setWithFrom(String... withFrom) {
         filterMap.put(WITH_FROM_SEARCH, withFrom);
     }
 
@@ -283,17 +279,16 @@ public class AnnotationRequest {
      * Return a list of with/from values, separated by commas
      * @return String containing comma separated list of with/From values.
      */
-    public String getWithFrom() {
+    public String[] getWithFrom() {
         return filterMap.get(WITH_FROM_SEARCH);
     }
 
-    public void setTaxonId(String taxId) {
+    public void setTaxonId(String... taxId) {
         filterMap.put(TAXON_ID, taxId);
     }
 
-    @Pattern(regexp = "[0-9]+(,[0-9]+)*",
-            message = "At least one 'Taxonomic identifier' value is invalid: ${validatedValue}")
-    public String getTaxonId() {
+    @ArrayPattern(regexp = "^[0-9]+$", message = "At least one 'Taxonomic identifier' value is invalid: ")
+    public String[] getTaxonId() {
         return filterMap.get(TAXON_ID);
     }
 
@@ -301,13 +296,13 @@ public class AnnotationRequest {
      * List of Gene Ontology ids in CSV format
      * @param goId
      */
-    public void setGoId(String goId) {
+    public void setGoId(String... goId) {
         filterMap.put(GO_ID, goId);
     }
 
-    @Pattern(regexp = "go:[0-9]{7}(,go:[0-9]{7})*", flags = CASE_INSENSITIVE,
-            message = "At least one 'GO Id' value is invalid: ${validatedValue}")
-    public String getGoId() {
+    @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE,
+            message = "At least one 'GO Id' value is invalid: ")
+    public String[] getGoId() {
         return filterMap.get(GO_ID);
     }
 
@@ -315,48 +310,50 @@ public class AnnotationRequest {
      * Will receive a list of eco ids thus: evidenceCode=ECO:0000256,ECO:0000323
      * @param evidenceCode
      */
-    public void setEvidenceCode(String evidenceCode) {
+    public void setEvidenceCode(String... evidenceCode) {
         filterMap.put(EVIDENCE_CODE, evidenceCode);
     }
 
-    @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*", flags = CASE_INSENSITIVE,
-            message = "At least one 'Evidence code identifier' value is invalid: ${validatedValue}")
-    public String getEvidenceCode() {
+    @ArrayPattern(regexp = "^ECO:[0-9]{7}$", flags = CASE_INSENSITIVE,
+            message = "At least one 'Evidence code identifier' value is invalid: ")
+    public String[] getEvidenceCode() {
         return filterMap.get(EVIDENCE_CODE);
-    }
-
-    @Pattern(regexp = "^slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
-            "${validatedValue}")
-    public String getUsage() {
-        return filterMap.get(USAGE_FIELD);
     }
 
     public void setUsage(String usage) {
         if (usage != null) {
-            filterMap.put(USAGE_FIELD, usage.toLowerCase());
+            filterMap.put(USAGE_FIELD, new String[]{usage.toLowerCase()});
         }
     }
 
-    @Pattern(regexp = "(is_a|part_of|occurs_in|regulates)(,is_a|part_of|occurs_in|regulates)*",
-            flags = CASE_INSENSITIVE,
-            message = "At least one usage relationship is invalid: ${validatedValue}")
-    public String getUsageRelationships() {
+    @Pattern(regexp = "^slim|descendants$", flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "Invalid usage: ${validatedValue}")
+    public String getUsage() {
+        return filterMap.get(USAGE_FIELD) == null ? null : filterMap.get(USAGE_FIELD)[0];
+    }
+
+    @ArrayPattern(regexp = "^is_a|part_of|occurs_in|regulates$", flags = CASE_INSENSITIVE,
+            message = "At least one 'Usage relationship' is invalid: ")
+    public String[] getUsageRelationships() {
         return filterMap.get(USAGE_RELATIONSHIPS);
     }
 
-    public void setUsageRelationships(String usageRelationships) {
+    public void setUsageRelationships(String... usageRelationships) {
         if (usageRelationships != null) {
-            filterMap.put(USAGE_RELATIONSHIPS, usageRelationships.toLowerCase());
+            String[] usageRelationshipArray = Stream.of(usageRelationships)
+                    .map(String::toLowerCase)
+                    .toArray(String[]::new);
+            filterMap.put(USAGE_RELATIONSHIPS, usageRelationshipArray);
         }
     }
 
-    public void setGeneProductType(String geneProductType) {
-        filterMap.put(GENE_PRODUCT_TYPE, geneProductType.toLowerCase());
+    public void setGeneProductType(String... geneProductType) {
+        filterMap.put(GENE_PRODUCT_TYPE, geneProductType);
     }
 
-    @Pattern(regexp = "^(complex|rna|protein)(,(complex|rna|protein)){0,2}", flags = CASE_INSENSITIVE,
-            message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
-    public String getGeneProductType() {
+    @ArrayPattern(regexp = "^complex|rna|protein$", flags = CASE_INSENSITIVE,
+            message = "At least one 'Gene Product Type' value is invalid: ")
+    public String[] getGeneProductType() {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
 
@@ -364,21 +361,21 @@ public class AnnotationRequest {
      * Filter by Target Sets e.g. BHF-UCK, KRUK, Parkinsons etc
      * @return
      */
-    public void setTargetSet(String targetSet) {
+    public void setTargetSet(String... targetSet) {
         filterMap.put(TARGET_SET, targetSet);
     }
 
-    public String getTargetSet() {
+    public String[] getTargetSet() {
         return filterMap.get(TARGET_SET);
     }
 
-    public void setGeneProductSubset(String geneProductSubset) {
+    public void setGeneProductSubset(String... geneProductSubset) {
         filterMap.put(DB_SUBSET, geneProductSubset);
     }
 
-    @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
-            message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
-    public String getGeneProductSubset() {
+    @ArrayPattern(regexp = "^[A-Za-z-]+$",
+            message = "At least one 'Gene Product Subset identifier' value is invalid: ")
+    public String[] getGeneProductSubset() {
         return filterMap.get(DB_SUBSET);
     }
 
@@ -416,7 +413,7 @@ public class AnnotationRequest {
         Optional<FilterRequest> request;
         if (filterMap.containsKey(key)) {
             FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
-            requestBuilder.addProperty(key, filterMap.get(key).split(COMMA));
+            requestBuilder.addProperty(key, filterMap.get(key));
             request = Optional.of(requestBuilder.build());
         } else {
             request = Optional.empty();
@@ -431,8 +428,11 @@ public class AnnotationRequest {
 
         if (filterMap.containsKey(USAGE_FIELD)) {
             if (filterMap.containsKey(GO_ID)) {
+                assert filterMap.get(USAGE_FIELD).length == 1 : USAGE_FIELD + ": can only have one value" ;
+                String usageValue = filterMap.get(USAGE_FIELD)[0];
+
                 filterBuilder
-                        .addProperty(filterMap.get(USAGE_FIELD))
+                        .addProperty(usageValue)
                         .addProperty(GO_ID, filterMap.get(GO_ID));
 
                 filterBuilder.addProperty(USAGE_RELATIONSHIPS, filterMap.get(USAGE_RELATIONSHIPS));

@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import org.junit.Before;
@@ -18,7 +19,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
@@ -26,13 +26,12 @@ import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {AnnotationRequestConfig.class})
 public class AnnotationRequestValidationIT {
-    private static final String[] VALID_ASSIGNED_BY_PARMS = {"ASPGD", "ASPGD,Agbase", "ASPGD_,Agbase",
-            "ASPGD,Agbase_", "ASPGD,Agbase", "BHF-UCL,Agbase", "Roslin_Institute,BHF-UCL,Agbase"};
+    private static final String[] VALID_ASSIGNED_BY_PARMS =
+            {"ASPGD", "Agbase", "ASPGD_", "Agbase_", "BHF-UCL", "Roslin_Institute"};
 
-    private static final String[] INVALID_ASSIGNED_BY_PARMS = {"_ASPGD", "ASPGD,_Agbase",
-            "5555,Agbase", "ASPGD,5555,", "4444,5555,"};
+    private static final String[] INVALID_ASSIGNED_BY_PARMS = {"_ASPGD", "_Agbase", "5555,", "4444"};
 
-    private static final String[] VALID_GO_EVIDENCE = {"IEA,IBD,IC"};
+    private static final String[] VALID_GO_EVIDENCE = {"IEA", "IBD", "IC"};
     private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
     private static final String[] INVALID_GENE_PRODUCT_ID = {"99999", "&12345"};
@@ -59,7 +58,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void allAssignedByValuesAreValid() {
-        String assignedByValues = toCSV(VALID_ASSIGNED_BY_PARMS);
+        String[] assignedByValues = VALID_ASSIGNED_BY_PARMS;
         annotationRequest.setAssignedBy(assignedByValues);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -80,7 +79,7 @@ public class AnnotationRequestValidationIT {
         );
     }
 
-    //GO EVIDENCE
+    //    GO EVIDENCE
     @Test
     public void nullGoEvidenceIsValid() {
         annotationRequest.setGoIdEvidence(null);
@@ -103,7 +102,8 @@ public class AnnotationRequestValidationIT {
                     AnnotationRequest annotationRequest = new AnnotationRequest();
                     annotationRequest.setGoIdEvidence(invalidValue);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate
+                            (annotationRequest);
                     assertThat(violations, hasSize(1));
                     assertThat(violations.iterator().next().getMessage(),
                             is("At least one 'GO Evidence' value is invalid: " + invalidValue));
@@ -111,11 +111,10 @@ public class AnnotationRequestValidationIT {
         );
     }
 
-    //ASPECT PARAMETER
+    //    ASPECT PARAMETER
     @Test
     public void nullAspectIsValid() {
-        String aspect = null;
-        annotationRequest.setAspect(aspect);
+        annotationRequest.setAspect(null);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -197,7 +196,8 @@ public class AnnotationRequestValidationIT {
                 invalidValue -> {
                     annotationRequest.setTaxonId(invalidValue);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate
+                            (annotationRequest);
                     assertThat(violations, hasSize(is(1)));
                     assertThat(violations.iterator().next().getMessage(),
                             is("At least one 'Taxonomic identifier' value is invalid: " + invalidValue));
@@ -216,7 +216,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void multiplePositiveNumericTaxonIdsIsValid() {
-        String taxId = "2,3,4,5";
+        String[] taxId = {"2", "3", "4", "5"};
 
         annotationRequest.setTaxonId(taxId);
 
@@ -238,22 +238,23 @@ public class AnnotationRequestValidationIT {
     //GENE PRODUCT ID
     @Test
     public void allGeneProductValuesAreValid() {
-        String geneProductIdValues = toCSV(VALID_GENE_PRODUCT_ID);
-        annotationRequest.setGeneProductId(geneProductIdValues);
+        annotationRequest.setGeneProductId(VALID_GENE_PRODUCT_ID);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void geneProductIDValidationIsCaseSensitive() {
-        String geneProductIdValues = (toCSV(VALID_GENE_PRODUCT_ID)).toLowerCase();
+        String[] geneProductIdValues = Stream.of(VALID_GENE_PRODUCT_ID)
+                .map(String::toLowerCase)
+                .toArray(String[]::new);
+
         annotationRequest.setGeneProductId(geneProductIdValues);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void allGeneProductValuesAreInvalid() {
-        String geneProductIdValues = toCSV(INVALID_GENE_PRODUCT_ID);
-        annotationRequest.setGeneProductId(geneProductIdValues);
+        annotationRequest.setGeneProductId(INVALID_GENE_PRODUCT_ID);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
@@ -261,7 +262,7 @@ public class AnnotationRequestValidationIT {
                         .collect(Collectors.joining(", "))));
     }
 
-    //GO ID PARAMETER
+    //    GO ID PARAMETER
 
     @Test
     public void goIdIsValid() {
@@ -287,7 +288,8 @@ public class AnnotationRequestValidationIT {
                 mixedCaseId -> {
                     annotationRequest.setGoId(mixedCaseId);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate
+                            (annotationRequest);
                     printConstraintViolations(violations);
 
                     assertThat(violations, hasSize(0));
@@ -303,7 +305,8 @@ public class AnnotationRequestValidationIT {
                 id -> {
                     annotationRequest.setGoId(id);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate
+                            (annotationRequest);
                     printConstraintViolations(violations);
 
                     assertThat(violations, hasSize(1));
@@ -323,7 +326,8 @@ public class AnnotationRequestValidationIT {
                 validIds -> {
                     annotationRequest.setEvidenceCode(validIds);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate
+                            (annotationRequest);
                     printConstraintViolations(violations);
 
                     assertThat(violations, hasSize(0));
@@ -367,14 +371,14 @@ public class AnnotationRequestValidationIT {
     //GENE PRODUCT TYPE PARAMETER
     @Test
     public void validGeneProductTypeValuesDontCauseAnError() {
-        String validIds = "complex,rna,protein";
+        String[] validIds = {"complex", "rna", "protein"};
         annotationRequest.setGeneProductType(validIds);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void setGpTypeNotCaseSensitive() {
-        String validIds = "comPlex,rnA,pRotein";
+        String[] validIds = {"comPlex", "rnA", "pRotein"};
         annotationRequest.setGeneProductType(validIds);
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -397,9 +401,9 @@ public class AnnotationRequestValidationIT {
     //GENE PRODUCT SUBSET PARAMETER
     @Test
     public void setGpSubsetSuccessfully() {
-        String geneProductSubsetValues = toCSV(VALID_GENE_PRODUCT_SUBSET);
+        String[] geneProductSubsetValues = VALID_GENE_PRODUCT_SUBSET;
         annotationRequest.setGeneProductSubset(geneProductSubsetValues);
-        assertThat(validator.validate(annotationRequest),hasSize(0));
+        assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
@@ -418,7 +422,7 @@ public class AnnotationRequestValidationIT {
         );
     }
 
-    //PAGE PARAMETER
+    //    PAGE PARAMETER
     @Test
     public void negativePageValueIsInvalid() {
         annotationRequest.setPage(-1);
@@ -476,7 +480,7 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
-    // usage parameters
+    //     usage parameters
     @Test
     public void descendantsUsageIsValid() {
         String usage = "descendants";
@@ -497,7 +501,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void exactUsageIsValid() {
-        // rather than specifying exact, user should just filter by GO Id.
+        //rather than specifying exact, user should just filter by GO Id.
         String usage = "exact";
 
         annotationRequest.setUsage(usage);
@@ -534,7 +538,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one usage relationship is invalid: " + invalidUsageRelationship));
+                is("At least one 'Usage relationship' is invalid: " + invalidUsageRelationship));
     }
 
     @Test(expected = ParameterException.class)
@@ -547,5 +551,4 @@ public class AnnotationRequestValidationIT {
     private void printConstraintViolations(Set<ConstraintViolation<AnnotationRequest>> violations) {
         violations.forEach(System.out::println);
     }
-
 }
