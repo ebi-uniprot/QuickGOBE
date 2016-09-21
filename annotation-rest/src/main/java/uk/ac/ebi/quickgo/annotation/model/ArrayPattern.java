@@ -15,14 +15,20 @@ import javax.validation.Payload;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {ArrayPattern.Validator.class})
-@Documented
-@interface ArrayPattern {
+@Documented @interface ArrayPattern {
+    String ERROR_MSG = "At least one '%s' value is invalid: %s";
+
     /**
      * Defines the regular expression that each element in the array must match
      */
     String regexp();
 
-    String message() default "Invalid values:";
+    String message() default ERROR_MSG;
+
+    /**
+     * The name of the parameter being validated
+     */
+    String paramName();
 
     Class<?>[] groups() default {};
 
@@ -100,10 +106,13 @@ import javax.validation.Payload;
 
     class Validator implements ConstraintValidator<ArrayPattern, String[]> {
         private Pattern pattern;
+        private String paramName;
 
         @Override
         public void initialize(ArrayPattern validator) {
             int intFlag = maskFlags(validator.flags());
+
+            paramName = validator.paramName();
 
             try {
                 pattern = Pattern.compile(validator.regexp(), intFlag);
@@ -150,7 +159,7 @@ import javax.validation.Payload;
                     String invalidItemsText = invalidItems.stream().collect(Collectors.joining(","));
 
                     context.buildConstraintViolationWithTemplate(
-                            context.getDefaultConstraintMessageTemplate() + invalidItemsText).addConstraintViolation();
+                            String.format(ERROR_MSG, paramName, invalidItemsText)).addConstraintViolation();
                 }
             }
 

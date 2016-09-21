@@ -191,8 +191,7 @@ public class AnnotationRequest {
         }
     }
 
-    @ArrayPattern(regexp = "^[A-Za-z][A-Za-z\\-_]+$",
-            message = "At least one 'Assigned By' value is invalid: ")
+    @ArrayPattern(regexp = "^[A-Za-z][A-Za-z\\-_]+$", paramName = "Assigned By")
     public String[] getAssignedBy() {
         return filterMap.get(ASSIGNED_BY);
     }
@@ -218,8 +217,8 @@ public class AnnotationRequest {
         }
     }
 
-    @ArrayPattern(regexp = "^biological_process|molecular_function|cellular_component$",
-            flags = CASE_INSENSITIVE, message = "At least one 'Aspect' value is invalid: ")
+    @ArrayPattern(regexp = "^biological_process|molecular_function|cellular_component$", flags = CASE_INSENSITIVE,
+            paramName = "Aspect")
     public String[] getAspect() {
         return filterMap.get(GO_ASPECT);
     }
@@ -248,7 +247,7 @@ public class AnnotationRequest {
         filterMap.put(GO_EVIDENCE, evidence);
     }
 
-    @ArrayPattern(regexp = "^[A-Za-z]{2,3}$", message = "At least one 'GO Evidence' value is invalid: ")
+    @ArrayPattern(regexp = "^[A-Za-z]{2,3}$", paramName = "GO Evidence")
     public String[] getGoIdEvidence() {
         return filterMap.get(GO_EVIDENCE);
     }
@@ -287,7 +286,7 @@ public class AnnotationRequest {
         filterMap.put(TAXON_ID, taxId);
     }
 
-    @ArrayPattern(regexp = "^[0-9]+$", message = "At least one 'Taxonomic identifier' value is invalid: ")
+    @ArrayPattern(regexp = "^[0-9]+$", paramName = "Taxonomic identifier")
     public String[] getTaxonId() {
         return filterMap.get(TAXON_ID);
     }
@@ -300,8 +299,7 @@ public class AnnotationRequest {
         filterMap.put(GO_ID, goId);
     }
 
-    @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE,
-            message = "At least one 'GO Id' value is invalid: ")
+    @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE, paramName = "GO Id")
     public String[] getGoId() {
         return filterMap.get(GO_ID);
     }
@@ -314,8 +312,7 @@ public class AnnotationRequest {
         filterMap.put(EVIDENCE_CODE, evidenceCode);
     }
 
-    @ArrayPattern(regexp = "^ECO:[0-9]{7}$", flags = CASE_INSENSITIVE,
-            message = "At least one 'Evidence code identifier' value is invalid: ")
+    @ArrayPattern(regexp = "^ECO:[0-9]{7}$", paramName = "Evidence code identifier", flags = CASE_INSENSITIVE)
     public String[] getEvidenceCode() {
         return filterMap.get(EVIDENCE_CODE);
     }
@@ -333,7 +330,7 @@ public class AnnotationRequest {
     }
 
     @ArrayPattern(regexp = "^is_a|part_of|occurs_in|regulates$", flags = CASE_INSENSITIVE,
-            message = "At least one 'Usage relationship' is invalid: ")
+            paramName = "Usage relationship")
     public String[] getUsageRelationships() {
         return filterMap.get(USAGE_RELATIONSHIPS);
     }
@@ -352,7 +349,7 @@ public class AnnotationRequest {
     }
 
     @ArrayPattern(regexp = "^complex|rna|protein$", flags = CASE_INSENSITIVE,
-            message = "At least one 'Gene Product Type' value is invalid: ")
+            paramName = "Gene Product Type")
     public String[] getGeneProductType() {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
@@ -373,8 +370,7 @@ public class AnnotationRequest {
         filterMap.put(DB_SUBSET, geneProductSubset);
     }
 
-    @ArrayPattern(regexp = "^[A-Za-z-]+$",
-            message = "At least one 'Gene Product Subset identifier' value is invalid: ")
+    @ArrayPattern(regexp = "^[A-Za-z-]+$", paramName = "Gene Product Subset identifier")
     public String[] getGeneProductSubset() {
         return filterMap.get(DB_SUBSET);
     }
@@ -428,7 +424,7 @@ public class AnnotationRequest {
 
         if (filterMap.containsKey(USAGE_FIELD)) {
             if (filterMap.containsKey(GO_ID)) {
-                assert filterMap.get(USAGE_FIELD).length == 1 : USAGE_FIELD + ": can only have one value" ;
+                assert filterMap.get(USAGE_FIELD).length == 1 : USAGE_FIELD + ": can only have one value";
                 String usageValue = filterMap.get(USAGE_FIELD)[0];
 
                 filterBuilder

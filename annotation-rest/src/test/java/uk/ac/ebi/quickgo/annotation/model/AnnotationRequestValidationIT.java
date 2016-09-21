@@ -74,7 +74,7 @@ public class AnnotationRequestValidationIT {
 
                     assertThat(violations, hasSize(1));
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one 'Assigned By' value is invalid: " + invalidValue));
+                            is(createErrorMessage("Assigned By", invalidValue)));
                 }
         );
     }
@@ -106,7 +106,7 @@ public class AnnotationRequestValidationIT {
                             (annotationRequest);
                     assertThat(violations, hasSize(1));
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one 'GO Evidence' value is invalid: " + invalidValue));
+                            is(createErrorMessage("GO Evidence", invalidValue)));
                 }
         );
     }
@@ -155,7 +155,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one 'Aspect' value is invalid: " + aspect));
+                is(createErrorMessage("Aspect", aspect)));
     }
 
     @Test
@@ -185,7 +185,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one 'Taxonomic identifier' value is invalid: " + taxId));
+                is(createErrorMessage("Taxonomic identifier", taxId)));
     }
 
     @Test
@@ -200,7 +200,7 @@ public class AnnotationRequestValidationIT {
                             (annotationRequest);
                     assertThat(violations, hasSize(is(1)));
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one 'Taxonomic identifier' value is invalid: " + invalidValue));
+                            is(createErrorMessage("Taxonomic identifier", invalidValue)));
                 }
         );
     }
@@ -232,7 +232,7 @@ public class AnnotationRequestValidationIT {
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(is(1)));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one 'Taxonomic identifier' value is invalid: " + taxId));
+                is(createErrorMessage("Taxonomic identifier", taxId)));
     }
 
     //GENE PRODUCT ID
@@ -258,8 +258,7 @@ public class AnnotationRequestValidationIT {
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one 'Gene Product ID' value is invalid: " + Arrays.stream(INVALID_GENE_PRODUCT_ID)
-                        .collect(Collectors.joining(", "))));
+                is(createErrorMessage("Gene Product ID", INVALID_GENE_PRODUCT_ID)));
     }
 
     //    GO ID PARAMETER
@@ -311,7 +310,7 @@ public class AnnotationRequestValidationIT {
 
                     assertThat(violations, hasSize(1));
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one 'GO Id' value is invalid: " + id));
+                            is(createErrorMessage("GO Id", id)));
                 }
         );
     }
@@ -356,13 +355,13 @@ public class AnnotationRequestValidationIT {
         String[] ecoIds = {"ECO:9", "xxx:0000888", "-"};
 
         Arrays.stream(ecoIds).forEach(
-                validId -> {
-                    annotationRequest.setEvidenceCode(validId);
+                inValidId -> {
+                    annotationRequest.setEvidenceCode(inValidId);
 
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     printConstraintViolations(violations);
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one 'Evidence code identifier' value is invalid: " + validId));
+                            is(createErrorMessage("Evidence code identifier", inValidId)));
                     assertThat(violations, hasSize(1));
                 }
         );
@@ -393,7 +392,7 @@ public class AnnotationRequestValidationIT {
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     assertThat(violations, hasSize(is(1)));
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one 'Gene Product Type' value is invalid: " + invalidValue));
+                            is(createErrorMessage("Gene Product Type", invalidValue)));
                 }
         );
     }
@@ -411,12 +410,12 @@ public class AnnotationRequestValidationIT {
         String[] subsets = {"9999", "Reference:Genome", "*"};
 
         Arrays.stream(subsets).forEach(
-                validId -> {
-                    annotationRequest.setGeneProductSubset(validId);
+                inValidId -> {
+                    annotationRequest.setGeneProductSubset(inValidId);
                     Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
                     printConstraintViolations(violations);
                     assertThat(violations.iterator().next().getMessage(),
-                            is("At least one 'Gene Product Subset identifier' value is invalid: " + validId));
+                            is(createErrorMessage("Gene Product Subset identifier", inValidId)));
                     assertThat(violations, hasSize(1));
                 }
         );
@@ -538,7 +537,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("At least one 'Usage relationship' is invalid: " + invalidUsageRelationship));
+                is(createErrorMessage("Usage relationship", invalidUsageRelationship)));
     }
 
     @Test(expected = ParameterException.class)
@@ -550,5 +549,10 @@ public class AnnotationRequestValidationIT {
 
     private void printConstraintViolations(Set<ConstraintViolation<AnnotationRequest>> violations) {
         violations.forEach(System.out::println);
+    }
+
+    private String createErrorMessage(String paramName, String... invalidItems) {
+        String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
+        return String.format(ArrayPattern.ERROR_MSG, paramName, csvInvalidItems);
     }
 }
