@@ -43,7 +43,7 @@ public class Co_occurringTermsConfiguration {
 
     @Bean
     public AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsManual() {
-        return new AnnotationCo_occurringTermsAggregator(t -> !"IEA".equals(t.evidenceCode));
+        return new AnnotationCo_occurringTermsAggregator(t -> !"IEA".equals(t.goEvidence));
     }
 
     @Bean
