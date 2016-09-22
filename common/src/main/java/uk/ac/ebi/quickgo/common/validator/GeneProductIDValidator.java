@@ -20,30 +20,33 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Created with IntelliJ IDEA.
  */
 public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList, String[]> {
-    private static final String MESSAGE = "At least one 'Gene Product ID' value is invalid: %s";
+    public static final String DEFAULT_ERROR_MESSAGE = "The 'Gene Product ID' parameter contains invalid values: %s";
 
     @Autowired
-    DbXRefEntityValidation xRefFormats;
+    private DbXRefEntityValidation xRefFormats;
     private Predicate<String> idValidator;
 
     @Override public void initialize(GeneProductIDList constraintAnnotation) {
-        idValidator = xRefFormats::test;
+        idValidator = xRefFormats;
     }
 
     @Override public boolean isValid(String[] geneProducts, ConstraintValidatorContext context) {
-        if (geneProducts == null) {
-            return true;
-        }
-        String invalid = Arrays.stream(geneProducts).filter(idValidator.negate()).collect
-                (Collectors.joining(", "));
+        boolean isValid = true;
 
-        if(invalid != null && invalid.isEmpty()){
-            return true;
-        }
-        context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate(String.format(MESSAGE, invalid))
-                .addConstraintViolation();
+        if (geneProducts != null) {
+            String invalidGpIds = Arrays.stream(geneProducts)
+                    .filter(idValidator.negate())
+                    .collect(Collectors.joining(", "));
 
-        return false;
+            if (!invalidGpIds.isEmpty()) {
+                isValid = false;
+
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate(String.format(DEFAULT_ERROR_MESSAGE, invalidGpIds))
+                        .addConstraintViolation();
+            }
+        }
+
+        return isValid;
     }
 }
