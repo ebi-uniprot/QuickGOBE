@@ -26,7 +26,7 @@ import org.springframework.core.io.Resource;
 @Configuration
 public class Co_occurringTermsConfiguration {
 
-    Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsConfiguration.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsConfiguration.class);
 
     public static final String COSTATS_MANUAL_COMPLETION_STEP_NAME = "costatsManualSummarizationStep";
     public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
