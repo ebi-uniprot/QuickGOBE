@@ -1,10 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -19,7 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static uk.ac.ebi.quickgo.annotation.AnnotationUtil.createGPId;
+import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
 
 /**
@@ -28,17 +29,7 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {AnnotationRequestConfig.class})
 public class AnnotationRequestValidationIT {
-    private static final String[] VALID_ASSIGNED_BY_PARMS =
-            {"ASPGD", "Agbase", "ASPGD_", "Agbase_", "BHF-UCL", "Roslin_Institute"};
-
-    private static final String[] INVALID_ASSIGNED_BY_PARMS = {"_ASPGD", "_Agbase", "5555,", "4444"};
-
-    private static final String[] VALID_GO_EVIDENCE = {"IEA", "IBD", "IC"};
-    private static final String[] INVALID_GO_EVIDENCE = {"9EA,IBDD,I"};
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
-    private static final String[] INVALID_GENE_PRODUCT_ID = {"99999", "&12345"};
-    private static final String[] VALID_GENE_PRODUCT_SUBSET = {"BHF-UCL", "Exosome", "KRUK", "ParkinsonsUK-UCL",
-            "ReferenceGenome"};
 
     @Autowired
     private Validator validator;
@@ -60,187 +51,186 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void allAssignedByValuesAreValid() {
-        String[] assignedByValues = VALID_ASSIGNED_BY_PARMS;
-        annotationRequest.setAssignedBy(assignedByValues);
+        String[] validAssignedBy = {"ASPGD", "Agbase", "ASPGD_", "Agbase_", "BHF-UCL", "Roslin_Institute"};
+        annotationRequest.setAssignedBy(validAssignedBy);
+
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void allAssignedByValuesAreInvalid() {
-        Arrays.stream(INVALID_ASSIGNED_BY_PARMS).forEach(
-                invalidValue -> {
-                    AnnotationRequest annotationRequest = new AnnotationRequest();
-                    annotationRequest.setAssignedBy(invalidValue);
+        String[] invalidAssignedBy = {"_ASPGD", "_Agbase", "5555,", "4444"};
+        annotationRequest.setAssignedBy(invalidAssignedBy);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
-                    assertThat(violations, hasSize(1));
-                    assertThat(violations.iterator().next().getMessage(),
-                            is(createRegexErrorMessage(ASSIGNED_BY_PARAM, invalidValue)));
-                }
-        );
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createRegexErrorMessage(ASSIGNED_BY_PARAM, invalidAssignedBy)));
     }
 
-    //    GO EVIDENCE
+    //GO EVIDENCE PARAMETER
     @Test
     public void nullGoEvidenceIsValid() {
         annotationRequest.setGoIdEvidence(null);
+
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void allGoEvidenceValuesAreValid() {
-        for (String valid : VALID_GO_EVIDENCE) {
-            annotationRequest.setGoIdEvidence(valid);
-            assertThat(valid + " expected to be a valid value, but has failed validation",
-                    validator.validate(annotationRequest), hasSize(0));
-        }
+        String[] goEvidence = {"IEA", "IBD", "IC"};
+        annotationRequest.setGoIdEvidence(goEvidence);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void allGoEvidenceValuesAreInvalid() {
-        Arrays.stream(INVALID_GO_EVIDENCE).forEach(
-                invalidValue -> {
-                    AnnotationRequest annotationRequest = new AnnotationRequest();
-                    annotationRequest.setGoIdEvidence(invalidValue);
+        String[] invalidGoEvidence = {"9EA", "IBDD", "I"};
+        annotationRequest.setGoIdEvidence(invalidGoEvidence);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate
-                            (annotationRequest);
-                    assertThat(violations, hasSize(1));
-                    assertThat(violations.iterator().next().getMessage(),
-                            is(createRegexErrorMessage(GO_EVIDENCE_PARAM, invalidValue)));
-                }
-        );
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createRegexErrorMessage(GO_EVIDENCE_PARAM, invalidGoEvidence)));
     }
 
-    //    ASPECT PARAMETER
+    //ASPECT PARAMETER
     @Test
     public void nullAspectIsValid() {
         annotationRequest.setAspect(null);
+
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void processAspectIsValid() {
-        String aspect = "biological_process";
-
-        annotationRequest.setAspect(aspect);
+        annotationRequest.setAspect("biological_process");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void functionAspectIsValid() {
-        String aspect = "molecular_function";
-
-        annotationRequest.setAspect(aspect);
+        annotationRequest.setAspect("molecular_function");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void componentAspectIsValid() {
-        String aspect = "cellular_component";
-
-        annotationRequest.setAspect(aspect);
+        annotationRequest.setAspect("cellular_component");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void unknownAspectIsInvalid() {
-        String aspect = "unknown";
+        String invalidAspect = "unknown";
 
-        annotationRequest.setAspect(aspect);
+        annotationRequest.setAspect(invalidAspect);
 
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(createRegexErrorMessage(ASPECT_PARAM, aspect)));
+                is(createRegexErrorMessage(ASPECT_PARAM, invalidAspect)));
     }
 
     @Test
     public void mixedCaseAspectIsValid() {
         String[] aspects = {"MoLeCuLaR_FuNcTiOn", "BiOlOgIcAl_pRoCeSs", "CeLlULaR_CoMpOnEnT"};
 
-        Arrays.stream(aspects).forEach(
-                mixedCaseAspect -> {
-                    annotationRequest.setAspect(mixedCaseAspect);
+        annotationRequest.setAspect(aspects);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
-                    printConstraintViolations(violations);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
-                    assertThat(violations, hasSize(0));
-                }
-        );
+        assertThat(violations, hasSize(0));
     }
 
     //TAXONOMY ID PARAMETER
     @Test
     public void negativeTaxonIdIsInvalid() {
-        String taxId = "-1";
+        String invalidTaxonId = "-1";
 
-        annotationRequest.setTaxonId(taxId);
+        annotationRequest.setTaxonId(invalidTaxonId);
 
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(createRegexErrorMessage(TAXON_ID_PARAM, taxId)));
+                is(createRegexErrorMessage(TAXON_ID_PARAM, invalidTaxonId)));
     }
 
     @Test
     public void taxonIdWithNonNumberCharactersIsInvalid() {
-        String[] invalidTaxonIdParms = {"1a", "a", "$1"};
+        String[] invalidTaxonIds = {"1a", "a", "$1"};
 
-        Arrays.stream(invalidTaxonIdParms).forEach(
-                invalidValue -> {
-                    annotationRequest.setTaxonId(invalidValue);
+        annotationRequest.setTaxonId(invalidTaxonIds);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate
-                            (annotationRequest);
-                    assertThat(violations, hasSize(is(1)));
-                    assertThat(violations.iterator().next().getMessage(),
-                            is(createRegexErrorMessage(TAXON_ID_PARAM, invalidValue)));
-                }
-        );
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(is(1)));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createRegexErrorMessage(TAXON_ID_PARAM, invalidTaxonIds)));
     }
 
     @Test
     public void positiveNumericTaxonIdIsValid() {
-        String taxId = "2";
+        String taxonId = "2";
 
-        annotationRequest.setTaxonId(taxId);
+        annotationRequest.setTaxonId(taxonId);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void multiplePositiveNumericTaxonIdsIsValid() {
-        String[] taxId = {"2", "3", "4", "5"};
+        String[] taxonId = {"2", "3", "4", "5"};
 
-        annotationRequest.setTaxonId(taxId);
+        annotationRequest.setTaxonId(taxonId);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void oneValidTaxIdAndOneInvalidTaxIdIsInvalid() {
-        String taxId = "2,-1";
+        String invalidTaxonId = "-1";
+        String[] taxonIds = {"2", invalidTaxonId};
 
-        annotationRequest.setTaxonId(taxId);
+        annotationRequest.setTaxonId(taxonIds);
 
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
         assertThat(violations, hasSize(is(1)));
         assertThat(violations.iterator().next().getMessage(),
-                is(createRegexErrorMessage(TAXON_ID_PARAM, taxId)));
+                is(createRegexErrorMessage(TAXON_ID_PARAM, invalidTaxonId)));
+    }
+
+    @Test
+    public void exceedingMaximumNumberOfTaxonIdentifiesSendsError() {
+        int numIds = AnnotationRequest.MAX_TAXON_IDS + 1;
+
+        String[] taxIds = IntStream.rangeClosed(1, numIds)
+                .mapToObj(String::valueOf)
+                .toArray(String[]::new);
+
+        annotationRequest.setTaxonId(taxIds);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createMaxSizeErrorMessage(TAXON_ID_PARAM, MAX_TAXON_IDS)));
     }
 
     //GENE PRODUCT ID
     @Test
     public void allGeneProductValuesAreValid() {
         annotationRequest.setGeneProductId(VALID_GENE_PRODUCT_ID);
+
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -251,195 +241,200 @@ public class AnnotationRequestValidationIT {
                 .toArray(String[]::new);
 
         annotationRequest.setGeneProductId(geneProductIdValues);
+
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void allGeneProductValuesAreInvalid() {
-        annotationRequest.setGeneProductId(INVALID_GENE_PRODUCT_ID);
+        String[] invalidGpIds = {"99999", "&12345"};
+
+        annotationRequest.setGeneProductId(invalidGpIds);
+
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(createRegexErrorMessage(GENE_PRODUCT_PARAM, INVALID_GENE_PRODUCT_ID)));
+                is("The 'Gene Product ID' parameter contains invalid values: 99999, &12345"));
     }
 
     @Test
     public void exceedingMaximumNumberOfGeneProductsIdentifiersSendsError() {
         int numIds = AnnotationRequest.MAX_GENE_PRODUCT_IDS + 1;
 
-        String[] gpIds = generateGeneProductIds(numIds);
+        String[] gpIds = generateValues(IdGeneratorUtil::createGPId, numIds);
 
         annotationRequest.setGeneProductId(gpIds);
 
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
         assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createMaxSizeErrorMessage(GENE_PRODUCT_PARAM, MAX_GENE_PRODUCT_IDS)));
     }
 
-    //    GO ID PARAMETER
+    //GO ID PARAMETER
     @Test
     public void goIdIsValid() {
         String[] goIds = {"GO:0003824", "GO:0009999", "GO:0003333"};
 
-        Arrays.stream(goIds).forEach(
-                id -> {
-                    annotationRequest.setGoId(id);
+        annotationRequest.setGoId(goIds);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
-                    printConstraintViolations(violations);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
-                    assertThat(violations, hasSize(0));
-                }
-        );
+        assertThat(violations, hasSize(0));
     }
 
     @Test
     public void mixedCaseGoIdIsValid() {
         String[] goIds = {"GO:0003824", "gO:0003824", "Go:0003824"};
 
-        Arrays.stream(goIds).forEach(
-                mixedCaseId -> {
-                    annotationRequest.setGoId(mixedCaseId);
+        annotationRequest.setGoId(goIds);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate
-                            (annotationRequest);
-                    printConstraintViolations(violations);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
-                    assertThat(violations, hasSize(0));
-                }
-        );
+        assertThat(violations, hasSize(0));
     }
 
     @Test
     public void goIdIsInvalid() {
         String[] invalidGoIds = {"GO:4", "xxx:0009999", "-"};
 
-        Arrays.stream(invalidGoIds).forEach(
-                id -> {
-                    annotationRequest.setGoId(id);
+        annotationRequest.setGoId(invalidGoIds);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate
-                            (annotationRequest);
-                    printConstraintViolations(violations);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
-                    assertThat(violations, hasSize(1));
-                    assertThat(violations.iterator().next().getMessage(),
-                            is(createRegexErrorMessage(GO_ID_PARAM, id)));
-                }
-        );
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createRegexErrorMessage(GO_ID_PARAM, invalidGoIds)));
+    }
+
+    @Test
+    public void exceedingMaximumNumberOfGOIdentifiersSendsError() {
+        int numIds = AnnotationRequest.MAX_GO_IDS + 1;
+
+        String[] goIds = generateValues(IdGeneratorUtil::createGoId, numIds);
+
+        annotationRequest.setGoId(goIds);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(), is(createMaxSizeErrorMessage(GO_ID_PARAM, MAX_GO_IDS)));
     }
 
     //EVIDENCE CODE PARAMETER
-
     @Test
     public void evidenceCodeIsValid() {
         String[] ecoIds = {"ECO:0000256", "ECO:0000888", "ECO:0000777"};
 
-        Arrays.stream(ecoIds).forEach(
-                validIds -> {
-                    annotationRequest.setEvidenceCode(validIds);
+        annotationRequest.setEvidenceCode(ecoIds);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate
-                            (annotationRequest);
-                    printConstraintViolations(violations);
-
-                    assertThat(violations, hasSize(0));
-                }
-        );
+        assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void mixedCaseEvidenceCodeIsValid() {
         String[] ecoIds = {"ECO:0000256", "EcO:0000256", "eCO:0000256"};
 
-        Arrays.stream(ecoIds).forEach(
-                mixedCaseId -> {
-                    annotationRequest.setEvidenceCode(mixedCaseId);
+        annotationRequest.setEvidenceCode(ecoIds);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
-                    printConstraintViolations(violations);
-
-                    assertThat(violations, hasSize(0));
-                }
-        );
+        assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void evidenceCodeIsInvalid() {
-        String[] ecoIds = {"ECO:9", "xxx:0000888", "-"};
+        String[] invalidEvCodeIds = {"ECO:9", "xxx:0000888", "-"};
 
-        Arrays.stream(ecoIds).forEach(
-                inValidId -> {
-                    annotationRequest.setEvidenceCode(inValidId);
+        annotationRequest.setEvidenceCode(invalidEvCodeIds);
 
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
-                    printConstraintViolations(violations);
-                    assertThat(violations.iterator().next().getMessage(),
-                            is(createRegexErrorMessage(EVIDENCE_CODE_PARAM, inValidId)));
-                    assertThat(violations, hasSize(1));
-                }
-        );
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createRegexErrorMessage(EVIDENCE_CODE_PARAM, invalidEvCodeIds)));
+    }
+
+    @Test
+    public void exceedingMaximumNumberOfEvidenceCodesSendsError() {
+        int numIds = AnnotationRequest.MAX_EVIDENCE_CODE + 1;
+
+        String[] evCodes = generateValues(IdGeneratorUtil::createEvidenceCode, numIds);
+
+        annotationRequest.setEvidenceCode(evCodes);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createMaxSizeErrorMessage(EVIDENCE_CODE_PARAM, MAX_EVIDENCE_CODE)));
     }
 
     //GENE PRODUCT TYPE PARAMETER
     @Test
     public void validGeneProductTypeValuesDontCauseAnError() {
-        String[] validIds = {"complex", "rna", "protein"};
-        annotationRequest.setGeneProductType(validIds);
+        String[] gpTypes = {"complex", "rna", "protein"};
+
+        annotationRequest.setGeneProductType(gpTypes);
+
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void setGpTypeNotCaseSensitive() {
-        String[] validIds = {"comPlex", "rnA", "pRotein"};
-        annotationRequest.setGeneProductType(validIds);
+        String[] gpTypes = {"comPlex", "rnA", "pRotein"};
+
+        annotationRequest.setGeneProductType(gpTypes);
+
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void invalidGeneProductTypesCauseError() {
-        String[] invalidGeneProductTypes = {"xxx", "000", "..."};
+        String[] invalidGPTypes = {"xxx", "000", "..."};
 
-        Arrays.stream(invalidGeneProductTypes).forEach(
-                invalidValue -> {
-                    annotationRequest.setGeneProductType(invalidValue);
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
-                    assertThat(violations, hasSize(is(1)));
-                    assertThat(violations.iterator().next().getMessage(),
-                            is(createRegexErrorMessage(GENE_PRODUCT_TYPE_PARAM, invalidValue)));
-                }
-        );
+        annotationRequest.setGeneProductType(invalidGPTypes);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(is(1)));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createRegexErrorMessage(GENE_PRODUCT_TYPE_PARAM, invalidGPTypes)));
     }
 
     //GENE PRODUCT SUBSET PARAMETER
     @Test
     public void setGpSubsetSuccessfully() {
-        String[] geneProductSubsetValues = VALID_GENE_PRODUCT_SUBSET;
-        annotationRequest.setGeneProductSubset(geneProductSubsetValues);
+        String[] gpSubsets = {"BHF-UCL", "Exosome", "KRUK", "ParkinsonsUK-UCL", "ReferenceGenome"};
+
+        annotationRequest.setGeneProductSubset(gpSubsets);
+
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void invalidGpSubsetValuesResultInError() {
-        String[] subsets = {"9999", "Reference:Genome", "*"};
+        String[] invalidSubsets = {"9999", "Reference:Genome", "*"};
 
-        Arrays.stream(subsets).forEach(
-                inValidId -> {
-                    annotationRequest.setGeneProductSubset(inValidId);
-                    Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
-                    printConstraintViolations(violations);
-                    assertThat(violations.iterator().next().getMessage(),
-                            is(createRegexErrorMessage(GENE_PRODUCT_SUBSET_PARAM, inValidId)));
-                    assertThat(violations, hasSize(1));
-                }
-        );
+        annotationRequest.setGeneProductSubset(invalidSubsets);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createRegexErrorMessage(GENE_PRODUCT_SUBSET_PARAM, invalidSubsets)));
     }
 
-    //    PAGE PARAMETER
+    //PAGE PARAMETER
     @Test
     public void negativePageValueIsInvalid() {
-        annotationRequest.setPage(-1);
+        int invalidPage = -1;
 
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        annotationRequest.setPage(invalidPage);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is("Page size cannot be less than " + MIN_PAGE_NUMBER + " but found: " + invalidPage));
     }
 
     @Test
@@ -459,9 +454,15 @@ public class AnnotationRequestValidationIT {
     //LIMIT PARAMETER
     @Test
     public void negativeLimitValueIsInvalid() {
-        annotationRequest.setLimit(-1);
+        int invalidEntriesPerPage = -1;
+        annotationRequest.setLimit(invalidEntriesPerPage);
 
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is("Number of entries per page cannot be less than " + MIN_ENTRIES_PER_PAGE + " but found: " +
+                        invalidEntriesPerPage));
     }
 
     @Test
@@ -487,70 +488,66 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void limitValueAboveMaxEntriesPerPageIsInvalid() {
-        annotationRequest.setLimit(AnnotationRequest.MAX_ENTRIES_PER_PAGE + 1);
+        int invalidEntriesPerPage = AnnotationRequest.MAX_ENTRIES_PER_PAGE + 1;
+        annotationRequest.setLimit(invalidEntriesPerPage);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is("Number of entries per page cannot be more than " + MAX_ENTRIES_PER_PAGE + " but found: " +
+                        invalidEntriesPerPage));
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
-    //     usage parameters
+    //USAGE PARAMETERS
     @Test
     public void descendantsUsageIsValid() {
-        String usage = "descendants";
-
-        annotationRequest.setUsage(usage);
+        annotationRequest.setUsage("descendants");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void slimUsageIsValid() {
-        String usage = "slim";
-
-        annotationRequest.setUsage(usage);
+        annotationRequest.setUsage("slim");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void exactUsageIsValid() {
-        //rather than specifying exact, user should just filter by GO Id.
-        String usage = "exact";
+    public void exactUsageIsInvalid() {
+        annotationRequest.setUsage("exact");
 
-        annotationRequest.setUsage(usage);
-
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        assertThat(validator.validate(annotationRequest), hasSize(1));
     }
 
     @Test
     public void usageValueIsInvalid() {
-        String usage = "thisDoesNotExistAsAValidUsage";
-
-        annotationRequest.setUsage(usage);
+        annotationRequest.setUsage("thisDoesNotExistAsAValidUsage");
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
     public void usageRelationshipIsValid() {
-        String usageRelationships = "is_a";
-
-        annotationRequest.setUsageRelationships(usageRelationships);
+        annotationRequest.setUsageRelationships("is_a");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void usageRelationshipIsInvalid() {
-        String invalidUsageRelationship = "invalid_relationship";
+        String invalidRel = "invalid_relationship";
 
-        AnnotationRequest annotationRequest = new AnnotationRequest();
-        annotationRequest.setUsageRelationships(invalidUsageRelationship);
+        annotationRequest.setUsageRelationships(invalidRel);
 
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(createRegexErrorMessage(USAGE_RELATIONSHIP_PARAM, invalidUsageRelationship)));
+                is(createRegexErrorMessage(USAGE_RELATIONSHIP_PARAM, invalidRel)));
     }
 
     @Test(expected = ParameterException.class)
@@ -560,22 +557,28 @@ public class AnnotationRequestValidationIT {
         annotationRequest.createFilterRequests();
     }
 
-    private void printConstraintViolations(Set<ConstraintViolation<AnnotationRequest>> violations) {
-        violations.forEach(System.out::println);
+    //REFERENCE PARAMETER
+    @Test
+    public void exceedingMaximumNumberOfReferencesSendsError() {
+        int numRefs = AnnotationRequest.MAX_REFERENCES + 1;
+
+        String[] refs = generateValues(IdGeneratorUtil::createGoRef, numRefs);
+
+        annotationRequest.setReference(refs);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createMaxSizeErrorMessage(REFERENCE_PARAM, MAX_REFERENCES)));
     }
 
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
-        return String.format(ArrayPattern.ERROR_MSG, paramName, csvInvalidItems);
+        return String.format(ArrayPattern.DEFAULT_ERROR_MSG, paramName, csvInvalidItems);
     }
 
-    private String[] generateGeneProductIds(int numberOfIds) {
-        String[] gpIds = new String[numberOfIds];
-
-        for (int i = 0; i < numberOfIds; i++) {
-            gpIds[i] = createGPId(i);
-        }
-
-        return gpIds;
+    private String createMaxSizeErrorMessage(String paramName, int maxSize) {
+        return "Number of items in '" + paramName + "' is larger than: " + maxSize;
     }
 }

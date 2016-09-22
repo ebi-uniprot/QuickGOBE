@@ -36,7 +36,11 @@ public class AnnotationRequest {
     public static final int DEFAULT_PAGE_NUMBER = 1;
     public static final int MIN_PAGE_NUMBER = 1;
 
+    static final int MAX_GO_IDS = 500;
     static final int MAX_GENE_PRODUCT_IDS = 500;
+    static final int MAX_EVIDENCE_CODE = 100;
+    static final int MAX_TAXON_IDS = 50;
+    static final int MAX_REFERENCES = 50;
 
     //Names of the parameters in readable format
     static final String ASSIGNED_BY_PARAM = "Assigned By";
@@ -49,6 +53,7 @@ public class AnnotationRequest {
     static final String GENE_PRODUCT_TYPE_PARAM = "Gene Product Type";
     static final String GENE_PRODUCT_SUBSET_PARAM = "Gene Product Subset identifier";
     static final String GENE_PRODUCT_PARAM = "Gene Product ID";
+    static final String REFERENCE_PARAM = "Reference";
 
     static final String USAGE_FIELD = "usage";
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
@@ -93,13 +98,11 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Number of results per page.",
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
-    @Min(MIN_ENTRIES_PER_PAGE) @Max(MAX_ENTRIES_PER_PAGE)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
     @ApiModelProperty(
             value = "Page number of the result set to display.",
             allowableValues = "range[" + MIN_PAGE_NUMBER + ",max_result_set_size]")
-    @Min(MIN_PAGE_NUMBER)
     private int page = DEFAULT_PAGE_NUMBER;
 
     /*
@@ -214,14 +217,14 @@ public class AnnotationRequest {
     /**
      * E.g. DOI, DOI:10.1002/adsc.201200590, GO_REF, PMID, PMID:12882977, Reactome, Reactome:R-RNO-912619,
      * GO_REF:0000037 etc
-     * @param reference
-     * @return
      */
     public void setReference(String... reference) {
         filterMap.put(REFERENCE_SEARCH, reference);
     }
 
     //todo create validation pattern @Pattern(regexp = "")
+    @Size(max = MAX_REFERENCES,
+            message = "Number of items in '" + REFERENCE_PARAM + "' is larger than: {max}")
     public String[] getReference() {
         return filterMap.get(REFERENCE_SEARCH);
     }
@@ -248,7 +251,8 @@ public class AnnotationRequest {
     }
 
     @GeneProductIDList
-    @Size(max = MAX_GENE_PRODUCT_IDS, message = "")
+    @Size(max = MAX_GENE_PRODUCT_IDS,
+            message = "Number of items in '" + GENE_PRODUCT_PARAM + "' is larger than: {max}")
     public String[] getGeneProductId() {
         return filterMap.get(GENE_PRODUCT_ID);
     }
@@ -270,7 +274,6 @@ public class AnnotationRequest {
 
     /**
      * NOT, enables etc
-     * @param qualifier
      */
     public void setQualifier(String... qualifier) {
         filterMap.put(QUALIFIER, qualifier);
@@ -303,32 +306,37 @@ public class AnnotationRequest {
     }
 
     @ArrayPattern(regexp = "^[0-9]+$", paramName = TAXON_ID_PARAM)
+    @Size(max = MAX_TAXON_IDS,
+            message = "Number of items in '" + TAXON_ID_PARAM + "' is larger than: {max}")
+
     public String[] getTaxonId() {
         return filterMap.get(TAXON_ID);
     }
 
     /**
      * List of Gene Ontology ids in CSV format
-     * @param goId
      */
     public void setGoId(String... goId) {
         filterMap.put(GO_ID, goId);
     }
 
     @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE, paramName = GO_ID_PARAM)
+    @Size(max = MAX_GO_IDS,
+            message = "Number of items in '" + GO_ID_PARAM + "' is larger than: {max}")
     public String[] getGoId() {
         return filterMap.get(GO_ID);
     }
 
     /**
      * Will receive a list of eco ids thus: evidenceCode=ECO:0000256,ECO:0000323
-     * @param evidenceCode
      */
     public void setEvidenceCode(String... evidenceCode) {
         filterMap.put(EVIDENCE_CODE, evidenceCode);
     }
 
     @ArrayPattern(regexp = "^ECO:[0-9]{7}$", paramName = EVIDENCE_CODE_PARAM, flags = CASE_INSENSITIVE)
+    @Size(max = MAX_EVIDENCE_CODE,
+            message = "Number of items in '" + EVIDENCE_CODE_PARAM + "' is larger than: {max}")
     public String[] getEvidenceCode() {
         return filterMap.get(EVIDENCE_CODE);
     }
@@ -371,7 +379,6 @@ public class AnnotationRequest {
 
     /**
      * Filter by Target Sets e.g. BHF-UCK, KRUK, Parkinsons etc
-     * @return
      */
     public void setTargetSet(String... targetSet) {
         filterMap.put(TARGET_SET, targetSet);
@@ -390,6 +397,10 @@ public class AnnotationRequest {
         return filterMap.get(DB_SUBSET);
     }
 
+    @Min(value = MIN_ENTRIES_PER_PAGE, message = "Number of entries per page cannot be less than {value} but " +
+            "found: ${validatedValue}")
+    @Max(value = MAX_ENTRIES_PER_PAGE, message = "Number of entries per page cannot be more than {value} but " +
+            "found: ${validatedValue}")
     public int getLimit() {
         return limit;
     }
@@ -398,6 +409,7 @@ public class AnnotationRequest {
         this.limit = limit;
     }
 
+    @Min(value = MIN_PAGE_NUMBER, message = "Page size cannot be less than {value} but found: ${validatedValue}")
     public int getPage() {
         return page;
     }
@@ -440,6 +452,7 @@ public class AnnotationRequest {
         if (filterMap.containsKey(USAGE_FIELD)) {
             if (filterMap.containsKey(GO_ID)) {
                 assert filterMap.get(USAGE_FIELD).length == 1 : USAGE_FIELD + ": can only have one value";
+
                 String usageValue = filterMap.get(USAGE_FIELD)[0];
 
                 filterBuilder
