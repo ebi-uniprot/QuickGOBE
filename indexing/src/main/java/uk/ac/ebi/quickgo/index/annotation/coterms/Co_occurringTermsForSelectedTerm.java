@@ -57,13 +57,6 @@ public class Co_occurringTermsForSelectedTerm {
         co_occurringTerms.add(coOccurringTerm);
     }
 
-    /**
-     * The term id which co-occurs with all the co-occurring terms listed in this instance.
-     * @return term id
-     */
-    public String getTarget() {
-        return target;
-    }
 
     /**
      * @return an iterator that makes available the list of co-occurring terms, in descending order of the similarity
