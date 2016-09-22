@@ -3,10 +3,8 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
-import uk.ac.ebi.quickgo.index.annotation.Annotation;
-import uk.ac.ebi.quickgo.index.annotation.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.index.annotation.AnnotationMocker;
 
 import java.util.Arrays;
 import java.util.List;
