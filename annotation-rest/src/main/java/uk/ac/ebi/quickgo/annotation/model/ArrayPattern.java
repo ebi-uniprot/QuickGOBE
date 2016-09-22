@@ -16,14 +16,14 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {ArrayPattern.Validator.class})
 @Documented @interface ArrayPattern {
-    String ERROR_MSG = "At least one '%s' value is invalid: %s";
+    String DEFAULT_ERROR_MSG = "The '%s' parameter contains invalid values: %s";
 
     /**
      * Defines the regular expression that each element in the array must match
      */
     String regexp();
 
-    String message() default ERROR_MSG;
+    String message() default DEFAULT_ERROR_MSG;
 
     /**
      * The name of the parameter being validated
@@ -153,13 +153,13 @@ import javax.validation.Payload;
                     }
                 }
 
-                if (!isValid && context.getDefaultConstraintMessageTemplate().equals(ERROR_MSG)) {
+                if (!isValid && context.getDefaultConstraintMessageTemplate().equals(DEFAULT_ERROR_MSG)) {
                     context.disableDefaultConstraintViolation();
 
-                    String invalidItemsText = invalidItems.stream().collect(Collectors.joining(","));
+                    String invalidItemsText = invalidItems.stream().collect(Collectors.joining(", "));
 
                     context.buildConstraintViolationWithTemplate(
-                            String.format(ERROR_MSG, paramName, invalidItemsText)).addConstraintViolation();
+                            String.format(DEFAULT_ERROR_MSG, paramName, invalidItemsText)).addConstraintViolation();
                 }
             }
 
