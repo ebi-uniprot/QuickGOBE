@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.read;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseType;
+import uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonRelevancyResponseType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,7 +55,10 @@ public class MockPresetDataConfig {
     static final PresetItem PRESET_GO_SLIM_METAGENOMICS;
     static final PresetItem PRESET_GO_SLIM_POMBE;
     static final PresetItem PRESET_GO_SLIM_SYNAPSE;
+    static final String TAXON_HUMAN = "9606";
+    static final String TAXON_BACTERIA = "2";
     private static final AssignedByRelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
+    private static final TaxonRelevancyResponseType DEFAULT_RELEVANT_TAXONS;
 
     static {
         DEFAULT_RELEVANT_ASSIGNED_BYS = new AssignedByRelevancyResponseType();
@@ -63,6 +68,14 @@ public class MockPresetDataConfig {
         DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add("1000");
         DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add(ENSEMBL);
         DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add("100");
+
+        DEFAULT_RELEVANT_TAXONS = new TaxonRelevancyResponseType();
+        DEFAULT_RELEVANT_TAXONS.terms = new TaxonRelevancyResponseType.Terms();
+        DEFAULT_RELEVANT_TAXONS.terms.taxonIds = new ArrayList<>();
+        DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add(TAXON_HUMAN);
+        DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add("1000");
+        DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add(TAXON_BACTERIA);
+        DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add("100");
 
         PRESET_ECO_32 = PresetItemBuilder
                 .createWithName("All manual codes")
@@ -107,10 +120,15 @@ public class MockPresetDataConfig {
         RestOperations mockRestOperations = mock(RestOperations.class);
 
         when(mockRestOperations.getForObject(
-                anyString(),
+                matches(".*assignedBy.*"),
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_ASSIGNED_BYS);
+        when(mockRestOperations.getForObject(
+                matches(".*taxonId.*"),
+                isA(Class.class),
+                any(HashMap.class)))
+                .thenReturn(DEFAULT_RELEVANT_TAXONS);
 
         return mockRestOperations;
     }

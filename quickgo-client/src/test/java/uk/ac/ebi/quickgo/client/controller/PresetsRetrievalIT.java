@@ -96,4 +96,13 @@ public class PresetsRetrievalIT {
                 .andExpect(jsonPath("$.goSlimSets").exists())
                 .andExpect(jsonPath("$.goSlimSets.presets.*", hasSize(greaterThan(0))));
     }
+
+    @Test
+    public void canRetrieveTaxonPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.taxons").exists())
+                .andExpect(jsonPath("$.taxons.presets").exists());
+    }
 }

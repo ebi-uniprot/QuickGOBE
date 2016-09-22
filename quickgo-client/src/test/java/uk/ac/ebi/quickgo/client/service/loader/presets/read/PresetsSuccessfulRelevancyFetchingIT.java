@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.evidence.EvidencePresetsC
 import uk.ac.ebi.quickgo.client.service.loader.presets.geneproduct.GeneProductPresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.reference.ReferencePresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.slimsets.GOSlimSetPresetsConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.withFrom.WithFromPresetsConfig;
 
 import java.util.List;
@@ -166,6 +167,20 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(presetItems.get(0), is(equalTo(PRESET_GO_SLIM_METAGENOMICS)));
         assertThat(presetItems.get(1), is(equalTo(PRESET_GO_SLIM_POMBE)));
         assertThat(presetItems.get(2), is(equalTo(PRESET_GO_SLIM_SYNAPSE)));
+    }
+
+    @Test
+    public void loadTaxonPresetsAfterSuccessfulRESTInfoFetching() throws Exception {
+        assertThat(preset.getTaxons().getPresets(), hasSize(0));
+
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(TaxonPresetsConfig.TAXON_LOADING_STEP_NAME);
+        BatchStatus status = jobExecution.getStatus();
+
+        assertThat(status, is(BatchStatus.COMPLETED));
+        assertThat(
+                extractPresetValues(preset.getTaxons(), PresetItem::getName),
+                contains(TAXON_HUMAN, TAXON_BACTERIA));
     }
 
     private <T> List<T> extractPresetValues(PresetItems presets, Function<PresetItem, T> extractor) {

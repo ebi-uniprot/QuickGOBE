@@ -18,4 +18,6 @@ public interface CompositePreset {
     PresetItems getGeneProducts();
 
     PresetItems getGoSlimSets();
+
+    PresetItems getTaxons();
 }

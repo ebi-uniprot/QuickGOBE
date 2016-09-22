@@ -10,3 +10,11 @@ search:
           responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseType",
           responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseConverter"
         }
+      - signature: taxonId
+        execution: REST_COMM
+        properties: {
+          ip: "localhost:8082",
+          resourceFormat: "/solr/annotation/terms?q=*%3A*&wt=json&indent=true&terms.fl=taxonId",
+          responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonRelevancyResponseType",
+          responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonRelevancyResponseConverter"
+        }

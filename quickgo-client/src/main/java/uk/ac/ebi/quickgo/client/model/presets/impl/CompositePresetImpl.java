@@ -26,6 +26,8 @@ public class CompositePresetImpl implements CompositePreset {
     public final PresetItemsBuilder geneProductsBuilder;
     @JsonIgnore
     public final GroupedPresetItemsBuilder goSlimSetsBuilder;
+    @JsonIgnore
+    public final PresetItemsBuilder taxonBuilder;
 
     public CompositePresetImpl() {
         assignedByBuilder = new PresetItemsBuilder();
@@ -34,17 +36,7 @@ public class CompositePresetImpl implements CompositePreset {
         withFromBuilder = new PresetItemsBuilder();
         geneProductsBuilder = new PresetItemsBuilder();
         goSlimSetsBuilder = new GroupedPresetItemsBuilder();
-    }
-
-    @Override public String toString() {
-        return "CompositePresetImpl{" +
-                "assignedByBuilder=" + assignedByBuilder +
-                ", referencesBuilder=" + referencesBuilder +
-                ", evidencesBuilder=" + evidencesBuilder +
-                ", withFromBuilder=" + withFromBuilder +
-                ", geneProductsBuilder=" + geneProductsBuilder +
-                ", goSlimSetsBuilder=" + goSlimSetsBuilder +
-                '}';
+        taxonBuilder = new PresetItemsBuilder();
     }
 
     @Override public PresetItems getAssignedBy() {
@@ -69,5 +61,21 @@ public class CompositePresetImpl implements CompositePreset {
 
     @Override public PresetItems getGoSlimSets() {
         return goSlimSetsBuilder.build();
+    }
+
+    @Override public PresetItems getTaxons() {
+        return taxonBuilder.build();
+    }
+
+    @Override public String toString() {
+        return "CompositePresetImpl{" +
+                "assignedByBuilder=" + assignedByBuilder +
+                ", referencesBuilder=" + referencesBuilder +
+                ", evidencesBuilder=" + evidencesBuilder +
+                ", withFromBuilder=" + withFromBuilder +
+                ", geneProductsBuilder=" + geneProductsBuilder +
+                ", goSlimSetsBuilder=" + goSlimSetsBuilder +
+                ", taxonBuilder=" + taxonBuilder +
+                '}';
     }
 }

@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetItems;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig;
 
 import java.util.List;
 import java.util.function.Function;
@@ -22,6 +23,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
@@ -60,6 +62,20 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(
                 extractPresetValues(preset.getAssignedBy(), PresetItem::getName),
                 contains(UNIPROT_KB));
+    }
+
+    @Test
+    public void loadDefaultTaxonPresetsAfterFailedRESTInfoFetching() throws Exception {
+        assertThat(preset.getTaxons().getPresets(), hasSize(0));
+
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(TaxonPresetsConfig.TAXON_LOADING_STEP_NAME);
+        BatchStatus status = jobExecution.getStatus();
+
+        assertThat(status, is(BatchStatus.COMPLETED));
+        assertThat(
+                extractPresetValues(preset.getTaxons(), PresetItem::getName),
+                is(empty()));
     }
 
     private <T> List<T> extractPresetValues(PresetItems presets, Function<PresetItem, T> extractor) {
