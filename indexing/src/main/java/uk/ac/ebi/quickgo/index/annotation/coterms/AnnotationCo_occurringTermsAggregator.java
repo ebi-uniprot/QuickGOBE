@@ -24,8 +24,8 @@ public class AnnotationCo_occurringTermsAggregator implements ItemWriter<Annotat
     private final Predicate<AnnotationDocument> toBeProcessed;
 
     private TermBatch termBatch;
-    private TermToTermOverlapMatrix overlapMatrix;
-    private TermGPCount termGPCount;
+    private final TermToTermOverlapMatrix overlapMatrix;
+    private final TermGPCount termGPCount;
 
     //Constructor
     public AnnotationCo_occurringTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
@@ -121,10 +121,10 @@ public class AnnotationCo_occurringTermsAggregator implements ItemWriter<Annotat
 class TermBatch {
 
     //A set of all terms encountered for a Gene Product. Therefore all these terms are co-occurring with each other.
-    Set<String> termsInBatch;
+    final Set<String> termsInBatch;
 
     //The input file has annotations in gene product order, so we use this value to note changes in gene product.
-    String currentGeneProduct;
+    private String currentGeneProduct;
 
     public TermBatch() {
         termsInBatch = new HashSet<>();
