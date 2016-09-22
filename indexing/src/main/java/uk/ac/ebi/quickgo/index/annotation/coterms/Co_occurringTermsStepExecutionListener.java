@@ -14,7 +14,7 @@ import org.springframework.batch.core.StepExecutionListener;
  * Time: 15:01
  * Created with IntelliJ IDEA.
  */
-public class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
+class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
 
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsStepExecutionListener.class);
