@@ -21,7 +21,7 @@ class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
 
     private final FlatFileItemWriter<T> wrapped;
 
-    Logger LOGGER = LoggerFactory.getLogger(FlatFileItemWriter.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(FlatFileItemWriter.class);
 
     public ListItemWriter(FlatFileItemWriter<T> coOccurringTermItemWriter) {
         wrapped = coOccurringTermItemWriter;
