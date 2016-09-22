@@ -1,9 +1,8 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import com.google.common.base.Preconditions;
-
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 
+import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.function.Predicate;
 import org.springframework.batch.item.ItemWriter;
@@ -31,8 +30,9 @@ public class AnnotationCo_occurringTermsAggregator implements ItemWriter<Annotat
     //Constructor
     public AnnotationCo_occurringTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
 
-        Preconditions.checkArgument(toBeProcessed != null, "Null predicate passed AnnotationCo_occurringTermsAggregator" +
-                " constructor");
+        Preconditions
+                .checkArgument(toBeProcessed != null, "Null predicate passed AnnotationCo_occurringTermsAggregator" +
+                        " constructor");
 
         this.toBeProcessed = toBeProcessed;
         this.overlapMatrix = new TermToTermOverlapMatrix();
@@ -40,7 +40,6 @@ public class AnnotationCo_occurringTermsAggregator implements ItemWriter<Annotat
         termGPCount = new TermGPCount();
         termBatch = new TermBatch();
     }
-
 
     /**
      * Number of unique gene products processed from Annotations
@@ -104,7 +103,6 @@ public class AnnotationCo_occurringTermsAggregator implements ItemWriter<Annotat
     public void finish() {
         increaseCountsForTermsInBatch();
     }
-
 
     /**
      * Got to the end of the list of annotations for this gene product

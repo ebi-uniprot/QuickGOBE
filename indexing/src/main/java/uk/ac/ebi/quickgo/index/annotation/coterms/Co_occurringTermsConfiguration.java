@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepExecutionListener;
@@ -15,8 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-
-import java.util.List;
 
 /**
  * @author Tony Wardell
@@ -76,12 +75,14 @@ public class Co_occurringTermsConfiguration {
     }
 
     @Bean
-    public ItemReader<String> coStatsManualItemReader(AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsManual) {
+    public ItemReader<String> coStatsManualItemReader(
+            AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsManual) {
         return new Co_occurringTermItemReader(co_occurringGoTermsFromAnnotationsManual);
     }
 
     @Bean
-    public ItemReader<String> coStatsAllItemReader(AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsAll) {
+    public ItemReader<String> coStatsAllItemReader(
+            AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsAll) {
         return new Co_occurringTermItemReader(co_occurringGoTermsFromAnnotationsAll);
     }
 

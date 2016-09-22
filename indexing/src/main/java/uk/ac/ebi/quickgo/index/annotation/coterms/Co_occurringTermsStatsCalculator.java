@@ -1,7 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import com.google.common.base.Preconditions;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.springframework.batch.item.ItemProcessor;
 
 /**
@@ -62,7 +65,7 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
         for (String comparedTerm : co_occurringTermsForTarget.keySet()) {
 
             coTerms.addAndCalculate(new Co_occurringTerm(target, comparedTerm, termGPCount.get(comparedTerm).hits,
-                            co_occurringTermsForTarget.get(comparedTerm).hits));
+                    co_occurringTermsForTarget.get(comparedTerm).hits));
         }
         return coTerms;
 
