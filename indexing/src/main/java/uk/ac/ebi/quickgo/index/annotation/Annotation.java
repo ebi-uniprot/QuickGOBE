@@ -10,11 +10,11 @@ package uk.ac.ebi.quickgo.index.annotation;
  */
 public class Annotation {
     String db;
-    public String dbObjectId;
+    String dbObjectId;
     String qualifier;
-    public String goId;
+    String goId;
     String dbReferences;
-    public String evidenceCode;
+    String evidenceCode;
     String with;
     String interactingTaxonId;
     String assignedBy;
