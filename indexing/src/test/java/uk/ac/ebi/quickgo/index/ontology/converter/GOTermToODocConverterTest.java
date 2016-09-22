@@ -280,10 +280,10 @@ public class GOTermToODocConverterTest {
         when(term.getProteinComplexes()).thenReturn(null);
 
         Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
-        List<String> extractedProteinComplxes =
+        List<String> extractedProteinComplexes =
                 extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.proteinComplexes);
 
-        assertThat(extractedProteinComplxes, is(nullValue()));
+        assertThat(extractedProteinComplexes, is(nullValue()));
     }
 
     private boolean proteinComplexExists(GOTerm.ProteinComplex proteinComplex,
