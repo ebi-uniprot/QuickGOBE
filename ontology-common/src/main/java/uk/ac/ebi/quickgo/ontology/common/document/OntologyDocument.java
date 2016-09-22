@@ -82,7 +82,7 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.CREDITS)
     public List<String> credits;
 
-    @Field(OntologyFields.PROTEIN_COMPLEXS)
+    @Field(OntologyFields.PROTEIN_COMPLEXES)
     public List<String> proteinComplexes;
 
     @Override
