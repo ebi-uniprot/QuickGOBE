@@ -1,8 +1,5 @@
 package uk.ac.ebi.quickgo.index.ontology.converter;
 
-import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
-import uk.ac.ebi.quickgo.model.ontology.generic.RelationType;
-import uk.ac.ebi.quickgo.model.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTermBlacklist;
 import uk.ac.ebi.quickgo.model.ontology.go.TaxonConstraint;
@@ -18,7 +15,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -191,6 +187,7 @@ public class GOTermToODocConverterTest {
         assertThat(extractedBlacklist, is(nullValue()));
     }
 
+    //GO discussions
     @Test
     public void extractingGoDiscussionsFromEmptyPlannedChangesListReturnsNull() throws Exception {
         when(term.getPlannedChanges()).thenReturn(null);
@@ -247,6 +244,55 @@ public class GOTermToODocConverterTest {
         return expectedGoDiscussions.stream()
                 .filter(expectedDiscussionText -> expectedDiscussionText.contains(goDiscussion.getTitle()) &&
                         expectedDiscussionText.contains(goDiscussion.getUrl()))
+                .findFirst().isPresent();
+    }
+
+    //Protein complexes
+    @Test
+    public void extracts2ProteinComplexFromProteinComplexList() {
+        String db = "Intact";
+        String id1 = "EBI-2410732";
+        String symbol1 = "nef1_yeast";
+        String name1 = "Nucleotide-excision repair factor 1 complex";
+
+        GOTerm.ProteinComplex proteinComplex1 = new GOTerm.ProteinComplex(db, id1, symbol1, name1);
+
+        String id2 = "EBI-2353861";
+        String symbol2 = "hat-b_yeast";
+        String name2 = "Histone acetyltransferase B";
+        GOTerm.ProteinComplex proteinComplex2 = new GOTerm.ProteinComplex(db, id2, symbol2, name2);
+
+        when(term.getProteinComplexes()).thenReturn(Arrays.asList(proteinComplex1, proteinComplex2));
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedProteinComplexes =
+                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.proteinComplexes);
+
+        assertThat(extractedProteinComplexes, hasSize(2));
+
+        assertThat(proteinComplexExists(proteinComplex1, extractedProteinComplexes), is(true));
+        assertThat(proteinComplexExists(proteinComplex2, extractedProteinComplexes), is(true));
+    }
+
+
+    @Test
+    public void extractingProteinComplexesFromEmptyProteinComplexesListReturnsNull() throws Exception {
+        when(term.getProteinComplexes()).thenReturn(null);
+
+        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        List<String> extractedProteinComplexes =
+                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.proteinComplexes);
+
+        assertThat(extractedProteinComplexes, is(nullValue()));
+    }
+
+    private boolean proteinComplexExists(GOTerm.ProteinComplex proteinComplex,
+            Collection<String> expectedProteinComplexes) {
+        return expectedProteinComplexes.stream()
+                .filter(expectedDiscussionText -> expectedDiscussionText.contains(proteinComplex.db)
+                        && expectedDiscussionText.contains(proteinComplex.id)
+                        && expectedDiscussionText.contains(proteinComplex.symbol)
+                        && expectedDiscussionText.contains(proteinComplex.name))
                 .findFirst().isPresent();
     }
 }
