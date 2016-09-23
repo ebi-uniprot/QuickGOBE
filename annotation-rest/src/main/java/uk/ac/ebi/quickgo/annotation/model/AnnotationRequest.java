@@ -351,7 +351,7 @@ public class AnnotationRequest {
     }
 
     public void setGeneProductType(String geneProductType) {
-        filterMap.put(GENE_PRODUCT_TYPE, geneProductType.toLowerCase());
+        filterMap.put(GENE_PRODUCT_TYPE, geneProductType);
     }
 
     @Pattern(regexp = "^(complex|rna|protein)(,(complex|rna|protein)){0,2}", flags = CASE_INSENSITIVE,
