@@ -31,22 +31,20 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
     }
 
     @Override public boolean isValid(String[] geneProducts, ConstraintValidatorContext context) {
-        boolean isValid = true;
+        String invalidGpIds = null;
 
         if (geneProducts != null) {
-            String invalidGpIds = Arrays.stream(geneProducts)
+            invalidGpIds = Arrays.stream(geneProducts)
                     .filter(idValidator.negate())
                     .collect(Collectors.joining(", "));
 
             if (!invalidGpIds.isEmpty()) {
-                isValid = false;
-
                 context.disableDefaultConstraintViolation();
                 context.buildConstraintViolationWithTemplate(String.format(DEFAULT_ERROR_MESSAGE, invalidGpIds))
                         .addConstraintViolation();
             }
         }
 
-        return isValid;
+        return invalidGpIds == null || invalidGpIds.isEmpty();
     }
 }
