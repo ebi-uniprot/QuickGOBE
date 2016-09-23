@@ -105,4 +105,31 @@ public class PresetsRetrievalIT {
                 .andExpect(jsonPath("$.taxons").exists())
                 .andExpect(jsonPath("$.taxons.presets").exists());
     }
+
+    @Test
+    public void canRetrieveQualifierPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.qualifiers").exists())
+                .andExpect(jsonPath("$.qualifiers.presets").exists());
+    }
+
+    @Test
+    public void canRetrieveAspectPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.aspects").exists())
+                .andExpect(jsonPath("$.aspects.presets.*", hasSize(3)));
+    }
+
+    @Test
+    public void canRetrieveGeneProductTypesPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.geneProductTypes").exists())
+                .andExpect(jsonPath("$.geneProductTypes.presets.*", hasSize(3)));
+    }
 }

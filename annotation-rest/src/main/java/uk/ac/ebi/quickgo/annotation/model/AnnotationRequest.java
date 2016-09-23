@@ -157,7 +157,7 @@ public class AnnotationRequest {
 
     @ApiModelProperty(
             value = "The type of gene product found within an annotation. Accepts comma separated values.",
-            allowableValues = "protein,RNA,complexes.",
+            allowableValues = "protein,RNA,complex.",
             example = "protein,RNA")
     private String geneProductType;
 

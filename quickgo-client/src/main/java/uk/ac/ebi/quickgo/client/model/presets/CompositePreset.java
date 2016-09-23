@@ -22,4 +22,8 @@ public interface CompositePreset {
     PresetItems getTaxons();
 
     PresetItems getQualifiers();
+
+    PresetItems getAspects();
+
+    PresetItems getGeneProductTypes();
 }
