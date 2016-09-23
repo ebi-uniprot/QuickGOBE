@@ -106,8 +106,8 @@
     <field name="symbol_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="symbol" dest="symbol_unsorted"/>
 
-    <field name="dbSubset_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
-    <copyField source="dbSubset" dest="dbSubset_unsorted"/>
+    <field name="geneProductSubset_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
+    <copyField source="geneProductSubset" dest="geneProductSubset_unsorted"/>
 
     <field name="evidenceCode_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="evidenceCode" dest="evidenceCode_unsorted"/>
