@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.client.service.loader.presets.read;
+package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
@@ -59,6 +59,10 @@ public class MockPresetDataConfig {
     static final String TAXON_BACTERIA = "2";
     private static final AssignedByRelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
     private static final TaxonRelevancyResponseType DEFAULT_RELEVANT_TAXONS;
+    private static final RelevancyResponseType DEFAULT_RELEVANT_QUALIFIERS;
+
+    static final String QUALIFIER_ENABLES = "enables";
+    static final String QUALIFIER_INVOLVED_IN = "involved_in";
 
     static {
         DEFAULT_RELEVANT_ASSIGNED_BYS = new AssignedByRelevancyResponseType();
@@ -76,6 +80,14 @@ public class MockPresetDataConfig {
         DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add("1000");
         DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add(TAXON_BACTERIA);
         DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add("100");
+
+        DEFAULT_RELEVANT_QUALIFIERS = new RelevancyResponseType();
+        DEFAULT_RELEVANT_QUALIFIERS.terms = new RelevancyResponseType.Terms();
+        DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies = new ArrayList<>();
+        DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies.add(QUALIFIER_ENABLES);
+        DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies.add("1000");
+        DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies.add(QUALIFIER_INVOLVED_IN);
+        DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies.add("100");
 
         PRESET_ECO_32 = PresetItemBuilder
                 .createWithName("All manual codes")
@@ -129,6 +141,11 @@ public class MockPresetDataConfig {
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_TAXONS);
+        when(mockRestOperations.getForObject(
+                matches(".*qualifier.*"),
+                isA(Class.class),
+                any(HashMap.class)))
+                .thenReturn(DEFAULT_RELEVANT_QUALIFIERS);
 
         return mockRestOperations;
     }

@@ -20,4 +20,6 @@ public interface CompositePreset {
     PresetItems getGoSlimSets();
 
     PresetItems getTaxons();
+
+    PresetItems getQualifiers();
 }

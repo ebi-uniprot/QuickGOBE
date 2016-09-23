@@ -1,15 +1,16 @@
-package uk.ac.ebi.quickgo.client.service.loader.presets.read;
+package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItems;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.hamcrest.collection.IsIterableContainingInOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -25,10 +26,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.read.MockPresetDataConfig.FAILED_FETCHING;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.read.MockPresetDataConfig.UNIPROT_KB;
 
 /**
  * Tests the population of the preset relevancy information despite a failure in REST communication to an
@@ -42,7 +40,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.read.MockPresetDat
         classes = {PresetsConfig.class, MockPresetDataConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
 @WebAppConfiguration
-@ActiveProfiles(profiles = FAILED_FETCHING)
+@ActiveProfiles(profiles = MockPresetDataConfig.FAILED_FETCHING)
 public class PresetsFailedRelevancyFetchingIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -61,7 +59,7 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(preset.getAssignedBy(), PresetItem::getName),
-                contains(UNIPROT_KB));
+                IsIterableContainingInOrder.contains(MockPresetDataConfig.UNIPROT_KB));
     }
 
     @Test
@@ -75,6 +73,20 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(preset.getTaxons(), PresetItem::getName),
+                is(empty()));
+    }
+
+    @Test
+    public void loadDefaultQualifierPresetsAfterFailedRESTInfoFetching() throws Exception {
+        assertThat(preset.getQualifiers().getPresets(), hasSize(0));
+
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(QualifierPresetsConfig.QUALIFIER_LOADING_STEP_NAME);
+        BatchStatus status = jobExecution.getStatus();
+
+        assertThat(status, is(BatchStatus.COMPLETED));
+        assertThat(
+                extractPresetValues(preset.getQualifiers(), PresetItem::getName),
                 is(empty()));
     }
 

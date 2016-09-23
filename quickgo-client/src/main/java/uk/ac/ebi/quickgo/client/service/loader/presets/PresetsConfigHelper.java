@@ -1,13 +1,21 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
+
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
@@ -93,5 +101,32 @@ public class PresetsConfigHelper {
         GZIPResource(Resource delegate) throws IOException {
             super(new GZIPInputStream(delegate.getInputStream()));
         }
+    }
+
+    public static ItemReader<RawNamedPreset> topItemsFromRESTReader(
+            RESTFilterConverterFactory converterFactory,
+            String field) {
+        FilterRequest request = FilterRequest.newBuilder().addProperty(field).build();
+
+        try {
+            List<String> relevantItems = converterFactory.<List<String>>convert(request).getConvertedValue();
+            Iterator<String> relevantItemIterator = relevantItems.iterator();
+            AtomicInteger position = new AtomicInteger(0);
+
+            return () -> {
+                if (relevantItemIterator.hasNext()) {
+                    RawNamedPreset rawNamedPreset = new RawNamedPreset();
+                    rawNamedPreset.name = relevantItemIterator.next();
+                    rawNamedPreset.relevancy = position.getAndIncrement();
+                    return rawNamedPreset;
+                } else {
+                    return null;
+                }
+            };
+        } catch (RetrievalException | IllegalStateException e) {
+            LOGGER.error("Failed to retrieve via REST call the relevant '" + field + "' values: ", e);
+        }
+
+        return () -> null;
     }
 }

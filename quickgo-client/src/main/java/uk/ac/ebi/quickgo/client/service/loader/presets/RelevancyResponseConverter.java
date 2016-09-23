@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.client.service.loader.presets.qualifier;
+package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter;
@@ -9,22 +9,22 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * Defines the transformation of a {@link QualifierRelevancyResponseType} instance to
+ * Defines the transformation of a {@link RelevancyResponseType} instance to
  * a list of {@link String}s, representing preset names in descending order (from high to low).
  *
  * Created 31/08/16
  * @author Edd
  */
-public class QualifierRelevancyResponseConverter
-        implements FilterConverter<QualifierRelevancyResponseType, List<String>> {
+public class RelevancyResponseConverter
+        implements FilterConverter<RelevancyResponseType, List<String>> {
 
-    @Override public ConvertedFilter<List<String>> transform(QualifierRelevancyResponseType response) {
+    @Override public ConvertedFilter<List<String>> transform(RelevancyResponseType response) {
         checkArgument(response != null, "Response cannot be null");
 
         List<String> keysWithoutCounts = new ArrayList<>();
 
-        if (response.terms != null && response.terms.taxonIds != null) {
-            List<String> values = response.terms.taxonIds;
+        if (response.terms != null && response.terms.relevancies != null) {
+            List<String> values = response.terms.relevancies;
             for (int i = 0; i < values.size() - 1; i += 2) {
                 keysWithoutCounts.add(values.get(i));
             }

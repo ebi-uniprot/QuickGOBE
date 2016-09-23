@@ -5,17 +5,11 @@ import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.rest.search.RetrievalException;
-import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +17,7 @@ import org.springframework.context.annotation.Import;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.topItemsFromRESTReader;
 
 /**
  * Exposes the {@link Step} bean that is used to read and populate information relating to the qualifier preset data.
@@ -69,32 +64,5 @@ public class QualifierPresetsConfig {
                                 .build());
             });
         };
-    }
-
-    private ItemReader<RawNamedPreset> topItemsFromRESTReader(
-            RESTFilterConverterFactory converterFactory,
-            String field) {
-        FilterRequest request = FilterRequest.newBuilder().addProperty(field).build();
-
-        try {
-            List<String> relevantItems = converterFactory.<List<String>>convert(request).getConvertedValue();
-            Iterator<String> relevantItemIterator = relevantItems.iterator();
-            AtomicInteger position = new AtomicInteger(0);
-
-            return () -> {
-                if (relevantItemIterator.hasNext()) {
-                    RawNamedPreset rawNamedPreset = new RawNamedPreset();
-                    rawNamedPreset.name = relevantItemIterator.next();
-                    rawNamedPreset.relevancy = position.getAndIncrement();
-                    return rawNamedPreset;
-                } else {
-                    return null;
-                }
-            };
-        } catch (RetrievalException | IllegalStateException e) {
-            LOGGER.error("Failed to retrieve via REST call the relevant '" + field + "' values: ", e);
-        }
-
-        return () -> null;
     }
 }

@@ -18,3 +18,11 @@ search:
           responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonRelevancyResponseType",
           responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonRelevancyResponseConverter"
         }
+      - signature: qualifier
+        execution: REST_COMM
+        properties: {
+          ip: "localhost:8082",
+          resourceFormat: "/solr/annotation/terms?q=*%3A*&wt=json&indent=true&terms.fl=qualifier",
+          responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseType",
+          responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseConverter"
+        }
