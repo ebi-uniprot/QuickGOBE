@@ -29,6 +29,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
@@ -314,12 +315,12 @@ public class AnnotationControllerIT {
         String goEvidenceCode = "IEA";
 
         String goEvidenceCode1 = "BSS";
-        AnnotationDocument annoDoc1 = AnnotationDocMocker.createAnnotationDoc(createId(999));
+        AnnotationDocument annoDoc1 = AnnotationDocMocker.createAnnotationDoc(createGPId(999));
         annoDoc1.goEvidence = goEvidenceCode1;
         repository.save(annoDoc1);
 
         String goEvidenceCode2 = "AWE";
-        AnnotationDocument annoDoc2 = AnnotationDocMocker.createAnnotationDoc(createId(998));
+        AnnotationDocument annoDoc2 = AnnotationDocMocker.createAnnotationDoc(createGPId(998));
         annoDoc2.goEvidence = goEvidenceCode2;
         repository.save(annoDoc2);
 
@@ -1139,7 +1140,7 @@ public class AnnotationControllerIT {
     public void filterWithAspectMolecularFunctionReturnsAnnotationsWithMolecularFunction() throws Exception {
         String goAspect = "molecular_function";
 
-        AnnotationDocument annoDoc1 = AnnotationDocMocker.createAnnotationDoc(createId(999));
+        AnnotationDocument annoDoc1 = AnnotationDocMocker.createAnnotationDoc(createGPId(999));
         annoDoc1.goAspect = goAspect;
         repository.save(annoDoc1);
 
@@ -1156,13 +1157,10 @@ public class AnnotationControllerIT {
 
     private List<AnnotationDocument> createGenericDocs(int n) {
         return IntStream.range(0, n)
-                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i))).collect
+                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createGPId(i))).collect
                         (Collectors.toList());
     }
 
-    private String createId(int idNum) {
-        return String.format("A0A%03d", idNum);
-    }
 
     private int totalPages(int totalEntries, int resultsPerPage) {
         return (int) Math.ceil(totalEntries / resultsPerPage) + 1;
