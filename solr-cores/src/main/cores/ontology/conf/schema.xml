@@ -46,6 +46,7 @@
     <field name="blacklist" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="goDiscussions" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="credits" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="proteinComplexes" type="string" indexed="false" stored="true" multiValued="true"/>
 
     <!-- autocomplete search fields -->
     <field name="edge_name" type="text_edge" indexed="true" stored="true" multiValued="false"/>

@@ -55,6 +55,16 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void canRetrieveProteinComplexes() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(GO_0000001, COMPLETE_SUB_RESOURCE)));
+
+        expectBasicFieldsInResults(response, Collections.singletonList(GO_0000001))
+                .andExpect(jsonPath("$.results.*.proteinComplexes", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
     /*
      * GO produces two more attributes in its response (aspect and usage), when compared
      * to the standard OBO response.

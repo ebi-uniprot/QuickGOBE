@@ -19,31 +19,32 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Time: 13:32
  * Created with IntelliJ IDEA.
  */
-public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList, String> {
-    private static final String MESSAGE = "At least one 'Gene Product ID' value is invalid: %s";
+public class GeneProductIDValidator implements ConstraintValidator<GeneProductIDList, String[]> {
+    public static final String DEFAULT_ERROR_MESSAGE = "The 'Gene Product ID' parameter contains invalid values: %s";
 
     @Autowired
-    DbXRefEntityValidation xRefFormats;
+    private DbXRefEntityValidation xRefFormats;
     private Predicate<String> idValidator;
 
     @Override public void initialize(GeneProductIDList constraintAnnotation) {
-        idValidator = xRefFormats::test;
+        idValidator = xRefFormats;
     }
 
-    @Override public boolean isValid(String s, ConstraintValidatorContext context) {
-        if (s == null) {
-            return true;
-        }
-        String invalid = Arrays.stream(s.split(",")).filter(idValidator.negate()).collect
-                (Collectors.joining(", "));
+    @Override public boolean isValid(String[] geneProducts, ConstraintValidatorContext context) {
+        String invalidGpIds = null;
 
-        if(invalid != null && invalid.isEmpty()){
-            return true;
-        }
-        context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate(String.format(MESSAGE, invalid))
-                .addConstraintViolation();
+        if (geneProducts != null) {
+            invalidGpIds = Arrays.stream(geneProducts)
+                    .filter(idValidator.negate())
+                    .collect(Collectors.joining(", "));
 
-        return false;
+            if (!invalidGpIds.isEmpty()) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate(String.format(DEFAULT_ERROR_MESSAGE, invalidGpIds))
+                        .addConstraintViolation();
+            }
+        }
+
+        return invalidGpIds == null || invalidGpIds.isEmpty();
     }
 }
