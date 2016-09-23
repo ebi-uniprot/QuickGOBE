@@ -18,11 +18,11 @@ public class AnnotationFields {
     public final static String ASSIGNED_BY = "assignedBy";
     public final static String QUALIFIER = "qualifier";
     public static final String SYMBOL = "symbol";
-    public static final String DB_SUBSET = "dbSubset";
     public final static String EVIDENCE_CODE = "evidenceCode";
     public final static String EXTENSION = "extension";
     public final static String GENE_PRODUCT_ID = "geneProductId";
     public static final String GENE_PRODUCT_TYPE = "geneProductType";
+    public static final String GENE_PRODUCT_SUBSET = "geneProductSubset";
     public final static String GO_EVIDENCE = "goEvidence";
     public final static String GO_ID = "goId";
     public final static String GO_ID_INDEXED_ORIGINAL = "goId_join";
@@ -58,7 +58,7 @@ public class AnnotationFields {
         private static final Set<String> VALUES = new HashSet<>();
 
         public static final String ASSIGNED_BY = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
-        public static final String DB_SUBSET = storeAndGet(VALUES, AnnotationFields.DB_SUBSET);
+        public static final String DB_SUBSET = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_SUBSET);
         public static final String EVIDENCE_CODE = storeAndGet(VALUES, AnnotationFields.EVIDENCE_CODE);
         public static final String GENE_PRODUCT_ID = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_ID);
         public static final String GENE_PRODUCT_TYPE = storeAndGet(VALUES, AnnotationFields.GENE_PRODUCT_TYPE);

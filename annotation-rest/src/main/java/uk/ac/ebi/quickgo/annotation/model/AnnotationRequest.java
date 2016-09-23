@@ -46,7 +46,7 @@ public class AnnotationRequest {
     private static final String[] FILTER_REQUEST_FIELDS = new String[]{
             GO_ASPECT,
             ASSIGNED_BY,
-            DB_SUBSET,
+            GENE_PRODUCT_SUBSET,
             EVIDENCE_CODE,
             GENE_PRODUCT_ID,
             GENE_PRODUCT_TYPE,
@@ -373,13 +373,13 @@ public class AnnotationRequest {
     }
 
     public void setGeneProductSubset(String geneProductSubset) {
-        filterMap.put(DB_SUBSET, geneProductSubset);
+        filterMap.put(GENE_PRODUCT_SUBSET, geneProductSubset);
     }
 
     @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
             message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
     public String getGeneProductSubset() {
-        return filterMap.get(DB_SUBSET);
+        return filterMap.get(GENE_PRODUCT_SUBSET);
     }
 
     public int getLimit() {

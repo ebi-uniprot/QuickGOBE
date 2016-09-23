@@ -28,8 +28,8 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.GENE_PRODUCT_TYPE)
     public String geneProductType;
 
-    @Field(AnnotationFields.DB_SUBSET)
-    public String dbSubset;
+    @Field(AnnotationFields.GENE_PRODUCT_SUBSET)
+    public String geneProductSubset;
 
     @Field(AnnotationFields.TAXON_ID)
     public int taxonId;
