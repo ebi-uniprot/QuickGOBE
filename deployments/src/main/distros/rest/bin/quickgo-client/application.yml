@@ -5,16 +5,24 @@ search:
       - signature: assignedBy
         execution: REST_COMM
         properties: {
-          ip: "localhost:8082",
+          ip: "http://ves-hx-c7:8090",
           resourceFormat: "/solr/annotation/terms?q=*%3A*&wt=json&indent=true&terms.fl=assignedBy",
-          responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseType",
-          responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseConverter"
+          responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseType",
+          responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseConverter"
         }
       - signature: taxonId
         execution: REST_COMM
         properties: {
-          ip: "localhost:8082",
+          ip: "http://ves-hx-c7:8090",
           resourceFormat: "/solr/annotation/terms?q=*%3A*&wt=json&indent=true&terms.fl=taxonId",
-          responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonRelevancyResponseType",
-          responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonRelevancyResponseConverter"
+          responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseType",
+          responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseConverter"
+        }
+      - signature: qualifier
+        execution: REST_COMM
+        properties: {
+          ip: "http://ves-hx-c7:8090",
+          resourceFormat: "/solr/annotation/terms?q=*%3A*&wt=json&indent=true&terms.fl=qualifier",
+          responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseType",
+          responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseConverter"
         }

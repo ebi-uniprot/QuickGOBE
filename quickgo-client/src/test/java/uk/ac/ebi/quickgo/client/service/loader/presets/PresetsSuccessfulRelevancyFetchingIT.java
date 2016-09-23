@@ -190,7 +190,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
     @Test
     public void loadQualifierPresetsAfterSuccessfulRESTInfoFetching() throws Exception {
-        assertThat(preset.getTaxons().getPresets(), hasSize(0));
+        assertThat(preset.getQualifiers().getPresets(), hasSize(0));
 
         JobExecution jobExecution =
                 jobLauncherTestUtils.launchStep(QualifierPresetsConfig.QUALIFIER_LOADING_STEP_NAME);
@@ -198,7 +198,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                extractPresetValues(preset.getTaxons(), PresetItem::getName),
+                extractPresetValues(preset.getQualifiers(), PresetItem::getName),
                 IsIterableContainingInOrder
                         .contains(MockPresetDataConfig.QUALIFIER_ENABLES, MockPresetDataConfig.QUALIFIER_INVOLVED_IN));
     }

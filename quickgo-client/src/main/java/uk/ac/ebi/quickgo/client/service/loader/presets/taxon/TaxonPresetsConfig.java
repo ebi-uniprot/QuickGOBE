@@ -5,24 +5,17 @@ import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.rest.search.RetrievalException;
-import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.slf4j.Logger;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.topItemsFromRESTReader;
 
 /**
  * Exposes the {@link Step} bean that is used to read and populate information relating to the taxonomy preset data.
@@ -34,9 +27,8 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP
 @Configuration
 @Import({PresetsCommonConfig.class})
 public class TaxonPresetsConfig {
-    private static final Logger LOGGER = getLogger(TaxonPresetsConfig.class);
     public static final String TAXON_LOADING_STEP_NAME = "TaxonReadingStep";
-    private static final String TAXON_ID = "taxonId";
+    public static final String TAXON_ID = "taxonId";
 
     @Bean
     public Step taxonStep(
@@ -49,7 +41,7 @@ public class TaxonPresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .reader(topTaxonsFromRESTReader(converterFactory))
+                .reader(topItemsFromRESTReader(converterFactory, TAXON_ID))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -69,30 +61,5 @@ public class TaxonPresetsConfig {
                                 .build());
             });
         };
-    }
-
-    private ItemReader<RawNamedPreset> topTaxonsFromRESTReader(RESTFilterConverterFactory converterFactory) {
-        FilterRequest taxonRequest = FilterRequest.newBuilder().addProperty(TAXON_ID).build();
-
-        try {
-            List<String> relevantTaxons = converterFactory.<List<String>>convert(taxonRequest).getConvertedValue();
-            Iterator<String> iterator = relevantTaxons.iterator();
-            AtomicInteger position = new AtomicInteger(0);
-
-            return () -> {
-                if (iterator.hasNext()) {
-                    RawNamedPreset rawNamedPreset = new RawNamedPreset();
-                    rawNamedPreset.name = iterator.next();
-                    rawNamedPreset.relevancy = position.getAndIncrement();
-                    return rawNamedPreset;
-                } else {
-                    return null;
-                }
-            };
-        } catch (RetrievalException | IllegalStateException e) {
-            LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", e);
-        }
-
-        return () -> null;
     }
 }

@@ -7,7 +7,6 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
-import org.slf4j.Logger;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemWriter;
@@ -15,13 +14,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.topItemsFromRESTReader;
 
 /**
  * Exposes the {@link Step} bean that is used to read and populate information relating to the qualifier preset data.
- * The required taxonomy information is only the top N qualifier IDs. No further information is required.
+ * The required qualifier information is only the top N qualifier IDs. No further information is required.
  *
  * Created 01/09/16
  * @author Edd
@@ -29,12 +27,11 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelpe
 @Configuration
 @Import({PresetsCommonConfig.class})
 public class QualifierPresetsConfig {
-    private static final Logger LOGGER = getLogger(QualifierPresetsConfig.class);
     public static final String QUALIFIER_LOADING_STEP_NAME = "QualifierReadingStep";
-    private static final String QUALIFIER = "qualifier";
+    public static final String QUALIFIER = "qualifier";
 
     @Bean
-    public Step taxonStep(
+    public Step qualifierStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePresetImpl presets,
@@ -58,7 +55,7 @@ public class QualifierPresetsConfig {
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> {
             rawItemList.forEach(rawItem -> {
-                presets.taxonBuilder.addPreset(
+                presets.qualifierBuilder.addPreset(
                         PresetItemBuilder.createWithName(rawItem.name)
                                 .withRelevancy(rawItem.relevancy)
                                 .build());

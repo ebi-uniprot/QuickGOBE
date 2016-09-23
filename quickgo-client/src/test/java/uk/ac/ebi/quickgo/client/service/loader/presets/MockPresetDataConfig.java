@@ -2,8 +2,7 @@ package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
-import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseType;
-import uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonRelevancyResponseType;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +23,9 @@ import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig.ASSIGNED_BY;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig.QUALIFIER;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig.TAXON_ID;
 
 /**
  * Provides configurable properties, beans, etc., used during tests.
@@ -57,29 +59,28 @@ public class MockPresetDataConfig {
     static final PresetItem PRESET_GO_SLIM_SYNAPSE;
     static final String TAXON_HUMAN = "9606";
     static final String TAXON_BACTERIA = "2";
-    private static final AssignedByRelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
-    private static final TaxonRelevancyResponseType DEFAULT_RELEVANT_TAXONS;
-    private static final RelevancyResponseType DEFAULT_RELEVANT_QUALIFIERS;
-
     static final String QUALIFIER_ENABLES = "enables";
     static final String QUALIFIER_INVOLVED_IN = "involved_in";
+    private static final RelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
+    private static final RelevancyResponseType DEFAULT_RELEVANT_TAXONS;
+    private static final RelevancyResponseType DEFAULT_RELEVANT_QUALIFIERS;
 
     static {
-        DEFAULT_RELEVANT_ASSIGNED_BYS = new AssignedByRelevancyResponseType();
-        DEFAULT_RELEVANT_ASSIGNED_BYS.terms = new AssignedByRelevancyResponseType.Terms();
-        DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy = new ArrayList<>();
-        DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add(UNIPROT_KB);
-        DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add("1000");
-        DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add(ENSEMBL);
-        DEFAULT_RELEVANT_ASSIGNED_BYS.terms.assignedBy.add("100");
+        DEFAULT_RELEVANT_ASSIGNED_BYS = new RelevancyResponseType();
+        DEFAULT_RELEVANT_ASSIGNED_BYS.terms = new RelevancyResponseType.Terms();
+        DEFAULT_RELEVANT_ASSIGNED_BYS.terms.relevancies = new ArrayList<>();
+        DEFAULT_RELEVANT_ASSIGNED_BYS.terms.relevancies.add(UNIPROT_KB);
+        DEFAULT_RELEVANT_ASSIGNED_BYS.terms.relevancies.add("1000");
+        DEFAULT_RELEVANT_ASSIGNED_BYS.terms.relevancies.add(ENSEMBL);
+        DEFAULT_RELEVANT_ASSIGNED_BYS.terms.relevancies.add("100");
 
-        DEFAULT_RELEVANT_TAXONS = new TaxonRelevancyResponseType();
-        DEFAULT_RELEVANT_TAXONS.terms = new TaxonRelevancyResponseType.Terms();
-        DEFAULT_RELEVANT_TAXONS.terms.taxonIds = new ArrayList<>();
-        DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add(TAXON_HUMAN);
-        DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add("1000");
-        DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add(TAXON_BACTERIA);
-        DEFAULT_RELEVANT_TAXONS.terms.taxonIds.add("100");
+        DEFAULT_RELEVANT_TAXONS = new RelevancyResponseType();
+        DEFAULT_RELEVANT_TAXONS.terms = new RelevancyResponseType.Terms();
+        DEFAULT_RELEVANT_TAXONS.terms.relevancies = new ArrayList<>();
+        DEFAULT_RELEVANT_TAXONS.terms.relevancies.add(TAXON_HUMAN);
+        DEFAULT_RELEVANT_TAXONS.terms.relevancies.add("1000");
+        DEFAULT_RELEVANT_TAXONS.terms.relevancies.add(TAXON_BACTERIA);
+        DEFAULT_RELEVANT_TAXONS.terms.relevancies.add("100");
 
         DEFAULT_RELEVANT_QUALIFIERS = new RelevancyResponseType();
         DEFAULT_RELEVANT_QUALIFIERS.terms = new RelevancyResponseType.Terms();
@@ -126,23 +127,23 @@ public class MockPresetDataConfig {
                 .build();
     }
 
-    @Bean @Profile(SUCCESSFUL_FETCHING)
+    @Bean(name = "restOperations") @Profile(SUCCESSFUL_FETCHING)
     @SuppressWarnings("unchecked")
     public RestOperations restOperations() {
         RestOperations mockRestOperations = mock(RestOperations.class);
 
         when(mockRestOperations.getForObject(
-                matches(".*assignedBy.*"),
+                anyStringContaining(ASSIGNED_BY),
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_ASSIGNED_BYS);
         when(mockRestOperations.getForObject(
-                matches(".*taxonId.*"),
+                anyStringContaining(TAXON_ID),
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_TAXONS);
         when(mockRestOperations.getForObject(
-                matches(".*qualifier.*"),
+                anyStringContaining(QUALIFIER),
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_QUALIFIERS);
@@ -150,16 +151,20 @@ public class MockPresetDataConfig {
         return mockRestOperations;
     }
 
-    @Bean @Profile(FAILED_FETCHING)
+    @Bean(name = "restOperations") @Profile(FAILED_FETCHING)
     @SuppressWarnings("unchecked")
     public RestOperations badRestOperations() {
         RestOperations mockRestOperations = mock(RestOperations.class);
-        doThrow(new RuntimeException())
+        doThrow(new RetrievalException("Deliberately causing error in test"))
                 .when(mockRestOperations)
                 .getForObject(
                         anyString(),
                         isA(Class.class),
                         any(HashMap.class));
         return mockRestOperations;
+    }
+
+    private String anyStringContaining(String value) {
+        return matches(".*" + value + ".*");
     }
 }

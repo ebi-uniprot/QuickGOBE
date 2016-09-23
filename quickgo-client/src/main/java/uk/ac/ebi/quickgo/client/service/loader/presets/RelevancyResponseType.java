@@ -22,7 +22,7 @@ public class RelevancyResponseType implements ResponseType {
     public Terms terms;
 
     public static class Terms {
-        private String termName;
+        public String termName;
         public List<String> relevancies;
 
         @JsonAnySetter
@@ -31,8 +31,8 @@ public class RelevancyResponseType implements ResponseType {
                 this.termName = termName;
                 this.relevancies = termInfo;
             } else {
-                LOGGER.warn("RelevancyResponseType has already been populated with term info [{}, {}]." +
-                                "Not overwriting existing information.",
+                LOGGER.warn("RelevancyResponseType has already been populated with term info [{}, {}]. " +
+                                "Will not overwrite existing information.",
                         this.termName, this.relevancies);
             }
         }

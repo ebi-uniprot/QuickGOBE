@@ -22,6 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.client.RestOperations;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
@@ -47,6 +48,9 @@ public class PresetsFailedRelevancyFetchingIT {
 
     @Autowired
     private CompositePresetImpl preset;
+
+    @Autowired
+    private RestOperations restOperations;
 
     @Test
     public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() throws Exception {
