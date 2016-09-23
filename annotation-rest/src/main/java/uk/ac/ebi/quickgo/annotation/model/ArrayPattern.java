@@ -140,20 +140,20 @@ import javax.validation.Payload;
 
         @Override
         public boolean isValid(String[] items, ConstraintValidatorContext context) {
-            boolean isValid = true;
+            List<String> invalidItems = null;
 
             if (items != null) {
-                List<String> invalidItems = new ArrayList<>();
+                invalidItems = new ArrayList<>();
 
                 for (String next : items) {
                     Matcher matcher = pattern.matcher(next);
                     if (!matcher.matches()) {
                         invalidItems.add(next);
-                        isValid = false;
                     }
                 }
 
-                if (!isValid && context.getDefaultConstraintMessageTemplate().equals(DEFAULT_ERROR_MSG)) {
+                if (!invalidItems.isEmpty() &&
+                        context.getDefaultConstraintMessageTemplate().equals(DEFAULT_ERROR_MSG)) {
                     context.disableDefaultConstraintViolation();
 
                     String invalidItemsText = invalidItems.stream().collect(Collectors.joining(", "));
@@ -163,7 +163,7 @@ import javax.validation.Payload;
                 }
             }
 
-            return isValid;
+            return invalidItems == null || invalidItems.isEmpty();
         }
     }
 }
