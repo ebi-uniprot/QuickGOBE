@@ -699,6 +699,16 @@ public abstract class OBOControllerIT {
         expectChartCreationError(response.andExpect(status().is5xxServerError()), exceptionMessage);
     }
 
+    @Test
+    public void failedChartRequestDueToBadIdProduces400() throws Exception {
+        requestToChartServiceReturnsValidImage();
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURLWithSubResource(invalidId(), CHART_SUB_RESOURCE)));
+
+        expectInvalidIdError(response, invalidId());
+    }
+
     private void requestToChartServiceReturnsValidImage() {
         GraphImageResult mockGraphImageResult = mock(GraphImageResult.class);
         when(mockGraphImageResult.getGraphImage()).thenReturn(new GraphImage("Mocked GraphImage"));

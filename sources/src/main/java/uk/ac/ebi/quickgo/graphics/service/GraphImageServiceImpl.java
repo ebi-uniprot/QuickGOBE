@@ -35,7 +35,7 @@ public class GraphImageServiceImpl implements GraphImageService {
     private final OntologyGraphicsSourceLoader sourceLoader;
 
     public GraphImageServiceImpl(OntologyGraphicsSourceLoader ontologyGraphicsSourceLoader) {
-        checkArgument(ontologyGraphicsSourceLoader != null, "LegacyOntologySourceLoader cannot be null");
+        checkArgument(ontologyGraphicsSourceLoader != null, "OntologyGraphicsSourceLoader cannot be null");
 
         this.sourceLoader = ontologyGraphicsSourceLoader;
     }
