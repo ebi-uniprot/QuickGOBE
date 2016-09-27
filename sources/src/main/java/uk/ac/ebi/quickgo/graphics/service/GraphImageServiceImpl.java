@@ -32,17 +32,7 @@ public class GraphImageServiceImpl implements GraphImageService {
     private static final EnumSet<RelationType> GO_RELATIONS_SET = EnumSet.of(RelationType.ISA, RelationType.PARTOF,
             RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES,
             RelationType.OCCURSIN, RelationType.CAPABLEOF, RelationType.CAPABLEOFPARTOF);
-    //    private GeneOntology geneOntology;
-    //    private EvidenceCodeOntology evidenceCodeOntology;
     private final OntologyGraphicsSourceLoader sourceLoader;
-
-    //    public GraphImageServiceImpl(GeneOntology geneOntology, EvidenceCodeOntology evidenceCodeOntology) {
-    //        checkArgument(geneOntology != null, "GeneOntology cannot be null");
-    //        checkArgument(evidenceCodeOntology != null, "EvidenceCodeOntology cannot be null");
-    //
-    //        this.geneOntology = geneOntology;
-    //        this.evidenceCodeOntology = evidenceCodeOntology;
-    //    }
 
     public GraphImageServiceImpl(OntologyGraphicsSourceLoader ontologyGraphicsSourceLoader) {
         checkArgument(ontologyGraphicsSourceLoader != null, "LegacyOntologySourceLoader cannot be null");

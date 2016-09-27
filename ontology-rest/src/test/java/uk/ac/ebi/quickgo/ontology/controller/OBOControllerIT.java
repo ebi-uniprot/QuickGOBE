@@ -1,9 +1,12 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
+import uk.ac.ebi.quickgo.graphics.ontology.GraphImageResult;
+import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
+import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -13,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -34,6 +38,11 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -49,7 +58,7 @@ import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
  * Created by edd on 14/01/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OntologyREST.class})
+@SpringApplicationConfiguration(classes = {OntologyREST.class, GraphicsConfig.class})
 @WebAppConfiguration
 public abstract class OBOControllerIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
@@ -70,6 +79,9 @@ public abstract class OBOControllerIT {
 
     @Autowired
     protected OntologyGraph ontologyGraph;
+
+    @Autowired
+    private GraphImageService graphImageService;
 
     protected MockMvc mockMvc;
 
@@ -99,6 +111,11 @@ public abstract class OBOControllerIT {
         ontologyRepository.save(basicDocs);
 
         setupSimpleRelationshipChain();
+    }
+
+    @After
+    public void after() {
+        reset(graphImageService);
     }
 
     @Test
@@ -659,6 +676,36 @@ public abstract class OBOControllerIT {
         expectInvalidRelationError(response, invalidRelation);
     }
 
+    @Test
+    public void canLoadChartIfSourcesWereLoaded() throws Exception {
+        requestToChartServiceReturnsValidImage();
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE)));
+
+        response.andExpect(status().isOk());
+    }
+
+    @Test
+    public void failedChartRequestProduces500() throws Exception {
+        String exceptionMessage = "exception message";
+        when(graphImageService.createChart(anyListOf(String.class), anyString())).thenThrow(
+                new RenderingGraphException(exceptionMessage)
+        );
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE)));
+
+        expectChartCreationError(response.andExpect(status().is5xxServerError()), exceptionMessage);
+    }
+
+    private void requestToChartServiceReturnsValidImage() {
+        GraphImageResult mockGraphImageResult = mock(GraphImageResult.class);
+        when(mockGraphImageResult.getGraphImage()).thenReturn(new GraphImage("Mocked GraphImage"));
+        when(graphImageService.createChart(anyListOf(String.class), anyString()))
+                .thenReturn(mockGraphImageResult);
+    }
+
     protected abstract String getResourceURL();
 
     protected abstract OntologyDocument createBasicDoc(String id, String name);
@@ -767,6 +814,13 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.url", is(requestUrl(result))))
                 .andExpect(jsonPath("$.messages", hasItem(
                         containsString("Unknown relationship requested: '" + relation + "'"))));
+    }
+
+    protected ResultActions expectChartCreationError(ResultActions result, String messagePrefix) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.url", is(requestUrl(result))))
+                .andExpect(jsonPath("$.messages", hasItem(containsString(messagePrefix))));
     }
 
     protected ResultActions expectResultsInfoExists(ResultActions result) throws Exception {
