@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.graphics.service;
 
+import uk.ac.ebi.quickgo.ff.loader.ontology.OntologyGraphicsSourceLoader;
 import uk.ac.ebi.quickgo.graphics.ontology.*;
-import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTermSet;
 import uk.ac.ebi.quickgo.model.ontology.generic.RelationType;
-import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -33,32 +32,45 @@ public class GraphImageServiceImpl implements GraphImageService {
     private static final EnumSet<RelationType> GO_RELATIONS_SET = EnumSet.of(RelationType.ISA, RelationType.PARTOF,
             RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES,
             RelationType.OCCURSIN, RelationType.CAPABLEOF, RelationType.CAPABLEOFPARTOF);
-    private final GeneOntology geneOntology;
-    private final EvidenceCodeOntology evidenceCodeOntology;
+    //    private GeneOntology geneOntology;
+    //    private EvidenceCodeOntology evidenceCodeOntology;
+    private final OntologyGraphicsSourceLoader sourceLoader;
 
-    public GraphImageServiceImpl(GeneOntology geneOntology, EvidenceCodeOntology evidenceCodeOntology) {
-        checkArgument(geneOntology != null, "GeneOntology cannot be null");
-        checkArgument(evidenceCodeOntology != null, "EvidenceCodeOntology cannot be null");
+    //    public GraphImageServiceImpl(GeneOntology geneOntology, EvidenceCodeOntology evidenceCodeOntology) {
+    //        checkArgument(geneOntology != null, "GeneOntology cannot be null");
+    //        checkArgument(evidenceCodeOntology != null, "EvidenceCodeOntology cannot be null");
+    //
+    //        this.geneOntology = geneOntology;
+    //        this.evidenceCodeOntology = evidenceCodeOntology;
+    //    }
 
-        this.geneOntology = geneOntology;
-        this.evidenceCodeOntology = evidenceCodeOntology;
+    public GraphImageServiceImpl(OntologyGraphicsSourceLoader ontologyGraphicsSourceLoader) {
+        checkArgument(ontologyGraphicsSourceLoader != null, "LegacyOntologySourceLoader cannot be null");
+
+        this.sourceLoader = ontologyGraphicsSourceLoader;
     }
 
     @Override
     public GraphImageResult createChart(List<String> ids, String scope) {
-        NameSpace nameSpace = NameSpace.getNameSpace(scope);
-        List<String> termsIdsList = validateIds(ids, nameSpace);
+        if (sourceLoader.isLoaded()) {
 
-        GraphImage graphImage = createRenderableImage(ids, nameSpace);
+            NameSpace nameSpace = NameSpace.getNameSpace(scope);
+            List<String> termsIdsList = validateIds(ids, nameSpace);
 
-        String description;
-        if (termsIdsList.size() == 1) {
-            description = "Ancestor chart for " + termsIdsList.get(0);
+            GraphImage graphImage = createRenderableImage(ids, nameSpace);
+
+            String description;
+            if (termsIdsList.size() == 1) {
+                description = "Ancestor chart for " + termsIdsList.get(0);
+            } else {
+                description = "Comparison chart for " + String.valueOf(termsIdsList.size());
+            }
+
+            return new GraphImageResult(description, graphImage);
         } else {
-            description = "Comparison chart for " + String.valueOf(termsIdsList.size());
+            throw new RenderingGraphException(
+                    "Cannot create chart because internal ontologies could not be loaded at application startup");
         }
-
-        return new GraphImageResult(description, graphImage);
     }
 
     private EnumSet<RelationType> getRelationTypes(NameSpace nameSpace) {
@@ -115,9 +127,9 @@ public class GraphImageServiceImpl implements GraphImageService {
     private GenericOntology getGenericOntology(NameSpace nameSpace) {
         switch (nameSpace) {
             case GO:
-                return geneOntology;
+                return sourceLoader.getGeneOntology();
             case ECO:
-                return evidenceCodeOntology;
+                return sourceLoader.getEvidenceCodeOntology();
             default:
                 throw new IllegalArgumentException("Unknown term namespace used: " + nameSpace.name());
         }
@@ -125,9 +137,9 @@ public class GraphImageServiceImpl implements GraphImageService {
 
     private Optional<GenericTerm> retrieveTerm(String id) {
         if (hasGONamespace(id)) {
-            return Optional.of(geneOntology.getTerm(id));
+            return Optional.of(sourceLoader.getGeneOntology().getTerm(id));
         } else if (hasECONamespace(id)) {
-            return Optional.of(evidenceCodeOntology.getTerm(id));
+            return Optional.of(sourceLoader.getEvidenceCodeOntology().getTerm(id));
         } else {
             throw new RenderingGraphException("Unknown term namespace: " + id);
         }
