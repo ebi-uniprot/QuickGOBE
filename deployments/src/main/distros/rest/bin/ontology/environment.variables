@@ -14,7 +14,7 @@ JVM_MEM_MIN="-Xmx3096M"
 JVM_FLIGHT_RECORDER="off" # on|off
 
 # ================ HOST VMS ================
-declare -gA HOSTS
+declare -A HOSTS
 HOSTS[dev]="ves-hx-c2"
 HOSTS[test]="ves-hx-cf"
 HOSTS[prod]="ves-oy-cc ves-oy-cd"
