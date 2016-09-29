@@ -4,7 +4,9 @@
 # Stops the self-contained web-application
 ##=========================================================================================
 
-set -euo pipefail
+set -eo pipefail
+
+source "../common/common.variables"
 
 # ======= read the variables used by the control scripts =======================================
 source "environment.variables" || {

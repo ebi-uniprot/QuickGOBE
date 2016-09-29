@@ -1,0 +1,49 @@
+VALID_PROFILES=( "dev" "test" "prod" )
+
+# ---------------------------- CHECK VALUE IN ARRAY ----------------------------
+array_contains () {
+    local array="$1[@]"
+    local seeking=$2
+    local in=1
+
+    for element in "${!array}"; do
+        if [[ $element == $seeking ]]; then
+            in=0
+            break
+        fi
+    done
+
+    echo $in
+}
+
+# ---------------------------- PRINT ARRAY CONTENTS ----------------------------
+function join_by { local IFS="$1"; shift; echo "$*"; }
+
+ALLOWABLE_PROFILES=`join_by , "${VALID_PROFILES[@]}"`
+
+# ---------------------------- CHECK USER PROVIDED VALUE AGAINST PROFILE ----------------------------
+
+function check_profile() {
+    local value="$1"
+    local is_profile=0;
+
+    if [ -z "$value" ]; then
+      is_profile=1;
+    elif [[ $(array_contains VALID_PROFILES $value) -eq "1" ]]; then
+      is_profile=1;
+    fi
+
+    echo $is_profile;
+}
+
+# ---------------------------- GET VMS FOR PROFILE ----------------------------
+function get_hosts() {
+     local is_profile=$(check_profile $1)
+
+     if [[ "$is_profile" == "1" ]]; then
+         echo.
+     fi
+
+     echo "${HOSTS[$1]}"
+}
+
