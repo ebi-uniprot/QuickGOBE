@@ -42,5 +42,5 @@ fi
 
 #startup each vm in the list
 for vm in $vms; do
-    ssh "$PERMITTED_USER"@"$vm" 'bash -s' < ../start_on_vm
+  ssh "$PERMITTED_USER"@"$vm" CURRENT_DIR="$(pwd -P)" 'bash -s' < ../start_on_vm
 done

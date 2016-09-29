@@ -10,7 +10,19 @@ set -eo pipefail
 IFS=$'\n\t '
 
 PERMITTED_USER="uni_qgo"
-SERVICE_CONF_PATH="$(pwd -P)"
+
+if [ -z "$CURRENT_DIR" ]; then
+    SERVICE_CONF_PATH="$(pwd -P)"
+else
+    SERVICE_CONF_PATH="$CURRENT_DIR"
+fi
+
+# ======= read the variables used by the control scripts =======================================
+source "${SERVICE_CONF_PATH}/environment.variables" || {
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1;
+}
+
 SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
 SERVICE_LIVE_NAME="live"
 SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
@@ -57,9 +69,8 @@ then
     fi
 fi
 
-[ ! -z "$ARTIFACT_GROUP" ] || [ ! -z "$ARTIFACT_VERSION" ] || [[ ! -z "$ARTIFACT_ID" ]] || {
-    echo "Please specify the environment variables ARTIFACT_GROUP, ARTIFACT_VERSION and ARTIFACT_ID, in file, \
-environment.variables."
+[ ! -z "$ARTIFACT_VERSION" ] || [[ ! -z "$ARTIFACT_ID" ]] || {
+    echo "Please specify the environment variables ARTIFACT_VERSION and ARTIFACT_ID."
     exit 1
 }
 
@@ -115,6 +126,7 @@ echo "Running command: $RUN_COMMAND"
 # run the application headless
 nohup $RUN_COMMAND > /dev/null 2>&1 &
 PID="$!"
+
 
 echo "Sleeping 2 seconds, before acquiring PID"
 sleep 2
