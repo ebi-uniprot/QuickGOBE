@@ -1,0 +1,70 @@
+#! /bin/bash
+
+##=========================================================================================
+# Stops the self-contained web-application
+##=========================================================================================
+
+set -eo pipefail
+
+if [ -z "$CURRENT_DIR" ]; then
+    SERVICE_CONF_PATH="$(pwd -P)"
+else
+    SERVICE_CONF_PATH="$CURRENT_DIR"
+fi
+
+# ======= read the variables used by the control scripts =======================================
+source "${SERVICE_CONF_PATH}/environment.variables" || {
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1;
+}
+
+# ======= CONSTANTS =======================================
+PERMITTED_USER="uni_qgo"
+
+# ======= check the right user runs this script =======================================
+if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
+    echo "This service can only be run as user(s), '$PERMITTED_USER'";
+    exit 1;
+fi;
+
+# ======= check if script is run on the right VM =====================================
+if [[ $(hostname) =~ ^ebi.* ]]; then
+    echo "This script can only be run on NON EBI cluster machines";
+    exit 1;
+fi
+
+# ======= variables to ID service =======================================
+SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
+SERVICE_LIVE_NAME="live"
+SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
+SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME"
+RUN_DIR="$SERVICE_PATH/out"
+PIDFILE="$RUN_DIR/up@$(hostname).pid"
+
+# ======= no PID file existence indicates the service is not running =======================================
+if [ ! -f $PIDFILE ]
+then
+    echo "Warning: PID file does not exist ($PIDFILE). Please check this service should be running on this machine ($(hostname))."
+    exit 1;
+fi
+
+# ======= read PIDFILE to check the PID =======================================
+PIDSTR=$(cat $PIDFILE)
+
+if ps "$PIDSTR" > /dev/null; then
+    # ======= stop the application =======================================
+    echo "Stopping the job with PID: $PIDSTR."
+    kill -9 $PIDSTR > /dev/null 2>&1 || {
+        echo "Could not kill process. Please check the PID manually: $PIDSTR"
+        exit 1;
+    }
+else
+   echo "No PID $PIDSTR on host, $(hostname) found. Nothing to stop."
+fi
+
+# ======= remove the now invalid PID file =======================================
+echo "Removing the now old PID file $PIDFILE"
+rm $PIDFILE
+
+
+echo "The service $PIDSTR is no longer running."

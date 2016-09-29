@@ -1,7 +1,7 @@
 #! /bin/bash
 
 ##=========================================================================================
-# Stops the self-contained web-application
+# Stops a RESTful service when logged onto any VM
 ##=========================================================================================
 
 set -eo pipefail
@@ -23,45 +23,23 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
     exit 1;
 fi;
 
-# ======= check if script is run on the right VM =====================================
-if [[ $(hostname) =~ ^ebi.* ]]; then
-    echo "This script can only be run on NON EBI cluster machines";
-    exit 1;
-fi
-
-# ======= variables to ID service =======================================
-SERVICE_CONF_PATH="$(pwd -P)"
-SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
-SERVICE_LIVE_NAME="live"
-SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
-SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME"
-RUN_DIR="$SERVICE_PATH/out"
-PIDFILE="$RUN_DIR/up@$(hostname).pid"
-
-# ======= no PID file existence indicates the service is not running =======================================
-if [ ! -f $PIDFILE ]
-then
-    echo "Warning: PID file does not exist ($PIDFILE). Please check this service should be running on this machine ($(hostname))."
-    exit 1;
-fi
-
-# ======= read PIDFILE to check the PID =======================================
-PIDSTR=$(cat $PIDFILE)
-
-if ps "$PIDSTR" > /dev/null; then
-    # ======= stop the application =======================================
-    echo "Stopping the job with PID: $PIDSTR."
-    kill -9 $PIDSTR > /dev/null 2>&1 || {
-        echo "Could not kill process. Please check the PID manually: $PIDSTR"
-        exit 1;
-    }
+# ====== check which environment will be started =====================================
+if [[ $(check_profile $1) == "0" ]]; then
+   profile="$1"
 else
-   echo "No PID $PIDSTR on host, $(hostname) found. Nothing to stop."
+   echo "Input profile: ${1}, not recognized. Allowable values: ${ALLOWABLE_PROFILES}"
+   exit 1
 fi
 
-# ======= remove the now invalid PID file =======================================
-echo "Removing the now old PID file $PIDFILE"
-rm $PIDFILE
+#grab the virtual machines to shutdown
+vms=$(get_hosts $profile)
 
+if [ -z "$vms" ]; then
+   echo "No virtual machines configured for profile: $profile"
+   exit 1;
+fi
 
-echo "The service $PIDSTR is no longer running."
+#startup each vm in the list
+for vm in $vms; do
+  ssh "$PERMITTED_USER"@"$vm" CURRENT_DIR="$(pwd -P)" 'bash -s' < ../stop_on_vm
+done
