@@ -47,3 +47,35 @@ function get_hosts() {
      echo "${HOSTS[$1]}"
 }
 
+# --------------------------- CHECK VM BELONGS TO PROFILE ------------------
+function vm_belongs_to_profile() {
+   local vm_to_check="$1"
+   local profile="$2"
+
+   vms_in_profile=${HOSTS[$profile]}
+
+   for vm in $vms_in_profile; do
+      if [ "$vm" == "$vm_to_check" ]; then
+          return 1
+      fi
+   done
+
+   return 0
+}
+
+# ------------------------- GET PROFILE FOR VM -----------------------------
+function get_profile_from_vm() {
+   local vm="$1"
+
+   for profile in "${!HOSTS[@]}"; do
+      for vm_in_profile in ${HOSTS[$profile]}; do
+         if [ "${vm_in_profile/.ebi.ac.uk/}" = "${vm/.ebi.ac.uk/}" ]; then
+             echo "$profile"
+             exit 0
+         fi
+      done
+   done
+
+   echo ""
+}
+
