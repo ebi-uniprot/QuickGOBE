@@ -108,6 +108,6 @@ fi
 for vm in $VMS; do
   if [[ -z $2 || $2 == $vm ]]; then
     trap 'cleanup $vm' INT TERM ERR
-    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$current bash ${CURRENT_DIR}/../start_on_vm"
+    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash $CURRENT_DIR/../start_on_vm"
   fi
 done
