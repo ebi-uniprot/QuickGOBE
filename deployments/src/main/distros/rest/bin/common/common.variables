@@ -5,7 +5,7 @@ array_contains () {
     local array="$1[@]"
     local seeking=$2
     local in=1
-
+    
     for element in "${!array}"; do
         if [[ $element == $seeking ]]; then
             in=0
@@ -13,11 +13,15 @@ array_contains () {
         fi
     done
 
-    echo $in
+    return $in
 }
 
 # ---------------------------- PRINT ARRAY CONTENTS ----------------------------
-function join_by { local IFS="$1"; shift; echo "$*"; }
+function join_by { 
+   local IFS="$1"; 
+   shift; 
+   echo "$*"; 
+}
 
 ALLOWABLE_PROFILES=`join_by , "${VALID_PROFILES[@]}"`
 
@@ -29,22 +33,21 @@ function check_profile() {
 
     if [ -z "$value" ]; then
       is_profile=1;
-    elif [[ $(array_contains VALID_PROFILES $value) -eq "1" ]]; then
+    elif ! array_contains VALID_PROFILES $value; then
       is_profile=1;
     fi
-
-    echo $is_profile;
+    
+    return $is_profile;
 }
 
 # ---------------------------- GET VMS FOR PROFILE ----------------------------
 function get_hosts() {
-     local is_profile=$(check_profile $1)
-
-     if [[ "$is_profile" == "1" ]]; then
+     if ! check_profile $1; then
          echo.
+         exit 1
      fi
 
-     echo "${HOSTS[$1]}"
+     echo ${HOSTS[$1]}
 }
 
 # --------------------------- CHECK VM BELONGS TO PROFILE ------------------
@@ -76,6 +79,6 @@ function get_profile_from_vm() {
       done
    done
 
-   echo ""
+   echo. 
 }
 

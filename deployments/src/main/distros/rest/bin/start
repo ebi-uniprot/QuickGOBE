@@ -40,8 +40,8 @@ if [[ $# -lt 1 || $# -gt 2 ]]; then
 fi
 
 # ====== check which environment will be started ========================================
-if [[ $(check_profile $1) == "0" ]]; then
-   profile="$1"
+if check_profile $1; then
+   PROFILE="$1"
 else
    echo "Input profile: ${1}, not recognized. Allowable values: ${ALLOWABLE_PROFILES}"
 
@@ -61,9 +61,9 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
 fi;
 
 # ======= grab the virtual machines to startup ==========================================
-vms=$(get_hosts $profile)
+readonly VMS=$(get_hosts $PROFILE)
 
-if [ -z "$vms" ]; then
+if [ -z "$VMS" ]; then
    show_help
    exit 1
 fi
@@ -71,21 +71,21 @@ fi
 function cleanup() {
    cat << EOF
       #================================ ERROR ======================================#
-       $1 has failed to startup. Shutting down all servers for profile: $profile 
+       $1 has failed to startup. Shutting down all servers for profile: $PROFILE 
       #=============================================================================#
 EOF
 
-   ../stop "$profile"
+   ../stop "$PROFILE"
 }
 
 #startup each vm in the list
-current="$(pwd -P)"
+readonly CURRENT_DIR="$(pwd -P)"
 
 # ====== confirm that all vms for given profile are down ================================
 up=0
 
-for vm in $vms; do
-  ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$current bash ${current}/../status-check" 1>/dev/null
+for vm in $VMS; do
+  ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash $CURRENT_DIR/../status-check" 1>/dev/null
   
   if [ $? -eq "0" ]; then
       servers_up+=$'\n'"   $vm"
@@ -105,9 +105,9 @@ EOF
 fi
 
 #start-up all vms for given profile
-for vm in $vms; do
+for vm in $VMS; do
   if [[ -z $2 || $2 == $vm ]]; then
     trap 'cleanup $vm' INT TERM ERR
-    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$current bash ${current}/../start_on_vm"
+    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$current bash ${CURRENT_DIR}/../start_on_vm"
   fi
 done
