@@ -1,19 +1,44 @@
 #! /bin/bash
 
-##=========================================================================================
-# Checks if the self-contained web-application is running
-##=========================================================================================
+##=======================================================================================
+# Starts the self-contained web-application
+##=======================================================================================
 
-set -euo pipefail
+set -o pipefail
+IFS=$'\n\t '
 
-# ======= read the variables used by the control scripts =======================================
+source "../common/common.variables"
+
+# ======= read the variables used by the control scripts ================================
 source "environment.variables" || {
     echo "Please create a file called, environment.variables, containing the necessary environment variables."
     exit 1;
 }
 
-# ======= CONSTANTS =======================================
+# ======= CONSTANTS =====================================================================
 PERMITTED_USER="uni_qgo"
+
+# ========================= utility functions ===========================================
+function show_help {
+    cat<<EOF
+  Usage: [dev|test|prod] [vm_name]
+
+  Argument description:
+    profile      => Indicates the profile of the services to check the status, possible values [dev|test|prod]
+    vm_name      => The name of the virtual machine top check the status
+
+  Example: dev -- checks status of all development REST services
+           dev ves-hx-c2 -- check status of the REST service on ves-hx-c2
+
+  WARNING: Please be aware of who is using the machine before starting/stopping them.
+EOF
+}
+
+# ====== check that the script has the right number of argument ========================
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+   show_help
+   exit 1
+fi
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
@@ -21,17 +46,34 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
     exit 1;
 fi;
 
-
-# ======= check necessary variables exist for upcoming tests =======================================
-if [ -z "$PORT" ]; then
-    echo "$PORT environment variable must be set. Aborting."
-    exit 1;
+# ===== check that vm argument belongs to provided profile =============================
+if [ ! -z "$2" ] && vm_belongs_to_profile $2 $1; then
+   echo "Input VM: ${2}, does not belong to profile ${1}."
+   exit 1  
 fi
 
+# ====== check which environment will be stopped =====================================
+if check_profile $1; then
+   PROFILE="$1"
+else
+   echo "Input profile: ${1}, not recognized. Allowable values: ${ALLOWABLE_PROFILES}"
+   exit 1
+fi
 
-TEST_URL="http://127.0.0.1:$PORT"
-nc -zv 127.0.0.1 $PORT > /dev/null 2>&1 || {
-    echo "Status Check: $TEST_URL is DOWN"
-    exit 1
-}
-echo "Status Check: $TEST_URL is UP"
+#grab the virtual machines to shutdown
+readonly VMS=$(get_hosts $PROFILE)
+
+if [ -z "$VMS" ]; then
+   echo "No virtual machines configured for profile: $PROFILE"
+   exit 1;
+fi
+
+#stop each vm in the list
+readonly CURRENT_DIR=$(pwd -P)
+
+for vm in $VMS; do
+  if [[ -z $2 || $2 == $vm ]]; then
+    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash ${CURRENT_DIR}/../status-check-on-vm"
+  fi
+done
+
