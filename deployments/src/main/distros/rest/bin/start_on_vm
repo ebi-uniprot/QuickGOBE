@@ -9,7 +9,7 @@
 set -eo pipefail
 IFS=$'\n\t '
 
-PERMITTED_USER="uni_qgo"
+readonly PERMITTED_USER="uni_qgo"
 
 if [ -z "$CURRENT_DIR" ]; then
     SERVICE_CONF_PATH="$(pwd -P)"
@@ -23,22 +23,31 @@ source "${SERVICE_CONF_PATH}/environment.variables" || {
     exit 1;
 }
 
-SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
-SERVICE_LIVE_NAME="live"
-SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
-SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME"
-RUN_DIR="$SERVICE_PATH/out"
-PIDFILE="$RUN_DIR/up@$(hostname).pid"
-LIB_DIR="$SERVICE_PATH/lib"
-SERVICE_JAR="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
-SERVER_ADDR_BINDING="-Dserver.address=0.0.0.0"
-SERVER_PORT="-Dserver.port=$PORT"
-SPRING_CONFIG_LOCATION="--spring.config.location=$SERVICE_CONF_PATH/"
-SPRING_LOADER_PATH="-Dloader.path=lib/,config/,$SERVICE_CONF_PATH/"
-SPRING_TOMCAT_ACCESS_LOGS="-Dserver.tomcat.access-log-enabled=true"
-SPRING_TOMCAT_BASEDIR="-Dserver.tomcat.basedir=$(hostname)"
-SPRING_LOGGING_CONFIG="-Dlogging.config=$SERVICE_CONF_PATH/logback.xml"
-SPRING_LOGGING_DEST="-Dlogging.path=$(hostname)/logs/"
+source "$(dirname $(which $0))/common/common.variables"
+
+readonly PROFILE=$(get_profile_from_vm "$(hostname)")
+
+if [ -z "$PROFILE" ]; then 
+   echo "Current VM: $(hostname) does not belong to any profile"
+   exit 1
+fi
+
+readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
+readonly SERVICE_LIVE_NAME="live"
+readonly SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
+readonly SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME/$PROFILE"
+readonly RUN_DIR="$SERVICE_PATH/out"
+readonly PIDFILE="$RUN_DIR/up@$(hostname).pid"
+readonly LIB_DIR="$SERVICE_PATH/lib"
+readonly SERVICE_JAR="$ARTIFACT_ID-$ARTIFACT_VERSION.jar"
+readonly SERVER_ADDR_BINDING="-Dserver.address=0.0.0.0"
+readonly SERVER_PORT="-Dserver.port=$PORT"
+readonly SPRING_CONFIG_LOCATION="--spring.config.location=$SERVICE_CONF_PATH/"
+readonly SPRING_LOADER_PATH="-Dloader.path=lib/,config/,$SERVICE_CONF_PATH/"
+readonly SPRING_TOMCAT_ACCESS_LOGS="-Dserver.tomcat.access-log-enabled=true"
+readonly SPRING_TOMCAT_BASEDIR="-Dserver.tomcat.basedir=$(hostname)"
+readonly SPRING_LOGGING_CONFIG="-Dlogging.config=$SERVICE_CONF_PATH/logback.xml"
+readonly SPRING_LOGGING_DEST="-Dlogging.path=$(hostname)/logs/"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
@@ -56,7 +65,7 @@ fi
 if [ -e $PIDFILE ]
 then
     # ======= read PIDFILE to check the PID =======================================
-    PIDSTR=$(cat $PIDFILE)
+    readonly IDSTR=$(cat $PIDFILE)
 
     if ps "$PIDSTR" > /dev/null; then
         # ======= PID exists so do not proceed =======================================
@@ -81,7 +90,7 @@ if [ -z "$JAVA_HOME" ]; then
     exit 1;
 fi
 
-JAVA=$JAVA_HOME/bin/java
+readonly JAVA=$JAVA_HOME/bin/java
 JAVA_OPTS="-Dcom.sun.management.jmxremote  \
             -Dcom.sun.management.jmxremote.authenticate=false \
             -Dcom.sun.management.jmxremote.ssl=false  \
