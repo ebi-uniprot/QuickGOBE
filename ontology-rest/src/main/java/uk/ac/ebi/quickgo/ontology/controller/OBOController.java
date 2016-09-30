@@ -70,7 +70,7 @@ public abstract class OBOController<T extends OBOTerm> {
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
 
-    private final OntologyService<T> ontologyService;
+    final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
