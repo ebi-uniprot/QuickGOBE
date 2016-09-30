@@ -24,10 +24,12 @@ function show_help {
   Usage: start [dev|test|prod] [vm_name]
 
   Argument description:
-    start                 => starts the REST services for the given profile
+    profile      => Indicates the profile of the services to startup, possible values [dev|test|prod]
+    vm_name      => The name of the virtual machine top startup
 
-  Example: start dev -- starts up the development REST services
-           start dev ves-hx-c2 -- starts the development REST service on ves-hx-c2
+
+  Example: dev -- starts up all development REST services
+           dev ves-hx-c2 -- starts the development REST service on ves-hx-c2
 
   WARNING: Please be aware of who is using the machine before starting/stopping them.
 EOF
