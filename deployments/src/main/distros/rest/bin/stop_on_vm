@@ -19,7 +19,7 @@ source "${SERVICE_CONF_PATH}/environment.variables" || {
 }
 
 # ======= CONSTANTS =======================================
-PERMITTED_USER="uni_qgo"
+readonly PERMITTED_USER="uni_qgo"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
@@ -33,13 +33,22 @@ if [[ $(hostname) =~ ^ebi.* ]]; then
     exit 1;
 fi
 
+source "$(dirname $(which $0))/common/common.variables"
+
+readonly PROFILE=$(get_profile_from_vm "$(hostname)")
+
+if [ -z "$PROFILE" ]; then 
+   echo "Current VM: $(hostname) does not belong to any profile"
+   exit 1
+fi
+
 # ======= variables to ID service =======================================
-SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
-SERVICE_LIVE_NAME="live"
-SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
-SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME"
-RUN_DIR="$SERVICE_PATH/out"
-PIDFILE="$RUN_DIR/up@$(hostname).pid"
+readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
+readonly SERVICE_LIVE_NAME="live"
+readonly SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
+readonly SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME/$PROFILE"
+readonly RUN_DIR="$SERVICE_PATH/out"
+readonly PIDFILE="$RUN_DIR/up@$(hostname).pid"
 
 # ======= no PID file existence indicates the service is not running =======================================
 if [ ! -f $PIDFILE ]
@@ -49,7 +58,7 @@ then
 fi
 
 # ======= read PIDFILE to check the PID =======================================
-PIDSTR=$(cat $PIDFILE)
+readonly PIDSTR=$(cat $PIDFILE)
 
 if ps "$PIDSTR" > /dev/null; then
     # ======= stop the application =======================================
@@ -65,6 +74,5 @@ fi
 # ======= remove the now invalid PID file =======================================
 echo "Removing the now old PID file $PIDFILE"
 rm $PIDFILE
-
 
 echo "The service $PIDSTR is no longer running."

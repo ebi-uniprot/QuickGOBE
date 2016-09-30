@@ -15,7 +15,35 @@ source "environment.variables" || {
 }
 
 # ======= CONSTANTS =======================================
-PERMITTED_USER="uni_qgo"
+readonly PERMITTED_USER="uni_qgo"
+
+
+# ========================= utility functions ===========================================
+function show_help {
+    cat<<EOF
+  Usage: stop [dev|test|prod] [vm_name]
+
+  Argument description:
+    stop                 => stops the REST services for the given profile
+
+  Example: stop dev -- stops the development REST services
+           stop dev ves-hx-c2 -- stops the development REST service on ves-hx-c2
+
+  WARNING: Please be aware of who is using the machine before starting/stopping them.
+EOF
+}
+
+# ====== check that the script has the right number of argument ========================
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+   show_help
+   exit 1
+fi
+
+# ===== check that vm argument belongs to provided profile =============================
+if [ ! -z "$2" ] && vm_belongs_to_profile $2 $1; then
+   echo "Input VM: ${2}, does not belong to profile ${1}."
+   exit 1  
+fi
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
@@ -24,22 +52,26 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
 fi;
 
 # ====== check which environment will be started =====================================
-if [[ $(check_profile $1) == "0" ]]; then
-   profile="$1"
+if check_profile $1; then
+   PROFILE="$1"
 else
    echo "Input profile: ${1}, not recognized. Allowable values: ${ALLOWABLE_PROFILES}"
    exit 1
 fi
 
 #grab the virtual machines to shutdown
-vms=$(get_hosts $profile)
+readonly VMS=$(get_hosts $PROFILE)
 
-if [ -z "$vms" ]; then
-   echo "No virtual machines configured for profile: $profile"
+if [ -z "$VMS" ]; then
+   echo "No virtual machines configured for profile: $PROFILE"
    exit 1;
 fi
 
 #startup each vm in the list
-for vm in $vms; do
-  ssh "$PERMITTED_USER"@"$vm" CURRENT_DIR="$(pwd -P)" 'bash -s' < ../stop_on_vm
+readonly CURRENT_DIR=$(pwd -P)
+
+for vm in $VMS; do
+  if [[ -z $2 || $2 == $vm ]]; then
+    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash ${CURRENT_DIR}/../stop_on_vm"
+  fi
 done
