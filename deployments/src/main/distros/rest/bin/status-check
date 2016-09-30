@@ -73,6 +73,12 @@ readonly CURRENT_DIR=$(pwd -P)
 
 for vm in $VMS; do
   if [[ -z $2 || $2 == $vm ]]; then
-    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash ${CURRENT_DIR}/../status-check-on-vm"
+    vm_status="$(ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash ${CURRENT_DIR}/../status-check-on-vm")"
+
+    if [[ $vm_status = *"UP"* ]]; then
+       echo "$vm is UP"
+    else
+       echo "$vm is DOWN"
+    fi
   fi
 done
