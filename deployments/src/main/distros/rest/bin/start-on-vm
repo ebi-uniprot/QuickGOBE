@@ -78,11 +78,10 @@ then
     fi
 fi
 
-[ ! -z "$ARTIFACT_VERSION" ] || [[ ! -z "$ARTIFACT_ID" ]] || {
+[ ! -z "$ARTIFACT_VERSION" ] || [ ! -z "$ARTIFACT_ID" ] {
     echo "Please specify the environment variables ARTIFACT_VERSION and ARTIFACT_ID."
     exit 1
 }
-
 
 # ======= build java variables =======================================
 if [ -z "$JAVA_HOME" ]; then
@@ -118,6 +117,7 @@ pushd . > /dev/null
 # ======= check the service jar exists before proceeding ... =======================================
 cd $LIB_DIR
 ls -1 $SERVICE_JAR > /dev/null 2>&1
+
 if [ ! $? ]; then
     echo "Error: $LIB_DIR/$SERVICE_JAR does not exist. Aborting."
     exit 1
@@ -135,7 +135,6 @@ echo "Running command: $RUN_COMMAND"
 # run the application headless
 nohup $RUN_COMMAND > /dev/null 2>&1 &
 PID="$!"
-
 
 echo "Sleeping 2 seconds, before acquiring PID"
 sleep 2

@@ -11,7 +11,7 @@ source "../common/common.variables"
 # ======= read the variables used by the control scripts =======================================
 source "environment.variables" || {
     echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1;
+    exit 1
 }
 
 # ======= CONSTANTS =======================================
@@ -21,7 +21,7 @@ readonly PERMITTED_USER="uni_qgo"
 # ========================= utility functions ===========================================
 function show_help {
     cat<<EOF
-  Usage: [dev|test|prod] [vm_name]
+  Usage: [profile] [vm_name]
 
   Argument description:
     profile      => Indicates the profile of the services to shutdown, possible values [dev|test|prod]
@@ -48,8 +48,8 @@ fi
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user(s), '$PERMITTED_USER'";
-    exit 1;
+    echo "This service can only be run as user(s), '$PERMITTED_USER'"
+    exit 1
 fi;
 
 # ====== check which environment will be stopped =====================================

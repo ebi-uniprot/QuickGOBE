@@ -15,7 +15,7 @@ fi
 # ======= read the variables used by the control scripts =======================================
 source "${SERVICE_CONF_PATH}/environment.variables" || {
     echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1;
+    exit 1
 }
 
 # ======= CONSTANTS =======================================
@@ -54,7 +54,7 @@ readonly PIDFILE="$RUN_DIR/up@$(hostname).pid"
 if [ ! -f $PIDFILE ]
 then
     echo "Warning: PID file does not exist ($PIDFILE). Please check this service should be running on this machine ($(hostname))."
-    exit 1;
+    exit 1
 fi
 
 # ======= read PIDFILE to check the PID =======================================
@@ -65,7 +65,7 @@ if ps "$PIDSTR" > /dev/null; then
     echo "Stopping the job with PID: $PIDSTR."
     kill -9 $PIDSTR > /dev/null 2>&1 || {
         echo "Could not kill process. Please check the PID manually: $PIDSTR"
-        exit 1;
+        exit 1
     }
 else
    echo "No PID $PIDSTR on host, $(hostname) found. Nothing to stop."

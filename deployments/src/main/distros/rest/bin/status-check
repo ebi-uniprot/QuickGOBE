@@ -12,7 +12,7 @@ source "../common/common.variables"
 # ======= read the variables used by the control scripts ================================
 source "environment.variables" || {
     echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1;
+    exit 1
 }
 
 # ======= CONSTANTS =====================================================================
@@ -21,7 +21,7 @@ PERMITTED_USER="uni_qgo"
 # ========================= utility functions ===========================================
 function show_help {
     cat<<EOF
-  Usage: [dev|test|prod] [vm_name]
+  Usage: [profile] [vm_name]
 
   Argument description:
     profile      => Indicates the profile of the services to check the status, possible values [dev|test|prod]
@@ -42,8 +42,8 @@ fi
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user(s), '$PERMITTED_USER'";
-    exit 1;
+    echo "This service can only be run as user(s), '$PERMITTED_USER'"
+    exit 1
 fi;
 
 # ===== check that vm argument belongs to provided profile =============================
@@ -65,7 +65,7 @@ readonly VMS=$(get_hosts $PROFILE)
 
 if [ -z "$VMS" ]; then
    echo "No virtual machines configured for profile: $PROFILE"
-   exit 1;
+   exit 1
 fi
 
 #stop each vm in the list
@@ -76,4 +76,3 @@ for vm in $VMS; do
     ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash ${CURRENT_DIR}/../status-check-on-vm"
   fi
 done
-

@@ -17,7 +17,7 @@ fi
 # ======= read the variables used by the control scripts =======================================
 source "${SERVICE_CONF_PATH}/environment.variables" || {
     echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1;
+    exit 1
 }
 
 source "$(dirname $(which $0))/common/common.variables"
@@ -31,23 +31,22 @@ fi
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user(s), '$PERMITTED_USER'";
-    exit 1;
+    echo "This service can only be run as user(s), '$PERMITTED_USER'"
+    exit 1
 fi;
 
 
 # ======= check if script is run on the right VM =====================================
 if [[ $(hostname) =~ ^ebi.* ]]; then
-    echo "This script can only be run on NON EBI cluster machines";
-    exit 1;
+    echo "This script can only be run on NON EBI cluster machines"
+    exit 1
 fi
 
 # ======= check necessary variables exist for upcoming tests =======================================
 if [ -z "$PORT" ]; then
     echo "$PORT environment variable must be set. Aborting."
-    exit 1;
+    exit 1
 fi
-
 
 readonly TEST_URL="http://127.0.0.1:$PORT"
 nc -zv 127.0.0.1 $PORT > /dev/null 2>&1 || {
