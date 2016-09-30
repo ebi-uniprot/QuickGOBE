@@ -6,39 +6,56 @@
 ##=========================================================================================
 
 set -euo pipefail
-IFS=$'\n\t '
-
+readonly IFS=$'\n\t '
 
 # ======= CONSTANTS =======================================
-RELEASE_REPO_TYPE="release"
-RELEASE_REPO_NAME="uniprot-artifactory-release"
-SNAPSHOT_REPO_TYPE="snapshot"
-SNAPSHOT_REPO_NAME="uniprot-artifactory-snapshots"
-PERMITTED_USER="uni_qgo"
-JAVA="$JAVA_HOME/bin/java"
-MAVEN="$MAVEN_HOME/bin/mvn"
+readonly RELEASE_REPO_TYPE="release"
+readonly RELEASE_REPO_NAME="uniprot-artifactory-release"
+readonly SNAPSHOT_REPO_TYPE="snapshot"
+readonly SNAPSHOT_REPO_NAME="uniprot-artifactory-snapshots"
+readonly PERMITTED_USER="uni_qgo"
+readonly JAVA="$JAVA_HOME/bin/java"
+readonly MAVEN="$MAVEN_HOME/bin/mvn"
 
 # ======= check the right user runs this script =======================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user(s), '$PERMITTED_USER'";
-    exit 1;
+    echo "This service can only be run as user(s), '$PERMITTED_USER'"
+    exit 1
 fi;
 
 # ======= check if script is run on the right VM =====================================
 if ! [[ $(hostname) =~ ^ebi.* ]]; then
-    echo "This script can only be run from an EBI cluster machine";
-    exit 1;
+    echo "This script can only be run from an EBI cluster machine"
+    exit 1
 fi
 
+source "../common/common.variables"
+
 # ======= FUNCTIONS ======================================================================
+# ========================= help message ===========================================
+function show_help {
+    cat<<EOF
+  Usage: [profile]
+
+  Argument description:
+    profile      => Indicates the profile of the services to update, possible values [dev|test|prod]
+
+  Example: dev -- updates libraries for the development REST services
+
+  WARNING: Please be aware of who is using the machine before starting/stopping them.
+EOF
+}
+
 # ======= take a string and add a time-stamp to it =======================================
 function addTimeStamp() {
     local dirname="$(dirname $1)"
     local fname=$(basename "$1")
     local fext=""
+
     if echo "$fname" | grep '\.'; then
         fext=".${fname##*.}"
     fi
+
     local fname="${fname%.*}"
     echo "$dirname/$fname-$(date '+%s.%N')$fext"
 }
@@ -46,7 +63,7 @@ function addTimeStamp() {
 # ======= read the variables used by the control scripts =======================================
 source "environment.variables" || {
     echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1;
+    exit 1
 }
 
 [ ! -z "$ARTIFACT_GROUP" ] || [ ! -z "$ARTIFACT_VERSION" ] || [[ ! -z "$ARTIFACT_ID" ]] || {
@@ -55,16 +72,25 @@ environment.variables."
     exit 1
 }
 
-SERVICE_CONF_PATH="$(pwd -P)"
-SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
-SERVICE_LIVE_NAME="live"
-SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
-SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME"
-LIB_DIR="$SERVICE_PATH/lib"
-BACKUP_LIB_DIR="$SERVICE_PATH/lib/backups"
-TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
-QUICKGO_REPO_DIR="$SERVICE_CONF_PATH/../../repos/QuickGOBE"
-BRANCH="master"
+# ====== check which environment will be started ========================================
+if check_profile $1; then
+   PROFILE="$1"
+else
+   echo "Input profile: ${1}, not recognized. Allowable values: ${ALLOWABLE_PROFILES}"
+
+   exit 1
+fi
+
+readonly SERVICE_CONF_PATH="$(pwd -P)"
+readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
+readonly SERVICE_LIVE_NAME="live"
+readonly SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
+readonly SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME/$PROFILE"
+readonly LIB_DIR="$SERVICE_PATH/lib"
+readonly BACKUP_LIB_DIR="$SERVICE_PATH/lib/backups"
+readonly TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
+readonly QUICKGO_REPO_DIR="$SERVICE_CONF_PATH/../../repos/QuickGOBE"
+readonly BRANCH="master"
 
 if [ ! -d "$LIB_DIR" ]; then
     mkdir -p $LIB_DIR
