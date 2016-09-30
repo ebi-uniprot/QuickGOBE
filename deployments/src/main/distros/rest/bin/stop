@@ -28,7 +28,7 @@ function show_help {
     vm_name      => The name of the virtual machine top shutdown
 
   Example: dev -- stops all development REST services
-            dev ves-hx-c2 -- stops the development REST service on ves-hx-c2
+           dev ves-hx-c2 -- stops the development REST service on ves-hx-c2
 
   WARNING: Please be aware of who is using the machine before starting/stopping them.
 EOF
