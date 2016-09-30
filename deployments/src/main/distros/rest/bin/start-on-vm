@@ -65,7 +65,7 @@ fi
 if [ -e $PIDFILE ]
 then
     # ======= read PIDFILE to check the PID =======================================
-    readonly IDSTR=$(cat $PIDFILE)
+    readonly PIDSTR=$(cat $PIDFILE)
 
     if ps "$PIDSTR" > /dev/null; then
         # ======= PID exists so do not proceed =======================================
