@@ -52,7 +52,7 @@ if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
     exit 1;
 fi;
 
-# ====== check which environment will be started =====================================
+# ====== check which environment will be stopped =====================================
 if check_profile $1; then
    PROFILE="$1"
 else
@@ -68,7 +68,7 @@ if [ -z "$VMS" ]; then
    exit 1;
 fi
 
-#startup each vm in the list
+#stop each vm in the list
 readonly CURRENT_DIR=$(pwd -P)
 
 for vm in $VMS; do
