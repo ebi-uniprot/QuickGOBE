@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermRepoConfig;
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
@@ -28,16 +30,18 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.ontology.service"})
-@Import({OntologyRepoConfig.class, OntologyGraphConfig.class})
+@Import({OntologyRepoConfig.class, OntologyGraphConfig.class, CoTermRepoConfig.class})
 public class ServiceConfig {
     @Bean
-    public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository, OntologyGraphTraversal ontologyGraphTraversal) {
+    public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository,
+            OntologyGraphTraversal ontologyGraphTraversal, CoTermRepository coTermRepository) {
         return new OntologyServiceImpl<>(
                 ontologyRepository,
                 goDocumentConverter(),
                 OntologyType.GO,
                 queryStringSanitizer(),
-                ontologyGraphTraversal);
+                ontologyGraphTraversal,
+                coTermRepository);
     }
 
     private GODocConverter goDocumentConverter() {
@@ -51,7 +55,8 @@ public class ServiceConfig {
                 ecoDocConverter(),
                 OntologyType.ECO,
                 queryStringSanitizer(),
-                ontologyGraphTraversal);
+                ontologyGraphTraversal,
+                emptyCoTermRepository());  //todo
     }
 
     private ECODocConverter ecoDocConverter() {
@@ -60,5 +65,11 @@ public class ServiceConfig {
 
     private QueryStringSanitizer queryStringSanitizer() {
         return new SolrQueryStringSanitizer();
+    }
+
+    private CoTermRepository emptyCoTermRepository(){
+        return (id, type, limit, thresholdLimit) -> {
+            throw new IllegalStateException("The method 'findCoTerms' is not valid for ECO Terms");
+        };
     }
 }
