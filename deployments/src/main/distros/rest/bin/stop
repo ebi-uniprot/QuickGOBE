@@ -21,13 +21,14 @@ readonly PERMITTED_USER="uni_qgo"
 # ========================= utility functions ===========================================
 function show_help {
     cat<<EOF
-  Usage: stop [dev|test|prod] [vm_name]
+  Usage: [dev|test|prod] [vm_name]
 
   Argument description:
-    stop                 => stops the REST services for the given profile
+    profile      => Indicates the profile of the services to shutdown, possible values [dev|test|prod]
+    vm_name      => The name of the virtual machine top shutdown
 
-  Example: stop dev -- stops the development REST services
-           stop dev ves-hx-c2 -- stops the development REST service on ves-hx-c2
+  Example: dev -- stops all development REST services
+            dev ves-hx-c2 -- stops the development REST service on ves-hx-c2
 
   WARNING: Please be aware of who is using the machine before starting/stopping them.
 EOF
