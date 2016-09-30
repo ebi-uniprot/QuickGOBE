@@ -72,6 +72,6 @@ readonly CURRENT_DIR=$(pwd -P)
 
 for vm in $VMS; do
   if [[ -z $2 || $2 == $vm ]]; then
-    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash ${CURRENT_DIR}/../stop_on_vm"
+    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash ${CURRENT_DIR}/../stop-on-vm"
   fi
 done
