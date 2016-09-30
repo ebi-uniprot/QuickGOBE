@@ -27,7 +27,6 @@ function show_help {
     profile      => Indicates the profile of the services to startup, possible values [dev|test|prod]
     vm_name      => The name of the virtual machine top startup
 
-
   Example: dev -- starts up all development REST services
            dev ves-hx-c2 -- starts the development REST service on ves-hx-c2
 
@@ -87,7 +86,7 @@ readonly CURRENT_DIR="$(pwd -P)"
 up=0
 
 for vm in $VMS; do
-  ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash $CURRENT_DIR/../status-check" 1>/dev/null
+  ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash $CURRENT_DIR/../status-check-on-vm" 1>/dev/null
   
   if [ $? -eq "0" ]; then
       servers_up+=$'\n'"   $vm"
