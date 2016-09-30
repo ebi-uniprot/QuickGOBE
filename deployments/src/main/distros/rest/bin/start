@@ -48,7 +48,7 @@ else
    exit 1
 fi
 
-# ===== check that vm argumnet belongs to provided profile =============================
+# ===== check that vm argument belongs to provided profile =============================
 if [ ! -z "$2" ] && vm_belongs_to_profile $2 $1; then
    echo "Input VM: ${2}, does not belong to profile ${1}."
    exit 1  
