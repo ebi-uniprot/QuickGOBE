@@ -1,8 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermType;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -44,6 +47,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     private OntologyRepository ontologyRepository;
     private OntologyDocConverter<T> converter;
     private String ontologyType;
+    private CoTermRepository coTermRepository;
 
     // necessary for Spring to create a proxy class
     private OntologyServiceImpl() {}
@@ -53,19 +57,22 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
             OntologyDocConverter<T> converter,
             OntologyType type,
             QueryStringSanitizer queryStringSanitizer,
-            OntologyGraphTraversal ontologyTraversal) {
+            OntologyGraphTraversal ontologyTraversal,
+            CoTermRepository coTermRepository) {
 
         Preconditions.checkArgument(repository != null, "Ontology repository cannot be null");
         Preconditions.checkArgument(type != null, "Ontology type cannot be null");
         Preconditions.checkArgument(converter != null, "Ontology converter cannot be null");
         Preconditions.checkArgument(queryStringSanitizer != null, "Ontology query string sanitizer cannot be null");
         Preconditions.checkArgument(ontologyTraversal != null, "OntologyGraphTraversal cannot be null");
+        Preconditions.checkArgument(coTermRepository != null, "CoTermRepository cannot be null");
 
         this.ontologyType = type.name();
         this.ontologyRepository = repository;
         this.converter = converter;
         this.queryStringSanitizer = queryStringSanitizer;
         this.ontologyTraversal = ontologyTraversal;
+        this.coTermRepository = coTermRepository;
     }
 
     @Override public QueryResult<T> findAllByOntologyType(OntologyType type, Page page) {
@@ -127,6 +134,11 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
                 .map(term -> this.insertDescendants(term, relations))
                 .collect(Collectors.toList());
+    }
+
+    @Override public List<CoTerm> findCoTermsByOntologyId(String id, CoTermType type, int limit, int
+            similarityThreshold) {
+        return coTermRepository.findCoTerms(id, type, limit, similarityThreshold);
     }
 
     List<String> buildIdList(List<String> ids) {
