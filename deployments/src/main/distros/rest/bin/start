@@ -1,46 +1,113 @@
 #! /bin/bash
 
-##=========================================================================================
+##=======================================================================================
 # Starts the self-contained web-application
-##=========================================================================================
+##=======================================================================================
 
-set -eo pipefail
+set -o pipefail
 IFS=$'\n\t '
 
 source "../common/common.variables"
 
-# ======= read the variables used by the control scripts =======================================
+# ======= read the variables used by the control scripts ================================
 source "environment.variables" || {
     echo "Please create a file called, environment.variables, containing the necessary environment variables."
     exit 1;
 }
 
-# ======= CONSTANTS =======================================
+# ======= CONSTANTS =====================================================================
 PERMITTED_USER="uni_qgo"
 
-# ====== check which environment will be started =====================================
+# ========================= utility functions ===========================================
+function show_help {
+    cat<<EOF
+  Usage: start [dev|test|prod] [vm_name]
+
+  Argument description:
+    start                 => starts the REST services for the given profile
+
+  Example: start dev -- starts up the development REST services
+           start dev ves-hx-c2 -- starts the development REST service on ves-hx-c2
+
+  WARNING: Please be aware of who is using the machine before starting/stopping them.
+EOF
+}
+
+# ====== check that the script has the right number of argument ========================
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+   show_help
+   exit 1
+fi
+
+# ====== check which environment will be started ========================================
 if [[ $(check_profile $1) == "0" ]]; then
    profile="$1"
 else
    echo "Input profile: ${1}, not recognized. Allowable values: ${ALLOWABLE_PROFILES}"
+
    exit 1
 fi
 
-# ======= check the right user runs this script =======================================
+# ===== check that vm argumnet belongs to provided profile =============================
+if [ ! -z "$2" ] && vm_belongs_to_profile $2 $1; then
+   echo "Input VM: ${2}, does not belong to profile ${1}."
+   exit 1  
+fi
+
+# ======= check the right user runs this script =========================================
 if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
     echo "This service can only be run as user(s), '$PERMITTED_USER'";
     exit 1;
 fi;
 
-#grab the virtual machines to startup
+# ======= grab the virtual machines to startup ==========================================
 vms=$(get_hosts $profile)
 
 if [ -z "$vms" ]; then
-   echo "No virtual machines configured for profile: $profile"
-   exit 1;
+   show_help
+   exit 1
 fi
 
+function cleanup() {
+   cat << EOF
+      #================================ ERROR ======================================#
+       $1 has failed to startup. Shutting down all servers for profile: $profile 
+      #=============================================================================#
+EOF
+
+   ../stop "$profile"
+}
+
 #startup each vm in the list
+current="$(pwd -P)"
+
+# ====== confirm that all vms for given profile are down ================================
+up=0
+
 for vm in $vms; do
-  ssh "$PERMITTED_USER"@"$vm" CURRENT_DIR="$(pwd -P)" 'bash -s' < ../start_on_vm
+  ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$current bash ${current}/../status-check" 1>/dev/null
+  
+  if [ $? -eq "0" ]; then
+      servers_up+=$'\n'"   $vm"
+      up=1
+  fi
+done
+
+if [ "$up" -eq "1" ]; then
+    cat<< EOF
+  #================================ ERROR ======================================#
+   The following servers are up, and need to be shutdown:                      
+   ${servers_up}                                                              
+  #=============================================================================#
+EOF
+
+  exit 1
+fi
+
+#start-up all vms for given profile
+for vm in $vms; do
+  if [[ -z $2 || $2 == $vm ]]; then
+    trap 'cleanup $vm' INT TERM ERR
+    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$current bash ${current}/../start_on_vm"
+  fi
 done
