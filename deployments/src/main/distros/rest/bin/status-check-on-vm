@@ -6,13 +6,14 @@
 
 set -eo pipefail
 
-readonly PERMITTED_USER=("uni_qgo")
-
 if [ -z "$CURRENT_DIR" ]; then
     SERVICE_CONF_PATH="$(pwd -P)"
 else
     SERVICE_CONF_PATH="$CURRENT_DIR"
 fi
+
+# ======= CONSTANTS =====================================================================
+readonly PERMITTED_USER=("uni_qgo")
 
 # ======= read the variables used by the control scripts =======================================
 source "${SERVICE_CONF_PATH}/environment.variables" || {
@@ -22,6 +23,7 @@ source "${SERVICE_CONF_PATH}/environment.variables" || {
 
 source "$(dirname $(which $0))/common/common"
 
+# ====== load the profile from the vm ===================================
 readonly PROFILE=$(get_profile_from_vm "$(hostname)")
 
 if [ -z "$PROFILE" ]; then 
@@ -34,7 +36,6 @@ if ! user_can_execute_script $USER PERMITTED_USER; then
     echo "This service can only be run as user(s), '${PERMITTED_USER[@]}'"
     exit 1
 fi
-
 
 # ======= check if script is run on the right VM =====================================
 if [[ $(hostname) =~ ^ebi.* ]]; then
@@ -53,4 +54,5 @@ nc -zv 127.0.0.1 $PORT > /dev/null 2>&1 || {
     echo "Status Check: $TEST_URL is DOWN"
     exit 1
 }
+
 echo "Status Check: $TEST_URL is UP"
