@@ -6,11 +6,21 @@
 
 set -eo pipefail
 
+# ======= load working directory ==============================
 if [ -z "$CURRENT_DIR" ]; then
     SERVICE_CONF_PATH="$(pwd -P)"
 else
     SERVICE_CONF_PATH="$CURRENT_DIR"
 fi
+
+# ======= CONSTANTS =======================================
+readonly PERMITTED_USER=("uni_qgo")
+readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
+readonly SERVICE_LIVE_NAME="live"
+readonly SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
+readonly SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME/$PROFILE"
+readonly RUN_DIR="$SERVICE_PATH/out"
+readonly PIDFILE="$RUN_DIR/up@$(hostname).pid"
 
 # ======= read the variables used by the control scripts =======================================
 source "${SERVICE_CONF_PATH}/environment.variables" || {
@@ -18,8 +28,7 @@ source "${SERVICE_CONF_PATH}/environment.variables" || {
     exit 1
 }
 
-# ======= CONSTANTS =======================================
-readonly PERMITTED_USER=("uni_qgo")
+source "$(dirname $(which $0))/common/common"
 
 # ======= check the right user runs this script =======================================
 if ! user_can_execute_script $USER PERMITTED_USER; then
@@ -33,22 +42,12 @@ if [[ $(hostname) =~ ^ebi.* ]]; then
     exit 1;
 fi
 
-source "$(dirname $(which $0))/common/common"
-
 readonly PROFILE=$(get_profile_from_vm "$(hostname)")
 
 if [ -z "$PROFILE" ]; then 
    echo "Current VM: $(hostname) does not belong to any profile"
    exit 1
 fi
-
-# ======= variables to ID service =======================================
-readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
-readonly SERVICE_LIVE_NAME="live"
-readonly SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
-readonly SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME/$PROFILE"
-readonly RUN_DIR="$SERVICE_PATH/out"
-readonly PIDFILE="$RUN_DIR/up@$(hostname).pid"
 
 # ======= no PID file existence indicates the service is not running =======================================
 if [ ! -f $PIDFILE ]
@@ -63,6 +62,7 @@ readonly PIDSTR=$(cat $PIDFILE)
 if ps "$PIDSTR" > /dev/null; then
     # ======= stop the application =======================================
     echo "Stopping the job with PID: $PIDSTR."
+
     kill -9 $PIDSTR > /dev/null 2>&1 || {
         echo "Could not kill process. Please check the PID manually: $PIDSTR"
         exit 1
