@@ -17,4 +17,6 @@ JVM_FLIGHT_RECORDER="off" # on|off
 declare -A HOSTS
 HOSTS[dev]="ves-hx-c2"
 HOSTS[test]="ves-hx-cf"
-HOSTS[prod]="ves-oy-cc ves-oy-cd"
+
+# ================ PROFILES ================
+VALID_PROFILES=( "dev" "test" )

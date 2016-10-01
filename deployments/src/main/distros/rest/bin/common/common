@@ -21,7 +21,10 @@ function join_by() {
    echo "$*"; 
 }
 
-ALLOWABLE_PROFILES=`join_by , "${VALID_PROFILES[@]}"`
+function print_valid_profiles () {
+    local array="$1[@]"
+    echo $(join_by , "${!array}")
+}
 
 # ---------------------------- CHECK USER PROVIDED VALUE AGAINST PROFILE ----------------------------
 

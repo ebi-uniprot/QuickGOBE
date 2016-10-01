@@ -56,7 +56,7 @@ fi
 if check_profile $1; then
    PROFILE="$1"
 else
-   echo "Input profile: ${1}, not recognized. Allowable values: ${ALLOWABLE_PROFILES}"
+   echo "Input profile: ${1}, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
    exit 1
 fi
 
