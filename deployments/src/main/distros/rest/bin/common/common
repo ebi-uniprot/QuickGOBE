@@ -1,5 +1,3 @@
-VALID_PROFILES=( "dev" "test" "prod" )
-
 # ---------------------------- CHECK VALUE IN ARRAY ----------------------------
 array_contains () {
     local array="$1[@]"
@@ -17,7 +15,7 @@ array_contains () {
 }
 
 # ---------------------------- PRINT ARRAY CONTENTS ----------------------------
-function join_by { 
+function join_by() {
    local IFS="$1"; 
    shift; 
    echo "$*"; 
@@ -81,4 +79,3 @@ function get_profile_from_vm() {
 
    echo. 
 }
-

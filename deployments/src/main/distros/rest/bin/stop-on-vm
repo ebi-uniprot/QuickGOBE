@@ -33,7 +33,7 @@ if [[ $(hostname) =~ ^ebi.* ]]; then
     exit 1;
 fi
 
-source "$(dirname $(which $0))/common/common.variables"
+source "$(dirname $(which $0))/common/common"
 
 readonly PROFILE=$(get_profile_from_vm "$(hostname)")
 

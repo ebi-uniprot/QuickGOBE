@@ -20,7 +20,7 @@ source "${SERVICE_CONF_PATH}/environment.variables" || {
     exit 1
 }
 
-source "$(dirname $(which $0))/common/common.variables"
+source "$(dirname $(which $0))/common/common"
 
 readonly PROFILE=$(get_profile_from_vm "$(hostname)")
 
