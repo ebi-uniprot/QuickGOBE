@@ -4,10 +4,10 @@
 # Starts the self-contained web-application
 ##=======================================================================================
 
-set -o pipefail
+set -eo pipefail
 IFS=$'\n\t '
 
-PERMITTED_USER="uni_qgo"
+PERMITTED_USER=("uni_qgo" "rantune")
 
 source "../common/common"
 
@@ -48,17 +48,17 @@ else
    exit 1
 fi
 
-# ===== check that vm argumnet belongs to provided profile =============================
+# ===== check that vm argument belongs to provided profile =============================
 if [ ! -z "$2" ] && vm_belongs_to_profile $2 $1; then
    echo "Input VM: ${2}, does not belong to profile ${1}."
    exit 1  
 fi
 
 # ======= check the right user runs this script =========================================
-if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user(s), '$PERMITTED_USER'"
+if ! user_can_execute_script $USER PERMITTED_USER; then
+    echo "This service can only be run as user(s), '${PERMITTED_USER[@]}'"
     exit 1
-fi;
+fi
 
 # ======= grab the virtual machines to startup ==========================================
 readonly VMS=$(get_hosts $PROFILE)

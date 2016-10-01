@@ -9,19 +9,19 @@ set -euo pipefail
 readonly IFS=$'\n\t '
 
 # ======= CONSTANTS =======================================
+readonly PERMITTED_USER=("uni_qgo")
 readonly RELEASE_REPO_TYPE="release"
 readonly RELEASE_REPO_NAME="uniprot-artifactory-release"
 readonly SNAPSHOT_REPO_TYPE="snapshot"
 readonly SNAPSHOT_REPO_NAME="uniprot-artifactory-snapshots"
-readonly PERMITTED_USER="uni_qgo"
 readonly JAVA="$JAVA_HOME/bin/java"
 readonly MAVEN="$MAVEN_HOME/bin/mvn"
 
 # ======= check the right user runs this script =======================================
-if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user(s), '$PERMITTED_USER'"
+if ! user_can_execute_script $USER PERMITTED_USER; then
+    echo "This service can only be run as user(s), '${PERMITTED_USER[@]}'"
     exit 1
-fi;
+fi
 
 # ======= check if script is run on the right VM =====================================
 if ! [[ $(hostname) =~ ^ebi.* ]]; then

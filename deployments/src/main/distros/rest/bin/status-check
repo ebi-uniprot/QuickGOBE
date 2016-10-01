@@ -16,7 +16,7 @@ source "environment.variables" || {
 }
 
 # ======= CONSTANTS =====================================================================
-PERMITTED_USER="uni_qgo"
+PERMITTED_USER=("uni_qgo")
 
 # ========================= utility functions ===========================================
 function show_help {
@@ -41,10 +41,10 @@ if [[ $# -lt 1 || $# -gt 2 ]]; then
 fi
 
 # ======= check the right user runs this script =======================================
-if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user(s), '$PERMITTED_USER'"
+if ! user_can_execute_script $USER PERMITTED_USER; then
+    echo "This service can only be run as user(s), '${PERMITTED_USER[@]}'"
     exit 1
-fi;
+fi
 
 # ===== check that vm argument belongs to provided profile =============================
 if [ ! -z "$2" ] && vm_belongs_to_profile $2 $1; then

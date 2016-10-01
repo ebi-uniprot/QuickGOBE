@@ -15,7 +15,7 @@ source "environment.variables" || {
 }
 
 # ======= CONSTANTS =======================================
-readonly PERMITTED_USER="uni_qgo"
+readonly PERMITTED_USER=("uni_qgo")
 
 
 # ========================= utility functions ===========================================

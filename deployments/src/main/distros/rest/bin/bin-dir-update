@@ -9,18 +9,18 @@
 set -euo pipefail
 
 # ======= CONSTANTS =======================================
-REPOS_DIR="$(pwd -P)/repos"
-QUICKGO_REPO="QuickGOBE"
-REST_BIN_CONTENT_DIR="bin"
-REST_BIN="rest-bin.tar.gz"
-PERMITTED_USER="uni_qgo"
-BRANCH="master"
+readonly REPOS_DIR="$(pwd -P)/repos"
+readonly QUICKGO_REPO="QuickGOBE"
+readonly REST_BIN_CONTENT_DIR="bin"
+readonly REST_BIN="rest-bin.tar.gz"
+readonly PERMITTED_USER=("uni_qgo")
+readonly BRANCH="master"
 
 # ======= check the right user runs this script =======================================
-if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user(s), '$PERMITTED_USER'";
-    exit 1;
-fi;
+if ! user_can_execute_script $USER PERMITTED_USER; then
+    echo "This service can only be run as user(s), '${PERMITTED_USER[@]}'"
+    exit 1
+fi
 
 # ======= FUNCTIONS ======================================================================
 # ======= take a string and add a time-stamp to it =======================================
