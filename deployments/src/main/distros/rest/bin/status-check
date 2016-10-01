@@ -7,6 +7,12 @@
 set -o pipefail
 IFS=$'\n\t '
 
+# ======= CONSTANTS =====================================================================
+readonly PERMITTED_USER=("uni_qgo")
+readonly CURRENT_DIR="$(pwd -P)"
+readonly PROFILE="$1"
+readonly VM_NAME="$2"
+
 source "../common/common"
 
 # ======= read the variables used by the control scripts ================================
@@ -14,9 +20,6 @@ source "environment.variables" || {
     echo "Please create a file called, environment.variables, containing the necessary environment variables."
     exit 1
 }
-
-# ======= CONSTANTS =====================================================================
-PERMITTED_USER=("uni_qgo")
 
 # ========================= utility functions ===========================================
 function show_help {
@@ -35,7 +38,7 @@ EOF
 }
 
 # ====== check that the script has the right number of argument ========================
-if [[ $# -lt 1 || $# -gt 2 ]]; then
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
    show_help
    exit 1
 fi
@@ -47,16 +50,14 @@ if ! user_can_execute_script $USER PERMITTED_USER; then
 fi
 
 # ===== check that vm argument belongs to provided profile =============================
-if [ ! -z "$2" ] && vm_belongs_to_profile $2 $1; then
-   echo "Input VM: ${2}, does not belong to profile ${1}."
+if [ ! -z "$VM_NAME" ] && vm_belongs_to_profile $VM_NAME $PROFILE; then
+   echo "Input VM: $VM_NAME, does not belong to profile $PROFILE."
    exit 1  
 fi
 
 # ====== check which environment will be stopped =====================================
-if check_profile $1; then
-   PROFILE="$1"
-else
-   echo "Input profile: ${1}, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
+if ! check_profile $PROFILE; then
+   echo "Input profile: $PROFILE, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
    exit 1
 fi
 
@@ -68,14 +69,12 @@ if [ -z "$VMS" ]; then
    exit 1
 fi
 
-#stop each vm in the list
-readonly CURRENT_DIR=$(pwd -P)
-
+# ====== check status of all vms associated to the profile ===========================
 for vm in $VMS; do
-  if [[ -z $2 || $2 == $vm ]]; then
-    vm_status="$(ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash ${CURRENT_DIR}/../status-check-on-vm")"
+  if [ -z "$VM_NAME" ] || [ "$VM_NAME" = $vm ]; then
+    vm_status="$(ssh "$USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash ${CURRENT_DIR}/../status-check-on-vm")"
 
-    if [[ $vm_status = *"UP"* ]]; then
+    if [ "$vm_status" = *"UP"* ]; then
        echo "$vm is UP"
     else
        echo "$vm is DOWN"
