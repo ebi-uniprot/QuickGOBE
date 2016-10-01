@@ -7,14 +7,17 @@
 set -eo pipefail
 IFS=$'\n\t '
 
-PERMITTED_USER=("uni_qgo" "rantune")
+readonly PERMITTED_USER=("uni_qgo")
+readonly CURRENT_DIR="$(pwd -P)"
+readonly PROFILE="$1"
+readonly VM_NAME="$2"
 
 source "../common/common"
 
 # ======= read the variables used by the control scripts ================================
 source "environment.variables" || {
     echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1;
+    exit 1
 }
 
 # ========================= utility functions ===========================================
@@ -34,23 +37,20 @@ EOF
 }
 
 # ====== check that the script has the right number of argument ========================
-if [[ $# -lt 1 || $# -gt 2 ]]; then
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
    show_help
    exit 1
 fi
 
 # ====== check which environment will be started ========================================
-if check_profile $1; then
-   PROFILE="$1"
-else
-   echo "Input profile: ${1}, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
-
+if ! check_profile $PROFILE; then
+   echo "Input profile: $PROFILE, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
    exit 1
 fi
 
 # ===== check that vm argument belongs to provided profile =============================
-if [ ! -z "$2" ] && vm_belongs_to_profile $2 $1; then
-   echo "Input VM: ${2}, does not belong to profile ${1}."
+if [ ! -z "$VM_NAME" ] && vm_belongs_to_profile $VM_NAME $PROFILE; then
+   echo "Input VM: $VM_NAME, does not belong to profile: $PROFILE."
    exit 1  
 fi
 
@@ -64,36 +64,38 @@ fi
 readonly VMS=$(get_hosts $PROFILE)
 
 if [ -z "$VMS" ]; then
-   show_help
+   echo "No VMs found for profile: $PROFILE"
    exit 1
 fi
 
-function cleanup() {
+function cleanup_on_error() {
    cat << EOF
       #================================ ERROR ======================================#
-       $1 has failed to startup. Shutting down all servers for profile: $PROFILE 
+       $VM_NAME has failed to startup. Shutting down all servers for profile: $PROFILE
       #=============================================================================#
 EOF
 
    ../stop "$PROFILE"
 }
 
-#startup each vm in the list
-readonly CURRENT_DIR="$(pwd -P)"
-
 # ====== confirm that all vms for given profile are down ================================
-up=0
+function check_all_vms_down() {
+   local up=0
 
-for vm in $VMS; do
-  ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash $CURRENT_DIR/../status-check-on-vm" 1>/dev/null
-  
-  if [ $? -eq "0" ]; then
-      servers_up+=$'\n'"   $vm"
-      up=1
-  fi
-done
+   for vm in $VMS; do
+     ssh "$USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash $CURRENT_DIR/../status-check-on-vm" 1>/dev/null
 
-if [ "$up" -eq "1" ]; then
+     # if server is up, then log it
+     if [ $? -eq "0" ]; then
+         servers_up+="   $vm"
+         up=1
+     fi
+   done
+
+   return $up
+}
+
+if ! check_all_vms_down; then
     cat<< EOF
   #================================ ERROR ======================================#
    The following servers are up, and need to be shutdown:                      
@@ -106,8 +108,8 @@ fi
 
 #start-up all vms for given profile
 for vm in $VMS; do
-  if [[ -z $2 || $2 == $vm ]]; then
-    trap 'cleanup $vm' INT TERM ERR
-    ssh "$PERMITTED_USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash $CURRENT_DIR/../start-on-vm"
+  if [ -z "$VM_NAME" ] || [ "$VM_NAME" = $vm ]; then
+    trap 'cleanup_on_error $vm' INT TERM ERR
+    ssh "$USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash $CURRENT_DIR/../start-on-vm"
   fi
 done
