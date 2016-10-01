@@ -6,7 +6,17 @@
 ##=========================================================================================
 
 set -euo pipefail
-readonly IFS=$'\n\t '
+IFS=$'\n\t '
+
+source "../common/common"
+
+readonly PROFILE="$1"
+
+# ====== check which environment will be started ========================================
+if ! check_profile $PROFILE; then
+   echo "Input profile: $PROFILE, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
+   exit 1
+fi
 
 # ======= CONSTANTS =======================================
 readonly PERMITTED_USER=("uni_qgo")
@@ -16,6 +26,16 @@ readonly SNAPSHOT_REPO_TYPE="snapshot"
 readonly SNAPSHOT_REPO_NAME="uniprot-artifactory-snapshots"
 readonly JAVA="$JAVA_HOME/bin/java"
 readonly MAVEN="$MAVEN_HOME/bin/mvn"
+readonly SERVICE_CONF_PATH="$(pwd -P)"
+readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
+readonly SERVICE_LIVE_NAME="live"
+readonly SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
+readonly SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME/$PROFILE"
+readonly LIB_DIR="$SERVICE_PATH/lib"
+readonly BACKUP_LIB_DIR="$SERVICE_PATH/lib/backups"
+readonly TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
+readonly QUICKGO_REPO_DIR="$SERVICE_CONF_PATH/../../repos/QuickGOBE"
+readonly BRANCH="master"
 
 # ======= check the right user runs this script =======================================
 if ! user_can_execute_script $USER PERMITTED_USER; then
@@ -29,10 +49,7 @@ if ! [[ $(hostname) =~ ^ebi.* ]]; then
     exit 1
 fi
 
-source "../common/common"
-
 # ======= FUNCTIONS ======================================================================
-# ========================= help message ===========================================
 function show_help {
     cat<<EOF
   Usage: [profile]
@@ -72,26 +89,7 @@ environment.variables."
     exit 1
 }
 
-# ====== check which environment will be started ========================================
-if check_profile $1; then
-   PROFILE="$1"
-else
-   echo "Input profile: ${1}, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
-
-   exit 1
-fi
-
-readonly SERVICE_CONF_PATH="$(pwd -P)"
-readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
-readonly SERVICE_LIVE_NAME="live"
-readonly SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
-readonly SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME/$PROFILE"
-readonly LIB_DIR="$SERVICE_PATH/lib"
-readonly BACKUP_LIB_DIR="$SERVICE_PATH/lib/backups"
-readonly TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
-readonly QUICKGO_REPO_DIR="$SERVICE_CONF_PATH/../../repos/QuickGOBE"
-readonly BRANCH="master"
-
+# ====== create library directories =====================
 if [ ! -d "$LIB_DIR" ]; then
     mkdir -p $LIB_DIR
 fi
@@ -114,23 +112,25 @@ GROUP_AS_URL="$(echo $ARTIFACT_GROUP | sed -e 's/\./\//g')"
 
 REPO_TYPE="$RELEASE_REPO_TYPE"
 REPO_NAME="$RELEASE_REPO_NAME"
+
 if echo "$JAR_NAME" | grep 'SNAPSHOT' > /dev/null; then
     REPO_TYPE="$SNAPSHOT_REPO_TYPE"
     REPO_NAME="$SNAPSHOT_REPO_NAME"
 fi
 REPO_URL="http://wwwdev.ebi.ac.uk/uniprot/artifactory/$REPO_TYPE"
 
-
 # ======= get the artifact from maven =======================================
 GAV="$ARTIFACT_GROUP:$ARTIFACT_ID:$ARTIFACT_VERSION"
 echo "Fetching artifact: $GAV"
 TEMP_DIR="$(addTimeStamp 'temp')"
+
 # first get the pom, so that later we can get the jar
 mvn -U org.apache.maven.plugins:maven-dependency-plugin:2.7:get \
         -DrepoUrl="$REPO_URL" \
         -DrepoId="$REPO_NAME" \
         -Dartifact="$GAV" \
         -Dtype=pom
+
 # ... and get the jar
 mvn -U org.apache.maven.plugins:maven-dependency-plugin:2.7:copy \
         -DrepoUrl="$REPO_URL" \
@@ -143,8 +143,9 @@ mvn -U org.apache.maven.plugins:maven-dependency-plugin:2.7:copy \
 # ======= keep only last 5 backups =======================================
 pushd . > /dev/null
 cd "$BACKUP_LIB_DIR"
+
 # double check we're actually in the backup directory, before deleting anything!
-if [ "$(basename $(pwd))" == "$(basename $BACKUP_LIB_DIR)" ]; then
+if [ "$(basename $(pwd))" = "$(basename $BACKUP_LIB_DIR)" ]; then
     echo "Deleting oldest backups, but keeping newest 5";
     (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf;
 fi
@@ -164,6 +165,7 @@ fi
 for new_lib in "$(ls $TEMP_DIR/*.jar)"; do
     ls "$new_lib" > /dev/null 2>&1 && mv "$new_lib" "$LIB_DIR"
 done
+
 rmdir $TEMP_DIR || {
     echo "Could not clean up temp directory: '$TEMP_DIR'. Please check it is empty."
 }
@@ -174,6 +176,5 @@ if [ -d "$SERVICE_BASE" ]; then
     echo "Contains live details (libraries, logs and PID files) for applications that " \
           "correspond to their configuration details in ../bin." > "$SERVICE_BASE/readme.txt"
 fi
-
 
 echo "done"
