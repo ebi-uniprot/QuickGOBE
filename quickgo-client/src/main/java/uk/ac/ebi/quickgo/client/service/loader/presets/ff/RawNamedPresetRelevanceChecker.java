@@ -20,7 +20,7 @@ public class RawNamedPresetRelevanceChecker implements ItemProcessor<RawNamedPre
         this.presetsOrderedByRelevance = presetsOrderedByRelevance;
     }
 
-    @Override public RawNamedPreset process(RawNamedPreset rawNamedPreset) throws Exception {
+    @Override public RawNamedPreset process(RawNamedPreset rawNamedPreset) {
         int relevancyPosition = presetsOrderedByRelevance.indexOf(rawNamedPreset.name);
 
         if (relevancyPosition >= 0) {
