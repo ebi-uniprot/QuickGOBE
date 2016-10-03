@@ -13,7 +13,7 @@ import org.springframework.batch.item.ItemProcessor;
  * Time: 11:59
  * Created with IntelliJ IDEA.
  *
- * For the contents of the termToTermOverlapMatrix calculate co-occurrence statistics
+ * For the contents of the coTermMatrix calculate co-occurrence statistics
  * A version of CoStatsSummarizer from Beta
  */
 public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, List<Co_occurringTerm>> {
@@ -44,7 +44,7 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
     public void initialize() {
         this.geneProductCount = aggregator.getTotalOfAnnotatedGeneProducts();
         this.termGPCount = aggregator.getGeneProductCounts();
-        this.termToTermOverlapMatrix = aggregator.getTermToTermOverlapMatrix();
+        this.termToTermOverlapMatrix = aggregator.getCoTerms();
     }
 
     /**
