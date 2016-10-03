@@ -82,8 +82,8 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
         Preconditions.checkArgument(items != null, "Null annotation passed to process");
 
         items.stream()
-                .filter(i -> this.toBeProcessed.test(i))
-                .forEach(i -> writeItem(i));
+                .filter(this.toBeProcessed::test)
+                .forEach(this::writeItem);
     }
 
     private void writeItem(AnnotationDocument doc) {
