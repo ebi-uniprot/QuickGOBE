@@ -26,7 +26,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
     private final Predicate<AnnotationDocument> toBeProcessed;
 
     private GeneProductBatch geneProductBatch;
-    private final TermToTermOverlapMatrix overlapMatrix;
+    private final CoTermMatrix overlapMatrix;
     private final TermGPCount termGPCount;
 
     public AnnotationCoOccurringTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
@@ -36,7 +36,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
                         " constructor");
 
         this.toBeProcessed = toBeProcessed;
-        this.overlapMatrix = new TermToTermOverlapMatrix();
+        this.overlapMatrix = new CoTermMatrix();
         geneProductList = new HashSet<>();
         termGPCount = new TermGPCount();
         geneProductBatch = new GeneProductBatch();
@@ -68,7 +68,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      * co-occurred.
      */
     public Map<String, Map<String, HitCount>> getTermToTermOverlapMatrix() {
-        return overlapMatrix.termToTermOverlapMatrix;
+        return overlapMatrix.coTermMatrix;
     }
 
     /**
@@ -170,13 +170,16 @@ class GeneProductBatch {
     }
 }
 
-class TermToTermOverlapMatrix {
+/**
+ * This class represents a matrix of term to compared term, and its used to hold the number of permutation occurrences.
+ */
+class CoTermMatrix {
 
     //Key =>target term, value=> map (key=>co-occurring term, value => HitCountForCo-occurrence
-    final Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
+    final Map<String, Map<String, HitCount>> coTermMatrix;
 
-    public TermToTermOverlapMatrix() {
-        termToTermOverlapMatrix = new TreeMap<>();
+    public CoTermMatrix() {
+        coTermMatrix = new TreeMap<>();
     }
 
     /**
@@ -214,12 +217,12 @@ class TermToTermOverlapMatrix {
     private Map<String, HitCount> getCo_occurringTerms(String termId) {
 
         //look in the store
-        Map<String, HitCount> termCoTerms = termToTermOverlapMatrix.get(termId);
+        Map<String, HitCount> termCoTerms = coTermMatrix.get(termId);
 
         //Create if it doesn't exist.
         if (termCoTerms == null) {
             termCoTerms = new HashMap<>();
-            termToTermOverlapMatrix.put(termId, termCoTerms);
+            coTermMatrix.put(termId, termCoTerms);
         }
         return termCoTerms;
     }
