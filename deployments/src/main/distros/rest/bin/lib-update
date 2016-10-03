@@ -10,6 +10,12 @@ IFS=$'\n\t '
 
 source "../common/common"
 
+# ======= read the variables used by the control scripts ================================
+source "environment.variables" || {
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1
+}
+
 readonly PROFILE="$1"
 
 # ====== check which environment will be started ========================================
@@ -33,7 +39,6 @@ readonly SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME
 readonly SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME/$PROFILE"
 readonly LIB_DIR="$SERVICE_PATH/lib"
 readonly BACKUP_LIB_DIR="$SERVICE_PATH/lib/backups"
-readonly TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
 readonly QUICKGO_REPO_DIR="$SERVICE_CONF_PATH/../../repos/QuickGOBE"
 readonly BRANCH="master"
 
@@ -76,6 +81,8 @@ function addTimeStamp() {
     local fname="${fname%.*}"
     echo "$dirname/$fname-$(date '+%s.%N')$fext"
 }
+
+readonly TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_LIB_DIR/version)"
 
 # ======= read the variables used by the control scripts =======================================
 source "environment.variables" || {
