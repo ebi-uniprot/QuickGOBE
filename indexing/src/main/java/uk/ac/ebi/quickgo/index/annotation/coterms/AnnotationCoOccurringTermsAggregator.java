@@ -147,8 +147,8 @@ class GeneProductBatch {
         terms = new HashSet<>();
     }
 
-    private void add(String goId) {
-        terms.add(goId);
+    private void addTerm(String termId) {
+        terms.add(termId);
     }
 
     /**
@@ -166,10 +166,10 @@ class GeneProductBatch {
         if (!doc.geneProductId.equals(geneProduct)) {
             GeneProductBatch geneProductBatch = new GeneProductBatch();
             geneProductBatch.geneProduct = doc.geneProductId;
-            geneProductBatch.add(doc.goId);
+            geneProductBatch.addTerm(doc.goId);
             return geneProductBatch;
         }
-        this.add(doc.goId);
+        this.addTerm(doc.goId);
         return this;
 
     }
