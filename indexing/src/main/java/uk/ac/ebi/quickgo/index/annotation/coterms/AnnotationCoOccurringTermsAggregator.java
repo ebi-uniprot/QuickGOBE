@@ -131,7 +131,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
     private void increaseCountsForTermsInBatch() {
 
         for (String termId : geneProductBatch.terms) {
-            coTerms.incrementCountForCo_occurringTerms(termId, geneProductBatch.terms);
+            coTerms.incrementCountForCoTerms(termId, geneProductBatch.terms);
             termGPCount.incrementGeneProductCountForTerm(termId);
         }
     }
@@ -190,7 +190,7 @@ class CoTermMatrix {
      * @param termId single term from batch
      * @param termsInBatch a list of all terms encountered in annotations for a particular gene product.
      */
-    void incrementCountForCo_occurringTerms(String termId, Set<String> termsInBatch) {
+    void incrementCountForCoTerms(String termId, Set<String> termsInBatch) {
 
         Map<String, HitCount> co_occurringTerms = getCo_occurringTerms(termId);
 
