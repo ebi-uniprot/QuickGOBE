@@ -131,7 +131,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
     private void increaseCountsForTermsInBatch() {
 
         for (String termId : geneProductBatch.terms) {
-            coTerms.incrementCountForCoTerms(termId, geneProductBatch.terms);
+            coTerms.incrementCoTerms(termId, geneProductBatch.terms);
             termGPCount.incrementGeneProductCountForTerm(termId);
         }
     }
@@ -190,20 +190,20 @@ class CoTermMatrix {
      * @param termId single term from batch
      * @param termsInBatch a list of all terms encountered in annotations for a particular gene product.
      */
-    void incrementCountForCoTerms(String termId, Set<String> termsInBatch) {
+    void incrementCoTerms(String termId, Set<String> termsInBatch) {
 
-        Map<String, HitCount> co_occurringTerms = getCo_occurringTerms(termId);
+        Map<String, HitCount> coTerms = getCoTerms(termId);
 
         //Loop through all the terms we have encountered in this batch and update the quantities
         for (String co_occurringTerm : termsInBatch) {
 
             //Get 'permanent' record for this termId/termId permutation
-            HitCount permutationHitCount = co_occurringTerms.get(co_occurringTerm);
+            HitCount permutationHitCount = coTerms.get(co_occurringTerm);
 
             //Create if it doesn't exist.
             if (permutationHitCount == null) {
                 permutationHitCount = new HitCount();
-                co_occurringTerms.put(co_occurringTerm, permutationHitCount);
+                coTerms.put(co_occurringTerm, permutationHitCount);
             }
 
             //Update it with a count of 'one' as this batch is for one gene protein and so the count must be one
@@ -213,12 +213,12 @@ class CoTermMatrix {
     }
 
     /**
-     * Get the co-stats for this termId
+     * Get the co-terms for this {@code termId}
      *
      * @param termId
-     * @return All terms that are co-occurring term to argument
+     * @return  all terms that co-occur with the term specified as parameter
      */
-    private Map<String, HitCount> getCo_occurringTerms(String termId) {
+    private Map<String, HitCount> getCoTerms(String termId) {
 
         //look in the store
         Map<String, HitCount> termCoTerms = coTermMatrix.get(termId);
