@@ -24,8 +24,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan({
-        "uk.ac.ebi.quickgo.client.service.loader.presets",
-        "uk.ac.ebi.quickgo.client.model.presets.impl"})
+        "uk.ac.ebi.quickgo.client.service.loader.presets"})
 public class PresetsConfig {
 
     private static final String PRESET_LOADING_JOB_NAME = "PresetReadingJob";

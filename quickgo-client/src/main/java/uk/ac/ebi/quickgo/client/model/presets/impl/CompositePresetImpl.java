@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItems;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.stereotype.Component;
 
 /**
  * Represents preset information relating to different aspects of QuickGO.
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
  * Created 30/08/16
  * @author Edd
  */
-@Component
 public class CompositePresetImpl implements CompositePreset {
     @JsonIgnore
     public final PresetItemsBuilder assignedByBuilder;
