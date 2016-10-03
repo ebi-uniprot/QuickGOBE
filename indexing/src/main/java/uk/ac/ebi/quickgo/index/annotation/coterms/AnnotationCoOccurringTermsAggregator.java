@@ -86,6 +86,18 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
                 .forEach(this::writeItem);
     }
 
+    /**
+     * Add the data in an AnnotationDocument instance to the aggregation.
+     * The documents are processed by this class in the gene product order.
+     * So the first thing to do is check if this doc has a previously unseen gene product id.
+     * If it doesn't we use the existing aggregation object (termBatch instance) to aggregate too.
+     * If it is a new gene product the we have a new termBatch instance created.
+     * Add the data in this document to the target termBatch.
+     * Add the gene product id to the list of geneproduct ids that have been processed (we need a list of all gene
+     * products processed for the statistics calculations at the end of the calculation.
+     *
+     * @param doc
+     */
     private void writeItem(AnnotationDocument doc) {
 
         TermBatch tb2 = termBatch.termBatch(doc);
