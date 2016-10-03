@@ -19,13 +19,13 @@ class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsStepExecutionListener.class);
 
-    private final AnnotationCo_occurringTermsAggregator all;
-    private final AnnotationCo_occurringTermsAggregator manual;
+    private final AnnotationCoOccurringTermsAggregator all;
+    private final AnnotationCoOccurringTermsAggregator manual;
     private final Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual;
     private final Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll;
 
-    public Co_occurringTermsStepExecutionListener(AnnotationCo_occurringTermsAggregator all,
-            AnnotationCo_occurringTermsAggregator manual,
+    public Co_occurringTermsStepExecutionListener(AnnotationCoOccurringTermsAggregator all,
+            AnnotationCoOccurringTermsAggregator manual,
             Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual,
             Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll) {
         this.all = all;

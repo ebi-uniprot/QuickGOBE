@@ -23,11 +23,11 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
  */
 public class AnnotationCoOccurringTermsAggregatorTest {
 
-    AnnotationCo_occurringTermsAggregator aggregator;
+    AnnotationCoOccurringTermsAggregator aggregator;
 
     @Before
     public void setup(){
-        aggregator = new AnnotationCo_occurringTermsAggregator(t -> true);
+        aggregator = new AnnotationCoOccurringTermsAggregator(t -> true);
     }
 
 	@Test
@@ -132,7 +132,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 
         AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
         AnnotationDocument annotation2 = AnnotationDocMocker.createAnnotationDoc("A0A000");
-        AnnotationCo_occurringTermsAggregator aggregatorFalse = new AnnotationCo_occurringTermsAggregator(t -> false);
+        AnnotationCoOccurringTermsAggregator aggregatorFalse = new AnnotationCoOccurringTermsAggregator(t -> false);
         List<AnnotationDocument> docs = Arrays.asList(annotation1, annotation2);
         aggregator.write(docs);
         aggregator.finish();
@@ -155,7 +155,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfNullPredicatePassedToConstructor() {
-        new AnnotationCo_occurringTermsAggregator(null);
+        new AnnotationCoOccurringTermsAggregator(null);
     }
 
 }

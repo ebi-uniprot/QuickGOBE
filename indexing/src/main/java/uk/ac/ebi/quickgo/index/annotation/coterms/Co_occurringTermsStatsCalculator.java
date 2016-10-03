@@ -26,10 +26,10 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
 
     //Total number of unique gene products that have annotations
     private long geneProductCount;
-    private final AnnotationCo_occurringTermsAggregator aggregator;
+    private final AnnotationCoOccurringTermsAggregator aggregator;
 
     public Co_occurringTermsStatsCalculator(
-            AnnotationCo_occurringTermsAggregator aggregator) {
+            AnnotationCoOccurringTermsAggregator aggregator) {
         this.aggregator = aggregator;
     }
 

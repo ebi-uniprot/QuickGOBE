@@ -14,10 +14,10 @@ import org.springframework.batch.item.ItemReader;
  */
 class Co_occurringTermItemReader implements ItemReader<String> {
 
-    private final AnnotationCo_occurringTermsAggregator aggregator;
+    private final AnnotationCoOccurringTermsAggregator aggregator;
     private Iterator<String> termsIt;
 
-    public Co_occurringTermItemReader(AnnotationCo_occurringTermsAggregator annotationCoOccurringTermsAggregator) {
+    public Co_occurringTermItemReader(AnnotationCoOccurringTermsAggregator annotationCoOccurringTermsAggregator) {
         this.aggregator = annotationCoOccurringTermsAggregator;
 
     }

@@ -32,7 +32,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.index.annotation.coterms.AnnotationCo_occurringTermsAggregator;
+import uk.ac.ebi.quickgo.index.annotation.coterms.AnnotationCoOccurringTermsAggregator;
 import uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTerm;
 import uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermsConfiguration;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
@@ -62,9 +62,9 @@ public class AnnotationConfig {
     static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
     static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
     @Autowired
-    AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsManual;
+    AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsManual;
     @Autowired
-    AnnotationCo_occurringTermsAggregator co_occurringGoTermsFromAnnotationsAll;
+    AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsAll;
     @Autowired
     ItemProcessor<String, List<Co_occurringTerm>> co_occurringTermsStatsCalculatorManual;
     @Autowired

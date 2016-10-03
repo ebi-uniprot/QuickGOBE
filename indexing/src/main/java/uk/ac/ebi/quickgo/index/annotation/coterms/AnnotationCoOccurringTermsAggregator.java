@@ -8,14 +8,14 @@ import java.util.function.Predicate;
 import org.springframework.batch.item.ItemWriter;
 
 /**
+ * Aggregates all the data need to calculate all co-occurrence stat data points.
+ *
  * @author Tony Wardell
  * Date: 26/11/2015
  * Time: 11:59
  * Created with IntelliJ IDEA.
- *
- * Aggregates all the data need to calculate all co-occurrence stat data points.
  */
-public class AnnotationCo_occurringTermsAggregator implements ItemWriter<AnnotationDocument> {
+public class AnnotationCoOccurringTermsAggregator implements ItemWriter<AnnotationDocument> {
 
     //A list of all unique geneProducts encountered - it exists so we can get a count of the total unique gene products.
     private final Set<String> geneProductList;
@@ -27,11 +27,10 @@ public class AnnotationCo_occurringTermsAggregator implements ItemWriter<Annotat
     private final TermToTermOverlapMatrix overlapMatrix;
     private final TermGPCount termGPCount;
 
-    //Constructor
-    public AnnotationCo_occurringTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
+    public AnnotationCoOccurringTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
 
         Preconditions
-                .checkArgument(toBeProcessed != null, "Null predicate passed AnnotationCo_occurringTermsAggregator" +
+                .checkArgument(toBeProcessed != null, "Null predicate passed AnnotationCoOccurringTermsAggregator" +
                         " constructor");
 
         this.toBeProcessed = toBeProcessed;

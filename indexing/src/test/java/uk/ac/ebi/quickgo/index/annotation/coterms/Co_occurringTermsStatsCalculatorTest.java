@@ -34,7 +34,7 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.
 public class Co_occurringTermsStatsCalculatorTest {
 
     @Mock
-    AnnotationCo_occurringTermsAggregator aggregator;
+    AnnotationCoOccurringTermsAggregator aggregator;
 
 	@Test
 	public void calculateStatisticsSingleGoTermComparedWithItself(){
