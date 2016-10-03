@@ -40,7 +40,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = aggregator.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = aggregator.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(1));
 
@@ -71,7 +71,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = aggregator.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = aggregator.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(2));
 
@@ -103,7 +103,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = aggregator.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = aggregator.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(2));
 
@@ -138,7 +138,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = aggregatorFalse.getTermToTermOverlapMatrix();
+        Map<String, Map<String, HitCount>> matrix = aggregatorFalse.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(0));
 
