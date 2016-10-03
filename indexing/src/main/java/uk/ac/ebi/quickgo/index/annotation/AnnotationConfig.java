@@ -62,9 +62,9 @@ public class AnnotationConfig {
     static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
     static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
     @Autowired
-    AnnotationCoOccurringTermsAggregator coTermsManualAggregator;
+    ItemWriter<AnnotationDocument> coTermsManualAggregationWriter;
     @Autowired
-    AnnotationCoOccurringTermsAggregator coTermsAllAggregator;
+    ItemWriter<AnnotationDocument> coTermsAllAggregationWriter;
     @Autowired
     ItemProcessor<String, List<Co_occurringTerm>> coTermsManualCalculator;
     @Autowired
@@ -72,11 +72,11 @@ public class AnnotationConfig {
     @Autowired
     ItemReader<String> coTermsManualReader;
     @Autowired
-    ItemWriter<List<Co_occurringTerm>> coTermsManualWriter;
+    ItemWriter<List<Co_occurringTerm>> coTermsManualStatsWriter;
     @Autowired
     ItemReader<String> coTermsAllReader;
     @Autowired
-    ItemWriter<List<Co_occurringTerm>> coTermsAllWriter;
+    ItemWriter<List<Co_occurringTerm>> coTermsAllStatsWriter;
     @Autowired
     StepExecutionListener coTermsStepExecutionListener;
     @Value("${indexing.annotation.source}")
@@ -139,7 +139,7 @@ public class AnnotationConfig {
                 .<String, List<Co_occurringTerm>>chunk(cotermsChunk)
                 .reader(coTermsManualReader)
                 .processor(coTermsManualCalculator)
-                .writer(coTermsManualWriter)
+                .writer(coTermsManualStatsWriter)
                 .listener(logStepListener())
                 .listener(logWriteRateListener(1000))
                 .listener(skipLogListener())
@@ -152,7 +152,7 @@ public class AnnotationConfig {
                 .<String, List<Co_occurringTerm>>chunk(cotermsChunk)
                 .reader(coTermsAllReader)
                 .processor(coTermsAllCalculator)
-                .writer(coTermsAllWriter)
+                .writer(coTermsAllStatsWriter)
                 .listener(logStepListener())
                 .listener(logWriteRateListener(1000))
                 .listener(skipLogListener())
@@ -249,8 +249,8 @@ public class AnnotationConfig {
         CompositeItemWriter<AnnotationDocument> compositeItemWriter = new CompositeItemWriter<>();
         List<ItemWriter<? super AnnotationDocument>> writerList = new ArrayList<>();
         writerList.add(annotationSolrServerWriter());
-        writerList.add(coTermsManualAggregator);
-        writerList.add(coTermsAllAggregator);
+        writerList.add(coTermsManualAggregationWriter);
+        writerList.add(coTermsAllAggregationWriter);
 
         compositeItemWriter.setDelegates(writerList);
         return compositeItemWriter;

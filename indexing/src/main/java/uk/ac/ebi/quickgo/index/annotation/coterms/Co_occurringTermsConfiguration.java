@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,58 +43,58 @@ public class Co_occurringTermsConfiguration {
     private Resource all;
 
     @Bean
-    public AnnotationCoOccurringTermsAggregator coTermsManualAggregator() {
+    public ItemWriter<AnnotationDocument> coTermsManualAggregationWriter() {
         return new AnnotationCoOccurringTermsAggregator(t -> !"IEA".equals(t.goEvidence));
     }
 
     @Bean
-    public AnnotationCoOccurringTermsAggregator coTermsAllAggregator() {
+    public ItemWriter<AnnotationDocument> coTermsAllAggregationWriter() {
         return new AnnotationCoOccurringTermsAggregator(t -> true);
     }
 
     @Bean
     public StepExecutionListener coTermsEndOfAggregationListener(
-            AnnotationCoOccurringTermsAggregator coTermsManualAggregator,
-            AnnotationCoOccurringTermsAggregator coTermsAllAggregator,
+            ItemWriter<AnnotationDocument> coTermsManualAggregationWriter,
+            ItemWriter<AnnotationDocument> coTermsAllAggregationWriter,
             Co_occurringTermsStatsCalculator coTermsManualCalculator,
             Co_occurringTermsStatsCalculator coTermsAllCalculator) {
-        return new Co_occurringTermsStepExecutionListener(coTermsManualAggregator,
-                coTermsAllAggregator, coTermsManualCalculator,
+        return new Co_occurringTermsStepExecutionListener(coTermsManualAggregationWriter,
+                coTermsAllAggregationWriter, coTermsManualCalculator,
                 coTermsAllCalculator);
 
     }
 
     @Bean
     public Co_occurringTermsStatsCalculator coTermsManualCalculator(
-            AnnotationCoOccurringTermsAggregator coTermsManualAggregator) {
-        return new Co_occurringTermsStatsCalculator(coTermsManualAggregator);
+            ItemWriter<AnnotationDocument> coTermsManualAggregationWriter) {
+        return new Co_occurringTermsStatsCalculator(coTermsManualAggregationWriter);
     }
 
     @Bean
     public Co_occurringTermsStatsCalculator coTermsAllCalculator(
-            AnnotationCoOccurringTermsAggregator coTermsAllAggregator) {
-        return new Co_occurringTermsStatsCalculator(coTermsAllAggregator);
+            ItemWriter<AnnotationDocument> coTermsAllAggregationWriter) {
+        return new Co_occurringTermsStatsCalculator(coTermsAllAggregationWriter);
     }
 
     @Bean
     public ItemReader<String> coTermsManualReader(
-            AnnotationCoOccurringTermsAggregator coTermsManualAggregator) {
-        return new Co_occurringTermItemReader(coTermsManualAggregator);
+            ItemWriter<AnnotationDocument> coTermsManualAggregationWriter) {
+        return new Co_occurringTermItemReader(coTermsManualAggregationWriter);
     }
 
     @Bean
     public ItemReader<String> coTermsAllReader(
-            AnnotationCoOccurringTermsAggregator coTermsAllAggregator) {
-        return new Co_occurringTermItemReader(coTermsAllAggregator);
+            ItemWriter<AnnotationDocument> coTermsAllAggregationWriter) {
+        return new Co_occurringTermItemReader(coTermsAllAggregationWriter);
     }
 
     @Bean
-    ItemWriter<List<Co_occurringTerm>> coTermsManualWriter() {
+    ItemWriter<List<Co_occurringTerm>> coTermsManualStatsWriter() {
         return listItemFlatFileWriter(manual);
     }
 
     @Bean
-    ItemWriter<List<Co_occurringTerm>> coTermsAllWriter() {
+    ItemWriter<List<Co_occurringTerm>> coTermsAllStatsWriter() {
         return listItemFlatFileWriter(all);
     }
 

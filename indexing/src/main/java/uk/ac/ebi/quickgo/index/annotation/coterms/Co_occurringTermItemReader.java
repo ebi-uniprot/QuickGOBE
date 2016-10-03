@@ -1,7 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+
 import java.util.Iterator;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * Provide a list of all GO Terms for which co-occurrence has been determined ( which is all of them that have been
@@ -17,8 +20,8 @@ class Co_occurringTermItemReader implements ItemReader<String> {
     private final AnnotationCoOccurringTermsAggregator aggregator;
     private Iterator<String> termsIt;
 
-    public Co_occurringTermItemReader(AnnotationCoOccurringTermsAggregator annotationCoOccurringTermsAggregator) {
-        this.aggregator = annotationCoOccurringTermsAggregator;
+    public Co_occurringTermItemReader(ItemWriter<AnnotationDocument> annotationCoOccurringTermsAggregator) {
+        this.aggregator = (AnnotationCoOccurringTermsAggregator)annotationCoOccurringTermsAggregator;
 
     }
 

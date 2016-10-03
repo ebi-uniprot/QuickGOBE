@@ -1,10 +1,13 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * Listener to be activated when all annotations have been passed to the co-occurring term aggregation code.
@@ -19,13 +22,13 @@ class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsStepExecutionListener.class);
 
-    private final AnnotationCoOccurringTermsAggregator all;
-    private final AnnotationCoOccurringTermsAggregator manual;
+    private final ItemWriter<AnnotationDocument> all;
+    private final ItemWriter<AnnotationDocument> manual;
     private final Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual;
     private final Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll;
 
-    public Co_occurringTermsStepExecutionListener(AnnotationCoOccurringTermsAggregator all,
-            AnnotationCoOccurringTermsAggregator manual,
+    public Co_occurringTermsStepExecutionListener(ItemWriter<AnnotationDocument> all,
+            ItemWriter<AnnotationDocument> manual,
             Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual,
             Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll) {
         this.all = all;
@@ -46,8 +49,8 @@ class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
      */
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        all.finish();
-        manual.finish();
+        ((AnnotationCoOccurringTermsAggregator)all).finish();
+        ((AnnotationCoOccurringTermsAggregator)manual).finish();
         co_occurringTermsStatsCalculatorManual.initialize();
         co_occurringTermsStatsCalculatorAll.initialize();
         return stepExecution.getExitStatus();

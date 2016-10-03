@@ -1,11 +1,14 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * @author Tony Wardell
@@ -29,8 +32,8 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
     private final AnnotationCoOccurringTermsAggregator aggregator;
 
     public Co_occurringTermsStatsCalculator(
-            AnnotationCoOccurringTermsAggregator aggregator) {
-        this.aggregator = aggregator;
+            ItemWriter<AnnotationDocument> aggregator) {
+        this.aggregator = (AnnotationCoOccurringTermsAggregator)aggregator;
     }
 
     /**
