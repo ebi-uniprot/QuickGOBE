@@ -1,0 +1,10 @@
+involved_in,colocalizes_with,part_of
+contributes_to,involved_in,enables
+contributes_to,involved_in,colocalizes_with
+contributes_to,enables,part_of
+involved_in,colocalizes_with,enables
+involved_in,part_of,enables
+contributes_to,colocalizes_with,enables
+colocalizes_with,enables,part_of
+contributes_to,involved_in,part_of
+contributes_to,colocalizes_with,part_of
