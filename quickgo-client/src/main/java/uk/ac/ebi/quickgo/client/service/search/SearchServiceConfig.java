@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.ECODocConverter;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.GODocConverter;
 import uk.ac.ebi.quickgo.client.service.search.ontology.OntologySearchServiceImpl;
+import uk.ac.ebi.quickgo.client.service.search.ontology.OntologySearchableField;
 import uk.ac.ebi.quickgo.client.service.search.ontology.OntologySolrQueryResultConverter;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
@@ -105,6 +106,11 @@ public class SearchServiceConfig {
                 return highlightDelimsArr[HIGHLIGHT_END_DELIM_INDEX];
             }
         };
+    }
+
+    @Bean
+    public OntologySearchableField ontologySearchableField() {
+        return new OntologySearchableField();
     }
 
     @Bean
