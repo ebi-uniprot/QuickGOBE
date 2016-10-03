@@ -25,8 +25,8 @@ public class CoTermLoader {
     private Resource manualCoTermsFile;
     private Resource allCoTermsFile;
 
-    Map<String, List<CoTerm>> coTermsAll;
-    Map<String, List<CoTerm>> coTermsManual;
+    public Map<String, List<CoTerm>> coTermsAll;
+    public Map<String, List<CoTerm>> coTermsManual;
 
     public CoTermLoader(Resource manualCoTermsFile, Resource allCoTermsFile) {
         this.manualCoTermsFile = manualCoTermsFile;
@@ -112,7 +112,7 @@ public class CoTermLoader {
 
 
     static CoTerm fromFile(String line) {
-        String[] columns = line.split("\t");
+        String[] columns = line.split("\\t");
         CoTerm coTerm = new CoTerm(columns[COLUMN_ID], columns[COLUMN_COMPARE],
                 Float.parseFloat(columns[COLUMN_PROB]), Float.parseFloat(columns[COLUMN_SIG]),
                 Long.parseLong(columns[COLUMN_TOGETHER]), Long.parseLong(columns[COLUMN_COMPARED]));
