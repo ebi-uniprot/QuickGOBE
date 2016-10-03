@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -11,8 +10,8 @@ import java.util.List;
  */
 public interface PresetItems {
     /**
-     * Retrieve the {@link Collection} of {@link PresetItem}s.
-     * @return the {@link Collection} of {@link PresetItem}s
+     * Retrieve the {@link List} of {@link PresetItem}s.
+     * @return the {@link List} of {@link PresetItem}s
      */
     List<PresetItem> getPresets();
 
