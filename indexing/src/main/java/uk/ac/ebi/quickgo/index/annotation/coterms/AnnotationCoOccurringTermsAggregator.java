@@ -70,10 +70,10 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
     }
 
     /**
-     * For each row of the GP Association file, create a list of terms, against which there is a list of all the
-     * other terms that that term share a referenced gene product with.
+     * For each AnnotationDocument item passed to this method, check whether it passed the criteria for aggregating,
+     * and if so add its data to the aggregated data.
      *
-     * @param items
+     * @param items a list of AnnotationDocuments.
      */
     @Override
     public void write(List<? extends AnnotationDocument> items) throws Exception {
