@@ -97,6 +97,8 @@ public class AnnotationConfig {
     private JobBuilderFactory jobBuilders;
     @Autowired
     private StepBuilderFactory stepBuilders;
+    @Value("${indexing.coterm.loginterval:1000}")
+    private int coTermLogInterval;
 
     @Bean
     public Job annotationJob() {
@@ -141,7 +143,7 @@ public class AnnotationConfig {
                 .processor(coTermsManualCalculator)
                 .writer(coTermsManualStatsWriter)
                 .listener(logStepListener())
-                .listener(logWriteRateListener(1000))
+                .listener(logWriteRateListener(coTermLogInterval))
                 .listener(skipLogListener())
                 .build();
     }
@@ -154,7 +156,7 @@ public class AnnotationConfig {
                 .processor(coTermsAllCalculator)
                 .writer(coTermsAllStatsWriter)
                 .listener(logStepListener())
-                .listener(logWriteRateListener(1000))
+                .listener(logWriteRateListener(coTermLogInterval))
                 .listener(skipLogListener())
                 .build();
     }
