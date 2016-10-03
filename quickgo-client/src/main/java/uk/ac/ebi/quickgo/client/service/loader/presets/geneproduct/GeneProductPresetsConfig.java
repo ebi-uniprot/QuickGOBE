@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.GENE_PRODUCT_COLUMNS;
@@ -56,8 +55,7 @@ public class GeneProductPresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
-                .processor(compositeItemProcessor(
-                        rawPresetValidator()))
+                .processor(rawPresetValidator())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
