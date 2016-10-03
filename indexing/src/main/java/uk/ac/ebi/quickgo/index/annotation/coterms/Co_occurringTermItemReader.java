@@ -26,7 +26,7 @@ class Co_occurringTermItemReader implements ItemReader<String> {
 
         //Delay providing full list until aggregator has fully processed all records.
         if (termsIt == null) {
-            termsIt = aggregator.getTermToTermOverlapMatrix().keySet().iterator();
+            termsIt = aggregator.getCoTerms().keySet().iterator();
         }
 
         if (termsIt.hasNext()) {
