@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 
@@ -22,10 +23,10 @@ import org.springframework.batch.item.ItemWriter;
 public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, List<Co_occurringTerm>> {
 
     //This is the count of all gene products for the term. We hold this figure separately as it is used many times.
-    private Map<String, HitCount> termGPCount;
+    private Map<String, AtomicLong> termGPCount;
 
     //Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
-    private Map<String, Map<String, HitCount>> termToTermOverlapMatrix;
+    private Map<String, Map<String, AtomicLong>> termToTermOverlapMatrix;
 
     //Total number of unique gene products that have annotations
     private long geneProductCount;
@@ -61,14 +62,14 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
 
         Preconditions.checkArgument(null != target, "Target passed to calculateCoStatsForTerm should not be null");
 
-        Map<String, HitCount> co_occurringTermsForTarget = termToTermOverlapMatrix.get(target);
+        Map<String, AtomicLong> co_occurringTermsForTarget = termToTermOverlapMatrix.get(target);
         Co_occurringTermsForSelectedTerm
-                coTerms = new Co_occurringTermsForSelectedTerm(target, geneProductCount, termGPCount.get(target).hits);
+                coTerms = new Co_occurringTermsForSelectedTerm(target, geneProductCount, termGPCount.get(target).get());
 
         for (String comparedTerm : co_occurringTermsForTarget.keySet()) {
 
-            coTerms.addAndCalculate(new Co_occurringTerm(target, comparedTerm, termGPCount.get(comparedTerm).hits,
-                    co_occurringTermsForTarget.get(comparedTerm).hits));
+            coTerms.addAndCalculate(new Co_occurringTerm(target, comparedTerm, termGPCount.get(comparedTerm).get(),
+                    co_occurringTermsForTarget.get(comparedTerm).get()));
         }
         return coTerms;
 

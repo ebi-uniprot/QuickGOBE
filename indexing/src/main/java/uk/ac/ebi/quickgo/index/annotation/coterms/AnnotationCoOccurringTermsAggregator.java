@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 
 import com.google.common.base.Preconditions;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 import org.springframework.batch.item.ItemWriter;
 
@@ -57,7 +58,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      *
      * @return map of GO terms to count of unique gene products for the term.
      */
-    public Map<String, HitCount> getGeneProductCounts() {
+    public Map<String, AtomicLong> getGeneProductCounts() {
         return termGPCount.termGPCount;
     }
 
@@ -67,7 +68,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      * @return map of processed terms to all co-occurring terms, together with count of how many times they have
      * co-occurred.
      */
-    public Map<String, Map<String, HitCount>> getCoTerms() {
+    public Map<String, Map<String, AtomicLong>> getCoTerms() {
         return coTerms.coTermMatrix;
     }
 
@@ -176,38 +177,38 @@ class GeneProductBatch {
 class CoTermMatrix {
 
     // Key is the target term, the value is a map of all the GO terms that are used in annotations for the same gene
-    // product. i.e.  Key =>target term, value=> map (key=>co-occurring term, value => HitCountForCo-occurrence)
+    // product. i.e.  Key =>target term, value=> map (key=>co-occurring term, value => AtomicLong For Co-occurrence)
     // For example key=>'GO:0003824', value=> map(entry 1 :: key=>'GO:0008152' value=>1346183 hits, entry 2 key=>'GO:0016740' value=>1043613 hits)
-    final Map<String, Map<String, HitCount>> coTermMatrix;
+    final Map<String, Map<String, AtomicLong>> coTermMatrix;
 
     public CoTermMatrix() {
         coTermMatrix = new TreeMap<>();
     }
 
     /**
-     * For all terms encountered for gene product batch, increment its hit count. If this is a new {@code termId}, then
-     * its hit count is initialised as 1.
+     * For all terms encountered for gene product batch, increment its count. If this is a new {@code termId}, then
+     * its count is initialised as 1.
      * @param termId single term from batch
      * @param termsInBatch a list of all terms encountered in annotations for a particular gene product.
      */
     void incrementCoTerms(String termId, Set<String> termsInBatch) {
 
-        Map<String, HitCount> coTerms = getCoTerms(termId);
+        Map<String, AtomicLong> coTerms = getCoTerms(termId);
 
         //Loop through all the terms we have encountered in this batch and update the quantities
         for (String co_occurringTerm : termsInBatch) {
 
             //Get 'permanent' record for this termId/termId permutation
-            HitCount permutationHitCount = coTerms.get(co_occurringTerm);
+            AtomicLong permutationCount = coTerms.get(co_occurringTerm);
 
             //Create if it doesn't exist.
-            if (permutationHitCount == null) {
-                permutationHitCount = new HitCount();
-                coTerms.put(co_occurringTerm, permutationHitCount);
+            if (permutationCount == null) {
+                permutationCount = new AtomicLong();
+                coTerms.put(co_occurringTerm, permutationCount);
             }
 
             //Update it with a count of 'one' as this batch is for one gene protein and so the count must be one
-            permutationHitCount.hits++;
+            permutationCount.incrementAndGet();
 
         }
     }
@@ -218,10 +219,10 @@ class CoTermMatrix {
      * @param termId
      * @return  all terms that co-occur with the term specified as parameter
      */
-    private Map<String, HitCount> getCoTerms(String termId) {
+    private Map<String, AtomicLong> getCoTerms(String termId) {
 
         //look in the store
-        Map<String, HitCount> termCoTerms = coTermMatrix.get(termId);
+        Map<String, AtomicLong> termCoTerms = coTermMatrix.get(termId);
 
         //Create if it doesn't exist.
         if (termCoTerms == null) {
@@ -234,7 +235,7 @@ class CoTermMatrix {
 }
 
 class TermGPCount {
-    final Map<String, HitCount> termGPCount;
+    final Map<String, AtomicLong> termGPCount;
 
     public TermGPCount() {
         this.termGPCount = new HashMap<>();
@@ -244,11 +245,11 @@ class TermGPCount {
      * For every term, increment by one the count of gene products for this term
      */
     void incrementGeneProductCountForTerm(String term) {
-        HitCount hitCount = termGPCount.get(term);
-        if (hitCount == null) {
-            hitCount = new HitCount();
-            termGPCount.put(term, hitCount);
+        AtomicLong count = termGPCount.get(term);
+        if (count == null) {
+            count = new AtomicLong();
+            termGPCount.put(term, count);
         }
-        hitCount.hits++;
+        count.incrementAndGet();
     }
 }

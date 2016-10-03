@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -13,7 +14,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.createMatrix;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.df1;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.df2;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.makeGpHitCountForTerm;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.makeGpCountForTerm;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.makeTermList;
 
 
@@ -41,9 +42,9 @@ public class Co_occurringTermsStatsCalculatorTest {
         long geneProductCount = 2l;
         final String goTerm = "GO:0003824";
 
-        Map<String, Map<String, HitCount>> matrix = Co_occurringTermMocker.singleEntry();
-        Map<String, HitCount> termGpCount = new HashMap<>();
-        termGpCount.put(goTerm, new HitCount(2));
+        Map<String, Map<String, AtomicLong>> matrix = Co_occurringTermMocker.singleEntry();
+        Map<String, AtomicLong> termGpCount = new HashMap<>();
+        termGpCount.put(goTerm, new AtomicLong(2));
 
         when(aggregator.getCoTerms()).thenReturn(matrix);
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
@@ -74,8 +75,8 @@ public class Co_occurringTermsStatsCalculatorTest {
         final List<String> selectedList = Arrays.asList(selected);
         final List<String> comparedList = Arrays.asList(compared);
 
-        Map<String, HitCount> termGpCount = makeGpHitCountForTerm(hitsPerTerm, selectedList, comparedList);
-        Map<String, Map<String, HitCount>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
+        Map<String, AtomicLong> termGpCount = makeGpCountForTerm(hitsPerTerm, selectedList, comparedList);
+        Map<String, Map<String, AtomicLong>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
 
         when(aggregator.getCoTerms()).thenReturn(matrix);
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
@@ -106,8 +107,8 @@ public class Co_occurringTermsStatsCalculatorTest {
         final List<String> selectedList = makeTermList(selected, df1);
         final List<String> comparedList = makeTermList(compared, df2);
 
-        Map<String, HitCount> termGpCount = makeGpHitCountForTerm(hitsPerTerm, selectedList, comparedList);
-        Map<String, Map<String, HitCount>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
+        Map<String, AtomicLong> termGpCount = makeGpCountForTerm(hitsPerTerm, selectedList, comparedList);
+        Map<String, Map<String, AtomicLong>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
 
         when(aggregator.getCoTerms()).thenReturn(matrix);
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
@@ -139,9 +140,9 @@ public class Co_occurringTermsStatsCalculatorTest {
         long geneProductCount = 2l;
         final String goTerm = "GO:0003824";
 
-        Map<String, Map<String, HitCount>> matrix = Co_occurringTermMocker.singleEntry();
-        Map<String, HitCount> termGpCount = new HashMap<>();
-        termGpCount.put(goTerm, new HitCount(2));
+        Map<String, Map<String, AtomicLong>> matrix = Co_occurringTermMocker.singleEntry();
+        Map<String, AtomicLong> termGpCount = new HashMap<>();
+        termGpCount.put(goTerm, new AtomicLong(2));
 
         Co_occurringTermsStatsCalculator
                 coOccurringTermsStatsCalculator = new Co_occurringTermsStatsCalculator(aggregator);

@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Tony Wardell
@@ -14,8 +15,8 @@ public class Co_occurringTermMocker {
     public static DecimalFormat df1 = new DecimalFormat("0000000");
     public static DecimalFormat df2 = new DecimalFormat("9000000");
 
-    static Map<String, Map<String, HitCount>> singleEntry(){
-        Map<String, Map<String, HitCount>> matrix = new HashMap<>();
+    static Map<String, Map<String, AtomicLong>> singleEntry(){
+        Map<String, Map<String, AtomicLong>> matrix = new HashMap<>();
         List<String> comparedList = Arrays.asList("GO:0003824");
         matrix.put("GO:0003824", makeSingleCostat(comparedList, 2));
         return  matrix;
@@ -25,18 +26,18 @@ public class Co_occurringTermMocker {
      * Suggests 2 annotations for GO:0003824, with different gene products
      * @return
      */
-     static Map<String, HitCount> makeSingleCostat(List<String> comparedList, int hits) {
-        Map<String, HitCount> coStat = new HashMap<>();
+     static Map<String, AtomicLong> makeSingleCostat(List<String> comparedList, int hits) {
+        Map<String, AtomicLong> coStat = new HashMap<>();
         for(String comparedTerm : comparedList) {
-            coStat.put(comparedTerm, new HitCount(hits));
+            coStat.put(comparedTerm, new AtomicLong(hits));
         }
         return coStat;
     }
 
 
-    static Map<String, Map<String, HitCount>> createMatrix(List<String> selectedList, List<String> comparedList, int
+    static Map<String, Map<String, AtomicLong>> createMatrix(List<String> selectedList, List<String> comparedList, int
             hits){
-        Map<String, Map<String, HitCount>> matrix = new HashMap<>();
+        Map<String, Map<String, AtomicLong>> matrix = new HashMap<>();
 
         for(String selectedTerm : selectedList) {
             matrix.put(selectedTerm, makeSingleCostat(comparedList, hits));
@@ -53,15 +54,15 @@ public class Co_occurringTermMocker {
         return termList;
     }
 
-    static Map<String, HitCount> makeGpHitCountForTerm(int count, List<String>... termsLists ){
-        Map<String, HitCount> termGpCount = new HashMap<>();
+    static Map<String, AtomicLong> makeGpCountForTerm(int count, List<String>... termsLists ){
+        Map<String, AtomicLong> termGpCount = new HashMap<>();
 
         for (int i = 0; i < termsLists.length; i++) {
             List<String> terms = termsLists[i];
 
             for (int j = 0; j < terms.size(); j++) {
                 String s =  terms.get(j);
-                termGpCount.put(s, new HitCount(count));
+                termGpCount.put(s, new AtomicLong(count));
             }
         }
 

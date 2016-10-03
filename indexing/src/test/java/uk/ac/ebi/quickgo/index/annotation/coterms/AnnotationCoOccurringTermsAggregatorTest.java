@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,22 +41,22 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = aggregator.getCoTerms();
+        Map<String, Map<String, AtomicLong>> matrix = aggregator.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(1));
 
-        Map<String, HitCount> costats = matrix.get("GO:0003824");
+        Map<String, AtomicLong> costats = matrix.get("GO:0003824");
         assertThat(costats, is(notNullValue()));
         assertThat(costats.keySet(), hasSize(1));
 
         //Is the only one
-        HitCount hc = costats.get("GO:0003824");
-        assertThat(hc.hits, is(1l));
+        AtomicLong ac = costats.get("GO:0003824");
+        assertThat(ac.get(), is(1l));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1l));
         assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(1));
-        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).hits, is(1L));
-        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).hits, is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).get(), is(1L));
 
 	}
 
@@ -71,24 +72,24 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = aggregator.getCoTerms();
+        Map<String, Map<String, AtomicLong>> matrix = aggregator.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(2));
 
-        Map<String, HitCount> costats1 = matrix.get(annotation1.goId);
+        Map<String, AtomicLong> costats1 = matrix.get(annotation1.goId);
         assertThat(costats1.keySet(), hasSize(1));//2
-        HitCount hc1 = costats1.get(annotation1.goId);
-        assertThat(hc1.hits, is(1l));
+        AtomicLong ac1 = costats1.get(annotation1.goId);
+        assertThat(ac1.get(), is(1l));
 
-        Map<String, HitCount> costats2 = matrix.get(annotation2.goId);
+        Map<String, AtomicLong> costats2 = matrix.get(annotation2.goId);
         assertThat(costats2.keySet(), hasSize(1));
-        HitCount hc2 = costats2.get(annotation2.goId);
-        assertThat(hc2.hits, is(1l));
+        AtomicLong ac2 = costats2.get(annotation2.goId);
+        assertThat(ac2.get(), is(1l));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(2l));
         assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(2));
-        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).hits, is(1L));
-        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).hits, is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).get(), is(1L));
     }
 
 
@@ -103,28 +104,28 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = aggregator.getCoTerms();
+        Map<String, Map<String, AtomicLong>> matrix = aggregator.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(2));
 
-        Map<String, HitCount> costats1 = matrix.get(annotation1.goId);
+        Map<String, AtomicLong> costats1 = matrix.get(annotation1.goId);
         assertThat(costats1.keySet(), hasSize(2));
-        HitCount hc1x1 = costats1.get(annotation1.goId);
-        assertThat(hc1x1.hits, is(1l));
-        HitCount hc1x2 = costats1.get(annotation2.goId);
-        assertThat(hc1x1.hits, is(1l));
+        AtomicLong ac1x1 = costats1.get(annotation1.goId);
+        assertThat(ac1x1.get(), is(1l));
+        AtomicLong ac1x2 = costats1.get(annotation2.goId);
+        assertThat(ac1x1.get(), is(1l));
 
-        Map<String, HitCount> costats2 = matrix.get(annotation2.goId);
+        Map<String, AtomicLong> costats2 = matrix.get(annotation2.goId);
         assertThat(costats2.keySet(), hasSize(2));
-        HitCount hc2x1 = costats2.get(annotation2.goId);
-        assertThat(hc2x1.hits, is(1l));
-        HitCount hc2x2 = costats2.get(annotation1.goId);
-        assertThat(hc2x2.hits, is(1l));
+        AtomicLong ac2x1 = costats2.get(annotation2.goId);
+        assertThat(ac2x1.get(), is(1l));
+        AtomicLong ac2x2 = costats2.get(annotation1.goId);
+        assertThat(ac2x2.get(), is(1l));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1l));
         assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(2));
-        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).hits, is(1L));
-        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).hits, is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).get(), is(1L));
     }
 
     @Test
@@ -138,7 +139,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
         aggregator.finish();
 
         //Now test
-        Map<String, Map<String, HitCount>> matrix = aggregatorFalse.getCoTerms();
+        Map<String, Map<String, AtomicLong>> matrix = aggregatorFalse.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(0));
 
