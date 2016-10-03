@@ -41,10 +41,10 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 @Configuration
 @Import({PresetsCommonConfig.class})
 public class AssignedByPresetsConfig {
-    private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
-    private static final String ASSIGNED_BY = "assignedBy";
     public static final String ASSIGNED_BY_DEFAULTS = "AgBase,BHF-UCL,CACAO,CGD,EcoCyc,UniProtKB";
+    private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
+    private static final String ASSIGNED_BY = "assignedBy";
 
     @Value("#{'${assignedBy.preset.source:}'.split(',')}")
     private Resource[] assignedByResources;
