@@ -26,7 +26,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
     private final Predicate<AnnotationDocument> toBeProcessed;
 
     private GeneProductBatch geneProductBatch;
-    private final CoTermMatrix overlapMatrix;
+    private final CoTermMatrix coTerms;
     private final TermGPCount termGPCount;
 
     public AnnotationCoOccurringTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
@@ -36,7 +36,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
                         " constructor");
 
         this.toBeProcessed = toBeProcessed;
-        this.overlapMatrix = new CoTermMatrix();
+        this.coTerms = new CoTermMatrix();
         geneProductList = new HashSet<>();
         termGPCount = new TermGPCount();
         geneProductBatch = new GeneProductBatch();
@@ -67,8 +67,8 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      * @return map of processed terms to all co-occurring terms, together with count of how many times they have
      * co-occurred.
      */
-    public Map<String, Map<String, HitCount>> getTermToTermOverlapMatrix() {
-        return overlapMatrix.coTermMatrix;
+    public Map<String, Map<String, HitCount>> getCoTerms() {
+        return coTerms.coTermMatrix;
     }
 
     /**
@@ -131,7 +131,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
     private void increaseCountsForTermsInBatch() {
 
         for (String termId : geneProductBatch.terms) {
-            overlapMatrix.incrementCountForCo_occurringTerms(termId, geneProductBatch.terms);
+            coTerms.incrementCountForCo_occurringTerms(termId, geneProductBatch.terms);
             termGPCount.incrementGeneProductCountForTerm(termId);
         }
     }
@@ -175,7 +175,9 @@ class GeneProductBatch {
  */
 class CoTermMatrix {
 
-    //Key =>target term, value=> map (key=>co-occurring term, value => HitCountForCo-occurrence
+    // Key is the target term, the value is a map of all the GO terms that are used in annotations for the same gene
+    // product. i.e.  Key =>target term, value=> map (key=>co-occurring term, value => HitCountForCo-occurrence)
+    // For example key=>'GO:0003824', value=> map(entry 1 :: key=>'GO:0008152' value=>1346183 hits, entry 2 key=>'GO:0016740' value=>1043613 hits)
     final Map<String, Map<String, HitCount>> coTermMatrix;
 
     public CoTermMatrix() {
