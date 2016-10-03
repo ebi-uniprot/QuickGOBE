@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.function.Predicate;
 import org.springframework.batch.item.ItemWriter;
 
+import static uk.ac.ebi.quickgo.index.annotation.coterms.GeneProductBatch.buildBatch;
+
 /**
  * Aggregates all the data need to calculate all co-occurrence stat data points.
  *
@@ -83,7 +85,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
 
         items.stream()
                 .filter(this.toBeProcessed::test)
-                .forEach(this::writeItem);
+                .forEach(this::addGOTermToAggregationForGeneProduct);
     }
 
     /**
@@ -98,12 +100,17 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      *
      * @param doc
      */
-    private void writeItem(AnnotationDocument doc) {
+    private void addGOTermToAggregationForGeneProduct(AnnotationDocument doc) {
 
-        GeneProductBatch tb2 = geneProductBatch.newOrExistingBatch(doc);
-        if (tb2 != geneProductBatch) {
+        if (geneProductBatch.geneProduct == null) {
+            geneProductBatch.geneProduct = doc.geneProductId;
+        }
+
+        if (!doc.geneProductId.equals(geneProductBatch.geneProduct)) {
             increaseCountsForTermsInBatch();
-            geneProductBatch = tb2;
+            geneProductBatch = buildBatch(doc);
+        }else{
+            geneProductBatch.addTerm(doc.goId);
         }
 
         geneProductList.add(doc.geneProductId); //set so each gp is only added once.
@@ -128,7 +135,6 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
             termGPCount.incrementGeneProductCountForTerm(termId);
         }
     }
-
 }
 
 /**
@@ -141,37 +147,26 @@ class GeneProductBatch {
     final Set<String> terms;
 
     //The input file has annotations in gene product order, so we use this value to note changes in gene product.
-    private String geneProduct;
+    public String geneProduct;
 
     public GeneProductBatch() {
         terms = new HashSet<>();
     }
 
-    private void addTerm(String termId) {
+    void addTerm(String termId) {
         terms.add(termId);
     }
 
     /**
-     * For an instance of an annotation document, if the doc has the same gene product id as the existing aggregation
-     * batch then re-use that batch. Otherwise create a new batch for the 'new' gene product id.
+     * Create a new batch for the 'new' gene product id.
      * @param doc
      * @return
      */
-    GeneProductBatch newOrExistingBatch(AnnotationDocument doc) {
-
-        if (geneProduct == null) {
-            geneProduct = doc.geneProductId;
-        }
-
-        if (!doc.geneProductId.equals(geneProduct)) {
-            GeneProductBatch geneProductBatch = new GeneProductBatch();
-            geneProductBatch.geneProduct = doc.geneProductId;
-            geneProductBatch.addTerm(doc.goId);
-            return geneProductBatch;
-        }
-        this.addTerm(doc.goId);
-        return this;
-
+    static GeneProductBatch buildBatch(AnnotationDocument doc){
+        GeneProductBatch geneProductBatch = new GeneProductBatch();
+        geneProductBatch.geneProduct = doc.geneProductId;
+        geneProductBatch.addTerm(doc.goId);
+        return geneProductBatch;
     }
 }
 
