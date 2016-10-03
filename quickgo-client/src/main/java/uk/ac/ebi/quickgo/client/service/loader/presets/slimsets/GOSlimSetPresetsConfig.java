@@ -37,8 +37,8 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 @Import({PresetsCommonConfig.class})
 public class GOSlimSetPresetsConfig {
     public static final String GO_SLIM_SET_LOADING_STEP_NAME = "GOSlimSetReadingStep";
-    private static final RawNamedPreset INVALID_PRESET = null;
     public static final String SLIM = "SLIM";
+    private static final RawNamedPreset INVALID_PRESET = null;
 
     @Value("#{'${go.slimset.preset.source:}'.split(',')}")
     private Resource[] resources;
