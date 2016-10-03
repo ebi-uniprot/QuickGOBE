@@ -45,7 +45,7 @@ public class Co_occurringTermsStatsCalculatorTest {
         Map<String, HitCount> termGpCount = new HashMap<>();
         termGpCount.put(goTerm, new HitCount(2));
 
-        when(aggregator.getTermToTermOverlapMatrix()).thenReturn(matrix);
+        when(aggregator.getCoTerms()).thenReturn(matrix);
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
@@ -77,7 +77,7 @@ public class Co_occurringTermsStatsCalculatorTest {
         Map<String, HitCount> termGpCount = makeGpHitCountForTerm(hitsPerTerm, selectedList, comparedList);
         Map<String, Map<String, HitCount>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
 
-        when(aggregator.getTermToTermOverlapMatrix()).thenReturn(matrix);
+        when(aggregator.getCoTerms()).thenReturn(matrix);
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
@@ -109,7 +109,7 @@ public class Co_occurringTermsStatsCalculatorTest {
         Map<String, HitCount> termGpCount = makeGpHitCountForTerm(hitsPerTerm, selectedList, comparedList);
         Map<String, Map<String, HitCount>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
 
-        when(aggregator.getTermToTermOverlapMatrix()).thenReturn(matrix);
+        when(aggregator.getCoTerms()).thenReturn(matrix);
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
