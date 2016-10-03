@@ -13,6 +13,15 @@ else
     SERVICE_CONF_PATH="$CURRENT_DIR"
 fi
 
+# ======= read the variables used by the control scripts =======================================
+source "${SERVICE_CONF_PATH}/environment.variables" || {
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1
+}
+
+source "$(dirname $(which $0))/common/common"
+
+readonly PROFILE=$(get_profile_from_vm "$(hostname)")
 # ======= CONSTANTS =======================================
 readonly PERMITTED_USER=("uni_qgo")
 readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
@@ -21,14 +30,6 @@ readonly SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME
 readonly SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME/$PROFILE"
 readonly RUN_DIR="$SERVICE_PATH/out"
 readonly PIDFILE="$RUN_DIR/up@$(hostname).pid"
-
-# ======= read the variables used by the control scripts =======================================
-source "${SERVICE_CONF_PATH}/environment.variables" || {
-    echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1
-}
-
-source "$(dirname $(which $0))/common/common"
 
 # ======= check the right user runs this script =======================================
 if ! user_can_execute_script $USER PERMITTED_USER; then
@@ -42,8 +43,7 @@ if [[ $(hostname) =~ ^ebi.* ]]; then
     exit 1;
 fi
 
-readonly PROFILE=$(get_profile_from_vm "$(hostname)")
-
+# ====== check if profile exists =====================================================
 if [ -z "$PROFILE" ]; then 
    echo "Current VM: $(hostname) does not belong to any profile"
    exit 1

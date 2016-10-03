@@ -16,9 +16,18 @@ else
     SERVICE_CONF_PATH="$CURRENT_DIR"
 fi
 
+# ======= read the variables used by the control scripts =======================================
+source "${SERVICE_CONF_PATH}/environment.variables" || {
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1
+}
+
+source "$(dirname $(which $0))/common/common"
+
 # ======= CONSTANTS =======================================
 readonly PERMITTED_USER=("uni_qgo")
 readonly SERVICE_LIVE_NAME="live"
+readonly PROFILE=$(get_profile_from_vm "$(hostname)")
 readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
 readonly SERVICE_BASE="$(readlink -f $SERVICE_CONF_PATH/../../$SERVICE_LIVE_NAME)"
 readonly SERVICE_PATH="$SERVICE_BASE/$SERVICE_NAME/$PROFILE"
@@ -36,21 +45,14 @@ readonly SPRING_LOGGING_CONFIG="-Dlogging.config=$SERVICE_CONF_PATH/logback.xml"
 readonly SPRING_LOGGING_DEST="-Dlogging.path=$(hostname)/logs/"
 
 readonly JAVA=$JAVA_HOME/bin/java
-# ======= read the variables used by the control scripts =======================================
-source "${SERVICE_CONF_PATH}/environment.variables" || {
-    echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1
-}
-
-source "$(dirname $(which $0))/common/common"
 
 # ======= load profile from the current VM ===================================
-readonly PROFILE=$(get_profile_from_vm "$(hostname)")
-
 if [ -z "$PROFILE" ]; then 
    echo "Current VM: $(hostname) does not belong to any profile"
    exit 1
 fi
+
+echo "Loaded profile: $PROFILE"
 
 # ======= check the right user runs this script =======================================
 if ! user_can_execute_script $USER PERMITTED_USER; then
@@ -95,7 +97,7 @@ JAVA_OPTS="-Dcom.sun.management.jmxremote  \
             -Dcom.sun.management.jmxremote.authenticate=false \
             -Dcom.sun.management.jmxremote.ssl=false  \
             -Dcom.sun.management.jmxremote.port=$JXM_REMOTE_PORT \
-            -Dspring.profile.active=$PROFILE"
+            -Dspring.profiles.active=$PROFILE"
 
 if [ "$JVM_FLIGHT_RECORDER" == "on" ]; then
     echo "JVM flight recorder options in use"
