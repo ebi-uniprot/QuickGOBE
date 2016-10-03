@@ -141,7 +141,7 @@ class GeneProductBatch {
     final Set<String> terms;
 
     //The input file has annotations in gene product order, so we use this value to note changes in gene product.
-    private String currentGeneProduct;
+    private String geneProduct;
 
     public GeneProductBatch() {
         terms = new HashSet<>();
@@ -159,13 +159,13 @@ class GeneProductBatch {
      */
     GeneProductBatch provideBatch(AnnotationDocument doc) {
 
-        if (currentGeneProduct == null) {
-            currentGeneProduct = doc.geneProductId;
+        if (geneProduct == null) {
+            geneProduct = doc.geneProductId;
         }
 
-        if (!doc.geneProductId.equals(currentGeneProduct)) {
+        if (!doc.geneProductId.equals(geneProduct)) {
             GeneProductBatch geneProductBatch = new GeneProductBatch();
-            geneProductBatch.currentGeneProduct = doc.geneProductId;
+            geneProductBatch.geneProduct = doc.geneProductId;
             geneProductBatch.add(doc.goId);
             return geneProductBatch;
         }
