@@ -74,6 +74,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      * and if so add its data to the aggregated data.
      *
      * @param items a list of AnnotationDocuments.
+     * @throws java.lang.Exception - if there are errors. The framework will catch the exception and convert or rethrow it as appropriate.
      */
     @Override
     public void write(List<? extends AnnotationDocument> items) throws Exception {
