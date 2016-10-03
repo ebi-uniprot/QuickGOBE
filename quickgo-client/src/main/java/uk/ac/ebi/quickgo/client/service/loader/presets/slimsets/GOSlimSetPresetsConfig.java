@@ -73,7 +73,7 @@ public class GOSlimSetPresetsConfig {
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.goSlimSetsBuilder.addPreset(
+            presets.addPreset(CompositePresetImpl.PresetType.GO_SLIMS_SETS,
                     PresetItemBuilder.createWithName(rawItem.name)
                             .withId(rawItem.id)
                             .build());

@@ -68,7 +68,7 @@ public class EvidencePresetsConfig {
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.evidencesBuilder.addPreset(
+            presets.addPreset(CompositePresetImpl.PresetType.EVIDENCES,
                     PresetItemBuilder.createWithName(rawItem.name)
                             .withId(rawItem.id)
                             .withRelevancy(rawItem.relevancy)

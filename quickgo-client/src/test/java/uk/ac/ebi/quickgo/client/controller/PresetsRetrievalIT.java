@@ -48,8 +48,7 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.assignedBy").exists())
-                .andExpect(jsonPath("$.assignedBy.presets.*", hasSize(1)));
+                .andExpect(jsonPath("$.assignedBy.*", hasSize(1)));
     }
 
     @Test
@@ -57,8 +56,7 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.references").exists())
-                .andExpect(jsonPath("$.references.presets.*", hasSize(greaterThan(0))));
+                .andExpect(jsonPath("$.references.*", hasSize(greaterThan(0))));
     }
 
     @Test
@@ -66,8 +64,7 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.evidences").exists())
-                .andExpect(jsonPath("$.evidences.presets.*", hasSize(greaterThan(0))));
+                .andExpect(jsonPath("$.evidences.*", hasSize(greaterThan(0))));
     }
 
     @Test
@@ -75,8 +72,7 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.withFrom").exists())
-                .andExpect(jsonPath("$.withFrom.presets.*", hasSize(greaterThan(0))));
+                .andExpect(jsonPath("$.withFrom.*", hasSize(greaterThan(0))));
     }
 
     @Test
@@ -84,8 +80,7 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.geneProducts").exists())
-                .andExpect(jsonPath("$.geneProducts.presets.*", hasSize(greaterThan(0))));
+                .andExpect(jsonPath("$.geneProducts.*", hasSize(greaterThan(0))));
     }
 
     @Test
@@ -93,7 +88,6 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.goSlimSets").exists())
-                .andExpect(jsonPath("$.goSlimSets.presets.*", hasSize(greaterThan(0))));
+                .andExpect(jsonPath("$.goSlimSets.*", hasSize(greaterThan(0))));
     }
 }

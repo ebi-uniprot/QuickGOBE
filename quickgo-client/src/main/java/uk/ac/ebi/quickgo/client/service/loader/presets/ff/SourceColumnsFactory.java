@@ -16,6 +16,12 @@ public class SourceColumnsFactory {
                         .createWithNamePosition(0)
                         .withDescriptionPosition(1)
                         .build();
+            case REF_COLUMNS:
+                return RawNamedPresetColumnsBuilder
+                        .createWithNamePosition(0)
+                        .withDescriptionPosition(1)
+                        .withRelevancyPosition(2)
+                        .build();
             case ECO2GO_COLUMNS:
                 return RawNamedPresetColumnsBuilder
                         .createWithNamePosition(2)
@@ -44,6 +50,7 @@ public class SourceColumnsFactory {
         DB_COLUMNS,
         ECO2GO_COLUMNS,
         GENE_PRODUCT_COLUMNS,
-        GO_SLIM_SET_COLUMNS
+        GO_SLIM_SET_COLUMNS,
+        REF_COLUMNS
     }
 }

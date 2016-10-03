@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.read;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItems;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
@@ -46,11 +45,11 @@ public class PresetsFailedRelevancyFetchingIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private CompositePresetImpl preset;
+    private CompositePresetImpl presets;
 
     @Test
     public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() throws Exception {
-        assertThat(preset.getAssignedBy().getPresets(), hasSize(0));
+        assertThat(presets.getAssignedBy(), hasSize(0));
 
         JobExecution jobExecution =
                 jobLauncherTestUtils.launchStep(AssignedByPresetsConfig.ASSIGNED_BY_LOADING_STEP_NAME);
@@ -58,12 +57,12 @@ public class PresetsFailedRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                extractPresetValues(preset.getAssignedBy(), PresetItem::getName),
+                extractPresetValues(presets.getAssignedBy(), PresetItem::getName),
                 contains(UNIPROT_KB));
     }
 
-    private <T> List<T> extractPresetValues(PresetItems presets, Function<PresetItem, T> extractor) {
-        return presets.getPresets().stream().map(extractor).collect(Collectors.toList());
+    private <T> List<T> extractPresetValues(List<PresetItem> presets, Function<PresetItem, T> extractor) {
+        return presets.stream().map(extractor).collect(Collectors.toList());
     }
 
 }

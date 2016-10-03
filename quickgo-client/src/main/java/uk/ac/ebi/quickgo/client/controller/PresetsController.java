@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.controller;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,10 @@ public class PresetsController {
     private final CompositePreset presets;
 
     @Autowired
-    public PresetsController(CompositePreset compositePreset) {
-        checkArgument(compositePreset != null, "Preset information cannot be null");
+    public PresetsController(CompositePresetImpl presets) {
+        checkArgument(presets != null, "Preset information cannot be null");
 
-        this.presets = compositePreset;
+        this.presets = presets;
     }
 
     /**

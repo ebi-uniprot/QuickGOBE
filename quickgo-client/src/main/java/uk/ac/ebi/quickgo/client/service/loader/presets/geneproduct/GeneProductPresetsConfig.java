@@ -68,7 +68,7 @@ public class GeneProductPresetsConfig {
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.geneProductsBuilder.addPreset(
+            presets.addPreset(CompositePresetImpl.PresetType.GENE_PRODUCT,
                     PresetItemBuilder.createWithName(rawItem.name)
                             .withDescription(rawItem.description)
                             .withUrl(rawItem.url)

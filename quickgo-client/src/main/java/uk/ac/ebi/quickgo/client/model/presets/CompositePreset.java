@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
+import java.util.List;
+
 /**
  * Represents preset information relating to different aspects of QuickGO.
  *
@@ -7,15 +9,15 @@ package uk.ac.ebi.quickgo.client.model.presets;
  * @author Edd
  */
 public interface CompositePreset {
-    PresetItems getAssignedBy();
+    List<PresetItem> getAssignedBy();
 
-    PresetItems getReferences();
+    List<PresetItem> getReferences();
 
-    PresetItems getEvidences();
+    List<PresetItem> getEvidences();
 
-    PresetItems getWithFrom();
+    List<PresetItem> getWithFrom();
 
-    PresetItems getGeneProducts();
+    List<PresetItem> getGeneProducts();
 
-    PresetItems getGoSlimSets();
+    List<PresetItem> getGoSlimSets();
 }

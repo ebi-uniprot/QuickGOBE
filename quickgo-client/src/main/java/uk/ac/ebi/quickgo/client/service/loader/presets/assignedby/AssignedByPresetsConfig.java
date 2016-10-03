@@ -82,7 +82,7 @@ public class AssignedByPresetsConfig {
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> {
             rawItemList.forEach(rawItem -> {
-                presets.assignedByBuilder.addPreset(
+                presets.addPreset(CompositePresetImpl.PresetType.ASSIGNED_BY,
                         PresetItemBuilder.createWithName(rawItem.name)
                                 .withDescription(rawItem.description)
                                 .withRelevancy(rawItem.relevancy)
