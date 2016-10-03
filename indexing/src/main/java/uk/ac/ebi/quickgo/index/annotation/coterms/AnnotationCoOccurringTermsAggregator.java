@@ -158,7 +158,7 @@ class GeneProductBatch {
     }
 
     /**
-     * Create a new batch for the 'new' gene product id.
+     * Create a new GeneProductBatch to aggregate terms for the 'new' gene product id.
      * @param doc
      * @return
      */
@@ -185,8 +185,10 @@ class CoTermMatrix {
     }
 
     /**
-     * For all terms encountered for gene product batch, add or increase hit count
+     * For all terms encountered for gene product batch, increment its hit count. If this is a new {@code termId}, then
+     * its hit count is initialised as 1.
      * @param termId single term from batch
+     * @param termsInBatch a list of all terms encountered in annotations for a particular gene product.
      */
     void incrementCountForCo_occurringTerms(String termId, Set<String> termsInBatch) {
 
