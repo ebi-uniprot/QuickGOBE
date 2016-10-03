@@ -23,7 +23,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
     //Determines which annotations get processed.
     private final Predicate<AnnotationDocument> toBeProcessed;
 
-    private TermBatch termBatch;
+    private GeneProductBatch geneProductBatch;
     private final TermToTermOverlapMatrix overlapMatrix;
     private final TermGPCount termGPCount;
 
@@ -37,7 +37,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
         this.overlapMatrix = new TermToTermOverlapMatrix();
         geneProductList = new HashSet<>();
         termGPCount = new TermGPCount();
-        termBatch = new TermBatch();
+        geneProductBatch = new GeneProductBatch();
     }
 
     /**
@@ -90,9 +90,9 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      * Add the data in an AnnotationDocument instance to the aggregation.
      * The documents are processed by this class in the gene product order.
      * So the first thing to do is check if this doc has a previously unseen gene product id.
-     * If it doesn't we use the existing aggregation object (termBatch instance) to aggregate too.
-     * If it is a new gene product the we have a new termBatch instance created.
-     * Add the data in this document to the target termBatch.
+     * If it doesn't we use the existing aggregation object (provideBatch instance) to aggregate too.
+     * If it is a new gene product the we have a new provideBatch instance created.
+     * Add the data in this document to the target provideBatch.
      * Add the gene product id to the list of geneproduct ids that have been processed (we need a list of all gene
      * products processed for the statistics calculations at the end of the calculation.
      *
@@ -100,17 +100,18 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      */
     private void writeItem(AnnotationDocument doc) {
 
-        TermBatch tb2 = termBatch.termBatch(doc);
-        if (tb2 != termBatch) {
+        GeneProductBatch tb2 = geneProductBatch.provideBatch(doc);
+        if (tb2 != geneProductBatch) {
             increaseCountsForTermsInBatch();
-            termBatch = tb2;
+            geneProductBatch = tb2;
         }
 
         geneProductList.add(doc.geneProductId); //set so each gp is only added once.
     }
 
     /**
-     * Make it clear to the client this method needs calling to wrap up processing
+     * The client must call finish() when all annotation documents have been processed by the write method to wrap up
+     * processing.
      */
     public void finish() {
         increaseCountsForTermsInBatch();
@@ -122,15 +123,19 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      */
     private void increaseCountsForTermsInBatch() {
 
-        for (String termId : termBatch.termsInBatch) {
-            overlapMatrix.incrementCountForCo_occurringTerms(termId, termBatch.termsInBatch);
+        for (String termId : geneProductBatch.termsInBatch) {
+            overlapMatrix.incrementCountForCo_occurringTerms(termId, geneProductBatch.termsInBatch);
             termGPCount.incrementGeneProductCountForTerm(termId);
         }
     }
 
 }
 
-class TermBatch {
+/**
+ * A data bucket for aggregating annotation document data. Each batch is created for all data with the same gene
+ * product id.
+ */
+class GeneProductBatch {
 
     //A set of all terms encountered for a Gene Product. Therefore all these terms are co-occurring with each other.
     final Set<String> termsInBatch;
@@ -138,7 +143,7 @@ class TermBatch {
     //The input file has annotations in gene product order, so we use this value to note changes in gene product.
     private String currentGeneProduct;
 
-    public TermBatch() {
+    public GeneProductBatch() {
         termsInBatch = new HashSet<>();
     }
 
@@ -146,17 +151,23 @@ class TermBatch {
         termsInBatch.add(goId);
     }
 
-    uk.ac.ebi.quickgo.index.annotation.coterms.TermBatch termBatch(AnnotationDocument doc) {
+    /**
+     * For an instance of an annotation document, if the doc has the same gene product id as the existing aggregation
+     * batch then re-use that batch. Otherwise create a new batch for the 'new' gene product id.
+     * @param doc
+     * @return
+     */
+    GeneProductBatch provideBatch(AnnotationDocument doc) {
 
         if (currentGeneProduct == null) {
             currentGeneProduct = doc.geneProductId;
         }
 
         if (!doc.geneProductId.equals(currentGeneProduct)) {
-            TermBatch termBatch = new TermBatch();
-            termBatch.currentGeneProduct = doc.geneProductId;
-            termBatch.add(doc.goId);
-            return termBatch;
+            GeneProductBatch geneProductBatch = new GeneProductBatch();
+            geneProductBatch.currentGeneProduct = doc.geneProductId;
+            geneProductBatch.add(doc.goId);
+            return geneProductBatch;
         }
         this.add(doc.goId);
         return this;
