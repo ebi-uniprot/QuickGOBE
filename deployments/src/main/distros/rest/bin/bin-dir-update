@@ -8,6 +8,8 @@
 
 set -euo pipefail
 
+source "./bin/common/common"
+
 # ======= CONSTANTS =======================================
 readonly REPOS_DIR="$(pwd -P)/repos"
 readonly QUICKGO_REPO="QuickGOBE"
