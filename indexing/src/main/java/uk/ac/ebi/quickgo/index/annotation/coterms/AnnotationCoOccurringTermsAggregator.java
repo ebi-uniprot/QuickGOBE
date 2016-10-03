@@ -123,8 +123,8 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      */
     private void increaseCountsForTermsInBatch() {
 
-        for (String termId : geneProductBatch.termsInBatch) {
-            overlapMatrix.incrementCountForCo_occurringTerms(termId, geneProductBatch.termsInBatch);
+        for (String termId : geneProductBatch.terms) {
+            overlapMatrix.incrementCountForCo_occurringTerms(termId, geneProductBatch.terms);
             termGPCount.incrementGeneProductCountForTerm(termId);
         }
     }
@@ -138,17 +138,17 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
 class GeneProductBatch {
 
     //A set of all terms encountered for a Gene Product. Therefore all these terms are co-occurring with each other.
-    final Set<String> termsInBatch;
+    final Set<String> terms;
 
     //The input file has annotations in gene product order, so we use this value to note changes in gene product.
     private String currentGeneProduct;
 
     public GeneProductBatch() {
-        termsInBatch = new HashSet<>();
+        terms = new HashSet<>();
     }
 
     private void add(String goId) {
-        termsInBatch.add(goId);
+        terms.add(goId);
     }
 
     /**
