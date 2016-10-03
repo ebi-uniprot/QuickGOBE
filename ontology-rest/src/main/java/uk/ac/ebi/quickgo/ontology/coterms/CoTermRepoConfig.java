@@ -1,4 +1,8 @@
-package uk.ac.ebi.quickgo.ontology.common.coterm;
+package uk.ac.ebi.quickgo.ontology.coterms;
+
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermLoader;
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermRepository;
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermRepositorySimpleMap;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +23,6 @@ public class CoTermRepoConfig {
 
     @Value("${coterm.file.all}")
     private Resource allResource;
-
-
 
     @Bean
     public CoTermRepository coTermRepository(){
