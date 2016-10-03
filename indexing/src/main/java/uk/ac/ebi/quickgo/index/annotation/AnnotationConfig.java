@@ -62,23 +62,23 @@ public class AnnotationConfig {
     static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
     static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
     @Autowired
-    AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsManual;
+    AnnotationCoOccurringTermsAggregator coTermsManualAggregator;
     @Autowired
-    AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsAll;
+    AnnotationCoOccurringTermsAggregator coTermsAllAggregator;
     @Autowired
-    ItemProcessor<String, List<Co_occurringTerm>> co_occurringTermsStatsCalculatorManual;
+    ItemProcessor<String, List<Co_occurringTerm>> coTermsManualCalculator;
     @Autowired
-    ItemProcessor<String, List<Co_occurringTerm>> co_occurringTermsStatsCalculatorAll;
+    ItemProcessor<String, List<Co_occurringTerm>> coTermsAllCalculator;
     @Autowired
-    ItemReader<String> coStatsManualItemReader;
+    ItemReader<String> coTermsManualReader;
     @Autowired
-    ItemWriter<List<Co_occurringTerm>> coStatManualFlatFileWriter;
+    ItemWriter<List<Co_occurringTerm>> coTermsManualWriter;
     @Autowired
-    ItemReader<String> coStatsAllItemReader;
+    ItemReader<String> coTermsAllReader;
+    @Autowired
+    ItemWriter<List<Co_occurringTerm>> coTermsAllWriter;
     @Autowired
     StepExecutionListener coTermsStepExecutionListener;
-    @Autowired
-    ItemWriter<List<Co_occurringTerm>> coStatsAllFlatFileWriter;
     @Value("${indexing.annotation.source}")
     private Resource[] resources;
     @Value("${indexing.annotation.chunk.size:500}")
@@ -137,9 +137,9 @@ public class AnnotationConfig {
     public Step coStatsManualSummarizationStep() {
         return stepBuilders.get(COSTATS_MANUAL_COMPLETION_STEP_NAME)
                 .<String, List<Co_occurringTerm>>chunk(cotermsChunk)
-                .reader(coStatsManualItemReader)
-                .processor(co_occurringTermsStatsCalculatorManual)
-                .writer(coStatManualFlatFileWriter)
+                .reader(coTermsManualReader)
+                .processor(coTermsManualCalculator)
+                .writer(coTermsManualWriter)
                 .listener(logStepListener())
                 .listener(logWriteRateListener(1000))
                 .listener(skipLogListener())
@@ -150,9 +150,9 @@ public class AnnotationConfig {
     public Step coStatsAllSummarizationStep() {
         return stepBuilders.get(COSTATS_ALL_COMPLETION_STEP_NAME)
                 .<String, List<Co_occurringTerm>>chunk(cotermsChunk)
-                .reader(coStatsAllItemReader)
-                .processor(co_occurringTermsStatsCalculatorAll)
-                .writer(coStatsAllFlatFileWriter)
+                .reader(coTermsAllReader)
+                .processor(coTermsAllCalculator)
+                .writer(coTermsAllWriter)
                 .listener(logStepListener())
                 .listener(logWriteRateListener(1000))
                 .listener(skipLogListener())
@@ -249,8 +249,8 @@ public class AnnotationConfig {
         CompositeItemWriter<AnnotationDocument> compositeItemWriter = new CompositeItemWriter<>();
         List<ItemWriter<? super AnnotationDocument>> writerList = new ArrayList<>();
         writerList.add(annotationSolrServerWriter());
-        writerList.add(co_occurringGoTermsFromAnnotationsManual);
-        writerList.add(co_occurringGoTermsFromAnnotationsAll);
+        writerList.add(coTermsManualAggregator);
+        writerList.add(coTermsAllAggregator);
 
         compositeItemWriter.setDelegates(writerList);
         return compositeItemWriter;

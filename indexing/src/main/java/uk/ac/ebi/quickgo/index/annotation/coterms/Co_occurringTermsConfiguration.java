@@ -41,58 +41,58 @@ public class Co_occurringTermsConfiguration {
     private Resource all;
 
     @Bean
-    public AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsManual() {
+    public AnnotationCoOccurringTermsAggregator coTermsManualAggregator() {
         return new AnnotationCoOccurringTermsAggregator(t -> !"IEA".equals(t.goEvidence));
     }
 
     @Bean
-    public AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsAll() {
+    public AnnotationCoOccurringTermsAggregator coTermsAllAggregator() {
         return new AnnotationCoOccurringTermsAggregator(t -> true);
     }
 
     @Bean
     public StepExecutionListener coTermsEndOfAggregationListener(
-            AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsManual,
-            AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsAll,
-            Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual,
-            Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll) {
-        return new Co_occurringTermsStepExecutionListener(co_occurringGoTermsFromAnnotationsManual,
-                co_occurringGoTermsFromAnnotationsAll, co_occurringTermsStatsCalculatorManual,
-                co_occurringTermsStatsCalculatorAll);
+            AnnotationCoOccurringTermsAggregator coTermsManualAggregator,
+            AnnotationCoOccurringTermsAggregator coTermsAllAggregator,
+            Co_occurringTermsStatsCalculator coTermsManualCalculator,
+            Co_occurringTermsStatsCalculator coTermsAllCalculator) {
+        return new Co_occurringTermsStepExecutionListener(coTermsManualAggregator,
+                coTermsAllAggregator, coTermsManualCalculator,
+                coTermsAllCalculator);
 
     }
 
     @Bean
-    public Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual(
-            AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsManual) {
-        return new Co_occurringTermsStatsCalculator(co_occurringGoTermsFromAnnotationsManual);
+    public Co_occurringTermsStatsCalculator coTermsManualCalculator(
+            AnnotationCoOccurringTermsAggregator coTermsManualAggregator) {
+        return new Co_occurringTermsStatsCalculator(coTermsManualAggregator);
     }
 
     @Bean
-    public Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll(
-            AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsAll) {
-        return new Co_occurringTermsStatsCalculator(co_occurringGoTermsFromAnnotationsAll);
+    public Co_occurringTermsStatsCalculator coTermsAllCalculator(
+            AnnotationCoOccurringTermsAggregator coTermsAllAggregator) {
+        return new Co_occurringTermsStatsCalculator(coTermsAllAggregator);
     }
 
     @Bean
-    public ItemReader<String> coStatsManualItemReader(
-            AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsManual) {
-        return new Co_occurringTermItemReader(co_occurringGoTermsFromAnnotationsManual);
+    public ItemReader<String> coTermsManualReader(
+            AnnotationCoOccurringTermsAggregator coTermsManualAggregator) {
+        return new Co_occurringTermItemReader(coTermsManualAggregator);
     }
 
     @Bean
-    public ItemReader<String> coStatsAllItemReader(
-            AnnotationCoOccurringTermsAggregator co_occurringGoTermsFromAnnotationsAll) {
-        return new Co_occurringTermItemReader(co_occurringGoTermsFromAnnotationsAll);
+    public ItemReader<String> coTermsAllReader(
+            AnnotationCoOccurringTermsAggregator coTermsAllAggregator) {
+        return new Co_occurringTermItemReader(coTermsAllAggregator);
     }
 
     @Bean
-    ItemWriter<List<Co_occurringTerm>> coStatManualFlatFileWriter() {
+    ItemWriter<List<Co_occurringTerm>> coTermsManualWriter() {
         return listItemFlatFileWriter(manual);
     }
 
     @Bean
-    ItemWriter<List<Co_occurringTerm>> coStatsAllFlatFileWriter() {
+    ItemWriter<List<Co_occurringTerm>> coTermsAllWriter() {
         return listItemFlatFileWriter(all);
     }
 
