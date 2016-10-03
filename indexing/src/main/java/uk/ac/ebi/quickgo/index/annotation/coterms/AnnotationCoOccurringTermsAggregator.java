@@ -90,9 +90,9 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      * Add the data in an AnnotationDocument instance to the aggregation.
      * The documents are processed by this class in the gene product order.
      * So the first thing to do is check if this doc has a previously unseen gene product id.
-     * If it doesn't we use the existing aggregation object (provideBatch instance) to aggregate too.
-     * If it is a new gene product the we have a new provideBatch instance created.
-     * Add the data in this document to the target provideBatch.
+     * If it doesn't we use the existing aggregation object (newOrExistingBatch instance) to aggregate too.
+     * If it is a new gene product the we have a new newOrExistingBatch instance created.
+     * Add the data in this document to the target newOrExistingBatch.
      * Add the gene product id to the list of geneproduct ids that have been processed (we need a list of all gene
      * products processed for the statistics calculations at the end of the calculation.
      *
@@ -100,7 +100,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
      */
     private void writeItem(AnnotationDocument doc) {
 
-        GeneProductBatch tb2 = geneProductBatch.provideBatch(doc);
+        GeneProductBatch tb2 = geneProductBatch.newOrExistingBatch(doc);
         if (tb2 != geneProductBatch) {
             increaseCountsForTermsInBatch();
             geneProductBatch = tb2;
@@ -157,7 +157,7 @@ class GeneProductBatch {
      * @param doc
      * @return
      */
-    GeneProductBatch provideBatch(AnnotationDocument doc) {
+    GeneProductBatch newOrExistingBatch(AnnotationDocument doc) {
 
         if (geneProduct == null) {
             geneProduct = doc.geneProductId;
