@@ -72,11 +72,9 @@ public abstract class OBOController<T extends OBOTerm> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
 
-    private static final String COMMA = ",";
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
-    public static final String PNG = "png";
 
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
@@ -392,7 +390,7 @@ public abstract class OBOController<T extends OBOTerm> {
                         .getGraphImage()
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(renderedImage, PNG, os);
+        ImageIO.write(renderedImage, "png", os);
         InputStream is = new ByteArrayInputStream(os.toByteArray());
 
         return ResponseEntity

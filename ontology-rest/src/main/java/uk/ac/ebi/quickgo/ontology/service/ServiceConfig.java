@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Import;
 @Import({OntologyRepoConfig.class, OntologyGraphConfig.class})
 public class ServiceConfig {
     @Value("${graphics.ontology.source}")
-    private String sourceFile;
+    private File sourceFile;
 
     @Bean
     public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository,
@@ -67,7 +67,7 @@ public class ServiceConfig {
 
     @Bean
     public OntologyGraphicsSourceLoader ontologyGraphicsSourceLoader() {
-        return new OntologyGraphicsSourceLoader(new File(sourceFile));
+        return new OntologyGraphicsSourceLoader(sourceFile);
     }
 
     private GODocConverter goDocumentConverter() {
