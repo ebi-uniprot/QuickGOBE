@@ -29,9 +29,9 @@ import org.springframework.core.io.Resource;
  * Created with IntelliJ IDEA.
  */
 @Configuration
-public class Co_occurringTermsConfig {
+public class CoTermsConfig {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsConfig.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(CoTermsConfig.class);
 
     public static final String COSTATS_MANUAL_COMPLETION_STEP_NAME = "costatsManualSummarizationStep";
     public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
