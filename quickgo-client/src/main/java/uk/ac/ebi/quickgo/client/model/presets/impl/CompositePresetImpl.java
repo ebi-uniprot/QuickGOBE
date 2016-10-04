@@ -94,42 +94,49 @@ public class CompositePresetImpl implements CompositePreset {
                         PresetItem::getName,
                         mapping(p -> p, Collectors.toList())))
                 .entrySet().stream()
-                .map(groupedEntry -> {
-                    PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
-
-                    ifPresetItemMatchesThenApply(groupedEntry.getValue(),
-                            p -> p != null && p.getRelevancy() != 0,
-                            p -> presetBuilder.withRelevancy(p.getRelevancy()));
-
-                    ifPresetItemMatchesThenApply(groupedEntry.getValue(),
-                            p -> p.getDescription() != null && !p.getDescription().trim().isEmpty(),
-                            p -> presetBuilder.withDescription(p.getDescription()));
-
-                    ifPresetItemMatchesThenApply(groupedEntry.getValue(),
-                            p -> p.getUrl() != null && !p.getUrl().trim().isEmpty(),
-                            p -> presetBuilder.withUrl(p.getUrl()));
-
-                    if (presetType == GO_SLIMS_SETS) {
-                        presetBuilder.withAssociations(groupedEntry.getValue().stream()
-                                .map(PresetItem::getId)
-                                .collect(Collectors.toList()));
-                    } else {
-                        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
-                                p -> p.getId() != null && !p.getId().trim().isEmpty(),
-                                p -> presetBuilder.withId(p.getId()));
-                    }
-
-                    return presetBuilder.build();
-                })
-                .sorted((p1, p2) -> {
-                    int relevancyComparison = p1.getRelevancy().compareTo(p2.getRelevancy());
-                    if (relevancyComparison != 0) {
-                        return relevancyComparison;
-                    } else {
-                        return p1.getName().compareTo(p2.getName());
-                    }
-                })
+                .map(groupedEntry -> transformGroupedEntryToPresetItem(presetType, groupedEntry))
+                .sorted(sortByRelevancyThenName())
                 .collect(Collectors.toList());
+    }
+
+    private Comparator<PresetItem> sortByRelevancyThenName() {
+        return (p1, p2) -> {
+            int relevancyComparison = p1.getRelevancy().compareTo(p2.getRelevancy());
+            if (relevancyComparison != 0) {
+                return relevancyComparison;
+            } else {
+                return p1.getName().compareTo(p2.getName());
+            }
+        };
+    }
+
+    private PresetItem transformGroupedEntryToPresetItem(PresetType presetType,
+            Map.Entry<String, List<PresetItem>> groupedEntry) {
+        PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
+
+        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                p -> p != null && p.getRelevancy() != 0,
+                p -> presetBuilder.withRelevancy(p.getRelevancy()));
+
+        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                p -> p.getDescription() != null && !p.getDescription().trim().isEmpty(),
+                p -> presetBuilder.withDescription(p.getDescription()));
+
+        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                p -> p.getUrl() != null && !p.getUrl().trim().isEmpty(),
+                p -> presetBuilder.withUrl(p.getUrl()));
+
+        if (presetType == GO_SLIMS_SETS) {
+            presetBuilder.withAssociations(groupedEntry.getValue().stream()
+                    .map(PresetItem::getId)
+                    .collect(Collectors.toList()));
+        } else {
+            ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                    p -> p.getId() != null && !p.getId().trim().isEmpty(),
+                    p -> presetBuilder.withId(p.getId()));
+        }
+
+        return presetBuilder.build();
     }
 
     /**
