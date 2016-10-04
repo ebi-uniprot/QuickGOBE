@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 
 import java.util.List;
+import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepExecutionListener;
@@ -31,6 +32,10 @@ import org.springframework.core.io.Resource;
 @Configuration
 public class CoTermsConfig {
 
+    public static final String ELECTRONIC = "IEA";
+    public static final Predicate<AnnotationDocument>
+            EXCLUDE_ANNOTATIONS_PRODUCED_BY_ELECTRONIC_MEANS = annotationDocument -> !ELECTRONIC.equals(annotationDocument.goEvidence);
+    public static final Predicate<AnnotationDocument> INCLUDE_ALL_ANNOTATIONS = annotationDocument -> true;
     private final Logger LOGGER = LoggerFactory.getLogger(CoTermsConfig.class);
 
     public static final String COTERM_MANUAL_COMPLETION_STEP_NAME = "coTermManualSummarizationStep";
@@ -47,12 +52,12 @@ public class CoTermsConfig {
 
     @Bean
     public ItemWriter<AnnotationDocument> coTermsManualAggregationWriter() {
-        return new CoTermsAggregator(t -> !"IEA".equals(t.goEvidence));
+        return new CoTermsAggregator(EXCLUDE_ANNOTATIONS_PRODUCED_BY_ELECTRONIC_MEANS);
     }
 
     @Bean
     public ItemWriter<AnnotationDocument> coTermsAllAggregationWriter() {
-        return new CoTermsAggregator(t -> true);
+        return new CoTermsAggregator(INCLUDE_ALL_ANNOTATIONS);
     }
 
     @Bean
