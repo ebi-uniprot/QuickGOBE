@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Import;
 @ComponentScan({"uk.ac.ebi.quickgo.ontology.service, uk.ac.ebi.quickgo.graphics.service"})
 @Import({OntologyRepoConfig.class, OntologyGraphConfig.class})
 public class ServiceConfig {
-    @Value("${graphics.ontology.source}")
+    @Value("${graphics.ontology.source:.}")
     private File sourceFile;
 
     @Bean

@@ -27,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -684,6 +685,9 @@ public abstract class OBOControllerIT {
                 get(buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE)));
 
         response.andExpect(status().isOk());
+
+        MvcResult result = response.andReturn();
+        assertThat(result.getResponse().getContentLength(), is(greaterThan(0)));
     }
 
     @Test
