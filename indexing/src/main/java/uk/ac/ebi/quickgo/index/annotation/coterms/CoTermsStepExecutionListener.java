@@ -17,24 +17,24 @@ import org.springframework.batch.item.ItemWriter;
  * Time: 15:01
  * Created with IntelliJ IDEA.
  */
-class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
+class CoTermsStepExecutionListener implements StepExecutionListener {
 
     // logger
-    private static final Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsStepExecutionListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger( CoTermsStepExecutionListener.class);
 
     private final ItemWriter<AnnotationDocument> all;
     private final ItemWriter<AnnotationDocument> manual;
-    private final CoTermsStatsCalculator co_TermsStatsCalculatorManual;
-    private final CoTermsStatsCalculator co_TermsStatsCalculatorAll;
+    private final StatisticsCalculator statisticsCalculatorManual;
+    private final StatisticsCalculator statisticsCalculatorAll;
 
-    public Co_occurringTermsStepExecutionListener(ItemWriter<AnnotationDocument> all,
+    public CoTermsStepExecutionListener(ItemWriter<AnnotationDocument> all,
             ItemWriter<AnnotationDocument> manual,
-            CoTermsStatsCalculator co_TermsStatsCalculatorManual,
-            CoTermsStatsCalculator co_TermsStatsCalculatorAll) {
+            StatisticsCalculator statisticsCalculatorManual,
+            StatisticsCalculator statisticsCalculatorAll) {
         this.all = all;
         this.manual = manual;
-        this.co_TermsStatsCalculatorManual = co_TermsStatsCalculatorManual;
-        this.co_TermsStatsCalculatorAll = co_TermsStatsCalculatorAll;
+        this.statisticsCalculatorManual = statisticsCalculatorManual;
+        this.statisticsCalculatorAll = statisticsCalculatorAll;
     }
 
     @Override
@@ -49,10 +49,10 @@ class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
      */
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        ((AnnotationCoOccurringTermsAggregator)all).finish();
-        ((AnnotationCoOccurringTermsAggregator)manual).finish();
-        co_TermsStatsCalculatorManual.initialize();
-        co_TermsStatsCalculatorAll.initialize();
+        ((CoTermsAggregator)all).finish();
+        ((CoTermsAggregator)manual).finish();
+        statisticsCalculatorManual.initialize();
+        statisticsCalculatorAll.initialize();
         return stepExecution.getExitStatus();
     }
 }

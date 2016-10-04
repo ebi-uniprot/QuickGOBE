@@ -23,8 +23,8 @@ class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
 
     private final Logger LOGGER = LoggerFactory.getLogger(FlatFileItemWriter.class);
 
-    public ListItemWriter(FlatFileItemWriter<T> coOccurringTermItemWriter) {
-        wrapped = coOccurringTermItemWriter;
+    public ListItemWriter(FlatFileItemWriter<T> coTermItemWriter) {
+        wrapped = coTermItemWriter;
     }
 
     @Override public void write(List<? extends List<T>> list) throws Exception {

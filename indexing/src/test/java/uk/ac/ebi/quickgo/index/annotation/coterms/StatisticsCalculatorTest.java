@@ -11,11 +11,11 @@ import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.createMatrix;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.df1;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.df2;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.makeGpCountForTerm;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.makeTermList;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.createMatrix;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.df1;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.df2;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.makeGpCountForTerm;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.makeTermList;
 
 
 /**
@@ -32,17 +32,17 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermMocker.
  * all  = 2;     // Total number of unique gene products annotated by selected term
  */
 @RunWith(MockitoJUnitRunner.class)
-public class Co_occurringTermsStatsCalculatorTest {
+public class StatisticsCalculatorTest {
 
     @Mock
-    AnnotationCoOccurringTermsAggregator aggregator;
+    CoTermsAggregator aggregator;
 
 	@Test
 	public void calculateStatisticsSingleGoTermComparedWithItself(){
         long geneProductCount = 2l;
         final String goTerm = "GO:0003824";
 
-        Map<String, Map<String, AtomicLong>> matrix = Co_occurringTermMocker.singleEntry();
+        Map<String, Map<String, AtomicLong>> matrix = CoTermMocker.singleEntry();
         Map<String, AtomicLong> termGpCount = new HashMap<>();
         termGpCount.put(goTerm, new AtomicLong(2));
 
@@ -50,9 +50,9 @@ public class Co_occurringTermsStatsCalculatorTest {
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
-        CoTermsStatsCalculator coTermsCalculator = new CoTermsStatsCalculator(aggregator);
+        StatisticsCalculator coTermsCalculator = new StatisticsCalculator(aggregator);
         coTermsCalculator.initialize();
-        List<Co_occurringTerm> results = coTermsCalculator.process(goTerm);
+        List<CoTerm> results = coTermsCalculator.process(goTerm);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getTarget(), is(goTerm));
@@ -82,9 +82,9 @@ public class Co_occurringTermsStatsCalculatorTest {
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
-        CoTermsStatsCalculator coTermsCalculator = new CoTermsStatsCalculator(aggregator);
+        StatisticsCalculator coTermsCalculator = new StatisticsCalculator(aggregator);
         coTermsCalculator.initialize();
-        List<Co_occurringTerm> results = coTermsCalculator.process(selected);
+        List<CoTerm> results = coTermsCalculator.process(selected);
         assertThat(results, hasSize(1));
 
         assertThat(results.get(0).getTarget(), is("GO:0000001"));
@@ -114,9 +114,9 @@ public class Co_occurringTermsStatsCalculatorTest {
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
-        CoTermsStatsCalculator coTermsCalculator = new CoTermsStatsCalculator(aggregator);
+        StatisticsCalculator coTermsCalculator = new StatisticsCalculator(aggregator);
         coTermsCalculator.initialize();
-        List<Co_occurringTerm> results = coTermsCalculator.process(selectedList.get(0));
+        List<CoTerm> results = coTermsCalculator.process(selectedList.get(0));
 
         assertThat(results, hasSize(2));
 
@@ -140,13 +140,13 @@ public class Co_occurringTermsStatsCalculatorTest {
         long geneProductCount = 2l;
         final String goTerm = "GO:0003824";
 
-        Map<String, Map<String, AtomicLong>> matrix = Co_occurringTermMocker.singleEntry();
+        Map<String, Map<String, AtomicLong>> matrix = CoTermMocker.singleEntry();
         Map<String, AtomicLong> termGpCount = new HashMap<>();
         termGpCount.put(goTerm, new AtomicLong(2));
 
-        CoTermsStatsCalculator
-                coOccurringTermsStatsCalculator = new CoTermsStatsCalculator(aggregator);
-        coOccurringTermsStatsCalculator.process(null);
+        StatisticsCalculator
+                calculator = new StatisticsCalculator(aggregator);
+        calculator.process(null);
 
     }
 

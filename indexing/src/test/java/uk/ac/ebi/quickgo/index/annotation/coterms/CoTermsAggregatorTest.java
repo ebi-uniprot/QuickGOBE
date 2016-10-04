@@ -22,13 +22,13 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
  * Time: 16:26
  * Created with IntelliJ IDEA.
  */
-public class AnnotationCoOccurringTermsAggregatorTest {
+public class CoTermsAggregatorTest {
 
-    AnnotationCoOccurringTermsAggregator aggregator;
+    CoTermsAggregator aggregator;
 
     @Before
     public void setup(){
-        aggregator = new AnnotationCoOccurringTermsAggregator(t -> true);
+        aggregator = new CoTermsAggregator(t -> true);
     }
 
 	@Test
@@ -133,7 +133,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 
         AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
         AnnotationDocument annotation2 = AnnotationDocMocker.createAnnotationDoc("A0A000");
-        AnnotationCoOccurringTermsAggregator aggregatorFalse = new AnnotationCoOccurringTermsAggregator(t -> false);
+        CoTermsAggregator aggregatorFalse = new CoTermsAggregator(t -> false);
         List<AnnotationDocument> docs = Arrays.asList(annotation1, annotation2);
         aggregator.write(docs);
         aggregator.finish();
@@ -156,7 +156,7 @@ public class AnnotationCoOccurringTermsAggregatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfNullPredicatePassedToConstructor() {
-        new AnnotationCoOccurringTermsAggregator(null);
+        new CoTermsAggregator(null);
     }
 
 }

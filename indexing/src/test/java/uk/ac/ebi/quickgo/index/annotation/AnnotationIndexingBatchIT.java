@@ -27,8 +27,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_JOB_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_STEP_NAME;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.COSTATS_ALL_COMPLETION_STEP_NAME;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.COSTATS_MANUAL_COMPLETION_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.COTERM_ALL_COMPLETION_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.COTERM_MANUAL_COMPLETION_STEP_NAME;
 
 /**
  * Tests whether Spring Batch is correctly wired up to run the annotation indexing.
@@ -83,7 +83,7 @@ public class AnnotationIndexingBatchIT {
         //Manual CoStats
         List<StepExecution> jobsSingleStepCoStatsManual = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals (COSTATS_MANUAL_COMPLETION_STEP_NAME))
+                .filter(step -> step.getStepName().equals (COTERM_MANUAL_COMPLETION_STEP_NAME))
                 .collect(Collectors.toList());
         assertThat(jobsSingleStepCoStatsManual, hasSize(1));
         StepExecution coTermsManualStep = jobsSingleStepCoStatsManual.get(0);
@@ -95,7 +95,7 @@ public class AnnotationIndexingBatchIT {
         //All Costats
         List<StepExecution> jobsSingleStepCoStatsAll = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals (COSTATS_ALL_COMPLETION_STEP_NAME))
+                .filter(step -> step.getStepName().equals (COTERM_ALL_COMPLETION_STEP_NAME))
                 .collect(Collectors.toList());
         assertThat(jobsSingleStepCoStatsAll, hasSize(1));
         StepExecution coTermsAllStep = jobsSingleStepCoStatsAll.get(0);

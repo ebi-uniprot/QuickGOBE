@@ -20,10 +20,10 @@ import static org.mockito.Mockito.when;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class Co_occurringTermsForSelectedTermTest {
+public class Co_TermsForSelectedTermTest {
 
     @Mock
-    Co_occurringTerm coOccurringTerm;
+    CoTerm coTerm;
 
     @Test
     public void testCalculationCalledOnAllTerms(){
@@ -32,18 +32,18 @@ public class Co_occurringTermsForSelectedTermTest {
         float totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
 
-        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
 
-        cootfst.addAndCalculate(coOccurringTerm);
-        cootfst.addAndCalculate(coOccurringTerm);
-        cootfst.addAndCalculate(coOccurringTerm);
-        cootfst.addAndCalculate(coOccurringTerm);
+        cootfst.addAndCalculate(coTerm);
+        cootfst.addAndCalculate(coTerm);
+        cootfst.addAndCalculate(coTerm);
+        cootfst.addAndCalculate(coTerm);
 
-        verify(coOccurringTerm, times(4)).calculateProbabilityRatio(2f,10f);
-        verify(coOccurringTerm, times(4)).calculateProbabilitySimilarityRatio(2f);
+        verify(coTerm, times(4)).calculateProbabilityRatio(2f,10f);
+        verify(coTerm, times(4)).calculateProbabilitySimilarityRatio(2f);
 
-       Iterator<Co_occurringTerm> it = cootfst.highestSimilarity();
+       Iterator<CoTerm> it = cootfst.highestSimilarity();
         int itCounter = 0;
         while(it.hasNext()){
             it.next();
@@ -60,13 +60,13 @@ public class Co_occurringTermsForSelectedTermTest {
         float totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
 
-        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
 
-        Co_occurringTerm mock1 = mock(Co_occurringTerm.class, "One");
-        Co_occurringTerm mock2 = mock(Co_occurringTerm.class, "Two");
-        Co_occurringTerm mock3 = mock(Co_occurringTerm.class, "Three");
-        Co_occurringTerm mock4 = mock(Co_occurringTerm.class, "Four");
+        CoTerm mock1 = mock(CoTerm.class, "One");
+        CoTerm mock2 = mock(CoTerm.class, "Two");
+        CoTerm mock3 = mock(CoTerm.class, "Three");
+        CoTerm mock4 = mock(CoTerm.class, "Four");
 
         cootfst.addAndCalculate(mock1);
         cootfst.addAndCalculate(mock2);
@@ -78,7 +78,7 @@ public class Co_occurringTermsForSelectedTermTest {
         when(mock3.getSimilarityRatio()).thenReturn(5f);
         when(mock4.getSimilarityRatio()).thenReturn(1f);
 
-        Iterator<Co_occurringTerm> it = cootfst.highestSimilarity();
+        Iterator<CoTerm> it = cootfst.highestSimilarity();
 
         assertThat(it.next().getSimilarityRatio(), is(5f));
         assertThat(it.next().getSimilarityRatio(), is(3f));
@@ -95,7 +95,7 @@ public class Co_occurringTermsForSelectedTermTest {
         float totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
 
-        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
 
         cootfst.addAndCalculate(null);
@@ -106,7 +106,7 @@ public class Co_occurringTermsForSelectedTermTest {
         String target = null;
         float totalNumberGeneProducts = 10;
         long selected = 2;
-        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
     }
 
@@ -115,7 +115,7 @@ public class Co_occurringTermsForSelectedTermTest {
         String target = "GO:00003824";
         float totalNumberGeneProducts = 0;
         long selected = 2;
-        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
     }
 
@@ -124,7 +124,7 @@ public class Co_occurringTermsForSelectedTermTest {
         String target = "GO:00003824";
         float totalNumberGeneProducts = 10;
         long selected = 0;
-        Co_occurringTermsForSelectedTerm cootfst = new Co_occurringTermsForSelectedTerm(target,
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
                 totalNumberGeneProducts, selected);
     }
 }

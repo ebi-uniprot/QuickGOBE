@@ -11,7 +11,7 @@ import java.text.DecimalFormat;
  * @author twardell
  *
  */
-public class Co_occurringTerm {
+public class CoTerm {
 
     private final String target;
     private final String comparedTerm;
@@ -27,7 +27,7 @@ public class Co_occurringTerm {
      * @param compared Count of proteins where compared term is annotated
      * @param together Count of proteins where both target and compared terms are annotated
      */
-    private Co_occurringTerm(String target, String comparedTerm, long compared, long together) {
+    private CoTerm(String target, String comparedTerm, long compared, long together) {
         this.target = target;
         this.comparedTerm = comparedTerm;
         this.compared = compared;
@@ -44,7 +44,7 @@ public class Co_occurringTerm {
     public void calculateProbabilitySimilarityRatio(float selected) {
 
         Preconditions
-                .checkArgument(selected != 0, "Co_occurringTerm::calculateProbabilitySimilarityRatio The value for" +
+                .checkArgument(selected != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
                         " selected should not be zero");
 
         DecimalFormat twoDForm = new DecimalFormat("#.##");
@@ -65,9 +65,9 @@ public class Co_occurringTerm {
      */
     public float calculateProbabilityRatio(float selected, float all) {
 
-        Preconditions.checkArgument(selected != 0, "Co_occurringTerm::calculateProbabilityRatio The value for selected" +
+        Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilityRatio The value for selected" +
                 " should not be zero");
-        Preconditions.checkArgument(all != 0, "Co_occurringTerm::calculateProbabilityRatio The value for all" +
+        Preconditions.checkArgument(all != 0, "CoTerm::calculateProbabilityRatio The value for all" +
                 " should not be zero");
 
         DecimalFormat twoDForm = new DecimalFormat("#.##");
@@ -132,7 +132,7 @@ public class Co_occurringTerm {
             return false;
         }
 
-        Co_occurringTerm that = (Co_occurringTerm) o;
+        CoTerm that = (CoTerm) o;
 
         if (together != that.together) {
             return false;
@@ -156,34 +156,34 @@ public class Co_occurringTerm {
     @Override public int hashCode() {
         return target.hashCode();
     }
-    public static class Co_occurringTermBuilder {
+    public static class Builder {
         private String target;
         private String comparedTerm;
         private long compared;
         private long together;
 
-        public Co_occurringTermBuilder setTarget(String target) {
+        public Builder setTarget(String target) {
             this.target = target;
             return this;
         }
 
-        public Co_occurringTermBuilder setComparedTerm(String comparedTerm) {
+        public Builder setComparedTerm(String comparedTerm) {
             this.comparedTerm = comparedTerm;
             return this;
         }
 
-        public Co_occurringTermBuilder setCompared(long compared) {
+        public Builder setCompared(long compared) {
             this.compared = compared;
             return this;
         }
 
-        public Co_occurringTermBuilder setTogether(long together) {
+        public Builder setTogether(long together) {
             this.together = together;
             return this;
         }
 
-        public Co_occurringTerm createCo_occurringTerm() {
-            return new Co_occurringTerm(target, comparedTerm, compared, together);
+        public CoTerm createCoTerm() {
+            return new CoTerm(target, comparedTerm, compared, together);
         }
     }
 

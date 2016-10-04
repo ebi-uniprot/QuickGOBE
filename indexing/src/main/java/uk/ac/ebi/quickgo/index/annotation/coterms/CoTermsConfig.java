@@ -33,8 +33,8 @@ public class CoTermsConfig {
 
     private final Logger LOGGER = LoggerFactory.getLogger(CoTermsConfig.class);
 
-    public static final String COSTATS_MANUAL_COMPLETION_STEP_NAME = "costatsManualSummarizationStep";
-    public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
+    public static final String COTERM_MANUAL_COMPLETION_STEP_NAME = "coTermManualSummarizationStep";
+    public static final String COTERM_ALL_COMPLETION_STEP_NAME = "cosTermAllSummarizationStep";
     private static final String[] FF_COL_NAMES = {"target", "comparedTerm", "probabilityRatio", "similarityRatio",
             "together", "compared"};
     private static final String DELIMITER = "\t";
@@ -47,85 +47,85 @@ public class CoTermsConfig {
 
     @Bean
     public ItemWriter<AnnotationDocument> coTermsManualAggregationWriter() {
-        return new AnnotationCoOccurringTermsAggregator(t -> !"IEA".equals(t.goEvidence));
+        return new CoTermsAggregator(t -> !"IEA".equals(t.goEvidence));
     }
 
     @Bean
     public ItemWriter<AnnotationDocument> coTermsAllAggregationWriter() {
-        return new AnnotationCoOccurringTermsAggregator(t -> true);
+        return new CoTermsAggregator(t -> true);
     }
 
     @Bean
     public StepExecutionListener coTermsEndOfAggregationListener(
             ItemWriter<AnnotationDocument> coTermsManualAggregationWriter,
             ItemWriter<AnnotationDocument> coTermsAllAggregationWriter,
-            CoTermsStatsCalculator coTermsManualCalculator,
-            CoTermsStatsCalculator coTermsAllCalculator) {
-        return new Co_occurringTermsStepExecutionListener(coTermsManualAggregationWriter,
+            StatisticsCalculator coTermsManualCalculator,
+            StatisticsCalculator coTermsAllCalculator) {
+        return new CoTermsStepExecutionListener(coTermsManualAggregationWriter,
                 coTermsAllAggregationWriter, coTermsManualCalculator,
                 coTermsAllCalculator);
 
     }
 
     @Bean
-    public CoTermsStatsCalculator coTermsManualCalculator(
+    public StatisticsCalculator coTermsManualCalculator(
             ItemWriter<AnnotationDocument> coTermsManualAggregationWriter) {
-        return new CoTermsStatsCalculator(coTermsManualAggregationWriter);
+        return new StatisticsCalculator(coTermsManualAggregationWriter);
     }
 
     @Bean
-    public CoTermsStatsCalculator coTermsAllCalculator(
+    public StatisticsCalculator coTermsAllCalculator(
             ItemWriter<AnnotationDocument> coTermsAllAggregationWriter) {
-        return new CoTermsStatsCalculator(coTermsAllAggregationWriter);
+        return new StatisticsCalculator(coTermsAllAggregationWriter);
     }
 
     @Bean
     public ItemReader<String> coTermsManualReader(
             ItemWriter<AnnotationDocument> coTermsManualAggregationWriter) {
-        return new Co_occurringTermItemReader(coTermsManualAggregationWriter);
+        return new CoTermItemReader(coTermsManualAggregationWriter);
     }
 
     @Bean
     public ItemReader<String> coTermsAllReader(
             ItemWriter<AnnotationDocument> coTermsAllAggregationWriter) {
-        return new Co_occurringTermItemReader(coTermsAllAggregationWriter);
+        return new CoTermItemReader(coTermsAllAggregationWriter);
     }
 
     @Bean
-    ItemWriter<List<Co_occurringTerm>> coTermsManualStatsWriter() {
+    ItemWriter<List<CoTerm>> coTermsManualStatsWriter() {
         return listItemFlatFileWriter(manual);
     }
 
     @Bean
-    ItemWriter<List<Co_occurringTerm>> coTermsAllStatsWriter() {
+    ItemWriter<List<CoTerm>> coTermsAllStatsWriter() {
         return listItemFlatFileWriter(all);
     }
 
-    private ListItemWriter<Co_occurringTerm> listItemFlatFileWriter(Resource outputFile) {
-        ListItemWriter<Co_occurringTerm> listWriter = new ListItemWriter<>(flatFileWriter(outputFile));
+    private ListItemWriter<CoTerm> listItemFlatFileWriter(Resource outputFile) {
+        ListItemWriter<CoTerm> listWriter = new ListItemWriter<>(flatFileWriter(outputFile));
         listWriter.setLineAggregator(new PassThroughLineAggregator<>()); //this shouldn't do anything
         return listWriter;
     }
 
-    private FlatFileItemWriter<Co_occurringTerm> flatFileWriter(Resource outputFile) {
-        FlatFileItemWriter<Co_occurringTerm> ffw = new FlatFileItemWriter<>();
+    private FlatFileItemWriter<CoTerm> flatFileWriter(Resource outputFile) {
+        FlatFileItemWriter<CoTerm> ffw = new FlatFileItemWriter<>();
         ffw.setLineAggregator(lineAggregator());
         LOGGER.info("Write out co-occurring terms to {}", outputFile.toString());
         ffw.setResource(outputFile);
-        FlatFileHeaderCallback headerCallBack = new Co_occurringTermsFlatFileHeaderCallBack();
+        FlatFileHeaderCallback headerCallBack = new CoTermsFlatFileHeaderCallBack();
         ffw.setHeaderCallback(headerCallBack);
         return ffw;
     }
 
-    private LineAggregator<Co_occurringTerm> lineAggregator() {
-        DelimitedLineAggregator<Co_occurringTerm> delimitedLineAggregator = new DelimitedLineAggregator<>();
+    private LineAggregator<CoTerm> lineAggregator() {
+        DelimitedLineAggregator<CoTerm> delimitedLineAggregator = new DelimitedLineAggregator<>();
         delimitedLineAggregator.setDelimiter(DELIMITER);
         delimitedLineAggregator.setFieldExtractor(beanWrapperFieldExtractor());
         return delimitedLineAggregator;
     }
 
-    private BeanWrapperFieldExtractor<Co_occurringTerm> beanWrapperFieldExtractor() {
-        BeanWrapperFieldExtractor<Co_occurringTerm> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
+    private BeanWrapperFieldExtractor<CoTerm> beanWrapperFieldExtractor() {
+        BeanWrapperFieldExtractor<CoTerm> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
         beanWrapperFieldExtractor.setNames(FF_COL_NAMES);
         return beanWrapperFieldExtractor;
     }

@@ -15,13 +15,13 @@ import org.springframework.batch.item.ItemWriter;
  * Time: 15:38
  * Created with IntelliJ IDEA.
  */
-class Co_occurringTermItemReader implements ItemReader<String> {
+class CoTermItemReader implements ItemReader<String> {
 
-    private final AnnotationCoOccurringTermsAggregator aggregator;
+    private final CoTermsAggregator aggregator;
     private Iterator<String> termsIt;
 
-    public Co_occurringTermItemReader(ItemWriter<AnnotationDocument> annotationCoOccurringTermsAggregator) {
-        this.aggregator = (AnnotationCoOccurringTermsAggregator)annotationCoOccurringTermsAggregator;
+    public CoTermItemReader(ItemWriter<AnnotationDocument> annotationCoOccurringTermsAggregator) {
+        this.aggregator = (CoTermsAggregator)annotationCoOccurringTermsAggregator;
 
     }
 

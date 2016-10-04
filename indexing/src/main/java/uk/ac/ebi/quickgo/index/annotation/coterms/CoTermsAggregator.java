@@ -11,14 +11,14 @@ import org.springframework.batch.item.ItemWriter;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.GeneProductBatch.buildBatch;
 
 /**
- * Aggregates all the data need to calculate all co-occurrence stat data points.
+ * Aggregates all the data need to calculate co-occurrence statistic data points.
  *
  * @author Tony Wardell
  * Date: 26/11/2015
  * Time: 11:59
  * Created with IntelliJ IDEA.
  */
-public class AnnotationCoOccurringTermsAggregator implements ItemWriter<AnnotationDocument> {
+public class CoTermsAggregator implements ItemWriter<AnnotationDocument> {
 
     //A list of all unique geneProducts encountered - it exists so we can get a count of the total unique gene products.
     private final Set<String> geneProductList;
@@ -30,7 +30,7 @@ public class AnnotationCoOccurringTermsAggregator implements ItemWriter<Annotati
     private final CoTermMatrix coTerms;
     private final TermGPCount termGPCount;
 
-    public AnnotationCoOccurringTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
+    public CoTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
 
         Preconditions
                 .checkArgument(toBeProcessed != null, "Null predicate passed AnnotationCoOccurringTermsAggregator" +
@@ -196,15 +196,15 @@ class CoTermMatrix {
         Map<String, AtomicLong> coTerms = getCoTerms(termId);
 
         //Loop through all the terms we have encountered in this batch and update the quantities
-        for (String co_occurringTerm : termsInBatch) {
+        for (String term : termsInBatch) {
 
             //Get 'permanent' record for this termId/termId permutation
-            AtomicLong permutationCount = coTerms.get(co_occurringTerm);
+            AtomicLong permutationCount = coTerms.get(term);
 
             //Create if it doesn't exist.
             if (permutationCount == null) {
                 permutationCount = new AtomicLong();
-                coTerms.put(co_occurringTerm, permutationCount);
+                coTerms.put(term, permutationCount);
             }
 
             //Update it with a count of 'one' as this batch is for one gene protein and so the count must be one
