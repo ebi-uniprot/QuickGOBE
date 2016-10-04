@@ -18,9 +18,9 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetItem.createWithName;
 import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.GO_SLIMS_SETS;
-import static uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder.createWithName;
 
 /**
  * Created 03/10/16

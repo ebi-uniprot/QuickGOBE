@@ -95,8 +95,7 @@ public class CompositePresetImpl implements CompositePreset {
                         mapping(p -> p, Collectors.toList())))
                 .entrySet().stream()
                 .map(groupedEntry -> {
-                    PresetItemBuilder presetBuilder = PresetItemBuilder
-                            .createWithName(groupedEntry.getKey());
+                    PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
 
                     ifPresetItemMatchesThenApply(groupedEntry.getValue(),
                             p -> p != null && p.getRelevancy() != 0,

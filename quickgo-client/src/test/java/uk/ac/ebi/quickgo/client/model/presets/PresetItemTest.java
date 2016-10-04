@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.client.model.presets.impl;
-
-import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+package uk.ac.ebi.quickgo.client.model.presets;
 
 import java.util.function.Function;
 import org.junit.Before;
@@ -15,41 +13,40 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 /**
- * Created 15/09/16
+ * Created 04/10/16
  * @author Edd
  */
-public class PresetItemBuilderTest {
-
+public class PresetItemTest {
     private static final String VALID_VALUE = "value value";
     private static final String EMPTY_VALUE = "";
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private PresetItemBuilder validPresetBuilder;
+    private PresetItem.Builder validPresetBuilder;
 
     @Before
     public void setUp() {
-        validPresetBuilder = PresetItemBuilder.createWithName(VALID_VALUE);
+        validPresetBuilder = PresetItem.createWithName(VALID_VALUE);
     }
 
     // name
     @Test
     public void canCreateWithValidName() {
         correctlyBuildsValidPreset(
-                PresetItemBuilder::createWithName,
+                PresetItem::createWithName,
                 VALID_VALUE,
                 PresetItem::getName);
     }
 
     @Test
     public void nullNameCausesException() {
-        exceptionIsThrownFor(PresetItemBuilder::createWithName, null, IllegalArgumentException.class);
+        exceptionIsThrownFor(PresetItem::createWithName, null, IllegalArgumentException.class);
     }
 
     @Test
     public void emptyNameCausesException() {
-        exceptionIsThrownFor(PresetItemBuilder::createWithName, EMPTY_VALUE, IllegalArgumentException.class);
+        exceptionIsThrownFor(PresetItem::createWithName, EMPTY_VALUE, IllegalArgumentException.class);
     }
 
     // relevancy
@@ -143,7 +140,7 @@ public class PresetItemBuilderTest {
     }
 
     private <T, E extends Exception> void exceptionIsThrownFor(
-            Function<T, PresetItemBuilder> builderFunction,
+            Function<T, PresetItem.Builder> builderFunction,
             T value,
             Class<E> exception) {
         thrown.expect(exception);
@@ -151,10 +148,10 @@ public class PresetItemBuilderTest {
     }
 
     private <T> PresetItem correctlyBuildsValidPreset(
-            Function<T, PresetItemBuilder> builderFunction,
+            Function<T, PresetItem.Builder> builderFunction,
             T value,
             Function<PresetItem, T> getterCheck) {
-        PresetItemBuilder builder = builderFunction.apply(value);
+        PresetItem.Builder builder = builderFunction.apply(value);
         PresetItem presetItem = builder.build();
         assertThat(presetItem, is(not(nullValue())));
         assertThat(getterCheck.apply(presetItem), is(value));

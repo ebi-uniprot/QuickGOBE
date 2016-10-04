@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.evidence;
 
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
@@ -69,7 +69,7 @@ public class EvidencePresetsConfig {
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem -> {
             presets.addPreset(CompositePresetImpl.PresetType.EVIDENCES,
-                    PresetItemBuilder.createWithName(rawItem.name)
+                    PresetItem.createWithName(rawItem.name)
                             .withId(rawItem.id)
                             .withRelevancy(rawItem.relevancy)
                             .withDescription(rawItem.description)

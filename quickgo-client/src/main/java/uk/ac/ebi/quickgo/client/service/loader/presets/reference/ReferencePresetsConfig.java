@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.reference;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
@@ -81,7 +80,7 @@ public class ReferencePresetsConfig {
                         rawPresetFilter(dbDefaults)))
                 .writer(rawPresetWriter(
                         presets,
-                        aRawPresetItem -> PresetItemBuilder.createWithName(aRawPresetItem.name)
+                        aRawPresetItem -> PresetItem.createWithName(aRawPresetItem.name)
                                 .withDescription(aRawPresetItem.description)
                                 .build()))
                 .listener(new LogStepListener())
@@ -106,7 +105,7 @@ public class ReferencePresetsConfig {
                         rawPresetFilter(specificDBDefaults)))
                 .writer(rawPresetWriter(
                         presets,
-                        aRawPresetItem -> PresetItemBuilder.createWithName(buildGORefID(aRawPresetItem.name))
+                        aRawPresetItem -> PresetItem.createWithName(buildGORefID(aRawPresetItem.name))
                                 .withDescription(aRawPresetItem.description)
                                 .withRelevancy(aRawPresetItem.relevancy)
                                 .build()))
