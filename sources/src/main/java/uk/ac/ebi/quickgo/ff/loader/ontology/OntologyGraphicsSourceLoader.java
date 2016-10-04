@@ -37,13 +37,17 @@ public class OntologyGraphicsSourceLoader {
     }
 
     private void loadOntologies() {
-        new GOLoader(new GOSourceFiles(requireNonNull(sourceDir))).load()
-                .map(go -> this.geneOntology = go)
-                .orElseThrow(IllegalStateException::new);
+        new GOLoader(new GOSourceFiles(requireNonNull(sourceDir)))
+                .load()
+                .map(go -> this.geneOntology = go);
 
-        new ECOLoader(new ECOSourceFiles(requireNonNull(sourceDir))).load()
-                .map(eco -> evidenceCodeOntology = eco)
-                .orElseThrow(IllegalStateException::new);
+        new ECOLoader(new ECOSourceFiles(requireNonNull(sourceDir)))
+                .load()
+                .map(eco -> evidenceCodeOntology = eco);
+
+        if (isLoaded()) {
+            LOGGER.warn("Could not load ontologies correctly. No graphics can be provided.");
+        }
     }
 
     public GeneOntology getGeneOntology() {
