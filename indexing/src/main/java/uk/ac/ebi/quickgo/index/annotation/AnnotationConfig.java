@@ -103,8 +103,8 @@ public class AnnotationConfig {
     public Job annotationJob() {
         return jobBuilders.get(ANNOTATION_INDEXING_JOB_NAME)
                 .start(annotationIndexingStep())
-                .next(coStatsManualSummarizationStep())
-                .next(coStatsAllSummarizationStep())
+                .next(coTermManualSummarizationStep())
+                .next(coTermAllSummarizationStep())
                 .listener(logJobListener())
                 // commit the documents to the solr server
                 .listener(new JobExecutionListener() {
@@ -135,7 +135,7 @@ public class AnnotationConfig {
 
 
     @Bean
-    public Step coStatsManualSummarizationStep() {
+    public Step coTermManualSummarizationStep() {
         return stepBuilders.get(COTERM_MANUAL_COMPLETION_STEP_NAME)
                 .<String, List<CoTerm>>chunk(cotermsChunk)
                 .reader(coTermsManualReader)
@@ -148,7 +148,7 @@ public class AnnotationConfig {
     }
 
     @Bean
-    public Step coStatsAllSummarizationStep() {
+    public Step coTermAllSummarizationStep() {
         return stepBuilders.get(COTERM_ALL_COMPLETION_STEP_NAME)
                 .<String, List<CoTerm>>chunk(cotermsChunk)
                 .reader(coTermsAllReader)

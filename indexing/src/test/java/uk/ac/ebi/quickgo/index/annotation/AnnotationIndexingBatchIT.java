@@ -80,25 +80,25 @@ public class AnnotationIndexingBatchIT {
                 "IntAct:EBI-10043089"
         ));
 
-        //Manual CoStats
-        List<StepExecution> jobsSingleStepCoStatsManual = jobExecution.getStepExecutions()
+        //Manual Stats
+        List<StepExecution> jobsSingleStepCoTermManual = jobExecution.getStepExecutions()
                 .stream()
                 .filter(step -> step.getStepName().equals (COTERM_MANUAL_COMPLETION_STEP_NAME))
                 .collect(Collectors.toList());
-        assertThat(jobsSingleStepCoStatsManual, hasSize(1));
-        StepExecution coTermsManualStep = jobsSingleStepCoStatsManual.get(0);
+        assertThat(jobsSingleStepCoTermManual, hasSize(1));
+        StepExecution coTermsManualStep = jobsSingleStepCoTermManual.get(0);
         assertThat(coTermsManualStep.getReadCount(), is(4));
         assertThat(coTermsManualStep.getReadSkipCount(), is(0));
         assertThat(coTermsManualStep.getProcessSkipCount(), is(0));
         assertThat(coTermsManualStep.getWriteCount(), is(4));
 
         //All Costats
-        List<StepExecution> jobsSingleStepCoStatsAll = jobExecution.getStepExecutions()
+        List<StepExecution> jobsSingleStepCoTermAll = jobExecution.getStepExecutions()
                 .stream()
                 .filter(step -> step.getStepName().equals (COTERM_ALL_COMPLETION_STEP_NAME))
                 .collect(Collectors.toList());
-        assertThat(jobsSingleStepCoStatsAll, hasSize(1));
-        StepExecution coTermsAllStep = jobsSingleStepCoStatsAll.get(0);
+        assertThat(jobsSingleStepCoTermAll, hasSize(1));
+        StepExecution coTermsAllStep = jobsSingleStepCoTermAll.get(0);
         assertThat(coTermsAllStep.getReadCount(), is(5));
         assertThat(coTermsAllStep.getReadSkipCount(), is(0));
         assertThat(coTermsAllStep.getProcessSkipCount(), is(0));

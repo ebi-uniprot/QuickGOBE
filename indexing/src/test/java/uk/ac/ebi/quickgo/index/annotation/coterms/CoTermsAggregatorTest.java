@@ -45,12 +45,12 @@ public class CoTermsAggregatorTest {
 
         assertThat(matrix.keySet(), hasSize(1));
 
-        Map<String, AtomicLong> costats = matrix.get("GO:0003824");
-        assertThat(costats, is(notNullValue()));
-        assertThat(costats.keySet(), hasSize(1));
+        Map<String, AtomicLong> coTerms = matrix.get("GO:0003824");
+        assertThat(coTerms, is(notNullValue()));
+        assertThat(coTerms.keySet(), hasSize(1));
 
         //Is the only one
-        AtomicLong ac = costats.get("GO:0003824");
+        AtomicLong ac = coTerms.get("GO:0003824");
         assertThat(ac.get(), is(1l));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1l));
@@ -61,7 +61,7 @@ public class CoTermsAggregatorTest {
 	}
 
     @Test
-    public void calculateStatisticsForTwoRecordsWithDifferentGoTermsAndDifferentGeneProductSoNoCoStats() throws
+    public void calculateStatisticsForTwoRecordsWithDifferentGoTermsAndDifferentGeneProductSoNoCoTerms() throws
                                                                                                        Exception {
 
         AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
@@ -76,14 +76,14 @@ public class CoTermsAggregatorTest {
 
         assertThat(matrix.keySet(), hasSize(2));
 
-        Map<String, AtomicLong> costats1 = matrix.get(annotation1.goId);
-        assertThat(costats1.keySet(), hasSize(1));//2
-        AtomicLong ac1 = costats1.get(annotation1.goId);
+        Map<String, AtomicLong> coTerms1 = matrix.get(annotation1.goId);
+        assertThat(coTerms1.keySet(), hasSize(1));//2
+        AtomicLong ac1 = coTerms1.get(annotation1.goId);
         assertThat(ac1.get(), is(1l));
 
-        Map<String, AtomicLong> costats2 = matrix.get(annotation2.goId);
-        assertThat(costats2.keySet(), hasSize(1));
-        AtomicLong ac2 = costats2.get(annotation2.goId);
+        Map<String, AtomicLong> coTerms2 = matrix.get(annotation2.goId);
+        assertThat(coTerms2.keySet(), hasSize(1));
+        AtomicLong ac2 = coTerms2.get(annotation2.goId);
         assertThat(ac2.get(), is(1l));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(2l));
@@ -108,18 +108,18 @@ public class CoTermsAggregatorTest {
 
         assertThat(matrix.keySet(), hasSize(2));
 
-        Map<String, AtomicLong> costats1 = matrix.get(annotation1.goId);
-        assertThat(costats1.keySet(), hasSize(2));
-        AtomicLong ac1x1 = costats1.get(annotation1.goId);
+        Map<String, AtomicLong> coTerms1 = matrix.get(annotation1.goId);
+        assertThat(coTerms1.keySet(), hasSize(2));
+        AtomicLong ac1x1 = coTerms1.get(annotation1.goId);
         assertThat(ac1x1.get(), is(1l));
-        AtomicLong ac1x2 = costats1.get(annotation2.goId);
+        AtomicLong ac1x2 = coTerms1.get(annotation2.goId);
         assertThat(ac1x1.get(), is(1l));
 
-        Map<String, AtomicLong> costats2 = matrix.get(annotation2.goId);
-        assertThat(costats2.keySet(), hasSize(2));
-        AtomicLong ac2x1 = costats2.get(annotation2.goId);
+        Map<String, AtomicLong> coTerms2 = matrix.get(annotation2.goId);
+        assertThat(coTerms2.keySet(), hasSize(2));
+        AtomicLong ac2x1 = coTerms2.get(annotation2.goId);
         assertThat(ac2x1.get(), is(1l));
-        AtomicLong ac2x2 = costats2.get(annotation1.goId);
+        AtomicLong ac2x2 = coTerms2.get(annotation1.goId);
         assertThat(ac2x2.get(), is(1l));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1l));

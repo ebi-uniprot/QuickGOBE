@@ -19,7 +19,6 @@ public class CoTermTest {
 		long compared = 8L;
 		long together = 4L;
 
-		//From the coStats class.
 		long selected = 8L;
 
 		CoTerm coTerm =
