@@ -22,7 +22,9 @@ public class Co_occurringTermTest {
 		//From the coStats class.
 		long selected = 8L;
 
-		Co_occurringTerm coOccurringTerm = new Co_occurringTerm(targetTerm, comparedTerm, compared, together);
+		Co_occurringTerm coOccurringTerm =
+				new Co_occurringTerm.Co_occurringTermBuilder().setTarget(targetTerm).setComparedTerm(comparedTerm).setCompared(compared)
+						.setTogether(together).createCo_occurringTerm();
 		coOccurringTerm.calculateProbabilitySimilarityRatio(selected);
 		assertEquals( 33.33f , coOccurringTerm.getSimilarityRatio() );
 
@@ -38,7 +40,9 @@ public class Co_occurringTermTest {
 		long compared = 8L;
 		long together = 4L;
 
-		Co_occurringTerm coOccurringTerm = new Co_occurringTerm(targetTerm, comparedTerm, compared, together);
+		Co_occurringTerm coOccurringTerm =
+				new Co_occurringTerm.Co_occurringTermBuilder().setTarget(targetTerm).setComparedTerm(comparedTerm).setCompared(compared)
+						.setTogether(together).createCo_occurringTerm();
 		coOccurringTerm.calculateProbabilitySimilarityRatio(0L);
 	}
 
@@ -51,7 +55,9 @@ public class Co_occurringTermTest {
 
 		int all = 24;
 
-		Co_occurringTerm coOccurringTerm = new Co_occurringTerm(targetTerm, comparedTerm, compared, together);
+		Co_occurringTerm coOccurringTerm =
+				new Co_occurringTerm.Co_occurringTermBuilder().setTarget(targetTerm).setComparedTerm(comparedTerm).setCompared(compared)
+						.setTogether(together).createCo_occurringTerm();
 		coOccurringTerm.calculateProbabilityRatio(0l, all);
 	}
 
@@ -64,7 +70,9 @@ public class Co_occurringTermTest {
 		long together = 4L;
 		long selected = 8L;
 
-		Co_occurringTerm coOccurringTerm = new Co_occurringTerm(targetTerm, comparedTerm, compared, together);
+		Co_occurringTerm coOccurringTerm =
+				new Co_occurringTerm.Co_occurringTermBuilder().setTarget(targetTerm).setComparedTerm(comparedTerm).setCompared(compared)
+						.setTogether(together).createCo_occurringTerm();
 		coOccurringTerm.calculateProbabilityRatio(selected, 0);
 	}
 }

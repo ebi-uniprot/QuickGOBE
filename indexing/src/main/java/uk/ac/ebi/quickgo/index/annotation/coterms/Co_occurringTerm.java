@@ -27,7 +27,7 @@ public class Co_occurringTerm {
      * @param compared Count of proteins where compared term is annotated
      * @param together Count of proteins where both target and compared terms are annotated
      */
-    public Co_occurringTerm(String target, String comparedTerm, long compared, long together) {
+    private Co_occurringTerm(String target, String comparedTerm, long compared, long together) {
         this.target = target;
         this.comparedTerm = comparedTerm;
         this.compared = compared;
@@ -156,4 +156,37 @@ public class Co_occurringTerm {
     @Override public int hashCode() {
         return target.hashCode();
     }
+    public static class Co_occurringTermBuilder {
+        private String target;
+        private String comparedTerm;
+        private long compared;
+        private long together;
+
+        public Co_occurringTermBuilder setTarget(String target) {
+            this.target = target;
+            return this;
+        }
+
+        public Co_occurringTermBuilder setComparedTerm(String comparedTerm) {
+            this.comparedTerm = comparedTerm;
+            return this;
+        }
+
+        public Co_occurringTermBuilder setCompared(long compared) {
+            this.compared = compared;
+            return this;
+        }
+
+        public Co_occurringTermBuilder setTogether(long together) {
+            this.together = together;
+            return this;
+        }
+
+        public Co_occurringTerm createCo_occurringTerm() {
+            return new Co_occurringTerm(target, comparedTerm, compared, together);
+        }
+    }
+
 }
+
+

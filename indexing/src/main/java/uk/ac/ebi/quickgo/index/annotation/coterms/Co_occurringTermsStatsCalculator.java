@@ -68,8 +68,10 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
 
         for (String comparedTerm : co_occurringTermsForTarget.keySet()) {
 
-            coTerms.addAndCalculate(new Co_occurringTerm(target, comparedTerm, termGPCount.get(comparedTerm).get(),
-                    co_occurringTermsForTarget.get(comparedTerm).get()));
+            coTerms.addAndCalculate(new Co_occurringTerm.Co_occurringTermBuilder().setTarget(target).setComparedTerm
+                    (comparedTerm)
+                    .setCompared(termGPCount.get(comparedTerm).get())
+                    .setTogether(co_occurringTermsForTarget.get(comparedTerm).get()).createCo_occurringTerm());
         }
         return coTerms;
 
