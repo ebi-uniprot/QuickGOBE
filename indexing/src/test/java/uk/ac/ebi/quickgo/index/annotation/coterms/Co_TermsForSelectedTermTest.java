@@ -34,10 +34,10 @@ public class Co_TermsForSelectedTermTest {
 
         CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
 
-        cootfst.addAndCalculate(coTerm);
-        cootfst.addAndCalculate(coTerm);
-        cootfst.addAndCalculate(coTerm);
-        cootfst.addAndCalculate(coTerm);
+        cootfst.addCoTerm(coTerm);
+        cootfst.addCoTerm(coTerm);
+        cootfst.addCoTerm(coTerm);
+        cootfst.addCoTerm(coTerm);
 
         verify(coTerm, times(4)).calculateProbabilityRatio(2f,10f);
         verify(coTerm, times(4)).calculateProbabilitySimilarityRatio(2f);
@@ -66,10 +66,10 @@ public class Co_TermsForSelectedTermTest {
         CoTerm mock3 = mock(CoTerm.class, "Three");
         CoTerm mock4 = mock(CoTerm.class, "Four");
 
-        cootfst.addAndCalculate(mock1);
-        cootfst.addAndCalculate(mock2);
-        cootfst.addAndCalculate(mock3);
-        cootfst.addAndCalculate(mock4);
+        cootfst.addCoTerm(mock1);
+        cootfst.addCoTerm(mock2);
+        cootfst.addCoTerm(mock3);
+        cootfst.addCoTerm(mock4);
 
         when(mock1.getSimilarityRatio()).thenReturn(3f);
         when(mock2.getSimilarityRatio()).thenReturn(2f);
@@ -95,7 +95,7 @@ public class Co_TermsForSelectedTermTest {
 
         CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
 
-        cootfst.addAndCalculate(null);
+        cootfst.addCoTerm(null);
     }
 
     @Test(expected=IllegalArgumentException.class)

@@ -1,10 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Aggregation class for co-occurring terms.
@@ -39,10 +36,12 @@ public class CoTermsForSelectedTerm {
 
     /**
      * Add this term to the list of terms that annotate the same gene products as the target term.
+     * In this method the probability and similarity ratios are calculated on the passed in CoTerm, using information
+     * held by this class.
      * @param coTerm has all the required information to all the co-occurrence statistics to be calculated.
      */
-    public void addAndCalculate(CoTerm coTerm) {
-        Preconditions.checkArgument(coTerm != null, "addAndCalculate was passed a coTerm which was null");
+    public void addCoTerm(CoTerm coTerm) {
+        Preconditions.checkArgument(coTerm != null, "addCoTerm was passed a coTerm which was null");
         coTerm.calculateProbabilityRatio(this.selected, this.totalNumberGeneProducts);
         coTerm.calculateProbabilitySimilarityRatio(this.selected);
         coTerms.add(coTerm);
@@ -50,26 +49,12 @@ public class CoTermsForSelectedTerm {
 
 
     /**
-     * @return an iterator that makes available the list of co-occurring terms, in descending order of the similarity
+     * @return an immutable list of co-occurring terms, in descending order of similarity.
      */
-    public Iterator<CoTerm> highestSimilarity() {
-
+    public List<CoTerm> highestSimilarity() {
         coTerms.sort(new SignificanceSorter());
+        return Collections.unmodifiableList(coTerms);
 
-        return new Iterator<CoTerm>() {
-
-            final Iterator<CoTerm> navIterator = coTerms.iterator();
-
-            @Override
-            public boolean hasNext() {
-                return navIterator.hasNext();
-            }
-
-            @Override
-            public CoTerm next() {
-                return navIterator.next();
-            }
-        };
     }
 
     private class SignificanceSorter implements Comparator<CoTerm> {

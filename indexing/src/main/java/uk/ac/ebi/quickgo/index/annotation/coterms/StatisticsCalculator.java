@@ -68,7 +68,7 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
 
         for (String comparedTerm : coTermsForTarget.keySet()) {
 
-            coTerms.addAndCalculate(new CoTerm.Builder().setTarget(goTerm).setComparedTerm
+            coTerms.addCoTerm(new CoTerm.Builder().setTarget(goTerm).setComparedTerm
                     (comparedTerm)
                     .setCompared(termGPCount.get(comparedTerm).get())
                     .setTogether(coTermsForTarget.get(comparedTerm).get()).createCoTerm());
@@ -77,19 +77,13 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
 
     }
 
-    private List<CoTerm> resultsForOneGoTerm(
-            CoTermsForSelectedTerm coOccurringTermsForSelectedTerm) {
-
-        List<CoTerm> results = new ArrayList<>();
-
-        //Get iterator of compared terms, ordered by significance ratio descending
-        Iterator<CoTerm> descendingIt = coOccurringTermsForSelectedTerm.highestSimilarity();
-
-        while (descendingIt.hasNext()) {
-            results.add(descendingIt.next());
-        }
-
-        return results;
+    /**
+     *  Get list of compared terms, ordered by significance ratio descending
+     * @param coTerms
+     * @return
+     */
+    private List<CoTerm> resultsForOneGoTerm(CoTermsForSelectedTerm coTerms) {
+        return coTerms.highestSimilarity();
     }
 
 }
