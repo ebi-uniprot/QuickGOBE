@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.client.service.loader.presets.read;
+package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseType;

@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.client.service.loader.presets.read;
-
-import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsValidationHelper;
+package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import org.junit.Test;
 import org.springframework.batch.item.validator.ValidationException;
