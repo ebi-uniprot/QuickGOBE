@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.reference;
 
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
@@ -78,7 +79,11 @@ public class ReferencePresetsConfig {
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
                         rawPresetFilter(dbDefaults)))
-                .writer(rawPresetWriter(presets, Function.identity()))
+                .writer(rawPresetWriter(
+                        presets,
+                        aRawPresetItem -> PresetItemBuilder.createWithName(aRawPresetItem.name)
+                                .withDescription(aRawPresetItem.description)
+                                .build()))
                 .listener(new LogStepListener())
                 .build();
     }
@@ -99,43 +104,21 @@ public class ReferencePresetsConfig {
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
                         rawPresetFilter(specificDBDefaults)))
-                .writer(rawPresetWriter2(presets, this::buildGORefID))
+                .writer(rawPresetWriter(
+                        presets,
+                        aRawPresetItem -> PresetItemBuilder.createWithName(buildGORefID(aRawPresetItem.name))
+                                .withDescription(aRawPresetItem.description)
+                                .withRelevancy(aRawPresetItem.relevancy)
+                                .build()))
                 .listener(new LogStepListener())
                 .build();
     }
 
-    /**
-     * Write the list of {@link RawNamedPreset}s to the {@link CompositePresetImpl}
-     * @param presets the presets to write to
-     * @param nameTransformer a transformation function to apply to each preset name
-     * @return the corresponding {@link ItemWriter}
-     */
     private ItemWriter<RawNamedPreset> rawPresetWriter(
             CompositePresetImpl presets,
-            Function<String, String> nameTransformer) {
+            Function<RawNamedPreset, PresetItem> presetItemSupplier) {
         return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.addPreset(CompositePresetImpl.PresetType.REFERENCES,
-                    PresetItemBuilder.createWithName(nameTransformer.apply(rawItem.name))
-                            .withDescription(rawItem.description)
-                            .build());
-        });
-    }
-
-    /**
-     * Write the list of {@link RawNamedPreset}s to the {@link CompositePresetImpl}
-     * @param presets the presets to write to
-     * @param nameTransformer a transformation function to apply to each preset name
-     * @return the corresponding {@link ItemWriter}
-     */
-    private ItemWriter<RawNamedPreset> rawPresetWriter2(
-            CompositePresetImpl presets,
-            Function<String, String> nameTransformer) {
-        return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.addPreset(CompositePresetImpl.PresetType.REFERENCES,
-                    PresetItemBuilder.createWithName(nameTransformer.apply(rawItem.name))
-                            .withDescription(rawItem.description)
-                            .withRelevancy(rawItem.relevancy)
-                            .build());
+            presets.addPreset(CompositePresetImpl.PresetType.REFERENCES, presetItemSupplier.apply(rawItem));
         });
     }
 

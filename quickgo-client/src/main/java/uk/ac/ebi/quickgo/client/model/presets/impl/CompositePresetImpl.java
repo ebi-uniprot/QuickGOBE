@@ -83,6 +83,11 @@ public class CompositePresetImpl implements CompositePreset {
         return sortedPresetItems(GO_SLIMS_SETS);
     }
 
+    /**
+     * Sorts the presets according to the ordering rules defined in the class description.
+     * @param presetType the {@link PresetType} whose list of {@link PresetItem}s are to be to returned.
+     * @return the list of {@link PresetItem}s corresponding to the specified {@code presetType}.
+     */
     private List<PresetItem> sortedPresetItems(PresetType presetType) {
         return presetsMap.get(presetType).stream()
                 .collect(Collectors.groupingBy(
@@ -93,15 +98,15 @@ public class CompositePresetImpl implements CompositePreset {
                     PresetItemBuilder presetBuilder = PresetItemBuilder
                             .createWithName(groupedEntry.getKey());
 
-                    ifTrueApply(groupedEntry.getValue(),
+                    ifPresetItemMatchesThenApply(groupedEntry.getValue(),
                             p -> p != null && p.getRelevancy() != 0,
                             p -> presetBuilder.withRelevancy(p.getRelevancy()));
 
-                    ifTrueApply(groupedEntry.getValue(),
+                    ifPresetItemMatchesThenApply(groupedEntry.getValue(),
                             p -> p.getDescription() != null && !p.getDescription().trim().isEmpty(),
                             p -> presetBuilder.withDescription(p.getDescription()));
 
-                    ifTrueApply(groupedEntry.getValue(),
+                    ifPresetItemMatchesThenApply(groupedEntry.getValue(),
                             p -> p.getUrl() != null && !p.getUrl().trim().isEmpty(),
                             p -> presetBuilder.withUrl(p.getUrl()));
 
@@ -110,7 +115,7 @@ public class CompositePresetImpl implements CompositePreset {
                                 .map(PresetItem::getId)
                                 .collect(Collectors.toList()));
                     } else {
-                        ifTrueApply(groupedEntry.getValue(),
+                        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
                                 p -> p.getId() != null && !p.getId().trim().isEmpty(),
                                 p -> presetBuilder.withId(p.getId()));
                     }
@@ -128,14 +133,22 @@ public class CompositePresetImpl implements CompositePreset {
                 .collect(Collectors.toList());
     }
 
-    private void ifTrueApply(
+    /**
+     * Given a list of {@link PresetItem}s, if a specified
+     * {@link Predicate} is true for a given element of the list, apply some action,
+     * defined as a {@link Consumer}.
+     * @param presets the list of {@link PresetItem}s
+     * @param presetPredicate the {@link Predicate} which must be true for {@code itemConsumer} to be applied
+     * @param itemConsumer the {@link Consumer} action to apply to an item
+     */
+    private void ifPresetItemMatchesThenApply(
             List<PresetItem> presets,
             Predicate<PresetItem> presetPredicate,
-            Consumer<PresetItem> target) {
+            Consumer<PresetItem> itemConsumer) {
         presets.stream()
                 .filter(presetPredicate)
                 .findFirst()
-                .ifPresent(target);
+                .ifPresent(itemConsumer);
     }
 
     public enum PresetType {
