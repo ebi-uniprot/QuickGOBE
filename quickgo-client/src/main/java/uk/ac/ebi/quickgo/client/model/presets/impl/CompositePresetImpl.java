@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -92,22 +93,11 @@ public class CompositePresetImpl implements CompositePreset {
         return presetsMap.get(presetType).stream()
                 .collect(Collectors.groupingBy(
                         PresetItem::getName,
-                        mapping(p -> p, Collectors.toList())))
+                        mapping(Function.identity(), Collectors.toList())))
                 .entrySet().stream()
                 .map(groupedEntry -> transformGroupedEntryToPresetItem(presetType, groupedEntry))
-                .sorted(sortByRelevancyThenName())
+                .sorted()
                 .collect(Collectors.toList());
-    }
-
-    private Comparator<PresetItem> sortByRelevancyThenName() {
-        return (p1, p2) -> {
-            int relevancyComparison = p1.getRelevancy().compareTo(p2.getRelevancy());
-            if (relevancyComparison != 0) {
-                return relevancyComparison;
-            } else {
-                return p1.getName().compareTo(p2.getName());
-            }
-        };
     }
 
     private PresetItem transformGroupedEntryToPresetItem(PresetType presetType,

@@ -15,7 +15,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Created 04/10/16
  * @author Edd
  */
-public class PresetItem {
+public class PresetItem implements Comparable<PresetItem> {
 
     private final String name;
     private String description;
@@ -66,15 +66,14 @@ public class PresetItem {
         return new Builder(name);
     }
 
-    @Override public String toString() {
-        return "PresetItem2{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", relevancy=" + relevancy +
-                ", id='" + id + '\'' +
-                ", url='" + url + '\'' +
-                ", associations=" + associations +
-                '}';
+    @Override public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (relevancy != null ? relevancy.hashCode() : 0);
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (associations != null ? associations.hashCode() : 0);
+        return result;
     }
 
     @Override public boolean equals(Object o) {
@@ -106,14 +105,34 @@ public class PresetItem {
 
     }
 
-    @Override public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (relevancy != null ? relevancy.hashCode() : 0);
-        result = 31 * result + (id != null ? id.hashCode() : 0);
-        result = 31 * result + (url != null ? url.hashCode() : 0);
-        result = 31 * result + (associations != null ? associations.hashCode() : 0);
-        return result;
+    @Override public String toString() {
+        return "PresetItem2{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", relevancy=" + relevancy +
+                ", id='" + id + '\'' +
+                ", url='" + url + '\'' +
+                ", associations=" + associations +
+                '}';
+    }
+
+    /**
+     * <p>Presets are ordered by the following criteria:
+     * <ol>
+     *     <li>natural ordering (low to high) by {@link PresetItem#getRelevancy()}</li>
+     *     <li>alphabetically by {@link PresetItem#getName()}}</li>
+     * </ol>
+     *
+     * @param presetItem
+     * @return
+     */
+    @Override public int compareTo(PresetItem presetItem) {
+        int relevancyComparison = this.getRelevancy().compareTo(presetItem.getRelevancy());
+        if (relevancyComparison != 0) {
+            return relevancyComparison;
+        } else {
+            return this.getName().compareTo(presetItem.getName());
+        }
     }
 
     public static class Builder {
