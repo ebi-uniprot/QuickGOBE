@@ -4,9 +4,10 @@ import com.google.common.base.Preconditions;
 import java.text.DecimalFormat;
 
 /**
- * A co-occurrence statistics entity. Represents two goTerms which are being used to annotate the same gene product.
- * This class only holds the compared to term however, as instances of this class are held in a collection for the
- * selected (target) goTerm.
+ * A class that represents the intersection between two GO terms, which have been used to annotate the
+ * same gene products in an annotation data set. An instance of this class will hold statistics related to this
+ * intersection.
+ * The data in this class is used by the QuickGO and Protein2GO applications.
  * @author twardell
  *
  */
@@ -21,10 +22,10 @@ public class Co_occurringTerm {
 
     /**
      * Create a permutation for the compared term.
-     * @param target the id of the GO Term against which we will make co-occurring terms
-     * @param comparedTerm term id for this statistics
-     * @param compared count of gene products where compared term is annotated
-     * @param together count of gene products where both selected and compared terms are annotated
+     * @param target the id of the GO Term which is our compared 'from' GO Term
+     * @param comparedTerm the id of the GO Term which is our compared 'to' GO Term
+     * @param compared Count of proteins where compared term is annotated
+     * @param together Count of proteins where both target and compared terms are annotated
      */
     public Co_occurringTerm(String target, String comparedTerm, long compared, long together) {
         this.target = target;
@@ -39,12 +40,11 @@ public class Co_occurringTerm {
      * <code>=#together/(#selected+#compared-#together)</code>
      * Probability of term here estimated as fraction of proteins annotated to term.
      * @param selected Total count of gene products annotated to selected term
-     * @return the calculated similarity ratio
      */
-    public float calculateProbabilitySimilarityRatio(float selected) {
+    public void calculateProbabilitySimilarityRatio(float selected) {
 
         Preconditions
-                .checkArgument(selected != 0, "CoOccurringTerm::calculateProbabilitySimilarityRatio The value for" +
+                .checkArgument(selected != 0, "Co_occurringTerm::calculateProbabilitySimilarityRatio The value for" +
                         " selected should not be zero");
 
         DecimalFormat twoDForm = new DecimalFormat("#.##");
@@ -54,7 +54,6 @@ public class Co_occurringTerm {
             this.similarityRatio = 100;
         }
         this.similarityRatio = psRatio;
-        return this.similarityRatio;
     }
 
     /**
@@ -63,13 +62,12 @@ public class Co_occurringTerm {
      * <code>=(#together/selected)/(#compared/#all)</code>
      * Probability of term here estimated as fraction of proteins annotated to term.
      * @param selected Total count of gene products annotated to selected term
-     * @return the calculated probability ratio
      */
     public float calculateProbabilityRatio(float selected, float all) {
 
-        Preconditions.checkArgument(selected != 0, "CoOccurringTerm::calculateProbabilityRatio The value for selected" +
+        Preconditions.checkArgument(selected != 0, "Co_occurringTerm::calculateProbabilityRatio The value for selected" +
                 " should not be zero");
-        Preconditions.checkArgument(all != 0, "CoOccurringTerm::calculateProbabilityRatio The value for all" +
+        Preconditions.checkArgument(all != 0, "Co_occurringTerm::calculateProbabilityRatio The value for all" +
                 " should not be zero");
 
         DecimalFormat twoDForm = new DecimalFormat("#.##");
