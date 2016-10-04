@@ -704,7 +704,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void failedChartRequestDueToBadIdProduces400() throws Exception {
+    public void failedChartRequestDueToInvalidIdProduces400() throws Exception {
         requestToChartServiceReturnsValidImage();
 
         ResultActions response = mockMvc.perform(
