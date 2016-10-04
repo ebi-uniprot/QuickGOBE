@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.graphics.service;
 
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImageResult;
+import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public interface GraphImageService {
      * @param ids the term ids whose graphical representation is required
      * @param scope the scope in which the graph is being drawn. Currently this is either "ECO" or "GO".
      * @return the corresponding graphical image representing the {@code ids}
+     * @throws RenderingGraphException if there was a problem rendering the graph
      */
     GraphImageResult createChart(List<String> ids, String scope);
 }
