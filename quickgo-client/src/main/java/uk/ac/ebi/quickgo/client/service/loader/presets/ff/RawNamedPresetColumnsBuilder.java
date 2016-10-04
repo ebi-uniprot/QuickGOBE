@@ -64,7 +64,8 @@ class RawNamedPresetColumnsBuilder {
     }
 
     private void checkColumnPosition(int columnPosition) {
-        checkArgument(columnPosition >= 0, "Column position must be greater than or equal to 0");
+        checkArgument(columnPosition >= 0,
+                "Column position [" + columnPosition + "] must be greater than or equal to 0");
     }
 
     private static class RawNamedPresetColumnsImpl implements RawNamedPresetColumns {
