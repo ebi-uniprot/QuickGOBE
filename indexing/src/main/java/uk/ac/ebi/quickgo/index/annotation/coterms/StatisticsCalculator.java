@@ -64,7 +64,7 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
 
         Map<String, AtomicLong> coTermsForTarget = coTermMatrix.get(goTerm);
         CoTermsForSelectedTerm
-                coTerms = new CoTermsForSelectedTerm(goTerm, geneProductCount, termGPCount.get(goTerm).get());
+                coTerms = new CoTermsForSelectedTerm(geneProductCount, termGPCount.get(goTerm).get());
 
         for (String comparedTerm : coTermsForTarget.keySet()) {
 

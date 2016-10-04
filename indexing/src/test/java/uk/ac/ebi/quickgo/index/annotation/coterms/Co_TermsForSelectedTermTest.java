@@ -32,8 +32,7 @@ public class Co_TermsForSelectedTermTest {
         float totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
 
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
-                totalNumberGeneProducts, selected);
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
 
         cootfst.addAndCalculate(coTerm);
         cootfst.addAndCalculate(coTerm);
@@ -60,8 +59,7 @@ public class Co_TermsForSelectedTermTest {
         float totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
 
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
-                totalNumberGeneProducts, selected);
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
 
         CoTerm mock1 = mock(CoTerm.class, "One");
         CoTerm mock2 = mock(CoTerm.class, "Two");
@@ -95,8 +93,7 @@ public class Co_TermsForSelectedTermTest {
         float totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
 
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
-                totalNumberGeneProducts, selected);
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
 
         cootfst.addAndCalculate(null);
     }
@@ -106,8 +103,7 @@ public class Co_TermsForSelectedTermTest {
         String target = null;
         float totalNumberGeneProducts = 10;
         long selected = 2;
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
-                totalNumberGeneProducts, selected);
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -115,8 +111,7 @@ public class Co_TermsForSelectedTermTest {
         String target = "GO:00003824";
         float totalNumberGeneProducts = 0;
         long selected = 2;
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
-                totalNumberGeneProducts, selected);
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -124,7 +119,6 @@ public class Co_TermsForSelectedTermTest {
         String target = "GO:00003824";
         float totalNumberGeneProducts = 10;
         long selected = 0;
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(target,
-                totalNumberGeneProducts, selected);
+        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
     }
 }

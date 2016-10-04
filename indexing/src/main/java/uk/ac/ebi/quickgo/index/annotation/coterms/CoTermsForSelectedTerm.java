@@ -8,8 +8,7 @@ import java.util.List;
 
 /**
  * Aggregation class for co-occurring terms.
- * Create the class with the target GO term id.
- * Then add a succession of terms that annotate the same gene product(s) as the target term.
+ * Add a succession of terms that annotate the same gene product(s) as a single (unspecified in this class) term.
  * Calculate co-occurring statistics at the time the compared to term is added to the list.
  *
  * @author Tony Wardell
@@ -19,27 +18,21 @@ import java.util.List;
  */
 public class CoTermsForSelectedTerm {
 
-    private final String target;
     private final float totalNumberGeneProducts;
     private final long selected;
-
     private final List<CoTerm> coTerms = new ArrayList<>();
 
     /**
      * Create an instance of this class, initializing it the term term (against which all compared terms will be
      * compared.
-     * @param term GO Term id which is the term will compare against all the compared too terms(because they are
-     * co-occurring)
      * @param totalNumberGeneProducts The total number of unique gene products processed
      * @param selected Total count of proteins annotated to selected term
      */
-    public CoTermsForSelectedTerm(String term, float totalNumberGeneProducts, long selected) {
-        Preconditions.checkArgument(term != null, "term should not be null");
+    public CoTermsForSelectedTerm(float totalNumberGeneProducts, long selected) {
         Preconditions
                 .checkArgument(totalNumberGeneProducts != 0, "totalNumberGeneProducts" +
                         " should not be zero");
         Preconditions.checkArgument(selected != 0, "term should not be zero");
-        this.target = term;
         this.totalNumberGeneProducts = totalNumberGeneProducts;
         this.selected = selected;
     }
