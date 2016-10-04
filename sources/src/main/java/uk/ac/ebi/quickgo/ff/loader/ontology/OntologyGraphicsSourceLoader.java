@@ -7,7 +7,6 @@ import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 
 import java.io.File;
-import java.util.Optional;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -38,20 +37,13 @@ public class OntologyGraphicsSourceLoader {
     }
 
     private void loadOntologies() {
-        try {
-            Optional<GeneOntology> geneOntologyOptional =
-                    new GOLoader(new GOSourceFiles(requireNonNull(sourceDir))).load();
-            if (geneOntologyOptional.isPresent()) {
-                this.geneOntology = geneOntologyOptional.get();
-            }
-            Optional<EvidenceCodeOntology> evidenceCodeOntologyOptional =
-                    new ECOLoader(new ECOSourceFiles(requireNonNull(sourceDir))).load();
-            if (evidenceCodeOntologyOptional.isPresent()) {
-                this.evidenceCodeOntology = evidenceCodeOntologyOptional.get();
-            }
-        } catch (Exception e) {
-            LOGGER.error("Could not load ontologies from source: ", e);
-        }
+        new GOLoader(new GOSourceFiles(requireNonNull(sourceDir))).load()
+                .map(go -> this.geneOntology = go)
+                .orElseThrow(IllegalStateException::new);
+
+        new ECOLoader(new ECOSourceFiles(requireNonNull(sourceDir))).load()
+                .map(eco -> evidenceCodeOntology = eco)
+                .orElseThrow(IllegalStateException::new);
     }
 
     public GeneOntology getGeneOntology() {
