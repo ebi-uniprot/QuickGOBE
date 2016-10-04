@@ -24,8 +24,6 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.makeTermLi
  * Time: 16:26
  * Created with IntelliJ IDEA.
  *
- * Based on CoStatsSummarizerTest in Beta.
- *
  * overlap = 2;  // Number of gene products annotated by both selected and compared terms
  * target  = 2;  // Number of gene products annotated by selected term
  * compared = 2; // Number of gene products annotated by compared terms

@@ -92,7 +92,6 @@ public class AnnotationIndexingBatchIT {
         assertThat(coTermsManualStep.getProcessSkipCount(), is(0));
         assertThat(coTermsManualStep.getWriteCount(), is(4));
 
-        //All Costats
         List<StepExecution> jobsSingleStepCoTermAll = jobExecution.getStepExecutions()
                 .stream()
                 .filter(step -> step.getStepName().equals (COTERM_ALL_COMPLETION_STEP_NAME))
