@@ -23,10 +23,12 @@ public class Co_occurringTermTest {
 		long selected = 8L;
 
 		Co_occurringTerm coOccurringTerm = new Co_occurringTerm(targetTerm, comparedTerm, compared, together);
-		assertEquals( 33.33f , coOccurringTerm.calculateProbabilitySimilarityRatio(selected));
+		coOccurringTerm.calculateProbabilitySimilarityRatio(selected);
+		assertEquals( 33.33f , coOccurringTerm.getSimilarityRatio() );
 
 		int all = 24;
-		assertEquals( 1.5f , coOccurringTerm.calculateProbabilityRatio(selected, all));
+		coOccurringTerm.calculateProbabilityRatio(selected, all);
+		assertEquals( 1.5f ,coOccurringTerm.getProbabilityRatio() );
 	}
 
 	@Test(expected = IllegalArgumentException.class)
