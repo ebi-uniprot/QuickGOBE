@@ -50,7 +50,7 @@ public class Co_occurringTermsStatsCalculatorTest {
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
-        Co_occurringTermsStatsCalculator coTermsCalculator = new Co_occurringTermsStatsCalculator(aggregator);
+        CoTermsStatsCalculator coTermsCalculator = new CoTermsStatsCalculator(aggregator);
         coTermsCalculator.initialize();
         List<Co_occurringTerm> results = coTermsCalculator.process(goTerm);
 
@@ -82,7 +82,7 @@ public class Co_occurringTermsStatsCalculatorTest {
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
-        Co_occurringTermsStatsCalculator coTermsCalculator = new Co_occurringTermsStatsCalculator(aggregator);
+        CoTermsStatsCalculator coTermsCalculator = new CoTermsStatsCalculator(aggregator);
         coTermsCalculator.initialize();
         List<Co_occurringTerm> results = coTermsCalculator.process(selected);
         assertThat(results, hasSize(1));
@@ -114,7 +114,7 @@ public class Co_occurringTermsStatsCalculatorTest {
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
-        Co_occurringTermsStatsCalculator coTermsCalculator = new Co_occurringTermsStatsCalculator(aggregator);
+        CoTermsStatsCalculator coTermsCalculator = new CoTermsStatsCalculator(aggregator);
         coTermsCalculator.initialize();
         List<Co_occurringTerm> results = coTermsCalculator.process(selectedList.get(0));
 
@@ -144,8 +144,8 @@ public class Co_occurringTermsStatsCalculatorTest {
         Map<String, AtomicLong> termGpCount = new HashMap<>();
         termGpCount.put(goTerm, new AtomicLong(2));
 
-        Co_occurringTermsStatsCalculator
-                coOccurringTermsStatsCalculator = new Co_occurringTermsStatsCalculator(aggregator);
+        CoTermsStatsCalculator
+                coOccurringTermsStatsCalculator = new CoTermsStatsCalculator(aggregator);
         coOccurringTermsStatsCalculator.process(null);
 
     }

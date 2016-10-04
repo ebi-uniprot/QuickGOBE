@@ -20,7 +20,7 @@ import org.springframework.batch.item.ItemWriter;
  * For the contents of the coTermMatrix calculate co-occurrence statistics
  * A version of CoStatsSummarizer from Beta
  */
-public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, List<Co_occurringTerm>> {
+public class CoTermsStatsCalculator implements ItemProcessor<String, List<Co_occurringTerm>> {
 
     //This is the count of all gene products for the term. We hold this figure separately as it is used many times.
     private Map<String, AtomicLong> termGPCount;
@@ -32,7 +32,7 @@ public class Co_occurringTermsStatsCalculator implements ItemProcessor<String, L
     private long geneProductCount;
     private final AnnotationCoOccurringTermsAggregator aggregator;
 
-    public Co_occurringTermsStatsCalculator(
+    public CoTermsStatsCalculator(
             ItemWriter<AnnotationDocument> aggregator) {
         this.aggregator = (AnnotationCoOccurringTermsAggregator)aggregator;
     }

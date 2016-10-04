@@ -32,9 +32,8 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.index.annotation.coterms.AnnotationCoOccurringTermsAggregator;
 import uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTerm;
-import uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermsConfiguration;
+import uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermsConfig;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
@@ -45,8 +44,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermsConfiguration.COSTATS_ALL_COMPLETION_STEP_NAME;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermsConfiguration.COSTATS_MANUAL_COMPLETION_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermsConfig.COSTATS_ALL_COMPLETION_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.Co_occurringTermsConfig.COSTATS_MANUAL_COMPLETION_STEP_NAME;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.TAB;
 
 /**
@@ -57,7 +56,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.T
  */
 @Configuration
 @EnableBatchProcessing
-@Import({AnnotationRepoConfig.class, Co_occurringTermsConfiguration.class})
+@Import({AnnotationRepoConfig.class, Co_occurringTermsConfig.class})
 public class AnnotationConfig {
     static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
     static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";

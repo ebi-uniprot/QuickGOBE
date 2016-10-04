@@ -20,15 +20,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 /**
+ *
+ * Spring Configuration class for Co-occurring terms.
+ *
  * @author Tony Wardell
  * Date: 08/09/2016
  * Time: 11:07
  * Created with IntelliJ IDEA.
  */
 @Configuration
-public class Co_occurringTermsConfiguration {
+public class Co_occurringTermsConfig {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsConfiguration.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(Co_occurringTermsConfig.class);
 
     public static final String COSTATS_MANUAL_COMPLETION_STEP_NAME = "costatsManualSummarizationStep";
     public static final String COSTATS_ALL_COMPLETION_STEP_NAME = "costatsAllSummarizationStep";
@@ -56,8 +59,8 @@ public class Co_occurringTermsConfiguration {
     public StepExecutionListener coTermsEndOfAggregationListener(
             ItemWriter<AnnotationDocument> coTermsManualAggregationWriter,
             ItemWriter<AnnotationDocument> coTermsAllAggregationWriter,
-            Co_occurringTermsStatsCalculator coTermsManualCalculator,
-            Co_occurringTermsStatsCalculator coTermsAllCalculator) {
+            CoTermsStatsCalculator coTermsManualCalculator,
+            CoTermsStatsCalculator coTermsAllCalculator) {
         return new Co_occurringTermsStepExecutionListener(coTermsManualAggregationWriter,
                 coTermsAllAggregationWriter, coTermsManualCalculator,
                 coTermsAllCalculator);
@@ -65,15 +68,15 @@ public class Co_occurringTermsConfiguration {
     }
 
     @Bean
-    public Co_occurringTermsStatsCalculator coTermsManualCalculator(
+    public CoTermsStatsCalculator coTermsManualCalculator(
             ItemWriter<AnnotationDocument> coTermsManualAggregationWriter) {
-        return new Co_occurringTermsStatsCalculator(coTermsManualAggregationWriter);
+        return new CoTermsStatsCalculator(coTermsManualAggregationWriter);
     }
 
     @Bean
-    public Co_occurringTermsStatsCalculator coTermsAllCalculator(
+    public CoTermsStatsCalculator coTermsAllCalculator(
             ItemWriter<AnnotationDocument> coTermsAllAggregationWriter) {
-        return new Co_occurringTermsStatsCalculator(coTermsAllAggregationWriter);
+        return new CoTermsStatsCalculator(coTermsAllAggregationWriter);
     }
 
     @Bean

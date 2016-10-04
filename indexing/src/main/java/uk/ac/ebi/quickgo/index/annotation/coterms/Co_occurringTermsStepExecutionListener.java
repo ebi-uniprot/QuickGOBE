@@ -24,17 +24,17 @@ class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
 
     private final ItemWriter<AnnotationDocument> all;
     private final ItemWriter<AnnotationDocument> manual;
-    private final Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual;
-    private final Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll;
+    private final CoTermsStatsCalculator co_TermsStatsCalculatorManual;
+    private final CoTermsStatsCalculator co_TermsStatsCalculatorAll;
 
     public Co_occurringTermsStepExecutionListener(ItemWriter<AnnotationDocument> all,
             ItemWriter<AnnotationDocument> manual,
-            Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorManual,
-            Co_occurringTermsStatsCalculator co_occurringTermsStatsCalculatorAll) {
+            CoTermsStatsCalculator co_TermsStatsCalculatorManual,
+            CoTermsStatsCalculator co_TermsStatsCalculatorAll) {
         this.all = all;
         this.manual = manual;
-        this.co_occurringTermsStatsCalculatorManual = co_occurringTermsStatsCalculatorManual;
-        this.co_occurringTermsStatsCalculatorAll = co_occurringTermsStatsCalculatorAll;
+        this.co_TermsStatsCalculatorManual = co_TermsStatsCalculatorManual;
+        this.co_TermsStatsCalculatorAll = co_TermsStatsCalculatorAll;
     }
 
     @Override
@@ -51,8 +51,8 @@ class Co_occurringTermsStepExecutionListener implements StepExecutionListener {
     public ExitStatus afterStep(StepExecution stepExecution) {
         ((AnnotationCoOccurringTermsAggregator)all).finish();
         ((AnnotationCoOccurringTermsAggregator)manual).finish();
-        co_occurringTermsStatsCalculatorManual.initialize();
-        co_occurringTermsStatsCalculatorAll.initialize();
+        co_TermsStatsCalculatorManual.initialize();
+        co_TermsStatsCalculatorAll.initialize();
         return stepExecution.getExitStatus();
     }
 }
