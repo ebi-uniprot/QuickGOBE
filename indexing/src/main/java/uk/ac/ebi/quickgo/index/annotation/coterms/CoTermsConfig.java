@@ -108,7 +108,7 @@ public class CoTermsConfig {
 
     private ListItemWriter<CoTerm> listItemFlatFileWriter(Resource outputFile) {
         ListItemWriter<CoTerm> listWriter = new ListItemWriter<>(flatFileWriter(outputFile));
-        listWriter.setLineAggregator(new PassThroughLineAggregator<>()); //this shouldn't do anything
+        listWriter.setLineAggregator(new PassThroughLineAggregator<>());
         return listWriter;
     }
 
