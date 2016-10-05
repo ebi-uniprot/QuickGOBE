@@ -49,7 +49,6 @@ public class StatisticsCalculatorTest {
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
         StatisticsCalculator coTermsCalculator = new StatisticsCalculator(aggregator);
-        coTermsCalculator.initialize();
         List<CoTerm> results = coTermsCalculator.process(goTerm);
 
         assertThat(results, hasSize(1));
@@ -81,7 +80,6 @@ public class StatisticsCalculatorTest {
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
         StatisticsCalculator coTermsCalculator = new StatisticsCalculator(aggregator);
-        coTermsCalculator.initialize();
         List<CoTerm> results = coTermsCalculator.process(selected);
         assertThat(results, hasSize(1));
 
@@ -113,7 +111,6 @@ public class StatisticsCalculatorTest {
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
         StatisticsCalculator coTermsCalculator = new StatisticsCalculator(aggregator);
-        coTermsCalculator.initialize();
         List<CoTerm> results = coTermsCalculator.process(selectedList.get(0));
 
         assertThat(results, hasSize(2));
