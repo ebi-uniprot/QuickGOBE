@@ -63,12 +63,9 @@ public class CoTermsConfig {
     @Bean
     public StepExecutionListener coTermsEndOfAggregationListener(
             ItemWriter<AnnotationDocument> coTermsManualAggregationWriter,
-            ItemWriter<AnnotationDocument> coTermsAllAggregationWriter,
-            StatisticsCalculator coTermsManualCalculator,
-            StatisticsCalculator coTermsAllCalculator) {
+            ItemWriter<AnnotationDocument> coTermsAllAggregationWriter) {
         return new CoTermsStepExecutionListener(coTermsManualAggregationWriter,
-                coTermsAllAggregationWriter, coTermsManualCalculator,
-                coTermsAllCalculator);
+                coTermsAllAggregationWriter);
 
     }
 
