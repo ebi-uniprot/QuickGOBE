@@ -19,9 +19,6 @@ import org.springframework.batch.item.ItemWriter;
  */
 class CoTermsStepExecutionListener implements StepExecutionListener {
 
-    // logger
-    private static final Logger LOGGER = LoggerFactory.getLogger( CoTermsStepExecutionListener.class);
-
     private final ItemWriter<AnnotationDocument> all;
     private final ItemWriter<AnnotationDocument> manual;
 
