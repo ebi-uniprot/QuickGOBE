@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.index.annotation.coterms;
+package uk.ac.ebi.quickgo.common.writer;
 
 import java.util.List;
 import org.slf4j.Logger;
@@ -17,20 +17,15 @@ import org.springframework.batch.item.file.FlatFileItemWriter;
  * Time: 16:47
  * Created with IntelliJ IDEA.
  */
-class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
+public class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
 
     private final FlatFileItemWriter<T> wrapped;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(FlatFileItemWriter.class);
-
-    public ListItemWriter(FlatFileItemWriter<T> coTermItemWriter) {
-        wrapped = coTermItemWriter;
+    public ListItemWriter(FlatFileItemWriter<T> writer) {
+        wrapped = writer;
     }
 
     @Override public void write(List<? extends List<T>> list) throws Exception {
-
-        LOGGER.info("Writing {} records to co-occurring terms file", list.size());
-
         for (List<T> subList : list) {
             wrapped.write(subList);
         }
