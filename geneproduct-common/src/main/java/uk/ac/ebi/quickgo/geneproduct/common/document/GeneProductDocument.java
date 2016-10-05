@@ -33,7 +33,7 @@ public class GeneProductDocument implements QuickGODocument {
     @Field(GeneProductFields.TAXON_ID)
     public int taxonId;
 
-`    @Field(GeneProductFields.DATABASE_SUBSET)
+    @Field(GeneProductFields.DATABASE_SUBSET)
     public List<String> databaseSubsets;
 
     @Field(GeneProductFields.COMPLETE_PROTEOME)
