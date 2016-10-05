@@ -4,7 +4,9 @@ import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Preconditions;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
@@ -48,7 +50,6 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         doc.type = geneProduct.type;
         doc.taxonId = extractTaxonIdFromValue(geneProduct.taxonId);
         doc.parentId = geneProduct.parentId;
-        doc.taxonName = properties.get(TAXON_NAME_KEY);
         doc.referenceProteome = properties.get(REFERENCE_PROTEOME_KEY);
         doc.databaseSubsets = convertToList(properties.get(DATABASE_SUBSET_KEY));
 
