@@ -60,6 +60,27 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.T
 public class AnnotationConfig {
     static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
     static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
+    @Value("${indexing.annotation.source}")
+    private Resource[] resources;
+    @Value("${indexing.annotation.chunk.size:500}")
+    private int chunkSize;
+    @Value("${indexing.coterms.chunk.size:1}")
+    private int cotermsChunk;
+    @Value("${indexing.annotation.header.lines:21}")
+    private int headerLines;
+    @Value("${indexing.annotation.skip.limit:100}")
+    private int skipLimit;
+    @Value("${indexing.coterm.loginterval:1000}")
+    private int coTermLogInterval;
+    @Autowired
+    private AnnotationRepository annotationRepository;
+    @Autowired
+    private SolrTemplate annotationTemplate;
+    @Autowired
+    private JobBuilderFactory jobBuilders;
+    @Autowired
+    private StepBuilderFactory stepBuilders;
+
     @Autowired
     ItemWriter<AnnotationDocument> coTermsManualAggregationWriter;
     @Autowired
@@ -71,33 +92,13 @@ public class AnnotationConfig {
     @Autowired
     ItemReader<String> coTermsManualReader;
     @Autowired
-    ItemWriter<List<CoTerm>> coTermsManualStatsWriter;
-    @Autowired
     ItemReader<String> coTermsAllReader;
+    @Autowired
+    ItemWriter<List<CoTerm>> coTermsManualStatsWriter;
     @Autowired
     ItemWriter<List<CoTerm>> coTermsAllStatsWriter;
     @Autowired
     StepExecutionListener coTermsStepExecutionListener;
-    @Value("${indexing.annotation.source}")
-    private Resource[] resources;
-    @Value("${indexing.annotation.chunk.size:500}")
-    private int chunkSize;
-    @Value("${indexing.coterms.chunk.size:1}")
-    private int cotermsChunk;
-    @Value("${indexing.annotation.header.lines:21}")
-    private int headerLines;
-    @Value("${indexing.annotation.skip.limit:100}")
-    private int skipLimit;
-    @Autowired
-    private AnnotationRepository annotationRepository;
-    @Autowired
-    private SolrTemplate annotationTemplate;
-    @Autowired
-    private JobBuilderFactory jobBuilders;
-    @Autowired
-    private StepBuilderFactory stepBuilders;
-    @Value("${indexing.coterm.loginterval:1000}")
-    private int coTermLogInterval;
 
     @Bean
     public Job annotationJob() {
@@ -132,7 +133,6 @@ public class AnnotationConfig {
                 .listener(skipLogListener())
                 .build();
     }
-
 
     @Bean
     public Step coTermManualSummarizationStep() {
@@ -252,7 +252,6 @@ public class AnnotationConfig {
         writerList.add(annotationSolrServerWriter());
         writerList.add(coTermsManualAggregationWriter);
         writerList.add(coTermsAllAggregationWriter);
-
         compositeItemWriter.setDelegates(writerList);
         return compositeItemWriter;
     }
