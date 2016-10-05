@@ -12,7 +12,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * For the contents of the co-occurring terms matrix calculate co-occurrence statistics.
+ * For a GO Term retrieve all the co-occurring terms together with the statistics related to that co-occurrence.
  *
  * @author Tony Wardell
  * Date: 26/11/2015
