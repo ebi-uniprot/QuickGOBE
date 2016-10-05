@@ -22,16 +22,12 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>> {
 
-    //This is the count of all gene products for the term. We hold this figure separately as it is used many times.
-    private Map<String, AtomicLong> termGPCount;
-
-    //Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
-    private Map<String, Map<String, AtomicLong>> coTermMatrix;
-
-    //Total number of unique gene products that have annotations
-    private long geneProductCount;
     private final CoTermsAggregator aggregator;
 
+    /**
+     *
+     * @param aggregator holds the data for co-occurring terms.
+     */
     public StatisticsCalculator(ItemWriter<AnnotationDocument> aggregator) {
         Preconditions.checkArgument(aggregator!=null, "The aggregator instance passed to the Statistics Calculator " +
                 "constructor cannot be null");
@@ -39,17 +35,15 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
     }
 
     /**
-     * Read each line in the term to term matrix for the selected term. For each calculate a CoTerm instance.
-     *
+     * For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
+     * @param goTerm the GO Term id for which co-occurring statistics will be calculated, co-occurring term list of
+     * objects will be returned containing data and statistics.
+     * @return a list of CoTerm objects. Each object represents a single permutation of two GO Terms that are
+     * used to annotate the same gene product, and the statistics about that permutation.
      */
+    @Override
     public List<CoTerm> process(String goTerm) {
         return createCoTermsForSelectedTerm(goTerm).highestSimilarity();
-    }
-
-    public void initialize() {
-        this.geneProductCount = aggregator.getTotalOfAnnotatedGeneProducts();
-        this.termGPCount = aggregator.getGeneProductCounts();
-        this.coTermMatrix = aggregator.getCoTerms();
     }
 
     /**
@@ -63,32 +57,17 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
         Preconditions.checkArgument(null != goTerm, "Target GO term id passed to createCoTermsForSelectedTerm should not " +
                 "be null");
 
-        Map<String, AtomicLong> coTermsForTarget = coTermMatrix.get(goTerm);
-//        CoTermsForSelectedTerm
-        //                coTerms = new CoTermsForSelectedTerm(geneProductCount, termGPCount.get(goTerm).get());
-
+        Map<String, AtomicLong> coTermsForTarget = aggregator.getCoTerms().get(goTerm);
         CoTermsForSelectedTerm.Builder coTermsBuilder =  new CoTermsForSelectedTerm.Builder()
-                .setTotalNumberOfGeneProducts
-        (geneProductCount).setSelected(termGPCount.get(goTerm).get());
+                .setTotalNumberOfGeneProducts(aggregator.getTotalOfAnnotatedGeneProducts()).setSelected(aggregator.getGeneProductCounts().get(goTerm).get());
 
         for (String comparedTerm : coTermsForTarget.keySet()) {
-
             coTermsBuilder.addCoTerm(new CoTerm.Builder().setTarget(goTerm).setComparedTerm
                     (comparedTerm)
-                    .setCompared(termGPCount.get(comparedTerm).get())
+                    .setCompared(aggregator.getGeneProductCounts().get(comparedTerm).get())
                     .setTogether(coTermsForTarget.get(comparedTerm).get()).createCoTerm());
         }
         return coTermsBuilder.build();
 
     }
-
-    /**
-     *  Get list of compared terms, ordered by significance ratio descending
-     * @param coTerms
-     * @return
-     */
-    private List<CoTerm> resultsForOneGoTerm(CoTermsForSelectedTerm coTerms) {
-        return coTerms.highestSimilarity();
-    }
-
 }
