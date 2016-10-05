@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.client;
 
-import uk.ac.ebi.quickgo.client.presets.read.PresetsConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
 

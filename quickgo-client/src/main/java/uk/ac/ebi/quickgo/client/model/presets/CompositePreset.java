@@ -1,21 +1,23 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
+import java.util.List;
+
 /**
  * Represents preset information relating to different aspects of QuickGO.
  *
- * Created 30/08/16
+ * Created 20/09/16
  * @author Edd
  */
-public class CompositePreset {
-    public final AssignedByPresets assignedBy;
+public interface CompositePreset {
+    List<PresetItem> getAssignedBy();
 
-    public CompositePreset() {
-        assignedBy = new AssignedByPresets();
-    }
+    List<PresetItem> getReferences();
 
-    @Override public String toString() {
-        return "CompositePreset{" +
-                "assignedBy=" + assignedBy +
-                '}';
-    }
+    List<PresetItem> getEvidences();
+
+    List<PresetItem> getWithFrom();
+
+    List<PresetItem> getGeneProducts();
+
+    List<PresetItem> getGoSlimSets();
 }
