@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.taxon;
 
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
@@ -55,8 +55,9 @@ public class TaxonPresetsConfig {
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> {
             rawItemList.forEach(rawItem -> {
-                presets.taxonBuilder.addPreset(
-                        PresetItemBuilder.createWithName(rawItem.name)
+                presets.addPreset(CompositePresetImpl.PresetType.TAXONS,
+                        PresetItem
+                                .createWithName(rawItem.name)
                                 .withRelevancy(rawItem.relevancy)
                                 .build());
             });

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseType;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

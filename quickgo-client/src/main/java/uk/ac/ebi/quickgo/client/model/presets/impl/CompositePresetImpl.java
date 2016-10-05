@@ -11,7 +11,11 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.mapping;
+import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.ASPECTS;
+import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.GENE_PRODUCT_TYPES;
 import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.GO_SLIMS_SETS;
+import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.QUALIFIERS;
+import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.TAXONS;
 
 /**
  * <p>Represents preset information relating to different aspects of QuickGO.
@@ -52,6 +56,8 @@ public class CompositePresetImpl implements CompositePreset {
         for (PresetType presetType : PresetType.values()) {
             presetsMap.put(presetType, new LinkedHashSet<>());
         }
+
+        initialiseStaticPresets();
     }
 
     public void addPreset(PresetType presetType, PresetItem presetItem) {
@@ -82,6 +88,27 @@ public class CompositePresetImpl implements CompositePreset {
 
     @Override public List<PresetItem> getGoSlimSets() {
         return sortedPresetItems(GO_SLIMS_SETS);
+    }
+
+    @Override public List<PresetItem> getTaxons() {
+        return sortedPresetItems(TAXONS);
+    }
+
+    @Override public List<PresetItem> getQualifiers() {
+        return sortedPresetItems(QUALIFIERS);
+    }
+
+    @Override public List<PresetItem> getAspects() {
+        return sortedPresetItems(ASPECTS);
+    }
+
+    @Override public List<PresetItem> getGeneProductTypes() {
+        return sortedPresetItems(GENE_PRODUCT_TYPES);
+    }
+
+    private void initialiseStaticPresets() {
+        presetsMap.put(ASPECTS, StaticAspects.createAspects());
+        presetsMap.put(GENE_PRODUCT_TYPES, StaticGeneProductTypes.createGeneProductTypes());
     }
 
     /**
@@ -160,7 +187,7 @@ public class CompositePresetImpl implements CompositePreset {
         ASPECTS
     }
 
-    static class StaticAspects {
+    private static class StaticAspects {
 
         static final String MOLECULAR_FUNCTION = "Molecular Function";
         static final String FUNCTION = "function";
@@ -169,22 +196,25 @@ public class CompositePresetImpl implements CompositePreset {
         static final String CELLULAR_COMPONENT = "Cellular Component";
         static final String COMPONENT = "component";
 
-        static PresetItemsBuilder createAspectBuilder() {
-            PresetItemsBuilder itemsBuilder = new PresetItemsBuilder();
-            itemsBuilder.addPreset(PresetItemBuilder
-                    .createWithName(MOLECULAR_FUNCTION)
-                    .withId(FUNCTION).build());
-            itemsBuilder.addPreset(PresetItemBuilder
-                    .createWithName(BIOLOGICAL_PROCESS)
-                    .withId(PROCESS).build());
-            itemsBuilder.addPreset(PresetItemBuilder
-                    .createWithName(CELLULAR_COMPONENT)
-                    .withId(COMPONENT).build());
-            return itemsBuilder;
+        static Set<PresetItem> createAspects() {
+            Set<PresetItem> presetAspects = new HashSet<>();
+            presetAspects.add(
+                    PresetItem
+                            .createWithName(MOLECULAR_FUNCTION)
+                            .withId(FUNCTION).build());
+            presetAspects.add(
+                    PresetItem
+                            .createWithName(BIOLOGICAL_PROCESS)
+                            .withId(PROCESS).build());
+            presetAspects.add(
+                    PresetItem
+                            .createWithName(CELLULAR_COMPONENT)
+                            .withId(COMPONENT).build());
+            return presetAspects;
         }
     }
 
-    static class StaticGeneProductTypes {
+    private static class StaticGeneProductTypes {
 
         static final String PROTEINS = "Proteins";
         static final String PROTEIN_ID = "protein";
@@ -193,18 +223,21 @@ public class CompositePresetImpl implements CompositePreset {
         static final String COMPLEXES = "Complexes";
         static final String COMPLEXES_ID = "complex";
 
-        static PresetItemsBuilder createGeneProductTypeBuilder() {
-            PresetItemsBuilder itemsBuilder = new PresetItemsBuilder();
-            itemsBuilder.addPreset(PresetItemBuilder
+        static Set<PresetItem> createGeneProductTypes() {
+            Set<PresetItem> presetGeneProductTypes = new HashSet<>();
+            presetGeneProductTypes.add(
+                    PresetItem
                     .createWithName(PROTEINS)
                     .withId(PROTEIN_ID).build());
-            itemsBuilder.addPreset(PresetItemBuilder
+            presetGeneProductTypes.add(
+                    PresetItem
                     .createWithName(RNA)
                     .withId(RNA_ID).build());
-            itemsBuilder.addPreset(PresetItemBuilder
+            presetGeneProductTypes.add(
+                    PresetItem
                     .createWithName(COMPLEXES)
                     .withId(COMPLEXES_ID).build());
-            return itemsBuilder;
+            return presetGeneProductTypes;
         }
     }
 }

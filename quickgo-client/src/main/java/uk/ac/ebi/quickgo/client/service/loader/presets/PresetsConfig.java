@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Configuration;
  * @author Edd
  */
 @Configuration
-//@Import({TaxonPresetsConfig.class})
 @ComponentScan({
         "uk.ac.ebi.quickgo.client.service.loader.presets"})
 public class PresetsConfig {

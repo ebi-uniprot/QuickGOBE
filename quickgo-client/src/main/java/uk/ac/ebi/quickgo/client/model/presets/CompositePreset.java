@@ -21,8 +21,6 @@ public interface CompositePreset {
 
     List<PresetItem> getGoSlimSets();
 
-    List<PresetItem> getGoSlimSets();
-
     List<PresetItem> getTaxons();
 
     List<PresetItem> getQualifiers();

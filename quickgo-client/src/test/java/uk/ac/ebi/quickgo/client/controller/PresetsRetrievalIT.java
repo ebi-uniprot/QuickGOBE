@@ -96,8 +96,7 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.taxons").exists())
-                .andExpect(jsonPath("$.taxons.presets").exists());
+                .andExpect(jsonPath("$.taxons").exists());
     }
 
     @Test
@@ -105,8 +104,7 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.qualifiers").exists())
-                .andExpect(jsonPath("$.qualifiers.presets").exists());
+                .andExpect(jsonPath("$.qualifiers").exists());
     }
 
     @Test
@@ -114,8 +112,7 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.aspects").exists())
-                .andExpect(jsonPath("$.aspects.presets.*", hasSize(3)));
+                .andExpect(jsonPath("$.aspects.*", hasSize(3)));
     }
 
     @Test
@@ -123,7 +120,6 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.geneProductTypes").exists())
-                .andExpect(jsonPath("$.geneProductTypes.presets.*", hasSize(3)));
+                .andExpect(jsonPath("$.geneProductTypes.*", hasSize(3)));
     }
 }
