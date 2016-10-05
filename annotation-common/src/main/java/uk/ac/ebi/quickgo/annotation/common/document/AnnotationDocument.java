@@ -22,14 +22,14 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.QUALIFIER)
     public String qualifier;
 
-    @Field(AnnotationFields.DB_OBJECT_SYMBOL)
-    public String dbObjectSymbol;
+    @Field(AnnotationFields.SYMBOL)
+    public String symbol;
 
     @Field(AnnotationFields.GENE_PRODUCT_TYPE)
     public String geneProductType;
 
-    @Field(AnnotationFields.DB_SUBSET)
-    public String dbSubset;
+    @Field(AnnotationFields.GENE_PRODUCT_SUBSET)
+    public String geneProductSubset;
 
     @Field(AnnotationFields.TAXON_ID)
     public int taxonId;
@@ -60,6 +60,9 @@ public class AnnotationDocument implements QuickGODocument {
 
     @Field(AnnotationFields.TARGET_SET)
     public List<String> targetSets;
+
+    @Field(AnnotationFields.GO_ASPECT)
+    public String goAspect;
 
     @Override public String getUniqueName() {
         return id;

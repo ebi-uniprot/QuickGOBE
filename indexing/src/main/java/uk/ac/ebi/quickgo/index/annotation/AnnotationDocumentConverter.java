@@ -51,11 +51,12 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
         doc.interactingTaxonId = extractInteractingTaxonId(annotation);
 
         doc.goEvidence = propertiesMap.get(GO_EVIDENCE);
-        doc.dbSubset = propertiesMap.get(DB_OBJECT_SUBSET);
-        doc.dbObjectSymbol = propertiesMap.get(DB_OBJECT_SYMBOL);
+        doc.geneProductSubset = propertiesMap.get(DB_OBJECT_SUBSET);
+        doc.symbol = propertiesMap.get(DB_OBJECT_SYMBOL);
         doc.geneProductType = propertiesMap.get(DB_OBJECT_TYPE);
         doc.taxonId = extractTaxonId(propertiesMap.get(TAXON_ID));
         doc.targetSets = constructTargetSets(propertiesMap.get(TARGET_SET));
+        doc.goAspect = propertiesMap.get(GO_ASPECT);
 
         return doc;
     }

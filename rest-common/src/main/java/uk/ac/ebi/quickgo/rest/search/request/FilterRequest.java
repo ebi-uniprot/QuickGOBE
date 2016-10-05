@@ -91,6 +91,7 @@ public class FilterRequest {
 
     public static class Builder {
         private Map<String, List<String>> properties;
+
         private Builder() {
             properties = new HashMap<>();
         }
@@ -100,7 +101,10 @@ public class FilterRequest {
                     "Property name cannot be null or empty");
 
             List<String> valuesList = new ArrayList<>();
-            Stream.of(values).filter(Objects::nonNull).forEach(valuesList::add);
+
+            if (values != null) {
+                Stream.of(values).filter(Objects::nonNull).forEach(valuesList::add);
+            }
 
             this.properties.put(name, valuesList);
             return this;

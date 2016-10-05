@@ -6,6 +6,8 @@ import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
+import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
@@ -13,7 +15,14 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
+import java.util.HashSet;
+import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -22,12 +31,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 
 /**
  * Provides RESTful endpoints for retrieving Gene Ontology (GO) Annotations to gene products.
@@ -87,7 +97,7 @@ public class AnnotationController {
 
     private final BasicSearchQueryTemplate queryTemplate;
     private final FilterConverterFactory converterFactory;
-
+    private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
 
     @Autowired
@@ -95,6 +105,7 @@ public class AnnotationController {
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
             ControllerValidationHelper validationHelper,
             FilterConverterFactory converterFactory,
+            ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
             StatisticsService statsService) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
@@ -102,23 +113,32 @@ public class AnnotationController {
                 ".AnnotationCompositeRetrievalConfig instance passed to the constructor of AnnotationController " +
                 "should not be null.");
         checkArgument(converterFactory != null, "The FilterConverterFactory cannot be null.");
+        checkArgument(resultTransformerChain != null,
+                "The ResultTransformerChain<QueryResult<Annotation>> cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
-
         this.converterFactory = converterFactory;
         this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
-
         this.statsService = statsService;
+        this.resultTransformerChain = resultTransformerChain;
     }
 
     /**
      * Search for an Annotations based on their attributes
      * @return a {@link QueryResult} instance containing the results of the search
      */
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Annotation result set has been filtered according to " +
+                    "the provided attribute values"),
+            @ApiResponse(code = 500, message = "Internal server error occurred whilst searching for " +
+                    "matching annotations", response = ResponseExceptionHandler.ErrorInfo.class),
+            @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
+                    "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
+    @ApiOperation(value = "Search for all annotations that match the filter criteria provided by the client.")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<Annotation>> annotationLookup(@Valid AnnotationRequest request,
-            BindingResult bindingResult) {
+    public ResponseEntity<QueryResult<Annotation>> annotationLookup(
+            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);
@@ -126,17 +146,47 @@ public class AnnotationController {
 
         validationHelper.validateRequestedResults(request.getLimit());
 
+        FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
+
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(request.createFilterRequests().stream()
-                        .map(converterFactory::convert)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet()))
+                .setFilters(filterQueryInfo.getFilterQueries())
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit())
                 .build();
 
-        return search(queryRequest, annotationSearchService);
+        return searchAndTransform(queryRequest, annotationSearchService, resultTransformerChain,
+                filterQueryInfo.getFilterContext());
+    }
+
+    private FilterQueryInfo extractFilterQueryInfo(
+            AnnotationRequest request) {
+        Set<QuickGOQuery> filterQueries = new HashSet<>();
+        Set<FilterContext> filterContexts = new HashSet<>();
+
+        request.createFilterRequests().stream()
+                .map(converterFactory::convert)
+                .forEach(convertedFilter -> {
+                    filterQueries.add(convertedFilter.getConvertedValue());
+                    convertedFilter.getFilterContext().ifPresent(filterContexts::add);
+                });
+
+        return new FilterQueryInfo() {
+            @Override public Set<QuickGOQuery> getFilterQueries() {
+                return filterQueries;
+            }
+
+            @Override public FilterContext getFilterContext() {
+                return filterContexts.stream().reduce(new FilterContext(), FilterContext::merge);
+            }
+        };
+
+    }
+
+    private interface FilterQueryInfo {
+        Set<QuickGOQuery> getFilterQueries();
+
+        FilterContext getFilterContext();
     }
 
     /**
@@ -145,9 +195,17 @@ public class AnnotationController {
      * The statistics are subdivided into two areas, each with
      * @return a {@link QueryResult} instance containing the results of the search
      */
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Statistics have been calculated for the annotation result set " +
+                    "obtained from the application of the filter parameters"),
+            @ApiResponse(code = 500, message = "Internal server error occurred whilst producing statistics",
+                    response = ResponseExceptionHandler.ErrorInfo.class),
+            @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
+                    "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
+    @ApiOperation(value = "Generate statistic on the annotation result set obtained from applying the filters.")
     @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(@Valid AnnotationRequest request,
-            BindingResult bindingResult) {
+    public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
+            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);

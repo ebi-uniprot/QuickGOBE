@@ -25,6 +25,7 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .useDefaultResponseMessages(false)
                 .select()
                 // exclude any spring boot's default APIs e.g., /error:
                 //   we only want our APIs documented

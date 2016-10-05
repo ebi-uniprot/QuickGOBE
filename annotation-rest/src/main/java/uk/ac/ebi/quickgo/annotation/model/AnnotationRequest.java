@@ -6,14 +6,16 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import com.google.common.base.Preconditions;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
 import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
-import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
+import static uk.ac.ebi.quickgo.annotation.model.ArrayPattern.Flag.CASE_INSENSITIVE;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -29,17 +31,50 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 public class AnnotationRequest {
     public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
     public static final int MAX_ENTRIES_PER_PAGE = 100;
+    public static final int MIN_ENTRIES_PER_PAGE = 0;
+
+    public static final int DEFAULT_PAGE_NUMBER = 1;
+    public static final int MIN_PAGE_NUMBER = 1;
+
+    static final int MAX_GO_IDS = 500;
+    static final int MAX_GENE_PRODUCT_IDS = 500;
+    static final int MAX_EVIDENCE_CODE = 100;
+    static final int MAX_TAXON_IDS = 50;
+    static final int MAX_REFERENCES = 50;
+
+    //Names of the parameters in readable format
+    static final String ASSIGNED_BY_PARAM = "Assigned By";
+    static final String ASPECT_PARAM = "Aspect";
+    static final String GO_EVIDENCE_PARAM = "GO Evidence";
+    static final String TAXON_ID_PARAM = "Taxonomic identifier";
+    static final String GO_ID_PARAM = "GO Id";
+    static final String USAGE_RELATIONSHIP_PARAM = "Usage relationship";
+    static final String EVIDENCE_CODE_PARAM = "Evidence code identifier";
+    static final String GENE_PRODUCT_TYPE_PARAM = "Gene Product Type";
+    static final String GENE_PRODUCT_SUBSET_PARAM = "Gene Product Subset identifier";
+    static final String GENE_PRODUCT_PARAM = "Gene Product ID";
+    static final String REFERENCE_PARAM = "Reference";
 
     static final String USAGE_FIELD = "usage";
-    static final String USAGE_IDS = "usageIds";
     static final String USAGE_RELATIONSHIPS = "usageRelationships";
-    private static final String ASPECT_FIELD = "aspect";
-    private static final String[] TARGET_FIELDS = new String[]{ASPECT_FIELD, ASSIGNED_BY, TAXON_ID, GO_EVIDENCE,
-            QUALIFIER, REFERENCE_SEARCH, WITH_FROM_SEARCH, EVIDENCE_CODE, GENE_PRODUCT_ID, GO_ID, GENE_PRODUCT_TYPE,
-            DB_SUBSET, TARGET_SET};
 
-    private static final int DEFAULT_PAGE_NUMBER = 1;
-    private static final String COMMA = ",";
+    /**
+     * indicates which fields should be looked at when creating filters
+     */
+    private static final String[] FILTER_REQUEST_FIELDS = new String[]{
+            GO_ASPECT,
+            ASSIGNED_BY,
+            GENE_PRODUCT_SUBSET,
+            EVIDENCE_CODE,
+            GENE_PRODUCT_ID,
+            GENE_PRODUCT_TYPE,
+            GO_EVIDENCE,
+            QUALIFIER,
+            REFERENCE_SEARCH,
+            TAXON_ID,
+            TARGET_SET,
+            WITH_FROM_SEARCH
+    };
 
     /**
      * At the moment the definition of the list is hardcoded because we only have need to display annotation and
@@ -52,7 +87,7 @@ public class AnnotationRequest {
 
     static {
         List<String> statsTypes =
-                Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE, ASSIGNED_BY);
+                Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE, ASSIGNED_BY, GO_ASPECT);
 
         StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
         StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);
@@ -60,69 +95,165 @@ public class AnnotationRequest {
         DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
     }
 
-    @Min(0) @Max(MAX_ENTRIES_PER_PAGE)
+    @ApiModelProperty(
+            value = "Number of results per page.",
+            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @Min(1)
+    @ApiModelProperty(
+            value = "Page number of the result set to display.",
+            allowableValues = "range[" + MIN_PAGE_NUMBER + ",max_result_set_size]")
     private int page = DEFAULT_PAGE_NUMBER;
 
-    private final Map<String, String> filterMap = new HashMap<>();
+    /*
+     * TODO: These state variables are only here until springfox can get the @ApiModelProperty to work with our POJO.
+     * When the fix is in place we can move the @ApiModelProperty definitions to the getters
+     */
+    @ApiModelProperty(
+            value = "Filter annotation by the ontology to which the associated GO term belongs. Accepts comma " +
+                    "separated values. Accepts comma separated values.",
+            allowableValues = "process,function,component",
+            example = "process,function")
+    private String aspect;
+
+    @ApiModelProperty(value = "The database which made the annotation. Accepts comma separated values.",
+            example = "BHF-UCL,Ensembl")
+    private String[] assignedBy;
+
+    @ApiModelProperty(
+            value = "Identifier of a literature or database reference, cited as an authority " +
+                    "for the attribution of the GO ID. It is also possible to filter just by the database type. " +
+                    "Format: DB:Reference. Accepts comma separated values.",
+            example = "PMID:2676709")
+    private String reference;
+
+    @ApiModelProperty(
+            value = "Unique identifier of a gene product present within an annotation. Accepts comma separated " +
+                    "values.", example = "P99999,URS00000064B1_559292")
+    private String geneProductId;
+
+    @ApiModelProperty(
+            value = "Evidence code used to indicate how the annotation is supported. Accepts comma separated values.",
+            example = "ECO:0000255,ECO:0000305")
+    private String evidenceCode;
+
+    @ApiModelProperty(
+            value = "The GO identifier attributed to an annotation. Accepts comma separated values.",
+            example = "GO:0030533,GO:0070125")
+    private String goId;
+
+    @ApiModelProperty(
+            value = "Flags that modify the interpretation of an annotation. Accepts comma separated values.",
+            example = "enables,involved_in")
+    private String qualifier;
+
+    @ApiModelProperty(
+            value = "Holds additional identifiers for an annotation. Accepts comma separated values.",
+            example = "GO:0030533,P63328")
+    private String withFrom;
+
+    @ApiModelProperty(
+            value = "The taxonomic identifier of the species encoding the gene product associated to an annotation. " +
+                    "Accepts comma separated values.",
+            example = "35758,1310605")
+    private String taxonId;
+
+    @ApiModelProperty(
+            value = "Indicates how the GO terms within the annotations should be used. Is used in conjunction with " +
+                    "'usageRelationships'.",
+            allowableValues = "descendants,slim",
+            example = "descendants")
+    private String usage;
+
+    @ApiModelProperty(
+            value = "The relationship between the provided 'goId' identifiers and the GO identifiers " +
+                    "found within the annotations. If the relationship is fulfilled, the annotation is selected." +
+                    "Allows comma separated values.",
+            allowableValues = "is_a,part_of,occurs_in,regulates",
+            example = "is_a,part_of")
+    private String usageRelationships;
+
+    @ApiModelProperty(
+            value = "The type of gene product found within an annotation. Accepts comma separated values.",
+            allowableValues = "protein,RNA,complexes.",
+            example = "protein,RNA")
+    private String geneProductType;
+
+    @ApiModelProperty(
+            value = "A set of gene products that have been identified as being of interest to a certain group. " +
+                    "Accepts comma separated values.",
+            example = "KRUK,BHF-UCL,Exosome")
+    private String targetSet;
+
+    @ApiModelProperty(
+            value = "The name of a database specific to gene products. Accepts comma separated values.",
+            example = "TrEMBL"
+    )
+    private String geneProductSubset;
+
+    @ApiModelProperty(
+            value = "Gene ontology evidence codes of the 'goId's found within the annotations. Accepts comma " +
+                    "separated values.",
+            example = "EXP,IDA")
+    private String goIdEvidence;
+
+    private final Map<String, String[]> filterMap = new HashMap<>();
 
     /**
      *  E.g. ASPGD,Agbase,..
      *  In the format assignedBy=ASPGD,Agbase
      */
-    public void setAssignedBy(String assignedBy) {
+    public void setAssignedBy(String... assignedBy) {
         if (assignedBy != null) {
             filterMap.put(ASSIGNED_BY, assignedBy);
         }
     }
 
-    @Pattern(regexp = "^[A-Za-z][A-Za-z\\-_]+(,[A-Za-z][A-Za-z\\-_]+)*",
-            message = "At least one 'Assigned By' value is invalid: ${validatedValue}")
-    public String getAssignedBy() {
+    @ArrayPattern(regexp = "^[A-Za-z][A-Za-z\\-_]+$", paramName = ASSIGNED_BY_PARAM)
+    public String[] getAssignedBy() {
         return filterMap.get(ASSIGNED_BY);
     }
 
     /**
      * E.g. DOI, DOI:10.1002/adsc.201200590, GO_REF, PMID, PMID:12882977, Reactome, Reactome:R-RNO-912619,
      * GO_REF:0000037 etc
-     * @param reference
-     * @return
      */
-    public void setReference(String reference) {
+    public void setReference(String... reference) {
         filterMap.put(REFERENCE_SEARCH, reference);
     }
 
     //todo create validation pattern @Pattern(regexp = "")
-    public String getReference() {
+    @Size(max = MAX_REFERENCES,
+            message = "Number of items in '" + REFERENCE_PARAM + "' is larger than: {max}")
+    public String[] getReference() {
         return filterMap.get(REFERENCE_SEARCH);
     }
 
-    public void setAspect(String aspect) {
+    public void setAspect(String... aspect) {
         if (aspect != null) {
-            filterMap.put(ASPECT_FIELD, aspect.toLowerCase());
+            filterMap.put(GO_ASPECT, aspect);
         }
     }
 
-    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = CASE_INSENSITIVE,
-            message = "At least one 'Aspect' value is invalid: ${validatedValue}")
-    public String getAspect() {
-        return filterMap.get(ASPECT_FIELD);
+    @ArrayPattern(regexp = "^biological_process|molecular_function|cellular_component$", flags = CASE_INSENSITIVE,
+            paramName = ASPECT_PARAM)
+    public String[] getAspect() {
+        return filterMap.get(GO_ASPECT);
     }
 
     /**
      * Gene Product IDs, in CSV format.
      */
-
-    public void setGpId(String listOfGeneProductIDs) {
+    public void setGeneProductId(String... listOfGeneProductIDs) {
         if (listOfGeneProductIDs != null) {
             filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
         }
     }
 
     @GeneProductIDList
-    public String getGpId() {
+    @Size(max = MAX_GENE_PRODUCT_IDS,
+            message = "Number of items in '" + GENE_PRODUCT_PARAM + "' is larger than: {max}")
+    public String[] getGeneProductId() {
         return filterMap.get(GENE_PRODUCT_ID);
     }
 
@@ -132,25 +263,23 @@ public class AnnotationRequest {
      * evidence codes</a>
      * @param evidence the evidence code
      */
-    public void setGoEvidence(String evidence) {
+    public void setGoIdEvidence(String... evidence) {
         filterMap.put(GO_EVIDENCE, evidence);
     }
 
-    @Pattern(regexp = "^[A-Za-z]{2,3}(,[A-Za-z]{2,3})*",
-            message = "At least one 'GO Evidence' value is invalid: ${validatedValue}")
-    public String getGoEvidence() {
+    @ArrayPattern(regexp = "^[A-Za-z]{2,3}$", paramName = GO_EVIDENCE_PARAM)
+    public String[] getGoIdEvidence() {
         return filterMap.get(GO_EVIDENCE);
     }
 
     /**
      * NOT, enables etc
-     * @param qualifier
      */
-    public void setQualifier(String qualifier) {
+    public void setQualifier(String... qualifier) {
         filterMap.put(QUALIFIER, qualifier);
     }
 
-    public String getQualifier() {
+    public String[] getQualifier() {
         return filterMap.get(QUALIFIER);
     }
 
@@ -160,7 +289,7 @@ public class AnnotationRequest {
      * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
      * @param withFrom comma separated with/from values
      */
-    public void setWithFrom(String withFrom) {
+    public void setWithFrom(String... withFrom) {
         filterMap.put(WITH_FROM_SEARCH, withFrom);
     }
 
@@ -168,116 +297,110 @@ public class AnnotationRequest {
      * Return a list of with/from values, separated by commas
      * @return String containing comma separated list of with/From values.
      */
-    public String getWithFrom() {
+    public String[] getWithFrom() {
         return filterMap.get(WITH_FROM_SEARCH);
     }
 
-    public void setTaxon(String taxId) {
+    public void setTaxonId(String... taxId) {
         filterMap.put(TAXON_ID, taxId);
     }
 
-    @Pattern(regexp = "[0-9]+(,[0-9]+)*",
-            message = "At least one 'Taxonomic identifier' value is invalid: ${validatedValue}")
-    public String getTaxon() {
+    @ArrayPattern(regexp = "^[0-9]+$", paramName = TAXON_ID_PARAM)
+    @Size(max = MAX_TAXON_IDS,
+            message = "Number of items in '" + TAXON_ID_PARAM + "' is larger than: {max}")
+
+    public String[] getTaxonId() {
         return filterMap.get(TAXON_ID);
     }
 
     /**
      * List of Gene Ontology ids in CSV format
-     * @param goId
      */
-    public void setGoId(String goId) {
+    public void setGoId(String... goId) {
         filterMap.put(GO_ID, goId);
     }
 
-    @Pattern(regexp = "go:[0-9]{7}(,go:[0-9]{7})*", flags = CASE_INSENSITIVE,
-            message = "At least one 'GO Id' value is invalid: ${validatedValue}")
-    public String getGoId() {
+    @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE, paramName = GO_ID_PARAM)
+    @Size(max = MAX_GO_IDS,
+            message = "Number of items in '" + GO_ID_PARAM + "' is larger than: {max}")
+    public String[] getGoId() {
         return filterMap.get(GO_ID);
     }
 
     /**
      * Will receive a list of eco ids thus: evidenceCode=ECO:0000256,ECO:0000323
-     * @param evidenceCode
      */
-    public void setEvidenceCode(String evidenceCode) {
+    public void setEvidenceCode(String... evidenceCode) {
         filterMap.put(EVIDENCE_CODE, evidenceCode);
     }
 
-    @Pattern(regexp = "ECO:[0-9]{7}(,ECO:[0-9]{7})*", flags = CASE_INSENSITIVE,
-            message = "At least one 'Evidence code identifier' value is invalid: ${validatedValue}")
-    public String getEvidenceCode() {
+    @ArrayPattern(regexp = "^ECO:[0-9]{7}$", paramName = EVIDENCE_CODE_PARAM, flags = CASE_INSENSITIVE)
+    @Size(max = MAX_EVIDENCE_CODE,
+            message = "Number of items in '" + EVIDENCE_CODE_PARAM + "' is larger than: {max}")
+    public String[] getEvidenceCode() {
         return filterMap.get(EVIDENCE_CODE);
-    }
-
-    @Pattern(regexp = "^exact|slim|descendants$", flags = CASE_INSENSITIVE, message = "Invalid usage: " +
-            "${validatedValue})")
-    public String getUsage() {
-        return filterMap.get(USAGE_FIELD);
     }
 
     public void setUsage(String usage) {
         if (usage != null) {
-            filterMap.put(USAGE_FIELD, usage.toLowerCase());
+            filterMap.put(USAGE_FIELD, new String[]{usage.toLowerCase()});
         }
     }
 
-    @Pattern(regexp = "GO:[0-9]+(,GO:[0-9]+)*", flags = CASE_INSENSITIVE,
-            message = "Invalid GO IDs specified: ${validatedValue})")
-    public String getUsageIds() {
-        return filterMap.get(USAGE_IDS);
+    @Pattern(regexp = "^slim|descendants$", flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "Invalid usage: ${validatedValue}")
+    public String getUsage() {
+        return filterMap.get(USAGE_FIELD) == null ? null : filterMap.get(USAGE_FIELD)[0];
     }
 
-    public void setUsageIds(String usageIds) {
-        if (usageIds != null) {
-            filterMap.put(USAGE_IDS, usageIds.toUpperCase());
-        }
-    }
-
-    @Pattern(regexp = "(is_a|part_of|occurs_in|regulates)(,is_a|part_of|occurs_in|regulates)*",
-            flags = CASE_INSENSITIVE)
-    public String getUsageRelationships() {
+    @ArrayPattern(regexp = "^is_a|part_of|occurs_in|regulates$", flags = CASE_INSENSITIVE,
+            paramName = USAGE_RELATIONSHIP_PARAM)
+    public String[] getUsageRelationships() {
         return filterMap.get(USAGE_RELATIONSHIPS);
     }
 
-    public void setUsageRelationships(String usageRelationships) {
+    public void setUsageRelationships(String... usageRelationships) {
         if (usageRelationships != null) {
-            filterMap.put(USAGE_RELATIONSHIPS, usageRelationships.toLowerCase());
+            String[] usageRelationshipArray = Stream.of(usageRelationships)
+                    .map(String::toLowerCase)
+                    .toArray(String[]::new);
+            filterMap.put(USAGE_RELATIONSHIPS, usageRelationshipArray);
         }
     }
 
-    public void setGpType(String geneProductType) {
-        filterMap.put(GENE_PRODUCT_TYPE, geneProductType.toLowerCase());
+    public void setGeneProductType(String... geneProductType) {
+        filterMap.put(GENE_PRODUCT_TYPE, geneProductType);
     }
 
-    @Pattern(regexp = "^(complex|rna|protein)(,(complex|rna|protein)){0,2}", flags = CASE_INSENSITIVE,
-            message = "At least one 'Gene Product Type' value is invalid: ${validatedValue}")
-    public String getGpType() {
+    @ArrayPattern(regexp = "^complex|rna|protein$", flags = CASE_INSENSITIVE, paramName = GENE_PRODUCT_TYPE_PARAM)
+    public String[] getGeneProductType() {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
 
     /**
      * Filter by Target Sets e.g. BHF-UCK, KRUK, Parkinsons etc
-     * @return
      */
-    public void setTargetSet(String targetSet) {
+    public void setTargetSet(String... targetSet) {
         filterMap.put(TARGET_SET, targetSet);
     }
 
-    public String getTargetSet() {
+    public String[] getTargetSet() {
         return filterMap.get(TARGET_SET);
     }
 
-    public void setGpSubset(String gpSubset) {
-        filterMap.put(DB_SUBSET, gpSubset);
+    public void setGeneProductSubset(String... geneProductSubset) {
+        filterMap.put(GENE_PRODUCT_SUBSET, geneProductSubset);
     }
 
-    @Pattern(regexp = "^[A-Za-z-]+(,[A-Za-z-]+)*",
-            message = "At least one 'Gene Product Subset identifier' value is invalid: ${validatedValue}")
-    public String getGpSubset() {
-        return filterMap.get(DB_SUBSET);
+    @ArrayPattern(regexp = "^[A-Za-z-]+$", paramName = GENE_PRODUCT_SUBSET_PARAM)
+    public String[] getGeneProductSubset() {
+        return filterMap.get(GENE_PRODUCT_SUBSET);
     }
 
+    @Min(value = MIN_ENTRIES_PER_PAGE, message = "Number of entries per page cannot be less than {value} but " +
+            "found: ${validatedValue}")
+    @Max(value = MAX_ENTRIES_PER_PAGE, message = "Number of entries per page cannot be more than {value} but " +
+            "found: ${validatedValue}")
     public int getLimit() {
         return limit;
     }
@@ -286,6 +409,7 @@ public class AnnotationRequest {
         this.limit = limit;
     }
 
+    @Min(value = MIN_PAGE_NUMBER, message = "Page size cannot be less than {value} but found: ${validatedValue}")
     public int getPage() {
         return page;
     }
@@ -297,7 +421,7 @@ public class AnnotationRequest {
     public List<FilterRequest> createFilterRequests() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 
-        Stream.of(TARGET_FIELDS)
+        Stream.of(FILTER_REQUEST_FIELDS)
                 .map(this::createSimpleFilter)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -312,7 +436,7 @@ public class AnnotationRequest {
         Optional<FilterRequest> request;
         if (filterMap.containsKey(key)) {
             FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
-            requestBuilder.addProperty(key, filterMap.get(key).split(COMMA));
+            requestBuilder.addProperty(key, filterMap.get(key));
             request = Optional.of(requestBuilder.build());
         } else {
             request = Optional.empty();
@@ -324,20 +448,24 @@ public class AnnotationRequest {
     private Optional<FilterRequest> createUsageFilter() {
         Optional<FilterRequest> request;
         FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
+
         if (filterMap.containsKey(USAGE_FIELD)) {
-            if (filterMap.containsKey(USAGE_IDS)) {
+            if (filterMap.containsKey(GO_ID)) {
+                assert filterMap.get(USAGE_FIELD).length == 1 : USAGE_FIELD + ": can only have one value";
+
+                String usageValue = filterMap.get(USAGE_FIELD)[0];
+
                 filterBuilder
-                        .addProperty(USAGE_FIELD, filterMap.get(USAGE_FIELD))
-                        .addProperty(USAGE_IDS, filterMap.get(USAGE_IDS));
+                        .addProperty(usageValue)
+                        .addProperty(GO_ID, filterMap.get(GO_ID));
+
+                filterBuilder.addProperty(USAGE_RELATIONSHIPS, filterMap.get(USAGE_RELATIONSHIPS));
+                request = Optional.of(filterBuilder.build());
             } else {
-                throw new ParameterException("Annotation usage requires 'usageIds' to be set.");
+                throw new ParameterException("Annotation usage requires 'goId' to be set.");
             }
-
-            filterBuilder.addProperty(USAGE_RELATIONSHIPS, filterMap.get(USAGE_RELATIONSHIPS));
-
-            request = Optional.of(filterBuilder.build());
         } else {
-            request = Optional.empty();
+            request = createSimpleFilter(GO_ID);
         }
 
         return request;

@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -27,6 +28,7 @@ final class ResponseVerifier {
     public static final String GENEPRODUCT_ID_FIELD = "geneProductId";
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
     public static final String GO_ID_FIELD = "goId";
+    public static final String SLIMMED_ID_FIELD = "slimmedIds";
     public static final String RESULTS = "results";
     public static final String QUALIFIER = "qualifier";
 
@@ -39,8 +41,24 @@ final class ResponseVerifier {
         return jsonPath(ERROR_MESSAGE, contains(values));
     }
 
+    static ResultMatcher valueStartingWithOccursInErrorMessage(String value) {
+        return jsonPath(ERROR_MESSAGE, hasItem(startsWith(value)));
+    }
+
     static ResultMatcher valuesOccurInField(String fieldName, String... values) {
         return jsonPath(RESULTS + ".*." + fieldName, contains(values));
+    }
+
+    static <T> ResultMatcher valuesOccurInField(String fieldName, List<T> match) {
+        return jsonPath(RESULTS + ".*." + fieldName, is(match));
+    }
+
+    static ResultMatcher valuesOccursInField(String fieldName, Integer... values) {
+        return jsonPath(RESULTS + ".*." + fieldName, contains(values));
+    }
+
+    static ResultMatcher fieldDoesNotExist(String fieldName) {
+        return jsonPath(RESULTS + ".*." + fieldName).doesNotExist();
     }
 
     static ResultMatcher atLeastOneResultHasItem(String fieldName, String value) {
@@ -59,11 +77,11 @@ final class ResponseVerifier {
         return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
     }
 
-    static ResultMatcher messageExists(String message){
+    static ResultMatcher messageExists(String message) {
         return jsonPath("$.messages", Matchers.hasItem(is(message)));
     }
 
-    static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {
+    private static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {
         String path = String.format(RESULTS_CONTENT_BY_INDEX, resultIndex);
 
         return new CompositeResultMatcher().addMatcher(jsonPath(path + "id").exists())
@@ -76,6 +94,8 @@ final class ResponseVerifier {
                 .addMatcher(jsonPath(path + "withFrom").exists())
                 .addMatcher(jsonPath(path + "taxonId").exists())
                 .addMatcher(jsonPath(path + "assignedBy").exists())
+                .addMatcher(jsonPath(path + "targetSets").exists())
+                .addMatcher(jsonPath(path + "symbol").exists())
                 .addMatcher(jsonPath(path + "extensions").exists());
     }
 
@@ -119,7 +139,7 @@ final class ResponseVerifier {
         private final List<ResultMatcher> matchers = new ArrayList<>();
 
         @Override public void match(MvcResult result) throws Exception {
-            matchers.stream().forEach(matcher -> {
+            matchers.forEach(matcher -> {
                 try {
                     matcher.match(result);
                 } catch (Exception e) {

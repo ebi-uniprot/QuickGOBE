@@ -34,13 +34,13 @@ public class FilterConverterFactory {
         this.restOperations = restOperations;
     }
 
-    public QuickGOQuery convert(FilterRequest request) {
+    public ConvertedFilter<QuickGOQuery> convert(FilterRequest request) {
         Optional<FilterConfig> configOpt = filterConfigRetrieval.getBySignature(request.getSignature());
         if (configOpt.isPresent()) {
             FilterConfig filterConfig = configOpt.get();
             switch (filterConfig.getExecution()) {
                 case REST_COMM:
-                    return new RESTFilterConverter(filterConfig, restOperations).transform(request);
+                    return new RESTFilterConverter<QuickGOQuery>(filterConfig, restOperations).transform(request);
                 case SIMPLE:
                     return new SimpleFilterConverter(filterConfig).transform(request);
                 case JOIN:

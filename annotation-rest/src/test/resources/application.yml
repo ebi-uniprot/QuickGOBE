@@ -4,19 +4,25 @@
 search:
   external:
     filterConfigs:
-      - signature: aspect
-        execution: JOIN
-        properties: {fromTable: ontology, fromAttribute: id_join, toTable: annotation, toAttribute: goId_join}
-      - signature: usageIds,usageRelationships,usage
+      - signature: goId,usageRelationships,descendants
         execution: REST_COMM
         properties: {
           ip: localhost,
-          resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
-          localField: goId_join,
-          responseBodyPath: "$.results[*].descendants[*]"
+          resourceFormat: "/QuickGO/services/go/terms/{goId}/descendants?relations={usageRelationships}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
+        }
+      - signature: goId,usageRelationships,slim
+        execution: REST_COMM
+        properties: {
+          ip: localhost,
+          resourceFormat: "/QuickGO/services/go/terms/{goId}/descendants?relations={usageRelationships}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
         }
 model:
   repo2domainFieldNameTransformations:
     transformations: {
-      goId_join: goId
+      goId_join: goId,
+      goAspect: aspect
     }

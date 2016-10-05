@@ -1,7 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.common.document;
 
-import java.util.Arrays;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * Class to create stubbed {@link AnnotationDocument} instances.
@@ -11,23 +12,23 @@ import java.util.List;
  */
 public class AnnotationDocMocker {
 
-    public static final String GO_ID= "GO:0003824";
+    public static final String GO_ID = "GO:0003824";
     public static final String ECO_ID = "ECO:0000256";
     public static final String QUALIFIER = "enables";
     public static final String GO_EVIDENCE = "IEA";
     public static final String REFERENCE = "GO_REF:0000002";
-    public static final List<String> WITH_FROM = Arrays.asList("InterPro:IPR015421", "InterPro:IPR015422");
+    public static final List<String> WITH_FROM = asList("InterPro:IPR015421", "InterPro:IPR015422");
     public static final int INTERACTING_TAXON_ID = 35758;
     public static final String ASSIGNED_BY = "InterPro";
-    public static final List<String> EXTENSIONS = Arrays.asList(
+    public static final List<String> EXTENSIONS = asList(
             "results_in_development_of(UBERON:0001675),acts_on_population_of(CL:0000032)",
             "results_in_development_of(UBERON:0006000)");
-    public static final String OBJECT_SYMBOL = "moeA5";
+    public static final String SYMBOL = "moeA5";
     public static final String OBJECT_TYPE = "protein";
     public static final int TAXON_ID = 12345;
-    public static final List<String> TARGET_SET = Arrays.asList("KRUK","BHF-UCL","Exosome");
-
-
+    public static final List<String> TARGET_SET = asList("KRUK", "BHF-UCL", "Exosome");
+    public static final String GP_SUBSET = "TrEMBL";
+    public static final String GO_ASPECT = "cellular_component";
 
     private AnnotationDocMocker() {}
 
@@ -49,10 +50,12 @@ public class AnnotationDocMocker {
         doc.interactingTaxonId = INTERACTING_TAXON_ID;
         doc.assignedBy = ASSIGNED_BY;
         doc.extensions = EXTENSIONS;
-        doc.dbObjectSymbol = OBJECT_SYMBOL;
+        doc.symbol = SYMBOL;
         doc.geneProductType = OBJECT_TYPE;
         doc.taxonId = TAXON_ID;
         doc.targetSets = TARGET_SET;
+        doc.geneProductSubset = GP_SUBSET;
+        doc.goAspect = GO_ASPECT;
 
         return doc;
     }

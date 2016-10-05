@@ -7,12 +7,24 @@ search:
       - signature: aspect
         execution: JOIN
         properties: {fromTable: ontology, fromAttribute: id_join, toTable: annotation, toAttribute: goId_join}
-      - signature: usageIds,usageRelationships,usage
+      - signature: usageIds,usageRelationships,descendants
         execution: REST_COMM
         properties: {
           ip: "http://ves-hx-c2:8082",
           resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
-          localField: goId_join,
-          responseBodyPath: "$.results[*].descendants[*]",
-          timeout: 2000
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }
+      - signature: usageIds,usageRelationships,slim
+        execution: REST_COMM
+        properties: {
+          ip: "http://ves-hx-c2:8082",
+          resourceFormat: "/QuickGO/services/go/terms/{usageIds}/descendants?relations={usageRelationships}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
+        }
+model:
+  repo2domainFieldNameTransformations:
+    transformations: {
+      goId_join: goId
+    }

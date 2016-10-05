@@ -19,13 +19,13 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
     private static final Logger LOGGER = getLogger(ControllerValidationHelperImpl.class);
     private static final String COMMA = ",";
 
-    private final Predicate<String> validIdCondition;
+    private final Predicate<String> entityValidation;
     private final Predicate<Integer> validNumberOfPageResults;
     private final int maxPageResults;
 
-    public ControllerValidationHelperImpl(int maxPageResults, Predicate<String> validIDCondition) {
+    public ControllerValidationHelperImpl(int maxPageResults, Predicate<String> validCondition) {
         this.validNumberOfPageResults = pageResults -> pageResults <= maxPageResults;
-        this.validIdCondition = validIDCondition;
+        this.entityValidation = validCondition;
         this.maxPageResults = maxPageResults;
     }
 
@@ -46,7 +46,8 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
 
         validateRequestedResults(idList.size());
 
-        idList.stream().filter(validIdCondition.negate())
+        idList.stream()
+                .filter(entityValidation.negate())
                 .forEach(badId -> {
                     String errorMessage = "Provided ID: '" + badId + "' is invalid";
                     LOGGER.error(errorMessage);

@@ -32,6 +32,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
+import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.GO_ASPECT_PARAM;
+import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.GO_ID_PARAM;
+import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.TAXON_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
@@ -54,8 +57,6 @@ public class AnnotationControllerStatisticsIT {
     private static final int NUMBER_OF_GENERIC_DOCS = 6;
     private static final String ANNOTATION_GROUP = "annotation";
     private static final String GENE_PRODUCT_GROUP = "geneProduct";
-    private static final String TAXON_PARAM = "taxon";
-    private static final String GO_ID_PARAM = "goId";
 
     private MockMvc mockMvc;
 
@@ -116,7 +117,7 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
-                        .param(TAXON_PARAM, "42")
+                        .param(TAXON_ID_PARAM.getName(), "42")
         );
 
         assertStatsResponse(response, type, 2, relevantGOIds);
@@ -161,7 +162,7 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
-                        .param(GO_ID_PARAM, filteringGoId)
+                        .param(GO_ID_PARAM.getName(), filteringGoId)
         );
 
         assertStatsResponse(response, type, 2, relevantTaxonIds);
@@ -205,7 +206,7 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
-                        .param(GO_ID_PARAM, filteringGoId)
+                        .param(GO_ID_PARAM.getName(), filteringGoId)
         );
 
         assertStatsResponse(response, type, 2, relevantReferenceIds);
@@ -249,7 +250,7 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
-                        .param(GO_ID_PARAM, filteringGoId)
+                        .param(GO_ID_PARAM.getName(), filteringGoId)
         );
 
         assertStatsResponse(response, type, 2, relevantEvidenceCodes);
@@ -293,7 +294,7 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
-                        .param(GO_ID_PARAM, filteringGoId)
+                        .param(GO_ID_PARAM.getName(), filteringGoId)
         );
 
         assertStatsResponse(response, type, 2, relevantAssignedBy);
@@ -318,7 +319,6 @@ public class AnnotationControllerStatisticsIT {
         assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues);
     }
 
-
     private void assertStatsResponse(ResultActions response, String statsType, int totalHits,
             Collection<String> statsValues) throws Exception {
         response.andDo(print())
@@ -329,6 +329,51 @@ public class AnnotationControllerStatisticsIT {
                 .andExpect(totalHitsInGroup(GENE_PRODUCT_GROUP, totalHits))
                 .andExpect(keysInTypeWithinGroup(ANNOTATION_GROUP, statsType, asArray(statsValues)))
                 .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, statsType, asArray(statsValues)));
+    }
+
+    //----------- GO aspect -----------//
+    @Test
+    public void statsForAllDocsContaining1AspectReturns1AspectByStat() throws Exception {
+        executesAndAssertsCalculatedStatsForAttribute(GO_ASPECT_PARAM.getName(), savedDocs, doc -> doc.goAspect);
+    }
+
+    @Test
+    public void statsForAllDocsContaining2AspectsReturns2AspectsStats() throws Exception {
+        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc.goAspect = "molecular_function";
+        repository.save(extraDoc);
+
+        List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
+        savedDocsPlusOne.add(extraDoc);
+
+        executesAndAssertsCalculatedStatsForAttribute(GO_ASPECT_PARAM.getName(), savedDocsPlusOne,
+                doc -> doc.goAspect);
+    }
+
+    @Test
+    public void statsForFilteredDocsContaining2AspectsReturns2AspectStats() throws Exception {
+        String filteringGoId = "GO:9999999";
+
+        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        extraDoc1.goId = filteringGoId;
+        extraDoc1.goAspect = "molecular_function";
+        repository.save(extraDoc1);
+
+        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        extraDoc2.goId = filteringGoId;
+        extraDoc2.goAspect = "cellular_component";
+        repository.save(extraDoc2);
+
+        List<String> relevantAspect = asList(extraDoc1.goAspect, extraDoc2.goAspect);
+
+        String type = GO_ASPECT_PARAM.getName();
+
+        ResultActions response = mockMvc.perform(
+                get(STATS_ENDPOINT)
+                        .param(GO_ID_PARAM.getName(), filteringGoId)
+        );
+
+        assertStatsResponse(response, type, 2, relevantAspect);
     }
 
     private String[] asArray(Collection<String> elements) {

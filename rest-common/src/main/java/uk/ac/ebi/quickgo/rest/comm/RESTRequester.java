@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
  * Created 31/05/16
  * @author Edd
  */
-@FunctionalInterface
-public interface RESTRequester {
+@FunctionalInterface interface RESTRequester {
     <T> CompletableFuture<T> get(Class<T> responseType);
 }

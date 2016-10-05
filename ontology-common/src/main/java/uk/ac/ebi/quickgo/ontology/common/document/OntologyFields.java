@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.storeAndGet;
+
 /**
  * The fields of an ontology document.
  *
@@ -42,6 +44,7 @@ public class OntologyFields {
     public final static String EXACT_SYNONYM = "exact_synonym";
     public final static String GO_DISCUSSIONS = "goDiscussions";
     public final static String CREDITS = "credits";
+    public final static String PROTEIN_COMPLEXES = "proteinComplexes";
 
     /**
      * Ontology fields that are stored, and can therefore be retrieved.
@@ -73,6 +76,7 @@ public class OntologyFields {
         public static final String ANCESTOR = storeAndGet(VALUES, OntologyFields.ANCESTOR);
         public static final String GO_DISCUSSIONS = storeAndGet(VALUES, OntologyFields.GO_DISCUSSIONS);
         public static final String CREDITS = storeAndGet(VALUES, OntologyFields.CREDITS);
+        public final static String PROTEIN_COMPLEXES = storeAndGet(VALUES, OntologyFields.PROTEIN_COMPLEXES);
 
         public static boolean isRetrievable(String field) {
             return VALUES.contains(field);
@@ -103,10 +107,5 @@ public class OntologyFields {
         public static Set<String> searchableFields() {
             return Collections.unmodifiableSet(VALUES);
         }
-    }
-    
-    private static String storeAndGet(Set<String> values, String value) {
-        values.add(value);
-        return value;
     }
 }

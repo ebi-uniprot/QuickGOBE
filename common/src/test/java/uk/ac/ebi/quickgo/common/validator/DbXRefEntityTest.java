@@ -32,15 +32,39 @@ public class DbXRefEntityTest {
 	}
 
 	@Test
-	public void validId(){
+	public void validIdWhenExactMatch() {
 		assertThat(dbXrefEntity.matches("A0A000"), is(true));
+	}
+
+	@Test
+	public void validIdWhenCaseInsensitiveMatch() {
 		assertThat(dbXrefEntity.matches("a0A000"), is(true));
 	}
 
 	@Test
-	public void inValidId(){
-		assertThat(dbXrefEntity.matches("99999"), is(CASE_SENSITIVE_MATCHING));
+	public void validIdWhenExactMatchIncludingDatabase() {
+		assertThat(dbXrefEntity.matches("UniProtKB:A0A000"), is(true));
 	}
+
+    @Test
+    public void invalidIdWhenExactMatchButNonMatchingDatabase() {
+        assertThat(dbXrefEntity.matches("UnirotKB:A0A000"), is(false));
+    }
+
+	@Test
+	public void validIdWhenCaseInsensitiveMatchIncludingDatabase() {
+		assertThat(dbXrefEntity.matches("uniProtkb:a0a000"), is(true));
+	}
+
+	@Test
+	public void validIdWhenExactMatchIncludingDatabaseWithEntityColons() {
+		assertThat(dbXrefEntity.matches("uniProtkb:a0a000:PRO_0123456789"), is(true));
+	}
+
+	@Test
+    public void isInvalidId() {
+        assertThat(dbXrefEntity.matches("99999"), is(false));
+    }
 
 	@Test
 	public void exceptionThrownIfDatabaseIsNull(){
@@ -76,5 +100,7 @@ public class DbXRefEntityTest {
 		dbXrefEntity = new DbXRefEntity(database, entityType, entityTypeName, idValidationPattern, dbURL, matchingIsCaseSensitive);
 		assertThat(dbXrefEntity.matches("A0A000"), is(true));
 		assertThat(dbXrefEntity.matches("a0A000"), is(false));
-	}
+        assertThat(dbXrefEntity.matches("UniProtKB:A0A000"), is(true));
+        assertThat(dbXrefEntity.matches("uniProtkb:a0a000"), is(false));
+    }
 }

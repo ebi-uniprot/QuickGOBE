@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntity;
-import uk.ac.ebi.quickgo.common.validator.EntityValidation;
+import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 
 import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
@@ -34,10 +34,10 @@ public class AnnotationRequestConfig {
      * UniProtKB.
      */
     @Bean
-    public EntityValidation geneProductValidator() {
+    public DbXRefEntityValidation geneProductValidator() {
         DbXRefEntity testEntity = new DbXRefEntity(TARGET_DB, ENTITY_TYPE_ID, ENTITY_TYPE_NAME,
                 UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX, DB_URL, false);
-        return EntityValidation.createWithData(Arrays.asList(testEntity));
+        return DbXRefEntityValidation.createWithData(Arrays.asList(testEntity));
     }
 
     /**
