@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
+import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.evidence.EvidencePresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.geneproduct.GeneProductPresetsConfig;
@@ -51,7 +51,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private CompositePresetImpl presets;
+    private CompositePreset presets;
 
     @Test
     public void loadAssignedByPresetsAfterSuccessfulRESTInfoFetching() throws Exception {

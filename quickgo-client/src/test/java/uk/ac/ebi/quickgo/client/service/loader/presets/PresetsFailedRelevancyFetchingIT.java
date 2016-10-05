@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
+import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig;
@@ -22,7 +21,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.client.RestOperations;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
@@ -47,10 +45,7 @@ public class PresetsFailedRelevancyFetchingIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private CompositePresetImpl presets;
-
-    @Autowired
-    private RestOperations restOperations;
+    private CompositePreset presets;
 
     @Test
     public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() throws Exception {
