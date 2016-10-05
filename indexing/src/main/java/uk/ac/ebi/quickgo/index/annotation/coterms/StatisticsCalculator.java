@@ -33,6 +33,8 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
     private final CoTermsAggregator aggregator;
 
     public StatisticsCalculator(ItemWriter<AnnotationDocument> aggregator) {
+        Preconditions.checkArgument(aggregator!=null, "The aggregator instance passed to the Statistics Calculator " +
+                "constructor cannot be null");
         this.aggregator = (CoTermsAggregator)aggregator;
     }
 

@@ -134,8 +134,14 @@ public class StatisticsCalculatorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void targetStringIsNullCausesException(){
-        long geneProductCount = 2l;
+    public void processNullCausesException(){
+        StatisticsCalculator
+                calculator = new StatisticsCalculator(aggregator);
+        calculator.process(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void aggregatorIsNullCausesException(){
         final String goTerm = "GO:0003824";
 
         Map<String, Map<String, AtomicLong>> matrix = CoTermMocker.singleEntry();
@@ -143,9 +149,7 @@ public class StatisticsCalculatorTest {
         termGpCount.put(goTerm, new AtomicLong(2));
 
         StatisticsCalculator
-                calculator = new StatisticsCalculator(aggregator);
-        calculator.process(null);
-
+                calculator = new StatisticsCalculator(null);
     }
 
 }
