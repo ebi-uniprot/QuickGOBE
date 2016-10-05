@@ -73,8 +73,7 @@ public class CoTermsConfig {
     }
 
     @Bean
-    public StatisticsCalculator coTermsManualCalculator(
-            ItemWriter<AnnotationDocument> coTermsManualAggregationWriter) {
+    public StatisticsCalculator coTermsManualCalculator(ItemWriter<AnnotationDocument> coTermsManualAggregationWriter) {
         return new StatisticsCalculator(coTermsManualAggregationWriter);
     }
 
