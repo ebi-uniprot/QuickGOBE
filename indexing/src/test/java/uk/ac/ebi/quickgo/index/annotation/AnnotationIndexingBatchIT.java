@@ -80,7 +80,7 @@ public class AnnotationIndexingBatchIT {
                 "IntAct:EBI-10043089"
         ));
 
-        //Manual Stats
+        //Manual
         List<StepExecution> jobsSingleStepCoTermManual = jobExecution.getStepExecutions()
                 .stream()
                 .filter(step -> step.getStepName().equals (COTERM_MANUAL_COMPLETION_STEP_NAME))
