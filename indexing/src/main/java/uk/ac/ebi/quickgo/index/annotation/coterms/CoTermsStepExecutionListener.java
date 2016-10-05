@@ -24,17 +24,11 @@ class CoTermsStepExecutionListener implements StepExecutionListener {
 
     private final ItemWriter<AnnotationDocument> all;
     private final ItemWriter<AnnotationDocument> manual;
-    private final StatisticsCalculator statisticsCalculatorManual;
-    private final StatisticsCalculator statisticsCalculatorAll;
 
     public CoTermsStepExecutionListener(ItemWriter<AnnotationDocument> all,
-            ItemWriter<AnnotationDocument> manual,
-            StatisticsCalculator statisticsCalculatorManual,
-            StatisticsCalculator statisticsCalculatorAll) {
+            ItemWriter<AnnotationDocument> manual) {
         this.all = all;
         this.manual = manual;
-        this.statisticsCalculatorManual = statisticsCalculatorManual;
-        this.statisticsCalculatorAll = statisticsCalculatorAll;
     }
 
     @Override
@@ -51,8 +45,6 @@ class CoTermsStepExecutionListener implements StepExecutionListener {
     public ExitStatus afterStep(StepExecution stepExecution) {
         ((CoTermsAggregator)all).finish();
         ((CoTermsAggregator)manual).finish();
-        statisticsCalculatorManual.initialize();
-        statisticsCalculatorAll.initialize();
         return stepExecution.getExitStatus();
     }
 }
