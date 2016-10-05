@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import java.util.Iterator;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -8,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -29,59 +31,58 @@ public class Co_TermsForSelectedTermTest {
     public void testCalculationCalledOnAllTerms(){
 
         String target = "GO:00003824";
-        float totalNumberGeneProducts = 10;
+        long totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
 
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
+        CoTermsForSelectedTerm.Builder cootfstBuilder = new CoTermsForSelectedTerm.Builder()
+                .setTotalNumberOfGeneProducts
+        (totalNumberGeneProducts).setSelected(selected);
 
-        cootfst.addCoTerm(coTerm);
-        cootfst.addCoTerm(coTerm);
-        cootfst.addCoTerm(coTerm);
-        cootfst.addCoTerm(coTerm);
+        cootfstBuilder.addCoTerm(coTerm);
+        cootfstBuilder.addCoTerm(coTerm);
+        cootfstBuilder.addCoTerm(coTerm);
+        cootfstBuilder.addCoTerm(coTerm);
+        CoTermsForSelectedTerm cootfst = cootfstBuilder.build();
 
         verify(coTerm, times(4)).calculateProbabilityRatio(2f,10f);
         verify(coTerm, times(4)).calculateProbabilitySimilarityRatio(2f);
 
-       Iterator<CoTerm> it = cootfst.highestSimilarity();
-        int itCounter = 0;
-        while(it.hasNext()){
-            it.next();
-            itCounter++;
-        }
-        assertThat(itCounter, equalTo(4));
+       List<CoTerm> terms = cootfst.highestSimilarity();
+        assertThat(terms, hasSize(equalTo(4)));
     }
 
 
     @Test
     public void testHighestSimilaritySortingWorks(){
 
-        String target = "GO:00003824";
-        float totalNumberGeneProducts = 10;
+        long totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
 
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
+        CoTermsForSelectedTerm.Builder cootfstBuilder = new CoTermsForSelectedTerm.Builder()
+                .setTotalNumberOfGeneProducts
+                        (totalNumberGeneProducts).setSelected(selected);
 
         CoTerm mock1 = mock(CoTerm.class, "One");
         CoTerm mock2 = mock(CoTerm.class, "Two");
         CoTerm mock3 = mock(CoTerm.class, "Three");
         CoTerm mock4 = mock(CoTerm.class, "Four");
 
-        cootfst.addCoTerm(mock1);
-        cootfst.addCoTerm(mock2);
-        cootfst.addCoTerm(mock3);
-        cootfst.addCoTerm(mock4);
+        cootfstBuilder.addCoTerm(mock1);
+        cootfstBuilder.addCoTerm(mock2);
+        cootfstBuilder.addCoTerm(mock3);
+        cootfstBuilder.addCoTerm(mock4);
 
         when(mock1.getSimilarityRatio()).thenReturn(3f);
         when(mock2.getSimilarityRatio()).thenReturn(2f);
         when(mock3.getSimilarityRatio()).thenReturn(5f);
         when(mock4.getSimilarityRatio()).thenReturn(1f);
+        CoTermsForSelectedTerm cootfst = cootfstBuilder.build();
+        List<CoTerm> terms = cootfst.highestSimilarity();
 
-        Iterator<CoTerm> it = cootfst.highestSimilarity();
-
-        assertThat(it.next().getSimilarityRatio(), is(5f));
-        assertThat(it.next().getSimilarityRatio(), is(3f));
-        assertThat(it.next().getSimilarityRatio(), is(2f));
-        assertThat(it.next().getSimilarityRatio(), is(1f));
+        assertThat(terms.get(0).getSimilarityRatio(), is(5f));
+        assertThat(terms.get(1).getSimilarityRatio(), is(3f));
+        assertThat(terms.get(2).getSimilarityRatio(), is(2f));
+        assertThat(terms.get(3).getSimilarityRatio(), is(1f));
     }
 
 
@@ -89,36 +90,39 @@ public class Co_TermsForSelectedTermTest {
     @Test(expected=IllegalArgumentException.class)
     public void passingNullToAddAndCalculateCausesException(){
 
-        String target = "GO:00003824";
-        float totalNumberGeneProducts = 10;
+        long totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
-
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
-
-        cootfst.addCoTerm(null);
+        CoTermsForSelectedTerm.Builder cootfstBuilder = new CoTermsForSelectedTerm.Builder().addCoTerm(null);
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void passingNullTargetToConstructorCausesException(){
-        String target = null;
-        float totalNumberGeneProducts = 10;
-        long selected = 2;
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
-    }
 
     @Test(expected=IllegalArgumentException.class)
     public void passingTotalNumberGeneProductsEqualToZeroToConstructorCausesException(){
-        String target = "GO:00003824";
-        float totalNumberGeneProducts = 0;
+        long totalNumberGeneProducts = 0;
         long selected = 2;
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
+        CoTermsForSelectedTerm.Builder cootfstBuilder = new CoTermsForSelectedTerm.Builder()
+                .setTotalNumberOfGeneProducts(totalNumberGeneProducts);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void passingSelectedEqualToZeroToConstructorCausesException(){
-        String target = "GO:00003824";
-        float totalNumberGeneProducts = 10;
+        long totalNumberGeneProducts = 10;
         long selected = 0;
-        CoTermsForSelectedTerm cootfst = new CoTermsForSelectedTerm(totalNumberGeneProducts, selected);
+        CoTermsForSelectedTerm.Builder cootfstBuilder = new CoTermsForSelectedTerm.Builder().setSelected(selected);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void buildingCoTermsForSelectedTermWithoutSpecifyingTotalNumberOfGeneProductsCausesException(){
+        CoTermsForSelectedTerm.Builder cootfstBuilder = new CoTermsForSelectedTerm.Builder()
+                .setSelected(4).addCoTerm(mock(CoTerm.class, "One"));
+        cootfstBuilder.build();
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void buildingCoTermsForSelectedTermWithoutSpecifyingSelectedCausesException(){
+        CoTermsForSelectedTerm.Builder cootfstBuilder = new CoTermsForSelectedTerm.Builder()
+                .setTotalNumberOfGeneProducts(4)
+                .addCoTerm( mock(CoTerm.class, "One"));
+        cootfstBuilder.build();
     }
 }

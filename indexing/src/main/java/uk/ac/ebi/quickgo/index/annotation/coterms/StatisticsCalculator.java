@@ -32,8 +32,7 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
     private long geneProductCount;
     private final CoTermsAggregator aggregator;
 
-    public StatisticsCalculator(
-            ItemWriter<AnnotationDocument> aggregator) {
+    public StatisticsCalculator(ItemWriter<AnnotationDocument> aggregator) {
         this.aggregator = (CoTermsAggregator)aggregator;
     }
 
@@ -42,7 +41,7 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
      *
      */
     public List<CoTerm> process(String goTerm) {
-        return resultsForOneGoTerm(createCoTermsForSelectedTerm(goTerm));
+        return createCoTermsForSelectedTerm(goTerm).highestSimilarity();
     }
 
     public void initialize() {
@@ -63,17 +62,21 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
                 "be null");
 
         Map<String, AtomicLong> coTermsForTarget = coTermMatrix.get(goTerm);
-        CoTermsForSelectedTerm
-                coTerms = new CoTermsForSelectedTerm(geneProductCount, termGPCount.get(goTerm).get());
+//        CoTermsForSelectedTerm
+        //                coTerms = new CoTermsForSelectedTerm(geneProductCount, termGPCount.get(goTerm).get());
+
+        CoTermsForSelectedTerm.Builder coTermsBuilder =  new CoTermsForSelectedTerm.Builder()
+                .setTotalNumberOfGeneProducts
+        (geneProductCount).setSelected(termGPCount.get(goTerm).get());
 
         for (String comparedTerm : coTermsForTarget.keySet()) {
 
-            coTerms.addCoTerm(new CoTerm.Builder().setTarget(goTerm).setComparedTerm
+            coTermsBuilder.addCoTerm(new CoTerm.Builder().setTarget(goTerm).setComparedTerm
                     (comparedTerm)
                     .setCompared(termGPCount.get(comparedTerm).get())
                     .setTogether(coTermsForTarget.get(comparedTerm).get()).createCoTerm());
         }
-        return coTerms;
+        return coTermsBuilder.build();
 
     }
 
