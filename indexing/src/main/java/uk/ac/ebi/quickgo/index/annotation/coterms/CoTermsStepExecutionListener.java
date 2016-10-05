@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 
+import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
@@ -22,8 +23,13 @@ class CoTermsStepExecutionListener implements StepExecutionListener {
     private final ItemWriter<AnnotationDocument> all;
     private final ItemWriter<AnnotationDocument> manual;
 
-    public CoTermsStepExecutionListener(ItemWriter<AnnotationDocument> all,
-            ItemWriter<AnnotationDocument> manual) {
+    public CoTermsStepExecutionListener(ItemWriter<AnnotationDocument> all, ItemWriter<AnnotationDocument> manual) {
+
+        Preconditions.checkArgument(null!=all, "The item writer instance for 'all' passed to " +
+                "CoTermsStepExecutionListener was null, and should be.");
+        Preconditions.checkArgument(null!=manual, "The item writer instance for 'all' passed to " +
+                "CoTermsStepExecutionListener was null, and should be.");
+
         this.all = all;
         this.manual = manual;
     }
