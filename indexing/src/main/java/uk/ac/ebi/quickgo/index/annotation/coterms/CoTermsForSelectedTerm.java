@@ -39,7 +39,8 @@ public class CoTermsForSelectedTerm {
 
         /**
          *
-         * @param totalNumberGeneProducts The total number of unique gene products processed
+         * @param totalNumberGeneProducts The total count of unique gene products for all terms encountered during
+         * processing.
          */
         Builder setTotalNumberOfGeneProducts(long totalNumberGeneProducts){
             Preconditions
@@ -51,7 +52,7 @@ public class CoTermsForSelectedTerm {
 
         /**
          *
-         * @param selected Total count of proteins annotated to selected term
+         * @param selected The count of unique gene products annotated to selected term.
          */
         Builder setSelected(long selected){
             Preconditions.checkArgument(selected != 0, "term should not be zero");
