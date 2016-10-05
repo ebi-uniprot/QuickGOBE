@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.assignedby;
 
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.*;
@@ -41,10 +41,10 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 @Configuration
 @Import({PresetsCommonConfig.class})
 public class AssignedByPresetsConfig {
-    private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
-    public static final String ASSIGNED_BY = "assignedBy";
     public static final String ASSIGNED_BY_DEFAULTS = "AgBase,BHF-UCL,CACAO,CGD,EcoCyc,UniProtKB";
+    private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
+    private static final String ASSIGNED_BY = "assignedBy";
 
     @Value("#{'${assignedBy.preset.source:}'.split(',')}")
     private Resource[] assignedByResources;
@@ -82,8 +82,8 @@ public class AssignedByPresetsConfig {
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> {
             rawItemList.forEach(rawItem -> {
-                presets.assignedByBuilder.addPreset(
-                        PresetItemBuilder.createWithName(rawItem.name)
+                presets.addPreset(CompositePresetImpl.PresetType.ASSIGNED_BY,
+                        PresetItem.createWithName(rawItem.name)
                                 .withDescription(rawItem.description)
                                 .withRelevancy(rawItem.relevancy)
                                 .build());

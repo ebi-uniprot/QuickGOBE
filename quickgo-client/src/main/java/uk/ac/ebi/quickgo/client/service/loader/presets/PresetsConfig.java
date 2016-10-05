@@ -25,13 +25,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 //@Import({TaxonPresetsConfig.class})
 @ComponentScan({
-        "uk.ac.ebi.quickgo.client.service.loader.presets",
-        "uk.ac.ebi.quickgo.client.model.presets.impl"})
+        "uk.ac.ebi.quickgo.client.service.loader.presets"})
 public class PresetsConfig {
 
-    private static final String PRESET_LOADING_JOB_NAME = "PresetReadingJob";
-    static final String TAB = "\t";
     public static final int SKIP_LIMIT = 0;
+    static final String TAB_DELIMITER = "\t";
+    private static final String PRESET_LOADING_JOB_NAME = "PresetReadingJob";
 
     @Bean
     public Job presetsBuildJob(

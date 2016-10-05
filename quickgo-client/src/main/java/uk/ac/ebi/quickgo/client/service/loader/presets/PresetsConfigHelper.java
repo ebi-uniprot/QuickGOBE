@@ -75,7 +75,7 @@ public class PresetsConfigHelper {
         FlatFileItemReader<T> reader = new FlatFileItemReader<>();
 
         DefaultLineMapper<T> lineMapper = new DefaultLineMapper<>();
-        lineMapper.setLineTokenizer(new DelimitedLineTokenizer(PresetsConfig.TAB));
+        lineMapper.setLineTokenizer(new DelimitedLineTokenizer(PresetsConfig.TAB_DELIMITER));
         lineMapper.setFieldSetMapper(fieldSetMapper);
         reader.setLineMapper(lineMapper);
 

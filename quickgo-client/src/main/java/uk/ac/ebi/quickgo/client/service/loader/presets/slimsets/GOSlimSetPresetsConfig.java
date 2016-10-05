@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.slimsets;
 
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
@@ -37,8 +37,8 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 @Import({PresetsCommonConfig.class})
 public class GOSlimSetPresetsConfig {
     public static final String GO_SLIM_SET_LOADING_STEP_NAME = "GOSlimSetReadingStep";
-    private static final RawNamedPreset INVALID_PRESET = null;
     public static final String SLIM = "SLIM";
+    private static final RawNamedPreset INVALID_PRESET = null;
 
     @Value("#{'${go.slimset.preset.source:}'.split(',')}")
     private Resource[] resources;
@@ -73,8 +73,8 @@ public class GOSlimSetPresetsConfig {
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.goSlimSetsBuilder.addPreset(
-                    PresetItemBuilder.createWithName(rawItem.name)
+            presets.addPreset(CompositePresetImpl.PresetType.GO_SLIMS_SETS,
+                    PresetItem.createWithName(rawItem.name)
                             .withId(rawItem.id)
                             .build());
         });

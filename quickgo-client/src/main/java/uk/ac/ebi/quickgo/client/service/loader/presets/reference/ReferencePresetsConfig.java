@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.reference;
 
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
@@ -28,6 +28,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelpe
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.DB_COLUMNS;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.REF_COLUMNS;
 
 /**
  * Exposes the {@link Step} bean that is used to read and populate information relating to the reference preset data.
@@ -66,7 +67,7 @@ public class ReferencePresetsConfig {
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePresetImpl presets) {
-        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
+        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(fieldSetMapper(DB_COLUMNS));
         itemReader.setLinesToSkip(dbHeaderLines);
 
         return stepBuilderFactory.get(CORE_REFERENCE_DB_LOADING_STEP_NAME)
@@ -77,7 +78,11 @@ public class ReferencePresetsConfig {
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
                         rawPresetFilter(dbDefaults)))
-                .writer(rawPresetWriter(presets, Function.identity()))
+                .writer(rawPresetWriter(
+                        presets,
+                        aRawPresetItem -> PresetItem.createWithName(aRawPresetItem.name)
+                                .withDescription(aRawPresetItem.description)
+                                .build()))
                 .listener(new LogStepListener())
                 .build();
     }
@@ -87,7 +92,7 @@ public class ReferencePresetsConfig {
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePresetImpl presets) {
-        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
+        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(fieldSetMapper(REF_COLUMNS));
         itemReader.setLinesToSkip(dbHeaderLines);
 
         return stepBuilderFactory.get(SPECIFIC_REFERENCE_LOADING_STEP_NAME)
@@ -98,25 +103,21 @@ public class ReferencePresetsConfig {
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
                         rawPresetFilter(specificDBDefaults)))
-                .writer(rawPresetWriter(presets, this::buildGORefID))
+                .writer(rawPresetWriter(
+                        presets,
+                        aRawPresetItem -> PresetItem.createWithName(buildGORefID(aRawPresetItem.name))
+                                .withDescription(aRawPresetItem.description)
+                                .withRelevancy(aRawPresetItem.relevancy)
+                                .build()))
                 .listener(new LogStepListener())
                 .build();
     }
 
-    /**
-     * Write the list of {@link RawNamedPreset}s to the {@link CompositePresetImpl}
-     * @param presets the presets to write to
-     * @param nameTransformer a transformation function to apply to each preset name
-     * @return the corresponding {@link ItemWriter}
-     */
     private ItemWriter<RawNamedPreset> rawPresetWriter(
             CompositePresetImpl presets,
-            Function<String, String> nameTransformer) {
+            Function<RawNamedPreset, PresetItem> presetItemSupplier) {
         return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.referencesBuilder.addPreset(
-                    PresetItemBuilder.createWithName(nameTransformer.apply(rawItem.name))
-                            .withDescription(rawItem.description)
-                            .build());
+            presets.addPreset(CompositePresetImpl.PresetType.REFERENCES, presetItemSupplier.apply(rawItem));
         });
     }
 
@@ -129,8 +130,8 @@ public class ReferencePresetsConfig {
                 validPresetNames.contains(rawNamedPreset.name) ? rawNamedPreset : INVALID_PRESET;
     }
 
-    private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(DB_COLUMNS));
+    private FieldSetMapper<RawNamedPreset> fieldSetMapper(SourceColumnsFactory.Source source) {
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(source));
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {

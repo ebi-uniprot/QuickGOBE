@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
-import uk.ac.ebi.quickgo.rest.search.RetrievalException;
+import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,13 +89,13 @@ public class MockPresetDataConfig {
         DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies.add(QUALIFIER_INVOLVED_IN);
         DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies.add("100");
 
-        PRESET_ECO_32 = PresetItemBuilder
+        PRESET_ECO_32 = PresetItem
                 .createWithName("All manual codes")
                 .withId("ECO:0000352")
                 .withDescription("evidence used in manual assertion")
                 .withRelevancy(1).build();
 
-        PRESET_BHF_UCL = PresetItemBuilder
+        PRESET_BHF_UCL = PresetItem
                 .createWithName("BHF-UCL")
                 .withDescription(
                         "The set of Cardiovascular-associated proteins being prioritised for annotation by the " +
@@ -105,23 +104,23 @@ public class MockPresetDataConfig {
                 .withUrl("http://www.ucl.ac.uk/cardiovasculargeneontology")
                 .build();
 
-        PRESET_DICTY_BASE = PresetItemBuilder
+        PRESET_DICTY_BASE = PresetItem
                 .createWithName("dictyBase")
                 .withDescription("dictyBase")
                 .withRelevancy(62)
                 .build();
 
-        PRESET_GO_SLIM_METAGENOMICS = PresetItemBuilder
+        PRESET_GO_SLIM_METAGENOMICS = PresetItem
                 .createWithName("goslim_metagenomics")
                 .withAssociations(asList("GO:0006259", "GO:0008233", "GO:0016740"))
                 .build();
 
-        PRESET_GO_SLIM_POMBE = PresetItemBuilder
+        PRESET_GO_SLIM_POMBE = PresetItem
                 .createWithName("goslim_pombe")
                 .withAssociations(asList("GO:0002181", "GO:0006355"))
                 .build();
 
-        PRESET_GO_SLIM_SYNAPSE = PresetItemBuilder
+        PRESET_GO_SLIM_SYNAPSE = PresetItem
                 .createWithName("goslim_synapse")
                 .withAssociations(singletonList("GO:0004444"))
                 .build();

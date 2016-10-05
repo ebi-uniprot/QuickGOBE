@@ -1,108 +1,163 @@
 package uk.ac.ebi.quickgo.client.model.presets.impl;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItems;
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.stereotype.Component;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.StaticAspects.createAspectBuilder;
-import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.StaticGeneProductTypes
-        .createGeneProductTypeBuilder;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.stream.Collectors.mapping;
+import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.GO_SLIMS_SETS;
 
 /**
- * Represents preset information relating to different aspects of QuickGO.
+ * <p>Represents preset information relating to different aspects of QuickGO.
+ *
+ * <p>Presets returned are ordered by three criteria:
+ * <ol>
+ *     <li>natural ordering (low to high) by {@link PresetItem#getRelevancy()}</li>
+ *     <li>alphabetically by {@link PresetItem#getName()}}</li>
+ *     <li>by insertion order</li>
+ * </ol>
+ *
+ * <p>Presets with the same name will be grouped by {@code name}, and
+ * the {@code id}s grouped into {@code associations}.
+ *
+ * <p>For example, by adding:
+ * <ul>
+ *     <li>{@link PresetItem} with {@code name} = "n1", {@code id} = "id1"</li>
+ *     <li>{@link PresetItem} with {@code name} = "n1", {@code id} = "id2"</li>
+ *     <li>{@link PresetItem} with {@code name} = "n2", {@code id} = "id3"</li>
+ * </ul>
+ *
+ * <p>The corresponding grouped presets will be:
+ * <ul>
+ *     <li>{@link PresetItem} with {@code name} = "n1", {@code associations} = ["id1", "id2"]</li>
+ *     <li>{@link PresetItem} with {@code name} = "n3", {@code associations} = ["id3"]</li>
+ * </ul>
+ *
  *
  * Created 30/08/16
  * @author Edd
  */
-@Component
 public class CompositePresetImpl implements CompositePreset {
-    @JsonIgnore
-    public final PresetItemsBuilder assignedByBuilder;
-    @JsonIgnore
-    public final PresetItemsBuilder referencesBuilder;
-    @JsonIgnore
-    public final PresetItemsBuilder evidencesBuilder;
-    @JsonIgnore
-    public final PresetItemsBuilder withFromBuilder;
-    @JsonIgnore
-    public final PresetItemsBuilder geneProductsBuilder;
-    @JsonIgnore
-    public final GroupedPresetItemsBuilder goSlimSetsBuilder;
-    @JsonIgnore
-    public final PresetItemsBuilder taxonBuilder;
-    @JsonIgnore
-    public final PresetItemsBuilder qualifierBuilder;
-    @JsonIgnore
-    private final PresetItemsBuilder aspectBuilder;
-    @JsonIgnore
-    private final PresetItemsBuilder geneProductTypeBuilder;
+    private final Map<PresetType, Set<PresetItem>> presetsMap;
 
     public CompositePresetImpl() {
-        assignedByBuilder = new PresetItemsBuilder();
-        referencesBuilder = new PresetItemsBuilder();
-        evidencesBuilder = new PresetItemsBuilder();
-        withFromBuilder = new PresetItemsBuilder();
-        geneProductsBuilder = new PresetItemsBuilder();
-        goSlimSetsBuilder = new GroupedPresetItemsBuilder();
-        taxonBuilder = new PresetItemsBuilder();
-        qualifierBuilder = new PresetItemsBuilder();
-        aspectBuilder = createAspectBuilder();
-        geneProductTypeBuilder = createGeneProductTypeBuilder();
+        presetsMap = new HashMap<>();
+
+        for (PresetType presetType : PresetType.values()) {
+            presetsMap.put(presetType, new LinkedHashSet<>());
+        }
     }
 
-    @Override public PresetItems getAssignedBy() {
-        return assignedByBuilder.build();
+    public void addPreset(PresetType presetType, PresetItem presetItem) {
+        checkArgument(presetItem != null, "PresetItem cannot be null");
+
+        presetsMap.get(presetType).add(presetItem);
     }
 
-    @Override public PresetItems getReferences() {
-        return referencesBuilder.build();
+    @Override public List<PresetItem> getAssignedBy() {
+        return sortedPresetItems(PresetType.ASSIGNED_BY);
     }
 
-    @Override public PresetItems getEvidences() {
-        return evidencesBuilder.build();
+    @Override public List<PresetItem> getReferences() {
+        return sortedPresetItems(PresetType.REFERENCES);
     }
 
-    @Override public PresetItems getWithFrom() {
-        return withFromBuilder.build();
+    @Override public List<PresetItem> getEvidences() {
+        return sortedPresetItems(PresetType.EVIDENCES);
     }
 
-    @Override public PresetItems getGeneProducts() {
-        return geneProductsBuilder.build();
+    @Override public List<PresetItem> getWithFrom() {
+        return sortedPresetItems(PresetType.WITH_FROM);
     }
 
-    @Override public PresetItems getGoSlimSets() {
-        return goSlimSetsBuilder.build();
+    @Override public List<PresetItem> getGeneProducts() {
+        return sortedPresetItems(PresetType.GENE_PRODUCT);
     }
 
-    @Override public PresetItems getTaxons() {
-        return taxonBuilder.build();
+    @Override public List<PresetItem> getGoSlimSets() {
+        return sortedPresetItems(GO_SLIMS_SETS);
     }
 
-    @Override public PresetItems getQualifiers() {
-        return qualifierBuilder.build();
+    /**
+     * Sorts the presets according to the ordering rules defined in the class description.
+     * @param presetType the {@link PresetType} whose list of {@link PresetItem}s are to be to returned.
+     * @return the list of {@link PresetItem}s corresponding to the specified {@code presetType}.
+     */
+    private List<PresetItem> sortedPresetItems(PresetType presetType) {
+        return presetsMap.get(presetType).stream()
+                .collect(Collectors.groupingBy(
+                        PresetItem::getName,
+                        mapping(Function.identity(), Collectors.toList())))
+                .entrySet().stream()
+                .map(groupedEntry -> transformGroupedEntryToPresetItem(presetType, groupedEntry))
+                .sorted()
+                .collect(Collectors.toList());
     }
 
-    @Override public PresetItems getAspects() {
-        return aspectBuilder.build();
+    private PresetItem transformGroupedEntryToPresetItem(PresetType presetType,
+            Map.Entry<String, List<PresetItem>> groupedEntry) {
+        PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
+
+        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                p -> p != null && p.getRelevancy() != 0,
+                p -> presetBuilder.withRelevancy(p.getRelevancy()));
+
+        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                p -> p.getDescription() != null && !p.getDescription().trim().isEmpty(),
+                p -> presetBuilder.withDescription(p.getDescription()));
+
+        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                p -> p.getUrl() != null && !p.getUrl().trim().isEmpty(),
+                p -> presetBuilder.withUrl(p.getUrl()));
+
+        if (presetType == GO_SLIMS_SETS) {
+            presetBuilder.withAssociations(groupedEntry.getValue().stream()
+                    .map(PresetItem::getId)
+                    .collect(Collectors.toList()));
+        } else {
+            ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                    p -> p.getId() != null && !p.getId().trim().isEmpty(),
+                    p -> presetBuilder.withId(p.getId()));
+        }
+
+        return presetBuilder.build();
     }
 
-    @Override public PresetItems getGeneProductTypes() {
-        return geneProductTypeBuilder.build();
+    /**
+     * Given a list of {@link PresetItem}s, if a specified
+     * {@link Predicate} is true for a given element of the list, apply some action,
+     * defined as a {@link Consumer}.
+     * @param presets the list of {@link PresetItem}s
+     * @param presetPredicate the {@link Predicate} which must be true for {@code itemConsumer} to be applied
+     * @param itemConsumer the {@link Consumer} action to apply to an item
+     */
+    private void ifPresetItemMatchesThenApply(
+            List<PresetItem> presets,
+            Predicate<PresetItem> presetPredicate,
+            Consumer<PresetItem> itemConsumer) {
+        presets.stream()
+                .filter(presetPredicate)
+                .findFirst()
+                .ifPresent(itemConsumer);
     }
 
-    @Override public String toString() {
-        return "CompositePresetImpl{" +
-                "assignedByBuilder=" + assignedByBuilder +
-                ", referencesBuilder=" + referencesBuilder +
-                ", evidencesBuilder=" + evidencesBuilder +
-                ", withFromBuilder=" + withFromBuilder +
-                ", geneProductsBuilder=" + geneProductsBuilder +
-                ", goSlimSetsBuilder=" + goSlimSetsBuilder +
-                ", taxonBuilder=" + taxonBuilder +
-                ", qualifierBuilder=" + qualifierBuilder +
-                '}';
+    public enum PresetType {
+        ASSIGNED_BY,
+        REFERENCES,
+        EVIDENCES,
+        WITH_FROM,
+        GENE_PRODUCT,
+        GENE_PRODUCT_TYPES,
+        GO_SLIMS_SETS,
+        TAXONS,
+        QUALIFIERS,
+        ASPECTS
     }
 
     static class StaticAspects {

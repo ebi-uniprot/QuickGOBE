@@ -25,6 +25,10 @@ public class RelevancyResponseConverter
 
         if (response.terms != null && response.terms.relevancies != null) {
             List<String> values = response.terms.relevancies;
+
+            // The values are of the form:
+            //      ["term1", "term1Frequency", "term2", "term2Frequency" ... ].
+            // Incrementing by 2 means selecting only the terms
             for (int i = 0; i < values.size() - 1; i += 2) {
                 keysWithoutCounts.add(values.get(i));
             }

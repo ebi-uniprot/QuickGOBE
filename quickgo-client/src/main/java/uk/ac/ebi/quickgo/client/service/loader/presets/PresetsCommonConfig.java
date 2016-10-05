@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -35,6 +36,11 @@ public class PresetsCommonConfig {
     @Bean
     public Integer chunkSize() {
         return chunkSize;
+    }
+
+    @Bean
+    public CompositePresetImpl presets() {
+        return new CompositePresetImpl();
     }
 
     @Bean

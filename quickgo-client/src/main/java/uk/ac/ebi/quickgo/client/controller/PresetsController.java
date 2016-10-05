@@ -25,10 +25,10 @@ public class PresetsController {
     private final CompositePreset presets;
 
     @Autowired
-    public PresetsController(CompositePreset compositePreset) {
-        checkArgument(compositePreset != null, "Preset information cannot be null");
+    public PresetsController(CompositePreset presets) {
+        checkArgument(presets != null, "Preset information cannot be null");
 
-        this.presets = compositePreset;
+        this.presets = presets;
     }
 
     /**

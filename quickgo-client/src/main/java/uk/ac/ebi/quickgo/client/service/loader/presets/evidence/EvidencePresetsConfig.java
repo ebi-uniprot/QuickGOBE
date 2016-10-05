@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.evidence;
 
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.client.model.presets.impl.PresetItemBuilder;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.ECO2GO_COLUMNS;
@@ -56,8 +55,7 @@ public class EvidencePresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
-                .processor(compositeItemProcessor(
-                        rawPresetValidator()))
+                .processor(rawPresetValidator())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -70,8 +68,8 @@ public class EvidencePresetsConfig {
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.evidencesBuilder.addPreset(
-                    PresetItemBuilder.createWithName(rawItem.name)
+            presets.addPreset(CompositePresetImpl.PresetType.EVIDENCES,
+                    PresetItem.createWithName(rawItem.name)
                             .withId(rawItem.id)
                             .withRelevancy(rawItem.relevancy)
                             .withDescription(rawItem.description)
