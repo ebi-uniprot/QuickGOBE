@@ -2,7 +2,8 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
  * @Author Tony Wardell
@@ -25,11 +26,11 @@ public class CoTermTest {
 				new CoTerm.Builder().setTarget(targetTerm).setComparedTerm(comparedTerm).setCompared(compared)
 						.setTogether(together).createCoTerm();
 		coTerm.calculateProbabilitySimilarityRatio(selected);
-		assertEquals( 33.33f , coTerm.getSimilarityRatio() );
+		assertThat(coTerm.getSimilarityRatio(), equalTo(33.33f) );
 
 		int all = 24;
 		coTerm.calculateProbabilityRatio(selected, all);
-		assertEquals( 1.5f ,coTerm.getProbabilityRatio() );
+		assertThat(coTerm.getProbabilityRatio(), equalTo( 1.5f));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
