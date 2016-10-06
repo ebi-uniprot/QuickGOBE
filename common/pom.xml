@@ -16,19 +16,14 @@
     <description>Module contains the common components shared by most of the top level projects</description>
     <packaging>jar</packaging>
 
-    <properties>
-        <guava.version>18.0</guava.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>

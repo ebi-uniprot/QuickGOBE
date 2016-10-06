@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
+import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
@@ -10,25 +12,28 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
-import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
-import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
-import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.*;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
+import java.awt.image.RenderedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 
@@ -60,12 +66,12 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String ANCESTORS_SUB_RESOURCE = "ancestors";
     static final String DESCENDANTS_SUB_RESOURCE = "descendants";
     static final String PATHS_SUB_RESOURCE = "paths";
+    static final String CHART_SUB_RESOURCE = "chart";
 
     static final int MAX_PAGE_RESULTS = 100;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
 
-    private static final String COMMA = ",";
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
@@ -75,21 +81,25 @@ public abstract class OBOController<T extends OBOTerm> {
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
     private final OBOControllerValidationHelper validationHelper;
+    private final GraphImageService graphImageService;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
-            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
-        Preconditions.checkArgument(ontologyService != null, "Ontology service cannot be null");
-        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
-        Preconditions.checkArgument(searchableField != null, "Ontology searchable field cannot be null");
-        Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
+            GraphImageService graphImageService) {
+        checkArgument(ontologyService != null, "Ontology service cannot be null");
+        checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
+        checkArgument(searchableField != null, "Ontology searchable field cannot be null");
+        checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
+        checkArgument(graphImageService != null, "Graph image service cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
         this.ontologyRetrievalConfig = ontologyRetrievalConfig;
         this.validationHelper = new OBOControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
+        this.graphImageService = graphImageService;
     }
 
     /**
@@ -345,6 +355,49 @@ public abstract class OBOController<T extends OBOTerm> {
                         asSet(validationHelper.validateCSVIds(toIds)),
                         asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))
                 ));
+    }
+
+    /**
+     * Retrieves the graphical image corresponding to ontology terms.
+     *
+     * @param ids the term ids whose image is required
+     * @return the image corresponding to the requested term ids
+     */
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_SUB_RESOURCE, method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE})
+    public ResponseEntity<InputStreamResource> getChart(@PathVariable(value = "ids") String ids) {
+        try {
+            return createChartResponseEntity(validationHelper.validateCSVIds(ids));
+        } catch (IOException | RenderingGraphException e) {
+            throw new RetrievalException(e);
+        }
+    }
+
+    /**
+     * Delegates the creation of an graphical image, corresponding to the specified list
+     * of {@code ids} and returns the appropriate {@link ResponseEntity}.
+     *
+     * @param ids the terms whose corresponding graphical image is required
+     * @return the image corresponding to the specified terms
+     * @throws IOException if there is an error during creation of the image {@link InputStreamResource}
+     * @throws RenderingGraphException if there was an error during the rendering of the image
+     */
+    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids)
+            throws IOException, RenderingGraphException {
+        RenderedImage renderedImage =
+                graphImageService
+                        .createChart(ids, getOntologyType().name())
+                        .getGraphImage()
+                        .render();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(renderedImage, "png", os);
+        InputStream is = new ByteArrayInputStream(os.toByteArray());
+
+        return ResponseEntity
+                .ok()
+                .contentLength(os.size())
+                .contentType(MediaType.IMAGE_PNG)
+                .body(new InputStreamResource(is));
     }
 
     /**

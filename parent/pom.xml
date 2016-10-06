@@ -35,6 +35,7 @@
         <spring-data-solr.version>2.0.2.RELEASE</spring-data-solr.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
         <hibernate-validator.version>5.2.4.Final</hibernate-validator.version>
+        <guava.version>18.0</guava.version>
 
         <solr.version>5.5.0</solr.version>
 
@@ -209,6 +210,11 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${hibernate-validator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
 
             <!-- REST API documentation -->

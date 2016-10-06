@@ -1,0 +1,10 @@
+parkinsonsuk,referencegenome,ucl
+bhf,parkinsonsuk,kruk
+bhf,parkinsonsuk,ucl
+referencegenome,exosome,kruk
+referencegenome,ucl,kruk
+bhf,referencegenome,exosome
+parkinsonsuk,referencegenome,exosome
+bhf,parkinsonsuk,referencegenome
+exosome,kruk,ucl
+bhf,exosome,ucl
