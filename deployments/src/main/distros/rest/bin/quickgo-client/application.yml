@@ -5,7 +5,7 @@ search:
       - signature: assignedBy
         execution: REST_COMM
         properties: {
-          ip: "http://ves-hx-c2:8082",
+          ip: "http://ves-hx-c7:8090",
           resourceFormat: "/solr/annotation/terms?q=*%3A*&wt=json&indent=true&terms.fl=assignedBy",
           responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseType",
           responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByRelevancyResponseConverter"
