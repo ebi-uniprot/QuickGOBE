@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.client.model.ontology;
 
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
+
 import java.util.Arrays;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -11,7 +13,8 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.DEFAULT_ERROR_MSG;
 
 /**
  * Tests that the validation added to the {@link OntologyRequest} class is correct.
@@ -134,19 +137,19 @@ public class OntologyRequestValidationIT {
     @Test
     public void unrecognizedFilterByAspectValueIsInvalid() {
         String incorrectAspect = "unrecognized";
-        ontologyRequest.setFilterByAspect(incorrectAspect);
+        ontologyRequest.setAspect(incorrectAspect);
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("Provided aspect is invalid: " + incorrectAspect));
+                is(String.format(DEFAULT_ERROR_MSG, OntologyFields.ASPECT, incorrectAspect)));
     }
 
     @Test
     public void aspectWithMixedCasingIsValid() {
         String mixedCaseAspect = "BiOlOgIcAl_PrOcEsS";
-        ontologyRequest.setFilterByAspect(mixedCaseAspect);
+        ontologyRequest.setAspect(mixedCaseAspect);
 
         assertThat(validator.validate(ontologyRequest), hasSize(0));
     }
@@ -155,7 +158,7 @@ public class OntologyRequestValidationIT {
     public void providedFilterByAspectValuesAreAllValid() throws Exception {
         Arrays.asList("biological_process", "molecular_function", "cellular_component")
                 .forEach(aspect -> {
-                            ontologyRequest.setFilterByAspect(aspect);
+                            ontologyRequest.setAspect(aspect);
                             assertThat("Aspect value: " + aspect + " is invalid",
                                     validator.validate(ontologyRequest), hasSize(0));
                         }
@@ -166,7 +169,7 @@ public class OntologyRequestValidationIT {
     @Test
     public void unrecognizedFilterByTypeValueIsInvalid() {
         String incorrectType = "incorrect";
-        ontologyRequest.setFilterByType(incorrectType);
+        ontologyRequest.setOntologyType(incorrectType);
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
 
@@ -178,7 +181,7 @@ public class OntologyRequestValidationIT {
     @Test
     public void typeWithMixedCasingIsValid() {
         String mixedCaseType = "EcO";
-        ontologyRequest.setFilterByType(mixedCaseType);
+        ontologyRequest.setOntologyType(mixedCaseType);
 
         assertThat(validator.validate(ontologyRequest), hasSize(0));
     }
@@ -187,7 +190,7 @@ public class OntologyRequestValidationIT {
     public void providedFilterByTypeValuesAreAllValid() throws Exception {
         Arrays.asList("go", "eco")
                 .forEach(type -> {
-                            ontologyRequest.setFilterByType(type);
+                            ontologyRequest.setOntologyType(type);
                             assertThat("Type value: " + type + " is invalid",
                                     validator.validate(ontologyRequest), hasSize(0));
                         }

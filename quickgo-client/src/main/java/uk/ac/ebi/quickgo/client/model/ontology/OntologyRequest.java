@@ -1,11 +1,18 @@
 package uk.ac.ebi.quickgo.client.model.ontology;
 
+import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
+import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
+import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
-import javax.validation.Valid;
+import io.swagger.annotations.ApiModelProperty;
+import java.util.*;
+import java.util.stream.Stream;
 import javax.validation.constraints.*;
 
 import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
+import static uk.ac.ebi.quickgo.ontology.common.document.OntologyFields.ONTOLOGY_TYPE;
 import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER;
 
 /**
@@ -15,24 +22,48 @@ import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_P
  * encapsulates the list and solr field name to use for that argument.
  */
 public class OntologyRequest {
+    static final int MIN_PAGE_NUMBER = 1;
+
     static final int DEFAULT_ENTRIES_PER_PAGE = 25;
+    static final int MIN_ENTRIES_PER_PAGE = 0;
     static final int MAX_ENTRIES_PER_PAGE = 100;
 
-    private boolean useHighlighting;
+    private static final String[] TARGET_FIELDS = new String[]{OntologyFields.ASPECT, ONTOLOGY_TYPE};
 
+    @ApiModelProperty(value = "Indicates whether the result set should be highlighted")
+    private boolean highlighting = false;
+
+    @ApiModelProperty(value = "Page number of the result set to display.",
+            allowableValues = "range[" + MIN_PAGE_NUMBER + ",  max_result_page_size]",
+            required = true)
     private int page = DEFAULT_PAGE_NUMBER;
 
+    @ApiModelProperty(value = "Number of results per page.",
+            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]",
+            required = true)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
+    @ApiModelProperty(value = "Fields to generate facets from", example = "aspect, type")
     private String[] facets;
 
+    @ApiModelProperty(value = "The query used to filter the gene products", example = "kinase", required = true)
     private String query;
 
-    private String filterByAspect;
+    /*
+        The filter fields are only declared here, because there is a bug in springfox that doesn't read annotations on
+        setters
+     */
+    @ApiModelProperty(value = "Further filters the results of the main query based on values chosen from " +
+            "the aspect field", example = "biological_process")
+    private String[] aspect;
 
-    private String filterByType;
+    @ApiModelProperty(value = "Further filters the results of the main query based on a value chosen from " +
+            "the type field", example = "go")
+    private String type;
 
-    @Min(value = 1, message = "Page number cannot be less than 1")
+    private Map<String, String[]> filterMap = new HashMap<>();
+
+    @Min(value = MIN_PAGE_NUMBER, message = "Page number cannot be less than 1")
     public int getPage() {
         return page;
     }
@@ -41,7 +72,7 @@ public class OntologyRequest {
         this.page = page;
     }
 
-    @Min(value = 0, message = "Number of results per page cannot be less than 0")
+    @Min(value = MIN_ENTRIES_PER_PAGE, message = "Number of results per page cannot be less than 0")
     @Max(value = MAX_ENTRIES_PER_PAGE,
             message = "Number of results per page cannot be greater than " + MAX_ENTRIES_PER_PAGE)
     public int getLimit() {
@@ -62,43 +93,74 @@ public class OntologyRequest {
         this.query = query;
     }
 
-    public boolean isUseHighlighting() {
-        return useHighlighting;
+    public boolean isHighlighting() {
+        return highlighting;
     }
 
-    public void setUseHighlighting(boolean useHighlighting) {
-        this.useHighlighting = useHighlighting;
+    public void setHighlighting(boolean useHighlighting) {
+        this.highlighting = useHighlighting;
     }
 
-    public String[] getFacets() {
+    public String[] getFacet() {
         return facets;
     }
 
-    public void setFacets(String[] facets) {
+    public void setFacet(String[] facets) {
         this.facets = facets;
     }
 
-    @Pattern(regexp = "biological_process|molecular_function|cellular_component", flags = CASE_INSENSITIVE,
-            message = "Provided aspect is invalid: ${validatedValue}")
-    public String getFilterByAspect() {
-        return filterByAspect;
+    @ArrayPattern(regexp = "biological_process|molecular_function|cellular_component",
+            paramName = "aspect",
+            flags = Flag.CASE_INSENSITIVE)
+    public String[] getAspect() {
+        return filterMap.get(OntologyFields.ASPECT);
     }
 
-    public void setFilterByAspect(String filterByAspect) {
-        this.filterByAspect = filterByAspect;
+    public void setAspect(String... filterByAspect) {
+        if (filterByAspect != null) {
+            filterMap.put(OntologyFields.ASPECT, filterByAspect);
+        }
     }
 
     @Pattern(regexp = "go|eco", flags = CASE_INSENSITIVE,
             message = "Provided ontology type is invalid: ${validatedValue}")
-    public String getFilterByType() {
-        return filterByType;
+    public String getOntologyType() {
+        return filterMap.get(ONTOLOGY_TYPE) == null ? null : filterMap.get(ONTOLOGY_TYPE)[0];
     }
 
-    public void setFilterByType(String filterByType) {
-        this.filterByType = filterByType;
+    public void setOntologyType(String filterByType) {
+        if (filterByType != null) {
+            filterMap.put(ONTOLOGY_TYPE, new String[]{filterByType});
+        }
     }
 
     public QuickGOQuery createQuery() {
         return QuickGOQuery.createQuery(query);
+    }
+
+    public List<FilterRequest> createFilterRequests() {
+        List<FilterRequest> filterRequests = new ArrayList<>();
+
+        Stream.of(TARGET_FIELDS)
+                .map(this::createFilter)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(filterRequests::add);
+
+        return filterRequests;
+    }
+
+    private Optional<FilterRequest> createFilter(String key) {
+        Optional<FilterRequest> request;
+
+        if (filterMap.containsKey(key)) {
+            FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
+            requestBuilder.addProperty(key, filterMap.get(key));
+            request = Optional.of(requestBuilder.build());
+        } else {
+            request = Optional.empty();
+        }
+
+        return request;
     }
 }
