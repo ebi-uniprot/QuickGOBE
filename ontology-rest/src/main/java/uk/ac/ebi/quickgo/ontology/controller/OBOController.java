@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
@@ -67,11 +68,11 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String DESCENDANTS_SUB_RESOURCE = "descendants";
     static final String PATHS_SUB_RESOURCE = "paths";
     static final String CHART_SUB_RESOURCE = "chart";
+    static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
 
     static final int MAX_PAGE_RESULTS = 100;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
-
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
@@ -363,12 +364,38 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param ids the term ids whose image is required
      * @return the image corresponding to the requested term ids
      */
+    @ApiOperation(value = "Retrieves the PNG image corresponding to the specified ontology terms")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<InputStreamResource> getChart(@PathVariable(value = "ids") String ids) {
         try {
             return createChartResponseEntity(validationHelper.validateCSVIds(ids));
         } catch (IOException | RenderingGraphException e) {
+            throw new RetrievalException(e);
+        }
+    }
+
+    /**
+     * Retrieves the graphical image coordination information corresponding to ontology terms.
+     *
+     * @param ids the term ids whose image is required
+     * @return the coordinate information of the terms in the chart
+     */
+    @ApiOperation(value = "Retrieves coordinate information about terms within the PNG chart from the " +
+            CHART_SUB_RESOURCE + " sub-resource")
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_COORDINATES_SUB_RESOURCE,
+            method =
+            RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<GraphImageLayout> getChartCoordinates(@PathVariable(value = "ids") String ids) {
+        try {
+            GraphImageLayout layout = graphImageService
+                    .createChart(validationHelper.validateCSVIds(ids), getOntologyType().name()).getLayout();
+
+            return ResponseEntity
+                    .ok()
+                    .body(layout);
+        } catch (RenderingGraphException e) {
             throw new RetrievalException(e);
         }
     }
