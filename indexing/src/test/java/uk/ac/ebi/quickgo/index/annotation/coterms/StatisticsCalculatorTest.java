@@ -1,16 +1,19 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import static org.mockito.Mockito.when;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.createMatrix;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.idFormat1;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.idFormat2;
@@ -18,15 +21,16 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.makeTermLi
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsAggregatorMocker.makeGpCountForTerm;
 
 /**
- * @Author Tony Wardell
- * Date: 26/11/2015
- * Time: 16:26
- * Created with IntelliJ IDEA.
  *
  * overlap = 2;  // Number of gene products annotated by both selected and compared terms
  * target  = 2;  // Number of gene products annotated by selected term
  * compared = 2; // Number of gene products annotated by compared terms
  * all  = 2;     // Total number of unique gene products annotated by selected term
+ *
+ * @author Tony Wardell
+ * Date: 26/11/2015
+ * Time: 16:26
+ * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class StatisticsCalculatorTest {
@@ -34,14 +38,15 @@ public class StatisticsCalculatorTest {
     @Mock
     CoTermsAggregator aggregator;
 
-	@Test
-	public void calculateStatisticsSingleGoTermComparedWithItself(){
+    private static final String goTerm = "GO:0003824";
+
+    @Test
+    public void calculateStatisticsSingleGoTermComparedWithItself() {
         long geneProductCount = 2l;
-        final String goTerm = "GO:0003824";
 
         Map<String, Map<String, AtomicLong>> matrix = CoTermMocker.singleEntry();
         Map<String, AtomicLong> termGpCount = new HashMap<>();
-        termGpCount.put(goTerm, new AtomicLong(2));
+        termGpCount.put(goTerm, new AtomicLong(geneProductCount));
 
         when(aggregator.getCoTerms()).thenReturn(matrix);
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
@@ -53,15 +58,14 @@ public class StatisticsCalculatorTest {
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getTarget(), is(goTerm));
         assertThat(results.get(0).getComparedTerm(), is(goTerm));
-        assertThat(results.get(0).getProbabilityRatio(), is(1f));    //correct
-        assertThat(results.get(0).getSimilarityRatio(), is(100f));      //correct
-        assertThat(results.get(0).getTogether(), is(2l));            //correct
-        assertThat(results.get(0).getCompared(), is(2l));            //correct
-	}
-
+        assertThat(results.get(0).getProbabilityRatio(), is(1f));
+        assertThat(results.get(0).getSimilarityRatio(), is(100f));
+        assertThat(results.get(0).getTogether(), is(geneProductCount));
+        assertThat(results.get(0).getCompared(), is(geneProductCount));
+    }
 
     @Test
-    public void goTermHasCo_occurrenceWithOneOtherTerm(){
+    public void goTermHasCo_occurrenceWithOneOtherTerm() {
         int noOfCoHits = 1;
         int hitsPerTerm = 2;
 
@@ -90,9 +94,8 @@ public class StatisticsCalculatorTest {
         assertThat(results.get(0).getCompared(), is(2l));
     }
 
-
     @Test
-    public void singleGoTermHasCooccurrenceWithTwoOtherTerms(){
+    public void singleGoTermHasCooccurrenceWithTwoOtherTerms() {
         int selected = 1;
         int compared = 2;
         int noOfCoHits = 1;
@@ -130,14 +133,14 @@ public class StatisticsCalculatorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void processNullCausesException(){
+    public void processNullCausesException() {
         StatisticsCalculator
                 calculator = new StatisticsCalculator(aggregator);
         calculator.process(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void aggregatorIsNullCausesException(){
+    public void aggregatorIsNullCausesException() {
         final String goTerm = "GO:0003824";
 
         Map<String, Map<String, AtomicLong>> matrix = CoTermMocker.singleEntry();
