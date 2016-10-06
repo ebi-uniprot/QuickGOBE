@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.common.writer;
+package uk.ac.ebi.quickgo.index.common.writer;
 
 import java.util.List;
 import org.slf4j.Logger;

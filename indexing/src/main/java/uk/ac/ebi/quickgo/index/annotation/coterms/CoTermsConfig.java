@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
-import uk.ac.ebi.quickgo.common.writer.ListItemWriter;
+import uk.ac.ebi.quickgo.index.common.writer.ListItemWriter;
 
 import java.util.List;
 import java.util.function.Predicate;
