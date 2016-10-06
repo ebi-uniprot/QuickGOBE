@@ -86,10 +86,10 @@ public class StatisticsCalculatorTest {
         List<CoTerm> results = coTermsCalculator.process(selected);
         assertThat(results, hasSize(1));
 
-        assertThat(results.get(0).getTarget(), is("GO:0000001"));
-        assertThat(results.get(0).getComparedTerm(), is("GO:9000001"));
-        assertThat(results.get(0).getProbabilityRatio(), is(2.5f));      //correct
-        assertThat(results.get(0).getSimilarityRatio(), is(33.33f));        //correct
+        assertThat(results.get(0).getTarget(), is(selected));
+        assertThat(results.get(0).getComparedTerm(), is(compared));
+        assertThat(results.get(0).getProbabilityRatio(), is(2.5f));
+        assertThat(results.get(0).getSimilarityRatio(), is(33.33f));
         assertThat(results.get(0).getTogether(), is(1l));
         assertThat(results.get(0).getCompared(), is(2l));
     }
@@ -116,26 +116,29 @@ public class StatisticsCalculatorTest {
         List<CoTerm> results = coTermsCalculator.process(selectedList.get(0));
 
         assertThat(results, hasSize(2));
+        final float expectedProbabilityRatio = 2.5f;
+        final float expectedSimiliarityRatio = 33.33f;
+        final long expectedTogether = 1l;
+        final long expectedCompared = 2l;
 
         assertThat(results.get(0).getTarget(), is(selectedList.get(0)));
         assertThat(results.get(0).getComparedTerm(), is(comparedList.get(0)));
-        assertThat(results.get(0).getProbabilityRatio(), is(2.5f));
-        assertThat(results.get(0).getSimilarityRatio(), is(33.33f));
-        assertThat(results.get(0).getTogether(), is(1l));
-        assertThat(results.get(0).getCompared(), is(2l));
+        assertThat(results.get(0).getProbabilityRatio(), is(expectedProbabilityRatio));
+        assertThat(results.get(0).getSimilarityRatio(), is(expectedSimiliarityRatio));
+        assertThat(results.get(0).getTogether(), is(expectedTogether));
+        assertThat(results.get(0).getCompared(), is(expectedCompared));
 
         assertThat(results.get(1).getTarget(), is(selectedList.get(0)));
         assertThat(results.get(1).getComparedTerm(), is(comparedList.get(1)));
-        assertThat(results.get(1).getProbabilityRatio(), is(2.5f));
-        assertThat(results.get(1).getSimilarityRatio(), is(33.33f));
-        assertThat(results.get(1).getTogether(), is(1l));
-        assertThat(results.get(1).getCompared(), is(2l));
+        assertThat(results.get(1).getProbabilityRatio(), is(expectedProbabilityRatio));
+        assertThat(results.get(1).getSimilarityRatio(), is(expectedSimiliarityRatio));
+        assertThat(results.get(1).getTogether(), is(expectedTogether));
+        assertThat(results.get(1).getCompared(), is(expectedCompared));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void processNullCausesException() {
-        StatisticsCalculator
-                calculator = new StatisticsCalculator(aggregator);
+        StatisticsCalculator calculator = new StatisticsCalculator(aggregator);
         calculator.process(null);
     }
 
@@ -146,9 +149,7 @@ public class StatisticsCalculatorTest {
         Map<String, Map<String, AtomicLong>> matrix = CoTermMocker.singleEntry();
         Map<String, AtomicLong> termGpCount = new HashMap<>();
         termGpCount.put(goTerm, new AtomicLong(2));
-
-        StatisticsCalculator
-                calculator = new StatisticsCalculator(null);
+        new StatisticsCalculator(null);
     }
 
 }
