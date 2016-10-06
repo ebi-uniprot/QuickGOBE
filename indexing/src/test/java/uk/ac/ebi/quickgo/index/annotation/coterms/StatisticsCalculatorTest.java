@@ -12,11 +12,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.createMatrix;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.df1;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.df2;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.makeGpCountForTerm;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.idFormat1;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.idFormat2;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.makeTermList;
-
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsAggregatorMocker.makeGpCountForTerm;
 
 /**
  * @Author Tony Wardell
@@ -100,8 +99,8 @@ public class StatisticsCalculatorTest {
         int hitsPerTerm = 2;
 
         long geneProductCount = 10l;
-        final List<String> selectedList = makeTermList(selected, df1);
-        final List<String> comparedList = makeTermList(compared, df2);
+        final List<String> selectedList = makeTermList(selected, idFormat1);
+        final List<String> comparedList = makeTermList(compared, idFormat2);
 
         Map<String, AtomicLong> termGpCount = makeGpCountForTerm(hitsPerTerm, selectedList, comparedList);
         Map<String, Map<String, AtomicLong>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
