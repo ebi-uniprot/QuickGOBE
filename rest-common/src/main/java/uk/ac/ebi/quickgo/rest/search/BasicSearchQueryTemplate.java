@@ -128,11 +128,9 @@ public class BasicSearchQueryTemplate {
             QueryRequest.Builder builder = new QueryRequest.Builder(query);
             builder.setPageParameters(page, pageSize);
 
-            filters.stream()
-                    .forEach(builder::addQueryFilter);
+            filters.forEach(builder::addQueryFilter);
 
-            returnedFields
-                    .forEach(builder::addProjectedField);
+            returnedFields.forEach(builder::addProjectedField);
 
             return builder;
         }
