@@ -9,14 +9,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -42,6 +46,16 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.COTERM_MA
         classes = {AnnotationConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
 public class AnnotationIndexingBatchIT {
+
+    @Value("${indexing.coterms.manual}")
+    private Resource manual;
+
+    @Value("${indexing.coterms.all}")
+    private Resource all;
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
@@ -106,6 +120,11 @@ public class AnnotationIndexingBatchIT {
         //Has finished
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.COMPLETED));
+
+        //clean up
+        manual.getFile().delete();
+        all.getFile().delete();
+
     }
 
     private List<String> getGeneProductIdsFromAnnotationDocuments(Iterable<AnnotationDocument> repoDocsWritten) {
