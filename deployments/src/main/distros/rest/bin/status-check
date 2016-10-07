@@ -73,8 +73,8 @@ fi
 for vm in $VMS; do
   if [ -z "$VM_NAME" ] || [ "$VM_NAME" = $vm ]; then
     vm_status="$(ssh "$USER"@"$vm" "CURRENT_DIR=$CURRENT_DIR bash ${CURRENT_DIR}/../status-check-on-vm")"
-
-    if [ "$vm_status" = *"UP"* ]; then
+    
+  if [[ "$vm_status" == *"UP"* ]]; then
        echo "$vm is UP"
     else
        echo "$vm is DOWN"
