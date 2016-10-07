@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermType;
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermSource;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.common.coterm.CoTerm;
@@ -136,7 +136,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 .collect(Collectors.toList());
     }
 
-    @Override public List<CoTerm> findCoTermsByOntologyId(String id, CoTermType type, int limit, int
+    @Override public List<CoTerm> findCoTermsByOntologyId(String id, CoTermSource type, int limit, int
             similarityThreshold) {
         return coTermRepository.findCoTerms(id, type, limit, similarityThreshold);
     }
