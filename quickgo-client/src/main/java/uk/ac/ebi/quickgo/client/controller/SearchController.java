@@ -8,7 +8,6 @@ import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
 /**
@@ -46,10 +46,9 @@ public class SearchController {
             SearchService<OntologyTerm> ontologySearchService,
             SearchableField ontologySearchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
-
-        Preconditions.checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
-        Preconditions.checkArgument(ontologySearchableField != null, "Ontology searchable field cannot be null");
-        Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
+        checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
+        checkArgument(ontologySearchableField != null, "Ontology searchable field cannot be null");
+        checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
 
         this.ontologySearchService = ontologySearchService;
 
@@ -94,5 +93,4 @@ public class SearchController {
 
         return search(requestBuilder.build(), ontologySearchService);
     }
-
 }

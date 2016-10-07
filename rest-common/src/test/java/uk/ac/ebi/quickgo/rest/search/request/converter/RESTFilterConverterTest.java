@@ -393,8 +393,7 @@ public class RESTFilterConverterTest {
         public void noNumericalTimeoutCausesInstantiationException() {
             addConfigParam(HOST, "host");
             addConfigParam(RESOURCE_FORMAT, "resource format");
-            addConfigParam(BODY_PATH, "body path");
-            addConfigParam(LOCAL_FIELD, "local field");
+            addConfigParam(RESPONSE_CLASS, FakeResponse.class.getName());
             addConfigParam(TIMEOUT, "THIS IS NOT A NUMBER");
 
             new RESTFilterConverter(filterConfig, restOperationsMock);
