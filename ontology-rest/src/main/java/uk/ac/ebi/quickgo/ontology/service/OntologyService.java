@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermType;
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermSource;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.common.coterm.CoTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
@@ -125,5 +125,5 @@ public interface OntologyService<T extends OBOTerm> {
      */
     List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations);
 
-    List<CoTerm> findCoTermsByOntologyId(String id, CoTermType type, int limit, int similarityThreshold);
+    List<CoTerm> findCoTermsByOntologyId(String id, CoTermSource type, int limit, int similarityThreshold);
 }
