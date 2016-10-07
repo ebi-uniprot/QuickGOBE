@@ -16,13 +16,13 @@ source "environment.variables" || {
     exit 1
 }
 
-readonly PROFILE="$1"
-
 # ====== check which environment will be started ========================================
-if ! check_profile $PROFILE; then
-   echo "Input profile: $PROFILE, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
+if ! check_profile $1; then
+   echo "Input profile: $1, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
    exit 1
 fi
+
+readonly PROFILE="$1"
 
 # ======= CONSTANTS =======================================
 readonly PERMITTED_USER=("uni_qgo")
