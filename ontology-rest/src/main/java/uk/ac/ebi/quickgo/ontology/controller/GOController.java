@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Edd
  */
 @RestController
-@RequestMapping(value = "/QuickGO/services/go")
+@RequestMapping(value = "/QuickGO/services/ontology/go")
 public class GOController extends OBOController<GOTerm> {
 
     private static final Pattern GO_ID_FORMAT = Pattern.compile("^GO:[0-9]{7}$");
