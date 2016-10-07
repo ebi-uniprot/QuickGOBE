@@ -37,22 +37,23 @@
 
     <!-- ========================================================================== -->
     <!-- Following fields are for search purposes -->
+    <!-- If an indexed field is marked as stored. It is because this field is used for highlighting purposes -->
     <field name="text" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
 
     <!-- autocomplete search fields -->
     <field name="id_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
-    <field name="name_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
-    <field name="symbol_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
-    <field name="synonym_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <field name="name_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
+    <field name="symbol_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
+    <field name="synonym_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
     <field name="dbSubset_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
 
-    <field name="symbol_edge" type="text_edge" indexed="true" stored="false" multiValued="true"/>
-    <field name="name_edge" type="text_edge" indexed="true" stored="false" multiValued="false"/>
-    <field name="synonym_edge" type="text_edge" indexed="true" stored="false" multiValued="true"/>
+    <field name="symbol_edge" type="text_edge" indexed="true" stored="true" multiValued="true"/>
+    <field name="name_edge" type="text_edge" indexed="true" stored="true" multiValued="false"/>
+    <field name="synonym_edge" type="text_edge" indexed="true" stored="true" multiValued="true"/>
 
-    <field name="symbol_exact" type="exact_lower" indexed="true" stored="false" multiValued="true"/>
-    <field name="name_exact" type="exact_lower" indexed="true" stored="false" multiValued="false"/>
-    <field name="synonym_exact" type="exact_lower" indexed="true" stored="false" multiValued="true"/>
+    <field name="symbol_exact" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
+    <field name="name_exact" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
+    <field name="synonym_exact" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
 
     <!--                     End of QuickGO Ontology fields                         -->
     <!-- ========================================================================== -->
