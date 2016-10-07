@@ -6,7 +6,7 @@ package uk.ac.ebi.quickgo.ontology.common.coterm;
  * Time: 15:49
  * Created with IntelliJ IDEA.
  */
-public enum CoTermType {
+public enum CoTermSource {
 
     ALL,
     MANUAL
