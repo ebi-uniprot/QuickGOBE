@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.ontology.service;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.coterm.CoTerm;
 import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermType;
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermSource;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
@@ -30,10 +30,7 @@ import org.springframework.data.domain.Pageable;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -456,47 +453,6 @@ public class OntologyServiceImplTest {
             assertThat(paths.size(), is(1));
         }
 
-
-        @Test
-        public void retrievesListOfCoTermsForGoTerm() {
-
-            String id = "GO:0003824";
-            int limit = 5;
-            int simThreshold = 0;
-
-            CoTerm coTerm1 = new CoTerm("GO:0003824", "GO:0003824", 11.63f, 100f, 3948313, 3948313);
-            CoTerm coTerm2 = new CoTerm("GO:0003824", "GO:0008152", 5.47f, 24.64f, 1346183, 2861162);
-            CoTerm coTerm3 = new CoTerm("GO:0003824", "GO:0016740", 2.27f, 12.65f, 1043613, 5345589);
-
-            List<CoTerm> results = Arrays.asList(coTerm1, coTerm2, coTerm3 );
-
-            when(coTermsRepositoryMock.findCoTerms(id, CoTermType.MANUAL, limit, simThreshold )).thenReturn(results);
-
-            List<CoTerm> coTerms = goOntologyService.findCoTermsByOntologyId(id, CoTermType.MANUAL, limit,
-                    simThreshold );
-
-            assertThat(coTerms, hasSize(3));
-        }
-
-
-        @Test(expected = IllegalArgumentException.class)
-        public void retrievesListOfCoTermsFromEcoOntologyServiceThrowsException() {
-
-            String id = "GO:0003824";
-            int limit = 5;
-            int simThreshold = 0;
-
-            doThrow(new IllegalArgumentException()).when(coTermsRepositoryMock).findCoTerms(id, CoTermType.MANUAL,
-                    limit, simThreshold );
-
-            List<CoTerm> coTerms = ecoOntologyService.findCoTermsByOntologyId(id, CoTermType.MANUAL, limit,
-                    simThreshold );
-
-
-        }
-
-
-
         private List<String> idsViaOntologyService(String... ids) {
             return goOntologyService.buildIdList(Arrays.asList(ids));
         }
@@ -810,6 +766,47 @@ public class OntologyServiceImplTest {
 
         private List<String> idsViaOntologyService(String... ids) {
             return ecoOntologyService.buildIdList(Arrays.asList(ids));
+        }
+    }
+
+    public class CoTermServiceTests{
+        @Test
+        public void retrievesListOfCoTermsForGoTerm() {
+
+            String id = "GO:0003824";
+            int limit = 5;
+            int simThreshold = 0;
+
+            CoTerm coTerm1 = new CoTerm("GO:0003824", "GO:0003824", 11.63f, 100f, 3948313, 3948313);
+            CoTerm coTerm2 = new CoTerm("GO:0003824", "GO:0008152", 5.47f, 24.64f, 1346183, 2861162);
+            CoTerm coTerm3 = new CoTerm("GO:0003824", "GO:0016740", 2.27f, 12.65f, 1043613, 5345589);
+
+            List<CoTerm> results = Arrays.asList(coTerm1, coTerm2, coTerm3 );
+
+            when(coTermsRepositoryMock.findCoTerms(id, CoTermSource.MANUAL, limit, simThreshold )).thenReturn(results);
+
+            List<CoTerm> coTerms = goOntologyService.findCoTermsByOntologyId(id, CoTermSource.MANUAL, limit,
+                    simThreshold );
+
+            assertThat(coTerms, hasSize(3));
+            assertThat(coTerms, containsInAnyOrder(coTerm1, coTerm2, coTerm3));
+        }
+
+
+        @Test(expected = IllegalArgumentException.class)
+        public void ecoOntologyServiceWillNotProcessCoTermRequestsThrowsException() {
+
+            String id = "GO:0003824";
+            int limit = 5;
+            int simThreshold = 0;
+
+            doThrow(new IllegalArgumentException()).when(coTermsRepositoryMock).findCoTerms(id, CoTermSource.MANUAL,
+                    limit, simThreshold );
+
+           ecoOntologyService.findCoTermsByOntologyId(id, CoTermSource.MANUAL, limit,
+                    simThreshold );
+
+
         }
     }
 
