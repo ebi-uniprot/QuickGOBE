@@ -7,11 +7,12 @@ import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,6 +37,9 @@ public class CoTermController {
     private static final String COTERMS_RESOURCE = "coterms";
     private final CoTermLimit coTermLimit;
     final OntologyService<GOTerm> ontologyService;
+    private static final String SOURCE_VALUES = Arrays.stream(CoTermSource.values())
+            .map(CoTermSource::name)
+            .collect(Collectors.joining(", "));
 
     /**
      * Create the endpoint for Co Terms.
@@ -92,8 +96,8 @@ public class CoTermController {
         try {
             coTermSource = CoTermSource.valueOf(source.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("The value for source should be one of "
-                    + CoTermSource.values() + " and not " + source);
+            throw new IllegalArgumentException("The value for source should be one of " + SOURCE_VALUES + " and not "
+                    + source);
         }
         return coTermSource;
     }
