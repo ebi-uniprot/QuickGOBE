@@ -2,12 +2,11 @@ package uk.ac.ebi.quickgo.rest.search;
 
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
@@ -117,12 +116,9 @@ public class DefaultSearchQueryTemplate {
          * @param filters the filter queries
          * @return this {@link DefaultSearchQueryTemplate.Builder} instance
          */
-        public DefaultSearchQueryTemplate.Builder addFilters(List<ConvertedFilter<QuickGOQuery>> filters) {
+        public DefaultSearchQueryTemplate.Builder addFilters(Collection<QuickGOQuery> filters) {
             if (filters != null) {
-                List<QuickGOQuery> queryFilters = filters.stream()
-                        .map(ConvertedFilter::getConvertedValue)
-                        .collect(Collectors.toList());
-                this.filterQueries.addAll(queryFilters);
+                this.filterQueries.addAll(filters);
             }
             return this;
         }

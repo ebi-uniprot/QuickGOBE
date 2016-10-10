@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.rest.search.query.Facet;
 import uk.ac.ebi.quickgo.rest.search.query.FieldProjection;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,8 +95,8 @@ public class DefaultSearchQueryTemplateTest {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
 
         QuickGOQuery filterQuery = QuickGOQuery.createQuery(id, "value");
-        List<ConvertedFilter<QuickGOQuery>> filterQueries =
-                Collections.singletonList(new ConvertedFilter<>(filterQuery));
+        List<QuickGOQuery> filterQueries =
+                Collections.singletonList(filterQuery);
 
         requestBuilder.addFilters(filterQueries);
 

@@ -10,6 +10,8 @@ import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -124,13 +126,16 @@ public class GeneProductController {
             throw new ParameterBindingException(bindingResult);
         }
 
+        List<QuickGOQuery> filterQueries = request.createFilterRequests().stream()
+                .map(converterFactory::convert)
+                .filter(Objects::nonNull)
+                .map(ConvertedFilter::getConvertedValue)
+                .collect(Collectors.toList());
+
         DefaultSearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
                 .setQuery(request.createQuery())
                 .addFacets(request.getFacet() == null ? null : Arrays.asList(request.getFacet()))
-                .addFilters(request.createFilterRequests().stream()
-                        .map(converterFactory::convert)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList()))
+                .addFilters(filterQueries)
                 .useHighlighting(request.isHighlighting())
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit());
