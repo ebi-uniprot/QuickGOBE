@@ -24,11 +24,19 @@ public class CoTermRepoConfig {
     @Value("${coterm.file.all}")
     private Resource allResource;
 
+    @Value("${coterm.default.limit:50}")
+    private int defaultLimit;
+
     @Bean
     public CoTermRepository coTermRepository(){
         CoTermLoader coTermLoader = new CoTermLoader(manualResource, allResource);
         coTermLoader.load();
         return new CoTermRepositorySimpleMap(coTermLoader.coTermsAll, coTermLoader.coTermsManual);
+    }
+
+    @Bean
+    public CoTermLimit coTermLimit(){
+        return new CoTermLimit(defaultLimit);
     }
 
 
