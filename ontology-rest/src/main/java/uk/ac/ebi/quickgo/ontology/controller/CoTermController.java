@@ -71,9 +71,8 @@ public class CoTermController {
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(@PathVariable(value = "id") String id,
             @RequestParam(value = "source", defaultValue = "ALL") String source,
             @RequestParam(value = "limit", required = false) String limit,
-            @RequestParam(value = "similarityThreshold", required = false) Float similarityThreshold) {
+            @RequestParam(value = "similarityThreshold", defaultValue = "0.0") float similarityThreshold) {
 
-        Preconditions.checkArgument(similarityThreshold!=null, "The value for similarityThreshold should not be empty");
         CoTermSource coTermSource = validateCoTermSource(source);
         validateGoTerm(id);
 
@@ -93,7 +92,7 @@ public class CoTermController {
         try {
             coTermSource = CoTermSource.valueOf(source.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("The value for similarityThreshold should be one of "
+            throw new IllegalArgumentException("The value for source should be one of "
                     + CoTermSource.values() + " and not " + source);
         }
         return coTermSource;
