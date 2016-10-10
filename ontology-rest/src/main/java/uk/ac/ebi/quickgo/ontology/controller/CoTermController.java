@@ -92,7 +92,7 @@ public class CoTermController {
             @RequestParam(value = "similarityThreshold") String similarityThreshold) {
         CoTermSource coTermSource = null;
         try {
-            coTermSource = CoTermSource.valueOf(source);
+            coTermSource = CoTermSource.valueOf(source.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("The value for similarityThreshold should be an integer between 0 " +
                     "and 100, not " + similarityThreshold);

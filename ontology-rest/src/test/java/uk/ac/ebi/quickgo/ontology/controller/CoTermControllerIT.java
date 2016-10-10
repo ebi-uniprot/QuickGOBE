@@ -107,6 +107,19 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
+
+    @Test
+    public void sourceParameterShouldNotBeCaseSensitive() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(MANUAL_ONLY_TERM, "source=MaNuAl")));
+
+        expectFieldsInResults(response, Arrays.asList(MANUAL_ONLY_TERM))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results.*.id").value(MANUAL_ONLY_TERM))
+                .andExpect(jsonPath("$.results.*.compare").value("GO:0004444"))
+                .andExpect(status().isOk());
+    }
+
     private String buildPathToResource(String id) {
         return RESOURCE_URL + "/" + id;
     }
