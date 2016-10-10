@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common;
-
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermLimit;
+package uk.ac.ebi.quickgo.ontology.coterms;
 
 import org.junit.Before;
 import org.junit.Test;

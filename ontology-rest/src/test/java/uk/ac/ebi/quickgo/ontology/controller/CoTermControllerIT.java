@@ -42,7 +42,7 @@ public class CoTermControllerIT {
 
     private MockMvc mockMvc;
 
-    private String GO_0000001 = "GO_0000001";
+    private String GO_0000001 = "GO:0000001";
 
     @Before
     public void setup() {
