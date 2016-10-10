@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -120,6 +122,11 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
+    /**
+     * Tests for similarity threshold
+     * @throws Exception
+     */
+
     @Test
     public void retrieveAllCoTermsUsingSimilarityThresholdBelowThatFoundInTheRecordsForAllCoTerms() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=0.1")));
@@ -149,6 +156,15 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void expectErrorIfValueForThresholdIsLeftBlank() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=")));
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+        expectInvalidThresholdError(response);
+    }
+
+
     private String buildPathToResource(String id) {
         return RESOURCE_URL + "/" + id;
     }
@@ -158,7 +174,7 @@ public class CoTermControllerIT {
                 .collect(Collectors.joining("&","?",""));
     }
 
-    protected ResultActions expectFieldsInResults(ResultActions result, List<String> ids) throws Exception {
+    private ResultActions expectFieldsInResults(ResultActions result, List<String> ids) throws Exception {
         int index = 0;
 
         for (String id : ids) {
@@ -168,7 +184,7 @@ public class CoTermControllerIT {
         return result;
     }
 
-    protected ResultActions expectBasicFields(ResultActions result, String id, String path) throws Exception {
+    private ResultActions expectBasicFields(ResultActions result, String id, String path) throws Exception {
         return result
                 .andDo(print())
                 .andExpect(jsonPath(path + "id").value(id))
@@ -177,5 +193,11 @@ public class CoTermControllerIT {
                 .andExpect(jsonPath(path + "significance").exists())
                 .andExpect(jsonPath(path + "together").exists())
                 .andExpect(jsonPath(path + "compared").exists());
+    }
+
+    private ResultActions expectInvalidThresholdError(ResultActions result) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.messages", hasItem(containsString("The value for similarityThreshold should not be empty"))));
     }
 }
