@@ -775,7 +775,7 @@ public class OntologyServiceImplTest {
 
             String id = "GO:0003824";
             int limit = 5;
-            int simThreshold = 0;
+            float simThreshold = 0f;
 
             CoTerm coTerm1 = new CoTerm("GO:0003824", "GO:0003824", 11.63f, 100f, 3948313, 3948313);
             CoTerm coTerm2 = new CoTerm("GO:0003824", "GO:0008152", 5.47f, 24.64f, 1346183, 2861162);
@@ -798,7 +798,7 @@ public class OntologyServiceImplTest {
 
             String id = "GO:0003824";
             int limit = 5;
-            int simThreshold = 0;
+            float simThreshold = 0f;
 
             doThrow(new IllegalArgumentException()).when(coTermsRepositoryMock).findCoTerms(id, CoTermSource.MANUAL,
                     limit, simThreshold );

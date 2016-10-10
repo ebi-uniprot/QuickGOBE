@@ -136,7 +136,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 .collect(Collectors.toList());
     }
 
-    @Override public List<CoTerm> findCoTermsByOntologyId(String id, CoTermSource type, int limit, int
+    @Override public List<CoTerm> findCoTermsByOntologyId(String id, CoTermSource type, int limit, Float
             similarityThreshold) {
         return coTermRepository.findCoTerms(id, type, limit, similarityThreshold);
     }
