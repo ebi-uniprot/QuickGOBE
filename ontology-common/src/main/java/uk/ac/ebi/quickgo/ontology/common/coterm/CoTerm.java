@@ -5,6 +5,9 @@ package uk.ac.ebi.quickgo.ontology.common.coterm;
  * Date: 29/09/2016
  * Time: 11:30
  * Created with IntelliJ IDEA.
+ *
+ * todo will be replaced with  uk.ac.ebi.quickgo.index.annotation.coterms.CoTerm
+ * todo although it will need to move from this location.
  */
 public class CoTerm {
 
