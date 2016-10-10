@@ -36,17 +36,14 @@ public class DefaultSearchQueryTemplate {
     private final String highlightEndDelim;
     private final Iterable<String> returnedFields;
     private final Iterable<String> highlightedFields;
-    private final StringToQuickGOQueryConverter converter;
     private final SearchableField fieldSpec;
 
     public DefaultSearchQueryTemplate(
-            StringToQuickGOQueryConverter converter,
             SearchableField fieldSpec,
             Iterable<String> returnedFields,
             Iterable<String> highlightedFields,
             String highlightStartDelim,
             String highlightEndDelim) {
-        this.converter = converter;
         this.highlightedFields = highlightedFields;
         this.highlightStartDelim = highlightStartDelim;
         this.highlightEndDelim = highlightEndDelim;
@@ -56,7 +53,6 @@ public class DefaultSearchQueryTemplate {
 
     public Builder newBuilder() {
         return new Builder(
-                converter,
                 fieldSpec,
                 returnedFields,
                 highlightedFields,
@@ -68,7 +64,6 @@ public class DefaultSearchQueryTemplate {
         private final String highlightStartDelim;
         private final String highlightEndDelim;
         private final Iterable<String> highlightedFields;
-        private final StringToQuickGOQueryConverter converter;
         private final Iterable<String> returnedFields;
         private final Set<String> filterQueriesText;
         private final Set<QuickGOQuery> filterQueries;
@@ -81,13 +76,12 @@ public class DefaultSearchQueryTemplate {
         private SearchableField fieldSpec;
         private boolean highlighting;
 
-        private Builder(StringToQuickGOQueryConverter converter,
+        private Builder(
                 SearchableField fieldSpec,
                 Iterable<String> returnedFields,
                 Iterable<String> highlightedFields,
                 String highlightStartDelim,
                 String highlightEndDelim) {
-            this.converter = converter;
             this.highlightedFields = highlightedFields;
             this.highlightStartDelim = highlightStartDelim;
             this.highlightEndDelim = highlightEndDelim;
@@ -123,23 +117,7 @@ public class DefaultSearchQueryTemplate {
          * @param filters the filter queries
          * @return this {@link DefaultSearchQueryTemplate.Builder} instance
          */
-        public DefaultSearchQueryTemplate.Builder addFilters(List<String> filters) {
-            if (filters != null) {
-                this.filterQueriesText.addAll(filters);
-            }
-            return this;
-        }
-
-        /**
-         * Specify a list of filter queries that should be used.
-         * <p>
-         * Note that this argument is nullable.
-         *
-         * @param filters the filter queries
-         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
-         */
-        public DefaultSearchQueryTemplate.Builder addFilters(List<ConvertedFilter<QuickGOQuery>> filters,
-                Object placeholder) {
+        public DefaultSearchQueryTemplate.Builder addFilters(List<ConvertedFilter<QuickGOQuery>> filters) {
             if (filters != null) {
                 List<QuickGOQuery> queryFilters = filters.stream()
                         .map(ConvertedFilter::getConvertedValue)
@@ -157,17 +135,6 @@ public class DefaultSearchQueryTemplate {
          */
         public DefaultSearchQueryTemplate.Builder useHighlighting(boolean highlighting) {
             this.highlighting = highlighting;
-            return this;
-        }
-
-        /**
-         * Specify the search query.
-         *
-         * @param query the search query.
-         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
-         */
-        public DefaultSearchQueryTemplate.Builder setQuery(String query) {
-            this.query = converter.convert(query);
             return this;
         }
 
@@ -213,12 +180,6 @@ public class DefaultSearchQueryTemplate {
 
             if (!facets.isEmpty()) {
                 facets.forEach(builder::addFacetField);
-            }
-
-            if (!filterQueriesText.isEmpty()) {
-                filterQueriesText.stream()
-                        .map(converter::convert)
-                        .forEach(builder::addQueryFilter);
             }
 
             if(!filterQueries.isEmpty()) {

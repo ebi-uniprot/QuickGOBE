@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.rest.search.query.Facet;
 import uk.ac.ebi.quickgo.rest.search.query.FieldProjection;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,22 +34,19 @@ public class DefaultSearchQueryTemplateTest {
     private static final String QUERY = "query";
     private static final String ID = "id";
 
-    private String query;
+    private QuickGOQuery query;
     private String id;
     private SearchableField searchableField = field -> field.equals(SEARCHABLE_FIELD) || field.equals(id);
     private List<String> returnedFields;
     private DefaultSearchQueryTemplate defaultSearchQueryTemplate;
-    private StringToQuickGOQueryConverter queryConverter;
 
     @Before
     public void setUp() {
         this.id = ID;
         this.returnedFields = Arrays.asList(id, SEARCHABLE_FIELD);
-        this.query = QUERY;
+        this.query = QuickGOQuery.createQuery(QUERY);
 
-        this.queryConverter = new StringToQuickGOQueryConverter(searchableField);
         this.defaultSearchQueryTemplate = new DefaultSearchQueryTemplate(
-                queryConverter,
                 searchableField,
                 returnedFields,
                 Collections.singletonList(id),
@@ -71,7 +69,7 @@ public class DefaultSearchQueryTemplateTest {
 
     @Test
     public void queryRequestQueryWasSet() {
-        assertThat(createBuilder().build().getQuery(), is(queryConverter.convert(query)));
+        assertThat(createBuilder().build().getQuery(), is(query));
     }
 
     @Test
@@ -96,13 +94,14 @@ public class DefaultSearchQueryTemplateTest {
     @Test
     public void queryRequestFilterWasSet() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
-        List<String> strFilters = new ArrayList<>();
-        String filterQueryStr = id + ":value";
-        strFilters.add(filterQueryStr);
-        requestBuilder.addFilters(strFilters);
 
-        List<QuickGOQuery> modelFilters = new ArrayList<>();
-        modelFilters.add(queryConverter.convert(filterQueryStr));
+        QuickGOQuery filterQuery = QuickGOQuery.createQuery(id, "value");
+        List<ConvertedFilter<QuickGOQuery>> filterQueries =
+                Collections.singletonList(new ConvertedFilter<>(filterQuery));
+
+        requestBuilder.addFilters(filterQueries);
+
+        List<QuickGOQuery> modelFilters = Collections.singletonList(filterQuery);
 
         assertThat(requestBuilder.build().getFilters(), is(modelFilters));
     }
@@ -124,7 +123,8 @@ public class DefaultSearchQueryTemplateTest {
     @Test
     public void queryRequestPageWasSetByDefault() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
-        assertThat(requestBuilder.build().getPage().getPageNumber(), is(DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER));
+        assertThat(requestBuilder.build().getPage().getPageNumber(),
+                is(DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER));
     }
 
     @Test
