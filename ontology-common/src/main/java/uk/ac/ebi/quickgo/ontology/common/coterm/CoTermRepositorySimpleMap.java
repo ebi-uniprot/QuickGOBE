@@ -32,7 +32,7 @@ public class CoTermRepositorySimpleMap  implements CoTermRepository{
      * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each object holds statistics related to that co-occurrence.
      */
-    public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Float similarityThreshold) {
+    public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, float similarityThreshold) {
         return source == CoTermSource.MANUAL?findCoTermsFromMap(coTermsManual, id, limit, similarityThreshold)
                 :findCoTermsFromMap(coTermsAll, id, limit, similarityThreshold);
     }
@@ -45,7 +45,7 @@ public class CoTermRepositorySimpleMap  implements CoTermRepository{
      * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each object holds statistics related to that co-occurrence.
      */
-    private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id, int limit, Float
+    private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id, int limit, float
             similarityThreshold) {
         List<CoTerm> results = map.get(id);
         if(results==null){
@@ -53,7 +53,7 @@ public class CoTermRepositorySimpleMap  implements CoTermRepository{
         }
 
         //use similarity threshold to filter results if it has been specified.
-        if(similarityThreshold!=null){
+        if(similarityThreshold > 0.0f){
             results = results.stream()
                     .filter(t -> t.getSignificance() >= similarityThreshold)
                     .collect(Collectors.toList());
