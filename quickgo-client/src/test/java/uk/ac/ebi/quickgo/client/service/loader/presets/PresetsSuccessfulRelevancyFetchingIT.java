@@ -43,7 +43,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
         classes = {PresetsConfig.class, MockPresetDataConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
 @WebAppConfiguration
-@ActiveProfiles(profiles = MockPresetDataConfig.SUCCESSFUL_FETCHING)
+@ActiveProfiles(profiles = {MockPresetDataConfig.SUCCESSFUL_FETCHING, MockPresetDataConfig.NO_SEARCH_ATTRIBUTES})
 public class PresetsSuccessfulRelevancyFetchingIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;

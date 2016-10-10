@@ -58,7 +58,12 @@ public class AssignedByPresetsConfig {
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePresetImpl presets,
-            RESTFilterConverterFactory converterFactory) {
+            FilterConfigRetrieval externalFilterConfigRetrieval,
+            RestOperations restOperations) {
+
+        RESTFilterConverterFactory converterFactory = assignedByConverterFactory(externalFilterConfigRetrieval,
+                restOperations);
+
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
         itemReader.setLinesToSkip(assignedByHeaderLines);
         return stepBuilderFactory.get(ASSIGNED_BY_LOADING_STEP_NAME)
@@ -72,6 +77,11 @@ public class AssignedByPresetsConfig {
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
+    }
+
+    private RESTFilterConverterFactory assignedByConverterFactory(FilterConfigRetrieval filterConfigRetrieval,
+            RestOperations restOperations) {
+        return new RESTFilterConverterFactory(filterConfigRetrieval, restOperations);
     }
 
     /**
