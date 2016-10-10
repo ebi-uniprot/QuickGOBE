@@ -60,10 +60,10 @@ public class AnnotationControllerRESTIT {
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     private static final String FAILED_REST_FETCH_PREFIX = "Failed to fetch REST response";
-    private static final String RESOURCE_URL = "/QuickGO/services/annotation";
+    private static final String RESOURCE_URL = "/annotation";
     private static final String BASE_URL = "http://localhost";
     private static final String COMMA = ",";
-    private static final String DESCENDANTS_RESOURCE_FORMAT = "/QuickGO/services/go/terms/%s/descendants?relations=%s";
+    private static final String DESCENDANTS_RESOURCE_FORMAT = "/ontology/go/terms/%s/descendants?relations=%s";
     private static final String IS_A = "is_a";
     private static final String DESCENDANTS_USAGE = "descendants";
     private static final String SLIM_USAGE = "slim";
