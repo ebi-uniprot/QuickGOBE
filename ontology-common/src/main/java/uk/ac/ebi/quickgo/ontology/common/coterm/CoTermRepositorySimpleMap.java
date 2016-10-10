@@ -59,7 +59,7 @@ public class CoTermRepositorySimpleMap  implements CoTermRepository{
                     .collect(Collectors.toList());
         }
         if(results.size()<=limit){
-            return results.subList(0,results.size()-1);
+            return results;
         }
         return results.subList(0, limit);
     }
