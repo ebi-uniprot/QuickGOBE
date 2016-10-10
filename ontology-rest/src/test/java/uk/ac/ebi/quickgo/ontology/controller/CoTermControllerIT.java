@@ -120,6 +120,35 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void retrieveAllCoTermsUsingSimilarityThresholdBelowThatFoundInTheRecordsForAllCoTerms() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=0.1")));
+        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void noCoTermsRetrievedWhenSimilarityThresholdAboveThatFoundInTheRecordsForAllCoTerms() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=101")));
+        response.andDo(print())
+                .andExpect(jsonPath("$.results.*", hasSize(0)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void useValueForSimiliaryThresholdThatReturnsOnlyOneRecord() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=99.9")));
+        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results.*.id").value(GO_0000001))
+                .andExpect(jsonPath("$.results.*.compare").value(GO_0000001))
+                .andExpect(jsonPath("$.results.*.significance").value(100.0))
+                .andExpect(status().isOk());
+    }
+
     private String buildPathToResource(String id) {
         return RESOURCE_URL + "/" + id;
     }
