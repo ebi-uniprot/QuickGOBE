@@ -24,7 +24,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     @Autowired
     private GeneProductRepository repository;
 
-    private static final String ONTOLOGY_RESOURCE_URL = "/QuickGO/services/geneproduct/search";
+    private static final String ONTOLOGY_RESOURCE_URL = "/geneproduct/search";
 
     @Before
     public void setUp() throws Exception {
