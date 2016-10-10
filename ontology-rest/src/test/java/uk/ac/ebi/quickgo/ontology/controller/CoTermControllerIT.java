@@ -44,9 +44,11 @@ public class CoTermControllerIT {
 
     private MockMvc mockMvc;
 
+    private static final int NUMBER_OF_ALL_CO_TERM_RECORDS = 12 ;
     private static final String GO_0000001 = "GO:0000001";
     private static final String GO_9000001 = "GO:9000001";
     private static final String MANUAL_ONLY_TERM = "GO:8888881";
+    private static final String ALL_ONLY_TERM = "GO:7777771";
 
     @Before
     public void setup() {
@@ -61,7 +63,7 @@ public class CoTermControllerIT {
 
         expectFieldsInResults(response, Arrays.asList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*", hasSize(11)))
+                .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
                 .andExpect(status().isOk());
     }
 
@@ -80,11 +82,28 @@ public class CoTermControllerIT {
         expectFieldsInResults(response, Arrays.asList(MANUAL_ONLY_TERM))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results.*.id").value(MANUAL_ONLY_TERM))
                 .andExpect(jsonPath("$.results.*.compare").value("GO:0004444"))
                 .andExpect(jsonPath("$.results.*.probabilityRatio").value(302.4))
                 .andExpect(jsonPath("$.results.*.significance").value(78.28))
                 .andExpect(jsonPath("$.results.*.together").value(1933))
                 .andExpect(jsonPath("$.results.*.compared").value(5219))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void retrieveAllCoTermsInformationWhenRequested() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(ALL_ONLY_TERM, "source=ALL")));
+
+        expectFieldsInResults(response, Arrays.asList(ALL_ONLY_TERM))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results.*.id").value(ALL_ONLY_TERM))
+                .andExpect(jsonPath("$.results.*.compare").value("GO:0003333"))
+                .andExpect(jsonPath("$.results.*.probabilityRatio").value(486.4))
+                .andExpect(jsonPath("$.results.*.significance").value(22.28))
+                .andExpect(jsonPath("$.results.*.together").value(8632))
+                .andExpect(jsonPath("$.results.*.compared").value(5778))
                 .andExpect(status().isOk());
     }
 
