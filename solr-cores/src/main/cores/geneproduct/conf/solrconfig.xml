@@ -914,22 +914,16 @@
                      - increase scoring of documents that match, with 0 slop, to search queries with more than one search
                      term. Again exact matches have higher boosting to make use these come first.
             -->
-            <!--<str name="qf">-->
-                <!--exact_symbol^10 id exact_name^5 exact_synonym^5 edge_name edge_symbol^3 edge_synonym-->
-            <!--</str>-->
-            <!--<str name="pf">-->
-                <!--exact_symbol^10 exact_name^5 exact_synonym^5 edge_name edge_symbol^3 edge_synonym-->
-            <!--</str>-->
             <str name="qf">
-                id
-                exact_symbol^20 symbol^12 edge_symbol^5
-                exact_synonym^10 synonym^11 edge_synonym
-                exact_name^10 name^11 edge_name
+                id_lowercase
+                symbol_exact^20 symbol_lowercase^12 symbol_edge^5
+                synonym_exact^13 synonym_lowercase^11 synonym_edge
+                name_exact^13 name_lowercase^11 name_edge
             </str>
             <str name="pf">
-                exact_symbol^20 symbol^12 edge_symbol^5
-                exact_synonym^10 synonym^11 edge_synonym
-                exact_name^10 name^11 edge_name
+                symbol_exact^20 symbol_lowercase^12 symbol_edge^5
+                synonym_exact^13 synonym_lowercase^11 synonym_edge
+                name_exact^13 name_lowercase^11 name_edge
             </str>
             <int name="ps">0</int>
         </lst>

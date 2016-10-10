@@ -155,7 +155,7 @@ public abstract class SearchControllerSetup {
         mockMvc.perform(clientRequest)
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.facet.facetFields.*", hasSize(facets.length)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facet.facetFields.*.field", containsInAnyOrder(facets)));
     }
 
     private void addFacetsToRequest(MockHttpServletRequestBuilder clientRequest, String... facets) {

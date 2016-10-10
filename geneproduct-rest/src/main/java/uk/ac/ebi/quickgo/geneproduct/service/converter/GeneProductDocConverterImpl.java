@@ -38,11 +38,9 @@ public class GeneProductDocConverterImpl implements GeneProductDocConverter {
         geneProduct.isCompleteProteome = geneProductDocument.isCompleteProteome;
         geneProduct.parentId = geneProductDocument.parentId;
         geneProduct.symbol = geneProductDocument.symbol;
-        geneProduct.taxonomy = geneProductDocument.taxonId == DEFAULT_TAXON_ID ?
-                null : new GeneProduct.Taxonomy(geneProductDocument.taxonId, geneProductDocument.taxonName);
+        geneProduct.taxonId = geneProductDocument.taxonId;
         geneProduct.type = GeneProductType.typeOf(geneProductDocument.type);
 
         return geneProduct;
     }
-
 }

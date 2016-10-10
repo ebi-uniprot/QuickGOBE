@@ -201,26 +201,7 @@ public class GeneProductDocumentConverterTest {
 
         GeneProductDocument doc = converter.process(geneProduct);
 
-        assertThat(doc.taxonName, is(nullValue()));
-    }
-
-    @Test
-    public void convertsTaxonNameInPropertiesInGeneProductToField() throws Exception {
-        String taxonName = "Homo sapiens";
-        geneProduct.properties = concatProperty(TAXON_NAME_KEY, taxonName);
-
-        GeneProductDocument doc = converter.process(geneProduct);
-
-        assertThat(doc.taxonName, is(taxonName));
-    }
-
-    @Test
-    public void convertsAbsenceOfTaxonNameInPropertiesInGeneProductToNull() throws Exception {
-        geneProduct.properties = "";
-
-        GeneProductDocument doc = converter.process(geneProduct);
-
-        assertThat(doc.taxonName, is(nullValue()));
+        assertThat(doc.databaseSubsets, is(nullValue()));
     }
 
     private String concatProperty(String key, String value) {

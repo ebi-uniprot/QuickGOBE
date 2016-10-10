@@ -140,7 +140,19 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("glycine", GeneProductFields.Searchable.NAME);
+        checkValidFacetResponse("glycine", GeneProductFields.Searchable.TYPE);
+    }
+
+    @Test
+    public void requestWithMultipleValidFacetFieldsReturnsResponseWithMultipleFacetsInResult() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkValidFacetResponse("glycine", GeneProductFields.Searchable.TYPE,
+                GeneProductFields.Searchable.TAXON_ID);
     }
 
     @Test
@@ -158,15 +170,17 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithMultipleValidFacetFieldsReturnsResponseWithMultipleFacetsInResult() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
+    public void requestWithTaxonIdFacetFieldReturnsResponseWithFacetInResult() throws Exception {
+        int taxonId = 99;
+        String name = "name";
+
+        GeneProductDocument doc1 = createGeneProductDocWithNameAndTaxonId("A0A0F8CSS1", name, taxonId);
+        GeneProductDocument doc2 = createGeneProductDocWithNameAndTaxonId("A0A0F8CSS2", name, taxonId);
+        GeneProductDocument doc3 = createGeneProductDocWithNameAndTaxonId("A0A0F8CSS3", name, taxonId);
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("glycine", GeneProductFields.Searchable.ID,
-                GeneProductFields.Searchable.NAME);
+        checkValidFacetResponse(name, GeneProductFields.Searchable.TAXON_ID);
     }
 
     // filter queries ---------------------------------------------------------
@@ -214,7 +228,6 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         checkValidFilterQueryResponse("metabolic", 2, fq);
     }
-
 
     @Test
     public void requestWith2FilterQueriesThatFilterOutAllResults() throws Exception {
@@ -340,6 +353,14 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     private GeneProductDocument createGeneProductDocWithNameAndType(String id, String name, GeneProductType type) {
         GeneProductDocument geneProductDocument = createDocWithId(id);
         geneProductDocument.type = type.getName();
+        geneProductDocument.name = name;
+
+        return geneProductDocument;
+    }
+
+    private GeneProductDocument createGeneProductDocWithNameAndTaxonId(String id, String name, int taxonId) {
+        GeneProductDocument geneProductDocument = createDocWithId(id);
+        geneProductDocument.taxonId = taxonId;
         geneProductDocument.name = name;
 
         return geneProductDocument;

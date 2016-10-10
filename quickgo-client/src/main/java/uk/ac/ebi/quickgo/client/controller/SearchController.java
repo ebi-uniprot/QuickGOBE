@@ -37,6 +37,11 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RestController
 @RequestMapping(value = "/QuickGO/internal/search")
 public class SearchController {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
+    private static final String DEFAULT_PAGE_NUMBER = "1";
+
     private final SearchService<OntologyTerm> ontologySearchService;
     private final DefaultSearchQueryTemplate requestTemplate;
     private final FilterConverterFactory converterFactory;

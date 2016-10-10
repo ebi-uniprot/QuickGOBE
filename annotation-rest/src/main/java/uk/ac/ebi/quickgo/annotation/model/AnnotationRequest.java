@@ -113,8 +113,8 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Filter annotation by the ontology to which the associated GO term belongs. Accepts comma " +
                     "separated values. Accepts comma separated values.",
-            allowableValues = "process,function,component",
-            example = "process,function")
+            allowableValues = "biological_process,molecular_function,cellular_component",
+            example = "biological_process,molecular_function")
     private String aspect;
 
     @ApiModelProperty(value = "The database which made the annotation. Accepts comma separated values.",
