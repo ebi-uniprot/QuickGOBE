@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.ontology.common.coterm.CoTerm;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermLimit;
+import uk.ac.ebi.quickgo.ontology.coterms.CoTermLimit;
 import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermSource;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +35,6 @@ public class CoTermController {
 
     private static final String COTERMS_RESOURCE = "coterms";
     private final CoTermLimit coTermLimit;
-
-    @Value("${coterm.default.limit:50}")
-    private int defaultLimit;
-
     final OntologyService<GOTerm> ontologyService;
 
     /**
@@ -52,7 +47,6 @@ public class CoTermController {
         this.ontologyService = goOntologyService;
         this.coTermLimit = coTermLimit;
     }
-
 
     /**
      * Get co-occurring term information for a single GO Term
@@ -72,12 +66,12 @@ public class CoTermController {
     @ApiOperation(value = "Get co-occurring term information for a single GO Term id.",
             notes = "If possible, response fields include: id, name, definition, probability ratio, similarity ratio," +
                     " together, compared.")
-    @RequestMapping(value = COTERMS_RESOURCE + "/{id}/", method = RequestMethod.GET,
+    @RequestMapping(value = COTERMS_RESOURCE + "/{id}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(@PathVariable(value = "id") String id,
             @RequestParam(value = "source", defaultValue = "ALL") String source,
-            @RequestParam(value = "limit") String limit,
-            @RequestParam(value = "similarityThreshold") String similarityThreshold) {
+            @RequestParam(value = "limit", required = false) String limit,
+            @RequestParam(value = "similarityThreshold", required = false) String similarityThreshold) {
 
         int similarityNumeric = validateSimilarity(similarityThreshold);
         CoTermSource coTermSource = validateCoTermSource(source, similarityThreshold);
