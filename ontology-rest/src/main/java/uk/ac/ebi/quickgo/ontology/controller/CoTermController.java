@@ -71,14 +71,14 @@ public class CoTermController {
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(@PathVariable(value = "id") String id,
             @RequestParam(value = "source", defaultValue = "ALL") String source,
             @RequestParam(value = "limit", required = false) String limit,
-            @RequestParam(value = "similarityThreshold", required = false) String similarityThreshold) {
+            @RequestParam(value = "similarityThreshold", required = false) Float similarityThreshold) {
 
-        int similarityNumeric = validateSimilarity(similarityThreshold);
-        CoTermSource coTermSource = validateCoTermSource(source, similarityThreshold);
+        Preconditions.checkArgument(similarityThreshold!=null, "The value for similarityThreshold should not be empty");
+        CoTermSource coTermSource = validateCoTermSource(source);
         validateGoTerm(id);
 
         return getResultsResponse(ontologyService.findCoTermsByOntologyId(id, coTermSource,
-                coTermLimit.workoutLimit(limit), similarityNumeric));
+                coTermLimit.workoutLimit(limit), similarityThreshold));
     }
 
     private void validateGoTerm(@PathVariable(value = "id") String id) {
@@ -88,31 +88,15 @@ public class CoTermController {
         }
     }
 
-    private CoTermSource validateCoTermSource(@RequestParam(value = "source", defaultValue = "ALL") String source,
-            @RequestParam(value = "similarityThreshold") String similarityThreshold) {
-        CoTermSource coTermSource = null;
+    private CoTermSource validateCoTermSource(String source) {
+        CoTermSource coTermSource;
         try {
             coTermSource = CoTermSource.valueOf(source.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("The value for similarityThreshold should be an integer between 0 " +
-                    "and 100, not " + similarityThreshold);
+            throw new IllegalArgumentException("The value for similarityThreshold should be one of "
+                    + CoTermSource.values() + " and not " + source);
         }
         return coTermSource;
-    }
-
-    private int validateSimilarity(@RequestParam(value = "similarityThreshold") String similarityThreshold) {
-        int similarityNumeric = 0;
-        if(similarityThreshold!=null) {
-            try {
-                similarityNumeric = Integer.parseInt(similarityThreshold);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("The value for similarityThreshold should be an integer between 0 " +
-                        "and 100, not " + similarityThreshold);
-            }
-            Preconditions.checkArgument(similarityNumeric < 0 || similarityNumeric > 100, "The value for " +
-                    "similarityThreshold should be an integer between 0 and 100, not {}", similarityThreshold);
-        }
-        return similarityNumeric;
     }
 
     public Predicate<String> idValidator() {
