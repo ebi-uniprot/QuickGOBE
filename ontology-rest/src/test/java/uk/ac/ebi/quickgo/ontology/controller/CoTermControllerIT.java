@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
+import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermSource;
 
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +52,10 @@ public class CoTermControllerIT {
     private static final String GO_9000001 = "GO:9000001";
     private static final String MANUAL_ONLY_TERM = "GO:8888881";
     private static final String ALL_ONLY_TERM = "GO:7777771";
+
+    private static final String SOURCE_VALUES = Arrays.stream(CoTermSource.values())
+            .map(CoTermSource::name)
+            .collect(Collectors.joining(", "));
 
     @Before
     public void setup() {
@@ -135,6 +140,15 @@ public class CoTermControllerIT {
     }
 
 
+    @Test
+    public void errorIfValueForSourceIsUnknown() throws Exception {
+        String requestedSource = "FUBAR";
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "source="+requestedSource)));
+        response.andExpect(status().isBadRequest());
+        expectInvalidSourceErrorMessage(response, requestedSource);
+    }
+
+
      // Tests for similarity threshold
 
     @Test
@@ -206,9 +220,11 @@ public class CoTermControllerIT {
                 .andExpect(jsonPath(path + "compared").exists());
     }
 
-    private ResultActions expectInvalidSourceError(ResultActions result) throws Exception {
+    private ResultActions expectInvalidSourceErrorMessage(ResultActions result, String requestedSource) throws
+                                                                                                       Exception {
         return result
                 .andDo(print())
-                .andExpect(jsonPath("$.messages", hasItem(containsString("The value for source should not be empty"))));
+                .andExpect(jsonPath("$.messages", hasItem(containsString("The value for source should be one of " +
+                        SOURCE_VALUES + " and not " + requestedSource))));
     }
 }
