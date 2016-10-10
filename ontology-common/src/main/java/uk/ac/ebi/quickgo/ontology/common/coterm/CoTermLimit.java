@@ -19,20 +19,29 @@ public class CoTermLimit {
         if (limit == null) {
             limitNumeric = defaultLimit;
         } else {
-            if (LimitValue.FULL.toString().equals(limitNumeric)) {
+            if (LimitValue.ALL.toString().equalsIgnoreCase(limit)) {
                 limitNumeric = Integer.MAX_VALUE;
             } else {
-                try {
-                    limitNumeric = Integer.parseInt(limit);
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("The value for limit co-occurring terms is not ALL, or 0-100");
+                if (limit.trim().length() == 0) {
+                    limitNumeric = defaultLimit;
+                } else {
+                    try {
+                        limitNumeric = Integer.parseInt(limit);
+
+                        if (limitNumeric == 0) {
+                            limitNumeric = defaultLimit;
+                        }
+                    } catch (NumberFormatException e) {
+                        throw new IllegalArgumentException("The value for co-occurring terms limit is not ALL, or a " +
+                                "number");
+                    }
                 }
             }
         }
         return limitNumeric;
     }
 
-    enum LimitValue{
-        FULL
+    enum LimitValue {
+        ALL
     }
 }
