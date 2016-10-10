@@ -77,6 +77,8 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
+    // Test source parameter
+
     @Test
     public void retrieveManualCoTermsInformationWhenRequested() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(MANUAL_ONLY_TERM, "source=MANUAL")));
@@ -122,10 +124,18 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
-    /**
-     * Tests for similarity threshold
-     * @throws Exception
-     */
+
+    @Test
+    public void doNotExpectErrorIfValueForSourceIsLeftBlank() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "source=")));
+        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
+                .andExpect(status().isOk());
+    }
+
+
+     // Tests for similarity threshold
 
     @Test
     public void retrieveAllCoTermsUsingSimilarityThresholdBelowThatFoundInTheRecordsForAllCoTerms() throws Exception {
@@ -157,11 +167,12 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void expectErrorIfValueForThresholdIsLeftBlank() throws Exception {
+    public void doNotGetErrorIfValueForThresholdIsLeftBlank() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=")));
-        response.andDo(print())
-                .andExpect(status().isBadRequest());
-        expectInvalidThresholdError(response);
+        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
+                .andExpect(status().isOk());
     }
 
 
@@ -195,9 +206,9 @@ public class CoTermControllerIT {
                 .andExpect(jsonPath(path + "compared").exists());
     }
 
-    private ResultActions expectInvalidThresholdError(ResultActions result) throws Exception {
+    private ResultActions expectInvalidSourceError(ResultActions result) throws Exception {
         return result
                 .andDo(print())
-                .andExpect(jsonPath("$.messages", hasItem(containsString("The value for similarityThreshold should not be empty"))));
+                .andExpect(jsonPath("$.messages", hasItem(containsString("The value for source should not be empty"))));
     }
 }
