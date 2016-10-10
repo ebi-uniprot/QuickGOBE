@@ -60,8 +60,8 @@ public class CoTermLoader {
 
                 lineCount++;
 
-                //Ignore comment lines.
-                if(line.startsWith("!")){  //todo double check
+                //Ignore any line that doesn't start with a GO id.
+                if(!line.startsWith("GO")){
                     continue;
                 }
 
