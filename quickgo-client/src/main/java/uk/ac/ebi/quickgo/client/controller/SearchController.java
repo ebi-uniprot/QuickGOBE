@@ -7,7 +7,6 @@ import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
-import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -17,6 +16,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +40,6 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 public class SearchController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
-    private static final String DEFAULT_PAGE_NUMBER = "1";
-
     private final SearchService<OntologyTerm> ontologySearchService;
     private final DefaultSearchQueryTemplate requestTemplate;
     private final FilterConverterFactory converterFactory;
@@ -62,7 +60,6 @@ public class SearchController {
         this.converterFactory = converterFactory;
 
         this.requestTemplate = new DefaultSearchQueryTemplate(
-                new StringToQuickGOQueryConverter(ontologySearchableField),
                 ontologySearchableField,
                 ontologyRetrievalConfig.getSearchReturnedFields(),
                 ontologyRetrievalConfig.repo2DomainFieldMap().keySet(),
@@ -92,7 +89,7 @@ public class SearchController {
                 .addFilters(request.createFilterRequests().stream()
                         .map(converterFactory::convert)
                         .filter(Objects::nonNull)
-                        .collect(Collectors.toList()), null)
+                        .collect(Collectors.toList()))
                 .useHighlighting(request.isHighlighting())
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit());

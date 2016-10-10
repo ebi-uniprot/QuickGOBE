@@ -10,7 +10,6 @@ import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
-import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -45,10 +44,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RestController
 @RequestMapping(value = "/QuickGO/services/geneproduct")
 public class GeneProductController {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
-    private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
-    private static final String DEFAULT_PAGE_NUMBER = "1";
 
     private final GeneProductService geneProductService;
     private final SearchService<GeneProduct> geneProductSearchService;
@@ -80,7 +76,6 @@ public class GeneProductController {
         this.converterFactory = converterFactory;
 
         this.requestTemplate = new DefaultSearchQueryTemplate(
-                new StringToQuickGOQueryConverter(geneProductSearchableField),
                 geneProductSearchableField,
                 geneProductRetrievalConfig.getSearchReturnedFields(),
                 geneProductRetrievalConfig.repo2DomainFieldMap().keySet(),
@@ -135,7 +130,7 @@ public class GeneProductController {
                 .addFilters(request.createFilterRequests().stream()
                         .map(converterFactory::convert)
                         .filter(Objects::nonNull)
-                        .collect(Collectors.toList()), null)
+                        .collect(Collectors.toList()))
                 .useHighlighting(request.isHighlighting())
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit());
