@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringApplicationConfiguration(classes = {QuickGOREST.class})
 @WebAppConfiguration
 public class OntologyUserQueryScoringIT {
-    private static final String RESOURCE_URL = "/QuickGO/internal/search/ontology";
+    private static final String RESOURCE_URL = "/internal/search/ontology";
     private static final String QUERY_PARAM = "query";
 
     @ClassRule
