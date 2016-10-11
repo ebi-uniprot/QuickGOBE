@@ -48,22 +48,23 @@ public class DefaultSearchQueryTemplate {
 
     public void setHighlighting(Collection<String> highlightedFields, String highlightStartDelim,
             String highlightEndDelim) {
-        Preconditions.checkArgument(highlightedFields != null && !highlightedFields.isEmpty(),
-                "Highlighted fields cannot be null or empty");
-        Preconditions.checkArgument(highlightStartDelim != null && !highlightStartDelim.isEmpty(),
-                "Highlighting start delimiter cannot be null or empty");
-        Preconditions.checkArgument(highlightEndDelim != null && !highlightEndDelim.isEmpty(),
-                "Highlighting end delimiter cannot be null or empty");
+        if (highlightedFields != null) {
+            this.highlightedFields = highlightedFields;
 
-        this.highlightedFields = highlightedFields;
-        this.highlightStartDelim = highlightStartDelim;
-        this.highlightEndDelim = highlightEndDelim;
+            if (highlightStartDelim != null) {
+                this.highlightStartDelim = highlightStartDelim;
+            }
+
+            if (highlightEndDelim != null) {
+                this.highlightEndDelim = highlightEndDelim;
+            }
+        }
     }
 
     public void setReturnedFields(Collection<String> returnedFields) {
-        Preconditions.checkArgument(returnedFields != null && !returnedFields.isEmpty(),
-                "Fields to return cannot be null or empty");
-        this.returnedFields = returnedFields;
+        if (returnedFields != null) {
+            this.returnedFields = returnedFields;
+        }
     }
 
     public Builder newBuilder() {
@@ -188,7 +189,7 @@ public class DefaultSearchQueryTemplate {
          * Add to the collection of aggregates which aggregates should be calculated.
          *
          * @param aggregate the aggregate to calculate
-         * @return this {@link AggregateSearchQueryTemplate.Builder} instance
+         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
          */
         public DefaultSearchQueryTemplate.Builder setAggregate(AggregateRequest aggregate) {
             this.aggregate = aggregate;
