@@ -148,6 +148,60 @@ public class CoTermControllerIT {
         expectInvalidSourceErrorMessage(response, requestedSource);
     }
 
+    // Tests for limit parameter
+    @Test
+    public void setNumberOfResponsesBasedOnLimit() throws Exception{
+
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=3")));
+
+        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(3)))
+                .andExpect(jsonPath("$.results[0].id").value(GO_0000001))
+                .andExpect(jsonPath("$.results[0].compare").value(GO_0000001))
+                .andExpect(jsonPath("$.results[0].probabilityRatio").value(16526.18))
+                .andExpect(jsonPath("$.results[1].compare").value("GO:0034643"))
+                .andExpect(jsonPath("$.results[1].probabilityRatio").value(16446.73))
+                .andExpect(jsonPath("$.results[2].compare").value("GO:0090149"))
+                .andExpect(jsonPath("$.results[2].probabilityRatio").value(12394.64))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void ifTheLimitIsLeftEmptyUseDefaultLimit() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=")));
+        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void ifTheLimitIsSetToZeroUseDefaultLimit() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=0")));
+        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void ifTheLimitIsSetToNegativeNumberReturnBadRequest() throws Exception {
+        String requestedLimit="-1";
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
+        response.andExpect(status().isBadRequest());
+        expectNegativeLimitErrorMessage(response);
+    }
+
+
+    @Test
+    public void ifTheLimitIsSetToNonNumberReturnBadRequest() throws Exception {
+        String requestedLimit="AAA";
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
+        response.andExpect(status().isBadRequest());
+        expectInvalidLimitErrorMessage(response);
+    }
 
      // Tests for similarity threshold
 
@@ -226,5 +280,18 @@ public class CoTermControllerIT {
                 .andDo(print())
                 .andExpect(jsonPath("$.messages", hasItem(containsString("The value for source should be one of " +
                         SOURCE_VALUES + " and not " + requestedSource))));
+    }
+
+    private ResultActions expectInvalidLimitErrorMessage(ResultActions result) throws
+                                                                                                        Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.messages", hasItem(containsString("The value for co-occurring terms limit is not ALL, or a number"))));
+    }
+
+    private ResultActions expectNegativeLimitErrorMessage(ResultActions result) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.messages", hasItem(containsString("The value for limit cannot be negative"))));
     }
 }
