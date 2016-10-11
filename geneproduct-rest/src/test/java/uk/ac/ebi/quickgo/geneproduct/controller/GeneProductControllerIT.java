@@ -49,7 +49,7 @@ public class GeneProductControllerIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-    private static final String RESOURCE_URL = "/QuickGO/services/geneproduct";
+    private static final String RESOURCE_URL = "/geneproduct";
 
     protected static final String COMMA = ",";
     public static final String NON_EXISTANT_ID = "Y0Y000";

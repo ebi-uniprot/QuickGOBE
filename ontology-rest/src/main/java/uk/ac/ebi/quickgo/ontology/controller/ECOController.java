@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Edd
  */
 @RestController
-@RequestMapping(value = "/QuickGO/services/ontology/eco")
+@RequestMapping(value = "/ontology/eco")
 public class ECOController extends OBOController<ECOTerm> {
 
     private static final Pattern ECO_ID_FORMAT = Pattern.compile("^ECO:[0-9]{7}$");

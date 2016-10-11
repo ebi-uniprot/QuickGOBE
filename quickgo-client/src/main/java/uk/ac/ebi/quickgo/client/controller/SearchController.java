@@ -37,7 +37,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
  * @author Edd
  */
 @RestController
-@RequestMapping(value = "/QuickGO/internal/search")
+@RequestMapping(value = "/internal/search")
 public class SearchController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

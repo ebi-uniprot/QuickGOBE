@@ -8,15 +8,15 @@ search:
         execution: REST_COMM
         properties: {
           ip: localhost,
-          resourceFormat: "/QuickGO/services/go/terms/{goId}/descendants?relations={usageRelationships}",
+          resourceFormat: "/ontology/go/terms/{goId}/descendants?relations={usageRelationships}",
           responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }
-      - signature: goId,usageRelationships,slim
+      - signature: goId,slim,usageRelationships
         execution: REST_COMM
         properties: {
           ip: localhost,
-          resourceFormat: "/QuickGO/services/go/terms/{goId}/descendants?relations={usageRelationships}",
+          resourceFormat: "/ontology/go/terms/{goId}/descendants?relations={usageRelationships}",
           responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
         }

@@ -44,7 +44,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
  * Created with IntelliJ IDEA.
  */
 @RestController
-@RequestMapping(value = "/QuickGO/services/geneproduct")
+@RequestMapping(value = "/geneproduct")
 public class GeneProductController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
 

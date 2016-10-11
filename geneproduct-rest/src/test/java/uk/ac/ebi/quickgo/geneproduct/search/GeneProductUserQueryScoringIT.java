@@ -73,7 +73,7 @@ public class GeneProductUserQueryScoringIT {
      */
     private static final boolean FIXED_GOA_2041 = false;
 
-    private static final String RESOURCE_URL = "/QuickGO/services/geneproduct/search";
+    private static final String RESOURCE_URL = "/geneproduct/search";
     private static final String QUERY_PARAM = "query";
 
     private static final String VALID_ID_1 = "A0A0F8CSS1";

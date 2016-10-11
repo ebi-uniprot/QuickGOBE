@@ -87,7 +87,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
  *         Created with IntelliJ IDEA.
  */
 @RestController
-@RequestMapping(value = "/QuickGO/services/annotation")
+@RequestMapping(value = "/annotation")
 public class AnnotationController {
     private final ControllerValidationHelper validationHelper;
 
