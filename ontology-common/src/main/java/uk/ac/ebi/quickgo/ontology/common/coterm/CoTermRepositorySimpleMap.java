@@ -39,7 +39,8 @@ public class CoTermRepositorySimpleMap  implements CoTermRepository{
 
 
     /**
-     * Get all co-occurring terms for the requested term up to the supplied limit
+     * Get all co-occurring terms for the requested term up to the supplied limit. The data within the file is
+     * ordered by GOTerm and then probability score.
      * @param id the GO Term for which we will lookup co-occurring terms.
      * @param limit Limit the number of co-occurring terms return to the limit specified.
      * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
