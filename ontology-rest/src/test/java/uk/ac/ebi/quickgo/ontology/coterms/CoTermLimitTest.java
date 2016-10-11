@@ -55,4 +55,9 @@ public class CoTermLimitTest {
     public void limitIsConstructorLimitIfRequestedLimitIsEmptyString(){
         assertThat(comTermLimit.workoutLimit("   "), is(50));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void negativeNumberForLimitThrowsException(){
+        comTermLimit.workoutLimit("-10");
+    }
 }
