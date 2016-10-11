@@ -16,10 +16,10 @@ import org.springframework.stereotype.Component;
  * Created with IntelliJ IDEA.
  */
 @Component
-public class CoTermRepositorySimpleMap  implements CoTermRepository{
+public class CoTermRepositorySimpleMap implements CoTermRepository {
 
-    private Map<String, List<CoTerm>> coTermsAll;
-    private Map<String, List<CoTerm>> coTermsManual;
+    private final Map<String, List<CoTerm>> coTermsAll;
+    private final Map<String, List<CoTerm>> coTermsManual;
 
     public CoTermRepositorySimpleMap(Map<String, List<CoTerm>> coTermsAll, Map<String, List<CoTerm>> coTermsManual) {
         this.coTermsAll = coTermsAll;
@@ -30,40 +30,36 @@ public class CoTermRepositorySimpleMap  implements CoTermRepository{
      * Get all co-occurring terms for the requested term up to the supplied limit
      * @param id the GO Term for which we will lookup co-occurring terms.
      * @param limit Limit the number of co-occurring terms return to the limit specified.
+     * @param filter apply the predicate to filter the results.
      * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each object holds statistics related to that co-occurrence.
      */
-    public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate filter) {
-        return source == CoTermSource.MANUAL?findCoTermsFromMap(coTermsManual, id, limit, filter)
-                :findCoTermsFromMap(coTermsAll, id, limit, filter);
+    public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate<CoTerm> filter) {
+        return source == CoTermSource.MANUAL ? findCoTermsFromMap(coTermsManual, id, limit, filter)
+                : findCoTermsFromMap(coTermsAll, id, limit, filter);
     }
-
 
     /**
      * Get all co-occurring terms for the requested term up to the supplied limit. The data within the file is
-     * ordered by GOTerm and then probability score.
+     * ordered by GOTerm and then probability score. Apply the predicate passed to this class for filtering the results.
      * @param id the GO Term for which we will lookup co-occurring terms.
      * @param limit Limit the number of co-occurring terms return to the limit specified.
+     * @param filter apply the predicate to filter the results.
      * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each object holds statistics related to that co-occurrence.
      */
-    private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id, int limit, Predicate filter) {
+    private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id, int limit, Predicate<CoTerm>
+            filter) {
         List<CoTerm> results = map.get(id);
-        if(results==null){
+        if (results == null) {
             return Collections.emptyList();
         }
 
         //If we have been passed a filtering predicate, use it. Could be extended to be a list of filters.
-        if(filter !=null ){
-            results = results.stream()
-                    .filter(filter::test)
-                    .collect(Collectors.toList());
-        }
-
-        if(results.size()<=limit){
-            return results;
-        }
-        return results.subList(0, limit);
+        return results.stream()
+                .filter(filter)
+                .limit(limit)
+                .collect(Collectors.toList());
     }
 
 }
