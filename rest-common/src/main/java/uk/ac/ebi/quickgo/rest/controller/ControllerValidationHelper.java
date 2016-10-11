@@ -17,6 +17,8 @@ public interface ControllerValidationHelper {
      */
     List<String> validateCSVIds(String ids);
 
+    void validateRequestedPages(int requestedPages);
+
     /**
      * Checks whether the requested number of results is valid.
      * @param requestedResultsSize the number of results being requested
