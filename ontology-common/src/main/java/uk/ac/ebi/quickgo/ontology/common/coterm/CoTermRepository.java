@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.common.coterm;
 
 import java.util.List;
+import java.util.function.Predicate;
 import org.springframework.data.repository.Repository;
 
 /**
@@ -25,5 +26,5 @@ public interface CoTermRepository extends Repository<List<CoTerm>, String> {
      * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each object holds statistics related to that co-occurrence.
      */
-    List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, float similarityThreshold);
+    List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate filter);
 }

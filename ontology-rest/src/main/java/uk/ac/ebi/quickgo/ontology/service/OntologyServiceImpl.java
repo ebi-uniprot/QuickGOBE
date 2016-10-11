@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -138,7 +139,8 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
 
     @Override public List<CoTerm> findCoTermsByOntologyId(String id, CoTermSource type, int limit, float
             similarityThreshold) {
-        return coTermRepository.findCoTerms(id, type, limit, similarityThreshold);
+        Predicate<CoTerm> filter = ct -> ct.getSignificance() >= similarityThreshold;
+        return coTermRepository.findCoTerms(id, type, limit, filter);
     }
 
     List<String> buildIdList(List<String> ids) {

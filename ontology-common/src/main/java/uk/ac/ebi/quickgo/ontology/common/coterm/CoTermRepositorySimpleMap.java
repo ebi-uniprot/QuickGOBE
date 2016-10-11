@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.ontology.common.coterm;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
@@ -32,9 +33,9 @@ public class CoTermRepositorySimpleMap  implements CoTermRepository{
      * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each object holds statistics related to that co-occurrence.
      */
-    public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, float similarityThreshold) {
-        return source == CoTermSource.MANUAL?findCoTermsFromMap(coTermsManual, id, limit, similarityThreshold)
-                :findCoTermsFromMap(coTermsAll, id, limit, similarityThreshold);
+    public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate filter) {
+        return source == CoTermSource.MANUAL?findCoTermsFromMap(coTermsManual, id, limit, filter)
+                :findCoTermsFromMap(coTermsAll, id, limit, filter);
     }
 
 
@@ -46,19 +47,19 @@ public class CoTermRepositorySimpleMap  implements CoTermRepository{
      * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each object holds statistics related to that co-occurrence.
      */
-    private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id, int limit, float
-            similarityThreshold) {
+    private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id, int limit, Predicate filter) {
         List<CoTerm> results = map.get(id);
         if(results==null){
             return Collections.emptyList();
         }
 
-        //use similarity threshold to filter results if it has been specified.
-        if(similarityThreshold > 0.0f){
+        //If we have been passed a filtering predicate, use it. Could be extended to be a list of filters.
+        if(filter !=null ){
             results = results.stream()
-                    .filter(t -> t.getSignificance() >= similarityThreshold)
+                    .filter(filter::test)
                     .collect(Collectors.toList());
         }
+
         if(results.size()<=limit){
             return results;
         }

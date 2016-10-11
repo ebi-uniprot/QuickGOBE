@@ -18,6 +18,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
@@ -770,6 +771,9 @@ public class OntologyServiceImplTest {
     }
 
     public class CoTermServiceTests{
+
+        Predicate<CoTerm> filterTrue = t->true;
+
         @Test
         public void retrievesListOfCoTermsForGoTerm() {
 
@@ -783,7 +787,7 @@ public class OntologyServiceImplTest {
 
             List<CoTerm> results = Arrays.asList(coTerm1, coTerm2, coTerm3 );
 
-            when(coTermsRepositoryMock.findCoTerms(id, CoTermSource.MANUAL, limit, simThreshold )).thenReturn(results);
+            when(coTermsRepositoryMock.findCoTerms(id, CoTermSource.MANUAL, limit, filterTrue )).thenReturn(results);
 
             List<CoTerm> coTerms = goOntologyService.findCoTermsByOntologyId(id, CoTermSource.MANUAL, limit,
                     simThreshold );
@@ -801,7 +805,7 @@ public class OntologyServiceImplTest {
             float simThreshold = 0f;
 
             doThrow(new IllegalArgumentException()).when(coTermsRepositoryMock).findCoTerms(id, CoTermSource.MANUAL,
-                    limit, simThreshold );
+                    limit, filterTrue );
 
            ecoOntologyService.findCoTermsByOntologyId(id, CoTermSource.MANUAL, limit,
                     simThreshold );
