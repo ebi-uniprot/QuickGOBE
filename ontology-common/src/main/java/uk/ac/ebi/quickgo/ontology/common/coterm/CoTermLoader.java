@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
+ * Read the files that hold the co-occurring term data, and load to memory.
+ *
  * @author Tony Wardell
  * Date: 29/09/2016
  * Time: 13:55
