@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.ontology.common.coterm.CoTerm;
-import uk.ac.ebi.quickgo.ontology.coterms.CoTermLimit;
 import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermSource;
+import uk.ac.ebi.quickgo.ontology.coterms.CoTermLimit;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -22,24 +22,22 @@ import org.springframework.web.bind.annotation.*;
 import static uk.ac.ebi.quickgo.ontology.controller.GOController.GO_ID_FORMAT;
 
 /**
- * REST controller for accessing GO related information.
+ * REST controller for accessing GO Term co-occurring term related information.
  *
- * For complete list of necessary endpoints, and their behaviour:
- *  refer to https://www.ebi.ac.uk/seqdb/confluence/display/GOA/REST+API
- *
- * Created 16/11/15
- * @author Edd
+ * Created 11/10/16
+ * @author Tony Wardell
  */
 @RestController
 @RequestMapping(value = "/QuickGO/services/go")
 public class CoTermController {
 
     private static final String COTERMS_RESOURCE = "coterms";
-    private final CoTermLimit coTermLimit;
-    final OntologyService<GOTerm> ontologyService;
+    //Populate a String of CoTerm source values ahead of time for use in error messages.
     private static final String SOURCE_VALUES = Arrays.stream(CoTermSource.values())
             .map(CoTermSource::name)
             .collect(Collectors.joining(", "));
+    private final CoTermLimit coTermLimit;
+    private final OntologyService<GOTerm> ontologyService;
 
     /**
      * Create the endpoint for Co Terms.
@@ -77,33 +75,10 @@ public class CoTermController {
             @RequestParam(value = "limit", required = false) String limit,
             @RequestParam(value = "similarityThreshold", defaultValue = "0.0") float similarityThreshold) {
 
-        CoTermSource coTermSource = validateCoTermSource(source);
         validateGoTerm(id);
 
-        return getResultsResponse(ontologyService.findCoTermsByOntologyId(id, coTermSource,
+        return getResultsResponse(ontologyService.findCoTermsByOntologyId(id, validateCoTermSource(source),
                 coTermLimit.workoutLimit(limit), similarityThreshold));
-    }
-
-    private void validateGoTerm(@PathVariable(value = "id") String id) {
-        if(!idValidator().test(id)){
-            String errorMessage = "Provided ID: '" + id + "' is invalid";
-            throw new IllegalArgumentException(errorMessage);
-        }
-    }
-
-    private CoTermSource validateCoTermSource(String source) {
-        CoTermSource coTermSource;
-        try {
-            coTermSource = CoTermSource.valueOf(source.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("The value for source should be one of " + SOURCE_VALUES + " and not "
-                    + source);
-        }
-        return coTermSource;
-    }
-
-    public Predicate<String> idValidator() {
-        return id -> GO_ID_FORMAT.matcher(id).matches();
     }
 
     /**
@@ -122,5 +97,27 @@ public class CoTermController {
 
         QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
+    }
+
+    private void validateGoTerm(String id) {
+        if (!idValidator().test(id)) {
+            String errorMessage = "Provided ID: '" + id + "' is invalid";
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
+
+    private CoTermSource validateCoTermSource(String source) {
+        CoTermSource coTermSource;
+        try {
+            coTermSource = CoTermSource.valueOf(source.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("The value for source should be one of " + SOURCE_VALUES + " and not "
+                    + source);
+        }
+        return coTermSource;
+    }
+
+    private Predicate<String> idValidator() {
+        return id -> GO_ID_FORMAT.matcher(id).matches();
     }
 }
