@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.geneproduct.controller;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
 import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
@@ -82,7 +83,7 @@ public class GeneProductController {
     @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status")
     @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
-        throw new IllegalArgumentException("The requested end-point does not exist.");
+        throw new ParameterException("The requested end-point does not exist.");
     }
 
     /**
