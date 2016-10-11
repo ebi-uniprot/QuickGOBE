@@ -9,22 +9,20 @@ import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
-import java.util.HashSet;
-import java.util.Set;
-import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -95,7 +93,7 @@ public class AnnotationController {
 
     private final SearchService<Annotation> annotationSearchService;
 
-    private final BasicSearchQueryTemplate queryTemplate;
+    private final DefaultSearchQueryTemplate queryTemplate;
     private final FilterConverterFactory converterFactory;
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
@@ -103,6 +101,7 @@ public class AnnotationController {
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
+            SearchableField annotationSearchableField,
             ControllerValidationHelper validationHelper,
             FilterConverterFactory converterFactory,
             ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
@@ -119,9 +118,16 @@ public class AnnotationController {
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
         this.converterFactory = converterFactory;
-        this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
+
         this.statsService = statsService;
         this.resultTransformerChain = resultTransformerChain;
+
+        this.queryTemplate = new DefaultSearchQueryTemplate(
+                annotationSearchableField,
+                annotationRetrievalConfig.getSearchReturnedFields(),
+                annotationRetrievalConfig.repo2DomainFieldMap().keySet(),
+                annotationRetrievalConfig.getHighlightStartDelim(),
+                annotationRetrievalConfig.getHighlightEndDelim());
     }
 
     /**
@@ -150,7 +156,7 @@ public class AnnotationController {
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(filterQueryInfo.getFilterQueries())
+                .addFilters(filterQueryInfo.getFilterQueries())
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit())
                 .build();
