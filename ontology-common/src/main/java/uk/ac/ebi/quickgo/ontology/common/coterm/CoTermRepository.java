@@ -21,10 +21,9 @@ public interface CoTermRepository extends Repository<List<CoTerm>, String> {
      * to annotation the same gene products as this GO Term is used to annotate).
      * @param source is the method from which the annotation that uses the GO term was generated.
      * @param limit Limit the number of co-occurring terms return to the limit specified.
-     * @param similarityThreshold if specified (greater than zero), only return co-occurring GO terms with a
-     * similarity ratio above this figure.
+     * @param filter apply the predicate to filter the results.
      * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each object holds statistics related to that co-occurrence.
      */
-    List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate filter);
+    List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate<CoTerm> filter);
 }
