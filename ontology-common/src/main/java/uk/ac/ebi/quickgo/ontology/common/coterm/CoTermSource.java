@@ -1,6 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.common.coterm;
 
 /**
+ *
+ * Types of CoTerm data by annotation source.
+ *
  * @author Tony Wardell
  * Date: 29/09/2016
  * Time: 15:49
