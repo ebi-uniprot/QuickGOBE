@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.common.coterm;
 
+import com.google.common.base.Preconditions;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -38,6 +39,10 @@ public class CoTermLoader {
      * from all sources.
      */
     public CoTermLoader(Resource manualCoTermsFile, Resource allCoTermsFile) {
+        Preconditions.checkArgument(manualCoTermsFile != null, "Resource manualCoTermsFile should not be null, but " +
+                "was");
+        Preconditions.checkArgument(allCoTermsFile != null, "Resource allCoTermsFile should not be null, but " +
+                "was");
         this.manualCoTermsFile = manualCoTermsFile;
         this.allCoTermsFile = allCoTermsFile;
     }
