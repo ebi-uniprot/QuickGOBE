@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import uk.ac.ebi.quickgo.annotation.model.*;
-import uk.ac.ebi.quickgo.rest.search.AggregateSearchQueryTemplate;
-import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
@@ -14,7 +14,10 @@ import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +45,18 @@ public class AnnotationStatisticsService implements StatisticsService {
     private final SearchService<Annotation> searchService;
     private final StatsRequestConverter converter;
 
+    private final DefaultSearchQueryTemplate queryTemplate;
+
     @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
-            StatsRequestConverter converter) {
+            StatsRequestConverter converter,
+            SearchableField searchableFields) {
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
+
+        queryTemplate = new DefaultSearchQueryTemplate(searchableFields);
     }
 
     @Override public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
@@ -68,24 +76,20 @@ public class AnnotationStatisticsService implements StatisticsService {
     }
 
     private QueryRequest buildQueryRequest(AnnotationRequest request) {
-        BasicSearchQueryTemplate basicTemplate = new BasicSearchQueryTemplate(Collections.emptyList());
-        AggregateSearchQueryTemplate aggregateTemplate = new AggregateSearchQueryTemplate();
-
-        BasicSearchQueryTemplate.Builder basicBuilder = basicTemplate.newBuilder()
+        return queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(request.createFilterRequests().stream()
+                .addFilters(request.createFilterRequests().stream()
                         .map(converterFactory::convert)
                         .map(ConvertedFilter::getConvertedValue)
                         .collect(Collectors.toSet()))
                 .setPage(FIRST_PAGE)
-                .setPageSize(RESULTS_PER_PAGE);
-
-        return aggregateTemplate.newBuilder(basicBuilder)
+                .setPageSize(RESULTS_PER_PAGE)
                 .setAggregate(converter.convert(request.createStatsRequests()))
                 .build();
     }
 
-    private StatisticsGroup convertResponse(AggregateResponse globalAggregation, AnnotationRequest.StatsRequest statsRequest) {
+    private StatisticsGroup convertResponse(AggregateResponse globalAggregation,
+            AnnotationRequest.StatsRequest statsRequest) {
         StatisticsConverter converter =
                 new StatisticsConverter(statsRequest.getGroupName(), statsRequest.getGroupField());
 
