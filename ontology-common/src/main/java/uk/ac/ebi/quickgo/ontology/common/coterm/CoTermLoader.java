@@ -24,32 +24,48 @@ public class CoTermLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(CoTermLoader.class);
 
-    private Resource manualCoTermsFile;
-    private Resource allCoTermsFile;
+    private final Resource manualCoTermsFile;
+    private final Resource allCoTermsFile;
 
     public Map<String, List<CoTerm>> coTermsAll;
     public Map<String, List<CoTerm>> coTermsManual;
 
+    /**
+     *
+     * @param manualCoTermsFile location and file name of co-occurring terms for Terms used in manually derived
+     * annotations.
+     * @param allCoTermsFile location and file name of co-occurring terms for Terms used in annotations derived
+     * from all sources.
+     */
     public CoTermLoader(Resource manualCoTermsFile, Resource allCoTermsFile) {
         this.manualCoTermsFile = manualCoTermsFile;
         this.allCoTermsFile = allCoTermsFile;
     }
 
+    /**
+     * Read the files, load data into memory.
+     */
     public void load(){
         logger.info("Loading Co terms from file");
 
         try {
             coTermsAll = new HashMap<>();
-            loadCoStatsFile(allCoTermsFile.getFile(), coTermsAll);
+            loadCoTermsFile(allCoTermsFile.getFile(), coTermsAll);
 
             coTermsManual = new HashMap<>();
-            loadCoStatsFile(manualCoTermsFile.getFile(), coTermsManual);
+            loadCoTermsFile(manualCoTermsFile.getFile(), coTermsManual);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load Co-occurring terms from file", e);
         }
     }
 
-    private Map<String, List<CoTerm>> loadCoStatsFile(File inputFile, Map<String, List<CoTerm>> stats){
+    /**
+     * Load file contents into memory
+     * @param inputFile source file
+     * @param coTerms target map
+     * @return map with file contents
+     */
+    private Map<String, List<CoTerm>> loadCoTermsFile(File inputFile, Map<String, List<CoTerm>> coTerms){
         List<CoTerm> comparedTerms = new ArrayList<>();
         String line;
         String currentTerm = null;
@@ -76,7 +92,7 @@ public class CoTermLoader {
 
                 //Have we arrived at a new source term?
                 if(!CoTerm.getId().equals(currentTerm)) {
-                    stats.put(currentTerm, comparedTerms);
+                    coTerms.put(currentTerm, comparedTerms);
 
                     //Reset
                     currentTerm = CoTerm.getId();
@@ -89,16 +105,16 @@ public class CoTermLoader {
 
 
             //save last term
-            stats.put(currentTerm, comparedTerms);
+            coTerms.put(currentTerm, comparedTerms);
             logger.info("Loaded " + lineCount + " lines from " + inputFile.getName());
-            logger.info("Number of GO Terms loaded is " + stats.keySet().size());
+            logger.info("Number of GO Terms loaded is " + coTerms.keySet().size());
 
 
 
         } catch (IOException e ) {
             throw new RuntimeException(e);
         }
-        return stats;
+        return coTerms;
     }
 
     /**
@@ -113,12 +129,11 @@ public class CoTermLoader {
     private static final int COLUMN_COMPARED = 5;
 
 
-    static CoTerm fromFile(String line) {
+    private static CoTerm fromFile(String line) {
         String[] columns = line.split("\\t");
-        CoTerm coTerm = new CoTerm(columns[COLUMN_ID], columns[COLUMN_COMPARE],
+        return new CoTerm(columns[COLUMN_ID], columns[COLUMN_COMPARE],
                 Float.parseFloat(columns[COLUMN_PROB]), Float.parseFloat(columns[COLUMN_SIG]),
                 Long.parseLong(columns[COLUMN_TOGETHER]), Long.parseLong(columns[COLUMN_COMPARED]));
-        return coTerm;
     }
 
 
