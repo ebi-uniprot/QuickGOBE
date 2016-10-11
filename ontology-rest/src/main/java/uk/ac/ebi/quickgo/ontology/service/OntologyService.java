@@ -137,5 +137,5 @@ public interface OntologyService<T extends OBOTerm> {
      * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each object holds statistics related to that co-occurrence.
      */
-    List<CoTerm> findCoTermsByOntologyId(String id, CoTermSource source, int limit, float similarityThreshold);
+    List<CoTerm> findCoTermsByGoTermId(String id, CoTermSource source, int limit, float similarityThreshold);
 }

@@ -77,7 +77,7 @@ public class CoTermController {
 
         validateGoTerm(id);
 
-        return getResultsResponse(ontologyService.findCoTermsByOntologyId(id, validateCoTermSource(source),
+        return getResultsResponse(ontologyService.findCoTermsByGoTermId(id, validateCoTermSource(source),
                 coTermLimit.workoutLimit(limit), similarityThreshold));
     }
 

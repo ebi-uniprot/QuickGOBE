@@ -789,7 +789,7 @@ public class OntologyServiceImplTest {
 
             when(coTermsRepositoryMock.findCoTerms(id, CoTermSource.MANUAL, limit, filterTrue )).thenReturn(results);
 
-            List<CoTerm> coTerms = goOntologyService.findCoTermsByOntologyId(id, CoTermSource.MANUAL, limit,
+            List<CoTerm> coTerms = goOntologyService.findCoTermsByGoTermId(id, CoTermSource.MANUAL, limit,
                     simThreshold );
 
             assertThat(coTerms, hasSize(3));
@@ -807,7 +807,7 @@ public class OntologyServiceImplTest {
             doThrow(new IllegalArgumentException()).when(coTermsRepositoryMock).findCoTerms(id, CoTermSource.MANUAL,
                     limit, filterTrue );
 
-           ecoOntologyService.findCoTermsByOntologyId(id, CoTermSource.MANUAL, limit,
+           ecoOntologyService.findCoTermsByGoTermId(id, CoTermSource.MANUAL, limit,
                     simThreshold );
 
 
