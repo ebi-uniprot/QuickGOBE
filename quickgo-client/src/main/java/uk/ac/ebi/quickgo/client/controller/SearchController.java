@@ -60,10 +60,9 @@ public class SearchController {
         this.ontologySearchService = ontologySearchService;
         this.converterFactory = converterFactory;
 
-        this.requestTemplate = new DefaultSearchQueryTemplate(
-                ontologySearchableField,
-                ontologyRetrievalConfig.getSearchReturnedFields(),
-                ontologyRetrievalConfig.repo2DomainFieldMap().keySet(),
+        this.requestTemplate = new DefaultSearchQueryTemplate(ontologySearchableField);
+        this.requestTemplate.setReturnedFields(ontologyRetrievalConfig.getSearchReturnedFields());
+        this.requestTemplate.setHighlighting(ontologyRetrievalConfig.repo2DomainFieldMap().keySet(),
                 ontologyRetrievalConfig.getHighlightStartDelim(),
                 ontologyRetrievalConfig.getHighlightEndDelim());
     }
@@ -74,7 +73,7 @@ public class SearchController {
      * @param request an object that wraps all possible configurations for this endpoint
      * @return the search results
      */
-    @ApiOperation(value="Searches a user defined query, e.g., query=apopto",
+    @ApiOperation(value = "Searches a user defined query, e.g., query=apopto",
             notes = "Response fields include: id and name (and aspect for GO terms)")
     @RequestMapping(value = "/ontology", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OntologyTerm>> ontologySearch(@Valid @ModelAttribute OntologyRequest request,

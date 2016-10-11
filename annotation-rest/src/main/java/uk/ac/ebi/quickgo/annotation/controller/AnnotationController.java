@@ -122,12 +122,8 @@ public class AnnotationController {
         this.statsService = statsService;
         this.resultTransformerChain = resultTransformerChain;
 
-        this.queryTemplate = new DefaultSearchQueryTemplate(
-                annotationSearchableField,
-                annotationRetrievalConfig.getSearchReturnedFields(),
-                annotationRetrievalConfig.repo2DomainFieldMap().keySet(),
-                annotationRetrievalConfig.getHighlightStartDelim(),
-                annotationRetrievalConfig.getHighlightEndDelim());
+        this.queryTemplate = new DefaultSearchQueryTemplate(annotationSearchableField);
+        this.queryTemplate.setReturnedFields(annotationRetrievalConfig.getSearchReturnedFields());
     }
 
     /**

@@ -71,16 +71,14 @@ public class GeneProductController {
         checkArgument(controllerValidationHelper != null, "The ControllerValidationHelper must not be null");
         checkArgument(converterFactory != null, "The FilterConverterFactory must not be null");
 
-
         this.geneProductService = geneProductService;
         this.geneProductSearchService = geneProductSearchService;
         this.controllerValidationHelper = controllerValidationHelper;
         this.converterFactory = converterFactory;
 
-        this.requestTemplate = new DefaultSearchQueryTemplate(
-                geneProductSearchableField,
-                geneProductRetrievalConfig.getSearchReturnedFields(),
-                geneProductRetrievalConfig.repo2DomainFieldMap().keySet(),
+        this.requestTemplate = new DefaultSearchQueryTemplate(geneProductSearchableField);
+        this.requestTemplate.setReturnedFields(geneProductRetrievalConfig.getSearchReturnedFields());
+        this.requestTemplate.setHighlighting(geneProductRetrievalConfig.repo2DomainFieldMap().keySet(),
                 geneProductRetrievalConfig.getHighlightStartDelim(),
                 geneProductRetrievalConfig.getHighlightEndDelim());
     }
