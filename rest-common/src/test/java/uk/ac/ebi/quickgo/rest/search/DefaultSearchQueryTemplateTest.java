@@ -10,9 +10,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyIterable;
@@ -24,8 +24,9 @@ import static org.hamcrest.Matchers.nullValue;
  * Created 11/04/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultSearchQueryTemplateTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     private static final String SEARCHABLE_FIELD = "searchable";
     private static final String START_HIGHLIGHT = "startHighlight";
@@ -37,21 +38,96 @@ public class DefaultSearchQueryTemplateTest {
     private String id;
     private SearchableField searchableField = field -> field.equals(SEARCHABLE_FIELD) || field.equals(id);
     private List<String> returnedFields;
+    private List<String> highlightFields;
     private DefaultSearchQueryTemplate defaultSearchQueryTemplate;
 
     @Before
     public void setUp() {
         this.id = ID;
         this.returnedFields = Arrays.asList(id, SEARCHABLE_FIELD);
+        this.highlightFields = Collections.singletonList(id);
         this.query = QuickGOQuery.createQuery(QUERY);
 
-        this.defaultSearchQueryTemplate = new DefaultSearchQueryTemplate(
-                searchableField,
-                returnedFields,
-                Collections.singletonList(id),
-                START_HIGHLIGHT,
-                END_HIGHLIGHT
-        );
+        this.defaultSearchQueryTemplate = new DefaultSearchQueryTemplate(searchableField);
+
+        this.defaultSearchQueryTemplate.setHighlighting(highlightFields, START_HIGHLIGHT, END_HIGHLIGHT);
+        this.defaultSearchQueryTemplate.setReturnedFields(returnedFields);
+    }
+
+    @Test
+    public void nullSearchableFieldThrowsException() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Search fields cannot be null");
+
+        new DefaultSearchQueryTemplate(null);
+    }
+
+    @Test
+    public void nullReturnedFieldsThrowsException() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Fields to return cannot be null or empty");
+
+        defaultSearchQueryTemplate.setReturnedFields(null);
+    }
+
+    @Test
+    public void emptyReturnedFieldsThrowsException() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Fields to return cannot be null or empty");
+
+        defaultSearchQueryTemplate.setReturnedFields(Collections.emptyList());
+    }
+
+    @Test
+    public void nullHighlightFieldsThrowsException() throws Exception {
+        List<String> highlightFields = null;
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Highlighted fields cannot be null or empty");
+
+        defaultSearchQueryTemplate.setHighlighting(highlightFields, START_HIGHLIGHT, END_HIGHLIGHT);
+    }
+
+    @Test
+    public void emptyHighlightFieldsThrowsException() throws Exception {
+        List<String> highlightFields = Collections.emptyList();
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Highlighted fields cannot be null or empty");
+
+        defaultSearchQueryTemplate.setHighlighting(highlightFields, START_HIGHLIGHT, END_HIGHLIGHT);
+    }
+
+    @Test
+    public void nullHighlightStartDelimThrowsException() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Highlighting start delimiter cannot be null or empty");
+
+        defaultSearchQueryTemplate.setHighlighting(highlightFields, null, END_HIGHLIGHT);
+    }
+
+    @Test
+    public void emptyHighlightStartDelimThrowsException() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Highlighting start delimiter cannot be null or empty");
+
+        defaultSearchQueryTemplate.setHighlighting(highlightFields, "", END_HIGHLIGHT);
+    }
+
+    @Test
+    public void nullHighlightEndDelimThrowsException() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Highlighting end delimiter cannot be null or empty");
+
+        defaultSearchQueryTemplate.setHighlighting(highlightFields, START_HIGHLIGHT, null);
+    }
+
+    @Test
+    public void emptyHighlightEndDelimThrowsException() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Highlighting end delimiter cannot be null or empty");
+
+        defaultSearchQueryTemplate.setHighlighting(highlightFields, START_HIGHLIGHT, "");
     }
 
     @Test(expected = IllegalArgumentException.class)

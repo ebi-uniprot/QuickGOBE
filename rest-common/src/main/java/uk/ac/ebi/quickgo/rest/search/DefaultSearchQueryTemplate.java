@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Preconditions;
+import java.util.*;
 
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
@@ -31,23 +30,40 @@ public class DefaultSearchQueryTemplate {
     public static final int DEFAULT_PAGE_NUMBER = 1;
     private static final boolean NO_HIGHLIGHTING = false;
 
-    private final String highlightStartDelim;
-    private final String highlightEndDelim;
-    private final Iterable<String> returnedFields;
-    private final Iterable<String> highlightedFields;
     private final SearchableField fieldSpec;
 
-    public DefaultSearchQueryTemplate(
-            SearchableField fieldSpec,
-            Iterable<String> returnedFields,
-            Iterable<String> highlightedFields,
-            String highlightStartDelim,
+    private String highlightStartDelim;
+    private String highlightEndDelim;
+    private Iterable<String> returnedFields;
+    private Iterable<String> highlightedFields;
+
+    public DefaultSearchQueryTemplate(SearchableField fieldSpec) {
+        Preconditions.checkArgument(fieldSpec != null, "Search fields cannot be null");
+        this.fieldSpec = fieldSpec;
+        this.returnedFields = Collections.emptyList();
+        this.highlightedFields = Collections.emptyList();
+        this.highlightStartDelim = "";
+        this.highlightEndDelim = "";
+    }
+
+    public void setHighlighting(Collection<String> highlightedFields, String highlightStartDelim,
             String highlightEndDelim) {
+        Preconditions.checkArgument(highlightedFields != null && !highlightedFields.isEmpty(),
+                "Highlighted fields cannot be null or empty");
+        Preconditions.checkArgument(highlightStartDelim != null && !highlightStartDelim.isEmpty(),
+                "Highlighting start delimiter cannot be null or empty");
+        Preconditions.checkArgument(highlightEndDelim != null && !highlightEndDelim.isEmpty(),
+                "Highlighting end delimiter cannot be null or empty");
+
         this.highlightedFields = highlightedFields;
         this.highlightStartDelim = highlightStartDelim;
         this.highlightEndDelim = highlightEndDelim;
+    }
+
+    public void setReturnedFields(Collection<String> returnedFields) {
+        Preconditions.checkArgument(returnedFields != null && !returnedFields.isEmpty(),
+                "Fields to return cannot be null or empty");
         this.returnedFields = returnedFields;
-        this.fieldSpec = fieldSpec;
     }
 
     public Builder newBuilder() {
@@ -74,6 +90,7 @@ public class DefaultSearchQueryTemplate {
         private int pageSize = DEFAULT_PAGE_SIZE;
         private SearchableField fieldSpec;
         private boolean highlighting;
+        private AggregateRequest aggregate;
 
         private Builder(
                 SearchableField fieldSpec,
@@ -167,6 +184,18 @@ public class DefaultSearchQueryTemplate {
             return this;
         }
 
+        /**
+         * Add to the collection of aggregates which aggregates should be calculated.
+         *
+         * @param aggregate the aggregate to calculate
+         * @return this {@link AggregateSearchQueryTemplate.Builder} instance
+         */
+        public DefaultSearchQueryTemplate.Builder setAggregate(AggregateRequest aggregate) {
+            this.aggregate = aggregate;
+
+            return this;
+        }
+
         @Override public QueryRequest build() {
             checkFacets(facets);
             checkFilters(filterQueriesText);
@@ -178,7 +207,7 @@ public class DefaultSearchQueryTemplate {
                 facets.forEach(builder::addFacetField);
             }
 
-            if(!filterQueries.isEmpty()) {
+            if (!filterQueries.isEmpty()) {
                 filterQueries.forEach(builder::addQueryFilter);
             }
 
@@ -191,6 +220,8 @@ public class DefaultSearchQueryTemplate {
 
             returnedFields
                     .forEach(builder::addProjectedField);
+
+            builder.setAggregate(aggregate);
 
             return builder.build();
         }
@@ -222,5 +253,4 @@ public class DefaultSearchQueryTemplate {
             return null;
         }
     }
-
 }
