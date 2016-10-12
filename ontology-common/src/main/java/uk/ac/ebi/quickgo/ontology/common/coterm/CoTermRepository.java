@@ -12,7 +12,7 @@ import org.springframework.data.repository.Repository;
  * Time: 11:39
  * Created with IntelliJ IDEA.
  */
-public interface CoTermRepository extends Repository<List<CoTerm>, String> {
+public interface CoTermRepository {
 
     /**
      * For a single GO Term, retrieve a list of co-occurring terms and related statistics, in order of the
