@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class PresetsRetrievalIT {
     private static final String RESOURCE_URL = "/internal/presets";
+    private static final String FIELDS_PARAM = "fields";
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
@@ -88,6 +89,23 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.goSlimSets.*", hasSize(greaterThan(0))));
+    }
+
+    @Test
+    public void canRetrieveSingleDesiredPreset() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL).param(FIELDS_PARAM, "goSlimSets"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.goSlimSets.*", hasSize(greaterThan(0))));
+    }
+
+    @Test
+    public void canRetrieveMultipleDesiredPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL).param(FIELDS_PARAM, "goSlimSets,geneProducts"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.geneProducts.*", hasSize(greaterThan(0))))
                 .andExpect(jsonPath("$.goSlimSets.*", hasSize(greaterThan(0))));
     }
 }
