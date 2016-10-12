@@ -139,6 +139,13 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
 
     @Override public List<CoTerm> findCoTermsByGoTermId(String id, CoTermSource type, int limit, float
             similarityThreshold) {
+
+//        If at any stage, more that one type of filtering operation is required we can use reduce to build a single
+//        predicate as per the following code
+//        Predicate<CoTerm> compositePredicate =
+//                allPredicates.stream()
+//                        .reduce(w -> true, Predicate::and);
+
         Predicate<CoTerm> filter = ct -> ct.getSignificance() >= similarityThreshold;
         return coTermRepository.findCoTerms(id, type, limit, filter);
     }
