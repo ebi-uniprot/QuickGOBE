@@ -76,32 +76,29 @@ public class AnnotationConfig {
     private int coTermLogInterval;
 
     @Autowired
-    private AnnotationRepository annotationRepository;
-    @Autowired
     private SolrTemplate annotationTemplate;
     @Autowired
     private JobBuilderFactory jobBuilders;
     @Autowired
     private StepBuilderFactory stepBuilders;
-
     @Autowired
-    CoTermsAggregationWriter coTermsManualAggregationWriter;
+    private CoTermsAggregationWriter coTermsManualAggregationWriter;
     @Autowired
-    CoTermsAggregationWriter coTermsAllAggregationWriter;
+    private CoTermsAggregationWriter coTermsAllAggregationWriter;
     @Autowired
-    ItemProcessor<String, List<CoTerm>> coTermsManualCalculator;
+    private ItemProcessor<String, List<CoTerm>> coTermsManualCalculator;
     @Autowired
-    ItemProcessor<String, List<CoTerm>> coTermsAllCalculator;
+    private ItemProcessor<String, List<CoTerm>> coTermsAllCalculator;
     @Autowired
-    ItemReader<String> coTermsManualReader;
+    private ItemReader<String> coTermsManualReader;
     @Autowired
-    ItemReader<String> coTermsAllReader;
+    private ItemReader<String> coTermsAllReader;
     @Autowired
-    ItemWriter<List<CoTerm>> coTermsManualStatsWriter;
+    private ItemWriter<List<CoTerm>> coTermsManualStatsWriter;
     @Autowired
-    ItemWriter<List<CoTerm>> coTermsAllStatsWriter;
+    private ItemWriter<List<CoTerm>> coTermsAllStatsWriter;
     @Autowired
-    StepExecutionListener coTermsStepExecutionListener;
+    private StepExecutionListener coTermsStepExecutionListener;
 
     @Bean
     public Job annotationJob() {
