@@ -21,7 +21,7 @@ class CoTermsForSelectedTerm {
     private List<CoTerm> sortedView;
 
     /**
-     * Create an instance of this class, initializing it the list of co-occurring terms for a term.
+     * Create an instance of this class, initializing it with the list of co-occurring terms for a term.
      * @param sortedView The list of co-occurring terms for a term, sorted by similarity ratio
      */
     private CoTermsForSelectedTerm(List<CoTerm> sortedView) {
@@ -47,7 +47,7 @@ class CoTermsForSelectedTerm {
          */
         Builder setTotalNumberOfGeneProducts(long totalNumberGeneProducts) {
             Preconditions
-                    .checkArgument(totalNumberGeneProducts != 0, "totalNumberGeneProducts" +
+                    .checkArgument(totalNumberGeneProducts > 0, "totalNumberGeneProducts" +
                             " should not be zero");
             this.totalNumberGeneProducts = totalNumberGeneProducts;
             return this;
@@ -83,9 +83,9 @@ class CoTermsForSelectedTerm {
          */
         CoTermsForSelectedTerm build() {
             Preconditions
-                    .checkArgument(totalNumberGeneProducts != 0, "totalNumberGeneProducts" +
+                    .checkState(totalNumberGeneProducts != 0, "totalNumberGeneProducts" +
                             " should not be zero");
-            Preconditions.checkArgument(selected != 0, "term should not be zero");
+            Preconditions.checkArgument(selected != 0, "selected should not be zero");
             coTerms.sort(new SignificanceSorter());
             return new CoTermsForSelectedTerm(Collections.unmodifiableList(coTerms));
         }
