@@ -16,18 +16,16 @@ public class CoTermsAggregatorMocker {
     /**
      * Mocks the {@code CoTermsAggregator#getGeneProductCounts} to product a count of gene products annotated by a
      * single GO Term.
-     * @param count
-     * @param termsLists
-     * @return
+     * @param count the number that the count for Gene Product will be set to.
+     * @param termsLists a list of GO Term identifiers used to seed a map of term::count used in testing
+     * @return a map of term::count used in testing
      */
+    @SafeVarargs
     static Map<String, AtomicLong> makeGpCountForTerm(int count, List<String>... termsLists ){
         Map<String, AtomicLong> termGpCount = new HashMap<>();
 
-        for (int i = 0; i < termsLists.length; i++) {
-            List<String> terms = termsLists[i];
-
-            for (int j = 0; j < terms.size(); j++) {
-                String s =  terms.get(j);
+        for (List<String> terms : termsLists) {
+            for (String s : terms) {
                 termGpCount.put(s, new AtomicLong(count));
             }
         }
