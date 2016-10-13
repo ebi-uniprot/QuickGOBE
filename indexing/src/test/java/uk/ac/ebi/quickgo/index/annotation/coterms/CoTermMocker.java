@@ -12,9 +12,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class CoTermMocker {
 
-    public static final DecimalFormat idFormat1 = new DecimalFormat("0000000");
-    public static final DecimalFormat idFormat2 = new DecimalFormat("9000000");
-    public static final String EXAMPLE_GO_TERM1 = "GO:0003824";
+    static final DecimalFormat ID_FORMAT_1 = new DecimalFormat("0000000");
+    static final DecimalFormat ID_FORMAT_2 = new DecimalFormat("9000000");
+    private static final String EXAMPLE_GO_TERM1 = "GO:0003824";
 
     static Map<String, Map<String, AtomicLong>> singleEntry(){
         Map<String, Map<String, AtomicLong>> matrix = new HashMap<>();
@@ -27,9 +27,8 @@ public class CoTermMocker {
      * @param comparedList a list of real or imagined GO Terms.
      * @param hits co-occurring count to be added to each member of the compared list.
      * @return a map of the contents of comparedList together with the hits value passed in as an argument.
-     * @return
      */
-     static Map<String, AtomicLong> createCoOccurringTermValues(List<String> comparedList, int hits) {
+     private static Map<String, AtomicLong> createCoOccurringTermValues(List<String> comparedList, int hits) {
         Map<String, AtomicLong> coOccurringTerms = new HashMap<>();
         for(String comparedTerm : comparedList) {
             coOccurringTerms.put(comparedTerm, new AtomicLong(hits));
@@ -41,7 +40,7 @@ public class CoTermMocker {
      * Create a representation of term-to-term intersections (as a matrix of maps) using the arguments as test data.
      * @param selectedList a list of real or imagined GO Terms, used as the compared 'from' values for the
      * term-to-term matrix this method creates.
-     * @param comparedList a list of real or imagined GO Terms used as the compared 'to' values for the matrixx
+     * @param comparedList a list of real or imagined GO Terms used as the compared 'to' values for the matrix
      * @param hits co-occurring count to be added to each member of the compared list.
      * @return a representation of term-to-term intersections
      */
