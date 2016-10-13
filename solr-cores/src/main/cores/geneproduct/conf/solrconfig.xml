@@ -902,17 +902,25 @@
             <!--<str name="tie">0.5</str>-->
 
             <!-- Search in order of importance:
-                    - Ontology identifier
-                    - Ontology name
-                    - Ontology synonym
+                    - Gene product identifier
+                    - Gene product symbol
+                    - Gene product synonym
+                    - Gene product name
 
                     The scoring has been customized to:
                      - Provide the identifier with the highest result
-                     - allow the name to be of higher importance than the synonym (by boosting)
-                     - prefer search terms that are exact matches to a name or synonym (these are boosted by 5 to
-                     appear over all other results, except ontology ids)
-                     - increase scoring of documents that match, with 0 slop, to search queries with more than one search
-                     term. Again exact matches have higher boosting to make use these come first.
+                     - allow the symbol to be of higher importance than the synonym and name (by boosting)
+                     - prefer searches where exact matching symbols (symbol_exact) are ranked higher than exact matches
+                      to synonyms (synonym_exact) or names (name_exact)
+                     - Exact matches to synonyms (synonym_exact) or names (name_exact) rank higher than
+                     case-insensitive word matches (synonym_lowercase, symbol_lowercase or name_lowercase)
+                     - Case-insensitive word matches to symbol (symbol_lowercase) rank higher than case insensitive
+                     word matches to synonyms (synonym_lowercase) or names (name_lowercase).
+                     - Case-insensitive matches to synonym (synonym_lowercase) or names (name_lowercase) rank higher
+                     than substring matches (symbol_edge, synonym_edge, name_edge)
+                     - Substring matches to synonym (synonym_edge) rank higher than substring matches to synonym
+                     (synonym_edge) or name (name_edge)
+                     - The process is the same when two or more search terms are input.
             -->
             <str name="qf">
                 id_lowercase
