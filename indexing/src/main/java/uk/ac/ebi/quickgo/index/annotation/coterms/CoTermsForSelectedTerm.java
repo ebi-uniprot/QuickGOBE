@@ -1,7 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import com.google.common.base.Preconditions;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Aggregation class for co-occurring terms.
@@ -13,7 +16,7 @@ import java.util.*;
  * Time: 14:24
  * Created with IntelliJ IDEA.
  */
-public class CoTermsForSelectedTerm {
+class CoTermsForSelectedTerm {
 
     private List<CoTerm> sortedView;
 
@@ -21,28 +24,28 @@ public class CoTermsForSelectedTerm {
      * Create an instance of this class, initializing it the list of co-occurring terms for a term.
      * @param sortedView The list of co-occurring terms for a term, sorted by similarity ratio
      */
-    public CoTermsForSelectedTerm(List<CoTerm> sortedView) {
+    private CoTermsForSelectedTerm(List<CoTerm> sortedView) {
         this.sortedView = sortedView;
     }
 
     /**
      * @return an immutable list of co-occurring terms, in descending order of similarity.
      */
-    public List<CoTerm> highestSimilarity() {
+    List<CoTerm> highestSimilarity() {
         return sortedView;
     }
 
-    public static class Builder{
+    public static class Builder {
+        private final List<CoTerm> coTerms = new ArrayList<>();
         private long totalNumberGeneProducts;
         private long selected;
-        private final List<CoTerm> coTerms = new ArrayList<>();
 
         /**
          *
          * @param totalNumberGeneProducts The total count of unique gene products for all terms encountered during
          * processing.
          */
-        Builder setTotalNumberOfGeneProducts(long totalNumberGeneProducts){
+        Builder setTotalNumberOfGeneProducts(long totalNumberGeneProducts) {
             Preconditions
                     .checkArgument(totalNumberGeneProducts != 0, "totalNumberGeneProducts" +
                             " should not be zero");
@@ -54,7 +57,7 @@ public class CoTermsForSelectedTerm {
          *
          * @param selected The count of unique gene products annotated to selected term.
          */
-        Builder setSelected(long selected){
+        Builder setSelected(long selected) {
             Preconditions.checkArgument(selected != 0, "term should not be zero");
             this.selected = selected;
             return this;
@@ -62,7 +65,8 @@ public class CoTermsForSelectedTerm {
 
         /**
          * Add this term to the list of terms that annotate the same gene products as the target term.
-         * In this method the probability and similarity ratios are calculated on the passed in CoTerm, using information
+         * In this method the probability and similarity ratios are calculated on the passed in CoTerm, using
+         * information
          * held by this class.
          * @param coTerm has all the required information to all the co-occurrence statistics to be calculated.
          */
@@ -77,13 +81,13 @@ public class CoTermsForSelectedTerm {
         /**
          * @return an immutable list of co-occurring terms, in descending order of similarity.
          */
-        CoTermsForSelectedTerm build(){
+        CoTermsForSelectedTerm build() {
             Preconditions
                     .checkArgument(totalNumberGeneProducts != 0, "totalNumberGeneProducts" +
                             " should not be zero");
             Preconditions.checkArgument(selected != 0, "term should not be zero");
             coTerms.sort(new SignificanceSorter());
-            return new CoTermsForSelectedTerm (Collections.unmodifiableList(coTerms));
+            return new CoTermsForSelectedTerm(Collections.unmodifiableList(coTerms));
         }
 
         private class SignificanceSorter implements Comparator<CoTerm> {
