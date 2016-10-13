@@ -12,8 +12,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.createMatrix;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.idFormat1;
-import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.idFormat2;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.ID_FORMAT_1;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.ID_FORMAT_2;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.makeTermList;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsAggregatorMocker.makeGpCountForTerm;
 
@@ -99,8 +99,8 @@ public class StatisticsCalculatorTest {
         int hitsPerTerm = 2;
 
         long geneProductCount = 10L;
-        final List<String> selectedList = makeTermList(selected, idFormat1);
-        final List<String> comparedList = makeTermList(compared, idFormat2);
+        final List<String> selectedList = makeTermList(selected, ID_FORMAT_1);
+        final List<String> comparedList = makeTermList(compared, ID_FORMAT_2);
 
         Map<String, AtomicLong> termGpCount = makeGpCountForTerm(hitsPerTerm, selectedList, comparedList);
         Map<String, Map<String, AtomicLong>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
