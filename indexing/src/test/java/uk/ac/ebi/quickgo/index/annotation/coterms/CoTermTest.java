@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -13,67 +14,46 @@ import static org.hamcrest.core.IsEqual.equalTo;
  */
 public class CoTermTest {
 
-	@Test
+    private static final String TARGET_TERM = "GO:00000200";
+    private static final String COMPARED_TERM = "GO:0003824";
+    private static final long COMPARED = 8L;
+    private static final long TOGETHER = 4L;
+    private static final long SELECTED = 8L;
+
+    CoTerm coTerm;
+
+    @Before
+    public void setup(){
+        coTerm =
+                new CoTerm.Builder().setTarget(TARGET_TERM).setComparedTerm(COMPARED_TERM).setCompared(COMPARED)
+                        .setTogether(TOGETHER).createCoTerm();
+    }
+
+    @Test
 	public void successfullyCalculateStatistics(){
-		String targetTerm = "GO:00000200";
-		String comparedTerm = "GO:0003824";
-		long compared = 8L;
-		long together = 4L;
-
-		long selected = 8L;
-
-		CoTerm coTerm =
-				new CoTerm.Builder().setTarget(targetTerm).setComparedTerm(comparedTerm).setCompared(compared)
-						.setTogether(together).createCoTerm();
-		coTerm.calculateProbabilitySimilarityRatio(selected);
+		coTerm.calculateProbabilitySimilarityRatio(SELECTED);
 		assertThat(coTerm.getSimilarityRatio(), equalTo(33.33f) );
 
 		int all = 24;
-		coTerm.calculateProbabilityRatio(selected, all);
+		coTerm.calculateProbabilityRatio(SELECTED, all);
 		assertThat(coTerm.getProbabilityRatio(), equalTo( 1.5f));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void calculateProbabilitySimilarityRatioSelectEqualToZeroThrowsException(){
-		String targetTerm = "GO:00000200";
-		String comparedTerm = "GO:0003824";
-		long compared = 8L;
-		long together = 4L;
-
-		CoTerm coTerm =
-				new CoTerm.Builder().setTarget(targetTerm).setComparedTerm(comparedTerm).setCompared(compared)
-						.setTogether(together).createCoTerm();
 		coTerm.calculateProbabilitySimilarityRatio(0L);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void calculateProbabilityRatioSelectEqualToZeroThrowsException(){
-		String targetTerm = "GO:00000200";
-		String comparedTerm = "GO:0003824";
-		long compared = 8L;
-		long together = 4L;
-
 		int all = 24;
-
-		CoTerm coTerm =
-				new CoTerm.Builder().setTarget(targetTerm).setComparedTerm(comparedTerm).setCompared(compared)
-						.setTogether(together).createCoTerm();
 		coTerm.calculateProbabilityRatio(0l, all);
 	}
 
 
 	@Test(expected = IllegalArgumentException.class)
 	public void calculateProbabilityRatioAllEqualToZeroThrowsException(){
-		String targetTerm = "GO:00000200";
-		String comparedTerm = "GO:0003824";
-		long compared = 8L;
-		long together = 4L;
-		long selected = 8L;
-
-		CoTerm coTerm =
-				new CoTerm.Builder().setTarget(targetTerm).setComparedTerm(comparedTerm).setCompared(compared)
-						.setTogether(together).createCoTerm();
-		coTerm.calculateProbabilityRatio(selected, 0);
+		coTerm.calculateProbabilityRatio(SELECTED, 0);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
