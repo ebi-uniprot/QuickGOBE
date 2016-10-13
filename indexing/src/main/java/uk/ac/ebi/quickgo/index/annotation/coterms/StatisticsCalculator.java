@@ -1,13 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
-
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemWriter;
 
 /**
  * For a GO Term retrieve all the co-occurring terms together with the statistics related to that co-occurrence.
@@ -27,7 +24,7 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
      * @param aggregator holds the data for co-occurring terms.
      */
     public StatisticsCalculator(CoTermsAggregationWriter aggregator) {
-        Preconditions.checkArgument(aggregator!=null, "The aggregator instance passed to the Statistics Calculator " +
+        Preconditions.checkArgument(aggregator != null, "The aggregator instance passed to the Statistics Calculator " +
                 "constructor cannot be null");
         this.aggregator = aggregator;
     }
@@ -52,12 +49,14 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
      */
     private CoTermsForSelectedTerm createCoTermsForSelectedTerm(String goTerm) {
 
-        Preconditions.checkArgument(null != goTerm, "Target GO term id passed to createCoTermsForSelectedTerm should not " +
-                "be null");
+        Preconditions
+                .checkArgument(null != goTerm, "Target GO term id passed to createCoTermsForSelectedTerm should not " +
+                        "be null");
 
         Map<String, AtomicLong> coTermsForTarget = aggregator.getCoTerms().get(goTerm);
-        CoTermsForSelectedTerm.Builder coTermsBuilder =  new CoTermsForSelectedTerm.Builder()
-                .setTotalNumberOfGeneProducts(aggregator.getTotalOfAnnotatedGeneProducts()).setSelected(aggregator.getGeneProductCounts().get(goTerm).get());
+        CoTermsForSelectedTerm.Builder coTermsBuilder = new CoTermsForSelectedTerm.Builder()
+                .setTotalNumberOfGeneProducts(aggregator.getTotalOfAnnotatedGeneProducts())
+                .setSelected(aggregator.getGeneProductCounts().get(goTerm).get());
 
         for (String comparedTerm : coTermsForTarget.keySet()) {
             coTermsBuilder.addCoTerm(new CoTerm.Builder().setTarget(goTerm).setComparedTerm
