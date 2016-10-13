@@ -16,11 +16,11 @@ public class CoTermMocker {
     static final DecimalFormat ID_FORMAT_2 = new DecimalFormat("9000000");
     private static final String EXAMPLE_GO_TERM1 = "GO:0003824";
 
-    static Map<String, Map<String, AtomicLong>> singleEntry(){
+    static Map<String, Map<String, AtomicLong>> singleEntry() {
         Map<String, Map<String, AtomicLong>> matrix = new HashMap<>();
         List<String> comparedList = Collections.singletonList(EXAMPLE_GO_TERM1);
         matrix.put(EXAMPLE_GO_TERM1, createCoOccurringTermValues(comparedList, 2));
-        return  matrix;
+        return matrix;
     }
 
     /**
@@ -28,9 +28,9 @@ public class CoTermMocker {
      * @param hits co-occurring count to be added to each member of the compared list.
      * @return a map of the contents of comparedList together with the hits value passed in as an argument.
      */
-     private static Map<String, AtomicLong> createCoOccurringTermValues(List<String> comparedList, int hits) {
+    private static Map<String, AtomicLong> createCoOccurringTermValues(List<String> comparedList, int hits) {
         Map<String, AtomicLong> coOccurringTerms = new HashMap<>();
-        for(String comparedTerm : comparedList) {
+        for (String comparedTerm : comparedList) {
             coOccurringTerms.put(comparedTerm, new AtomicLong(hits));
         }
         return coOccurringTerms;
@@ -45,13 +45,13 @@ public class CoTermMocker {
      * @return a representation of term-to-term intersections
      */
     static Map<String, Map<String, AtomicLong>> createMatrix(List<String> selectedList, List<String> comparedList, int
-            hits){
+            hits) {
         Map<String, Map<String, AtomicLong>> matrix = new HashMap<>();
 
-        for(String selectedTerm : selectedList) {
+        for (String selectedTerm : selectedList) {
             matrix.put(selectedTerm, createCoOccurringTermValues(comparedList, hits));
         }
-        return  matrix;
+        return matrix;
     }
 
     /**
@@ -60,9 +60,9 @@ public class CoTermMocker {
      * @param df The format to use when building each id.
      * @return a list of pseudo GO Term ids.
      */
-    static List<String> makeTermList(int numberRequired, DecimalFormat df ){
+    static List<String> makeTermList(int numberRequired, DecimalFormat df) {
         List<String> termList = new ArrayList<>();
-        for(;numberRequired>0; numberRequired--) {
+        for (; numberRequired > 0; numberRequired--) {
             String id = "GO:" + df.format(numberRequired);
             termList.add(id);
         }
