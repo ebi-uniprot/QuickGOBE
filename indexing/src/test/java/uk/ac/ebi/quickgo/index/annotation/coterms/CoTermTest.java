@@ -32,11 +32,11 @@ public class CoTermTest {
     @Test
 	public void successfullyCalculateStatistics(){
 		coTerm.calculateProbabilitySimilarityRatio(SELECTED);
-		assertThat(coTerm.getSimilarityRatio(), equalTo(33.33f) );
+		assertThat(coTerm.getSimilarityRatio(), equalTo(33.33F) );
 
 		int all = 24;
 		coTerm.calculateProbabilityRatio(SELECTED, all);
-		assertThat(coTerm.getProbabilityRatio(), equalTo( 1.5f));
+		assertThat(coTerm.getProbabilityRatio(), equalTo(1.5F));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -47,7 +47,7 @@ public class CoTermTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void calculateProbabilityRatioSelectEqualToZeroThrowsException(){
 		int all = 24;
-		coTerm.calculateProbabilityRatio(0l, all);
+		coTerm.calculateProbabilityRatio(0L, all);
 	}
 
 
