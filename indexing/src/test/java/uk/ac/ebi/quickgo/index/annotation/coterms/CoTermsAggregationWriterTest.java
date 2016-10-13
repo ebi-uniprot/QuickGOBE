@@ -1,15 +1,14 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import java.util.concurrent.atomic.AtomicLong;
-import org.junit.Before;
-import org.junit.Test;
-
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -24,139 +23,135 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
  */
 public class CoTermsAggregationWriterTest {
 
+    public static final String[] TWO_SAME_GENEPRODUCTS = {"A0A000", "A0A000"};
+    public static final String[] TWO_DIFFERENT_GENE_PRODUCTS = {"A0A000", "A0A001"};
+    public static final String REPLACEMENT_GOID = "GO:0009999";
     CoTermsAggregationWriter aggregator;
 
     @Before
-    public void setup(){
+    public void setup() {
         aggregator = new CoTermsAggregationWriter(t -> true);
     }
 
-	@Test
+    @Test
     public void calculateStatisticsForTwoRecordsWithTheSameGoTerm() throws Exception {
 
-        AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
-        AnnotationDocument annotation2 = AnnotationDocMocker.createAnnotationDoc("A0A000");
-        List<AnnotationDocument> docs = Arrays.asList(annotation1, annotation2);
-        aggregator.write(docs);
-        aggregator.finish();
+        List<AnnotationDocument> docs = writeDocs(TWO_SAME_GENEPRODUCTS);
+        completeAggregation(docs);
 
         //Now test
         Map<String, Map<String, AtomicLong>> matrix = aggregator.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(1));
 
-        Map<String, AtomicLong> coTerms = matrix.get("GO:0003824");
+        Map<String, AtomicLong> coTerms = matrix.get(AnnotationDocMocker.GO_ID);
         assertThat(coTerms, is(notNullValue()));
         assertThat(coTerms.keySet(), hasSize(1));
 
         //Is the only one
-        AtomicLong ac = coTerms.get("GO:0003824");
-        assertThat(ac.get(), is(1l));
+        AtomicLong ac = coTerms.get(AnnotationDocMocker.GO_ID);
+        assertThat(ac.get(), is(1L));
 
-        assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1l));
+        assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1L));
         assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(1));
-        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).get(), is(1L));
-        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(docs.get(0).goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(docs.get(1).goId).get(), is(1L));
 
-	}
+    }
 
     @Test
     public void calculateStatisticsForTwoRecordsWithDifferentGoTermsAndDifferentGeneProductSoNoCoTerms() throws
-                                                                                                       Exception {
+                                                                                                         Exception {
+        List<AnnotationDocument> docs = writeDocs(TWO_DIFFERENT_GENE_PRODUCTS);
+        docs.get(1).goId = REPLACEMENT_GOID;
+        completeAggregation(docs);
 
-        AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
-        AnnotationDocument annotation2 = AnnotationDocMocker.createAnnotationDoc("A0A001");
-        annotation2.goId = "GO:0009999";
-        List<AnnotationDocument> docs = Arrays.asList(annotation1, annotation2);
-        aggregator.write(docs);
-        aggregator.finish();
-
-        //Now test
         Map<String, Map<String, AtomicLong>> matrix = aggregator.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(2));
 
-        Map<String, AtomicLong> coTerms1 = matrix.get(annotation1.goId);
-        assertThat(coTerms1.keySet(), hasSize(1));//2
-        AtomicLong ac1 = coTerms1.get(annotation1.goId);
+        Map<String, AtomicLong> coTerms1 = matrix.get(docs.get(0).goId);
+        assertThat(coTerms1.keySet(), hasSize(1));
+        AtomicLong ac1 = coTerms1.get(docs.get(0).goId);
         assertThat(ac1.get(), is(1l));
 
-        Map<String, AtomicLong> coTerms2 = matrix.get(annotation2.goId);
+        Map<String, AtomicLong> coTerms2 = matrix.get(docs.get(1).goId);
         assertThat(coTerms2.keySet(), hasSize(1));
-        AtomicLong ac2 = coTerms2.get(annotation2.goId);
+        AtomicLong ac2 = coTerms2.get(docs.get(1).goId);
         assertThat(ac2.get(), is(1l));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(2l));
         assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(2));
-        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).get(), is(1L));
-        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(docs.get(0).goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(docs.get(1).goId).get(), is(1L));
     }
-
 
     @Test
     public void calculateStatisticsForTwoRecordsWithTheDifferentGoTermsSameGeneProduct() throws Exception {
 
-        AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
-        AnnotationDocument annotation2 = AnnotationDocMocker.createAnnotationDoc("A0A000");
-        annotation2.goId = "GO:0009999";
-        List<AnnotationDocument> docs = Arrays.asList(annotation1, annotation2);
-        aggregator.write(docs);
-        aggregator.finish();
+        List<AnnotationDocument> docs = writeDocs(TWO_SAME_GENEPRODUCTS);
+        docs.get(1).goId = REPLACEMENT_GOID;
+        completeAggregation(docs);
 
         //Now test
         Map<String, Map<String, AtomicLong>> matrix = aggregator.getCoTerms();
 
         assertThat(matrix.keySet(), hasSize(2));
 
-        Map<String, AtomicLong> coTerms1 = matrix.get(annotation1.goId);
+        Map<String, AtomicLong> coTerms1 = matrix.get(docs.get(0).goId);
         assertThat(coTerms1.keySet(), hasSize(2));
-        AtomicLong ac1x1 = coTerms1.get(annotation1.goId);
-        assertThat(ac1x1.get(), is(1l));
-        AtomicLong ac1x2 = coTerms1.get(annotation2.goId);
-        assertThat(ac1x1.get(), is(1l));
+        AtomicLong ac1x1 = coTerms1.get(docs.get(0).goId);
+        assertThat(ac1x1.get(), is(1L));
+        AtomicLong ac1x2 = coTerms1.get(docs.get(1).goId);
+        assertThat(ac1x1.get(), is(1L));
 
-        Map<String, AtomicLong> coTerms2 = matrix.get(annotation2.goId);
+        Map<String, AtomicLong> coTerms2 = matrix.get(docs.get(1).goId);
         assertThat(coTerms2.keySet(), hasSize(2));
-        AtomicLong ac2x1 = coTerms2.get(annotation2.goId);
-        assertThat(ac2x1.get(), is(1l));
-        AtomicLong ac2x2 = coTerms2.get(annotation1.goId);
-        assertThat(ac2x2.get(), is(1l));
+        AtomicLong ac2x1 = coTerms2.get(docs.get(1).goId);
+        assertThat(ac2x1.get(), is(1L));
+        AtomicLong ac2x2 = coTerms2.get(docs.get(1).goId);
+        assertThat(ac2x2.get(), is(1L));
 
-        assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1l));
+        assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1L));
         assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(2));
-        assertThat(aggregator.getGeneProductCounts().get(annotation1.goId).get(), is(1L));
-        assertThat(aggregator.getGeneProductCounts().get(annotation2.goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(docs.get(0).goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCounts().get(docs.get(1).goId).get(), is(1L));
     }
 
     @Test
     public void zeroAnnotationsProcessedIfPredicateNotTrue() throws Exception {
+        List<AnnotationDocument> docs = writeDocs(TWO_SAME_GENEPRODUCTS);
+        completeAggregation(docs);
 
-        AnnotationDocument annotation1 = AnnotationDocMocker.createAnnotationDoc("A0A000");
-        AnnotationDocument annotation2 = AnnotationDocMocker.createAnnotationDoc("A0A000");
         CoTermsAggregationWriter aggregatorFalse = new CoTermsAggregationWriter(t -> false);
-        List<AnnotationDocument> docs = Arrays.asList(annotation1, annotation2);
-        aggregator.write(docs);
-        aggregator.finish();
-
-        //Now test
         Map<String, Map<String, AtomicLong>> matrix = aggregatorFalse.getCoTerms();
-
         assertThat(matrix.keySet(), hasSize(0));
-
-        assertThat(aggregatorFalse.getTotalOfAnnotatedGeneProducts(), is(0l));
+        assertThat(aggregatorFalse.getTotalOfAnnotatedGeneProducts(), is(0L));
         assertThat(aggregatorFalse.getGeneProductCounts().keySet(), hasSize(0));
-
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfNullAnnotationPassedToAddRowToMatrix() throws Exception {
         aggregator.write(null);
     }
 
-
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfNullPredicatePassedToConstructor() {
         new CoTermsAggregationWriter(null);
+    }
+
+    private List<AnnotationDocument> writeDocs(String... geneProductIds) throws Exception {
+        List<AnnotationDocument> docs = new ArrayList<>();
+
+        for (int i = 0; i < geneProductIds.length; i++) {
+            docs.add(AnnotationDocMocker.createAnnotationDoc(geneProductIds[i]));
+        }
+        return docs;
+    }
+
+    private void completeAggregation(List<AnnotationDocument> docs) throws Exception {
+        aggregator.write(docs);
+        aggregator.finish();
     }
 
 }
