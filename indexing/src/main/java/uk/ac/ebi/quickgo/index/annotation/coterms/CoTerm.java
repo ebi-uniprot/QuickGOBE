@@ -13,6 +13,7 @@ import java.text.DecimalFormat;
  */
 public class CoTerm {
 
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
     private final String target;
     private final String comparedTerm;
     private final long together;
@@ -47,9 +48,8 @@ public class CoTerm {
                 .checkArgument(selected != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
                         " selected should not be zero");
 
-        DecimalFormat twoDForm = new DecimalFormat("#.##");
         float similarityRatio = 100 * ((this.together) / (selected + this.compared - this.together));
-        float psRatio = Float.valueOf(twoDForm.format(similarityRatio));// Round it with 2 decimals
+        float psRatio = Float.valueOf(DECIMAL_FORMAT.format(similarityRatio));// Round it with 2 decimals
         if (Math.round(psRatio) == 100) {
             this.similarityRatio = 100;
         }
@@ -70,9 +70,8 @@ public class CoTerm {
         Preconditions.checkArgument(all != 0, "CoTerm::calculateProbabilityRatio The value for all" +
                 " should not be zero");
 
-        DecimalFormat twoDForm = new DecimalFormat("#.##");
         probabilityRatio = (this.together / selected) / (this.compared / all);
-        probabilityRatio = Float.valueOf(twoDForm.format(probabilityRatio));// Round it with 2 decimals
+        probabilityRatio = Float.valueOf(DECIMAL_FORMAT.format(probabilityRatio));// Round it with 2 decimals
         return probabilityRatio;
     }
 
@@ -163,21 +162,27 @@ public class CoTerm {
         private long together;
 
         public Builder setTarget(String target) {
+            Preconditions.checkArgument(target!=null && !target.trim().isEmpty(), "The parameter for 'setTarget' cannot " +
+                    "be null or empty.");
             this.target = target;
             return this;
         }
 
         public Builder setComparedTerm(String comparedTerm) {
+            Preconditions.checkArgument(comparedTerm != null && !comparedTerm.trim().isEmpty(), "The parameter for " +
+                    "'setComparedTerm' cannot be null or empty.");
             this.comparedTerm = comparedTerm;
             return this;
         }
 
         public Builder setCompared(long compared) {
+            Preconditions.checkArgument(compared > 0, "The parameter for 'setCompared' cannot be zero.");
             this.compared = compared;
             return this;
         }
 
         public Builder setTogether(long together) {
+            Preconditions.checkArgument(together > 0, "The parameter for 'setTogether' cannot be zero.");
             this.together = together;
             return this;
         }
