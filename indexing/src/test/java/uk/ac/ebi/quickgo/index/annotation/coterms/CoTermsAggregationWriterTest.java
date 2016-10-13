@@ -26,7 +26,7 @@ public class CoTermsAggregationWriterTest {
     private static final String[] TWO_SAME_GENEPRODUCTS = {"A0A000", "A0A000"};
     private static final String[] TWO_DIFFERENT_GENE_PRODUCTS = {"A0A000", "A0A001"};
     private static final String REPLACEMENT_GOID = "GO:0009999";
-    CoTermsAggregationWriter aggregator;
+    private CoTermsAggregationWriter aggregator;
 
     @Before
     public void setup() {
