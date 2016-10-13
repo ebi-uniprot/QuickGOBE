@@ -1,9 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,28 +33,28 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsAggregatorMocker
 public class StatisticsCalculatorTest {
 
     @Mock
-    CoTermsAggregationWriter aggregator;
+    private CoTermsAggregationWriter aggregator;
 
-    private static final String goTerm = "GO:0003824";
+    private static final String GO_TERM = "GO:0003824";
 
     @Test
     public void calculateStatisticsSingleGoTermComparedWithItself() {
-        long geneProductCount = 2l;
+        long geneProductCount = 2L;
 
         Map<String, Map<String, AtomicLong>> matrix = CoTermMocker.singleEntry();
         Map<String, AtomicLong> termGpCount = new HashMap<>();
-        termGpCount.put(goTerm, new AtomicLong(geneProductCount));
+        termGpCount.put(GO_TERM, new AtomicLong(geneProductCount));
 
         when(aggregator.getCoTerms()).thenReturn(matrix);
         when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
         StatisticsCalculator coTermsCalculator = new StatisticsCalculator(aggregator);
-        List<CoTerm> results = coTermsCalculator.process(goTerm);
+        List<CoTerm> results = coTermsCalculator.process(GO_TERM);
 
         assertThat(results, hasSize(1));
-        assertThat(results.get(0).getTarget(), is(goTerm));
-        assertThat(results.get(0).getComparedTerm(), is(goTerm));
+        assertThat(results.get(0).getTarget(), is(GO_TERM));
+        assertThat(results.get(0).getComparedTerm(), is(GO_TERM));
         assertThat(results.get(0).getProbabilityRatio(), is(1f));
         assertThat(results.get(0).getSimilarityRatio(), is(100f));
         assertThat(results.get(0).getTogether(), is(geneProductCount));
@@ -69,11 +66,11 @@ public class StatisticsCalculatorTest {
         int noOfCoHits = 1;
         int hitsPerTerm = 2;
 
-        long geneProductCount = 10l;
+        long geneProductCount = 10L;
         final String selected = "GO:0000001";
         final String compared = "GO:9000001";
-        final List<String> selectedList = Arrays.asList(selected);
-        final List<String> comparedList = Arrays.asList(compared);
+        final List<String> selectedList = Collections.singletonList(selected);
+        final List<String> comparedList = Collections.singletonList(compared);
 
         Map<String, AtomicLong> termGpCount = makeGpCountForTerm(hitsPerTerm, selectedList, comparedList);
         Map<String, Map<String, AtomicLong>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
@@ -90,8 +87,8 @@ public class StatisticsCalculatorTest {
         assertThat(results.get(0).getComparedTerm(), is(compared));
         assertThat(results.get(0).getProbabilityRatio(), is(2.5f));
         assertThat(results.get(0).getSimilarityRatio(), is(33.33f));
-        assertThat(results.get(0).getTogether(), is(1l));
-        assertThat(results.get(0).getCompared(), is(2l));
+        assertThat(results.get(0).getTogether(), is(1L));
+        assertThat(results.get(0).getCompared(), is(2L));
     }
 
     @Test
@@ -101,7 +98,7 @@ public class StatisticsCalculatorTest {
         int noOfCoHits = 1;
         int hitsPerTerm = 2;
 
-        long geneProductCount = 10l;
+        long geneProductCount = 10L;
         final List<String> selectedList = makeTermList(selected, idFormat1);
         final List<String> comparedList = makeTermList(compared, idFormat2);
 
@@ -117,21 +114,21 @@ public class StatisticsCalculatorTest {
 
         assertThat(results, hasSize(2));
         final float expectedProbabilityRatio = 2.5f;
-        final float expectedSimiliarityRatio = 33.33f;
-        final long expectedTogether = 1l;
-        final long expectedCompared = 2l;
+        final float expectedSimilarityRatio = 33.33f;
+        final long expectedTogether = 1L;
+        final long expectedCompared = 2L;
 
         assertThat(results.get(0).getTarget(), is(selectedList.get(0)));
         assertThat(results.get(0).getComparedTerm(), is(comparedList.get(0)));
         assertThat(results.get(0).getProbabilityRatio(), is(expectedProbabilityRatio));
-        assertThat(results.get(0).getSimilarityRatio(), is(expectedSimiliarityRatio));
+        assertThat(results.get(0).getSimilarityRatio(), is(expectedSimilarityRatio));
         assertThat(results.get(0).getTogether(), is(expectedTogether));
         assertThat(results.get(0).getCompared(), is(expectedCompared));
 
         assertThat(results.get(1).getTarget(), is(selectedList.get(0)));
         assertThat(results.get(1).getComparedTerm(), is(comparedList.get(1)));
         assertThat(results.get(1).getProbabilityRatio(), is(expectedProbabilityRatio));
-        assertThat(results.get(1).getSimilarityRatio(), is(expectedSimiliarityRatio));
+        assertThat(results.get(1).getSimilarityRatio(), is(expectedSimilarityRatio));
         assertThat(results.get(1).getTogether(), is(expectedTogether));
         assertThat(results.get(1).getCompared(), is(expectedCompared));
     }
@@ -144,11 +141,6 @@ public class StatisticsCalculatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void aggregatorIsNullCausesException() {
-        final String goTerm = "GO:0003824";
-
-        Map<String, Map<String, AtomicLong>> matrix = CoTermMocker.singleEntry();
-        Map<String, AtomicLong> termGpCount = new HashMap<>();
-        termGpCount.put(goTerm, new AtomicLong(2));
         new StatisticsCalculator(null);
     }
 
