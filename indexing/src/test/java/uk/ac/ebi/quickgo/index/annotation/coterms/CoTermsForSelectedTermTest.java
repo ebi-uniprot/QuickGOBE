@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class Co_TermsForSelectedTermTest {
+public class CoTermsForSelectedTermTest {
 
     @Mock
     CoTerm mockCoTerm;
