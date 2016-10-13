@@ -3,9 +3,10 @@
 ## This script should be run as tc_uni02, and functions to control starting,
 ## stopping, and re-starting the indexing server.
 ## It should be run from the staging environment's build directory
-##   Arguments: status              => show whether the index machine tomcat is up or down
-##              start               => start all or a specific index machine
-##              stop                => stop all or a specific index machine
+##   Arguments:
+#       status [profile [vm]]   => shows a profile's machines/specific machine, and it is up or down
+##      start [profile [vm]]    => start a profile's machines/specific machine
+##      stop [profile [vm]]     => stop a profile's machines/specific machine
 
 VALID_USERS=("uni_qgo");
 
@@ -26,16 +27,16 @@ fi
 ## ---------------------------- UTILITY FUNCTIONS ----------------------------
 function showHelp {
     cat<<EOF
-Usage: $0 [status|stop|start]
+Usage: $0 [status|stop|start] [profile [vm]]
 
 Argument description:
-  status                => show whether the local machine $solr_vm is up or down, and the contents of its release base directory.
-  start                 => starts the tomcat of the $solr_vm
-  stop                  => stops the tomcat of the $solr_vm
+  status [profile [vm]]   => shows whether a profile\'s machines/specific machine is up or down
+  start [profile [vm]]    => start a profile\'s machines/specific machine
+  stop [profile [vm]]     => stop a profile\'s machines/specific machine
 
-  Example: $0 stop -- causes the tomcat on $solr_vm to be stopped
+  Example: $0 stop dev ves-hx-c2 -- causes the development solr instance on ves-hx-c2 to be stopped
 
-  WARNING: Please be aware of who is using the machine before starting/stopping them.
+  WARNING: Please be aware of who is using the machines before starting/stopping them.
 EOF
 }
 
