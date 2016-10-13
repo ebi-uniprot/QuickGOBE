@@ -3,8 +3,6 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 
 import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -46,8 +44,8 @@ class CoTermsStepExecutionListener implements StepExecutionListener {
      */
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        ((CoTermsAggregator)all).finish();
-        ((CoTermsAggregator)manual).finish();
+        ((CoTermsAggregationWriter)all).finish();
+        ((CoTermsAggregationWriter)manual).finish();
         return stepExecution.getExitStatus();
     }
 }

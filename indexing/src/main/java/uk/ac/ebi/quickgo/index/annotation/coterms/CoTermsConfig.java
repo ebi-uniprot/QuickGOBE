@@ -52,44 +52,44 @@ public class CoTermsConfig {
     private Resource all;
 
     @Bean
-    public ItemWriter<AnnotationDocument> coTermsManualAggregationWriter() {
-        return new CoTermsAggregator(EXCLUDE_ANNOTATIONS_PRODUCED_BY_ELECTRONIC_MEANS);
+    public CoTermsAggregationWriter coTermsManualAggregationWriter() {
+        return new CoTermsAggregationWriter(EXCLUDE_ANNOTATIONS_PRODUCED_BY_ELECTRONIC_MEANS);
     }
 
     @Bean
-    public ItemWriter<AnnotationDocument> coTermsAllAggregationWriter() {
-        return new CoTermsAggregator(INCLUDE_ALL_ANNOTATIONS);
+    public CoTermsAggregationWriter coTermsAllAggregationWriter() {
+        return new CoTermsAggregationWriter(INCLUDE_ALL_ANNOTATIONS);
     }
 
     @Bean
     public StepExecutionListener coTermsEndOfAggregationListener(
-            ItemWriter<AnnotationDocument> coTermsManualAggregationWriter,
-            ItemWriter<AnnotationDocument> coTermsAllAggregationWriter) {
+            CoTermsAggregationWriter coTermsManualAggregationWriter,
+            CoTermsAggregationWriter coTermsAllAggregationWriter) {
         return new CoTermsStepExecutionListener(coTermsManualAggregationWriter,
                 coTermsAllAggregationWriter);
 
     }
 
     @Bean
-    public StatisticsCalculator coTermsManualCalculator(ItemWriter<AnnotationDocument> coTermsManualAggregationWriter) {
+    public StatisticsCalculator coTermsManualCalculator(CoTermsAggregationWriter coTermsManualAggregationWriter) {
         return new StatisticsCalculator(coTermsManualAggregationWriter);
     }
 
     @Bean
     public StatisticsCalculator coTermsAllCalculator(
-            ItemWriter<AnnotationDocument> coTermsAllAggregationWriter) {
+            CoTermsAggregationWriter coTermsAllAggregationWriter) {
         return new StatisticsCalculator(coTermsAllAggregationWriter);
     }
 
     @Bean
     public ItemReader<String> coTermsManualReader(
-            ItemWriter<AnnotationDocument> coTermsManualAggregationWriter) {
+            CoTermsAggregationWriter coTermsManualAggregationWriter) {
         return new CoTermItemReader(coTermsManualAggregationWriter);
     }
 
     @Bean
     public ItemReader<String> coTermsAllReader(
-            ItemWriter<AnnotationDocument> coTermsAllAggregationWriter) {
+            CoTermsAggregationWriter coTermsAllAggregationWriter) {
         return new CoTermItemReader(coTermsAllAggregationWriter);
     }
 

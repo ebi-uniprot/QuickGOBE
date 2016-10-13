@@ -36,7 +36,7 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsAggregatorMocker
 public class StatisticsCalculatorTest {
 
     @Mock
-    CoTermsAggregator aggregator;
+    CoTermsAggregationWriter aggregator;
 
     private static final String goTerm = "GO:0003824";
 

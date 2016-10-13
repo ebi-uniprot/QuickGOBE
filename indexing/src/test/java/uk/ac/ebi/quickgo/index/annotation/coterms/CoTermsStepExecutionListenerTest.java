@@ -17,10 +17,10 @@ import static org.mockito.Mockito.verify;
 public class CoTermsStepExecutionListenerTest {
 
     @Mock
-    CoTermsAggregator mockAllAggregator;
+    CoTermsAggregationWriter mockAllAggregator;
 
     @Mock
-    CoTermsAggregator mockManualAggregator;
+    CoTermsAggregationWriter mockManualAggregator;
 
     @Mock
     StepExecution mockExecution;

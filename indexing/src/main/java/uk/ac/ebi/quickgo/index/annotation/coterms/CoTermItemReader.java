@@ -18,13 +18,13 @@ import org.springframework.batch.item.ItemWriter;
  */
 class CoTermItemReader implements ItemReader<String> {
 
-    private final CoTermsAggregator aggregator;
+    private final CoTermsAggregationWriter aggregator;
     private Iterator<String> termsIt;
 
     public CoTermItemReader(ItemWriter<AnnotationDocument> aggregator) {
         Preconditions.checkArgument(aggregator!=null, "An instance of CoTermItemReader has been passed a null " +
                 "ItemWriter<AnnotationDocument> to it's constructor which is illegal");
-        this.aggregator = (CoTermsAggregator)aggregator;
+        this.aggregator = (CoTermsAggregationWriter)aggregator;
     }
 
     /**

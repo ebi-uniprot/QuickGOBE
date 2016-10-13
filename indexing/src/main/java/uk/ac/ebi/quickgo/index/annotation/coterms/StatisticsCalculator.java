@@ -3,8 +3,6 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -22,16 +20,16 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>> {
 
-    private final CoTermsAggregator aggregator;
+    private final CoTermsAggregationWriter aggregator;
 
     /**
      *
      * @param aggregator holds the data for co-occurring terms.
      */
-    public StatisticsCalculator(ItemWriter<AnnotationDocument> aggregator) {
+    public StatisticsCalculator(CoTermsAggregationWriter aggregator) {
         Preconditions.checkArgument(aggregator!=null, "The aggregator instance passed to the Statistics Calculator " +
                 "constructor cannot be null");
-        this.aggregator = (CoTermsAggregator)aggregator;
+        this.aggregator = aggregator;
     }
 
     /**
