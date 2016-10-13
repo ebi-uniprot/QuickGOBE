@@ -72,14 +72,14 @@ public class CoTermsAggregationWriterTest {
         Map<String, AtomicLong> coTerms1 = matrix.get(docs.get(0).goId);
         assertThat(coTerms1.keySet(), hasSize(1));
         AtomicLong ac1 = coTerms1.get(docs.get(0).goId);
-        assertThat(ac1.get(), is(1l));
+        assertThat(ac1.get(), is(1L));
 
         Map<String, AtomicLong> coTerms2 = matrix.get(docs.get(1).goId);
         assertThat(coTerms2.keySet(), hasSize(1));
         AtomicLong ac2 = coTerms2.get(docs.get(1).goId);
-        assertThat(ac2.get(), is(1l));
+        assertThat(ac2.get(), is(1L));
 
-        assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(2l));
+        assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(2L));
         assertThat(aggregator.getGeneProductCountForGoTerm(docs.get(0).goId), is(1L));
         assertThat(aggregator.getGeneProductCountForGoTerm(docs.get(1).goId), is(1L));
     }
@@ -101,7 +101,7 @@ public class CoTermsAggregationWriterTest {
         AtomicLong ac1x1 = coTerms1.get(docs.get(0).goId);
         assertThat(ac1x1.get(), is(1L));
         AtomicLong ac1x2 = coTerms1.get(docs.get(1).goId);
-        assertThat(ac1x1.get(), is(1L));
+        assertThat(ac1x2.get(), is(1L));
 
         Map<String, AtomicLong> coTerms2 = matrix.get(docs.get(1).goId);
         assertThat(coTerms2.keySet(), hasSize(2));
