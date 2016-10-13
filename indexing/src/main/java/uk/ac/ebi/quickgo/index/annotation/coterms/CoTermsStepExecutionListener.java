@@ -42,7 +42,7 @@ class CoTermsStepExecutionListener implements StepExecutionListener {
      * Call finish() on the aggregation instances, so the last accumulating buckets can be processed.
      * Call initialize on calculators so they have the data ready to calculate.
      * @param stepExecution
-     * @return 'COMPLETED' once the aggregation code has finished processing.
+     * @return the ExitStatus passed to this method via the StepExecution argument.
      */
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
