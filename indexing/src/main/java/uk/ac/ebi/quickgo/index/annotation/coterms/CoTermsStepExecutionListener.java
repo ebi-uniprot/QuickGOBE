@@ -26,9 +26,9 @@ class CoTermsStepExecutionListener implements StepExecutionListener {
     public CoTermsStepExecutionListener(ItemWriter<AnnotationDocument> all, ItemWriter<AnnotationDocument> manual) {
 
         Preconditions.checkArgument(null!=all, "The item writer instance for 'all' passed to " +
-                "CoTermsStepExecutionListener was null, and should be.");
-        Preconditions.checkArgument(null!=manual, "The item writer instance for 'all' passed to " +
-                "CoTermsStepExecutionListener was null, and should be.");
+                "CoTermsStepExecutionListener was null, and not should be.");
+        Preconditions.checkArgument(null!=manual, "The item writer instance for 'manual' passed to " +
+                "CoTermsStepExecutionListener was null, and not should be.");
 
         this.all = all;
         this.manual = manual;
