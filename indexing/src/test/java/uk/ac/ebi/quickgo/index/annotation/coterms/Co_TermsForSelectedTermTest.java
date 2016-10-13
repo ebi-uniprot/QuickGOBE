@@ -91,9 +91,6 @@ public class Co_TermsForSelectedTermTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void passingNullToAddAndCalculateCausesException(){
-
-        long totalNumberGeneProducts = 10;
-        long selected = 2;  //Total count of proteins annotated to selected term
         new CoTermsForSelectedTerm.Builder().addCoTerm(null);
     }
 
@@ -101,14 +98,12 @@ public class Co_TermsForSelectedTermTest {
     @Test(expected=IllegalArgumentException.class)
     public void passingTotalNumberGeneProductsEqualToZeroToConstructorCausesException(){
         long totalNumberGeneProducts = 0;
-        long selected = 2;
         new CoTermsForSelectedTerm.Builder()
                 .setTotalNumberOfGeneProducts(totalNumberGeneProducts);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void passingSelectedEqualToZeroToConstructorCausesException(){
-        long totalNumberGeneProducts = 10;
         long selected = 0;
         new CoTermsForSelectedTerm.Builder().setSelected(selected);
     }
