@@ -97,6 +97,11 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL).param(FIELDS_PARAM, "goSlimSets"))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.assignedBy").doesNotExist())
+                .andExpect(jsonPath("$.references").doesNotExist())
+                .andExpect(jsonPath("$.evidences").doesNotExist())
+                .andExpect(jsonPath("$.withFrom").doesNotExist())
+                .andExpect(jsonPath("$.geneProducts").doesNotExist())
                 .andExpect(jsonPath("$.goSlimSets.*", hasSize(greaterThan(0))));
     }
 
@@ -105,6 +110,10 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL).param(FIELDS_PARAM, "goSlimSets,geneProducts"))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.assignedBy").doesNotExist())
+                .andExpect(jsonPath("$.references").doesNotExist())
+                .andExpect(jsonPath("$.evidences").doesNotExist())
+                .andExpect(jsonPath("$.withFrom").doesNotExist())
                 .andExpect(jsonPath("$.geneProducts.*", hasSize(greaterThan(0))))
                 .andExpect(jsonPath("$.goSlimSets.*", hasSize(greaterThan(0))));
     }
