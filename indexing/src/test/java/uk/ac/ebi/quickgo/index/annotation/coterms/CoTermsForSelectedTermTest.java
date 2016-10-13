@@ -108,7 +108,7 @@ public class CoTermsForSelectedTermTest {
         new CoTermsForSelectedTerm.Builder().setSelected(selected);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=IllegalStateException.class)
     public void buildingCoTermsForSelectedTermWithoutSpecifyingTotalNumberOfGeneProductsCausesException(){
         CoTermsForSelectedTerm.Builder builder = new CoTermsForSelectedTerm.Builder()
                 .setSelected(4).addCoTerm(mock(CoTerm.class, "One"));

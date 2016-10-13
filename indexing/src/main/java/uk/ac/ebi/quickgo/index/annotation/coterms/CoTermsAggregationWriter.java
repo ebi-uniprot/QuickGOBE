@@ -12,7 +12,9 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.GeneProductBatch.buildB
 
 /**
  * Aggregates all the data need to calculate co-occurrence statistic data points.
- *
+ * AnnotationDocuments are passed to the write method for aggregation.
+ * <B>*IMPORTANT* The AnnotationDocuments need to be passed to the write method in gene product order (asc) - the code
+ * assumes this is the case in-order to carry out it batching.</B>
  * An optimization could be applied to this class.
  * Please see https://www.ebi.ac.uk/panda/jira/browse/GOA-2397 for details.
  *
@@ -28,39 +30,38 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
     //Determines which annotations get processed.
     private final Predicate<AnnotationDocument> toBeProcessed;
     private final CoTermMatrix coTerms;
-    private final TermGPCount termGPCount;
+    private final TermGPCount geneProductCountForTerms;
     private GeneProductBatch geneProductBatch;
 
     CoTermsAggregationWriter(Predicate<AnnotationDocument> toBeProcessed) {
         Preconditions
                 .checkArgument(toBeProcessed != null, "Null predicate passed AnnotationCoOccurringTermsAggregator" +
-                        " constructor");
+                        " constructor.");
 
         this.toBeProcessed = toBeProcessed;
         this.coTerms = new CoTermMatrix();
-        geneProductList = new HashSet<>();
-        termGPCount = new TermGPCount();
-        geneProductBatch = new GeneProductBatch();
+        this.geneProductList = new HashSet<>();
+        this.geneProductCountForTerms = new TermGPCount();
+        this.geneProductBatch = new GeneProductBatch();
+    }
+
+    /**
+     * We hold a count of the number of unique gene products encountered during processing, for each term.
+     * @param goTerm
+     * @return count of the number of unique gene products encountered during processing for the request term.
+     */
+    long getGeneProductCountForGoTerm(String goTerm) {
+        return geneProductCountForTerms.id2Count.get(goTerm).get();
     }
 
     /**
      * Number of unique gene products processed from Annotations
-     *
      * @return unique gene product count
      */
     long getTotalOfAnnotatedGeneProducts() {
         return geneProductList.size();
     }
 
-    /**
-     * This is the count of all unique gene products for terms encountered during processing. We hold this figure
-     * separately as it is used many times.
-     *
-     * @return map of GO terms to count of unique gene products for the term.
-     */
-    Map<String, AtomicLong> getGeneProductCounts() {
-        return termGPCount.termGPCount;
-    }
 
     /**
      * Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
@@ -130,7 +131,7 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
     private void increaseCountsForTermsInBatch() {
         for (String termId : geneProductBatch.terms) {
             coTerms.incrementCoTerms(termId, geneProductBatch.terms);
-            termGPCount.incrementGeneProductCountForTerm(termId);
+            geneProductCountForTerms.incrementGeneProductCountForTerm(termId);
         }
     }
 }
@@ -234,20 +235,20 @@ class CoTermMatrix {
 }
 
 class TermGPCount {
-    final Map<String, AtomicLong> termGPCount;
+    final Map<String, AtomicLong> id2Count;
 
     TermGPCount() {
-        this.termGPCount = new HashMap<>();
+        this.id2Count = new HashMap<>();
     }
 
     /**
      * For every term, increment by one the count of gene products for this term
      */
     void incrementGeneProductCountForTerm(String term) {
-        AtomicLong count = termGPCount.get(term);
+        AtomicLong count = id2Count.get(term);
         if (count == null) {
             count = new AtomicLong();
-            termGPCount.put(term, count);
+            id2Count.put(term, count);
         }
         count.incrementAndGet();
     }

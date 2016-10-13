@@ -58,7 +58,7 @@ class CoTermsForSelectedTerm {
          * @param selected The count of unique gene products annotated to selected term.
          */
         Builder setSelected(long selected) {
-            Preconditions.checkArgument(selected != 0, "term should not be zero");
+            Preconditions.checkArgument(selected != 0, "'setSelected' should not be zero");
             this.selected = selected;
             return this;
         }

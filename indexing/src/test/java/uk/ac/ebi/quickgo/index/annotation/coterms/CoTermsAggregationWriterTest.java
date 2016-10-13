@@ -53,9 +53,8 @@ public class CoTermsAggregationWriterTest {
         assertThat(ac.get(), is(1L));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1L));
-        assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(1));
-        assertThat(aggregator.getGeneProductCounts().get(docs.get(0).goId).get(), is(1L));
-        assertThat(aggregator.getGeneProductCounts().get(docs.get(1).goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCountForGoTerm(docs.get(0).goId), is(1L));
+        assertThat(aggregator.getGeneProductCountForGoTerm(docs.get(1).goId), is(1L));
 
     }
 
@@ -81,9 +80,8 @@ public class CoTermsAggregationWriterTest {
         assertThat(ac2.get(), is(1l));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(2l));
-        assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(2));
-        assertThat(aggregator.getGeneProductCounts().get(docs.get(0).goId).get(), is(1L));
-        assertThat(aggregator.getGeneProductCounts().get(docs.get(1).goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCountForGoTerm(docs.get(0).goId), is(1L));
+        assertThat(aggregator.getGeneProductCountForGoTerm(docs.get(1).goId), is(1L));
     }
 
     @Test
@@ -113,9 +111,8 @@ public class CoTermsAggregationWriterTest {
         assertThat(ac2x2.get(), is(1L));
 
         assertThat(aggregator.getTotalOfAnnotatedGeneProducts(), is(1L));
-        assertThat(aggregator.getGeneProductCounts().keySet(), hasSize(2));
-        assertThat(aggregator.getGeneProductCounts().get(docs.get(0).goId).get(), is(1L));
-        assertThat(aggregator.getGeneProductCounts().get(docs.get(1).goId).get(), is(1L));
+        assertThat(aggregator.getGeneProductCountForGoTerm(docs.get(0).goId), is(1L));
+        assertThat(aggregator.getGeneProductCountForGoTerm(docs.get(1).goId), is(1L));
     }
 
     @Test
@@ -127,7 +124,6 @@ public class CoTermsAggregationWriterTest {
         Map<String, Map<String, AtomicLong>> matrix = aggregatorFalse.getCoTerms();
         assertThat(matrix.keySet(), hasSize(0));
         assertThat(aggregatorFalse.getTotalOfAnnotatedGeneProducts(), is(0L));
-        assertThat(aggregatorFalse.getGeneProductCounts().keySet(), hasSize(0));
     }
 
     @Test(expected = IllegalArgumentException.class)

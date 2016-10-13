@@ -56,12 +56,12 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
         Map<String, AtomicLong> coTermsForTarget = aggregator.getCoTerms().get(goTerm);
         CoTermsForSelectedTerm.Builder coTermsBuilder = new CoTermsForSelectedTerm.Builder()
                 .setTotalNumberOfGeneProducts(aggregator.getTotalOfAnnotatedGeneProducts())
-                .setSelected(aggregator.getGeneProductCounts().get(goTerm).get());
+                .setSelected(aggregator.getGeneProductCountForGoTerm(goTerm));
 
         for (String comparedTerm : coTermsForTarget.keySet()) {
             coTermsBuilder.addCoTerm(new CoTerm.Builder().setTarget(goTerm).setComparedTerm
                     (comparedTerm)
-                    .setCompared(aggregator.getGeneProductCounts().get(comparedTerm).get())
+                    .setCompared(aggregator.getGeneProductCountForGoTerm(comparedTerm))
                     .setTogether(coTermsForTarget.get(comparedTerm).get()).createCoTerm());
         }
         return coTermsBuilder.build();

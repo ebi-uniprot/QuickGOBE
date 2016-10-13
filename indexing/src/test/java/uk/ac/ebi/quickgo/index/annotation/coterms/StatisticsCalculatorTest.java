@@ -42,11 +42,8 @@ public class StatisticsCalculatorTest {
         long geneProductCount = 2L;
 
         Map<String, Map<String, AtomicLong>> matrix = CoTermMocker.singleEntry();
-        Map<String, AtomicLong> termGpCount = new HashMap<>();
-        termGpCount.put(GO_TERM, new AtomicLong(geneProductCount));
-
         when(aggregator.getCoTerms()).thenReturn(matrix);
-        when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
+        when(aggregator.getGeneProductCountForGoTerm(GO_TERM)).thenReturn(geneProductCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
         StatisticsCalculator coTermsCalculator = new StatisticsCalculator(aggregator);
@@ -76,7 +73,8 @@ public class StatisticsCalculatorTest {
         Map<String, Map<String, AtomicLong>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
 
         when(aggregator.getCoTerms()).thenReturn(matrix);
-        when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
+        when(aggregator.getGeneProductCountForGoTerm(selectedList.get(0))).thenReturn(2L);
+        when(aggregator.getGeneProductCountForGoTerm(comparedList.get(0))).thenReturn(2L);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
         StatisticsCalculator coTermsCalculator = new StatisticsCalculator(aggregator);
@@ -96,17 +94,17 @@ public class StatisticsCalculatorTest {
         int selected = 1;
         int compared = 2;
         int noOfCoHits = 1;
-        int hitsPerTerm = 2;
 
         long geneProductCount = 10L;
         final List<String> selectedList = makeTermList(selected, ID_FORMAT_1);
         final List<String> comparedList = makeTermList(compared, ID_FORMAT_2);
 
-        Map<String, AtomicLong> termGpCount = makeGpCountForTerm(hitsPerTerm, selectedList, comparedList);
         Map<String, Map<String, AtomicLong>> matrix = createMatrix(selectedList, comparedList, noOfCoHits);
 
         when(aggregator.getCoTerms()).thenReturn(matrix);
-        when(aggregator.getGeneProductCounts()).thenReturn(termGpCount);
+        when(aggregator.getGeneProductCountForGoTerm(selectedList.get(0))).thenReturn(2L);
+        when(aggregator.getGeneProductCountForGoTerm(comparedList.get(0))).thenReturn(2L);
+        when(aggregator.getGeneProductCountForGoTerm(comparedList.get(1))).thenReturn(2L);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
         StatisticsCalculator coTermsCalculator = new StatisticsCalculator(aggregator);
