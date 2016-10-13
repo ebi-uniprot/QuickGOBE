@@ -13,25 +13,25 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.GeneProductBatch.buildB
 /**
  * Aggregates all the data need to calculate co-occurrence statistic data points.
  *
+ * An optimization could be applied to this class.
+ * Please see https://www.ebi.ac.uk/panda/jira/browse/GOA-2397 for details.
+ *
  * @author Tony Wardell
  * Date: 26/11/2015
  * Time: 11:59
  * Created with IntelliJ IDEA.
  */
-public class CoTermsAggregator implements ItemWriter<AnnotationDocument> {
-
+class CoTermsAggregator implements ItemWriter<AnnotationDocument> {
     //A list of all unique geneProducts encountered - it exists so we can get a count of the total unique gene products.
     private final Set<String> geneProductList;
 
     //Determines which annotations get processed.
     private final Predicate<AnnotationDocument> toBeProcessed;
-
-    private GeneProductBatch geneProductBatch;
     private final CoTermMatrix coTerms;
     private final TermGPCount termGPCount;
+    private GeneProductBatch geneProductBatch;
 
-    public CoTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
-
+    CoTermsAggregator(Predicate<AnnotationDocument> toBeProcessed) {
         Preconditions
                 .checkArgument(toBeProcessed != null, "Null predicate passed AnnotationCoOccurringTermsAggregator" +
                         " constructor");
@@ -48,7 +48,7 @@ public class CoTermsAggregator implements ItemWriter<AnnotationDocument> {
      *
      * @return unique gene product count
      */
-    public long getTotalOfAnnotatedGeneProducts() {
+    long getTotalOfAnnotatedGeneProducts() {
         return geneProductList.size();
     }
 
@@ -58,7 +58,7 @@ public class CoTermsAggregator implements ItemWriter<AnnotationDocument> {
      *
      * @return map of GO terms to count of unique gene products for the term.
      */
-    public Map<String, AtomicLong> getGeneProductCounts() {
+    Map<String, AtomicLong> getGeneProductCounts() {
         return termGPCount.termGPCount;
     }
 
@@ -68,7 +68,7 @@ public class CoTermsAggregator implements ItemWriter<AnnotationDocument> {
      * @return map of processed terms to all co-occurring terms, together with count of how many times they have
      * co-occurred.
      */
-    public Map<String, Map<String, AtomicLong>> getCoTerms() {
+    Map<String, Map<String, AtomicLong>> getCoTerms() {
         return coTerms.coTermMatrix;
     }
 
@@ -77,16 +77,23 @@ public class CoTermsAggregator implements ItemWriter<AnnotationDocument> {
      * and if so add its data to the aggregated data.
      *
      * @param items a list of AnnotationDocuments.
-     * @throws java.lang.Exception - if there are errors. The framework will catch the exception and convert or rethrow it as appropriate.
+     * @throws java.lang.Exception - if there are errors. The framework will catch the exception and convert or
+     * rethrow it as appropriate.
      */
     @Override
     public void write(List<? extends AnnotationDocument> items) throws Exception {
-
         Preconditions.checkArgument(items != null, "Null annotation passed to process");
-
         items.stream()
                 .filter(this.toBeProcessed::test)
                 .forEach(this::addGOTermToAggregationForGeneProduct);
+    }
+
+    /**
+     * The client must call finish() when all annotation documents have been processed by the write method to wrap up
+     * processing.
+     */
+    void finish() {
+        increaseCountsForTermsInBatch();
     }
 
     /**
@@ -102,7 +109,6 @@ public class CoTermsAggregator implements ItemWriter<AnnotationDocument> {
      * @param doc
      */
     private void addGOTermToAggregationForGeneProduct(AnnotationDocument doc) {
-
         if (geneProductBatch.geneProduct == null) {
             geneProductBatch.geneProduct = doc.geneProductId;
         }
@@ -110,7 +116,7 @@ public class CoTermsAggregator implements ItemWriter<AnnotationDocument> {
         if (!doc.geneProductId.equals(geneProductBatch.geneProduct)) {
             increaseCountsForTermsInBatch();
             geneProductBatch = buildBatch(doc);
-        }else{
+        } else {
             geneProductBatch.addTerm(doc.goId);
         }
 
@@ -118,19 +124,10 @@ public class CoTermsAggregator implements ItemWriter<AnnotationDocument> {
     }
 
     /**
-     * The client must call finish() when all annotation documents have been processed by the write method to wrap up
-     * processing.
-     */
-    public void finish() {
-        increaseCountsForTermsInBatch();
-    }
-
-    /**
      * Got to the end of the list of annotations for this gene product
      * Record which terms annotate the same gene products.
      */
     private void increaseCountsForTermsInBatch() {
-
         for (String termId : geneProductBatch.terms) {
             coTerms.incrementCoTerms(termId, geneProductBatch.terms);
             termGPCount.incrementGeneProductCountForTerm(termId);
@@ -148,14 +145,10 @@ class GeneProductBatch {
     final Set<String> terms;
 
     //The input file has annotations in gene product order, so we use this value to note changes in gene product.
-    public String geneProduct;
+    String geneProduct;
 
-    public GeneProductBatch() {
+    GeneProductBatch() {
         terms = new HashSet<>();
-    }
-
-    void addTerm(String termId) {
-        terms.add(termId);
     }
 
     /**
@@ -163,11 +156,19 @@ class GeneProductBatch {
      * @param doc
      * @return
      */
-    static GeneProductBatch buildBatch(AnnotationDocument doc){
+    static GeneProductBatch buildBatch(AnnotationDocument doc) {
         GeneProductBatch geneProductBatch = new GeneProductBatch();
         geneProductBatch.geneProduct = doc.geneProductId;
         geneProductBatch.addTerm(doc.goId);
         return geneProductBatch;
+    }
+
+    /**
+     * Add this term id to this list of term ids encountered for the gene product that is currently being read.
+     * @param termId
+     */
+    void addTerm(String termId) {
+        terms.add(termId);
     }
 }
 
@@ -178,10 +179,11 @@ class CoTermMatrix {
 
     // Key is the target term, the value is a map of all the GO terms that are used in annotations for the same gene
     // product. i.e.  Key =>target term, value=> map (key=>co-occurring term, value => AtomicLong For Co-occurrence)
-    // For example key=>'GO:0003824', value=> map(entry 1 :: key=>'GO:0008152' value=>1346183 hits, entry 2 key=>'GO:0016740' value=>1043613 hits)
+    // For example key=>'GO:0003824', value=> map(entry 1 :: key=>'GO:0008152' value=>1346183 hits, entry 2
+    // key=>'GO:0016740' value=>1043613 hits)
     final Map<String, Map<String, AtomicLong>> coTermMatrix;
 
-    public CoTermMatrix() {
+    CoTermMatrix() {
         coTermMatrix = new TreeMap<>();
     }
 
@@ -192,7 +194,6 @@ class CoTermMatrix {
      * @param termsInBatch a list of all terms encountered in annotations for a particular gene product.
      */
     void incrementCoTerms(String termId, Set<String> termsInBatch) {
-
         Map<String, AtomicLong> coTerms = getCoTerms(termId);
 
         //Loop through all the terms we have encountered in this batch and update the quantities
@@ -216,12 +217,10 @@ class CoTermMatrix {
     /**
      * Get the co-terms for this {@code termId}
      *
-     * @param termId
-     * @return  all terms that co-occur with the term specified as parameter
+     * @param termId GO Term id to use for the lookup.
+     * @return all terms that co-occur with the term specified as parameter.
      */
     private Map<String, AtomicLong> getCoTerms(String termId) {
-
-        //look in the store
         Map<String, AtomicLong> termCoTerms = coTermMatrix.get(termId);
 
         //Create if it doesn't exist.
@@ -237,7 +236,7 @@ class CoTermMatrix {
 class TermGPCount {
     final Map<String, AtomicLong> termGPCount;
 
-    public TermGPCount() {
+    TermGPCount() {
         this.termGPCount = new HashMap<>();
     }
 
