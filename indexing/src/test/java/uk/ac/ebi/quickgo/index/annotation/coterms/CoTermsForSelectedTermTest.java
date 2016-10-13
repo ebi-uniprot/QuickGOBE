@@ -51,7 +51,7 @@ public class CoTermsForSelectedTermTest {
 
 
     @Test
-    public void testHighestSimilaritySortingWorks(){
+    public void callingHighestSimilaritySortingWorks(){
 
         long totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
