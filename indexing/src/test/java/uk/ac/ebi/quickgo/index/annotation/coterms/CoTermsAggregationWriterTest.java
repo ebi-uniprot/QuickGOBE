@@ -23,9 +23,9 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
  */
 public class CoTermsAggregationWriterTest {
 
-    public static final String[] TWO_SAME_GENEPRODUCTS = {"A0A000", "A0A000"};
-    public static final String[] TWO_DIFFERENT_GENE_PRODUCTS = {"A0A000", "A0A001"};
-    public static final String REPLACEMENT_GOID = "GO:0009999";
+    private static final String[] TWO_SAME_GENEPRODUCTS = {"A0A000", "A0A000"};
+    private static final String[] TWO_DIFFERENT_GENE_PRODUCTS = {"A0A000", "A0A001"};
+    private static final String REPLACEMENT_GOID = "GO:0009999";
     CoTermsAggregationWriter aggregator;
 
     @Before
@@ -143,8 +143,8 @@ public class CoTermsAggregationWriterTest {
     private List<AnnotationDocument> writeDocs(String... geneProductIds) throws Exception {
         List<AnnotationDocument> docs = new ArrayList<>();
 
-        for (int i = 0; i < geneProductIds.length; i++) {
-            docs.add(AnnotationDocMocker.createAnnotationDoc(geneProductIds[i]));
+        for (String geneProductId : geneProductIds) {
+            docs.add(AnnotationDocMocker.createAnnotationDoc(geneProductId));
         }
         return docs;
     }
