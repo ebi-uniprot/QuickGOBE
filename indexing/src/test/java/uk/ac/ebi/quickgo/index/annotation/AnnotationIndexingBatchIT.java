@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.index.annotation;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermTemporaryDataStore;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
 import java.util.List;
@@ -20,7 +21,6 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -43,18 +43,12 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.COTERM_MA
 @ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {AnnotationConfig.class, JobTestRunnerConfig.class},
+        classes = {AnnotationConfig.class, JobTestRunnerConfig.class, CoTermTemporaryDataStore.Config.class},
         loader = SpringApplicationContextLoader.class)
 public class AnnotationIndexingBatchIT {
 
-    @Value("${indexing.coterms.manual}")
-    private Resource manual;
-
-    @Value("${indexing.coterms.all}")
-    private Resource all;
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    @ClassRule
+    public static final CoTermTemporaryDataStore coTermsDataStore = new CoTermTemporaryDataStore();
 
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
@@ -120,10 +114,6 @@ public class AnnotationIndexingBatchIT {
         //Has finished
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.COMPLETED));
-
-        //clean up
-        manual.getFile().delete();
-        all.getFile().delete();
 
     }
 

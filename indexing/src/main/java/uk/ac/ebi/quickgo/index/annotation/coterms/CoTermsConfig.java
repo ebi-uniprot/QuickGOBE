@@ -19,6 +19,7 @@ import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 /**
@@ -46,10 +47,20 @@ public class CoTermsConfig {
     private static final String DELIMITER = "\t";
 
     @Value("${indexing.coterms.manual}")
-    private Resource manual;
+    private String manualCoTermsPath;
 
-    @Value("${indexing.coterms.all}")
-    private Resource all;
+    @Value("${indexing.coterms.manual}")
+    private String allCoTermsPath;
+
+    @Bean
+    public Resource manualCoTermsResource() {
+        return new FileSystemResource(manualCoTermsPath);
+    }
+
+    @Bean
+    public Resource allCoTermsResource() {
+        return new FileSystemResource(allCoTermsPath);
+    }
 
     @Bean
     public CoTermsAggregationWriter coTermsManualAggregationWriter() {
@@ -95,12 +106,12 @@ public class CoTermsConfig {
 
     @Bean
     ItemWriter<List<CoTerm>> coTermsManualStatsWriter() {
-        return listItemFlatFileWriter(manual);
+        return listItemFlatFileWriter(manualCoTermsResource());
     }
 
     @Bean
     ItemWriter<List<CoTerm>> coTermsAllStatsWriter() {
-        return listItemFlatFileWriter(all);
+        return listItemFlatFileWriter(allCoTermsResource());
     }
 
     private ListItemWriter<CoTerm> listItemFlatFileWriter(Resource outputFile) {
