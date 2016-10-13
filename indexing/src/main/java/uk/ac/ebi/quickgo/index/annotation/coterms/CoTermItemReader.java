@@ -22,10 +22,9 @@ class CoTermItemReader implements ItemReader<String> {
     private Iterator<String> termsIt;
 
     public CoTermItemReader(ItemWriter<AnnotationDocument> aggregator) {
-        this.aggregator = (CoTermsAggregator)aggregator;
         Preconditions.checkArgument(aggregator!=null, "An instance of CoTermItemReader has been passed a null " +
                 "ItemWriter<AnnotationDocument> to it's constructor which is illegal");
-
+        this.aggregator = (CoTermsAggregator)aggregator;
     }
 
     /**
@@ -34,9 +33,6 @@ class CoTermItemReader implements ItemReader<String> {
      * @throws Exception
      */
     @Override public String read() throws Exception {
-
-        Preconditions.checkArgument(aggregator!=null, "CoTermsAggregator instance is null");
-
         //Delay providing full list until aggregator has fully processed all records.
         if (termsIt == null) {
             termsIt = aggregator.getCoTerms().keySet().iterator();
