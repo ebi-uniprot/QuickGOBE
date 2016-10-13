@@ -21,7 +21,7 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.GeneProductBatch.buildB
  * Time: 11:59
  * Created with IntelliJ IDEA.
  */
-class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> {
+public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> {
     //A list of all unique geneProducts encountered - it exists so we can get a count of the total unique gene products.
     private final Set<String> geneProductList;
 
