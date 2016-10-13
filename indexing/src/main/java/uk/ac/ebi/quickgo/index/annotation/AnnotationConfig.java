@@ -33,6 +33,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTerm;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsAggregationWriter;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
@@ -82,9 +83,9 @@ public class AnnotationConfig {
     private StepBuilderFactory stepBuilders;
 
     @Autowired
-    ItemWriter<AnnotationDocument> coTermsManualAggregationWriter;
+    CoTermsAggregationWriter coTermsManualAggregationWriter;
     @Autowired
-    ItemWriter<AnnotationDocument> coTermsAllAggregationWriter;
+    CoTermsAggregationWriter coTermsAllAggregationWriter;
     @Autowired
     ItemProcessor<String, List<CoTerm>> coTermsManualCalculator;
     @Autowired
