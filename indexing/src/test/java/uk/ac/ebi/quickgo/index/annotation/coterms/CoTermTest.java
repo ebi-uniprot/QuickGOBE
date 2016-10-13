@@ -75,4 +75,34 @@ public class CoTermTest {
 						.setTogether(together).createCoTerm();
 		coTerm.calculateProbabilityRatio(selected, 0);
 	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void ifSetTargetIsPassedNullAnExceptionIsThrown(){
+		new CoTerm.Builder().setTarget(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void ifSetTargetIsPassedEmptyStringAnExceptionIsThrown(){
+		new CoTerm.Builder().setTarget("   ");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void ifSetComparedTermIsPassedNullAnExceptionIsThrown(){
+		new CoTerm.Builder().setComparedTerm(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void ifSetComparedTermIsPassedEmptyStringAnExceptionIsThrown(){
+		new CoTerm.Builder().setComparedTerm("   ");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void ifSetComparedIsPassedZeroAnExceptionIsThrown(){
+		new CoTerm.Builder().setCompared(0);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void ifSetTogetherTermIsPassedEmptyStringAnExceptionIsThrown(){
+		new CoTerm.Builder().setTogether(0);
+	}
 }
