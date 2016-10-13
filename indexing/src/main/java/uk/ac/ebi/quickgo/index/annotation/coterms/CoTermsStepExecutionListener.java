@@ -18,10 +18,10 @@ import org.springframework.batch.item.ItemWriter;
  */
 class CoTermsStepExecutionListener implements StepExecutionListener {
 
-    private final ItemWriter<AnnotationDocument> all;
-    private final ItemWriter<AnnotationDocument> manual;
+    private final CoTermsAggregationWriter all;
+    private final CoTermsAggregationWriter manual;
 
-    public CoTermsStepExecutionListener(ItemWriter<AnnotationDocument> all, ItemWriter<AnnotationDocument> manual) {
+    public CoTermsStepExecutionListener(CoTermsAggregationWriter all, CoTermsAggregationWriter manual) {
 
         Preconditions.checkArgument(null!=all, "The item writer instance for 'all' passed to " +
                 "CoTermsStepExecutionListener was null, and not should be.");
@@ -44,8 +44,8 @@ class CoTermsStepExecutionListener implements StepExecutionListener {
      */
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        ((CoTermsAggregationWriter)all).finish();
-        ((CoTermsAggregationWriter)manual).finish();
+        all.finish();
+        manual.finish();
         return stepExecution.getExitStatus();
     }
 }
