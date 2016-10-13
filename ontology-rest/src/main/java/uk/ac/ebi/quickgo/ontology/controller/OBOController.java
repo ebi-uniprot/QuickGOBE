@@ -371,7 +371,7 @@ public abstract class OBOController<T extends OBOTerm> {
         try {
             return createChartResponseEntity(validationHelper.validateCSVIds(ids));
         } catch (IOException | RenderingGraphException e) {
-            throw new RetrievalException(e);
+            throw createChartGraphicsException(e);
         }
     }
 
@@ -396,35 +396,8 @@ public abstract class OBOController<T extends OBOTerm> {
                     .ok()
                     .body(layout);
         } catch (RenderingGraphException e) {
-            throw new RetrievalException(e);
+            throw createChartGraphicsException(e);
         }
-    }
-
-    /**
-     * Delegates the creation of an graphical image, corresponding to the specified list
-     * of {@code ids} and returns the appropriate {@link ResponseEntity}.
-     *
-     * @param ids the terms whose corresponding graphical image is required
-     * @return the image corresponding to the specified terms
-     * @throws IOException if there is an error during creation of the image {@link InputStreamResource}
-     * @throws RenderingGraphException if there was an error during the rendering of the image
-     */
-    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids)
-            throws IOException, RenderingGraphException {
-        RenderedImage renderedImage =
-                graphImageService
-                        .createChart(ids, getOntologyType().name())
-                        .getGraphImage()
-                        .render();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(renderedImage, "png", os);
-        InputStream is = new ByteArrayInputStream(os.toByteArray());
-
-        return ResponseEntity
-                .ok()
-                .contentLength(os.size())
-                .contentType(MediaType.IMAGE_PNG)
-                .body(new InputStreamResource(is));
     }
 
     /**
@@ -476,6 +449,39 @@ public abstract class OBOController<T extends OBOTerm> {
 
         QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
+    }
+
+    private RetrievalException createChartGraphicsException(Throwable throwable) {
+        String errorMessage = "Error encountered during creation of ontology chart graphics.";
+        LOGGER.error(errorMessage, throwable);
+        return new RetrievalException(errorMessage);
+    }
+
+    /**
+     * Delegates the creation of an graphical image, corresponding to the specified list
+     * of {@code ids} and returns the appropriate {@link ResponseEntity}.
+     *
+     * @param ids the terms whose corresponding graphical image is required
+     * @return the image corresponding to the specified terms
+     * @throws IOException if there is an error during creation of the image {@link InputStreamResource}
+     * @throws RenderingGraphException if there was an error during the rendering of the image
+     */
+    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids)
+            throws IOException, RenderingGraphException {
+        RenderedImage renderedImage =
+                graphImageService
+                        .createChart(ids, getOntologyType().name())
+                        .getGraphImage()
+                        .render();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(renderedImage, "png", os);
+        InputStream is = new ByteArrayInputStream(os.toByteArray());
+
+        return ResponseEntity
+                .ok()
+                .contentLength(os.size())
+                .contentType(MediaType.IMAGE_PNG)
+                .body(new InputStreamResource(is));
     }
 
     private QueryRequest buildRequest(String query,
