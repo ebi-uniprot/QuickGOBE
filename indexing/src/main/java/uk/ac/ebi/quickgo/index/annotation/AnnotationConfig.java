@@ -61,6 +61,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.T
 public class AnnotationConfig {
     static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
     static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
+
     @Value("${indexing.annotation.source}")
     private Resource[] resources;
     @Value("${indexing.annotation.chunk.size:500}")
@@ -73,6 +74,7 @@ public class AnnotationConfig {
     private int skipLimit;
     @Value("${indexing.coterm.loginterval:1000}")
     private int coTermLogInterval;
+
     @Autowired
     private AnnotationRepository annotationRepository;
     @Autowired
