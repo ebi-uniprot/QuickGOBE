@@ -192,6 +192,16 @@ public class CoTerm {
         }
     }
 
+    @Override public String toString() {
+        return "CoTerm{" +
+                "target='" + target + '\'' +
+                ", comparedTerm='" + comparedTerm + '\'' +
+                ", together=" + together +
+                ", compared=" + compared +
+                ", similarityRatio=" + similarityRatio +
+                ", probabilityRatio=" + probabilityRatio +
+                '}';
+    }
 }
 
 
