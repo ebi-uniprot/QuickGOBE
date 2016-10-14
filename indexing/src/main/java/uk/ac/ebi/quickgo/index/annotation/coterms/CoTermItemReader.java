@@ -35,7 +35,7 @@ class CoTermItemReader implements ItemReader<String> {
     @Override public String read() throws Exception {
         //Delay providing full list until aggregator has fully processed all records.
         if (termsIt == null) {
-            termsIt = aggregator.getCoTerms().keySet().iterator();
+            termsIt = aggregator.getCoTermsIterator();
         }
 
         if (termsIt.hasNext()) {
