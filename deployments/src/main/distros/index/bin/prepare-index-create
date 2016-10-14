@@ -62,6 +62,8 @@ if [ -z "$SOLR_ADDRESS" ]; then
 fi
 
 # ------------------------ start off the indexing via LSF ------------------------
+# todo: --------------- loop over vms start
+# todo: add vm name to end
 release_dir="${SOLR_INDEX_DIR}/${CORE_NAME}/${requestedProfile}";
 
 if [ ! -d "$release_dir" ]; then
@@ -81,6 +83,8 @@ echo "executing fetch-libraries"
 
 echo "executing fetch-cores"
 ../fetch-cores "$release_dir";
+
+# todo: --------------- loop over vms end
 
 # check solr server statuses
 if allServersUpForCoreProfile "$CORE_NAME" "$requestedProfile"; then

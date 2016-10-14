@@ -125,20 +125,39 @@ function printServerStatus {
     prettyEcho "$tabCount" "Server @ $addr is $server_message";
 }
 
+function printServerStatusForCoreProfile {
+    local requestedCore="$1"
+    local requestedProfile="$2"
+
+    somethingWasPrinted=1
+    for core in $CORES; do
+        if [ "$core" = "$requestedCore" ]; then
+            profilesForCore "$core"
+            for profile in $CORE_PROFILES; do
+                if [ "$profile" = "$requestedProfile" ]; then
+                    vmsForProfile "$core" "$profile"
+                    for vm in $PROFILE_VMS; do
+                        printServerStatus "$vm"
+                        somethingWasPrinted=0
+                    done
+                fi
+            done
+        fi
+    done
+    return $somethingWasPrinted
+}
+
 function allServersUpForCoreProfile {
     local requestedCore="$1"
     local requestedProfile="$2"
 
     for core in $CORES; do
         if [ "$core" = "$requestedCore" ]; then
-            echo "checking $core"
             profilesForCore "$core"
             for profile in $CORE_PROFILES; do
                 if [ "$profile" = "$requestedProfile" ]; then
-                    echo "checking $profile"
                     vmsForProfile "$core" "$profile"
                     for vm in $PROFILE_VMS; do
-                            echo "checking $vm"
                         if ! serverIsUp "$vm"; then
                             return 1;
                         fi

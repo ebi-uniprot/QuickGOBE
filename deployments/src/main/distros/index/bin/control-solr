@@ -4,16 +4,17 @@
 ## stopping, and re-starting the indexing server.
 ## It should be run from the staging environment's build directory
 ##   Arguments:
-#       status [profile [vm]]   => shows a profile's machines/specific machine, and it is up or down
-##      start [profile [vm]]    => start a profile's machines/specific machine
-##      stop [profile [vm]]     => stop a profile's machines/specific machine
+#       status [profile] [vm]   => shows a profile's machines/specific machine, and it is up or down
+##      start [profile] [vm]    => start a profile's machines/specific machine
+##      stop [profile] [vm]     => stop a profile's machines/specific machine
 
-readonly VALID_USERS=("uni_qgo");
+readonly VALID_USERS=("uni_qgo" "eddturner");
 readonly PROFILE="$2"
 readonly VM_NAME="$3"
 
 # ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
-if ! source "common/common.variables"; then
+source "index.variables"
+if ! source "../common/common" || ! source "../common/common.variables" || ! source "index.variables"; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
@@ -21,7 +22,7 @@ fi
 ## ---------------------------- UTILITY FUNCTIONS ----------------------------
 function showHelp {
     cat<<EOF
-Usage: $0 [status|stop|start] [profile [vm]]
+Usage: $0 [status|stop|start] [profile] [vm]
 
 Argument description:
   status profile        => shows whether a profile\'s machines/specific machine is up or down
@@ -35,23 +36,38 @@ EOF
 }
 
 ## ---------------------------- CHECK ARGUMENTS ----------------------------
-if [ "$#" -ne 1 ]; then
+if [ "$#" -eq 0 ]; then
     showHelp;
     exit 1;
 fi
 
 ## ---------------------------- PRINT STATUS OF SOLR SERVER ----------------------------
 if [ "$1" == "status" ]; then
-    # show status of up / down, and data version
-    printDivider;
-    printSolrServerStatus;
-
-    echo "";
-    printReleaseBaseDirContents;
+    if [ $# -eq 2 ]; then
+        # show status of up / down, and data version
+        printDivider;
+        if printServerStatusForCoreProfile "$CORE_NAME" "$PROFILE"; then
+            echo "";
+            printReleaseBaseDirContents;
+        else
+            prettyEcho "No servers matched core <warn>$CORE_NAME</warn> and profile <warn>$PROFILE</warn>"
+            exit 1;
+        fi
+    else
+        prettyEcho "Viewing the <warn>status</warn> requires only the profile name as parameter, e.g., $0 status dev"
+        exit 1;
+    fi
 
 ## ---------------------------- STOP/START SERVER ----------------------------
 elif [ "$1" == "stop" ] || [ "$1" == "start" ]; then
     action="$1";
+
+    # todo: startup all or specified vms
+     # e.g·, for vm all vms
+     #          if $# = 3 && vm = requestedVM
+     #              startit
+     #          else
+     #              start vm
 
     if [ "$(serverIsUp $solr_vm)" == "UP" ]; then
         if [ "$1" == "start" ]; then

@@ -40,6 +40,7 @@ echo "Fetched solr cores"
 chmod -R 774 "$core_dir"
 
 #update core link in $SOLR_CONFIG_DIR directory
+# todo: add profile and vm name to symlink variable
 symlink=${SOLR_CONFIG_DIR}/cores/${CORE_NAME}
 ln -snf "$core_dir" "$symlink"
 
