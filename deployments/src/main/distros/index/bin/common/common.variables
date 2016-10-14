@@ -118,33 +118,33 @@ function prettyEcho {
 }
 
 # determines if a given server is up or down
-function serverIsUp {
-    local port="$http_solr_port";
-    local path="";
-    if [ $# -ge 2 ]; then
-        port="$2";
-        if [ $# -eq 3 ]; then
-            path="/$3";
-        fi
-    fi
-
-    if curl --output /dev/null --silent --head --fail "http://$1:$port$path"; then
-        echo "UP";
-    else
-        echo "DOWN";
-    fi
-}
-
-function solrServerStatus {
-    local server="$solr_vm"; # by default show the environment's tomcat's solr status
-    if [ "$#" -eq 1 ]; then
-        server="$1";
-    fi
-
-    solr_addr="http://$server:$http_solr_port/$http_solr_path";
-
-    echo "$(serverIsUp $server $http_solr_port $http_solr_path)";
-}
+#function serverIsUp {
+#    local port="$http_solr_port";
+#    local path="";
+#    if [ $# -ge 2 ]; then
+#        port="$2";
+#        if [ $# -eq 3 ]; then
+#            path="/$3";
+#        fi
+#    fi
+#
+#    if curl --output /dev/null --silent --head --fail "http://$1:$port$path"; then
+#        echo "UP";
+#    else
+#        echo "DOWN";
+#    fi
+#}
+#
+#function solrServerStatus {
+#    local server="$solr_vm"; # by default show the environment's tomcat's solr status
+#    if [ "$#" -eq 1 ]; then
+#        server="$1";
+#    fi
+#
+#    solr_addr="http://$server:$http_solr_port/$http_solr_path";
+#
+#    echo "$(serverIsUp $server $http_solr_port $http_solr_path)";
+#}
 
 function printSolrServerStatus {
     server_status="$(solrServerStatus)"

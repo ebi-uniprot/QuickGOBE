@@ -104,6 +104,9 @@ function isValidProfileId {
 }
 
 ## ------------------------- SERVER LIVENESS CHECKING -------------------------
+function serverIsUp {
+    return $(curl --output /dev/null --silent --head --fail "http://$1");
+}
 function printServerStatus {
     if [ $# -eq 2 ]; then
         tabCount="$1"
@@ -113,11 +116,36 @@ function printServerStatus {
         addr="$1"
     fi
     local server_message="<warn>UNKNOWN</warn>"
-    if curl --output /dev/null --silent --head --fail "http://$addr"; then
+    if serverIsUp "$addr"; then
         server_message="<success>UP</success>";
     else
         server_message="<error>DOWN</error>";
     fi
 
     prettyEcho "$tabCount" "Server @ $addr is $server_message";
+}
+
+function allServersUpForCoreProfile {
+    local requestedCore="$1"
+    local requestedProfile="$2"
+
+    for core in $CORES; do
+        if [ "$core" = "$requestedCore" ]; then
+            echo "checking $core"
+            profilesForCore "$core"
+            for profile in $CORE_PROFILES; do
+                if [ "$profile" = "$requestedProfile" ]; then
+                    echo "checking $profile"
+                    vmsForProfile "$core" "$profile"
+                    for vm in $PROFILE_VMS; do
+                            echo "checking $vm"
+                        if ! serverIsUp "$vm"; then
+                            return 1;
+                        fi
+                    done
+                fi
+            done
+        fi
+    done
+    return 0;
 }
