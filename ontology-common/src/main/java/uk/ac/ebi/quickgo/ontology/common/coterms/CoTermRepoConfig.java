@@ -1,8 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.coterms;
-
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermLoader;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepositorySimpleMap;
+package uk.ac.ebi.quickgo.ontology.common.coterms;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -24,19 +20,11 @@ public class CoTermRepoConfig {
     @Value("${coterm.file.all}")
     private Resource allResource;
 
-    @Value("${coterm.default.limit:50}")
-    private int defaultLimit;
-
     @Bean
     public CoTermRepository coTermRepository(){
         CoTermLoader coTermLoader = new CoTermLoader(manualResource, allResource);
         coTermLoader.load();
         return new CoTermRepositorySimpleMap(coTermLoader.coTermsAll, coTermLoader.coTermsManual);
-    }
-
-    @Bean
-    public CoTermLimit coTermLimit(){
-        return new CoTermLimit(defaultLimit);
     }
 
 

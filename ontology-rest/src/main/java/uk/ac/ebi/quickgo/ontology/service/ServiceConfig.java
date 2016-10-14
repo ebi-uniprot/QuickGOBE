@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageServiceImpl;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.coterms.CoTermRepoConfig;
+import uk.ac.ebi.quickgo.ontology.coterms.CoTermConfig;
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.ontology.service, uk.ac.ebi.quickgo.graphics.service"})
-@Import({OntologyRepoConfig.class, OntologyGraphConfig.class, CoTermRepoConfig.class})
+@Import({OntologyRepoConfig.class, OntologyGraphConfig.class, CoTermConfig.class})
 public class ServiceConfig {
     @Value("${graphics.ontology.source}")
     private String sourceFile;
