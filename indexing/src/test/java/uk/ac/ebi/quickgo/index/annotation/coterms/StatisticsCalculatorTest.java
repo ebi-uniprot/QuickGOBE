@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermMocker.*;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsAggregatorMocker.createCoOccurringTermValues;
 
 /**
  *
@@ -35,8 +36,10 @@ public class StatisticsCalculatorTest {
     @Test
     public void calculateStatisticsSingleGoTermComparedWithItself() {
         long geneProductCount = 2L;
+        int noOfCoHits = 2;
 
-        when(aggregator.getCoTermsAndCounts(GO_TERM)).thenReturn(singleCoTermMapping());
+        when(aggregator.getCoTermsAndCounts(GO_TERM)).thenReturn(createCoOccurringTermValues(Collections
+                .singletonList(GO_TERM), noOfCoHits));
         when(aggregator.getGeneProductCountForGoTerm(GO_TERM)).thenReturn(geneProductCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
@@ -55,7 +58,6 @@ public class StatisticsCalculatorTest {
     @Test
     public void goTermHasCo_occurrenceWithOneOtherTerm() {
         int noOfCoHits = 1;
-        //int hitsPerTerm = 2;
 
         long geneProductCount = 10L;
         final String selected = "GO:0000001";
@@ -63,7 +65,7 @@ public class StatisticsCalculatorTest {
         final List<String> selectedList = Collections.singletonList(selected);
         final List<String> comparedList = Collections.singletonList(compared);
 
-        when(aggregator.getCoTermsAndCounts("GO:0000001")).thenReturn(getCoTerms(comparedList, noOfCoHits));
+        when(aggregator.getCoTermsAndCounts("GO:0000001")).thenReturn(createCoOccurringTermValues(comparedList, noOfCoHits));
         when(aggregator.getGeneProductCountForGoTerm(selectedList.get(0))).thenReturn(2L);
         when(aggregator.getGeneProductCountForGoTerm(comparedList.get(0))).thenReturn(2L);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
@@ -90,7 +92,7 @@ public class StatisticsCalculatorTest {
         final List<String> selectedList = makeTermList(selected, ID_FORMAT_1);
         final List<String> comparedList = makeTermList(compared, ID_FORMAT_2);
 
-        when(aggregator.getCoTermsAndCounts(selectedList.get(0))).thenReturn(getCoTerms(comparedList, noOfCoHits));
+        when(aggregator.getCoTermsAndCounts(selectedList.get(0))).thenReturn(createCoOccurringTermValues(comparedList, noOfCoHits));
         when(aggregator.getGeneProductCountForGoTerm(selectedList.get(0))).thenReturn(2L);
         when(aggregator.getGeneProductCountForGoTerm(comparedList.get(0))).thenReturn(2L);
         when(aggregator.getGeneProductCountForGoTerm(comparedList.get(1))).thenReturn(2L);
