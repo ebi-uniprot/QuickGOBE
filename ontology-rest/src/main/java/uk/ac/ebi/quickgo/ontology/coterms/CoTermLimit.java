@@ -11,20 +11,20 @@ package uk.ac.ebi.quickgo.ontology.coterms;
  */
 public class CoTermLimit {
 
-    int defaultLimit;
+    private final int defaultLimit;
 
     /**
      *
      * @param defaultLimit The limit to use under some circumstances.
      */
-    public CoTermLimit(int defaultLimit) {
+    CoTermLimit(int defaultLimit) {
         this.defaultLimit = defaultLimit;
     }
 
     /**
      * Determine the limit value to use for retrieving co-occurring terms.
      * @param limit value to be checked.
-     * @return
+     * @return maximum number of co-occurring terms to returned to the caller.
      */
     public int workoutLimit(String limit) {
         int limitNumeric;
@@ -47,7 +47,7 @@ public class CoTermLimit {
     /**
      * Now that other values for limit have been attempted, treat the argument as a numeric and deal with any
      * problems that occur if it is not.
-     * @param limit
+     * @param limit requested limit value - could represent a numeric or constant identifier.
      * @return a limit value.
      */
     private int processLimitAsANumeric(String limit) {
