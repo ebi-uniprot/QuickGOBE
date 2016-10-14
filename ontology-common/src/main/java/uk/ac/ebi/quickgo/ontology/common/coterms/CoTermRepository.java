@@ -15,7 +15,7 @@ public interface CoTermRepository {
 
     /**
      * For a single GO Term, retrieve a list of co-occurring terms and related statistics, in order of the
-     * co-occurring terms similarity probablity (descending).
+     * co-occurring terms similarity probability (descending).
      * @param id is the target GO term, for which the method will retrieve co-occurring terms (GO terms that are used
      * to annotation the same gene products as this GO Term is used to annotate).
      * @param source is the method from which the annotation that uses the GO term was generated.
