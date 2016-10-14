@@ -70,7 +70,7 @@ public class CoTermLoader {
      * @param coTerms target map
      * @return map with file contents
      */
-    private Map<String, List<CoTerm>> loadCoTermsFile(File inputFile, Map<String, List<CoTerm>> coTerms){
+    private void loadCoTermsFile(File inputFile, Map<String, List<CoTerm>> coTerms){
         List<CoTerm> comparedTerms = new ArrayList<>();
         String line;
         String currentTerm = null;
@@ -114,12 +114,9 @@ public class CoTermLoader {
             logger.info("Loaded " + lineCount + " lines from " + inputFile.getName());
             logger.info("Number of GO Terms loaded is " + coTerms.keySet().size());
 
-
-
         } catch (IOException e ) {
             throw new RuntimeException(e);
         }
-        return coTerms;
     }
 
     /**
