@@ -53,7 +53,7 @@ public class StatisticsCalculator implements ItemProcessor<String, List<CoTerm>>
                 .checkArgument(null != goTerm, "Target GO term id passed to createCoTermsForSelectedTerm should not " +
                         "be null");
 
-        Map<String, AtomicLong> coTermsForTarget = aggregator.getCoTerms().get(goTerm);
+        Map<String, AtomicLong> coTermsForTarget = aggregator.getCoTerms(goTerm);
         CoTermsForSelectedTerm.Builder coTermsBuilder = new CoTermsForSelectedTerm.Builder()
                 .setTotalNumberOfGeneProducts(aggregator.getTotalOfAnnotatedGeneProducts())
                 .setSelected(aggregator.getGeneProductCountForGoTerm(goTerm));
