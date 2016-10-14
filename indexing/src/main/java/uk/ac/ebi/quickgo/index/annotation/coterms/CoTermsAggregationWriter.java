@@ -46,6 +46,16 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
     }
 
     /**
+     * Provide an iteration of the all GO Terms with a co-occurrence (which will be all GO Terms annotated, since at
+     * the very least a term is said to coincide with itself).
+     * @return
+     */
+    public Iterator<String> getCoTermsIterator() {
+        return this.coTerms.coTermMatrix.keySet().iterator();
+
+    }
+
+    /**
      * We hold a count of the number of unique gene products encountered during processing, for each term.
      * @param goTerm
      * @return count of the number of unique gene products encountered during processing for the request term.
@@ -62,15 +72,13 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
         return geneProductList.size();
     }
 
-
     /**
-     * Holds a termN by termN matrix, each cell of which holds the count of gp this intersection of terms hold
-     *
-     * @return map of processed terms to all co-occurring terms, together with count of how many times they have
-     * co-occurred.
+     * Get a map of all co-occurring terms to co-occurrence count for the target termId.
+     * @param termId the termId for which the caller should receive all the co-occurring terms plus co-occurrence count.
+     * @return map of co-occurring terms to co-occurrence count.
      */
-    Map<String, Map<String, AtomicLong>> getCoTerms() {
-        return coTerms.coTermMatrix;
+    Map<String, AtomicLong> getCoTerms(String termId){
+        return coTerms.coTermMatrix.get(termId);
     }
 
     /**
