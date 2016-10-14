@@ -64,7 +64,7 @@ public class StatisticsCalculatorTest {
         final List<String> selectedList = Collections.singletonList(selected);
         final List<String> comparedList = Collections.singletonList(compared);
 
-        when(aggregator.getCoTerms("GO:0000001")).thenReturn(getCoTerms(compared, noOfCoHits));
+        when(aggregator.getCoTerms("GO:0000001")).thenReturn(getCoTerms(comparedList, noOfCoHits));
         when(aggregator.getGeneProductCountForGoTerm(selectedList.get(0))).thenReturn(2L);
         when(aggregator.getGeneProductCountForGoTerm(comparedList.get(0))).thenReturn(2L);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
