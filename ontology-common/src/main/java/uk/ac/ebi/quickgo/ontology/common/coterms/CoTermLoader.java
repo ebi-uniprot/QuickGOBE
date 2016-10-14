@@ -50,7 +50,7 @@ public class CoTermLoader {
     /**
      * Read the files, load data into memory.
      */
-    public void load(){
+    public void load() {
         logger.info("Loading Co terms from file");
 
         try {
@@ -70,11 +70,11 @@ public class CoTermLoader {
      * @param coTerms target map
      * @return map with file contents
      */
-    private void loadCoTermsFile(File inputFile, Map<String, List<CoTerm>> coTerms){
+    private void loadCoTermsFile(File inputFile, Map<String, List<CoTerm>> coTerms) {
         List<CoTerm> comparedTerms = new ArrayList<>();
         String line;
         String currentTerm = null;
-        long lineCount=0;
+        long lineCount = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
 
@@ -84,19 +84,19 @@ public class CoTermLoader {
                 lineCount++;
 
                 //Ignore any line that doesn't start with a GO id.
-                if(!line.startsWith("GO")){
+                if (!line.startsWith("GO")) {
                     continue;
                 }
 
                 CoTerm CoTerm = fromFile(line);
 
                 //one time initialisation
-                if(currentTerm==null){
+                if (currentTerm == null) {
                     currentTerm = CoTerm.getId();
                 }
 
                 //Have we arrived at a new source term?
-                if(!CoTerm.getId().equals(currentTerm)) {
+                if (!CoTerm.getId().equals(currentTerm)) {
                     coTerms.put(currentTerm, comparedTerms);
 
                     //Reset
@@ -105,16 +105,14 @@ public class CoTermLoader {
                 }
 
                 comparedTerms.add(CoTerm);
-
             }
-
 
             //save last term
             coTerms.put(currentTerm, comparedTerms);
             logger.info("Loaded " + lineCount + " lines from " + inputFile.getName());
             logger.info("Number of GO Terms loaded is " + coTerms.keySet().size());
 
-        } catch (IOException e ) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -130,14 +128,12 @@ public class CoTermLoader {
     private static final int COLUMN_TOGETHER = 4;
     private static final int COLUMN_COMPARED = 5;
 
-
     private static CoTerm fromFile(String line) {
         String[] columns = line.split("\\t");
         return new CoTerm(columns[COLUMN_ID], columns[COLUMN_COMPARE],
                 Float.parseFloat(columns[COLUMN_PROB]), Float.parseFloat(columns[COLUMN_SIG]),
                 Long.parseLong(columns[COLUMN_TOGETHER]), Long.parseLong(columns[COLUMN_COMPARED]));
     }
-
 
 }
 

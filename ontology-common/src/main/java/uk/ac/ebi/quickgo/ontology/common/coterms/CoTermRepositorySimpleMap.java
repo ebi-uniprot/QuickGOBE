@@ -37,9 +37,9 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      */
     public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate<CoTerm> filter) {
 
-        Preconditions.checkArgument(id!=null, "The findCoTerms id should not be null, but is");
-        Preconditions.checkArgument(source!=null, "The findCoTerms source should not be null, but is");
-        Preconditions.checkArgument(filter!=null, "The findCoTerms filter should not be null, but is");
+        Preconditions.checkArgument(id != null, "The findCoTerms id should not be null, but is");
+        Preconditions.checkArgument(source != null, "The findCoTerms source should not be null, but is");
+        Preconditions.checkArgument(filter != null, "The findCoTerms filter should not be null, but is");
         return source == CoTermSource.MANUAL ? findCoTermsFromMap(coTermsManual, id, limit, filter)
                 : findCoTermsFromMap(coTermsAll, id, limit, filter);
     }
