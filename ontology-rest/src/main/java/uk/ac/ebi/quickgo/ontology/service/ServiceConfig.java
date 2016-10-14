@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.ontology.service;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.coterms.CoTermRepoConfig;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermRepository;
+import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;

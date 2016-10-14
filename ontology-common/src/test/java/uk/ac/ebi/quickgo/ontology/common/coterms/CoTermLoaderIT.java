@@ -1,10 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTerm;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermLoader;
-
-import java.util.Iterator;
-import java.util.Set;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;

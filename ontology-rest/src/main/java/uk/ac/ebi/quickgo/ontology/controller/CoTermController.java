@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTerm;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermSource;
+import uk.ac.ebi.quickgo.ontology.common.coterms.CoTerm;
+import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
 import uk.ac.ebi.quickgo.ontology.coterms.CoTermLimit;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;

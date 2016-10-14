@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTerm;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermSource;
+import uk.ac.ebi.quickgo.ontology.common.coterms.CoTerm;
+import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
+import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermSource;
+import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
 
 import java.util.Arrays;
 import java.util.List;

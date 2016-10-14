@@ -1,9 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTerm;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermRepositorySimpleMap;
-import uk.ac.ebi.quickgo.ontology.common.coterm.CoTermSource;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
