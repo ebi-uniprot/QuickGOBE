@@ -287,11 +287,15 @@ class TermGPCount {
      * For every term, increment by one the count of gene products for this term
      */
     void incrementGeneProductCountForTerm(String term) {
-        AtomicLong count = id2Count.get(term);
-        if (count == null) {
-            count = new AtomicLong();
-            id2Count.put(term, count);
+        if(id2Count.putIfAbsent(term, new AtomicLong(1L)) != null) {
+            id2Count.get(term).incrementAndGet();
         }
-        count.incrementAndGet();
+
+//        Alternatives to the above code for the distracted.
+//        Object v = id2Count.putIfAbsent(term, new AtomicLong(1L)) == null ? null : id2Count.get(term).incrementAndGet();
+//
+//        Object x = id2Count.get(term) == null ? id2Count.put(term, new AtomicLong(1L)) :
+//                id2Count.get(term).incrementAndGet();
+
     }
 }
