@@ -34,14 +34,14 @@ import org.springframework.core.io.Resource;
 @Configuration
 public class CoTermsConfig {
 
-    public static final String ELECTRONIC = "IEA";
-    public static final Predicate<AnnotationDocument>
+    private static final String ELECTRONIC = "IEA";
+    private static final Predicate<AnnotationDocument>
             EXCLUDE_ANNOTATIONS_PRODUCED_BY_ELECTRONIC_MEANS = annotationDocument -> !ELECTRONIC.equals(annotationDocument.goEvidence);
-    public static final Predicate<AnnotationDocument> INCLUDE_ALL_ANNOTATIONS = annotationDocument -> true;
+    private static final Predicate<AnnotationDocument> INCLUDE_ALL_ANNOTATIONS = annotationDocument -> true;
     private final Logger LOGGER = LoggerFactory.getLogger(CoTermsConfig.class);
 
-    public static final String COTERM_MANUAL_COMPLETION_STEP_NAME = "coTermManualSummarizationStep";
-    public static final String COTERM_ALL_COMPLETION_STEP_NAME = "cosTermAllSummarizationStep";
+    public static final String CO_TERM_MANUAL_SUMMARIZATION_STEP = "coTermManualSummarizationStep";
+    public static final String CO_TERM_ALL_SUMMARIZATION_STEP = "coTermAllSummarizationStep";
     private static final String[] FF_COL_NAMES = {"target", "comparedTerm", "probabilityRatio", "similarityRatio",
             "together", "compared"};
     private static final String DELIMITER = "\t";
@@ -82,14 +82,14 @@ public class CoTermsConfig {
     }
 
     @Bean
-    public StatisticsCalculator coTermsManualCalculator(CoTermsAggregationWriter coTermsManualAggregationWriter) {
-        return new StatisticsCalculator(coTermsManualAggregationWriter);
+    public CoTermsProcessor coTermsManualCalculator(CoTermsAggregationWriter coTermsManualAggregationWriter) {
+        return new CoTermsProcessor(coTermsManualAggregationWriter);
     }
 
     @Bean
-    public StatisticsCalculator coTermsAllCalculator(
+    public CoTermsProcessor coTermsAllCalculator(
             CoTermsAggregationWriter coTermsAllAggregationWriter) {
-        return new StatisticsCalculator(coTermsAllAggregationWriter);
+        return new CoTermsProcessor(coTermsAllAggregationWriter);
     }
 
     @Bean
