@@ -21,15 +21,15 @@ import org.springframework.core.io.Resource;
  * Time: 13:55
  * Created with IntelliJ IDEA.
  */
-public class CoTermLoader {
+class CoTermLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(CoTermLoader.class);
 
     private final Resource manualCoTermsFile;
     private final Resource allCoTermsFile;
 
-    public Map<String, List<CoTerm>> coTermsAll;
-    public Map<String, List<CoTerm>> coTermsManual;
+    Map<String, List<CoTerm>> coTermsAll;
+    Map<String, List<CoTerm>> coTermsManual;
 
     /**
      *
@@ -38,7 +38,7 @@ public class CoTermLoader {
      * @param allCoTermsFile location and file name of co-occurring terms for Terms used in annotations derived
      * from all sources.
      */
-    public CoTermLoader(Resource manualCoTermsFile, Resource allCoTermsFile) {
+    CoTermLoader(Resource manualCoTermsFile, Resource allCoTermsFile) {
         Preconditions.checkArgument(manualCoTermsFile != null, "Resource manualCoTermsFile should not be null, but " +
                 "was");
         Preconditions.checkArgument(allCoTermsFile != null, "Resource allCoTermsFile should not be null, but " +
@@ -68,7 +68,6 @@ public class CoTermLoader {
      * Load file contents into memory
      * @param inputFile source file
      * @param coTerms target map
-     * @return map with file contents
      */
     private void loadCoTermsFile(File inputFile, Map<String, List<CoTerm>> coTerms) {
         List<CoTerm> comparedTerms = new ArrayList<>();
