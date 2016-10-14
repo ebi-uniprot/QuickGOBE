@@ -23,6 +23,11 @@ public class CoTermMocker {
         return matrix;
     }
 
+    static Map<String, AtomicLong> singleCoTermMapping() {
+        List<String> comparedList = Collections.singletonList(EXAMPLE_GO_TERM1);
+        return createCoOccurringTermValues(comparedList, 2);
+    }
+
     /**
      * @param comparedList a list of real or imagined GO Terms.
      * @param hits co-occurring count to be added to each member of the compared list.
@@ -52,6 +57,15 @@ public class CoTermMocker {
             matrix.put(selectedTerm, createCoOccurringTermValues(comparedList, hits));
         }
         return matrix;
+    }
+
+
+    static Map<String, AtomicLong> getCoTerms(List<String> comparedList, long count){
+        Map cooccurringMap  = new HashMap<String, AtomicLong>();
+        for (String comparedTerm: comparedList) {
+            cooccurringMap.put(comparedTerm, new AtomicLong(count));
+        }
+        return cooccurringMap;
     }
 
     /**
