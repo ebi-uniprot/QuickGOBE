@@ -17,17 +17,8 @@ if [ ! -d "$conf_release_dir" ]; then
     exit 1;
 fi
 
-# read common environment variables
-properties_not_found="false";
-
-source "../common/common.variables";
-source "index.variables";
-
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-if [ "$properties_not_found" = "true" ]; then
+# source required scripts
+if ! source "index.variables" || ! source "../common/common.variables" ; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi

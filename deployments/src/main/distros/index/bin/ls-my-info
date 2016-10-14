@@ -4,7 +4,7 @@
 
 VALID_USERS=("uni_qgo" "eddturner");
 
-# read common environment variables
+# source required scripts
 if ! source "common/common" || ! source "common/common.variables" ; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;

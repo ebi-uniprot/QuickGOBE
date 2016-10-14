@@ -14,15 +14,8 @@ else
    conf_release_dir=$1;
 fi
 
-# read common environment variables
-properties_not_found="false";
-
-source "../common/common.variables";
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-if [ "$properties_not_found" = "true" ]; then
+# source required scripts
+if ! source "../common/common.variables" ; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
@@ -38,7 +31,7 @@ fi
 
 cd "$QUICKGO_REPO_DIR"
 
-#fetch the indexing jar
+# fetch the indexing jar
 
 git fetch
 git checkout "$QUICKGO_BRANCH"
