@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -37,7 +36,7 @@ public class StatisticsCalculatorTest {
     public void calculateStatisticsSingleGoTermComparedWithItself() {
         long geneProductCount = 2L;
 
-        when(aggregator.getCoTerms(GO_TERM)).thenReturn(singleCoTermMapping());
+        when(aggregator.getCoTermsAndCounts(GO_TERM)).thenReturn(singleCoTermMapping());
         when(aggregator.getGeneProductCountForGoTerm(GO_TERM)).thenReturn(geneProductCount);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
 
@@ -64,7 +63,7 @@ public class StatisticsCalculatorTest {
         final List<String> selectedList = Collections.singletonList(selected);
         final List<String> comparedList = Collections.singletonList(compared);
 
-        when(aggregator.getCoTerms("GO:0000001")).thenReturn(getCoTerms(comparedList, noOfCoHits));
+        when(aggregator.getCoTermsAndCounts("GO:0000001")).thenReturn(getCoTerms(comparedList, noOfCoHits));
         when(aggregator.getGeneProductCountForGoTerm(selectedList.get(0))).thenReturn(2L);
         when(aggregator.getGeneProductCountForGoTerm(comparedList.get(0))).thenReturn(2L);
         when(aggregator.getTotalOfAnnotatedGeneProducts()).thenReturn(geneProductCount);
@@ -91,7 +90,7 @@ public class StatisticsCalculatorTest {
         final List<String> selectedList = makeTermList(selected, ID_FORMAT_1);
         final List<String> comparedList = makeTermList(compared, ID_FORMAT_2);
 
-        when(aggregator.getCoTerms(selectedList.get(0))).thenReturn(getCoTerms(comparedList, noOfCoHits));
+        when(aggregator.getCoTermsAndCounts(selectedList.get(0))).thenReturn(getCoTerms(comparedList, noOfCoHits));
         when(aggregator.getGeneProductCountForGoTerm(selectedList.get(0))).thenReturn(2L);
         when(aggregator.getGeneProductCountForGoTerm(comparedList.get(0))).thenReturn(2L);
         when(aggregator.getGeneProductCountForGoTerm(comparedList.get(1))).thenReturn(2L);

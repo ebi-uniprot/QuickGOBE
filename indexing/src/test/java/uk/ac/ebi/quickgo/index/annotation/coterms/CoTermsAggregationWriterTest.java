@@ -38,7 +38,7 @@ public class CoTermsAggregationWriterTest {
         List<AnnotationDocument> docs = writeDocs(TWO_SAME_GENEPRODUCTS);
         completeAggregation(docs);
 
-        Map<String, AtomicLong> coTerms = aggregator.getCoTerms(AnnotationDocMocker.GO_ID);
+        Map<String, AtomicLong> coTerms = aggregator.getCoTermsAndCounts(AnnotationDocMocker.GO_ID);
         assertThat(coTerms, is(notNullValue()));
         assertThat(coTerms.keySet(), hasSize(1));
 
@@ -58,12 +58,12 @@ public class CoTermsAggregationWriterTest {
         docs.get(1).goId = REPLACEMENT_GOID;
         completeAggregation(docs);
 
-        Map<String, AtomicLong> coTerms1 = aggregator.getCoTerms(docs.get(0).goId);
+        Map<String, AtomicLong> coTerms1 = aggregator.getCoTermsAndCounts(docs.get(0).goId);
         assertThat(coTerms1.keySet(), hasSize(1));
         AtomicLong ac1 = coTerms1.get(docs.get(0).goId);
         assertThat(ac1.get(), is(1L));
 
-        Map<String, AtomicLong> coTerms2 = aggregator.getCoTerms(docs.get(1).goId);
+        Map<String, AtomicLong> coTerms2 = aggregator.getCoTermsAndCounts(docs.get(1).goId);
         assertThat(coTerms2.keySet(), hasSize(1));
         AtomicLong ac2 = coTerms2.get(docs.get(1).goId);
         assertThat(ac2.get(), is(1L));
@@ -79,14 +79,14 @@ public class CoTermsAggregationWriterTest {
         docs.get(1).goId = REPLACEMENT_GOID;
         completeAggregation(docs);
 
-        Map<String, AtomicLong> coTerms1 =aggregator.getCoTerms(docs.get(0).goId);
+        Map<String, AtomicLong> coTerms1 =aggregator.getCoTermsAndCounts(docs.get(0).goId);
         assertThat(coTerms1.keySet(), hasSize(2));
         AtomicLong ac1x1 = coTerms1.get(docs.get(0).goId);
         assertThat(ac1x1.get(), is(1L));
         AtomicLong ac1x2 = coTerms1.get(docs.get(1).goId);
         assertThat(ac1x2.get(), is(1L));
 
-        Map<String, AtomicLong> coTerms2 = aggregator.getCoTerms(docs.get(1).goId);
+        Map<String, AtomicLong> coTerms2 = aggregator.getCoTermsAndCounts(docs.get(1).goId);
         assertThat(coTerms2.keySet(), hasSize(2));
         AtomicLong ac2x1 = coTerms2.get(docs.get(1).goId);
         assertThat(ac2x1.get(), is(1L));

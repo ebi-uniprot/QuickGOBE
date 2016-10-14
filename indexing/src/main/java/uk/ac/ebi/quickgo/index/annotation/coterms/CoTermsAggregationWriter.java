@@ -77,7 +77,7 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
      * @param termId the termId for which the caller should receive all the co-occurring terms plus co-occurrence count.
      * @return map of co-occurring terms to co-occurrence count.
      */
-    Map<String, AtomicLong> getCoTerms(String termId){
+    Map<String, AtomicLong> getCoTermsAndCounts(String termId){
         return coTerms.coTermMatrix.get(termId);
     }
 
