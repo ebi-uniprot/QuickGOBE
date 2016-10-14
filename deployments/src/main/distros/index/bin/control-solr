@@ -8,21 +8,15 @@
 ##      start [profile [vm]]    => start a profile's machines/specific machine
 ##      stop [profile [vm]]     => stop a profile's machines/specific machine
 
-VALID_USERS=("uni_qgo");
+readonly VALID_USERS=("uni_qgo");
+readonly PROFILE="$2"
+readonly VM_NAME="$3"
 
 # ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
-properties_not_found="false";
-source "common/common.variables";
-
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-if [ "$properties_not_found" = "true" ]; then
+if ! source "common/common.variables"; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
-
 
 ## ---------------------------- UTILITY FUNCTIONS ----------------------------
 function showHelp {
@@ -30,9 +24,9 @@ function showHelp {
 Usage: $0 [status|stop|start] [profile [vm]]
 
 Argument description:
-  status [profile [vm]]   => shows whether a profile\'s machines/specific machine is up or down
-  start [profile [vm]]    => start a profile\'s machines/specific machine
-  stop [profile [vm]]     => stop a profile\'s machines/specific machine
+  status profile        => shows whether a profile\'s machines/specific machine is up or down
+  start profile [vm]    => start a profile\'s machines/specific machine
+  stop profile [vm]     => stop a profile\'s machines/specific machine
 
   Example: $0 stop dev ves-hx-c2 -- causes the development solr instance on ves-hx-c2 to be stopped
 
