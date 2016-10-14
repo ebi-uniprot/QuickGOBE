@@ -48,19 +48,19 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
     /**
      * Provide an iteration of the all GO Terms with a co-occurrence (which will be all GO Terms annotated, since at
      * the very least a term is said to coincide with itself).
-     * @return
+     * @return an iterator over all the GO Terms that have co-occurring terms.
      */
-    public Iterator<String> getCoTermsIterator() {
+    Iterator<String> getCoTermsIterator() {
         return this.coTerms.coTermMatrix.keySet().iterator();
 
     }
 
     /**
      * We hold a count of the number of unique gene products encountered during processing, for each term.
-     * @param goTerm
+     * @param goTerm GO Term account for which we want the gene product count.
      * @return count of the number of unique gene products encountered during processing for the request term.
      */
-    long getGeneProductCountForGoTerm(String goTerm) {
+    private long getGeneProductCountForGoTerm(String goTerm) {
         return geneProductCountForTerms.id2Count.get(goTerm).get();
     }
 
@@ -68,7 +68,7 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
      * Number of unique gene products processed from Annotations
      * @return unique gene product count
      */
-    long getTotalOfAnnotatedGeneProducts() {
+    private long getTotalOfAnnotatedGeneProducts() {
         return geneProductList.size();
     }
 
@@ -77,7 +77,7 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
      * @param termId the termId for which the caller should receive all the co-occurring terms plus co-occurrence count.
      * @return map of co-occurring terms to co-occurrence count.
      */
-    Map<String, AtomicLong> getCoTermsAndCounts(String termId){
+    private Map<String, AtomicLong> getCoTermsAndCounts(String termId){
         return coTerms.coTermMatrix.get(termId);
     }
 
@@ -105,6 +105,35 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
         increaseCountsForTermsInBatch();
     }
 
+
+
+    /**
+     * Create a CoTermsForSelectedTerm instance for each compared term.
+     * @param goTerm The GO Term for which the co-occurrence statistics will be calculated.
+     * @return CoTermsForSelectedTerm instance with co-occurring statistics calculated for every
+     * co-occurring term.
+     */
+    CoTermsForSelectedTerm createCoTermsForSelectedTerm(String goTerm) {
+
+        Preconditions
+                .checkArgument(null != goTerm, "Target GO term id passed to createCoTermsForSelectedTerm should not " +
+                        "be null");
+
+        CoTermsForSelectedTerm.Builder coTermsBuilder = new CoTermsForSelectedTerm.Builder()
+                .setTotalNumberOfGeneProducts(this.getTotalOfAnnotatedGeneProducts())
+                .setSelected(this.getGeneProductCountForGoTerm(goTerm));
+
+        for (String comparedTerm : this.getCoTermsAndCounts(goTerm).keySet()) {
+            coTermsBuilder.addCoTerm(new CoTerm.Builder()
+                    .setTarget(goTerm)
+                    .setComparedTerm(comparedTerm)
+                    .setCompared(this.getGeneProductCountForGoTerm(comparedTerm))
+                    .setTogether(this.getCoTermsAndCounts(goTerm).get(comparedTerm).get()).createCoTerm());
+        }
+        return coTermsBuilder.build();
+    }
+
+
     /**
      * Add the data in an AnnotationDocument instance to the aggregation.
      * The documents are processed by this class in the gene product order.
@@ -112,10 +141,10 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
      * If it doesn't we use the existing aggregation object (newOrExistingBatch instance) to aggregate too.
      * If it is a new gene product the we have a new newOrExistingBatch instance created.
      * Add the data in this document to the target newOrExistingBatch.
-     * Add the gene product id to the list of geneproduct ids that have been processed (we need a list of all gene
+     * Add the gene product id to the list of gene product ids that have been processed (we need a list of all gene
      * products processed for the statistics calculations at the end of the calculation.
      *
-     * @param doc
+     * @param doc an AnnotationDocument instance to be added to aggregation.
      */
     private void addGOTermToAggregationForGeneProduct(AnnotationDocument doc) {
         if (geneProductBatch.geneProduct == null) {
@@ -162,8 +191,9 @@ class GeneProductBatch {
 
     /**
      * Create a new GeneProductBatch to aggregate terms for the 'new' gene product id.
-     * @param doc
-     * @return
+     * @param doc an AnnotationDocument instance to be added to aggregation.
+     * @return an instance of GeneProductBatch which will be used to aggregate co-occurring terms annotating the same
+     * gene product.
      */
     static GeneProductBatch buildBatch(AnnotationDocument doc) {
         GeneProductBatch geneProductBatch = new GeneProductBatch();
@@ -174,7 +204,7 @@ class GeneProductBatch {
 
     /**
      * Add this term id to this list of term ids encountered for the gene product that is currently being read.
-     * @param termId
+     * @param termId GO Term processed.
      */
     void addTerm(String termId) {
         terms.add(termId);
