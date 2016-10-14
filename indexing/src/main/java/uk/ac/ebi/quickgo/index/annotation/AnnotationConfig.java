@@ -96,8 +96,6 @@ public class AnnotationConfig {
     private ItemWriter<List<CoTerm>> coTermsManualStatsWriter;
     @Autowired
     private ItemWriter<List<CoTerm>> coTermsAllStatsWriter;
-    @Autowired
-    private StepExecutionListener coTermsStepExecutionListener;
 
     @Bean
     public Job annotationJob() {
@@ -128,7 +126,7 @@ public class AnnotationConfig {
                 .processor(annotationCompositeProcessor())
                 .<AnnotationDocument>writer(compositeAnnotationWriter())
                 .listener(logWriteRateListener())
-                .listener(compositeStepExecutionListener())
+                .listener(logStepListener())
                 .listener(skipLogListener())
                 .build();
     }
@@ -200,7 +198,6 @@ public class AnnotationConfig {
         DefaultLineMapper<Annotation> lineMapper = new DefaultLineMapper<>();
         lineMapper.setLineTokenizer(annotationLineTokenizer());
         lineMapper.setFieldSetMapper(annotationFieldSetMapper());
-
         return lineMapper;
     }
 
@@ -234,7 +231,6 @@ public class AnnotationConfig {
 
         CompositeItemProcessor<Annotation, AnnotationDocument> compositeProcessor = new CompositeItemProcessor<>();
         compositeProcessor.setDelegates(processors);
-
         return compositeProcessor;
     }
 
@@ -242,7 +238,6 @@ public class AnnotationConfig {
     ItemWriter<AnnotationDocument> annotationSolrServerWriter() {
         return new SolrServerWriter<>(annotationTemplate.getSolrClient());
     }
-
 
     @Bean
     ItemWriter<AnnotationDocument> compositeAnnotationWriter() {
@@ -253,14 +248,5 @@ public class AnnotationConfig {
         writerList.add(coTermsAllAggregationWriter);
         compositeItemWriter.setDelegates(writerList);
         return compositeItemWriter;
-    }
-
-
-    private StepExecutionListener compositeStepExecutionListener() {
-        CompositeStepExecutionListener compositeStepExecutionListener = new CompositeStepExecutionListener();
-        StepExecutionListener[] listeners = new StepExecutionListener[] { coTermsStepExecutionListener,
-                logStepListener()};
-        compositeStepExecutionListener.setListeners(listeners);
-        return compositeStepExecutionListener;
     }
 }

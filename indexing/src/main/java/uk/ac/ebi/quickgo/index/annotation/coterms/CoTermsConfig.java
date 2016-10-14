@@ -73,15 +73,6 @@ public class CoTermsConfig {
     }
 
     @Bean
-    public StepExecutionListener coTermsEndOfAggregationListener(
-            CoTermsAggregationWriter coTermsManualAggregationWriter,
-            CoTermsAggregationWriter coTermsAllAggregationWriter) {
-        return new CoTermsStepExecutionListener(coTermsManualAggregationWriter,
-                coTermsAllAggregationWriter);
-
-    }
-
-    @Bean
     public CoTermsProcessor coTermsManualCalculator(CoTermsAggregationWriter coTermsManualAggregationWriter) {
         return new CoTermsProcessor(coTermsManualAggregationWriter);
     }
