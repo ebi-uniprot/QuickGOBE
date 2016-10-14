@@ -11,12 +11,12 @@ package uk.ac.ebi.quickgo.ontology.common.coterms;
  */
 public class CoTerm {
 
-    private String id;
-    private String compare;
-    private float probabilityRatio;
-    private float significance;
-    private long together;
-    private long compared;
+    private final String id;
+    private final String compare;
+    private final float probabilityRatio;
+    private final float significance;
+    private final long together;
+    private final long compared;
 
     public CoTerm(String id, String compare, float probabilityRatio, float significance, long together,
             long compared) {
