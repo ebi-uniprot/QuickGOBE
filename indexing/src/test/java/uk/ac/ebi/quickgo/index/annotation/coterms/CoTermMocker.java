@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Tony Wardell
@@ -14,59 +13,7 @@ public class CoTermMocker {
 
     static final DecimalFormat ID_FORMAT_1 = new DecimalFormat("0000000");
     static final DecimalFormat ID_FORMAT_2 = new DecimalFormat("9000000");
-    private static final String EXAMPLE_GO_TERM1 = "GO:0003824";
 
-    static Map<String, Map<String, AtomicLong>> singleEntry() {
-        Map<String, Map<String, AtomicLong>> matrix = new HashMap<>();
-        List<String> comparedList = Collections.singletonList(EXAMPLE_GO_TERM1);
-        matrix.put(EXAMPLE_GO_TERM1, createCoOccurringTermValues(comparedList, 2));
-        return matrix;
-    }
-
-    static Map<String, AtomicLong> singleCoTermMapping() {
-        List<String> comparedList = Collections.singletonList(EXAMPLE_GO_TERM1);
-        return createCoOccurringTermValues(comparedList, 2);
-    }
-
-    /**
-     * @param comparedList a list of real or imagined GO Terms.
-     * @param hits co-occurring count to be added to each member of the compared list.
-     * @return a map of the contents of comparedList together with the hits value passed in as an argument.
-     */
-    private static Map<String, AtomicLong> createCoOccurringTermValues(List<String> comparedList, int hits) {
-        Map<String, AtomicLong> coOccurringTerms = new HashMap<>();
-        for (String comparedTerm : comparedList) {
-            coOccurringTerms.put(comparedTerm, new AtomicLong(hits));
-        }
-        return coOccurringTerms;
-    }
-
-    /**
-     * Create a representation of term-to-term intersections (as a matrix of maps) using the arguments as test data.
-     * @param selectedList a list of real or imagined GO Terms, used as the compared 'from' values for the
-     * term-to-term matrix this method creates.
-     * @param comparedList a list of real or imagined GO Terms used as the compared 'to' values for the matrix
-     * @param hits co-occurring count to be added to each member of the compared list.
-     * @return a representation of term-to-term intersections
-     */
-    static Map<String, Map<String, AtomicLong>> createMatrix(List<String> selectedList, List<String> comparedList, int
-            hits) {
-        Map<String, Map<String, AtomicLong>> matrix = new HashMap<>();
-
-        for (String selectedTerm : selectedList) {
-            matrix.put(selectedTerm, createCoOccurringTermValues(comparedList, hits));
-        }
-        return matrix;
-    }
-
-
-    static Map<String, AtomicLong> getCoTerms(List<String> comparedList, long count){
-        Map cooccurringMap  = new HashMap<String, AtomicLong>();
-        for (String comparedTerm: comparedList) {
-            cooccurringMap.put(comparedTerm, new AtomicLong(count));
-        }
-        return cooccurringMap;
-    }
 
     /**
      * Generate a list of pseudo GO Term ids.

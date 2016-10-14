@@ -14,22 +14,15 @@ import java.util.concurrent.atomic.AtomicLong;
 public class CoTermsAggregatorMocker {
 
     /**
-     * Mocks the {@code CoTermsAggregator#getGeneProductCounts} to product a count of gene products annotated by a
-     * single GO Term.
-     * @param count the number that the count for Gene Product will be set to.
-     * @param termsLists a list of GO Term identifiers used to seed a map of term::count used in testing
-     * @return a map of term::count used in testing
+     * @param comparedList a list of real or imagined GO Terms.
+     * @param hits co-occurring count to be added to each member of the compared list.
+     * @return a map of the contents of comparedList together with the hits value passed in as an argument.
      */
-    @SafeVarargs
-    static Map<String, AtomicLong> makeGpCountForTerm(int count, List<String>... termsLists ){
-        Map<String, AtomicLong> termGpCount = new HashMap<>();
-
-        for (List<String> terms : termsLists) {
-            for (String s : terms) {
-                termGpCount.put(s, new AtomicLong(count));
-            }
+    static Map<String, AtomicLong> createCoOccurringTermValues(List<String> comparedList, int hits) {
+        Map<String, AtomicLong> coOccurringTerms = new HashMap<>();
+        for (String comparedTerm : comparedList) {
+            coOccurringTerms.put(comparedTerm, new AtomicLong(hits));
         }
-
-        return termGpCount;
+        return coOccurringTerms;
     }
 }
