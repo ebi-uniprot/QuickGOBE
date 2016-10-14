@@ -73,11 +73,11 @@
     <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="symbol" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="dbSubset" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="evidenceCode" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="extension" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="geneProductId" type="database_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="geneProductType" type="string" indexed="true" stored="false" multiValued="false"/>
+    <field name="geneProductSubset" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="goEvidence" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="goAspect" type="text_ignorecase" indexed="true" stored="false" multiValued="false"/>
     <field name="goId" type="lowercase" indexed="true" stored="true" multiValued="false"/>
@@ -106,8 +106,8 @@
     <field name="symbol_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="symbol" dest="symbol_unsorted"/>
 
-    <field name="dbSubset_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
-    <copyField source="dbSubset" dest="dbSubset_unsorted"/>
+    <field name="geneProductSubset_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
+    <copyField source="geneProductSubset" dest="geneProductSubset_unsorted"/>
 
     <field name="evidenceCode_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="evidenceCode" dest="evidenceCode_unsorted"/>

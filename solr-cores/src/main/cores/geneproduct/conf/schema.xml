@@ -17,35 +17,43 @@
 -->
 
 <schema name="geneproduct" version="1.5">
-    <!-- ========================================================================== -->
-    <!--                   Start of QuickGO Gene Product fields                         -->
 
-    <field name="id" type="lowercase" indexed="true" stored="true"/>
-    <field name="name" type="text_ignorecase" indexed="true" stored="true"/>
-    <field name="synonym" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
-    <field name="symbol" type="text_ignorecase" indexed="true" stored="true"/>
+    <!-- ========================================================================== -->
+    <!--                   Start of QuickGO Gene Product fields                     -->
+    <!-- NOTE: Do not change the analyzers of these fields. These fields are only to store or facet, not to search -->
+    <field name="id" type="string" indexed="true" stored="true"/>
+    <field name="name" type="string" indexed="false" stored="true"/>
+    <field name="synonym" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="symbol" type="string" indexed="false" stored="true"/>
     <field name="database" type="string" indexed="false" stored="true"/>
     <field name="type" type="string" indexed="true" stored="true"/>
-    <field name="taxonId" type="int" indexed="false" stored="true"/>
-    <field name="taxonName" type="string" indexed="false" stored="true"/>
-    <field name="dbSubset" type="lowercase" indexed="true" stored="true" multiValued="true"/>
+    <field name="taxonId" type="int" indexed="true" stored="true"/>
+    <field name="dbSubset" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="isCompleteProteome" type="boolean" indexed="false" stored="true"/>
     <field name="referenceProteome" type="string" indexed="false" stored="true"/>
     <field name="isIsoform" type="boolean" indexed="false" stored="true"/>
     <field name="isAnnotated" type="boolean" indexed="false" stored="true"/>
     <field name="parentId" type="string" indexed="false" stored="true"/>
 
-    <!-- computed field that contains most of the gene product information -->
+    <!-- ========================================================================== -->
+    <!-- Following fields are for search purposes -->
+    <!-- If an indexed field is marked as stored. It is because this field is used for highlighting purposes -->
     <field name="text" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
 
     <!-- autocomplete search fields -->
-    <field name="edge_symbol" type="text_edge" indexed="true" stored="true" multiValued="true"/>
-    <field name="edge_name" type="text_edge" indexed="true" stored="true" multiValued="false"/>
-    <field name="edge_synonym" type="text_edge" indexed="true" stored="true" multiValued="true"/>
+    <field name="id_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <field name="name_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
+    <field name="symbol_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
+    <field name="synonym_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
+    <field name="dbSubset_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
 
-    <field name="exact_symbol" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
-    <field name="exact_name" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
-    <field name="exact_synonym" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
+    <field name="symbol_edge" type="text_edge" indexed="true" stored="true" multiValued="true"/>
+    <field name="name_edge" type="text_edge" indexed="true" stored="true" multiValued="false"/>
+    <field name="synonym_edge" type="text_edge" indexed="true" stored="true" multiValued="true"/>
+
+    <field name="symbol_exact" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
+    <field name="name_exact" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
+    <field name="synonym_exact" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
 
     <!--                     End of QuickGO Ontology fields                         -->
     <!-- ========================================================================== -->
@@ -61,20 +69,27 @@
           is added to the index.  It's used either to index the same field differently,
           or to add multiple fields to the same field for easier/faster searching.  -->
 
+    <!-- Copy fields for autocomplete search-->
+    <copyField source="symbol" dest="symbol_edge"/>
+    <copyField source="name" dest="name_edge"/>
+    <copyField source="synonym" dest="synonym_edge"/>
+
+    <copyField source="symbol" dest="symbol_exact"/>
+    <copyField source="name" dest="name_exact"/>
+    <copyField source="synonym" dest="synonym_exact"/>
+
+    <copyField source="id" dest="id_lowercase"/>
+    <copyField source="symbol" dest="symbol_lowercase"/>
+    <copyField source="name" dest="name_lowercase"/>
+    <copyField source="synonym" dest="synonym_lowercase"/>
+
     <!-- Copy fields for generic search -->
     <copyField source="id" dest="text"/>
     <copyField source="symbol" dest="text"/>
     <copyField source="name" dest="text"/>
     <copyField source="synonym" dest="text"/>
 
-    <!-- Copy fields for autocomplete search-->
-    <copyField source="symbol" dest="edge_symbol"/>
-    <copyField source="name" dest="edge_name"/>
-    <copyField source="synonym" dest="edge_synonym"/>
-
-    <copyField source="symbol" dest="exact_symbol"/>
-    <copyField source="name" dest="exact_name"/>
-    <copyField source="synonym" dest="exact_synonym"/>
+    <copyField source="dbSubset" dest="dbSubset_lowercase"/>
 
     <!--Use this for autocomplete searches-->
     <fieldType name="text_edge" class="solr.TextField" sortMissingLast="true" omitNorms="false"

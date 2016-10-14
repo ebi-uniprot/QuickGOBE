@@ -49,7 +49,7 @@ public class GeneProductControllerIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-    private static final String RESOURCE_URL = "/QuickGO/services/geneproduct";
+    private static final String RESOURCE_URL = "/geneproduct";
 
     protected static final String COMMA = ",";
     public static final String NON_EXISTANT_ID = "Y0Y000";
@@ -143,8 +143,7 @@ public class GeneProductControllerIT {
                 .andDo(print())
                 .andExpect(jsonPath(path + "id").value(id))
                 .andExpect(jsonPath(path + "type").value("PROTEIN"))
-                .andExpect(jsonPath(path + "taxonomy.id").value(35758))
-                .andExpect(jsonPath(path + "taxonomy.name").value("Streptomyces ghanaensis"))
+                .andExpect(jsonPath(path + "taxonId").value(35758))
                 .andExpect(jsonPath(path + "symbol").value("Streptomyces ghanaensis - symbol"))
                 .andExpect(jsonPath(path + "parentId").value("UniProtKB:OK0206"))
                 .andExpect(jsonPath(path + "databaseSubset[0]").value("RRR"))

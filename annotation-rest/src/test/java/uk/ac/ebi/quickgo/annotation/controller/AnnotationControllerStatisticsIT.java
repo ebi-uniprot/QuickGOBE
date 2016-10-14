@@ -51,7 +51,7 @@ public class AnnotationControllerStatisticsIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
-    private static final String RESOURCE_URL = "/QuickGO/services/annotation";
+    private static final String RESOURCE_URL = "/annotation";
     private static final String STATS_ENDPOINT = RESOURCE_URL + "/stats";
 
     private static final int NUMBER_OF_GENERIC_DOCS = 6;

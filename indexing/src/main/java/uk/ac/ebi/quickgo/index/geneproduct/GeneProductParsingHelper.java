@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 final class GeneProductParsingHelper {
     public static final int DEFAULT_TAXON_ID = 0;
 
-    static final String TAXON_NAME_KEY = "taxon_name";
     static final String COMPLETE_PROTEOME_KEY = "proteome";
     static final String REFERENCE_PROTEOME_KEY = "reference_proteome";
     static final String IS_ANNOTATED_KEY = "is_annotated";

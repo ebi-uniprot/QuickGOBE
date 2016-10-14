@@ -1,5 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
+import uk.ac.ebi.quickgo.ff.loader.ontology.OntologyGraphicsSourceLoader;
+import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
+import uk.ac.ebi.quickgo.graphics.service.GraphImageServiceImpl;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.coterms.CoTermRepoConfig;
@@ -15,6 +18,8 @@ import uk.ac.ebi.quickgo.ontology.traversal.read.OntologyGraphConfig;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 
+import java.io.File;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,9 +34,12 @@ import org.springframework.context.annotation.Import;
  * @author Edd
  */
 @Configuration
-@ComponentScan({"uk.ac.ebi.quickgo.ontology.service"})
+@ComponentScan({"uk.ac.ebi.quickgo.ontology.service, uk.ac.ebi.quickgo.graphics.service"})
 @Import({OntologyRepoConfig.class, OntologyGraphConfig.class, CoTermRepoConfig.class})
 public class ServiceConfig {
+    @Value("${graphics.ontology.source}")
+    private String sourceFile;
+
     @Bean
     public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository,
             OntologyGraphTraversal ontologyGraphTraversal, CoTermRepository coTermRepository) {
@@ -44,12 +52,9 @@ public class ServiceConfig {
                 coTermRepository);
     }
 
-    private GODocConverter goDocumentConverter() {
-        return new GODocConverter();
-    }
-
     @Bean
-    public OntologyService<ECOTerm> ecoOntologyService(OntologyRepository ontologyRepository, OntologyGraphTraversal ontologyGraphTraversal) {
+    public OntologyService<ECOTerm> ecoOntologyService(OntologyRepository ontologyRepository,
+            OntologyGraphTraversal ontologyGraphTraversal) {
         return new OntologyServiceImpl<>(
                 ontologyRepository,
                 ecoDocConverter(),
@@ -57,6 +62,20 @@ public class ServiceConfig {
                 queryStringSanitizer(),
                 ontologyGraphTraversal,
                 emptyCoTermRepository());  //todo
+    }
+
+    @Bean
+    public GraphImageService graphImageService(OntologyGraphicsSourceLoader ontologyGraphicsSourceLoader) {
+        return new GraphImageServiceImpl(ontologyGraphicsSourceLoader);
+    }
+
+    @Bean
+    public OntologyGraphicsSourceLoader ontologyGraphicsSourceLoader() {
+        return new OntologyGraphicsSourceLoader(new File(sourceFile));
+    }
+
+    private GODocConverter goDocumentConverter() {
+        return new GODocConverter();
     }
 
     private ECODocConverter ecoDocConverter() {

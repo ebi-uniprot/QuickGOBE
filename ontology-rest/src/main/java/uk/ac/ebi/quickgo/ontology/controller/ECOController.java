@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Edd
  */
 @RestController
-@RequestMapping(value = "/QuickGO/services/eco")
+@RequestMapping(value = "/ontology/eco")
 public class ECOController extends OBOController<ECOTerm> {
 
     private static final Pattern ECO_ID_FORMAT = Pattern.compile("^ECO:[0-9]{7}$");
@@ -33,8 +34,9 @@ public class ECOController extends OBOController<ECOTerm> {
     public ECOController(OntologyService<ECOTerm> ecoOntologyService,
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
-            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
-        super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig);
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
+            GraphImageService graphImageService) {
+        super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService);
     }
 
     @Override

@@ -17,14 +17,11 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
-import java.util.HashSet;
-import java.util.Set;
-import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -89,7 +86,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
  *         Created with IntelliJ IDEA.
  */
 @RestController
-@RequestMapping(value = "/QuickGO/services/annotation")
+@RequestMapping(value = "/annotation")
 public class AnnotationController {
     private final ControllerValidationHelper validationHelper;
 

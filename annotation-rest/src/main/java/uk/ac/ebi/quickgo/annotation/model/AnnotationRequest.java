@@ -64,7 +64,7 @@ public class AnnotationRequest {
     private static final String[] FILTER_REQUEST_FIELDS = new String[]{
             GO_ASPECT,
             ASSIGNED_BY,
-            DB_SUBSET,
+            GENE_PRODUCT_SUBSET,
             EVIDENCE_CODE,
             GENE_PRODUCT_ID,
             GENE_PRODUCT_TYPE,
@@ -112,8 +112,8 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Filter annotation by the ontology to which the associated GO term belongs. Accepts comma " +
                     "separated values. Accepts comma separated values.",
-            allowableValues = "process,function,component",
-            example = "process,function")
+            allowableValues = "biological_process,molecular_function,cellular_component",
+            example = "biological_process,molecular_function")
     private String aspect;
 
     @ApiModelProperty(value = "The database which made the annotation. Accepts comma separated values.",
@@ -389,12 +389,12 @@ public class AnnotationRequest {
     }
 
     public void setGeneProductSubset(String... geneProductSubset) {
-        filterMap.put(DB_SUBSET, geneProductSubset);
+        filterMap.put(GENE_PRODUCT_SUBSET, geneProductSubset);
     }
 
     @ArrayPattern(regexp = "^[A-Za-z-]+$", paramName = GENE_PRODUCT_SUBSET_PARAM)
     public String[] getGeneProductSubset() {
-        return filterMap.get(DB_SUBSET);
+        return filterMap.get(GENE_PRODUCT_SUBSET);
     }
 
     @Min(value = MIN_ENTRIES_PER_PAGE, message = "Number of entries per page cannot be less than {value} but " +

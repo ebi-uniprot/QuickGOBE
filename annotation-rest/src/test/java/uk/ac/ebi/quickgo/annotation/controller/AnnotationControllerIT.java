@@ -54,7 +54,7 @@ public class AnnotationControllerIT {
 
     //Test Data
     private static final String MISSING_ASSIGNED_BY = "ZZZZZ";
-    private static final String RESOURCE_URL = "/QuickGO/services/annotation";
+    private static final String RESOURCE_URL = "/annotation";
     private static final String MISSING_GO_ID = "GO:0009871";
     private static final String INVALID_GO_ID = "GO:1";
     private static final String ECO_ID2 = "ECO:0000323";
