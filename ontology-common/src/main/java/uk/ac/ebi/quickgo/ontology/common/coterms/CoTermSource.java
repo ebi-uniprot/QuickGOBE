@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common.coterm;
+package uk.ac.ebi.quickgo.ontology.common.coterms;
 
 /**
  *

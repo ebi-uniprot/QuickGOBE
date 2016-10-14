@@ -1,8 +1,7 @@
-package uk.ac.ebi.quickgo.ontology.common.coterm;
+package uk.ac.ebi.quickgo.ontology.common.coterms;
 
 import java.util.List;
 import java.util.function.Predicate;
-import org.springframework.data.repository.Repository;
 
 /**
  * Represents the store of co-occurring GO Term information.
