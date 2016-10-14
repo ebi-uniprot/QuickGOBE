@@ -273,6 +273,9 @@ class CoTermMatrix {
 
 }
 
+/**
+ * State for GO termId::count of gene products for it.
+ */
 class TermGPCount {
     final Map<String, AtomicLong> id2Count;
 
