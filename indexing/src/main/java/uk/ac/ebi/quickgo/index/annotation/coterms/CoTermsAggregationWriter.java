@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 
 import static uk.ac.ebi.quickgo.index.annotation.coterms.GeneProductBatch.buildBatch;
 
@@ -23,7 +23,7 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.GeneProductBatch.buildB
  * Time: 11:59
  * Created with IntelliJ IDEA.
  */
-public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> {
+public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<AnnotationDocument> {
     //A list of all unique geneProducts encountered - it exists so we can get a count of the total unique gene products.
     private final Set<String> geneProductList;
 
@@ -98,10 +98,11 @@ public class CoTermsAggregationWriter implements ItemWriter<AnnotationDocument> 
     }
 
     /**
-     * The client must call finish() when all annotation documents have been processed by the write method to wrap up
-     * processing.
+     * When all annotation documents have been processed by the write method then an operation wrap up processing is
+     * required.
      */
-    void finish() {
+    @Override
+    public void close() {
         increaseCountsForTermsInBatch();
     }
 

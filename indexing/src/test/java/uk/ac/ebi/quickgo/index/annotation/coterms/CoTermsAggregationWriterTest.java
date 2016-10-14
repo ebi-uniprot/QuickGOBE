@@ -87,7 +87,7 @@ public class CoTermsAggregationWriterTest {
 
     private void completeAggregation(List<AnnotationDocument> docs) throws Exception {
         aggregator.write(docs);
-        aggregator.finish();
+        aggregator.close();
     }
 
 }
