@@ -8,7 +8,6 @@ import org.springframework.core.io.Resource;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 
 /**
  * @author Tony Wardell
@@ -18,22 +17,22 @@ import static org.hamcrest.Matchers.hasSize;
  */
 public class CoTermRepositorySimpleMapIT {
 
-    private CoTermRepositorySimpleMap coTermRepository;
     private static final String GO_TERM_ID_ALL_ONLY = "GO:7777771";
     private static final String GO_TERM_ID_MANUAL_ONLY = "GO:8888881";
+    private CoTermRepositorySimpleMap coTermRepository;
 
     @Before
-    public void setup(){
+    public void setup() {
         Resource manualResource = new ClassPathResource("CoTermsManual");
         Resource allResource = new ClassPathResource("CoTermsAll");
         coTermRepository = new CoTermRepositorySimpleMap();
-        CoTermRepositorySimpleMap.CoTermLoader coTermLoader = coTermRepository.new CoTermLoader(manualResource, allResource);
+        CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
+                coTermRepository.new CoTermLoader(manualResource, allResource);
         coTermLoader.load();
     }
 
-
     @Test
-    public void retrievalIsSuccessfulFromAll(){
+    public void retrievalIsSuccessfulFromAll() {
         List<CoTerm> coTerms = coTermRepository.findCoTerms(GO_TERM_ID_ALL_ONLY, CoTermSource.ALL, 1, t -> true);
         assertThat(coTerms.get(0).getId(), is(GO_TERM_ID_ALL_ONLY));
         assertThat(coTerms.get(0).getCompare(), is("GO:0003333"));
@@ -44,7 +43,7 @@ public class CoTermRepositorySimpleMapIT {
     }
 
     @Test
-    public void retrievalIsSuccessfulFromManual(){
+    public void retrievalIsSuccessfulFromManual() {
         List<CoTerm> coTerms = coTermRepository.findCoTerms(GO_TERM_ID_MANUAL_ONLY, CoTermSource.MANUAL, 1, t -> true);
         assertThat(coTerms.get(0).getId(), is(GO_TERM_ID_MANUAL_ONLY));
         assertThat(coTerms.get(0).getCompare(), is("GO:0004444"));
