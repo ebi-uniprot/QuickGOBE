@@ -1,7 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
 import com.google.common.base.Preconditions;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -85,10 +87,19 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * Read the sources that hold the co-occurring term data, and load to memory.
      */
     class CoTermLoader {
+        /**
+         * Specification how to map input string columns to CoTerm entity
+         */
+
+        private static final int COLUMN_ID = 0;
+        private static final int COLUMN_COMPARE = 1;
+        private static final int COLUMN_PROB = 2;
+        private static final int COLUMN_SIG = 3;
+        private static final int COLUMN_TOGETHER = 4;
+        private static final int COLUMN_COMPARED = 5;
         private final Logger logger = LoggerFactory.getLogger(CoTermLoader.class);
         private final Resource manualSource;
         private final Resource allSource;
-
         /**
          *
          * @param manualCoTermsSource source of co-occurring terms for Terms used in manually derived annotations.
@@ -162,18 +173,6 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
                 throw new RuntimeException(e);
             }
         }
-
-
-        /**
-         * Specification how to map input string columns to CoTerm entity
-         */
-
-        private static final int COLUMN_ID = 0;
-        private static final int COLUMN_COMPARE = 1;
-        private static final int COLUMN_PROB = 2;
-        private static final int COLUMN_SIG = 3;
-        private static final int COLUMN_TOGETHER = 4;
-        private static final int COLUMN_COMPARED = 5;
 
         private CoTerm parseInputString(String line) {
             String[] columns = line.split("\\t");
