@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,6 +41,7 @@ public class CoTermRepositorySimpleMapTest {
                 new CoTerm("GO:0001234", "GO:0055085", 24f, 4f, 465, 4564)));
 
         simpleMap = new CoTermRepositorySimpleMap(coTermsAll, coTermsManual);
+
     }
 
     @Test
@@ -81,4 +85,5 @@ public class CoTermRepositorySimpleMapTest {
     public void exceptionThrownIfFilterIsNull(){
         simpleMap.findCoTerms("GO:0001234", CoTermSource.ALL, 7, null);
     }
+
 }

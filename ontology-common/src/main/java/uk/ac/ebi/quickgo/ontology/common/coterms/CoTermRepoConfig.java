@@ -22,9 +22,11 @@ public class CoTermRepoConfig {
 
     @Bean
     public CoTermRepository coTermRepository(){
-        CoTermLoader coTermLoader = new CoTermLoader(manualResource, allResource);
+        CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
+        CoTermRepositorySimpleMap.CoTermLoader coTermLoader = coTermRepository.new CoTermLoader(manualResource, allResource);
         coTermLoader.load();
-        return new CoTermRepositorySimpleMap(coTermLoader.coTermsAll, coTermLoader.coTermsManual);
+        return coTermRepository;
+
     }
 
 
