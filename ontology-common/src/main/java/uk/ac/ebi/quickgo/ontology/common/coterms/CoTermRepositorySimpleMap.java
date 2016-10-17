@@ -39,7 +39,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
             Map<String, List<CoTerm>> coTermsManual) {
 
         Preconditions.checkArgument(coTermsAll != null, "Map coTermsAll should not be null.");
-        Preconditions.checkArgument(coTermsManual != null,"Map coTermsManual should not be null");
+        Preconditions.checkArgument(coTermsManual != null,"Map coTermsManual should not be null.");
 
         CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
         coTermRepository.coTermsAll = coTermsAll;
@@ -59,7 +59,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
         Preconditions.checkArgument(manualCoTermsSource != null,"Resource manualCoTermsSource should not be null");
         Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource should not be null.");
         Preconditions.checkState(manualCoTermsSource.exists(),"Resource manualCoTermsSource should not be " +
-                "non-existent");
+                "non-existent.");
         Preconditions.checkState(allCoTermSource.exists(), "Resource allCoTermSource should not be non-existent.");
 
         CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
