@@ -12,7 +12,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.W
  * Created 29/04/16
  * @author Edd
  */
-public class AnnotationParsingHelper {
+class AnnotationParsingHelper {
 
     // data file values
     static final String GO_EVIDENCE = "go_evidence";

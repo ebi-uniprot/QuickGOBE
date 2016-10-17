@@ -20,7 +20,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*
  * Created 19/04/16
  * @author Edd
  */
-public class AnnotationDocumentConverter implements ItemProcessor<Annotation, AnnotationDocument> {
+class AnnotationDocumentConverter implements ItemProcessor<Annotation, AnnotationDocument> {
     static final int DEFAULT_TAXON = 0;
 
     private final AtomicLong documentCounter;

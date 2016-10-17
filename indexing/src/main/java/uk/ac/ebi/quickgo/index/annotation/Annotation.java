@@ -8,7 +8,7 @@ package uk.ac.ebi.quickgo.index.annotation;
  * Created 19/04/16
  * @author Edd
  */
-public class Annotation {
+class Annotation {
     String db;
     String dbObjectId;
     String qualifier;

@@ -13,7 +13,7 @@ import static uk.ac.ebi.quickgo.index.annotation.Columns.*;
  * Created 19/04/16
  * @author Edd
  */
-public class StringToAnnotationMapper implements FieldSetMapper<Annotation> {
+class StringToAnnotationMapper implements FieldSetMapper<Annotation> {
     @Override public Annotation mapFieldSet(FieldSet fieldSet) throws BindException {
         if (fieldSet == null) {
             throw new IllegalArgumentException("Provided field set is null");
