@@ -15,10 +15,10 @@ import org.springframework.core.io.Resource;
 @Configuration
 public class CoTermRepoConfig {
 
-    @Value("${coterm.file.manual}")
+    @Value("${coterm.source.manual}")
     private Resource manualResource;
 
-    @Value("${coterm.file.all}")
+    @Value("${coterm.source.all}")
     private Resource allResource;
 
     @Bean
