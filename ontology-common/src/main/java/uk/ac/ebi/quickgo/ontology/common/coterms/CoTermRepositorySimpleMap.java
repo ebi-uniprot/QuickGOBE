@@ -96,18 +96,16 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
 
         /**
          *
-         * @param manualCoTermsFile location and file name of co-occurring terms for Terms used in manually derived
-         * annotations.
-         * @param allCoTermsFile location and file name of co-occurring terms for Terms used in annotations derived
-         * from all sources.
+         * @param manualCoTermsSource source of co-occurring terms for Terms used in manually derived annotations.
+         * @param allCoTermSource source of co-occurring terms for Terms used in annotations derived from all sources.
          */
-        CoTermLoader(Resource manualCoTermsFile, Resource allCoTermsFile) {
-            Preconditions.checkArgument(manualCoTermsFile != null, "Resource manualCoTermsFile should not be null, but " +
+        CoTermLoader(Resource manualCoTermsSource, Resource allCoTermSource) {
+            Preconditions.checkArgument(manualCoTermsSource != null, "Resource manualCoTermsSource should not be null, but " +
                     "was");
-            Preconditions.checkArgument(allCoTermsFile != null, "Resource allCoTermsFile should not be null, but " +
+            Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource should not be null, but " +
                     "was");
-            this.manualCoTermsFile = manualCoTermsFile;
-            this.allCoTermsFile = allCoTermsFile;
+            this.manualCoTermsFile = manualCoTermsSource;
+            this.allCoTermsFile = allCoTermSource;
         }
 
         /**
