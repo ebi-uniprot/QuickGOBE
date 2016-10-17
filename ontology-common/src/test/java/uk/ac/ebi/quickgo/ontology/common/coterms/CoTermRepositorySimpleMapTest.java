@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 import org.junit.Before;
@@ -82,7 +83,7 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void manualSourceDoesNotExistSoExceptionIsThrown() {
+    public void manualSourceDoesNotExistSoExceptionIsThrown() throws IOException {
         Resource mockManualResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(false);
         CoTermRepositorySimpleMap.CoTermLoader coTermLoader = coTermRepository.new CoTermLoader(mockManualResource,
@@ -91,10 +92,22 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void allSourceDoesNotExistSoExceptionIsThrown() {
+    public void allSourceDoesNotExistSoExceptionIsThrown() throws Exception {
         Resource mockAllResource = mock(Resource.class);
         when(mockAllResource.exists()).thenReturn(false);
         CoTermRepositorySimpleMap.CoTermLoader coTermLoader = coTermRepository.new CoTermLoader(mock(Resource.class),
+                mockAllResource);
+        coTermLoader.load();
+    }
+
+    @Test(expected = IOException.class)
+    public void readingSourceFailsAndThrowsIOException() throws Exception {
+        Resource mockManualResource = mock(Resource.class);
+        Resource mockAllResource = mock(Resource.class);
+        when(mockManualResource.exists()).thenReturn(true);
+        when(mockAllResource.exists()).thenReturn(true);
+        when(mockAllResource.getInputStream()).thenThrow(IOException.class);
+        CoTermRepositorySimpleMap.CoTermLoader coTermLoader = coTermRepository.new CoTermLoader(mockManualResource,
                 mockAllResource);
         coTermLoader.load();
     }

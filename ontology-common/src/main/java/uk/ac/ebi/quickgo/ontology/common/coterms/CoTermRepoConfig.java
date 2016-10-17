@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,13 @@ public class CoTermRepoConfig {
         CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
         CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
                 coTermRepository.new CoTermLoader(manualResource, allResource);
-        coTermLoader.load();
+        try {
+            coTermLoader.load();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load co-occurring terms from manual source " +
+                    (manualResource!=null?manualResource.getDescription():"unknown") + " or from all source " +
+                    (allResource!=null?allResource.getDescription():"unknown"));
+        }
         return coTermRepository;
     }
 }

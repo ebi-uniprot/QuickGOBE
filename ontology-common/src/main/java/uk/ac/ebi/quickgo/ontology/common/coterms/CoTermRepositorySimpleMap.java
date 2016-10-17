@@ -100,6 +100,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
         private final Logger logger = LoggerFactory.getLogger(CoTermLoader.class);
         private final Resource manualSource;
         private final Resource allSource;
+
         /**
          *
          * @param manualCoTermsSource source of co-occurring terms for Terms used in manually derived annotations.
@@ -115,8 +116,9 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
 
         /**
          * Read the sources, load data into memory.
+         * @throws IOException if the source of the co-occurring terms exists, but fails to be read.
          */
-        public void load() {
+        public void load() throws IOException {
             logger.info("Loading Co terms from sources");
             loadCoTermsSource(allSource, coTermsAll = new HashMap<>());
             loadCoTermsSource(manualSource, coTermsManual = new HashMap<>());
@@ -126,8 +128,9 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
          * Load source contents into memory
          * @param source of CoTerms.
          * @param coTerms target map.
+         * @throws IOException if the source of the co-occurring terms exists, but fails to be read.
          */
-        private void loadCoTermsSource(Resource source, Map<String, List<CoTerm>> coTerms) {
+        private void loadCoTermsSource(Resource source, Map<String, List<CoTerm>> coTerms) throws IOException {
             Preconditions.checkState(source.exists(), "The input source " + source.getDescription() + " for CoTerms " +
                     "does not exist.");
             List<CoTerm> comparedTerms = new ArrayList<>();
@@ -135,43 +138,40 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
             String currentTerm = null;
             long lineCount = 0;
 
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(source.getInputStream()))) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(source.getInputStream()));
 
-                while ((line = br.readLine()) != null) {
-                    lineCount++;
+            while ((line = br.readLine()) != null) {
+                lineCount++;
 
-                    //Ignore any line that doesn't start with a GO id.
-                    if (!line.startsWith("GO")) {
-                        continue;
-                    }
-
-                    CoTerm CoTerm = parseInputString(line);
-
-                    //one time initialisation
-                    if (currentTerm == null) {
-                        currentTerm = CoTerm.getId();
-                    }
-
-                    //Have we arrived at a new source term?
-                    if (!CoTerm.getId().equals(currentTerm)) {
-                        coTerms.put(currentTerm, comparedTerms);
-
-                        //Reset
-                        currentTerm = CoTerm.getId();
-                        comparedTerms = new ArrayList<>();
-                    }
-
-                    comparedTerms.add(CoTerm);
+                //Ignore any line that doesn't start with a GO id.
+                if (!line.startsWith("GO")) {
+                    continue;
                 }
 
-                //save last term
-                coTerms.put(currentTerm, comparedTerms);
-                logger.info("Loaded " + lineCount + " lines from " + source.getDescription());
-                logger.info("Number of GO Terms loaded is " + coTerms.keySet().size());
+                CoTerm CoTerm = parseInputString(line);
 
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                //one time initialisation
+                if (currentTerm == null) {
+                    currentTerm = CoTerm.getId();
+                }
+
+                //Have we arrived at a new source term?
+                if (!CoTerm.getId().equals(currentTerm)) {
+                    coTerms.put(currentTerm, comparedTerms);
+
+                    //Reset
+                    currentTerm = CoTerm.getId();
+                    comparedTerms = new ArrayList<>();
+                }
+
+                comparedTerms.add(CoTerm);
             }
+
+            //save last term
+            coTerms.put(currentTerm, comparedTerms);
+            logger.info("Loaded " + lineCount + " lines from " + source.getDescription());
+            logger.info("Number of GO Terms loaded is " + coTerms.keySet().size());
+
         }
 
         private CoTerm parseInputString(String line) {
