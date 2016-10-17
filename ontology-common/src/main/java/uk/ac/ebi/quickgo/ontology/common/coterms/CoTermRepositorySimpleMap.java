@@ -36,8 +36,11 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @param coTermsManual CoTerms derived from non-electronic source.
      */
     public static CoTermRepositorySimpleMap createCoTermRepositorySimpleMap(Map<String, List<CoTerm>> coTermsAll,
-            Map<String, List<CoTerm>>
-                    coTermsManual) {
+            Map<String, List<CoTerm>> coTermsManual) {
+
+        Preconditions.checkArgument(coTermsAll != null, "Map coTermsAll should not be null.");
+        Preconditions.checkArgument(coTermsManual != null,"Map coTermsManual should not be null");
+
         CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
         coTermRepository.coTermsAll = coTermsAll;
         coTermRepository.coTermsManual = coTermsManual;
@@ -52,6 +55,13 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      */
     public static CoTermRepositorySimpleMap createCoTermRepositorySimpleMap(Resource manualCoTermsSource, Resource
             allCoTermSource) throws IOException {
+
+        Preconditions.checkArgument(manualCoTermsSource != null,"Resource manualCoTermsSource should not be null");
+        Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource should not be null.");
+        Preconditions.checkState(manualCoTermsSource.exists(),"Resource manualCoTermsSource should not be " +
+                "non-existent");
+        Preconditions.checkState(allCoTermSource.exists(), "Resource allCoTermSource should not be non-existent.");
+
         CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
         CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
                 coTermRepository.new CoTermLoader(manualCoTermsSource, allCoTermSource);
@@ -69,9 +79,10 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      */
     public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate<CoTerm> filter) {
 
-        Preconditions.checkArgument(id != null, "The findCoTerms id should not be null, but is");
-        Preconditions.checkArgument(source != null, "The findCoTerms source should not be null, but is");
-        Preconditions.checkArgument(filter != null, "The findCoTerms filter should not be null, but is");
+        Preconditions.checkArgument(id != null, "The findCoTerms id should not be null.");
+        Preconditions.checkArgument(source != null, "The findCoTerms source should not be null.");
+        Preconditions.checkArgument(limit > 0 , "The findCoTerms limit should not be less than 1.");
+        Preconditions.checkArgument(filter != null, "The findCoTerms filter should not be null.");
         return source == CoTermSource.MANUAL ? findCoTermsFromMap(coTermsManual, id, limit, filter)
                 : findCoTermsFromMap(coTermsAll, id, limit, filter);
     }
@@ -117,9 +128,6 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
          * @param allCoTermSource source of co-occurring terms for Terms used in annotations derived from all sources.
          */
         private CoTermLoader(Resource manualCoTermsSource, Resource allCoTermSource) {
-            Preconditions.checkArgument(manualCoTermsSource != null, "Resource manualCoTermsSource should not be null" +
-                    ".");
-            Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource should not be null.");
             this.manualSource = manualCoTermsSource;
             this.allSource = allCoTermSource;
         }
@@ -141,8 +149,6 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
          * @throws IOException if the source of the co-occurring terms exists, but fails to be read.
          */
         private void loadCoTermsSource(Resource source, Map<String, List<CoTerm>> coTerms) throws IOException {
-            Preconditions.checkState(source.exists(), "The input source " + source.getDescription() + " for CoTerms " +
-                    "does not exist.");
             List<CoTerm> comparedTerms = new ArrayList<>();
             String line;
             String currentTerm = null;

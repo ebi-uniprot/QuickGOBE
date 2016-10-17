@@ -82,6 +82,11 @@ public class CoTermRepositorySimpleMapTest {
         coTermRepository.findCoTerms("GO:0001234", CoTermSource.ALL, 7, null);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void exceptionThrownIfLimitIsZeroOrLess() {
+        coTermRepository.findCoTerms("GO:0001234", CoTermSource.ALL, 0, t -> true);
+    }
+
     @Test(expected = IllegalStateException.class)
     public void manualSourceDoesNotExistSoExceptionIsThrown() throws IOException {
         Resource mockManualResource = mock(Resource.class);
@@ -106,5 +111,15 @@ public class CoTermRepositorySimpleMapTest {
         when(mockAllResource.exists()).thenReturn(true);
         when(mockAllResource.getInputStream()).thenThrow(IOException.class);
         CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void exceptionThrownIfMapsManualMapIsNull() {
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, new HashMap());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void exceptionThrownIfMapsAllMapIsNull() {
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(new HashMap<>(), null);
     }
 }
