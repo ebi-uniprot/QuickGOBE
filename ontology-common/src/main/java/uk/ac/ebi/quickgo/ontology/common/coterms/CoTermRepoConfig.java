@@ -24,11 +24,9 @@ public class CoTermRepoConfig {
 
     @Bean
     public CoTermRepository coTermRepository() {
-        CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
-        CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
-                coTermRepository.new CoTermLoader(manualResource, allResource);
-        try {
-            coTermLoader.load();
+        CoTermRepositorySimpleMap coTermRepository;
+        try{
+            coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load co-occurring terms from manual source " +
                     (manualResource!=null?manualResource.getDescription():"unknown") + " or from all source " +
