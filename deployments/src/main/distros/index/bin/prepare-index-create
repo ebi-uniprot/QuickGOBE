@@ -62,29 +62,32 @@ if [ -z "$SOLR_ADDRESS" ]; then
 fi
 
 # ------------------------ start off the indexing via LSF ------------------------
-# todo: --------------- loop over vms start
-# todo: add vm name to end
-release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/${CORE_NAME}";
 
-if [ ! -d "$release_dir" ]; then
-   echo "Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...";
-   mkdir -p "$release_dir";
-fi
+vmsForProfile "$CORE_NAME" "$requestedProfile"
+echo "**** size of VM list is ${#PROFILE_VMS[@]}"
+for vm in ${PROFILE_VMS[@]}; do
+    vmIP="$(extractVMFromURL $vm)"
+    release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/$vmIP/${CORE_NAME}";
 
-# calculate the next release for the current $release_dir
-nextReleaseVersion;
+    if [ ! -d "$release_dir" ]; then
+       echo "Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...";
+       mkdir -p "$release_dir";
+    fi
 
-# create dir for current release
-release_dir="${release_dir}/${next_release}/conf";
-mkdir -p "$release_dir";
+    # calculate the next release for the current $release_dir
+    nextReleaseVersion;
 
-echo "executing fetch-libraries"
-../fetch-libraries "$release_dir";
+    # create dir for current release
+    release_dir="${release_dir}/${next_release}/conf";
+    mkdir -p "$release_dir";
 
-echo "executing fetch-cores"
-../fetch-cores "$release_dir";
+    echo "executing fetch-libraries"
+    ../fetch-libraries "$release_dir" "$requestedProfile" "$CORE_NAME" "$vmIP";
 
-# todo: --------------- loop over vms end
+    echo "executing fetch-cores"
+    ../fetch-cores "$release_dir" "$requestedProfile" "$CORE_NAME" "$vmIP";
+    echo "here!!!!!"
+done
 
 # check solr server statuses
 if allServersUpForCoreProfile "$CORE_NAME" "$requestedProfile"; then

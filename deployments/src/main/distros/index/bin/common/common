@@ -65,6 +65,7 @@ function vmsForProfile() {
         if [ "${profileData[0]}" = "$1" -a "${profileData[1]}" = "$2" ]; then
             IFS=',' read -ra vmsForProfileArray <<< "${profileData[2]}"
             for vm in "${vmsForProfileArray[@]}"; do
+            echo " --------------> $vm"
                 __PROFILE_VMS+=($vm)
             done
         fi
