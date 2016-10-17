@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,6 +46,10 @@ public class CoTermController {
      */
     @Autowired
     public CoTermController(OntologyService<GOTerm> goOntologyService, CoTermLimit coTermLimit) {
+
+        Preconditions.checkArgument(goOntologyService != null, "The goOntologyService must not be null.");
+        Preconditions.checkArgument(coTermLimit != null, "The coTermLimit must not be null.");
+
         this.ontologyService = goOntologyService;
         this.coTermLimit = coTermLimit;
     }
