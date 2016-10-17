@@ -14,7 +14,7 @@ import org.springframework.core.io.Resource;
  * Created with IntelliJ IDEA.
  */
 @Configuration
-public class CoTermRepoConfig {
+public class CoTermRepoTestConfig {
 
     @Value("${coterm.source.manual}")
     private Resource manualResource;
@@ -23,12 +23,12 @@ public class CoTermRepoConfig {
     private Resource allResource;
 
     @Bean
-    public CoTermRepository coTermRepository() {
+    public CoTermRepository coTermRepository() throws IOException {
         CoTermRepositorySimpleMap coTermRepository;
         try{
             coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load co-occurring terms from manual source " +
+            throw new IOException("Failed to load co-occurring terms from manual source " +
                     (manualResource!=null?manualResource.getDescription():"unknown") + " or from all source " +
                     (allResource!=null?allResource.getDescription():"unknown"));
         }
