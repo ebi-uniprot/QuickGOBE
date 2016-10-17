@@ -1,10 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
 import com.google.common.base.Preconditions;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -62,7 +59,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     }
 
     /**
-     * Get all co-occurring terms for the requested term up to the supplied limit. The data within the file is
+     * Get all co-occurring terms for the requested term up to the supplied limit. The data within the source is
      * ordered by GOTerm and then probability score. Apply the predicate passed to this class for filtering the results.
      * @param id the GO Term for which we will lookup co-occurring terms.
      * @param limit Limit the number of co-occurring terms return to the limit specified.
@@ -85,14 +82,12 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     }
 
     /**
-     * Read the files that hold the co-occurring term data, and load to memory.
+     * Read the sources that hold the co-occurring term data, and load to memory.
      */
     class CoTermLoader {
-
         private final Logger logger = LoggerFactory.getLogger(CoTermLoader.class);
-
-        private final Resource manualCoTermsFile;
-        private final Resource allCoTermsFile;
+        private final Resource manualSource;
+        private final Resource allSource;
 
         /**
          *
@@ -103,43 +98,35 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
             Preconditions.checkArgument(manualCoTermsSource != null, "Resource manualCoTermsSource should not be null" +
                     ".");
             Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource should not be null.");
-            this.manualCoTermsFile = manualCoTermsSource;
-            this.allCoTermsFile = allCoTermSource;
+            this.manualSource = manualCoTermsSource;
+            this.allSource = allCoTermSource;
         }
 
         /**
-         * Read the files, load data into memory.
+         * Read the sources, load data into memory.
          */
         public void load() {
-            logger.info("Loading Co terms from file");
-
-            try {
-                coTermsAll = new HashMap<>();
-                loadCoTermsFile(allCoTermsFile.getFile(), coTermsAll);
-
-                coTermsManual = new HashMap<>();
-                loadCoTermsFile(manualCoTermsFile.getFile(), coTermsManual);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to load Co-occurring terms from file", e);
-            }
+            logger.info("Loading Co terms from sources");
+            loadCoTermsSource(allSource, coTermsAll = new HashMap<>());
+            loadCoTermsSource(manualSource, coTermsManual = new HashMap<>());
         }
 
         /**
-         * Load file contents into memory
-         * @param inputFile source file
-         * @param coTerms target map
+         * Load source contents into memory
+         * @param source of CoTerms.
+         * @param coTerms target map.
          */
-        private void loadCoTermsFile(File inputFile, Map<String, List<CoTerm>> coTerms) {
+        private void loadCoTermsSource(Resource source, Map<String, List<CoTerm>> coTerms) {
+            Preconditions.checkState(source.exists(), "The input source " + source.getDescription() + " for CoTerms " +
+                    "does not exist.");
             List<CoTerm> comparedTerms = new ArrayList<>();
             String line;
             String currentTerm = null;
             long lineCount = 0;
 
-            try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(source.getInputStream()))) {
 
-                //Read file which is sorted by source id, then size of significance ratio.
                 while ((line = br.readLine()) != null) {
-
                     lineCount++;
 
                     //Ignore any line that doesn't start with a GO id.
@@ -147,7 +134,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
                         continue;
                     }
 
-                    CoTerm CoTerm = fromFile(line);
+                    CoTerm CoTerm = parseInputString(line);
 
                     //one time initialisation
                     if (currentTerm == null) {
@@ -168,7 +155,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
 
                 //save last term
                 coTerms.put(currentTerm, comparedTerms);
-                logger.info("Loaded " + lineCount + " lines from " + inputFile.getName());
+                logger.info("Loaded " + lineCount + " lines from " + source.getDescription());
                 logger.info("Number of GO Terms loaded is " + coTerms.keySet().size());
 
             } catch (IOException e) {
@@ -176,8 +163,9 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
             }
         }
 
+
         /**
-         * Specification how to map file columns to CoTerm entity
+         * Specification how to map input string columns to CoTerm entity
          */
 
         private static final int COLUMN_ID = 0;
@@ -187,7 +175,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
         private static final int COLUMN_TOGETHER = 4;
         private static final int COLUMN_COMPARED = 5;
 
-        private CoTerm fromFile(String line) {
+        private CoTerm parseInputString(String line) {
             String[] columns = line.split("\\t");
             return new CoTerm(columns[COLUMN_ID], columns[COLUMN_COMPARE],
                     Float.parseFloat(columns[COLUMN_PROB]), Float.parseFloat(columns[COLUMN_SIG]),
