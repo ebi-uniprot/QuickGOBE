@@ -26,21 +26,35 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     private Map<String, List<CoTerm>> coTermsAll;
     private Map<String, List<CoTerm>> coTermsManual;
 
+    private CoTermRepositorySimpleMap() {}
+
     /**
      * Create a instance of CoTermRepositorySimpleMap without using the CoTermLoader inner class.
      * @param coTermsAll CoTerms derived from all sources.
      * @param coTermsManual CoTerms derived from non-electronic source.
      */
-    public CoTermRepositorySimpleMap(Map<String, List<CoTerm>> coTermsAll, Map<String, List<CoTerm>> coTermsManual) {
-        this.coTermsAll = coTermsAll;
-        this.coTermsManual = coTermsManual;
+    public static CoTermRepositorySimpleMap createCoTermRepositorySimpleMap(Map<String, List<CoTerm>> coTermsAll,
+            Map<String, List<CoTerm>>
+                    coTermsManual) {
+        CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
+        coTermRepository.coTermsAll = coTermsAll;
+        coTermRepository.coTermsManual = coTermsManual;
+        return coTermRepository;
     }
 
     /**
-     * Create a instance of CoTermRepositorySimpleMap with the expectation of using the CoTermLoader inner class.
+     * Create a instance of CoTermRepositorySimpleMap loading the co-occurring data from the resource sources.
+     * @param manualCoTermsSource source of co-occurring terms for Terms used in manually derived annotations.
+     * @param allCoTermSource source of co-occurring terms for Terms used in annotations derived from all sources.
+     * @throws IOException if the source of the co-occurring terms exists, but fails to be read.
      */
-    public CoTermRepositorySimpleMap() {
-
+    public static CoTermRepositorySimpleMap createCoTermRepositorySimpleMap(Resource manualCoTermsSource, Resource
+            allCoTermSource) throws IOException {
+        CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
+        CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
+                coTermRepository.new CoTermLoader(manualCoTermsSource, allCoTermSource);
+        coTermLoader.load();
+        return coTermRepository;
     }
 
     /**
@@ -86,7 +100,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     /**
      * Read the sources that hold the co-occurring term data, and load to memory.
      */
-    class CoTermLoader {
+    private class CoTermLoader {
         /**
          * Specification how to map input string columns to CoTerm entity
          */
@@ -106,7 +120,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
          * @param manualCoTermsSource source of co-occurring terms for Terms used in manually derived annotations.
          * @param allCoTermSource source of co-occurring terms for Terms used in annotations derived from all sources.
          */
-        CoTermLoader(Resource manualCoTermsSource, Resource allCoTermSource) {
+        private CoTermLoader(Resource manualCoTermsSource, Resource allCoTermSource) {
             Preconditions.checkArgument(manualCoTermsSource != null, "Resource manualCoTermsSource should not be null" +
                     ".");
             Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource should not be null.");
@@ -118,7 +132,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
          * Read the sources, load data into memory.
          * @throws IOException if the source of the co-occurring terms exists, but fails to be read.
          */
-        public void load() throws IOException {
+        private void load() throws IOException {
             logger.info("Loading Co terms from sources");
             loadCoTermsSource(allSource, coTermsAll = new HashMap<>());
             loadCoTermsSource(manualSource, coTermsManual = new HashMap<>());
@@ -180,7 +194,5 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
                     Float.parseFloat(columns[COLUMN_PROB]), Float.parseFloat(columns[COLUMN_SIG]),
                     Long.parseLong(columns[COLUMN_TOGETHER]), Long.parseLong(columns[COLUMN_COMPARED]));
         }
-
     }
-
 }
