@@ -36,7 +36,7 @@ public class CoTermRepositorySimpleMapTest {
         coTermsManual.put("GO:0001234", Arrays.asList(new CoTerm("GO:0001234", "GO:0009999", 99f, 47f, 34356, 456),
                 new CoTerm("GO:0001234", "GO:0055085", 24f, 4f, 465, 4564)));
 
-        coTermRepository = new CoTermRepositorySimpleMap(coTermsAll, coTermsManual);
+        coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(coTermsAll, coTermsManual);
 
     }
 
@@ -85,19 +85,17 @@ public class CoTermRepositorySimpleMapTest {
     @Test(expected = IllegalStateException.class)
     public void manualSourceDoesNotExistSoExceptionIsThrown() throws IOException {
         Resource mockManualResource = mock(Resource.class);
+        Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(false);
-        CoTermRepositorySimpleMap.CoTermLoader coTermLoader = coTermRepository.new CoTermLoader(mockManualResource,
-                mock(Resource.class));
-        coTermLoader.load();
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
     }
 
     @Test(expected = IllegalStateException.class)
     public void allSourceDoesNotExistSoExceptionIsThrown() throws Exception {
+        Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockAllResource.exists()).thenReturn(false);
-        CoTermRepositorySimpleMap.CoTermLoader coTermLoader = coTermRepository.new CoTermLoader(mock(Resource.class),
-                mockAllResource);
-        coTermLoader.load();
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
     }
 
     @Test(expected = IOException.class)
@@ -107,8 +105,6 @@ public class CoTermRepositorySimpleMapTest {
         when(mockManualResource.exists()).thenReturn(true);
         when(mockAllResource.exists()).thenReturn(true);
         when(mockAllResource.getInputStream()).thenThrow(IOException.class);
-        CoTermRepositorySimpleMap.CoTermLoader coTermLoader = coTermRepository.new CoTermLoader(mockManualResource,
-                mockAllResource);
-        coTermLoader.load();
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
     }
 }
