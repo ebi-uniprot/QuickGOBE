@@ -39,30 +39,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class CoTermControllerIT {
 
-
     private static final String RESOURCE_URL = "/ontology/go/coterms";
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    private MockMvc mockMvc;
-
-    private static final int NUMBER_OF_ALL_CO_TERM_RECORDS = 12 ;
+    private static final int NUMBER_OF_ALL_CO_TERM_RECORDS = 12;
     private static final String GO_0000001 = "GO:0000001";
     private static final String GO_9000001 = "GO:9000001";
     private static final String MANUAL_ONLY_TERM = "GO:8888881";
     private static final String ALL_ONLY_TERM = "GO:7777771";
-
     private static final String SOURCE_VALUES = Arrays.stream(CoTermSource.values())
             .map(CoTermSource::name)
             .collect(Collectors.joining(", "));
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+    private MockMvc mockMvc;
 
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .build();
     }
-
 
     @Test
     public void canRetrieveCoTermsForTerm() throws Exception {
@@ -116,7 +110,6 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     public void sourceParameterShouldNotBeCaseSensitive() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(MANUAL_ONLY_TERM, "source=MaNuAl")));
@@ -129,7 +122,6 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     public void doNotExpectErrorIfValueForSourceIsLeftBlank() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "source=")));
@@ -139,18 +131,17 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     public void errorIfValueForSourceIsUnknown() throws Exception {
         String requestedSource = "FUBAR";
-        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "source="+requestedSource)));
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "source=" + requestedSource)));
         response.andExpect(status().isBadRequest());
         expectInvalidSourceErrorMessage(response, requestedSource);
     }
 
     // Tests for limit parameter
     @Test
-    public void setNumberOfResponsesBasedOnLimit() throws Exception{
+    public void setNumberOfResponsesBasedOnLimit() throws Exception {
 
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=3")));
 
@@ -185,25 +176,23 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     public void ifTheLimitIsSetToNegativeNumberReturnBadRequest() throws Exception {
-        String requestedLimit="-1";
+        String requestedLimit = "-1";
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
         response.andExpect(status().isBadRequest());
         expectNegativeLimitErrorMessage(response);
     }
 
-
     @Test
     public void ifTheLimitIsSetToNonNumberReturnBadRequest() throws Exception {
-        String requestedLimit="AAA";
+        String requestedLimit = "AAA";
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
         response.andExpect(status().isBadRequest());
         expectInvalidLimitErrorMessage(response);
     }
 
-     // Tests for similarity threshold
+    // Tests for similarity threshold
 
     @Test
     public void retrieveAllCoTermsUsingSimilarityThresholdBelowThatFoundInTheRecordsForAllCoTerms() throws Exception {
@@ -243,14 +232,13 @@ public class CoTermControllerIT {
                 .andExpect(status().isOk());
     }
 
-
     private String buildPathToResource(String id) {
         return RESOURCE_URL + "/" + id;
     }
 
     private String buildPathToResource(String id, String... args) {
         return RESOURCE_URL + "/" + id + Arrays.stream(args)
-                .collect(Collectors.joining("&","?",""));
+                .collect(Collectors.joining("&", "?", ""));
     }
 
     private ResultActions expectFieldsInResults(ResultActions result, List<String> ids) throws Exception {
@@ -275,7 +263,7 @@ public class CoTermControllerIT {
     }
 
     private ResultActions expectInvalidSourceErrorMessage(ResultActions result, String requestedSource) throws
-                                                                                                       Exception {
+                                                                                                        Exception {
         return result
                 .andDo(print())
                 .andExpect(jsonPath("$.messages", hasItem(containsString("The value for source should be one of " +
@@ -283,10 +271,11 @@ public class CoTermControllerIT {
     }
 
     private ResultActions expectInvalidLimitErrorMessage(ResultActions result) throws
-                                                                                                        Exception {
+                                                                               Exception {
         return result
                 .andDo(print())
-                .andExpect(jsonPath("$.messages", hasItem(containsString("The value for co-occurring terms limit is not ALL, or a number"))));
+                .andExpect(jsonPath("$.messages",
+                        hasItem(containsString("The value for co-occurring terms limit is not ALL, or a number"))));
     }
 
     private ResultActions expectNegativeLimitErrorMessage(ResultActions result) throws Exception {
