@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepositorySimpleMap.CoTermRecordParser.createFromText;
+
 /**
  * Retrieve the co-occurring terms for the selected term from the in-memory map.
  *
@@ -105,12 +107,6 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
          * Specification how to map input string columns to CoTerm entity
          */
 
-        private static final int COLUMN_ID = 0;
-        private static final int COLUMN_COMPARE = 1;
-        private static final int COLUMN_PROB = 2;
-        private static final int COLUMN_SIG = 3;
-        private static final int COLUMN_TOGETHER = 4;
-        private static final int COLUMN_COMPARED = 5;
         private final Logger logger = LoggerFactory.getLogger(CoTermLoader.class);
         private final Resource manualSource;
         private final Resource allSource;
@@ -150,21 +146,13 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
             List<CoTerm> comparedTerms = new ArrayList<>();
             String line;
             String currentTerm = null;
-            long lineCount = 0;
 
             BufferedReader br = new BufferedReader(new InputStreamReader(source.getInputStream()));
+            br.readLine(); //throw away first line as it will be the header
 
             while ((line = br.readLine()) != null) {
-                lineCount++;
+                CoTerm CoTerm = createFromText(line);
 
-                //Ignore any line that doesn't start with a GO id.
-                if (!line.startsWith("GO")) {
-                    continue;
-                }
-
-                CoTerm CoTerm = parseInputString(line);
-
-                //one time initialisation
                 if (currentTerm == null) {
                     currentTerm = CoTerm.getId();
                 }
@@ -183,12 +171,20 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
 
             //save last term
             coTerms.put(currentTerm, comparedTerms);
-            logger.info("Loaded " + lineCount + " lines from " + source.getDescription());
             logger.info("Number of GO Terms loaded is " + coTerms.keySet().size());
 
         }
+    }
 
-        private CoTerm parseInputString(String line) {
+    static class CoTermRecordParser {
+        private static final int COLUMN_ID = 0;
+        private static final int COLUMN_COMPARE = 1;
+        private static final int COLUMN_PROB = 2;
+        private static final int COLUMN_SIG = 3;
+        private static final int COLUMN_TOGETHER = 4;
+        private static final int COLUMN_COMPARED = 5;
+
+        static CoTerm createFromText(String line) {
             String[] columns = line.split("\\t");
             return new CoTerm(columns[COLUMN_ID], columns[COLUMN_COMPARE],
                     Float.parseFloat(columns[COLUMN_PROB]), Float.parseFloat(columns[COLUMN_SIG]),
@@ -196,3 +192,5 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
         }
     }
 }
+
+
