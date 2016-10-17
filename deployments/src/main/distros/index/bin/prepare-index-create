@@ -64,7 +64,6 @@ fi
 # ------------------------ start off the indexing via LSF ------------------------
 
 vmsForProfile "$CORE_NAME" "$requestedProfile"
-echo "**** size of VM list is ${#PROFILE_VMS[@]}"
 for vm in ${PROFILE_VMS[@]}; do
     vmIP="$(extractVMFromURL $vm)"
     release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/$vmIP/${CORE_NAME}";
@@ -86,7 +85,6 @@ for vm in ${PROFILE_VMS[@]}; do
 
     echo "executing fetch-cores"
     ../fetch-cores "$release_dir" "$requestedProfile" "$CORE_NAME" "$vmIP";
-    echo "here!!!!!"
 done
 
 # check solr server statuses
