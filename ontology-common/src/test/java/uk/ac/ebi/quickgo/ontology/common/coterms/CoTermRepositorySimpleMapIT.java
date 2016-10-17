@@ -5,7 +5,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,12 +23,9 @@ public class CoTermRepositorySimpleMapIT {
 
     @Before
     public void setup() throws IOException {
-        Resource manualResource = new ClassPathResource("CoTermsManual");
-        Resource allResource = new ClassPathResource("CoTermsAll");
-        coTermRepository = new CoTermRepositorySimpleMap();
-        CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
-                coTermRepository.new CoTermLoader(manualResource, allResource);
-        coTermLoader.load();
+        coTermRepository = CoTermRepositorySimpleMap
+                .createCoTermRepositorySimpleMap(new ClassPathResource("CoTermsManual"),
+                        new ClassPathResource("CoTermsAll"));
     }
 
     @Test
