@@ -107,6 +107,14 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test
+    public void exceptionThrownIfLimitIsLessThanZero() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The findCoTerms limit should not be less than 1.");
+        coTermRepository.findCoTerms(ID_1, CoTermSource.ALL, -1, NO_FILTER);
+    }
+
+
+    @Test
     public void exceptionThrownIfFilterIsNull() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The findCoTerms filter should not be null.");
