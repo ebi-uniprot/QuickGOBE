@@ -33,8 +33,8 @@ public class CoTermRepositorySimpleMapTest {
     public static final CoTerm CO_TERM_A1Y = new CoTerm(ID_1, ID_2, 54f, 55f, 335, 9424);
     public static final CoTerm CO_TERM_A1Z = new CoTerm(ID_1, ID_3, 24f, 24f, 5732, 355);
     public static final CoTerm CO_TERM_A2X = new CoTerm(ID_4, ID_1, 34f, 66f, 556, 872);
-    public static final CoTerm CO_TERM_MX  = new CoTerm(ID_6, ID_5, 99f, 47f, 34356, 456);
-    public static final CoTerm CO_TERM_MY  = new CoTerm(ID_6, ID_1, 24f, 4f, 465, 4564);
+    public static final CoTerm CO_TERM_MX = new CoTerm(ID_6, ID_5, 99f, 47f, 34356, 456);
+    public static final CoTerm CO_TERM_MY = new CoTerm(ID_6, ID_1, 24f, 4f, 465, 4564);
     public static final Predicate<CoTerm> NO_FILTER = t -> true;
 
     private CoTermRepositorySimpleMap coTermRepository;
