@@ -103,7 +103,6 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
             return Collections.emptyList();
         }
 
-        //If we have been passed a filtering predicate, use it. Could be extended to be a list of filters.
         return results.stream()
                 .filter(filter)
                 .limit(limit)
