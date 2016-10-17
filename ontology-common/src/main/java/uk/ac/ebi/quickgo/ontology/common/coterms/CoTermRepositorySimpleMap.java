@@ -89,7 +89,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      */
     class CoTermLoader {
 
-        private final Logger logger = LoggerFactory.getLogger(uk.ac.ebi.quickgo.ontology.common.coterms.CoTermLoader.class);
+        private final Logger logger = LoggerFactory.getLogger(CoTermLoader.class);
 
         private final Resource manualCoTermsFile;
         private final Resource allCoTermsFile;
