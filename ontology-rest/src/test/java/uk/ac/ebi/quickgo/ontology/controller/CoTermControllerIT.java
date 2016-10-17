@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CoTermControllerIT {
 
 
-    private static final String RESOURCE_URL = "/QuickGO/services/go/coterms";
+    private static final String RESOURCE_URL = "/ontology/go/coterms";
 
     @Autowired
     private WebApplicationContext webApplicationContext;

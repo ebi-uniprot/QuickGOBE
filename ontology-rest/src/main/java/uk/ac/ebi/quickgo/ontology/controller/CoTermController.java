@@ -28,10 +28,9 @@ import static uk.ac.ebi.quickgo.ontology.controller.GOController.GO_ID_FORMAT;
  * @author Tony Wardell
  */
 @RestController
-@RequestMapping(value = "/QuickGO/services/go")
+@RequestMapping(value = "/ontology/go/coterms")
 public class CoTermController {
 
-    private static final String COTERMS_RESOURCE = "coterms";
     //Populate a String of CoTerm source values ahead of time for use in error messages.
     private static final String SOURCE_VALUES = Arrays.stream(CoTermSource.values())
             .map(CoTermSource::name)
@@ -68,7 +67,7 @@ public class CoTermController {
     @ApiOperation(value = "Get co-occurring term information for a single GO Term id.",
             notes = "If possible, response fields include: id, name, definition, probability ratio, similarity ratio," +
                     " together, compared.")
-    @RequestMapping(value = COTERMS_RESOURCE + "/{id}", method = RequestMethod.GET,
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(@PathVariable(value = "id") String id,
             @RequestParam(value = "source", defaultValue = "ALL") String source,
