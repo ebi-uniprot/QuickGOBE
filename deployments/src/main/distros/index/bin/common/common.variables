@@ -2,7 +2,7 @@
 
 # ---------------------------- VALIDATE USER ----------------------------
 # require VALID_USERS defined
-if [ -z $VALID_USERS ]; then
+if [ -z "$VALID_USERS" ]; then
     echo "VALID_USERS array variable must be defined, e.g., VALID_USERS=(\"uni_qgo\");";
     exit 1;
 fi

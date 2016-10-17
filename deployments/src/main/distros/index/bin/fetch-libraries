@@ -5,7 +5,7 @@ set -e
 
 QUICKGO_LIB_PATH="lib/quickgo"
 
-VALID_USERS=("uni_qgo");
+VALID_USERS=("uni_qgo" "eddturner");
 
 if [ -z "$1" ] || [ "$1" == "submit" ]; then
    echo "Missing the release directory to copy the libraries into";

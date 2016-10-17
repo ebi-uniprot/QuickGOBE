@@ -64,7 +64,7 @@ fi
 # ------------------------ start off the indexing via LSF ------------------------
 # todo: --------------- loop over vms start
 # todo: add vm name to end
-release_dir="${SOLR_INDEX_DIR}/${CORE_NAME}/${requestedProfile}";
+release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/${CORE_NAME}";
 
 if [ ! -d "$release_dir" ]; then
    echo "Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...";
