@@ -48,8 +48,7 @@ public class ServiceConfig {
                 goDocumentConverter(),
                 OntologyType.GO,
                 queryStringSanitizer(),
-                ontologyGraphTraversal,
-                coTermRepository);
+                ontologyGraphTraversal);
     }
 
     @Bean
@@ -60,8 +59,7 @@ public class ServiceConfig {
                 ecoDocConverter(),
                 OntologyType.ECO,
                 queryStringSanitizer(),
-                ontologyGraphTraversal,
-                emptyCoTermRepository());  //todo
+                ontologyGraphTraversal);
     }
 
     @Bean

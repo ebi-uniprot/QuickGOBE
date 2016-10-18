@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTerm;
+import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
@@ -14,6 +15,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -36,16 +38,14 @@ public class CoTermController {
     public static final String LIMIT_ALL = "ALL";
     @Value("${coterm.default.limit:50}")
     private int defaultLimit;
-    private final OntologyService<GOTerm> ontologyService;
+    private CoTermRepository coTermRepository;
 
     /**
      * Create the endpoint for Co Terms.
-     * @param goOntologyService Service layer class consolidates ontology functionality
      */
     @Autowired
-    public CoTermController(OntologyService<GOTerm> goOntologyService) {
-        Preconditions.checkArgument(goOntologyService != null, "The goOntologyService must not be null.");
-        this.ontologyService = goOntologyService;
+    public CoTermController(CoTermRepository coTermRepository) {
+        this.coTermRepository = coTermRepository;
     }
 
     /**
@@ -80,8 +80,9 @@ public class CoTermController {
 
         validateGoTerm(id);
 
-        return getResultsResponse(ontologyService.findCoTermsByGoTermId(id, toCoTermSource(source),
-                workoutLimit(limit), similarityThreshold));
+        Predicate<CoTerm> filter = ct -> ct.getSignificance() >= similarityThreshold;
+        return getResultsResponse(coTermRepository.findCoTerms(id, toCoTermSource(source), workoutLimit
+                (limit), filter));
     }
 
     /**

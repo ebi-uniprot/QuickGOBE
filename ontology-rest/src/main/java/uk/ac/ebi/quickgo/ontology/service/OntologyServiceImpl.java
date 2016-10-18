@@ -48,7 +48,6 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     private OntologyRepository ontologyRepository;
     private OntologyDocConverter<T> converter;
     private String ontologyType;
-    private CoTermRepository coTermRepository;
 
     // necessary for Spring to create a proxy class
     private OntologyServiceImpl() {}
@@ -58,22 +57,19 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
             OntologyDocConverter<T> converter,
             OntologyType type,
             QueryStringSanitizer queryStringSanitizer,
-            OntologyGraphTraversal ontologyTraversal,
-            CoTermRepository coTermRepository) {
+            OntologyGraphTraversal ontologyTraversal) {
 
         Preconditions.checkArgument(repository != null, "Ontology repository cannot be null");
         Preconditions.checkArgument(type != null, "Ontology type cannot be null");
         Preconditions.checkArgument(converter != null, "Ontology converter cannot be null");
         Preconditions.checkArgument(queryStringSanitizer != null, "Ontology query string sanitizer cannot be null");
         Preconditions.checkArgument(ontologyTraversal != null, "OntologyGraphTraversal cannot be null");
-        Preconditions.checkArgument(coTermRepository != null, "CoTermRepository cannot be null");
 
         this.ontologyType = type.name();
         this.ontologyRepository = repository;
         this.converter = converter;
         this.queryStringSanitizer = queryStringSanitizer;
         this.ontologyTraversal = ontologyTraversal;
-        this.coTermRepository = coTermRepository;
     }
 
     @Override public QueryResult<T> findAllByOntologyType(OntologyType type, Page page) {
@@ -135,19 +131,6 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
                 .map(term -> this.insertDescendants(term, relations))
                 .collect(Collectors.toList());
-    }
-
-    @Override public List<CoTerm> findCoTermsByGoTermId(String id, CoTermSource type, int limit, float
-            similarityThreshold) {
-
-//        If at any stage, more that one type of filtering operation is required we can use reduce to build a single
-//        predicate as per the following code
-//        Predicate<CoTerm> compositePredicate =
-//                allPredicates.stream()
-//                        .reduce(w -> true, Predicate::and);
-
-        Predicate<CoTerm> filter = ct -> ct.getSignificance() >= similarityThreshold;
-        return coTermRepository.findCoTerms(id, type, limit, filter);
     }
 
     List<String> buildIdList(List<String> ids) {

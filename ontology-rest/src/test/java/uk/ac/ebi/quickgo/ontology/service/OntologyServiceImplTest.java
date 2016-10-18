@@ -1,9 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTerm;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
@@ -18,7 +15,6 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +52,6 @@ public class OntologyServiceImplTest {
     private GODocConverter goDocumentConverterMock;
     private ECODocConverter ecoDocumentConverterMock;
     private OntologyGraphTraversal ontologyTraversalMock;
-    private CoTermRepository coTermsRepositoryMock;
 
     @Before
     public void setUp() throws Exception {
@@ -64,52 +59,49 @@ public class OntologyServiceImplTest {
         goDocumentConverterMock = mock(GODocConverter.class);
         ecoDocumentConverterMock = mock(ECODocConverter.class);
         ontologyTraversalMock = mock(OntologyGraphTraversal.class);
-        coTermsRepositoryMock = mock(CoTermRepository.class);
 
         goOntologyService = new OntologyServiceImpl<>
                 (repositoryMock,
                         goDocumentConverterMock,
                         OntologyType.GO,
                         new SolrQueryStringSanitizer(),
-                        ontologyTraversalMock,
-                        coTermsRepositoryMock);
+                        ontologyTraversalMock);
         ecoOntologyService = new OntologyServiceImpl<>
                 (repositoryMock,
                         ecoDocumentConverterMock,
                         OntologyType.ECO,
                         new SolrQueryStringSanitizer(),
-                        ontologyTraversalMock,
-                        coTermsRepositoryMock);
+                        ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullRepoProducesIllegalArgumentException() {
         new OntologyServiceImpl<>(null, goDocumentConverterMock, OntologyType.GO, new SolrQueryStringSanitizer(),
-                ontologyTraversalMock, coTermsRepositoryMock);
+                ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullConverterProducesIllegalArgumentException() {
         new OntologyServiceImpl<>(repositoryMock, null, OntologyType.GO, new SolrQueryStringSanitizer(),
-                ontologyTraversalMock, coTermsRepositoryMock);
+                ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullDocTypeProducesIllegalArgumentException() {
         new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, null,
-                new SolrQueryStringSanitizer(), ontologyTraversalMock, coTermsRepositoryMock);
+                new SolrQueryStringSanitizer(), ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullQueryStringSanitizerProducesIllegalArgumentException() {
         new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO, null,
-                ontologyTraversalMock, coTermsRepositoryMock);
+                ontologyTraversalMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullOntologyTraversalProducesIllegalArgumentException() {
         new OntologyServiceImpl<>(repositoryMock, goDocumentConverterMock, OntologyType.GO, new
-                SolrQueryStringSanitizer(), null, coTermsRepositoryMock);
+                SolrQueryStringSanitizer(), null);
     }
 
     public class GOServiceTests {
@@ -767,50 +759,6 @@ public class OntologyServiceImplTest {
 
         private List<String> idsViaOntologyService(String... ids) {
             return ecoOntologyService.buildIdList(Arrays.asList(ids));
-        }
-    }
-
-    public class CoTermServiceTests{
-
-        Predicate<CoTerm> filterTrue = t->true;
-
-        @Test
-        public void retrievesListOfCoTermsForGoTerm() {
-
-            String id = "GO:0003824";
-            int limit = 5;
-            float simThreshold = 0f;
-
-            CoTerm coTerm1 = new CoTerm("GO:0003824", "GO:0003824", 11.63f, 100f, 3948313, 3948313);
-            CoTerm coTerm2 = new CoTerm("GO:0003824", "GO:0008152", 5.47f, 24.64f, 1346183, 2861162);
-            CoTerm coTerm3 = new CoTerm("GO:0003824", "GO:0016740", 2.27f, 12.65f, 1043613, 5345589);
-
-            List<CoTerm> results = Arrays.asList(coTerm1, coTerm2, coTerm3 );
-
-            when(coTermsRepositoryMock.findCoTerms(id, CoTermSource.MANUAL, limit, filterTrue )).thenReturn(results);
-
-            List<CoTerm> coTerms = goOntologyService.findCoTermsByGoTermId(id, CoTermSource.MANUAL, limit,
-                    simThreshold );
-
-            assertThat(coTerms, hasSize(3));
-            assertThat(coTerms, containsInAnyOrder(coTerm1, coTerm2, coTerm3));
-        }
-
-
-        @Test(expected = IllegalArgumentException.class)
-        public void ecoOntologyServiceWillNotProcessCoTermRequestsThrowsException() {
-
-            String id = "GO:0003824";
-            int limit = 5;
-            float simThreshold = 0f;
-
-            doThrow(new IllegalArgumentException()).when(coTermsRepositoryMock).findCoTerms(id, CoTermSource.MANUAL,
-                    limit, filterTrue );
-
-           ecoOntologyService.findCoTermsByGoTermId(id, CoTermSource.MANUAL, limit,
-                    simThreshold );
-
-
         }
     }
 
