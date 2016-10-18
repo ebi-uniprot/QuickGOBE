@@ -94,7 +94,7 @@ function isValidProfileId {
         elif [ $# -eq 3 -a "$1" = "$core" -a "$2" = "$profileName" ]; then
             IFS=',' read -ra vmsForProfileArray <<< "$profileVMs"
             for vm in "${vmsForProfileArray[@]}"; do
-                if [ "$vm" = "$3" ]; then
+                if [ "$vm" = "$3" -o "$(extractVMFromURL $vm)" = "$3" ]; then
                     return 0
                 fi
             done

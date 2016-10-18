@@ -11,7 +11,7 @@ if ! source "common/common" || ! source "common/common.variables" ; then
 fi
 
 # ------------------------ SHOW ASSOCIATED VM PURPOSE ------------------------
-printDivider;
+printDivider "Server statuses";
 
 for core in $CORES; do
     prettyEcho "1" "Core:   $core"
