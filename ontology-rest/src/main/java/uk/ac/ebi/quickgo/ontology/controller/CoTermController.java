@@ -5,10 +5,13 @@ import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
 import uk.ac.ebi.quickgo.ontology.coterms.CoTermLimit;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
+import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -66,12 +69,17 @@ public class CoTermController {
      *     <li>all ids are valid: response consists of a 200 with the co-occurring term information including
      *     statistics</li>
      *     <li>any id is not found: response returns 404</li>
-     *     <li>any id is of the an invalid format: response returns 400</li>
+     *     <li>any id with an invalid format: response returns 400</li>
      * </ul>
      */
-    @ApiOperation(value = "Get co-occurring term information for a single GO Term id.",
-            notes = "If possible, response fields include: id, name, definition, probability ratio, similarity ratio," +
-                    " together, compared.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "All request values are valid, and any co-occurring terms identified " +
+                    "for the supplied GO term id are returned."),
+            @ApiResponse(code = 500, message = "Internal server error occurred whilst searching for co-occurring terms",
+                    response = ResponseExceptionHandler.ErrorInfo.class),
+            @ApiResponse(code = 400, message = "Bad request due to a validation issue with one of the request values.",
+                    response = ResponseExceptionHandler.ErrorInfo.class)})
+    @ApiOperation(value = "Get co-occurring term information for a single GO Term id.")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(@PathVariable(value = "id") String id,
