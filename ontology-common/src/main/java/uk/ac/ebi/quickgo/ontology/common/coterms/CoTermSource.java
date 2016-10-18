@@ -1,5 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
  *
  * Types of CoTerm data by annotation source.
@@ -12,5 +15,24 @@ package uk.ac.ebi.quickgo.ontology.common.coterms;
 public enum CoTermSource {
 
     ALL,
-    MANUAL
+    MANUAL;
+
+    /**
+     * Test to see if a value exists as a CoTermSource.
+     */
+    public static boolean isValidValue(String value) {
+       return Arrays.stream(CoTermSource.values())
+                .map(CoTermSource::name)
+                .anyMatch(n -> n.equals(value));
+    }
+
+    /**
+     * Populate a String of CoTerm source values.
+     * @return list of CoTermSource values.
+     */
+    public static String valuesAsCSV() {
+        return Arrays.stream(CoTermSource.values())
+                .map(CoTermSource::name)
+                .collect(Collectors.joining(", "));
+    }
 }
