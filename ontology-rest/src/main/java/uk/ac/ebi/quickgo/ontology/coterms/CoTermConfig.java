@@ -29,11 +29,6 @@ public class CoTermConfig {
     private Resource allResource;
 
     @Bean
-    public CoTermLimit coTermLimit(){
-        return new CoTermLimit(defaultLimit);
-    }
-
-    @Bean
     public CoTermRepository coTermRepository() {
         CoTermRepositorySimpleMap coTermRepository;
         try{

@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTerm;
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
-import uk.ac.ebi.quickgo.ontology.coterms.CoTermLimit;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.rest.ParameterException;
@@ -16,6 +15,7 @@ import io.swagger.annotations.ApiResponses;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,22 +33,19 @@ import static uk.ac.ebi.quickgo.ontology.controller.validation.GOTermPredicate.i
 @RequestMapping(value = "/ontology/go/coterms")
 public class CoTermController {
 
-    private final CoTermLimit coTermLimit;
+    public static final String LIMIT_ALL = "ALL";
+    @Value("${coterm.default.limit:50}")
+    private int defaultLimit;
     private final OntologyService<GOTerm> ontologyService;
 
     /**
      * Create the endpoint for Co Terms.
      * @param goOntologyService Service layer class consolidates ontology functionality
-     * @param coTermLimit provides the correct limit for the number of co terms to return.
      */
     @Autowired
-    public CoTermController(OntologyService<GOTerm> goOntologyService, CoTermLimit coTermLimit) {
-
+    public CoTermController(OntologyService<GOTerm> goOntologyService) {
         Preconditions.checkArgument(goOntologyService != null, "The goOntologyService must not be null.");
-        Preconditions.checkArgument(coTermLimit != null, "The coTermLimit must not be null.");
-
         this.ontologyService = goOntologyService;
-        this.coTermLimit = coTermLimit;
     }
 
     /**
@@ -84,7 +81,7 @@ public class CoTermController {
         validateGoTerm(id);
 
         return getResultsResponse(ontologyService.findCoTermsByGoTermId(id, toCoTermSource(source),
-                coTermLimit.workoutLimit(limit), similarityThreshold));
+                workoutLimit(limit), similarityThreshold));
     }
 
     /**
@@ -116,5 +113,20 @@ public class CoTermController {
         }
         return CoTermSource.valueOf(asUpperCase);
     }
+
+    public int workoutLimit(String limit) {
+        if (limitNotSpecified(limit))return defaultLimit;
+        if (userHasRequestedAllCoTerms(limit)) return Integer.MAX_VALUE;
+        return Integer.parseInt(limit);
+    }
+
+    private boolean limitNotSpecified(String limit){
+        return limit==null;
+    }
+
+    private boolean userHasRequestedAllCoTerms(String limit){
+        return LIMIT_ALL.equalsIgnoreCase(limit);
+    }
+
 
 }

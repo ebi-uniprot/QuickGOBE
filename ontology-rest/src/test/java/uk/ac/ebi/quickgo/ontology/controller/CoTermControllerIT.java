@@ -168,37 +168,32 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void ifTheLimitIsLeftEmptyUseDefaultLimit() throws Exception {
+    public void ifTheLimitIsLeftEmptyTheError() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=")));
-        expectFieldsInResults(response, Arrays.asList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
-                .andExpect(status().isOk());
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void ifTheLimitIsSetToZeroUseDefaultLimit() throws Exception {
+    public void ifTheLimitIsSetToZeroThenExpectError() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=0")));
-        expectFieldsInResults(response, Arrays.asList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
-                .andExpect(status().isOk());
+        response.andExpect(status().isBadRequest());
+        expectLimitErrorMessage(response);
     }
 
     @Test
-    public void ifTheLimitIsSetToNegativeNumberReturnBadRequest() throws Exception {
+    public void ifTheLimitIsSetToNegativeNumberThenExpectError() throws Exception {
         String requestedLimit = "-1";
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
         response.andExpect(status().isBadRequest());
-        expectNegativeLimitErrorMessage(response);
+        expectLimitErrorMessage(response);
     }
 
     @Test
-    public void ifTheLimitIsSetToNonNumberReturnBadRequest() throws Exception {
+    public void ifTheLimitIsSetToNonNumberThenExpectError() throws Exception {
         String requestedLimit = "AAA";
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
         response.andExpect(status().isBadRequest());
-        expectInvalidLimitErrorMessage(response);
     }
 
     // Tests for similarity threshold
@@ -294,9 +289,9 @@ public class CoTermControllerIT {
                         hasItem(containsString("The value for co-occurring terms limit is not ALL, or a number"))));
     }
 
-    private ResultActions expectNegativeLimitErrorMessage(ResultActions result) throws Exception {
+    private ResultActions expectLimitErrorMessage(ResultActions result) throws Exception {
         return result
                 .andDo(print())
-                .andExpect(jsonPath("$.messages", hasItem(containsString("The value for limit cannot be negative"))));
+                .andExpect(jsonPath("$.messages", hasItem(containsString("The findCoTerms limit should not be less than 1."))));
     }
 }
