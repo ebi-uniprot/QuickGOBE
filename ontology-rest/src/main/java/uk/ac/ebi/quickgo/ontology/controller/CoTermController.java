@@ -35,10 +35,6 @@ import static uk.ac.ebi.quickgo.ontology.controller.validation.GOTermPredicate.i
 @RequestMapping(value = "/ontology/go/coterms")
 public class CoTermController {
 
-    //Populate a String of CoTerm source values ahead of time for use in error messages.
-    private static final String SOURCE_VALUES = Arrays.stream(CoTermSource.values())
-            .map(CoTermSource::name)
-            .collect(Collectors.joining(", "));
     private final CoTermLimit coTermLimit;
     private final OntologyService<GOTerm> ontologyService;
 
@@ -89,7 +85,7 @@ public class CoTermController {
 
         validateGoTerm(id);
 
-        return getResultsResponse(ontologyService.findCoTermsByGoTermId(id, validateCoTermSource(source),
+        return getResultsResponse(ontologyService.findCoTermsByGoTermId(id, toCoTermSource(source),
                 coTermLimit.workoutLimit(limit), similarityThreshold));
     }
 
@@ -114,15 +110,13 @@ public class CoTermController {
         }
     }
 
-    private CoTermSource validateCoTermSource(String source) {
-        CoTermSource coTermSource;
-        try {
-            coTermSource = CoTermSource.valueOf(source.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("The value for source should be one of " + SOURCE_VALUES + " and not "
-                    + source);
+    private CoTermSource toCoTermSource(String source) {
+        final String asUpperCase = source.toUpperCase();
+        if(!CoTermSource.isValidValue(asUpperCase)){
+            throw new IllegalArgumentException("The value for source should be one of " + CoTermSource.valuesAsCSV() +
+                    " and not " + source + ".");
         }
-        return coTermSource;
+        return CoTermSource.valueOf(asUpperCase);
     }
 
 }
