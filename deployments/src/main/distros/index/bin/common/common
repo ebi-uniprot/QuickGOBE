@@ -219,15 +219,3 @@ function printDivider {
     fi
     echo "===========================$title===========================";
 }
-
-function updateQuickGOServiceJarLocation {
-    if [ $# -ne 3 ]; then
-        echo "Cannot set QuickGO service jar location in 'updateQuickGOServiceJarLocation'. Function expected 2 arguments: 1.) profile and 2.) vm."
-        exit 1;
-    else
-        local requestedProfile="$1"
-        local requestedVM="$2"
-    fi
-    # java class path -- include all jars for creating the indexes
-    QUICKGO_SERVICE_JAR="${SOLR_CONFIG_DIR}/$requestedProfile/$requestedVM/lib/quickgo/*"
-}

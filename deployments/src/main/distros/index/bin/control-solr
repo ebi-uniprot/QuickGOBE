@@ -80,7 +80,7 @@ elif [ "$1" == "stop" ] || [ "$1" == "start" ]; then
 
     for vm in $(vmsForProfile "$PROFILE"); do
         VM_NAME=$(extractVMFromURL $vm)
-        resetProfileId;
+        updateSolrVariables "$PROFILE" "$VM_NAME";
         if [ ! -z "$REQUESTED_VM" -a "$REQUESTED_VM" = "$(extractVMFromURL $vm)" ] || [ $# -eq 2 ]; then
             if serverIsUp "$vm"; then # server is up
                 if [ "$ACTION" == "start" ]; then

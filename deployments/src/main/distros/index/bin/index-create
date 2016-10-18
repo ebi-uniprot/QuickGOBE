@@ -49,7 +49,8 @@ fi
 
 # ------------------------ compute the java indexing job string ------------------------
 vm="$(extractVMFromURL $requestedVM)"
-updateQuickGOServiceJarLocation "$requestedProfile" "$vm" "$CORE_NAME";
+QUICKGO_SERVICE_JAR=${QUICKGO_SERVICE_JAR/PROFILE_PLACEHOLDER/$requestedProfile}
+QUICKGO_SERVICE_JAR=${QUICKGO_SERVICE_JAR/VM_PLACEHOLDER/$vm}
 javaJob="bsub $(lsfJavaJobOptions)";
 
 # ------------------------ start off the indexing via LSF ------------------------
