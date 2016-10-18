@@ -73,8 +73,8 @@ public class CoTermController {
      * </ul>
      */
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "All request values are valid, and any co-occurring terms identified " +
-                    "for the supplied GO term id are returned."),
+            @ApiResponse(code = 200, message = "All request values are valid, and co-occurring terms identified " +
+                    "for the supplied GO term id are returned if they exist."),
             @ApiResponse(code = 500, message = "Internal server error occurred whilst searching for co-occurring terms",
                     response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue with one of the request values.",
