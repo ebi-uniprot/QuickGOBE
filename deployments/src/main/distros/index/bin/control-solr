@@ -9,12 +9,12 @@
 ##      stop [profile] [vm]     => stop a profile's machines/specific machine
 
 readonly VALID_USERS=("uni_qgo" "eddturner");
+readonly ACTION="$1";
 readonly PROFILE="$2"
-readonly VM_NAME="$3"
+readonly REQUESTED_VM="$3"
 
 # ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
-source "index.variables"
-if ! source "../common/common" || ! source "../common/common.variables" || ! source "index.variables"; then
+if ! source "common/common" || ! source "common/common.variables" ; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
@@ -22,7 +22,7 @@ fi
 ## ---------------------------- UTILITY FUNCTIONS ----------------------------
 function showHelp {
     cat<<EOF
-Usage: $0 [status|stop|start] [profile] [vm]
+Usage: $0 status|stop|start profile [vm]
 
 Argument description:
   status profile        => shows whether a profile\'s machines/specific machine is up or down
@@ -30,6 +30,7 @@ Argument description:
   stop profile [vm]     => stop a profile\'s machines/specific machine
 
   Example: $0 stop dev ves-hx-c7 -- causes the development solr instance on ves-hx-c7 to be stopped
+           $0 stop dev           -- causes all development solr instances to be stopped
 
   WARNING: Please be aware of who is using the machines before starting/stopping them.
 EOF
@@ -50,12 +51,11 @@ if [ "$#" -eq 0 ]; then
     exit 1;
 fi
 
-if [ "$#" -eq 3 ] && ! isValidProfileId "$CORE_NAME" "$PROFILE" "$VM_NAME"; then
-    prettyEcho "No servers matched core <warn>$CORE_NAME</warn>, profile <warn>$PROFILE</warn> and vm
-        <warn>$VM_NAME</warn>"
+if [ "$#" -eq 3 ] && ! isValidProfileId "$PROFILE" "$REQUESTED_VM"; then
+    prettyEcho "No servers matched profile <warn>$PROFILE</warn> and vm <warn>$REQUESTED_VM</warn>"
     endScript 1;
-elif [ "$#" -eq 2 ] && ! isValidProfileId "$CORE_NAME" "$PROFILE"; then
-    prettyEcho "No servers matched core <warn>$CORE_NAME</warn> and profile <warn>$PROFILE</warn>"
+elif [ "$#" -eq 2 ] && ! isValidProfileId "$PROFILE"; then
+    prettyEcho "No servers matched profile <warn>$PROFILE</warn>"
     endScript 1;
 fi
 
@@ -64,13 +64,9 @@ if [ "$1" == "status" ]; then
     if [ $# -eq 2 ]; then
         # show status of up / down, and data version
         printDivider "Server statuses for '$PROFILE' profile";
-        if printServerStatusForCoreProfile "$CORE_NAME" "$PROFILE"; then
-            echo "";
-            printReleaseBaseDirContents;
-        else
-            prettyEcho "No servers matched core <warn>$CORE_NAME</warn> and profile <warn>$PROFILE</warn>"
-            endScript 1;
-        fi
+        printServerStatusForProfile "$PROFILE";
+        echo "";
+        printReleaseBaseDirContents;
     else
         showHelp
         exit 1;
@@ -78,21 +74,21 @@ if [ "$1" == "status" ]; then
 
 ## ---------------------------- STOP/START SERVER ----------------------------
 elif [ "$1" == "stop" ] || [ "$1" == "start" ]; then
-    action="$1";
 
     # if server is up => cannot start
     # if server is down => cannot stop
 
-    vmsForProfile "$CORE_NAME" "$PROFILE";
-    for vm in ${PROFILE_VMS[@]}; do
-        rawVM=$(extractVMFromURL $vm)
-        if [ ! -z "$VM_NAME" -a "$VM_NAME" = "$(extractVMFromURL $vm)" ] || [ $# -eq 2 ]; then
+    for vm in $(vmsForProfile "$PROFILE"); do
+        VM_NAME=$(extractVMFromURL $vm)
+        resetProfileId;
+        if [ ! -z "$REQUESTED_VM" -a "$REQUESTED_VM" = "$(extractVMFromURL $vm)" ] || [ $# -eq 2 ]; then
             if serverIsUp "$vm"; then # server is up
-                if [ "$action" == "start" ]; then
+                if [ "$ACTION" == "start" ]; then
                     prettyEcho "<warn>Cannot start $vm</warn> because it is already up";
-                elif [ "$action" == "stop" ]; then
+                elif [ "$ACTION" == "stop" ]; then
                     # stop the server
                     prettyEcho "<bold>Stopping $vm</bold>";
+                    echo "stopping in $solr_server_dir/bin"
 #                    ssh $rawVM bash << EOF
 #                        export JAVA_HOME=$JAVA_HOME
 #                        cd "$solr_server_dir/bin";
@@ -100,9 +96,10 @@ elif [ "$1" == "stop" ] || [ "$1" == "start" ]; then
 #EOF
                 fi
             else # server is down
-                if [ "$action" == "start" ]; then
+                if [ "$ACTION" == "start" ]; then
                     # start the server
                     prettyEcho "<bold>Starting $vm</bold>";
+                    echo "submitting: ./solr start $solr_system_properties -a $solr_jvm_properties -m $solr_memory -s $solr_home -p $(extractPortFromURL $vm);"
 #                    ssh $rawVM bash << EOF
 #                        export JAVA_HOME=$JAVA_HOME
 #                        cd "$solr_server_dir/bin";

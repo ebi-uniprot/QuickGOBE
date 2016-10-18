@@ -58,13 +58,6 @@ CORE_NAME=
 source "$BASE_DIR/index.properties";
 source "$BASE_DIR/vm-profile.properties";
 
-## ------------- RECORD THE VALID CORES -------------
-for vmInfo in "${PROFILE_VM_MAP[@]}" ; do
-    IFS='|' read -ra profileData <<< "$vmInfo"
-    __CORES_WITH_DUPLICATES+=(${profileData[0]})
-done
-CORES=$(tr ' ' '\n' <<< "${__CORES_WITH_DUPLICATES[@]}" | sort -u | tr '\n' ' ')
-
 SOLR_INDEX_DIR="${BASE_DIR}/.quickgo-indexes"
 SOLR_CONFIG_DIR="${BASE_DIR}/solr-conf"
 
@@ -88,66 +81,3 @@ JMX_PORT=3333
 MAIN_CLASS=
 MAIN_CLASS_PARAMS=
 LSF_JOB_NAME=
-
-function updateQuickGOServiceJarLocation {
-    if [ $# -ne 3 ]; then
-        echo "Cannot set QuickGO service jar location in 'updateQuickGOServiceJarLocation'. Function expected 3
-        arguments: 1.) profile, 2.) vm, and 3.) core."
-        exit 1;
-    else
-        local requestedProfile="$1"
-        local requestedVM="$2"
-        local requestedCore="$3"
-    fi
-    # java class path -- include all jars for creating the indexes
-    QUICKGO_SERVICE_JAR="${SOLR_CONFIG_DIR}/$requestedProfile/$requestedVM/lib/quickgo/$requestedCore/*"
-}
-
-## ---------------------------- GENERAL UTILITY FUNCTIONS ----------------------------
-# quick way for echoing coloured text
-# e.g., prettyEcho "<warn>warning message</warn>"
-# e.g., prettyEcho "<info>info message: <warn>specific message</warn></info>"
-# e.g., prettyEcho "<error>warning message</error>"
-function prettyEcho {
-    local prefix="$1";
-    local string="$2";
-    if [ $# -eq 1 ]; then
-        prefix="0"
-        string="$1"
-    fi
-
-    string=$(echo $string | perl -pe 's@<warn>(.*?)<\/warn>@\$(tput setaf 3)\1\$(tput sgr 0)@g');
-    string=$(echo $string | perl -pe 's@<info>(.*?)<\/info>@\$(tput setaf 2)\1\$(tput sgr 0)@g');
-    string=$(echo $string | perl -pe 's@<error>(.*?)<\/error>@\$(tput setaf 1)\$(tput bold)\1\$(tput sgr 0)@g');
-    string=$(echo $string | perl -pe 's@<success>(.*?)<\/success>@\$(tput setaf 2)\$(tput bold)\1\$(tput sgr 0)@g');
-    string=$(echo $string | perl -pe 's@<bold>(.*?)<\/bold>@\$(tput bold)\1\$(tput sgr 0)@g');
-    for i in $(seq 1 $prefix); do
-        echo -n "   "
-    done
-    eval "echo "$string"";
-}
-
-
-function printSolrServerStatus {
-    server_status="$(solrServerStatus)"
-    local server_message="<error>$server_status</error>";
-    if [ "$server_status" == "UP" ]; then
-            server_message="<success>$server_status</success>";
-    fi
-
-    prettyEcho "Solr @ $solr_addr is $server_message";
-}
-
-function printReleaseBaseDirContents {
-    prettyEcho "Listing contents of release base directory, $SOLR_INDEX_DIR:";
-    ls -l "$SOLR_INDEX_DIR" | sed 's/^/     /';
-}
-
-function printDivider {
-    if [ $# -eq 1 ]; then
-        title=" $1 ";
-    else
-        title="";
-    fi
-    echo "===========================$title===========================";
-}

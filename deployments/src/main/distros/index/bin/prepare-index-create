@@ -41,15 +41,8 @@ if [ $# -ne 1 ]; then
 fi
 requestedProfile="$1"
 
-# check core is correct
-if ! isValidProfileId "$CORE_NAME"; then
-    prettyEcho "<error>Invalid core name: $CORE_NAME.
-                    Please check your index.variables and vm-profiles.properties file.</error>";
-    exit 1;
-fi
-
 # check profile specified is correct
-if ! isValidProfileId "$CORE_NAME" "$requestedProfile"; then
+if ! isValidProfileId "$requestedProfile"; then
     prettyEcho "<error>Invalid profile name: $requestedProfile.
                     Please check your index.variables and vm-profiles.properties file.</error>";
     exit 1;
@@ -63,10 +56,10 @@ fi
 
 # ------------------------ start off the indexing via LSF ------------------------
 
-vmsForProfile "$CORE_NAME" "$requestedProfile"
-for vm in ${PROFILE_VMS[@]}; do
+for vm in $(vmsForProfile "$requestedProfile"); do
     vmIP="$(extractVMFromURL $vm)"
-    release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/$vmIP/${CORE_NAME}";
+#    release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/$vmIP/${CORE_NAME}";
+    release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/$vmIP";
 
     if [ ! -d "$release_dir" ]; then
        echo "Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...";
@@ -81,15 +74,15 @@ for vm in ${PROFILE_VMS[@]}; do
     mkdir -p "$release_dir";
 
     echo "executing fetch-libraries"
-    ../fetch-libraries "$release_dir" "$requestedProfile" "$CORE_NAME" "$vmIP";
+    ../fetch-libraries "$release_dir" "$requestedProfile" "$vmIP";
 
     echo "executing fetch-cores"
-    ../fetch-cores "$release_dir" "$requestedProfile" "$CORE_NAME" "$vmIP";
+    ../fetch-cores "$release_dir" "$requestedProfile" "$vmIP";
 done
 
 # check solr server statuses
-if allServersUpForCoreProfile "$CORE_NAME" "$requestedProfile"; then
-    echo "All solr servers for $CORE_NAME|$requestedProfile are currently UP, please restart them, before proceeding to index-create";
+if allServersUpForProfile "$requestedProfile"; then
+    echo "All solr servers for $requestedProfile are currently UP; please restart them, before proceeding to index-create";
 else
     echo "Preparation to create index DONE."
     echo "Proceed to index-create to submit indexing job";

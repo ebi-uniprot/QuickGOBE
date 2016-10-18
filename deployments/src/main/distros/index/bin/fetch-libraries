@@ -6,22 +6,21 @@ set -e
 VALID_USERS=("uni_qgo" "eddturner");
 
 # source required scripts
-if ! source "../common/common.variables" && ! source "../common/common"; then
+if ! source "../common/common" || ! source "../common/common.variables" ; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
 
-if [ $# -ne 4 ]; then
-    echo "${0} expects 4 arguments: 1.) the configuration release directory, 2.) profile, 3.) core, 4.) vm"
+if [ $# -ne 3 ]; then
+    echo "${0} expects 4 arguments: 1.) the configuration release directory, 2.) profile, 3.) vm"
     exit 1;
 else
    conf_release_dir=$1;
    requestedProfile=$2;
-   requestedCore=$3;
-   requestedVM=$4;
+   requestedVM=$3;
 fi
 
-QUICKGO_LIB_PATH="$requestedProfile/$requestedVM/lib/quickgo/$requestedCore"
+QUICKGO_LIB_PATH="$requestedProfile/$requestedVM/lib/quickgo"
 
 if [ ! -d "$conf_release_dir" ]; then
     echo "Release directory does not exist: $conf_release_dir";
@@ -35,7 +34,6 @@ fi
 cd "$QUICKGO_REPO_DIR"
 
 # fetch the indexing jar
-
 git fetch
 git checkout "$QUICKGO_BRANCH"
 git pull

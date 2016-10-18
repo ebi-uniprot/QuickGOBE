@@ -13,18 +13,12 @@ fi
 # ------------------------ SHOW ASSOCIATED VM PURPOSE ------------------------
 printDivider "Server statuses";
 
-for core in $CORES; do
-    prettyEcho "1" "Core:   $core"
-    profilesForCore "$core"
-    for profile in $CORE_PROFILES; do
-        prettyEcho "2" "Profile: $profile"
-        vmsForProfile "$core" "$profile"
-        for vm in $PROFILE_VMS; do
-            prettyEcho "3" "VM: $(extractVMFromURL $vm)"
-            printServerStatus "4" "$vm"
-        done
+for profile in $(profiles); do
+    prettyEcho "1" "Profile: $profile"
+    for vm in $(vmsForProfile "$profile"); do
+        prettyEcho "2" "VM: $(extractVMFromURL $vm)"
+        printServerStatus "3" "$vm"
     done
-    echo
 done
 
 echo "";

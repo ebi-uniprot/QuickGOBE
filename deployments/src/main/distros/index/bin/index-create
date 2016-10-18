@@ -35,7 +35,7 @@ requestedVM="$2"
 action="$3"
 
 # ------------------------ check profile/vm specified is correct ------------------------
-if ! isValidProfileId "$CORE_NAME" "$requestedProfile" "$requestedVM"; then
+if ! isValidProfileId "$requestedProfile" "$requestedVM"; then
     prettyEcho "<error>Invalid profile/vm name specified: $requestedProfile/$requestedVM.
                     Please check your index.variables and vm-profiles.properties file.</error>";
     exit 1;
