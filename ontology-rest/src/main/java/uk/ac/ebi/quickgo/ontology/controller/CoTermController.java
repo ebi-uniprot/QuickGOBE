@@ -122,7 +122,7 @@ public class CoTermController {
     }
 
     private boolean limitNotSpecified(String limit){
-        return limit==null;
+        return limit==null || limit.trim().isEmpty();
     }
 
     private boolean userHasRequestedAllCoTerms(String limit){

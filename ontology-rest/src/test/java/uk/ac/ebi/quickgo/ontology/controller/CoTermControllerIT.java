@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.ontology.OntologyREST;
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Before;
@@ -35,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OntologyREST.class}) //holds coterm config via service config
+@SpringApplicationConfiguration(classes = {OntologyREST.class})
 @WebAppConfiguration
 public class CoTermControllerIT {
 
@@ -63,7 +64,7 @@ public class CoTermControllerIT {
     public void canRetrieveCoTermsForTerm() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001)));
 
-        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+        expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
                 .andExpect(status().isOk());
@@ -91,7 +92,7 @@ public class CoTermControllerIT {
     public void retrieveManualCoTermsInformationWhenRequested() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(MANUAL_ONLY_TERM, "source=MANUAL")));
 
-        expectFieldsInResults(response, Arrays.asList(MANUAL_ONLY_TERM))
+        expectFieldsInResults(response, Collections.singletonList(MANUAL_ONLY_TERM))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
                 .andExpect(jsonPath("$.results.*.id").value(MANUAL_ONLY_TERM))
@@ -107,7 +108,7 @@ public class CoTermControllerIT {
     public void retrieveAllCoTermsInformationWhenRequested() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(ALL_ONLY_TERM, "source=ALL")));
 
-        expectFieldsInResults(response, Arrays.asList(ALL_ONLY_TERM))
+        expectFieldsInResults(response, Collections.singletonList(ALL_ONLY_TERM))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
                 .andExpect(jsonPath("$.results.*.id").value(ALL_ONLY_TERM))
@@ -123,7 +124,7 @@ public class CoTermControllerIT {
     public void sourceParameterShouldNotBeCaseSensitive() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(MANUAL_ONLY_TERM, "source=MaNuAl")));
 
-        expectFieldsInResults(response, Arrays.asList(MANUAL_ONLY_TERM))
+        expectFieldsInResults(response, Collections.singletonList(MANUAL_ONLY_TERM))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
                 .andExpect(jsonPath("$.results.*.id").value(MANUAL_ONLY_TERM))
@@ -132,9 +133,9 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void doNotExpectErrorIfValueForSourceIsLeftBlank() throws Exception {
+    public void retrievesAllCoTermsWhenNoSourceProvided() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "source=")));
-        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+        expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
                 .andExpect(status().isOk());
@@ -151,10 +152,14 @@ public class CoTermControllerIT {
     // Tests for limit parameter
     @Test
     public void setNumberOfResponsesBasedOnLimit() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=4")));
+        expectFieldsInResults(response, Collections.singletonList(GO_0000001))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(4)));
 
-        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=3")));
-
-        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+        //Now we are going to reduce the requested limit to see if it works OK.
+        response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=3")));
+        expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(3)))
                 .andExpect(jsonPath("$.results[0].id").value(GO_0000001))
@@ -168,10 +173,12 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void ifTheLimitIsLeftEmptyTheError() throws Exception {
+    public void ifTheLimitIsLeftEmptyThenUserDefaultLimit() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=")));
-        response.andDo(print())
-                .andExpect(status().isBadRequest());
+        expectFieldsInResults(response, Collections.singletonList(GO_0000001))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -201,7 +208,7 @@ public class CoTermControllerIT {
     @Test
     public void retrieveAllCoTermsUsingSimilarityThresholdBelowThatFoundInTheRecordsForAllCoTerms() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=0.1")));
-        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+        expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
                 .andExpect(status().isOk());
@@ -216,9 +223,9 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void useValueForSimiliaryThresholdThatReturnsOnlyOneRecord() throws Exception {
+    public void useValueForSimilarityThresholdThatReturnsOnlyOneRecord() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=99.9")));
-        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+        expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
                 .andExpect(jsonPath("$.results.*.id").value(GO_0000001))
@@ -228,16 +235,12 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void doNotGetErrorIfValueForThresholdIsLeftBlank() throws Exception {
+    public void returnsAllCoTermsWhenSimilarityNotFilledIn() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=")));
-        expectFieldsInResults(response, Arrays.asList(GO_0000001))
+        expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
                 .andExpect(status().isOk());
-    }
-
-    private String buildPathToResource(String id) {
-        return RESOURCE_URL + "/" + id;
     }
 
     private String buildPathToResource(String id, String... args) {
@@ -255,8 +258,8 @@ public class CoTermControllerIT {
         return result;
     }
 
-    private ResultActions expectBasicFields(ResultActions result, String id, String path) throws Exception {
-        return result
+    private void expectBasicFields(ResultActions result, String id, String path) throws Exception {
+        result
                 .andDo(print())
                 .andExpect(jsonPath(path + "id").value(id))
                 .andExpect(jsonPath(path + "compare").exists())
@@ -266,31 +269,22 @@ public class CoTermControllerIT {
                 .andExpect(jsonPath(path + "compared").exists());
     }
 
-    private ResultActions expectInvalidGoTermErrorMessage(ResultActions result, String id) throws Exception {
-        return result
+    private void expectInvalidGoTermErrorMessage(ResultActions result, String id) throws Exception {
+        result
                 .andDo(print())
                 .andExpect(jsonPath("$.messages", hasItem(containsString("Provided ID: '" + id + "' is invalid"))));
     }
 
 
-    private ResultActions expectInvalidSourceErrorMessage(ResultActions result, String requestedSource) throws
-                                                                                                        Exception {
-        return result
+    private void expectInvalidSourceErrorMessage(ResultActions result, String requestedSource) throws Exception {
+        result
                 .andDo(print())
                 .andExpect(jsonPath("$.messages", hasItem(containsString("The value for source should be one of " +
                         SOURCE_VALUES + " and not " + requestedSource))));
     }
 
-    private ResultActions expectInvalidLimitErrorMessage(ResultActions result) throws
-                                                                               Exception {
-        return result
-                .andDo(print())
-                .andExpect(jsonPath("$.messages",
-                        hasItem(containsString("The value for co-occurring terms limit is not ALL, or a number"))));
-    }
-
-    private ResultActions expectLimitErrorMessage(ResultActions result) throws Exception {
-        return result
+    private void expectLimitErrorMessage(ResultActions result) throws Exception {
+        result
                 .andDo(print())
                 .andExpect(jsonPath("$.messages", hasItem(containsString("The findCoTerms limit should not be less than 1."))));
     }
