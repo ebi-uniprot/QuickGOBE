@@ -30,8 +30,8 @@ public class GeneProductDocConverterImplTest {
     private static final String NAME = "moeA5";
     private static final String PARENT_ID = "QWERTY";
     private static final String REF_PROTEOME = "P1234";
+    private static final String DATABASE_SUBSET = "SUB1";
 
-    private static final List<String> DATABASE_SUBSETS = Arrays.asList("SUB1", "SUB2");
     private static final List<String> SYNONYMS = Arrays.asList("Q1234", "R1234", "S1234");
 
     private GeneProductDocConverter geneProductDocConverter;
@@ -45,7 +45,7 @@ public class GeneProductDocConverterImplTest {
 
         geneProductDocument.id = ID;
         geneProductDocument.database = DATABASE;
-        geneProductDocument.databaseSubsets = DATABASE_SUBSETS;
+        geneProductDocument.databaseSubset = DATABASE_SUBSET;
         geneProductDocument.isAnnotated = true;
         geneProductDocument.synonyms = SYNONYMS;
         geneProductDocument.isIsoform = true;
@@ -64,7 +64,7 @@ public class GeneProductDocConverterImplTest {
 
         assertThat(convertedGeneProduct.id, is(equalTo(ID)));
         assertThat(convertedGeneProduct.database, is(equalTo(DATABASE)));
-        assertThat(convertedGeneProduct.databaseSubset, containsInAnyOrder("SUB1", "SUB2"));
+        assertThat(convertedGeneProduct.databaseSubset, is("SUB1"));
         assertThat(convertedGeneProduct.synonyms, containsInAnyOrder("Q1234", "R1234", "S1234"));
         assertThat(convertedGeneProduct.isIsoform, is(true));
         assertThat(convertedGeneProduct.name, is(NAME));
@@ -87,7 +87,7 @@ public class GeneProductDocConverterImplTest {
 
     @Test
     public void nullDocDbSubsetConvertsToNullModelDbSubset() {
-        geneProductDocument.databaseSubsets = null;
+        geneProductDocument.databaseSubset = null;
 
         GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
 

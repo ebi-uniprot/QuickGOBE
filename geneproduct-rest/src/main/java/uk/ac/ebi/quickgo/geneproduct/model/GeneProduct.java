@@ -37,7 +37,7 @@ public class GeneProduct {
     // NCBI taxon id of the species encoding the gene product.
     public int taxonId;
 
-    public List<String> databaseSubset;
+    public String databaseSubset;
 
     // UPID
     public String referenceProteome;

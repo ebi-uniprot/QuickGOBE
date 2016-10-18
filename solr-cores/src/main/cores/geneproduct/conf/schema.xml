@@ -28,7 +28,7 @@
     <field name="database" type="string" indexed="false" stored="true"/>
     <field name="type" type="string" indexed="true" stored="true"/>
     <field name="taxonId" type="int" indexed="true" stored="true"/>
-    <field name="dbSubset" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="dbSubset" type="string" indexed="true" stored="true"/>
     <field name="isCompleteProteome" type="boolean" indexed="false" stored="true"/>
     <field name="referenceProteome" type="string" indexed="false" stored="true"/>
     <field name="isIsoform" type="boolean" indexed="false" stored="true"/>

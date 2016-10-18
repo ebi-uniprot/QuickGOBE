@@ -34,7 +34,7 @@ public class GeneProductDocument implements QuickGODocument {
     public int taxonId;
 
     @Field(GeneProductFields.DATABASE_SUBSET)
-    public List<String> databaseSubsets;
+    public String databaseSubset;
 
     @Field(GeneProductFields.COMPLETE_PROTEOME)
     public boolean isCompleteProteome;
@@ -95,8 +95,8 @@ public class GeneProductDocument implements QuickGODocument {
         if (type != null ? !type.equals(document.type) : document.type != null) {
             return false;
         }
-        if (databaseSubsets != null ? !databaseSubsets.equals(document.databaseSubsets) :
-                document.databaseSubsets != null) {
+        if (databaseSubset != null ? !databaseSubset.equals(document.databaseSubset) :
+                document.databaseSubset != null) {
             return false;
         }
         if (referenceProteome != null ? !referenceProteome.equals(document.referenceProteome) :
@@ -115,7 +115,7 @@ public class GeneProductDocument implements QuickGODocument {
         result = 31 * result + (synonyms != null ? synonyms.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + taxonId;
-        result = 31 * result + (databaseSubsets != null ? databaseSubsets.hashCode() : 0);
+        result = 31 * result + (databaseSubset != null ? databaseSubset.hashCode() : 0);
         result = 31 * result + (isCompleteProteome ? 1 : 0);
         result = 31 * result + (referenceProteome != null ? referenceProteome.hashCode() : 0);
         result = 31 * result + (isIsoform ? 1 : 0);
@@ -133,7 +133,7 @@ public class GeneProductDocument implements QuickGODocument {
                 ", synonyms=" + synonyms +
                 ", type='" + type + '\'' +
                 ", taxonId=" + taxonId +
-                ", databaseSubsets=" + databaseSubsets +
+                ", databaseSubset=" + databaseSubset +
                 ", isCompleteProteome=" + isCompleteProteome +
                 ", referenceProteome='" + referenceProteome + '\'' +
                 ", isIsoform=" + isIsoform +
