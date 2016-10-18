@@ -73,8 +73,17 @@ function vmsForProfile() {
     PROFILE_VMS=$(tr ' ' '\n' <<< "${__PROFILE_VMS[@]}" | sort -u | tr '\n' ' ')
 }
 
+# e.g., extractVMFromURL "ves-hx-c7:8090/solr" produces "ves-hx-c7"
 function extractVMFromURL {
     echo "${1%%:*}"
+}
+
+# e.g., extractPortFromURL "ves-hx-c7:8090/solr" produces "8090"
+function extractPortFromURL {
+    local vmWithoutResource=${1%%/*}
+    vmWithoutIpAndResource=${vmWithoutResource%%:*}
+    vmWithoutIpAndResourceLen=$((${#vmWithoutIpAndResource} + 1))
+    echo ${vmWithoutResource:vmWithoutIpAndResourceLen}
 }
 
 # Checks whether a (core, profile, vm) is a valid definition, e.g., isValidProfileId "ontology" "dev" "ves-hx-c2"
