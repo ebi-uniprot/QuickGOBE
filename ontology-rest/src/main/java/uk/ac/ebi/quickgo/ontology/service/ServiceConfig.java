@@ -35,14 +35,14 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan({"uk.ac.ebi.quickgo.ontology.service, uk.ac.ebi.quickgo.graphics.service"})
-@Import({OntologyRepoConfig.class, OntologyGraphConfig.class, CoTermConfig.class})
+@Import({OntologyRepoConfig.class, OntologyGraphConfig.class})
 public class ServiceConfig {
     @Value("${graphics.ontology.source}")
     private String sourceFile;
 
     @Bean
     public OntologyService<GOTerm> goOntologyService(OntologyRepository ontologyRepository,
-            OntologyGraphTraversal ontologyGraphTraversal, CoTermRepository coTermRepository) {
+            OntologyGraphTraversal ontologyGraphTraversal) {
         return new OntologyServiceImpl<>(
                 ontologyRepository,
                 goDocumentConverter(),
