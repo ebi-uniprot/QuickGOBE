@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTerm;
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
+import uk.ac.ebi.quickgo.ontology.controller.validation.GOTermPredicate;
 import uk.ac.ebi.quickgo.ontology.coterms.CoTermLimit;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
@@ -15,7 +16,6 @@ import io.swagger.annotations.ApiResponses;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static uk.ac.ebi.quickgo.ontology.controller.GOController.GO_ID_FORMAT;
+import static uk.ac.ebi.quickgo.ontology.controller.validation.GOTermPredicate.isValidGOTermId;
 
 /**
  * REST controller for accessing GO Term co-occurring term related information.
@@ -99,20 +99,16 @@ public class CoTermController {
      * @param results a list of results
      * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of results
      */
-    <ResponseType> ResponseEntity<QueryResult<ResponseType>> getResultsResponse(List<ResponseType> results) {
-        List<ResponseType> resultsToShow;
+    private <ResponseType> ResponseEntity<QueryResult<ResponseType>> getResultsResponse(List<ResponseType> results) {
         if (results == null) {
-            resultsToShow = Collections.emptyList();
-        } else {
-            resultsToShow = results;
+            results = Collections.emptyList();
         }
-
-        QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
+        QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(results.size(), results).build();
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 
     private void validateGoTerm(String id) {
-        if (!idValidator().test(id)) {
+        if (!isValidGOTermId().test(id)) {
             String errorMessage = "Provided ID: '" + id + "' is invalid";
             throw new IllegalArgumentException(errorMessage);
         }
@@ -129,7 +125,4 @@ public class CoTermController {
         return coTermSource;
     }
 
-    private Predicate<String> idValidator() {
-        return id -> GO_ID_FORMAT.matcher(id).matches();
-    }
 }
