@@ -43,6 +43,7 @@ public class CoTermControllerIT {
     private static final int NUMBER_OF_ALL_CO_TERM_RECORDS = 12;
     private static final String GO_0000001 = "GO:0000001";
     private static final String GO_9000001 = "GO:9000001";
+    private static final String GO_TERM_INVALID = "GO:ABCDEFG";
     private static final String MANUAL_ONLY_TERM = "GO:8888881";
     private static final String ALL_ONLY_TERM = "GO:7777771";
     private static final String SOURCE_VALUES = Arrays.stream(CoTermSource.values())
@@ -74,6 +75,14 @@ public class CoTermControllerIT {
         response.andDo(print())
                 .andExpect(jsonPath("$.results.*", hasSize(0)))
                 .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void errorReturnedIfTheRequestedGoTermIdIsInvalid() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_TERM_INVALID)));
+        response.andExpect(status().isBadRequest());
+        expectInvalidGoTermErrorMessage(response, GO_TERM_INVALID);
     }
 
     // Test source parameter
@@ -261,6 +270,13 @@ public class CoTermControllerIT {
                 .andExpect(jsonPath(path + "together").exists())
                 .andExpect(jsonPath(path + "compared").exists());
     }
+
+    private ResultActions expectInvalidGoTermErrorMessage(ResultActions result, String id) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.messages", hasItem(containsString("Provided ID: '" + id + "' is invalid"))));
+    }
+
 
     private ResultActions expectInvalidSourceErrorMessage(ResultActions result, String requestedSource) throws
                                                                                                         Exception {
