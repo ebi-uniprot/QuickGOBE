@@ -2,10 +2,10 @@ package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTerm;
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
-import uk.ac.ebi.quickgo.ontology.controller.validation.GOTermPredicate;
 import uk.ac.ebi.quickgo.ontology.coterms.CoTermLimit;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -13,10 +13,8 @@ import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -112,8 +110,8 @@ public class CoTermController {
 
     private CoTermSource toCoTermSource(String source) {
         final String asUpperCase = source.toUpperCase();
-        if(!CoTermSource.isValidValue(asUpperCase)){
-            throw new IllegalArgumentException("The value for source should be one of " + CoTermSource.valuesAsCSV() +
+        if (!CoTermSource.isValidValue(asUpperCase)) {
+            throw new ParameterException("The value for source should be one of " + CoTermSource.valuesAsCSV() +
                     " and not " + source + ".");
         }
         return CoTermSource.valueOf(asUpperCase);
