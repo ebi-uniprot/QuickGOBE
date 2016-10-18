@@ -174,10 +174,16 @@ public class AnnotationConfig {
     }
 
     @Bean
+    ItemProcessor<AnnotationDocument, AnnotationDocument> annotationShardGenerator() {
+        return new AnnotationPartitionKeyGenerator();
+    }
+
+    @Bean
     ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor() {
-        List<ItemProcessor<Annotation, ?>> processors = new ArrayList<>();
+        List<ItemProcessor<?, ?>> processors = new ArrayList<>();
         processors.add(annotationValidator());
         processors.add(annotationDocConverter());
+        processors.add(annotationShardGenerator());
 
         CompositeItemProcessor<Annotation, AnnotationDocument> compositeProcessor = new CompositeItemProcessor<>();
         compositeProcessor.setDelegates(processors);
