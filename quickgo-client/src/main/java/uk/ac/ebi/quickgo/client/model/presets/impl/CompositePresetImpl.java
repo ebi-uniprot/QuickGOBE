@@ -189,55 +189,61 @@ public class CompositePresetImpl implements CompositePreset {
 
     private static class StaticAspects {
 
-        static final String MOLECULAR_FUNCTION = "Molecular Function";
-        static final String FUNCTION = "function";
-        static final String BIOLOGICAL_PROCESS = "Biological Process";
-        static final String PROCESS = "process";
-        static final String CELLULAR_COMPONENT = "Cellular Component";
-        static final String COMPONENT = "component";
+        private enum Aspect {
+            FUNCTION("Molecular Function", "function"),
+            PROCESS("Biological Process", "process"),
+            COMPONENT("Cellular Component", "component");
+
+            private final String name;
+            private final String shortName;
+
+            Aspect(String name, String shortName) {
+                this.name = name;
+                this.shortName = shortName;
+            }
+        }
 
         static Set<PresetItem> createAspects() {
             Set<PresetItem> presetAspects = new HashSet<>();
-            presetAspects.add(
-                    PresetItem
-                            .createWithName(MOLECULAR_FUNCTION)
-                            .withId(FUNCTION).build());
-            presetAspects.add(
-                    PresetItem
-                            .createWithName(BIOLOGICAL_PROCESS)
-                            .withId(PROCESS).build());
-            presetAspects.add(
-                    PresetItem
-                            .createWithName(CELLULAR_COMPONENT)
-                            .withId(COMPONENT).build());
+            Arrays.stream(Aspect.values())
+                    .forEach(aspect -> insertAspect(presetAspects, aspect));
             return presetAspects;
+        }
+
+        private static void insertAspect(Set<PresetItem> presets, Aspect aspect) {
+            presets.add(PresetItem
+                    .createWithName(aspect.name)
+                    .withId(aspect.shortName).build());
         }
     }
 
     private static class StaticGeneProductTypes {
 
-        static final String PROTEINS = "Proteins";
-        static final String PROTEIN_ID = "protein";
-        static final String RNA = "RNA";
-        static final String RNA_ID = "rna";
-        static final String COMPLEXES = "Complexes";
-        static final String COMPLEXES_ID = "complex";
+        private enum GeneProductType {
+            PROTEINS("Proteins", "protein"),
+            RNA("RNA", "rna"),
+            COMPLEXES("Complexes", "complex");
+
+            private final String name;
+            private final String shortName;
+
+            GeneProductType(String name, String shortName) {
+                this.name = name;
+                this.shortName = shortName;
+            }
+        }
 
         static Set<PresetItem> createGeneProductTypes() {
-            Set<PresetItem> presetGeneProductTypes = new HashSet<>();
-            presetGeneProductTypes.add(
-                    PresetItem
-                    .createWithName(PROTEINS)
-                    .withId(PROTEIN_ID).build());
-            presetGeneProductTypes.add(
-                    PresetItem
-                    .createWithName(RNA)
-                    .withId(RNA_ID).build());
-            presetGeneProductTypes.add(
-                    PresetItem
-                    .createWithName(COMPLEXES)
-                    .withId(COMPLEXES_ID).build());
-            return presetGeneProductTypes;
+            Set<PresetItem> presetAspects = new HashSet<>();
+            Arrays.stream(GeneProductType.values())
+                    .forEach(aspect -> insertGeneProductType(presetAspects, aspect));
+            return presetAspects;
+        }
+
+        private static void insertGeneProductType(Set<PresetItem> presets, GeneProductType geneProductType) {
+            presets.add(PresetItem
+                    .createWithName(geneProductType.name)
+                    .withId(geneProductType.shortName).build());
         }
     }
 }
