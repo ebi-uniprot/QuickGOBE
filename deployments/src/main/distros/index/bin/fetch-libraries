@@ -12,7 +12,7 @@ if ! source "../common/common" || ! source "../common/common.variables" ; then
 fi
 
 if [ $# -ne 3 ]; then
-    echo "${0} expects 4 arguments: 1.) the configuration release directory, 2.) profile, 3.) vm"
+    echo "${0} expects 3 arguments: 1.) the configuration release directory, 2.) profile, 3.) vm"
     exit 1;
 else
    conf_release_dir=$1;

@@ -6,7 +6,7 @@ set -e
 VALID_USERS=("uni_qgo" "eddturner");
 
 if [ $# -ne 3 ]; then
-    echo "${0} expects 4 arguments: 1.) the configuration release directory, 2.) profile, 3.) vm"
+    echo "${0} expects 3 arguments: 1.) the configuration release directory, 2.) profile, 3.) vm"
     exit 1;
 else
    conf_release_dir=$1;
@@ -31,10 +31,11 @@ git fetch
 git checkout "$QUICKGO_BRANCH"
 git pull
 
-core_dir="${conf_release_dir}/homes/cores/${CORE_NAME}"
+core_base="${conf_release_dir}/homes/cores"
+core_dir="${core_base}/${CORE_NAME}"
 
 mkdir -p "${core_dir}"
-cp -a "${QUICKGO_REPO_DIR}/solr-cores/src/main/cores/${CORE_NAME}/." "${core_dir}"
+cp -a "${QUICKGO_REPO_DIR}/solr-cores/src/main/cores/${CORE_NAME}/." "${core_dir}"  # copy the core
 
 echo "Fetched solr cores"
 
@@ -42,15 +43,14 @@ echo "Fetched solr cores"
 chmod -R 774 "$core_dir"
 
 # update core link in $SOLR_CONFIG_DIR directory
-
-symlink_name="${SOLR_CONFIG_DIR}/$requestedProfile/$requestedVM/cores/${CORE_NAME}"
-echo ">>>core_dir $core_dir"
-echo ">>>symlink_name $symlink_name"
-if [ ! -d "$(dirname $symlink_name)" ]; then
-    mkdir -p "$(dirname $symlink_name)";
+symlink_base="${SOLR_CONFIG_DIR}/$requestedProfile/$requestedVM/cores"
+symlink_name="$symlink_base/${CORE_NAME}"
+if [ ! -d "$symlink_base" ]; then
+    mkdir -p "$symlink_base";
 fi
 
-ln -snf "$core_dir" "$symlink_name"
+cp ${QUICKGO_REPO_DIR}/solr-cores/src/main/cores/* "${symlink_base}" 2>>/dev/null  # copy, e.g., the solr.xml file
+ln -snf "$core_dir" "$symlink_name"                                             # link the core
 
 prettyEcho "<success>Symlink</success> ${core_dir} has been <success>updated</success> with new core definitions"
 echo
