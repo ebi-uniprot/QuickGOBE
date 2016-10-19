@@ -22,12 +22,6 @@ PERMITTED_USER="uni_qgo"
 #BRANCH="master"
 BRANCH="GOA-2385_indexing-scripts-to-handle-diff-envs"
 
-# ======= check the right user runs this script =======================================
-if ! user_can_execute_script $USER PERMITTED_USER; then
-    echo "This service can only be run as user(s), '$PERMITTED_USER'";
-    exit 1;
-fi;
-
 # ======= FUNCTIONS ======================================================================
 # ======= take a string and add a time-stamp to it =======================================
 function addTimeStamp() {
