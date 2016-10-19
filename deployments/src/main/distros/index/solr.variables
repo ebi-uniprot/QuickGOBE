@@ -1,5 +1,9 @@
 #! /bin/bash
 
+## This script contains variables that are used when starting/stopping a Solr service.
+## Functions are defined to make available up-to-date values for the Solr variables.
+## Note: the port and resource used by Solr are expected to remain constant for our use-case.
+
 solr_server_dir="/nfs/public/rw/goa/.solr/current"
 solr_port="8090"
 solr_resource="solr"
