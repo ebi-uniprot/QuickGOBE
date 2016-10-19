@@ -26,7 +26,7 @@ EOF
 }
 
 # ------------------------ VALIDATE PARAMETERS ------------------------
-if [ $# -eq 0 -o $# -gt 2 ]; then
+if [ $# -eq 0 -o $# -gt 3 ]; then
     showHelp;
     exit 1;
 fi
@@ -58,9 +58,7 @@ if [ "$action" = "submit" ]; then
     # ensure indexing job variable is defined
     if [ ! -z "$javaJob" ]; then
         # check the Solr server status
-        server_status="$(serverIsUp $requestedVM)";
-        
-        if [ "$server_status" == "UP" ]; then
+        if serverIsUp $(buildSolrAddress "$requestedVM"); then
             echo "executing command:"
             echo "$javaJob";
 
