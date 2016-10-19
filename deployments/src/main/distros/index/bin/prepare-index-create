@@ -57,9 +57,7 @@ fi
 # ------------------------ start off the indexing via LSF ------------------------
 
 for vm in $(vmsForProfile "$requestedProfile"); do
-    vmIP="$(extractVMFromURL $vm)"
-#    release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/$vmIP/${CORE_NAME}";
-    release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/$vmIP";
+    release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/$vm";
 
     if [ ! -d "$release_dir" ]; then
        echo "Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...";
@@ -74,10 +72,10 @@ for vm in $(vmsForProfile "$requestedProfile"); do
     mkdir -p "$release_dir";
 
     echo "executing fetch-libraries"
-    ../fetch-libraries "$release_dir" "$requestedProfile" "$vmIP";
+    ../fetch-libraries "$release_dir" "$requestedProfile" "$vm";
 
     echo "executing fetch-cores"
-    ../fetch-cores "$release_dir" "$requestedProfile" "$vmIP";
+    ../fetch-cores "$release_dir" "$requestedProfile" "$vm";
 done
 
 # check solr server statuses

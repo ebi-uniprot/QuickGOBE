@@ -55,8 +55,10 @@ QUICKGO_BRANCH="master"
 CORE_NAME=
 
 # source environment specific variables
-source "$BASE_DIR/index.properties";
-source "$BASE_DIR/vm-profile.properties";
+if ! source "$BASE_DIR/solr.variables" || ! source "$BASE_DIR/vm-profile.variables"; then
+    echo "Could not source '$BASE_DIR/solr.variables' or '$BASE_DIR/vm-profile.variables'. Exiting."
+    exit 1;
+fi
 
 SOLR_INDEX_DIR="${BASE_DIR}/.quickgo-indexes"
 SOLR_CONFIG_DIR="${BASE_DIR}/solr-conf"

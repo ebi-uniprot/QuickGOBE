@@ -20,7 +20,7 @@ if [ ! -d "$conf_release_dir" ]; then
 fi
 
 # source required scripts
-if ! source "index.variables" || ! source "../common/common" || ! source "../common/common.variables" ; then
+if ! source "../common/common" || ! source "../common/common.variables" || ! source "index.variables"; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
@@ -43,8 +43,9 @@ chmod -R 774 "$core_dir"
 
 # update core link in $SOLR_CONFIG_DIR directory
 
-symlink_name="${SOLR_CONFIG_DIR}/$requestedProfile/$requestedVM/cores"
-#echo ">>>. $symlink_name"
+symlink_name="${SOLR_CONFIG_DIR}/$requestedProfile/$requestedVM/cores/${CORE_NAME}"
+echo ">>>core_dir $core_dir"
+echo ">>>symlink_name $symlink_name"
 if [ ! -d "$(dirname $symlink_name)" ]; then
     mkdir -p "$(dirname $symlink_name)";
 fi

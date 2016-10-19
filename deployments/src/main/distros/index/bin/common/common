@@ -104,7 +104,7 @@ function isValidProfileId {
         elif [ $# -eq 2 ]; then
             IFS=',' read -ra vmsForProfileArray <<< "$profileVMs"
             for vm in "${vmsForProfileArray[@]}"; do
-                if [ "$vm" = "$requestedVM" -o "$(extractVMFromURL $vm)" = "$requestedVM" ]; then
+                if [ "$vm" = "$requestedVM" ]; then
                     return 0
                 fi
             done
@@ -129,7 +129,9 @@ function printServerStatus {
         addr="$1"
     fi
 
-    local server_message=""
+    addr="$(buildSolrAddress $addr)";
+
+    local server_message="";
     if serverIsUp "$addr"; then
         server_message="<success>UP</success>";
     else

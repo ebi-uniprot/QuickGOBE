@@ -48,9 +48,8 @@ if [ "$requestedProfile" == "stage" ] ; then
 fi
 
 # ------------------------ compute the java indexing job string ------------------------
-vm="$(extractVMFromURL $requestedVM)"
 QUICKGO_SERVICE_JAR=${QUICKGO_SERVICE_JAR/PROFILE_PLACEHOLDER/$requestedProfile}
-QUICKGO_SERVICE_JAR=${QUICKGO_SERVICE_JAR/VM_PLACEHOLDER/$vm}
+QUICKGO_SERVICE_JAR=${QUICKGO_SERVICE_JAR/VM_PLACEHOLDER/$requestedVM}
 javaJob="bsub $(lsfJavaJobOptions)";
 
 # ------------------------ start off the indexing via LSF ------------------------

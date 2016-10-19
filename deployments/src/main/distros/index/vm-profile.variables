@@ -1,0 +1,3 @@
+PROFILE_VM_MAP=( \
+  "dev|ves-hx-c7,ves-hx-c8" \
+  "test|ves-hx-t2" )

@@ -16,7 +16,7 @@ printDivider "Server statuses";
 for profile in $(profiles); do
     prettyEcho "1" "Profile: $profile"
     for vm in $(vmsForProfile "$profile"); do
-        prettyEcho "2" "VM: $(extractVMFromURL $vm)"
+        prettyEcho "2" "VM: $vm"
         printServerStatus "3" "$vm"
     done
 done
