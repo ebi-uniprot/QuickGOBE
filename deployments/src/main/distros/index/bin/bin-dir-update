@@ -8,7 +8,11 @@
 
 set -euo pipefail
 
-source "./bin/common/common"
+VALID_USERS=("uni_qgo" "eddturner");
+if ! source "./common/common" || ! source "./common/common.variables" ; then
+    echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
 
 # ======= CONSTANTS =======================================
 REPO_DIR="$(pwd -P)/repos"
