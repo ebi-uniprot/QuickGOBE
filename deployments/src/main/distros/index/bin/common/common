@@ -1,3 +1,20 @@
+# ---------------------------- CHECK USER PERMISSIONS ----------------------------
+function user_can_execute_script {
+   local name_to_check="$1"
+   local allowed_users="$2[@]"
+
+   local user_is_allowed=1
+
+   for user in "${!allowed_users}"; do
+      if [ "$user" = "$name_to_check" ]; then
+         user_is_allowed=0
+         break
+      fi
+   done
+
+   return $user_is_allowed
+}
+
 # ---------------------------- CHECK VALUE IN ARRAY ----------------------------
 array_contains () {
     local array="$1[@]"
