@@ -16,4 +16,11 @@
 
     <name>Legacy Source Data Files</name>
     <description>Holds the information for the location and parsing of QuickGO data files</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+    </dependencies>
 </project>

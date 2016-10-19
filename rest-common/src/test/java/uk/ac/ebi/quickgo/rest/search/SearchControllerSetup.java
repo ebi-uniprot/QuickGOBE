@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -156,7 +155,7 @@ public abstract class SearchControllerSetup {
         mockMvc.perform(clientRequest)
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.facet.facetFields.*", hasSize(facets.length)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facet.facetFields.*.field", containsInAnyOrder(facets)));
     }
 
     private void addFacetsToRequest(MockHttpServletRequestBuilder clientRequest, String... facets) {

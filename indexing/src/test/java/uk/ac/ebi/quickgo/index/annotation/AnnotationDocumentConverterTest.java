@@ -220,7 +220,7 @@ public class AnnotationDocumentConverterTest {
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.dbSubset, is(nullValue()));
+        assertThat(doc.geneProductSubset, is(nullValue()));
     }
 
     @Test
@@ -230,7 +230,7 @@ public class AnnotationDocumentConverterTest {
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.dbSubset, is(value));
+        assertThat(doc.geneProductSubset, is(value));
     }
 
     // annotation extensions
