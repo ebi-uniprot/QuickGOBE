@@ -9,8 +9,12 @@
 set -euo pipefail
 
 VALID_USERS=("uni_qgo" "eddturner");
-if ! source "./bin/common/common" && user_can_execute_script "$(whoami)" "$VALID_USERS"; then
+if ! source "./bin/common/common" ]; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
+if [ ! user_can_execute_script "$(whoami)" "$VALID_USERS" ]; then
+    echo "You $(whoami) are not permitted to run this script. You must be one of: $VALID_USERS";
     exit 1;
 fi
 
