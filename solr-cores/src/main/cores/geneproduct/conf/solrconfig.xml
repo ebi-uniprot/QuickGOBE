@@ -931,16 +931,17 @@
             -->
             <str name="qf">
                 id_lowercase
-                symbol_exact^20 symbol_lowercase^15 symbol_edge^5
-                taxonName_exact^17 taxonName_lowercase^13 taxonName_edge^3
-                synonym_exact^15 synonym_lowercase^11 synonym_edge
-                name_exact^15 name_lowercase^11 name_edge
+                symbol_exact^24 symbol_lowercase^15 symbol_edge^4
+                taxonName_exact^21 taxonName_lowercase^12 taxonName_edge^2
+                synonym_exact^18 synonym_lowercase^9 synonym_edge
+                name_exact^18 name_lowercase^9 name_edge
             </str>
             <str name="pf">
-                symbol_exact^20 symbol_lowercase^15 symbol_edge^5
-                taxonName_exact^17 taxonName_lowercase^13 taxonName_edge^3
-                synonym_exact^15 synonym_lowercase^11 synonym_edge
-                name_exact^15 name_lowercase^11 name_edge
+                id_lowercase
+                symbol_exact^24 symbol_lowercase^15 symbol_edge^4
+                taxonName_exact^21 taxonName_lowercase^12 taxonName_edge^2
+                synonym_exact^18 synonym_lowercase^9 synonym_edge
+                name_exact^18 name_lowercase^9 name_edge
             </str>
             <int name="ps">0</int>
         </lst>
