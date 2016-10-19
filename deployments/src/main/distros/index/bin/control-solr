@@ -89,22 +89,22 @@ elif [ "$1" == "stop" ] || [ "$1" == "start" ]; then
                     # stop the server
                     prettyEcho "<bold>Stopping $solrAddr</bold>";
                     echo "stopping in $solr_server_dir/bin"
-#                    ssh $vm bash << EOF
-#                        export JAVA_HOME=$JAVA_HOME
-#                        cd "$solr_server_dir/bin";
-#                        ./solr stop;
-#EOF
+                    ssh $vm bash << EOF
+                        export JAVA_HOME=$JAVA_HOME
+                        cd "$solr_server_dir/bin";
+                        ./solr stop;
+EOF
                 fi
             else # server is down
                 if [ "$ACTION" == "start" ]; then
                     # start the server
                     prettyEcho "<bold>Starting $solrAddr</bold>";
                     echo "submitting: ./solr start $solr_system_properties -a $solr_jvm_properties -m $solr_memory -s $solr_home -p $solr_port;"
-#                    ssh $vm bash << EOF
-#                        export JAVA_HOME=$JAVA_HOME
-#                        cd "$solr_server_dir/bin";
-#                        ./solr start $solr_system_properties -a $solr_jvm_properties -m $solr_memory -s $solr_home -p $solr_port;
-#EOF
+                    ssh $vm bash << EOF
+                        export JAVA_HOME=$JAVA_HOME
+                        cd "$solr_server_dir/bin";
+                        ./solr start $solr_system_properties -a $solr_jvm_properties -m $solr_memory -s $solr_home -p $solr_port;
+EOF
                 elif [ "$1" == "stop" ]; then
                     prettyEcho "<warn>Cannot stop $solrAddr</warn> because it is already down";
                 fi
