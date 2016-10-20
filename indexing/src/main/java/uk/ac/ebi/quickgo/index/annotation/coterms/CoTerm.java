@@ -18,8 +18,8 @@ public class CoTerm {
     private final String comparedTerm;
     private final long together;
     private final long compared;
-    private float similarityRatio;
-    private float probabilityRatio;
+    private final float similarityRatio;
+    private final float probabilityRatio;
 
     /**
      * Create a permutation for the compared term.
@@ -27,12 +27,17 @@ public class CoTerm {
      * @param comparedTerm the id of the GO Term which is our compared 'to' GO Term
      * @param compared Count of proteins where compared term is annotated
      * @param together Count of proteins where both target and compared terms are annotated
+     * @param probabilityRatio Probability of term here estimated as fraction of proteins annotated to term.
+     * @param similarityRatio Ratio of probability of both terms to probability of either term
      */
-    private CoTerm(String target, String comparedTerm, long compared, long together) {
+    private CoTerm(String target, String comparedTerm, long compared, long together, float probabilityRatio,
+            float similarityRatio) {
         this.target = target;
         this.comparedTerm = comparedTerm;
         this.compared = compared;
         this.together = together;
+        this.probabilityRatio = probabilityRatio;
+        this.similarityRatio = similarityRatio;
     }
 
     /**
@@ -40,20 +45,21 @@ public class CoTerm {
      * Ratio of probability of both terms to probability of either term
      * <code>=#together/(#selected+#compared-#together)</code>
      * Probability of term here estimated as fraction of proteins annotated to term.
-     * @param selected Total count of gene products annotated to selected term
+     * @param selected Total count of gene products annotated to selected .
+     * @param together Count of proteins where both selected and compared terms are annotated
+     * @param compared Count of proteins where compared term is annotated
      */
-    public void calculateProbabilitySimilarityRatio(float selected) {
-
+    static float calculateSimilarityRatio(float selected, long together, long compared) {
         Preconditions
                 .checkArgument(selected != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
                         " selected should not be zero");
 
-        float similarityRatio = 100 * ((this.together) / (selected + this.compared - this.together));
+        float similarityRatio = 100 * ((together) / (selected + compared - together));
         float psRatio = Float.valueOf(DECIMAL_FORMAT.format(similarityRatio));// Round it with 2 decimals
         if (Math.round(psRatio) == 100) {
-            this.similarityRatio = 100;
+            return 100;
         }
-        this.similarityRatio = psRatio;
+        return psRatio;
     }
 
     /**
@@ -62,17 +68,18 @@ public class CoTerm {
      * <code>=(#together/selected)/(#compared/#all)</code>
      * Probability of term here estimated as fraction of proteins annotated to term.
      * @param selected Total count of gene products annotated to selected term
+     * @param together Count of proteins where both selected and compared terms are annotated
+     * @param all Total count of proteins
+     * @param compared Count of proteins where compared term is annotated
      */
-    public float calculateProbabilityRatio(float selected, float all) {
+    static float calculateProbabilityRatio(float selected, long together, float all, long compared) {
 
         Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilityRatio The value for selected" +
                 " should not be zero");
         Preconditions.checkArgument(all != 0, "CoTerm::calculateProbabilityRatio The value for all" +
                 " should not be zero");
-
-        probabilityRatio = (this.together / selected) / (this.compared / all);
-        probabilityRatio = Float.valueOf(DECIMAL_FORMAT.format(probabilityRatio));// Round it with 2 decimals
-        return probabilityRatio;
+        float probabilityRatio = (together / selected) / (compared / all);
+        return Float.valueOf(DECIMAL_FORMAT.format(probabilityRatio));
     }
 
     /**
@@ -153,17 +160,27 @@ public class CoTerm {
     }
 
     @Override public int hashCode() {
-        return target.hashCode();
+        int result = target != null ? target.hashCode() : 0;
+        result = 31 * result + (comparedTerm != null ? comparedTerm.hashCode() : 0);
+        result = 31 * result + (int) (together ^ (together >>> 32));
+        result = 31 * result + (int) (compared ^ (compared >>> 32));
+        result = 31 * result + (similarityRatio != +0.0f ? Float.floatToIntBits(similarityRatio) : 0);
+        result = 31 * result + (probabilityRatio != +0.0f ? Float.floatToIntBits(probabilityRatio) : 0);
+        return result;
     }
+
     public static class Builder {
         private String target;
         private String comparedTerm;
         private long compared;
         private long together;
+        private float probabilityRatio;
+        private float similarityRatio;
 
         public Builder setTarget(String target) {
-            Preconditions.checkArgument(target!=null && !target.trim().isEmpty(), "The parameter for 'setTarget' cannot " +
-                    "be null or empty.");
+            Preconditions
+                    .checkArgument(target != null && !target.trim().isEmpty(), "The parameter for 'setTarget' cannot " +
+                            "be null or empty.");
             this.target = target;
             return this;
         }
@@ -187,8 +204,20 @@ public class CoTerm {
             return this;
         }
 
+        public Builder setProbabilityRatio(float probabilityRatio) {
+            Preconditions.checkArgument(probabilityRatio > 0, "ProbabilityRatio cannot be zero.");
+            this.probabilityRatio = probabilityRatio;
+            return this;
+        }
+
+        public Builder setSimilarityRatio(float similarityRatio) {
+            Preconditions.checkArgument(similarityRatio > 0, "SimilarityRatio cannot be zero.");
+            this.similarityRatio = similarityRatio;
+            return this;
+        }
+
         public CoTerm build() {
-            return new CoTerm(target, comparedTerm, compared, together);
+            return new CoTerm(target, comparedTerm, compared, together, probabilityRatio, similarityRatio);
         }
     }
 
