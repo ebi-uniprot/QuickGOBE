@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
@@ -36,7 +35,8 @@ public class CoTermsConfig {
 
     private static final String ELECTRONIC = "IEA";
     private static final Predicate<AnnotationDocument>
-            EXCLUDE_ANNOTATIONS_PRODUCED_BY_ELECTRONIC_MEANS = annotationDocument -> !ELECTRONIC.equals(annotationDocument.goEvidence);
+            EXCLUDE_ANNOTATIONS_PRODUCED_BY_ELECTRONIC_MEANS =
+            annotationDocument -> !ELECTRONIC.equals(annotationDocument.goEvidence);
     private static final Predicate<AnnotationDocument> INCLUDE_ALL_ANNOTATIONS = annotationDocument -> true;
     private final Logger LOGGER = LoggerFactory.getLogger(CoTermsConfig.class);
 
