@@ -42,9 +42,6 @@ public class CoTermsForSelectedTermTest {
         builder.addCoTerm(mockCoTerm);
         CoTermsForSelectedTerm coTermsForSelectedTerm = builder.build();
 
-        verify(mockCoTerm, times(4)).calculateProbabilityRatio(2f,10f);
-        verify(mockCoTerm, times(4)).calculateProbabilitySimilarityRatio(2f);
-
        List<CoTerm> terms = coTermsForSelectedTerm.highestSimilarity();
         assertThat(terms, hasSize(equalTo(4)));
     }
