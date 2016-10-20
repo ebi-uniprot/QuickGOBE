@@ -46,42 +46,6 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
     }
 
     /**
-     * Provide an iteration of the all GO Terms with a co-occurrence (which will be all GO Terms annotated, since at
-     * the very least a term is said to coincide with itself).
-     * @return an iterator over all the GO Terms that have co-occurring terms.
-     */
-    Iterator<String> getCoTermsIterator() {
-        return this.coTerms.coTermMatrix.keySet().iterator();
-
-    }
-
-    /**
-     * We hold a count of the number of unique gene products encountered during processing, for each term.
-     * @param goTerm GO Term account for which we want the gene product count.
-     * @return count of the number of unique gene products encountered during processing for the request term.
-     */
-    private long getGeneProductCountForGoTerm(String goTerm) {
-        return geneProductCountForTerms.id2Count.get(goTerm).get();
-    }
-
-    /**
-     * Number of unique gene products processed from Annotations
-     * @return unique gene product count
-     */
-    private long getTotalOfAnnotatedGeneProducts() {
-        return geneProductList.size();
-    }
-
-    /**
-     * Get a map of all co-occurring terms to co-occurrence count for the target termId.
-     * @param termId the termId for which the caller should receive all the co-occurring terms plus co-occurrence count.
-     * @return map of co-occurring terms to co-occurrence count.
-     */
-    private Map<String, AtomicLong> getCoTermsAndCounts(String termId){
-        return coTerms.coTermMatrix.get(termId);
-    }
-
-    /**
      * For each AnnotationDocument item passed to this method, check whether it passed the criteria for aggregating,
      * and if so add its data to the aggregated data.
      *
@@ -106,7 +70,15 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
         increaseCountsForTermsInBatch();
     }
 
+    /**
+     * Provide an iteration of the all GO Terms with a co-occurrence (which will be all GO Terms annotated, since at
+     * the very least a term is said to coincide with itself).
+     * @return an iterator over all the GO Terms that have co-occurring terms.
+     */
+    Iterator<String> getCoTermsIterator() {
+        return this.coTerms.coTermMatrix.keySet().iterator();
 
+    }
 
     /**
      * Create a CoTermsForSelectedTerm instance for each compared term.
@@ -121,19 +93,64 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
                         "be null");
 
         CoTermsForSelectedTerm.Builder coTermsBuilder = new CoTermsForSelectedTerm.Builder()
-                .setTotalNumberOfGeneProducts(this.getTotalOfAnnotatedGeneProducts())
-                .setSelected(this.getGeneProductCountForGoTerm(goTerm));
+                .setTotalNumberOfGeneProducts(getGeneProductTotal())
+                .setSelected(getCountOfGeneProductsForTerm(goTerm));
 
-        for (String comparedTerm : this.getCoTermsAndCounts(goTerm).keySet()) {
+        for (String comparedTerm : getCoTermsAndCounts(goTerm).keySet()) {
+
+            long targetCount = getCountOfGeneProductsForTerm(goTerm);
+            long together = getTogether(goTerm, comparedTerm);
+            long comparedCount = getCountOfGeneProductsForTerm(comparedTerm);
+
             coTermsBuilder.addCoTerm(new CoTerm.Builder()
                     .setTarget(goTerm)
                     .setComparedTerm(comparedTerm)
-                    .setCompared(this.getGeneProductCountForGoTerm(comparedTerm))
-                    .setTogether(this.getCoTermsAndCounts(goTerm).get(comparedTerm).get()).build());
+                    .setCompared(getCountOfGeneProductsForTerm(comparedTerm))
+                    .setTogether(getTogether(goTerm, comparedTerm))
+                    .setProbabilityRatio(calculateProbabilityRatio(targetCount, together, comparedCount))
+                    .setSimilarityRatio(calculateSimilarityRatio(targetCount, together))
+                    .build());
         }
         return coTermsBuilder.build();
     }
 
+    private float calculateProbabilityRatio(long targetCount, long together, long comparedCount) {
+        return CoTerm.calculateProbabilityRatio(targetCount, together, getGeneProductTotal(), comparedCount);
+    }
+
+    private float calculateSimilarityRatio(long targetCount, long together) {
+        return CoTerm.calculateSimilarityRatio(targetCount, together, getGeneProductTotal());
+    }
+
+    /**
+     * We hold a count of the number of unique gene products encountered during processing, for each term.
+     * @param goTerm GO Term account for which we want the gene product count.
+     * @return count of the number of unique gene products encountered during processing for the request term.
+     */
+    private long getCountOfGeneProductsForTerm(String goTerm) {
+        return geneProductCountForTerms.id2Count.get(goTerm).get();
+    }
+
+    /**
+     * Number of unique gene products processed from Annotations
+     * @return unique gene product count
+     */
+    private long getGeneProductTotal() {
+        return geneProductList.size();
+    }
+
+    /**
+     * Get a map of all co-occurring terms to co-occurrence count for the target termId.
+     * @param termId the termId for which the caller should receive all the co-occurring terms plus co-occurrence count.
+     * @return map of co-occurring terms to co-occurrence count.
+     */
+    private Map<String, AtomicLong> getCoTermsAndCounts(String termId) {
+        return coTerms.coTermMatrix.get(termId);
+    }
+
+    private long getTogether(String targetTerm, String comparedTerm) {
+        return coTerms.coTermMatrix.get(targetTerm).get(comparedTerm).get();
+    }
 
     /**
      * Add the data in an AnnotationDocument instance to the aggregation.
@@ -287,15 +304,16 @@ class TermGPCount {
      * For every term, increment by one the count of gene products for this term
      */
     void incrementGeneProductCountForTerm(String term) {
-        if(id2Count.putIfAbsent(term, new AtomicLong(1L)) != null) {
+        if (id2Count.putIfAbsent(term, new AtomicLong(1L)) != null) {
             id2Count.get(term).incrementAndGet();
         }
 
-//        Alternatives to the above code for the distracted.
-//        Object v = id2Count.putIfAbsent(term, new AtomicLong(1L)) == null ? null : id2Count.get(term).incrementAndGet();
-//
-//        Object x = id2Count.get(term) == null ? id2Count.put(term, new AtomicLong(1L)) :
-//                id2Count.get(term).incrementAndGet();
+        //        Alternatives to the above code for the distracted.
+        //        Object v = id2Count.putIfAbsent(term, new AtomicLong(1L)) == null ? null : id2Count.get(term)
+        // .incrementAndGet();
+        //
+        //        Object x = id2Count.get(term) == null ? id2Count.put(term, new AtomicLong(1L)) :
+        //                id2Count.get(term).incrementAndGet();
 
     }
 }
