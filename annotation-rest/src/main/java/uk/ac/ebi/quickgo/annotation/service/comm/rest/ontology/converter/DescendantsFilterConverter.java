@@ -2,12 +2,12 @@ package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
@@ -22,30 +22,47 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
  */
 public class DescendantsFilterConverter implements FilterConverter<ConvertedOntologyFilter, QuickGOQuery> {
 
-    @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
-        ConvertedFilter<QuickGOQuery> convertedFilter;
+    private static final ConvertedFilter<QuickGOQuery> FILTER_EVERYTHING =
+            new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
+    public static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "no descendants found for IDs, ";
 
-        if (response.getResults() != null && atLeastOneDescendantExists(response)) {
+    @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
+        ConvertedFilter<QuickGOQuery> convertedFilter = FILTER_EVERYTHING;
+
+        StringJoiner idsWithNoDescendants = new StringJoiner(",");
+        if (response.getResults() != null) {
             Set<QuickGOQuery> queries = new HashSet<>();
 
             for (ConvertedOntologyFilter.Result result : response.getResults()) {
-                for (String desc : result.getDescendants()) {
-                    queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
+                if (result.getDescendants() != null) {
+                    if (!result.getDescendants().isEmpty()) {
+                        for (String desc : result.getDescendants()) {
+                            if (notNullOrEmpty(desc)) {
+                                queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
+                            }
+                        }
+                        convertedFilter = new ConvertedFilter<>(or(queries.toArray(new QuickGOQuery[queries.size()])));
+                    }
+                } else {
+                    updateJoinerIfValid(idsWithNoDescendants, result.getId());
                 }
             }
+        }
 
-            convertedFilter = new ConvertedFilter<>(or(queries.toArray(new QuickGOQuery[queries.size()])));
-        } else {
-            convertedFilter = new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
+        if (idsWithNoDescendants.length() > 0) {
+            throw new RetrievalException(ERROR_MESSAGE_ON_NO_DESCENDANTS + idsWithNoDescendants.toString());
         }
 
         return convertedFilter;
     }
 
-    private boolean atLeastOneDescendantExists(ConvertedOntologyFilter response) {
-        return response.getResults().stream()
-                .filter(r -> !r.getDescendants().isEmpty())
-                .findFirst()
-                .isPresent();
+    private static void updateJoinerIfValid(StringJoiner joiner, String value) {
+        if (notNullOrEmpty(value)) {
+            joiner.add(value);
+        }
+    }
+
+    private static boolean notNullOrEmpty(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }
