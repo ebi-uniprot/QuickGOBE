@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * Aggregation class for co-occurring terms.
  * Add a succession of terms that annotate the same gene product(s) as a single (unspecified in this class) term.
- * Calculate co-occurring statistics at the time the compared to term is added to the list.
  *
  * @author Tony Wardell
  * Date: 13/11/2015
@@ -18,7 +17,7 @@ import java.util.List;
  */
 class CoTermsForSelectedTerm {
 
-    private List<CoTerm> sortedView;
+    private final List<CoTerm> sortedView;
 
     /**
      * Create an instance of this class, initializing it with the list of co-occurring terms for a term.
@@ -72,8 +71,6 @@ class CoTermsForSelectedTerm {
          */
         Builder addCoTerm(CoTerm coTerm) {
             Preconditions.checkArgument(coTerm != null, "addCoTerm was passed a coTerm which was null");
-            coTerm.calculateProbabilityRatio(this.selected, this.totalNumberGeneProducts);
-            coTerm.calculateProbabilitySimilarityRatio(this.selected);
             coTerms.add(coTerm);
             return this;
         }
