@@ -3,13 +3,10 @@ package uk.ac.ebi.quickgo.ontology.controller;
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTerm;
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
-import uk.ac.ebi.quickgo.ontology.model.GOTerm;
-import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -80,7 +77,7 @@ public class CoTermController {
 
         validateGoTerm(id);
 
-        Predicate<CoTerm> filter = ct -> ct.getSignificance() >= similarityThreshold;
+        Predicate<CoTerm> filter = ct -> ct.getSimilarityRatio() >= similarityThreshold;
         return getResultsResponse(coTermRepository.findCoTerms(id, toCoTermSource(source), workoutLimit
                 (limit), filter));
     }

@@ -11,37 +11,37 @@ package uk.ac.ebi.quickgo.ontology.common.coterms;
  */
 public class CoTerm {
 
-    private final String id;
-    private final String compare;
-    private final float probabilityRatio;
-    private final float significance;
+    private final String target;
+    private final String comparedTerm;
     private final long together;
     private final long compared;
+    private final float similarityRatio;
+    private final float probabilityRatio;
 
-    public CoTerm(String id, String compare, float probabilityRatio, float significance, long together,
+    public CoTerm(String target, String comparedTerm, float probabilityRatio, float similarityRatio, long together,
             long compared) {
-        this.id = id;
-        this.compare = compare;
+        this.target = target;
+        this.comparedTerm = comparedTerm;
         this.probabilityRatio = probabilityRatio;
-        this.significance = significance;
+        this.similarityRatio = similarityRatio;
         this.together = together;
         this.compared = compared;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getCompare() {
-        return compare;
+    public float getSimilarityRatio() {
+        return similarityRatio;
     }
 
     public float getProbabilityRatio() {
         return probabilityRatio;
     }
 
-    public float getSignificance() {
-        return significance;
+    public String getTarget() {
+        return target;
+    }
+
+    public String getComparedTerm() {
+        return comparedTerm;
     }
 
     public long getTogether() {
@@ -51,5 +51,6 @@ public class CoTerm {
     public long getCompared() {
         return compared;
     }
+
 
 }

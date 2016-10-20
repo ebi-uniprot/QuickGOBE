@@ -159,15 +159,15 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
                 CoTerm CoTerm = createFromText(line);
 
                 if (currentTerm == null) {
-                    currentTerm = CoTerm.getId();
+                    currentTerm = CoTerm.getTarget();
                 }
 
                 //Have we arrived at a new source term?
-                if (!CoTerm.getId().equals(currentTerm)) {
+                if (!CoTerm.getTarget().equals(currentTerm)) {
                     coTerms.put(currentTerm, comparedTerms);
 
                     //Reset
-                    currentTerm = CoTerm.getId();
+                    currentTerm = CoTerm.getTarget();
                     comparedTerms = new ArrayList<>();
                 }
 
