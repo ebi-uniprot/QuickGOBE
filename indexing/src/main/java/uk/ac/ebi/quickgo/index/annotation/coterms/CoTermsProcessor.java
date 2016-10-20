@@ -2,9 +2,10 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
+import org.springframework.batch.item.ItemProcessor;
+
 //import java.util.Map;
 //import java.util.concurrent.atomic.AtomicLong;
-import org.springframework.batch.item.ItemProcessor;
 
 /**
  * For a GO Term retrieve all the co-occurring terms together with the statistics related to that co-occurrence.
@@ -38,9 +39,9 @@ public class CoTermsProcessor implements ItemProcessor<String, List<CoTerm>> {
      */
     @Override
     public List<CoTerm> process(String goTerm) {
-                Preconditions
-                        .checkArgument(null != goTerm, "Target GO term id passed to createCoTermsForSelectedTerm should not " +
-                                "be null");
+        Preconditions
+                .checkArgument(null != goTerm, "Target GO term id passed to createCoTermsForSelectedTerm should not " +
+                        "be null");
         return aggregator.createCoTermsForSelectedTerm(goTerm).highestSimilarity();
     }
 
