@@ -129,7 +129,7 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
                     .setTarget(goTerm)
                     .setComparedTerm(comparedTerm)
                     .setCompared(this.getGeneProductCountForGoTerm(comparedTerm))
-                    .setTogether(this.getCoTermsAndCounts(goTerm).get(comparedTerm).get()).createCoTerm());
+                    .setTogether(this.getCoTermsAndCounts(goTerm).get(comparedTerm).get()).build());
         }
         return coTermsBuilder.build();
     }

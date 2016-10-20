@@ -187,7 +187,7 @@ public class CoTerm {
             return this;
         }
 
-        public CoTerm createCoTerm() {
+        public CoTerm build() {
             return new CoTerm(target, comparedTerm, compared, together);
         }
     }

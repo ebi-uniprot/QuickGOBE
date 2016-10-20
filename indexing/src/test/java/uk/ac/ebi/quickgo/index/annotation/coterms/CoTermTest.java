@@ -26,7 +26,7 @@ public class CoTermTest {
     public void setup(){
         coTerm =
                 new CoTerm.Builder().setTarget(TARGET_TERM).setComparedTerm(COMPARED_TERM).setCompared(COMPARED)
-                        .setTogether(TOGETHER).createCoTerm();
+                        .setTogether(TOGETHER).build();
     }
 
     @Test
