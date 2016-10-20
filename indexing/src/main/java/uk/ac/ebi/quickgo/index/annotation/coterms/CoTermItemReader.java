@@ -22,17 +22,16 @@ class CoTermItemReader implements ItemReader<String> {
     private Iterator<String> termsIt;
 
     public CoTermItemReader(ItemWriter<AnnotationDocument> aggregator) {
-        Preconditions.checkArgument(aggregator!=null, "An instance of CoTermItemReader has been passed a null " +
+        Preconditions.checkArgument(aggregator != null, "An instance of CoTermItemReader has been passed a null " +
                 "ItemWriter<AnnotationDocument> to it's constructor which is illegal");
-        this.aggregator = (CoTermsAggregationWriter)aggregator;
+        this.aggregator = (CoTermsAggregationWriter) aggregator;
     }
 
     /**
      * Provide the next GO Term id from the list of all co-occurring GO Terms.
      * @return a single GO Term id
-     * @throws Exception
      */
-    @Override public String read() throws Exception {
+    @Override public String read() {
         //Delay providing full list until aggregator has fully processed all records.
         if (termsIt == null) {
             termsIt = aggregator.getCoTermsIterator();
