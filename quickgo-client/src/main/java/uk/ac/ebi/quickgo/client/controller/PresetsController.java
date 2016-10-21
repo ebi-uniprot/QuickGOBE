@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @author Edd
  */
 @RestController
-@RequestMapping(value = "/QuickGO/internal/presets")
+@RequestMapping(value = "/internal/presets")
 public class PresetsController {
     private final CompositePreset presets;
 

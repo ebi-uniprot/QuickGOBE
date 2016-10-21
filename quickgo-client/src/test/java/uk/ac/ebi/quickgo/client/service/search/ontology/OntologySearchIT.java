@@ -23,7 +23,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     @Autowired
     private OntologyRepository repository;
 
-    private static final String ONTOLOGY_RESOURCE_URL = "/QuickGO/internal/search/ontology";
+    private static final String ONTOLOGY_RESOURCE_URL = "/internal/search/ontology";
 
     @Before
     public void setUp() throws Exception {

@@ -1,9 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
-import uk.ac.ebi.quickgo.common.FieldType;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
 /**
@@ -36,8 +34,8 @@ public class GeneProduct {
     // Protein; RNA or complex
     public GeneProductType type;
 
-    // taxonomic id(s) The NCBI taxon ID of the species encoding the gene product. this field is mandatory,
-    public Taxonomy taxonomy;
+    // NCBI taxon id of the species encoding the gene product.
+    public int taxonId;
 
     public List<String> databaseSubset;
 
@@ -54,21 +52,6 @@ public class GeneProduct {
     //todo maybe.. this value could be replaced with the UPID (as we have for referenceProteome)
     public boolean isCompleteProteome;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class Taxonomy implements FieldType {
-
-        // Numeric id e.g. 35758
-        public int id;
-
-        // Organism name e.g. Streptomyces ghanaensis
-        public String name;
-
-        public Taxonomy(int identifier, String name) {
-            this.id = identifier;
-            this.name = name;
-        }
-    }
-
     @Override
     public String toString() {
         return "GeneProduct{" +
@@ -78,7 +61,6 @@ public class GeneProduct {
                 ", name='" + name + '\'' +
                 ", synonyms=" + synonyms +
                 ", type=" + type +
-                ", taxonomy=" + taxonomy +
                 ", databaseSubset=" + databaseSubset +
                 ", referenceProteome='" + referenceProteome + '\'' +
                 ", parentId='" + parentId + '\'' +

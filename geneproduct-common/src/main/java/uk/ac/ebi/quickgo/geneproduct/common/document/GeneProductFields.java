@@ -19,7 +19,6 @@ public class GeneProductFields {
     public static final String SYNONYM = "synonym";
     public static final String TYPE = "type";
     public static final String TAXON_ID = "taxonId";
-    public static final String TAXON_NAME = "taxonName";
     public static final String DATABASE_SUBSET = "dbSubset";
     public static final String COMPLETE_PROTEOME = "isCompleteProteome";
     public static final String REFERENCE_PROTEOME = "referenceProteome";
@@ -40,7 +39,6 @@ public class GeneProductFields {
         public static final String SYNONYM = storeAndGet(VALUES, GeneProductFields.SYNONYM);
         public static final String TYPE = storeAndGet(VALUES, GeneProductFields.TYPE);
         public static final String TAXON_ID = storeAndGet(VALUES, GeneProductFields.TAXON_ID);
-        public static final String TAXON_NAME = storeAndGet(VALUES, GeneProductFields.TAXON_NAME);
         public static final String DATABASE_SUBSET = storeAndGet(VALUES, GeneProductFields.DATABASE_SUBSET);
 
         public static boolean isRetrievable(String field) {

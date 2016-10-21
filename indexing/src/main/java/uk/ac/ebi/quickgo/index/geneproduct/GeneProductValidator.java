@@ -85,12 +85,6 @@ public class GeneProductValidator implements Validator<GeneProduct> {
         checkIsEmpty(value, field);
     }
 
-    private void checkTaxonName(String taxonId, String taxonName) {
-        if (taxonId != null && taxonId.length() > 0) {
-            checkIsNullOrEmpty(taxonName, TAXON_NAME_KEY);
-        }
-    }
-
     private void checkHasAtMostOneParentId(String parentId) {
         if (parentId != null) {
             String[] parentIds = splitValue(parentId, interValueDelimiter);
