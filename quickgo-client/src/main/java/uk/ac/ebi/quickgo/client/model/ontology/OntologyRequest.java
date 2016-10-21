@@ -7,7 +7,11 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import io.swagger.annotations.ApiModelProperty;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.validation.constraints.*;
 
@@ -139,15 +143,11 @@ public class OntologyRequest {
     }
 
     public List<FilterRequest> createFilterRequests() {
-        List<FilterRequest> filterRequests = new ArrayList<>();
-
-        Stream.of(TARGET_FIELDS)
+        return Stream.of(TARGET_FIELDS)
                 .map(this::createFilter)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .forEach(filterRequests::add);
-
-        return filterRequests;
+                .collect(Collectors.toList());
     }
 
     private Optional<FilterRequest> createFilter(String key) {
