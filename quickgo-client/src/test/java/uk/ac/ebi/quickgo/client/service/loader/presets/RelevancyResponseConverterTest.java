@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.client.service.loader.presets.assignedby;
+package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
@@ -8,29 +8,28 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 /**
- * Created 06/09/16
+ * Created 23/09/16
  * @author Edd
  */
-public class AssignedByRelevancyResponseConverterTest {
-
-    private AssignedByRelevancyResponseConverter responseConverter;
+public class RelevancyResponseConverterTest {
+    private RelevancyResponseConverter responseConverter;
 
     @Before
     public void setUp() {
-        responseConverter = new AssignedByRelevancyResponseConverter();
+        responseConverter = new RelevancyResponseConverter();
     }
 
     @Test
     public void transformsValidAssignedByResponse() {
-        AssignedByRelevancyResponseType response = new AssignedByRelevancyResponseType();
-        response.terms = new AssignedByRelevancyResponseType.Terms();
-        response.terms.assignedBy = new ArrayList<>();
+        RelevancyResponseType response = new RelevancyResponseType();
+        response.terms = new RelevancyResponseType.Terms();
+        response.terms.relevancies = new ArrayList<>();
 
         String term1 = "term1";
         String term2 = "term2";
@@ -48,7 +47,7 @@ public class AssignedByRelevancyResponseConverterTest {
 
     @Test
     public void nullTermsIsTransformedGracefully() {
-        AssignedByRelevancyResponseType response = new AssignedByRelevancyResponseType();
+        RelevancyResponseType response = new RelevancyResponseType();
         assertThat(response.terms, is(nullValue()));
 
         ConvertedFilter<List<String>> convertedFilter = responseConverter.transform(response);
@@ -58,17 +57,18 @@ public class AssignedByRelevancyResponseConverterTest {
 
     @Test
     public void nullAssignedByIsTransformedGracefully() {
-        AssignedByRelevancyResponseType response = new AssignedByRelevancyResponseType();
-        response.terms = new AssignedByRelevancyResponseType.Terms();
-        assertThat(response.terms.assignedBy, is(nullValue()));
+        RelevancyResponseType response = new RelevancyResponseType();
+        response.terms = new RelevancyResponseType.Terms();
+        assertThat(response.terms.relevancies, is(nullValue()));
 
         ConvertedFilter<List<String>> convertedFilter = responseConverter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(empty()));
     }
 
-    private static void insertRelevancy(AssignedByRelevancyResponseType response, String term, String count) {
-        response.terms.assignedBy.add(term);
-        response.terms.assignedBy.add(count);
+    private static void insertRelevancy(RelevancyResponseType response, String term, String count) {
+        response.terms.relevancies.add(term);
+        response.terms.relevancies.add(count);
     }
+
 }

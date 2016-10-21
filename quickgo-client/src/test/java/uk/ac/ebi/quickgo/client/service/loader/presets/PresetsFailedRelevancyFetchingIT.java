@@ -1,8 +1,10 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
+import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig;
 
 import java.util.List;
 import java.util.function.Function;
@@ -21,6 +23,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
@@ -42,7 +45,7 @@ public class PresetsFailedRelevancyFetchingIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private CompositePresetImpl presets;
+    private CompositePreset presets;
 
     @Test
     public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() throws Exception {
@@ -56,6 +59,34 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(
                 extractPresetValues(presets.getAssignedBy(), PresetItem::getName),
                 IsIterableContainingInOrder.contains(MockPresetDataConfig.UNIPROT_KB));
+    }
+
+    @Test
+    public void loadDefaultTaxonPresetsAfterFailedRESTInfoFetching() throws Exception {
+        assertThat(presets.getTaxons(), hasSize(0));
+
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(TaxonPresetsConfig.TAXON_LOADING_STEP_NAME);
+        BatchStatus status = jobExecution.getStatus();
+
+        assertThat(status, is(BatchStatus.COMPLETED));
+        assertThat(
+                extractPresetValues(presets.getTaxons(), PresetItem::getName),
+                is(empty()));
+    }
+
+    @Test
+    public void loadDefaultQualifierPresetsAfterFailedRESTInfoFetching() throws Exception {
+        assertThat(presets.getQualifiers(), hasSize(0));
+
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(QualifierPresetsConfig.QUALIFIER_LOADING_STEP_NAME);
+        BatchStatus status = jobExecution.getStatus();
+
+        assertThat(status, is(BatchStatus.COMPLETED));
+        assertThat(
+                extractPresetValues(presets.getQualifiers(), PresetItem::getName),
+                is(empty()));
     }
 
     private <T> List<T> extractPresetValues(List<PresetItem> presets, Function<PresetItem, T> extractor) {

@@ -46,7 +46,7 @@ public class AssignedByPresetsConfig {
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     public static final String ASSIGNED_BY_DEFAULTS = "AgBase,BHF-UCL,CACAO,CGD,EcoCyc,UniProtKB";
     private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
-    private static final String ASSIGNED_BY = "assignedBy";
+    public static final String ASSIGNED_BY = "assignedBy";
 
     @Value("#{'${assignedBy.preset.source:}'.split(',')}")
     private Resource[] assignedByResources;
