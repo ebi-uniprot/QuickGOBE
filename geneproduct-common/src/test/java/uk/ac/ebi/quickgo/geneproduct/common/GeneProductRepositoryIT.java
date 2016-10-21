@@ -5,6 +5,8 @@ import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -68,7 +70,17 @@ public class GeneProductRepositoryIT {
         geneProductRepository.save(doc2);
         geneProductRepository.save(doc3);
 
-        assertThat(geneProductRepository.findAll(), containsInAnyOrder(doc1, doc2, doc3));
+        Collection<String> extractedIds = extractIds(geneProductRepository.findAll());
+
+        assertThat(extractedIds, containsInAnyOrder(id1, id2, id3));
+    }
+
+    private Collection<String> extractIds(Iterable<GeneProductDocument> gpDocuments) {
+        List<String> ids = new ArrayList<>();
+
+        gpDocuments.forEach(gpDoc -> ids.add(gpDoc.id));
+
+        return ids;
     }
 
     @Test
@@ -97,7 +109,7 @@ public class GeneProductRepositoryIT {
         List<GeneProductDocument> retrievedDoc = geneProductRepository.findById(Collections.singletonList(id));
 
         assertThat(retrievedDoc.isEmpty(), is(false));
-        assertThat(retrievedDoc.get(0), is(doc));
+        assertThat(retrievedDoc.get(0).id, is(id));
 
     }
 

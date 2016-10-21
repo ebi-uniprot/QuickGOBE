@@ -33,6 +33,9 @@ public class GeneProductDocument implements QuickGODocument {
     @Field(GeneProductFields.TAXON_ID)
     public int taxonId;
 
+    @Field(GeneProductFields.TAXON_NAME)
+    public String taxonName;
+
     @Field(GeneProductFields.DATABASE_SUBSET)
     public List<String> databaseSubsets;
 
@@ -80,6 +83,9 @@ public class GeneProductDocument implements QuickGODocument {
         if (id != null ? !id.equals(document.id) : document.id != null) {
             return false;
         }
+        if (taxonName != null ? !taxonName.equals(document.taxonName) : document.taxonName != null) {
+            return false;
+        }
         if (database != null ? !database.equals(document.database) : document.database != null) {
             return false;
         }
@@ -115,6 +121,7 @@ public class GeneProductDocument implements QuickGODocument {
         result = 31 * result + (synonyms != null ? synonyms.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + taxonId;
+        result = 31 * result + (taxonName != null ? taxonName.hashCode() : 0);
         result = 31 * result + (databaseSubsets != null ? databaseSubsets.hashCode() : 0);
         result = 31 * result + (isCompleteProteome ? 1 : 0);
         result = 31 * result + (referenceProteome != null ? referenceProteome.hashCode() : 0);
@@ -133,6 +140,7 @@ public class GeneProductDocument implements QuickGODocument {
                 ", synonyms=" + synonyms +
                 ", type='" + type + '\'' +
                 ", taxonId=" + taxonId +
+                ", taxonName=" + taxonName +
                 ", databaseSubsets=" + databaseSubsets +
                 ", isCompleteProteome=" + isCompleteProteome +
                 ", referenceProteome='" + referenceProteome + '\'' +
