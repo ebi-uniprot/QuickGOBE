@@ -19,7 +19,7 @@ import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_P
  * A data structure used to store the input parameters a client can submit to the Ontology search endpoint
  *
  * Once the comma separated values have been set, then turn then into an object (SimpleFilter) that
- * encapsulates the list and solr field name to use for that argument.
+ * encapsulates the list and document field name to use for that argument.
  */
 public class OntologyRequest {
     static final int MIN_PAGE_NUMBER = 1;
