@@ -28,6 +28,7 @@
     <field name="database" type="string" indexed="false" stored="true"/>
     <field name="type" type="string" indexed="true" stored="true"/>
     <field name="taxonId" type="int" indexed="true" stored="true"/>
+    <field name="taxonName" type="string" indexed="false" stored="false"/>
     <field name="dbSubset" type="string" indexed="true" stored="true"/>
     <field name="isCompleteProteome" type="boolean" indexed="false" stored="true"/>
     <field name="referenceProteome" type="string" indexed="false" stored="true"/>
@@ -41,19 +42,22 @@
     <field name="text" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
 
     <!-- autocomplete search fields -->
-    <field name="id_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
-    <field name="name_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
-    <field name="symbol_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
+    <field name="id_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
+    <field name="name_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
+    <field name="symbol_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="synonym_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
     <field name="dbSubset_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <field name="taxonName_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="false"/>
 
-    <field name="symbol_edge" type="text_edge" indexed="true" stored="true" multiValued="true"/>
+    <field name="symbol_edge" type="text_edge" indexed="true" stored="true" multiValued="false"/>
     <field name="name_edge" type="text_edge" indexed="true" stored="true" multiValued="false"/>
     <field name="synonym_edge" type="text_edge" indexed="true" stored="true" multiValued="true"/>
+    <field name="taxonName_edge" type="text_edge" indexed="true" stored="false" multiValued="false"/>
 
-    <field name="symbol_exact" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
+    <field name="symbol_exact" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
     <field name="name_exact" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
     <field name="synonym_exact" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
+    <field name="taxonName_exact" type="exact_lower" indexed="true" stored="false" multiValued="false"/>
 
     <!--                     End of QuickGO Ontology fields                         -->
     <!-- ========================================================================== -->
@@ -73,15 +77,18 @@
     <copyField source="symbol" dest="symbol_edge"/>
     <copyField source="name" dest="name_edge"/>
     <copyField source="synonym" dest="synonym_edge"/>
+    <copyField source="taxonName" dest="taxonName_edge"/>
 
     <copyField source="symbol" dest="symbol_exact"/>
     <copyField source="name" dest="name_exact"/>
     <copyField source="synonym" dest="synonym_exact"/>
+    <copyField source="taxonName" dest="taxonName_exact"/>
 
     <copyField source="id" dest="id_lowercase"/>
     <copyField source="symbol" dest="symbol_lowercase"/>
     <copyField source="name" dest="name_lowercase"/>
     <copyField source="synonym" dest="synonym_lowercase"/>
+    <copyField source="taxonName" dest="taxonName_lowercase"/>
 
     <!-- Copy fields for generic search -->
     <copyField source="id" dest="text"/>
