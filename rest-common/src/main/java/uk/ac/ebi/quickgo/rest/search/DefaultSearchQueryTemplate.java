@@ -81,7 +81,6 @@ public class DefaultSearchQueryTemplate {
         private final String highlightEndDelim;
         private final Iterable<String> highlightedFields;
         private final Iterable<String> returnedFields;
-        private final Set<String> filterQueriesText;
         private final Set<QuickGOQuery> filterQueries;
 
         private final Set<String> facets;
@@ -106,7 +105,6 @@ public class DefaultSearchQueryTemplate {
             this.fieldSpec = fieldSpec;
 
             this.facets = new HashSet<>();
-            this.filterQueriesText = new HashSet<>();
             this.filterQueries = new HashSet<>();
             this.highlighting = NO_HIGHLIGHTING;
         }
@@ -199,7 +197,6 @@ public class DefaultSearchQueryTemplate {
 
         @Override public QueryRequest build() {
             checkFacets(facets);
-            checkFilters(filterQueriesText);
 
             QueryRequest.Builder builder = new QueryRequest.Builder(query);
             builder.setPageParameters(page, pageSize);
