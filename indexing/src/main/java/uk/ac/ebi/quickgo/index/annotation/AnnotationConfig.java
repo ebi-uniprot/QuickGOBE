@@ -13,6 +13,7 @@ import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -86,6 +87,7 @@ public class AnnotationConfig {
                 // commit the documents to the solr server
                 .listener(new JobExecutionListener() {
                     @Override public void beforeJob(JobExecution jobExecution) {}
+
                     @Override public void afterJob(JobExecution jobExecution) {
                         annotationTemplate.commit();
                     }
@@ -175,7 +177,12 @@ public class AnnotationConfig {
 
     @Bean
     ItemProcessor<AnnotationDocument, AnnotationDocument> annotationShardGenerator() {
-        return new AnnotationPartitionKeyGenerator();
+        return new AnnotationPartitionKeyGenerator(shardingKeyGenerator());
+    }
+
+    @Bean
+    Function<AnnotationDocument, String> shardingKeyGenerator() {
+        return (AnnotationDocument doc) -> doc.geneProductId;
     }
 
     @Bean
