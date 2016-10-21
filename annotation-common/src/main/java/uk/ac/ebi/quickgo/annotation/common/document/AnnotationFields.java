@@ -35,6 +35,7 @@ public class AnnotationFields {
     public final static String REFERENCE_SEARCH = "referenceSearch";
     public final static String WITH_FROM_SEARCH = "withFromSearch";
     public final static String GO_ASPECT = "goAspect";
+    public final static String DATE = "date";
 
     /**
      * Annotation fields that are stored, and can therefore be retrieved.

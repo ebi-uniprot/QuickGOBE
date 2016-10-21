@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.common.document;
 
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 
+import java.util.Date;
 import java.util.List;
 import org.apache.solr.client.solrj.beans.Field;
 
@@ -63,6 +64,9 @@ public class AnnotationDocument implements QuickGODocument {
 
     @Field(AnnotationFields.GO_ASPECT)
     public String goAspect;
+
+    @Field(AnnotationFields.DATE)
+    public Date date;
 
     @Override public String getUniqueName() {
         return id;
