@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatStrings;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
@@ -211,7 +210,7 @@ public class GeneProductDocumentConverterTest {
 
         GeneProductDocument doc = converter.process(geneProduct);
 
-        assertThat(doc.databaseSubsets, contains(db));
+        assertThat(doc.databaseSubset, is(db));
     }
 
     @Test
@@ -220,7 +219,7 @@ public class GeneProductDocumentConverterTest {
 
         GeneProductDocument doc = converter.process(geneProduct);
 
-        assertThat(doc.databaseSubsets, is(nullValue()));
+        assertThat(doc.databaseSubset, is(nullValue()));
     }
 
     private String concatProperty(String key, String value) {

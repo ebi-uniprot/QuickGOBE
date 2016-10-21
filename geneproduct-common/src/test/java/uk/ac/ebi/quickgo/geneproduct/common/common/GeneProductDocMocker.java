@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.geneproduct.common.common;
 
 import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -20,7 +19,7 @@ public final class GeneProductDocMocker {
         doc.symbol = "Streptomyces ghanaensis - symbol";
         doc.parentId = "UniProtKB:OK0206";
         doc.database = "UniProt";
-        doc.databaseSubsets = Arrays.asList("RRR","QQQ");
+        doc.databaseSubset = "RRR";
         doc.isAnnotated = true;
         doc.isIsoform = true;
         doc.isCompleteProteome = true;
