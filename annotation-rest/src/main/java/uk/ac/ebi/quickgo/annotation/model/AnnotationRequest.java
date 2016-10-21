@@ -419,6 +419,11 @@ public class AnnotationRequest {
         this.page = page;
     }
 
+    /**
+     * Produces a set of {@link FilterRequest} objects given the filter attributes provided by the user.
+     *
+     * @return a list of {@link FilterRequest}
+     */
     public List<FilterRequest> createFilterRequests() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 

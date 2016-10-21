@@ -142,6 +142,11 @@ public class OntologyRequest {
         return QuickGOQuery.createQuery(query);
     }
 
+    /**
+     * Produces a set of {@link FilterRequest} objects given the filter attributes provided by the user.
+     *
+     * @return a list of {@link FilterRequest}
+     */
     public List<FilterRequest> createFilterRequests() {
         return Stream.of(TARGET_FIELDS)
                 .map(this::createFilter)
