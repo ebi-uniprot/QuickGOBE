@@ -24,23 +24,24 @@ public class DescendantsFilterConverter implements FilterConverter<ConvertedOnto
 
     private static final ConvertedFilter<QuickGOQuery> FILTER_EVERYTHING =
             new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
-    public static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "no descendants found for IDs, ";
+    private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "no descendants found for IDs, ";
+    private static final String COMMA = ",";
 
     @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
         ConvertedFilter<QuickGOQuery> convertedFilter = FILTER_EVERYTHING;
 
-        StringJoiner idsWithNoDescendants = new StringJoiner(",");
+        StringJoiner idsWithNoDescendants = new StringJoiner(COMMA);
         if (response.getResults() != null) {
             Set<QuickGOQuery> queries = new HashSet<>();
 
             for (ConvertedOntologyFilter.Result result : response.getResults()) {
                 if (result.getDescendants() != null) {
                     if (!result.getDescendants().isEmpty()) {
-                        for (String desc : result.getDescendants()) {
-                            if (notNullOrEmpty(desc)) {
-                                queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
-                            }
-                        }
+                        result.getDescendants().stream()
+                                .filter(this::notNullOrEmpty)
+                                .forEach(desc -> {
+                                    queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
+                                });
                         convertedFilter = new ConvertedFilter<>(or(queries.toArray(new QuickGOQuery[queries.size()])));
                     }
                 } else {
@@ -56,13 +57,13 @@ public class DescendantsFilterConverter implements FilterConverter<ConvertedOnto
         return convertedFilter;
     }
 
-    private static void updateJoinerIfValid(StringJoiner joiner, String value) {
+    private void updateJoinerIfValid(StringJoiner joiner, String value) {
         if (notNullOrEmpty(value)) {
             joiner.add(value);
         }
     }
 
-    private static boolean notNullOrEmpty(String value) {
+    private boolean notNullOrEmpty(String value) {
         return value != null && !value.trim().isEmpty();
     }
 }

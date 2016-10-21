@@ -13,6 +13,7 @@ import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import org.junit.After;
 import org.junit.Before;
@@ -195,7 +196,6 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        String goIdsCSV = goId(1) + "," + goId(2);
         expectRestCallHasDescendants(
                 asList(goId(1), goId(2)),
                 emptyList(),
@@ -204,7 +204,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goIdsCSV));
+                        .param(GO_ID, csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -223,7 +223,6 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(4), goId(4)));
 
-        String goIdsCSV = goId(1) + "," + goId(2);
         expectRestCallHasDescendants(
                 asList(goId(1), goId(2)),
                 emptyList(),
@@ -234,7 +233,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goIdsCSV));
+                        .param(GO_ID, csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -262,7 +261,7 @@ public class AnnotationControllerRESTIT {
     }
 
     @Test
-    public void oneGOTermWithOneNullDescendantsListAndOneValidDescendantsProducesErrorMessage() throws Exception {
+    public void goTermWithOneNullDescendantsListAndOneValidDescendantsProducesError() throws Exception {
         expectRestCallHasDescendants(
                 asList(goId(1), goId(2)),
                 emptyList(),
@@ -270,11 +269,10 @@ public class AnnotationControllerRESTIT {
                         singletonList(goId(3)),
                         null));
 
-        String goIdsCSV = goId(1) + "," + goId(2);
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goIdsCSV));
+                        .param(GO_ID, csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -283,7 +281,29 @@ public class AnnotationControllerRESTIT {
     }
 
     @Test
-    public void oneGOTermWithOneDescendantIdThatIsNullSucceeds() throws Exception {
+    public void goTermWithTwoNullDescendantsListAndOneValidDescendantsProducesErrorShowingBothIds() throws Exception {
+        expectRestCallHasDescendants(
+                asList(goId(1), goId(2), goId(3)),
+                emptyList(),
+                asList(
+                        singletonList(goId(4)),
+                        null,
+                        null));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(USAGE, DESCENDANTS_USAGE)
+                        .param(GO_ID, csv(goId(1), goId(2), goId(3))));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(valuesOccurInErrorMessage(failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + csv(goId(2),
+                        goId(3)))));
+    }
+
+    @Test
+    public void oneGOTermWithOneDescendantIdThatIsNullAndOneNonNullSucceeds() throws Exception {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
         expectRestCallHasDescendants(
@@ -301,10 +321,6 @@ public class AnnotationControllerRESTIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(valuesOccurInField(GO_ID_FIELD, goId(2)));
-    }
-
-    private String failedRESTResponseErrorMessage(String suffix) {
-        return FAILED_REST_FETCH_PREFIX + suffix;
     }
 
     @Test
@@ -461,7 +477,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goId(1) + "," + goId(2))
+                        .param(GO_ID, csv(goId(1), goId(2)))
                         .param(USAGE_RELATIONS, IS_A));
 
         response.andDo(print())
@@ -477,7 +493,6 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        String goIdsCSV = goId(1) + "," + goId(2);
         expectRestCallHasDescendants(
                 asList(goId(1), goId(2)),
                 emptyList(),
@@ -488,7 +503,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goIdsCSV));
+                        .param(GO_ID, csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -507,7 +522,6 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(4), goId(4)));
 
-        String goIdsCSV = goId(1) + "," + goId(2);
         expectRestCallHasDescendants(
                 asList(goId(1), goId(2)),
                 emptyList(),
@@ -518,7 +532,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goIdsCSV));
+                        .param(GO_ID, csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -530,6 +544,90 @@ public class AnnotationControllerRESTIT {
                 .andExpect(valuesOccurInField(SLIMMED_ID_FIELD,
                         asList(
                                 asList(goId(1), goId(2)),
+                                singletonList(goId(1)))));
+    }
+
+    @Test
+    public void slimForGOTermWithNullDescendantsProducesErrorMessage() throws Exception {
+        expectRestCallHasDescendants(singletonList(goId(1)), emptyList(), singletonList(null));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(USAGE, SLIM_USAGE)
+                        .param(GO_ID, goId(1)));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(valuesOccurInErrorMessage(failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + goId(1))));
+    }
+
+    @Test
+    public void slimForGOTermWithOneNullDescendantsListAndOneValidDescendantsProducesError() throws Exception {
+        expectRestCallHasDescendants(
+                asList(goId(1), goId(2)),
+                emptyList(),
+                asList(
+                        singletonList(goId(3)),
+                        null));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(USAGE, SLIM_USAGE)
+                        .param(GO_ID, csv(goId(1), goId(2))));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(valuesOccurInErrorMessage(failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + goId(2))));
+    }
+
+    @Test
+    public void slimForGOTermWithTwoNullDescendantsListAndOneValidDescendantsProducesErrorShowingBothIds() throws Exception {
+        expectRestCallHasDescendants(
+                asList(goId(1), goId(2), goId(3)),
+                emptyList(),
+                asList(
+                        singletonList(goId(4)),
+                        null,
+                        null));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(USAGE, SLIM_USAGE)
+                        .param(GO_ID, csv(goId(1), goId(2), goId(3))));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(valuesOccurInErrorMessage(failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + csv(goId(2),
+                        goId(3)))));
+    }
+
+    @Test
+    public void slimForGOTermWithOneDescendantIdThatIsNullAndOneNonNullSucceeds() throws Exception {
+        annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
+
+        expectRestCallHasDescendants(
+                singletonList(goId(1)),
+                emptyList(),
+                singletonList(
+                        asList(goId(2), null)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(USAGE, SLIM_USAGE)
+                        .param(GO_ID, goId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valuesOccurInField(GO_ID_FIELD, goId(2)))
+                .andExpect(valuesOccurInField(SLIMMED_ID_FIELD,
+                        singletonList(
                                 singletonList(goId(1)))));
     }
 
@@ -606,6 +704,18 @@ public class AnnotationControllerRESTIT {
     @After
     public void deleteCoreContents() {
         annotationRepository.deleteAll();
+    }
+
+    private static String csv(String... values) {
+        StringJoiner joiner = new StringJoiner(COMMA);
+        for (String value : values) {
+            joiner.add(value);
+        }
+        return joiner.toString();
+    }
+
+    private String failedRESTResponseErrorMessage(String suffix) {
+        return FAILED_REST_FETCH_PREFIX + suffix;
     }
 
     private String gpId(int id) {

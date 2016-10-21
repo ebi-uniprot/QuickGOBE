@@ -3,12 +3,14 @@ package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
@@ -25,38 +27,54 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
  */
 public class SlimmingFilterConverter implements FilterConverter<ConvertedOntologyFilter, QuickGOQuery> {
 
-    @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
-        ConvertedFilter<QuickGOQuery> convertedFilter;
+    private static final ConvertedFilter<QuickGOQuery> FILTER_EVERYTHING =
+            new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
+    private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "no descendants found for IDs, ";
+    private static final String COMMA = ",";
 
+    @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
+        ConvertedFilter<QuickGOQuery> convertedFilter = FILTER_EVERYTHING;
         SlimmingConversionInfo conversionInfo = new SlimmingConversionInfo();
 
-        if (response.getResults() != null && atLeastOneDescendantExists(response)) {
+        StringJoiner idsWithNoDescendants = new StringJoiner(COMMA);
+        if (response.getResults() != null) {
             Set<QuickGOQuery> queries = new HashSet<>();
             FilterContext context = new FilterContext();
 
             for (ConvertedOntologyFilter.Result result : response.getResults()) {
-                for (String desc : result.getDescendants()) {
-                    queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
-                    conversionInfo.addOriginal2SlimmedGOIdMapping(desc, result.getId());
+                if (result.getDescendants() != null) {
+                    if (!result.getDescendants().isEmpty()) {
+                        result.getDescendants().stream()
+                                .filter(this::notNullOrEmpty)
+                                .forEach(desc -> {
+                                    queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
+                                    conversionInfo.addOriginal2SlimmedGOIdMapping(desc, result.getId());
+                                });
+
+                        context.save(SlimmingConversionInfo.class, conversionInfo);
+                        convertedFilter =
+                                new ConvertedFilter<>(or(queries.toArray(new QuickGOQuery[queries.size()])), context);
+                    }
+                } else {
+                    updateJoinerIfValid(idsWithNoDescendants, result.getId());
                 }
             }
+        }
 
-            context.save(SlimmingConversionInfo.class, conversionInfo);
-
-            convertedFilter = new ConvertedFilter<>(
-                    or(queries.toArray(new QuickGOQuery[queries.size()])),
-                    context);
-        } else {
-            convertedFilter = new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
+        if (idsWithNoDescendants.length() > 0) {
+            throw new RetrievalException(ERROR_MESSAGE_ON_NO_DESCENDANTS + idsWithNoDescendants.toString());
         }
 
         return convertedFilter;
     }
 
-    private boolean atLeastOneDescendantExists(ConvertedOntologyFilter response) {
-        return response.getResults().stream()
-                .filter(r -> !r.getDescendants().isEmpty())
-                .findFirst()
-                .isPresent();
+    private void updateJoinerIfValid(StringJoiner joiner, String value) {
+        if (notNullOrEmpty(value)) {
+            joiner.add(value);
+        }
+    }
+
+    private boolean notNullOrEmpty(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }
