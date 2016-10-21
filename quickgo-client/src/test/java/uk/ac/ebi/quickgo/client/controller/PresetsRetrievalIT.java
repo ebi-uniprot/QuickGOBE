@@ -93,6 +93,38 @@ public class PresetsRetrievalIT {
     }
 
     @Test
+    public void canRetrieveTaxonPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.taxons").exists());
+    }
+
+    @Test
+    public void canRetrieveQualifierPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.qualifiers").exists());
+    }
+
+    @Test
+    public void canRetrieveAspectPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.aspects.*", hasSize(3)));
+    }
+
+    @Test
+    public void canRetrieveGeneProductTypesPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.geneProductTypes.*", hasSize(3)));
+    }
+
+    @Test
     public void canRetrieveSingleDesiredPreset() throws Exception {
         mockMvc.perform(get(RESOURCE_URL).param(FIELDS_PARAM, "goSlimSets"))
                 .andDo(print())
