@@ -186,7 +186,7 @@ public class DefaultSearchQueryTemplate {
         }
 
         /**
-         * Add to the collection of aggregates which aggregates should be calculated.
+         * Set the collection of aggregates to be calculated.
          *
          * @param aggregate the aggregate to calculate
          * @return this {@link DefaultSearchQueryTemplate.Builder} instance
