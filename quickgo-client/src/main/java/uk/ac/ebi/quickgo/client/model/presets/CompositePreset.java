@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import java.util.List;
 
 /**
@@ -8,6 +9,7 @@ import java.util.List;
  * Created 20/09/16
  * @author Edd
  */
+@JsonFilter("CompositePreset")
 public interface CompositePreset {
     List<PresetItem> getAssignedBy();
 
