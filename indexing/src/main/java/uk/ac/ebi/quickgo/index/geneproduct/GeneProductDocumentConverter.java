@@ -52,7 +52,7 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         doc.taxonName = properties.get(TAXON_NAME_KEY);
         doc.parentId = geneProduct.parentId;
         doc.referenceProteome = properties.get(REFERENCE_PROTEOME_KEY);
-        doc.databaseSubsets = convertToList(properties.get(DATABASE_SUBSET_KEY));
+        doc.databaseSubset = properties.get(DATABASE_SUBSET_KEY);
 
         doc.isCompleteProteome = isTrue(properties.get(COMPLETE_PROTEOME_KEY));
         doc.isAnnotated = isTrue(properties.get(IS_ANNOTATED_KEY));

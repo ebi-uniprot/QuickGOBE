@@ -29,7 +29,7 @@ public class GeneProductDocConverterImpl implements GeneProductDocConverter {
 
         geneProduct.id = geneProductDocument.id;
         geneProduct.database = geneProductDocument.database;
-        geneProduct.databaseSubset = geneProductDocument.databaseSubsets;
+        geneProduct.databaseSubset = geneProductDocument.databaseSubset;
         geneProduct.isAnnotated = geneProductDocument.isAnnotated;
         geneProduct.synonyms = geneProductDocument.synonyms;
         geneProduct.isIsoform = geneProductDocument.isIsoform;
