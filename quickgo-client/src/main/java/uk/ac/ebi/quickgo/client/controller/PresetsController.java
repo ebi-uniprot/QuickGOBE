@@ -47,7 +47,7 @@ public class PresetsController {
     @ApiOperation(value = "Provides preset filtering information indicating valid terms and a corresponding " +
             "description; all of which are ordered by relevancy.")
     @RequestMapping(method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public FilteredCompositePreset compositePreset(@RequestParam(name = "fields", required = false) String fields) {
+    public FilteredCompositePreset compositePreset(@RequestParam(name = "fields", required = false) String... fields) {
         return createFilteredPreset(fields);
     }
 
@@ -57,7 +57,7 @@ public class PresetsController {
      * @param fields the fields required by the user. If the value is null, all fields will be shown.
      * @return the filtered {@link CompositePreset} instance, showing only the desired fields.
      */
-    private FilteredCompositePreset createFilteredPreset(String fields) {
+    private FilteredCompositePreset createFilteredPreset(String[] fields) {
         FilteredCompositePreset filteredPreset = new FilteredCompositePreset(presets);
         if (fields != null) {
             filteredPreset.showFields(fields);
@@ -66,7 +66,6 @@ public class PresetsController {
     }
 
     private static class FilteredCompositePreset extends MappingJacksonValue {
-        private static final String COMMA = ",";
         private static final String COMPOSITE_PRESET_FILTER = "CompositePreset";
 
         FilteredCompositePreset(CompositePreset compositePreset) {
@@ -80,8 +79,8 @@ public class PresetsController {
             return new SimpleFilterProvider().addFilter(COMPOSITE_PRESET_FILTER, SimpleBeanPropertyFilter.serializeAllExcept());
         }
 
-        void showFields(String csvFields) {
-            Set<String> fieldsSet = Stream.of(csvFields.split(COMMA)).collect(Collectors.toSet());
+        void showFields(String[] csvFields) {
+            Set<String> fieldsSet = Stream.of(csvFields).collect(Collectors.toSet());
             if (fieldsSet.size() > 0) {
                 SimpleFilterProvider filterProvider =
                         new SimpleFilterProvider()
