@@ -1,16 +1,14 @@
 package uk.ac.ebi.quickgo.graphics.service;
 
 import uk.ac.ebi.quickgo.ff.loader.ontology.OntologyGraphicsSourceLoader;
+import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.*;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTermSet;
 import uk.ac.ebi.quickgo.model.ontology.generic.RelationType;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -49,11 +47,60 @@ public class GraphImageServiceImpl implements GraphImageService {
                 description = "Comparison chart for " + String.valueOf(idsSize);
             }
 
-            return new GraphImageResult(description, graphImage);
+            return new GraphImageResult(
+                    description,
+                    graphImage,
+                    createGraphImageLayout(graphImage, description));
         } else {
             throw new RenderingGraphException(
                     "Cannot create chart because internal ontologies could not be loaded at application startup");
         }
+    }
+
+    /**
+     * Creates the coordinates of the node information stored within the graph image
+     * which can be used as an image-map.
+     * @param graphImage the image whose layouting information is required
+     * @param title the title of the image
+     * @return the layouting information for the specified {@link GraphImage}
+     */
+    private GraphImageLayout createGraphImageLayout(GraphImage graphImage, String title) {
+        Collection<TermNode> terms = graphImage.getOntologyTerms();
+        GraphImageLayout layout = new GraphImageLayout();
+
+        terms.stream()
+            .map(term -> {
+                GraphImageLayout.NodePosition nodePosition = new GraphImageLayout.NodePosition();
+                nodePosition.id = term.getId();
+                nodePosition.bottom = term.bottom();
+                nodePosition.top = term.top();
+                nodePosition.left = term.left();
+                nodePosition.right = term.right();
+                return nodePosition;
+            })
+            .forEach(layout.nodePositions::add);
+
+        layout.imageHeight = graphImage.height;
+        layout.imageWidth = graphImage.width;
+
+        graphImage.legend.stream()
+                .map(legendNode -> {
+                    GraphImageLayout.LegendPosition legendPosition = new GraphImageLayout.LegendPosition();
+                    legendPosition.bottom = legendNode.bottom();
+                    legendPosition.top = legendNode.top();
+                    legendPosition.height = legendNode.height;
+                    legendPosition.width = legendNode.width;
+                    legendPosition.left = legendNode.left();
+                    legendPosition.right = legendNode.right();
+                    legendPosition.xCentre = legendNode.xCentre;
+                    legendPosition.yCentre = legendNode.yCentre;
+                    return legendPosition;
+                })
+                .forEach(layout.legendPositions::add);
+
+        layout.title = title;
+
+        return layout;
     }
 
     private EnumSet<RelationType> getRelationTypes(NameSpace nameSpace) {
