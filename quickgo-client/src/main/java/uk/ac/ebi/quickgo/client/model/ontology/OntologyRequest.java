@@ -16,7 +16,7 @@ import static uk.ac.ebi.quickgo.ontology.common.document.OntologyFields.ONTOLOGY
 import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER;
 
 /**
- * A data structure used to store the input parameters a client can submit to the Ontology search enpoint
+ * A data structure used to store the input parameters a client can submit to the Ontology search endpoint
  *
  * Once the comma separated values have been set, then turn then into an object (SimpleFilter) that
  * encapsulates the list and solr field name to use for that argument.
