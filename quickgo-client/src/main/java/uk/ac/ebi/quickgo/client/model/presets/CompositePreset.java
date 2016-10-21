@@ -20,4 +20,12 @@ public interface CompositePreset {
     List<PresetItem> getGeneProducts();
 
     List<PresetItem> getGoSlimSets();
+
+    List<PresetItem> getTaxons();
+
+    List<PresetItem> getQualifiers();
+
+    List<PresetItem> getAspects();
+
+    List<PresetItem> getGeneProductTypes();
 }
