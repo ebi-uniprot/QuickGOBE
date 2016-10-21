@@ -2,9 +2,9 @@ package uk.ac.ebi.quickgo.client.controller;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 

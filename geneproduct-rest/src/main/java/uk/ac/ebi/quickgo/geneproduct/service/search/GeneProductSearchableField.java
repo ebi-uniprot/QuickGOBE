@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.service.search;
 
-import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
+import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
@@ -13,16 +12,12 @@ import org.springframework.stereotype.Component;
  * @author Edd Turner
  */
 @Component
-public class GeneProductSearchableField implements SearchableField, SearchableDocumentFields {
+public class GeneProductSearchableField implements SearchableField {
     @Override public boolean isSearchable(String field) {
         return GeneProductFields.Searchable.isSearchable(field);
     }
 
-    @Override public boolean isDocumentSearchable(String field) {
-        return isSearchable(field);
-    }
-
-    @Override public Stream<String> searchableDocumentFields() {
+    @Override public Stream<String> searchableFields() {
         return GeneProductFields.Searchable.searchableFields().stream();
     }
 }

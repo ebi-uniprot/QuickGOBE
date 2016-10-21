@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
+import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
 import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
@@ -7,7 +8,6 @@ import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 

@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.query.Facet;
 import uk.ac.ebi.quickgo.rest.search.query.FieldProjection;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,7 +37,7 @@ public class DefaultSearchQueryTemplateTest {
 
     private String query;
     private String id;
-    private SearchableField searchableField = field -> field.equals(SEARCHABLE_FIELD) || field.equals(id);
+    private SearchableField searchableField;
     private List<String> returnedFields;
     private DefaultSearchQueryTemplate defaultSearchQueryTemplate;
     private StringToQuickGOQueryConverter queryConverter;
@@ -45,6 +47,8 @@ public class DefaultSearchQueryTemplateTest {
         this.id = ID;
         this.returnedFields = Arrays.asList(id, SEARCHABLE_FIELD);
         this.query = QUERY;
+
+        searchableField = createSearchableField();
 
         this.queryConverter = new StringToQuickGOQueryConverter(searchableField);
         this.defaultSearchQueryTemplate = new DefaultSearchQueryTemplate(
@@ -185,5 +189,17 @@ public class DefaultSearchQueryTemplateTest {
         DefaultSearchQueryTemplate.Builder builder = defaultSearchQueryTemplate.newBuilder();
         builder.setQuery(this.query);
         return builder;
+    }
+
+    private SearchableField createSearchableField() {
+        return new SearchableField() {
+            @Override public boolean isSearchable(String field) {
+                return field.equals(SEARCHABLE_FIELD) || field.equals(id);
+            }
+
+            @Override public Stream<String> searchableFields() {
+                return Stream.empty();
+            }
+        };
     }
 }

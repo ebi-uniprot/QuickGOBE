@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
+import uk.ac.ebi.quickgo.common.SearchableField;
 
 import java.util.Iterator;
 import java.util.List;
@@ -60,16 +60,16 @@ public class PresetsConfig {
     }
 
     @Bean
-    public SearchableDocumentFields searchableDocumentFields() {
+    public SearchableField searchableField() {
         return new NoSearchablePresetDocumentFields();
     }
 
-    private static class NoSearchablePresetDocumentFields implements SearchableDocumentFields {
-        @Override public boolean isDocumentSearchable(String field) {
+    private static class NoSearchablePresetDocumentFields implements SearchableField {
+        @Override public boolean isSearchable(String field) {
             return false;
         }
 
-        @Override public Stream<String> searchableDocumentFields() {
+        @Override public Stream<String> searchableFields() {
             return Stream.empty();
         }
     }
