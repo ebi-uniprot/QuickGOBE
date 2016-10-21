@@ -1,9 +1,11 @@
-package uk.ac.ebi.quickgo.geneproduct.common.document;
+package uk.ac.ebi.quickgo.geneproduct.common;
 
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 
 import java.util.List;
 import org.apache.solr.client.solrj.beans.Field;
+
+import static uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields.*;
 
 /**
  * Solr document class defining all necessary fields within the gene product core.
@@ -11,47 +13,46 @@ import org.apache.solr.client.solrj.beans.Field;
  * @author Ricardo antunes
  */
 public class GeneProductDocument implements QuickGODocument {
-
-    @Field(GeneProductFields.ID)
+    @Field(ID)
     public String id;
 
-    @Field(GeneProductFields.DATABASE)
+    @Field(DATABASE)
     public String database;
 
-    @Field(GeneProductFields.SYMBOL)
+    @Field(SYMBOL)
     public String symbol;
 
-    @Field(GeneProductFields.NAME)
+    @Field(NAME)
     public String name;
 
-    @Field(GeneProductFields.SYNONYM)
+    @Field(SYNONYM)
     public List<String> synonyms;
 
-    @Field(GeneProductFields.TYPE)
+    @Field(TYPE)
     public String type;
 
-    @Field(GeneProductFields.TAXON_ID)
+    @Field(TAXON_ID)
     public int taxonId;
 
-    @Field(GeneProductFields.TAXON_NAME)
+    @Field(TAXON_NAME)
     public String taxonName;
 
-    @Field(GeneProductFields.DATABASE_SUBSET)
+    @Field(DATABASE_SUBSET)
     public String databaseSubset;
 
-    @Field(GeneProductFields.COMPLETE_PROTEOME)
+    @Field(COMPLETE_PROTEOME)
     public boolean isCompleteProteome;
 
-    @Field(GeneProductFields.REFERENCE_PROTEOME)
+    @Field(REFERENCE_PROTEOME)
     public String referenceProteome;
 
-    @Field(GeneProductFields.IS_ISOFORM)
+    @Field(IS_ISOFORM)
     public boolean isIsoform;
 
-    @Field(GeneProductFields.IS_ANNOTATED)
+    @Field(IS_ANNOTATED)
     public boolean isAnnotated;
 
-    @Field(GeneProductFields.PARENT_ID)
+    @Field(PARENT_ID)
     public String parentId;
 
     @Override public String getUniqueName() {

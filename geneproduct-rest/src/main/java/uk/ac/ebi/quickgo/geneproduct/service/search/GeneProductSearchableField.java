@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.service.search;
 
 import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
 
 import java.util.stream.Stream;

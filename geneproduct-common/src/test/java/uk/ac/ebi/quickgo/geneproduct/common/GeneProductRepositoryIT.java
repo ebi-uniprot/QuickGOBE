@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
 
 import java.io.IOException;
 import java.util.ArrayList;

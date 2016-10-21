@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.geneproduct.common.document;
+package uk.ac.ebi.quickgo.geneproduct.common;
 
 /**
  * Enumeration that expresses the possible types of gene products.

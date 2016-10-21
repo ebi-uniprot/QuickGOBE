@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.common.document;
 
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
+
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;

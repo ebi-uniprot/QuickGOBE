@@ -1,13 +1,12 @@
 package uk.ac.ebi.quickgo.geneproduct.search;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
-import java.util.Collections;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -217,20 +216,23 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     @Test
     public void requestWith3FilterQueriesThatFilterOutAllResults() throws Exception {
         GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        doc1.symbol = "important";
-        doc1.synonyms = Collections.singletonList("Klose");
+        doc1.type = GeneProductType.PROTEIN.getName();
+        doc1.taxonId = 1;
+        doc1.databaseSubset = "TrEMBL";
         GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        doc2.symbol = "important";
-        doc2.synonyms = Collections.singletonList("Jerome");
+        doc2.type = GeneProductType.PROTEIN.getName();
+        doc2.taxonId = 2;
+        doc1.databaseSubset = "Swiss-Prot";
         GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.symbol = "pointless";
-        doc3.synonyms = Collections.singletonList("Jerome");
+        doc3.type = GeneProductType.RNA.getName();
+        doc3.taxonId = 3;
+        doc1.databaseSubset = null;
 
         saveToRepository(doc1, doc2, doc3);
 
-        String fq1 = buildFilterQuery(GeneProductFields.Searchable.SYMBOL, "Process");
-        String fq2 = buildFilterQuery(GeneProductFields.Searchable.SYNONYM, "Klose");
-        String fq3 = buildFilterQuery(GeneProductFields.Searchable.SYNONYM, "Ibrahimovic");
+        String fq1 = buildFilterQuery(GeneProductFields.Searchable.TYPE, GeneProductType.PROTEIN.getName());
+        String fq2 = buildFilterQuery(GeneProductFields.Searchable.TAXON_ID, "1");
+        String fq3 = buildFilterQuery(GeneProductFields.Searchable.DATABASE_SUBSET, "Swiss-Prot");
 
         checkValidFilterQueryResponse("process", 0, fq1, fq2, fq3);
     }
