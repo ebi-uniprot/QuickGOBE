@@ -31,7 +31,8 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     private CoTermRepositorySimpleMap() {}
 
     /**
-     * Create a instance of CoTermRepositorySimpleMap.
+     * Create a instance of CoTermRepositorySimpleMap using maps of CoTerms from all sources and manual sources
+     * respectively.
      * @param coTermsAll CoTerms derived from all sources.
      * @param coTermsManual CoTerms derived from non-electronic source.
      */
@@ -48,7 +49,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     }
 
     /**
-     * Create a instance of CoTermRepositorySimpleMap loading the co-occurring data from the resource sources.
+     * Create a instance of CoTermRepositorySimpleMap loading the co-occurring data from the resources.
      * @param manualCoTermsSource source of co-occurring terms for Terms used in manually derived annotations.
      * @param allCoTermSource source of co-occurring terms for Terms used in annotations derived from all sources.
      * @throws IOException if the source of the co-occurring terms exists, but fails to be read.
@@ -56,7 +57,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     public static CoTermRepositorySimpleMap createCoTermRepositorySimpleMap(Resource manualCoTermsSource, Resource
             allCoTermSource) throws IOException {
 
-        Preconditions.checkArgument(manualCoTermsSource != null,"Resource manualCoTermsSource should not be null");
+        Preconditions.checkArgument(manualCoTermsSource != null,"Resource manualCoTermsSource should not be null.");
         Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource should not be null.");
         Preconditions.checkState(manualCoTermsSource.exists(),"Resource manualCoTermsSource should not be " +
                 "non-existent.");
