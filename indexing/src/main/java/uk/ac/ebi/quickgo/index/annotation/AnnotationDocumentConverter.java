@@ -86,13 +86,12 @@ public class AnnotationDocumentConverter implements ItemProcessor<Annotation, An
      * @return a {@link Date} instance representing the date.
      */
     private Date createDateFromString(Annotation annotation) {
-        String dateString = annotation.date;
-        if (dateString != null && !dateString.trim().isEmpty()) {
+        if (!Strings.isNullOrEmpty(annotation.date)) {
             try {
-                LocalDate localDate = LocalDate.parse(dateString.trim(), dateTimeFormatter);
+                LocalDate localDate = LocalDate.parse(annotation.date, dateTimeFormatter);
                 return Date.from(localDate.atStartOfDay(ZoneOffset.UTC).toInstant());
             } catch (IllegalArgumentException|DateTimeParseException iae) {
-                LOGGER.error("Could not parse annotation date: " + dateString, iae);
+                LOGGER.error("Could not parse annotation date: " + annotation.date, iae);
             }
         }
         return null;

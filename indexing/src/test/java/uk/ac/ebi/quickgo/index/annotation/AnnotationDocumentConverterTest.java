@@ -300,17 +300,6 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsValidDateWithSpacesSuccessfully() throws Exception {
-        annotation.date = "   20150122       ";
-        LocalDate expectedLocalDate = LocalDate.of(2015, 1, 22);
-        Date expectedDate = Date.from(expectedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        AnnotationDocument doc = converter.process(annotation);
-
-        assertThat(doc.date, is(expectedDate));
-    }
-
-    @Test
     public void convertsInvalidDateToNull() throws Exception {
         annotation.date = "3dd333stopAskingMeForADate320150122";
 
@@ -331,6 +320,15 @@ public class AnnotationDocumentConverterTest {
     @Test
     public void convertsSpaceFilledDateToNull() throws Exception {
         annotation.date = "    ";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.date, is(CoreMatchers.nullValue()));
+    }
+
+    @Test
+    public void convertsNullDateToNull() throws Exception {
+        annotation.date = null;
 
         AnnotationDocument doc = converter.process(annotation);
 
