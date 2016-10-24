@@ -31,7 +31,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     private CoTermRepositorySimpleMap() {}
 
     /**
-     * Create a instance of CoTermRepositorySimpleMap without using the CoTermLoader inner class.
+     * Create a instance of CoTermRepositorySimpleMap.
      * @param coTermsAll CoTerms derived from all sources.
      * @param coTermsManual CoTerms derived from non-electronic source.
      */
