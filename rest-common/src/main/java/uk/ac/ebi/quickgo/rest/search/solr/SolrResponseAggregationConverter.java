@@ -244,6 +244,8 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
 
         if (number instanceof Double) {
             convertedValue = (double) number;
+        } else if(number instanceof Long) {
+            convertedValue = (long) number;
         } else if (number instanceof Integer) {
             convertedValue = ((Integer) number).doubleValue();
         } else {
