@@ -8,7 +8,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
 
 /**
@@ -26,14 +25,11 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class CoTermsProcessorTest {
 
-    @Mock
-    private CoTermsAggregationWriter aggregator;
-
+    private static final String GO_TERM = "GO:0003824";
     @Mock
     CoTermsForSelectedTerm coTermsForSelectedTerm;
-
-    private static final String GO_TERM = "GO:0003824";
-
+    @Mock
+    private CoTermsAggregationWriter aggregator;
 
     @Test
     public void singleGoTermHasCooccurrenceWithTwoOtherTerms() {
