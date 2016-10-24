@@ -29,7 +29,7 @@ public class Annotation {
 
     public String reference;
 
-    public List<String> withFrom;
+    public List<AllOf> withFrom;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public int taxonId;
@@ -94,11 +94,11 @@ public class Annotation {
         if (slimmedIds != null ? !slimmedIds.equals(that.slimmedIds) : that.slimmedIds != null) {
             return false;
         }
-        if(symbol != null ? symbol.equals(that.symbol) : that.symbol != null) {
+        if (targetSets != null ? !targetSets.equals(that.targetSets) : that.targetSets != null) {
             return false;
         }
+        return symbol != null ? symbol.equals(that.symbol) : that.symbol == null;
 
-        return targetSets != null ? targetSets.equals(that.targetSets) : that.targetSets == null;
     }
 
     @Override public int hashCode() {
@@ -115,8 +115,8 @@ public class Annotation {
         result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
         result = 31 * result + (extensions != null ? extensions.hashCode() : 0);
         result = 31 * result + (slimmedIds != null ? slimmedIds.hashCode() : 0);
-        result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
         result = 31 * result + (targetSets != null ? targetSets.hashCode() : 0);
+        result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
         return result;
     }
 
@@ -138,5 +138,33 @@ public class Annotation {
                 ", targetSets=" + targetSets +
                 ", symbol='" + symbol + '\'' +
                 '}';
+    }
+
+    public static class AllOf {
+        public List<String> allOf;
+
+        @Override public String toString() {
+            return "AllOf{" +
+                    "allOf=" + allOf +
+                    '}';
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            AllOf allOf1 = (AllOf) o;
+
+            return allOf != null ? allOf.equals(allOf1.allOf) : allOf1.allOf == null;
+
+        }
+
+        @Override public int hashCode() {
+            return allOf != null ? allOf.hashCode() : 0;
+        }
     }
 }

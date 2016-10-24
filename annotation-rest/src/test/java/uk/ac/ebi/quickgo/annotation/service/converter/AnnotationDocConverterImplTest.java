@@ -4,6 +4,8 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AnnotationDocConverterImplTest {
+    public static final String COMMA = ",";
     private static final String ID = "1";
     private static final String GENE_PRODUCT_ID = "P99999";
     private static final String QUALIFIER = "enables";
@@ -36,9 +39,7 @@ public class AnnotationDocConverterImplTest {
     private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
     private static final String SYMBOL = "moeA5";
     private static final String GO_ASPECT = "cellular_component";
-
     private static final AnnotationDocument DOCUMENT = createStubDocument();
-
     private AnnotationDocConverter docConverter;
 
     @Before
@@ -85,7 +86,7 @@ public class AnnotationDocConverterImplTest {
     @Test
     public void convertWithFromSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.withFrom, is(WITH_FROM));
+        assertThat(model.withFrom, is(asAllOfList(WITH_FROM)));
     }
 
     @Test
@@ -101,7 +102,6 @@ public class AnnotationDocConverterImplTest {
     public void convertExtensionSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
         assertThat(model.extensions, is(EXTENSIONS));
-
     }
 
     @Test
@@ -162,5 +162,19 @@ public class AnnotationDocConverterImplTest {
         doc.goAspect = GO_ASPECT;
 
         return doc;
+    }
+
+    private List<Annotation.AllOf> asAllOfList(List<String> csvs) {
+        if (csvs != null && !csvs.isEmpty()) {
+            return csvs.stream().map(
+                    csv -> {
+                        Annotation.AllOf allOf = new Annotation.AllOf();
+                        allOf.allOf = Stream.of(csv.split(COMMA)).collect(Collectors.toList());
+                        return allOf;
+                    }
+            ).collect(Collectors.toList());
+        } else {
+            return null;
+        }
     }
 }

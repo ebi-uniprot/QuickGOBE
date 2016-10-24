@@ -59,6 +59,7 @@ public class AnnotationControllerIT {
     private static final String INVALID_GO_ID = "GO:1";
     private static final String ECO_ID2 = "ECO:0000323";
     private static final String MISSING_ECO_ID = "ECO:0000888";
+    private static final String WITH_FROMS_PATH = "withFrom.*.allOf";
 
     //Configuration
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
@@ -711,7 +712,7 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"));
+                .andExpect(valueOccursInCollection(WITH_FROMS_PATH, "InterPro:IPR015421"));
 
     }
 
@@ -723,9 +724,8 @@ public class AnnotationControllerIT {
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015422"));
-
+                .andExpect(valueOccursInCollection(WITH_FROMS_PATH, "InterPro:IPR015421"))
+                .andExpect(valueOccursInCollection(WITH_FROMS_PATH, "InterPro:IPR015422"));
     }
 
     @Test
@@ -745,8 +745,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015422"));
+                .andExpect(valueOccursInCollection(WITH_FROMS_PATH, "InterPro:IPR015421"))
+                .andExpect(valueOccursInCollection(WITH_FROMS_PATH, "InterPro:IPR015422"));
     }
 
     @Test
@@ -757,7 +757,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"));
+                .andExpect(valueOccursInCollection(WITH_FROMS_PATH, "InterPro:IPR015421"));
     }
 
     //---------- Limit related tests.
