@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import java.util.Date;
-
 /**
  * An intermediate object used to store the data retrieved from a row in an annotation file.
  *
@@ -22,7 +20,7 @@ public class Annotation {
     String assignedBy;
     String annotationExtension;
     String annotationProperties;
-    Date date;
+    String date;
 
     @Override public String toString() {
         return "Annotation{" +
@@ -37,7 +35,7 @@ public class Annotation {
                 ", assignedBy='" + assignedBy + '\'' +
                 ", annotationExtension='" + annotationExtension + '\'' +
                 ", annotationProperties='" + annotationProperties + '\'' +
-                ", date=" + date +
+                ", date='" + date + '\'' +
                 '}';
     }
 
@@ -106,5 +104,4 @@ public class Annotation {
         result = 31 * result + (date != null ? date.hashCode() : 0);
         return result;
     }
-
 }

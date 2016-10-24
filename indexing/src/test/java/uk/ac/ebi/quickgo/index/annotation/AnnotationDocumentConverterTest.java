@@ -4,8 +4,12 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.stream.Collectors;
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -281,6 +285,56 @@ public class AnnotationDocumentConverterTest {
         AnnotationDocument doc = converter.process(annotation);
 
         assertThat(doc.goAspect, is(value));
+    }
+
+    // date
+    @Test
+    public void convertsValidDateSuccessfully() throws Exception {
+        annotation.date = "20150122";
+        LocalDate expectedLocalDate = LocalDate.of(2015, 1, 22);
+        Date expectedDate = Date.from(expectedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.date, is(expectedDate));
+    }
+
+    @Test
+    public void convertsValidDateWithSpacesSuccessfully() throws Exception {
+        annotation.date = "   20150122       ";
+        LocalDate expectedLocalDate = LocalDate.of(2015, 1, 22);
+        Date expectedDate = Date.from(expectedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.date, is(expectedDate));
+    }
+
+    @Test
+    public void convertsInvalidDateToNull() throws Exception {
+        annotation.date = "3dd333stopAskingMeForADate320150122";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.date, is(nullValue()));
+    }
+
+    @Test
+    public void convertsEmptyDateToNull() throws Exception {
+        annotation.date = "";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.date, is(CoreMatchers.nullValue()));
+    }
+
+    @Test
+    public void convertsSpaceFilledDateToNull() throws Exception {
+        annotation.date = "    ";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.date, is(CoreMatchers.nullValue()));
     }
 
     private String constructGeneProductId(Annotation annotation) {return annotation.db + ":" + annotation.dbObjectId;}

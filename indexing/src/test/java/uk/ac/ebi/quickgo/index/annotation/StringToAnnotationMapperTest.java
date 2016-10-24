@@ -1,11 +1,5 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -14,11 +8,9 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.index.annotation.Columns.*;
-import static uk.ac.ebi.quickgo.index.annotation.StringToAnnotationMapper.ANNOTATION_DATE_FORMAT;
 
 /**
  * Test the behaviour of the {@link StringToAnnotationMapper} class.
@@ -121,47 +113,6 @@ public class StringToAnnotationMapperTest {
         checkAnnotationObjectFieldsMatchTokenFields(tokens, annotation);
     }
 
-    @Test
-    public void convertsValidDateSuccessfully() {
-        LocalDate expectedLocalDate = LocalDate.of(2015, 1, 22);
-        Date expectedDate = Date.from(expectedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        Date date = mapper.createDateFromString("20150122");
-
-        assertThat(date, is(expectedDate));
-    }
-
-    @Test
-    public void convertsValidDateWithSpacesSuccessfully() {
-        LocalDate expectedLocalDate = LocalDate.of(2015, 1, 22);
-        Date expectedDate = Date.from(expectedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        Date date = mapper.createDateFromString("    20150122   ");
-
-        assertThat(date, is(expectedDate));
-    }
-
-    @Test
-    public void convertsInvalidDateToNull() {
-        Date date = mapper.createDateFromString("3dd333stopAskingMeForADate320150122");
-
-        assertThat(date, is(nullValue()));
-    }
-
-    @Test
-    public void convertsEmptyDateToNull() {
-        Date date = mapper.createDateFromString("");
-
-        assertThat(date, is(nullValue()));
-    }
-
-    @Test
-    public void convertsSpaceFilledDateToNull() {
-        Date date = mapper.createDateFromString("    ");
-
-        assertThat(date, is(nullValue()));
-    }
-
     private void checkAnnotationObjectFieldsMatchTokenFields(String[] tokens, Annotation annotation) {
         assertThat(annotation.db, is(trim(tokens[COLUMN_DB.getPosition()])));
         assertThat(annotation.dbObjectId, is(trim(tokens[COLUMN_DB_OBJECT_ID.getPosition()])));
@@ -174,20 +125,7 @@ public class StringToAnnotationMapperTest {
         assertThat(annotation.assignedBy, is(trim(tokens[COLUMN_ASSIGNED_BY.getPosition()])));
         assertThat(annotation.annotationExtension, is(trim(tokens[COLUMN_ANNOTATION_EXTENSION.getPosition()])));
         assertThat(annotation.annotationProperties, is(trim(tokens[COLUMN_ANNOTATION_PROPERTIES.getPosition()])));
-        assertThat(annotation.date, is(buildDateFromDateString(tokens[COLUMN_DATE.getPosition()])));
-    }
-
-    private Date buildDateFromDateString(String dateString) {
-        if (dateString != null && !dateString.trim().isEmpty()) {
-            try {
-                LocalDate localDate =
-                        LocalDate.parse(dateString.trim(), DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT));
-                return Date.from(localDate.atStartOfDay(ZoneOffset.UTC).toInstant());
-            } catch (IllegalArgumentException | DateTimeParseException iae) {
-                LOGGER.error("Test could not parse annotation date: " + dateString, iae);
-            }
-        }
-        return null;
+        assertThat(annotation.date, is(trim(tokens[COLUMN_DATE.getPosition()])));
     }
 
     private String trim(String value) {
