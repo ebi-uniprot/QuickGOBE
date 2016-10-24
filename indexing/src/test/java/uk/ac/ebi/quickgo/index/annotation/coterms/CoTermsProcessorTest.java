@@ -1,13 +1,17 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static java.util.Collections.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -34,7 +38,12 @@ public class CoTermsProcessorTest {
     @Test
     public void singleGoTermHasCooccurrenceWithTwoOtherTerms() {
 
-        List<CoTerm> returnList = Arrays.asList();
+        CoTerm mockTermA = mock(CoTerm.class);
+        CoTerm mockTermB = mock(CoTerm.class);
+        CoTerm mockTermC = mock(CoTerm.class);
+
+        List<CoTerm> returnList = Arrays.asList(mockTermA, mockTermB, mockTermC);
+
         when(aggregator.createCoTermsForSelectedTerm(GO_TERM)).thenReturn(coTermsForSelectedTerm);
         when(coTermsForSelectedTerm.highestSimilarity()).thenReturn(returnList);
         CoTermsProcessor coTermsCalculator = new CoTermsProcessor(aggregator);
