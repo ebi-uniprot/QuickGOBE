@@ -84,9 +84,4 @@ public class ServiceConfig {
         return new SolrQueryStringSanitizer();
     }
 
-    private CoTermRepository emptyCoTermRepository(){
-        return (id, type, limit, thresholdLimit) -> {
-            throw new IllegalStateException("The method 'findCoTerms' is not valid for ECO Terms");
-        };
-    }
 }
