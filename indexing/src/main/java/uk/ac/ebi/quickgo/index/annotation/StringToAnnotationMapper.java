@@ -58,6 +58,17 @@ public class StringToAnnotationMapper implements FieldSetMapper<Annotation> {
         return annotation;
     }
 
+    /**
+     * <p>Creates a date from a date string. The date string is expected to be of the form: YYYYMMDD,
+     * e.g., 20120123 for 23rd January 2012. Any problem parsing this date will have the error logged.
+     * Since such errors are not critical, indexing will set the date to null in such circumstances
+     * and continue.
+     * <p>The {@link Date} instance created needs to be in UTC format, required by the underlying data repository,
+     * into which the instance will be persisted.
+     *
+     * @param dateString the date string, expected to be of the form YYYYMMDD
+     * @return a {@link Date} instance representing the date.
+     */
     Date createDateFromString(String dateString) {
         if (dateString != null && !dateString.trim().isEmpty()) {
             try {
