@@ -1,18 +1,19 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
 import com.google.common.base.Preconditions;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepositorySimpleMap.CoTermRecordParser.createFromText;
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Retrieve the co-occurring terms for the selected term from the in-memory map.
@@ -142,46 +143,26 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
          */
         private void load() throws IOException {
             logger.info("Loading Co terms from sources");
-            loadCoTermsSource(allSource, coTermsAll = new HashMap<>());
-            loadCoTermsSource(manualSource, coTermsManual = new HashMap<>());
+            coTermsAll = loadCoTermsSource(allSource);
+            coTermsManual = loadCoTermsSource(manualSource);
         }
 
         /**
          * Load source contents into memory
          * @param source of CoTerms.
-         * @param coTerms target map.
          * @throws IOException if the source of the co-occurring terms exists, but fails to be read.
          */
-        private void loadCoTermsSource(Resource source, Map<String, List<CoTerm>> coTerms) throws IOException {
-            List<CoTerm> comparedTerms = new ArrayList<>();
-            String line;
-            String currentTerm = null;
+        private Map<String, List<CoTerm>> loadCoTermsSource(Resource source) throws IOException {
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(source.getInputStream()));
-            br.readLine(); //throw away first line as it will be the header
+            try (Stream<String> lines = Files.lines(Paths.get(source.getURI()))) {
+                return lines
+                        .skip(1)    //header
+                        .map(CoTermRecordParser::createFromText)
+                        .collect(groupingBy(CoTerm::getTarget));
 
-            while ((line = br.readLine()) != null) {
-                CoTerm CoTerm = createFromText(line);
-
-                if (currentTerm == null) {
-                    currentTerm = CoTerm.getTarget();
-                }
-
-                //Have we arrived at a new source term?
-                if (!CoTerm.getTarget().equals(currentTerm)) {
-                    coTerms.put(currentTerm, comparedTerms);
-
-                    //Reset
-                    currentTerm = CoTerm.getTarget();
-                    comparedTerms = new ArrayList<>();
-                }
-
-                comparedTerms.add(CoTerm);
+            } catch (IOException e) {
+                throw e;
             }
-
-            //save last term
-            coTerms.put(currentTerm, comparedTerms);
-            logger.info("Number of GO Terms loaded is " + coTerms.keySet().size());
 
         }
     }
