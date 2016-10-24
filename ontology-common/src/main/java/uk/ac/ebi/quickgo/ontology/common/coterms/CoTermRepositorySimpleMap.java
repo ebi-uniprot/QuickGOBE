@@ -40,7 +40,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
             Map<String, List<CoTerm>> coTermsManual) {
 
         Preconditions.checkArgument(coTermsAll != null, "Map coTermsAll should not be null.");
-        Preconditions.checkArgument(coTermsManual != null,"Map coTermsManual should not be null.");
+        Preconditions.checkArgument(coTermsManual != null, "Map coTermsManual should not be null.");
 
         CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
         coTermRepository.coTermsAll = coTermsAll;
@@ -57,9 +57,9 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     public static CoTermRepositorySimpleMap createCoTermRepositorySimpleMap(Resource manualCoTermsSource, Resource
             allCoTermSource) throws IOException {
 
-        Preconditions.checkArgument(manualCoTermsSource != null,"Resource manualCoTermsSource should not be null.");
+        Preconditions.checkArgument(manualCoTermsSource != null, "Resource manualCoTermsSource should not be null.");
         Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource should not be null.");
-        Preconditions.checkState(manualCoTermsSource.exists(),"Resource manualCoTermsSource should not be " +
+        Preconditions.checkState(manualCoTermsSource.exists(), "Resource manualCoTermsSource should not be " +
                 "non-existent.");
         Preconditions.checkState(allCoTermSource.exists(), "Resource allCoTermSource should not be non-existent.");
 
@@ -82,7 +82,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
 
         Preconditions.checkArgument(id != null, "The findCoTerms id should not be null.");
         Preconditions.checkArgument(source != null, "The findCoTerms source should not be null.");
-        Preconditions.checkArgument(limit > 0 , "The findCoTerms limit should not be less than 1.");
+        Preconditions.checkArgument(limit > 0, "The findCoTerms limit should not be less than 1.");
         Preconditions.checkArgument(filter != null, "The findCoTerms filter should not be null.");
         return source == CoTermSource.MANUAL ? findCoTermsFromMap(coTermsManual, id, limit, filter)
                 : findCoTermsFromMap(coTermsAll, id, limit, filter);
@@ -108,6 +108,22 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
                 .filter(filter)
                 .limit(limit)
                 .collect(Collectors.toList());
+    }
+
+    static class CoTermRecordParser {
+        private static final int COLUMN_ID = 0;
+        private static final int COLUMN_COMPARE = 1;
+        private static final int COLUMN_PROB = 2;
+        private static final int COLUMN_SIG = 3;
+        private static final int COLUMN_TOGETHER = 4;
+        private static final int COLUMN_COMPARED = 5;
+
+        static CoTerm createFromText(String line) {
+            String[] columns = line.split("\\t");
+            return new CoTerm(columns[COLUMN_ID], columns[COLUMN_COMPARE],
+                    Float.parseFloat(columns[COLUMN_PROB]), Float.parseFloat(columns[COLUMN_SIG]),
+                    Long.parseLong(columns[COLUMN_TOGETHER]), Long.parseLong(columns[COLUMN_COMPARED]));
+        }
     }
 
     /**
@@ -179,22 +195,6 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
             coTerms.put(currentTerm, comparedTerms);
             logger.info("Number of GO Terms loaded is " + coTerms.keySet().size());
 
-        }
-    }
-
-    static class CoTermRecordParser {
-        private static final int COLUMN_ID = 0;
-        private static final int COLUMN_COMPARE = 1;
-        private static final int COLUMN_PROB = 2;
-        private static final int COLUMN_SIG = 3;
-        private static final int COLUMN_TOGETHER = 4;
-        private static final int COLUMN_COMPARED = 5;
-
-        static CoTerm createFromText(String line) {
-            String[] columns = line.split("\\t");
-            return new CoTerm(columns[COLUMN_ID], columns[COLUMN_COMPARE],
-                    Float.parseFloat(columns[COLUMN_PROB]), Float.parseFloat(columns[COLUMN_SIG]),
-                    Long.parseLong(columns[COLUMN_TOGETHER]), Long.parseLong(columns[COLUMN_COMPARED]));
         }
     }
 }
