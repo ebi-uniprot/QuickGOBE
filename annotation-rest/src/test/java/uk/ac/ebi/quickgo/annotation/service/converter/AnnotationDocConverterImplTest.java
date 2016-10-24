@@ -25,7 +25,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AnnotationDocConverterImplTest {
-    public static final String COMMA = ",";
+    private static final String COMMA = ",";
+    private static final String COLON = ":";
     private static final String ID = "1";
     private static final String GENE_PRODUCT_ID = "P99999";
     private static final String QUALIFIER = "enables";
@@ -86,7 +87,7 @@ public class AnnotationDocConverterImplTest {
     @Test
     public void convertWithFromSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.withFrom, is(asAllOfList(WITH_FROM)));
+        assertThat(model.withFrom, is(asConnectedXrefList(WITH_FROM)));
     }
 
     @Test
@@ -164,17 +165,40 @@ public class AnnotationDocConverterImplTest {
         return doc;
     }
 
-    private List<Annotation.AllOf> asAllOfList(List<String> csvs) {
+    private List<Annotation.ConnectedXRefs> asConnectedXrefList(List<String> csvs) {
         if (csvs != null && !csvs.isEmpty()) {
-            return csvs.stream().map(
-                    csv -> {
-                        Annotation.AllOf allOf = new Annotation.AllOf();
-                        allOf.allOf = Stream.of(csv.split(COMMA)).collect(Collectors.toList());
-                        return allOf;
+            return csvs.stream()
+                    .map(csv -> {
+                        Annotation.ConnectedXRefs<Annotation.SimpleXRef> connectedXRefs =
+                                new Annotation.ConnectedXRefs<>();
+
+                        Stream.of(csv.split(COMMA))
+                                .forEach(xref -> {
+                                    String[] dbAndSig = extractDBAndSignature(xref);
+                                    connectedXRefs.addXref(new Annotation.SimpleXRef(dbAndSig[0], dbAndSig[1]));
+                                });
+                        return connectedXRefs;
                     }
             ).collect(Collectors.toList());
         } else {
             return null;
         }
+    }
+
+    private String[] extractDBAndSignature(String xref) {
+        int colonPos = xref.indexOf(COLON);
+
+        String database;
+        String signature;
+
+        if (colonPos == -1) {
+            database = xref;
+            signature = null;
+        } else {
+            database = xref.substring(0, colonPos);
+            signature = xref.substring(colonPos + 1, xref.length());
+        }
+
+        return new String[]{database, signature};
     }
 }

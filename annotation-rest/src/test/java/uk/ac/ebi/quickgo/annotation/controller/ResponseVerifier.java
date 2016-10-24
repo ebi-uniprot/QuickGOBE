@@ -69,12 +69,8 @@ final class ResponseVerifier {
         return jsonPath(RESULTS + ".*.[?(@." + fieldName + " == " + value + ")]", hasSize(expectedCount));
     }
 
-    static ResultMatcher valueOccurInField(String fieldName, String value) {
+    static <T> ResultMatcher valueOccursInField(String fieldName, T value) {
         return jsonPath(RESULTS + ".*." + fieldName, hasItem(value));
-    }
-
-    static ResultMatcher valueOccursInCollection(String fieldName, String value) {
-        return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
     }
 
     static ResultMatcher messageExists(String message) {
