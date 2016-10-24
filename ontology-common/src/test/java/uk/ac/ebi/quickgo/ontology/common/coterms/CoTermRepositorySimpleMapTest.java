@@ -1,12 +1,16 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Predicate;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.core.io.Resource;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -22,6 +26,7 @@ import static org.mockito.Mockito.when;
  * Time: 14:57
  * Created with IntelliJ IDEA.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class CoTermRepositorySimpleMapTest {
 
     @Rule
@@ -44,6 +49,9 @@ public class CoTermRepositorySimpleMapTest {
 
     private CoTermRepositorySimpleMap coTermRepository;
 
+    @Mock
+    InputStream mockInputStream;
+
     @Before
     public void setup() {
         Map<String, List<CoTerm>> coTermsAll = new HashMap<>();
@@ -62,14 +70,14 @@ public class CoTermRepositorySimpleMapTest {
     @Test
     public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllMapIsNull() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Map coTermsAll should not be null.");
+        thrown.expectMessage("Map coTermsAll is null.");
         CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, new HashMap());
     }
 
     @Test
     public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualMapIsNull() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Map coTermsManual should not be null.");
+        thrown.expectMessage("Map coTermsManual is null.");
         CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(new HashMap<>(), null);
     }
 
@@ -78,7 +86,7 @@ public class CoTermRepositorySimpleMapTest {
     @Test
     public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualResourceIsNull() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Resource manualCoTermsSource should not be null.");
+        thrown.expectMessage("Resource manualCoTermsSource is null.");
         Resource mockAllResource = mock(Resource.class);
         CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, mockAllResource);
     }
@@ -86,7 +94,7 @@ public class CoTermRepositorySimpleMapTest {
     @Test
     public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllResourceIsNull() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Resource allCoTermSource should not be null.");
+        thrown.expectMessage("Resource allCoTermSource is null.");
         Resource mockManualResource = mock(Resource.class);
         CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, null);
     }
@@ -95,7 +103,7 @@ public class CoTermRepositorySimpleMapTest {
     @Test
     public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualResourceIsNonExistent() throws IOException {
         thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Resource manualCoTermsSource should not be non-existent.");
+        thrown.expectMessage("Resource manualCoTermsSource does not exist.");
 
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
@@ -106,7 +114,7 @@ public class CoTermRepositorySimpleMapTest {
     @Test
     public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllResourceIsNonExistent() throws Exception {
         thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Resource allCoTermSource should not be non-existent.");
+        thrown.expectMessage("Resource allCoTermSource does not exist.");
 
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
@@ -122,6 +130,7 @@ public class CoTermRepositorySimpleMapTest {
         when(mockManualResource.exists()).thenReturn(true);
         when(mockAllResource.exists()).thenReturn(true);
         when(mockManualResource.getInputStream()).thenThrow(IOException.class);
+        when(mockAllResource.getInputStream()).thenReturn(mockInputStream);
         CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
     }
 
@@ -171,34 +180,34 @@ public class CoTermRepositorySimpleMapTest {
     @Test
     public void findCoTermsThrowsExceptionIfSearchIdIsNull() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms id should not be null.");
+        thrown.expectMessage("The findCoTerms id is null.");
         coTermRepository.findCoTerms(null, CoTermSource.ALL, Integer.MAX_VALUE, NO_FILTER);
     }
     @Test
     public void findCoTermsThrowsExceptionIfCoTermSearchIsNull() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms source should not be null.");
+        thrown.expectMessage("The findCoTerms source is null.");
         coTermRepository.findCoTerms(ID_1, null, Integer.MAX_VALUE, NO_FILTER);
     }
 
     @Test
     public void findCoTermsThrowsExceptionIfLimitIsZero() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms limit should not be less than 1.");
+        thrown.expectMessage("The findCoTerms limit is less than 1.");
         coTermRepository.findCoTerms(ID_1, CoTermSource.ALL, 0, NO_FILTER);
     }
 
     @Test
     public void findCoTermsThrowsExceptionIfLimitIsLessThanZero() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms limit should not be less than 1.");
+        thrown.expectMessage("The findCoTerms limit is less than 1.");
         coTermRepository.findCoTerms(ID_1, CoTermSource.ALL, -1, NO_FILTER);
     }
 
     @Test
     public void findCoTermsThrowsExceptionIfFilterIsNull() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms filter should not be null.");
+        thrown.expectMessage("The findCoTerms filter is null.");
         coTermRepository.findCoTerms(ID_1, CoTermSource.ALL, Integer.MAX_VALUE, null);
     }
 }
