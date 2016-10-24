@@ -1,19 +1,13 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
-import java.util.function.Predicate;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.core.io.Resource;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -26,7 +20,6 @@ import static org.mockito.Mockito.when;
  * Time: 14:57
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
 public class CoTermRepositorySimpleMapTest {
 
     @Rule
@@ -39,27 +32,23 @@ public class CoTermRepositorySimpleMapTest {
     private static final String ID_5 = "GO:0009999";
     private static final String ID_6 = "GO:0055085";
 
-    private static final CoTerm CO_TERM_A1X = new CoTerm(ID_1, ID_1, 79f, 46f, 838, 933);
-    private static final CoTerm CO_TERM_A1Y = new CoTerm(ID_1, ID_2, 54f, 55f, 335, 9424);
-    private static final CoTerm CO_TERM_A1Z = new CoTerm(ID_1, ID_3, 24f, 24f, 5732, 355);
-    private static final CoTerm CO_TERM_A2X = new CoTerm(ID_4, ID_1, 34f, 66f, 556, 872);
-    private static final CoTerm CO_TERM_MX = new CoTerm(ID_6, ID_5, 99f, 47f, 34356, 456);
-    private static final CoTerm CO_TERM_MY = new CoTerm(ID_6, ID_1, 24f, 4f, 465, 4564);
-    private static final Predicate<CoTerm> NO_FILTER = t -> true;
+    private static final CoTerm CO_TERM_A = new CoTerm(ID_1, ID_1, 79f, 46f, 838, 933);
+    private static final CoTerm CO_TERM_B = new CoTerm(ID_1, ID_2, 54f, 55f, 335, 9424);
+    private static final CoTerm CO_TERM_C = new CoTerm(ID_1, ID_3, 24f, 24f, 5732, 355);
+    private static final CoTerm CO_TERM_D = new CoTerm(ID_4, ID_1, 34f, 66f, 556, 872);
+    private static final CoTerm CO_TERM_E = new CoTerm(ID_6, ID_5, 99f, 47f, 34356, 456);
+    private static final CoTerm CO_TERM_F = new CoTerm(ID_6, ID_1, 24f, 4f, 465, 4564);
 
     private CoTermRepositorySimpleMap coTermRepository;
 
-    @Mock
-    InputStream mockInputStream;
-
     @Before
-    public void setup() {
+    public void setup() throws Exception{
         Map<String, List<CoTerm>> coTermsAll = new HashMap<>();
-        coTermsAll.put(ID_1, Arrays.asList(CO_TERM_A1X, CO_TERM_A1Y, CO_TERM_A1Z));
-        coTermsAll.put(ID_4, Collections.singletonList(CO_TERM_A2X));
+        coTermsAll.put(ID_1, Arrays.asList(CO_TERM_A, CO_TERM_B, CO_TERM_C));
+        coTermsAll.put(ID_4, Collections.singletonList(CO_TERM_D));
 
         Map<String, List<CoTerm>> coTermsManual = new HashMap<>();
-        coTermsManual.put(ID_6, Arrays.asList(CO_TERM_MX, CO_TERM_MY));
+        coTermsManual.put(ID_6, Arrays.asList(CO_TERM_E, CO_TERM_F));
 
         coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(coTermsAll, coTermsManual);
 
@@ -124,24 +113,12 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test(expected = IOException.class)
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualResourceIsBad() throws Exception {
-        Resource mockManualResource = mock(Resource.class);
-        Resource mockAllResource = mock(Resource.class);
-        when(mockManualResource.exists()).thenReturn(true);
-        when(mockAllResource.exists()).thenReturn(true);
-        when(mockManualResource.getInputStream()).thenThrow(IOException.class);
-        when(mockAllResource.getInputStream()).thenReturn(mockInputStream);
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
-    }
-
-
-    @Test(expected = IOException.class)
     public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllResourceIsBad() throws Exception {
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(true);
         when(mockAllResource.exists()).thenReturn(true);
-        when(mockAllResource.getInputStream()).thenThrow(IOException.class);
+        when(mockAllResource.getURI()).thenThrow(IOException.class);
         CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
     }
 
@@ -151,7 +128,7 @@ public class CoTermRepositorySimpleMapTest {
     public void retrievalIsSuccessfulFromAll() {
         List<CoTerm> results = coTermRepository.findCoTerms(ID_1, CoTermSource.ALL);
         assertThat(results, hasSize(3));
-        assertThat(results, containsInAnyOrder(CO_TERM_A1X, CO_TERM_A1Y, CO_TERM_A1Z));
+        assertThat(results, containsInAnyOrder(CO_TERM_A, CO_TERM_B, CO_TERM_C));
     }
 
     @Test
