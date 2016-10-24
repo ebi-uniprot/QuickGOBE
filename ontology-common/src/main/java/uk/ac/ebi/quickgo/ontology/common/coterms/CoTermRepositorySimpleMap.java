@@ -39,8 +39,8 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     public static CoTermRepositorySimpleMap createCoTermRepositorySimpleMap(Map<String, List<CoTerm>> coTermsAll,
             Map<String, List<CoTerm>> coTermsManual) {
 
-        Preconditions.checkArgument(coTermsAll != null, "Map coTermsAll should not be null.");
-        Preconditions.checkArgument(coTermsManual != null, "Map coTermsManual should not be null.");
+        Preconditions.checkArgument(coTermsAll != null, "Map coTermsAll is null.");
+        Preconditions.checkArgument(coTermsManual != null, "Map coTermsManual is null.");
 
         CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
         coTermRepository.coTermsAll = coTermsAll;
@@ -57,11 +57,10 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     public static CoTermRepositorySimpleMap createCoTermRepositorySimpleMap(Resource manualCoTermsSource, Resource
             allCoTermSource) throws IOException {
 
-        Preconditions.checkArgument(manualCoTermsSource != null, "Resource manualCoTermsSource should not be null.");
-        Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource should not be null.");
-        Preconditions.checkState(manualCoTermsSource.exists(), "Resource manualCoTermsSource should not be " +
-                "non-existent.");
-        Preconditions.checkState(allCoTermSource.exists(), "Resource allCoTermSource should not be non-existent.");
+        Preconditions.checkArgument(manualCoTermsSource != null, "Resource manualCoTermsSource is null.");
+        Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource is null.");
+        Preconditions.checkState(manualCoTermsSource.exists(), "Resource manualCoTermsSource does not exist.");
+        Preconditions.checkState(allCoTermSource.exists(), "Resource allCoTermSource does not exist.");
 
         CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
         CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
@@ -80,10 +79,10 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      */
     public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate<CoTerm> filter) {
 
-        Preconditions.checkArgument(id != null, "The findCoTerms id should not be null.");
-        Preconditions.checkArgument(source != null, "The findCoTerms source should not be null.");
-        Preconditions.checkArgument(limit > 0, "The findCoTerms limit should not be less than 1.");
-        Preconditions.checkArgument(filter != null, "The findCoTerms filter should not be null.");
+        Preconditions.checkArgument(id != null, "The findCoTerms id is null.");
+        Preconditions.checkArgument(source != null, "The findCoTerms source is null.");
+        Preconditions.checkArgument(limit > 0, "The findCoTerms limit is less than 1.");
+        Preconditions.checkArgument(filter != null, "The findCoTerms filter is null.");
         return source == CoTermSource.MANUAL ? findCoTermsFromMap(coTermsManual, id, limit, filter)
                 : findCoTermsFromMap(coTermsAll, id, limit, filter);
     }
