@@ -95,10 +95,10 @@ public class CoTermControllerIT {
         expectFieldsInResults(response, Collections.singletonList(MANUAL_ONLY_TERM))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
-                .andExpect(jsonPath("$.results.*.id").value(MANUAL_ONLY_TERM))
-                .andExpect(jsonPath("$.results.*.compare").value("GO:0004444"))
+                .andExpect(jsonPath("$.results.*.target").value(MANUAL_ONLY_TERM))
+                .andExpect(jsonPath("$.results.*.comparedTerm").value("GO:0004444"))
                 .andExpect(jsonPath("$.results.*.probabilityRatio").value(302.4))
-                .andExpect(jsonPath("$.results.*.significance").value(78.28))
+                .andExpect(jsonPath("$.results.*.similarityRatio").value(78.28))
                 .andExpect(jsonPath("$.results.*.together").value(1933))
                 .andExpect(jsonPath("$.results.*.compared").value(5219))
                 .andExpect(status().isOk());
@@ -111,10 +111,10 @@ public class CoTermControllerIT {
         expectFieldsInResults(response, Collections.singletonList(ALL_ONLY_TERM))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
-                .andExpect(jsonPath("$.results.*.id").value(ALL_ONLY_TERM))
-                .andExpect(jsonPath("$.results.*.compare").value("GO:0003333"))
+                .andExpect(jsonPath("$.results.*.target").value(ALL_ONLY_TERM))
+                .andExpect(jsonPath("$.results.*.comparedTerm").value("GO:0003333"))
                 .andExpect(jsonPath("$.results.*.probabilityRatio").value(486.4))
-                .andExpect(jsonPath("$.results.*.significance").value(22.28))
+                .andExpect(jsonPath("$.results.*.similarityRatio").value(22.28))
                 .andExpect(jsonPath("$.results.*.together").value(8632))
                 .andExpect(jsonPath("$.results.*.compared").value(5778))
                 .andExpect(status().isOk());
@@ -127,8 +127,8 @@ public class CoTermControllerIT {
         expectFieldsInResults(response, Collections.singletonList(MANUAL_ONLY_TERM))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
-                .andExpect(jsonPath("$.results.*.id").value(MANUAL_ONLY_TERM))
-                .andExpect(jsonPath("$.results.*.compare").value("GO:0004444"))
+                .andExpect(jsonPath("$.results.*.target").value(MANUAL_ONLY_TERM))
+                .andExpect(jsonPath("$.results.*.comparedTerm").value("GO:0004444"))
                 .andExpect(status().isOk());
     }
 
@@ -162,12 +162,12 @@ public class CoTermControllerIT {
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(3)))
-                .andExpect(jsonPath("$.results[0].id").value(GO_0000001))
-                .andExpect(jsonPath("$.results[0].compare").value(GO_0000001))
+                .andExpect(jsonPath("$.results[0].target").value(GO_0000001))
+                .andExpect(jsonPath("$.results[0].comparedTerm").value(GO_0000001))
                 .andExpect(jsonPath("$.results[0].probabilityRatio").value(16526.18))
-                .andExpect(jsonPath("$.results[1].compare").value("GO:0034643"))
+                .andExpect(jsonPath("$.results[1].comparedTerm").value("GO:0034643"))
                 .andExpect(jsonPath("$.results[1].probabilityRatio").value(16446.73))
-                .andExpect(jsonPath("$.results[2].compare").value("GO:0090149"))
+                .andExpect(jsonPath("$.results[2].comparedTerm").value("GO:0090149"))
                 .andExpect(jsonPath("$.results[2].probabilityRatio").value(12394.64))
                 .andExpect(status().isOk());
     }
@@ -182,18 +182,16 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void ifTheLimitIsSetToZeroThenExpectError() throws Exception {
+    public void ifTheLimitIsSetToZeroThenReturnNoResults() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=0")));
-        response.andExpect(status().isBadRequest());
-        expectLimitErrorMessage(response);
+        response.andExpect(status().isOk());
     }
 
     @Test
-    public void ifTheLimitIsSetToNegativeNumberThenExpectError() throws Exception {
+    public void ifTheLimitIsSetToNegativeNumberThenReturnNoResults() throws Exception {
         String requestedLimit = "-1";
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
         response.andExpect(status().isBadRequest());
-        expectLimitErrorMessage(response);
     }
 
     @Test
@@ -228,9 +226,9 @@ public class CoTermControllerIT {
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
-                .andExpect(jsonPath("$.results.*.id").value(GO_0000001))
-                .andExpect(jsonPath("$.results.*.compare").value(GO_0000001))
-                .andExpect(jsonPath("$.results.*.significance").value(100.0))
+                .andExpect(jsonPath("$.results.*.target").value(GO_0000001))
+                .andExpect(jsonPath("$.results.*.comparedTerm").value(GO_0000001))
+                .andExpect(jsonPath("$.results.*.similarityRatio").value(100.0))
                 .andExpect(status().isOk());
     }
 
@@ -261,10 +259,10 @@ public class CoTermControllerIT {
     private void expectBasicFields(ResultActions result, String id, String path) throws Exception {
         result
                 .andDo(print())
-                .andExpect(jsonPath(path + "id").value(id))
-                .andExpect(jsonPath(path + "compare").exists())
+                .andExpect(jsonPath(path + "target").value(id))
+                .andExpect(jsonPath(path + "comparedTerm").exists())
                 .andExpect(jsonPath(path + "probabilityRatio").exists())
-                .andExpect(jsonPath(path + "significance").exists())
+                .andExpect(jsonPath(path + "similarityRatio").exists())
                 .andExpect(jsonPath(path + "together").exists())
                 .andExpect(jsonPath(path + "compared").exists());
     }

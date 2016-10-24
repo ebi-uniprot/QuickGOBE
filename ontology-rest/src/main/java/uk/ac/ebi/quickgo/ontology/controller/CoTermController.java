@@ -7,12 +7,14 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -77,9 +79,11 @@ public class CoTermController {
 
         validateGoTerm(id);
 
-        Predicate<CoTerm> filter = ct -> ct.getSimilarityRatio() >= similarityThreshold;
-        return getResultsResponse(coTermRepository.findCoTerms(id, toCoTermSource(source), workoutLimit
-                (limit), filter));
+        final List<CoTerm> coTerms = coTermRepository.findCoTerms(id, toCoTermSource(source));
+        return getResultsResponse(coTerms.stream()
+                .filter(ct -> ct.getSimilarityRatio() >= similarityThreshold)
+                .limit(workoutLimit(limit))
+                .collect(Collectors.toList()));
     }
 
     /**

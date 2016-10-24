@@ -72,41 +72,30 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     /**
      * Get all co-occurring terms for the requested term up to the supplied limit
      * @param id the GO Term for which we will lookup co-occurring terms.
-     * @param limit Limit the number of co-occurring terms return to the limit specified.
-     * @param filter apply the predicate to filter the results.
      * @return a list of CoTerms, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each CoTerm holds statistics related to that co-occurrence.
      */
-    public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate<CoTerm> filter) {
+    public List<CoTerm> findCoTerms(String id, CoTermSource source) {
 
         Preconditions.checkArgument(id != null, "The findCoTerms id is null.");
         Preconditions.checkArgument(source != null, "The findCoTerms source is null.");
-        Preconditions.checkArgument(limit > 0, "The findCoTerms limit is less than 1.");
-        Preconditions.checkArgument(filter != null, "The findCoTerms filter is null.");
-        return source == CoTermSource.MANUAL ? findCoTermsFromMap(coTermsManual, id, limit, filter)
-                : findCoTermsFromMap(coTermsAll, id, limit, filter);
+        return source == CoTermSource.MANUAL ? findCoTermsFromMap(coTermsManual, id)
+                : findCoTermsFromMap(coTermsAll, id);
     }
 
     /**
      * Get all co-occurring terms for the requested term up to the supplied limit. The data within the source is
      * ordered by GOTerm and then probability score. Apply the predicate passed to this class for filtering the results.
      * @param id the GO Term for which we will lookup co-occurring terms.
-     * @param limit Limit the number of co-occurring terms return to the limit specified.
-     * @param filter apply the predicate to filter the results.
      * @return a list of CoTerms, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each CoTerm holds statistics related to that co-occurrence.
      */
-    private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id, int limit, Predicate<CoTerm>
-            filter) {
+    private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id) {
         List<CoTerm> results = map.get(id);
         if (results == null) {
             return Collections.emptyList();
         }
-
-        return results.stream()
-                .filter(filter)
-                .limit(limit)
-                .collect(Collectors.toList());
+        return results;
     }
 
     static class CoTermRecordParser {

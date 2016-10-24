@@ -149,29 +149,14 @@ public class CoTermRepositorySimpleMapTest {
 
     @Test
     public void retrievalIsSuccessfulFromAll() {
-        List<CoTerm> results = coTermRepository.findCoTerms(ID_1, CoTermSource.ALL, Integer.MAX_VALUE, NO_FILTER);
+        List<CoTerm> results = coTermRepository.findCoTerms(ID_1, CoTermSource.ALL);
         assertThat(results, hasSize(3));
         assertThat(results, containsInAnyOrder(CO_TERM_A1X, CO_TERM_A1Y, CO_TERM_A1Z));
     }
 
     @Test
-    public void retrievalIsSuccessfulWithFilteringPredicate() {
-        Predicate<CoTerm> filter = ct -> ct.getProbabilityRatio() == CO_TERM_A1Y.getProbabilityRatio();
-        List<CoTerm> results = coTermRepository.findCoTerms(ID_1, CoTermSource.ALL, Integer.MAX_VALUE, filter);
-        assertThat(results, hasSize(1));
-        assertThat(results.get(0), is(CO_TERM_A1Y));
-    }
-
-    @Test
-    public void retrievalIsSuccessfulWithLimitLessThanNumberOfRecordsThatWouldOtherwiseBeReturned() {
-        List<CoTerm> results = coTermRepository.findCoTerms(ID_1, CoTermSource.ALL, 1, NO_FILTER);
-        assertThat(results, hasSize(1));
-        assertThat(results, containsInAnyOrder(CO_TERM_A1X));
-    }
-
-    @Test
     public void retrievalIsSuccessfulFromManual() {
-        List<CoTerm> results = coTermRepository.findCoTerms(ID_6, CoTermSource.MANUAL, Integer.MAX_VALUE, NO_FILTER);
+        List<CoTerm> results = coTermRepository.findCoTerms(ID_6, CoTermSource.MANUAL);
         assertThat(results, hasSize(2));
     }
 
@@ -181,33 +166,12 @@ public class CoTermRepositorySimpleMapTest {
     public void findCoTermsThrowsExceptionIfSearchIdIsNull() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The findCoTerms id is null.");
-        coTermRepository.findCoTerms(null, CoTermSource.ALL, Integer.MAX_VALUE, NO_FILTER);
+        coTermRepository.findCoTerms(null, CoTermSource.ALL);
     }
     @Test
     public void findCoTermsThrowsExceptionIfCoTermSearchIsNull() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The findCoTerms source is null.");
-        coTermRepository.findCoTerms(ID_1, null, Integer.MAX_VALUE, NO_FILTER);
-    }
-
-    @Test
-    public void findCoTermsThrowsExceptionIfLimitIsZero() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms limit is less than 1.");
-        coTermRepository.findCoTerms(ID_1, CoTermSource.ALL, 0, NO_FILTER);
-    }
-
-    @Test
-    public void findCoTermsThrowsExceptionIfLimitIsLessThanZero() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms limit is less than 1.");
-        coTermRepository.findCoTerms(ID_1, CoTermSource.ALL, -1, NO_FILTER);
-    }
-
-    @Test
-    public void findCoTermsThrowsExceptionIfFilterIsNull() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms filter is null.");
-        coTermRepository.findCoTerms(ID_1, CoTermSource.ALL, Integer.MAX_VALUE, null);
+        coTermRepository.findCoTerms(ID_1, null);
     }
 }

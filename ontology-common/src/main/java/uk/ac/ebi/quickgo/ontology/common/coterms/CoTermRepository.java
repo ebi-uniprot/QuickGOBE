@@ -18,9 +18,7 @@ public interface CoTermRepository {
      * a GO Term that is used to annotate the same gene.
      * @param id is the target GO term, for which the method will retrieve co-occurring terms.
      * @param source is the method from which the annotation that uses the GO term was generated.
-     * @param limit Limit the number of co-occurring terms returned to this number, as a maximum.
-     * @param filter apply the predicate to filter the results.
      * @return a list of CoTerms.
      */
-    List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate<CoTerm> filter);
+    List<CoTerm> findCoTerms(String id, CoTermSource source);
 }

@@ -38,7 +38,7 @@ public class CoTermRepositorySimpleMapIT {
 
     @Test
     public void retrievalIsSuccessfulFromAll() {
-        List<CoTerm> coTerms = coTermRepository.findCoTerms(GO_TERM_ID_ALL_ONLY, CoTermSource.ALL, 1, t -> true);
+        List<CoTerm> coTerms = coTermRepository.findCoTerms(GO_TERM_ID_ALL_ONLY, CoTermSource.ALL);
         assertThat(coTerms.get(0).getTarget(), is(GO_TERM_ID_ALL_ONLY));
         assertThat(coTerms.get(0).getComparedTerm(), is("GO:0003333"));
         assertThat(coTerms.get(0).getProbabilityRatio(), is(486.4f));
@@ -49,7 +49,7 @@ public class CoTermRepositorySimpleMapIT {
 
     @Test
     public void retrievalIsSuccessfulFromManual() {
-        List<CoTerm> coTerms = coTermRepository.findCoTerms(GO_TERM_ID_MANUAL_ONLY, CoTermSource.MANUAL, 1, t -> true);
+        List<CoTerm> coTerms = coTermRepository.findCoTerms(GO_TERM_ID_MANUAL_ONLY, CoTermSource.MANUAL);
         assertThat(coTerms.get(0).getTarget(), is(GO_TERM_ID_MANUAL_ONLY));
         assertThat(coTerms.get(0).getComparedTerm(), is("GO:0004444"));
         assertThat(coTerms.get(0).getProbabilityRatio(), is(302.4f));
