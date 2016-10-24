@@ -74,8 +74,8 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @param id the GO Term for which we will lookup co-occurring terms.
      * @param limit Limit the number of co-occurring terms return to the limit specified.
      * @param filter apply the predicate to filter the results.
-     * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
-     * product as the id. Each object holds statistics related to that co-occurrence.
+     * @return a list of CoTerms, each one of which represent a GO Term that is used to annotate the same gene
+     * product as the id. Each CoTerm holds statistics related to that co-occurrence.
      */
     public List<CoTerm> findCoTerms(String id, CoTermSource source, int limit, Predicate<CoTerm> filter) {
 
@@ -93,8 +93,8 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @param id the GO Term for which we will lookup co-occurring terms.
      * @param limit Limit the number of co-occurring terms return to the limit specified.
      * @param filter apply the predicate to filter the results.
-     * @return a list of objects, each one of which represent a GO Term that is used to annotate the same gene
-     * product as the id. Each object holds statistics related to that co-occurrence.
+     * @return a list of CoTerms, each one of which represent a GO Term that is used to annotate the same gene
+     * product as the id. Each CoTerm holds statistics related to that co-occurrence.
      */
     private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id, int limit, Predicate<CoTerm>
             filter) {
