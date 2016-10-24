@@ -36,12 +36,12 @@ public class CoTermTest {
 
     @Test
     public void successfullyCalculateSimilarityRatio() {
-        assertThat(CoTerm.calculateSimilarityRatio(SELECTED, TOGETHER, COMPARED), equalTo(33.33F));
+        assertThat(CoTerm.calculateSimilarityRatio(SELECTED, TOGETHER, COMPARED), equalTo(SIMILARITY_RATIO));
     }
 
     @Test
     public void successfullyProbabilityRatio() {
-        assertThat(CoTerm.calculateProbabilityRatio(SELECTED, TOGETHER, ALL, COMPARED), equalTo(1.5F));
+        assertThat(CoTerm.calculateProbabilityRatio(SELECTED, TOGETHER, ALL, COMPARED), equalTo(PROBABILITY_RATIO));
     }
 
     @Test(expected = IllegalArgumentException.class)
