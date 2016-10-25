@@ -54,6 +54,9 @@ public class GeneProductDocument implements QuickGODocument {
     @Field(GeneProductFields.PARENT_ID)
     public String parentId;
 
+    @Field(GeneProductFields.TARGET_SET)
+    public List<String> targetSet;
+
     @Override public String getUniqueName() {
         return id;
     }

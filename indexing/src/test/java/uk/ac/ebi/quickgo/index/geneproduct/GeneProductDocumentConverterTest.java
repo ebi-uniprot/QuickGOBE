@@ -24,6 +24,7 @@ public class GeneProductDocumentConverterTest {
     private static final String INTER_VALUE_DELIMITER = "|";
     private static final String INTER_VALUE_DELIMITER_REGEX = "\\|";
     private static final String INTRA_VALUE_DELIMITER = "=";
+    private static final String SPECIFIC_VALUE_DELIMITER = ",";
 
     private GeneProductDocumentConverter converter;
 
@@ -31,7 +32,7 @@ public class GeneProductDocumentConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        converter = new GeneProductDocumentConverter(INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
+        converter = new GeneProductDocumentConverter(INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER, SPECIFIC_VALUE_DELIMITER);
 
         geneProduct = new GeneProduct();
     }
@@ -42,7 +43,7 @@ public class GeneProductDocumentConverterTest {
         String intraValueDelimiter = INTRA_VALUE_DELIMITER;
 
         try {
-            converter = new GeneProductDocumentConverter(interValueDelimiter, intraValueDelimiter);
+            converter = new GeneProductDocumentConverter(interValueDelimiter, intraValueDelimiter, SPECIFIC_VALUE_DELIMITER);
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), is("Inter value delimiter can not be null or empty"));
         }
@@ -54,7 +55,7 @@ public class GeneProductDocumentConverterTest {
         String intraValueDelimiter = null;
 
         try {
-            converter = new GeneProductDocumentConverter(interValueDelimiter, intraValueDelimiter);
+            converter = new GeneProductDocumentConverter(interValueDelimiter, intraValueDelimiter, SPECIFIC_VALUE_DELIMITER);
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), is("Intra value delimiter can not be null or empty"));
         }
@@ -142,6 +143,18 @@ public class GeneProductDocumentConverterTest {
 
         assertThat(doc.synonyms, containsInAnyOrder(synonyms.toArray(new String[synonyms.size()])));
     }
+
+    @Test
+    public void converts3TargetSetValuesInPropertiesToListWith3TargetSets() throws Exception {
+        List<String> targetSets = Arrays.asList("KRUK", "Parkinsons", "BHF-UCL");
+
+        String targetSet = concatProperty(TARGET_SET_KEY, concatStrings(targetSets, SPECIFIC_VALUE_DELIMITER));
+        geneProduct.properties = concatStrings(Arrays.asList(targetSet), INTER_VALUE_DELIMITER);
+        GeneProductDocument doc = converter.process(geneProduct);
+
+        assertThat(doc.targetSet, containsInAnyOrder(targetSets.toArray()));
+    }
+
 
     @Test
     public void convertsYValuePropertiesInGeneProductToTrueBooleanFields() throws Exception {
