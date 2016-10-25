@@ -7,9 +7,7 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +32,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.QUALIFIER;
+import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
 
 /**
@@ -59,8 +58,8 @@ public class AnnotationControllerIT {
     private static final String INVALID_GO_ID = "GO:1";
     private static final String ECO_ID2 = "ECO:0000323";
     private static final String MISSING_ECO_ID = "ECO:0000888";
-//    private static final String WITH_FROM_IDS_PATH = "withFrom.*.connectedXrefs.*.id";
-    private static final String WITH_FROM_IDS_PATH = "withFrom.*.connectedXrefs.*.id";
+//    private static final String WITH_FROM_PATH = "withFrom.*.connectedXrefs.*.id";
+    private static final String WITH_FROM_PATH = "withFrom.*.connectedXrefs";
 
     //Configuration
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
@@ -709,11 +708,28 @@ public class AnnotationControllerIT {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM.getName(), "InterPro:IPR015421"));
 
+//        .andExpect(valueOccursInField(WITH_FROM_PATH, "IPR015421"));
+
+//        List<String> is = asList("IPR015421",
+//                "IPR015422",
+//                "IPR015421",
+//                "IPR015422",
+//                "IPR015421",
+//                "IPR015422");
+//        response.andDo(print())
+//                .andExpect(status().isOk())
+//                .andExpect(contentTypeToBeJson())
+//                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+//                .andExpect(fieldIs(WITH_FROM_PATH, is));
+
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInField(WITH_FROM_IDS_PATH, "IPR015421"));
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH,
+                        responseItem()
+                                .withAttribute("db", "InterPro")
+                                .withAttribute("id", "IPR015421").build()));
     }
 
     @Test
@@ -721,11 +737,16 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM.getName(),
                 "InterPro:IPR015421,InterPro:IPR015422"));
 
-        response.andExpect(status().isOk())
+        response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInField(WITH_FROM_IDS_PATH, "IPR015421"))
-                .andExpect(valueOccursInField(WITH_FROM_IDS_PATH, "IPR015422"));
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH, responseItem()
+                        .withAttribute("db", "InterPro")
+                        .withAttribute("id", "IPR015421").build()))
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH, responseItem()
+                        .withAttribute("db", "InterPro")
+                        .withAttribute("id", "IPR015422").build()));
     }
 
     @Test
@@ -745,8 +766,12 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInField(WITH_FROM_IDS_PATH, "IPR015421"))
-                .andExpect(valueOccursInField(WITH_FROM_IDS_PATH, "IPR015422"));
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH, responseItem()
+                        .withAttribute("db", "InterPro")
+                        .withAttribute("id", "IPR015421").build()))
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH, responseItem()
+                        .withAttribute("db", "InterPro")
+                        .withAttribute("id", "IPR015422").build()));
     }
 
     @Test
@@ -757,7 +782,9 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInField(WITH_FROM_IDS_PATH, "IPR015421"));
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH, responseItem()
+                        .withAttribute("db", "InterPro")
+                        .withAttribute("id", "IPR015421").build()));
     }
 
     //---------- Limit related tests.
