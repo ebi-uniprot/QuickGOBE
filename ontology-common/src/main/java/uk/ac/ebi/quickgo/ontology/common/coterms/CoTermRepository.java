@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * Represents the store of co-occurring GO Term information.
