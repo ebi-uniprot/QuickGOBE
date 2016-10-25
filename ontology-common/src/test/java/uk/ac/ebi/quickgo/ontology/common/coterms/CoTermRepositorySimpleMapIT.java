@@ -5,6 +5,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,14 +28,9 @@ public class CoTermRepositorySimpleMapIT {
 
     private static final String GO_TERM_ID_ALL_ONLY = "GO:7777771";
     private static final String GO_TERM_ID_MANUAL_ONLY = "GO:8888881";
-    private CoTermRepositorySimpleMap coTermRepository;
 
-    @Before
-    public void setup() throws IOException {
-        coTermRepository = CoTermRepositorySimpleMap
-                .createCoTermRepositorySimpleMap(new ClassPathResource("CoTermsManual"),
-                        new ClassPathResource("CoTermsAll"));
-    }
+    @Autowired
+    private CoTermRepository coTermRepository;
 
     @Test
     public void retrievalIsSuccessfulFromAll() {
