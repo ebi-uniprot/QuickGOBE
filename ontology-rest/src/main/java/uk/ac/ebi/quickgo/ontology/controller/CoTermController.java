@@ -119,7 +119,15 @@ public class CoTermController {
     public int workoutLimit(String limit) {
         if (limitNotSpecified(limit))return defaultLimit;
         if (userHasRequestedAllCoTerms(limit)) return Integer.MAX_VALUE;
-        return Integer.parseInt(limit);
+        try {
+            int numLimit =  Integer.parseInt(limit);
+            if(numLimit <=0) {
+                throw new ParameterException("The value for limit should be a positive integer, or 'ALL'");
+            }
+            return numLimit;
+        } catch (NumberFormatException e) {
+            throw new ParameterException("The value for limit should be a positive integer, or 'ALL'");
+        }
     }
 
     private boolean limitNotSpecified(String limit){

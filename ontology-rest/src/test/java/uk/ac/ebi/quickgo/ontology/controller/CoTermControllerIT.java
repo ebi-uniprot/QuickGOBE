@@ -184,14 +184,16 @@ public class CoTermControllerIT {
     @Test
     public void ifTheLimitIsSetToZeroThenReturnNoResults() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=0")));
-        response.andExpect(status().isOk());
+        response.andExpect(status().isBadRequest());
+        expectLimitErrorMessage(response);
     }
 
     @Test
-    public void ifTheLimitIsSetToNegativeNumberThenReturnNoResults() throws Exception {
+    public void ifTheLimitIsSetToNegativeNumberThenExpectError() throws Exception {
         String requestedLimit = "-1";
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
         response.andExpect(status().isBadRequest());
+        expectLimitErrorMessage(response);
     }
 
     @Test
@@ -199,7 +201,9 @@ public class CoTermControllerIT {
         String requestedLimit = "AAA";
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
         response.andExpect(status().isBadRequest());
+        expectLimitErrorMessage(response);
     }
+
 
     // Tests for similarity threshold
 
@@ -284,6 +288,6 @@ public class CoTermControllerIT {
     private void expectLimitErrorMessage(ResultActions result) throws Exception {
         result
                 .andDo(print())
-                .andExpect(jsonPath("$.messages", hasItem(containsString("The findCoTerms limit should not be less than 1."))));
+                .andExpect(jsonPath("$.messages", hasItem(containsString("The value for limit should be a positive integer, or 'ALL'"))));
     }
 }
