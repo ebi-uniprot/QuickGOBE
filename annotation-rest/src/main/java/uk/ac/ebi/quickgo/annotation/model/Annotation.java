@@ -31,22 +31,6 @@ public class Annotation {
 
     public String reference;
 
-    public List<ConnectedXRefs> withFrom;
-
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    public int taxonId;
-
-    public String assignedBy;
-
-    public List<String> extensions;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public List<String> slimmedIds;
-
-    public List<String> targetSets;
-
-    public String symbol;
-
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -141,6 +125,22 @@ public class Annotation {
                 ", symbol='" + symbol + '\'' +
                 '}';
     }
+
+    public List<ConnectedXRefs> withFrom;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    public int taxonId;
+
+    public String assignedBy;
+
+    public List<ConnectedXRefs> extensions;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public List<String> slimmedIds;
+
+    public List<String> targetSets;
+
+    public String symbol;
 
     /**
      * Represents a connected list of {@link AbstractXref} instances in the with/from or extensions column.
@@ -243,5 +243,54 @@ public class Annotation {
                     ", id='" + id + '\'' +
                     '}';
         }
+    }
+
+    /**
+     * Class that represents a cross-reference (database name and entry id) with an associated qualifier
+     * containing just the database name. Qualified Xrefs can be found in the extension state attribute.
+     */
+    public static class QualifiedXref extends AbstractXref {
+        private String qualifier;
+
+        public QualifiedXref(String database, String signature, String qualifier) {
+            super(database, signature);
+            this.qualifier = qualifier;
+        }
+
+        public String getQualifier() {
+            return qualifier;
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof QualifiedXref)) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            QualifiedXref that = (QualifiedXref) o;
+
+            return qualifier != null ? qualifier.equals(that.qualifier) : that.qualifier == null;
+
+        }
+
+        @Override public int hashCode() {
+            int result = super.hashCode();
+            result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
+            return result;
+        }
+
+        @Override public String toString() {
+            return "QualifiedXref{" +
+                    "database='" + db + '\'' +
+                    ", id='" + id + '\'' +
+                    ", qualifier='" + qualifier + '\'' +
+                    '}';
+        }
+
     }
 }

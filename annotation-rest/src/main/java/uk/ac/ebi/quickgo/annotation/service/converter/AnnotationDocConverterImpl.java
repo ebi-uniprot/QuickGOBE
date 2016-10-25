@@ -37,7 +37,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
 
         annotation.targetSets = asUnmodifiableList(annotationDocument.targetSets);
         annotation.withFrom = asXRefList(annotationDocument.withFrom, this::createSimpleXRef);
-        annotation.extensions = asUnmodifiableList(annotationDocument.extensions);
+        annotation.extensions = asXRefList(annotationDocument.extensions, this::createQualifiedXRef);
 
         return annotation;
     }
@@ -82,6 +82,20 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
     private Annotation.SimpleXRef createSimpleXRef(String xref) {
         String[] dbAndSig = extractDBAndSignature(xref);
         return new Annotation.SimpleXRef(dbAndSig[0], dbAndSig[1]);
+    }
+
+    private Annotation.QualifiedXref createQualifiedXRef(String xref) {
+        String[] dbAndSig = extractDBAndSignature(extractContentsWithinParenthesis(xref));
+        String qualifier = extractQualifier(xref);
+        return new Annotation.QualifiedXref(dbAndSig[0], dbAndSig[1], qualifier);
+    }
+
+    private String extractQualifier(String unformattedXref) {
+        return unformattedXref.substring(0, unformattedXref.indexOf("("));
+    }
+
+    private String extractContentsWithinParenthesis(String unformattedXref) {
+        return unformattedXref.substring(unformattedXref.indexOf("(") + 1, unformattedXref.indexOf(")"));
     }
 
     private Stream<String> streamCSV(String xrefs) {return Stream.of(xrefs.split(COMMA));}

@@ -35,8 +35,8 @@ public class AnnotationDocConverterImplTest {
     private static final String ECO_ID = "ECO:0000353";
     private static final List<String> WITH_FROM = asList("GO:0036376", "GO:1990573,GO:1990573");
     private static final String ASSIGNED_BY = "InterPro";
-    private static final List<String> EXTENSIONS = asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429),occurs_in" +
-            "(CL:1000430)");
+    private static final List<String> EXTENSIONS =
+            asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429),occurs_in(CL:1000430)");
     private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
     private static final String SYMBOL = "moeA5";
     private static final String GO_ASPECT = "cellular_component";
@@ -102,7 +102,7 @@ public class AnnotationDocConverterImplTest {
     @Test
     public void convertExtensionSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.extensions, is(EXTENSIONS));
+        assertThat(model.extensions, is(asConnectedXrefList(EXTENSIONS)));
     }
 
     @Test
