@@ -78,16 +78,10 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
         Preconditions.checkArgument(response != null, "Cannot convert null Solr response to an aggregation");
         NamedList<?> aggregateResponse = extractAggregationsFromResponse(response);
 
-        AggregateResponse globalAgg = null;
+        AggregateResponse globalAgg = new AggregateResponse(GLOBAL_ID);
 
         if (aggregateResponse != null && aggregateResponse.size() > 0) {
-            globalAgg = new AggregateResponse(GLOBAL_ID);
-
             convertSolrAggregationsToDomainAggregations(aggregateResponse, globalAgg);
-
-            if (!globalAgg.isPopulated()) {
-                globalAgg = null;
-            }
         }
 
         return globalAgg;

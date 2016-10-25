@@ -58,11 +58,18 @@ public class AnnotationStatisticsService implements StatisticsService {
 
         AggregateResponse globalAggregation = annotationQueryResult.getAggregation();
 
-        List<StatisticsGroup> statsGroups = statsRequest.stream()
-                .map(req -> convertResponse(globalAggregation, req))
-                .collect(Collectors.toList());
+        QueryResult<StatisticsGroup> response;
 
-        return new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
+        if(globalAggregation.isPopulated()) {
+            List<StatisticsGroup> statsGroups = statsRequest.stream()
+                    .map(req -> convertResponse(globalAggregation, req))
+                    .collect(Collectors.toList());
+            response = new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
+        } else {
+            response = new QueryResult.Builder<>(0, Collections.<StatisticsGroup>emptyList()).build();
+        }
+
+        return response;
     }
 
     private QueryRequest buildQueryRequest(AnnotationRequest request) {

@@ -23,11 +23,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.AGGREGATIONS_MARKER;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKETS_ID;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKET_FIELD_ID;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.AGGREGATIONS_MARKER;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.GLOBAL_ID;
 
 /**
  * Tests the behaviour of the {@link SolrResponseAggregationConverter} class.
@@ -74,19 +74,25 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithNoAggregatesConvertsToNullAggregation() throws Exception {
+    public void solrResponseWithNoAggregatesConvertsToEmptyAggregation() throws Exception {
         when(responseMock.getResponse()).thenReturn(new NamedList<>());
 
         AggregateResponse agg = converter.convert(responseMock);
 
-        assertThat(agg, is(nullValue()));
+        assertThat(agg.getName(), is(GLOBAL_ID));
+        assertThat(agg.getAggregationResults(), hasSize(0));
+        assertThat(agg.getBuckets(), hasSize(0));
+        assertThat(agg.getNestedAggregations(), hasSize(0));
     }
 
     @Test
-    public void solrResponseWithNonAggregatesConvertToNullAggregation() throws Exception {
+    public void solrResponseWithNonAggregatesConvertToEmptyAggregation() throws Exception {
         AggregateResponse agg = converter.convert(responseMock);
 
-        assertThat(agg, is(nullValue()));
+        assertThat(agg.getName(), is(GLOBAL_ID));
+        assertThat(agg.getAggregationResults(), hasSize(0));
+        assertThat(agg.getBuckets(), hasSize(0));
+        assertThat(agg.getNestedAggregations(), hasSize(0));
     }
 
     @Test
@@ -100,13 +106,16 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithNonAggregatedBucketInGlobalAggregateConvertsToANullAggregation() throws Exception {
+    public void solrResponseWithNonAggregatedBucketInGlobalAggregateConvertsToAEmptyAggregation() throws Exception {
         SolrBucket bucket = new SolrBucket("goId");
         solrAggregate.addBucket(bucket);
 
         AggregateResponse agg = converter.convert(responseMock);
 
-        assertThat(agg, is(nullValue()));
+        assertThat(agg.getName(), is(GLOBAL_ID));
+        assertThat(agg.getAggregationResults(), hasSize(0));
+        assertThat(agg.getBuckets(), hasSize(0));
+        assertThat(agg.getNestedAggregations(), hasSize(0));
     }
 
     @Test
