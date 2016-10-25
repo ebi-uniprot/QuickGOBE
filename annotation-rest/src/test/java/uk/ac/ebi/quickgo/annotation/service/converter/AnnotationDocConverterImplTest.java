@@ -5,16 +5,22 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem.OCCURS_IN_CL_1;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem.OCCURS_IN_CL_2;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem.OCCURS_IN_CL_3;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_1;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_2;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_3;
 
 /**
  * Tests the implementation of the {@link AnnotationDocConverterImpl} class.
@@ -33,10 +39,12 @@ public class AnnotationDocConverterImplTest {
     private static final String GO_ID = "GO:0000977";
     private static final int TAXON_ID = 2;
     private static final String ECO_ID = "ECO:0000353";
-    private static final List<String> WITH_FROM = asList("GO:0036376", "GO:1990573,GO:1990573");
+    private static final List<List<ConnectedXrefCreator<Annotation.SimpleXRef>>> WITH_FROM = asList(
+            singletonList(GO_1), asList(GO_2, GO_3));
     private static final String ASSIGNED_BY = "InterPro";
-    private static final List<String> EXTENSIONS =
-            asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429),occurs_in(CL:1000430)");
+    private static final List<List<ConnectedXrefCreator<Annotation.QualifiedXref>>> EXTENSIONS = asList(
+            singletonList(OCCURS_IN_CL_1),
+            asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
     private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
     private static final String SYMBOL = "moeA5";
     private static final String GO_ASPECT = "cellular_component";
@@ -87,7 +95,7 @@ public class AnnotationDocConverterImplTest {
     @Test
     public void convertWithFromSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.withFrom, is(asConnectedXrefList(WITH_FROM)));
+        assertThat(model.withFrom, is(connectedXrefs(WITH_FROM)));
     }
 
     @Test
@@ -102,7 +110,7 @@ public class AnnotationDocConverterImplTest {
     @Test
     public void convertExtensionSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.extensions, is(asConnectedXrefList(EXTENSIONS)));
+        assertThat(model.extensions, is(connectedXrefs(EXTENSIONS)));
     }
 
     @Test
@@ -147,6 +155,25 @@ public class AnnotationDocConverterImplTest {
         assertThat(model.targetSets, is(TARGET_SETS));
     }
 
+    private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs<T>> connectedXrefs(
+            List<List<ConnectedXrefCreator<T>>> items) {
+        return items.stream().map(itemList -> {
+                    Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
+                    itemList.stream().map(ConnectedXrefCreator::toConnectedXref).forEach(xrefs::addXref);
+                    return xrefs;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    private static <T extends Annotation.AbstractXref> List<String> stringsForConnectedXrefs(
+            List<List<ConnectedXrefCreator<T>>> items) {
+        return items.stream()
+                .map(itemList ->
+                        itemList.stream()
+                                .map(ConnectedXrefCreator::toString).collect(Collectors.joining(COMMA))
+                ).collect(Collectors.toList());
+    }
+
     private static AnnotationDocument createStubDocument() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.id = ID;
@@ -155,9 +182,9 @@ public class AnnotationDocConverterImplTest {
         doc.goId = GO_ID;
         doc.taxonId = TAXON_ID;
         doc.evidenceCode = ECO_ID;
-        doc.withFrom = WITH_FROM;
+        doc.withFrom = stringsForConnectedXrefs(WITH_FROM);
         doc.assignedBy = ASSIGNED_BY;
-        doc.extensions = EXTENSIONS;
+        doc.extensions = stringsForConnectedXrefs(EXTENSIONS);
         doc.targetSets = TARGET_SETS;
         doc.symbol = SYMBOL;
         doc.goAspect = GO_ASPECT;
@@ -165,40 +192,62 @@ public class AnnotationDocConverterImplTest {
         return doc;
     }
 
-    private List<Annotation.ConnectedXRefs> asConnectedXrefList(List<String> csvs) {
-        if (csvs != null && !csvs.isEmpty()) {
-            return csvs.stream()
-                    .map(csv -> {
-                        Annotation.ConnectedXRefs<Annotation.SimpleXRef> connectedXRefs =
-                                new Annotation.ConnectedXRefs<>();
+    private Annotation.ConnectedXRefs<Annotation.QualifiedXref> createConnectedSimpleXrefs(
+            FakeExtensionItem... items) {
+        Annotation.ConnectedXRefs<Annotation.QualifiedXref> connectedXRefs = new Annotation.ConnectedXRefs<>();
+        for (FakeExtensionItem item : items) {
+            connectedXRefs.addXref(item.toConnectedXref());
+        }
+        return connectedXRefs;
+    }
 
-                        Stream.of(csv.split(COMMA))
-                                .forEach(xref -> {
-                                    String[] dbAndSig = extractDBAndSignature(xref);
-                                    connectedXRefs.addXref(new Annotation.SimpleXRef(dbAndSig[0], dbAndSig[1]));
-                                });
-                        return connectedXRefs;
-                    }
-            ).collect(Collectors.toList());
-        } else {
-            return null;
+    enum FakeWithFromItem implements ConnectedXrefCreator<Annotation.SimpleXRef> {
+        GO_1("GO", "0000001"),
+        GO_2("GO", "0000002"),
+        GO_3("GO", "0000003");
+
+        private final String db;
+        private final String id;
+
+        FakeWithFromItem(String db, String id) {
+            this.db = db;
+            this.id = id;
+        }
+
+        public Annotation.SimpleXRef toConnectedXref() {
+            return new Annotation.SimpleXRef(db, id);
+        }
+
+        @Override public String toString() {
+            return db + ":" + id;
         }
     }
 
-    private String[] extractDBAndSignature(String xref) {
-        int colonPos = xref.indexOf(COLON);
+    enum FakeExtensionItem implements ConnectedXrefCreator<Annotation.QualifiedXref> {
+        OCCURS_IN_CL_1("occurs_in", "CL", "0000001"),
+        OCCURS_IN_CL_2("occurs_in", "CL", "0000002"),
+        OCCURS_IN_CL_3("occurs_in", "CL", "0000003");
 
-        String database;
-        String signature;
+        private final String qualifier;
+        private final String db;
+        private final String id;
 
-        if (colonPos == -1) {
-            database = xref;
-            signature = null;
-        } else {
-            database = xref.substring(0, colonPos);
-            signature = xref.substring(colonPos + 1, xref.length());
+        FakeExtensionItem(String qualifier, String db, String id) {
+            this.qualifier = qualifier;
+            this.db = db;
+            this.id = id;
         }
 
-        return new String[]{database, signature};
+        public Annotation.QualifiedXref toConnectedXref() {
+            return new Annotation.QualifiedXref(db, id, qualifier);
+        }
+
+        @Override public String toString() {
+            return qualifier + "(" + db + ":" + id + ")";
+        }
+    }
+
+    private interface ConnectedXrefCreator<T extends Annotation.AbstractXref> {
+        T toConnectedXref();
     }
 }

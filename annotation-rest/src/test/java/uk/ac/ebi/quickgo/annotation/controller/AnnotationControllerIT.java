@@ -58,7 +58,6 @@ public class AnnotationControllerIT {
     private static final String INVALID_GO_ID = "GO:1";
     private static final String ECO_ID2 = "ECO:0000323";
     private static final String MISSING_ECO_ID = "ECO:0000888";
-//    private static final String WITH_FROM_PATH = "withFrom.*.connectedXrefs.*.id";
     private static final String WITH_FROM_PATH = "withFrom.*.connectedXrefs";
 
     //Configuration
