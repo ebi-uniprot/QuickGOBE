@@ -7,13 +7,11 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -103,7 +101,7 @@ public class CoTermController {
     private void validateGoTerm(String id) {
         if (!isValidGOTermId().test(id)) {
             String errorMessage = "Provided ID: '" + id + "' is invalid";
-            throw new IllegalArgumentException(errorMessage);
+            throw new ParameterException(errorMessage);
         }
     }
 
