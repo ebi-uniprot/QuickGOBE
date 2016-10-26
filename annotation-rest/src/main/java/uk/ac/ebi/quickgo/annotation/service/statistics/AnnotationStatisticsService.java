@@ -14,6 +14,7 @@ import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +53,11 @@ public class AnnotationStatisticsService implements StatisticsService {
             SearchService<Annotation> searchService,
             StatsRequestConverter converter,
             SearchableField searchableFields) {
+        Preconditions.checkArgument(converterFactory != null, "Filter factory cannot be null");
+        Preconditions.checkArgument(searchService != null, "Search service cannot be null");
+        Preconditions.checkArgument(converter != null, "Stats request converter cannot be null");
+        Preconditions.checkArgument(searchableFields != null, "Searchable fields cannot be null");
+
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
@@ -60,7 +66,10 @@ public class AnnotationStatisticsService implements StatisticsService {
     }
 
     @Override public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
+        Preconditions.checkArgument(request != null, "Annotation request cannot be null");
+
         List<AnnotationRequest.StatsRequest> statsRequest = request.createStatsRequests();
+        Preconditions.checkArgument(statsRequest != null, "Statistics request cannot be null");
 
         QueryRequest queryRequest = buildQueryRequest(request);
 
