@@ -7,6 +7,8 @@ import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -14,6 +16,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -86,15 +89,19 @@ public class SearchController {
         DefaultSearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
                 .setQuery(request.createQuery())
                 .addFacets(request.getFacet() == null ? null : Arrays.asList(request.getFacet()))
-                .addFilters(request.createFilterRequests().stream()
-                        .map(converterFactory::convert)
-                        .filter(Objects::nonNull)
-                        .map(ConvertedFilter::getConvertedValue)
-                        .collect(Collectors.toList()))
+                .addFilters(convertFilterRequestsToQueries(request.createFilterRequests()))
                 .useHighlighting(request.isHighlighting())
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit());
 
         return search(requestBuilder.build(), ontologySearchService);
+    }
+
+    private Collection<QuickGOQuery> convertFilterRequestsToQueries(Collection<FilterRequest> filterRequests) {
+        return filterRequests.stream()
+                .map(converterFactory::convert)
+                .filter(Objects::nonNull)
+                .map(ConvertedFilter::getConvertedValue)
+                .collect(Collectors.toList());
     }
 }
