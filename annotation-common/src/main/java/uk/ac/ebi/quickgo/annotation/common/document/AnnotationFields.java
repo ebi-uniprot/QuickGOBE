@@ -35,12 +35,15 @@ public class AnnotationFields {
     public final static String REFERENCE_SEARCH = "referenceSearch";
     public final static String WITH_FROM_SEARCH = "withFromSearch";
     public final static String GO_ASPECT = "goAspect";
+    public final static String DATE = "date";
 
     /**
      * Annotation fields that are stored, and can therefore be retrieved.
      */
     public static final class Retrievable extends AnnotationFields {
         private static final Set<String> VALUES = new HashSet<>();
+
+        public static final String DATE = storeAndGet(VALUES, AnnotationFields.DATE);
 
         public static boolean isRetrievable(String field) {
             return VALUES.contains(field);

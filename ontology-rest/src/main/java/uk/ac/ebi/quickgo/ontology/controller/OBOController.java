@@ -138,7 +138,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -159,7 +159,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -179,7 +179,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -199,7 +199,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -219,7 +219,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -239,7 +239,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -259,7 +259,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
