@@ -227,7 +227,7 @@ public class AnnotationControllerRESTIT {
                 asList(goId(1), goId(2)),
                 emptyList(),
                 asList(
-                        asList(goId(3), goId(4)),
+                        singletonList(goId(3)),
                         singletonList(goId(4))));
 
         ResultActions response = mockMvc.perform(

@@ -30,35 +30,26 @@ public class SlimmingFilterConverter implements FilterConverter<ConvertedOntolog
     private static final ConvertedFilter<QuickGOQuery> FILTER_EVERYTHING =
             new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
     private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "no descendants found for IDs, ";
-    private static final String COMMA = ",";
+    private static final String DELIMITER = ",";
 
     @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
         ConvertedFilter<QuickGOQuery> convertedFilter = FILTER_EVERYTHING;
         SlimmingConversionInfo conversionInfo = new SlimmingConversionInfo();
 
-        StringJoiner idsWithNoDescendants = new StringJoiner(COMMA);
+        StringJoiner idsWithNoDescendants = new StringJoiner(DELIMITER);
         if (response.getResults() != null) {
             Set<QuickGOQuery> queries = new HashSet<>();
             FilterContext context = new FilterContext();
 
             for (ConvertedOntologyFilter.Result result : response.getResults()) {
                 if (result.getDescendants() != null) {
-                    if (!result.getDescendants().isEmpty()) {
-                        result.getDescendants().stream()
-                                .filter(this::notNullOrEmpty)
-                                .forEach(desc -> {
-                                    queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
-                                    conversionInfo.addOriginal2SlimmedGOIdMapping(desc, result.getId());
-                                });
-
-                        context.save(SlimmingConversionInfo.class, conversionInfo);
-                        convertedFilter =
-                                new ConvertedFilter<>(or(queries.toArray(new QuickGOQuery[queries.size()])), context);
-                    }
+                    insertQueryForEachDescendant(result, queries, conversionInfo);
                 } else {
                     updateJoinerIfValid(idsWithNoDescendants, result.getId());
                 }
             }
+
+            convertedFilter = createFilterForAllDescendants(queries, context, conversionInfo);
         }
 
         if (idsWithNoDescendants.length() > 0) {
@@ -66,6 +57,28 @@ public class SlimmingFilterConverter implements FilterConverter<ConvertedOntolog
         }
 
         return convertedFilter;
+    }
+
+    private ConvertedFilter<QuickGOQuery> createFilterForAllDescendants(
+            Set<QuickGOQuery> queries,
+            FilterContext context,
+            SlimmingConversionInfo conversionInfo) {
+        if (!queries.isEmpty()) {
+            context.save(SlimmingConversionInfo.class, conversionInfo);
+            return new ConvertedFilter<>(or(queries.toArray(new QuickGOQuery[queries.size()])), context);
+        } else {
+            return FILTER_EVERYTHING;
+        }
+    }
+
+    private void insertQueryForEachDescendant(ConvertedOntologyFilter.Result result, Set<QuickGOQuery> queries,
+            SlimmingConversionInfo conversionInfo) {
+        result.getDescendants().stream()
+                .filter(this::notNullOrEmpty)
+                .forEach(desc -> {
+                    queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
+                    conversionInfo.addOriginal2SlimmedGOIdMapping(desc, result.getId());
+                });
     }
 
     private void updateJoinerIfValid(StringJoiner joiner, String value) {
