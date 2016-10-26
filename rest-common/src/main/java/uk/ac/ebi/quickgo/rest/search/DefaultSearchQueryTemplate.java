@@ -191,7 +191,6 @@ public class DefaultSearchQueryTemplate {
          */
         public DefaultSearchQueryTemplate.Builder setAggregate(AggregateRequest aggregate) {
             this.aggregate = aggregate;
-
             return this;
         }
 
@@ -201,13 +200,9 @@ public class DefaultSearchQueryTemplate {
             QueryRequest.Builder builder = new QueryRequest.Builder(query);
             builder.setPageParameters(page, pageSize);
 
-            if (!facets.isEmpty()) {
-                facets.forEach(builder::addFacetField);
-            }
+            facets.forEach(builder::addFacetField);
 
-            if (!filterQueries.isEmpty()) {
-                filterQueries.forEach(builder::addQueryFilter);
-            }
+            filterQueries.forEach(builder::addQueryFilter);
 
             if (highlighting) {
                 highlightedFields
