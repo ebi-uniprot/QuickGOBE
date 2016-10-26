@@ -412,8 +412,14 @@ public class AnnotationValidatorTest {
 
     // bad date field
     @Test(expected = ValidationException.class)
-    public void invalidDateDueToNumberFormat() {
+    public void invalidDateDueToNumberFormatTooShort() {
         annotation.date = "2012123";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidDateDueToNumberFormatTooLong() {
+        annotation.date = "201212345";
         validator.validate(annotation);
     }
 
