@@ -91,7 +91,6 @@ public class GeneProductControllerTest {
         when(validationHelper.validateCSVIds(SINGLE_CSV)).thenReturn(SINGLE_CSV_LIST);
         doThrow(new IllegalArgumentException()).when(validationHelper).validateCSVIds(multiCSVTooBig);
 
-        when(validationHelper.validateTargetSetId(TARGET_SET)).thenReturn(TARGET_SET);
         when(geneProductService.findByTargetSet(TARGET_SET)).thenReturn(multiGP);
     }
 
@@ -168,6 +167,12 @@ public class GeneProductControllerTest {
         assertThat(response.getBody().getResults(), contains(geneProduct1, geneProduct2, geneProduct3));
     }
 
+    @Test
+    public void retrieveEmptyListForTargetSetWhenFindByValueDoesNotExist() {
+        ResponseEntity<QueryResult<GeneProduct>> response = controller.findById("BLAH");
+        assertThat(response.getHeaders().isEmpty(), is(true));
+        assertThat(response.getBody().getResults(), is(empty()));
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullValidationHelper() {

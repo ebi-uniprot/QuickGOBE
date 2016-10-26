@@ -56,6 +56,7 @@ public class GeneProductControllerIT {
     public static final String INVALID_ID = "ZZZZ";
 
     private static final String VALID_TARGET_SET_NAME = "KRUK";
+    private static final String NON_EXISTENT_TARGET_SET_NAME = "BLAH";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -142,7 +143,7 @@ public class GeneProductControllerIT {
 
 
     @Test
-    public void canRetrieveMultiGeneProductByTargetSetName() throws Exception {
+    public void targetSetLookUpUsingValidValueReturnsMultiGeneProduct() throws Exception {
         ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL(VALID_TARGET_SET_NAME)));
 
         result.andDo(print())
@@ -154,6 +155,13 @@ public class GeneProductControllerIT {
         for (String id : validIdList) {
             expectFields(result, id, "$.results[" + index++ + "].");
         }
+    }
+
+    @Test
+    public void targetSetLookUpUsingInvalidValueReturnsEmptyResults() throws Exception {
+        ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL(NON_EXISTENT_TARGET_SET_NAME)));
+        result.andDo(print())
+              .andExpect(status().isOk());
     }
 
     private ResultActions expectFields(ResultActions result, String id, String path) throws Exception {
