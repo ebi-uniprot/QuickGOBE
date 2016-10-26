@@ -1,12 +1,10 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
-import uk.ac.ebi.quickgo.rest.ParameterException;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -25,10 +23,6 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
     private final Predicate<String> entityValidation;
     private final Predicate<Integer> validNumberOfPageResults;
     private final int maxPageResults;
-
-    List<String> validTargetSetNames = Arrays.asList("BHF-UCL", "Exosome", "KRUK","ParkinsonsUK-UCL",
-            "ReferenceGenome");
-
 
     public ControllerValidationHelperImpl(int maxPageResults, Predicate<String> validCondition) {
         this.validNumberOfPageResults = pageResults -> pageResults <= maxPageResults;
@@ -86,19 +80,6 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
             return Arrays.asList(csv.split(COMMA));
         } else {
             return Collections.emptyList();
-        }
-    }
-
-    @Override public String validateTargetSetId(String name) {
-
-        //todo - this information wil be loaded in from the data file CV_PROTEIN_SETS
-        //todo - soon to be renamed as CV_TARGET_SETS, but for now it is hard-coded.
-
-        if(validTargetSetNames.stream().anyMatch(v -> v.matches(name))) {
-            return name;
-        }else{
-            throw new ParameterException("The requested targetSet " + name + " is not valid, please use one of the " +
-                    "following: " + validTargetSetNames.stream().collect(Collectors.joining(", ")));
         }
     }
 }

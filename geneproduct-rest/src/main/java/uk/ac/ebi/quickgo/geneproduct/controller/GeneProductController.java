@@ -132,9 +132,15 @@ public class GeneProductController {
         return search(requestBuilder.build(), geneProductSearchService);
     }
 
-    @RequestMapping(value="/targetset/{id}", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<GeneProduct>> findByTargetSet(@PathVariable String id) {
-        return getGeneProductResponse(geneProductService.findByTargetSet(controllerValidationHelper.validateTargetSetId(id)));
+    /**
+     * Perform a lookup of gene products associated to a target set.
+     * @param name name of target set
+     * @return lookup results
+     */
+    @RequestMapping(value="/targetset/{name}", method = {RequestMethod.GET}, produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<GeneProduct>> findByTargetSet(@PathVariable String name) {
+        return getGeneProductResponse(geneProductService.findByTargetSet(name));
     }
 
 
