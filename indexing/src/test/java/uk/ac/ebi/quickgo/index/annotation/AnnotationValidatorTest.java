@@ -281,7 +281,6 @@ public class AnnotationValidatorTest {
     public void invalidAnnotationPropertyDueToMissingGOEvidence() {
         annotation.annotationProperties =
                 "taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";
-        ;
         validator.validate(annotation);
     }
 
@@ -289,14 +288,12 @@ public class AnnotationValidatorTest {
     public void invalidAnnotationPropertyDueToMissingTaxonId() {
         annotation.annotationProperties =
                 "go_evidence=IEA|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";
-        ;
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
     public void invalidAnnotationPropertyDueToMissingDbObjectType() {
         annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5";
-        ;
         validator.validate(annotation);
     }
 
@@ -414,6 +411,12 @@ public class AnnotationValidatorTest {
     }
 
     // bad date field
+    @Test(expected = ValidationException.class)
+    public void invalidDateDueToNumberFormat() {
+        annotation.date = "2012123";
+        validator.validate(annotation);
+    }
+
     @Test(expected = ValidationException.class)
     public void invalidDate() {
         annotation.date = "asdf201squiggle21111KABLAMO!";
