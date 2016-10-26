@@ -9,7 +9,6 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -66,6 +65,7 @@ public class AnnotationControllerRESTIT {
     private static final String FAILED_REST_FETCH_PREFIX = "Failed to fetch REST response due to: ";
     private static final String RESOURCE_URL = "/annotation";
     private static final String BASE_URL = "http://localhost";
+    private static final String DELIMITER = ", ";
     private static final String COMMA = ",";
     private static final String DESCENDANTS_RESOURCE_FORMAT = "/ontology/go/terms/%s/descendants?relations=%s";
     private static final String IS_A = "is_a";
@@ -707,7 +707,7 @@ public class AnnotationControllerRESTIT {
     }
 
     private static String csv(String... values) {
-        StringJoiner joiner = new StringJoiner(COMMA);
+        StringJoiner joiner = new StringJoiner(DELIMITER);
         for (String value : values) {
             joiner.add(value);
         }
