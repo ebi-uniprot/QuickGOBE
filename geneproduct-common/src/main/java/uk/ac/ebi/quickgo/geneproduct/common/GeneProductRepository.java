@@ -26,5 +26,5 @@ public interface GeneProductRepository extends SolrCrudRepository<GeneProductDoc
                     GeneProductFields.IS_ISOFORM, GeneProductFields.IS_ANNOTATED, GeneProductFields.PARENT_ID})
     List<GeneProductDocument> findById(List<String> ids);
 
-
+    List<GeneProductDocument> findByTargetSet(String name);
 }

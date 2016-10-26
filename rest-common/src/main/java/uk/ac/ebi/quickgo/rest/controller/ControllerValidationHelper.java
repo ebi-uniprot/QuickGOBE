@@ -25,4 +25,10 @@ public interface ControllerValidationHelper {
     void validateRequestedResults(int requestedResultsSize);
 
     List<String> csvToList(String csv);
+
+    /**
+     * Checks whether the requested target set name is sane.
+     * @param name target set name.
+     */
+    String validateTargetSetId(String name);
 }

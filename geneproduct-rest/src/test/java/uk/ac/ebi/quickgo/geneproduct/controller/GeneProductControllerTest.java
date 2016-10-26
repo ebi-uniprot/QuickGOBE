@@ -46,6 +46,7 @@ public class GeneProductControllerTest {
     private static final List<String> SINGLE_CSV_LIST = singletonList(GENE_PRODUCT_ID1);
     private static final String MULTI_CSV = GENE_PRODUCT_ID1 + "," + GENE_PRODUCT_ID2 + "," + GENE_PRODUCT_ID3;
     private static final List<String> MULTI_CSV_LIST = asList(GENE_PRODUCT_ID1, GENE_PRODUCT_ID2, GENE_PRODUCT_ID3);
+    private static final String TARGET_SET = "KRUK";
     private static String multiCSVTooBig;
     private GeneProductController controller;
     private GeneProduct geneProduct1;
@@ -89,6 +90,9 @@ public class GeneProductControllerTest {
         when(validationHelper.validateCSVIds(MULTI_CSV)).thenReturn(MULTI_CSV_LIST);
         when(validationHelper.validateCSVIds(SINGLE_CSV)).thenReturn(SINGLE_CSV_LIST);
         doThrow(new IllegalArgumentException()).when(validationHelper).validateCSVIds(multiCSVTooBig);
+
+        when(validationHelper.validateTargetSetId(TARGET_SET)).thenReturn(TARGET_SET);
+        when(geneProductService.findByTargetSet(TARGET_SET)).thenReturn(multiGP);
     }
 
     @Test
@@ -156,6 +160,14 @@ public class GeneProductControllerTest {
                 null,
                 validationHelper);
     }
+
+    @Test
+    public void retrieveMultipleGeneProductForTargetSet() {
+        ResponseEntity<QueryResult<GeneProduct>> response = controller.findByTargetSet(TARGET_SET);
+        assertThat(response.getBody().getResults(), hasSize(3));
+        assertThat(response.getBody().getResults(), contains(geneProduct1, geneProduct2, geneProduct3));
+    }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullValidationHelper() {

@@ -132,6 +132,12 @@ public class GeneProductController {
         return search(requestBuilder.build(), geneProductSearchService);
     }
 
+    @RequestMapping(value="/targetset/{id}", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<GeneProduct>> findByTargetSet(@PathVariable String id) {
+        return getGeneProductResponse(geneProductService.findByTargetSet(controllerValidationHelper.validateTargetSetId(id)));
+    }
+
+
     /**
      * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.
      *

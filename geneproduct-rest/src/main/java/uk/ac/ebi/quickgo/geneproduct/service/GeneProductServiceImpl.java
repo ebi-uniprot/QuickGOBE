@@ -49,6 +49,10 @@ public class GeneProductServiceImpl implements GeneProductService {
         return convertDocs(geneProductRepository.findById(serviceHelper.buildIdList(ids)));
     }
 
+    @Override public List<GeneProduct> findByTargetSet(String name) {
+        return convertDocs(geneProductRepository.findByTargetSet(name));
+    }
+
     protected List<GeneProduct> convertDocs(List<GeneProductDocument> docs) {
         return docs
                 .stream()
