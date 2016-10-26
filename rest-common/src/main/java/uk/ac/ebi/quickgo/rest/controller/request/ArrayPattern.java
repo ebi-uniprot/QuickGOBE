@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.model;
+package uk.ac.ebi.quickgo.rest.controller.request;
 
 import java.lang.annotation.*;
 import java.util.ArrayList;
@@ -15,8 +15,9 @@ import javax.validation.Payload;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {ArrayPattern.Validator.class})
-@Documented @interface ArrayPattern {
-    String DEFAULT_ERROR_MSG = "The '%s' parameter contains invalid values: %s";
+@Documented
+public @interface ArrayPattern {
+    public String DEFAULT_ERROR_MSG = "The '%s' parameter contains invalid values: %s";
 
     /**
      * Defines the regular expression that each element in the array must match

@@ -185,30 +185,30 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
     // filter queries ---------------------------------------------------------
     @Test
-    public void requestWithInvalidFilterQueryReturns400Response() throws Exception {
+    public void requestWithInvalidFilterQueryIgnoresTheFilter() throws Exception {
         GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
         GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
         GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
-        String fq = buildFilterQuery("thisFieldDoesNotExist", "Process");
+        Param fq = new Param("thisFieldDoesNotExist", "Process");
 
-        checkInvalidFilterQueryResponse("glycine", fq);
+        checkValidFilterQueryResponse("glycine", 3, fq);
     }
 
     @Test
-    public void requestWithAFilterQueryReturnsFilteredResponse() throws Exception {
+    public void requestWithATypeFilterQueryReturnsFilteredResponse() throws Exception {
         GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        doc1.taxonId = 1;
+        doc1.type = "protein";
         GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        doc2.taxonId = 1;
+        doc2.type = "protein";
         GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.taxonId = 2;
+        doc3.type = "rna";
 
         saveToRepository(doc1, doc2, doc3);
 
-        String fq = buildFilterQuery(GeneProductFields.Searchable.TAXON_ID, "1");
+        Param fq = new Param(GeneProductFields.Searchable.TYPE, "protein");
 
         checkValidFilterQueryResponse("metabolic", 2, fq);
     }
@@ -238,35 +238,39 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
+    public void requestWith2FilterQueriesThatFilterOutAllResults() throws Exception {
         GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        doc1.taxonId = 1;
+        doc1.type = "protein";
+        doc1.taxonId = 2;
         GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        doc2.type = "rna";
         doc2.taxonId = 1;
         GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.taxonId = 1;
+        doc3.type = "protein";
+        doc3.taxonId = 2;
 
         saveToRepository(doc1, doc2, doc3);
 
-        String fq = buildFilterQuery(GeneProductFields.Searchable.TAXON_ID, "1");
+        Param fq1 = new Param(GeneProductFields.Searchable.TYPE, "rna");
+        Param fq2 = new Param(GeneProductFields.Searchable.TAXON_ID, "2");
 
-        checkValidFilterQueryResponse("glycine", 3, fq);
+        checkValidFilterQueryResponse("process", 0, fq1, fq2);
     }
 
     @Test
-    public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
+    public void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
         GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        doc1.taxonId = 1;
+        doc1.type = "rna";
         GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        doc2.taxonId = 2;
+        doc2.type = "rna";
         GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.taxonId = 1;
+        doc3.type = "rna";
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFilterQueryResponse("process", 2, GeneProductFields.Searchable.TAXON_ID + ":1")
-                .andExpect(jsonPath("$.results[0].id").value("A0A0F8CSS1"))
-                .andExpect(jsonPath("$.results[1].id").value("A0A0F8CSS3"));
+        Param fq = new Param(GeneProductFields.Searchable.TYPE, "rna");
+
+        checkValidFilterQueryResponse("glycine", 3, fq);
     }
 
     // highlighting ------------------------------------------------
