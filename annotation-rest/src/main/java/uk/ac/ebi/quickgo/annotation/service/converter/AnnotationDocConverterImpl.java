@@ -32,6 +32,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         annotation.targetSets = asUnmodifiableList(annotationDocument.targetSets);
         annotation.withFrom = asUnmodifiableList(annotationDocument.withFrom);
         annotation.extensions = asUnmodifiableList(annotationDocument.extensions);
+        annotation.date = annotationDocument.date;
 
         return annotation;
     }
