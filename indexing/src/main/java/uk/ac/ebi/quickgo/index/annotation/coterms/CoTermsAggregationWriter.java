@@ -287,7 +287,6 @@ class CoTermMatrix {
         }
         return termCoTerms;
     }
-
 }
 
 /**
@@ -307,13 +306,5 @@ class TermGPCount {
         if (id2Count.putIfAbsent(term, new AtomicLong(1L)) != null) {
             id2Count.get(term).incrementAndGet();
         }
-
-        //        Alternatives to the above code for the distracted.
-        //        Object v = id2Count.putIfAbsent(term, new AtomicLong(1L)) == null ? null : id2Count.get(term)
-        // .incrementAndGet();
-        //
-        //        Object x = id2Count.get(term) == null ? id2Count.put(term, new AtomicLong(1L)) :
-        //                id2Count.get(term).incrementAndGet();
-
     }
 }
