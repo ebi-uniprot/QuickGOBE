@@ -279,19 +279,21 @@ public class AnnotationValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void invalidAnnotationPropertyDueToMissingGOEvidence() {
-        annotation.annotationProperties = "taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";;
+        annotation.annotationProperties =
+                "taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
     public void invalidAnnotationPropertyDueToMissingTaxonId() {
-        annotation.annotationProperties = "go_evidence=IEA|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";;
+        annotation.annotationProperties =
+                "go_evidence=IEA|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
     public void invalidAnnotationPropertyDueToMissingDbObjectType() {
-        annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5";;
+        annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5";
         validator.validate(annotation);
     }
 
@@ -393,6 +395,38 @@ public class AnnotationValidatorTest {
     @Test
     public void createsValidAnnotationWithMandatoryFields() {
         validator.validate(createValidAnnotation());
+    }
+
+    // good date field
+    @Test
+    public void validDate() {
+        annotation.date = "20121111";
+        validator.validate(annotation);
+    }
+
+    @Test
+    public void validNullDate() {
+        annotation.date = null;
+        validator.validate(annotation);
+    }
+
+    // bad date field
+    @Test(expected = ValidationException.class)
+    public void invalidDateDueToNumberFormatTooShort() {
+        annotation.date = "2012123";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidDateDueToNumberFormatTooLong() {
+        annotation.date = "201212345";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidDate() {
+        annotation.date = "asdf201squiggle21111KABLAMO!";
+        validator.validate(annotation);
     }
 
 }

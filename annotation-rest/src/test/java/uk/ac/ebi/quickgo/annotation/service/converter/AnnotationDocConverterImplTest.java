@@ -3,6 +3,9 @@ package uk.ac.ebi.quickgo.annotation.service.converter;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +38,8 @@ public class AnnotationDocConverterImplTest {
     private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
     private static final String SYMBOL = "moeA5";
     private static final String GO_ASPECT = "cellular_component";
+    private static final Date DATE = Date.from(
+            LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());;
 
     private static final AnnotationDocument DOCUMENT = createStubDocument();
 
@@ -145,6 +150,21 @@ public class AnnotationDocConverterImplTest {
         assertThat(model.targetSets, is(TARGET_SETS));
     }
 
+    @Test
+    public void convertsDateSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.date, is(DATE));
+    }
+
+    @Test
+    public void convertsNullDateSuccessfully() {
+        AnnotationDocument doc = new AnnotationDocument();
+        doc.date = null;
+
+        Annotation model = docConverter.convert(doc);
+        assertThat(model.date, is(nullValue()));
+    }
+
     private static AnnotationDocument createStubDocument() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.id = ID;
@@ -159,6 +179,7 @@ public class AnnotationDocConverterImplTest {
         doc.targetSets = TARGET_SETS;
         doc.symbol = SYMBOL;
         doc.goAspect = GO_ASPECT;
+        doc.date = DATE;
 
         return doc;
     }
