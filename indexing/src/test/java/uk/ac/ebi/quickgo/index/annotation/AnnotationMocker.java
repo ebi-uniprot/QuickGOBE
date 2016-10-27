@@ -7,8 +7,8 @@ package uk.ac.ebi.quickgo.index.annotation;
  * Created 22/04/16
  * @author Edd
  */
-class AnnotationMocker {
-    static Annotation createValidAnnotation() {
+public class AnnotationMocker {
+    public static Annotation createValidAnnotation() {
         Annotation annotation = new Annotation();
 
         annotation.db = "IntAct";
