@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
+
 import java.util.List;
 
 /**
@@ -22,7 +24,7 @@ public interface ControllerValidationHelper {
     /**
      * Checks whether the requested number of results is valid.
      * @param requestedResultsSize the number of results being requested
-     * @throws IllegalArgumentException if the number is greater than the maximum permissible number of results.
+     * @throws ParameterException if the number is greater than the maximum permissible number of results.
      */
     void validateRequestedResults(int requestedResultsSize);
 
