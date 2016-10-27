@@ -897,6 +897,7 @@
             <str name="wt">json</str>
             <str name="indent">true</str>
             <str name="df">text</str>
+            <str name="sort">geneProductId asc</str>
         </lst>
     </requestHandler>
 
