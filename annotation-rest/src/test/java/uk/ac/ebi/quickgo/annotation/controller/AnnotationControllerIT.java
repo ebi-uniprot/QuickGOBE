@@ -706,21 +706,6 @@ public class AnnotationControllerIT {
     public void successfulLookupWithFromForSingleId() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM.getName(), "InterPro:IPR015421"));
-
-//        .andExpect(valueOccursInField(WITH_FROM_PATH, "IPR015421"));
-
-//        List<String> is = asList("IPR015421",
-//                "IPR015422",
-//                "IPR015421",
-//                "IPR015422",
-//                "IPR015421",
-//                "IPR015422");
-//        response.andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(contentTypeToBeJson())
-//                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-//                .andExpect(fieldIs(WITH_FROM_PATH, is));
-
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
