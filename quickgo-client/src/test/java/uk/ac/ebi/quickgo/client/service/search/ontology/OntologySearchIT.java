@@ -171,73 +171,72 @@ public class OntologySearchIT extends SearchControllerSetup {
 
     // filter queries ---------------------------------------------------------
     @Test
-    public void requestWithInvalidFilterQueryReturns400Response() throws Exception {
+    public void requestWithInvalidFilterQueryIgnoresFilter() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
 
         saveToRepository(doc1, doc2, doc3);
 
-        String fq = buildFilterQuery("thisFieldDoesNotExist", "Process");
+        Param filterParam = new Param("thisFieldDoesNotExist", "biological_process");
 
-        checkInvalidFilterQueryResponse("go", fq);
+        checkValidFilterQueryResponse("go", 3, filterParam);
     }
 
     @Test
     public void requestWithAFilterQueryReturnsFilteredResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
-        doc1.aspect = "Process";
+        doc1.aspect = "biological_process";
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
-        doc2.aspect = "Function";
+        doc2.aspect = "molecular_function";
         OntologyDocument doc3 = createGODoc("GO:0000003", "go function 3");
-        doc3.aspect = "Process";
+        doc3.aspect = "biological_process";
 
         repository.save(doc1);
         repository.save(doc2);
         repository.save(doc3);
 
-        String fq = buildFilterQuery(OntologyFields.Searchable.ASPECT, "Process");
+        Param filterParam = new Param(OntologyFields.Searchable.ASPECT, "biological_process");
 
-        checkValidFilterQueryResponse("go function", 2, fq);
+        checkValidFilterQueryResponse("go function", 2, filterParam);
     }
 
     @Test
-    public void requestWith3FilterQueriesThatFilterOutAllResults() throws Exception {
+    public void requestWith2FilterQueriesThatFilterOutAllResults() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
-        doc1.aspect = "Process";
-        doc1.definition = "definition Klose";
+        doc1.aspect = "biological_process";
+        doc1.ontologyType = "GO";
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
-        doc2.aspect = "Function";
-        doc2.definition = "definition Jerome";
+        doc2.aspect = "molecular_function";
+        doc2.ontologyType = "GO";
         OntologyDocument doc3 = createGODoc("GO:0000003", "go function 3");
-        doc3.aspect = "Process";
-        doc3.definition = "definition Jerome";
+        doc3.aspect = "biological_process";
+        doc3.ontologyType = "GO";
 
         repository.save(doc1);
         repository.save(doc2);
         repository.save(doc3);
 
-        String fq1 = buildFilterQuery(OntologyFields.Searchable.ASPECT, "Process");
-        String fq2 = buildFilterQuery(OntologyFields.Searchable.DEFINITION, "Klose");
-        String fq3 = buildFilterQuery(OntologyFields.Searchable.DEFINITION, "Ibrahimovic");
+        Param fq1 = new Param(OntologyFields.Searchable.ASPECT, "biological_process");
+        Param fq2 = new Param(OntologyFields.Searchable.ONTOLOGY_TYPE, "eco");
 
-        checkValidFilterQueryResponse("go function", 0, fq1, fq2, fq3);
+        checkValidFilterQueryResponse("go function", 0, fq1, fq2);
     }
 
     @Test
     public void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
-        doc1.aspect = "Process";
+        doc1.aspect = "biological_process";
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
-        doc2.aspect = "Process";
+        doc2.aspect = "biological_process";
         OntologyDocument doc3 = createGODoc("GO:0000003", "go function 3");
-        doc3.aspect = "Process";
+        doc3.aspect = "biological_process";
 
         repository.save(doc1);
         repository.save(doc2);
         repository.save(doc3);
 
-        String fq = buildFilterQuery(OntologyFields.Searchable.ASPECT, "Process");
+        Param fq = new Param(OntologyFields.Searchable.ASPECT, "biological_process");
 
         checkValidFilterQueryResponse("go function", 3, fq);
     }
@@ -245,17 +244,19 @@ public class OntologySearchIT extends SearchControllerSetup {
     @Test
     public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
-        doc1.aspect = "Process";
+        doc1.aspect = "biological_process";
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
-        doc2.aspect = "Function";
+        doc2.aspect = "mollecular_function";
         OntologyDocument doc3 = createGODoc("GO:0000003", "go function 3");
-        doc3.aspect = "Process";
+        doc3.aspect = "biological_process";
 
         repository.save(doc1);
         repository.save(doc2);
         repository.save(doc3);
 
-        checkValidFilterQueryResponse("go function", 2, OntologyFields.Searchable.ASPECT + ":Process")
+        Param fq = new Param(OntologyFields.ASPECT, "biological_process");
+
+        checkValidFilterQueryResponse("go function", 2, fq)
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))
                 .andExpect(jsonPath("$.results[1].id").value("GO:0000003"));
     }
@@ -340,10 +341,6 @@ public class OntologySearchIT extends SearchControllerSetup {
         for (OntologyDocument doc : documents) {
             repository.save(doc);
         }
-    }
-
-    private String buildFilterQuery(String field, String value) {
-        return field + ":" + value;
     }
 
     private OntologyDocument createGODoc(String id, String name) {

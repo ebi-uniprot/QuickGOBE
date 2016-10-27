@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 
 import java.util.Set;
 import java.util.stream.Collectors;

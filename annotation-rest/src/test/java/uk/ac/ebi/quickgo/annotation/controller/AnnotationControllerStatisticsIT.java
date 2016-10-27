@@ -87,8 +87,7 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
-    public void statsForAllDocsContaining2OntologyIdsReturns2OntologyIdStats()
-            throws Exception {
+    public void statsForAllDocsContaining2OntologyIdsReturns2OntologyIdStats() throws Exception {
         AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
         extraDoc.goId = "GO:0016020";
         repository.save(extraDoc);

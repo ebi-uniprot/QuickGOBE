@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 
 import java.util.ArrayList;
@@ -45,8 +46,12 @@ public class MockPresetDataConfig {
                     "GO_REF:0000104"
             ).collect(Collectors.toList());
     static final String UNIPROT_KB = "UniProtKB";
+
+    //Profiles
     static final String SUCCESSFUL_FETCHING = "successfulFetching";
     static final String FAILED_FETCHING = "failedFetching";
+    static final String NO_SEARCH_ATTRIBUTES = "noSearchAttributes";
+
     /*
      * Preset items information representing the most relevant, ECO:0000352 term.
      */
@@ -165,5 +170,20 @@ public class MockPresetDataConfig {
 
     private String anyStringContaining(String value) {
         return matches(".*" + value + ".*");
+    }
+
+    @Bean @Profile(NO_SEARCH_ATTRIBUTES)
+    public SearchableDocumentFields searchableDocumentFields() {
+       return new NoSearchablePresetDocumentFields();
+    }
+
+    private static class NoSearchablePresetDocumentFields implements SearchableDocumentFields {
+        @Override public boolean isDocumentSearchable(String field) {
+            return false;
+        }
+
+        @Override public Stream<String> searchableDocumentFields() {
+            return Stream.empty();
+        }
     }
 }

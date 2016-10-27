@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -27,8 +26,6 @@ public class PresetsCommonConfig {
     private JobBuilderFactory jobBuilders;
     @Autowired
     private StepBuilderFactory stepBuilders;
-    @Autowired
-    private RESTFilterConverterFactory converterFactory;
 
     @Value("${preset.chunk.size:500}")
     private int chunkSize;
