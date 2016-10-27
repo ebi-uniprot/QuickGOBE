@@ -4,7 +4,7 @@ package uk.ac.ebi.quickgo.index.annotation;
  * An intermediate object used to store the data retrieved from a row in an annotation file.
  *
  * This object can be later transformed into a more fine grained domain object.
- * 
+ *
  * Created 19/04/16
  * @author Edd
  */

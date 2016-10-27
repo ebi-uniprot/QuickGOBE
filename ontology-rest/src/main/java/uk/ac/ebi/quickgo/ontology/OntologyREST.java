@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.ontology;
 
 
 
+import uk.ac.ebi.quickgo.ontology.coterms.CoTermConfig;
 import uk.ac.ebi.quickgo.ontology.service.ServiceConfig;
 import uk.ac.ebi.quickgo.rest.controller.CORSFilter;
 import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
@@ -24,7 +25,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @ComponentScan({
         "uk.ac.ebi.quickgo.ontology.controller",
         "uk.ac.ebi.quickgo.rest"})
-@Import({ServiceConfig.class, SwaggerConfig.class, CORSFilter.class})
+@Import({ServiceConfig.class, SwaggerConfig.class, CORSFilter.class, CoTermConfig.class})
 public class OntologyREST {
     /**
      * Ensures that placeholders are replaced with property values
