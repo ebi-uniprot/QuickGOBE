@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 
 import java.util.ArrayList;
@@ -170,7 +171,6 @@ public class MockPresetDataConfig {
     private String anyStringContaining(String value) {
         return matches(".*" + value + ".*");
     }
-}
 
     @Bean @Profile(NO_SEARCH_ATTRIBUTES)
     public SearchableDocumentFields searchableDocumentFields() {
