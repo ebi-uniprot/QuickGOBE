@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.*;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
+import org.springframework.web.client.RestOperations;
 
 import static java.util.Arrays.asList;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -44,7 +46,7 @@ public class AssignedByPresetsConfig {
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     public static final String ASSIGNED_BY_DEFAULTS = "AgBase,BHF-UCL,CACAO,CGD,EcoCyc,UniProtKB";
     private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
-    private static final String ASSIGNED_BY = "assignedBy";
+    public static final String ASSIGNED_BY = "assignedBy";
 
     @Value("#{'${assignedBy.preset.source:}'.split(',')}")
     private Resource[] assignedByResources;
@@ -58,7 +60,12 @@ public class AssignedByPresetsConfig {
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePresetImpl presets,
-            RESTFilterConverterFactory converterFactory) {
+            FilterConfigRetrieval externalFilterConfigRetrieval,
+            RestOperations restOperations) {
+
+        RESTFilterConverterFactory converterFactory = assignedByConverterFactory(externalFilterConfigRetrieval,
+                restOperations);
+
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
         itemReader.setLinesToSkip(assignedByHeaderLines);
         return stepBuilderFactory.get(ASSIGNED_BY_LOADING_STEP_NAME)
@@ -72,6 +79,11 @@ public class AssignedByPresetsConfig {
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
+    }
+
+    private RESTFilterConverterFactory assignedByConverterFactory(FilterConfigRetrieval filterConfigRetrieval,
+            RestOperations restOperations) {
+        return new RESTFilterConverterFactory(filterConfigRetrieval, restOperations);
     }
 
     /**

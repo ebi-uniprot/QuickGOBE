@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.converter.ontology;
 
 import uk.ac.ebi.quickgo.client.model.ontology.GOTerm;
-import uk.ac.ebi.quickgo.client.service.converter.ontology.GODocConverter;
 import uk.ac.ebi.quickgo.ontology.common.document.Aspect;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
@@ -25,7 +24,7 @@ public class GODocConverterTest {
 
     @Test
     public void ontologyDocumentWithNullAspectIsConvertedIntoGoTermWithNullAspect() throws Exception {
-        String aspect = Aspect.BIOLOGICAL_PROCESS.getShortName();
+        String aspect = Aspect.BIOLOGICAL_PROCESS.getScientificName();
 
         OntologyDocument doc = new OntologyDocument();
         doc.aspect = aspect;
