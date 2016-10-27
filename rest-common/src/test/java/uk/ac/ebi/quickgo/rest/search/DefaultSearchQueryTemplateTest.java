@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
@@ -28,7 +27,6 @@ public class DefaultSearchQueryTemplateTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private static final String SEARCHABLE_FIELD = "searchable";
     private static final String START_HIGHLIGHT = "startHighlight";
     private static final String END_HIGHLIGHT = "endHighlight";
     private static final String QUERY = "query";
@@ -36,42 +34,22 @@ public class DefaultSearchQueryTemplateTest {
 
     private QuickGOQuery query;
     private String id;
-    private SearchableField searchableField = field -> field.equals(SEARCHABLE_FIELD) || field.equals(id);
     private List<String> returnedFields;
-    private List<String> highlightFields;
     private DefaultSearchQueryTemplate defaultSearchQueryTemplate;
 
     @Before
     public void setUp() {
         this.id = ID;
-        this.returnedFields = Arrays.asList(id, SEARCHABLE_FIELD);
-        this.highlightFields = Collections.singletonList(id);
+
+        List<String> highlightFields = Collections.singletonList(id);
+
+        this.returnedFields = Collections.singletonList(id);
         this.query = QuickGOQuery.createQuery(QUERY);
 
-        this.defaultSearchQueryTemplate = new DefaultSearchQueryTemplate(searchableField);
+        this.defaultSearchQueryTemplate = new DefaultSearchQueryTemplate();
 
         this.defaultSearchQueryTemplate.setHighlighting(highlightFields, START_HIGHLIGHT, END_HIGHLIGHT);
         this.defaultSearchQueryTemplate.setReturnedFields(returnedFields);
-    }
-
-    @Test
-    public void nullSearchableFieldThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Search fields cannot be null");
-
-        new DefaultSearchQueryTemplate(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nonSearchableFacetThrowsException() {
-        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
-        requestBuilder.checkFacets(Collections.singleton("nonExistingFacet"));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nonSearchableFilterThrowsException() {
-        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
-        requestBuilder.checkFilters(Collections.singleton("nonExistingFilterField:someQuery"));
     }
 
     @Test
