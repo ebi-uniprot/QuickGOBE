@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
@@ -110,12 +110,12 @@ public class GeneProductRequest {
 
     @ArrayPattern(regexp = "[0-9]+", paramName = "taxonId")
     public String[] getTaxonId() {
-        return filterMap.get(GeneProductFields.TAXON_ID);
+        return filterMap.get(GeneProductFields.Searchable.TAXON_ID);
     }
 
     public void setTaxonId(String... taxonIds) {
         if (taxonIds != null) {
-            filterMap.put(GeneProductFields.TAXON_ID, taxonIds);
+            filterMap.put(GeneProductFields.Searchable.TAXON_ID, taxonIds);
         }
     }
 
