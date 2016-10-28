@@ -114,13 +114,14 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
         PageInfo pageInfo;
 
         int resultsPerPage = page.getPageSize();
+        int currentPage = page.getPageNumber();
 
         if (resultsPerPage > 0) {
             int totalPages = (int) Math.ceil((double) totalNumberOfResults / (double) resultsPerPage);
 
             totalPages = totalPages == 0 ? 1 : totalPages;
 
-            pageInfo = new PageInfo(totalPages, page.getPageNumber(), resultsPerPage);
+            pageInfo = new PageInfo(totalPages, currentPage, resultsPerPage);
         } else {
             pageInfo = new PageInfo(1, 1, resultsPerPage);
         }

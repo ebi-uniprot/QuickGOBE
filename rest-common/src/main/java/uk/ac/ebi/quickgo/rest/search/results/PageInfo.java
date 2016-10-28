@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import uk.ac.ebi.quickgo.rest.RangeOutOfBoundsException;
+import uk.ac.ebi.quickgo.rest.QuickGoIndexOutOfBoundsException;
 
 import com.google.common.base.Preconditions;
 
@@ -26,7 +26,7 @@ public class PageInfo {
 
     private void checkCurrentPageIsWithinLimits(int currentPage, int upperLimit) {
         if(currentPage > upperLimit) {
-            throw new RangeOutOfBoundsException("Current page can not be greater than total amount ofTAXON_ID_FILTER " +
+            throw new QuickGoIndexOutOfBoundsException("Current page can not be greater than total amount ofTAXON_ID_FILTER " +
                     "pages: [current: " + currentPage + ", total: " + totalPages + "]");
         }
     }

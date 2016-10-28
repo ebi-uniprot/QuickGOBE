@@ -8,9 +8,9 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 /**
- * Tests the behaviour of the {@link RangeOutOfBoundsException} class.
+ * Tests the behaviour of the {@link QuickGoIndexOutOfBoundsException} class.
  */
-public class RangeOutOfBoundsExceptionTest {
+public class QuickGoIndexOutOfBoundsExceptionTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -18,7 +18,7 @@ public class RangeOutOfBoundsExceptionTest {
     public void exceptionReturnsCustomMessage() throws Exception {
         String errorMessage = "This is an error message";
 
-        RangeOutOfBoundsException exception = new RangeOutOfBoundsException(errorMessage);
+        QuickGoIndexOutOfBoundsException exception = new QuickGoIndexOutOfBoundsException(errorMessage);
 
         assertThat(exception.getMessage(), is(errorMessage));
     }
@@ -30,12 +30,12 @@ public class RangeOutOfBoundsExceptionTest {
 
         int value = upperLimit + 1;
 
-        RangeOutOfBoundsException exception = new RangeOutOfBoundsException(lowerLimit, upperLimit, value);
+        QuickGoIndexOutOfBoundsException exception = new QuickGoIndexOutOfBoundsException(lowerLimit, upperLimit, value);
 
         assertThat(exception.getMessage(), is(createErrorMessage(value, lowerLimit, upperLimit)));
     }
 
     private String createErrorMessage(int value, int lowerLimit, int upperLimit) {
-        return String.format(RangeOutOfBoundsException.RANGE_ERROR_MSG, value, lowerLimit, upperLimit);
+        return String.format(QuickGoIndexOutOfBoundsException.RANGE_ERROR_MSG, value, lowerLimit, upperLimit);
     }
 }

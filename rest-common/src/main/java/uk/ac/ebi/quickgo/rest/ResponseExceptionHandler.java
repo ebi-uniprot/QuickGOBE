@@ -33,8 +33,8 @@ public class ResponseExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({RangeOutOfBoundsException.class})
-    protected ResponseEntity<ErrorInfo> handleInvalidRequest(RangeOutOfBoundsException ex,
+    @ExceptionHandler({QuickGoIndexOutOfBoundsException.class})
+    protected ResponseEntity<ErrorInfo> handleInvalidRequest(QuickGoIndexOutOfBoundsException ex,
             HttpServletRequest request) {
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

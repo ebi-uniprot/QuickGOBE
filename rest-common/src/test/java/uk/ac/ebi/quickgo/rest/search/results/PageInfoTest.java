@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import uk.ac.ebi.quickgo.rest.RangeOutOfBoundsException;
+import uk.ac.ebi.quickgo.rest.QuickGoIndexOutOfBoundsException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,7 +59,7 @@ public class PageInfoTest {
         int currentPage = totalPages + 1;
         int resultsPerPage = 1;
 
-        thrown.expect(RangeOutOfBoundsException.class);
+        thrown.expect(QuickGoIndexOutOfBoundsException.class);
         thrown.expectMessage(startsWith("Current page can not be greater than total amount ofTAXON_ID_FILTER"));
 
         new PageInfo(totalPages, currentPage, resultsPerPage);
