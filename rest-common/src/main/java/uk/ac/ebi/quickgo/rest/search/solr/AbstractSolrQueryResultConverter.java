@@ -118,11 +118,9 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
         if (resultsPerPage > 0) {
             int totalPages = (int) Math.ceil((double) totalNumberOfResults / (double) resultsPerPage);
 
-            Preconditions.checkArgument((page.getPageNumber() - 1) <= totalPages,
-                    "The requested page number should not be greater than the number of pages available.");
-            int currentPage = (totalPages == 0 ? 0 : page.getPageNumber());
+            totalPages = totalPages == 0 ? 1 : totalPages;
 
-            pageInfo = new PageInfo(totalPages, currentPage, resultsPerPage);
+            pageInfo = new PageInfo(totalPages, page.getPageNumber(), resultsPerPage);
         } else {
             pageInfo = new PageInfo(1, 1, resultsPerPage);
         }
