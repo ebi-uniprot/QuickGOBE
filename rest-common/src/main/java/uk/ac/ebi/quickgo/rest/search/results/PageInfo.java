@@ -26,7 +26,7 @@ public class PageInfo {
 
     private void checkCurrentPageIsWithinLimits(int currentPage, int upperLimit) {
         if(currentPage > upperLimit) {
-            throw new RangeOutOfBoundsException("Current page can not be larger than total amount of " +
+            throw new RangeOutOfBoundsException("Current page can not be greater than total amount ofTAXON_ID_FILTER " +
                     "pages: [current: " + currentPage + ", total: " + totalPages + "]");
         }
     }

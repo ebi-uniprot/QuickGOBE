@@ -60,7 +60,7 @@ public class PageInfoTest {
         int resultsPerPage = 1;
 
         thrown.expect(RangeOutOfBoundsException.class);
-        thrown.expectMessage(startsWith("Current page can not be larger than total amount of"));
+        thrown.expectMessage(startsWith("Current page can not be greater than total amount ofTAXON_ID_FILTER"));
 
         new PageInfo(totalPages, currentPage, resultsPerPage);
     }
