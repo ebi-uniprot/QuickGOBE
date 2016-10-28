@@ -23,12 +23,14 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     @Autowired
     private GeneProductRepository repository;
 
-    private static final String ONTOLOGY_RESOURCE_URL = "/geneproduct/search";
+    private static final String GENE_PRODUCT_RESOURCE_URL = "/geneproduct/search";
+    private static final String TYPE_FILTER = "type";
+    private static final String TAXON_ID_FILTER = "taxonId";
 
     @Before
     public void setUp() throws Exception {
         repository.deleteAll();
-        resourceUrl = ONTOLOGY_RESOURCE_URL;
+        resourceUrl = GENE_PRODUCT_RESOURCE_URL;
     }
 
     // response format ---------------------------------------------------------
@@ -140,7 +142,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("glycine", GeneProductFields.Searchable.TYPE);
+        checkValidFacetResponse("glycine", TYPE_FILTER);
     }
 
     @Test
@@ -151,8 +153,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("glycine", GeneProductFields.Searchable.TYPE,
-                GeneProductFields.Searchable.TAXON_ID);
+        checkValidFacetResponse("glycine", TYPE_FILTER, TAXON_ID_FILTER);
     }
 
     @Test
@@ -166,7 +167,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse(name, GeneProductFields.Searchable.TYPE);
+        checkValidFacetResponse(name, TYPE_FILTER);
     }
 
     @Test
@@ -180,7 +181,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse(name, GeneProductFields.Searchable.TAXON_ID);
+        checkValidFacetResponse(name, TAXON_ID_FILTER);
     }
 
     // filter queries ---------------------------------------------------------
@@ -208,7 +209,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq = new Param(GeneProductFields.Searchable.TYPE, "protein");
+        Param fq = new Param(TYPE_FILTER, "protein");
 
         checkValidFilterQueryResponse("metabolic", 2, fq);
     }
@@ -230,9 +231,9 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        String fq1 = buildFilterQuery(GeneProductFields.Searchable.TYPE, GeneProductType.PROTEIN.getName());
-        String fq2 = buildFilterQuery(GeneProductFields.Searchable.TAXON_ID, "1");
-        String fq3 = buildFilterQuery(GeneProductFields.Searchable.DATABASE_SUBSET, "Swiss-Prot");
+        Param fq1 = new Param(TYPE_FILTER, GeneProductType.PROTEIN.getName());
+        Param fq2 = new Param(TAXON_ID_FILTER, "1");
+        Param fq3 = new Param(GeneProductFields.Searchable.DATABASE_SUBSET, "Swiss-Prot");
 
         checkValidFilterQueryResponse("process", 0, fq1, fq2, fq3);
     }
@@ -251,8 +252,8 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq1 = new Param(GeneProductFields.Searchable.TYPE, "rna");
-        Param fq2 = new Param(GeneProductFields.Searchable.TAXON_ID, "2");
+        Param fq1 = new Param(TYPE_FILTER, "rna");
+        Param fq2 = new Param(TAXON_ID_FILTER, "2");
 
         checkValidFilterQueryResponse("process", 0, fq1, fq2);
     }
@@ -268,7 +269,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq = new Param(GeneProductFields.Searchable.TYPE, "rna");
+        Param fq = new Param(TYPE_FILTER, "rna");
 
         checkValidFilterQueryResponse("glycine", 3, fq);
     }
@@ -345,10 +346,6 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         for (GeneProductDocument doc : documents) {
             repository.save(doc);
         }
-    }
-
-    private String buildFilterQuery(String field, String value) {
-        return field + ":" + value;
     }
 
     private GeneProductDocument createGeneProductDocWithName(String id, String name) {
