@@ -26,10 +26,17 @@ public class ResponseExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(ParameterException.class)
+    @ExceptionHandler({ParameterException.class})
     protected ResponseEntity<ErrorInfo> handleParameterErrorRequest(ParameterException ex, HttpServletRequest request) {
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(),
                 ex.getMessages().collect(Collectors.toList()));
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({RangeOutOfBoundsException.class})
+    protected ResponseEntity<ErrorInfo> handleInvalidRequest(RangeOutOfBoundsException ex,
+            HttpServletRequest request) {
+        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
