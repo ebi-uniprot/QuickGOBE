@@ -1096,11 +1096,12 @@ public class AnnotationControllerIT {
     @Test
     public void filterByTargetSetContainingSpacesReturnsMatchingDocuments() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.targetSets = Collections.singletonList("Reference Genome");
+        String targetSetWithSpaces = "Reference Genome";
+        doc.targetSets = Collections.singletonList(targetSetWithSpaces);
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM.getName(),
-                "Reference Genome"));
+                targetSetWithSpaces));
 
         response.andDo(print())
                 .andExpect(status().isOk())
