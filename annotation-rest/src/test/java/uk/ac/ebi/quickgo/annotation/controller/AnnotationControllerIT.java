@@ -971,10 +971,11 @@ public class AnnotationControllerIT {
     public void filterBySingleGeneProductTypeOfRnaReturnsMatchingDocument() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.geneProductType = "rna";
+        doc.geneProductType = "miRNA";
         repository.save(doc);
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(), "RNA"));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName
+                (), "miRNA"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1024,7 +1025,7 @@ public class AnnotationControllerIT {
         doc.geneProductType = "complex";
         repository.save(doc);
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(), "rna"));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(), "miRNA"));
 
         response.andDo(print())
                 .andExpect(status().isOk())

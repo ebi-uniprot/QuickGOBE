@@ -54,7 +54,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
  *
  * gp=A0A000,A0A001
  * gpSet=BHF-UCL,Exosome
- * gpType=protein,rna,complex
+ * gpType=protein,miRNA,complex
  *
  * goTerm=GO:0016021,GO:0016022
  * goTermSet=goslim_chembl, goSlimGeneric .. and others.
