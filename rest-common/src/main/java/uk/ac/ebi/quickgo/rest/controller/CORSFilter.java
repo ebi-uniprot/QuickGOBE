@@ -24,16 +24,26 @@ import org.springframework.stereotype.Component;
  * @author Edd
  */
 @Component
-@ConfigurationProperties(prefix="cors")
+@ConfigurationProperties(prefix = "cors")
 public class CORSFilter implements Filter {
 
-    private static final String DEFAULT_ACCESS_CONTROL_ALLOW_CREDENTIALS = "true";
-    private static final String DEFAULT_ACCESS_CONTROL_ALLOW_HEADERS =
-            "Origin, Accept, X-Requested-With, Content-Type, " +
-                    "Access-Control-Request-Method, Access-Control-Request-Headers";
-    private static final String DEFAULT_ACCESS_CONTROL_ALLOW_METHODS = "GET";
-    private static final String DEFAULT_ACCESS_CONTROL_ALLOW_ORIGIN = "*";
-    private static final String DEFAULT_ACCESS_CONTROL_MAX_AGE = "3600";
+    static final String DEFAULT_ACCESS_CONTROL_ALLOW_CREDENTIALS = "true";
+    static final String DEFAULT_ACCESS_CONTROL_ALLOW_HEADERS =
+            "Origin, " +
+                    "Accept, " +
+                    "X-Requested-With, " +
+                    "Content-Type, " +
+                    "Access-Control-Request-Method, " +
+                    "Access-Control-Request-Headers";
+    static final String DEFAULT_ACCESS_CONTROL_ALLOW_METHODS = "GET";
+    static final String DEFAULT_ACCESS_CONTROL_ALLOW_ORIGIN = "*";
+    static final String DEFAULT_ACCESS_CONTROL_MAX_AGE = "3600";
+    static final String ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
+    static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
+    static final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+    static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
+    static final String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
+    static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
 
     private String allowCredentials = DEFAULT_ACCESS_CONTROL_ALLOW_CREDENTIALS;
     private String allowHeaders = DEFAULT_ACCESS_CONTROL_ALLOW_HEADERS;
@@ -51,14 +61,20 @@ public class CORSFilter implements Filter {
             throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        response.setHeader("Access-Control-Allow-Credentials", allowCredentials);
-        response.setHeader("Access-Control-Allow-Headers", allowHeaders);
-        response.setHeader("Access-Control-Allow-Origin", allowOrigins);
-        response.setHeader("Access-Control-Allow-Methods", allowMethods);
-        response.setHeader("Access-Control-Expose-Headers", exposeHeaders);
-        response.setHeader("Access-Control-Max-Age", maxAge);
+        addHeaderIfNotNull(response, ACCESS_CONTROL_ALLOW_CREDENTIALS, allowCredentials);
+        addHeaderIfNotNull(response, ACCESS_CONTROL_ALLOW_HEADERS, allowHeaders);
+        addHeaderIfNotNull(response, ACCESS_CONTROL_ALLOW_ORIGIN, allowOrigins);
+        addHeaderIfNotNull(response, ACCESS_CONTROL_ALLOW_METHODS, allowMethods);
+        addHeaderIfNotNull(response, ACCESS_CONTROL_EXPOSE_HEADERS, exposeHeaders);
+        addHeaderIfNotNull(response, ACCESS_CONTROL_MAX_AGE, maxAge);
 
         filterChain.doFilter(servletRequest, servletResponse);
+    }
+
+    private void addHeaderIfNotNull(HttpServletResponse response, String header, String value) {
+        if (value != null) {
+            response.setHeader(header, value);
+        }
     }
 
     @Override public void destroy() {
