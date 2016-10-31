@@ -5,14 +5,13 @@ import javax.servlet.ServletException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -23,6 +22,7 @@ import static uk.ac.ebi.quickgo.rest.controller.CORSFilter.*;
  * Created 31/10/16
  * @author Edd
  */
+@ActiveProfiles("cors-test")
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = CORSFilterReadingPropertiesTest.FakeApplication.class)
 public class CORSFilterReadingPropertiesTest {
@@ -71,13 +71,10 @@ public class CORSFilterReadingPropertiesTest {
         assertThat(response.getHeader(ACCESS_CONTROL_MAX_AGE), is("my-max-age"));
     }
 
-    @SpringBootApplication
+    @Profile("cors-test")
+    @Configuration
+    @EnableAutoConfiguration
     @PropertySource(value = "cors.test.properties")
-    @ComponentScan(
-            basePackages = {"uk.ac.ebi.quickgo.rest.controller"},
-            excludeFilters = {
-                    @ComponentScan.Filter(
-                            type = FilterType.ASSIGNABLE_TYPE,
-                            value = CORSFilterDefaultPropertiesTest.FakeApplication.class)})
+    @Import(CORSFilter.class)
     public static class FakeApplication {}
 }
