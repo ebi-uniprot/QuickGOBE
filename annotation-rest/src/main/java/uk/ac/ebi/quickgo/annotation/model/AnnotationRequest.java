@@ -373,7 +373,7 @@ public class AnnotationRequest {
         filterMap.put(GENE_PRODUCT_TYPE, geneProductType);
     }
 
-    @ArrayPattern(regexp = "^complex|rna|protein$", flags = CASE_INSENSITIVE, paramName = GENE_PRODUCT_TYPE_PARAM)
+    @ArrayPattern(regexp = "^complex|miRNA|protein$", flags = CASE_INSENSITIVE, paramName = GENE_PRODUCT_TYPE_PARAM)
     public String[] getGeneProductType() {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }

@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation;
 
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.controller.CORSFilter;
 import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
 
 import org.springframework.boot.SpringApplication;
@@ -24,7 +25,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @ComponentScan({"uk.ac.ebi.quickgo.annotation.controller",
         "uk.ac.ebi.quickgo.rest",
         "uk.ac.ebi.quickgo.annotation.service.statistics"})
-@Import({SearchServiceConfig.class, SwaggerConfig.class})
+@Import({SearchServiceConfig.class, SwaggerConfig.class, CORSFilter.class})
 public class AnnotationREST {
 
     /**
