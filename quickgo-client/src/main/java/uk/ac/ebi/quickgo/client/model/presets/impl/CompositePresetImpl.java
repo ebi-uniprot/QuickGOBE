@@ -221,7 +221,7 @@ public class CompositePresetImpl implements CompositePreset {
 
         private enum GeneProductType {
             PROTEINS("Proteins", "protein"),
-            RNA("RNA", "rna"),
+            RNA("RNA", "miRNA"),
             COMPLEXES("Complexes", "complex");
 
             private final String name;
