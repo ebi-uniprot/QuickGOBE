@@ -91,8 +91,10 @@ public class AnnotationRequest {
         List<String> statsTypes =
                 Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE, ASSIGNED_BY, GO_ASPECT);
 
-        StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
-        StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);
+        StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, AggregateFunction
+                .COUNT.getName(), statsTypes);
+        StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID,
+                AggregateFunction.UNIQUE.getName(), statsTypes);
 
         DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
     }
