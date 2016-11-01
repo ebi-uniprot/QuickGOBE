@@ -1,11 +1,9 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -57,20 +55,5 @@ public class PresetsConfig {
         }
 
         throw new IllegalStateException("PresetsBuildJob could not be created");
-    }
-
-    @Bean
-    public SearchableDocumentFields searchableDocumentFields() {
-        return new NoSearchablePresetDocumentFields();
-    }
-
-    private static class NoSearchablePresetDocumentFields implements SearchableDocumentFields {
-        @Override public boolean isDocumentSearchable(String field) {
-            return false;
-        }
-
-        @Override public Stream<String> searchableDocumentFields() {
-            return Stream.empty();
-        }
     }
 }
