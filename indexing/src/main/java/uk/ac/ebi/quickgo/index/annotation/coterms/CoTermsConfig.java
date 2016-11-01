@@ -46,10 +46,10 @@ public class CoTermsConfig {
             "together", "compared"};
     private static final String DELIMITER = "\t";
 
-    @Value("${indexing.coterms.manual:/tmp}")
+    @Value("${indexing.coterms.manual:/nfs/public/rw/goa/quickgo_origin/full/CoTermsManual}")
     private String manualCoTermsPath;
 
-    @Value("${indexing.coterms.manual:/tmp}")
+    @Value("${indexing.coterms.manual:/nfs/public/rw/goa/quickgo_origin/full/CoTermsAll}")
     private String allCoTermsPath;
 
     @Bean

@@ -204,7 +204,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
         doc2.type = "protein";
         GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.type = "rna";
+        doc3.type = "miRNA";
 
         saveToRepository(doc1, doc2, doc3);
 
@@ -219,7 +219,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         doc1.type = "protein";
         doc1.taxonId = 2;
         GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        doc2.type = "rna";
+        doc2.type = "miRNA";
         doc2.taxonId = 1;
         GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
         doc3.type = "protein";
@@ -227,7 +227,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq1 = new Param(TYPE_FILTER, "rna");
+        Param fq1 = new Param(TYPE_FILTER, "miRNA");
         Param fq2 = new Param(TAXON_ID_FILTER, "2");
 
         checkValidFilterQueryResponse("process", 0, fq1, fq2);
@@ -236,15 +236,15 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     @Test
     public void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
         GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        doc1.type = "rna";
+        doc1.type = "miRNA";
         GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        doc2.type = "rna";
+        doc2.type = "miRNA";
         GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.type = "rna";
+        doc3.type = "miRNA";
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq = new Param(TYPE_FILTER, "rna");
+        Param fq = new Param(TYPE_FILTER, "miRNA");
 
         checkValidFilterQueryResponse("glycine", 3, fq);
     }
