@@ -1,7 +1,8 @@
 package uk.ac.ebi.quickgo.rest.controller.request;
 
-import uk.ac.ebi.quickgo.common.SearchableField;
+import uk.ac.ebi.quickgo.common.FacetableField;
 
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,11 +19,13 @@ import static uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets.DEFAULT_
  * @author Ricardo Antunes
  */
 public class AllowableFacetsImpl implements ConstraintValidator<AllowableFacets, String[]> {
-    private SearchableField searchableField;
+    private final FacetableField facetableField;
 
     @Autowired
-    public AllowableFacetsImpl(SearchableField searchableField){
-        this.searchableField = searchableField;
+    public AllowableFacetsImpl(FacetableField facetableField){
+        Preconditions.checkArgument(facetableField != null, "Facetable fields cannot be null");
+
+        this.facetableField = facetableField;
     }
 
     @Override public void initialize(AllowableFacets constraintAnnotation) {}
@@ -34,7 +37,7 @@ public class AllowableFacetsImpl implements ConstraintValidator<AllowableFacets,
             invalidItems = new ArrayList<>();
 
             for (String facet : facetValues) {
-                if (!searchableField.isSearchable(facet)) {
+                if (!facetableField.isFacetable(facet)) {
                     invalidItems.add(facet);
                 }
             }

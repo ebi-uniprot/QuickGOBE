@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.rest.controller.request;
 
-import uk.ac.ebi.quickgo.common.SearchableField;
-
 import java.lang.annotation.*;
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -18,6 +16,4 @@ public @interface AllowableFacets {
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
-    Class<? extends SearchableField> searchableFields();
 }

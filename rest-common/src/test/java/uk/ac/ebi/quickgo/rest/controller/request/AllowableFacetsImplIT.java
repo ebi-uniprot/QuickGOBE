@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.controller.request;
 
-import uk.ac.ebi.quickgo.common.SearchableField;
+import uk.ac.ebi.quickgo.common.FacetableField;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +15,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -26,6 +28,7 @@ import static org.hamcrest.Matchers.hasSize;
 /**
  * Tests the behaviour of the {@link AllowableFacetsImpl} class.
  */
+@ActiveProfiles("test-AllowableFacetsImplIT")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = AllowableFacetsImplIT.AllowableFacetsConfig.class)
 public class AllowableFacetsImplIT {
@@ -33,25 +36,26 @@ public class AllowableFacetsImplIT {
     private static final String INVALID_FACET_2 = "invalid2";
 
     @Configuration
+    @Profile("test-AllowableFacetsImplIT")
     static class AllowableFacetsConfig {
         @Bean
-        SearchableField searchableField() {
-            return new SearchableField() {
-                private final List<String> notSearchable = Arrays.asList(INVALID_FACET_1, INVALID_FACET_2);
+        FacetableField FacetableField() {
+            return new FacetableField() {
+                private final List<String> notfacetable = Arrays.asList(INVALID_FACET_1, INVALID_FACET_2);
 
-                @Override public boolean isSearchable(String field) {
-                    return !notSearchable.contains(field);
+                @Override public boolean isFacetable(String field) {
+                    return !notfacetable.contains(field);
                 }
 
-                @Override public Stream<String> searchableFields() {
+                @Override public Stream<String> facetableFields() {
                     return Stream.empty();
                 }
             };
         }
 
         @Bean
-        AllowableFacetsImpl allowableFacets(SearchableField searchableField) {
-            return new AllowableFacetsImpl(searchableField);
+        AllowableFacetsImpl allowableFacets(FacetableField facetableField) {
+            return new AllowableFacetsImpl(facetableField);
         }
 
         @Bean
