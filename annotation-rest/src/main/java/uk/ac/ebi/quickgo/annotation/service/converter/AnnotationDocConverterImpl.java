@@ -38,6 +38,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         annotation.targetSets = asUnmodifiableList(annotationDocument.targetSets);
         annotation.withFrom = asXRefList(annotationDocument.withFrom, this::createSimpleXRef);
         annotation.extensions = asXRefList(annotationDocument.extensions, this::createQualifiedXRef);
+        annotation.date = annotationDocument.date;
 
         return annotation;
     }

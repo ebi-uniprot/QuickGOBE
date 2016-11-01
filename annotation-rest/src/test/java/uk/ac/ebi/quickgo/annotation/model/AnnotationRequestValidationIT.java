@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -373,7 +374,7 @@ public class AnnotationRequestValidationIT {
     //GENE PRODUCT TYPE PARAMETER
     @Test
     public void validGeneProductTypeValuesDontCauseAnError() {
-        String[] gpTypes = {"complex", "rna", "protein"};
+        String[] gpTypes = {"complex", "miRNA", "protein"};
 
         annotationRequest.setGeneProductType(gpTypes);
 
@@ -382,7 +383,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void setGpTypeNotCaseSensitive() {
-        String[] gpTypes = {"comPlex", "rnA", "pRotein"};
+        String[] gpTypes = {"comPlex", "mirna", "pRotein"};
 
         annotationRequest.setGeneProductType(gpTypes);
 

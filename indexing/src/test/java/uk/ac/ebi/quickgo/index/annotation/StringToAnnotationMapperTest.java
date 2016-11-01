@@ -2,21 +2,25 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.index.annotation.Columns.*;
-import static uk.ac.ebi.quickgo.index.annotation.Columns.numColumns;
 
 /**
  * Test the behaviour of the {@link StringToAnnotationMapper} class.
  * Created 21/04/16
  * @author Edd
  */
+
 public class StringToAnnotationMapperTest {
+
+    private static final Logger LOGGER = getLogger(StringToAnnotationMapper.class);
     private StringToAnnotationMapper mapper;
 
     @Before
@@ -121,6 +125,7 @@ public class StringToAnnotationMapperTest {
         assertThat(annotation.assignedBy, is(trim(tokens[COLUMN_ASSIGNED_BY.getPosition()])));
         assertThat(annotation.annotationExtension, is(trim(tokens[COLUMN_ANNOTATION_EXTENSION.getPosition()])));
         assertThat(annotation.annotationProperties, is(trim(tokens[COLUMN_ANNOTATION_PROPERTIES.getPosition()])));
+        assertThat(annotation.date, is(trim(tokens[COLUMN_DATE.getPosition()])));
     }
 
     private String trim(String value) {

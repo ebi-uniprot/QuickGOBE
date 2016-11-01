@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,6 +28,22 @@ public class Annotation {
     public String evidenceCode;
 
     public String reference;
+
+    public List<String> withFrom;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    public int taxonId;
+
+    public String assignedBy;
+
+    public List<String> extensions;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public List<String> slimmedIds;
+
+    public List<String> targetSets;
+
+    public String symbol;
 
     @Override public boolean equals(Object o) {
         if (this == o) {
@@ -85,6 +99,7 @@ public class Annotation {
         }
         return symbol != null ? symbol.equals(that.symbol) : that.symbol == null;
 
+        return targetSets != null ? targetSets.equals(that.targetSets) : that.targetSets == null;
     }
 
     @Override public int hashCode() {
@@ -141,6 +156,9 @@ public class Annotation {
     public List<String> targetSets;
 
     public String symbol;
+
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    public Date date;
 
     /**
      * Represents a connected list of {@link AbstractXref} instances in the with/from or extensions column.

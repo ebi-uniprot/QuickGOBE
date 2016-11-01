@@ -124,7 +124,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId2, geneProductId1));
     }
 
     @Test
@@ -151,7 +151,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId2, geneProductId1));
     }
 
     @Test
@@ -240,8 +240,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccursInField(TAXON_ID, taxonId1, taxonId2))
-                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId1, geneProductId2));
+                .andExpect(valuesOccursInField(TAXON_ID, taxonId2, taxonId1))
+                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId2, geneProductId1));
     }
 
     @Test
@@ -982,10 +982,11 @@ public class AnnotationControllerIT {
     public void filterBySingleGeneProductTypeOfRnaReturnsMatchingDocument() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.geneProductType = "rna";
+        doc.geneProductType = "miRNA";
         repository.save(doc);
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(), "RNA"));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName
+                (), "miRNA"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1035,7 +1036,7 @@ public class AnnotationControllerIT {
         doc.geneProductType = "complex";
         repository.save(doc);
 
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(), "rna"));
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(), "miRNA"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
