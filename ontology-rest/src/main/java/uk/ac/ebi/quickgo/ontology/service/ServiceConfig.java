@@ -5,6 +5,8 @@ import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageServiceImpl;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
+import uk.ac.ebi.quickgo.ontology.coterms.CoTermConfig;
+import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
@@ -81,4 +83,5 @@ public class ServiceConfig {
     private QueryStringSanitizer queryStringSanitizer() {
         return new SolrQueryStringSanitizer();
     }
+
 }

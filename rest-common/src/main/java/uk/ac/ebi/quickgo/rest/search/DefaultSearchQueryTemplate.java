@@ -1,9 +1,11 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.base.Preconditions;
+import java.util.*;
 
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
@@ -28,31 +30,45 @@ public class DefaultSearchQueryTemplate {
     public static final int DEFAULT_PAGE_NUMBER = 1;
     private static final boolean NO_HIGHLIGHTING = false;
 
-    private final String highlightStartDelim;
-    private final String highlightEndDelim;
-    private final Iterable<String> returnedFields;
-    private final Iterable<String> highlightedFields;
-    private final StringToQuickGOQueryConverter converter;
     private final SearchableField fieldSpec;
 
-    public DefaultSearchQueryTemplate(
-            StringToQuickGOQueryConverter converter,
-            SearchableField fieldSpec,
-            Iterable<String> returnedFields,
-            Iterable<String> highlightedFields,
-            String highlightStartDelim,
-            String highlightEndDelim) {
-        this.converter = converter;
-        this.highlightedFields = highlightedFields;
-        this.highlightStartDelim = highlightStartDelim;
-        this.highlightEndDelim = highlightEndDelim;
-        this.returnedFields = returnedFields;
+    private String highlightStartDelim;
+    private String highlightEndDelim;
+    private Iterable<String> returnedFields;
+    private Iterable<String> highlightedFields;
+
+    public DefaultSearchQueryTemplate(SearchableField fieldSpec) {
+        Preconditions.checkArgument(fieldSpec != null, "Search fields cannot be null");
         this.fieldSpec = fieldSpec;
+        this.returnedFields = Collections.emptyList();
+        this.highlightedFields = Collections.emptyList();
+        this.highlightStartDelim = "";
+        this.highlightEndDelim = "";
+    }
+
+    public void setHighlighting(Collection<String> highlightedFields, String highlightStartDelim,
+            String highlightEndDelim) {
+        if (highlightedFields != null) {
+            this.highlightedFields = highlightedFields;
+
+            if (highlightStartDelim != null) {
+                this.highlightStartDelim = highlightStartDelim;
+            }
+
+            if (highlightEndDelim != null) {
+                this.highlightEndDelim = highlightEndDelim;
+            }
+        }
+    }
+
+    public void setReturnedFields(Collection<String> returnedFields) {
+        if (returnedFields != null) {
+            this.returnedFields = returnedFields;
+        }
     }
 
     public Builder newBuilder() {
         return new Builder(
-                converter,
                 fieldSpec,
                 returnedFields,
                 highlightedFields,
@@ -64,32 +80,32 @@ public class DefaultSearchQueryTemplate {
         private final String highlightStartDelim;
         private final String highlightEndDelim;
         private final Iterable<String> highlightedFields;
-        private final StringToQuickGOQueryConverter converter;
         private final Iterable<String> returnedFields;
-        private final List<String> filterQueries;
-        private final List<String> facets;
+        private final Set<QuickGOQuery> filterQueries;
 
-        private String query;
+        private final Set<String> facets;
+
+        private QuickGOQuery query;
         private int page = DEFAULT_PAGE_NUMBER;
         private int pageSize = DEFAULT_PAGE_SIZE;
         private SearchableField fieldSpec;
         private boolean highlighting;
+        private AggregateRequest aggregate;
 
-        private Builder(StringToQuickGOQueryConverter converter,
+        private Builder(
                 SearchableField fieldSpec,
                 Iterable<String> returnedFields,
                 Iterable<String> highlightedFields,
                 String highlightStartDelim,
                 String highlightEndDelim) {
-            this.converter = converter;
             this.highlightedFields = highlightedFields;
             this.highlightStartDelim = highlightStartDelim;
             this.highlightEndDelim = highlightEndDelim;
             this.returnedFields = returnedFields;
             this.fieldSpec = fieldSpec;
 
-            this.facets = new ArrayList<>();
-            this.filterQueries = new ArrayList<>();
+            this.facets = new HashSet<>();
+            this.filterQueries = new HashSet<>();
             this.highlighting = NO_HIGHLIGHTING;
         }
 
@@ -116,7 +132,7 @@ public class DefaultSearchQueryTemplate {
          * @param filters the filter queries
          * @return this {@link DefaultSearchQueryTemplate.Builder} instance
          */
-        public DefaultSearchQueryTemplate.Builder addFilters(List<String> filters) {
+        public DefaultSearchQueryTemplate.Builder addFilters(Collection<QuickGOQuery> filters) {
             if (filters != null) {
                 this.filterQueries.addAll(filters);
             }
@@ -140,7 +156,7 @@ public class DefaultSearchQueryTemplate {
          * @param query the search query.
          * @return this {@link DefaultSearchQueryTemplate.Builder} instance
          */
-        public DefaultSearchQueryTemplate.Builder setQuery(String query) {
+        public DefaultSearchQueryTemplate.Builder setQuery(QuickGOQuery query) {
             this.query = query;
             return this;
         }
@@ -167,22 +183,26 @@ public class DefaultSearchQueryTemplate {
             return this;
         }
 
+        /**
+         * Set the collection of aggregates to be calculated.
+         *
+         * @param aggregate the aggregate to calculate
+         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
+         */
+        public DefaultSearchQueryTemplate.Builder setAggregate(AggregateRequest aggregate) {
+            this.aggregate = aggregate;
+            return this;
+        }
+
         @Override public QueryRequest build() {
             checkFacets(facets);
-            checkFilters(filterQueries);
 
-            QueryRequest.Builder builder = new QueryRequest.Builder(converter.convert(query));
+            QueryRequest.Builder builder = new QueryRequest.Builder(query);
             builder.setPageParameters(page, pageSize);
 
-            if (facets != null) {
-                facets.forEach(builder::addFacetField);
-            }
+            facets.forEach(builder::addFacetField);
 
-            if (filterQueries != null) {
-                filterQueries.stream()
-                        .map(converter::convert)
-                        .forEach(builder::addQueryFilter);
-            }
+            filterQueries.forEach(builder::addQueryFilter);
 
             if (highlighting) {
                 highlightedFields
@@ -193,6 +213,8 @@ public class DefaultSearchQueryTemplate {
 
             returnedFields
                     .forEach(builder::addProjectedField);
+
+            builder.setAggregate(aggregate);
 
             return builder.build();
         }
@@ -224,5 +246,4 @@ public class DefaultSearchQueryTemplate {
             return null;
         }
     }
-
 }

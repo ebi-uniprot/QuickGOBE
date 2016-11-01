@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.model;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
@@ -16,7 +17,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
-import static uk.ac.ebi.quickgo.annotation.model.ArrayPattern.Flag.CASE_INSENSITIVE;
+import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
@@ -90,11 +91,8 @@ public class AnnotationRequest {
         List<String> statsTypes =
                 Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE, ASSIGNED_BY, GO_ASPECT);
 
-        StatsRequest annotationStats =
-                new StatsRequest("annotation", AnnotationFields.ID, AggregateFunction.COUNT.getName(), statsTypes);
-        StatsRequest geneProductStats =
-                new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, AggregateFunction.UNIQUE.getName(),
-                        statsTypes);
+        StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
+        StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);
 
         DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
     }
@@ -376,7 +374,7 @@ public class AnnotationRequest {
         filterMap.put(GENE_PRODUCT_TYPE, geneProductType);
     }
 
-    @ArrayPattern(regexp = "^complex|rna|protein$", flags = CASE_INSENSITIVE, paramName = GENE_PRODUCT_TYPE_PARAM)
+    @ArrayPattern(regexp = "^complex|miRNA|protein$", flags = CASE_INSENSITIVE, paramName = GENE_PRODUCT_TYPE_PARAM)
     public String[] getGeneProductType() {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }
@@ -422,6 +420,11 @@ public class AnnotationRequest {
         this.page = page;
     }
 
+    /**
+     * Produces a set of {@link FilterRequest} objects given the filter attributes provided by the user.
+     *
+     * @return a list of {@link FilterRequest}
+     */
     public List<FilterRequest> createFilterRequests() {
         List<FilterRequest> filterRequests = new ArrayList<>();
 

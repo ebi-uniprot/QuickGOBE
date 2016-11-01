@@ -11,15 +11,18 @@ import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import com.google.common.base.Preconditions;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static uk.ac.ebi.quickgo.rest.search.AggregateFunction.UNIQUE;
 
 /**
  * Service that collects distribution statistics of annotations and gene products throughout a given set of annotation
@@ -40,17 +43,30 @@ public class AnnotationStatisticsService implements StatisticsService {
     private final SearchService<Annotation> searchService;
     private final StatsRequestConverter converter;
 
+    private final DefaultSearchQueryTemplate queryTemplate;
+
     @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
-            StatsRequestConverter converter) {
+            StatsRequestConverter converter,
+            SearchableField searchableFields) {
+        Preconditions.checkArgument(converterFactory != null, "Filter factory cannot be null");
+        Preconditions.checkArgument(searchService != null, "Search service cannot be null");
+        Preconditions.checkArgument(converter != null, "Stats request converter cannot be null");
+        Preconditions.checkArgument(searchableFields != null, "Searchable fields cannot be null");
+
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
+
+        queryTemplate = new DefaultSearchQueryTemplate(searchableFields);
     }
 
     @Override public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
+        Preconditions.checkArgument(request != null, "Annotation request cannot be null");
+
         List<AnnotationRequest.StatsRequest> statsRequest = request.createStatsRequests();
+        Preconditions.checkArgument(statsRequest != null, "Statistics request cannot be null");
 
         QueryRequest queryRequest = buildQueryRequest(request);
 
@@ -73,19 +89,14 @@ public class AnnotationStatisticsService implements StatisticsService {
     }
 
     private QueryRequest buildQueryRequest(AnnotationRequest request) {
-        BasicSearchQueryTemplate basicTemplate = new BasicSearchQueryTemplate(Collections.emptyList());
-        AggregateSearchQueryTemplate aggregateTemplate = new AggregateSearchQueryTemplate();
-
-        BasicSearchQueryTemplate.Builder basicBuilder = basicTemplate.newBuilder()
+        return queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(request.createFilterRequests().stream()
+                .addFilters(request.createFilterRequests().stream()
                         .map(converterFactory::convert)
                         .map(ConvertedFilter::getConvertedValue)
                         .collect(Collectors.toSet()))
                 .setPage(FIRST_PAGE)
-                .setPageSize(RESULTS_PER_PAGE);
-
-        return aggregateTemplate.newBuilder(basicBuilder)
+                .setPageSize(RESULTS_PER_PAGE)
                 .setAggregate(converter.convert(request.createStatsRequests()))
                 .build();
     }
