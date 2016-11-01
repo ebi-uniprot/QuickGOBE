@@ -17,7 +17,7 @@ import javax.validation.Payload;
 @Constraint(validatedBy = {ArrayPattern.Validator.class})
 @Documented
 public @interface ArrayPattern {
-    public String DEFAULT_ERROR_MSG = "The '%s' parameter contains invalid values: %s";
+    String DEFAULT_ERROR_MSG = "The '%s' parameter contains invalid values: %s";
 
     /**
      * Defines the regular expression that each element in the array must match
