@@ -4,6 +4,14 @@
 search:
   external:
     filterConfigs:
+      - signature: descendants,evidenceCode,evidenceCodeUsageRelationships
+        execution: REST_COMM
+        properties: {
+          ip: localhost,
+          resourceFormat: "/ontology/eco/terms/{ecoId}/descendants?relations={evidenceCodeUsageRelationships}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
+        }
       - signature: descendants,goId,goUsageRelationships
         execution: REST_COMM
         properties: {

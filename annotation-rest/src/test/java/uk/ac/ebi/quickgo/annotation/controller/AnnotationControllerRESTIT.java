@@ -428,7 +428,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(4), goId(4)));
-
+                                                                                               n
         String goIdsCSV = goId(1) + "," + goId(2);
         expectRestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), asList(goId(3), goId(4)));
 
@@ -531,6 +531,10 @@ public class AnnotationControllerRESTIT {
 
     private String goId(int id) {
         return String.format("GO:000000%d", id);
+    }
+
+    private String ecoId(int id) {
+        return String.format("ECO:000000%d", id);
     }
 
     private String buildResource(String format, String... arguments) {

@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
 import java.util.stream.Stream;
@@ -15,6 +14,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
 
@@ -59,6 +59,9 @@ public class AnnotationRequest {
     static final String GO_USAGE_FIELD = "goUsage";
     static final String GO_USAGE_RELATIONSHIPS = "goUsageRelationships";
 
+    static final String EVIDENCE_CODE_USAGE_FIELD = "evidenceCodeUsage";
+    static final String EVIDENCE_CODE_USAGE_RELATIONSHIPS = "evidenceCodeUsageRelationships";
+
     /**
      * indicates which fields should be looked at when creating filters
      */
@@ -66,7 +69,6 @@ public class AnnotationRequest {
             GO_ASPECT,
             ASSIGNED_BY,
             GENE_PRODUCT_SUBSET,
-            EVIDENCE_CODE,
             GENE_PRODUCT_ID,
             GENE_PRODUCT_TYPE,
             GO_EVIDENCE,
@@ -167,12 +169,27 @@ public class AnnotationRequest {
     private String goUsage;
 
     @ApiModelProperty(
-            value = "The relationship between the provided 'goId' identifiers and the GO identifiers " +
-                    "found within the annotations. If the relationship is fulfilled, the annotation is selected." +
-                    "Allows comma separated values.",
+            value = "The relationship between the provided 'goId' (GO) identifiers " +
+                    "found within the annotations. If the relationship is fulfilled, " +
+                    "the annotation is selected. Allows comma separated values.",
             allowableValues = "is_a,part_of,occurs_in,regulates",
             example = "is_a,part_of")
     private String goUsageRelationships;
+
+    @ApiModelProperty(
+            value = "Indicates how the evidence code terms within the annotations should be used. Is used in " +
+                    "conjunction with 'evidenceCodeUsageRelationships'.",
+            allowableValues = "descendants",
+            example = "descendants")
+    private String evidenceCodeUsage;
+
+    @ApiModelProperty(
+            value = "The relationship between the provided 'evidenceCode' identifiers " +
+                    "found within the annotations. If the relationship is fulfilled, " +
+                    "the annotation is selected. Allows comma separated values.",
+            allowableValues = "is_a,part_of,occurs_in,regulates",
+            example = "is_a,part_of")
+    private String evidenceCodeUsageRelationships;
 
     @ApiModelProperty(
             value = "The type of gene product found within an annotation. Accepts comma separated values.",
@@ -315,20 +332,6 @@ public class AnnotationRequest {
     }
 
     /**
-     * List of Gene Ontology ids in CSV format
-     */
-    public void setGoId(String... goId) {
-        filterMap.put(GO_ID, goId);
-    }
-
-    @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE, paramName = GO_ID_PARAM)
-    @Size(max = MAX_GO_IDS,
-            message = "Number of items in '" + GO_ID_PARAM + "' is larger than: {max}")
-    public String[] getGoId() {
-        return filterMap.get(GO_ID);
-    }
-
-    /**
      * Will receive a list of eco ids thus: evidenceCode=ECO:0000256,ECO:0000323
      */
     public void setEvidenceCode(String... evidenceCode) {
@@ -340,6 +343,47 @@ public class AnnotationRequest {
             message = "Number of items in '" + EVIDENCE_CODE_PARAM + "' is larger than: {max}")
     public String[] getEvidenceCode() {
         return filterMap.get(EVIDENCE_CODE);
+    }
+
+    public void setEvidenceCodeUsage(String usage) {
+        if (usage != null) {
+            filterMap.put(EVIDENCE_CODE_USAGE_FIELD, new String[]{usage.toLowerCase()});
+        }
+    }
+
+    @Pattern(regexp = "^descendants$", flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "Invalid evidenceCodeUsage: ${validatedValue}")
+    public String getEvidenceCodeUsage() {
+        return filterMap.get(EVIDENCE_CODE_USAGE_FIELD) == null ? null : filterMap.get(EVIDENCE_CODE_USAGE_FIELD)[0];
+    }
+
+    @ArrayPattern(regexp = "^is_a|part_of|occurs_in|regulates$", flags = CASE_INSENSITIVE,
+            paramName = USAGE_RELATIONSHIP_PARAM)
+    public String[] getEvidenceCodeUsageRelationships() {
+        return filterMap.get(EVIDENCE_CODE_USAGE_RELATIONSHIPS);
+    }
+
+    public void setEvidenceCodeUsageRelationships(String... usageRelationships) {
+        if (usageRelationships != null) {
+            String[] usageRelationshipArray = Stream.of(usageRelationships)
+                    .map(String::toLowerCase)
+                    .toArray(String[]::new);
+            filterMap.put(EVIDENCE_CODE_USAGE_RELATIONSHIPS, usageRelationshipArray);
+        }
+    }
+
+    /**
+     * List of Gene Ontology ids in CSV format
+     */
+    public void setGoId(String... goId) {
+        filterMap.put(GO_ID, goId);
+    }
+
+    @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE, paramName = GO_ID_PARAM)
+    @Size(max = MAX_GO_IDS,
+            message = "Number of items in '" + GO_ID_PARAM + "' is larger than: {max}")
+    public String[] getGoId() {
+        return filterMap.get(GO_ID);
     }
 
     public void setGoUsage(String goUsage) {
@@ -433,7 +477,8 @@ public class AnnotationRequest {
                 .map(Optional::get)
                 .forEach(filterRequests::add);
 
-        createUsageFilter().ifPresent(filterRequests::add);
+        createGoUsageFilter().ifPresent(filterRequests::add);
+        createEvidenceCodeUsageFilter().ifPresent(filterRequests::add);
 
         return filterRequests;
     }
@@ -451,27 +496,51 @@ public class AnnotationRequest {
         return request;
     }
 
-    private Optional<FilterRequest> createUsageFilter() {
+    private Optional<FilterRequest> createGoUsageFilter() {
+        return createUsageFilter(GO_USAGE_FIELD);
+    }
+
+    private Optional<FilterRequest> createEvidenceCodeUsageFilter() {
+        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD);
+    }
+
+    private Optional<FilterRequest> createUsageFilter(String usageParam) {
+        String idParam;
+        String relationshipsParam;
+        switch (usageParam) {
+            case GO_USAGE_FIELD:
+                idParam = GO_ID;
+                relationshipsParam = GO_USAGE_RELATIONSHIPS;
+                break;
+            case EVIDENCE_CODE_USAGE_FIELD:
+                idParam = EVIDENCE_CODE;
+                relationshipsParam = EVIDENCE_CODE_USAGE_RELATIONSHIPS;
+                break;
+            default:
+                throw new ParameterException("Unknown usage specified: " + usageParam + ". Use either " +
+                        GO_USAGE_FIELD + " or " + EVIDENCE_CODE_USAGE_FIELD);
+        }
+
         Optional<FilterRequest> request;
         FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
 
-        if (filterMap.containsKey(GO_USAGE_FIELD)) {
-            if (filterMap.containsKey(GO_ID)) {
-                assert filterMap.get(GO_USAGE_FIELD).length == 1 : GO_USAGE_FIELD + ": can only have one value";
+        if (filterMap.containsKey(usageParam)) {
+            if (filterMap.containsKey(idParam)) {
+                assert filterMap.get(usageParam).length == 1 : usageParam + ": can only have one value";
 
-                String usageValue = filterMap.get(GO_USAGE_FIELD)[0];
+                String usageValue = filterMap.get(usageParam)[0];
 
                 filterBuilder
                         .addProperty(usageValue)
-                        .addProperty(GO_ID, filterMap.get(GO_ID));
+                        .addProperty(idParam, filterMap.get(idParam));
 
-                filterBuilder.addProperty(GO_USAGE_RELATIONSHIPS, filterMap.get(GO_USAGE_RELATIONSHIPS));
+                filterBuilder.addProperty(relationshipsParam, filterMap.get(relationshipsParam));
                 request = Optional.of(filterBuilder.build());
             } else {
-                throw new ParameterException("Annotation goUsage requires 'goId' to be set.");
+                throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
             }
         } else {
-            request = createSimpleFilter(GO_ID);
+            request = createSimpleFilter(idParam);
         }
 
         return request;
@@ -490,11 +559,11 @@ public class AnnotationRequest {
         private final List<String> types;
 
         public StatsRequest(String groupName, String groupField, List<String> types) {
-            Preconditions.checkArgument(groupName != null && !groupName.trim().isEmpty(),
+            checkArgument(groupName != null && !groupName.trim().isEmpty(),
                     "Statistics group name cannot be null or empty");
-            Preconditions.checkArgument(groupField != null && !groupName.trim().isEmpty(),
+            checkArgument(groupField != null && !groupName.trim().isEmpty(),
                     "Statistics group field cannot be null or empty");
-            Preconditions.checkArgument(types != null, "Types collection cannot be null or empty");
+            checkArgument(types != null, "Types collection cannot be null or empty");
 
             this.groupName = groupName;
             this.groupField = groupField;
