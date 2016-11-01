@@ -14,7 +14,7 @@ public interface ControllerValidationHelper {
     /**
      * Checks the validity of a list of IDs in CSV format.
      * @param ids a list of IDs in CSV format
-     * @throws IllegalArgumentException is thrown if an ID is not valid, or if
+     * @throws ParameterException is thrown if an ID is not valid, or if
      * number of IDs listed is greater than the maximum permissible number of results.
      */
     List<String> validateCSVIds(String ids);
