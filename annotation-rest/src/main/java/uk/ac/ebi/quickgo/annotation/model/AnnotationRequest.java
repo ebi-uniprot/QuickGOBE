@@ -493,8 +493,9 @@ public class AnnotationRequest {
                     "Statistics group name cannot be null or empty");
             Preconditions.checkArgument(groupField != null && !groupName.trim().isEmpty(),
                     "Statistics group field cannot be null or empty");
-            Preconditions.checkArgument(aggregateFunction != null && !aggregateFunction.isEmpty(), "Statistics " +
-                    "aggregate function cannot be null or empty");
+            Preconditions
+                    .checkArgument(aggregateFunction != null && !aggregateFunction.trim().isEmpty(), "Statistics " +
+                            "aggregate function cannot be null or empty");
 
             this.groupName = groupName;
             this.groupField = groupField;
