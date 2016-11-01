@@ -19,7 +19,12 @@ public interface ControllerValidationHelper {
      */
     List<String> validateCSVIds(String ids);
 
-    void validateRequestedPages(int requestedPages);
+    /**
+     * Checks if the user has set {@code requestedPages} to a valid value
+     *
+     * @param requestedPage the page the client would like to view
+     */
+    void validatePageRequest(int requestedPage);
 
     /**
      * Checks whether the requested number of results is valid.

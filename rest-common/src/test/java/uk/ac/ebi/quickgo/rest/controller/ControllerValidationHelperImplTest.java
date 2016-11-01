@@ -119,21 +119,21 @@ public class ControllerValidationHelperImplTest {
 
     @Test(expected = ParameterException.class)
     public void negativePageNumberThrowsException() throws Exception {
-        defaultControllerValidator.validateRequestedPages(-1);
+        defaultControllerValidator.validatePageRequest(-1);
     }
 
     @Test(expected = ParameterException.class)
     public void zeroPageNumberThrowsException() throws Exception {
-        defaultControllerValidator.validateRequestedPages(0);
+        defaultControllerValidator.validatePageRequest(0);
     }
 
     @Test
     public void onePageNumberIsValid() throws Exception {
-        defaultControllerValidator.validateRequestedPages(1);
+        defaultControllerValidator.validatePageRequest(1);
     }
 
     @Test
     public void positivePageNumberIsValid() throws Exception {
-        defaultControllerValidator.validateRequestedPages(3);
+        defaultControllerValidator.validatePageRequest(3);
     }
 }

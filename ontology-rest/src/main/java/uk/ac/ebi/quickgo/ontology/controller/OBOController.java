@@ -128,7 +128,7 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
-        validationHelper.validateRequestedPages(page);
+        validationHelper.validatePageRequest(page);
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType(getOntologyType(),
                 new Page(page, MAX_PAGE_RESULTS)), HttpStatus.OK);
@@ -292,7 +292,7 @@ public abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         validationHelper.validateRequestedResults(limit);
-        validationHelper.validateRequestedPages(page);
+        validationHelper.validatePageRequest(page);
 
         QueryRequest request = buildRequest(
                 query,

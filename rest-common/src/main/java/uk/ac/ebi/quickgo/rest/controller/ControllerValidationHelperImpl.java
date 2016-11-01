@@ -68,8 +68,8 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
         }
     }
 
-    @Override public void validateRequestedPages(int requestedPages) {
-        if (requestedPages < MIN_PAGE) {
+    @Override public void validatePageRequest(int requestedPage) {
+        if (requestedPage < MIN_PAGE) {
             String errorMessage = "Cannot retrieve the requested page. Lower page limit is: " + MIN_PAGE + ".";
             LOGGER.error(errorMessage);
             throw new ParameterException(errorMessage);
