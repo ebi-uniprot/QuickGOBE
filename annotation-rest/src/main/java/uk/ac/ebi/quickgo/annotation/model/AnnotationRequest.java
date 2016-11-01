@@ -56,8 +56,8 @@ public class AnnotationRequest {
     static final String GENE_PRODUCT_PARAM = "Gene Product ID";
     static final String REFERENCE_PARAM = "Reference";
 
-    static final String USAGE_FIELD = "usage";
-    static final String USAGE_RELATIONSHIPS = "usageRelationships";
+    static final String GO_USAGE_FIELD = "goUsage";
+    static final String GO_USAGE_RELATIONSHIPS = "goUsageRelationships";
 
     /**
      * indicates which fields should be looked at when creating filters
@@ -161,10 +161,10 @@ public class AnnotationRequest {
 
     @ApiModelProperty(
             value = "Indicates how the GO terms within the annotations should be used. Is used in conjunction with " +
-                    "'usageRelationships'.",
+                    "'goUsageRelationships'.",
             allowableValues = "descendants,slim",
             example = "descendants")
-    private String usage;
+    private String goUsage;
 
     @ApiModelProperty(
             value = "The relationship between the provided 'goId' identifiers and the GO identifiers " +
@@ -172,7 +172,7 @@ public class AnnotationRequest {
                     "Allows comma separated values.",
             allowableValues = "is_a,part_of,occurs_in,regulates",
             example = "is_a,part_of")
-    private String usageRelationships;
+    private String goUsageRelationships;
 
     @ApiModelProperty(
             value = "The type of gene product found within an annotation. Accepts comma separated values.",
@@ -342,30 +342,30 @@ public class AnnotationRequest {
         return filterMap.get(EVIDENCE_CODE);
     }
 
-    public void setUsage(String usage) {
-        if (usage != null) {
-            filterMap.put(USAGE_FIELD, new String[]{usage.toLowerCase()});
+    public void setGoUsage(String goUsage) {
+        if (goUsage != null) {
+            filterMap.put(GO_USAGE_FIELD, new String[]{goUsage.toLowerCase()});
         }
     }
 
     @Pattern(regexp = "^slim|descendants$", flags = Pattern.Flag.CASE_INSENSITIVE,
-            message = "Invalid usage: ${validatedValue}")
-    public String getUsage() {
-        return filterMap.get(USAGE_FIELD) == null ? null : filterMap.get(USAGE_FIELD)[0];
+            message = "Invalid goUsage: ${validatedValue}")
+    public String getGoUsage() {
+        return filterMap.get(GO_USAGE_FIELD) == null ? null : filterMap.get(GO_USAGE_FIELD)[0];
     }
 
     @ArrayPattern(regexp = "^is_a|part_of|occurs_in|regulates$", flags = CASE_INSENSITIVE,
             paramName = USAGE_RELATIONSHIP_PARAM)
-    public String[] getUsageRelationships() {
-        return filterMap.get(USAGE_RELATIONSHIPS);
+    public String[] getGoUsageRelationships() {
+        return filterMap.get(GO_USAGE_RELATIONSHIPS);
     }
 
-    public void setUsageRelationships(String... usageRelationships) {
-        if (usageRelationships != null) {
-            String[] usageRelationshipArray = Stream.of(usageRelationships)
+    public void setGoUsageRelationships(String... goUsageRelationships) {
+        if (goUsageRelationships != null) {
+            String[] usageRelationshipArray = Stream.of(goUsageRelationships)
                     .map(String::toLowerCase)
                     .toArray(String[]::new);
-            filterMap.put(USAGE_RELATIONSHIPS, usageRelationshipArray);
+            filterMap.put(GO_USAGE_RELATIONSHIPS, usageRelationshipArray);
         }
     }
 
@@ -455,20 +455,20 @@ public class AnnotationRequest {
         Optional<FilterRequest> request;
         FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
 
-        if (filterMap.containsKey(USAGE_FIELD)) {
+        if (filterMap.containsKey(GO_USAGE_FIELD)) {
             if (filterMap.containsKey(GO_ID)) {
-                assert filterMap.get(USAGE_FIELD).length == 1 : USAGE_FIELD + ": can only have one value";
+                assert filterMap.get(GO_USAGE_FIELD).length == 1 : GO_USAGE_FIELD + ": can only have one value";
 
-                String usageValue = filterMap.get(USAGE_FIELD)[0];
+                String usageValue = filterMap.get(GO_USAGE_FIELD)[0];
 
                 filterBuilder
                         .addProperty(usageValue)
                         .addProperty(GO_ID, filterMap.get(GO_ID));
 
-                filterBuilder.addProperty(USAGE_RELATIONSHIPS, filterMap.get(USAGE_RELATIONSHIPS));
+                filterBuilder.addProperty(GO_USAGE_RELATIONSHIPS, filterMap.get(GO_USAGE_RELATIONSHIPS));
                 request = Optional.of(filterBuilder.build());
             } else {
-                throw new ParameterException("Annotation usage requires 'goId' to be set.");
+                throw new ParameterException("Annotation goUsage requires 'goId' to be set.");
             }
         } else {
             request = createSimpleFilter(GO_ID);

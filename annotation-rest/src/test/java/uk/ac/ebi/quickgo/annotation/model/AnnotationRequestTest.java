@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.GO_USAGE_RELATIONSHIPS;
 
 /**
  *
@@ -124,9 +124,9 @@ public class AnnotationRequestTest {
     public void setAndGetUsage() {
         String usage = "exact";
 
-        annotationRequest.setUsage(usage);
+        annotationRequest.setGoUsage(usage);
 
-        assertThat(annotationRequest.getUsage(), is(usage));
+        assertThat(annotationRequest.getGoUsage(), is(usage));
     }
 
     @Test
@@ -142,13 +142,13 @@ public class AnnotationRequestTest {
     public void setAndGetUsageRelationships() {
         String[] usageRelationships = {"iS_", "paRt_of"};
 
-        annotationRequest.setUsageRelationships(usageRelationships);
+        annotationRequest.setGoUsageRelationships(usageRelationships);
 
         String[] expectedLowerCaseRels = Stream.of(usageRelationships)
                 .map(String::toLowerCase)
                 .toArray(String[]::new);
 
-        assertThat(annotationRequest.getUsageRelationships(), arrayContaining(expectedLowerCaseRels));
+        assertThat(annotationRequest.getGoUsageRelationships(), arrayContaining(expectedLowerCaseRels));
     }
 
     @Test
@@ -156,13 +156,13 @@ public class AnnotationRequestTest {
         String usage = "descEndants";
         String goId = "GO:0000001";
 
-        annotationRequest.setUsage(usage);
+        annotationRequest.setGoUsage(usage);
         annotationRequest.setGoId(goId);
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(usage.toLowerCase())
                 .addProperty(GO_ID, goId.toUpperCase())
-                .addProperty(USAGE_RELATIONSHIPS)
+                .addProperty(GO_USAGE_RELATIONSHIPS)
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
                 contains(request));
@@ -174,21 +174,21 @@ public class AnnotationRequestTest {
         String goId = "GO:0000001";
         String relationships = "is_A";
 
-        annotationRequest.setUsage(usage);
+        annotationRequest.setGoUsage(usage);
         annotationRequest.setGoId(goId);
-        annotationRequest.setUsageRelationships(relationships);
+        annotationRequest.setGoUsageRelationships(relationships);
 
         assertThat(annotationRequest.createFilterRequests(),
                 contains(FilterRequest.newBuilder()
                         .addProperty(usage.toLowerCase())
                         .addProperty(GO_ID, goId.toUpperCase())
-                        .addProperty(USAGE_RELATIONSHIPS, relationships.toLowerCase())
+                        .addProperty(GO_USAGE_RELATIONSHIPS, relationships.toLowerCase())
                         .build()));
     }
 
     @Test(expected = ParameterException.class)
     public void cannotCreateFilterWithUsageAndNoUsageIds() {
-        annotationRequest.setUsage("descendants");
+        annotationRequest.setGoUsage("descendants");
 
         annotationRequest.createFilterRequests();
     }
