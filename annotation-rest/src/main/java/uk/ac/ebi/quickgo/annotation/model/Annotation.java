@@ -1,6 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,14 +33,14 @@ public class Annotation {
 
     public String reference;
 
-    public List<String> withFrom;
+    public List<ConnectedXRefs> withFrom;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public int taxonId;
 
     public String assignedBy;
 
-    public List<String> extensions;
+    public List<ConnectedXRefs> extensions;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public List<String> slimmedIds;
@@ -44,6 +48,30 @@ public class Annotation {
     public List<String> targetSets;
 
     public String symbol;
+
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    public Date date;
+
+    @Override public String toString() {
+        return "Annotation{" +
+                "id='" + id + '\'' +
+                ", geneProductId='" + geneProductId + '\'' +
+                ", qualifier='" + qualifier + '\'' +
+                ", goId='" + goId + '\'' +
+                ", goEvidence='" + goEvidence + '\'' +
+                ", goAspect='" + goAspect + '\'' +
+                ", evidenceCode='" + evidenceCode + '\'' +
+                ", reference='" + reference + '\'' +
+                ", withFrom=" + withFrom +
+                ", taxonId=" + taxonId +
+                ", assignedBy='" + assignedBy + '\'' +
+                ", extensions=" + extensions +
+                ", slimmedIds=" + slimmedIds +
+                ", targetSets=" + targetSets +
+                ", symbol='" + symbol + '\'' +
+                ", date=" + date +
+                '}';
+    }
 
     @Override public boolean equals(Object o) {
         if (this == o) {
@@ -97,9 +125,11 @@ public class Annotation {
         if (targetSets != null ? !targetSets.equals(that.targetSets) : that.targetSets != null) {
             return false;
         }
-        return symbol != null ? symbol.equals(that.symbol) : that.symbol == null;
+        if (symbol != null ? !symbol.equals(that.symbol) : that.symbol != null) {
+            return false;
+        }
+        return date != null ? date.equals(that.date) : that.date == null;
 
-        return targetSets != null ? targetSets.equals(that.targetSets) : that.targetSets == null;
     }
 
     @Override public int hashCode() {
@@ -118,47 +148,9 @@ public class Annotation {
         result = 31 * result + (slimmedIds != null ? slimmedIds.hashCode() : 0);
         result = 31 * result + (targetSets != null ? targetSets.hashCode() : 0);
         result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
+        result = 31 * result + (date != null ? date.hashCode() : 0);
         return result;
     }
-
-    @Override public String toString() {
-        return "Annotation{" +
-                "id='" + id + '\'' +
-                ", geneProductId='" + geneProductId + '\'' +
-                ", qualifier='" + qualifier + '\'' +
-                ", goId='" + goId + '\'' +
-                ", goEvidence='" + goEvidence + '\'' +
-                ", goAspect='" + goAspect + '\'' +
-                ", evidenceCode='" + evidenceCode + '\'' +
-                ", reference='" + reference + '\'' +
-                ", withFrom=" + withFrom +
-                ", taxonId=" + taxonId +
-                ", assignedBy='" + assignedBy + '\'' +
-                ", extensions=" + extensions +
-                ", slimmedIds=" + slimmedIds +
-                ", targetSets=" + targetSets +
-                ", symbol='" + symbol + '\'' +
-                '}';
-    }
-
-    public List<ConnectedXRefs> withFrom;
-
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    public int taxonId;
-
-    public String assignedBy;
-
-    public List<ConnectedXRefs> extensions;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public List<String> slimmedIds;
-
-    public List<String> targetSets;
-
-    public String symbol;
-
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    public Date date;
 
     /**
      * Represents a connected list of {@link AbstractXref} instances in the with/from or extensions column.
