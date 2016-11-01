@@ -118,7 +118,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
      * Solr does not have a count aggregate function (e.g. count(myField)), so we need to do some magic.
      *
      * The solution to not having a count(), is to apply Solr's SUM function on constant value, i.e. 1. This should
-     * yield the sam result.
+     * yield the same result.
      *
      * @param aggregateFunctionRequest the aggregate function request to convert
      * @return a sum function on the value 1.
