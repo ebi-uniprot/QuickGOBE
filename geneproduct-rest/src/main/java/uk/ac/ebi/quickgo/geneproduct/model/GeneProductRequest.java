@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields;
+import uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
@@ -100,6 +101,7 @@ public class GeneProductRequest {
         this.highlighting = useHighlighting;
     }
 
+    @AllowableFacets
     public String[] getFacet() {
         return facets;
     }
