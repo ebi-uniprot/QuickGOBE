@@ -8,7 +8,7 @@ search:
         execution: REST_COMM
         properties: {
           ip: localhost,
-          resourceFormat: "/ontology/eco/terms/{ecoId}/descendants?relations={evidenceCodeUsageRelationships}",
+          resourceFormat: "/ontology/eco/terms/{evidenceCode}/descendants?relations={evidenceCodeUsageRelationships}",
           responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }

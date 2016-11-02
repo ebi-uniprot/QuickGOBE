@@ -45,6 +45,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createAnnotationDoc;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.EVIDENCE_CODE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 
@@ -63,12 +64,15 @@ public class AnnotationControllerRESTIT {
     private static final String RESOURCE_URL = "/annotation";
     private static final String BASE_URL = "http://localhost";
     private static final String COMMA = ",";
-    private static final String DESCENDANTS_RESOURCE_FORMAT = "/ontology/go/terms/%s/descendants?relations=%s";
+    private static final String GO_DESCENDANTS_RESOURCE_FORMAT = "/ontology/go/terms/%s/descendants?relations=%s";
+    private static final String ECO_DESCENDANTS_RESOURCE_FORMAT = "/ontology/eco/terms/%s/descendants?relations=%s";
     private static final String IS_A = "is_a";
     private static final String DESCENDANTS_USAGE = "descendants";
     private static final String SLIM_USAGE = "slim";
     private static final String GO_USAGE = "goUsage";
     private static final String GO_USAGE_RELATIONS = "goUsageRelationships";
+    private static final String EVIDENCE_CODE_USAGE = "evidenceCodeUsage";
+    private static final String EVIDENCE_CODE_USAGE_RELATIONS = "evidenceCodeUsageRelationships";
     private static final String SEARCH_RESOURCE = RESOURCE_URL + "/search";
 
     @Autowired
@@ -97,12 +101,32 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallHasDescendants(singletonList(goId(1)), emptyList(), emptyList());
+        expectGORestCallHasDescendants(singletonList(goId(1)), emptyList(), emptyList());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(GO_USAGE, DESCENDANTS_USAGE)
                         .param(GO_ID, goId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    @Test
+    public void filterFor1ECOTermBy0ValidDescendantMeansFilterEverything()
+            throws Exception {
+        annotationRepository.save(createAnnotationDocWithEcoId(gpId(1), ecoId(1)));
+        annotationRepository.save(createAnnotationDocWithEcoId(gpId(2), ecoId(2)));
+
+        expectECORestCallHasDescendants(singletonList(ecoId(1)), emptyList(), emptyList());
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(EVIDENCE_CODE_USAGE, DESCENDANTS_USAGE)
+                        .param(EVIDENCE_CODE, ecoId(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -118,7 +142,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        expectRestCallHasDescendants(singletonList(goId(1)), emptyList(), singletonList(goId(3)));
+        expectGORestCallHasDescendants(singletonList(goId(1)), emptyList(), singletonList(goId(3)));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -136,13 +160,37 @@ public class AnnotationControllerRESTIT {
     }
 
     @Test
+    public void filterFor1ECOTermBy1ValidDescendant()
+            throws Exception {
+        annotationRepository.save(createAnnotationDocWithEcoId(gpId(1), ecoId(1)));
+        annotationRepository.save(createAnnotationDocWithEcoId(gpId(2), ecoId(2)));
+        annotationRepository.save(createAnnotationDocWithEcoId(gpId(3), ecoId(3)));
+
+        expectECORestCallHasDescendants(singletonList(ecoId(1)), emptyList(), singletonList(ecoId(3)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(EVIDENCE_CODE_USAGE, DESCENDANTS_USAGE)
+                        .param(EVIDENCE_CODE, ecoId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(fieldDoesNotExist(SLIMMED_ID_FIELD))
+                .andExpect(valuesOccurInField(EVIDENCE_CODE, ecoId(3)));
+    }
+
+    @Test
     public void filterFor1GOTermBy2ValidDescendants()
             throws Exception {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        expectRestCallHasDescendants(
+        expectGORestCallHasDescendants(
                 singletonList(goId(1)),
                 singletonList(IS_A),
                 asList(goId(2), goId(3)));
@@ -169,7 +217,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        expectRestCallHasDescendants(asList(goId(1), goId(2)), singletonList(IS_A), emptyList());
+        expectGORestCallHasDescendants(asList(goId(1), goId(2)), singletonList(IS_A), emptyList());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -192,7 +240,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
         String goIdsCSV = goId(1) + "," + goId(2);
-        expectRestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), singletonList(goId(3)));
+        expectGORestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), singletonList(goId(3)));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -217,7 +265,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(4), goId(4)));
 
         String goIdsCSV = goId(1) + "," + goId(2);
-        expectRestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), asList(goId(3), goId(4)));
+        expectGORestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), asList(goId(3), goId(4)));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -255,7 +303,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallResponse(GET, buildResource(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withTimeout());
+        expectRestCallResponse(GET, buildResource(GO_DESCENDANTS_RESOURCE_FORMAT, goId(1)), withTimeout());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -273,7 +321,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallResponse(GET, buildResource(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withServerError());
+        expectRestCallResponse(GET, buildResource(GO_DESCENDANTS_RESOURCE_FORMAT, goId(1)), withServerError());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -291,7 +339,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallResponse(GET, buildResource(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withBadRequest());
+        expectRestCallResponse(GET, buildResource(GO_DESCENDANTS_RESOURCE_FORMAT, goId(1)), withBadRequest());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -310,7 +358,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallHasDescendants(singletonList(goId(1)), emptyList(), emptyList());
+        expectGORestCallHasDescendants(singletonList(goId(1)), emptyList(), emptyList());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -330,7 +378,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        expectRestCallHasDescendants(singletonList(goId(1)), emptyList(), singletonList(goId(3)));
+        expectGORestCallHasDescendants(singletonList(goId(1)), emptyList(), singletonList(goId(3)));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -353,7 +401,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        expectRestCallHasDescendants(
+        expectGORestCallHasDescendants(
                 singletonList(goId(1)),
                 singletonList(IS_A),
                 asList(goId(2), goId(3)));
@@ -383,7 +431,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
-        expectRestCallHasDescendants(asList(goId(1), goId(2)), singletonList(IS_A), emptyList());
+        expectGORestCallHasDescendants(asList(goId(1), goId(2)), singletonList(IS_A), emptyList());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -405,7 +453,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
 
         String goIdsCSV = goId(1) + "," + goId(2);
-        expectRestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), singletonList(goId(3)));
+        expectGORestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), singletonList(goId(3)));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -428,9 +476,9 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(3), goId(3)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(4), goId(4)));
-                                                                                               n
+
         String goIdsCSV = goId(1) + "," + goId(2);
-        expectRestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), asList(goId(3), goId(4)));
+        expectGORestCallHasDescendants(asList(goId(1), goId(2)), emptyList(), asList(goId(3), goId(4)));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -471,7 +519,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallResponse(GET, buildResource(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withTimeout());
+        expectRestCallResponse(GET, buildResource(GO_DESCENDANTS_RESOURCE_FORMAT, goId(1)), withTimeout());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -489,7 +537,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallResponse(GET, buildResource(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withServerError());
+        expectRestCallResponse(GET, buildResource(GO_DESCENDANTS_RESOURCE_FORMAT, goId(1)), withServerError());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -507,7 +555,7 @@ public class AnnotationControllerRESTIT {
         annotationRepository.save(createAnnotationDocWithGoId(gpId(1), goId(1)));
         annotationRepository.save(createAnnotationDocWithGoId(gpId(2), goId(2)));
 
-        expectRestCallResponse(GET, buildResource(DESCENDANTS_RESOURCE_FORMAT, goId(1)), withBadRequest());
+        expectRestCallResponse(GET, buildResource(GO_DESCENDANTS_RESOURCE_FORMAT, goId(1)), withBadRequest());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -550,7 +598,22 @@ public class AnnotationControllerRESTIT {
         return String.format(format, args.toArray());
     }
 
+    private void expectGORestCallHasDescendants(
+            List<String> termIds,
+            List<String> usageRelations,
+            List<String> descendants) {
+        expectRestCallHasDescendants(GO_DESCENDANTS_RESOURCE_FORMAT, termIds, usageRelations, descendants);
+    }
+
+    private void expectECORestCallHasDescendants(
+            List<String> termIds,
+            List<String> usageRelations,
+            List<String> descendants) {
+        expectRestCallHasDescendants(ECO_DESCENDANTS_RESOURCE_FORMAT, termIds, usageRelations, descendants);
+    }
+
     private void expectRestCallHasDescendants(
+            String resourceFormat,
             List<String> termIds,
             List<String> usageRelations,
             List<String> descendants) {
@@ -561,7 +624,7 @@ public class AnnotationControllerRESTIT {
         expectRestCallSuccess(
                 GET,
                 buildResource(
-                        DESCENDANTS_RESOURCE_FORMAT,
+                        resourceFormat,
                         termIdsCSV,
                         relationsCSV),
                 constructResponseObject(termIds, descendants));
@@ -603,6 +666,13 @@ public class AnnotationControllerRESTIT {
     private AnnotationDocument createAnnotationDocWithGoId(String geneProductId, String goId) {
         AnnotationDocument doc = createAnnotationDoc(geneProductId);
         doc.goId = goId;
+
+        return doc;
+    }
+
+    private AnnotationDocument createAnnotationDocWithEcoId(String geneProductId, String ecoId) {
+        AnnotationDocument doc = createAnnotationDoc(geneProductId);
+        doc.evidenceCode = ecoId;
 
         return doc;
     }
