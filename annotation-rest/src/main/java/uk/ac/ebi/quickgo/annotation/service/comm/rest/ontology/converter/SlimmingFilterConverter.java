@@ -5,13 +5,10 @@ import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOn
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
-import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter;
 
-import java.util.HashSet;
 import java.util.Set;
-import java.util.StringJoiner;
+import java.util.function.Consumer;
 
-import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.FilterConverterHelper.*;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 /**
@@ -24,38 +21,22 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
  * Created 09/08/16
  * @author Edd
  */
-public class SlimmingFilterConverter implements FilterConverter<ConvertedOntologyFilter, QuickGOQuery> {
+public class SlimmingFilterConverter extends AbstractDescendantFilterConverter {
+    private final SlimmingConversionInfo conversionInfo;
 
-    @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
-        ConvertedFilter<QuickGOQuery> convertedFilter = FILTER_EVERYTHING;
-        SlimmingConversionInfo conversionInfo = new SlimmingConversionInfo();
-
-        StringJoiner idsWithNoDescendants = createNoDescendantRecorder();
-        if (isNotNull(response.getResults())) {
-            Set<QuickGOQuery> queries = new HashSet<>();
-
-            for (ConvertedOntologyFilter.Result result : response.getResults()) {
-                if (isNotNull(result.getDescendants())) {
-                    forEachDescendantApply(result, desc -> {
-                        queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
-                        conversionInfo.addOriginal2SlimmedGOIdMapping(desc, result.getId());
-                    });
-                } else {
-                    updateJoinerIfValid(idsWithNoDescendants, result.getId());
-                }
-            }
-
-            convertedFilter = createFilterForAllDescendants(queries, conversionInfo);
-        }
-
-        handleNoDescendants(idsWithNoDescendants);
-
-        return convertedFilter;
+    public SlimmingFilterConverter() {
+        conversionInfo = new SlimmingConversionInfo();
     }
 
-    private ConvertedFilter<QuickGOQuery> createFilterForAllDescendants(
-            Set<QuickGOQuery> queries,
-            SlimmingConversionInfo conversionInfo) {
+    @Override protected Consumer<String> processDescendant(
+            ConvertedOntologyFilter.Result result, Set<QuickGOQuery> queries) {
+        return desc -> {
+            queries.add(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
+            conversionInfo.addOriginal2SlimmedGOIdMapping(desc, result.getId());
+        };
+    }
+
+    @Override protected ConvertedFilter<QuickGOQuery> createFilterForAllDescendants(Set<QuickGOQuery> queries) {
         if (!queries.isEmpty()) {
             FilterContext context = new FilterContext();
             context.save(SlimmingConversionInfo.class, conversionInfo);
