@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;

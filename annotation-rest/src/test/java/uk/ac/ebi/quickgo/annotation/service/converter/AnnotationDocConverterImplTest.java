@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.converter;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
 import java.time.LocalDate;

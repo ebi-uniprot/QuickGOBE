@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.common.document;
+package uk.ac.ebi.quickgo.annotation.common;
 
 import java.util.Collections;
 import java.util.HashSet;

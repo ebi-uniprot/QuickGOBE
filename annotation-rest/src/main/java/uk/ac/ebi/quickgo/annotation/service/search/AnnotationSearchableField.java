@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.common.SearchableField;
 
 import java.util.stream.Stream;

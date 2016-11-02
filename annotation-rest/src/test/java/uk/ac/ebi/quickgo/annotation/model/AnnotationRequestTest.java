@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
+import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
 /**
