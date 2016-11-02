@@ -34,17 +34,15 @@ public class GeneProductRequest {
     private boolean highlighting = false;
 
     @ApiModelProperty(value = "Page number of the result set to display.",
-            allowableValues = "range[" + MIN_PAGE_NUMBER + ",  max_result_page_size]",
-            required = true)
+            allowableValues = "range[" + MIN_PAGE_NUMBER + ",  max_result_page_size]")
     private int page = DEFAULT_PAGE_NUMBER;
 
     @ApiModelProperty(value = "Number of results per page.",
-            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]",
-            required = true)
+            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @ApiModelProperty(value = "Fields to generate facets from", example = "taxonId, type")
-    private String[] facets;
+    @ApiModelProperty(value = "Fields to generate facet from", example = "taxonId, type")
+    private String[] facet;
 
     @ApiModelProperty(value = "The query used to filter the gene products", example = "kinase", required = true)
     private String query;
@@ -103,11 +101,11 @@ public class GeneProductRequest {
 
     @AllowableFacets
     public String[] getFacet() {
-        return facets;
+        return facet;
     }
 
     public void setFacet(String[] facets) {
-        this.facets = facets;
+        this.facet = facets;
     }
 
     @ArrayPattern(regexp = "[0-9]+", paramName = "taxonId")

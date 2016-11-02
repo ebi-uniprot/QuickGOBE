@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
+import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import com.google.common.base.Preconditions;
@@ -90,8 +91,10 @@ public class AnnotationRequest {
         List<String> statsTypes =
                 Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE, ASSIGNED_BY, GO_ASPECT);
 
-        StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, statsTypes);
-        StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID, statsTypes);
+        StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, AggregateFunction
+                .COUNT.getName(), statsTypes);
+        StatsRequest geneProductStats = new StatsRequest("geneProduct", AnnotationFields.GENE_PRODUCT_ID,
+                AggregateFunction.UNIQUE.getName(), statsTypes);
 
         DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
     }
@@ -487,18 +490,27 @@ public class AnnotationRequest {
     public static class StatsRequest {
         private final String groupName;
         private final String groupField;
+        private final String aggregateFunction;
         private final List<String> types;
 
-        public StatsRequest(String groupName, String groupField, List<String> types) {
+        public StatsRequest(String groupName, String groupField, String aggregateFunction, List<String> types) {
             Preconditions.checkArgument(groupName != null && !groupName.trim().isEmpty(),
                     "Statistics group name cannot be null or empty");
             Preconditions.checkArgument(groupField != null && !groupName.trim().isEmpty(),
                     "Statistics group field cannot be null or empty");
-            Preconditions.checkArgument(types != null, "Types collection cannot be null or empty");
+            Preconditions
+                    .checkArgument(aggregateFunction != null && !aggregateFunction.trim().isEmpty(), "Statistics " +
+                            "aggregate function cannot be null or empty");
 
             this.groupName = groupName;
             this.groupField = groupField;
-            this.types = types;
+            this.aggregateFunction = aggregateFunction;
+
+            if (types == null) {
+                this.types = Collections.emptyList();
+            } else {
+                this.types = types;
+            }
         }
 
         public String getGroupName() {
@@ -507,6 +519,10 @@ public class AnnotationRequest {
 
         public String getGroupField() {
             return groupField;
+        }
+
+        public String getAggregateFunction() {
+            return aggregateFunction;
         }
 
         public Collection<String> getTypes() {

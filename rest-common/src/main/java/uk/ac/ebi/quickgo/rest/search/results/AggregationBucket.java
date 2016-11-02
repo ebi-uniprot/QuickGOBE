@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import com.google.common.base.Preconditions;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents a distinct value, within a field.
@@ -32,6 +33,12 @@ public class AggregationBucket {
 
     public Optional<AggregationResult> getAggregationResult(AggregateFunction function, String fieldName) {
         return aggregationResultsManager.getAggregationResult(function, fieldName);
+    }
+
+    public Set<AggregationResult> getAggregationResults(String fieldName) {
+        return aggregationResultsManager.getAggregationResults().stream()
+                .filter(aggregationResult -> aggregationResult.getField().equals(fieldName))
+                .collect(Collectors.toSet());
     }
 
     public Set<AggregationResult> getAggregationResults() {

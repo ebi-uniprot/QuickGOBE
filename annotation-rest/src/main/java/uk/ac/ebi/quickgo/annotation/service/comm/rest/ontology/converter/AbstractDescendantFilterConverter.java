@@ -1,0 +1,149 @@
+package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
+
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
+import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.function.Consumer;
+
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
+
+/**
+ * This class is responsible for converting an ontology model containing descendant information, to a
+ * {@link ConvertedFilter}. This result encapsulates a {@link QuickGOQuery} applicable to filtering the annotation
+ * core data, by these descendants.
+ *
+ * Created 02/11/16
+ * @author Edd
+ */
+abstract class AbstractDescendantFilterConverter
+        implements FilterConverter<ConvertedOntologyFilter, QuickGOQuery> {
+    static final ConvertedFilter<QuickGOQuery> FILTER_EVERYTHING =
+            new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
+    private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "no descendants found for IDs, %s";
+    private static final String DELIMITER = ", ";
+    private ConvertedFilter<QuickGOQuery> convertedFilter;
+
+    AbstractDescendantFilterConverter() {
+        convertedFilter = FILTER_EVERYTHING;
+    }
+
+    /**
+     * Defines the procedure for transforming each descendant in a {@link ConvertedOntologyFilter} instance into a
+     * {@link ConvertedOntologyFilter} encapsulating a {@link QuickGOQuery}. Concrete implementations of this class
+     * define both {@link #processDescendant(ConvertedOntologyFilter.Result, Set)} and
+     * {@link #createFilterForAllDescendants(Set)}, which enable the necessary behaviour specialisation.
+     *
+     * @param response the {@link ConvertedOntologyFilter} to transform
+     * @return a {@link ConvertedFilter} over {@link QuickGOQuery} instances
+     */
+    @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
+        StringJoiner idsWithNoDescendants = createNoDescendantRecorder();
+        if (isNotNull(response.getResults())) {
+            Set<QuickGOQuery> queries = new HashSet<>();
+
+            for (ConvertedOntologyFilter.Result result : response.getResults()) {
+                if (isNotNull(result.getDescendants())) {
+                    forEachDescendantApply(result, processDescendant(result, queries));
+                } else {
+                    updateJoinerIfValid(idsWithNoDescendants, result.getId());
+                }
+            }
+
+            convertedFilter = createFilterForAllDescendants(queries);
+        }
+
+        handleNoDescendants(idsWithNoDescendants);
+
+        return convertedFilter;
+    }
+
+    /**
+     * Defines the logic for how to process a descendant within the {@link #transform(ConvertedOntologyFilter)} method.
+     *
+     * @param result the result in which the descendants reside
+     * @param queries the queries to progressively build on each invocation of this method
+     * @return a {@link Consumer} over {@link String}s, each of which represent a descendant identifier
+     */
+    protected abstract Consumer<String> processDescendant(
+            ConvertedOntologyFilter.Result result, Set<QuickGOQuery> queries);
+
+    /**
+     * Creates the {@link ConvertedFilter} over {@link QuickGOQuery}s representing the supplied {@code queries}.
+     * @param queries the {@link Set} of {@link QuickGOQuery} for which to build a {@link ConvertedFilter}
+     * @return the {@link ConvertedFilter} over {@link QuickGOQuery} instances.
+     */
+    protected abstract ConvertedFilter<QuickGOQuery> createFilterForAllDescendants(Set<QuickGOQuery> queries);
+
+    /**
+     * Check whether an object is null (a simple check, but using a more fluent api style)
+     * @param object the object to check
+     * @return whether or not the object is null
+     */
+    private static boolean isNotNull(Object object) {
+        return object != null;
+    }
+
+    /**
+     * Creates a new {@link StringJoiner} which is used to store {@link String}s denoting term IDs that have
+     * no descendants
+     *
+     * @return a {@link StringJoiner} used to record term IDs with no descendants
+     */
+    private static StringJoiner createNoDescendantRecorder() {
+        return new StringJoiner(DELIMITER);
+    }
+
+    /**
+     * Checks whether an instance created through {@link #createNoDescendantRecorder()} has recorded any IDs.
+     * If yes, then a {@link RetrievalException} is thrown indicating this.
+     *
+     * @param idsWithNoDescendants a {@link StringJoiner} created via the {@link #createNoDescendantRecorder()} method.
+     */
+    private static void handleNoDescendants(StringJoiner idsWithNoDescendants) {
+        if (idsWithNoDescendants.length() > 0) {
+            throw new RetrievalException(
+                    String.format(ERROR_MESSAGE_ON_NO_DESCENDANTS, idsWithNoDescendants.toString()));
+        }
+    }
+
+    /**
+     * Apply a {@link Consumer} action to each descendant in the descendants of {@code result}.
+     *
+     * @param result the {@link uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter.Result}
+     *               whose descendants are being iterated through
+     * @param action the action to apply for each descendant
+     */
+    private static void forEachDescendantApply(
+            ConvertedOntologyFilter.Result result,
+            Consumer<String> action) {
+        result.getDescendants().stream()
+                .filter(AbstractDescendantFilterConverter::notNullOrEmpty)
+                .forEach(action);
+    }
+
+    /**
+     * Adds a value to a {@link StringJoiner} if the value is not null or empty
+     * @param joiner the joiner to add to
+     * @param value the value to add
+     */
+    private static void updateJoinerIfValid(StringJoiner joiner, String value) {
+        if (notNullOrEmpty(value)) {
+            joiner.add(value);
+        }
+    }
+
+    /**
+     * Checks whether a value is not null or empty
+     * @param value the value to check
+     * @return whether the value is not null or empty
+     */
+    private static boolean notNullOrEmpty(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+}

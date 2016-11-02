@@ -80,6 +80,18 @@ public class AnnotationControllerStatisticsIT {
         repository.save(savedDocs);
     }
 
+    @Test
+    public void queryWithNoHitsProducesEmptyStats() throws Exception {
+        repository.deleteAll();
+
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
     //----------- Ontology ID -----------//
     @Test
     public void statsForAllDocsContaining1OntologyIdReturns1OntologyIdStat() throws Exception {
