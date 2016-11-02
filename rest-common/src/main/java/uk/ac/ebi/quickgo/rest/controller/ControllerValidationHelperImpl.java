@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -14,10 +16,11 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class ControllerValidationHelperImpl implements ControllerValidationHelper {
-
     public static final int MAX_PAGE_RESULTS = 100;
+
     private static final Logger LOGGER = getLogger(ControllerValidationHelperImpl.class);
     private static final String COMMA = ",";
+    private static final int MIN_PAGE = 1;
 
     private final Predicate<String> entityValidation;
     private final Predicate<Integer> validNumberOfPageResults;
@@ -30,14 +33,12 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
     }
 
     public ControllerValidationHelperImpl(int maxPageResults) {
-        this(
-                maxPageResults,
+        this(maxPageResults,
                 anyId -> true);
     }
 
     public ControllerValidationHelperImpl() {
-        this(
-                MAX_PAGE_RESULTS,
+        this(MAX_PAGE_RESULTS,
                 anyId -> true);
     }
 
@@ -51,7 +52,7 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
                 .forEach(badId -> {
                     String errorMessage = "Provided ID: '" + badId + "' is invalid";
                     LOGGER.error(errorMessage);
-                    throw new IllegalArgumentException(errorMessage);
+                    throw new ParameterException(errorMessage);
                 });
 
         return idList;
@@ -63,7 +64,15 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
                     maxPageResults + ". Please consider using end-points that " +
                     "return paged results.";
             LOGGER.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+            throw new ParameterException(errorMessage);
+        }
+    }
+
+    @Override public void validatePageRequest(int requestedPage) {
+        if (requestedPage < MIN_PAGE) {
+            String errorMessage = "Cannot retrieve the requested page. Lower page limit is: " + MIN_PAGE + ".";
+            LOGGER.error(errorMessage);
+            throw new ParameterException(errorMessage);
         }
     }
 

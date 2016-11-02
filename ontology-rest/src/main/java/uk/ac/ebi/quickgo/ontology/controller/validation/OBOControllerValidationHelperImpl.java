@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller.validation;
 
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class OBOControllerValidationHelperImpl
                 relationType = OntologyRelationType.getByLongName(relationTypeStr);
             } catch (IllegalArgumentException e) {
                 LOGGER.error(e.getMessage());
-                throw new IllegalArgumentException("Unknown relationship requested: '" + relationTypeStr + "'");
+                throw new ParameterException("Unknown relationship requested: '" + relationTypeStr + "'");
             }
 
             if (relationType != null) {
@@ -55,8 +56,7 @@ public class OBOControllerValidationHelperImpl
             String errorMessage = "Cannot traverse over relation type: " + relationType.getLongName() + ". " +
                     "Can only traverse over: " + DEFAULT_TRAVERSAL_TYPES_CSV;
             LOGGER.error(errorMessage);
-            throw new IllegalArgumentException(
-                    errorMessage);
+            throw new ParameterException(errorMessage);
         }
     }
 }
