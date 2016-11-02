@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
@@ -51,19 +50,17 @@ public class SearchController {
     @Autowired
     public SearchController(
             SearchService<OntologyTerm> ontologySearchService,
-            SearchableField ontologySearchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
             FilterConverterFactory converterFactory) {
 
         Preconditions.checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
-        Preconditions.checkArgument(ontologySearchableField != null, "Ontology searchable field cannot be null");
         Preconditions.checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
         Preconditions.checkArgument(converterFactory != null, "Ontology converter factory cannot be null");
 
         this.ontologySearchService = ontologySearchService;
         this.converterFactory = converterFactory;
 
-        this.requestTemplate = new DefaultSearchQueryTemplate(ontologySearchableField);
+        this.requestTemplate = new DefaultSearchQueryTemplate();
         this.requestTemplate.setReturnedFields(ontologyRetrievalConfig.getSearchReturnedFields());
         this.requestTemplate.setHighlighting(ontologyRetrievalConfig.repo2DomainFieldMap().keySet(),
                 ontologyRetrievalConfig.getHighlightStartDelim(),
