@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.service.converter;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
@@ -7,23 +11,16 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem.OCCURS_IN_CL_1;
-import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem.OCCURS_IN_CL_2;
-import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem.OCCURS_IN_CL_3;
-import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_1;
-import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_2;
-import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_3;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem.*;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.*;
 
 /**
  * Tests the implementation of the {@link AnnotationDocConverterImpl} class.
@@ -35,17 +32,16 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConver
 @RunWith(MockitoJUnitRunner.class)
 public class AnnotationDocConverterImplTest {
     private static final String COMMA = ",";
-    private static final String COLON = ":";
     private static final String ID = "1";
     private static final String GENE_PRODUCT_ID = "P99999";
     private static final String QUALIFIER = "enables";
     private static final String GO_ID = "GO:0000977";
     private static final int TAXON_ID = 2;
     private static final String ECO_ID = "ECO:0000353";
-    private static final List<List<ConnectedXrefCreator<Annotation.SimpleXRef>>> WITH_FROM = asList(
+    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
             singletonList(GO_1), asList(GO_2, GO_3));
     private static final String ASSIGNED_BY = "InterPro";
-    private static final List<List<ConnectedXrefCreator<Annotation.QualifiedXref>>> EXTENSIONS = asList(
+    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
             singletonList(OCCURS_IN_CL_1),
             asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
     private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
@@ -177,21 +173,21 @@ public class AnnotationDocConverterImplTest {
 
 
     private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs<T>> connectedXrefs(
-            List<List<ConnectedXrefCreator<T>>> items) {
+            List<List<Supplier<T>>> items) {
         return items.stream().map(itemList -> {
                     Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
-                    itemList.stream().map(ConnectedXrefCreator::toConnectedXref).forEach(xrefs::addXref);
+                    itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
                     return xrefs;
                 }
         ).collect(Collectors.toList());
     }
 
     private static <T extends Annotation.AbstractXref> List<String> stringsForConnectedXrefs(
-            List<List<ConnectedXrefCreator<T>>> items) {
+            List<List<Supplier<T>>> items) {
         return items.stream()
                 .map(itemList ->
                         itemList.stream()
-                                .map(ConnectedXrefCreator::toString).collect(Collectors.joining(COMMA))
+                                .map(Supplier::toString).collect(Collectors.joining(COMMA))
                 ).collect(Collectors.toList());
     }
 
@@ -214,16 +210,7 @@ public class AnnotationDocConverterImplTest {
         return doc;
     }
 
-    private Annotation.ConnectedXRefs<Annotation.QualifiedXref> createConnectedSimpleXrefs(
-            FakeExtensionItem... items) {
-        Annotation.ConnectedXRefs<Annotation.QualifiedXref> connectedXRefs = new Annotation.ConnectedXRefs<>();
-        for (FakeExtensionItem item : items) {
-            connectedXRefs.addXref(item.toConnectedXref());
-        }
-        return connectedXRefs;
-    }
-
-    enum FakeWithFromItem implements ConnectedXrefCreator<Annotation.SimpleXRef> {
+    enum FakeWithFromItem implements Supplier<Annotation.SimpleXRef> {
         GO_1("GO", "0000001"),
         GO_2("GO", "0000002"),
         GO_3("GO", "0000003");
@@ -236,7 +223,7 @@ public class AnnotationDocConverterImplTest {
             this.id = id;
         }
 
-        public Annotation.SimpleXRef toConnectedXref() {
+        @Override public Annotation.SimpleXRef get() {
             return new Annotation.SimpleXRef(db, id);
         }
 
@@ -245,7 +232,7 @@ public class AnnotationDocConverterImplTest {
         }
     }
 
-    enum FakeExtensionItem implements ConnectedXrefCreator<Annotation.QualifiedXref> {
+    enum FakeExtensionItem implements Supplier<Annotation.QualifiedXref> {
         OCCURS_IN_CL_1("occurs_in", "CL", "0000001"),
         OCCURS_IN_CL_2("occurs_in", "CL", "0000002"),
         OCCURS_IN_CL_3("occurs_in", "CL", "0000003");
@@ -260,16 +247,12 @@ public class AnnotationDocConverterImplTest {
             this.id = id;
         }
 
-        public Annotation.QualifiedXref toConnectedXref() {
+        @Override public Annotation.QualifiedXref get() {
             return new Annotation.QualifiedXref(db, id, qualifier);
         }
 
         @Override public String toString() {
             return qualifier + "(" + db + ":" + id + ")";
         }
-    }
-
-    private interface ConnectedXrefCreator<T extends Annotation.AbstractXref> {
-        T toConnectedXref();
     }
 }
