@@ -38,23 +38,6 @@ public class AnnotationFields {
     public final static String DATE = "date";
 
     /**
-     * Annotation fields that are stored, and can therefore be retrieved.
-     */
-    public static final class Retrievable extends AnnotationFields {
-        private static final Set<String> VALUES = new HashSet<>();
-
-        public static final String DATE = storeAndGet(VALUES, AnnotationFields.DATE);
-
-        public static boolean isRetrievable(String field) {
-            return VALUES.contains(field);
-        }
-
-        private static Set<String> retrievableFields() {
-            return Collections.unmodifiableSet(VALUES);
-        }
-    }
-
-    /**
      * Annotation fields that are indexed, and can therefore be searched.
      */
     public static final class Searchable {
