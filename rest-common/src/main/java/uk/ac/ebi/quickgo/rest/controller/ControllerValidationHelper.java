@@ -23,6 +23,7 @@ public interface ControllerValidationHelper {
      * Checks if the user has set {@code requestedPages} to a valid value
      *
      * @param requestedPage the page the client would like to view
+     * @throws ParameterException is thrown if the {@code requestedPage} is invalid
      */
     void validatePageRequest(int requestedPage);
 
