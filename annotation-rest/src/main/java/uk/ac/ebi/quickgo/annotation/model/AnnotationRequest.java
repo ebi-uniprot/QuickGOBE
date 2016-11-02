@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
+import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
 import java.util.stream.Stream;
@@ -15,7 +16,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
 
