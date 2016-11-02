@@ -142,7 +142,7 @@ public class AggregateRequestToStringConverterTest {
         String convertedAggregation = converter.convert(aggregate);
 
         assertThat(convertedAggregation, containsString(createSolrAggregation(GP_ID_FIELD, UNIQUE_FUNCTION)));
-        assertThat(convertedAggregation, containsString(createSolrAggregation(ANN_ID_FIELD, COUNT_FUNCTION)));
+        assertThat(convertedAggregation, containsString(createSolrCOUNTAggregation(ANN_ID_FIELD, COUNT_FUNCTION)));
     }
 
     @Test
@@ -182,12 +182,22 @@ public class AggregateRequestToStringConverterTest {
         assertThat(convertedAggregation, containsString(aggregatePrefixWithTypeTitle(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
         assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
-        assertThat(convertedAggregation, containsString(createSolrAggregation(GO_ID_TYPE, COUNT_FUNCTION)));
+        assertThat(convertedAggregation, containsString(createSolrCOUNTAggregation(GO_ID_TYPE, COUNT_FUNCTION)));
     }
 
     private String createSolrAggregation(String field, AggregateFunction function) {
         return aggregateFieldTitle(function, field)
                 + NAME_TO_VALUE_SEPARATOR
                 + convertToSolrAggregation(field, function);
+    }
+
+    /**
+     * Solr does not have a simple count function. To circumvent this issue, we employ the SUM function, and apply it
+     * to the constant 1. This is equivalent to counting rows with a given field.
+     */
+    private String createSolrCOUNTAggregation(String field, AggregateFunction function) {
+        return aggregateFieldTitle(function, field)
+                + NAME_TO_VALUE_SEPARATOR
+                + convertToSolrAggregation("1", AggregateFunction.SUM);
     }
 }
