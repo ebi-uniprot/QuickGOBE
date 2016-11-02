@@ -74,7 +74,12 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
             ResponseType results = (ResponseType) fetchResults(restRequesterBuilder.build(), restResponseType);
             return converter.transform(results);
         } catch (Exception e) {
-            String errorMessage = FAILED_REST_FETCH_PREFIX + " due to: '" + e.getClass().getSimpleName() + "'";
+            String errorMessage = FAILED_REST_FETCH_PREFIX + " due to: ";
+            if (e.getMessage() != null && !e.getMessage().trim().isEmpty()) {
+                errorMessage += e.getMessage();
+            } else {
+                errorMessage += e.getClass().getSimpleName();
+            }
             LOGGER.error(errorMessage, e);
             throw new RetrievalException(errorMessage, e);
         }

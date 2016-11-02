@@ -7,7 +7,8 @@ package uk.ac.ebi.quickgo.rest.search;
  */
 public enum AggregateFunction {
     COUNT("count"),
-    UNIQUE("unique");
+    UNIQUE("unique"),
+    SUM("sum");
 
     private String name;
 
