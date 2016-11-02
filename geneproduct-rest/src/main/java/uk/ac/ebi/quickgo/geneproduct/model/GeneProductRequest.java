@@ -42,8 +42,8 @@ public class GeneProductRequest {
             required = true)
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @ApiModelProperty(value = "Fields to generate facets from", example = "taxonId, type")
-    private String[] facets;
+    @ApiModelProperty(value = "Fields to generate facet from", example = "taxonId, type")
+    private String[] facet;
 
     @ApiModelProperty(value = "The query used to filter the gene products", example = "kinase", required = true)
     private String query;
@@ -101,11 +101,11 @@ public class GeneProductRequest {
     }
 
     public String[] getFacet() {
-        return facets;
+        return facet;
     }
 
     public void setFacet(String[] facets) {
-        this.facets = facets;
+        this.facet = facets;
     }
 
     @ArrayPattern(regexp = "[0-9]+", paramName = "taxonId")
