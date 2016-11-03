@@ -29,8 +29,8 @@ abstract class AbstractDescendantFilterConverter
             new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
     private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "no descendants found for IDs, %s";
     private static final String DELIMITER = ", ";
-    private static final Pattern GO_MATCHER = Pattern.compile("^GO:[0-9]+$");
-    private static final Pattern ECO_MATCHER = Pattern.compile("^ECO:[0-9]+$");
+    private static final Pattern GO_MATCHER = Pattern.compile("^GO:[0-9]+$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern ECO_MATCHER = Pattern.compile("^ECO:[0-9]+$", Pattern.CASE_INSENSITIVE);
     private static final String UNKNOWN_DESCENDANT_FORMAT =
             "Unknown descendant encountered: %s. Expected either GO/ECO term.";
 
