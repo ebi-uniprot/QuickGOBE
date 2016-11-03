@@ -58,6 +58,9 @@ public class AnnotationControllerStatisticsIT {
     private static final String ANNOTATION_GROUP = "annotation";
     private static final String GENE_PRODUCT_GROUP = "geneProduct";
 
+    //model fields
+    private static final String ASSIGNED_BY_STATS_FIELD = Facetable.ASSIGNED_BY;
+
     private MockMvc mockMvc;
 
     private List<AnnotationDocument> savedDocs;
@@ -270,7 +273,7 @@ public class AnnotationControllerStatisticsIT {
     //----------- Assigned by -----------//
     @Test
     public void statsForAllDocsContaining1AssignedByReturns1AssignedByStat() throws Exception {
-        executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY, savedDocs, doc -> doc.assignedBy);
+        executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY_STATS_FIELD, savedDocs, doc -> doc.assignedBy);
     }
 
     @Test
@@ -282,7 +285,7 @@ public class AnnotationControllerStatisticsIT {
         List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
         savedDocsPlusOne.add(extraDoc);
 
-        executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY, savedDocsPlusOne, doc -> doc.assignedBy);
+        executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY_STATS_FIELD, savedDocsPlusOne, doc -> doc.assignedBy);
     }
 
     @Test
@@ -301,14 +304,12 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantAssignedBy = asList(extraDoc1.assignedBy, extraDoc2.assignedBy);
 
-        String type = ASSIGNED_BY;
-
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
                         .param(GO_ID_PARAM.getName(), filteringGoId)
         );
 
-        assertStatsResponse(response, type, 2, relevantAssignedBy);
+        assertStatsResponse(response, ASSIGNED_BY_STATS_FIELD, 2, relevantAssignedBy);
     }
 
     /**

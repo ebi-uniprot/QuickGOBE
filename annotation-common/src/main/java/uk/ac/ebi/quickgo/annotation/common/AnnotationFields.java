@@ -15,7 +15,7 @@ import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.storeAndGet;
 public class AnnotationFields {
 
     // fields from annotations's schema.xml
-    public final static String ASSIGNED_BY = "assignedBy";
+    static final String ASSIGNED_BY = "assignedBy";
     public final static String QUALIFIER = "qualifier";
     public static final String SYMBOL = "symbol";
     public final static String EVIDENCE_CODE = "evidenceCode";
@@ -66,5 +66,14 @@ public class AnnotationFields {
         public static Set<String> searchableFields() {
             return Collections.unmodifiableSet(VALUES);
         }
+    }
+
+    /**
+     * Annotation fields that are indexed, and can therefore be searched.
+     */
+    public static final class Facetable {
+        private static final Set<String> VALUES = new HashSet<>();
+
+        public static final String ASSIGNED_BY = storeAndGet(VALUES, AnnotationFields.ASSIGNED_BY);
     }
 }

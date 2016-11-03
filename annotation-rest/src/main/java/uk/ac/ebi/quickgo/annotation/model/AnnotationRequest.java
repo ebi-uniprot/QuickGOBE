@@ -65,7 +65,7 @@ public class AnnotationRequest {
      */
     private static final String[] FILTER_REQUEST_FIELDS = new String[]{
             GO_ASPECT,
-            ASSIGNED_BY,
+            Searchable.ASSIGNED_BY,
             GENE_PRODUCT_SUBSET,
             EVIDENCE_CODE,
             GENE_PRODUCT_ID,
@@ -89,7 +89,8 @@ public class AnnotationRequest {
 
     static {
         List<String> statsTypes =
-                Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE, ASSIGNED_BY, GO_ASPECT);
+                Arrays.asList(GO_ID_INDEXED_ORIGINAL, TAXON_ID, REFERENCE, EVIDENCE_CODE, Facetable.ASSIGNED_BY,
+                        GO_ASPECT);
 
         StatsRequest annotationStats = new StatsRequest("annotation", AnnotationFields.ID, AggregateFunction
                 .COUNT.getName(), statsTypes);
@@ -209,13 +210,13 @@ public class AnnotationRequest {
      */
     public void setAssignedBy(String... assignedBy) {
         if (assignedBy != null) {
-            filterMap.put(ASSIGNED_BY, assignedBy);
+            filterMap.put(Searchable.ASSIGNED_BY, assignedBy);
         }
     }
 
     @ArrayPattern(regexp = "^[A-Za-z][A-Za-z\\-_]+$", paramName = ASSIGNED_BY_PARAM)
     public String[] getAssignedBy() {
-        return filterMap.get(ASSIGNED_BY);
+        return filterMap.get(Searchable.ASSIGNED_BY);
     }
 
     /**

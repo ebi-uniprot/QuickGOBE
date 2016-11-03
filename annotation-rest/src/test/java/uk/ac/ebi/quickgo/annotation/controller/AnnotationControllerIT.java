@@ -60,6 +60,8 @@ public class AnnotationControllerIT {
     private static final String ECO_ID2 = "ECO:0000323";
     private static final String MISSING_ECO_ID = "ECO:0000888";
 
+    private static final String ASSIGNED_BY_FIELD = "assignedBy";
+
     //Configuration
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
 
@@ -506,7 +508,7 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(GENE_PRODUCT_ID_PARAM.getName(), genericDocs.get(0).geneProductId)
-                        .param(ASSIGNED_BY, genericDocs.get(0).assignedBy));
+                        .param(ASSIGNED_BY_PARAM.getName(), genericDocs.get(0).assignedBy));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -514,7 +516,7 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
                 .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(0).geneProductId, 1))
-                .andExpect(itemExistsExpectedTimes(ASSIGNED_BY, genericDocs.get(1).assignedBy, 1));
+                .andExpect(itemExistsExpectedTimes(ASSIGNED_BY_FIELD, genericDocs.get(1).assignedBy, 1));
     }
 
     //---------- Gene Ontology Id

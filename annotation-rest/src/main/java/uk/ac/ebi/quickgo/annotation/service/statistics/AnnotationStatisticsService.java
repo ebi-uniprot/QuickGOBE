@@ -1,7 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import uk.ac.ebi.quickgo.annotation.model.*;
-import uk.ac.ebi.quickgo.rest.search.*;
+import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
@@ -46,18 +49,16 @@ public class AnnotationStatisticsService implements StatisticsService {
     @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
-            StatsRequestConverter converter,
-            SearchableField searchableFields) {
+            StatsRequestConverter converter) {
         Preconditions.checkArgument(converterFactory != null, "Filter factory cannot be null");
         Preconditions.checkArgument(searchService != null, "Search service cannot be null");
         Preconditions.checkArgument(converter != null, "Stats request converter cannot be null");
-        Preconditions.checkArgument(searchableFields != null, "Searchable fields cannot be null");
 
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
 
-        queryTemplate = new DefaultSearchQueryTemplate(searchableFields);
+        queryTemplate = new DefaultSearchQueryTemplate();
     }
 
     @Override public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
