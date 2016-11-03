@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
-import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
@@ -71,23 +70,26 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     static final String IS_A = "is_a";
     static final String SLIM_USAGE = "slim";
     static final String NO_DESCENDANTS_PREFIX = "no descendants found for IDs, ";
-    private static final String RESOURCE_URL = "/annotation";
-    static final String SEARCH_RESOURCE = RESOURCE_URL + "/search";
+    static final String SEARCH_RESOURCE = "/annotation" + "/search";
+
     private static final String BASE_URL = "http://localhost";
     private static final String DELIMITER = ", ";
     private static final String COMMA = ",";
     private static final String DESCENDANTS_USAGE = "descendants";
-    @Autowired
-    AnnotationRepository annotationRepository;
+
     MockMvc mockMvc;
     String resourceFormat;
     String usageParam;
     String idParam;
     String usageRelations;
+
+    @Autowired
+    AnnotationRepository annotationRepository;
     @Autowired
     private WebApplicationContext webApplicationContext;
     @Autowired
     private RestOperations restOperations;
+
     private MockRestServiceServer mockRestServiceServer;
     private ObjectMapper dtoMapper;
 
