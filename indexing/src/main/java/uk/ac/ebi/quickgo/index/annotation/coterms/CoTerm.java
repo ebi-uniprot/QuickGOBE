@@ -20,24 +20,27 @@ public class CoTerm {
     private final long compared;
     private final float similarityRatio;
     private final float probabilityRatio;
+    private final long gpCount;
 
     /**
      * Create a permutation for the compared term.
-     * @param target the id of the GO Term which is our compared 'from' GO Term
-     * @param comparedTerm the id of the GO Term which is our compared 'to' GO Term
-     * @param compared Count of proteins where compared term is annotated
-     * @param together Count of proteins where both target and compared terms are annotated
+     * @param target the id of the GO Term which is our compared 'from' GO Term.
+     * @param comparedTerm the id of the GO Term which is our compared 'to' GO Term.
+     * @param compared Count of proteins where compared term is annotated.
+     * @param together Count of proteins where both target and compared terms are annotated.
      * @param probabilityRatio Probability of term here estimated as fraction of proteins annotated to term.
-     * @param similarityRatio Ratio of probability of both terms to probability of either term
+     * @param similarityRatio Ratio of probability of both terms to probability of either term.
+     * @param gpCount the total number of unique gene products that have been annotated by the target term.
      */
     private CoTerm(String target, String comparedTerm, long compared, long together, float probabilityRatio,
-            float similarityRatio) {
+            float similarityRatio, long gpCount) {
         this.target = target;
         this.comparedTerm = comparedTerm;
         this.compared = compared;
         this.together = together;
         this.probabilityRatio = probabilityRatio;
         this.similarityRatio = similarityRatio;
+        this.gpCount = gpCount;
     }
 
     /**
@@ -176,6 +179,7 @@ public class CoTerm {
         private long together;
         private float probabilityRatio;
         private float similarityRatio;
+        private long gpCount;
 
         public Builder setTarget(String target) {
             Preconditions
@@ -216,8 +220,13 @@ public class CoTerm {
             return this;
         }
 
+        public Builder setGpCount(long gpCount) {
+            this.gpCount = gpCount;
+            return this;
+        }
+
         public CoTerm build() {
-            return new CoTerm(target, comparedTerm, compared, together, probabilityRatio, similarityRatio);
+            return new CoTerm(target, comparedTerm, compared, together, probabilityRatio, similarityRatio, gpCount);
         }
     }
 
@@ -229,6 +238,7 @@ public class CoTerm {
                 ", compared=" + compared +
                 ", similarityRatio=" + similarityRatio +
                 ", probabilityRatio=" + probabilityRatio +
+                ", gpCount=" + gpCount +
                 '}';
     }
 }

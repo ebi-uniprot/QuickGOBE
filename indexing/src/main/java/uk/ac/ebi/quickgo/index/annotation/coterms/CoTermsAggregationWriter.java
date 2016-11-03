@@ -109,6 +109,7 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
                     .setTogether(getTogether(goTerm, comparedTerm))
                     .setProbabilityRatio(calculateProbabilityRatio(targetCount, together, comparedCount))
                     .setSimilarityRatio(calculateSimilarityRatio(targetCount, together))
+                    .setGpCount(targetCount)
                     .build());
         }
         return coTermsBuilder.build();
