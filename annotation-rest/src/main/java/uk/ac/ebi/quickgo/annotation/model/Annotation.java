@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.annotation.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -31,14 +33,14 @@ public class Annotation {
 
     public String reference;
 
-    public List<String> withFrom;
+    public List<ConnectedXRefs> withFrom;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public int taxonId;
 
     public String assignedBy;
 
-    public List<String> extensions;
+    public List<ConnectedXRefs> extensions;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public List<String> slimmedIds;
@@ -47,7 +49,7 @@ public class Annotation {
 
     public String symbol;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     public Date date;
 
     @Override public String toString() {
@@ -148,5 +150,157 @@ public class Annotation {
         result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
         return result;
+    }
+
+    /**
+     * Represents a connected list of {@link AbstractXref} instances in the with/from or extensions column.
+     *
+     * See <a href="http://geneontology.org/page/go-annotation-file-gaf-format-21">GAF format</a>
+     */
+    public static class ConnectedXRefs<T extends AbstractXref> {
+        private List<T> connectedXrefs;
+
+        public ConnectedXRefs() {
+            this.connectedXrefs = new ArrayList<>();
+        }
+
+        public void addXref(T xref) {
+            connectedXrefs.add(xref);
+        }
+
+        public List<T> getConnectedXrefs() {
+            return Collections.unmodifiableList(connectedXrefs);
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            ConnectedXRefs xrefs = (ConnectedXRefs) o;
+
+            return connectedXrefs != null ? connectedXrefs.equals(xrefs.connectedXrefs) : xrefs.connectedXrefs == null;
+
+        }
+
+        @Override public int hashCode() {
+            return connectedXrefs != null ? connectedXrefs.hashCode() : 0;
+        }
+
+        @Override public String toString() {
+            return "Xrefs{" +
+                    "connectedXrefs=" + connectedXrefs +
+                    '}';
+        }
+    }
+
+    public static abstract class AbstractXref {
+        String db;
+        protected String id;
+
+        AbstractXref(String db, String id) {
+            this.db = db;
+            this.id = id;
+        }
+
+        public String getDb() {
+            return db;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            AbstractXref that = (AbstractXref) o;
+
+            if (db != null ? !db.equals(that.db) : that.db != null) {
+                return false;
+            }
+            return id != null ? id.equals(that.id) : that.id == null;
+
+        }
+
+        @Override public int hashCode() {
+            int result = db != null ? db.hashCode() : 0;
+            result = 31 * result + (id != null ? id.hashCode() : 0);
+            return result;
+        }
+    }
+
+    /**
+     * Class that represents a simple cross-reference containing just the database name and the entry id of
+     * the Xref. Simple Xrefs can be found in the with state attribute.
+     */
+    public static class SimpleXRef extends AbstractXref {
+        public SimpleXRef(String database, String signature) {
+            super(database, signature);
+        }
+
+        @Override public String toString() {
+            return "SimpleXref{" +
+                    "database='" + db + '\'' +
+                    ", id='" + id + '\'' +
+                    '}';
+        }
+    }
+
+    /**
+     * Class that represents a cross-reference (database name and entry id) with an associated qualifier
+     * containing just the database name. Qualified Xrefs can be found in the extension state attribute.
+     */
+    public static class QualifiedXref extends AbstractXref {
+        private String qualifier;
+
+        public QualifiedXref(String database, String signature, String qualifier) {
+            super(database, signature);
+            this.qualifier = qualifier;
+        }
+
+        public String getQualifier() {
+            return qualifier;
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof QualifiedXref)) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            QualifiedXref that = (QualifiedXref) o;
+
+            return qualifier != null ? qualifier.equals(that.qualifier) : that.qualifier == null;
+
+        }
+
+        @Override public int hashCode() {
+            int result = super.hashCode();
+            result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
+            return result;
+        }
+
+        @Override public String toString() {
+            return "QualifiedXref{" +
+                    "database='" + db + '\'' +
+                    ", id='" + id + '\'' +
+                    ", qualifier='" + qualifier + '\'' +
+                    '}';
+        }
+
     }
 }

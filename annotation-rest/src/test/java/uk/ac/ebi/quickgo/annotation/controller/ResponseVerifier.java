@@ -2,8 +2,7 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import org.hamcrest.Matchers;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
@@ -70,12 +69,12 @@ final class ResponseVerifier {
         return jsonPath(RESULTS + ".*.[?(@." + fieldName + " == " + value + ")]", hasSize(expectedCount));
     }
 
-    static ResultMatcher valueOccurInField(String fieldName, String value) {
+    static <T> ResultMatcher valueOccursInField(String fieldName, T value) {
         return jsonPath(RESULTS + ".*." + fieldName, hasItem(value));
     }
 
-    static ResultMatcher valueOccursInCollection(String fieldName, String value) {
-        return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
+    static <T> ResultMatcher valueOccursInFieldList(String fieldName, T value) {
+        return jsonPath(RESULTS + ".*." + fieldName + ".*", hasItem(value));
     }
 
     static ResultMatcher messageExists(String message) {
@@ -154,6 +153,27 @@ final class ResponseVerifier {
             matchers.add(matcher);
 
             return this;
+        }
+    }
+
+    public static class ResponseItem {
+        private final Map<String, String> contents;
+
+        private ResponseItem() {
+            contents = new HashMap<>();
+        }
+
+        public static ResponseItem responseItem() {
+            return new ResponseItem();
+        }
+
+        public ResponseItem withAttribute(String key, String value) {
+            contents.put(key, value);
+            return this;
+        }
+
+        public Map<String, String> build() {
+            return Collections.unmodifiableMap(contents);
         }
     }
 
