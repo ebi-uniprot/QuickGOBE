@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.rest.controller;
 
 import uk.ac.ebi.quickgo.rest.ParameterException;
 
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
