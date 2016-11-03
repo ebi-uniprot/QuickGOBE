@@ -138,7 +138,9 @@ public class GeneProductControllerIT {
     public void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
         mockMvc.perform(get(buildGeneProductURL(NON_EXISTANT_ID)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(jsonPath("$.results").isArray());
     }
 
 
@@ -161,7 +163,17 @@ public class GeneProductControllerIT {
     public void targetSetLookUpUsingInvalidValueReturnsEmptyResults() throws Exception {
         ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL(NON_EXISTENT_TARGET_SET_NAME)));
         result.andDo(print())
-              .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void targetSetLookUpUsingEmptyStringReturnsBadRequest() throws Exception {
+        ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL("")));
+        result.andDo(print())
+                .andExpect(jsonPath("$.messages", hasItem(is("Provided ID: 'targetset' is invalid"))))
+                .andExpect(status().isBadRequest());
     }
 
     private ResultActions expectFields(ResultActions result, String id, String path) throws Exception {
