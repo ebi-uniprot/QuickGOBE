@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -46,7 +47,7 @@ final class ResponseVerifier {
     }
 
     static ResultMatcher valuesOccurInField(String fieldName, String... values) {
-        return jsonPath(RESULTS + ".*." + fieldName, contains(values));
+        return jsonPath(RESULTS + ".*." + fieldName, containsInAnyOrder(values));
     }
 
     static <T> ResultMatcher valuesOccurInField(String fieldName, List<T> match) {
@@ -54,7 +55,7 @@ final class ResponseVerifier {
     }
 
     static ResultMatcher valuesOccursInField(String fieldName, Integer... values) {
-        return jsonPath(RESULTS + ".*." + fieldName, contains(values));
+        return jsonPath(RESULTS + ".*." + fieldName, containsInAnyOrder(values));
     }
 
     static ResultMatcher fieldDoesNotExist(String fieldName) {
