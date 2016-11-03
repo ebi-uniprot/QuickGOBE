@@ -108,4 +108,12 @@ public class CoTermTest {
         assertThat(coTerm.getProbabilityRatio(), is(PROBABILITY_RATIO));
         assertThat(coTerm.getSimilarityRatio(), is(SIMILARITY_RATIO));
     }
+
+    @Test
+    public void isSimilarityRatioCalculatedAsZero(){
+        float selected = 1;
+        long together = 1;
+        long compared = 3201;
+        assertThat(CoTerm.calculateSimilarityRatio(selected, together, compared), equalTo(0));
+    }
 }
