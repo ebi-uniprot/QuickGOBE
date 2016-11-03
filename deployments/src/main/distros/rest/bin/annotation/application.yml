@@ -7,6 +7,14 @@ search:
       - signature: aspect
         execution: JOIN
         properties: {fromTable: ontology, fromAttribute: id_join, toTable: annotation, toAttribute: goId_join}
+      - signature: descendants,evidenceCode,evidenceCodeUsageRelationships
+        execution: REST_COMM
+        properties: {
+          ip: "http://ves-hx-c2:8082",
+          resourceFormat: "/ontology/eco/terms/{evidenceCode}/descendants?relations={evidenceCodeUsageRelationships}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
+        }
       - signature: descendants,goId,goUsageRelationships
         execution: REST_COMM
         properties: {
