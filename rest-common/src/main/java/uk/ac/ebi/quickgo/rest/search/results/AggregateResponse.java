@@ -176,14 +176,14 @@ public class AggregateResponse {
 
     /**
      * Indicates whether the aggregation, at the moment of the method call, has any buckets associated to it.
-     * @return boolean indicating whether or not the aggration has associated buckets
+     * @return boolean indicating whether or not the aggregation has associated buckets
      */
     public boolean hasBuckets() {
         return !buckets.isEmpty();
     }
 
     /**
-     * Inidcates whether the aggregation, at the time of the method call, has at least one of its state elements
+     * Indicates whether the aggregation, at the time of the method call, has at least one of its state elements
      * populated.
      *
      * @return true if it has at least one object stored within it, false otherwise

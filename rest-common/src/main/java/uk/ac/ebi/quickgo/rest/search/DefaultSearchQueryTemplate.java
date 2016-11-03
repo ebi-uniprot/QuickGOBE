@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -226,7 +227,7 @@ public class DefaultSearchQueryTemplate {
          */
         void checkFacets(Iterable<String> facets) {
             if (!isValidFacets(fieldSpec, facets)) {
-                throw new IllegalArgumentException("At least one of the provided facets is not searchable: " + facets);
+                throw new ParameterException("At least one of the provided facets is not searchable: " + facets);
             }
         }
 
@@ -237,7 +238,7 @@ public class DefaultSearchQueryTemplate {
          */
         void checkFilters(Iterable<String> filterQueries) {
             if (!isValidFilterQueries(fieldSpec, filterQueries)) {
-                throw new IllegalArgumentException("At least one of the provided filter queries is not filterable: " +
+                throw new ParameterException("At least one of the provided filter queries is not filterable: " +
                         filterQueries);
             }
         }

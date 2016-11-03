@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller.validation;
 
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public interface OBOControllerValidationHelper extends ControllerValidationHelpe
      * @return the {@link List} of {@link OntologyRelationType} which correspond to the original {@code
      * relationTypesCSV}
      *
-     * @throws IllegalArgumentException if {@code relationTypesCSV} contains a value that does not correspond
+     * @throws ParameterException if {@code relationTypesCSV} contains a value that does not correspond
      * to a valid {@link OntologyRelationType}
      */
     List<OntologyRelationType> validateRelationTypes(String relationTypesCSV);

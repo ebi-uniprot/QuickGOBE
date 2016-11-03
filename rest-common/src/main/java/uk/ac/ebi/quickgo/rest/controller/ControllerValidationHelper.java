@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
+
 import java.util.List;
 
 /**
@@ -12,15 +14,23 @@ public interface ControllerValidationHelper {
     /**
      * Checks the validity of a list of IDs in CSV format.
      * @param ids a list of IDs in CSV format
-     * @throws IllegalArgumentException is thrown if an ID is not valid, or if
+     * @throws ParameterException is thrown if an ID is not valid, or if
      * number of IDs listed is greater than the maximum permissible number of results.
      */
     List<String> validateCSVIds(String ids);
 
     /**
+     * Checks if the user has set {@code requestedPages} to a valid value
+     *
+     * @param requestedPage the page the client would like to view
+     * @throws ParameterException is thrown if the {@code requestedPage} is invalid
+     */
+    void validatePageRequest(int requestedPage);
+
+    /**
      * Checks whether the requested number of results is valid.
      * @param requestedResultsSize the number of results being requested
-     * @throws IllegalArgumentException if the number is greater than the maximum permissible number of results.
+     * @throws ParameterException if the number is greater than the maximum permissible number of results.
      */
     void validateRequestedResults(int requestedResultsSize);
 
