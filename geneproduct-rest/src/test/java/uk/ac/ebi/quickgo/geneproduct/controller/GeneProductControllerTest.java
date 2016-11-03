@@ -113,13 +113,6 @@ public class GeneProductControllerTest {
         assertThat(response.getBody().getResults(), hasSize(1));
     }
 
-    @Test
-    public void retrieveMultipleGeneProduct() {
-        ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(MULTI_CSV);
-        assertThat(response.getBody().getResults(), hasSize(3));
-        assertThat(response.getBody().getResults(), contains(geneProduct1, geneProduct2, geneProduct3));
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void retrieveMultipleGeneProductOverLimit() {
         controller.findById(multiCSVTooBig);
