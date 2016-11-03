@@ -57,12 +57,7 @@ public class CoTerm {
                 .checkArgument(selected != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
                         " selected should not be zero");
 
-        float similarityRatio = 100 * ((together) / (selected + compared - together));
-        float psRatio = Float.valueOf(DECIMAL_FORMAT.format(similarityRatio));// Round it with 2 decimals
-        if (Math.round(psRatio) == 100) {
-            return 100;
-        }
-        return psRatio;
+        return 100 * ((together) / (selected + compared - together));
     }
 
     /**
@@ -81,8 +76,7 @@ public class CoTerm {
                 " should not be zero");
         Preconditions.checkArgument(all != 0, "CoTerm::calculateProbabilityRatio The value for all" +
                 " should not be zero");
-        float probabilityRatio = (together / selected) / (compared / all);
-        return Float.valueOf(DECIMAL_FORMAT.format(probabilityRatio));
+        return (together / selected) / (compared / all);
     }
 
     /**
@@ -197,25 +191,21 @@ public class CoTerm {
         }
 
         public Builder setCompared(long compared) {
-            Preconditions.checkArgument(compared > 0, "The parameter for 'setCompared' cannot be zero.");
             this.compared = compared;
             return this;
         }
 
         public Builder setTogether(long together) {
-            Preconditions.checkArgument(together > 0, "The parameter for 'setTogether' cannot be zero.");
             this.together = together;
             return this;
         }
 
         public Builder setProbabilityRatio(float probabilityRatio) {
-            Preconditions.checkArgument(probabilityRatio > 0, "ProbabilityRatio cannot be zero.");
             this.probabilityRatio = probabilityRatio;
             return this;
         }
 
         public Builder setSimilarityRatio(float similarityRatio) {
-            Preconditions.checkArgument(similarityRatio > 0, "SimilarityRatio cannot be zero.");
             this.similarityRatio = similarityRatio;
             return this;
         }
