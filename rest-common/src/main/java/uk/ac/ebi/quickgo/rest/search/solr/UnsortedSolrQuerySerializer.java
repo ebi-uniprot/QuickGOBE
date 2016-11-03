@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.rest.search.query;
+package uk.ac.ebi.quickgo.rest.search.solr;
+
+import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import com.google.common.base.Preconditions;
 import java.util.Set;
@@ -7,9 +9,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.TermQueryTransformationResult
+import static uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer.TermQueryTransformationResult
         .failedTransformationResult;
-import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.TermQueryTransformationResult
+import static uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer.TermQueryTransformationResult
         .successfulTransformationResult;
 
 /**
