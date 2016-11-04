@@ -132,13 +132,6 @@
     <copyField source="taxonId" dest="taxonId_unsorted"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
-    <!-- Fields that are used in cross-core joins with other collections -->
-
-    <!-- goId_join is used for joining with the ontology collection-->
-    <field name="goId_join" type="string" indexed="true" stored="false" multiValued="false"/>
-    <copyField source="goId" dest="goId_join"/>
-
-    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields that are used specifically for search -->
     <field name="referenceSearch" type="reference_ignorecase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="reference" dest="referenceSearch"/>
