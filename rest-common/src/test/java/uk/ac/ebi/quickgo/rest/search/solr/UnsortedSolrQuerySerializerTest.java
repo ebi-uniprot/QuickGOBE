@@ -18,7 +18,6 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
 import static uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer.TERMS_LOCAL_PARAMS_QUERY_FORMAT;
-import static uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer.unsortedNameFor;
 
 /**
  * Created 02/08/16
@@ -181,9 +180,6 @@ public class UnsortedSolrQuerySerializerTest {
     }
 
     public class TransformationsToTermsQueries {
-
-        private static final String UNSORTED_FIELD_SUFFIX = "_unsorted";
-
         @Test
         public void visitTransformsOneQueryToTermsQueryString() {
             FieldQuery query = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
@@ -317,30 +313,12 @@ public class UnsortedSolrQuerySerializerTest {
             System.out.println(queryString);
         }
 
-        @Test
-        public void canCreateUnsortedFieldName() {
-            String field = "field";
-            assertThat(unsortedNameFor(field), is(field + UNSORTED_FIELD_SUFFIX));
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void unsortedFieldNameForNullValueCausesException() {
-            String field = null;
-            unsortedNameFor(field);
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void unsortedFieldNameForEmptyValueCausesException() {
-            String field = "";
-            unsortedNameFor(field);
-        }
-
         String buildTermsQuery(String field, String... values) {
             StringJoiner stringJoiner = new StringJoiner(",");
             for (String value : values) {
                 stringJoiner.add(value);
             }
-            return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, unsortedNameFor(field), stringJoiner.toString());
+            return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
         }
     }
 }
