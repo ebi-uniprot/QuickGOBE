@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.GO_ID;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_GO_ID;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
 /**
@@ -161,7 +161,7 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(usage.toLowerCase())
-                .addProperty(GO_ID, goId.toUpperCase())
+                .addProperty(USAGE_GO_ID, goId.toUpperCase())
                 .addProperty(USAGE_RELATIONSHIPS)
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
@@ -181,7 +181,7 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.createFilterRequests(),
                 contains(FilterRequest.newBuilder()
                         .addProperty(usage.toLowerCase())
-                        .addProperty(GO_ID, goId.toUpperCase())
+                        .addProperty(USAGE_GO_ID, goId.toUpperCase())
                         .addProperty(USAGE_RELATIONSHIPS, relationships.toLowerCase())
                         .build()));
     }

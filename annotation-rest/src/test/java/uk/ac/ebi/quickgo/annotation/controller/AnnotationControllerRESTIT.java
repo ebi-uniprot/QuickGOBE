@@ -47,8 +47,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createAnnotationDoc;
+import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 
 /**
@@ -107,7 +107,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -128,7 +128,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -155,7 +155,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goId(1))
+                        .param(GO_ID_PARAM.getName(), goId(1))
                         .param(USAGE_RELATIONS, IS_A));
 
         response.andDo(print())
@@ -179,7 +179,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goId(1) + "," + goId(2))
+                        .param(GO_ID_PARAM.getName(), goId(1) + "," + goId(2))
                         .param(USAGE_RELATIONS, IS_A));
 
         response.andDo(print())
@@ -204,7 +204,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, csv(goId(1), goId(2))));
+                        .param(GO_ID_PARAM.getName(), csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -233,7 +233,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, csv(goId(1), goId(2))));
+                        .param(GO_ID_PARAM.getName(), csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -252,7 +252,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -272,7 +272,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, csv(goId(1), goId(2))));
+                        .param(GO_ID_PARAM.getName(), csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -293,7 +293,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, csv(goId(1), goId(2), goId(3))));
+                        .param(GO_ID_PARAM.getName(), csv(goId(1), goId(2), goId(3))));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -315,7 +315,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -331,7 +331,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -349,7 +349,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -367,7 +367,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -385,7 +385,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, DESCENDANTS_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -404,7 +404,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -424,7 +424,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -451,7 +451,7 @@ public class AnnotationControllerRESTIT {
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
                         .param(USAGE_RELATIONS, IS_A)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -477,7 +477,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, csv(goId(1), goId(2)))
+                        .param(GO_ID_PARAM.getName(), csv(goId(1), goId(2)))
                         .param(USAGE_RELATIONS, IS_A));
 
         response.andDo(print())
@@ -503,7 +503,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, csv(goId(1), goId(2))));
+                        .param(GO_ID_PARAM.getName(), csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -532,7 +532,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, csv(goId(1), goId(2))));
+                        .param(GO_ID_PARAM.getName(), csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -554,7 +554,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -574,7 +574,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, csv(goId(1), goId(2))));
+                        .param(GO_ID_PARAM.getName(), csv(goId(1), goId(2))));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -595,7 +595,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, csv(goId(1), goId(2), goId(3))));
+                        .param(GO_ID_PARAM.getName(), csv(goId(1), goId(2), goId(3))));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -617,7 +617,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -639,7 +639,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -657,7 +657,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -675,7 +675,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
@@ -693,7 +693,7 @@ public class AnnotationControllerRESTIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(USAGE, SLIM_USAGE)
-                        .param(GO_ID, goId(1)));
+                        .param(GO_ID_PARAM.getName(), goId(1)));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError())

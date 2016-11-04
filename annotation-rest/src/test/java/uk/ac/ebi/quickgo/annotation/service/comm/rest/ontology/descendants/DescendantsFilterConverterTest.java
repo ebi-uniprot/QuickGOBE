@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
-import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -14,6 +13,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
@@ -40,7 +40,7 @@ public class DescendantsFilterConverterTest {
         addResponseDescendant(id1, desc1);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
+        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(Searchable.GO_ID, desc1)));
         assertThat(convertedFilter.getFilterContext(), is(Optional.empty()));
     }
 
@@ -57,8 +57,8 @@ public class DescendantsFilterConverterTest {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(
-                or(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1),
-                        QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc2))));
+                or(QuickGOQuery.createQuery(Searchable.GO_ID, desc1),
+                        QuickGOQuery.createQuery(Searchable.GO_ID, desc2))));
         assertThat(convertedFilter.getFilterContext(), is(Optional.empty()));
     }
 
@@ -74,7 +74,7 @@ public class DescendantsFilterConverterTest {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(
-                QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
+                QuickGOQuery.createQuery(Searchable.GO_ID, desc1)));
         assertThat(convertedFilter.getFilterContext(), is(Optional.empty()));
     }
 

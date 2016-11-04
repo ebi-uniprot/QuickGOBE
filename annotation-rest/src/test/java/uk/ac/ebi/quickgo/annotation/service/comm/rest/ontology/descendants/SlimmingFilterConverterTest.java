@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
-import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingConversionInfo;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
@@ -18,6 +17,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
+import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
@@ -44,7 +44,7 @@ public class SlimmingFilterConverterTest {
         addResponseDescendant(id1, desc1);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
+        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(Searchable.GO_ID, desc1)));
         assertThat(convertedFilter.getFilterContext().isPresent(), is(true));
     }
 
@@ -61,8 +61,8 @@ public class SlimmingFilterConverterTest {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(
-                or(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1),
-                        QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc2))));
+                or(QuickGOQuery.createQuery(Searchable.GO_ID, desc1),
+                        QuickGOQuery.createQuery(Searchable.GO_ID, desc2))));
         assertThat(convertedFilter.getFilterContext().isPresent(), is(true));
     }
 
@@ -78,7 +78,7 @@ public class SlimmingFilterConverterTest {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(
-                QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
+                QuickGOQuery.createQuery(Searchable.GO_ID, desc1)));
         assertThat(convertedFilter.getFilterContext().isPresent(), is(true));
     }
 

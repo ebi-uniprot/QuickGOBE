@@ -22,7 +22,7 @@ public class DescendantsFilterConverter extends AbstractDescendantFilterConverte
     @Override protected Consumer<String> processDescendant(
             ConvertedOntologyFilter.Result result, Set<QuickGOQuery> queries) {
         return desc -> queries.add(
-                QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
+                QuickGOQuery.createQuery(AnnotationFields.Searchable.GO_ID, desc));
     }
 
     @Override protected ConvertedFilter<QuickGOQuery> createFilterForAllDescendants(Set<QuickGOQuery> queries) {

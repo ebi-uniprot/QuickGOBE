@@ -30,10 +30,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
-import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.*;
 import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
-import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.QUALIFIER;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
 
 /**
@@ -60,7 +58,7 @@ public class AnnotationControllerIT {
     private static final String ECO_ID2 = "ECO:0000323";
     private static final String MISSING_ECO_ID = "ECO:0000888";
 
-    private static final String ASSIGNED_BY_FIELD = "assignedBy";
+
 
     //Configuration
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
@@ -102,7 +100,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
     }
 
     @Test
@@ -126,7 +124,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId2, geneProductId1));
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId2, geneProductId1));
     }
 
     @Test
@@ -153,7 +151,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId2, geneProductId1));
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId2, geneProductId1));
     }
 
     @Test
@@ -183,7 +181,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
     }
 
     @Test
@@ -214,8 +212,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(valuesOccursInField(TAXON_ID, taxonId))
-                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
+                .andExpect(valuesOccursInField(TAXON_ID_FIELD, taxonId))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
     }
 
     @Test
@@ -242,8 +240,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(valuesOccursInField(TAXON_ID, taxonId2, taxonId1))
-                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId2, geneProductId1));
+                .andExpect(valuesOccursInField(TAXON_ID_FIELD, taxonId2, taxonId1))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId2, geneProductId1));
     }
 
     @Test
@@ -261,8 +259,8 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
-                .andExpect(fieldDoesNotExist(TAXON_ID))
-                .andExpect(valuesOccurInField(GENE_PRODUCT_ID, geneProductId));
+                .andExpect(fieldDoesNotExist(TAXON_ID_FIELD))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
     }
 
     @Test
@@ -361,7 +359,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccurInField(QUALIFIER, qualifier));
+                .andExpect(valueOccurInField(QUALIFIER_FIELD, qualifier));
 
     }
 
@@ -396,7 +394,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, fullGeneProductId, 1));
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, fullGeneProductId, 1));
     }
 
     @Test
@@ -413,7 +411,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, geneProductId, 1));
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
     }
 
     @Test
@@ -434,9 +432,9 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(3))
                 .andExpect(fieldsInAllResultsExist(3))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, uniprotGp, 1))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, intactGp, 1))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, rnaGp, 1));
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, uniprotGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, intactGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, rnaGp, 1));
     }
 
     @Test
@@ -457,9 +455,9 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(3))
                 .andExpect(fieldsInAllResultsExist(3))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, uniprotGp, 1))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, intactGp, 1))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, rnaGp, 1));
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, uniprotGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, intactGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, rnaGp, 1));
     }
 
     @Test
@@ -499,8 +497,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(0).geneProductId, 1))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(1).geneProductId, 1));
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, genericDocs.get(0).geneProductId, 1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, genericDocs.get(1).geneProductId, 1));
     }
 
     @Test
@@ -515,7 +513,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(itemExistsExpectedTimes(GENE_PRODUCT_ID, genericDocs.get(0).geneProductId, 1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, genericDocs.get(0).geneProductId, 1))
                 .andExpect(itemExistsExpectedTimes(ASSIGNED_BY_FIELD, genericDocs.get(1).assignedBy, 1));
     }
 
@@ -532,7 +530,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(GO_ID, AnnotationDocMocker.GO_ID, NUMBER_OF_GENERIC_DOCS));
+                .andExpect(itemExistsExpectedTimes(GO_ID_FIELD, AnnotationDocMocker.GO_ID, NUMBER_OF_GENERIC_DOCS));
     }
 
     @Test
@@ -545,7 +543,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(GO_ID, AnnotationDocMocker.GO_ID, NUMBER_OF_GENERIC_DOCS));
+                .andExpect(itemExistsExpectedTimes(GO_ID_FIELD, AnnotationDocMocker.GO_ID, NUMBER_OF_GENERIC_DOCS));
     }
 
     @Test
@@ -713,7 +711,7 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"));
+                .andExpect(valueOccursInCollection(WITH_FROM_FIELD, "InterPro:IPR015421"));
 
     }
 
@@ -725,8 +723,8 @@ public class AnnotationControllerIT {
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015422"));
+                .andExpect(valueOccursInCollection(WITH_FROM_FIELD, "InterPro:IPR015421"))
+                .andExpect(valueOccursInCollection(WITH_FROM_FIELD, "InterPro:IPR015422"));
 
     }
 
@@ -747,8 +745,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015422"));
+                .andExpect(valueOccursInCollection(WITH_FROM_FIELD, "InterPro:IPR015421"))
+                .andExpect(valueOccursInCollection(WITH_FROM_FIELD, "InterPro:IPR015422"));
     }
 
     @Test
@@ -759,7 +757,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInCollection(WITH_FROM, "InterPro:IPR015421"));
+                .andExpect(valueOccursInCollection(WITH_FROM_FIELD, "InterPro:IPR015421"));
     }
 
     //---------- Limit related tests.
@@ -820,7 +818,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS));
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS));
     }
 
     @Test
@@ -836,7 +834,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, doc.reference, 1));
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, doc.reference, 1));
     }
 
     @Test
@@ -857,9 +855,9 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, docB.reference, 1));
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docA.reference, 1))
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docB.reference, 1));
     }
 
     @Test
@@ -880,9 +878,9 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, docB.reference, 1));
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docA.reference, 1))
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docB.reference, 1));
     }
 
     @Test
@@ -918,8 +916,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1));
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docA.reference, 1));
     }
 
     @Test
@@ -939,9 +937,9 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, docA.reference, 1))
-                .andExpect(itemExistsExpectedTimes(REFERENCE, docB.reference, 1));
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docA.reference, 1))
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docB.reference, 1));
     }
 
     @Test
