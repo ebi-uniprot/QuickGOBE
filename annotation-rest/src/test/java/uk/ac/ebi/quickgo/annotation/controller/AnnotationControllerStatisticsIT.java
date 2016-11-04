@@ -31,7 +31,6 @@ import static java.util.Arrays.asList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.TAXON_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
@@ -57,12 +56,12 @@ public class AnnotationControllerStatisticsIT {
     private static final String ANNOTATION_GROUP = "annotation";
     private static final String GENE_PRODUCT_GROUP = "geneProduct";
 
-    //model fields
-    private static final String ASSIGNED_BY_STATS_FIELD = Facetable.ASSIGNED_BY;
-    private static final String EVIDENCE_CODE_STATS_FIELD = Facetable.EVIDENCE_CODE;
-    private static final String GO_ID_STATS_FIELD = Facetable.GO_ID;
-    private static final String REFERENCE_STATS_FIELD = Facetable.REFERENCE;
-    private static final String TAXON_ID_STATS_FIELD = Facetable.TAXON_ID;
+    //statistics model fields
+    private static final String ASSIGNED_BY_STATS_FIELD = "assignedBy";
+    private static final String EVIDENCE_CODE_STATS_FIELD = "evidenceCode";
+    private static final String GO_ID_STATS_FIELD = "goId";
+    private static final String REFERENCE_STATS_FIELD = "reference";
+    private static final String TAXON_ID_STATS_FIELD = "taxonId";
     private static final String GO_ASPECT_STATS_FIELD = "aspect";
 
     private MockMvc mockMvc;
