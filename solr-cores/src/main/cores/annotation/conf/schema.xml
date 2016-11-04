@@ -69,14 +69,14 @@
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields used by the annotation model -->
-
+    <!-- The following fields are used for storage and/or faceting, do not add search specific analyzers to these -->
     <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="symbol" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="symbol" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="date" type="tdate" indexed="false" stored="true" multiValued="false"/>
     <field name="evidenceCode" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="extension" type="string" indexed="false" stored="true" multiValued="true"/>
-    <field name="geneProductId" type="database_ignorecase" indexed="true" stored="true" multiValued="false"/>
+    <field name="geneProductId" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="geneProductType" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="geneProductSubset" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="goEvidence" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
@@ -113,9 +113,6 @@
     <field name="evidenceCode_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="evidenceCode" dest="evidenceCode_unsorted"/>
 
-    <field name="geneProductId_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
-    <copyField source="geneProductId" dest="geneProductId_unsorted"/>
-
     <field name="geneProductType_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="geneProductType" dest="geneProductType_unsorted"/>
 
@@ -148,6 +145,9 @@
 
     <field name="withFromSearch" type="database_ignorecase" indexed="true" stored="false" multiValued="true"/>
     <copyField source="withFrom" dest="withFromSearch"/>
+
+    <field name="geneProductId_search" type="database_ignorecase" indexed="true" stored="false" multiValued="false"/>
+    <copyField source="geneProductId" dest="geneProductId_search"/>
 
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->

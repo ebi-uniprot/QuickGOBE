@@ -44,7 +44,7 @@ public class AnnotationFields {
         public static final String ASSIGNED_BY = storeAndGet(VALUES, "assignedBy_unsorted");
         public static final String QUALIFIER = storeAndGet(VALUES, "qualifier_unsorted");
         public static final String EVIDENCE_CODE = storeAndGet(VALUES, "evidenceCode_unsorted");
-        public static final String GENE_PRODUCT_ID = storeAndGet(VALUES, "geneProductId");
+        public static final String GENE_PRODUCT_ID = storeAndGet(VALUES, "geneProductId_search");
         public static final String GENE_PRODUCT_TYPE = storeAndGet(VALUES, "geneProductType_unsorted");
         public static final String GENE_PRODUCT_SUBSET = storeAndGet(VALUES, "geneProductSubset_unsorted");
         public static final String GO_EVIDENCE = storeAndGet(VALUES, "goEvidence_unsorted");
