@@ -1,9 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
+import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
+import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
@@ -158,6 +160,19 @@ public class SearchServiceConfig {
     @Bean
     public DbXRefEntityValidation geneProductValidator() {
         return DbXRefEntityValidation.createWithData(geneProductLoader().load());
+    }
+
+    @Bean
+    public SearchableField annotationSearchableField() {
+        return new SearchableField() {
+            @Override public boolean isSearchable(String field) {
+                return AnnotationFields.Searchable.isSearchable(field);
+            }
+
+            @Override public Stream<String> searchableFields() {
+                return AnnotationFields.Searchable.searchableFields().stream();
+            }
+        };
     }
 
     private DbXRefLoader geneProductLoader() {
