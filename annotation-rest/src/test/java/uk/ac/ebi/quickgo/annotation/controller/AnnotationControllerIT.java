@@ -7,7 +7,9 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
 import static uk.ac.ebi.quickgo.annotation.controller.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
+import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
 
 /**
