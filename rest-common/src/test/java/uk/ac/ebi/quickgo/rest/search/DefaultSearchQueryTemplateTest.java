@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.query.Facet;
 import uk.ac.ebi.quickgo.rest.search.query.FieldProjection;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;

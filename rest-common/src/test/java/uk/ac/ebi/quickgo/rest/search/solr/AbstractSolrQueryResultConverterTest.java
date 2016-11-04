@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.results.*;
-import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -101,8 +100,8 @@ public class AbstractSolrQueryResultConverterTest {
         assertThat(result.getNumberOfHits(), is(0L));
         assertThat(result.getResults().isEmpty(), is(true));
 
-        int expectedTotalPages = 0;
-        int expectedCurrentPage = 0;
+        int expectedTotalPages = 1;
+        int expectedCurrentPage = 1;
         int expectedResultsPerPage = 1;
 
         checkPageInfo(result.getPageInfo(), expectedTotalPages, expectedCurrentPage, expectedResultsPerPage);

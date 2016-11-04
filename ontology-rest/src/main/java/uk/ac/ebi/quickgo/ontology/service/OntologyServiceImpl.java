@@ -1,11 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -21,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
