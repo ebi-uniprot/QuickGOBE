@@ -22,7 +22,7 @@ import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
 public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, GeneProductDocument> {
 
     /**
-     * The following values define how the contents of the Gene Product properties are describes
+     * The following values define how the contents of the Gene Product properties are described.
      * E.g <code>db_object_type=protein|go_aspect=cellular_component|target_set=KRUK,BHF-UCL</code>
      * where pipes are inter-value delimiters, the equals symbol is the intra-value delimiter
      * to split up keys and their value and comma is the delimiter for values for a single key.
