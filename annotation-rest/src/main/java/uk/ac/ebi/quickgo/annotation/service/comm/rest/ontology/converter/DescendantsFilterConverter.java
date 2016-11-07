@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
@@ -20,7 +21,8 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 public class DescendantsFilterConverter extends AbstractDescendantFilterConverter {
     @Override protected Consumer<String> processDescendant(
             ConvertedOntologyFilter.Result result, Set<QuickGOQuery> queries) {
-        return desc -> queries.add(createQueryForOntologyId(desc));
+        return desc -> queries.add(
+                QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc));
     }
 
     @Override protected ConvertedFilter<QuickGOQuery> createFilterForAllDescendants(Set<QuickGOQuery> queries) {
