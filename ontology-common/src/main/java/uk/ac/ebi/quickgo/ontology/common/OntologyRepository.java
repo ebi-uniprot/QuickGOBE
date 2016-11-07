@@ -1,8 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.common;
 
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
-
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

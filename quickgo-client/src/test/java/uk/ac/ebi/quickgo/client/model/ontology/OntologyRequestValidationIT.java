@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.client.model.ontology;
 
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
+import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 
 import java.util.Arrays;
 import java.util.Set;

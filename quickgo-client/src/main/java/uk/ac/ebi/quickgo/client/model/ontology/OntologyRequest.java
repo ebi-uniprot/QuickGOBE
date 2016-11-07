@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.client.model.ontology;
 
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
+import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import javax.validation.constraints.*;
 
 import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
-import static uk.ac.ebi.quickgo.ontology.common.document.OntologyFields.ONTOLOGY_TYPE;
+import static uk.ac.ebi.quickgo.ontology.common.OntologyFields.ONTOLOGY_TYPE;
 import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER;
 
 /**
