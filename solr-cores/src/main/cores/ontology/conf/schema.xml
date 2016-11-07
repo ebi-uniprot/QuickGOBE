@@ -21,8 +21,6 @@
     <!--                   Start of QuickGO Ontology fields                         -->
 
     <field name="id" type="lowercase" indexed="true" stored="true"/>
-    <!--Used for cross-core joins with other Solr cores, do not change the definition of the field-->
-    <field name="id_join" type="string" indexed="true" stored="false"/>
     <field name="ontologyType" type="string" indexed="true" stored="true"/>
     <field name="name" type="text_ignorecase" indexed="true" stored="true"/>
     <field name="secondaryId" type="lowercase" indexed="true" stored="true" multiValued="true"/>
@@ -82,9 +80,6 @@
 
     <copyField source="name" dest="exact_name"/>
     <copyField source="synonymName" dest="exact_synonym"/>
-
-    <!--Field used in cross-core joins with other collections-->
-    <copyField source="id" dest="id_join"/>
 
     <!--Use this for autocomplete searches-->
     <fieldType name="text_edge" class="solr.TextField" sortMissingLast="true" omitNorms="false"
