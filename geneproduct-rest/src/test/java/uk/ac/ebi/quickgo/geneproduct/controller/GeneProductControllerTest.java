@@ -47,7 +47,6 @@ public class GeneProductControllerTest {
     private static final List<String> SINGLE_CSV_LIST = singletonList(GENE_PRODUCT_ID1);
     private static final String MULTI_CSV = GENE_PRODUCT_ID1 + "," + GENE_PRODUCT_ID2 + "," + GENE_PRODUCT_ID3;
     private static final List<String> MULTI_CSV_LIST = asList(GENE_PRODUCT_ID1, GENE_PRODUCT_ID2, GENE_PRODUCT_ID3);
-    private static final String TARGET_SET = "KRUK";
     private static String multiCSVTooBig;
     private GeneProductController controller;
     private GeneProduct geneProduct1;
