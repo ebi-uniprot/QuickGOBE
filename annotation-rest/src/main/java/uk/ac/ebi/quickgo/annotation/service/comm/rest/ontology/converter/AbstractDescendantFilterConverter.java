@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 
@@ -27,6 +29,11 @@ abstract class AbstractDescendantFilterConverter
             new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
     private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "no descendants found for IDs, %s";
     private static final String DELIMITER = ", ";
+    private static final Pattern GO_MATCHER = Pattern.compile("^GO:[0-9]+$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern ECO_MATCHER = Pattern.compile("^ECO:[0-9]+$", Pattern.CASE_INSENSITIVE);
+    private static final String UNKNOWN_DESCENDANT_FORMAT =
+            "Unknown descendant encountered: %s. Expected either GO/ECO term.";
+
     private ConvertedFilter<QuickGOQuery> convertedFilter;
 
     AbstractDescendantFilterConverter() {
@@ -115,7 +122,8 @@ abstract class AbstractDescendantFilterConverter
     /**
      * Apply a {@link Consumer} action to each descendant in the descendants of {@code result}.
      *
-     * @param result the {@link uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter.Result}
+     * @param result the
+     * {@link uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter.Result}
      *               whose descendants are being iterated through
      * @param action the action to apply for each descendant
      */
@@ -145,5 +153,22 @@ abstract class AbstractDescendantFilterConverter
      */
     private static boolean notNullOrEmpty(String value) {
         return value != null && !value.trim().isEmpty();
+    }
+
+    /**
+     * Creates a {@link QuickGOQuery} based on a supplied ontology id.
+     * @param id the identifier of the ontology for which to create a {@link QuickGOQuery}
+     * @return the {@link QuickGOQuery} corresponding to the supplied ontology id
+     */
+    QuickGOQuery createQueryForOntologyId(String id) {
+        String field;
+        if (GO_MATCHER.matcher(id).matches()) {
+            field = AnnotationFields.GO_ID;
+        } else if (ECO_MATCHER.matcher(id).matches()) {
+            field = AnnotationFields.EVIDENCE_CODE;
+        } else {
+            throw new RetrievalException(String.format(UNKNOWN_DESCENDANT_FORMAT, id));
+        }
+        return QuickGOQuery.createQuery(field, id);
     }
 }
