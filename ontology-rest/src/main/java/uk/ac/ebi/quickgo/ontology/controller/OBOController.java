@@ -13,6 +13,7 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
@@ -115,7 +116,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status")
     @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
-        throw new IllegalArgumentException("The requested end-point does not exist.");
+        throw new ParameterException("The requested end-point does not exist.");
     }
 
     /**
@@ -130,6 +131,8 @@ public abstract class OBOController<T extends OBOTerm> {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
+
+        validationHelper.validatePageRequest(page);
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType(getOntologyType(),
                 new Page(page, MAX_PAGE_RESULTS)), HttpStatus.OK);
@@ -152,8 +155,8 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
-        return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds
-                (ids)));
+        return getResultsResponse(
+                ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -293,6 +296,7 @@ public abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         validationHelper.validateRequestedResults(limit);
+        validationHelper.validatePageRequest(page);
 
         QueryRequest request = buildRequest(
                 query,

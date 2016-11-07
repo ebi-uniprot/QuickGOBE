@@ -5,6 +5,9 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Concrete implementation of the {@link AnnotationDocConverter}.
@@ -14,6 +17,9 @@ import java.util.List;
  * Time: 16:52
  */
 public class AnnotationDocConverterImpl implements AnnotationDocConverter {
+
+    private static final String COMMA = ",";
+    private static final String COLON = ":";
 
     @Override public Annotation convert(AnnotationDocument annotationDocument) {
         Annotation annotation = new Annotation();
@@ -30,8 +36,8 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         annotation.assignedBy = annotationDocument.assignedBy;
 
         annotation.targetSets = asUnmodifiableList(annotationDocument.targetSets);
-        annotation.withFrom = asUnmodifiableList(annotationDocument.withFrom);
-        annotation.extensions = asUnmodifiableList(annotationDocument.extensions);
+        annotation.withFrom = asXRefList(annotationDocument.withFrom, this::createSimpleXRef);
+        annotation.extensions = asXRefList(annotationDocument.extensions, this::createQualifiedXRef);
         annotation.date = annotationDocument.date;
 
         return annotation;
@@ -47,5 +53,68 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         }
 
         return unmodifiableList;
+    }
+
+    private <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs> asXRefList(
+            List<String> csvs,
+            Function<String, T> xrefCreator) {
+        if (csvs != null && !csvs.isEmpty()) {
+
+            return csvs.stream()
+                    .map(xrefs -> createConnectedXRefs(xrefCreator, xrefs))
+                    .collect(Collectors.toList());
+        } else {
+            return null;
+        }
+    }
+
+    private <T extends Annotation.AbstractXref> Annotation.ConnectedXRefs<T> createConnectedXRefs(
+            Function<String, T> xrefCreator,
+            String xrefs) {
+        Annotation.ConnectedXRefs<T> connectedXRefs = new Annotation.ConnectedXRefs<>();
+
+        streamCSV(xrefs)
+                .map(xrefCreator)
+                .forEach(connectedXRefs::addXref);
+
+        return connectedXRefs;
+    }
+
+    private Annotation.SimpleXRef createSimpleXRef(String xref) {
+        String[] dbAndSig = extractDBAndSignature(xref);
+        return new Annotation.SimpleXRef(dbAndSig[0], dbAndSig[1]);
+    }
+
+    private Annotation.QualifiedXref createQualifiedXRef(String xref) {
+        String[] dbAndSig = extractDBAndSignature(extractContentsWithinParenthesis(xref));
+        String qualifier = extractQualifier(xref);
+        return new Annotation.QualifiedXref(dbAndSig[0], dbAndSig[1], qualifier);
+    }
+
+    private String extractQualifier(String unformattedXref) {
+        return unformattedXref.substring(0, unformattedXref.indexOf("("));
+    }
+
+    private String extractContentsWithinParenthesis(String unformattedXref) {
+        return unformattedXref.substring(unformattedXref.indexOf("(") + 1, unformattedXref.indexOf(")"));
+    }
+
+    private Stream<String> streamCSV(String xrefs) {return Stream.of(xrefs.split(COMMA));}
+
+    private String[] extractDBAndSignature(String xref) {
+        int colonPos = xref.indexOf(COLON);
+
+        String database;
+        String signature;
+
+        if (colonPos == -1) {
+            database = xref;
+            signature = null;
+        } else {
+            database = xref.substring(0, colonPos);
+            signature = xref.substring(colonPos + 1, xref.length());
+        }
+
+        return new String[]{database, signature};
     }
 }

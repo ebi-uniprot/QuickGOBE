@@ -124,8 +124,8 @@ public abstract class SearchControllerSetup {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.resultsPerPage")
                         .value(DEFAULT_ENTRIES_PER_PAGE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.current").value(0))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.total").value(0));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.current").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.total").value(1));
     }
 
     protected ResultActions checkResultsBodyResponse(String query) throws Exception {
