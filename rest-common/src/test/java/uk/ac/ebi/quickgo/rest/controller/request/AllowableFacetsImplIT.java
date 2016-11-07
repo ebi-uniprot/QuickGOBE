@@ -41,10 +41,10 @@ public class AllowableFacetsImplIT {
         @Bean
         FacetableField FacetableField() {
             return new FacetableField() {
-                private final List<String> notfacetable = Arrays.asList(INVALID_FACET_1, INVALID_FACET_2);
+                private final List<String> notFacetable = Arrays.asList(INVALID_FACET_1, INVALID_FACET_2);
 
                 @Override public boolean isFacetable(String field) {
-                    return !notfacetable.contains(field);
+                    return !notFacetable.contains(field);
                 }
 
                 @Override public Stream<String> facetableFields() {
