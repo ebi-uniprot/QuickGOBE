@@ -14,10 +14,8 @@ import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.EVIDENCE_CODE;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.EVIDENCE_CODE_USAGE_RELATIONSHIPS;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.GO_USAGE_RELATIONSHIPS;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.USAGE_RELATIONSHIPS;
 
 /**
  *
@@ -123,12 +121,12 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetGoUsage() {
+    public void setAndGetUsage() {
         String usage = "exact";
 
-        annotationRequest.setGoUsage(usage);
+        annotationRequest.setUsage(usage);
 
-        assertThat(annotationRequest.getGoUsage(), is(usage));
+        assertThat(annotationRequest.getUsage(), is(usage));
     }
 
     @Test
@@ -141,134 +139,59 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetGoUsageRelationships() {
+    public void setAndGetUsageRelationships() {
         String[] usageRelationships = {"iS_", "paRt_of"};
 
-        annotationRequest.setGoUsageRelationships(usageRelationships);
+        annotationRequest.setUsageRelationships(usageRelationships);
 
         String[] expectedLowerCaseRels = Stream.of(usageRelationships)
                 .map(String::toLowerCase)
                 .toArray(String[]::new);
 
-        assertThat(annotationRequest.getGoUsageRelationships(), arrayContaining(expectedLowerCaseRels));
+        assertThat(annotationRequest.getUsageRelationships(), arrayContaining(expectedLowerCaseRels));
     }
 
     @Test
-    public void createsFilterWithCaseInsensitiveGoUsageAndGoIds() {
+    public void createsFilterWithCaseInsensitiveUsageAndGoIds() {
         String usage = "descEndants";
         String goId = "GO:0000001";
 
-        annotationRequest.setGoUsage(usage);
+        annotationRequest.setUsage(usage);
         annotationRequest.setGoId(goId);
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(usage.toLowerCase())
                 .addProperty(GO_ID, goId.toUpperCase())
-                .addProperty(GO_USAGE_RELATIONSHIPS)
+                .addProperty(USAGE_RELATIONSHIPS)
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
                 contains(request));
     }
 
     @Test
-    public void createsFilterWithCaseInsensitiveUsageAndGoIdsAndGoUsageRelationships() {
+    public void createsFilterWithCaseInsensitiveUsageAndGoIdsAndUsageRelationships() {
         String usage = "deSCendants";
         String goId = "GO:0000001";
         String relationships = "is_A";
 
-        annotationRequest.setGoUsage(usage);
+        annotationRequest.setUsage(usage);
         annotationRequest.setGoId(goId);
-        annotationRequest.setGoUsageRelationships(relationships);
+        annotationRequest.setUsageRelationships(relationships);
 
         assertThat(annotationRequest.createFilterRequests(),
                 contains(FilterRequest.newBuilder()
                         .addProperty(usage.toLowerCase())
                         .addProperty(GO_ID, goId.toUpperCase())
-                        .addProperty(GO_USAGE_RELATIONSHIPS, relationships.toLowerCase())
+                        .addProperty(USAGE_RELATIONSHIPS, relationships.toLowerCase())
                         .build()));
     }
 
     @Test(expected = ParameterException.class)
-    public void cannotCreateFilterWithUsageAndNoGoUsageIds() {
-        annotationRequest.setGoUsage("descendants");
+    public void cannotCreateFilterWithUsageAndNoUsageIds() {
+        annotationRequest.setUsage("descendants");
 
         annotationRequest.createFilterRequests();
     }
-
-    //-----------------
-    @Test
-    public void setAndGetEvidenceCodeUsage() {
-        String usage = "descendants";
-
-        annotationRequest.setEvidenceCodeUsage(usage);
-
-        assertThat(annotationRequest.getEvidenceCodeUsage(), is(usage));
-    }
-
-    @Test
-    public void setAndGetEvidenceCodeIds() {
-        String[] usageIds = {"GO:0000001", "GO:0000002"};
-
-        annotationRequest.setEvidenceCode(usageIds);
-
-        assertThat(annotationRequest.getEvidenceCode(), is(usageIds));
-    }
-
-    @Test
-    public void setAndGetEvidenceCodeUsageRelationships() {
-        String[] usageRelationships = {"iS_", "paRt_of"};
-
-        annotationRequest.setEvidenceCodeUsageRelationships(usageRelationships);
-
-        String[] expectedLowerCaseRels = Stream.of(usageRelationships)
-                .map(String::toLowerCase)
-                .toArray(String[]::new);
-
-        assertThat(annotationRequest.getEvidenceCodeUsageRelationships(), arrayContaining(expectedLowerCaseRels));
-    }
-
-    @Test
-    public void createsFilterWithCaseInsensitiveEvidenceCodeUsageAndIds() {
-        String usage = "descEndants";
-        String id = "ECO:0000001";
-
-        annotationRequest.setEvidenceCodeUsage(usage);
-        annotationRequest.setEvidenceCode(id);
-
-        FilterRequest request = FilterRequest.newBuilder()
-                .addProperty(usage.toLowerCase())
-                .addProperty(EVIDENCE_CODE, id.toUpperCase())
-                .addProperty(EVIDENCE_CODE_USAGE_RELATIONSHIPS)
-                .build();
-        assertThat(annotationRequest.createFilterRequests(),
-                contains(request));
-    }
-
-    @Test
-    public void createsFilterWithCaseInsensitiveEvidenceCodeUsageAndIdsAndRelationships() {
-        String usage = "deSCendants";
-        String id = "ECO:0000001";
-        String relationships = "is_A";
-
-        annotationRequest.setEvidenceCodeUsage(usage);
-        annotationRequest.setEvidenceCode(id);
-        annotationRequest.setEvidenceCodeUsageRelationships(relationships);
-
-        assertThat(annotationRequest.createFilterRequests(),
-                contains(FilterRequest.newBuilder()
-                        .addProperty(usage.toLowerCase())
-                        .addProperty(EVIDENCE_CODE, id.toUpperCase())
-                        .addProperty(EVIDENCE_CODE_USAGE_RELATIONSHIPS, relationships.toLowerCase())
-                        .build()));
-    }
-
-    @Test(expected = ParameterException.class)
-    public void cannotCreateFilterWithEvidenceCodeUsageAndNoIds() {
-        annotationRequest.setEvidenceCodeUsage("descendants");
-
-        annotationRequest.createFilterRequests();
-    }
-    //-----------------
 
     @Test
     public void setAndGetQualifier() {

@@ -4,6 +4,6 @@
 search:
   external:
     filterConfigs:
-      - signature: goIds,goUsage,relations
+      - signature: goIds,relations,usage
         execution: REST_COMM
         properties: {ip: 123.456.789, resourceFormat: endpoint, localField: goId}

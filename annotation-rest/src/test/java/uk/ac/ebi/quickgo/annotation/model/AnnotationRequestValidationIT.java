@@ -505,35 +505,35 @@ public class AnnotationRequestValidationIT {
     //USAGE PARAMETERS
     @Test
     public void descendantsUsageIsValid() {
-        annotationRequest.setGoUsage("descendants");
+        annotationRequest.setUsage("descendants");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void slimUsageIsValid() {
-        annotationRequest.setGoUsage("slim");
+        annotationRequest.setUsage("slim");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void exactUsageIsInvalid() {
-        annotationRequest.setGoUsage("exact");
+        annotationRequest.setUsage("exact");
 
         assertThat(validator.validate(annotationRequest), hasSize(1));
     }
 
     @Test
     public void usageValueIsInvalid() {
-        annotationRequest.setGoUsage("thisDoesNotExistAsAValidUsage");
+        annotationRequest.setUsage("thisDoesNotExistAsAValidUsage");
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
     public void usageRelationshipIsValid() {
-        annotationRequest.setGoUsageRelationships("is_a");
+        annotationRequest.setUsageRelationships("is_a");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -542,7 +542,7 @@ public class AnnotationRequestValidationIT {
     public void usageRelationshipIsInvalid() {
         String invalidRel = "invalid_relationship";
 
-        annotationRequest.setGoUsageRelationships(invalidRel);
+        annotationRequest.setUsageRelationships(invalidRel);
 
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
@@ -553,7 +553,7 @@ public class AnnotationRequestValidationIT {
 
     @Test(expected = ParameterException.class)
     public void cannotCreateFilterWithUsageAndNoUsageIds() {
-        annotationRequest.setGoUsage("descendants");
+        annotationRequest.setUsage("descendants");
 
         annotationRequest.createFilterRequests();
     }
