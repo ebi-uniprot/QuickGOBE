@@ -30,7 +30,7 @@ public class GeneProductFields {
     static final String IS_ISOFORM = "isIsoform";
     static final String IS_ANNOTATED = "isAnnotated";
     static final String PARENT_ID = "parentId";
-
+    static final String TARGET_SET = "targetSet";
     /**
      * GeneProduct fields that are stored, and can therefore be retrieved.
      */
@@ -62,6 +62,7 @@ public class GeneProductFields {
         public static final String TYPE = storeAndGet(VALUES, "type_lowercase");
         public static final String TAXON_ID = storeAndGet(VALUES, GeneProductFields.TAXON_ID);
         public static final String DATABASE_SUBSET = storeAndGet(VALUES, "dbSubset_lowercase");
+        public static final String TARGET_SET = storeAndGet(VALUES, GeneProductFields.TARGET_SET);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);

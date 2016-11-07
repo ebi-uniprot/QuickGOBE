@@ -145,6 +145,18 @@ public class GeneProductController {
     }
 
     /**
+     * Perform a lookup of gene products associated to a target set.
+     * @param name name of target set
+     * @return lookup results
+     */
+    @RequestMapping(value="/targetset/{name}", method = {RequestMethod.GET}, produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<GeneProduct>> findByTargetSet(@PathVariable String name) {
+        return getGeneProductResponse(geneProductService.findByTargetSet(name));
+    }
+
+
+    /**
      * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.
      *
      * @param docList a list of results

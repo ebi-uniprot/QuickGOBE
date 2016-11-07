@@ -20,4 +20,11 @@ public interface GeneProductService {
 	 * chosen information
 	 */
 	List<GeneProduct> findById(List<String> ids);
+
+	/**
+	 * Find gene products core data for all gene products associated with the named target set.
+	 * @param name value to match for target gene product set name.
+	 * @return a list of gene product instances that match the target set name, or empty list if no matches are found.
+	 */
+    List<GeneProduct> findByTargetSet(String name);
 }
