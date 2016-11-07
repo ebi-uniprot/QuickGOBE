@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.service.converter;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 
 /**

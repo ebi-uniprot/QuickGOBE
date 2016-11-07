@@ -10,7 +10,6 @@ import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
@@ -60,7 +59,6 @@ public class GeneProductController {
     public GeneProductController(
             GeneProductService geneProductService,
             SearchService<GeneProduct> geneProductSearchService,
-            SearchableField geneProductSearchableField,
             SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig,
             ControllerValidationHelper controllerValidationHelper,
             FilterConverterFactory converterFactory) {
@@ -68,7 +66,6 @@ public class GeneProductController {
         checkArgument(geneProductService != null,
                 "The GeneProductService instance passed to the constructor of GeneProductController must not be null.");
         checkArgument(geneProductSearchService != null, "The SearchService<GeneProduct> must not be null.");
-        checkArgument(geneProductSearchableField != null, "The gene product SearchableField must not be null");
         checkArgument(geneProductRetrievalConfig != null, "The GeneProductCompositeRetrievalConfig must not be null");
         checkArgument(controllerValidationHelper != null, "The ControllerValidationHelper must not be null");
         checkArgument(converterFactory != null, "The FilterConverterFactory must not be null");
@@ -78,7 +75,7 @@ public class GeneProductController {
         this.controllerValidationHelper = controllerValidationHelper;
         this.converterFactory = converterFactory;
 
-        this.requestTemplate = new DefaultSearchQueryTemplate(geneProductSearchableField);
+        this.requestTemplate = new DefaultSearchQueryTemplate();
         this.requestTemplate.setReturnedFields(geneProductRetrievalConfig.getSearchReturnedFields());
         this.requestTemplate.setHighlighting(geneProductRetrievalConfig.repo2DomainFieldMap().keySet(),
                 geneProductRetrievalConfig.getHighlightStartDelim(),

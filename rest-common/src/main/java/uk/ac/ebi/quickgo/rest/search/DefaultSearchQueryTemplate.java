@@ -5,11 +5,7 @@ import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
-import com.google.common.base.Preconditions;
 import java.util.*;
-
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFacets;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.isValidFilterQueries;
 
 /**
  * Records common configuration details required to create a {@link QueryRequest} instance,
@@ -31,16 +27,12 @@ public class DefaultSearchQueryTemplate {
     public static final int DEFAULT_PAGE_NUMBER = 1;
     private static final boolean NO_HIGHLIGHTING = false;
 
-    private final SearchableField fieldSpec;
-
     private String highlightStartDelim;
     private String highlightEndDelim;
     private Iterable<String> returnedFields;
     private Iterable<String> highlightedFields;
 
-    public DefaultSearchQueryTemplate(SearchableField fieldSpec) {
-        Preconditions.checkArgument(fieldSpec != null, "Search fields cannot be null");
-        this.fieldSpec = fieldSpec;
+    public DefaultSearchQueryTemplate() {
         this.returnedFields = Collections.emptyList();
         this.highlightedFields = Collections.emptyList();
         this.highlightStartDelim = "";
@@ -70,7 +62,6 @@ public class DefaultSearchQueryTemplate {
 
     public Builder newBuilder() {
         return new Builder(
-                fieldSpec,
                 returnedFields,
                 highlightedFields,
                 highlightStartDelim,
@@ -89,12 +80,10 @@ public class DefaultSearchQueryTemplate {
         private QuickGOQuery query;
         private int page = DEFAULT_PAGE_NUMBER;
         private int pageSize = DEFAULT_PAGE_SIZE;
-        private SearchableField fieldSpec;
         private boolean highlighting;
         private AggregateRequest aggregate;
 
         private Builder(
-                SearchableField fieldSpec,
                 Iterable<String> returnedFields,
                 Iterable<String> highlightedFields,
                 String highlightStartDelim,
@@ -103,7 +92,6 @@ public class DefaultSearchQueryTemplate {
             this.highlightStartDelim = highlightStartDelim;
             this.highlightEndDelim = highlightEndDelim;
             this.returnedFields = returnedFields;
-            this.fieldSpec = fieldSpec;
 
             this.facets = new HashSet<>();
             this.filterQueries = new HashSet<>();
@@ -196,8 +184,6 @@ public class DefaultSearchQueryTemplate {
         }
 
         @Override public QueryRequest build() {
-            checkFacets(facets);
-
             QueryRequest.Builder builder = new QueryRequest.Builder(query);
             builder.setPageParameters(page, pageSize);
 
@@ -218,29 +204,6 @@ public class DefaultSearchQueryTemplate {
             builder.setAggregate(aggregate);
 
             return builder.build();
-        }
-
-        /**
-         * Checks the specified facets are all searchable fields.
-         *
-         * @param facets the facets
-         */
-        void checkFacets(Iterable<String> facets) {
-            if (!isValidFacets(fieldSpec, facets)) {
-                throw new ParameterException("At least one of the provided facets is not searchable: " + facets);
-            }
-        }
-
-        /**
-         * Checks the specified filters all refer to searchable fields.
-         *
-         * @param filterQueries the filter queries
-         */
-        void checkFilters(Iterable<String> filterQueries) {
-            if (!isValidFilterQueries(fieldSpec, filterQueries)) {
-                throw new ParameterException("At least one of the provided filter queries is not filterable: " +
-                        filterQueries);
-            }
         }
 
         @Override public QueryRequest.Builder builder() {

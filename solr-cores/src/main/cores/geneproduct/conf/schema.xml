@@ -41,13 +41,15 @@
     <!-- Following fields are for search purposes -->
     <!-- If an indexed field is marked as stored. It is because this field is used for highlighting purposes -->
     <field name="text" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <field name="dbSubset_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <field name="type_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="false"/>
+
 
     <!-- autocomplete search fields -->
     <field name="id_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="name_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="symbol_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <field name="synonym_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
-    <field name="dbSubset_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
     <field name="taxonName_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="false"/>
 
     <field name="symbol_edge" type="text_edge" indexed="true" stored="true" multiValued="false"/>
@@ -98,6 +100,7 @@
     <copyField source="synonym" dest="text"/>
 
     <copyField source="dbSubset" dest="dbSubset_lowercase"/>
+    <copyField source="type" dest="type_lowercase"/>
 
     <!--Use this for autocomplete searches-->
     <fieldType name="text_edge" class="solr.TextField" sortMissingLast="true" omitNorms="false"
