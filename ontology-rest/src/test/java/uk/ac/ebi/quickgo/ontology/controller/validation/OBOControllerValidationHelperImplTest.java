@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller.validation;
 
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.rest.ParameterException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,11 +44,11 @@ public class OBOControllerValidationHelperImplTest {
 
     @Test
     public void checkInvalidTraversalRelationshipTypes() {
-        List<ParameterException> exceptions = new ArrayList<>();
+        List<IllegalArgumentException> exceptions = new ArrayList<>();
         for (OntologyRelationType relationship : OntologyRelationType.values()) {
             try {
                 validator.checkValidTraversalRelationType(relationship);
-            } catch (ParameterException exception) {
+            } catch (IllegalArgumentException exception) {
                 exceptions.add(exception);
             }
         }
@@ -76,12 +75,12 @@ public class OBOControllerValidationHelperImplTest {
         assertThat(validRelations, containsInAnyOrder(validRelation0, validRelation1));
     }
 
-    @Test(expected = ParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void checkValidationWorksFor1InvalidRelation() {
         validator.validateRelationTypes(invalidRelationships.get(0).getLongName());
     }
 
-    @Test(expected = ParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void checkValidationWorksFor2InvalidRelations() {
         validator.validateRelationTypes(
                 toCSV(invalidRelationships.get(0).getLongName(), invalidRelationships.get(1)

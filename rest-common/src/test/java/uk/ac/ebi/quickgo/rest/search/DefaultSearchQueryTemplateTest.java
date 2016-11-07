@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.query.Facet;
 import uk.ac.ebi.quickgo.rest.search.query.FieldProjection;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
@@ -63,13 +62,13 @@ public class DefaultSearchQueryTemplateTest {
         new DefaultSearchQueryTemplate(null);
     }
 
-    @Test(expected = ParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void nonSearchableFacetThrowsException() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         requestBuilder.checkFacets(Collections.singleton("nonExistingFacet"));
     }
 
-    @Test(expected = ParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void nonSearchableFilterThrowsException() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         requestBuilder.checkFilters(Collections.singleton("nonExistingFilterField:someQuery"));

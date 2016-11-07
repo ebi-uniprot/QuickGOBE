@@ -19,24 +19,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  */
 @ControllerAdvice
 public class ResponseExceptionHandler {
-    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class, RetrievalException.class,
-            ServiceConfigException.class})
+    @ExceptionHandler({IllegalStateException.class, RetrievalException.class, ServiceConfigException.class})
     protected ResponseEntity<ErrorInfo> handleInternalServer(RuntimeException ex, HttpServletRequest request) {
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler({ParameterException.class})
-    protected ResponseEntity<ErrorInfo> handleParameterErrorRequest(ParameterException ex, HttpServletRequest request) {
-        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(),
-                ex.getMessages().collect(Collectors.toList()));
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<ErrorInfo> handleBadRequest(RuntimeException ex, HttpServletRequest request) {
+        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({QuickGoIndexOutOfBoundsException.class})
-    protected ResponseEntity<ErrorInfo> handleInvalidRequest(QuickGoIndexOutOfBoundsException ex,
-            HttpServletRequest request) {
-        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), ex.getMessage());
+    @ExceptionHandler(ParameterException.class)
+    protected ResponseEntity<ErrorInfo> handleParameterErrorRequest(ParameterException ex, HttpServletRequest request) {
+        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(),
+                ex.getMessages().collect(Collectors.toList()));
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 

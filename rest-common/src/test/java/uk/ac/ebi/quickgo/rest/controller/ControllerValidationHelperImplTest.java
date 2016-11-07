@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
-import uk.ac.ebi.quickgo.rest.ParameterException;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,13 +24,13 @@ public class ControllerValidationHelperImplTest {
                 id -> id.matches(ID_FORMAT));
     }
 
-    @Test(expected = ParameterException.class)
-    public void invalidIdAtStartProducesException() {
+    @Test(expected = IllegalArgumentException.class)
+    public void invalidIdAtStartProducesIllegalArgumentException() {
         controllerValidator.validateCSVIds("wrongFormat");
     }
 
-    @Test(expected = ParameterException.class)
-    public void invalidIdAfterStartProducesException() {
+    @Test(expected = IllegalArgumentException.class)
+    public void invalidIdAfterStartProducesIllegalArgumentException() {
         controllerValidator.validateCSVIds("id1,wrongFormat");
     }
 
@@ -63,7 +61,7 @@ public class ControllerValidationHelperImplTest {
     }
 
     // result validation
-    @Test(expected = ParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void tooManyResultsIsInvalid() {
         controllerValidator.validateRequestedResults(MAX_RESULTS + 1);
     }
@@ -80,7 +78,7 @@ public class ControllerValidationHelperImplTest {
         controllerValidator.validateRequestedResults(1);
     }
 
-    @Test(expected = ParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void tooManyResultsIsInvalidForDefaultValidator() {
         defaultControllerValidator.validateRequestedResults(ControllerValidationHelperImpl.MAX_PAGE_RESULTS + 1);
     }
@@ -115,25 +113,5 @@ public class ControllerValidationHelperImplTest {
     @Test
     public void createsListFromCSVForTwoItems() {
         assertThat(defaultControllerValidator.csvToList("a,b").size(), is(2));
-    }
-
-    @Test(expected = ParameterException.class)
-    public void negativePageNumberThrowsException() throws Exception {
-        defaultControllerValidator.validatePageRequest(-1);
-    }
-
-    @Test(expected = ParameterException.class)
-    public void zeroPageNumberThrowsException() throws Exception {
-        defaultControllerValidator.validatePageRequest(0);
-    }
-
-    @Test
-    public void onePageNumberIsValid() throws Exception {
-        defaultControllerValidator.validatePageRequest(1);
-    }
-
-    @Test
-    public void positivePageNumberIsValid() throws Exception {
-        defaultControllerValidator.validatePageRequest(3);
     }
 }
