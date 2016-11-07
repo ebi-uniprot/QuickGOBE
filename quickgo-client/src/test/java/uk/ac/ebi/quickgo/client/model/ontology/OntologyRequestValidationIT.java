@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.client.model.ontology;
 
-import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
-
 import java.util.Arrays;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -14,6 +12,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static uk.ac.ebi.quickgo.ontology.common.OntologyFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.DEFAULT_ERROR_MSG;
 
 /**
@@ -143,7 +142,7 @@ public class OntologyRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(String.format(DEFAULT_ERROR_MSG, OntologyFields.ASPECT, incorrectAspect)));
+                is(String.format(DEFAULT_ERROR_MSG, Searchable.ASPECT, incorrectAspect)));
     }
 
     @Test

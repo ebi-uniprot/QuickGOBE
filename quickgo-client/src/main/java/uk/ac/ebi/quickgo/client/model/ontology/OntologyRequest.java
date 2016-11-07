@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.client.model.ontology;
 
-import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -16,7 +15,7 @@ import java.util.stream.Stream;
 import javax.validation.constraints.*;
 
 import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
-import static uk.ac.ebi.quickgo.ontology.common.OntologyFields.ONTOLOGY_TYPE;
+import static uk.ac.ebi.quickgo.ontology.common.OntologyFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER;
 
 /**
@@ -32,7 +31,7 @@ public class OntologyRequest {
     static final int MIN_ENTRIES_PER_PAGE = 0;
     static final int MAX_ENTRIES_PER_PAGE = 100;
 
-    private static final String[] TARGET_FIELDS = new String[]{OntologyFields.ASPECT, ONTOLOGY_TYPE};
+    private static final String[] TARGET_FIELDS = new String[]{Searchable.ASPECT, Searchable.ONTOLOGY_TYPE};
 
     @ApiModelProperty(value = "Indicates whether the result set should be highlighted")
     private boolean highlighting = false;
@@ -117,24 +116,25 @@ public class OntologyRequest {
             paramName = "aspect",
             flags = Flag.CASE_INSENSITIVE)
     public String[] getAspect() {
-        return filterMap.get(OntologyFields.ASPECT);
+        return filterMap.get(Searchable.ASPECT);
     }
 
     public void setAspect(String... filterByAspect) {
         if (filterByAspect != null) {
-            filterMap.put(OntologyFields.ASPECT, filterByAspect);
+            filterMap.put(Searchable.ASPECT, filterByAspect);
         }
     }
 
     @Pattern(regexp = "go|eco", flags = CASE_INSENSITIVE,
             message = "Provided ontology type is invalid: ${validatedValue}")
     public String getOntologyType() {
-        return filterMap.get(ONTOLOGY_TYPE) == null ? null : filterMap.get(ONTOLOGY_TYPE)[0];
+        return filterMap.get(Searchable.ONTOLOGY_TYPE) == null ? null :
+                filterMap.get(Searchable.ONTOLOGY_TYPE)[0];
     }
 
     public void setOntologyType(String filterByType) {
         if (filterByType != null) {
-            filterMap.put(ONTOLOGY_TYPE, new String[]{filterByType});
+            filterMap.put(Searchable.ONTOLOGY_TYPE, new String[]{filterByType});
         }
     }
 

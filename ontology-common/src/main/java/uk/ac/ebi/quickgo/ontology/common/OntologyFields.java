@@ -47,18 +47,30 @@ public class OntologyFields {
     public static final class Searchable {
         private static final Set<String> VALUES = new HashSet<>();
 
-        public static final String ASPECT = storeAndGet(VALUES, OntologyFields.ASPECT);
-        public static final String ID = storeAndGet(VALUES, OntologyFields.ID);
-        public static final String DEFINITION = storeAndGet(VALUES, OntologyFields.DEFINITION);
-        public static final String NAME = storeAndGet(VALUES, OntologyFields.NAME);
-        public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, OntologyFields.ONTOLOGY_TYPE);
-        public static final String SYNONYM_NAME = storeAndGet(VALUES, OntologyFields.SYNONYM_NAME);
+        public static final String ASPECT = storeAndGet(VALUES, "aspect_lowercase");
+        public static final String ID = storeAndGet(VALUES, "id_lowercase");
+        public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, "ontologyType_lowercase");
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);
         }
 
         public static Set<String> searchableFields() {
+            return Collections.unmodifiableSet(VALUES);
+        }
+    }
+
+    public static class Facetable {
+        private static final Set<String> VALUES = new HashSet<>();
+
+        public static final String ASPECT = storeAndGet(VALUES, OntologyFields.ASPECT);
+        public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, OntologyFields.ONTOLOGY_TYPE);
+
+        public static boolean isFacetable(String field) {
+            return VALUES.contains(field);
+        }
+
+        public static Set<String> facetableFields() {
             return Collections.unmodifiableSet(VALUES);
         }
     }
