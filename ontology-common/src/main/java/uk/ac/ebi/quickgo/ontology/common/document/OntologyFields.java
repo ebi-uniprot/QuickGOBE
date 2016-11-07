@@ -47,47 +47,6 @@ public class OntologyFields {
     public final static String PROTEIN_COMPLEXES = "proteinComplexes";
 
     /**
-     * Ontology fields that are stored, and can therefore be retrieved.
-     */
-    public static final class Retrievable extends OntologyFields {
-        private static final Set<String> VALUES = new HashSet<>();
-
-        public static final String ID = storeAndGet(VALUES, OntologyFields.ID);
-        public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, OntologyFields.ONTOLOGY_TYPE);
-        public static final String NAME = storeAndGet(VALUES, OntologyFields.NAME);
-        public static final String IS_OBSOLETE = storeAndGet(VALUES, OntologyFields.IS_OBSOLETE);
-        public static final String REPLACES = storeAndGet(VALUES, OntologyFields.REPLACES);
-        public static final String REPLACEMENTS = storeAndGet(VALUES, OntologyFields.REPLACEMENTS);
-        public static final String DEFINITION = storeAndGet(VALUES, OntologyFields.DEFINITION);
-        public static final String COMMENT = storeAndGet(VALUES, OntologyFields.COMMENT);
-        public static final String ASPECT = storeAndGet(VALUES, OntologyFields.ASPECT);
-        public static final String USAGE = storeAndGet(VALUES, OntologyFields.USAGE);
-        public static final String SUBSET = storeAndGet(VALUES, OntologyFields.SUBSET);
-        public static final String CHILDREN = storeAndGet(VALUES, OntologyFields.CHILDREN);
-        public static final String SYNONYM = storeAndGet(VALUES, OntologyFields.SYNONYM);
-        public static final String HISTORY = storeAndGet(VALUES, OntologyFields.HISTORY);
-        public static final String XREF = storeAndGet(VALUES, OntologyFields.XREF);
-        public static final String ANNOTATION_GUIDELINE = storeAndGet(VALUES, OntologyFields.ANNOTATION_GUIDELINE);
-        public static final String TAXON_CONSTRAINT = storeAndGet(VALUES, OntologyFields.TAXON_CONSTRAINT);
-        public static final String XRELATION = storeAndGet(VALUES, OntologyFields.XRELATION);
-        public static final String BLACKLIST = storeAndGet(VALUES, OntologyFields.BLACKLIST);
-        public static final String SECONDARY_ID = storeAndGet(VALUES, OntologyFields.SECONDARY_ID);
-        public static final String DEFINITION_XREF = storeAndGet(VALUES, OntologyFields.DEFINITION_XREFS);
-        public static final String ANCESTOR = storeAndGet(VALUES, OntologyFields.ANCESTOR);
-        public static final String GO_DISCUSSIONS = storeAndGet(VALUES, OntologyFields.GO_DISCUSSIONS);
-        public static final String CREDITS = storeAndGet(VALUES, OntologyFields.CREDITS);
-        public final static String PROTEIN_COMPLEXES = storeAndGet(VALUES, OntologyFields.PROTEIN_COMPLEXES);
-
-        public static boolean isRetrievable(String field) {
-            return VALUES.contains(field);
-        }
-
-        private static Set<String> retrievableFields() {
-            return Collections.unmodifiableSet(VALUES);
-        }
-    }
-
-    /**
      * Ontology fields that are indexed, and can therefore be searched.
      */
     public static final class Searchable {
