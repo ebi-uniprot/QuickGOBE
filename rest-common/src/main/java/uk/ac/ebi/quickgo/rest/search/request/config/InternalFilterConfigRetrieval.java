@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
-import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
+import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import com.google.common.base.Preconditions;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Takes care of providing {@link FilterConfig} instances for {@link FilterRequest}
- * signatures that are searchable via the provided{@link SearchableDocumentFields} instance.
+ * signatures that are searchable via the provided{@link SearchableField} instance.
  *
  * @author Ricardo Antunes
  */
@@ -22,11 +22,11 @@ import org.springframework.stereotype.Component;
     private final Map<Set<String>, FilterConfig> executionConfigs;
 
     @Autowired
-    public InternalFilterConfigRetrieval(SearchableDocumentFields searchableDocumentFields) {
+    public InternalFilterConfigRetrieval(SearchableField searchableField) {
         Preconditions
-                .checkArgument(searchableDocumentFields != null, "SearchableDocumentFields instance cannot be null.");
+                .checkArgument(searchableField != null, "SearchableField instance cannot be null.");
 
-        executionConfigs = populateExecutionConfigs(searchableDocumentFields);
+        executionConfigs = populateExecutionConfigs(searchableField);
     }
 
     @Override public Optional<FilterConfig> getBySignature(Set<String> signature) {
@@ -35,11 +35,10 @@ import org.springframework.stereotype.Component;
         return Optional.ofNullable(executionConfigs.get(signature));
     }
 
-    private Map<Set<String>, FilterConfig> populateExecutionConfigs(SearchableDocumentFields
-            searchableDocumentFields) {
+    private Map<Set<String>, FilterConfig> populateExecutionConfigs(SearchableField searchableField) {
         final FilterConfig.ExecutionType executionType = FilterConfig.ExecutionType.SIMPLE;
 
-        return searchableDocumentFields.searchableDocumentFields()
+        return searchableField.searchableFields()
                 .map(field -> createRequestConfig(field, executionType))
                 .collect(Collectors.toMap(FilterConfig::getSignature, Function.identity()));
     }

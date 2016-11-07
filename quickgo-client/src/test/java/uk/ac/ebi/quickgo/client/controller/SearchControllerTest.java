@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.client.controller;
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 
 import org.junit.Test;
@@ -21,9 +20,6 @@ public class SearchControllerTest {
     private SearchService<OntologyTerm> searchService;
 
     @Mock
-    private SearchableField searchableField;
-
-    @Mock
     private SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig;
 
     @Mock
@@ -33,7 +29,6 @@ public class SearchControllerTest {
     public void controllerInstantiationFailsOnNullSearchService() {
         new SearchController(
                 null,
-                searchableField,
                 retrievalConfig,
                 converterFactory);
     }
@@ -41,7 +36,6 @@ public class SearchControllerTest {
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullSearchableField() {
         new SearchController(
-                searchService,
                 null,
                 retrievalConfig,
                 converterFactory);
@@ -51,7 +45,6 @@ public class SearchControllerTest {
     public void controllerInstantiationFailsOnNullRetrievalConfig() {
         new SearchController(
                 searchService,
-                searchableField,
                 null,
                 converterFactory);
     }
@@ -60,7 +53,6 @@ public class SearchControllerTest {
     public void controllerInstantiationFailsOnNullConverterFactory() {
         new SearchController(
                 searchService,
-                searchableField,
                 retrievalConfig,
                 null);
     }

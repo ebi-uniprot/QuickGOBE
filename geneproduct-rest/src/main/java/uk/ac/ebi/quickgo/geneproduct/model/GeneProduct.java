@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 
 import java.util.List;
 

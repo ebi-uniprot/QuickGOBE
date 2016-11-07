@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
-import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.common.SearchableField;
 
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
@@ -13,16 +12,12 @@ import org.springframework.stereotype.Component;
  * @author Ricardo Antunes
  */
 @Component
-public class AnnotationSearchableField implements SearchableField, SearchableDocumentFields {
-    @Override public boolean isDocumentSearchable(String field) {
-        return AnnotationFields.Searchable.isSearchable(field);
-    }
-
-    @Override public Stream<String> searchableDocumentFields() {
-        return AnnotationFields.Searchable.searchableFields().stream();
-    }
-
+public class AnnotationSearchableField implements SearchableField {
     @Override public boolean isSearchable(String field) {
         return AnnotationFields.Searchable.isSearchable(field);
+    }
+
+    @Override public Stream<String> searchableFields() {
+        return AnnotationFields.Searchable.searchableFields().stream();
     }
 }

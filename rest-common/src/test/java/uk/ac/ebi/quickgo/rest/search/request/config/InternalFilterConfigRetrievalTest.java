@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
-import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
+import uk.ac.ebi.quickgo.common.SearchableField;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -33,20 +33,20 @@ public class InternalFilterConfigRetrievalTest {
     private InternalFilterConfigRetrieval config;
 
     @Mock
-    private SearchableDocumentFields searchableDocumentFields;
+    private SearchableField searchableField;
 
     @Before
     public void setUp() throws Exception {
-        when(searchableDocumentFields.isDocumentSearchable(SEARCHABLE_FIELD_NAME)).thenReturn(true);
+        when(searchableField.isSearchable(SEARCHABLE_FIELD_NAME)).thenReturn(true);
 
-        when(searchableDocumentFields.searchableDocumentFields()).thenReturn(Stream.of(SEARCHABLE_FIELD_NAME));
-        config = new InternalFilterConfigRetrieval(searchableDocumentFields);
+        when(searchableField.searchableFields()).thenReturn(Stream.of(SEARCHABLE_FIELD_NAME));
+        config = new InternalFilterConfigRetrieval(searchableField);
     }
 
     @Test
     public void nullSearchableFieldThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("SearchableDocumentFields instance cannot be null.");
+        thrown.expectMessage("SearchableField instance cannot be null.");
 
         config = new InternalFilterConfigRetrieval(null);
     }

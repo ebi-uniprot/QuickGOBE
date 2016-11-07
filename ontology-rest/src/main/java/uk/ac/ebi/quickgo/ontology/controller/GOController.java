@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.GOTermPredicate;
@@ -8,7 +9,6 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;

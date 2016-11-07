@@ -1,10 +1,9 @@
 package uk.ac.ebi.quickgo.geneproduct.search;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
 import org.apache.http.HttpStatus;
@@ -23,12 +22,14 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     @Autowired
     private GeneProductRepository repository;
 
-    private static final String ONTOLOGY_RESOURCE_URL = "/geneproduct/search";
+    private static final String GENE_PRODUCT_RESOURCE_URL = "/geneproduct/search";
+    private static final String TYPE_FILTER = "type";
+    private static final String TAXON_ID_FILTER = "taxonId";
 
     @Before
     public void setUp() throws Exception {
         repository.deleteAll();
-        resourceUrl = ONTOLOGY_RESOURCE_URL;
+        resourceUrl = GENE_PRODUCT_RESOURCE_URL;
     }
 
     // response format ---------------------------------------------------------
@@ -140,7 +141,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("glycine", GeneProductFields.Searchable.TYPE);
+        checkValidFacetResponse("glycine", TYPE_FILTER);
     }
 
     @Test
@@ -151,8 +152,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("glycine", GeneProductFields.Searchable.TYPE,
-                GeneProductFields.Searchable.TAXON_ID);
+        checkValidFacetResponse("glycine", TYPE_FILTER, TAXON_ID_FILTER);
     }
 
     @Test
@@ -166,7 +166,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse(name, GeneProductFields.Searchable.TYPE);
+        checkValidFacetResponse(name, TYPE_FILTER);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse(name, GeneProductFields.Searchable.TAXON_ID);
+        checkValidFacetResponse(name, TAXON_ID_FILTER);
     }
 
     // filter queries ---------------------------------------------------------
@@ -208,23 +208,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq = new Param(GeneProductFields.Searchable.TYPE, "protein");
-
-        checkValidFilterQueryResponse("metabolic", 2, fq);
-    }
-
-    @Test
-    public void requestWithATaxonIdFilterQueryReturnsFilteredResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        doc1.taxonId = 1;
-        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        doc2.taxonId = 2;
-        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.taxonId = 2;
-
-        saveToRepository(doc1, doc2, doc3);
-
-        Param fq = new Param(GeneProductFields.Searchable.TAXON_ID, "2");
+        Param fq = new Param(TYPE_FILTER, "protein");
 
         checkValidFilterQueryResponse("metabolic", 2, fq);
     }
@@ -243,8 +227,8 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq1 = new Param(GeneProductFields.Searchable.TYPE, "miRNA");
-        Param fq2 = new Param(GeneProductFields.Searchable.TAXON_ID, "2");
+        Param fq1 = new Param(TYPE_FILTER, "miRNA");
+        Param fq2 = new Param(TAXON_ID_FILTER, "2");
 
         checkValidFilterQueryResponse("process", 0, fq1, fq2);
     }
@@ -260,7 +244,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq = new Param(GeneProductFields.Searchable.TYPE, "miRNA");
+        Param fq = new Param(TYPE_FILTER, "miRNA");
 
         checkValidFilterQueryResponse("glycine", 3, fq);
     }
@@ -337,10 +321,6 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         for (GeneProductDocument doc : documents) {
             repository.save(doc);
         }
-    }
-
-    private String buildFilterQuery(String field, String value) {
-        return field + ":" + value;
     }
 
     private GeneProductDocument createGeneProductDocWithName(String id, String name) {

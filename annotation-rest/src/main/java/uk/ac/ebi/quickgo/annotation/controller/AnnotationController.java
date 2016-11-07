@@ -11,7 +11,6 @@ import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
@@ -101,7 +100,6 @@ public class AnnotationController {
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
-            SearchableField annotationSearchableField,
             ControllerValidationHelper validationHelper,
             FilterConverterFactory converterFactory,
             ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
@@ -114,6 +112,7 @@ public class AnnotationController {
         checkArgument(converterFactory != null, "The FilterConverterFactory cannot be null.");
         checkArgument(resultTransformerChain != null,
                 "The ResultTransformerChain<QueryResult<Annotation>> cannot be null.");
+        checkArgument(statsService != null, "Annotation stats service cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
@@ -122,7 +121,7 @@ public class AnnotationController {
         this.statsService = statsService;
         this.resultTransformerChain = resultTransformerChain;
 
-        this.queryTemplate = new DefaultSearchQueryTemplate(annotationSearchableField);
+        this.queryTemplate = new DefaultSearchQueryTemplate();
         this.queryTemplate.setReturnedFields(annotationRetrievalConfig.getSearchReturnedFields());
     }
 
