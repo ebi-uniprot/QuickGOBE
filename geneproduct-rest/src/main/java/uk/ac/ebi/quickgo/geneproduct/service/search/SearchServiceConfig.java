@@ -1,5 +1,8 @@
 package uk.ac.ebi.quickgo.geneproduct.service.search;
 
+import uk.ac.ebi.quickgo.common.FacetableField;
+import uk.ac.ebi.quickgo.common.SearchableField;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl;
@@ -14,6 +17,7 @@ import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,6 +52,32 @@ public class SearchServiceConfig {
     public SearchService<GeneProduct> geneProductSearchService(RequestRetrieval<GeneProduct>
             geneProductSolrRequestRetrieval) {
         return new SearchServiceImpl(geneProductSolrRequestRetrieval);
+    }
+
+    @Bean
+    public SearchableField searchableField() {
+        return new SearchableField() {
+            @Override public boolean isSearchable(String field) {
+                return GeneProductFields.Searchable.isSearchable(field);
+            }
+
+            @Override public Stream<String> searchableFields() {
+                return GeneProductFields.Searchable.searchableFields().stream();
+            }
+        };
+    }
+
+    @Bean
+    public FacetableField facetableField() {
+        return new FacetableField() {
+            @Override public boolean isFacetable(String field) {
+                return GeneProductFields.Facetable.isFacetable(field);
+            }
+
+            @Override public Stream<String> facetableFields() {
+                return GeneProductFields.Facetable.facetableFields().stream();
+            }
+        };
     }
 
     @Bean

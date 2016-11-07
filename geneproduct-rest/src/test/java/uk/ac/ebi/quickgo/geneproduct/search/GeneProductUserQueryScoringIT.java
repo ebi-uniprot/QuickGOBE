@@ -2,8 +2,8 @@ package uk.ac.ebi.quickgo.geneproduct.search;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 
 import java.util.Arrays;
 import org.junit.Before;

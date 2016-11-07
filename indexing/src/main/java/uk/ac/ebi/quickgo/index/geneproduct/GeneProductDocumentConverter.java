@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Preconditions;
@@ -15,7 +15,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.s
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
 
 /**
- * Converts a {@link GeneProduct} into an {@link uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument}
+ * Converts a {@link GeneProduct} into an {@link GeneProductDocument}
  *
  * @author Ricardo Antunes
  */
