@@ -143,7 +143,6 @@ public class GeneProductControllerIT {
                 .andExpect(jsonPath("$.results").isArray());
     }
 
-
     @Test
     public void targetSetLookUpUsingValidValueReturnsMultiGeneProduct() throws Exception {
         ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL(VALID_TARGET_SET_NAME)));
