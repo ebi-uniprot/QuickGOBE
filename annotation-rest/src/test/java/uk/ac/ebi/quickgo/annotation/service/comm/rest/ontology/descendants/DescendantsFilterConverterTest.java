@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
-import org.junit.Before;
-import org.junit.Test;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -10,6 +9,8 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -17,12 +18,12 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 /**
- * Created by edd on 02/11/2016.
+ * Created 10/08/16
+ * @author Edd
  */
-public abstract class AbstractDescendantsFilterConverterTest {
+public class DescendantsFilterConverterTest {
     private ConvertedOntologyFilter response;
     private DescendantsFilterConverter converter;
-    String field;
 
     @Before
     public void setUp() {
@@ -31,26 +32,24 @@ public abstract class AbstractDescendantsFilterConverterTest {
         converter = new DescendantsFilterConverter();
     }
 
-    public abstract String ontologyId(int id);
-
     @Test
     public void descendantsFromSingleResourceAreConvertedToQuickGOQuery() {
-        String id1 = ontologyId(1);
-        String desc1 = ontologyId(2);
+        String id1 = "id1";
+        String desc1 = "desc1";
 
         addResponseDescendant(id1, desc1);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(field, desc1)));
+        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
         assertThat(convertedFilter.getFilterContext(), is(Optional.empty()));
     }
 
     @Test
     public void differentDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
-        String id1 = ontologyId(1);
-        String id2 = ontologyId(2);
-        String desc1 = ontologyId(11);
-        String desc2 = ontologyId(22);
+        String id1 = "id1";
+        String id2 = "id2";
+        String desc1 = "desc1";
+        String desc2 = "desc2";
 
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id2, desc2);
@@ -58,16 +57,16 @@ public abstract class AbstractDescendantsFilterConverterTest {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(
-                or(QuickGOQuery.createQuery(field, desc1),
-                        QuickGOQuery.createQuery(field, desc2))));
+                or(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1),
+                        QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc2))));
         assertThat(convertedFilter.getFilterContext(), is(Optional.empty()));
     }
 
     @Test
     public void sameDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
-        String id1 = ontologyId(1);
-        String id2 = ontologyId(2);
-        String desc1 = ontologyId(11);
+        String id1 = "id1";
+        String id2 = "id2";
+        String desc1 = "desc1";
 
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id2, desc1);
@@ -75,7 +74,7 @@ public abstract class AbstractDescendantsFilterConverterTest {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(
-                QuickGOQuery.createQuery(field, desc1)));
+                QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
         assertThat(convertedFilter.getFilterContext(), is(Optional.empty()));
     }
 
@@ -111,5 +110,4 @@ public abstract class AbstractDescendantsFilterConverterTest {
         newResult.setDescendants(descList);
         response.getResults().add(newResult);
     }
-
 }
