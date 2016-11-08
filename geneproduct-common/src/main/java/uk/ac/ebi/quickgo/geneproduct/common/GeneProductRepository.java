@@ -21,4 +21,5 @@ public interface GeneProductRepository extends SolrCrudRepository<GeneProductDoc
                     COMPLETE_PROTEOME, REFERENCE_PROTEOME, IS_ISOFORM, IS_ANNOTATED, PARENT_ID})
     List<GeneProductDocument> findById(List<String> ids);
 
+    List<GeneProductDocument> findByTargetSet(String name);
 }
