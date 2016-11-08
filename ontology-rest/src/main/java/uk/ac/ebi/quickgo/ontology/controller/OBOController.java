@@ -30,10 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
@@ -483,12 +480,13 @@ public abstract class OBOController<T extends OBOTerm> {
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(renderedImage, "png", os);
-        InputStream is = new ByteArrayInputStream(os.toByteArray());
+        InputStream is = new ByteArrayInputStream(Base64.getMimeEncoder().encode(os.toByteArray()));
 
         return ResponseEntity
                 .ok()
                 .contentLength(os.size())
                 .contentType(MediaType.IMAGE_PNG)
+                .header("Content-Encoding","base64")
                 .body(new InputStreamResource(is));
     }
 

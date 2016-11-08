@@ -69,15 +69,16 @@ public class AnnotationIndexingBatchIT {
 
         StepExecution indexingStep = jobsSingleStepAsList.get(0);
 
-        assertThat(indexingStep.getReadCount(), is(7));
+        assertThat(indexingStep.getReadCount(), is(8));
         assertThat(indexingStep.getReadSkipCount(), is(0));
         assertThat(indexingStep.getProcessSkipCount(), is(2));
-        assertThat(indexingStep.getWriteCount(), is(5));
+        assertThat(indexingStep.getWriteCount(), is(6));
 
         List<String> writtenAnnotationDocGeneProductIds =
                 getGeneProductIdsFromAnnotationDocuments(annotationRepository.findAll());
 
         assertThat(writtenAnnotationDocGeneProductIds, containsInAnyOrder(
+                "IntAct:EBI-10043081",
                 "IntAct:EBI-10043081",
                 "IntAct:EBI-10043081",
                 "IntAct:EBI-10205244",
