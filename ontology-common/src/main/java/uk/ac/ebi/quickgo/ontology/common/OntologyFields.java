@@ -41,6 +41,15 @@ public class OntologyFields {
     static final String CREDITS = "credits";
     static final String PROTEIN_COMPLEXES = "proteinComplexes";
 
+    /*
+     * The following fields are declared solely for use by the OntologyRepository queries. These are necessary given
+     * that annotations can only accept constant values. So declaring something like OntologyFields.Facetable.ASPECT
+     * is not valid. The Java compiler will give an error, even though the searchable aspect is a constant.
+     */
+    static final String ID_LOWERCASE = "id_lowercase";
+    static final String SECONDARY_ID_LOWERCASE = "secondaryId_lowercase";
+    static final String ONTOLOGY_TYPE_LOWERCASE = "ontologyType_lowercase";
+
     /**
      * Ontology fields that are indexed, and can therefore be searched.
      */
@@ -48,8 +57,8 @@ public class OntologyFields {
         private static final Set<String> VALUES = new HashSet<>();
 
         public static final String ASPECT = storeAndGet(VALUES, "aspect_lowercase");
-        public static final String ID = storeAndGet(VALUES, "id_lowercase");
-        public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, "ontologyType_lowercase");
+        public static final String ID = storeAndGet(VALUES, ID_LOWERCASE);
+        public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, ONTOLOGY_TYPE_LOWERCASE);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);

@@ -16,8 +16,8 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
  * @author Edd
  */
 public interface OntologyRepository extends SolrCrudRepository<OntologyDocument, String> {
-    String QUERY_ONTOLOGY_TYPE_AND_ID = OntologyFields.ONTOLOGY_TYPE + ":?0 " +
-            "AND (" + OntologyFields.ID + ":(?1) OR " + OntologyFields.SECONDARY_ID + ":(?1))";
+    String QUERY_ONTOLOGY_TYPE_AND_ID = OntologyFields.ONTOLOGY_TYPE_LOWERCASE + ":?0 " +
+            "AND (" + OntologyFields.ID_LOWERCASE + ":(?1) OR " + OntologyFields.SECONDARY_ID_LOWERCASE + ":(?1))";
 
     // complete
     @Query(QUERY_ONTOLOGY_TYPE_AND_ID) List<OntologyDocument> findCompleteByTermId(String idType, List<String> ids);
