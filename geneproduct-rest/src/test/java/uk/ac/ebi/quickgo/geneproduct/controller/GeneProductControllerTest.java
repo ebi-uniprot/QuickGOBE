@@ -89,6 +89,7 @@ public class GeneProductControllerTest {
         when(validationHelper.validateCSVIds(MULTI_CSV)).thenReturn(MULTI_CSV_LIST);
         when(validationHelper.validateCSVIds(SINGLE_CSV)).thenReturn(SINGLE_CSV_LIST);
         doThrow(new IllegalArgumentException()).when(validationHelper).validateCSVIds(multiCSVTooBig);
+
     }
 
     @Test
@@ -103,13 +104,6 @@ public class GeneProductControllerTest {
         ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(GENE_PRODUCT_ID1);
         assertThat(response.getBody().getResults(), contains(geneProduct1));
         assertThat(response.getBody().getResults(), hasSize(1));
-    }
-
-    @Test
-    public void retrieveMultipleGeneProduct() {
-        ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(MULTI_CSV);
-        assertThat(response.getBody().getResults(), hasSize(3));
-        assertThat(response.getBody().getResults(), contains(geneProduct1, geneProduct2, geneProduct3));
     }
 
     @Test(expected = IllegalArgumentException.class)

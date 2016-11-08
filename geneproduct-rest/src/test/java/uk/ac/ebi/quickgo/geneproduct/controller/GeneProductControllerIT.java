@@ -55,6 +55,9 @@ public class GeneProductControllerIT {
     public static final String NON_EXISTANT_ID = "Y0Y000";
     public static final String INVALID_ID = "ZZZZ";
 
+    private static final String VALID_TARGET_SET_NAME = "KRUK";
+    private static final String NON_EXISTENT_TARGET_SET_NAME = "BLAH";
+
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -135,7 +138,41 @@ public class GeneProductControllerIT {
     public void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
         mockMvc.perform(get(buildGeneProductURL(NON_EXISTANT_ID)))
                 .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void targetSetLookUpUsingValidValueReturnsMultiGeneProduct() throws Exception {
+        ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL(VALID_TARGET_SET_NAME)));
+
+        result.andDo(print())
+                .andExpect(jsonPath("$.results.*.id", hasSize(3)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
+
+        int index = 0;
+        for (String id : validIdList) {
+            expectFields(result, id, "$.results[" + index++ + "].");
+        }
+    }
+
+    @Test
+    public void targetSetLookUpUsingInvalidValueReturnsEmptyResults() throws Exception {
+        ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL(NON_EXISTENT_TARGET_SET_NAME)));
+        result.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void targetSetLookUpUsingEmptyStringReturnsBadRequest() throws Exception {
+        ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL("")));
+        result.andDo(print())
+                .andExpect(jsonPath("$.messages", hasItem(is("Provided ID: 'targetset' is invalid"))))
+                .andExpect(status().isBadRequest());
     }
 
     private ResultActions expectFields(ResultActions result, String id, String path) throws Exception {
@@ -158,6 +195,10 @@ public class GeneProductControllerIT {
 
     private String buildGeneProductURL(String id) {
         return RESOURCE_URL + "/" + id;
+    }
+
+    private String buildGeneProductTargetSetURL(String id) {
+        return RESOURCE_URL + "/targetset/" + id;
     }
 
     private List<GeneProductDocument> createBasicDocs() {
