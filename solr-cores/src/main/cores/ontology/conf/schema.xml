@@ -23,7 +23,7 @@
     <!-- The following fields are used for storage and faceting purposes, search fields are declared below -->
     <field name="id" type="string" indexed="true" stored="true"/>
     <field name="ontologyType" type="string" indexed="true" stored="true"/>
-    <field name="name" type="string" indexed="true" stored="true"/>
+    <field name="name" type="string" indexed="false" stored="true"/>
     <field name="secondaryId" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="isObsolete" type="boolean" indexed="false" stored="true"/>
     <field name="replacements" type="string" indexed="false" stored="true" multiValued="true"/>
@@ -35,7 +35,7 @@
     <field name="usage" type="string" indexed="false" stored="true"/>
     <field name="subset" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="synonym" type="string" indexed="false" stored="true" multiValued="true"/>
-    <field name="synonymName" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="synonymName" type="string" indexed="false" stored="true" multiValued="true"/>
 
     <field name="history" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="xref" type="string" indexed="false" stored="true" multiValued="true"/>
