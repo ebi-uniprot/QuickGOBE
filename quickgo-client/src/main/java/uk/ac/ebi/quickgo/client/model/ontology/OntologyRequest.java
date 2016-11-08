@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.client.model.ontology;
 
+import uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -104,6 +105,7 @@ public class OntologyRequest {
         this.highlighting = useHighlighting;
     }
 
+    @AllowableFacets
     public String[] getFacet() {
         return facets;
     }
