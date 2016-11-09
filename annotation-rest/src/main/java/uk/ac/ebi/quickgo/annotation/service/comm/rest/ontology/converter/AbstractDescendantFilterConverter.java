@@ -27,7 +27,7 @@ abstract class AbstractDescendantFilterConverter
         implements FilterConverter<ConvertedOntologyFilter, QuickGOQuery> {
     static final ConvertedFilter<QuickGOQuery> FILTER_EVERYTHING =
             new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
-    private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "no descendants found for IDs, %s";
+    private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "No descendants found for IDs, %s";
     private static final String DELIMITER = ", ";
     private static final Pattern GO_MATCHER = Pattern.compile("^GO:[0-9]+$", Pattern.CASE_INSENSITIVE);
     private static final Pattern ECO_MATCHER = Pattern.compile("^ECO:[0-9]+$", Pattern.CASE_INSENSITIVE);
@@ -43,14 +43,15 @@ abstract class AbstractDescendantFilterConverter
     /**
      * Defines the procedure for transforming each descendant in a {@link ConvertedOntologyFilter} instance into a
      * {@link ConvertedOntologyFilter} encapsulating a {@link QuickGOQuery}. Concrete implementations of this class
-     * define both {@link #processDescendant(ConvertedOntologyFilter.Result, Set)} and
+     * defines both {@link #processDescendant(ConvertedOntologyFilter.Result, Set)} and
      * {@link #createFilterForAllDescendants(Set)}, which enable the necessary behaviour specialisation.
      *
      * @param response the {@link ConvertedOntologyFilter} to transform
      * @return a {@link ConvertedFilter} over {@link QuickGOQuery} instances
      */
     @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
-        StringJoiner idsWithNoDescendants = createNoDescendantRecorder();
+        StringJoiner idsWithNoDescendants = new StringJoiner(DELIMITER);
+
         if (isNotNull(response.getResults())) {
             Set<QuickGOQuery> queries = new HashSet<>();
 
@@ -58,14 +59,13 @@ abstract class AbstractDescendantFilterConverter
                 if (isNotNull(result.getDescendants())) {
                     forEachDescendantApply(result, processDescendant(result, queries));
                 } else {
-                    updateJoinerIfValid(idsWithNoDescendants, result.getId());
+                    addToJoiner(idsWithNoDescendants, result.getId());
                 }
             }
 
             convertedFilter = createFilterForAllDescendants(queries);
+            handleNoDescendants(idsWithNoDescendants);
         }
-
-        handleNoDescendants(idsWithNoDescendants);
 
         return convertedFilter;
     }
@@ -97,20 +97,10 @@ abstract class AbstractDescendantFilterConverter
     }
 
     /**
-     * Creates a new {@link StringJoiner} which is used to store {@link String}s denoting term IDs that have
-     * no descendants
-     *
-     * @return a {@link StringJoiner} used to record term IDs with no descendants
-     */
-    private static StringJoiner createNoDescendantRecorder() {
-        return new StringJoiner(DELIMITER);
-    }
-
-    /**
-     * Checks whether an instance created through {@link #createNoDescendantRecorder()} has recorded any IDs.
+     * Checks whether the {@code idsWithNoDescendants} has recorded any IDs.
      * If yes, then a {@link RetrievalException} is thrown indicating this.
      *
-     * @param idsWithNoDescendants a {@link StringJoiner} created via the {@link #createNoDescendantRecorder()} method.
+     * @param idsWithNoDescendants an instance of {@link StringJoiner}.
      */
     private static void handleNoDescendants(StringJoiner idsWithNoDescendants) {
         if (idsWithNoDescendants.length() > 0) {
@@ -140,7 +130,7 @@ abstract class AbstractDescendantFilterConverter
      * @param joiner the joiner to add to
      * @param value the value to add
      */
-    private static void updateJoinerIfValid(StringJoiner joiner, String value) {
+    private static void addToJoiner(StringJoiner joiner, String value) {
         if (notNullOrEmpty(value)) {
             joiner.add(value);
         }

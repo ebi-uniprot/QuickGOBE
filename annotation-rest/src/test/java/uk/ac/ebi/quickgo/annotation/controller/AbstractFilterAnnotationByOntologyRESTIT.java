@@ -49,7 +49,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
-import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.valuesOccurInField;
 
 /**
  * Tests filter parameters in the {@link AnnotationController} that require REST requests to perform
@@ -69,7 +68,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     static final String FAILED_REST_FETCH_PREFIX = "Failed to fetch REST response due to: ";
     static final String IS_A = "is_a";
     static final String SLIM_USAGE = "slim";
-    static final String NO_DESCENDANTS_PREFIX = "no descendants found for IDs, ";
+    static final String NO_DESCENDANTS_PREFIX = "No descendants found for IDs, ";
     static final String SEARCH_RESOURCE = "/annotation" + "/search";
 
     private static final String BASE_URL = "http://localhost";
