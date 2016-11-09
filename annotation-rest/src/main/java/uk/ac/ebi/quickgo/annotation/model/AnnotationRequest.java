@@ -496,30 +496,14 @@ public class AnnotationRequest {
     }
 
     private Optional<FilterRequest> createGoUsageFilter() {
-        return createUsageFilter(GO_USAGE_FIELD);
+        return createUsageFilter(GO_USAGE_FIELD, GO_ID, GO_USAGE_RELATIONSHIPS);
     }
 
     private Optional<FilterRequest> createEvidenceCodeUsageFilter() {
-        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD);
+        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
     }
 
-    private Optional<FilterRequest> createUsageFilter(String usageParam) {
-        String idParam;
-        String relationshipsParam;
-        switch (usageParam) {
-            case GO_USAGE_FIELD:
-                idParam = GO_ID;
-                relationshipsParam = GO_USAGE_RELATIONSHIPS;
-                break;
-            case EVIDENCE_CODE_USAGE_FIELD:
-                idParam = EVIDENCE_CODE;
-                relationshipsParam = EVIDENCE_CODE_USAGE_RELATIONSHIPS;
-                break;
-            default:
-                throw new ParameterException("Unknown usage specified: " + usageParam + ". Use either " +
-                        GO_USAGE_FIELD + " or " + EVIDENCE_CODE_USAGE_FIELD);
-        }
-
+    private Optional<FilterRequest> createUsageFilter(String usageParam, String idParam, String relationshipsParam) {
         Optional<FilterRequest> request;
         FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
 
