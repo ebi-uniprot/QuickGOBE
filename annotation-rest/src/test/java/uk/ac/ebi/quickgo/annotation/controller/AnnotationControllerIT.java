@@ -712,7 +712,7 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInFieldList(WITH_FROM_FIELD,
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH,
                         responseItem()
                                 .withAttribute("db", "InterPro")
                                 .withAttribute("id", "IPR015421").build()));
@@ -727,10 +727,10 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInFieldList(WITH_FROM_FIELD, responseItem()
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH, responseItem()
                         .withAttribute("db", "InterPro")
                         .withAttribute("id", "IPR015421").build()))
-                .andExpect(valueOccursInFieldList(WITH_FROM_FIELD, responseItem()
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH, responseItem()
                         .withAttribute("db", "InterPro")
                         .withAttribute("id", "IPR015422").build()));
     }
@@ -754,10 +754,10 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInFieldList(WITH_FROM_FIELD, responseItem()
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH, responseItem()
                         .withAttribute("db", "InterPro")
                         .withAttribute("id", "IPR015421").build()))
-                .andExpect(valueOccursInFieldList(WITH_FROM_FIELD, responseItem()
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH, responseItem()
                         .withAttribute("db", "InterPro")
                         .withAttribute("id", "IPR015422").build()));
     }
@@ -771,7 +771,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(valueOccursInFieldList(WITH_FROM_FIELD, responseItem()
+                .andExpect(valueOccursInFieldList(WITH_FROM_PATH, responseItem()
                         .withAttribute("db", "InterPro")
                         .withAttribute("id", "IPR015421").build()));
     }
