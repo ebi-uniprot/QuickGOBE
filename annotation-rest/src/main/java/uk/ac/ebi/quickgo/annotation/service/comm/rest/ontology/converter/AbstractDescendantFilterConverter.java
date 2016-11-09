@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
+import uk.ac.ebi.quickgo.common.validator.GOTermPredicate;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
@@ -29,7 +31,7 @@ abstract class AbstractDescendantFilterConverter
             new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
     private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "No descendants found for IDs, %s";
     private static final String DELIMITER = ", ";
-    private static final Pattern GO_MATCHER = Pattern.compile("^GO:[0-9]+$", Pattern.CASE_INSENSITIVE);
+    private static final Predicate<String> GO_MATCHER = GOTermPredicate.isValidGOTermId();
     private static final Pattern ECO_MATCHER = Pattern.compile("^ECO:[0-9]+$", Pattern.CASE_INSENSITIVE);
     private static final String UNKNOWN_DESCENDANT_FORMAT =
             "Unknown descendant encountered: %s. Expected either GO/ECO term.";
@@ -150,9 +152,9 @@ abstract class AbstractDescendantFilterConverter
      * @param id the identifier of the ontology for which to create a {@link QuickGOQuery}
      * @return the {@link QuickGOQuery} corresponding to the supplied ontology id
      */
-    QuickGOQuery createQueryForOntologyId(String id) {
+    static QuickGOQuery createQueryForOntologyId(String id) {
         String field;
-        if (GO_MATCHER.matcher(id).matches()) {
+        if (GO_MATCHER.test(id)) {
             field = AnnotationFields.GO_ID;
         } else if (ECO_MATCHER.matcher(id).matches()) {
             field = AnnotationFields.EVIDENCE_CODE;
