@@ -12,6 +12,9 @@ import static uk.ac.ebi.quickgo.annotation.validation.loader.DBXrefEntityColumns
 import static uk.ac.ebi.quickgo.annotation.validation.loader.DBXrefEntityColumns.numColumns;
 
 /**
+ * Class responsible for mapping a {@link FieldSet} that contains data related to Database Cross references
+ * to a corresponding instance of {@link DBXRefEntity} encapsulating this information.
+ *
  * @author Tony Wardell
  * Date: 07/11/2016
  * Time: 18:12
