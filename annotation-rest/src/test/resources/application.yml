@@ -26,3 +26,9 @@ model:
       goId_join: goId,
       goAspect: aspect
     }
+
+## ================= Loading validation values =================
+annotation:
+    validation:
+        source: classpath:/DB_XREFS_ENTITIES.dat.gz
+
