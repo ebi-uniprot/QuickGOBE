@@ -12,6 +12,9 @@ import javax.validation.ConstraintValidatorContext;
 import org.springframework.batch.item.ItemWriter;
 
 /**
+ * Use the database cross reference information contain in this class to verify a list of potential database cross
+ * reference identifiers.
+ *
  * @author Tony Wardell
  * Date: 08/11/2016
  * Time: 14:41
@@ -25,17 +28,20 @@ public class DBXRefEntityValidation implements ConstraintValidator<WithFromValid
 
     }
 
+    /**
+     * If the entire list of values passed to isValid can be successfully validated, or not validated at all then
+     * isValid will return true.
+     * @param values list of potential database cross reference identifiers.
+     * @param context of the isValid call.
+     * @return validation result as boolean.
+     */
     @Override public boolean isValid(String[] values, ConstraintValidatorContext context) {
-        return values == null ? true : Stream.of(values)
+        return values == null || Stream.of(values)
                 .allMatch(this::valueIsValid);
     }
 
     private boolean valueIsValid(String value) {
-        if( value.contains(":")){
-            return (isValidForDb(value));
-        }else{
-            return true;
-        }
+        return !value.contains(":") || (isValidForDb(value));
     }
 
     private boolean isValidForDb(String value) {
