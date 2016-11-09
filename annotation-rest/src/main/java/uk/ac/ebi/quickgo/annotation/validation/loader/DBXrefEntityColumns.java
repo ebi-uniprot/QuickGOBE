@@ -6,6 +6,7 @@ package uk.ac.ebi.quickgo.annotation.validation.loader;
  * Time: 18:16
  * Created with IntelliJ IDEA.
  *
+ * Specify the layout of the DB_XREFS_ENTITIES.dat.gz file.
  * DATABASE        ENTITY_TYPE_ID  ENTITY_TYPE_NAME        LOCAL_ID_SYNTAX URL_SYNTAX
  *
  */
