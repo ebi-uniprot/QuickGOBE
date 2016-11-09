@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
-import uk.ac.ebi.quickgo.common.validator.GOTermPredicate;
+import uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
@@ -12,8 +12,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 
@@ -29,10 +27,8 @@ abstract class AbstractDescendantFilterConverter
         implements FilterConverter<ConvertedOntologyFilter, QuickGOQuery> {
     static final ConvertedFilter<QuickGOQuery> FILTER_EVERYTHING =
             new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
-    private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "No descendants found for IDs, %s";
     private static final String DELIMITER = ", ";
-    private static final Predicate<String> GO_MATCHER = GOTermPredicate.isValidGOTermId();
-    private static final Pattern ECO_MATCHER = Pattern.compile("^ECO:[0-9]+$", Pattern.CASE_INSENSITIVE);
+    private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "No descendants found for IDs, %s";
     private static final String UNKNOWN_DESCENDANT_FORMAT =
             "Unknown descendant encountered: %s. Expected either GO/ECO term.";
 
@@ -154,13 +150,14 @@ abstract class AbstractDescendantFilterConverter
      */
     static QuickGOQuery createQueryForOntologyId(String id) {
         String field;
-        if (GO_MATCHER.test(id)) {
+        if (OntologyIdPredicate.isValidGOTermId().test(id)) {
             field = AnnotationFields.GO_ID;
-        } else if (ECO_MATCHER.matcher(id).matches()) {
+        } else if (OntologyIdPredicate.isValidECOTermId().test(id)) {
             field = AnnotationFields.EVIDENCE_CODE;
         } else {
             throw new RetrievalException(String.format(UNKNOWN_DESCENDANT_FORMAT, id));
         }
+
         return QuickGOQuery.createQuery(field, id);
     }
 }
