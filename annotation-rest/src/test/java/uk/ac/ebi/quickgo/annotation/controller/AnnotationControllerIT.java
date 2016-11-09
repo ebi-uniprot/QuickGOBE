@@ -7,7 +7,9 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang.StringUtils;
@@ -1096,23 +1098,6 @@ public class AnnotationControllerIT {
 
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM.getName(), "PARKINSONS"));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(1))
-                .andExpect(fieldsInAllResultsExist(1));
-    }
-
-    @Test
-    public void filterByTargetSetContainingSpacesReturnsMatchingDocuments() throws Exception {
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        String targetSetWithSpaces = "Reference Genome";
-        doc.targetSets = Collections.singletonList(targetSetWithSpaces);
-        repository.save(doc);
-
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM.getName(),
-                targetSetWithSpaces));
 
         response.andDo(print())
                 .andExpect(status().isOk())

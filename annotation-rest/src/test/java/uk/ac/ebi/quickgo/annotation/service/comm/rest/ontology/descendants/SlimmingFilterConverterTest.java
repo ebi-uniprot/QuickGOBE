@@ -18,6 +18,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
+import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGoId;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
@@ -38,8 +39,8 @@ public class SlimmingFilterConverterTest {
 
     @Test
     public void descendantsFromSingleResourceAreConvertedToQuickGOQuery() {
-        String id1 = "id1";
-        String desc1 = "desc1";
+        String id1 = createGoId(1);
+        String desc1 = createGoId(11);
 
         addResponseDescendant(id1, desc1);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
@@ -50,10 +51,10 @@ public class SlimmingFilterConverterTest {
 
     @Test
     public void differentDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
-        String id1 = "id1";
-        String id2 = "id2";
-        String desc1 = "desc1";
-        String desc2 = "desc2";
+        String id1 = createGoId(1);
+        String id2 = createGoId(2);
+        String desc1 = createGoId(11);
+        String desc2 = createGoId(22);
 
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id2, desc2);
@@ -68,9 +69,9 @@ public class SlimmingFilterConverterTest {
 
     @Test
     public void sameDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
-        String id1 = "id1";
-        String id2 = "id2";
-        String desc1 = "desc1";
+        String id1 = createGoId(1);
+        String id2 = createGoId(2);
+        String desc1 = createGoId(11);
 
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id2, desc1);
@@ -99,8 +100,8 @@ public class SlimmingFilterConverterTest {
 
     @Test
     public void conversionContextContainsOneMapping() {
-        String id1 = "id1";
-        String desc1 = "desc1";
+        String id1 = createGoId(1);
+        String desc1 = createGoId(11);
 
         addResponseDescendant(id1, desc1);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
@@ -110,11 +111,11 @@ public class SlimmingFilterConverterTest {
 
     @Test
     public void conversionContextContainsTwoMappings() {
-        String id1 = "id1";
-        String id2 = "id2";
-        String desc1 = "desc1";
-        String desc2 = "desc2";
-        String desc3 = "desc3";
+        String id1 = createGoId(1);
+        String id2 = createGoId(2);
+        String desc1 = createGoId(11);
+        String desc2 = createGoId(22);
+        String desc3 = createGoId(33);
 
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id1, desc2);

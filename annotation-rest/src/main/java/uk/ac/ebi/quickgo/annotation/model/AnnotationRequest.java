@@ -70,6 +70,7 @@ public class AnnotationRequest {
             GO_ASPECT,
             ASSIGNED_BY,
             GENE_PRODUCT_SUBSET,
+            EVIDENCE_CODE,
             GENE_PRODUCT_ID,
             GENE_PRODUCT_TYPE,
             GO_EVIDENCE,
