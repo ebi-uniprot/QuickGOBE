@@ -368,9 +368,7 @@ public class AnnotationRequest {
 
     public void setEvidenceCodeUsageRelationships(String... usageRelationships) {
         if (usageRelationships != null) {
-            String[] usageRelationshipArray = Stream.of(usageRelationships)
-                    .map(String::toLowerCase)
-                    .toArray(String[]::new);
+            String[] usageRelationshipArray = createLowercasedStringArray(usageRelationships);
             filterMap.put(EVIDENCE_CODE_USAGE_RELATIONSHIPS, usageRelationshipArray);
         }
     }
@@ -409,9 +407,7 @@ public class AnnotationRequest {
 
     public void setGoUsageRelationships(String... goUsageRelationships) {
         if (goUsageRelationships != null) {
-            String[] usageRelationshipArray = Stream.of(goUsageRelationships)
-                    .map(String::toLowerCase)
-                    .toArray(String[]::new);
+            String[] usageRelationshipArray = createLowercasedStringArray(goUsageRelationships);
             filterMap.put(GO_USAGE_RELATIONSHIPS, usageRelationshipArray);
         }
     }
@@ -551,6 +547,12 @@ public class AnnotationRequest {
 
     public List<StatsRequest> createStatsRequests() {
         return DEFAULT_STATS_REQUESTS;
+    }
+
+    private String[] createLowercasedStringArray(String... args) {
+        return Stream.of(args)
+                .map(String::toLowerCase)
+                .toArray(String[]::new);
     }
 
     /**
