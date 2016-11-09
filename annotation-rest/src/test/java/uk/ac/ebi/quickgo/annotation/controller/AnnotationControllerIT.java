@@ -1106,23 +1106,6 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByTargetSetContainingSpacesReturnsMatchingDocuments() throws Exception {
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        String targetSetWithSpaces = "Reference Genome";
-        doc.targetSets = Collections.singletonList(targetSetWithSpaces);
-        repository.save(doc);
-
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM.getName(),
-                targetSetWithSpaces));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(1))
-                .andExpect(fieldsInAllResultsExist(1));
-    }
-
-    @Test
     public void filterByNonExistentTargetSetReturnsNoDocuments() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM.getName(), "CLAP"));
