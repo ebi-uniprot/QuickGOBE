@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.common.SearchableField;
+import uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
-import uk.ac.ebi.quickgo.ontology.controller.validation.OntologyIdPredicate;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;

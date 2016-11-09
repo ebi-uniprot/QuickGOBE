@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.controller.validation;
+package uk.ac.ebi.quickgo.common.validator;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -15,7 +15,7 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
  */
 public class OntologyIdPredicate {
     private static final Pattern GO_ID_FORMAT = Pattern.compile("^GO:[0-9]{7}$", CASE_INSENSITIVE);
-    private static final Pattern ECO_ID_FORMAT = Pattern.compile("^ECO:[0-9]{7}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern ECO_ID_FORMAT = Pattern.compile("^ECO:[0-9]{7}$", CASE_INSENSITIVE);
 
     /**
      * Provide a Predicate that can be used to test a String for validity as a GO Term id.
