@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.controller.validation;
+package uk.ac.ebi.quickgo.common.validator;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;

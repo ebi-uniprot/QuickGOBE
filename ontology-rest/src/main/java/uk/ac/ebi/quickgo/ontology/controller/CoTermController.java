@@ -20,7 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static uk.ac.ebi.quickgo.ontology.controller.validation.GOTermPredicate.isValidGOTermId;
+import static uk.ac.ebi.quickgo.common.validator.GOTermPredicate.isValidGOTermId;
 
 /**
  * REST controller for accessing GO Term co-occurring term related information.

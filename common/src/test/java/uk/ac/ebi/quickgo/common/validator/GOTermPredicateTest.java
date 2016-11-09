@@ -1,10 +1,10 @@
-package uk.ac.ebi.quickgo.ontology.controller.validation;
+package uk.ac.ebi.quickgo.common.validator;
 
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.ontology.controller.validation.GOTermPredicate.isValidGOTermId;
+import static uk.ac.ebi.quickgo.common.validator.GOTermPredicate.isValidGOTermId;
 
 /**
  * @author Tony Wardell
