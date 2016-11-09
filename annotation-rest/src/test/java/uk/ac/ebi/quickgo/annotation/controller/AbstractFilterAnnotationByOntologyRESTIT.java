@@ -83,7 +83,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     String usageRelations;
 
     @Autowired
-    AnnotationRepository annotationRepository;
+    protected AnnotationRepository annotationRepository;
     @Autowired
     private WebApplicationContext webApplicationContext;
     @Autowired
@@ -102,8 +102,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void filterFor1TermBy0ValidDescendantMeansFilterEverything()
-            throws Exception {
+    public void filterFor1TermBy0ValidDescendantMeansFilterEverything() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
 
@@ -122,13 +121,13 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void filterFor1TermBy1ValidDescendant()
-            throws Exception {
+    public void filterFor1TermBy1ValidDescendant() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
 
-        expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(), singletonList(singletonList(ontologyId(3))));
+        expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(),
+                singletonList(singletonList(ontologyId(3))));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -146,8 +145,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void filterFor1TermBy2ValidDescendants()
-            throws Exception {
+    public void filterFor1TermBy2ValidDescendants() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
@@ -179,7 +177,8 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
 
-        expectRestCallHasDescendants(asList(ontologyId(1), ontologyId(2)), singletonList(IS_A), asList(emptyList(), emptyList()));
+        expectRestCallHasDescendants(asList(ontologyId(1), ontologyId(2)), singletonList(IS_A),
+                asList(emptyList(), emptyList()));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -262,7 +261,8 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(valuesOccurInErrorMessage(failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + ontologyId(1))));
+                .andExpect(valuesOccurInErrorMessage(
+                        failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + ontologyId(1))));
     }
 
     @Test
@@ -282,7 +282,8 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(valuesOccurInErrorMessage(failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + ontologyId(2))));
+                .andExpect(valuesOccurInErrorMessage(
+                        failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + ontologyId(2))));
     }
 
     @Test
@@ -303,8 +304,9 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
         response.andDo(print())
                 .andExpect(status().is5xxServerError())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(valuesOccurInErrorMessage(failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + csv(ontologyId(2),
-                        ontologyId(3)))));
+                .andExpect(valuesOccurInErrorMessage(
+                        failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + csv(ontologyId(2),
+                                ontologyId(3)))));
     }
 
     @Test
