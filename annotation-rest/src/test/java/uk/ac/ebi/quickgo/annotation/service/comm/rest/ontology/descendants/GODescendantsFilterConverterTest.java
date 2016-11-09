@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGoId;
 
@@ -9,7 +9,7 @@ import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGoId;
  */
 public class GODescendantsFilterConverterTest extends AbstractDescendantsFilterConverterTest {
     public GODescendantsFilterConverterTest() {
-        field = AnnotationFields.GO_ID;
+        field = AnnotationFields.Searchable.GO_ID;
     }
 
     @Override

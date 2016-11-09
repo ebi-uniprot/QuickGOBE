@@ -499,26 +499,28 @@ public class AnnotationRequest {
     }
 
     private Optional<FilterRequest> createGoUsageFilter() {
-        return createUsageFilter(GO_USAGE_FIELD, GO_USAGE_ID, GO_USAGE_RELATIONSHIPS);
+        return createUsageFilter(GO_USAGE_FIELD, GO_USAGE_ID, Searchable.GO_ID, GO_USAGE_RELATIONSHIPS);
     }
 
     private Optional<FilterRequest> createEvidenceCodeUsageFilter() {
-        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, EVIDENCE_CODE_USAGE_ID, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
+        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, EVIDENCE_CODE_USAGE_ID,
+                Searchable.EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
     }
 
-    private Optional<FilterRequest> createUsageFilter(String usageParam, String idParam, String relationshipsParam) {
+    private Optional<FilterRequest> createUsageFilter(String usageParam, String idParam, String idField,
+            String relationshipsParam) {
         Optional<FilterRequest> request;
         FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
 
         if (filterMap.containsKey(usageParam)) {
-            if (filterMap.containsKey(idParam)) {
+            if (filterMap.containsKey(idField)) {
                 assert filterMap.get(usageParam).length == 1 : usageParam + ": can only have one value";
 
                 String usageValue = filterMap.get(usageParam)[0];
 
                 filterBuilder
                         .addProperty(usageValue)
-                        .addProperty(idParam, filterMap.get(idParam));
+                        .addProperty(idParam, filterMap.get(idField));
 
                 filterBuilder.addProperty(relationshipsParam, filterMap.get(relationshipsParam));
                 request = Optional.of(filterBuilder.build());
@@ -526,7 +528,7 @@ public class AnnotationRequest {
                 throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
             }
         } else {
-            request = createSimpleFilter(idParam);
+            request = createSimpleFilter(idField);
         }
 
         return request;
