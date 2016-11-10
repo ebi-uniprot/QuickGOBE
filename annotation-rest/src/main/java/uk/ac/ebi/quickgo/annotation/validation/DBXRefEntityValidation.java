@@ -2,16 +2,18 @@ package uk.ac.ebi.quickgo.annotation.validation;
 
 import uk.ac.ebi.quickgo.annotation.validation.model.DBXRefEntity;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import org.springframework.batch.item.ItemWriter;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Use the database cross reference information contain in this class to verify a list of potential database cross
@@ -24,9 +26,9 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class DBXRefEntityValidation implements ConstraintValidator<WithFromValidator, String[]> {
 
-    private final static Map<String, List<DBXRefEntity>> mappedEntities = new HashMap<>();
+    private static Map<String, List<DBXRefEntity>> mappedEntities = new HashMap<>();
 
-    private static Function<String,String>  toDb = (value) -> value.substring(0, value.indexOf(":")).toLowerCase();
+    private static Function<String, String> toDb = (value) -> value.substring(0, value.indexOf(":")).toLowerCase();
     private static Function<String, String> toId = (value) -> value.substring(value.indexOf(":") + 1);
 
     @Override public void initialize(WithFromValidator constraintAnnotation) {
@@ -60,9 +62,10 @@ public class DBXRefEntityValidation implements ConstraintValidator<WithFromValid
             Preconditions.checkArgument(items != null, "The list of DBXRefEntity written to DBXRefEntityAggregator " +
                     "cannot be null.");
 
-            for (DBXRefEntity item : items) {
-                mappedEntities.computeIfAbsent(item.database.toLowerCase(), k -> new ArrayList<>()).add(item);
-            }
+            mappedEntities = items.stream()
+                    .filter(Objects::nonNull)
+                    .filter(i -> i.database != null)
+                    .collect(groupingBy(i -> i.database.toLowerCase()));
         }
     }
 }
