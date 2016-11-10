@@ -62,10 +62,10 @@ public class DBXRefEntityValidation implements ConstraintValidator<WithFromValid
             Preconditions.checkArgument(items != null, "The list of DBXRefEntity written to DBXRefEntityAggregator " +
                     "cannot be null.");
 
-            mappedEntities = items.stream()
+            mappedEntities.putAll(items.stream()
                     .filter(Objects::nonNull)
                     .filter(i -> i.database != null)
-                    .collect(groupingBy(i -> i.database.toLowerCase()));
+                    .collect(groupingBy(i -> i.database.toLowerCase())));
         }
     }
 }
