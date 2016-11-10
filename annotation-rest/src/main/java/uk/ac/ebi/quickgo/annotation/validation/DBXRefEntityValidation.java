@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.annotation.validation;
 
 import uk.ac.ebi.quickgo.annotation.validation.model.DBXRefEntity;
 
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +26,9 @@ public class DBXRefEntityValidation implements ConstraintValidator<WithFromValid
 
     private final static Map<String, List<DBXRefEntity>> mappedEntities = new HashMap<>();
 
+    private static Function<String,String>  toDb = (value) -> value.substring(0, value.indexOf(":")).toLowerCase();
+    private static Function<String, String> toId = (value) -> value.substring(value.indexOf(":") + 1);
+
     @Override public void initialize(WithFromValidator constraintAnnotation) {
 
     }
@@ -31,7 +36,7 @@ public class DBXRefEntityValidation implements ConstraintValidator<WithFromValid
     /**
      * If the entire list of values passed to isValid can be successfully validated, or not validated at all then
      * isValid will return true.
-     * @param values list of potential database cross reference identifiers.
+     * @param values list of potential database cross reference identifiers. Can be null.
      * @param context of the isValid call.
      * @return validation result as boolean.
      */
@@ -45,23 +50,15 @@ public class DBXRefEntityValidation implements ConstraintValidator<WithFromValid
     }
 
     private boolean isValidForDb(String value) {
-        final String dbKey = value.substring(0, value.indexOf(":")).toLowerCase();
-        final String id = value.substring(value.indexOf(":")+1);
-        List<DBXRefEntity> entities = mappedEntities.get(dbKey);
-
-        if(entities!=null){
-            for(DBXRefEntity entity : entities){
-                if(entity.test(id)){
-                    return true;
-                }
-            }
-        }
-        return false;
+        final List<DBXRefEntity> entities = mappedEntities.get(toDb.apply(value));
+        return entities != null && entities.stream().anyMatch(e -> e.test(toId.apply(value)));
     }
 
     static class DBXRefEntityAggregator implements ItemWriter<DBXRefEntity> {
 
-        @Override public void write(List<? extends DBXRefEntity> items) throws Exception {
+        @Override public void write(List<? extends DBXRefEntity> items) {
+            Preconditions.checkArgument(items != null, "The list of DBXRefEntity written to DBXRefEntityAggregator " +
+                    "cannot be null.");
 
             for (DBXRefEntity item : items) {
                 mappedEntities.computeIfAbsent(item.database.toLowerCase(), k -> new ArrayList<>()).add(item);
