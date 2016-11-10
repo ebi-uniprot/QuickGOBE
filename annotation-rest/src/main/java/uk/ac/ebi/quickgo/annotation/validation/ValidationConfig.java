@@ -1,23 +1,28 @@
 package uk.ac.ebi.quickgo.annotation.validation;
 
-import uk.ac.ebi.quickgo.annotation.validation.loader.*;
+import uk.ac.ebi.quickgo.annotation.validation.loader.LogJobListener;
+import uk.ac.ebi.quickgo.annotation.validation.loader.LogStepListener;
+import uk.ac.ebi.quickgo.annotation.validation.loader.SkipLoggerListener;
+import uk.ac.ebi.quickgo.annotation.validation.loader.StringToDbXrefEntityMapper;
 import uk.ac.ebi.quickgo.annotation.validation.model.DBXRefEntity;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.*;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
@@ -39,48 +44,43 @@ import org.springframework.core.io.Resource;
 @EnableBatchProcessing
 public class ValidationConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ValidationConfig.class);
-
-    public static final String LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME =
+    static final String LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME =
             "Load Annotation Filtering Validation Values";
-    public static final String LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME =
+    private static final String LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME =
             "Load Annotation DB Xref Entities Validation Values";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidationConfig.class);
     private static final String TAB = "\t";
-
+    private static final int HEADER_LINES = 1;
     @Value("${annotation.validation.source}")
     private Resource[] resources;
-
     //@Value("${annotation.validation.chunksize:30}")
-    private String chunkSize="30";
+    private final String chunkSize = "30";
     //@Value("${foo.bar.skipLimit:5}")
-    private String skipLimit="5";
-    private static final int HEADER_LINES = 1;
-
+    private final String skipLimit = "5";
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
 
     @Autowired
     private StepBuilderFactory stepBuilders;
 
-    @Bean
-    public Job validationJob(){
-        JobBuilder jobBuilder = jobBuilderFactory.get(LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME);
-        return jobBuilder.start(loadDbXrefEntities())
-        .listener(logJobListener())
-        .build();
+    private static <T> FlatFileItemReader<T> validationReader(Resource resource, FlatFileItemReader<T> reader) {
+
+        try {
+            reader.setResource(new GZIPResource(resource));
+        } catch (IOException e) {
+            LOGGER.error(
+                    "Failed to load " + Stream.of(resource) + ". " +
+                            "No corresponding information for this annotation validation will be available.", e);
+        }
+
+        return reader;
     }
 
-//    @Bean
-    private Step loadDbXrefEntities() {
-        return stepBuilders.get(LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME)
-                .<DBXRefEntity, DBXRefEntity>chunk(Integer.parseInt(chunkSize))
-                .faultTolerant()
-                .skipLimit(Integer.parseInt(skipLimit))
-                .skip(FlatFileParseException.class)
-                .<DBXRefEntity>reader(validationReader(resources[0], dbXrefReader()))
-                .<DBXRefEntity>writer(entityItemWriter())
-                .listener(logStepListener())
-                .listener(skipLogListener())
+    @Bean
+    public Job validationJob() {
+        JobBuilder jobBuilder = jobBuilderFactory.get(LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME);
+        return jobBuilder.start(loadDbXrefEntities())
+                .listener(logJobListener())
                 .build();
     }
 
@@ -91,7 +91,6 @@ public class ValidationConfig {
         reader.setLinesToSkip(HEADER_LINES);
         return reader;
     }
-
 
     @Bean
     LineMapper<DBXRefEntity> dbXrefEntityLineMapper() {
@@ -117,8 +116,21 @@ public class ValidationConfig {
     }
 
     @Bean
-    DBXRefEntityValidation dBXRefEntityValidation(){
+    DBXRefEntityValidation dBXRefEntityValidation() {
         return new DBXRefEntityValidation();
+    }
+
+    private Step loadDbXrefEntities() {
+        return stepBuilders.get(LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME)
+                .<DBXRefEntity, DBXRefEntity>chunk(Integer.parseInt(chunkSize))
+                .faultTolerant()
+                .skipLimit(Integer.parseInt(skipLimit))
+                .skip(FlatFileParseException.class)
+                .<DBXRefEntity>reader(validationReader(resources[0], dbXrefReader()))
+                .<DBXRefEntity>writer(entityItemWriter())
+                .listener(logStepListener())
+                .listener(skipLogListener())
+                .build();
     }
 
     private JobExecutionListener logJobListener() {
@@ -133,80 +145,9 @@ public class ValidationConfig {
         return new SkipLoggerListener<>();
     }
 
-    private static <T> FlatFileItemReader<T> validationReader(Resource resource, FlatFileItemReader<T> reader) {
-
-        try{
-            reader.setResource(new GZIPResource(resource));
-        } catch (IOException e) {
-            LOGGER.error(
-                    "Failed to load " + Stream.of(resource) + ". " +
-                            "No corresponding information for this annotation validation will be available.", e);
-        }
-
-        return reader;
-    }
-
-//    public static <T> MultiResourceItemReader<T> validationReader(
-//            Resource[] resources,
-//            FlatFileItemReader<T> itemReader) {
-//        MultiResourceItemReader<T> reader = new MultiResourceItemReader<>();
-//
-//        setResourceComparator(reader);
-//
-//        try {
-//            GZIPResource[] zippedResources = new GZIPResource[resources.length];
-//            for (int i = 0; i < resources.length; i++) {
-//                zippedResources[i] = new GZIPResource(resources[i]);
-//            }
-//
-//            reader.setResources(zippedResources);
-//            reader.setDelegate(itemReader);
-//        } catch (IOException e) {
-//            LOGGER.error(
-//                    "Failed to load preset information for " + Stream.of(resources) + ". " +
-//                            "No corresponding information for this preset will be available.", e);
-//        }
-//
-//        return reader;
-//    }
-
     private static class GZIPResource extends InputStreamResource implements Resource {
-                GZIPResource(Resource delegate) throws IOException {
-                    super(new GZIPInputStream(delegate.getInputStream()));
-                }
-            }
-
-    private static <T> void setResourceComparator(MultiResourceItemReader<T> reader) {
-        reader.setComparator((o1, o2) -> 0);
+        GZIPResource(Resource delegate) throws IOException {
+            super(new GZIPInputStream(delegate.getInputStream()));
+        }
     }
-
-//    @Bean
-//    FlatFileItemReader<DBXRefEntity> ffr(){
-//        FlatFileItemReader ffr = new FlatFileItemReader<>();
-//        ffr.setBufferedReaderFactory(gzipBufferedReaderFactory());
-//        return ffr;
-//    }
-//
-//    private BufferedReaderFactory gzipBufferedReaderFactory() {
-//        return null;
-//    }
-//
-//    private class GzippedBufferedReaderFactory implements BufferedReaderFactory{
-//
-//        @Override public BufferedReader create(Resource resource, String encoding)
-//                throws UnsupportedEncodingException, IOException {
-//            return new GzippedBufferedReader();
-//        }
-//    }
-//
-//    private class GzippedBufferedReader extends BufferedReader {
-//
-//        public GzippedBufferedReader(Reader in, int sz) {
-//            super(in, sz);
-//        }
-//
-//        public GzippedBufferedReader(Reader in) {
-//            super(in);
-//        }
-//    }
 }
