@@ -4,7 +4,10 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +21,9 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
+import static uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph.BIOLOGICAL_PROCESS_STOP_NODE;
+import static uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph.CELLULAR_COMPONENT_STOP_NODE;
+import static uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph.MOLECULAR_FUNCTION_STOP_NODE;
 
 /**
  * Validates the behaviour of {@link OntologyGraph}. The tests are divided amongst different
@@ -197,8 +203,8 @@ public class OntologyGraphTest {
             );
 
             assertThat(paths, hasSize(2));
-            checkPathsContains(paths, Arrays.asList(v1_CO_v2, v2_OI_v3));
-            checkPathsContains(paths, Arrays.asList(v1_CP_v2, v2_OI_v3));
+            checkPathsContains(paths, asList(v1_CO_v2, v2_OI_v3));
+            checkPathsContains(paths, asList(v1_CP_v2, v2_OI_v3));
         }
 
         @Test
@@ -226,7 +232,7 @@ public class OntologyGraphTest {
             );
 
             assertThat(paths, hasSize(1));
-            checkPathsContains(paths, Arrays.asList(v1_CP_v2, v2_OI_v3));
+            checkPathsContains(paths, asList(v1_CP_v2, v2_OI_v3));
         }
 
         @Test
@@ -263,10 +269,10 @@ public class OntologyGraphTest {
             );
 
             assertThat(paths, hasSize(4));
-            checkPathsContains(paths, Arrays.asList(v1_IS_v2, v2_IS_v5, v5_IS_v6));
-            checkPathsContains(paths, Arrays.asList(v1_IS_v8, v8_IS_v9, v9_IS_v6));
-            checkPathsContains(paths, Arrays.asList(v1_IS_v7, v7_IS_v9, v9_IS_v6));
-            checkPathsContains(paths, Arrays.asList(v1_IS_v7, v7_IS_v8, v8_IS_v9, v9_IS_v6));
+            checkPathsContains(paths, asList(v1_IS_v2, v2_IS_v5, v5_IS_v6));
+            checkPathsContains(paths, asList(v1_IS_v8, v8_IS_v9, v9_IS_v6));
+            checkPathsContains(paths, asList(v1_IS_v7, v7_IS_v9, v9_IS_v6));
+            checkPathsContains(paths, asList(v1_IS_v7, v7_IS_v8, v8_IS_v9, v9_IS_v6));
         }
 
         @Test
@@ -305,17 +311,17 @@ public class OntologyGraphTest {
             assertThat(paths, hasSize(7));
 
             // between 1 & 6
-            checkPathsContains(paths, Arrays.asList(v1_IS_v2, v2_IS_v5, v5_IS_v6));
-            checkPathsContains(paths, Arrays.asList(v1_IS_v8, v8_IS_v9, v9_IS_v6));
-            checkPathsContains(paths, Arrays.asList(v1_IS_v7, v7_IS_v9, v9_IS_v6));
-            checkPathsContains(paths, Arrays.asList(v1_IS_v7, v7_IS_v8, v8_IS_v9, v9_IS_v6));
+            checkPathsContains(paths, asList(v1_IS_v2, v2_IS_v5, v5_IS_v6));
+            checkPathsContains(paths, asList(v1_IS_v8, v8_IS_v9, v9_IS_v6));
+            checkPathsContains(paths, asList(v1_IS_v7, v7_IS_v9, v9_IS_v6));
+            checkPathsContains(paths, asList(v1_IS_v7, v7_IS_v8, v8_IS_v9, v9_IS_v6));
 
             // between 2 & 4
-            checkPathsContains(paths, Arrays.asList(v2_HP_v3, v3_HP_v4));
-            checkPathsContains(paths, Arrays.asList(v1_IS_v2, v2_HP_v3, v3_HP_v4));
+            checkPathsContains(paths, asList(v2_HP_v3, v3_HP_v4));
+            checkPathsContains(paths, asList(v1_IS_v2, v2_HP_v3, v3_HP_v4));
 
             // between 2 & 6
-            checkPathsContains(paths, Arrays.asList(v2_IS_v5, v5_IS_v6));
+            checkPathsContains(paths, asList(v2_IS_v5, v5_IS_v6));
         }
 
         private void checkPathsContains(
@@ -425,6 +431,69 @@ public class OntologyGraphTest {
 
             assertThat(ancestors, containsInAnyOrder(id("1"), id("2"), id("5"), id("6"), id("7"), id("8"), id("9")));
         }
+
+        @Test
+        public void omitAncestorsOfOneStopNodeSuccessor() {
+            String stopA = MOLECULAR_FUNCTION_STOP_NODE;
+            String rootNodeThatShouldBeHidden = id("0009999");
+
+            OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
+            OntologyRelationship v2_IS_vStopA = createRelationship(id("2"), stopA, IS_A);
+            OntologyRelationship vStopA_IS_v9999 = createRelationship(stopA, rootNodeThatShouldBeHidden, IS_A);
+            OntologyRelationship v1_IS_v3 = createRelationship(id("1"), id("3"), IS_A);
+            OntologyRelationship v1_IS_v4 = createRelationship(id("1"), id("4"), IS_A);
+            OntologyRelationship v3_IS_v5 = createRelationship(id("3"), id("5"), IS_A);
+            OntologyRelationship v4_IS_v6 = createRelationship(id("4"), id("6"), IS_A);
+
+
+            ontologyGraph.addRelationships(asList(
+                    v1_IS_v2,
+                    v2_IS_vStopA,
+                    vStopA_IS_v9999,
+                    v1_IS_v3,
+                    v1_IS_v4,
+                    v3_IS_v5,
+                    v4_IS_v6
+            ));
+
+            List<String> ancestors = ontologyGraph.ancestors(ids("1"));
+
+            assertThat(ancestors, containsInAnyOrder(id("1"), id("2"), id("3"), id("4"), id("5"), id("6"), stopA));
+        }
+
+        @Test
+        public void omitAncestorsOfAllStopNodeSuccessors() {
+            String stopA = MOLECULAR_FUNCTION_STOP_NODE;
+            String stopB = BIOLOGICAL_PROCESS_STOP_NODE;
+            String stopC = CELLULAR_COMPONENT_STOP_NODE;
+            String rootNodeThatShouldBeHidden = id("0009999");
+
+            OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
+            OntologyRelationship v1_IS_v3 = createRelationship(id("1"), id("3"), IS_A);
+            OntologyRelationship v1_IS_v4 = createRelationship(id("1"), id("4"), IS_A);
+            OntologyRelationship v2_IS_vStopA = createRelationship(id("2"), stopA, IS_A);
+            OntologyRelationship v3_IS_vStopB = createRelationship(id("2"), stopB, IS_A);
+            OntologyRelationship v4_IS_vStopC = createRelationship(id("2"), stopC, IS_A);
+            OntologyRelationship vStopA_IS_v9999 = createRelationship(stopA, rootNodeThatShouldBeHidden, IS_A);
+            OntologyRelationship vStopB_IS_v9999 = createRelationship(stopB, rootNodeThatShouldBeHidden, IS_A);
+            OntologyRelationship vStopC_IS_v9999 = createRelationship(stopC, rootNodeThatShouldBeHidden, IS_A);
+
+            ontologyGraph.addRelationships(asList(
+                    v1_IS_v2,
+                    v1_IS_v3,
+                    v1_IS_v4,
+                    v2_IS_vStopA,
+                    v3_IS_vStopB,
+                    v4_IS_vStopC,
+                    vStopA_IS_v9999,
+                    vStopB_IS_v9999,
+                    vStopC_IS_v9999
+            ));
+
+            List<String> ancestors = ontologyGraph.ancestors(ids("1"));
+
+            assertThat(ancestors, containsInAnyOrder(id("1"), id("2"), id("3"), id("4"), stopA, stopB, stopC));
+        }
     }
 
     public class DescendantTests {
@@ -440,11 +509,6 @@ public class OntologyGraphTest {
 
         @Test
         public void findDescendantsViaAllRelations() {
-            //            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            //            OntologyRelationship v1_CP_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
-            //            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
-            //
-            //            ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
             setupGraphWith3SimpleRelationships();
 
             List<String> ancestors = ontologyGraph.descendants(ids("3"));
@@ -454,11 +518,6 @@ public class OntologyGraphTest {
 
         @Test
         public void findDescendantsVia1Relation() {
-            //            OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
-            //            OntologyRelationship v1_CP_v2 =createRelationship(id("1"), id("2"), CAPABLE_OF_PART_OF);
-            //            OntologyRelationship v2_OI_v3 = createRelationship(id("2"), id("3"), OCCURS_IN);
-            //
-            //            ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_OI_v3));
             setupGraphWith3SimpleRelationships();
 
             List<String> ancestors = ontologyGraph.descendants(ids("3"), OCCURS_IN);

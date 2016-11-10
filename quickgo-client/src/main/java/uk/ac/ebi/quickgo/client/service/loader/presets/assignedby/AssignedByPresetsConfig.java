@@ -11,7 +11,12 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -26,7 +31,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.web.client.RestOperations;
 
-import static java.util.Arrays.asList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
@@ -45,8 +49,9 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 public class AssignedByPresetsConfig {
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     public static final String ASSIGNED_BY_DEFAULTS = "AgBase,BHF-UCL,CACAO,CGD,EcoCyc,UniProtKB";
-    private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
     public static final String ASSIGNED_BY = "assignedBy";
+
+    private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
 
     @Value("#{'${assignedBy.preset.source:}'.split(',')}")
     private Resource[] assignedByResources;
@@ -115,14 +120,14 @@ public class AssignedByPresetsConfig {
             RESTFilterConverterFactory converterFactory) {
         FilterRequest assignedByRequest = FilterRequest.newBuilder().addProperty(ASSIGNED_BY).build();
 
-        List<String> relevantAssignedByPresets;
+        Set<String> relevantAssignedByPresets =
+                Stream.of(assignedByDefaults).collect(Collectors.toCollection(LinkedHashSet::new));
         try {
             ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(assignedByRequest);
-            relevantAssignedByPresets = convertedFilter.getConvertedValue();
+            relevantAssignedByPresets.addAll(convertedFilter.getConvertedValue());
         } catch (RetrievalException | IllegalStateException e) {
             LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", e);
-            relevantAssignedByPresets = asList(assignedByDefaults);
         }
-        return new RawNamedPresetRelevanceChecker(relevantAssignedByPresets);
+        return new RawNamedPresetRelevanceChecker(new ArrayList<>(relevantAssignedByPresets));
     }
 }
