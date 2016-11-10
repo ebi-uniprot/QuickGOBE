@@ -123,4 +123,9 @@ public class DBXRefEntityValidationTest {
         thrown.expect(IllegalArgumentException.class);
         aggregator.write(null);
     }
+
+    @Test
+    public void writeEntitiesIsSuccessfulEvenIfContainsNull() {
+        aggregator.write(Arrays.asList(new DBXRefEntity(), null, new DBXRefEntity()));
+    }
 }
