@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.annotation.validation.ReferenceValidator;
 import uk.ac.ebi.quickgo.annotation.validation.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
@@ -227,7 +228,7 @@ public class AnnotationRequest {
         filterMap.put(REFERENCE_SEARCH, reference);
     }
 
-    //todo create validation pattern @Pattern(regexp = "")
+    @ReferenceValidator
     @Size(max = MAX_REFERENCES,
             message = "Number of items in '" + REFERENCE_PARAM + "' is larger than: {max}")
     public String[] getReference() {
