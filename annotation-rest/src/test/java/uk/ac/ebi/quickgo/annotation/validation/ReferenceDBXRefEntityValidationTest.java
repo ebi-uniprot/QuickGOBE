@@ -60,5 +60,4 @@ public class ReferenceDBXRefEntityValidationTest {
     public void validationFailsIfArgumentListContainsNull(){
         assertThat(refValidator.isValid(new String[]{null}, mockContext), is(false));
     }
-
 }
