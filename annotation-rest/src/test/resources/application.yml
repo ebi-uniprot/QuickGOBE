@@ -31,4 +31,10 @@ model:
 annotation:
     validation:
         source: classpath:/DB_XREFS_ENTITIES.dat.gz
+        referenceDatabases:
+          - pmid
+          - doi
+          - go_ref
+          - reactome
+
 
