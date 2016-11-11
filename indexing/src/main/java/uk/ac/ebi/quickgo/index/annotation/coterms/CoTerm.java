@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class CoTerm {
-
+    private static final Logger logger = LoggerFactory.getLogger(CoTerm.class);
     private static int logCount = 0;
     private final String target;
     private final String comparedTerm;
@@ -22,7 +22,6 @@ public class CoTerm {
     private final float similarityRatio;
     private final float probabilityRatio;
     private final long gpCount;
-    private static final Logger logger = LoggerFactory.getLogger(CoTerm.class);
 
     /**
      * Create a permutation for the compared term.
