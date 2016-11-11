@@ -53,10 +53,11 @@ public class ValidationConfig {
     private static final int HEADER_LINES = 1;
     @Value("${annotation.validation.source}")
     private Resource[] resources;
-    //@Value("${annotation.validation.chunksize:30}")
-    private final String chunkSize = "30";
-    //@Value("${foo.bar.skipLimit:5}")
-    private final String skipLimit = "5";
+
+    @Value("${annotation.validation.chunkSize:30}")
+    private String chunkSize;
+    @Value("${foo.bar.skipLimit:5}")
+    private String skipLimit;
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
 

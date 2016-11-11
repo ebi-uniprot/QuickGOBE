@@ -36,5 +36,8 @@ annotation:
           - doi
           - go_ref
           - reactome
+        validation:
+          chunkSize: 30
+          skipLimit: 5
 
 
