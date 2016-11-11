@@ -29,15 +29,7 @@ model:
 
 ## ================= Loading validation values =================
 annotation:
-    validation:
-        source: classpath:/DB_XREFS_ENTITIES.dat.gz
-        referenceDatabases:
-          - pmid
-          - doi
-          - go_ref
-          - reactome
-        validation:
-          chunkSize: 30
-          skipLimit: 5
-
-
+  validation:
+    source: classpath:/DB_XREFS_ENTITIES.dat.gz
+    chunkSize: 30
+    skipLimit: 5
