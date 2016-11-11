@@ -6,7 +6,6 @@ import java.util.stream.Stream;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import static uk.ac.ebi.quickgo.annotation.validation.QuickGoValidation.toDb;
 
@@ -21,7 +20,6 @@ public class ReferenceDBXRefEntityValidation implements ConstraintValidator<Refe
     @Autowired
     DBXRefEntityValidation dbxRefEntityValidation;
 
-    //@Value("${annotation.validation.reference.databases}")
     List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
 
     @Override public void initialize(ReferenceValidator constraintAnnotation) {}
