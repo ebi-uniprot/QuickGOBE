@@ -43,11 +43,8 @@ public class CoTerm {
         this.similarityRatio = similarityRatio;
         this.gpCount = gpCount;
 
-        if (!(compared > 0) || !(together > 0) || !(probabilityRatio > 0) || !(similarityRatio > 0)) {
-            if (logCount++ < 100) {
-                logger.info("The following coterm tuple may be incorrect: {}", this.toString());
-            }
-        }
+        testForInvalidTermCreatedAndLogNoMoreThanASetAmountIfThisHappens(compared, together, probabilityRatio,
+                similarityRatio);
     }
 
     /**
@@ -183,6 +180,15 @@ public class CoTerm {
                 ", probabilityRatio=" + probabilityRatio +
                 ", gpCount=" + gpCount +
                 '}';
+    }
+
+    private void testForInvalidTermCreatedAndLogNoMoreThanASetAmountIfThisHappens(long compared, long together,
+            float probabilityRatio, float similarityRatio) {
+        if (compared <= 0 || together <= 0 || probabilityRatio <= 0 || similarityRatio <= 0) {
+            if (logCount++ < 100) {
+                logger.info("The following Co Term tuple may be incorrect: {}", this.toString());
+            }
+        }
     }
 
     public static class Builder {
