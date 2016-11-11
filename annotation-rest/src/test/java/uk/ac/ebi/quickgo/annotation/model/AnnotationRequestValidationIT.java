@@ -574,6 +574,25 @@ public class AnnotationRequestValidationIT {
                 is(createMaxSizeErrorMessage(REFERENCE_PARAM, MAX_REFERENCES)));
     }
 
+    // QUALIFIER
+    @Test
+    public void StringWithUnderscoreNoSpacesOrNumbersIsAnOKQualifier() {
+        annotationRequest.setQualifier("foobar","foo_bar");
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void StringWithSpacesIsAnInvalidQualifier() {
+        annotationRequest.setQualifier("foo bar");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void StringWithNumbersIsAnInvalidQualifier() {
+        annotationRequest.setQualifier("foo3bar");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
         return String.format(ArrayPattern.DEFAULT_ERROR_MSG, paramName, csvInvalidItems);
