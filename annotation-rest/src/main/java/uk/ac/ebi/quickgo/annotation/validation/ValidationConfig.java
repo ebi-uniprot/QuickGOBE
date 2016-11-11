@@ -54,10 +54,8 @@ public class ValidationConfig {
     @Value("${annotation.validation.source}")
     private Resource[] resources;
 
-    @Value("${annotation.validation.chunkSize:30}")
-    private String chunkSize;
-    @Value("${foo.bar.skipLimit:5}")
-    private String skipLimit;
+    private int chunkSize = 30;
+    private int skipLimit = 5;
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
 
@@ -123,9 +121,9 @@ public class ValidationConfig {
 
     private Step loadDbXrefEntities() {
         return stepBuilders.get(LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME)
-                .<DBXRefEntity, DBXRefEntity>chunk(Integer.parseInt(chunkSize))
+                .<DBXRefEntity, DBXRefEntity>chunk(chunkSize)
                 .faultTolerant()
-                .skipLimit(Integer.parseInt(skipLimit))
+                .skipLimit(skipLimit)
                 .skip(FlatFileParseException.class)
                 .<DBXRefEntity>reader(validationReader(resources[0], dbXrefReader()))
                 .<DBXRefEntity>writer(entityItemWriter())

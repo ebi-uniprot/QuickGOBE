@@ -31,5 +31,3 @@ model:
 annotation:
   validation:
     source: classpath:/DB_XREFS_ENTITIES.dat.gz
-    chunkSize: 30
-    skipLimit: 5
