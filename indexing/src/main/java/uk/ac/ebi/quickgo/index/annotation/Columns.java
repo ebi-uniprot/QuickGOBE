@@ -6,7 +6,7 @@ package uk.ac.ebi.quickgo.index.annotation;
  * Created 19/04/16
  * @author Edd
  */
-public enum Columns {
+enum Columns {
     /*
      * ==================================================
      * Column specification (as given in goa_uniprot.gpa)

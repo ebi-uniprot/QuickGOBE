@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.index.ExceptionMatcher;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil;
@@ -15,7 +15,10 @@ import org.junit.rules.ExpectedException;
 import org.springframework.batch.item.validator.ValidationException;
 
 import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.COMPLETE_PROTEOME_KEY;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.IS_ANNOTATED_KEY;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.IS_ISOFORM_KEY;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.REFERENCE_PROTEOME_KEY;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
 
 /**
@@ -52,8 +55,6 @@ public class GeneProductValidatorTest {
         geneProduct.type = "protein";
         geneProduct.parentId = "A0A001";
         geneProduct.taxonId = createUnconvertedTaxonId(9606);
-
-        geneProduct.properties = concatProperty(TAXON_NAME_KEY, "Homo sapiens");
 
         return geneProduct;
     }
@@ -246,13 +247,6 @@ public class GeneProductValidatorTest {
 
         assertExceptionThrown(createValidationException("Taxon id column does not conform to regex: "
                 + createUnconvertedTaxonId(-9606)));
-
-        validator.validate(geneProduct);
-    }
-
-    @Test
-    public void taxonNameIsValid() throws Exception {
-        geneProduct.properties = concatProperty(TAXON_NAME_KEY, "name");
 
         validator.validate(geneProduct);
     }

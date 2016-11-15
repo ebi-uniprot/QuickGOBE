@@ -2,9 +2,9 @@ package uk.ac.ebi.quickgo.client.service.search.ontology;
 
 import uk.ac.ebi.quickgo.client.QuickGOREST;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 
 import java.util.Arrays;
 import org.junit.Before;
@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringApplicationConfiguration(classes = {QuickGOREST.class})
 @WebAppConfiguration
 public class OntologyUserQueryScoringIT {
-    private static final String RESOURCE_URL = "/QuickGO/internal/search/ontology";
+    private static final String RESOURCE_URL = "/internal/search/ontology";
     private static final String QUERY_PARAM = "query";
 
     @ClassRule

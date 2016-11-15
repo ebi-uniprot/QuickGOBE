@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
 
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
@@ -33,6 +33,7 @@ public class GeneProductServiceImplTest {
 
     private final static List<String> id = Collections.singletonList("A0A000");
     private final static List<String> ids = Arrays.asList("A0A001", "A0A002", "A0A003", "A0A004");
+    private static final String targetSet = "KRUK";
 
     @Mock
     private ServiceHelper serviceHelper;
@@ -91,10 +92,10 @@ public class GeneProductServiceImplTest {
         when(geneProductDocConverter.convert(multiDocList.get(1))).thenReturn(geneProduct1);
         when(geneProductDocConverter.convert(multiDocList.get(2))).thenReturn(geneProduct2);
         when(geneProductDocConverter.convert(multiDocList.get(3))).thenReturn(geneProduct3);
+        when(geneProductRepository.findByTargetSet(targetSet)).thenReturn(multiDocList);
     }
 
     @Test
-
     public void findSingleId() {
         List<GeneProduct> geneProducts = geneProductService.findById(id);
         assertThat(geneProducts, contains(geneProduct));
@@ -112,5 +113,12 @@ public class GeneProductServiceImplTest {
     public void idDoesntExist() {
         List<GeneProduct> geneProducts = geneProductService.findById(Collections.singletonList("QWERTY"));
         assertThat(geneProducts, hasSize(0));
+    }
+
+    @Test
+    public void findTargetSet() {
+        List<GeneProduct> geneProducts = geneProductService.findByTargetSet(targetSet);
+        assertThat(geneProducts, contains(geneProduct0, geneProduct1, geneProduct2, geneProduct3));
+        assertThat(geneProducts, hasSize(4));
     }
 }

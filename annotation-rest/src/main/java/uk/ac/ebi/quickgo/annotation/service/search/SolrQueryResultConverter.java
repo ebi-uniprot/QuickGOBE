@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;

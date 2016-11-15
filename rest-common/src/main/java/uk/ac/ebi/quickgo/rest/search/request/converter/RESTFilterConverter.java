@@ -28,8 +28,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
     static final String HOST = "ip";
     static final String RESOURCE_FORMAT = "resourceFormat";
-    static final String BODY_PATH = "responseBodyPath";
-    static final String LOCAL_FIELD = "localField";
     static final String TIMEOUT = "timeout";
     static final String RESPONSE_CLASS = "responseClass";
     static final String RESPONSE_CONVERTER_CLASS = "responseConverter";
@@ -76,7 +74,12 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
             ResponseType results = (ResponseType) fetchResults(restRequesterBuilder.build(), restResponseType);
             return converter.transform(results);
         } catch (Exception e) {
-            String errorMessage = FAILED_REST_FETCH_PREFIX + " due to: '" + e.getClass().getSimpleName() + "'";
+            String errorMessage = FAILED_REST_FETCH_PREFIX + " due to: ";
+            if (e.getMessage() != null && !e.getMessage().trim().isEmpty()) {
+                errorMessage += e.getMessage();
+            } else {
+                errorMessage += e.getClass().getSimpleName();
+            }
             LOGGER.error(errorMessage, e);
             throw new RetrievalException(errorMessage, e);
         }

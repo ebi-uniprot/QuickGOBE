@@ -9,7 +9,7 @@ import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
-import uk.ac.ebi.quickgo.rest.search.BasicSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -17,14 +17,11 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
-import java.util.HashSet;
-import java.util.Set;
-import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,7 +53,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
  *
  * gp=A0A000,A0A001
  * gpSet=BHF-UCL,Exosome
- * gpType=protein,rna,complex
+ * gpType=protein,miRNA,complex
  *
  * goTerm=GO:0016021,GO:0016022
  * goTermSet=goslim_chembl, goSlimGeneric .. and others.
@@ -89,13 +86,13 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
  *         Created with IntelliJ IDEA.
  */
 @RestController
-@RequestMapping(value = "/QuickGO/services/annotation")
+@RequestMapping(value = "/annotation")
 public class AnnotationController {
     private final ControllerValidationHelper validationHelper;
 
     private final SearchService<Annotation> annotationSearchService;
 
-    private final BasicSearchQueryTemplate queryTemplate;
+    private final DefaultSearchQueryTemplate queryTemplate;
     private final FilterConverterFactory converterFactory;
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
@@ -115,13 +112,17 @@ public class AnnotationController {
         checkArgument(converterFactory != null, "The FilterConverterFactory cannot be null.");
         checkArgument(resultTransformerChain != null,
                 "The ResultTransformerChain<QueryResult<Annotation>> cannot be null.");
+        checkArgument(statsService != null, "Annotation stats service cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
         this.converterFactory = converterFactory;
-        this.queryTemplate = new BasicSearchQueryTemplate(annotationRetrievalConfig.getSearchReturnedFields());
+
         this.statsService = statsService;
         this.resultTransformerChain = resultTransformerChain;
+
+        this.queryTemplate = new DefaultSearchQueryTemplate();
+        this.queryTemplate.setReturnedFields(annotationRetrievalConfig.getSearchReturnedFields());
     }
 
     /**
@@ -150,7 +151,7 @@ public class AnnotationController {
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .setFilters(filterQueryInfo.getFilterQueries())
+                .addFilters(filterQueryInfo.getFilterQueries())
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit())
                 .build();

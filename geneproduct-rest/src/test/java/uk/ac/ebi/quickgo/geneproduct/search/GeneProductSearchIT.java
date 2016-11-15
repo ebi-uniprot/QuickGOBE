@@ -1,13 +1,11 @@
 package uk.ac.ebi.quickgo.geneproduct.search;
 
 import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductFields;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
-import java.util.Collections;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,12 +22,14 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     @Autowired
     private GeneProductRepository repository;
 
-    private static final String ONTOLOGY_RESOURCE_URL = "/QuickGO/services/geneproduct/search";
+    private static final String GENE_PRODUCT_RESOURCE_URL = "/geneproduct/search";
+    private static final String TYPE_FILTER = "type";
+    private static final String TAXON_ID_FILTER = "taxonId";
 
     @Before
     public void setUp() throws Exception {
         repository.deleteAll();
-        resourceUrl = ONTOLOGY_RESOURCE_URL;
+        resourceUrl = GENE_PRODUCT_RESOURCE_URL;
     }
 
     // response format ---------------------------------------------------------
@@ -141,7 +141,18 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("glycine", GeneProductFields.Searchable.NAME);
+        checkValidFacetResponse("glycine", TYPE_FILTER);
+    }
+
+    @Test
+    public void requestWithMultipleValidFacetFieldsReturnsResponseWithMultipleFacetsInResult() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkValidFacetResponse("glycine", TYPE_FILTER, TAXON_ID_FILTER);
     }
 
     @Test
@@ -155,102 +166,87 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse(name, GeneProductFields.Searchable.TYPE);
+        checkValidFacetResponse(name, TYPE_FILTER);
     }
 
     @Test
-    public void requestWithMultipleValidFacetFieldsReturnsResponseWithMultipleFacetsInResult() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
+    public void requestWithTaxonIdFacetFieldReturnsResponseWithFacetInResult() throws Exception {
+        int taxonId = 99;
+        String name = "name";
+
+        GeneProductDocument doc1 = createGeneProductDocWithNameAndTaxonId("A0A0F8CSS1", name, taxonId);
+        GeneProductDocument doc2 = createGeneProductDocWithNameAndTaxonId("A0A0F8CSS2", name, taxonId);
+        GeneProductDocument doc3 = createGeneProductDocWithNameAndTaxonId("A0A0F8CSS3", name, taxonId);
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("glycine", GeneProductFields.Searchable.ID,
-                GeneProductFields.Searchable.NAME);
+        checkValidFacetResponse(name, TAXON_ID_FILTER);
     }
 
     // filter queries ---------------------------------------------------------
     @Test
-    public void requestWithInvalidFilterQueryReturns400Response() throws Exception {
+    public void requestWithInvalidFilterQueryIgnoresTheFilter() throws Exception {
         GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
         GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
         GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
 
         saveToRepository(doc1, doc2, doc3);
 
-        String fq = buildFilterQuery("thisFieldDoesNotExist", "Process");
-
-        checkInvalidFilterQueryResponse("glycine", fq);
-    }
-
-    @Test
-    public void requestWithAFilterQueryReturnsFilteredResponse() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        doc1.symbol = "important";
-        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        doc2.symbol = "important";
-        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.symbol = "pointless";
-
-        saveToRepository(doc1, doc2, doc3);
-
-        String fq = buildFilterQuery(GeneProductFields.Searchable.SYMBOL, "important");
-
-        checkValidFilterQueryResponse("metabolic", 2, fq);
-    }
-
-    @Test
-    public void requestWith3FilterQueriesThatFilterOutAllResults() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        doc1.symbol = "important";
-        doc1.synonyms = Collections.singletonList("Klose");
-        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        doc2.symbol = "important";
-        doc2.synonyms = Collections.singletonList("Jerome");
-        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.symbol = "pointless";
-        doc3.synonyms = Collections.singletonList("Jerome");
-
-        saveToRepository(doc1, doc2, doc3);
-
-        String fq1 = buildFilterQuery(GeneProductFields.Searchable.SYMBOL, "Process");
-        String fq2 = buildFilterQuery(GeneProductFields.Searchable.SYNONYM, "Klose");
-        String fq3 = buildFilterQuery(GeneProductFields.Searchable.SYNONYM, "Ibrahimovic");
-
-        checkValidFilterQueryResponse("process", 0, fq1, fq2, fq3);
-    }
-
-    @Test
-    public void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
-        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        doc1.symbol = "important";
-        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        doc2.symbol = "important";
-        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.symbol = "important";
-
-        saveToRepository(doc1, doc2, doc3);
-
-        String fq = buildFilterQuery(GeneProductFields.Searchable.SYMBOL, "important");
+        Param fq = new Param("thisFieldDoesNotExist", "Process");
 
         checkValidFilterQueryResponse("glycine", 3, fq);
     }
 
     @Test
-    public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
+    public void requestWithATypeFilterQueryReturnsFilteredResponse() throws Exception {
         GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
-        doc1.symbol = "important";
+        doc1.type = "protein";
         GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
-        doc2.symbol = "pointless";
+        doc2.type = "protein";
         GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
-        doc3.symbol = "important";
+        doc3.type = "miRNA";
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFilterQueryResponse("process", 2, GeneProductFields.Searchable.SYMBOL + ":important")
-                .andExpect(jsonPath("$.results[0].id").value("A0A0F8CSS1"))
-                .andExpect(jsonPath("$.results[1].id").value("A0A0F8CSS3"));
+        Param fq = new Param(TYPE_FILTER, "protein");
+
+        checkValidFilterQueryResponse("metabolic", 2, fq);
+    }
+
+    @Test
+    public void requestWith2FilterQueriesThatFilterOutAllResults() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        doc1.type = "protein";
+        doc1.taxonId = 2;
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        doc2.type = "miRNA";
+        doc2.taxonId = 1;
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
+        doc3.type = "protein";
+        doc3.taxonId = 2;
+
+        saveToRepository(doc1, doc2, doc3);
+
+        Param fq1 = new Param(TYPE_FILTER, "miRNA");
+        Param fq2 = new Param(TAXON_ID_FILTER, "2");
+
+        checkValidFilterQueryResponse("process", 0, fq1, fq2);
+    }
+
+    @Test
+    public void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        doc1.type = "miRNA";
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        doc2.type = "miRNA";
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
+        doc3.type = "miRNA";
+
+        saveToRepository(doc1, doc2, doc3);
+
+        Param fq = new Param(TYPE_FILTER, "miRNA");
+
+        checkValidFilterQueryResponse("glycine", 3, fq);
     }
 
     // highlighting ------------------------------------------------
@@ -327,10 +323,6 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         }
     }
 
-    private String buildFilterQuery(String field, String value) {
-        return field + ":" + value;
-    }
-
     private GeneProductDocument createGeneProductDocWithName(String id, String name) {
         GeneProductDocument geneProductDocument = createDocWithId(id);
         geneProductDocument.name = name;
@@ -341,6 +333,14 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     private GeneProductDocument createGeneProductDocWithNameAndType(String id, String name, GeneProductType type) {
         GeneProductDocument geneProductDocument = createDocWithId(id);
         geneProductDocument.type = type.getName();
+        geneProductDocument.name = name;
+
+        return geneProductDocument;
+    }
+
+    private GeneProductDocument createGeneProductDocWithNameAndTaxonId(String id, String name, int taxonId) {
+        GeneProductDocument geneProductDocument = createDocWithId(id);
+        geneProductDocument.taxonId = taxonId;
         geneProductDocument.name = name;
 
         return geneProductDocument;

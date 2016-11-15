@@ -17,35 +17,50 @@
 -->
 
 <schema name="geneproduct" version="1.5">
-    <!-- ========================================================================== -->
-    <!--                   Start of QuickGO Gene Product fields                         -->
 
-    <field name="id" type="lowercase" indexed="true" stored="true"/>
-    <field name="name" type="text_ignorecase" indexed="true" stored="true"/>
-    <field name="synonym" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
-    <field name="symbol" type="text_ignorecase" indexed="true" stored="true"/>
+    <!-- ========================================================================== -->
+    <!--                   Start of QuickGO Gene Product fields                     -->
+    <!-- NOTE: Do not change the analyzers of these fields. These fields are only to store or facet, not to search -->
+    <field name="id" type="string" indexed="true" stored="true"/>
+    <field name="name" type="string" indexed="false" stored="true"/>
+    <field name="synonym" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="symbol" type="string" indexed="false" stored="true"/>
     <field name="database" type="string" indexed="false" stored="true"/>
     <field name="type" type="string" indexed="true" stored="true"/>
-    <field name="taxonId" type="int" indexed="false" stored="true"/>
-    <field name="taxonName" type="string" indexed="false" stored="true"/>
-    <field name="dbSubset" type="lowercase" indexed="true" stored="true" multiValued="true"/>
+    <field name="taxonId" type="int" indexed="true" stored="true"/>
+    <field name="taxonName" type="string" indexed="false" stored="false"/>
+    <field name="dbSubset" type="string" indexed="true" stored="true"/>
     <field name="isCompleteProteome" type="boolean" indexed="false" stored="true"/>
     <field name="referenceProteome" type="string" indexed="false" stored="true"/>
     <field name="isIsoform" type="boolean" indexed="false" stored="true"/>
     <field name="isAnnotated" type="boolean" indexed="false" stored="true"/>
     <field name="parentId" type="string" indexed="false" stored="true"/>
+    <field name="targetSet" type="string" indexed="true" stored="false" multiValued="true"/>
 
-    <!-- computed field that contains most of the gene product information -->
+    <!-- ========================================================================== -->
+    <!-- Following fields are for search purposes -->
+    <!-- If an indexed field is marked as stored. It is because this field is used for highlighting purposes -->
     <field name="text" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <field name="dbSubset_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <field name="type_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="false"/>
+
 
     <!-- autocomplete search fields -->
-    <field name="edge_symbol" type="text_edge" indexed="true" stored="true" multiValued="true"/>
-    <field name="edge_name" type="text_edge" indexed="true" stored="true" multiValued="false"/>
-    <field name="edge_synonym" type="text_edge" indexed="true" stored="true" multiValued="true"/>
+    <field name="id_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
+    <field name="name_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
+    <field name="symbol_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
+    <field name="synonym_lowercase" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
+    <field name="taxonName_lowercase" type="text_ignorecase" indexed="true" stored="false" multiValued="false"/>
 
-    <field name="exact_symbol" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
-    <field name="exact_name" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
-    <field name="exact_synonym" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
+    <field name="symbol_edge" type="text_edge" indexed="true" stored="true" multiValued="false"/>
+    <field name="name_edge" type="text_edge" indexed="true" stored="true" multiValued="false"/>
+    <field name="synonym_edge" type="text_edge" indexed="true" stored="true" multiValued="true"/>
+    <field name="taxonName_edge" type="text_edge" indexed="true" stored="false" multiValued="false"/>
+
+    <field name="symbol_exact" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
+    <field name="name_exact" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
+    <field name="synonym_exact" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
+    <field name="taxonName_exact" type="exact_lower" indexed="true" stored="false" multiValued="false"/>
 
     <!--                     End of QuickGO Ontology fields                         -->
     <!-- ========================================================================== -->
@@ -61,20 +76,31 @@
           is added to the index.  It's used either to index the same field differently,
           or to add multiple fields to the same field for easier/faster searching.  -->
 
+    <!-- Copy fields for autocomplete search-->
+    <copyField source="symbol" dest="symbol_edge"/>
+    <copyField source="name" dest="name_edge"/>
+    <copyField source="synonym" dest="synonym_edge"/>
+    <copyField source="taxonName" dest="taxonName_edge"/>
+
+    <copyField source="symbol" dest="symbol_exact"/>
+    <copyField source="name" dest="name_exact"/>
+    <copyField source="synonym" dest="synonym_exact"/>
+    <copyField source="taxonName" dest="taxonName_exact"/>
+
+    <copyField source="id" dest="id_lowercase"/>
+    <copyField source="symbol" dest="symbol_lowercase"/>
+    <copyField source="name" dest="name_lowercase"/>
+    <copyField source="synonym" dest="synonym_lowercase"/>
+    <copyField source="taxonName" dest="taxonName_lowercase"/>
+
     <!-- Copy fields for generic search -->
     <copyField source="id" dest="text"/>
     <copyField source="symbol" dest="text"/>
     <copyField source="name" dest="text"/>
     <copyField source="synonym" dest="text"/>
 
-    <!-- Copy fields for autocomplete search-->
-    <copyField source="symbol" dest="edge_symbol"/>
-    <copyField source="name" dest="edge_name"/>
-    <copyField source="synonym" dest="edge_synonym"/>
-
-    <copyField source="symbol" dest="exact_symbol"/>
-    <copyField source="name" dest="exact_name"/>
-    <copyField source="synonym" dest="exact_synonym"/>
+    <copyField source="dbSubset" dest="dbSubset_lowercase"/>
+    <copyField source="type" dest="type_lowercase"/>
 
     <!--Use this for autocomplete searches-->
     <fieldType name="text_edge" class="solr.TextField" sortMissingLast="true" omitNorms="false"
@@ -125,7 +151,7 @@
 
 
     <!-- field type definitions. The "name" attribute is
-       just a label to be used by field definitions.  The "class" 
+       just a label to be used by field definitions.  The "class"
      attribute and any other attributes determine the real
        behavior of the fieldType.
          Class names starting with "solr" refer to java classes in a
@@ -185,7 +211,7 @@
 
     <!-- The format for this date field is of the form 1995-12-31T23:59:59Z, and
          is a more restricted form of the canonical representation of dateTime
-         http://www.w3.org/TR/xmlschema-2/#dateTime    
+         http://www.w3.org/TR/xmlschema-2/#dateTime
          The trailing "Z" designates UTC time and is mandatory.
          Optional fractional seconds are allowed: 1995-12-31T23:59:59.999Z
          All other components are mandatory.
@@ -200,7 +226,7 @@
                NOW/DAY+6MONTHS+3DAYS
                   ... 6 months and 3 days in the future from the start of
                       the current day
-                      
+
          Consult the DateField javadocs for more information.
 
          Note: For faster range queries, consider the tdate type
@@ -216,11 +242,11 @@
 
     <!-- The "RandomSortField" is not used to store or search any
          data.  You can declare fields of this type it in your schema
-         to generate pseudo-random orderings of your docs for sorting 
+         to generate pseudo-random orderings of your docs for sorting
          or function purposes.  The ordering is generated based on the field
          name and the version of the index. As long as the index version
          remains unchanged, and the same field name is reused,
-         the ordering of the docs will be consistent.  
+         the ordering of the docs will be consistent.
          If you want different psuedo-random orderings of documents,
          for the same version of the index, use a dynamicField and
          change the field name in the request.
@@ -361,7 +387,7 @@
 
     <!-- This point type indexes the coordinates as separate fields (subFields)
       If subFieldType is defined, it references a type, and a dynamic field
-      definition is created matching *___<typename>.  Alternately, if 
+      definition is created matching *___<typename>.  Alternately, if
       subFieldSuffix is defined, that is used to create the subFields.
       Example: if subFieldType="double", then the coordinates would be
         indexed in fields myloc_0___double,myloc_1___double.

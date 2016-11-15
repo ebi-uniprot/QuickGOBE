@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,7 +30,7 @@ import static uk.ac.ebi.quickgo.ontology.controller.OBOController.CONSTRAINTS_SU
  */
 public class GOControllerIT extends OBOControllerIT {
 
-    private static final String RESOURCE_URL = "/QuickGO/services/go";
+    private static final String RESOURCE_URL = "/ontology/go";
     private static final String GO_0000001 = "GO:0000001";
     private static final String GO_0000002 = "GO:0000002";
 

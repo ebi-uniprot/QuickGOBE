@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.service.converter;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 
 import java.util.Arrays;
@@ -26,13 +26,12 @@ public class GeneProductDocConverterImplTest {
 
     private static final String DATABASE = "UniProt";
     private static final String SYMBOL = "G12345";
-    private static final String TAX_NAME = "Streptomyces ghanaensis";
     private static final String TYPE = "protein";
     private static final String NAME = "moeA5";
     private static final String PARENT_ID = "QWERTY";
     private static final String REF_PROTEOME = "P1234";
+    private static final String DATABASE_SUBSET = "SUB1";
 
-    private static final List<String> DATABASE_SUBSETS = Arrays.asList("SUB1", "SUB2");
     private static final List<String> SYNONYMS = Arrays.asList("Q1234", "R1234", "S1234");
 
     private GeneProductDocConverter geneProductDocConverter;
@@ -46,7 +45,7 @@ public class GeneProductDocConverterImplTest {
 
         geneProductDocument.id = ID;
         geneProductDocument.database = DATABASE;
-        geneProductDocument.databaseSubsets = DATABASE_SUBSETS;
+        geneProductDocument.databaseSubset = DATABASE_SUBSET;
         geneProductDocument.isAnnotated = true;
         geneProductDocument.synonyms = SYNONYMS;
         geneProductDocument.isIsoform = true;
@@ -56,7 +55,6 @@ public class GeneProductDocConverterImplTest {
         geneProductDocument.parentId = PARENT_ID;
         geneProductDocument.symbol = SYMBOL;
         geneProductDocument.taxonId = TAX_ID;
-        geneProductDocument.taxonName = TAX_NAME;
         geneProductDocument.type = TYPE;
     }
 
@@ -66,7 +64,7 @@ public class GeneProductDocConverterImplTest {
 
         assertThat(convertedGeneProduct.id, is(equalTo(ID)));
         assertThat(convertedGeneProduct.database, is(equalTo(DATABASE)));
-        assertThat(convertedGeneProduct.databaseSubset, containsInAnyOrder("SUB1", "SUB2"));
+        assertThat(convertedGeneProduct.databaseSubset, is("SUB1"));
         assertThat(convertedGeneProduct.synonyms, containsInAnyOrder("Q1234", "R1234", "S1234"));
         assertThat(convertedGeneProduct.isIsoform, is(true));
         assertThat(convertedGeneProduct.name, is(NAME));
@@ -74,8 +72,7 @@ public class GeneProductDocConverterImplTest {
         assertThat(convertedGeneProduct.isCompleteProteome, is(true));
         assertThat(convertedGeneProduct.parentId, is(PARENT_ID));
         assertThat(convertedGeneProduct.symbol, is(SYMBOL));
-        assertThat(convertedGeneProduct.taxonomy.id, is(TAX_ID));
-        assertThat(convertedGeneProduct.taxonomy.name, is(TAX_NAME));
+        assertThat(convertedGeneProduct.taxonId, is(TAX_ID));
         assertThat(convertedGeneProduct.type, is(GeneProductType.PROTEIN));
         assertThat(convertedGeneProduct.isAnnotated, is(true));
     }
@@ -85,12 +82,12 @@ public class GeneProductDocConverterImplTest {
         geneProductDocument.taxonId = DEFAULT_TAXON_ID;
         GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
 
-        assertThat(convertedGeneProduct.taxonomy, is(nullValue()));
+        assertThat(convertedGeneProduct.taxonId, is(DEFAULT_TAXON_ID));
     }
 
     @Test
     public void nullDocDbSubsetConvertsToNullModelDbSubset() {
-        geneProductDocument.databaseSubsets = null;
+        geneProductDocument.databaseSubset = null;
 
         GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
 

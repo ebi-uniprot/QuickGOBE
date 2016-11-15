@@ -1,25 +1,35 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
+import uk.ac.ebi.quickgo.geneproduct.model.GeneProductRequest;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
 import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.ParameterBindingException;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
-import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
+import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import io.swagger.annotations.ApiOperation;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -35,41 +45,39 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
  * Created with IntelliJ IDEA.
  */
 @RestController
-@RequestMapping(value = "/QuickGO/services/geneproduct")
+@RequestMapping(value = "/geneproduct")
 public class GeneProductController {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
-    private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
-    private static final String DEFAULT_PAGE_NUMBER = "1";
 
     private final GeneProductService geneProductService;
     private final SearchService<GeneProduct> geneProductSearchService;
     private final ControllerValidationHelper controllerValidationHelper;
     private final DefaultSearchQueryTemplate requestTemplate;
+    private final FilterConverterFactory converterFactory;
 
     @Autowired
     public GeneProductController(
             GeneProductService geneProductService,
             SearchService<GeneProduct> geneProductSearchService,
-            SearchableField geneProductSearchableField,
             SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig,
-            ControllerValidationHelper controllerValidationHelper) {
+            ControllerValidationHelper controllerValidationHelper,
+            FilterConverterFactory converterFactory) {
+
         checkArgument(geneProductService != null,
                 "The GeneProductService instance passed to the constructor of GeneProductController must not be null.");
         checkArgument(geneProductSearchService != null, "The SearchService<GeneProduct> must not be null.");
-        checkArgument(geneProductSearchableField != null, "The gene product SearchableField must not be null");
         checkArgument(geneProductRetrievalConfig != null, "The GeneProductCompositeRetrievalConfig must not be null");
         checkArgument(controllerValidationHelper != null, "The ControllerValidationHelper must not be null");
+        checkArgument(converterFactory != null, "The FilterConverterFactory must not be null");
 
         this.geneProductService = geneProductService;
         this.geneProductSearchService = geneProductSearchService;
         this.controllerValidationHelper = controllerValidationHelper;
+        this.converterFactory = converterFactory;
 
-        this.requestTemplate = new DefaultSearchQueryTemplate(
-                new StringToQuickGOQueryConverter(geneProductSearchableField),
-                geneProductSearchableField,
-                geneProductRetrievalConfig.getSearchReturnedFields(),
-                geneProductRetrievalConfig.repo2DomainFieldMap().keySet(),
+        this.requestTemplate = new DefaultSearchQueryTemplate();
+        this.requestTemplate.setReturnedFields(geneProductRetrievalConfig.getSearchReturnedFields());
+        this.requestTemplate.setHighlighting(geneProductRetrievalConfig.repo2DomainFieldMap().keySet(),
                 geneProductRetrievalConfig.getHighlightStartDelim(),
                 geneProductRetrievalConfig.getHighlightEndDelim());
     }
@@ -82,7 +90,7 @@ public class GeneProductController {
     @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status")
     @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
-        throw new IllegalArgumentException("The requested end-point does not exist.");
+        throw new ParameterException("The requested end-point does not exist.");
     }
 
     /**
@@ -92,7 +100,7 @@ public class GeneProductController {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the gene product ids</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -104,33 +112,49 @@ public class GeneProductController {
     /**
      * Perform a custom client search
      *
-     * @param query the user query
-     * @param limit number of entries per page
-     * @param page which page number of entries to retrieve
-     * @param filterQueries an optional list of filter queries
-     * @param facets an optional list of facet fields
-     * @param highlighting whether or not to highlight the search results
+     * @param request an object that wraps all possible configurations for this endpoint
      * @return the search results
      */
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<GeneProduct>> geneProductSearch(
-            @RequestParam(value = "query") String query,
-            @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
-            @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page,
-            @RequestParam(value = "filterQuery", required = false) List<String> filterQueries,
-            @RequestParam(value = "facet", required = false) List<String> facets,
-            @RequestParam(value = "highlighting", required = false) boolean highlighting) {
+    public ResponseEntity<QueryResult<GeneProduct>> geneProductSearch(@Valid @ModelAttribute GeneProductRequest
+            request, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            throw new ParameterBindingException(bindingResult);
+        }
 
         DefaultSearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
-                .setQuery(query)
-                .addFacets(facets)
-                .addFilters(filterQueries)
-                .useHighlighting(highlighting)
-                .setPage(page)
-                .setPageSize(limit);
+                .setQuery(request.createQuery())
+                .addFacets(request.getFacet() == null ? null : Arrays.asList(request.getFacet()))
+                .addFilters(
+                        convertFilterRequestsToQueries(request.createFilterRequests())
+                )
+                .useHighlighting(request.isHighlighting())
+                .setPage(request.getPage())
+                .setPageSize(request.getLimit());
 
         return search(requestBuilder.build(), geneProductSearchService);
     }
+
+    private List<QuickGOQuery> convertFilterRequestsToQueries(List<FilterRequest> filterRequests) {
+        return filterRequests.stream()
+                .map(converterFactory::convert)
+                .filter(Objects::nonNull)
+                .map(ConvertedFilter::getConvertedValue)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Perform a lookup of gene products associated to a target set.
+     * @param name name of target set
+     * @return lookup results
+     */
+    @RequestMapping(value="/targetset/{name}", method = {RequestMethod.GET}, produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<GeneProduct>> findByTargetSet(@PathVariable String name) {
+        return getGeneProductResponse(geneProductService.findByTargetSet(name));
+    }
+
 
     /**
      * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.

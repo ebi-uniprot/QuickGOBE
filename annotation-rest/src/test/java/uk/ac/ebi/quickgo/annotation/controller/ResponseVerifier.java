@@ -2,8 +2,7 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import org.hamcrest.Matchers;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
@@ -14,6 +13,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -25,12 +25,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * service is working as expected.
  */
 final class ResponseVerifier {
+    public static final String ASSIGNED_BY_FIELD = "assignedBy";
     public static final String GENEPRODUCT_ID_FIELD = "geneProductId";
     public static final String GO_EVIDENCE_FIELD = "goEvidence";
     public static final String GO_ID_FIELD = "goId";
     public static final String SLIMMED_ID_FIELD = "slimmedIds";
     public static final String RESULTS = "results";
-    public static final String QUALIFIER = "qualifier";
+    public static final String QUALIFIER_FIELD = "qualifier";
+    public static final String REFERENCE_FIELD = "reference";
+    public static final String TAXON_ID_FIELD = "taxonId";
+    public static final String WITH_FROM_FIELD = "withFrom";
 
     private static final String ERROR_MESSAGE = "messages";
     private static final String RESULTS_CONTENT_BY_INDEX = RESULTS + "[%d].";
@@ -46,7 +50,7 @@ final class ResponseVerifier {
     }
 
     static ResultMatcher valuesOccurInField(String fieldName, String... values) {
-        return jsonPath(RESULTS + ".*." + fieldName, contains(values));
+        return jsonPath(RESULTS + ".*." + fieldName, containsInAnyOrder(values));
     }
 
     static <T> ResultMatcher valuesOccurInField(String fieldName, List<T> match) {
@@ -54,7 +58,7 @@ final class ResponseVerifier {
     }
 
     static ResultMatcher valuesOccursInField(String fieldName, Integer... values) {
-        return jsonPath(RESULTS + ".*." + fieldName, contains(values));
+        return jsonPath(RESULTS + ".*." + fieldName, containsInAnyOrder(values));
     }
 
     static ResultMatcher fieldDoesNotExist(String fieldName) {
@@ -69,12 +73,12 @@ final class ResponseVerifier {
         return jsonPath(RESULTS + ".*.[?(@." + fieldName + " == " + value + ")]", hasSize(expectedCount));
     }
 
-    static ResultMatcher valueOccurInField(String fieldName, String value) {
+    static <T> ResultMatcher valueOccursInField(String fieldName, T value) {
         return jsonPath(RESULTS + ".*." + fieldName, hasItem(value));
     }
 
-    static ResultMatcher valueOccursInCollection(String fieldName, String value) {
-        return jsonPath(RESULTS + ".*." + fieldName + "[*]", hasItem(value));
+    static <T> ResultMatcher valueOccursInFieldList(String fieldName, T value) {
+        return jsonPath(RESULTS + ".*." + fieldName + ".*", hasItem(value));
     }
 
     static ResultMatcher messageExists(String message) {
@@ -96,6 +100,7 @@ final class ResponseVerifier {
                 .addMatcher(jsonPath(path + "assignedBy").exists())
                 .addMatcher(jsonPath(path + "targetSets").exists())
                 .addMatcher(jsonPath(path + "symbol").exists())
+                .addMatcher(jsonPath(path + "date").exists())
                 .addMatcher(jsonPath(path + "extensions").exists());
     }
 
@@ -152,6 +157,27 @@ final class ResponseVerifier {
             matchers.add(matcher);
 
             return this;
+        }
+    }
+
+    public static class ResponseItem {
+        private final Map<String, String> contents;
+
+        private ResponseItem() {
+            contents = new HashMap<>();
+        }
+
+        public static ResponseItem responseItem() {
+            return new ResponseItem();
+        }
+
+        public ResponseItem withAttribute(String key, String value) {
+            contents.put(key, value);
+            return this;
+        }
+
+        public Map<String, String> build() {
+            return Collections.unmodifiableMap(contents);
         }
     }
 

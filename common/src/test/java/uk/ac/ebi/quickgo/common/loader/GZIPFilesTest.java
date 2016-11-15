@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.common.loader;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 import org.junit.Rule;

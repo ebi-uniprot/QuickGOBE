@@ -1,10 +1,12 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Preconditions;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
@@ -13,22 +15,33 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.s
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
 
 /**
- * Converts a {@link GeneProduct} into an {@link uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument}
+ * Converts a {@link GeneProduct} into an {@link GeneProductDocument}
  *
  * @author Ricardo Antunes
  */
 public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, GeneProductDocument> {
+
+    /**
+     * The following values define how the contents of the Gene Product properties are described.
+     * E.g <code>db_object_type=protein|go_aspect=cellular_component|target_set=KRUK,BHF-UCL</code>
+     * where pipes are inter-value delimiters, the equals symbol is the intra-value delimiter
+     * to split up keys and their value and comma is the delimiter for values for a single key.
+     */
     private final String interValueDelimiter;
     private final String intraValueDelimiter;
+    private final String specificValueDelimiter;
 
-    public GeneProductDocumentConverter(String interValueDelimiter, String intraValueDelimiter) {
+    public GeneProductDocumentConverter(String interValueDelimiter, String intraValueDelimiter, String
+            specificValueDelimiter) {
         Preconditions.checkArgument(interValueDelimiter != null && interValueDelimiter.length() > 0,
                 "Inter value delimiter can not be null or empty");
         Preconditions.checkArgument(intraValueDelimiter != null && intraValueDelimiter.length() > 0, "Intra " +
                 "value delimiter can not be null or empty");
-
+        Preconditions.checkArgument(specificValueDelimiter != null && specificValueDelimiter.length() > 0, "Specific " +
+                "value delimiter can not be null or empty");
         this.interValueDelimiter = interValueDelimiter;
         this.intraValueDelimiter = intraValueDelimiter;
+        this.specificValueDelimiter = specificValueDelimiter;
     }
 
     @Override public GeneProductDocument process(GeneProduct geneProduct) throws Exception {
@@ -47,11 +60,11 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         doc.synonyms = convertToList(splitValue(geneProduct.synonym, interValueDelimiter));
         doc.type = geneProduct.type;
         doc.taxonId = extractTaxonIdFromValue(geneProduct.taxonId);
-        doc.parentId = geneProduct.parentId;
         doc.taxonName = properties.get(TAXON_NAME_KEY);
+        doc.parentId = geneProduct.parentId;
         doc.referenceProteome = properties.get(REFERENCE_PROTEOME_KEY);
-        doc.databaseSubsets = convertToList(properties.get(DATABASE_SUBSET_KEY));
-
+        doc.databaseSubset = properties.get(DATABASE_SUBSET_KEY);
+        doc.targetSet = convertToList((splitValue(properties.get(TARGET_SET_KEY), specificValueDelimiter)));
         doc.isCompleteProteome = isTrue(properties.get(COMPLETE_PROTEOME_KEY));
         doc.isAnnotated = isTrue(properties.get(IS_ANNOTATED_KEY));
         doc.isIsoform = isTrue(properties.get(IS_ISOFORM_KEY));

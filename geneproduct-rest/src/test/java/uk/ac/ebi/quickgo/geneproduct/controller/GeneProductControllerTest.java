@@ -2,12 +2,11 @@ package uk.ac.ebi.quickgo.geneproduct.controller;
 
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
-import uk.ac.ebi.quickgo.geneproduct.service.search.GeneProductSearchableField;
 import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
+import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.Collections;
@@ -51,7 +50,6 @@ public class GeneProductControllerTest {
     private GeneProduct geneProduct1;
     private GeneProduct geneProduct2;
     private GeneProduct geneProduct3;
-    private SearchableField geneProductSearchableField;
     private SearchServiceConfig.GeneProductCompositeRetrievalConfig geneProductRetrievalConfig;
 
     @Mock
@@ -63,20 +61,22 @@ public class GeneProductControllerTest {
     @Mock
     private SearchService<GeneProduct> geneProductSearchService;
 
+    @Mock
+    private FilterConverterFactory converterFactory;
+
     @Before
     public void setUp() {
         geneProduct1 = createGeneProduct(GENE_PRODUCT_ID1);
         geneProduct2 = createGeneProduct(GENE_PRODUCT_ID2);
         geneProduct3 = createGeneProduct(GENE_PRODUCT_ID3);
-        geneProductSearchableField = new GeneProductSearchableField();
         geneProductRetrievalConfig = createStubGeneProductCompositeRetrievalConfig();
 
         this.controller = new GeneProductController(
                 geneProductService,
                 geneProductSearchService,
-                geneProductSearchableField,
                 geneProductRetrievalConfig,
-                validationHelper);
+                validationHelper,
+                converterFactory);
 
         final List<GeneProduct> singleGP = singletonList(geneProduct1);
         when(geneProductService.findById(SINGLE_CSV_LIST)).thenReturn(singleGP);
@@ -89,6 +89,7 @@ public class GeneProductControllerTest {
         when(validationHelper.validateCSVIds(MULTI_CSV)).thenReturn(MULTI_CSV_LIST);
         when(validationHelper.validateCSVIds(SINGLE_CSV)).thenReturn(SINGLE_CSV_LIST);
         doThrow(new IllegalArgumentException()).when(validationHelper).validateCSVIds(multiCSVTooBig);
+
     }
 
     @Test
@@ -105,13 +106,6 @@ public class GeneProductControllerTest {
         assertThat(response.getBody().getResults(), hasSize(1));
     }
 
-    @Test
-    public void retrieveMultipleGeneProduct() {
-        ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(MULTI_CSV);
-        assertThat(response.getBody().getResults(), hasSize(3));
-        assertThat(response.getBody().getResults(), contains(geneProduct1, geneProduct2, geneProduct3));
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void retrieveMultipleGeneProductOverLimit() {
         controller.findById(multiCSVTooBig);
@@ -122,9 +116,9 @@ public class GeneProductControllerTest {
         new GeneProductController(
                 null,
                 geneProductSearchService,
-                geneProductSearchableField,
                 geneProductRetrievalConfig,
-                validationHelper);
+                validationHelper,
+                converterFactory);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -132,19 +126,9 @@ public class GeneProductControllerTest {
         new GeneProductController(
                 geneProductService,
                 null,
-                geneProductSearchableField,
                 geneProductRetrievalConfig,
-                validationHelper);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullSearchableField() {
-        new GeneProductController(
-                geneProductService,
-                geneProductSearchService,
-                null,
-                geneProductRetrievalConfig,
-                validationHelper);
+                validationHelper,
+                converterFactory);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -152,9 +136,9 @@ public class GeneProductControllerTest {
         new GeneProductController(
                 geneProductService,
                 geneProductSearchService,
-                geneProductSearchableField,
                 null,
-                validationHelper);
+                validationHelper,
+                converterFactory);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -162,8 +146,18 @@ public class GeneProductControllerTest {
         new GeneProductController(
                 geneProductService,
                 geneProductSearchService,
-                geneProductSearchableField,
                 geneProductRetrievalConfig,
+                null,
+                converterFactory);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void controllerInstantiationFailsOnNullFilterConverterHelper() {
+        new GeneProductController(
+                geneProductService,
+                geneProductSearchService,
+                geneProductRetrievalConfig,
+                validationHelper,
                 null);
     }
 

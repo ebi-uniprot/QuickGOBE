@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.rest.search;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
+import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
@@ -13,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -40,7 +40,6 @@ public abstract class SearchControllerSetup {
     private static final String FACET_PARAM = "facet";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
-    private static final String FILTER_QUERY_PARAM = "filterQuery";
     private static final String HIGHLIGHTING_PARAM = "highlighting";
 
     protected String resourceUrl;
@@ -156,7 +155,7 @@ public abstract class SearchControllerSetup {
         mockMvc.perform(clientRequest)
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.facet.facetFields.*", hasSize(facets.length)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facet.facetFields.*.field", containsInAnyOrder(facets)));
     }
 
     private void addFacetsToRequest(MockHttpServletRequestBuilder clientRequest, String... facets) {
@@ -164,7 +163,7 @@ public abstract class SearchControllerSetup {
     }
 
     // filter queries ---------------------------------------------------------
-    protected void checkInvalidFilterQueryResponse(String query, String... filterQuery) throws Exception {
+    protected void checkInvalidFilterQueryResponse(String query, Param... filterQuery) throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         addFiltersToRequest(clientRequest, filterQuery);
@@ -176,11 +175,11 @@ public abstract class SearchControllerSetup {
         checkErrorMessage(result);
     }
 
-    protected ResultActions checkValidFilterQueryResponse(String query, int expectedResponseSize, String... filterQuery)
+    protected ResultActions checkValidFilterQueryResponse(String query, int expectedResponseSize, Param... filterQueries)
             throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
-        addFiltersToRequest(clientRequest, filterQuery);
+        addFiltersToRequest(clientRequest, filterQueries);
 
         return mockMvc.perform(clientRequest)
                 .andDo(print())
@@ -217,8 +216,12 @@ public abstract class SearchControllerSetup {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.highlighting.*").doesNotExist());
     }
 
-    private void addFiltersToRequest(MockHttpServletRequestBuilder clientRequest, String... filters) {
-        addParamsToRequest(clientRequest, FILTER_QUERY_PARAM, filters);
+    private void addFiltersToRequest(MockHttpServletRequestBuilder clientRequest, Param... filters) {
+        if(filters != null) {
+            Stream.of(filters)
+                    .forEach(fq -> clientRequest.param(fq.key, fq.value));
+
+        }
     }
 
     private MockHttpServletRequestBuilder createRequest(String query) {
@@ -238,5 +241,15 @@ public abstract class SearchControllerSetup {
     private void checkErrorMessage(ResultActions result) throws Exception {
         result.andExpect(MockMvcResultMatchers.jsonPath("$.url", is(getRequestUrl(result))));
         result.andExpect(MockMvcResultMatchers.jsonPath("$.messages").exists());
+    }
+
+    public static class Param {
+        final String key;
+        final String value;
+
+        public Param(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }

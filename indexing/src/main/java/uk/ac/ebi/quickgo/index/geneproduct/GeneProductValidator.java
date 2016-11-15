@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Preconditions;
@@ -83,12 +83,6 @@ public class GeneProductValidator implements Validator<GeneProduct> {
     private void checkIsNullOrEmpty(String value, String field) {
         checkIsNull(value, field);
         checkIsEmpty(value, field);
-    }
-
-    private void checkTaxonName(String taxonId, String taxonName) {
-        if (taxonId != null && taxonId.length() > 0) {
-            checkIsNullOrEmpty(taxonName, TAXON_NAME_KEY);
-        }
     }
 
     private void checkHasAtMostOneParentId(String parentId) {

@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
-import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateFunctionRequest;
+import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 
 import com.google.common.base.Preconditions;
 import java.util.Collection;
@@ -12,7 +12,8 @@ import static java.util.stream.Collectors.joining;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
 
 /**
- * Simple implementation of the {@link AggregateConverter}, that converts an {@link AggregateRequest} into a {@link String}
+ * Simple implementation of the {@link AggregateConverter}, that converts an {@link AggregateRequest} into a
+ * {@link String}
  * object.
  * <p/>
  * Note: At the time of writing this converter the SolrJ API did not have direct support for the JSON facet API. So
@@ -65,7 +66,8 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
     }
 
     /**
-     * Converts a stream of {@link AggregateFunctionRequest} stored within an {@link AggregateRequest} into a format Solr can understand.
+     * Converts a stream of {@link AggregateFunctionRequest} stored within an {@link AggregateRequest} into a format
+     * Solr can understand.
      *
      * @param fields aggregate fields to convert
      * @return a Solr String representation of the fields
@@ -100,7 +102,32 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
      * @return a Solr aggregation statement
      */
     private String convertAggregateFieldToText(AggregateFunctionRequest aggregateFunctionRequest) {
-        return convertToSolrAggregation(aggregateFunctionRequest.getField(), aggregateFunctionRequest.getFunction());
+        String aggregationText;
+
+        if (aggregateFunctionRequest.getFunction() == AggregateFunction.COUNT) {
+            aggregationText = convertCountToSum(aggregateFunctionRequest);
+        } else {
+            aggregationText = convertToSolrAggregation(aggregateFunctionRequest.getField(),
+                    aggregateFunctionRequest.getFunction());
+        }
+
+        return aggregationText;
+    }
+
+    /**
+     * Solr does not have a count aggregate function (e.g. count(myField)), so we need to do some magic.
+     *
+     * The solution to not having a count(), is to apply Solr's SUM function on constant value, i.e. 1. This should
+     * yield the same result.
+     *
+     * @param aggregateFunctionRequest the aggregate function request to convert
+     * @return a sum function on the value 1.
+     */
+    private String convertCountToSum(AggregateFunctionRequest aggregateFunctionRequest) {
+        assert aggregateFunctionRequest.getFunction() == AggregateFunction.COUNT :
+                "Can't call method to convert count to sum, when function is not count: " + aggregateFunctionRequest;
+
+        return convertToSolrAggregation("1", AggregateFunction.SUM);
     }
 
     /**

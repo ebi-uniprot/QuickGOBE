@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
  * @author Edd
  */
 public class ECOControllerIT extends OBOControllerIT {
-    private static final String RESOURCE_URL = "/QuickGO/services/eco";
+    private static final String RESOURCE_URL = "/ontology/eco";
     private static final String ECO_0000001 = "ECO:0000001";
     private static final String ECO_0000002 = "ECO:0000002";
 

@@ -1,11 +1,12 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
+import uk.ac.ebi.quickgo.common.SearchableField;
+import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.Collections;
@@ -40,12 +41,15 @@ public class OBOControllerTest {
     private SearchService<OBOTerm> searchService;
     @Mock
     private SearchableField searchableField;
+    @Mock
+    private GraphImageService graphImageService;
 
     private OBOController<FakeOBOTerm> controller;
 
     @Before
     public void setUp() {
-        this.controller = createOBOController(ontologyService, searchService, searchableField, retrievalConfig);
+        this.controller = createOBOController(ontologyService, searchService, searchableField, retrievalConfig,
+                graphImageService);
     }
 
     @Test
@@ -73,29 +77,36 @@ public class OBOControllerTest {
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullOntologyService() {
         createOBOController(
-                null, searchService, searchableField, retrievalConfig);
+                null, searchService, searchableField, retrievalConfig, graphImageService);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullSearchService() {
-        createOBOController(ontologyService, null, searchableField, retrievalConfig);
+        createOBOController(ontologyService, null, searchableField, retrievalConfig, graphImageService);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullSearchableField() {
-        createOBOController(ontologyService, searchService, null, retrievalConfig);
+        createOBOController(ontologyService, searchService, null, retrievalConfig, graphImageService);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullRetrievalConfig() {
-        createOBOController(ontologyService, searchService, searchableField, null);
+        createOBOController(ontologyService, searchService, searchableField, null, graphImageService);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void controllerInstantiationFailsOnNullGraphImageService() {
+        createOBOController(ontologyService, searchService, searchableField, retrievalConfig, null);
     }
 
     private static OBOController<FakeOBOTerm> createOBOController(
             final OntologyService<FakeOBOTerm> ontologyService, final SearchService<OBOTerm> searchService,
             final SearchableField searchableField,
-            final SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig) {
-        return new OBOController<FakeOBOTerm>(ontologyService, searchService, searchableField, retrievalConfig) {
+            final SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig,
+            final GraphImageService graphImageService) {
+        return new OBOController<FakeOBOTerm>(ontologyService, searchService, searchableField, retrievalConfig,
+                graphImageService) {
             @Override protected Predicate<String> idValidator() {
                 return id -> ID_FORMAT.matcher(id).matches();
             }
