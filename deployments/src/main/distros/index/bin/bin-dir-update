@@ -8,18 +8,23 @@
 
 set -euo pipefail
 
+VALID_USERS=("uni_qgo" "eddturner");
+if ! source "./bin/common/common" ]; then
+    echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
+if [ ! user_can_execute_script "$(whoami)" "$VALID_USERS" ]; then
+    echo "You $(whoami) are not permitted to run this script. You must be one of: $VALID_USERS";
+    exit 1;
+fi
+
 # ======= CONSTANTS =======================================
 REPO_DIR="$(pwd -P)/repos"
 INDEX_BIN_CONTENT_DIR="bin"
 INDEX_BIN="index-bin.tar.gz"
 PERMITTED_USER="uni_qgo"
-BRANCH="master"
-
-# ======= check the right user runs this script =======================================
-if ! echo "$PERMITTED_USER" | grep "$USER" > /dev/null 2>&1; then
-    echo "This service can only be run as user(s), '$PERMITTED_USER'";
-    exit 1;
-fi;
+#BRANCH="master"
+BRANCH="GOA-2385_indexing-scripts-to-handle-diff-envs"
 
 # ======= FUNCTIONS ======================================================================
 # ======= take a string and add a time-stamp to it =======================================

@@ -3,57 +3,62 @@
 #fail on error
 set -e
 
-VALID_USERS=("uni_qgo");
+VALID_USERS=("uni_qgo" "eddturner");
 
-# read common environment variables
-properties_not_found="false";
-
-source "../common/common.variables";
-
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-source "index.variables";
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-source "../common/lsf.command.variables";
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-if [ "$properties_not_found" = "true" ]; then
+# ------------------------ SOURCE NECESSARY FILES ------------------------
+if ! source "../common/common" || ! source "../common/common.variables" || ! source "index.variables" || ! source "../common/lsf.command.variables"; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
 
+## ---------------------------- UTILITY FUNCTIONS ----------------------------
+function showHelp {
+    cat<<EOF
+Usage: $0 profile vm [submit]
+
+Argument description:
+  profile    =>    the profile for which we want to create a new Solr index
+  vm         =>    the VM to whom the indexing job is to be sent
+  submit     =>    submits the indexing job to the load sharing facility
+
+  Example: $0 dev ves-hx-c7
+EOF
+}
+
+# ------------------------ VALIDATE PARAMETERS ------------------------
+if [ $# -eq 0 -o $# -gt 3 ]; then
+    showHelp;
+    exit 1;
+fi
+requestedProfile="$1"
+requestedVM="$2"
+action="$3"
+
+# ------------------------ check profile/vm specified is correct ------------------------
+if ! isValidProfileId "$requestedProfile" "$requestedVM"; then
+    prettyEcho "<error>Invalid profile/vm name specified: $requestedProfile/$requestedVM.
+                    Please check your index.variables and vm-profiles.properties file.</error>";
+    exit 1;
+fi
+
 # ------------------------ abort if we're building in a staging environment ------------------------
-if [ "$vm_purpose" == "STAGE" ] ; then
+if [ "$requestedProfile" == "stage" ] ; then
     prettyEcho "QuickGO <bold>build related tasks</bold> should not take place in a <bold>STAGING</bold> environment";
     exit 1;
 fi
 
-# ------------------------ verify the solr address variable is set ------------------------
-if [ -z "$SOLR_ADDRESS" ]; then
-    echo '$SOLR_ADDRESS variable must be set';
-    exit 1;
-fi
-
 # ------------------------ compute the java indexing job string ------------------------
-# change log file so it prints correctly
+QUICKGO_SERVICE_JAR=${QUICKGO_SERVICE_JAR/PROFILE_PLACEHOLDER/$requestedProfile}
+QUICKGO_SERVICE_JAR=${QUICKGO_SERVICE_JAR/VM_PLACEHOLDER/$requestedVM}
 javaJob="bsub $(lsfJavaJobOptions)";
 
 # ------------------------ start off the indexing via LSF ------------------------
-if [ "$1" = "submit" ]; then
+if [ "$action" = "submit" ]; then
 
     # ensure indexing job variable is defined
     if [ ! -z "$javaJob" ]; then
-        #check the Solr server status
-        server_status="$(solrServerStatus)";
-        
-        if [ "$server_status" == "UP" ]; then
+        # check the Solr server status
+        if serverIsUp $(buildSolrAddress "$requestedVM"); then
             echo "executing command:"
             echo "$javaJob";
 

@@ -1,12 +1,24 @@
-#!/bin/bash
+#! /bin/bash
 
-#fail on error
+# fail on error
 set -e
 
-VALID_USERS=("uni_qgo");
+VALID_USERS=("uni_qgo" "eddturner");
 RELEASE_VERSION_PREFIX="v";
 
-nextReleaseVersion (){
+## ---------------------------- UTILITY FUNCTIONS ----------------------------
+function showHelp {
+    cat<<EOF
+Usage: $0 profile
+
+Argument description:
+  profile    =>    the profile for which we want to create a new set of Solr configuration files and data-set
+
+  Example: $0 dev
+EOF
+}
+
+function nextReleaseVersion {
    current_release="$(ls $release_dir | sed "s/${RELEASE_VERSION_PREFIX}//g" | sort -n | tail -1)";
 
    if [ ! -z "$current_release" ]; then
@@ -16,33 +28,23 @@ nextReleaseVersion (){
    fi
 }
 
-# read common environment variables
-properties_not_found="false";
-
-source "../common/common.variables";
-
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-source "index.variables";
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-source "../common/lsf.command.variables";
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-if [ "$properties_not_found" = "true" ]; then
+# ------------------------ SOURCE NECESSARY FILES ------------------------
+if ! source "../common/common" || ! source "../common/common.variables" || ! source "index.variables" || ! source "../common/lsf.command.variables"; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
 
-# ------------------------ abort if we're building in a staging environment ------------------------
-if [ "$vm_purpose" == "STAGE" ] ; then
-    prettyEcho "QuickGO <bold>build related tasks</bold> should not take place in a <bold>STAGING</bold> environment";
+# ------------------------ VALIDATE PARAMETERS ------------------------
+if [ $# -ne 1 ]; then
+    showHelp;
+    exit 1;
+fi
+requestedProfile="$1"
+
+# check profile specified is correct
+if ! isValidProfileId "$requestedProfile"; then
+    prettyEcho "<error>Invalid profile name: $requestedProfile.
+                    Please check your index.variables and vm-profiles.properties file.</error>";
     exit 1;
 fi
 
@@ -53,31 +55,32 @@ if [ -z "$SOLR_ADDRESS" ]; then
 fi
 
 # ------------------------ start off the indexing via LSF ------------------------
-release_dir="${SOLR_INDEX_DIR}/${CORE_NAME}";
 
-if [ ! -d "$release_dir" ]; then
-   echo "Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...";
-   mkdir -p "$release_dir";
-fi
+for vm in $(vmsForProfile "$requestedProfile"); do
+    release_dir="${SOLR_INDEX_DIR}/${requestedProfile}/$vm";
 
-#calculate the next release for the current $release_dir
-nextReleaseVersion;
+    if [ ! -d "$release_dir" ]; then
+       echo "Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...";
+       mkdir -p "$release_dir";
+    fi
 
-#create dir for current release
-release_dir="${release_dir}/${next_release}/conf";
-mkdir -p "$release_dir";
+    # calculate the next release for the current $release_dir
+    nextReleaseVersion;
 
-echo "executing fetch-libraries"
-../fetch-libraries "$release_dir";
+    # create dir for current release
+    release_dir="${release_dir}/${next_release}/conf";
+    mkdir -p "$release_dir";
 
-echo "executing fetch-cores"
-../fetch-cores "$release_dir";
+    echo "executing fetch-libraries"
+    ../fetch-libraries "$release_dir" "$requestedProfile" "$vm";
 
-#check solr server status
-server_status="$(solrServerStatus)";
+    echo "executing fetch-cores"
+    ../fetch-cores "$release_dir" "$requestedProfile" "$vm";
+done
 
-if [ "$server_status" == "UP" ]; then
-    echo "Solr server is currently UP, please restart the server, before proceeding to index-create";
+# check solr server statuses
+if allServersUpForProfile "$requestedProfile"; then
+    echo "All solr servers for $requestedProfile are currently UP; please restart them, before proceeding to index-create";
 else
     echo "Preparation to create index DONE."
     echo "Proceed to index-create to submit indexing job";

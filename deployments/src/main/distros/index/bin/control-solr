@@ -1,0 +1,124 @@
+#! /bin/bash
+
+## This script should be run as tc_uni02, and functions to control starting,
+## stopping, and re-starting the indexing server.
+## It should be run from the staging environment's build directory
+##   Arguments:
+#       status [profile] [vm]   => shows a profile's machines/specific machine, and it is up or down
+##      start [profile] [vm]    => start a profile's machines/specific machine
+##      stop [profile] [vm]     => stop a profile's machines/specific machine
+
+readonly VALID_USERS=("uni_qgo" "eddturner");
+readonly ACTION="$1";
+readonly PROFILE="$2"
+readonly REQUESTED_VM="$3"
+
+# ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
+if ! source "common/common" || ! source "common/common.variables" ; then
+    echo "Required properties files were not found. Please make sure you're in the right directory";
+    exit 1;
+fi
+
+## ---------------------------- UTILITY FUNCTIONS ----------------------------
+function showHelp {
+    cat<<EOF
+Usage: $0 status|stop|start profile [vm]
+
+Argument description:
+  status profile        => shows whether a profile\'s machines/specific machine is up or down
+  start profile [vm]    => start a profile\'s machines/specific machine
+  stop profile [vm]     => stop a profile\'s machines/specific machine
+
+  Example: $0 stop dev ves-hx-c7 -- causes the development solr instance on ves-hx-c7 to be stopped
+           $0 stop dev           -- causes all development solr instances to be stopped
+
+  WARNING: Please be aware of who is using the machines before starting/stopping them.
+EOF
+}
+
+function endScript {
+    echo
+    if [ $# -gt 1 ]; then
+        echo "$2"
+    fi
+    echo "done."
+    exit $1;
+}
+
+## ---------------------------- CHECK ARGUMENTS ----------------------------
+if [ "$#" -eq 0 ]; then
+    showHelp;
+    exit 1;
+fi
+
+if [ "$#" -eq 3 ] && ! isValidProfileId "$PROFILE" "$REQUESTED_VM"; then
+    prettyEcho "No servers matched profile <warn>$PROFILE</warn> and vm <warn>$REQUESTED_VM</warn>"
+    endScript 1;
+elif [ "$#" -eq 2 ] && ! isValidProfileId "$PROFILE"; then
+    prettyEcho "No servers matched profile <warn>$PROFILE</warn>"
+    endScript 1;
+fi
+
+## ---------------------------- PRINT STATUS OF SOLR SERVER ----------------------------
+if [ "$1" == "status" ]; then
+    if [ $# -eq 2 ]; then
+        # show status of up / down, and data version
+        printDivider "Server statuses for '$PROFILE' profile";
+        printServerStatusForProfile "$PROFILE";
+        echo "";
+        printReleaseBaseDirContents;
+    else
+        showHelp
+        exit 1;
+    fi
+
+## ---------------------------- STOP/START SERVER ----------------------------
+elif [ "$1" == "stop" ] || [ "$1" == "start" ]; then
+
+    # if server is up => cannot start
+    # if server is down => cannot stop
+
+    for vm in $(vmsForProfile "$PROFILE"); do
+        updateSolrVariables "$PROFILE" "$vm";
+        if [ ! -z "$REQUESTED_VM" -a "$REQUESTED_VM" = "$vm" ] || [ $# -eq 2 ]; then
+            solrAddr="$(buildSolrAddress $vm)"
+            if serverIsUp "$solrAddr"; then # server is up
+                if [ "$ACTION" == "start" ]; then
+                    prettyEcho "<warn>Cannot start $solrAddr</warn> because it is already up";
+                elif [ "$ACTION" == "stop" ]; then
+                    # stop the server
+                    prettyEcho "<bold>Stopping $solrAddr</bold>";
+                    echo "stopping in $solr_server_dir/bin"
+                    ssh $vm bash << EOF
+                        export JAVA_HOME=$JAVA_HOME
+                        cd "$solr_server_dir/bin";
+                        ./solr stop;
+EOF
+                fi
+            else # server is down
+                if [ "$ACTION" == "start" ]; then
+                    # start the server
+                    prettyEcho "<bold>Starting $solrAddr</bold>";
+                    echo "submitting: ./solr start $solr_system_properties -a $solr_jvm_properties -m $solr_memory -s $solr_home -p $solr_port;"
+                    ssh $vm bash << EOF
+                        export JAVA_HOME=$JAVA_HOME
+                        cd "$solr_server_dir/bin";
+                        ./solr start $solr_system_properties -a $solr_jvm_properties -m $solr_memory -s $solr_home -p $solr_port;
+EOF
+                elif [ "$1" == "stop" ]; then
+                    prettyEcho "<warn>Cannot stop $solrAddr</warn> because it is already down";
+                fi
+            fi
+            if [ $# -eq 3 ]; then
+                endScript 0
+            fi
+        fi
+    done
+
+    endScript 0
+
+## ---------------------------- UNRECOGNISED OPTION ----------------------------
+else
+    showHelp;
+    endScript 1;
+fi

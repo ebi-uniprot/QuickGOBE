@@ -3,61 +3,62 @@
 #fail on error
 set -e
 
-QUICKGO_LIB_PATH="lib/quickgo"
+VALID_USERS=("uni_qgo" "eddturner");
 
-VALID_USERS=("uni_qgo");
-
-if [ -z "$1" ] || [ "$1" == "submit" ]; then
-   echo "Missing the release directory to copy the libraries into";
-   exit 1;
-else
-   conf_release_dir=$1;
-fi
-
-# read common environment variables
-properties_not_found="false";
-
-source "../common/common.variables";
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-if [ "$properties_not_found" = "true" ]; then
+# source required scripts
+if ! source "../common/common" || ! source "../common/common.variables" ; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
+
+if [ $# -ne 3 ]; then
+    echo "${0} expects 3 arguments: 1.) the configuration release directory, 2.) profile, 3.) vm"
+    exit 1;
+else
+   conf_release_dir=$1;
+   requestedProfile=$2;
+   requestedVM=$3;
+fi
+
+QUICKGO_LIB_PATH="$requestedProfile/$requestedVM/lib/quickgo"
 
 if [ ! -d "$conf_release_dir" ]; then
     echo "Release directory does not exist: $conf_release_dir";
     exit 1;
 else
-    lib_dir="${conf_release_dir}/${QUICKGO_LIB_PATH}"
+    target_lib_dir="${conf_release_dir}/lib/quickgo"
 
-    mkdir -p "$lib_dir"
+    mkdir -p "$target_lib_dir"
 fi
 
 cd "$QUICKGO_REPO_DIR"
 
-#fetch the indexing jar
-
+# fetch the indexing jar
 git fetch
 git checkout "$QUICKGO_BRANCH"
 git pull
 mvn -U -DskipTests -P indexing,solr-plugins package
 
 #copy QuickGO jar
-mkdir -p "$lib_dir"
-mv ./indexing/target/*.jar "$lib_dir"
+mkdir -p "$target_lib_dir"
+mv ./indexing/target/*.jar "$target_lib_dir"
 
-echo "Copied QuickGO indexing libraries into ${lib_dir}"
+echo "Copied QuickGO indexing libraries into ${target_lib_dir}"
 
 #fetch the Solr plugin jars
-mv ./solr-plugin/target/*.jar "$lib_dir"
+mv ./solr-plugin/target/*.jar "$target_lib_dir"
 
-echo "Copied QuickGO Solr plugins into ${lib_dir}"
+echo "Copied QuickGO Solr plugins into ${target_lib_dir}"
 
-#update symlink to the latest version of the indexing jar
-ln -snf "$lib_dir" "${SOLR_CONFIG_DIR}/${QUICKGO_LIB_PATH}"
+# update symlink to the latest version of the indexing jar
+symlink_name="${SOLR_CONFIG_DIR}/${QUICKGO_LIB_PATH}"
+if [ ! -d "$(dirname $symlink_name)" ]; then
+    mkdir -p "$(dirname $symlink_name)";
+fi
 
-echo "Symlink ${lib_dir} has been updated with new library definitions"
+ln -snf "$target_lib_dir" "${SOLR_CONFIG_DIR}/${QUICKGO_LIB_PATH}"
+
+prettyEcho "<success>Symlink</success> ${target_lib_dir} has been <success>updated</success> with new library definitions"
+echo
 ls -l "${SOLR_CONFIG_DIR}/${QUICKGO_LIB_PATH}" | sed -e 's/^/    /g';
+echo

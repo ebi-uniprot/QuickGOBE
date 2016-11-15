@@ -3,13 +3,15 @@
 #fail on error
 set -e
 
-VALID_USERS=("uni_qgo");
+VALID_USERS=("uni_qgo" "eddturner");
 
-if [ -z "$1" ] || [ "$1" == "submit" ]; then
-   echo "Missing the release directory to copy the libraries into";
-   exit 1;
+if [ $# -ne 3 ]; then
+    echo "${0} expects 3 arguments: 1.) the configuration release directory, 2.) profile, 3.) vm"
+    exit 1;
 else
    conf_release_dir=$1;
+   requestedProfile=$2;
+   requestedVM=$3;
 fi
 
 if [ ! -d "$conf_release_dir" ]; then
@@ -17,17 +19,8 @@ if [ ! -d "$conf_release_dir" ]; then
     exit 1;
 fi
 
-# read common environment variables
-properties_not_found="false";
-
-source "../common/common.variables";
-source "index.variables";
-
-if [ $? -eq 1 ]; then
-    properties_not_found="true";
-fi
-
-if [ "$properties_not_found" = "true" ]; then
+# source required scripts
+if ! source "../common/common" || ! source "../common/common.variables" || ! source "index.variables"; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
@@ -38,19 +31,28 @@ git fetch
 git checkout "$QUICKGO_BRANCH"
 git pull
 
-core_dir="${conf_release_dir}/homes/cores/${CORE_NAME}"
+core_base="${conf_release_dir}/homes/cores"
+core_dir="${core_base}/${CORE_NAME}"
 
 mkdir -p "${core_dir}"
-cp -a "${QUICKGO_REPO_DIR}/solr-cores/src/main/cores/${CORE_NAME}/." "${core_dir}"
+cp -a "${QUICKGO_REPO_DIR}/solr-cores/src/main/cores/${CORE_NAME}/." "${core_dir}"  # copy the core
 
 echo "Fetched solr cores"
 
-#make core dir readable and writable to user and group
+# make core dir readable and writable to user and group
 chmod -R 774 "$core_dir"
 
-#update core link in $SOLR_CONFIG_DIR directory
-symlink=${SOLR_CONFIG_DIR}/cores/${CORE_NAME}
-ln -snf "$core_dir" "$symlink"
+# update core link in $SOLR_CONFIG_DIR directory
+symlink_base="${SOLR_CONFIG_DIR}/$requestedProfile/$requestedVM/cores"
+symlink_name="$symlink_base/${CORE_NAME}"
+if [ ! -d "$symlink_base" ]; then
+    mkdir -p "$symlink_base";
+fi
 
-echo "Symlink ${core_dir} has been updated with new core definitions"
-ls -l "$symlink" | sed -e 's/^/    /g';
+cp ${QUICKGO_REPO_DIR}/solr-cores/src/main/cores/* "${symlink_base}" 2>>/dev/null  # copy, e.g., the solr.xml file
+ln -snf "$core_dir" "$symlink_name"                                             # link the core
+
+prettyEcho "<success>Symlink</success> ${core_dir} has been <success>updated</success> with new core definitions"
+echo
+ls -l "$symlink_name" | sed -e 's/^/    /g';
+echo

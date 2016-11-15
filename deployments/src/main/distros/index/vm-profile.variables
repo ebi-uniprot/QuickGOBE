@@ -1,0 +1,9 @@
+## This file should contain a single PROFILE_VM_MAP array variable
+## containing the associations between a profile name and its virtual-machines.
+##
+## Format of each array element:
+##      <profile-name>|<virtual-machine>[,<virtual-machine]*
+
+PROFILE_VM_MAP=( \
+  "dev|ves-hx-c7,ves-hx-c8" \
+  "test|ves-hx-t2" )
