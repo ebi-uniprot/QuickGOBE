@@ -38,16 +38,15 @@ public class OntologyRequest {
     private boolean highlighting = false;
 
     @ApiModelProperty(value = "Page number of the result set to display.",
-            allowableValues = "range[" + MIN_PAGE_NUMBER + ",  max_result_page_size]",
-            required = true)
+            allowableValues = "range[" + MIN_PAGE_NUMBER + ",  max_result_page_size]")
     private int page = DEFAULT_PAGE_NUMBER;
 
     @ApiModelProperty(value = "Number of results per page.",
-            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]",
-            required = true)
+            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @ApiModelProperty(value = "Fields to generate facets from", example = "aspect, type")
+    @ApiModelProperty(value = "Fields to generate facets from", allowableValues = "facet,aspect",
+            example = "aspect, type")
     private String[] facets;
 
     @ApiModelProperty(value = "The query used to filter the gene products", example = "kinase", required = true)
@@ -62,7 +61,7 @@ public class OntologyRequest {
     private String[] aspect;
 
     @ApiModelProperty(value = "Further filters the results of the main query based on a value chosen from " +
-            "the type field", example = "go")
+            "the type field", allowableValues = "GO,ECO", example = "GO")
     private String type;
 
     private Map<String, String[]> filterMap = new HashMap<>();
