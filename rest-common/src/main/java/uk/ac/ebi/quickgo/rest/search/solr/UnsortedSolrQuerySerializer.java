@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.rest.search.query;
+package uk.ac.ebi.quickgo.rest.search.solr;
+
+import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import com.google.common.base.Preconditions;
 import java.util.Set;
@@ -7,9 +9,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.TermQueryTransformationResult
+import static uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer.TermQueryTransformationResult
         .failedTransformationResult;
-import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.TermQueryTransformationResult
+import static uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer.TermQueryTransformationResult
         .successfulTransformationResult;
 
 /**
@@ -33,8 +35,8 @@ import static uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer.Te
  */
 public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
     static final String TERMS_LOCAL_PARAMS_QUERY_FORMAT = "({!terms f=%s}%s)";
-    private static final String UNSORTED_FIELD_SUFFIX = "_unsorted";
     private static final Logger LOGGER = getLogger(UnsortedSolrQuerySerializer.class);
+
     private final SortedSolrQuerySerializer sortedQuerySerializer;
     private final Set<String> termsQueryCompatibleFields;
 
@@ -61,24 +63,12 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         }
     }
 
-    /**
-     * Create the unsorted field name used in an underlying repository.
-     *
-     * @param field the field, for which we want the corresponding unsorted field name
-     * @return the corresponding unsorted field name for {@code field}
-     */
-    static String unsortedNameFor(String field) {
-        Preconditions.checkArgument(field != null && !field.isEmpty(), "Supplied Field cannot be null or empty");
-
-        return field + UNSORTED_FIELD_SUFFIX;
-    }
-
     private String buildTermsQuery(String field, String... values) {
         StringJoiner stringJoiner = new StringJoiner(",");
         for (String value : values) {
             stringJoiner.add(value.toLowerCase());
         }
-        return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, unsortedNameFor(field), stringJoiner.toString());
+        return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
     }
 
     private boolean isTermsQueryCompatible(FieldQuery query) {
@@ -222,5 +212,4 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
     public String visit(JoinQuery query) {
         return sortedQuerySerializer.visit(query);
     }
-
 }

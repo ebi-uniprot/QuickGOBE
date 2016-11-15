@@ -4,10 +4,7 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.*;
 
 import java.util.List;
 import org.springframework.batch.core.Step;
@@ -46,8 +43,6 @@ public class WithFromPresetsConfig {
                     "RefSeq,SGD,TAIR,TIGR,TIGR_GenProp,UniPathway,UniProt,UniProtKB,UniProtKB,UniProtKB,UniRule," +
                     "WB,ZFIN,dictyBase,protein_id";
 
-    private static final RawNamedPreset INVALID_PRESET = null;
-
     @Value("#{'${withfrom.db.preset.source:}'.split(',')}")
     private Resource[] resources;
     @Value("${withfrom.db.preset.header.lines:1}")
@@ -70,7 +65,7 @@ public class WithFromPresetsConfig {
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
-                        setPresetRelevancy(defaults)))
+                        new RawNamedPresetRelevanceChecker(defaults)))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -89,18 +84,6 @@ public class WithFromPresetsConfig {
                             .withRelevancy(rawItem.relevancy)
                             .build());
         });
-    }
-
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> setPresetRelevancy(List<String> validPresetNames) {
-        return rawNamedPreset -> {
-            int relevancy = validPresetNames.indexOf(rawNamedPreset.name);
-            if (relevancy >= 0) {
-                rawNamedPreset.relevancy = relevancy;
-                return rawNamedPreset;
-            } else {
-                return INVALID_PRESET;
-            }
-        };
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {

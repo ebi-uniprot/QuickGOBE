@@ -1,6 +1,7 @@
-package uk.ac.ebi.quickgo.rest.search.query;
+package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
+import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;

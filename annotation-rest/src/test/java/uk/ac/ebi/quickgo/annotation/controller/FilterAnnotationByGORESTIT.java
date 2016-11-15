@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import org.junit.Test;
 import org.springframework.test.web.servlet.ResultActions;
@@ -16,6 +15,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_PARAM;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_RELATIONS_PARAM;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createAnnotationDoc;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 
@@ -25,14 +27,12 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
  */
 public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntologyRESTIT {
     private static final String GO_DESCENDANTS_RESOURCE_FORMAT = "/ontology/go/terms/%s/descendants?relations=%s";
-    private static final String GO_USAGE = "goUsage";
-    private static final String GO_USAGE_RELATIONS = "goUsageRelationships";
 
     public FilterAnnotationByGORESTIT() {
         resourceFormat = GO_DESCENDANTS_RESOURCE_FORMAT;
-        usageParam = GO_USAGE;
-        idParam = AnnotationFields.GO_ID;
-        usageRelations = GO_USAGE_RELATIONS;
+        usageParam = GO_USAGE_PARAM.getName();
+        idParam = GO_ID_PARAM.getName();
+        usageRelations = GO_USAGE_RELATIONS_PARAM.getName();
     }
 
     // slimming tests (which is GO specific)

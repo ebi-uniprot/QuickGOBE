@@ -11,11 +11,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.mapping;
-import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.ASPECTS;
-import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.GENE_PRODUCT_TYPES;
-import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.GO_SLIMS_SETS;
-import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.QUALIFIERS;
-import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.TAXONS;
+import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.*;
 
 /**
  * <p>Represents preset information relating to different aspects of QuickGO.
@@ -190,16 +186,18 @@ public class CompositePresetImpl implements CompositePreset {
     private static class StaticAspects {
 
         private enum Aspect {
-            FUNCTION("Molecular Function", "function"),
-            PROCESS("Biological Process", "process"),
-            COMPONENT("Cellular Component", "component");
+            FUNCTION("Molecular Function", "function", "molecular_function"),
+            PROCESS("Biological Process", "process", "biological_process"),
+            COMPONENT("Cellular Component", "component", "cellular_component");
 
             private final String name;
             private final String shortName;
+            private final String scientificName;
 
-            Aspect(String name, String shortName) {
+            Aspect(String name, String shortName, String scientificName) {
                 this.name = name;
                 this.shortName = shortName;
+                this.scientificName = scientificName;
             }
         }
 
@@ -213,7 +211,7 @@ public class CompositePresetImpl implements CompositePreset {
         private static void insertAspect(Set<PresetItem> presets, Aspect aspect) {
             presets.add(PresetItem
                     .createWithName(aspect.name)
-                    .withId(aspect.shortName).build());
+                    .withId(aspect.scientificName).build());
         }
     }
 

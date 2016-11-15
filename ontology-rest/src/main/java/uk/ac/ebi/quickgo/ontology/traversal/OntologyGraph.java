@@ -22,8 +22,17 @@ import org.jgrapht.graph.DirectedMultigraph;
  * @author Edd
  */
 public class OntologyGraph implements OntologyGraphTraversal {
+    static final String MOLECULAR_FUNCTION_STOP_NODE = "GO:0003674";
+    static final String BIOLOGICAL_PROCESS_STOP_NODE = "GO:0008150";
+    static final String CELLULAR_COMPONENT_STOP_NODE = "GO:0005575";
+
+    private static final List<String> STOP_NODES =
+            Arrays.asList(MOLECULAR_FUNCTION_STOP_NODE,
+                    BIOLOGICAL_PROCESS_STOP_NODE,
+                    CELLULAR_COMPONENT_STOP_NODE);
+
     private final DirectedGraph<String, OntologyRelationship> ontology;
-    private Map<String, Set<OntologyRelationship>> ancestorEdgesMap = new HashMap<>();
+    private final Map<String, Set<OntologyRelationship>> ancestorEdgesMap = new HashMap<>();
 
     public OntologyGraph() {
         ontology = new DirectedMultigraph<>(new ClassBasedEdgeFactory<>(OntologyRelationship.class));
@@ -206,12 +215,14 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
             ancestorEdgesOfV.add(new OntologyRelationship(vertex, vertex, OntologyRelationType.IDENTITY));
 
-            for (OntologyRelationship successorEdge : ontology.outgoingEdgesOf(vertex)) {
-                for (OntologyRelationship grandparentSuccessorEdge : getAncestorEdges(successorEdge.parent)) {
-                    OntologyRelationship combinedRelationship =
-                            OntologyRelationship.combineRelationships(successorEdge, grandparentSuccessorEdge);
-                    if (combinedRelationship.relationship != OntologyRelationType.UNDEFINED) {
-                        ancestorEdgesOfV.add(combinedRelationship);
+            if (isNotStopNode(vertex)) {
+                for (OntologyRelationship successorEdge : ontology.outgoingEdgesOf(vertex)) {
+                    for (OntologyRelationship grandparentSuccessorEdge : getAncestorEdges(successorEdge.parent)) {
+                        OntologyRelationship combinedRelationship =
+                                OntologyRelationship.combineRelationships(successorEdge, grandparentSuccessorEdge);
+                        if (combinedRelationship.relationship != OntologyRelationType.UNDEFINED) {
+                            ancestorEdgesOfV.add(combinedRelationship);
+                        }
                     }
                 }
             }
@@ -219,6 +230,10 @@ public class OntologyGraph implements OntologyGraphTraversal {
             ancestorEdgesMap.put(vertex, ancestorEdgesOfV);
         }
         return ancestorEdgesMap.get(vertex);
+    }
+
+    private boolean isNotStopNode(String id) {
+        return !STOP_NODES.contains(id);
     }
 
     /**
