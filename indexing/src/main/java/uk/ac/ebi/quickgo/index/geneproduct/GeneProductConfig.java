@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
@@ -50,6 +50,7 @@ public class GeneProductConfig {
     private static final String COLUMN_DELIMITER = "\t";
     private static final String INTER_VALUE_DELIMITER = "\\|";
     private static final String INTRA_VALUE_DELIMITER = "=";
+    private static final String SPECIFIC_VALUE_DELIMITER = ",";
 
     @Autowired
     private JobBuilderFactory jobBuilders;
@@ -144,7 +145,7 @@ public class GeneProductConfig {
 
     @Bean
     ItemProcessor<GeneProduct, GeneProductDocument> geneProductDocConverter() {
-        return new GeneProductDocumentConverter(INTER_VALUE_DELIMITER, INTRA_VALUE_DELIMITER);
+        return new GeneProductDocumentConverter(INTER_VALUE_DELIMITER, INTRA_VALUE_DELIMITER, SPECIFIC_VALUE_DELIMITER);
     }
 
     @Bean

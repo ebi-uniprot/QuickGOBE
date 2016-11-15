@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class GeneProduct {
     // NCBI taxon id of the species encoding the gene product.
     public int taxonId;
 
-    public List<String> databaseSubset;
+    public String databaseSubset;
 
     // UPID
     public String referenceProteome;

@@ -1,5 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.common.document;
 
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -29,6 +34,9 @@ public class AnnotationDocMocker {
     public static final List<String> TARGET_SET = asList("KRUK", "BHF-UCL", "Exosome");
     public static final String GP_SUBSET = "TrEMBL";
     public static final String GO_ASPECT = "cellular_component";
+    public static final Date DATE = Date.from(
+            LocalDate.of(1869, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
 
     private AnnotationDocMocker() {}
 
@@ -56,6 +64,7 @@ public class AnnotationDocMocker {
         doc.targetSets = TARGET_SET;
         doc.geneProductSubset = GP_SUBSET;
         doc.goAspect = GO_ASPECT;
+        doc.date = DATE;
 
         return doc;
     }

@@ -16,7 +16,6 @@ import static org.hamcrest.Matchers.hasSize;
  *         Time: 09:27
  *         Created with IntelliJ IDEA.
  */
-@Ignore //todo sort out path not being picked up when running verify
 public class DbXRefLoaderTestIT {
 
 	private static final String NOWHERE_CANTFIND = "OVER/RAINBOW";

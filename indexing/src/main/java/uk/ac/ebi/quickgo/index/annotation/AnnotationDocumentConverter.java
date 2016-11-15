@@ -1,16 +1,23 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Strings;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
+import org.slf4j.Logger;
 import org.springframework.batch.item.ItemProcessor;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*;
 
@@ -22,11 +29,15 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*
  */
 class AnnotationDocumentConverter implements ItemProcessor<Annotation, AnnotationDocument> {
     static final int DEFAULT_TAXON = 0;
+    private static final Logger LOGGER = getLogger(AnnotationDocumentConverter.class);
+    private static final String ANNOTATION_DATE_FORMAT = "yyyyMMdd";
+    private final DateTimeFormatter dateTimeFormatter;
 
     private final AtomicLong documentCounter;
 
     AnnotationDocumentConverter() {
         documentCounter = new AtomicLong(0L);
+        this.dateTimeFormatter = DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT);
     }
 
     @Override public AnnotationDocument process(Annotation annotation) throws Exception {
@@ -57,8 +68,33 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         doc.taxonId = extractTaxonId(propertiesMap.get(TAXON_ID));
         doc.targetSets = constructTargetSets(propertiesMap.get(TARGET_SET));
         doc.goAspect = propertiesMap.get(GO_ASPECT);
+        doc.date = createDateFromString(annotation);
 
         return doc;
+    }
+
+    /**
+     * <p>Creates a date from a date string. The date string is expected to be of the form: YYYYMMDD,
+     * e.g., 20120123 for 23rd January 2012. Any problem parsing this date will have the error logged.
+     * Since such errors are not critical, indexing will set the date to null in such circumstances
+     * and continue.
+     * <p>The {@link Date} instance created needs to be in UTC format, required by the underlying data repository,
+     * into which the instance will be persisted.
+     *
+     * @param annotation the annotation whose date string, of the form YYYYMMDD, is to be converted to a {@link Date}
+     *                   instance
+     * @return a {@link Date} instance representing the date.
+     */
+    private Date createDateFromString(Annotation annotation) {
+        if (!Strings.isNullOrEmpty(annotation.date)) {
+            try {
+                LocalDate localDate = LocalDate.parse(annotation.date, dateTimeFormatter);
+                return Date.from(localDate.atStartOfDay(ZoneOffset.UTC).toInstant());
+            } catch (IllegalArgumentException|DateTimeParseException iae) {
+                LOGGER.error("Could not parse annotation date: " + annotation.date, iae);
+            }
+        }
+        return null;
     }
 
     private int extractInteractingTaxonId(Annotation annotation) {

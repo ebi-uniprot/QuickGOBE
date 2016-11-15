@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.service.search;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;

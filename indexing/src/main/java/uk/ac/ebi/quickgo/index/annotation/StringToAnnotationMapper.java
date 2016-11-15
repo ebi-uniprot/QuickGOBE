@@ -13,7 +13,8 @@ import static uk.ac.ebi.quickgo.index.annotation.Columns.*;
  * Created 19/04/16
  * @author Edd
  */
-class StringToAnnotationMapper implements FieldSetMapper<Annotation> {
+public class StringToAnnotationMapper implements FieldSetMapper<Annotation> {
+
     @Override public Annotation mapFieldSet(FieldSet fieldSet) throws BindException {
         if (fieldSet == null) {
             throw new IllegalArgumentException("Provided field set is null");
@@ -36,7 +37,9 @@ class StringToAnnotationMapper implements FieldSetMapper<Annotation> {
         annotation.interactingTaxonId = trimIfNotNull(fieldSet.readString(COLUMN_INTERACTING_TAXON_ID.getPosition()));
         annotation.assignedBy = trimIfNotNull(fieldSet.readString(COLUMN_ASSIGNED_BY.getPosition()));
         annotation.annotationExtension = trimIfNotNull(fieldSet.readString(COLUMN_ANNOTATION_EXTENSION.getPosition()));
-        annotation.annotationProperties = trimIfNotNull(fieldSet.readString(COLUMN_ANNOTATION_PROPERTIES.getPosition()));
+        annotation.annotationProperties =
+                trimIfNotNull(fieldSet.readString(COLUMN_ANNOTATION_PROPERTIES.getPosition()));
+        annotation.date = trimIfNotNull(fieldSet.readString(COLUMN_DATE.getPosition()));
 
         return annotation;
     }

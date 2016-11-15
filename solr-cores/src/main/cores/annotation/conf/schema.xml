@@ -69,23 +69,24 @@
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields used by the annotation model -->
-
-    <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true"/>
-    <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="symbol" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="evidenceCode" type="string" indexed="true" stored="true" multiValued="false"/>
+    <!-- The following fields are used for storage and/or faceting, do not add search specific analyzers to these -->
+    <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true" docValues="true"/>
+    <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
+    <field name="symbol" type="string" indexed="false" stored="true" multiValued="false"/>
+    <field name="date" type="tdate" indexed="false" stored="true" multiValued="false"/>
+    <field name="evidenceCode" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
     <field name="extension" type="string" indexed="false" stored="true" multiValued="true"/>
-    <field name="geneProductId" type="database_ignorecase" indexed="true" stored="true" multiValued="false"/>
+    <field name="geneProductId" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
     <field name="geneProductType" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="geneProductSubset" type="string" indexed="true" stored="false" multiValued="false"/>
-    <field name="goEvidence" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
-    <field name="goAspect" type="text_ignorecase" indexed="true" stored="false" multiValued="false"/>
-    <field name="goId" type="lowercase" indexed="true" stored="true" multiValued="false"/>
+    <field name="goEvidence" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="goAspect" type="string" indexed="true" stored="false" multiValued="false" docValues="true"/>
+    <field name="goId" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
     <field name="interactingTaxonId" type="int" indexed="false" stored="true" multiValued="false"/>
     <field name="qualifier" type="string" indexed="false" stored="true" multiValued="false"/>
-    <field name="reference" type="string" indexed="true" stored="true" multiValued="false"/>
-    <field name="targetSet" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
-    <field name="taxonId" type="int" indexed="true" stored="true" multiValued="false"/>
+    <field name="reference" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
+    <field name="targetSet" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="taxonId" type="int" indexed="true" stored="true" multiValued="false" docValues="true"/>
     <field name="withFrom" type="string" indexed="true" stored="true" multiValued="true"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
@@ -112,9 +113,6 @@
     <field name="evidenceCode_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="evidenceCode" dest="evidenceCode_unsorted"/>
 
-    <field name="geneProductId_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
-    <copyField source="geneProductId" dest="geneProductId_unsorted"/>
-
     <field name="geneProductType_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="geneProductType" dest="geneProductType_unsorted"/>
 
@@ -134,19 +132,19 @@
     <copyField source="taxonId" dest="taxonId_unsorted"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
-    <!-- Fields that are used in cross-core joins with other collections -->
-
-    <!-- goId_join is used for joining with the ontology collection-->
-    <field name="goId_join" type="string" indexed="true" stored="false" multiValued="false"/>
-    <copyField source="goId" dest="goId_join"/>
-
-    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields that are used specifically for search -->
-    <field name="referenceSearch" type="reference_ignorecase" indexed="true" stored="false" multiValued="false"/>
-    <copyField source="reference" dest="referenceSearch"/>
+    <field name="reference_search" type="reference_ignorecase" indexed="true" stored="false" multiValued="false"/>
+    <copyField source="reference" dest="reference_search"/>
 
-    <field name="withFromSearch" type="database_ignorecase" indexed="true" stored="false" multiValued="true"/>
-    <copyField source="withFrom" dest="withFromSearch"/>
+    <field name="withFrom_search" type="database_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <copyField source="withFrom" dest="withFrom_search"/>
+
+    <field name="geneProductId_search" type="database_ignorecase" indexed="true" stored="false" multiValued="false"/>
+    <copyField source="geneProductId" dest="geneProductId_search"/>
+
+    <field name="goAspect_search" type="lowercase" indexed="true" stored="false" multiValued="false"/>
+    <copyField source="goAspect" dest="goAspect_search"/>
+
 
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->

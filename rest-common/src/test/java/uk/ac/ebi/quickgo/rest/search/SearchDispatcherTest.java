@@ -1,9 +1,12 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import uk.ac.ebi.quickgo.common.SearchableField;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,6 +29,10 @@ public class SearchDispatcherTest {
 
         @Override public boolean isSearchable(String field) {
             return field.equals(SEARCHABLE_FIELD);
+        }
+
+        @Override public Stream<String> searchableFields() {
+            return Stream.empty();
         }
     }
 

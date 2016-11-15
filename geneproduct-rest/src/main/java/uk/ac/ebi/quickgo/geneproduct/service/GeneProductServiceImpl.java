@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
 
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
@@ -47,6 +47,10 @@ public class GeneProductServiceImpl implements GeneProductService {
     @Override
     public List<GeneProduct> findById(List<String> ids) {
         return convertDocs(geneProductRepository.findById(serviceHelper.buildIdList(ids)));
+    }
+
+    @Override public List<GeneProduct> findByTargetSet(String name) {
+        return convertDocs(geneProductRepository.findByTargetSet(name));
     }
 
     protected List<GeneProduct> convertDocs(List<GeneProductDocument> docs) {

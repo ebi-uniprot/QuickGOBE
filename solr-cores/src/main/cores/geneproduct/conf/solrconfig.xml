@@ -911,27 +911,37 @@
                      - Provide the identifier with the highest result
                      - allow the symbol to be of higher importance than the synonym and name (by boosting)
                      - prefer searches where exact matching symbols (symbol_exact) are ranked higher than exact matches
-                      to synonyms (synonym_exact) or names (name_exact)
+                     to taxon names (taxonName_exact)
+                     - Exact matches to taxon names (taxonName_exact) ranks higher than exact matches to synonyms
+                     (synonym_exact) or names (name_exact)
                      - Exact matches to synonyms (synonym_exact) or names (name_exact) rank higher than
-                     case-insensitive word matches (synonym_lowercase, symbol_lowercase or name_lowercase)
+                     case-insensitive word matches (synonym_lowercase, taxon_lowercase, symbol_lowercase or
+                     name_lowercase)
                      - Case-insensitive word matches to symbol (symbol_lowercase) rank higher than case insensitive
+                     word matches to taxon names (taxon_lowercase).
+                     - Case-insensitive word matches to taxon name (symbol_lowercase) rank higher than case insensitive
                      word matches to synonyms (synonym_lowercase) or names (name_lowercase).
                      - Case-insensitive matches to synonym (synonym_lowercase) or names (name_lowercase) rank higher
-                     than substring matches (symbol_edge, synonym_edge, name_edge)
-                     - Substring matches to synonym (synonym_edge) rank higher than substring matches to synonym
+                     than substring matches (symbol_edge, taxonName_edge, synonym_edge, name_edge)
+                     - Substring matches to symbol (symbol_edge) rank higher than substring matches to taxon name
+                     (taxonName_edge)
+                     - Substring matches to taxon name (taxonName_edge) rank higher than substring matches to synonym
                      (synonym_edge) or name (name_edge)
                      - The process is the same when two or more search terms are input.
             -->
             <str name="qf">
                 id_lowercase
-                symbol_exact^20 symbol_lowercase^12 symbol_edge^5
-                synonym_exact^13 synonym_lowercase^11 synonym_edge
-                name_exact^13 name_lowercase^11 name_edge
+                symbol_exact^24 symbol_lowercase^15 symbol_edge^4
+                taxonName_exact^21 taxonName_lowercase^12 taxonName_edge^2
+                synonym_exact^18 synonym_lowercase^9 synonym_edge
+                name_exact^18 name_lowercase^9 name_edge
             </str>
             <str name="pf">
-                symbol_exact^20 symbol_lowercase^12 symbol_edge^5
-                synonym_exact^13 synonym_lowercase^11 synonym_edge
-                name_exact^13 name_lowercase^11 name_edge
+                id_lowercase
+                symbol_exact^24 symbol_lowercase^15 symbol_edge^4
+                taxonName_exact^21 taxonName_lowercase^12 taxonName_edge^2
+                synonym_exact^18 synonym_lowercase^9 synonym_edge
+                name_exact^18 name_lowercase^9 name_edge
             </str>
             <int name="ps">0</int>
         </lst>

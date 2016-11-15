@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.converter.ontology;
 
 import uk.ac.ebi.quickgo.client.model.ontology.GOTerm;
-import uk.ac.ebi.quickgo.ontology.common.document.Aspect;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 /**
  * Class responsible for converting GO specific fields from the {@link OntologyDocument} into the {@link GOTerm}.
@@ -18,6 +17,6 @@ public class GODocConverter extends AbstractDocConverter<GOTerm> {
         assert doc != null : "Ontology document cannot be null";
         assert term != null : "GoTerm cannot be null";
 
-        term.aspect = doc.aspect != null ? Aspect.fromShortName(doc.aspect).getName() : null;
+        term.aspect = doc.aspect != null ? doc.aspect : null;
     }
 }

@@ -4,8 +4,10 @@ import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.ECODocConverter;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.GODocConverter;
 import uk.ac.ebi.quickgo.client.service.search.ontology.OntologySearchServiceImpl;
-import uk.ac.ebi.quickgo.client.service.search.ontology.OntologySearchableField;
 import uk.ac.ebi.quickgo.client.service.search.ontology.OntologySolrQueryResultConverter;
+import uk.ac.ebi.quickgo.common.FacetableField;
+import uk.ac.ebi.quickgo.common.SearchableField;
+import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
@@ -18,6 +20,7 @@ import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
@@ -109,8 +112,29 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public OntologySearchableField ontologySearchableField() {
-        return new OntologySearchableField();
+    public SearchableField ontologySearchableField() {
+        return new SearchableField() {
+            @Override public boolean isSearchable(String field) {
+                return OntologyFields.Searchable.isSearchable(field);
+            }
+
+            @Override public Stream<String> searchableFields() {
+                return OntologyFields.Searchable.searchableFields().stream();
+            }
+        };
+    }
+
+    @Bean
+    public FacetableField ontologyFacetableField() {
+        return new FacetableField() {
+            @Override public boolean isFacetable(String field) {
+                return OntologyFields.Facetable.isFacetable(field);
+            }
+
+            @Override public Stream<String> facetableFields() {
+                return OntologyFields.Facetable.facetableFields().stream();
+            }
+        };
     }
 
     @Bean

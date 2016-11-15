@@ -10,12 +10,13 @@ import java.util.regex.Pattern;
 final class GeneProductParsingHelper {
     public static final int DEFAULT_TAXON_ID = 0;
 
+    static final String TAXON_NAME_KEY = "taxon_name";
     static final String COMPLETE_PROTEOME_KEY = "proteome";
     static final String REFERENCE_PROTEOME_KEY = "reference_proteome";
     static final String IS_ANNOTATED_KEY = "is_annotated";
     static final String IS_ISOFORM_KEY = "is_isoform";
     static final String DATABASE_SUBSET_KEY = "db_subset";
-
+    static final String TARGET_SET_KEY = "target_set";
     static final String TRUE_STRING = "Y";
     static final String FALSE_STRING = "N";
 

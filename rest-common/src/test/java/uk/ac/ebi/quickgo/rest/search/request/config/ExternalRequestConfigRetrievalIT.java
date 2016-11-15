@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
-import uk.ac.ebi.quickgo.common.SearchableDocumentFields;
+import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.request.FilterUtil;
 
 import java.util.HashMap;
@@ -38,13 +38,13 @@ public class ExternalRequestConfigRetrievalIT {
 
         @Profile(value = "ExternalFilterExecutionConfigIT")
         @Bean
-        public SearchableDocumentFields dummySearchableDocumentFields() {
-            return new SearchableDocumentFields() {
-                @Override public boolean isDocumentSearchable(String field) {
+        public SearchableField dummySearchableDocumentFields() {
+            return new SearchableField() {
+                @Override public boolean isSearchable(String field) {
                     return false;
                 }
 
-                @Override public Stream<String> searchableDocumentFields() {
+                @Override public Stream<String> searchableFields() {
                     return Stream.empty();
                 }
             };
@@ -86,6 +86,6 @@ public class ExternalRequestConfigRetrievalIT {
         map.put("localField", "goId");
         map.put("timeout", "4000");
 
-        return FilterUtil.createExecutionConfigWithProps("goIds,relations,usage", ExecutionType.REST_COMM, map);
+        return FilterUtil.createExecutionConfigWithProps("goIds,goUsage,relations", ExecutionType.REST_COMM, map);
     }
 }
