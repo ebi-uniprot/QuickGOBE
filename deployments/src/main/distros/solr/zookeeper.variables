@@ -1,0 +1,6 @@
+source ../common.variables
+
+# ================ HOST VMS ================
+declare -A ZOO_HOSTS
+ZOO_HOSTS[test]="ves-hx-ed"
+ZOO_PORT=2181

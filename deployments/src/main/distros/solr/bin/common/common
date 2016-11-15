@@ -1,0 +1,88 @@
+# --------------------------- UTILITY FUNCTIONS -----------------------------------
+array_contains () {
+    local array="$1[@]"
+    local seeking="$2"
+    local in=1
+
+    for element in "${!array}"; do
+        if [[ $element == $seeking ]]; then
+            in=0
+            break
+        fi
+    done
+
+    return $in
+}
+
+# ---------------------------- CHECK USER PERMISSIONS ----------------------------
+function user_can_execute_script() {
+   local name_to_check="$1"
+   local allowed_users="$2"
+
+   local user_is_allowed=1
+
+   if array_contains $allowed_users $name_to_check; then
+      user_is_allowed=0;
+   fi
+
+   return $user_is_allowed
+}
+
+# --------------------------- JOIN ELEMENTS IN ARRAY -----------------------------
+function join_by() {
+   local IFS="$1";
+   shift;
+   echo "$*";
+}
+
+# -------------------------- PROFILE FUNCTIONS -----------------------------------
+function check_profile() {
+    local valid_profiles="$1"
+    local value="$2"
+
+    local is_profile=0;
+
+    if [ -z "$value" ]; then
+      is_profile=1;
+    elif ! array_contains $valid_profiles $value; then
+      is_profile=1;
+    fi
+
+    return $is_profile;
+}
+
+function print_valid_profiles () {
+   local array="$1[@]"
+   echo $(join_by , "${!array}")
+}
+
+function vm_belongs_to_profile() {
+   local valid_vms="$1"
+   local vm_to_check="$2"
+
+   local belongs_to_profile=1
+
+   for vm in "${valid_vms}"; do
+      echo "checking vm: $vm"
+      if [ "$vm" = "$vm_to_check" ]; then
+          belongs_to_profile=0
+          break
+      fi
+   done
+
+   return $belongs_to_profile
+}
+
+# ------------------------- ZOOKEEPER FUNCTIONS ---------------------------------
+function zookeeper_hosts() {
+    local hosts="$1"
+    local port="$2"
+
+    local concat_hosts=""
+
+    for host in "$hosts"; do
+        concat_hosts+="$host:$port,"
+    done
+
+    echo "${concat_hosts%,}"
+}

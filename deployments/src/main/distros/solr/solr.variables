@@ -1,0 +1,10 @@
+source ../common.variables
+# ========== SOLR BINARTY LOCATION =========
+SOLR_LOCATION=/nfs/public/rw/goa/.solr/dist/solr/current
+
+# ================ HOST VMS ================
+declare -A SOLR_HOSTS
+SOLR_HOSTS[test]="ves-hx-ac ves-hx-b4 ves-hx-c4 ves-hx-c6"
+SOLR_PORT=8080
+SOLR_DATA_DIR=/nfs/public/rw/goa/.solr/data
+SOLR_MEM=6g
