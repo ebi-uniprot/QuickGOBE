@@ -14,8 +14,8 @@ import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.EVIDENCE_CODE;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields.GO_ID;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_PARAM;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.EVIDENCE_CODE_USAGE_RELATIONSHIPS;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.GO_USAGE_RELATIONSHIPS;
 
@@ -163,7 +163,7 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(usage.toLowerCase())
-                .addProperty(GO_ID, goId.toUpperCase())
+                .addProperty(GO_ID_PARAM.getName(), goId.toUpperCase())
                 .addProperty(GO_USAGE_RELATIONSHIPS)
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
@@ -183,7 +183,7 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.createFilterRequests(),
                 contains(FilterRequest.newBuilder()
                         .addProperty(usage.toLowerCase())
-                        .addProperty(GO_ID, goId.toUpperCase())
+                        .addProperty(GO_ID_PARAM.getName(), goId.toUpperCase())
                         .addProperty(GO_USAGE_RELATIONSHIPS, relationships.toLowerCase())
                         .build()));
     }
@@ -237,7 +237,7 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(usage.toLowerCase())
-                .addProperty(EVIDENCE_CODE, id.toUpperCase())
+                .addProperty(EVIDENCE_CODE_PARAM.getName(), id.toUpperCase())
                 .addProperty(EVIDENCE_CODE_USAGE_RELATIONSHIPS)
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
@@ -257,7 +257,7 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.createFilterRequests(),
                 contains(FilterRequest.newBuilder()
                         .addProperty(usage.toLowerCase())
-                        .addProperty(EVIDENCE_CODE, id.toUpperCase())
+                        .addProperty(EVIDENCE_CODE_PARAM.getName(), id.toUpperCase())
                         .addProperty(EVIDENCE_CODE_USAGE_RELATIONSHIPS, relationships.toLowerCase())
                         .build()));
     }

@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import com.google.common.base.Preconditions;
 import java.util.*;

@@ -1,10 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.converter;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
 import java.time.LocalDate;
@@ -13,14 +9,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem.*;
-import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.*;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem
+        .OCCURS_IN_CL_1;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem
+        .OCCURS_IN_CL_2;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem
+        .OCCURS_IN_CL_3;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_1;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_2;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_3;
 
 /**
  * Tests the implementation of the {@link AnnotationDocConverterImpl} class.
