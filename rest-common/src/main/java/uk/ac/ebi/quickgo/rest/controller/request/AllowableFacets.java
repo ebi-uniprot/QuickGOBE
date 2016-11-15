@@ -9,7 +9,7 @@ import javax.validation.Payload;
 @Constraint(validatedBy = {AllowableFacetsImpl.class})
 @Documented
 public @interface AllowableFacets {
-    String DEFAULT_ERROR_MESSAGE = "The facet parameter contains invalid values: %s";
+    String DEFAULT_ERROR_MESSAGE = "The facet parameter contains invalid values";
 
     String message() default DEFAULT_ERROR_MESSAGE;
 

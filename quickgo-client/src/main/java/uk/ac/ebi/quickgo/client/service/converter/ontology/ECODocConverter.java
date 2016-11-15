@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.converter.ontology;
 
 import uk.ac.ebi.quickgo.client.model.ontology.ECOTerm;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 /**
  * Class responsible for converting ECO specific fields from the {@link OntologyDocument} into the {@link ECOTerm}.

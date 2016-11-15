@@ -7,8 +7,8 @@ import uk.ac.ebi.quickgo.graphics.ontology.GraphImageResult;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
@@ -155,8 +155,38 @@ public abstract class OBOControllerIT {
     }
 
     @Test
+    public void canRetrieveOntologyViaLowerCasedSecondaryId() throws Exception {
+        ontologyRepository.deleteAll();
+
+        String primaryId = createId(1);
+        String secondaryId = createId(2);
+
+        OntologyDocument doc = createBasicDoc(primaryId, "name");
+        doc.secondaryIds = Collections.singletonList(secondaryId);
+
+        ontologyRepository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(buildTermsURL(secondaryId.toLowerCase())));
+
+        expectCoreFieldsInResults(response, singletonList(primaryId))
+                .andExpect(jsonPath("$.results.*.id", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void canRetrieveCoreAttrByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validId)));
+
+        expectCoreFieldsInResults(response, singletonList(validId))
+                .andExpect(jsonPath("$.results.*.id", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveCoreAttrByOneIdInLowercase() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId.toLowerCase())));
 
         expectCoreFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))

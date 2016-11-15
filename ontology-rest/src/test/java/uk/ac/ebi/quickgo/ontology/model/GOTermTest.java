@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.model;
 
-import uk.ac.ebi.quickgo.ontology.common.document.Aspect;
+import uk.ac.ebi.quickgo.ontology.common.Aspect;
 
 import org.junit.Test;
 

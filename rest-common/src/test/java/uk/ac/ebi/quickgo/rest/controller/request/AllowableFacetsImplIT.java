@@ -14,9 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -28,18 +25,15 @@ import static org.hamcrest.Matchers.hasSize;
 /**
  * Tests the behaviour of the {@link AllowableFacetsImpl} class.
  */
-@ActiveProfiles("test-AllowableFacetsImplIT")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = AllowableFacetsImplIT.AllowableFacetsConfig.class)
 public class AllowableFacetsImplIT {
     private static final String INVALID_FACET_1 = "invalid1";
     private static final String INVALID_FACET_2 = "invalid2";
 
-    @Configuration
-    @Profile("test-AllowableFacetsImplIT")
     static class AllowableFacetsConfig {
         @Bean
-        FacetableField FacetableField() {
+        FacetableField facetableField() {
             return new FacetableField() {
                 private final List<String> notFacetable = Arrays.asList(INVALID_FACET_1, INVALID_FACET_2);
 
@@ -67,36 +61,36 @@ public class AllowableFacetsImplIT {
     @Autowired
     private Validator validator;
 
-    private DummyFacet dummyFacet;
+    private StubFacet stubFacet;
 
     @Before
     public void setUp() throws Exception {
-        dummyFacet = new DummyFacet();
+        stubFacet = new StubFacet();
     }
 
     @Test
     public void nullFacetArrayIsValid() throws Exception {
-        dummyFacet.facets = null;
+        stubFacet.facets = null;
 
-        validator.validate(dummyFacet);
+        validator.validate(stubFacet);
 
-        Set<ConstraintViolation<DummyFacet>> violations = validator.validate(dummyFacet);
+        Set<ConstraintViolation<StubFacet>> violations = validator.validate(stubFacet);
 
         assertThat(violations, hasSize(0));
     }
 
     @Test
     public void emptyFacetArrayIsValid() throws Exception {
-        validator.validate(dummyFacet);
+        validator.validate(stubFacet);
     }
 
     @Test
     public void facetArrayWithInvalidFacetsIsInvalid() throws Exception {
-        dummyFacet.facets = new String[]{INVALID_FACET_1};
+        stubFacet.facets = new String[]{INVALID_FACET_1};
 
-        validator.validate(dummyFacet);
+        validator.validate(stubFacet);
 
-        Set<ConstraintViolation<DummyFacet>> violations = validator.validate(dummyFacet);
+        Set<ConstraintViolation<StubFacet>> violations = validator.validate(stubFacet);
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(), is(createRegexErrorMessage(INVALID_FACET_1)));
@@ -104,22 +98,22 @@ public class AllowableFacetsImplIT {
 
     @Test
     public void facetArrayWithJustValidFacetsIsValid() throws Exception {
-        dummyFacet.facets = new String[]{"valid1", "valid2", "valid3",};
+        stubFacet.facets = new String[]{"valid1", "valid2", "valid3",};
 
-        validator.validate(dummyFacet);
+        validator.validate(stubFacet);
 
-        Set<ConstraintViolation<DummyFacet>> violations = validator.validate(dummyFacet);
+        Set<ConstraintViolation<StubFacet>> violations = validator.validate(stubFacet);
 
         assertThat(violations, hasSize(0));
     }
 
     @Test
     public void facetArrayWithASeveralValidFacetsAndAnInvalidFacetIsInValid() throws Exception {
-        dummyFacet.facets = new String[]{"valid1", INVALID_FACET_1, "valid3"};
+        stubFacet.facets = new String[]{"valid1", INVALID_FACET_1, "valid3"};
 
-        validator.validate(dummyFacet);
+        validator.validate(stubFacet);
 
-        Set<ConstraintViolation<DummyFacet>> violations = validator.validate(dummyFacet);
+        Set<ConstraintViolation<StubFacet>> violations = validator.validate(stubFacet);
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(), is(createRegexErrorMessage(INVALID_FACET_1)));
@@ -127,11 +121,11 @@ public class AllowableFacetsImplIT {
 
     @Test
     public void facetArrayWithSeveralInvalidFacetsIsInValid() throws Exception {
-        dummyFacet.facets = new String[]{"valid1", INVALID_FACET_1, INVALID_FACET_2};
+        stubFacet.facets = new String[]{"valid1", INVALID_FACET_1, INVALID_FACET_2};
 
-        validator.validate(dummyFacet);
+        validator.validate(stubFacet);
 
-        Set<ConstraintViolation<DummyFacet>> violations = validator.validate(dummyFacet);
+        Set<ConstraintViolation<StubFacet>> violations = validator.validate(stubFacet);
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
@@ -140,19 +134,18 @@ public class AllowableFacetsImplIT {
 
     private String createRegexErrorMessage(String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
-        return String.format(AllowableFacets.DEFAULT_ERROR_MESSAGE, csvInvalidItems);
+        return AllowableFacets.DEFAULT_ERROR_MESSAGE + ":"+ csvInvalidItems;
     }
 
     /**
      * Class annotated with {@link AllowableFacets} so that we can test the annotation.
      */
-    private class DummyFacet {
+    private class StubFacet {
         @AllowableFacets
         String[] facets;
 
-        public DummyFacet() {
+        public StubFacet() {
             this.facets = new String[]{};
         }
     }
-
 }

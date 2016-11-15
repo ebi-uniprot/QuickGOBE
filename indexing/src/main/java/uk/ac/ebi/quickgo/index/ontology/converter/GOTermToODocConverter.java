@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.index.ontology.converter;
 
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import java.util.List;
 import java.util.Optional;

@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.common.FacetableField;
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintValidator;
@@ -22,7 +23,7 @@ public class AllowableFacetsImpl implements ConstraintValidator<AllowableFacets,
     private final FacetableField facetableField;
 
     @Autowired
-    public AllowableFacetsImpl(FacetableField facetableField){
+    public AllowableFacetsImpl(FacetableField facetableField) {
         Preconditions.checkArgument(facetableField != null, "Facetable fields cannot be null");
 
         this.facetableField = facetableField;
@@ -31,28 +32,32 @@ public class AllowableFacetsImpl implements ConstraintValidator<AllowableFacets,
     @Override public void initialize(AllowableFacets constraintAnnotation) {}
 
     @Override public boolean isValid(String[] facetValues, ConstraintValidatorContext context) {
-        List<String> invalidItems = null;
+        List<String> invalidFacets = null;
 
         if (facetValues != null) {
-            invalidItems = new ArrayList<>();
+            invalidFacets = new ArrayList<>();
 
             for (String facet : facetValues) {
                 if (!facetableField.isFacetable(facet)) {
-                    invalidItems.add(facet);
+                    invalidFacets.add(facet);
                 }
             }
 
-            if (!invalidItems.isEmpty() &&
+            if (!invalidFacets.isEmpty() &&
                     context.getDefaultConstraintMessageTemplate().equals(DEFAULT_ERROR_MESSAGE)) {
                 context.disableDefaultConstraintViolation();
 
-                String invalidItemsText = invalidItems.stream().collect(Collectors.joining(", "));
-
-                context.buildConstraintViolationWithTemplate(
-                        String.format(DEFAULT_ERROR_MESSAGE, invalidItemsText)).addConstraintViolation();
+                context.buildConstraintViolationWithTemplate(createErrorMessage(invalidFacets))
+                        .addConstraintViolation();
             }
         }
 
-        return invalidItems == null || invalidItems.isEmpty();
+        return invalidFacets == null || invalidFacets.isEmpty();
+    }
+
+    private String createErrorMessage(Collection<String> invalidFacets) {
+        String invalidItemsText = invalidFacets.stream().collect(Collectors.joining(", "));
+
+        return DEFAULT_ERROR_MESSAGE + ":" + invalidItemsText;
     }
 }

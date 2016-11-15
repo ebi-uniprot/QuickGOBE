@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.converter.ontology;
 
 import uk.ac.ebi.quickgo.client.model.ontology.GOTerm;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 /**
  * Class responsible for converting GO specific fields from the {@link OntologyDocument} into the {@link GOTerm}.
