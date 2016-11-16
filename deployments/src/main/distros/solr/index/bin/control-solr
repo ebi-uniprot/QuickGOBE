@@ -8,16 +8,17 @@
 ##      start [profile] [vm]    => start a profile's machines/specific machine
 ##      stop [profile] [vm]     => stop a profile's machines/specific machine
 
-readonly VALID_USERS=("uni_qgo" "eddturner");
+readonly VALID_USERS=("uni_qgo" "rantunes");
 readonly ACTION="$1";
 readonly PROFILE="$2"
 readonly REQUESTED_VM="$3"
 
 # ---------------------------- READ COMMON ENVIRONMENT VARIABLES ----------------------------
-if ! source "common/common" || ! source "common/common.variables" ; then
+if ! source "../../common/common" || ! source "../../common/common.variables" ; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
+
 
 ## ---------------------------- UTILITY FUNCTIONS ----------------------------
 function showHelp {

@@ -55,8 +55,8 @@ QUICKGO_BRANCH="master"
 CORE_NAME=
 
 # source environment specific variables
-if ! source "$BASE_DIR/solr.variables" || ! source "$BASE_DIR/vm-profile.variables"; then
-    echo "Could not source '$BASE_DIR/solr.variables' or '$BASE_DIR/vm-profile.variables'. Exiting."
+if ! source "$BASE_DIR/../solr.variables" || ! source "$BASE_DIR/../vm-profile.variables"; then
+    echo "Could not source '$BASE_DIR/../solr.variables' or '$BASE_DIR/../vm-profile.variables'. Exiting."
     exit 1;
 fi
 

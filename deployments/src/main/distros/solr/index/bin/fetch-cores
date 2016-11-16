@@ -3,7 +3,7 @@
 #fail on error
 set -e
 
-VALID_USERS=("uni_qgo" "eddturner");
+VALID_USERS=("uni_qgo" "rantunes");
 
 if [ $# -ne 3 ]; then
     echo "${0} expects 3 arguments: 1.) the configuration release directory, 2.) profile, 3.) vm"
@@ -20,7 +20,8 @@ if [ ! -d "$conf_release_dir" ]; then
 fi
 
 # source required scripts
-if ! source "../common/common" || ! source "../common/common.variables" || ! source "index.variables"; then
+if ! source "../../../common/common" || ! source "../../../common/common.variables" || ! source "index.variables";
+then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi

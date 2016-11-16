@@ -3,10 +3,10 @@
 #fail on error
 set -e
 
-VALID_USERS=("uni_qgo" "eddturner");
+VALID_USERS=("uni_qgo" "rantunes");
 
 # ------------------------ SOURCE NECESSARY FILES ------------------------
-if ! source "../common/common" || ! source "../common/common.variables" || ! source "index.variables" || ! source "../common/lsf.command.variables"; then
+if ! source "../../../common/common" || ! source "../../../common/common.variables" || ! source "index.variables" || ! source "../common/lsf.command.variables"; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi

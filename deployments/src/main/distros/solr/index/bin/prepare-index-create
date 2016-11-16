@@ -3,7 +3,7 @@
 # fail on error
 set -e
 
-VALID_USERS=("uni_qgo" "eddturner");
+VALID_USERS=("uni_qgo" "rantunes");
 RELEASE_VERSION_PREFIX="v";
 
 ## ---------------------------- UTILITY FUNCTIONS ----------------------------
@@ -29,7 +29,8 @@ function nextReleaseVersion {
 }
 
 # ------------------------ SOURCE NECESSARY FILES ------------------------
-if ! source "../common/common" || ! source "../common/common.variables" || ! source "index.variables" || ! source "../common/lsf.command.variables"; then
+if ! source "../../../common/common" || ! source "../../../common/common.variables" || ! source "index.variables" ||
+! source "../common/lsf.command.variables"; then
     echo "Required properties files were not found. Please make sure you're in the right directory";
     exit 1;
 fi
@@ -85,3 +86,4 @@ else
     echo "Preparation to create index DONE."
     echo "Proceed to index-create to submit indexing job";
 fi
+
