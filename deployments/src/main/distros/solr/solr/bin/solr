@@ -27,7 +27,7 @@ readonly ACTION="$1"
 readonly PROFILE="$2"
 readonly CORE_CONFIG="$3"
 
-source "./common/common"
+source "common/common"
 
 # ======= read the variables used by the control scripts ================================
 source "../solr.variables" || {

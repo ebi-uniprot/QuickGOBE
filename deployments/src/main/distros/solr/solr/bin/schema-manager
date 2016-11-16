@@ -18,7 +18,7 @@ readonly ACTION="$1"
 readonly SCHEMA="$2"
 readonly PROFILE="$3"
 
-source "./common/common"
+source "common/common"
 
 # ======= read the variables used by the control scripts ================================
 source "../zookeeper.variables" || {

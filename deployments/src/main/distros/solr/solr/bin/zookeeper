@@ -9,7 +9,7 @@
 set -eo pipefail
 IFS=$' '
 
-source "./common/common"
+source "common/common"
 source "../zookeeper.variables" || {
     echo "Please create a file called, zookeeper.variables, containing the necessary environment variables."
     exit 1
