@@ -51,15 +51,6 @@ REPOS_DIR="$BASE_DIR/repos"
 QUICKGO_REPO_DIR="$REPOS_DIR/QuickGOBE"
 QUICKGO_BRANCH="master"
 
-# ---------------------------- SOLR CORE INFO ----------------------------
-CORE_NAME=
-
-# source environment specific variables
-if ! source "$BASE_DIR/../solr.variables" || ! source "$BASE_DIR/../vm-profile.variables"; then
-    echo "Could not source '$BASE_DIR/../solr.variables' or '$BASE_DIR/../vm-profile.variables'. Exiting."
-    exit 1;
-fi
-
 SOLR_INDEX_DIR="${BASE_DIR}/.quickgo-indexes"
 SOLR_CONFIG_DIR="${BASE_DIR}/solr-conf"
 

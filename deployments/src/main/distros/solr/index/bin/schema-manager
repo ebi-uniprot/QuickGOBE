@@ -4,7 +4,7 @@
 # Manages the schemas for solr cloud
 #
 # In this script schemas are managed via zookeeper. This approach was chosen because
-# zookeeper is the central resource management tool for solr cloud. So it makes sense to
+# zookeeper is the central resource management tool for Solr cloud. So it makes sense to
 # keep the schemas house in zookeeper
 ##=======================================================================================
 
@@ -18,10 +18,10 @@ readonly ACTION="$1"
 readonly SCHEMA="$2"
 readonly PROFILE="$3"
 
-source "common/common"
+source "../../common/common"
 
 # ======= read the variables used by the control scripts ================================
-source "../zookeeper.variables" || {
+source "../../zookeeper.variables" || {
     echo "Please create a file called, zookeeper.variables, containing the necessary environment variables to setup zookeeper."
     exit 1
 }
