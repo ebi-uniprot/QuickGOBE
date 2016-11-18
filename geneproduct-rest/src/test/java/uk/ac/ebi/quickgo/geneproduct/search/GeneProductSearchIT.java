@@ -25,6 +25,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     private static final String GENE_PRODUCT_RESOURCE_URL = "/geneproduct/search";
     private static final String TYPE_FILTER = "type";
     private static final String TAXON_ID_FILTER = "taxonId";
+    private static final String DB_SUBSET_FILTER = "dbSubset";
 
     @Before
     public void setUp() throws Exception {
@@ -183,6 +184,20 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         checkValidFacetResponse(name, TAXON_ID_FILTER);
     }
 
+    @Test
+    public void requestWithDbSubsetFacetFieldReturnsResponseWithFacetInResult() throws Exception {
+        String dbSubset = "TrEMBL";
+        String name = "name";
+
+        GeneProductDocument doc1 = createGeneProductDocWithNameAndDbSubset("A0A0F8CSS1", name, dbSubset);
+        GeneProductDocument doc2 = createGeneProductDocWithNameAndDbSubset("A0A0F8CSS2", name, dbSubset);
+        GeneProductDocument doc3 = createGeneProductDocWithNameAndDbSubset("A0A0F8CSS3", name, dbSubset);
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkValidFacetResponse(name, DB_SUBSET_FILTER);
+    }
+
     // filter queries ---------------------------------------------------------
     @Test
     public void requestWithInvalidFilterQueryIgnoresTheFilter() throws Exception {
@@ -209,6 +224,22 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         saveToRepository(doc1, doc2, doc3);
 
         Param fq = new Param(TYPE_FILTER, "protein");
+
+        checkValidFilterQueryResponse("metabolic", 2, fq);
+    }
+
+    @Test
+    public void requestWithADbSubsetFilterQueryReturnsFilteredResponse() throws Exception {
+        GeneProductDocument doc1 = createGeneProductDocWithName("A0A0F8CSS1", "glycine metabolic process 1");
+        doc1.databaseSubset = "Swiss-Prot";
+        GeneProductDocument doc2 = createGeneProductDocWithName("A0A0F8CSS2", "glycine metabolic process 2");
+        doc2.databaseSubset = "TrEMBL";
+        GeneProductDocument doc3 = createGeneProductDocWithName("A0A0F8CSS3", "glycine metabolic process 3");
+        doc3.databaseSubset = "Swiss-Prot";
+
+        saveToRepository(doc1, doc2, doc3);
+
+        Param fq = new Param(DB_SUBSET_FILTER, "Swiss-Prot");
 
         checkValidFilterQueryResponse("metabolic", 2, fq);
     }
@@ -342,6 +373,14 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         GeneProductDocument geneProductDocument = createDocWithId(id);
         geneProductDocument.taxonId = taxonId;
         geneProductDocument.name = name;
+
+        return geneProductDocument;
+    }
+
+    private GeneProductDocument createGeneProductDocWithNameAndDbSubset(String id, String name, String dbSubset) {
+        GeneProductDocument geneProductDocument = createDocWithId(id);
+        geneProductDocument.name = name;
+        geneProductDocument.databaseSubset = dbSubset;
 
         return geneProductDocument;
     }
