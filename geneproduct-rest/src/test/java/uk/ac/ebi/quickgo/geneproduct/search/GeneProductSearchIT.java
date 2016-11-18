@@ -15,6 +15,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.DB_SUBSET_PARAM;
+import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.TAXON_ID_PARAM;
+import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.TYPE_PARAM;
 import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.createDocWithId;
 
 @SpringApplicationConfiguration(classes = {GeneProductREST.class})
@@ -23,9 +26,6 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     private GeneProductRepository repository;
 
     private static final String GENE_PRODUCT_RESOURCE_URL = "/geneproduct/search";
-    private static final String TYPE_FILTER = "type";
-    private static final String TAXON_ID_FILTER = "taxonId";
-    private static final String DB_SUBSET_FILTER = "dbSubset";
 
     @Before
     public void setUp() throws Exception {
@@ -142,7 +142,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("glycine", TYPE_FILTER);
+        checkValidFacetResponse("glycine", TYPE_PARAM.getName());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("glycine", TYPE_FILTER, TAXON_ID_FILTER);
+        checkValidFacetResponse("glycine", TYPE_PARAM.getName(), TAXON_ID_PARAM.getName());
     }
 
     @Test
@@ -167,7 +167,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse(name, TYPE_FILTER);
+        checkValidFacetResponse(name, TYPE_PARAM.getName());
     }
 
     @Test
@@ -181,7 +181,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse(name, TAXON_ID_FILTER);
+        checkValidFacetResponse(name, TAXON_ID_PARAM.getName());
     }
 
     @Test
@@ -195,7 +195,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse(name, DB_SUBSET_FILTER);
+        checkValidFacetResponse(name, DB_SUBSET_PARAM.getName());
     }
 
     // filter queries ---------------------------------------------------------
@@ -223,7 +223,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq = new Param(TYPE_FILTER, "protein");
+        Param fq = new Param(TYPE_PARAM.getName(), "protein");
 
         checkValidFilterQueryResponse("metabolic", 2, fq);
     }
@@ -239,7 +239,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq = new Param(DB_SUBSET_FILTER, "Swiss-Prot");
+        Param fq = new Param(DB_SUBSET_PARAM.getName(), "Swiss-Prot");
 
         checkValidFilterQueryResponse("metabolic", 2, fq);
     }
@@ -258,8 +258,8 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq1 = new Param(TYPE_FILTER, "miRNA");
-        Param fq2 = new Param(TAXON_ID_FILTER, "2");
+        Param fq1 = new Param(TYPE_PARAM.getName(), "miRNA");
+        Param fq2 = new Param(TAXON_ID_PARAM.getName(), "2");
 
         checkValidFilterQueryResponse("process", 0, fq1, fq2);
     }
@@ -275,7 +275,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        Param fq = new Param(TYPE_FILTER, "miRNA");
+        Param fq = new Param(TYPE_PARAM.getName(), "miRNA");
 
         checkValidFilterQueryResponse("glycine", 3, fq);
     }
