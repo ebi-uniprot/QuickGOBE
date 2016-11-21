@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.validation;
 
 import com.google.common.base.Preconditions;
+import java.util.Objects;
 
 /**
  * @author Tony Wardell
@@ -12,15 +13,15 @@ class IdValidation {
 
     private static final String DELIMITER = ":";
 
-    static String db(final String idWithDb) {
-        Preconditions.checkArgument(idWithDb.contains(DELIMITER), "The id should contain contain the delimiter %s",
-                DELIMITER);
+    public static String db(final String idWithDb) {
+        Preconditions.checkArgument(Objects.nonNull(idWithDb), "The id should not be null");
+        Preconditions.checkArgument(idWithDb.contains(DELIMITER), "The id should contain the delimiter %s", DELIMITER);
         return idWithDb.substring(0, idWithDb.indexOf(":")).toLowerCase();
     }
 
-    static String id(final String id){
-        Preconditions.checkArgument(id.contains(DELIMITER), "The id should contain contain the delimiter %s",
-                DELIMITER);
-        return id.substring(id.indexOf(":") + 1);
+    static String id(final String idWithDb){
+        Preconditions.checkArgument(Objects.nonNull(idWithDb), "The id should not be null");
+        Preconditions.checkArgument(idWithDb.contains(DELIMITER), "The id should contain the delimiter %s", DELIMITER);
+        return idWithDb.substring(idWithDb.indexOf(":") + 1);
     }
 }
