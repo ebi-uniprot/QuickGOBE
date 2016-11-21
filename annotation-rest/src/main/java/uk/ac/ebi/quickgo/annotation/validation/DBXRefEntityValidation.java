@@ -28,7 +28,7 @@ class DBXRefEntityValidation implements ConstraintValidator<WithFromValidator, S
     @Override public void initialize(WithFromValidator constraintAnnotation) {}
 
     /**
-     * If the entire list of values passed to isValid can be successfully validated, or not validated at all then
+     * If the entire list of values passed to this method can be successfully validated, or not validated at all then
      * isValid will return true.
      * @param values list of potential database cross reference identifiers. Can be null.
      * @param context of the isValid call.
@@ -40,7 +40,7 @@ class DBXRefEntityValidation implements ConstraintValidator<WithFromValidator, S
     }
 
     private boolean valueIsValid(String value) {
-        return !value.contains(":") || (isValidForDb(value));
+        return !value.contains(":") || isValidForDb(value);
     }
 
     private boolean isValidForDb(String value) {
