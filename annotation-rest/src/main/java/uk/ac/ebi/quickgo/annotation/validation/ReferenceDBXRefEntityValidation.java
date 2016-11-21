@@ -15,7 +15,7 @@ import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.db;
  * Time: 13:22
  * Created with IntelliJ IDEA.
  */
-public class ReferenceDBXRefEntityValidation implements ConstraintValidator<ReferenceValidator, String[]> {
+class ReferenceDBXRefEntityValidation implements ConstraintValidator<ReferenceValidator, String[]> {
 
     @Autowired
     DBXRefEntityValidation dbxRefEntityValidation;
