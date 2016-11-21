@@ -580,10 +580,31 @@ public class AnnotationRequestValidationIT {
         annotationRequest.setQualifier("foobar","foo_bar");
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
+    @Test
+    public void StringWithSpacesAndPipeIsAnOKQualifier() {
+        annotationRequest.setQualifier("NOT | enables");
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
 
     @Test
-    public void StringWithSpacesIsAnInvalidQualifier() {
-        annotationRequest.setQualifier("foo bar");
+    public void StringWithSpacesAndPipeIsAnOKQualifierIsCaseInsensitive() {
+        annotationRequest.setQualifier("Not | enableS");
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void StringWithSpacesAndNoPipeIsInvalid() {
+        annotationRequest.setQualifier("not boo");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void StringWithPipeButNoSpacesIsInvalid() {
+        annotationRequest.setQualifier("Not|enableS");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        annotationRequest.setQualifier("Not| enableS");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        annotationRequest.setQualifier("Not |enableS");
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
@@ -592,6 +613,7 @@ public class AnnotationRequestValidationIT {
         annotationRequest.setQualifier("foo3bar");
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
+
 
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
