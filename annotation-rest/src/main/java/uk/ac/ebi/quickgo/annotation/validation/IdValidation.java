@@ -8,7 +8,7 @@ import com.google.common.base.Preconditions;
  * Time: 13:41
  * Created with IntelliJ IDEA.
  */
-public class IdValidation {
+class IdValidation {
 
     private static final String DELIMITER = ":";
 
