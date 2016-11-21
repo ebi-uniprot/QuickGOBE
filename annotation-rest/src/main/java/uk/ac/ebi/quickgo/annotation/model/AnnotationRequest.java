@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.validation.ReferenceValidator;
 import uk.ac.ebi.quickgo.annotation.validation.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
