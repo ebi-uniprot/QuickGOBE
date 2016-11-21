@@ -16,12 +16,12 @@ class IdValidation {
     public static String db(final String idWithDb) {
         Preconditions.checkArgument(Objects.nonNull(idWithDb), "The id should not be null");
         Preconditions.checkArgument(idWithDb.contains(DELIMITER), "The id should contain the delimiter %s", DELIMITER);
-        return idWithDb.substring(0, idWithDb.indexOf(":")).toLowerCase();
+        return idWithDb.substring(0, idWithDb.indexOf(":")).toLowerCase().trim();
     }
 
     static String id(final String idWithDb){
         Preconditions.checkArgument(Objects.nonNull(idWithDb), "The id should not be null");
         Preconditions.checkArgument(idWithDb.contains(DELIMITER), "The id should contain the delimiter %s", DELIMITER);
-        return idWithDb.substring(idWithDb.indexOf(":") + 1);
+        return idWithDb.substring(idWithDb.indexOf(":") + 1).trim();
     }
 }

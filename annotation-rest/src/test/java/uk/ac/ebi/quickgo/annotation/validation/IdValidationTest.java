@@ -16,7 +16,7 @@ public class IdValidationTest {
 
     private static final String DB = "UniProt";
     private static final String ID = "12345";
-    public static final String DELIMITER = ":";
+    private static final String DELIMITER = ":";
     private static final String ID_WITH_DB = DB + DELIMITER + ID;
 
     @Test
@@ -67,5 +67,15 @@ public class IdValidationTest {
     @Test
     public void retrieveIdSectionWhereDoesNotExistGivesEmptyString(){
         assertThat(id(DB+DELIMITER), is(""));
+    }
+
+    @Test
+    public void retrieveDbSectionWhereDbSectionContainsSpaces(){
+        assertThat(db("   " + DB + "   " + DELIMITER), is(DB.toLowerCase()));
+    }
+
+    @Test
+    public void retrieveIdSectionWhereIdSectionContainsSpaces(){
+        assertThat(id(DELIMITER + "    " + ID + "    "), is(ID.toLowerCase()));
     }
 }
