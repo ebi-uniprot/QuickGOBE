@@ -7,7 +7,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static uk.ac.ebi.quickgo.annotation.validation.QuickGoValidation.toDb;
+import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.db;
 
 /**
  * @author Tony Wardell
@@ -44,6 +44,6 @@ public class ReferenceDBXRefEntityValidation implements ConstraintValidator<Refe
             return true;
         }
 
-        return referenceDatabases.contains(toDb.apply(s));
+        return referenceDatabases.contains(db(s));
     }
 }

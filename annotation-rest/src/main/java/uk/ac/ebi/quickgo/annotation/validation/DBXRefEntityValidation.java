@@ -3,20 +3,17 @@ package uk.ac.ebi.quickgo.annotation.validation;
 import uk.ac.ebi.quickgo.annotation.validation.model.DBXRefEntity;
 
 import com.google.common.base.Preconditions;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Stream;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import org.springframework.batch.item.ItemWriter;
 
 import static java.util.stream.Collectors.groupingBy;
+import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.*;
 
 /**
- * Use the database cross reference information contain in this class to verify a list of potential database cross
+ * Use the database cross reference information contained in this class to verify a list of potential database cross
  * reference identifiers.
  *
  * @author Tony Wardell
@@ -24,13 +21,9 @@ import static java.util.stream.Collectors.groupingBy;
  * Time: 14:41
  * Created with IntelliJ IDEA.
  */
-public class DBXRefEntityValidation implements ConstraintValidator<WithFromValidator, String[]> {
+class DBXRefEntityValidation implements ConstraintValidator<WithFromValidator, String[]> {
 
     private static Map<String, List<DBXRefEntity>> mappedEntities = new HashMap<>();
-
-    private static Function<String, String> toDb = (value) -> value.substring(0, value.indexOf(":")).toLowerCase();
-    private static Function<String, String> toId = (value) -> value.substring(value.indexOf(":") + 1);
-
     @Override public void initialize(WithFromValidator constraintAnnotation) {
 
     }
@@ -52,8 +45,8 @@ public class DBXRefEntityValidation implements ConstraintValidator<WithFromValid
     }
 
     private boolean isValidForDb(String value) {
-        final List<DBXRefEntity> entities = mappedEntities.get(toDb.apply(value));
-        return entities != null && entities.stream().anyMatch(e -> e.test(toId.apply(value)));
+        final List<DBXRefEntity> entities = mappedEntities.get(db(value));
+        return entities != null && entities.stream().anyMatch(e -> e.test(id(value)));
     }
 
     static class DBXRefEntityAggregator implements ItemWriter<DBXRefEntity> {
