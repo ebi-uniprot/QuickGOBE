@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
 
 import java.util.ArrayList;
 import java.util.List;

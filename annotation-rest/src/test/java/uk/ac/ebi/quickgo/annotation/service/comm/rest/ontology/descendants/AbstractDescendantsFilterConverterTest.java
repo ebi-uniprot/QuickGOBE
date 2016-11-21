@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -18,12 +17,12 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 /**
- * Created 10/08/16
- * @author Edd
+ * Created by edd on 02/11/2016.
  */
-public class DescendantsFilterConverterTest {
+public abstract class AbstractDescendantsFilterConverterTest {
     private ConvertedOntologyFilter response;
     private DescendantsFilterConverter converter;
+    String field;
 
     @Before
     public void setUp() {
@@ -32,24 +31,26 @@ public class DescendantsFilterConverterTest {
         converter = new DescendantsFilterConverter();
     }
 
+    public abstract String ontologyId(int id);
+
     @Test
     public void descendantsFromSingleResourceAreConvertedToQuickGOQuery() {
-        String id1 = "id1";
-        String desc1 = "desc1";
+        String id1 = ontologyId(1);
+        String desc1 = ontologyId(2);
 
         addResponseDescendant(id1, desc1);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
+        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(field, desc1)));
         assertThat(convertedFilter.getFilterContext(), is(Optional.empty()));
     }
 
     @Test
     public void differentDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
-        String id1 = "id1";
-        String id2 = "id2";
-        String desc1 = "desc1";
-        String desc2 = "desc2";
+        String id1 = ontologyId(1);
+        String id2 = ontologyId(2);
+        String desc1 = ontologyId(11);
+        String desc2 = ontologyId(22);
 
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id2, desc2);
@@ -57,16 +58,16 @@ public class DescendantsFilterConverterTest {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(
-                or(QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1),
-                        QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc2))));
+                or(QuickGOQuery.createQuery(field, desc1),
+                        QuickGOQuery.createQuery(field, desc2))));
         assertThat(convertedFilter.getFilterContext(), is(Optional.empty()));
     }
 
     @Test
     public void sameDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
-        String id1 = "id1";
-        String id2 = "id2";
-        String desc1 = "desc1";
+        String id1 = ontologyId(1);
+        String id2 = ontologyId(2);
+        String desc1 = ontologyId(11);
 
         addResponseDescendant(id1, desc1);
         addResponseDescendant(id2, desc1);
@@ -74,7 +75,7 @@ public class DescendantsFilterConverterTest {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(
-                QuickGOQuery.createQuery(AnnotationFields.GO_ID, desc1)));
+                QuickGOQuery.createQuery(field, desc1)));
         assertThat(convertedFilter.getFilterContext(), is(Optional.empty()));
     }
 

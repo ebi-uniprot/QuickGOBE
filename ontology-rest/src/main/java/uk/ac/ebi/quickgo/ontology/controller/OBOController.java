@@ -4,8 +4,8 @@ import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
+import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
@@ -13,7 +13,6 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
@@ -30,10 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
@@ -116,7 +112,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status")
     @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
-        throw new ParameterException("The requested end-point does not exist.");
+        throw new IllegalArgumentException("The requested end-point does not exist.");
     }
 
     /**
@@ -131,8 +127,6 @@ public abstract class OBOController<T extends OBOTerm> {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
-
-        validationHelper.validatePageRequest(page);
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType(getOntologyType(),
                 new Page(page, MAX_PAGE_RESULTS)), HttpStatus.OK);
@@ -155,8 +149,8 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
-        return getResultsResponse(
-                ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds(ids)));
+        return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds
+                (ids)));
     }
 
     /**
@@ -296,7 +290,6 @@ public abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         validationHelper.validateRequestedResults(limit);
-        validationHelper.validatePageRequest(page);
 
         QueryRequest request = buildRequest(
                 query,
@@ -483,12 +476,13 @@ public abstract class OBOController<T extends OBOTerm> {
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(renderedImage, "png", os);
-        InputStream is = new ByteArrayInputStream(os.toByteArray());
+        InputStream is = new ByteArrayInputStream(Base64.getMimeEncoder().encode(os.toByteArray()));
 
         return ResponseEntity
                 .ok()
                 .contentLength(os.size())
                 .contentType(MediaType.IMAGE_PNG)
+                .header("Content-Encoding","base64")
                 .body(new InputStreamResource(is));
     }
 

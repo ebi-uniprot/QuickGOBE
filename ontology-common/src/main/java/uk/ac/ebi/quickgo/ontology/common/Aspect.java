@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common.document;
+package uk.ac.ebi.quickgo.ontology.common;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

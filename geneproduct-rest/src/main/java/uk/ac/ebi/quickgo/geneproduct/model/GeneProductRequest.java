@@ -27,8 +27,10 @@ public class GeneProductRequest {
     static final int MIN_ENTRIES_PER_PAGE = 0;
     static final int MAX_ENTRIES_PER_PAGE = 100;
 
-    private static final String[] TARGET_FIELDS = new String[]{GeneProductFields.Searchable.TYPE,
-            GeneProductFields.Searchable.TAXON_ID};
+    private static final String[] TARGET_FIELDS = new String[]{
+            GeneProductFields.Searchable.TYPE,
+            GeneProductFields.Searchable.TAXON_ID,
+            GeneProductFields.Searchable.DATABASE_SUBSET};
 
     @ApiModelProperty(value = "Indicates whether the result set should be highlighted")
     private boolean highlighting = false;
@@ -51,13 +53,18 @@ public class GeneProductRequest {
         The filter fields are only declared here, because there is a bug in springfox that doesn't read annotations on
         setters
      */
-    @ApiModelProperty(value = "Further filters the results of the main query based on values chosen from " +
+    @ApiModelProperty(value = "Filters the results of the main query based on values chosen from " +
             "the taxonomy identifier field", example = "9606")
     private String[] taxonId;
 
-    @ApiModelProperty(value = "Further filters the results of the main query based on a value chosen from " +
+    @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from " +
             "the type field", allowableValues = "protein,miRNA,complexes", example = "protein")
     private String type;
+
+    @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from " +
+            "the sbSubset field", allowableValues = "TrEMBL,Swiss-Prot", example = "TrEMBL")
+    private String dbSubset;
+
 
     private Map<String, String[]> filterMap = new HashMap<>();
 
@@ -126,9 +133,22 @@ public class GeneProductRequest {
                 filterMap.get(GeneProductFields.Searchable.TYPE)[0];
     }
 
-    public void setType(String filterByType) {
-        if (filterByType != null) {
-            filterMap.put(GeneProductFields.Searchable.TYPE, new String[]{filterByType});
+    public void setType(String type) {
+        if (type != null) {
+            filterMap.put(GeneProductFields.Searchable.TYPE, new String[]{type});
+        }
+    }
+
+    @Pattern(regexp = "trembl|swiss-prot", flags = CASE_INSENSITIVE,
+            message = "Provided dbSubset is invalid: ${validatedValue}")
+    public String getDbSubset() {
+        return filterMap.get(GeneProductFields.Searchable.DATABASE_SUBSET) == null ? null :
+                filterMap.get(GeneProductFields.Searchable.DATABASE_SUBSET)[0];
+    }
+
+    public void setDbSubset(String dbSubset) {
+        if (dbSubset != null) {
+            filterMap.put(GeneProductFields.Searchable.DATABASE_SUBSET, new String[]{dbSubset});
         }
     }
 

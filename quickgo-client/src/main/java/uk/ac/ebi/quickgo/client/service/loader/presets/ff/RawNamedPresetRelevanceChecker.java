@@ -21,13 +21,15 @@ public class RawNamedPresetRelevanceChecker implements ItemProcessor<RawNamedPre
     }
 
     @Override public RawNamedPreset process(RawNamedPreset rawNamedPreset) {
-        int relevancyPosition = presetsOrderedByRelevance.indexOf(rawNamedPreset.name);
-
-        if (relevancyPosition >= 0) {
-            rawNamedPreset.relevancy = relevancyPosition;
-            return rawNamedPreset;
-        } else {
-            return INSIGNIFICANT_PRESET;
+        int relevancyPosition = 0;
+        for (String preset : presetsOrderedByRelevance) {
+            if (preset.equalsIgnoreCase(rawNamedPreset.name)) {
+                rawNamedPreset.relevancy = relevancyPosition;
+                return rawNamedPreset;
+            }
+            relevancyPosition++;
         }
+
+        return INSIGNIFICANT_PRESET;
     }
 }

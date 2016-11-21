@@ -1,10 +1,25 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
+import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoTerm;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsAggregationWriter;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig;
+import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
+import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
+import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -28,21 +43,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.data.solr.core.SolrTemplate;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
-import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.index.annotation.coterms.CoTerm;
-import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsAggregationWriter;
-import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig;
-import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
-import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
-import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
-import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
-import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_ALL_SUMMARIZATION_STEP;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_MANUAL_SUMMARIZATION_STEP;
@@ -107,6 +107,7 @@ public class AnnotationConfig {
                 // commit the documents to the solr server
                 .listener(new JobExecutionListener() {
                     @Override public void beforeJob(JobExecution jobExecution) {}
+
                     @Override public void afterJob(JobExecution jobExecution) {
                         annotationTemplate.commit();
                     }
@@ -224,10 +225,21 @@ public class AnnotationConfig {
     }
 
     @Bean
+    ItemProcessor<AnnotationDocument, AnnotationDocument> annotationShardGenerator() {
+        return new AnnotationPartitionKeyGenerator(shardingKeyGenerator());
+    }
+
+    @Bean
+    Function<AnnotationDocument, String> shardingKeyGenerator() {
+        return (AnnotationDocument doc) -> doc.geneProductId;
+    }
+
+    @Bean
     ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor() {
-        List<ItemProcessor<Annotation, ?>> processors = new ArrayList<>();
+        List<ItemProcessor<?, ?>> processors = new ArrayList<>();
         processors.add(annotationValidator());
         processors.add(annotationDocConverter());
+        processors.add(annotationShardGenerator());
 
         CompositeItemProcessor<Annotation, AnnotationDocument> compositeProcessor = new CompositeItemProcessor<>();
         compositeProcessor.setDelegates(processors);

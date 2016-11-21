@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -25,8 +25,6 @@ public interface OntologyService<T extends OBOTerm> {
      * which fulfil the specification of the {@code pageable} instance.
      * @param page the requested page of results
      * @return the page of results
-     * @throws IllegalArgumentException if the query result model encounters an invalid state when its being
-     * constructed.
      */
     QueryResult<T> findAllByOntologyType(OntologyType type, Page page);
 

@@ -1,14 +1,12 @@
 package uk.ac.ebi.quickgo.client.service.search.ontology;
 
 import uk.ac.ebi.quickgo.client.QuickGOREST;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
 import org.apache.http.HttpStatus;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +15,18 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assume.assumeThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static uk.ac.ebi.quickgo.ontology.common.OntologyFields.Facetable;
 
 @SpringApplicationConfiguration(classes = {QuickGOREST.class})
 public class OntologySearchIT extends SearchControllerSetup {
-    @Autowired
-    private OntologyRepository repository;
-
     private static final String ONTOLOGY_RESOURCE_URL = "/internal/search/ontology";
 
-    private static final boolean FIXED_GOA_2406 = false;
+    private static final String ASPECT_PARAM = "aspect";
+    private static final String TYPE_PARAM = "ontologyType";
+
+    @Autowired
+    private OntologyRepository repository;
 
     @Before
     public void setUp() throws Exception {
@@ -141,7 +140,6 @@ public class OntologySearchIT extends SearchControllerSetup {
     // facets ---------------------------------------------------------
     @Test
     public void requestWithInValidFacetFieldReturns400Response() throws Exception {
-        assumeThat(FIXED_GOA_2406, Matchers.is(true));
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
@@ -159,7 +157,7 @@ public class OntologySearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("go", OntologyFields.Searchable.ASPECT);
+        checkValidFacetResponse("go", ASPECT_PARAM);
     }
 
     @Test
@@ -170,8 +168,7 @@ public class OntologySearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("go", OntologyFields.Searchable.ASPECT,
-                OntologyFields.Searchable.NAME);
+        checkValidFacetResponse("go", Facetable.ASPECT, Facetable.ONTOLOGY_TYPE);
     }
 
     // filter queries ---------------------------------------------------------
@@ -201,7 +198,7 @@ public class OntologySearchIT extends SearchControllerSetup {
         repository.save(doc2);
         repository.save(doc3);
 
-        Param filterParam = new Param(OntologyFields.Searchable.ASPECT, "biological_process");
+        Param filterParam = new Param(ASPECT_PARAM, "biological_process");
 
         checkValidFilterQueryResponse("go function", 2, filterParam);
     }
@@ -222,8 +219,8 @@ public class OntologySearchIT extends SearchControllerSetup {
         repository.save(doc2);
         repository.save(doc3);
 
-        Param fq1 = new Param(OntologyFields.Searchable.ASPECT, "biological_process");
-        Param fq2 = new Param(OntologyFields.Searchable.ONTOLOGY_TYPE, "eco");
+        Param fq1 = new Param(ASPECT_PARAM, "biological_process");
+        Param fq2 = new Param(TYPE_PARAM, "eco");
 
         checkValidFilterQueryResponse("go function", 0, fq1, fq2);
     }
@@ -241,7 +238,7 @@ public class OntologySearchIT extends SearchControllerSetup {
         repository.save(doc2);
         repository.save(doc3);
 
-        Param fq = new Param(OntologyFields.Searchable.ASPECT, "biological_process");
+        Param fq = new Param(ASPECT_PARAM, "biological_process");
 
         checkValidFilterQueryResponse("go function", 3, fq);
     }
@@ -259,7 +256,7 @@ public class OntologySearchIT extends SearchControllerSetup {
         repository.save(doc2);
         repository.save(doc3);
 
-        Param fq = new Param(OntologyFields.ASPECT, "biological_process");
+        Param fq = new Param(ASPECT_PARAM, "biological_process");
 
         checkValidFilterQueryResponse("go function", 2, fq)
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))

@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import uk.ac.ebi.quickgo.rest.QuickGoIndexOutOfBoundsException;
-
 import com.google.common.base.Preconditions;
 
 /**
@@ -15,20 +13,13 @@ public class PageInfo {
     public PageInfo(int totalPages, int currentPage, int resultsPerPage) {
         Preconditions.checkArgument(totalPages >= 0, "Total number of pages can not be negative: " + totalPages);
         Preconditions.checkArgument(currentPage >= 0, "Current page can not be negative: " + currentPage);
+        Preconditions.checkArgument(totalPages >= currentPage, "Current page can not be larger than total amount of " +
+                "pages: [current: " + currentPage + ", total: " + totalPages + "]");
         Preconditions.checkArgument(resultsPerPage >= 0, "Results per page can not be less than 0: " + resultsPerPage);
-
-        checkCurrentPageIsWithinLimits(currentPage, totalPages);
 
         this.totalPages = totalPages;
         this.currentPage = currentPage;
         this.resultsPerPage = resultsPerPage;
-    }
-
-    private void checkCurrentPageIsWithinLimits(int currentPage, int upperLimit) {
-        if(currentPage > upperLimit) {
-            throw new QuickGoIndexOutOfBoundsException("Current page can not be greater than total amount ofTAXON_ID_FILTER " +
-                    "pages: [current: " + currentPage + ", total: " + totalPages + "]");
-        }
     }
 
     /**
