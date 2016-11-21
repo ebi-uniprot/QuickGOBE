@@ -24,9 +24,8 @@ import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.*;
 class DBXRefEntityValidation implements ConstraintValidator<WithFromValidator, String[]> {
 
     private static Map<String, List<DBXRefEntity>> mappedEntities = new HashMap<>();
-    @Override public void initialize(WithFromValidator constraintAnnotation) {
 
-    }
+    @Override public void initialize(WithFromValidator constraintAnnotation) {}
 
     /**
      * If the entire list of values passed to isValid can be successfully validated, or not validated at all then
