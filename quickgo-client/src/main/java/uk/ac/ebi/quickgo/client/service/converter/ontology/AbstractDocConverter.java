@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.client.service.converter.ontology;
 
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.common.converter.FieldConverter;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import com.google.common.base.Preconditions;
 

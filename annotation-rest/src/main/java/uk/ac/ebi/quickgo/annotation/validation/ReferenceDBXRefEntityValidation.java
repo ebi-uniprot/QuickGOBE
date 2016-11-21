@@ -20,7 +20,6 @@ public class ReferenceDBXRefEntityValidation implements ConstraintValidator<Refe
     @Autowired
     DBXRefEntityValidation dbxRefEntityValidation;
 
-
     List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
 
     @Override public void initialize(ReferenceValidator constraintAnnotation) {}

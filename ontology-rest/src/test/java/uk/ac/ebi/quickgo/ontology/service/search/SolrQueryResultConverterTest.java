@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.service.search;
 
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;

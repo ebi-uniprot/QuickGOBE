@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common.document;
+package uk.ac.ebi.quickgo.ontology.common;
 
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 

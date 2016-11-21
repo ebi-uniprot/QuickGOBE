@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Strings;
@@ -27,7 +27,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*
  * Created 19/04/16
  * @author Edd
  */
-public class AnnotationDocumentConverter implements ItemProcessor<Annotation, AnnotationDocument> {
+class AnnotationDocumentConverter implements ItemProcessor<Annotation, AnnotationDocument> {
     static final int DEFAULT_TAXON = 0;
     private static final Logger LOGGER = getLogger(AnnotationDocumentConverter.class);
     private static final String ANNOTATION_DATE_FORMAT = "yyyyMMdd";

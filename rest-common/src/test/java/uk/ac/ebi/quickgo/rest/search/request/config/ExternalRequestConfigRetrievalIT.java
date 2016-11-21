@@ -86,6 +86,6 @@ public class ExternalRequestConfigRetrievalIT {
         map.put("localField", "goId");
         map.put("timeout", "4000");
 
-        return FilterUtil.createExecutionConfigWithProps("goIds,relations,usage", ExecutionType.REST_COMM, map);
+        return FilterUtil.createExecutionConfigWithProps("goIds,goUsage,relations", ExecutionType.REST_COMM, map);
     }
 }

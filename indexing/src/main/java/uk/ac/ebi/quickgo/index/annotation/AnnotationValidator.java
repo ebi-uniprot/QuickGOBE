@@ -21,7 +21,7 @@ import static uk.ac.ebi.quickgo.index.common.validation.ValidationHelper.handleF
  * Created 20/04/16
  * @author Edd
  */
-public class AnnotationValidator implements Validator<Annotation> {
+class AnnotationValidator implements Validator<Annotation> {
 
     private static final Logger LOGGER = getLogger(AnnotationValidator.class);
 

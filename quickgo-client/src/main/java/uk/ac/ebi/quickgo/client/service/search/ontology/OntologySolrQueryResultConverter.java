@@ -3,8 +3,8 @@ package uk.ac.ebi.quickgo.client.service.search.ontology;
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.ECODocConverter;
 import uk.ac.ebi.quickgo.client.service.converter.ontology.GODocConverter;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryResultHighlightingConverter;
 
 import com.google.common.base.Preconditions;

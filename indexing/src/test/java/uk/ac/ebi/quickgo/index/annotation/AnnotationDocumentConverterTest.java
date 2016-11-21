@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper;
 

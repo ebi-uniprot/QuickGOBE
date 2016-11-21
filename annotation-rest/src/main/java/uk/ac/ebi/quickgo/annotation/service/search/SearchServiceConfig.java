@@ -1,9 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
+import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
+import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
@@ -11,13 +13,13 @@ import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
-import uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.config.FieldNameTransformer;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
+import uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
 import java.util.Arrays;
@@ -158,6 +160,19 @@ public class SearchServiceConfig {
     @Bean
     public DbXRefEntityValidation geneProductValidator() {
         return DbXRefEntityValidation.createWithData(geneProductLoader().load());
+    }
+
+    @Bean
+    public SearchableField annotationSearchableField() {
+        return new SearchableField() {
+            @Override public boolean isSearchable(String field) {
+                return AnnotationFields.Searchable.isSearchable(field);
+            }
+
+            @Override public Stream<String> searchableFields() {
+                return AnnotationFields.Searchable.searchableFields().stream();
+            }
+        };
     }
 
     private DbXRefLoader geneProductLoader() {
