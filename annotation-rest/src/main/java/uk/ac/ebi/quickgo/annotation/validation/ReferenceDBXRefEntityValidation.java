@@ -10,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.db;
 
 /**
+ * Validate the reference values used to filter annotations.
+ * There is a limited list of databases that can be used as the database portion of the identifier, defined within
+ * this class.
+ *
  * @author Tony Wardell
  * Date: 10/11/2016
  * Time: 13:22
