@@ -42,9 +42,6 @@ public class CoTerm {
         this.probabilityRatio = probabilityRatio;
         this.similarityRatio = similarityRatio;
         this.gpCount = gpCount;
-
-        testForInvalidTermCreatedAndLogNoMoreThanASetAmountIfThisHappens(compared, together, probabilityRatio,
-                similarityRatio);
     }
 
     /**
@@ -57,9 +54,12 @@ public class CoTerm {
      * @param compared Count of proteins where compared term is annotated
      */
     static float calculateSimilarityRatio(float selected, long together, long compared) {
-        Preconditions
-                .checkArgument(selected != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
-                        " selected should not be zero");
+        Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
+                        " 'selected' should not be zero");
+        Preconditions.checkArgument(together != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
+                        " 'together' should not be zero");
+        Preconditions.checkArgument(compared != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
+                        " 'compared' should not be zero");
 
         return 100 * ((together) / (selected + compared - together));
     }
@@ -76,9 +76,13 @@ public class CoTerm {
      */
     static float calculateProbabilityRatio(float selected, long together, float all, long compared) {
 
-        Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilityRatio The value for selected" +
+        Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilityRatio The value for 'selected'" +
                 " should not be zero");
-        Preconditions.checkArgument(all != 0, "CoTerm::calculateProbabilityRatio The value for all" +
+        Preconditions.checkArgument(together != 0, "CoTerm::calculateProbabilityRatio The value for 'together'" +
+                " should not be zero");
+        Preconditions.checkArgument(all != 0, "CoTerm::calculateProbabilityRatio The value for 'all'" +
+                " should not be zero");
+        Preconditions.checkArgument(compared != 0, "CoTerm::calculateProbabilityRatio The value for 'compared'" +
                 " should not be zero");
         return (together / selected) / (compared / all);
     }
@@ -180,15 +184,6 @@ public class CoTerm {
                 ", probabilityRatio=" + probabilityRatio +
                 ", gpCount=" + gpCount +
                 '}';
-    }
-
-    private void testForInvalidTermCreatedAndLogNoMoreThanASetAmountIfThisHappens(long compared, long together,
-            float probabilityRatio, float similarityRatio) {
-        if (compared <= 0 || together <= 0 || probabilityRatio <= 0 || similarityRatio <= 0) {
-            if (logCount++ < 100) {
-                logger.info("The following Co Term tuple may be incorrect: {}", this.toString());
-            }
-        }
     }
 
     public static class Builder {
