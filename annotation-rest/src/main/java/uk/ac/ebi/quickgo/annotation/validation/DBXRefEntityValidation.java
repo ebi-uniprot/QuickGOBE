@@ -31,8 +31,7 @@ class DBXRefEntityValidation {
      */
 
     boolean isValid(String value) {
-        Preconditions.checkArgument(Objects.nonNull(value), "The value for id cannot be null");
-        return !value.contains(":") || isValidForDb(value);
+        return Objects.nonNull(value) && (!value.contains(":") || isValidForDb(value));
     }
 
     private boolean isValidForDb(String value) {
