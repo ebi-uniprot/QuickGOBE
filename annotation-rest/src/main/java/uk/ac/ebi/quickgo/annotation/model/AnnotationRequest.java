@@ -300,7 +300,7 @@ public class AnnotationRequest {
         filterMap.put(QUALIFIER, qualifier);
     }
 
-    @ArrayPattern(regexp = "^(?i:NOT \\| )?[A-Za-z_]+$", paramName = QUALIFIER)
+    @ArrayPattern(regexp = "^(NOT \\| )?[A-Z_]+$", flags = CASE_INSENSITIVE, paramName = QUALIFIER)
     public String[] getQualifier() {
         return filterMap.get(QUALIFIER);
     }
