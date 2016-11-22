@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.validation;
 
-import uk.ac.ebi.quickgo.common.validator.GeneProductIDValidator;
-
 import java.lang.annotation.*;
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -14,7 +12,7 @@ import javax.validation.Payload;
  * Created with IntelliJ IDEA.
  */
 
-@Constraint(validatedBy = DBXRefEntityValidation.class)
+@Constraint(validatedBy = WithFromValuesValidation.class)
 @Documented
 @Target({ElementType.METHOD,
         ElementType.FIELD,
