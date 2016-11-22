@@ -25,7 +25,6 @@ public class WithFromValuesValidationIT {
     @Autowired
     WithFromValuesValidation validator;
 
-
     @Test
     public void passesValidation() {
         String[] idList = {ID_SUCCEEDS};
@@ -60,5 +59,4 @@ public class WithFromValuesValidationIT {
     public void nullListPassesSuccessfully() {
         assertThat(validator.isValid(null, null), is(true));
     }
-
 }
