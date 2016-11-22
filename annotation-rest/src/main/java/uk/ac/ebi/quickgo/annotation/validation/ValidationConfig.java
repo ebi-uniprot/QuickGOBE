@@ -35,6 +35,9 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 
 /**
+ * The configuration required to validate restful requests against the annotation service, including load data
+ * required for validation.
+ *
  * @author Tony Wardell
  * Date: 07/11/2016
  * Time: 17:22
@@ -56,6 +59,7 @@ public class ValidationConfig {
 
     private int chunkSize = 30;
     private int skipLimit = 5;
+
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
 
@@ -63,7 +67,6 @@ public class ValidationConfig {
     private StepBuilderFactory stepBuilders;
 
     private static <T> FlatFileItemReader<T> validationReader(Resource resource, FlatFileItemReader<T> reader) {
-
         try {
             reader.setResource(new GZIPResource(resource));
         } catch (IOException e) {
