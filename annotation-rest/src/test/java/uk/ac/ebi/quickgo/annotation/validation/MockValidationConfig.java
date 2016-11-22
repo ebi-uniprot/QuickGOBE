@@ -17,17 +17,25 @@ import static org.mockito.Mockito.when;
 @Configuration
 public class MockValidationConfig {
 
-    public static final String DB_REF_VALIDATION_SUCCEEDS= "dbXrefValidationSucceeds";
+    public static final String ID_SUCCEEDS = "PMID:123456";
+    public static final String ID_FAILS = "xxx";
 
     @Bean
     public DBXRefEntityValidation dBXRefEntityValidation(){
         DBXRefEntityValidation dbxRefEntityValidation = mock(DBXRefEntityValidation.class);
-        when(dbxRefEntityValidation.isValid(any(String.class))).thenReturn(true);
+
+        when(dbxRefEntityValidation.isValid(ID_SUCCEEDS)).thenReturn(true);
+        when(dbxRefEntityValidation.isValid(ID_FAILS)).thenReturn(false);
         return dbxRefEntityValidation;
     }
 
     @Bean
-    public ReferenceValuesValidation validator(){
+    public ReferenceValuesValidation referenceValidator(){
         return new ReferenceValuesValidation();
+    }
+
+    @Bean
+    public WithFromValuesValidation withFromValidator(){
+        return new WithFromValuesValidation();
     }
 }
