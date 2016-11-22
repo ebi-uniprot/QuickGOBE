@@ -914,10 +914,10 @@
                      term. Again exact matches have higher boosting to make use these come first.
             -->
             <str name="qf">
-                id^10 edge_name^2 edge_synonym exact_name^5 exact_synonym^5
+                id_lowercase^10 name_edge^2 synonym_edge name_exact^5 synonym_exact^5
             </str>
             <str name="pf">
-                edge_name^2 edge_synonym exact_name^5 exact_synonym^5
+                name_edge^2 synonym_edge name_exact^5 synonym_exact^5
             </str>
             <int name="ps">0</int>
         </lst>

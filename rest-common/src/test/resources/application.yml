@@ -7,7 +7,7 @@ search:
       - signature: aspect
         execution: JOIN
         properties: {fromTable: ontology, fromAttribute: id, toTable: annotation, toAttribute: id}
-      - signature: goIds,relations,usage
+      - signature: goIds,relations,goUsage
         execution: REST_COMM
         properties: {ip: 123.456.789, resourceFormat: endpoint, localField: goId, timeout: 4000}
 model:

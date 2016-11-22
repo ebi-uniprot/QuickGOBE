@@ -1,13 +1,14 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImageResult;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
@@ -154,8 +155,38 @@ public abstract class OBOControllerIT {
     }
 
     @Test
+    public void canRetrieveOntologyViaLowerCasedSecondaryId() throws Exception {
+        ontologyRepository.deleteAll();
+
+        String primaryId = createId(1);
+        String secondaryId = createId(2);
+
+        OntologyDocument doc = createBasicDoc(primaryId, "name");
+        doc.secondaryIds = Collections.singletonList(secondaryId);
+
+        ontologyRepository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(buildTermsURL(secondaryId.toLowerCase())));
+
+        expectCoreFieldsInResults(response, singletonList(primaryId))
+                .andExpect(jsonPath("$.results.*.id", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void canRetrieveCoreAttrByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validId)));
+
+        expectCoreFieldsInResults(response, singletonList(validId))
+                .andExpect(jsonPath("$.results.*.id", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveCoreAttrByOneIdInLowercase() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId.toLowerCase())));
 
         expectCoreFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
@@ -692,15 +723,15 @@ public abstract class OBOControllerIT {
 
     @Test
     public void failedChartRequestProduces500() throws Exception {
-        String exceptionMessage = "exception message";
+        String exceptionDescription = "Error encountered during creation of ontology chart graphics.";
         when(graphImageService.createChart(anyListOf(String.class), anyString())).thenThrow(
-                new RenderingGraphException(exceptionMessage)
+                new RenderingGraphException("Problem rendering graphics")
         );
 
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE)));
 
-        expectChartCreationError(response.andExpect(status().is5xxServerError()), exceptionMessage);
+        expectChartCreationError(response.andExpect(status().is5xxServerError()), exceptionDescription);
     }
 
     @Test
@@ -713,9 +744,52 @@ public abstract class OBOControllerIT {
         expectInvalidIdError(response, invalidId());
     }
 
+    @Test
+    public void canLoadChartCoordsIfSourcesWereLoaded() throws Exception {
+        requestToChartServiceReturnsValidImage();
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURLWithSubResource(validId, CHART_COORDINATES_SUB_RESOURCE)));
+
+        response.andExpect(status().isOk());
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.imageWidth").exists())
+                .andExpect(jsonPath("$.imageHeight").exists())
+                .andExpect(jsonPath("$.title").exists())
+                .andExpect(jsonPath("$.nodePositions").exists())
+                .andExpect(jsonPath("$.legendPositions").exists());
+    }
+
+    @Test
+    public void failedChartCoordsRequestProduces500() throws Exception {
+        String exceptionDescription = "Error encountered during creation of ontology chart graphics.";
+        when(graphImageService.createChart(anyListOf(String.class), anyString())).thenThrow(
+                new RenderingGraphException("Problem rendering graphics")
+        );
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURLWithSubResource(validId, CHART_COORDINATES_SUB_RESOURCE)));
+
+        expectChartCreationError(response.andExpect(status().is5xxServerError()), exceptionDescription);
+    }
+
+    @Test
+    public void failedChartCoordsRequestDueToInvalidIdProduces400() throws Exception {
+        requestToChartServiceReturnsValidImage();
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURLWithSubResource(invalidId(), CHART_COORDINATES_SUB_RESOURCE)));
+
+        expectInvalidIdError(response, invalidId());
+    }
+
     private void requestToChartServiceReturnsValidImage() {
         GraphImageResult mockGraphImageResult = mock(GraphImageResult.class);
         when(mockGraphImageResult.getGraphImage()).thenReturn(new GraphImage("Mocked GraphImage"));
+        GraphImageLayout layout = new GraphImageLayout();
+        layout.title = "layout title";
+        when(mockGraphImageResult.getLayout()).thenReturn(layout);
         when(graphImageService.createChart(anyListOf(String.class), anyString()))
                 .thenReturn(mockGraphImageResult);
     }

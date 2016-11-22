@@ -99,7 +99,7 @@
          replication is in use, this should match the replication
          configuration.
       -->
-    <dataDir>${solr.data.dir}/${solr.core.name}/data</dataDir>
+    <!--<dataDir>${solr.data.dir}/${solr.core.name}/data</dataDir>-->
 
 
     <!-- The DirectoryFactory to use for indexes.
@@ -897,6 +897,7 @@
             <str name="wt">json</str>
             <str name="indent">true</str>
             <str name="df">text</str>
+            <str name="sort">score desc, geneProductId asc</str>
         </lst>
     </requestHandler>
 

@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -373,7 +374,7 @@ public class AnnotationRequestValidationIT {
     //GENE PRODUCT TYPE PARAMETER
     @Test
     public void validGeneProductTypeValuesDontCauseAnError() {
-        String[] gpTypes = {"complex", "rna", "protein"};
+        String[] gpTypes = {"complex", "miRNA", "protein"};
 
         annotationRequest.setGeneProductType(gpTypes);
 
@@ -382,7 +383,7 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void setGpTypeNotCaseSensitive() {
-        String[] gpTypes = {"comPlex", "rnA", "pRotein"};
+        String[] gpTypes = {"comPlex", "mirna", "pRotein"};
 
         annotationRequest.setGeneProductType(gpTypes);
 
@@ -504,35 +505,35 @@ public class AnnotationRequestValidationIT {
     //USAGE PARAMETERS
     @Test
     public void descendantsUsageIsValid() {
-        annotationRequest.setUsage("descendants");
+        annotationRequest.setGoUsage("descendants");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void slimUsageIsValid() {
-        annotationRequest.setUsage("slim");
+        annotationRequest.setGoUsage("slim");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void exactUsageIsInvalid() {
-        annotationRequest.setUsage("exact");
+        annotationRequest.setGoUsage("exact");
 
         assertThat(validator.validate(annotationRequest), hasSize(1));
     }
 
     @Test
     public void usageValueIsInvalid() {
-        annotationRequest.setUsage("thisDoesNotExistAsAValidUsage");
+        annotationRequest.setGoUsage("thisDoesNotExistAsAValidUsage");
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
     public void usageRelationshipIsValid() {
-        annotationRequest.setUsageRelationships("is_a");
+        annotationRequest.setGoUsageRelationships("is_a");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -541,7 +542,7 @@ public class AnnotationRequestValidationIT {
     public void usageRelationshipIsInvalid() {
         String invalidRel = "invalid_relationship";
 
-        annotationRequest.setUsageRelationships(invalidRel);
+        annotationRequest.setGoUsageRelationships(invalidRel);
 
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
@@ -552,7 +553,7 @@ public class AnnotationRequestValidationIT {
 
     @Test(expected = ParameterException.class)
     public void cannotCreateFilterWithUsageAndNoUsageIds() {
-        annotationRequest.setUsage("descendants");
+        annotationRequest.setGoUsage("descendants");
 
         annotationRequest.createFilterRequests();
     }

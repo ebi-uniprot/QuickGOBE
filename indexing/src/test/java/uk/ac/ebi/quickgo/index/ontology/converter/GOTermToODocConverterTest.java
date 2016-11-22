@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.index.ontology.converter;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTermBlacklist;
 import uk.ac.ebi.quickgo.model.ontology.go.TaxonConstraint;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import java.util.*;
 import org.junit.Before;

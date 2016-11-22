@@ -4,11 +4,11 @@ package uk.ac.ebi.quickgo.index.annotation;
  * An intermediate object used to store the data retrieved from a row in an annotation file.
  *
  * This object can be later transformed into a more fine grained domain object.
- * 
+ *
  * Created 19/04/16
  * @author Edd
  */
-public class Annotation {
+class Annotation {
     String db;
     String dbObjectId;
     String qualifier;
@@ -20,6 +20,7 @@ public class Annotation {
     String assignedBy;
     String annotationExtension;
     String annotationProperties;
+    String date;
 
     @Override public String toString() {
         return "Annotation{" +
@@ -34,6 +35,7 @@ public class Annotation {
                 ", assignedBy='" + assignedBy + '\'' +
                 ", annotationExtension='" + annotationExtension + '\'' +
                 ", annotationProperties='" + annotationProperties + '\'' +
+                ", date='" + date + '\'' +
                 '}';
     }
 
@@ -79,8 +81,11 @@ public class Annotation {
                 that.annotationExtension != null) {
             return false;
         }
-        return annotationProperties != null ? annotationProperties.equals(that.annotationProperties) :
-                that.annotationProperties == null;
+        if (annotationProperties != null ? !annotationProperties.equals(that.annotationProperties) :
+                that.annotationProperties != null) {
+            return false;
+        }
+        return date != null ? date.equals(that.date) : that.date == null;
 
     }
 
@@ -96,7 +101,7 @@ public class Annotation {
         result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
         result = 31 * result + (annotationExtension != null ? annotationExtension.hashCode() : 0);
         result = 31 * result + (annotationProperties != null ? annotationProperties.hashCode() : 0);
+        result = 31 * result + (date != null ? date.hashCode() : 0);
         return result;
     }
-
 }

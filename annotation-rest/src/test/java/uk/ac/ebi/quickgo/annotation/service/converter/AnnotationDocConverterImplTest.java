@@ -1,18 +1,33 @@
 package uk.ac.ebi.quickgo.annotation.service.converter;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem
+        .OCCURS_IN_CL_1;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem
+        .OCCURS_IN_CL_2;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeExtensionItem
+        .OCCURS_IN_CL_3;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_1;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_2;
+import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImplTest.FakeWithFromItem.GO_3;
 
 /**
  * Tests the implementation of the {@link AnnotationDocConverterImpl} class.
@@ -23,21 +38,25 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AnnotationDocConverterImplTest {
+    private static final String COMMA = ",";
     private static final String ID = "1";
     private static final String GENE_PRODUCT_ID = "P99999";
     private static final String QUALIFIER = "enables";
     private static final String GO_ID = "GO:0000977";
     private static final int TAXON_ID = 2;
     private static final String ECO_ID = "ECO:0000353";
-    private static final List<String> WITH_FROM = asList("GO:0036376", "GO:1990573");
+    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
+            singletonList(GO_1), asList(GO_2, GO_3));
     private static final String ASSIGNED_BY = "InterPro";
-    private static final List<String> EXTENSIONS = asList("occurs_in(CL:1000428)", "occurs_in(CL:1000429)");
+    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
+            singletonList(OCCURS_IN_CL_1),
+            asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
     private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
     private static final String SYMBOL = "moeA5";
     private static final String GO_ASPECT = "cellular_component";
-
+    private static final Date DATE = Date.from(
+            LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
     private static final AnnotationDocument DOCUMENT = createStubDocument();
-
     private AnnotationDocConverter docConverter;
 
     @Before
@@ -84,7 +103,7 @@ public class AnnotationDocConverterImplTest {
     @Test
     public void convertWithFromSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.withFrom, is(WITH_FROM));
+        assertThat(model.withFrom, is(connectedXrefs(WITH_FROM)));
     }
 
     @Test
@@ -99,8 +118,7 @@ public class AnnotationDocConverterImplTest {
     @Test
     public void convertExtensionSuccessfully() {
         Annotation model = docConverter.convert(DOCUMENT);
-        assertThat(model.extensions, is(EXTENSIONS));
-
+        assertThat(model.extensions, is(connectedXrefs(EXTENSIONS)));
     }
 
     @Test
@@ -145,6 +163,41 @@ public class AnnotationDocConverterImplTest {
         assertThat(model.targetSets, is(TARGET_SETS));
     }
 
+    @Test
+    public void convertsDateSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.date, is(DATE));
+    }
+
+    @Test
+    public void convertsNullDateSuccessfully() {
+        AnnotationDocument doc = new AnnotationDocument();
+        doc.date = null;
+
+        Annotation model = docConverter.convert(doc);
+        assertThat(model.date, is(nullValue()));
+    }
+
+
+    private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs<T>> connectedXrefs(
+            List<List<Supplier<T>>> items) {
+        return items.stream().map(itemList -> {
+                    Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
+                    itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
+                    return xrefs;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    private static <T extends Annotation.AbstractXref> List<String> stringsForConnectedXrefs(
+            List<List<Supplier<T>>> items) {
+        return items.stream()
+                .map(itemList ->
+                        itemList.stream()
+                                .map(Supplier::toString).collect(Collectors.joining(COMMA))
+                ).collect(Collectors.toList());
+    }
+
     private static AnnotationDocument createStubDocument() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.id = ID;
@@ -153,13 +206,60 @@ public class AnnotationDocConverterImplTest {
         doc.goId = GO_ID;
         doc.taxonId = TAXON_ID;
         doc.evidenceCode = ECO_ID;
-        doc.withFrom = WITH_FROM;
+        doc.withFrom = stringsForConnectedXrefs(WITH_FROM);
         doc.assignedBy = ASSIGNED_BY;
-        doc.extensions = EXTENSIONS;
+        doc.extensions = stringsForConnectedXrefs(EXTENSIONS);
         doc.targetSets = TARGET_SETS;
         doc.symbol = SYMBOL;
         doc.goAspect = GO_ASPECT;
+        doc.date = DATE;
 
         return doc;
+    }
+
+    enum FakeWithFromItem implements Supplier<Annotation.SimpleXRef> {
+        GO_1("GO", "0000001"),
+        GO_2("GO", "0000002"),
+        GO_3("GO", "0000003");
+
+        private final String db;
+        private final String id;
+
+        FakeWithFromItem(String db, String id) {
+            this.db = db;
+            this.id = id;
+        }
+
+        @Override public Annotation.SimpleXRef get() {
+            return new Annotation.SimpleXRef(db, id);
+        }
+
+        @Override public String toString() {
+            return db + ":" + id;
+        }
+    }
+
+    enum FakeExtensionItem implements Supplier<Annotation.QualifiedXref> {
+        OCCURS_IN_CL_1("occurs_in", "CL", "0000001"),
+        OCCURS_IN_CL_2("occurs_in", "CL", "0000002"),
+        OCCURS_IN_CL_3("occurs_in", "CL", "0000003");
+
+        private final String qualifier;
+        private final String db;
+        private final String id;
+
+        FakeExtensionItem(String qualifier, String db, String id) {
+            this.qualifier = qualifier;
+            this.db = db;
+            this.id = id;
+        }
+
+        @Override public Annotation.QualifiedXref get() {
+            return new Annotation.QualifiedXref(db, id, qualifier);
+        }
+
+        @Override public String toString() {
+            return qualifier + "(" + db + ":" + id + ")";
+        }
     }
 }

@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -26,7 +27,7 @@ import org.springframework.http.ResponseEntity;
 public final class SearchDispatcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchDispatcher.class);
 
-    private static final Pattern VALID_FILTER_QUERY_FORMAT = Pattern.compile("(\\w+):\\w+");
+    private static final Pattern VALID_FILTER_QUERY_FORMAT = Pattern.compile("(\\w+):(\\w|-)+");
 
     private SearchDispatcher() { }
 

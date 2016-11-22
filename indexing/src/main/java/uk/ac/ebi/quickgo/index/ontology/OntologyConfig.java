@@ -4,9 +4,9 @@ import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
 
 import java.io.File;
 import org.springframework.batch.core.Job;

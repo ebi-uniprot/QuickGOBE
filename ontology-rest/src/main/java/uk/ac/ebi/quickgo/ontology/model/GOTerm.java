@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.model;
 
 import uk.ac.ebi.quickgo.common.FieldType;
-import uk.ac.ebi.quickgo.ontology.common.document.Aspect;
+import uk.ac.ebi.quickgo.ontology.common.Aspect;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;

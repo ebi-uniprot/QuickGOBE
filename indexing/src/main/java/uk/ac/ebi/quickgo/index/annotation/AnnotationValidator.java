@@ -21,7 +21,7 @@ import static uk.ac.ebi.quickgo.index.common.validation.ValidationHelper.handleF
  * Created 20/04/16
  * @author Edd
  */
-public class AnnotationValidator implements Validator<Annotation> {
+class AnnotationValidator implements Validator<Annotation> {
 
     private static final Logger LOGGER = getLogger(AnnotationValidator.class);
 
@@ -38,12 +38,24 @@ public class AnnotationValidator implements Validator<Annotation> {
         checkIsNullOrEmpty(annotation.dbReferences, COLUMN_DB_REFERENCES.getName());
         checkIsNullOrEmpty(annotation.evidenceCode, COLUMN_EVIDENCE_CODE.getName());
         checkIsNullOrEmpty(annotation.assignedBy, COLUMN_ASSIGNED_BY.getName());
+        checkDate(annotation);
 
         // optional fields
         checkProperties(annotation);
         checkExtensions(annotation);
         checkWith(annotation);
         checkTaxon(annotation);
+    }
+
+    private void checkDate(Annotation annotation) {
+        if (!Strings.isNullOrEmpty(annotation.date) &&
+                !DATE_REGEX.matcher(annotation.date).matches()) {
+            handleFieldPatternMismatchError(
+                    "Date",
+                    annotation.date,
+                    DATE_REGEX.pattern(),
+                    annotation);
+        }
     }
 
     private void checkTaxon(Annotation annotation) {

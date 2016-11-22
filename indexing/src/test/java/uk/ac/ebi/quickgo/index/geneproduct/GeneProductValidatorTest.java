@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.geneproduct.common.document.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.index.ExceptionMatcher;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil;

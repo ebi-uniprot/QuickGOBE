@@ -1,9 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import uk.ac.ebi.quickgo.common.SearchableField;
+import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyType;
+import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
@@ -12,7 +14,10 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
-import uk.ac.ebi.quickgo.rest.search.*;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
+import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -24,10 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
@@ -67,11 +69,11 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String DESCENDANTS_SUB_RESOURCE = "descendants";
     static final String PATHS_SUB_RESOURCE = "paths";
     static final String CHART_SUB_RESOURCE = "chart";
+    static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
 
     static final int MAX_PAGE_RESULTS = 100;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
-
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
@@ -137,7 +139,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -158,7 +160,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -178,7 +180,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -198,7 +200,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -218,7 +220,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -238,7 +240,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -258,7 +260,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return
      * <ul>
      *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 404</li>
+     *     <li>any id is not found: response returns 200 with an empty result set.</li>
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
@@ -363,41 +365,40 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param ids the term ids whose image is required
      * @return the image corresponding to the requested term ids
      */
+    @ApiOperation(value = "Retrieves the PNG image corresponding to the specified ontology terms")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<InputStreamResource> getChart(@PathVariable(value = "ids") String ids) {
         try {
             return createChartResponseEntity(validationHelper.validateCSVIds(ids));
         } catch (IOException | RenderingGraphException e) {
-            throw new RetrievalException(e);
+            throw createChartGraphicsException(e);
         }
     }
 
     /**
-     * Delegates the creation of an graphical image, corresponding to the specified list
-     * of {@code ids} and returns the appropriate {@link ResponseEntity}.
+     * Retrieves the graphical image coordination information corresponding to ontology terms.
      *
-     * @param ids the terms whose corresponding graphical image is required
-     * @return the image corresponding to the specified terms
-     * @throws IOException if there is an error during creation of the image {@link InputStreamResource}
-     * @throws RenderingGraphException if there was an error during the rendering of the image
+     * @param ids the term ids whose image is required
+     * @return the coordinate information of the terms in the chart
      */
-    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids)
-            throws IOException, RenderingGraphException {
-        RenderedImage renderedImage =
-                graphImageService
-                        .createChart(ids, getOntologyType().name())
-                        .getGraphImage()
-                        .render();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(renderedImage, "png", os);
-        InputStream is = new ByteArrayInputStream(os.toByteArray());
+    @ApiOperation(value = "Retrieves coordinate information about terms within the PNG chart from the " +
+            CHART_SUB_RESOURCE + " sub-resource")
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_COORDINATES_SUB_RESOURCE,
+            method =
+            RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<GraphImageLayout> getChartCoordinates(@PathVariable(value = "ids") String ids) {
+        try {
+            GraphImageLayout layout = graphImageService
+                    .createChart(validationHelper.validateCSVIds(ids), getOntologyType().name()).getLayout();
 
-        return ResponseEntity
-                .ok()
-                .contentLength(os.size())
-                .contentType(MediaType.IMAGE_PNG)
-                .body(new InputStreamResource(is));
+            return ResponseEntity
+                    .ok()
+                    .body(layout);
+        } catch (RenderingGraphException e) {
+            throw createChartGraphicsException(e);
+        }
     }
 
     /**
@@ -449,6 +450,40 @@ public abstract class OBOController<T extends OBOTerm> {
 
         QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
+    }
+
+    private RetrievalException createChartGraphicsException(Throwable throwable) {
+        String errorMessage = "Error encountered during creation of ontology chart graphics.";
+        LOGGER.error(errorMessage, throwable);
+        return new RetrievalException(errorMessage);
+    }
+
+    /**
+     * Delegates the creation of an graphical image, corresponding to the specified list
+     * of {@code ids} and returns the appropriate {@link ResponseEntity}.
+     *
+     * @param ids the terms whose corresponding graphical image is required
+     * @return the image corresponding to the specified terms
+     * @throws IOException if there is an error during creation of the image {@link InputStreamResource}
+     * @throws RenderingGraphException if there was an error during the rendering of the image
+     */
+    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids)
+            throws IOException, RenderingGraphException {
+        RenderedImage renderedImage =
+                graphImageService
+                        .createChart(ids, getOntologyType().name())
+                        .getGraphImage()
+                        .render();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(renderedImage, "png", os);
+        InputStream is = new ByteArrayInputStream(Base64.getMimeEncoder().encode(os.toByteArray()));
+
+        return ResponseEntity
+                .ok()
+                .contentLength(os.size())
+                .contentType(MediaType.IMAGE_PNG)
+                .header("Content-Encoding","base64")
+                .body(new InputStreamResource(is));
     }
 
     private QueryRequest buildRequest(String query,
