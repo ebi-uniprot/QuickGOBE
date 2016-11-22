@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class CoTerm {
-    private static final Logger logger = LoggerFactory.getLogger(CoTerm.class);
-    private static int logCount = 0;
     private final String target;
     private final String comparedTerm;
     private final long together;
