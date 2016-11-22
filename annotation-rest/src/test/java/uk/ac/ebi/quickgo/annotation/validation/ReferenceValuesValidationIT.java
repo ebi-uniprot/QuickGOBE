@@ -43,8 +43,9 @@ public class ReferenceValuesValidationIT {
         assertThat(refValidator.isValid(new String[]{"XXXX:123456"}, null), is(false));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void validationFailsIfArgumentListContainsNull(){
-       refValidator.isValid(new String[]{null}, null);
+        assertThat(refValidator.isValid(new String[]{null}, null), is(false));
+
     }
 }

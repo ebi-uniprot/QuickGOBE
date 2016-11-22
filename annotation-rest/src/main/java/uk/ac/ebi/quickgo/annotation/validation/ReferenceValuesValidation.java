@@ -34,7 +34,9 @@ class ReferenceValuesValidation implements ConstraintValidator<ReferenceValidato
     }
 
     private boolean isValid(String value){
-        Preconditions.checkArgument(Objects.nonNull(value), "The value for id cannot be null");
+        if(Objects.isNull(value)){
+            return false;
+        }
 
         if (value.trim().isEmpty()) {
             return false;
