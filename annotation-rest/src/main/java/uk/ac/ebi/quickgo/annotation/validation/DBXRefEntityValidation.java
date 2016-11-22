@@ -2,11 +2,9 @@ package uk.ac.ebi.quickgo.annotation.validation;
 
 import uk.ac.ebi.quickgo.annotation.validation.model.DBXRefEntity;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.*;
 import java.util.*;
-import java.util.stream.Stream;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import java.util.Objects;
 import org.springframework.batch.item.ItemWriter;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -21,25 +19,19 @@ import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.*;
  * Time: 14:41
  * Created with IntelliJ IDEA.
  */
-class DBXRefEntityValidation implements ConstraintValidator<WithFromValidator, String[]> {
+class DBXRefEntityValidation {
 
     private static Map<String, List<DBXRefEntity>> mappedEntities = new HashMap<>();
-
-    @Override public void initialize(WithFromValidator constraintAnnotation) {}
 
     /**
      * If the entire list of values passed to this method can be successfully validated, or not validated at all then
      * isValid will return true.
-     * @param values list of potential database cross reference identifiers. Can be null.
-     * @param context of the isValid call.
+     * @param value a potential database cross reference identifier.
      * @return validation result as boolean.
      */
-    @Override public boolean isValid(String[] values, ConstraintValidatorContext context) {
-        return values == null || Stream.of(values)
-                .allMatch(this::valueIsValid);
-    }
 
-    private boolean valueIsValid(String value) {
+    boolean isValid(String value) {
+        Preconditions.checkArgument(Objects.nonNull(value), "The value for id cannot be null");
         return !value.contains(":") || isValidForDb(value);
     }
 
