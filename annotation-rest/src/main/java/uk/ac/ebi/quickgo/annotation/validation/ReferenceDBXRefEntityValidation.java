@@ -1,12 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.validation;
 
+import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import java.util.Objects;
 import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.db;
 
 /**
@@ -19,35 +16,26 @@ import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.db;
  * Time: 13:22
  * Created with IntelliJ IDEA.
  */
-class ReferenceDBXRefEntityValidation implements ConstraintValidator<ReferenceValidator, String[]> {
+class ReferenceDBXRefEntityValidation extends DBXRefEntityValidation {
 
-    @Autowired
-    DBXRefEntityValidation dbxRefEntityValidation;
+    private List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
 
-    List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
+    @Override
+    boolean isValid(String value) {
+        Preconditions.checkArgument(Objects.nonNull(value), "The value for id cannot be null");
 
-    @Override public void initialize(ReferenceValidator constraintAnnotation) {}
-
-
-    @Override public boolean isValid(String[] values, ConstraintValidatorContext context) {
-        return values == null ||
-                Stream.of(values).allMatch(this::validReference) && dbxRefEntityValidation.isValid(values, context);
-    }
-
-    private boolean validReference(String s) {
-
-        if(s == null){
+        if(value.trim().isEmpty()){
             return false;
         }
 
-        if(s.trim().isEmpty()){
-            return false;
-        }
-
-        if(!s.contains(":")){
+        if(!value.contains(":")){
             return true;
         }
 
-        return referenceDatabases.contains(db(s));
+        if (!referenceDatabases.contains(db(value))){
+            return false;
+        }
+
+        return super.isValid(value);
     }
 }
