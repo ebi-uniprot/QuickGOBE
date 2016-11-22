@@ -60,63 +60,46 @@ public class DBXRefEntityValidationTest {
     }
 
     @Test
-    public void idWithDatabaseIsValidatedSuccessfully() {
-        String[] idList = {"InterPro:IPR123456"};
-        assertThat(validation.isValid(idList, null), is(true));
+    public void idWithDatabasePassesVerification() {
+        assertThat(validation.isValid("InterPro:IPR123456"), is(true));
     }
 
     @Test
-    public void idWithoutDatabaseIsValidatedSuccessfully() {
-        String[] idList = {"xxx"};
-        assertThat(validation.isValid(idList, null), is(true));
+    public void idWithoutDatabasePassesVerification() {
+        assertThat(validation.isValid("xxx"), is(true));
     }
 
     @Test
-    public void idWithKnownDatabaseButNoIdPartIsNotVerified() {
-        String[] idList = {"InterPro:"};
-        assertThat(validation.isValid(idList, null), is(false));
+    public void idWithKnownDatabaseButNoIdPartFailsVerification() {
+        assertThat(validation.isValid("InterPro:"), is(false));
     }
 
     @Test
-    public void idWithUnknownDatabaseButNoIdPartIsNotVerified() {
-        String[] idList = {"Dell:"};
-        assertThat(validation.isValid(idList, null), is(false));
+    public void idWithUnknownDatabaseButNoIdPartFailsVerification() {
+        assertThat(validation.isValid("Dell:"), is(false));
     }
 
     @Test
-    public void idWithUnknownDatabaseAndIdPartIsNotVerified() {
-        String[] idList = {"Dell:12345"};
-        assertThat(validation.isValid(idList, null), is(false));
+    public void idWithUnknownDatabaseAndIdPartFailsVerification() {
+        assertThat(validation.isValid("Dell:12345"), is(false));
     }
 
     @Test
     public void idContainsOnlyColonIsNotVerified() {
-        String[] idList = {"Dell:12345"};
-        assertThat(validation.isValid(idList, null), is(false));
-    }
-
-    @Test
-    public void multipleIdsWithOneInvalidIsNotVerified() {
-        String[] idList = {"InterPro:IPR123456", "InterPro:YYY123456", "InterPro:IPR123456"};
-        assertThat(validation.isValid(idList, null), is(false));
+        assertThat(validation.isValid(":"), is(false));
     }
 
     @Test
     public void verificationUsingFlattenedDatabaseNamesIsSuccessful() {
-        String[] idList = {"InterPro:IPR123456", "InterPro:ZZZ123456", "InterPro:IPR123456"};
-        assertThat(validation.isValid(idList, null), is(true));
+        assertThat(validation.isValid("InterPro:IPR123456"), is(true));
+        assertThat(validation.isValid("InterPro:ZZZ123456"), is(true));
+        assertThat(validation.isValid("InterPro:IPR123456"), is(true));
     }
 
     @Test
-    public void verificationUsingMixtureOfDatabaseNamesIsSuccessful() {
-        String[] idList = {"InterPro:IPR123456", "UniRule:UR123456789", "InterPro:IPR123456"};
-        assertThat(validation.isValid(idList, null), is(true));
+    public void nullIdFailsVerification() {
+        assertThat(validation.isValid(null), is(false));
     }
-
-    @Test
-    public void nullListOfIdsToBeValidationThrowsException() {
-        assertThat(validation.isValid(null, null), is(true));
-}
 
     @Test
     public void nullListOfEntitiesWrittenToDBXRefEntityValidationCannotBeNull() {
@@ -126,6 +109,6 @@ public class DBXRefEntityValidationTest {
 
     @Test
     public void writeEntitiesIsSuccessfulEvenIfContainsNull() {
-        aggregator.write(Arrays.asList(new DBXRefEntity(), null, new DBXRefEntity()));
+        aggregator.write(Arrays.asList(new DBXRefEntity(), new DBXRefEntity()));
     }
 }
