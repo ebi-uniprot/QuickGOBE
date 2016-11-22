@@ -12,7 +12,7 @@ import javax.validation.Payload;
  * Created with IntelliJ IDEA.
  */
 
-@Constraint(validatedBy = ReferenceDBXRefEntityValidation.class)
+@Constraint(validatedBy = ReferenceValuesValidation.class)
 @Documented
 @Target({ElementType.METHOD,
         ElementType.FIELD,
@@ -22,7 +22,7 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ReferenceValidator {
 
-    String message() default "The with/from value is invalid";
+    String message() default "The reference value is invalid";
 
     Class<?>[] groups() default {};
 
