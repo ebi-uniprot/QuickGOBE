@@ -1,7 +1,8 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import com.google.common.base.Preconditions;
-import java.text.DecimalFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class that represents the intersection between two GO terms, which have been used to annotate the
@@ -12,32 +13,33 @@ import java.text.DecimalFormat;
  *
  */
 public class CoTerm {
-
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
     private final String target;
     private final String comparedTerm;
     private final long together;
     private final long compared;
     private final float similarityRatio;
     private final float probabilityRatio;
+    private final long gpCount;
 
     /**
      * Create a permutation for the compared term.
-     * @param target the id of the GO Term which is our compared 'from' GO Term
-     * @param comparedTerm the id of the GO Term which is our compared 'to' GO Term
-     * @param compared Count of proteins where compared term is annotated
-     * @param together Count of proteins where both target and compared terms are annotated
+     * @param target the id of the GO Term which is our compared 'from' GO Term.
+     * @param comparedTerm the id of the GO Term which is our compared 'to' GO Term.
+     * @param compared Count of proteins where compared term is annotated.
+     * @param together Count of proteins where both target and compared terms are annotated.
      * @param probabilityRatio Probability of term here estimated as fraction of proteins annotated to term.
-     * @param similarityRatio Ratio of probability of both terms to probability of either term
+     * @param similarityRatio Ratio of probability of both terms to probability of either term.
+     * @param gpCount the total number of unique gene products that have been annotated by the target term.
      */
     private CoTerm(String target, String comparedTerm, long compared, long together, float probabilityRatio,
-            float similarityRatio) {
+            float similarityRatio, long gpCount) {
         this.target = target;
         this.comparedTerm = comparedTerm;
         this.compared = compared;
         this.together = together;
         this.probabilityRatio = probabilityRatio;
         this.similarityRatio = similarityRatio;
+        this.gpCount = gpCount;
     }
 
     /**
@@ -50,16 +52,14 @@ public class CoTerm {
      * @param compared Count of proteins where compared term is annotated
      */
     static float calculateSimilarityRatio(float selected, long together, long compared) {
-        Preconditions
-                .checkArgument(selected != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
-                        " selected should not be zero");
+        Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
+                        " 'selected' should not be zero");
+        Preconditions.checkArgument(together != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
+                        " 'together' should not be zero");
+        Preconditions.checkArgument(compared != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
+                        " 'compared' should not be zero");
 
-        float similarityRatio = 100 * ((together) / (selected + compared - together));
-        float psRatio = Float.valueOf(DECIMAL_FORMAT.format(similarityRatio));// Round it with 2 decimals
-        if (Math.round(psRatio) == 100) {
-            return 100;
-        }
-        return psRatio;
+        return 100 * ((together) / (selected + compared - together));
     }
 
     /**
@@ -74,12 +74,15 @@ public class CoTerm {
      */
     static float calculateProbabilityRatio(float selected, long together, float all, long compared) {
 
-        Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilityRatio The value for selected" +
+        Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilityRatio The value for 'selected'" +
                 " should not be zero");
-        Preconditions.checkArgument(all != 0, "CoTerm::calculateProbabilityRatio The value for all" +
+        Preconditions.checkArgument(together != 0, "CoTerm::calculateProbabilityRatio The value for 'together'" +
                 " should not be zero");
-        float probabilityRatio = (together / selected) / (compared / all);
-        return Float.valueOf(DECIMAL_FORMAT.format(probabilityRatio));
+        Preconditions.checkArgument(all != 0, "CoTerm::calculateProbabilityRatio The value for 'all'" +
+                " should not be zero");
+        Preconditions.checkArgument(compared != 0, "CoTerm::calculateProbabilityRatio The value for 'compared'" +
+                " should not be zero");
+        return (together / selected) / (compared / all);
     }
 
     /**
@@ -130,6 +133,16 @@ public class CoTerm {
         return compared;
     }
 
+    @Override public int hashCode() {
+        int result = target != null ? target.hashCode() : 0;
+        result = 31 * result + (comparedTerm != null ? comparedTerm.hashCode() : 0);
+        result = 31 * result + (int) (together ^ (together >>> 32));
+        result = 31 * result + (int) (compared ^ (compared >>> 32));
+        result = 31 * result + (similarityRatio != +0.0f ? Float.floatToIntBits(similarityRatio) : 0);
+        result = 31 * result + (probabilityRatio != +0.0f ? Float.floatToIntBits(probabilityRatio) : 0);
+        return result;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -159,14 +172,16 @@ public class CoTerm {
 
     }
 
-    @Override public int hashCode() {
-        int result = target != null ? target.hashCode() : 0;
-        result = 31 * result + (comparedTerm != null ? comparedTerm.hashCode() : 0);
-        result = 31 * result + (int) (together ^ (together >>> 32));
-        result = 31 * result + (int) (compared ^ (compared >>> 32));
-        result = 31 * result + (similarityRatio != +0.0f ? Float.floatToIntBits(similarityRatio) : 0);
-        result = 31 * result + (probabilityRatio != +0.0f ? Float.floatToIntBits(probabilityRatio) : 0);
-        return result;
+    @Override public String toString() {
+        return "CoTerm{" +
+                "target='" + target + '\'' +
+                ", comparedTerm='" + comparedTerm + '\'' +
+                ", together=" + together +
+                ", compared=" + compared +
+                ", similarityRatio=" + similarityRatio +
+                ", probabilityRatio=" + probabilityRatio +
+                ", gpCount=" + gpCount +
+                '}';
     }
 
     public static class Builder {
@@ -176,6 +191,7 @@ public class CoTerm {
         private long together;
         private float probabilityRatio;
         private float similarityRatio;
+        private long gpCount;
 
         public Builder setTarget(String target) {
             Preconditions
@@ -193,43 +209,33 @@ public class CoTerm {
         }
 
         public Builder setCompared(long compared) {
-            Preconditions.checkArgument(compared > 0, "The parameter for 'setCompared' cannot be zero.");
             this.compared = compared;
             return this;
         }
 
         public Builder setTogether(long together) {
-            Preconditions.checkArgument(together > 0, "The parameter for 'setTogether' cannot be zero.");
             this.together = together;
             return this;
         }
 
         public Builder setProbabilityRatio(float probabilityRatio) {
-            Preconditions.checkArgument(probabilityRatio > 0, "ProbabilityRatio cannot be zero.");
             this.probabilityRatio = probabilityRatio;
             return this;
         }
 
         public Builder setSimilarityRatio(float similarityRatio) {
-            Preconditions.checkArgument(similarityRatio > 0, "SimilarityRatio cannot be zero.");
             this.similarityRatio = similarityRatio;
             return this;
         }
 
-        public CoTerm build() {
-            return new CoTerm(target, comparedTerm, compared, together, probabilityRatio, similarityRatio);
+        public Builder setGpCount(long gpCount) {
+            this.gpCount = gpCount;
+            return this;
         }
-    }
 
-    @Override public String toString() {
-        return "CoTerm{" +
-                "target='" + target + '\'' +
-                ", comparedTerm='" + comparedTerm + '\'' +
-                ", together=" + together +
-                ", compared=" + compared +
-                ", similarityRatio=" + similarityRatio +
-                ", probabilityRatio=" + probabilityRatio +
-                '}';
+        public CoTerm build() {
+            return new CoTerm(target, comparedTerm, compared, together, probabilityRatio, similarityRatio, gpCount);
+        }
     }
 }
 
