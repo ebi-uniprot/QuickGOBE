@@ -79,7 +79,8 @@ public class AnnotationRequest {
             Searchable.REFERENCE,
             Searchable.TAXON_ID,
             Searchable.TARGET_SET,
-            Searchable.WITH_FROM
+            Searchable.WITH_FROM,
+            Searchable.EXTENSION
     };
 
     /**
@@ -220,6 +221,18 @@ public class AnnotationRequest {
                     "separated values.",
             example = "EXP,IDA")
     private String goIdEvidence;
+
+    @ApiModelProperty(
+            value = "Relationships that can occur within an annotation extension. Accepts comma separated values",
+            example = "occurs_in, part_of, regulates_o_occurs_in")
+    private String[] extensionRelationships;
+
+    @ApiModelProperty(
+            value = "Databases that can occur within an annotation extension. Filtering can be done by " +
+                    "database type, a database id or database_type:database_id. Accepts comma separated " +
+                    "values",
+            example = "occurs_in, part_of, regulates_o_occurs_in")
+    private String[] extensionDatabases;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
@@ -463,6 +476,48 @@ public class AnnotationRequest {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    /**
+     * A list of extension relationship values, separated by commas
+     * In the format extension=occurrs_in(PomBase:SPBP23A10.14c),RGD:621207 etc
+     * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
+     * @param withFrom comma separated with/from values
+     */
+
+
+    /**
+     * A list of extension relationship values, separated by commas
+     * In the format extension=occurrs_in,part_of etc
+     * @param extensionRelationships comma separated extension relationships values
+     */
+    public void setExtensionRelationships(String... extensionRelationships) {
+        filterMap.put(Searchable.EXTENSION, extensionRelationships);
+    }
+
+    /**
+     * Return a list of annotation extension relationship values, separated by commas
+     * @return String containing comma separated list of extension relationship values.
+     */
+    public String[] getExtensionRelationships() {
+        return filterMap.get(Searchable.EXTENSION);
+    }
+
+    /**
+     * Return a list of annotation extension database values, separated by commas
+     * @return String containing comma separated list of extension database values.
+     */
+    public String[] getExtensionDatabases() {
+        return filterMap.get(Searchable.EXTENSION);
+    }
+
+    /**
+     * A list of extension database values, separated by commas
+     * In the format extension=UniProtKB:P01130 etc
+     * @param extensionDatabases comma separated extension relationships values
+     */
+    public void setExtensionDatabases(String... extensionDatabases) {
+        filterMap.put(Searchable.EXTENSION, extensionDatabases);
     }
 
     /**
