@@ -22,7 +22,7 @@ import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId
  */
 public class ReferenceValuesValidation implements ConstraintValidator<ReferenceValidator, String[]> {
 
-    public final ValidationEntityChecker validator;
+    private final ValidationEntityChecker validator;
 
     @Autowired
     public ReferenceValuesValidation(ValidationEntityChecker validator) {
