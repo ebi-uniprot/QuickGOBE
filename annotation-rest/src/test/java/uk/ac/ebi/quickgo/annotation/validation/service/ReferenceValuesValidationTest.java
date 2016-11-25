@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.validation.service;
 
+import uk.ac.ebi.quickgo.annotation.validation.model.ValidationProperties;
+
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
@@ -19,15 +23,17 @@ public class ReferenceValuesValidationTest {
 
     private static final String ID_SUCCEEDS = "PMID:123456";
     private static final String ID_FAILS = "PMID:ZZZZZZZZ";
-
+    private final List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
     private ReferenceValuesValidation refValidator;
 
     @Before
     public void setup() {
         ValidationEntityChecker validationEntityChecker = mock(ValidationEntityChecker.class);
-        refValidator = new ReferenceValuesValidation(validationEntityChecker);
+        ValidationProperties validationProperties = mock(ValidationProperties.class);
+        refValidator = new ReferenceValuesValidation(validationEntityChecker, validationProperties);
         when(validationEntityChecker.isValid(ID_SUCCEEDS)).thenReturn(true);
         when(validationEntityChecker.isValid(ID_FAILS)).thenReturn(false);
+        when(validationProperties.getReferenceDbs()).thenReturn(referenceDatabases);
     }
 
     @Test
