@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.validation;
+package uk.ac.ebi.quickgo.annotation.validation.service;
 
 import java.lang.annotation.*;
 import javax.validation.Constraint;
