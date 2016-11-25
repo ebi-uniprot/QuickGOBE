@@ -1,12 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.validation.service;
 
-import java.util.Arrays;
-import java.util.List;
+import uk.ac.ebi.quickgo.annotation.validation.model.ValidationProperties;
+
 import java.util.Objects;
 import java.util.stream.Stream;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.db;
 
@@ -20,16 +21,17 @@ import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId
  * Time: 13:22
  * Created with IntelliJ IDEA.
  */
+@EnableConfigurationProperties(ValidationProperties.class)
 public class ReferenceValuesValidation implements ConstraintValidator<ReferenceValidator, String[]> {
 
     private final ValidationEntityChecker validator;
+    private final ValidationProperties validationLoadProperties;
 
     @Autowired
-    public ReferenceValuesValidation(ValidationEntityChecker validator) {
+    public ReferenceValuesValidation(ValidationEntityChecker validator, ValidationProperties validationLoadProperties) {
         this.validator = validator;
+        this.validationLoadProperties = validationLoadProperties;
     }
-
-    private final List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
 
     @Override public void initialize(ReferenceValidator constraintAnnotation) {}
 
@@ -50,7 +52,7 @@ public class ReferenceValuesValidation implements ConstraintValidator<ReferenceV
             return true;
         }
 
-        if (!referenceDatabases.contains(db(value))) {
+        if (!validationLoadProperties.getReferenceDbs().contains(db(value))) {
             return false;
         }
 
