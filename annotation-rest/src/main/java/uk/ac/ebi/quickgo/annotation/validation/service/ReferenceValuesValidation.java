@@ -1,6 +1,5 @@
-package uk.ac.ebi.quickgo.annotation.validation;
+package uk.ac.ebi.quickgo.annotation.validation.service;
 
-import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +8,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.db;
+import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.db;
 
 /**
  * Validate the reference values used to filter annotations.
@@ -21,10 +20,15 @@ import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.db;
  * Time: 13:22
  * Created with IntelliJ IDEA.
  */
-class ReferenceValuesValidation implements ConstraintValidator<ReferenceValidator, String[]> {
+public class ReferenceValuesValidation implements ConstraintValidator<ReferenceValidator, String[]> {
+
+    public final ValidationEntityChecker validator;
 
     @Autowired
-    DBXRefEntityValidation validator;
+    public ReferenceValuesValidation(ValidationEntityChecker validator) {
+        this.validator = validator;
+    }
+
     private List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
 
     @Override public void initialize(ReferenceValidator constraintAnnotation) {}
