@@ -1,10 +1,10 @@
-package uk.ac.ebi.quickgo.annotation.validation;
+package uk.ac.ebi.quickgo.annotation.validation.service;
 
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.*;
+import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.*;
 
 /**
  * @author Tony Wardell
@@ -12,7 +12,7 @@ import static uk.ac.ebi.quickgo.annotation.validation.IdValidation.*;
  * Time: 14:36
  * Created with IntelliJ IDEA.
  */
-public class IdValidationTest {
+public class DbCrossReferenceIdTest {
 
     private static final String DB = "UniProt";
     private static final String ID = "12345";
