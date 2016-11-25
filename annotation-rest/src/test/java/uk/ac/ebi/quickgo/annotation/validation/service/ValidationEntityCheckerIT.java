@@ -31,7 +31,7 @@ import static uk.ac.ebi.quickgo.annotation.validation.loader.LoadingConfig.LOAD_
 public class ValidationEntityCheckerIT {
 
     @Autowired
-    ValidationEntityChecker validator;
+    private ValidationEntityChecker validator;
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
