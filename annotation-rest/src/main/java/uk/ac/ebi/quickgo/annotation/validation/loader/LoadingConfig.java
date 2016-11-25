@@ -103,8 +103,8 @@ public class LoadingConfig {
     }
 
     @Bean
-    ValidationEntityChecker validationEntityChecker() {
-        return new ValidationEntityChecker();
+    ValidationEntityChecker validationEntityChecker(ValidationEntities<ValidationEntity> validationEntities) {
+        return new ValidationEntityChecker(validationEntities);
     }
 
     @Bean
