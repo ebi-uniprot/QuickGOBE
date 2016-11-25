@@ -34,8 +34,7 @@ model:
       goId_join: goId,
       goAspect: aspect
     }
-
-## ================= Loading validation values =================
 annotation:
   validation:
-    source: classpath:/DB_XREFS_ENTITIES.dat.gz
+    validationFile: src/test/resources/DB_XREFS_ENTITIES.dat.gz
+    chunk: 30
