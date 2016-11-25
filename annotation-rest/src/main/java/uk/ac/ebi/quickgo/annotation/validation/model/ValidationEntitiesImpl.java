@@ -11,7 +11,7 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  */
 public class ValidationEntitiesImpl implements ValidationEntities<ValidationEntity> {
-    ValidationEntitiesAggregator aggregator;
+    private final ValidationEntitiesAggregator aggregator;
 
     public ValidationEntitiesImpl(ValidationEntitiesAggregator aggregator) {
         this.aggregator = aggregator;
