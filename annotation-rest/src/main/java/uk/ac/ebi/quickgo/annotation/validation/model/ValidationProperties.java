@@ -1,5 +1,6 @@
-package uk.ac.ebi.quickgo.annotation.validation.loader;
+package uk.ac.ebi.quickgo.annotation.validation.model;
 
+import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +14,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "annotation.validation")
-public class ValidationLoadProperties {
+public class ValidationProperties {
 
     private String chunk;
     private String validationFile;
+    private List<String> referenceDbs;
 
     public String getChunk() {
         return chunk;
@@ -32,5 +34,13 @@ public class ValidationLoadProperties {
 
     public void setValidationFile(String validationFile) {
         this.validationFile = validationFile;
+    }
+
+    public List<String> getReferenceDbs() {
+        return referenceDbs;
+    }
+
+    public void setReferenceDbs(List<String> referenceDbs) {
+        this.referenceDbs = referenceDbs;
     }
 }
