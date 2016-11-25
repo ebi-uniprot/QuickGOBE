@@ -1,27 +1,34 @@
-package uk.ac.ebi.quickgo.annotation.validation;
+package uk.ac.ebi.quickgo.annotation.validation.service;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.annotation.validation.MockValidationConfig.ID_SUCCEEDS;
 
 /**
+ * Tests for ReferenceValuesValidation.
+ *
  * @author Tony Wardell
  * Date: 22/11/2016
  * Time: 09:38
  * Created with IntelliJ IDEA.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = MockValidationConfig.class)
-public class ReferenceValuesValidationIT {
+public class ReferenceValuesValidationTest {
 
-    @Autowired
-    ReferenceValuesValidation refValidator;
+    private static final String ID_SUCCEEDS = "PMID:123456";
+    private static final String ID_FAILS = "PMID:ZZZZZZZZ";
+
+    private ReferenceValuesValidation refValidator;
+
+    @Before
+    public void setup() {
+        ValidationEntityChecker validationEntityChecker = mock(ValidationEntityChecker.class);
+        refValidator = new ReferenceValuesValidation(validationEntityChecker);
+        when(validationEntityChecker.isValid(ID_SUCCEEDS)).thenReturn(true);
+        when(validationEntityChecker.isValid(ID_FAILS)).thenReturn(false);
+    }
 
     @Test
     public void validationSucceedsIfKnownDb(){
