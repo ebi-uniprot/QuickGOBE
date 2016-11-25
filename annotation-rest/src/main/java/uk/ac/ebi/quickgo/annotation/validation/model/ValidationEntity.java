@@ -19,7 +19,7 @@ public interface ValidationEntity {
 
     /**
      * Request the String value used to identify this validation instance.
-     * @return
+     * @return identifying value.
      */
     String keyValue();
 }
