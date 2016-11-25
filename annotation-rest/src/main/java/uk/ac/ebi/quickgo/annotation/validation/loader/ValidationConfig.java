@@ -40,12 +40,12 @@ import org.springframework.core.io.Resource;
 @Configuration
 @EnableBatchProcessing
 @EnableConfigurationProperties(ValidationLoadProperties.class)
-public class LoadingConfig {
+public class ValidationConfig {
 
     public static final String LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME =
             "Load Annotation DB Xref Entities Validation Values";
     private static final String LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME = "validationLoadingJob";
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoadingConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidationConfig.class);
     private static final String TAB = "\t";
     private static final int HEADER_LINES = 1;
 

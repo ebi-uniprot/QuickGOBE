@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
-import uk.ac.ebi.quickgo.annotation.validation.loader.LoadingConfig;
+import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
 import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
@@ -30,13 +30,13 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.LoadingConfig.LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME;
+import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {AnnotationRequestConfig.class, LoadingConfig.class, JobTestRunnerConfig
+@SpringApplicationConfiguration(classes = {AnnotationRequestConfig.class, ValidationConfig.class, JobTestRunnerConfig
         .class}, initializers = ConfigFileApplicationContextInitializer.class)
 public class AnnotationRequestValidationIT {
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
