@@ -1,21 +1,27 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
-import uk.ac.ebi.quickgo.annotation.validation.ValidationConfig;
+import uk.ac.ebi.quickgo.annotation.validation.loader.LoadingConfig;
+import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -24,17 +30,22 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
+import static uk.ac.ebi.quickgo.annotation.validation.loader.LoadingConfig.LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AnnotationRequestConfig.class, ValidationConfig.class})
+@SpringApplicationConfiguration(classes = {AnnotationRequestConfig.class, LoadingConfig.class, JobTestRunnerConfig
+        .class}, initializers = ConfigFileApplicationContextInitializer.class)
 public class AnnotationRequestValidationIT {
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
 
     @Autowired
     private Validator validator;
+
+    @Autowired
+    private JobLauncherTestUtils jobLauncherTestUtils;
 
     private AnnotationRequest annotationRequest;
 
@@ -559,20 +570,62 @@ public class AnnotationRequestValidationIT {
         annotationRequest.createFilterRequests();
     }
 
+    //WITH/FROM PARAMETER
+    @Test
+    public void withFromIsValid() {
+        setupDbXrefValidationData();
+        String[] refs = new String[]{"PMID:123456"};
+        annotationRequest.setWithFrom(refs);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(0));
+    }
+
+    @Test
+    public void withFromIsInvalid() {
+        setupDbXrefValidationData();
+        String[] refs = new String[]{"PMID:ZZZZZZZZ"};
+        annotationRequest.setWithFrom(refs);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(1));
+    }
+
     //REFERENCE PARAMETER
     @Test
     public void exceedingMaximumNumberOfReferencesSendsError() {
+        setupDbXrefValidationData();
+
         int numRefs = AnnotationRequest.MAX_REFERENCES + 1;
 
-        String[] refs = generateValues(IdGeneratorUtil::createGoRef, numRefs);
+        //String[] refs = generateValues(IdGeneratorUtil::createGoRef, numRefs);
+        List<String> refs = new ArrayList<>();
 
-        annotationRequest.setReference(refs);
+        for(int i=0; i<numRefs; i++){
+            refs.add("PMID:123456");
+        }
 
+        annotationRequest.setReference(refs.toArray(new String[0]));
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createMaxSizeErrorMessage(REFERENCE_PARAM, MAX_REFERENCES)));
+    }
 
-        assertThat(violations, hasSize(2));
-//        assertThat(violations.iterator().next().getMessage(),
-//                is(createMaxSizeErrorMessage(REFERENCE_PARAM, MAX_REFERENCES)));
+    @Test
+    public void referenceIsValid(){
+        setupDbXrefValidationData();
+        String[] refs = new String[] {"PMID:123456"};
+        annotationRequest.setReference(refs);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(0));
+    }
+
+    @Test
+    public void referenceIsInvalid(){
+        setupDbXrefValidationData();
+        String[] refs = new String[] {"PMID:ZZZZZZZZ"};
+        annotationRequest.setReference(refs);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(1));
     }
 
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
@@ -582,5 +635,15 @@ public class AnnotationRequestValidationIT {
 
     private String createMaxSizeErrorMessage(String paramName, int maxSize) {
         return "Number of items in '" + paramName + "' is larger than: " + maxSize;
+    }
+
+    private static boolean HAS_RUN = false;
+    private void setupDbXrefValidationData(){
+        if(!HAS_RUN) {
+            JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME);
+            assertThat(jobExecution.getStatus(), Is.is(BatchStatus.COMPLETED));
+            HAS_RUN = true;
+        }
+
     }
 }
