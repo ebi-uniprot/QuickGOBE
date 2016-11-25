@@ -29,7 +29,7 @@ public class ReferenceValuesValidation implements ConstraintValidator<ReferenceV
         this.validator = validator;
     }
 
-    private List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
+    private final List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
 
     @Override public void initialize(ReferenceValidator constraintAnnotation) {}
 
