@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.validation.ReferenceValidator;
-import uk.ac.ebi.quickgo.annotation.validation.WithFromValidator;
+import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
+import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
