@@ -14,7 +14,7 @@ import org.springframework.batch.core.StepExecution;
  * Created 03/12/15
  * @author Edd
  */
-public class LogJobListener implements JobExecutionListener {
+class LogJobListener implements JobExecutionListener {
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(LogJobListener.class);
 

@@ -12,7 +12,7 @@ import org.springframework.batch.core.StepExecutionListener;
  * Created 02/12/15
  * @author Edd
  */
-public class LogStepListener implements StepExecutionListener {
+class LogStepListener implements StepExecutionListener {
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(LogStepListener.class);
 

@@ -9,7 +9,7 @@ import org.springframework.batch.core.SkipListener;
  *
  * @author Ricardo Antunes
  */
-public class SkipLoggerListener<T, S> implements SkipListener<T, S> {
+class SkipLoggerListener<T, S> implements SkipListener<T, S> {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override public void onSkipInWrite(S item, Throwable t) {
