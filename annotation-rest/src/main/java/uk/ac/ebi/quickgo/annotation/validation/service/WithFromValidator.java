@@ -1,11 +1,11 @@
-package uk.ac.ebi.quickgo.annotation.validation;
+package uk.ac.ebi.quickgo.annotation.validation.service;
 
 import java.lang.annotation.*;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
 /**
- * Annotation that allows a list of strings, separated by commas to be validated as Gene Product IDs
+ * Annotation that allows a list of strings, separated by commas to be validated With/From values.
  * @author Tony Wardell
  * Date: 14/06/2016
  * Time: 12:03
