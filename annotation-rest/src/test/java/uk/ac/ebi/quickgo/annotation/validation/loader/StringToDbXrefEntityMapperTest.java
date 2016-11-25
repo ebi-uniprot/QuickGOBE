@@ -31,11 +31,6 @@ public class StringToDbXrefEntityMapperTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    @Before
-    public void setup(){
-
-    }
-
     @Test
     public void mappingIsSuccessful() throws BindException {
         FieldSet validFieldSet = new DefaultFieldSet(VALID_ROW);
