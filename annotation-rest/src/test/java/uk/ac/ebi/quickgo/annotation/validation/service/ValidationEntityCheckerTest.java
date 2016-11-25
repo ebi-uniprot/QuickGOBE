@@ -34,7 +34,7 @@ public class ValidationEntityCheckerTest {
     public void setup() throws Exception {
         ValidationEntity validationEntity = mock(ValidationEntity.class);
         List<ValidationEntity> entities = Collections.singletonList(validationEntity);
-        ValidationEntities validationEntities = mock(ValidationEntities.class);
+        ValidationEntities<ValidationEntity> validationEntities = mock(ValidationEntities.class);
 
         checker = new ValidationEntityChecker(validationEntities);
         when(validationEntities.get("interpro")).thenReturn(entities);
