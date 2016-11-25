@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.validation.service;
 
-import uk.ac.ebi.quickgo.annotation.validation.loader.LoadingConfig;
+import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
 
 import org.hamcrest.core.Is;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.LoadingConfig.LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME;
+import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME;
 
 
 /**
@@ -26,7 +26,7 @@ import static uk.ac.ebi.quickgo.annotation.validation.loader.LoadingConfig.LOAD_
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {JobTestRunnerConfig.class, LoadingConfig.class},
+@ContextConfiguration(classes = {JobTestRunnerConfig.class, ValidationConfig.class},
         loader = SpringApplicationContextLoader.class)
 public class ValidationEntityCheckerIT {
 
