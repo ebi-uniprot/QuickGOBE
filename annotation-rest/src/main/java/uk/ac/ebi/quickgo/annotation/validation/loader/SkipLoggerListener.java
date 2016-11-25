@@ -10,7 +10,7 @@ import org.springframework.batch.core.SkipListener;
  * @author Ricardo Antunes
  */
 class SkipLoggerListener<T, S> implements SkipListener<T, S> {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override public void onSkipInWrite(S item, Throwable t) {
         logger.error("Error whilst writing: {}", item, t);
