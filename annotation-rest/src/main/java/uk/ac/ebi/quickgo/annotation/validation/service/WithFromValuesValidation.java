@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class WithFromValuesValidation implements ConstraintValidator<WithFromValidator, String[]> {
 
-    public final ValidationEntityChecker validator;
+    private final ValidationEntityChecker validator;
 
     @Autowired
     public WithFromValuesValidation(ValidationEntityChecker validator) {
