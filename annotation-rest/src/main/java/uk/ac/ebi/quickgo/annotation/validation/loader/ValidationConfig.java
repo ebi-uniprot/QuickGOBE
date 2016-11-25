@@ -39,7 +39,7 @@ import org.springframework.core.io.Resource;
  */
 @Configuration
 @EnableBatchProcessing
-@EnableConfigurationProperties(ValidationLoadProperties.class)
+@EnableConfigurationProperties(ValidationProperties.class)
 public class ValidationConfig {
 
     public static final String LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME =
@@ -50,7 +50,7 @@ public class ValidationConfig {
     private static final int HEADER_LINES = 1;
 
     @Autowired
-    private ValidationLoadProperties validationLoadProperties;
+    private ValidationProperties validationProperties;
 
     @Autowired
     private JobBuilderFactory jobBuilders;
@@ -68,10 +68,10 @@ public class ValidationConfig {
 
     @Bean
     Step validationEntitiesStep() {
-        System.out.println(validationLoadProperties.getChunk());
+        System.out.println(validationProperties.getChunk());
         return stepBuilders
                 .get(LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME)
-                .<DBXRefEntity, DBXRefEntity>chunk(Integer.parseInt(validationLoadProperties.getChunk()))
+                .<DBXRefEntity, DBXRefEntity>chunk(Integer.parseInt(validationProperties.getChunk()))
                 .reader(dbXrefReader())
                 .writer(validationEntitiesAggregator())
                 .listener(logStepListener())
@@ -129,10 +129,10 @@ public class ValidationConfig {
         reader.setLineMapper(dbXrefEntityLineMapper());
         reader.setLinesToSkip(HEADER_LINES);
         try {
-            reader.setResource(new GZIPResource(new FileSystemResource(validationLoadProperties.getValidationFile())));
+            reader.setResource(new GZIPResource(new FileSystemResource(validationProperties.getValidationFile())));
         } catch (IOException e) {
             LOGGER.error(
-                    "Failed to load " + validationLoadProperties.getValidationFile() + ". " +
+                    "Failed to load " + validationProperties.getValidationFile() + ". " +
                             "No corresponding information for this annotation validation will be available.", e);
         }
 
