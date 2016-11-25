@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.validation;
+package uk.ac.ebi.quickgo.annotation.validation.service;
 
 import java.util.stream.Stream;
 import javax.validation.ConstraintValidator;
@@ -6,6 +6,8 @@ import javax.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * Validate the with/from values used to filter annotations.
+ *
  * @author Tony Wardell
  * Date: 21/11/2016
  * Time: 16:37
@@ -13,8 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class WithFromValuesValidation implements ConstraintValidator<WithFromValidator, String[]> {
 
+    public final ValidationEntityChecker validator;
+
     @Autowired
-    DBXRefEntityValidation validator;
+    public WithFromValuesValidation(ValidationEntityChecker validator) {
+        this.validator = validator;
+    }
 
     @Override public void initialize(WithFromValidator constraintAnnotation) {}
 
