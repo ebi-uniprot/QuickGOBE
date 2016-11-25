@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.validation.loader;
 
 /**
+ * Specify the columns for Database Cross Reference file.
+ *
  * @author Tony Wardell
  * Date: 07/11/2016
  * Time: 18:16
@@ -18,7 +20,7 @@ public enum DBXrefEntityColumns {
     COLUMN_LOCAL_ID_SYNTAX(3),
     COLUMN_URL_SYNTAX(4);
 
-    private int position;
+    private final int position;
 
     DBXrefEntityColumns(int position) {
         this.position = position;
