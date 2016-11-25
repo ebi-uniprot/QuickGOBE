@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.validation;
+package uk.ac.ebi.quickgo.annotation.validation.service;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.test.JobLauncherTestUtils;
