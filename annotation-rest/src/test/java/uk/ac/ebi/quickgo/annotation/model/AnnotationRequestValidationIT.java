@@ -576,35 +576,38 @@ public class AnnotationRequestValidationIT {
 
     // QUALIFIER
     @Test
-    public void StringWithUnderscoreNoSpacesOrNumbersIsAnOKQualifier() {
+    public void qualifierWithUnderscoreNoSpacesOrNumbersIsValid() {
         annotationRequest.setQualifier("foobar","foo_bar");
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
+
     @Test
-    public void StringWithSpacesAndPipeIsAnOKQualifier() {
+    public void qualifierWithNoSpacesAroundPipeIsValid() {
+        annotationRequest.setQualifier("NOT|enables");
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void qualifierWithSpacesAroundPipeIsInvalid() {
         annotationRequest.setQualifier("NOT | enables");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        annotationRequest.setQualifier("NOT |enables");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        annotationRequest.setQualifier("NOT| enables");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void qualifierNotValueCaseInsensitiveIsValid() {
+        annotationRequest.setQualifier("Not|enable");
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+        annotationRequest.setQualifier("nOT|enable");
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void StringWithSpacesAndPipeIsAnOKQualifierIsCaseInsensitive() {
-        annotationRequest.setQualifier("Not | enableS");
-        assertThat(validator.validate(annotationRequest), hasSize(0));
-    }
-
-    @Test
-    public void StringWithSpacesAndNoPipeIsInvalid() {
+    public void qualifierWithNotAndNoPipeIsInvalid() {
         annotationRequest.setQualifier("not boo");
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
-    }
-
-    @Test
-    public void StringWithPipeButNoSpacesIsInvalid() {
-        annotationRequest.setQualifier("Not|enableS");
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
-        annotationRequest.setQualifier("Not| enableS");
-        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
-        annotationRequest.setQualifier("Not |enableS");
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
