@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common.document;
+package uk.ac.ebi.quickgo.ontology.common;
 
 /**
  * Enumeration defining the different types of ontology supported.

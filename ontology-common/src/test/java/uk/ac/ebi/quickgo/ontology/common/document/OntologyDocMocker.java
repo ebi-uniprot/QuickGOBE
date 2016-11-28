@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.common.document;
 
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 
 import java.util.ArrayList;
 import java.util.Arrays;

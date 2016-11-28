@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
 
-import uk.ac.ebi.quickgo.ontology.common.document.Aspect;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.Aspect;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 
 /**

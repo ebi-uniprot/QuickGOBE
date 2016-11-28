@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.client.model.ontology;
 
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyFields;
+import uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import javax.validation.constraints.*;
 
 import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
-import static uk.ac.ebi.quickgo.ontology.common.document.OntologyFields.ONTOLOGY_TYPE;
+import static uk.ac.ebi.quickgo.ontology.common.OntologyFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER;
 
 /**
@@ -32,22 +32,21 @@ public class OntologyRequest {
     static final int MIN_ENTRIES_PER_PAGE = 0;
     static final int MAX_ENTRIES_PER_PAGE = 100;
 
-    private static final String[] TARGET_FIELDS = new String[]{OntologyFields.ASPECT, ONTOLOGY_TYPE};
+    private static final String[] TARGET_FIELDS = new String[]{Searchable.ASPECT, Searchable.ONTOLOGY_TYPE};
 
     @ApiModelProperty(value = "Indicates whether the result set should be highlighted")
     private boolean highlighting = false;
 
     @ApiModelProperty(value = "Page number of the result set to display.",
-            allowableValues = "range[" + MIN_PAGE_NUMBER + ",  max_result_page_size]",
-            required = true)
+            allowableValues = "range[" + MIN_PAGE_NUMBER + ",  max_result_page_size]")
     private int page = DEFAULT_PAGE_NUMBER;
 
     @ApiModelProperty(value = "Number of results per page.",
-            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]",
-            required = true)
+            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @ApiModelProperty(value = "Fields to generate facets from", example = "aspect, type")
+    @ApiModelProperty(value = "Fields to generate facets from", allowableValues = "facet,aspect",
+            example = "aspect, type")
     private String[] facets;
 
     @ApiModelProperty(value = "The query used to filter the gene products", example = "kinase", required = true)
@@ -62,7 +61,7 @@ public class OntologyRequest {
     private String[] aspect;
 
     @ApiModelProperty(value = "Further filters the results of the main query based on a value chosen from " +
-            "the type field", example = "go")
+            "the type field", allowableValues = "GO,ECO", example = "GO")
     private String type;
 
     private Map<String, String[]> filterMap = new HashMap<>();
@@ -105,6 +104,7 @@ public class OntologyRequest {
         this.highlighting = useHighlighting;
     }
 
+    @AllowableFacets
     public String[] getFacet() {
         return facets;
     }
@@ -117,24 +117,25 @@ public class OntologyRequest {
             paramName = "aspect",
             flags = Flag.CASE_INSENSITIVE)
     public String[] getAspect() {
-        return filterMap.get(OntologyFields.ASPECT);
+        return filterMap.get(Searchable.ASPECT);
     }
 
     public void setAspect(String... filterByAspect) {
         if (filterByAspect != null) {
-            filterMap.put(OntologyFields.ASPECT, filterByAspect);
+            filterMap.put(Searchable.ASPECT, filterByAspect);
         }
     }
 
     @Pattern(regexp = "go|eco", flags = CASE_INSENSITIVE,
             message = "Provided ontology type is invalid: ${validatedValue}")
     public String getOntologyType() {
-        return filterMap.get(ONTOLOGY_TYPE) == null ? null : filterMap.get(ONTOLOGY_TYPE)[0];
+        return filterMap.get(Searchable.ONTOLOGY_TYPE) == null ? null :
+                filterMap.get(Searchable.ONTOLOGY_TYPE)[0];
     }
 
     public void setOntologyType(String filterByType) {
         if (filterByType != null) {
-            filterMap.put(ONTOLOGY_TYPE, new String[]{filterByType});
+            filterMap.put(Searchable.ONTOLOGY_TYPE, new String[]{filterByType});
         }
     }
 

@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import com.google.common.base.Preconditions;
 import java.util.*;
@@ -109,6 +109,7 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
                     .setTogether(getTogether(goTerm, comparedTerm))
                     .setProbabilityRatio(calculateProbabilityRatio(targetCount, together, comparedCount))
                     .setSimilarityRatio(calculateSimilarityRatio(targetCount, together))
+                    .setGpCount(targetCount)
                     .build());
         }
         return coTermsBuilder.build();

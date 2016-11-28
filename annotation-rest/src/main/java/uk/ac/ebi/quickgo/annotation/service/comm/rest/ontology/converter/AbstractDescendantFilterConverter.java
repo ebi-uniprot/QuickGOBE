@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
 import uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
@@ -13,6 +12,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 
+import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 
 /**
@@ -150,9 +150,9 @@ abstract class AbstractDescendantFilterConverter
     static QuickGOQuery createQueryForOntologyId(String id) {
         String field;
         if (OntologyIdPredicate.isValidGOTermId().test(id)) {
-            field = AnnotationFields.GO_ID;
+            field = Searchable.GO_ID;
         } else if (OntologyIdPredicate.isValidECOTermId().test(id)) {
-            field = AnnotationFields.EVIDENCE_CODE;
+            field = Searchable.EVIDENCE_CODE;
         } else {
             throw new RetrievalException(String.format(UNKNOWN_DESCENDANT_FORMAT, id));
         }

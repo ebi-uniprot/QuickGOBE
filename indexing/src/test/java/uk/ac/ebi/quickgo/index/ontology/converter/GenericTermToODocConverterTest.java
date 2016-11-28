@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.index.ontology.converter;
 
 import uk.ac.ebi.quickgo.model.ontology.generic.*;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import java.util.*;
 import java.util.function.Function;

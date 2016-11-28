@@ -1,6 +1,6 @@
-package uk.ac.ebi.quickgo.rest.search.query;
+package uk.ac.ebi.quickgo.rest.search.solr;
 
-import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
+import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import org.junit.Before;
 import org.junit.Test;
