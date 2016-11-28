@@ -363,7 +363,24 @@ public class AnnotationControllerIT {
 
     }
 
-    //todo test valid values for qualifier once a custom validator has been created
+    @Test
+    public void successfullyLookupAnnotationsByNegatedQualifier() throws Exception {
+        String qualifier = "not|enables";
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.qualifier = qualifier;
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM.getName(), qualifier));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valueOccursInField(QUALIFIER_FIELD, qualifier));
+
+    }
 
     @Test
     public void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
