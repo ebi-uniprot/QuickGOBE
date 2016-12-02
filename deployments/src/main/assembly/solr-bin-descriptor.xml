@@ -7,10 +7,19 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
 
+    <files>
+        <file>
+            <source>${project.basedir}/src/main/distros/solr/scripts-update</source>
+        </file>
+    </files>
+
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/src/main/distros/solr</directory>
             <outputDirectory>solr</outputDirectory>
+            <excludes>
+                <exclude>scripts-update</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
 </assembly>
