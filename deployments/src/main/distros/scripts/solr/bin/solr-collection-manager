@@ -1,0 +1,124 @@
+#! /bin/bash
+
+##=======================================================================================
+# Manages the Sol collections within a solr cloud instances.
+#
+# Allows you to create, remove collections
+##=======================================================================================
+
+set -eo pipefail
+IFS=$'\n\t '
+
+readonly valid_users=("uni_qgo")
+
+readonly action=$1
+readonly collection=$2
+readonly requested_profile=$3
+
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables"; then
+  prettyEcho "<error>Required common files were not found. Please make sure you're in the right directory.</error>";
+  exit 1
+fi
+
+# ======= read the variables used by the control scripts ================================
+if ! source "$solr_scripts_dir/common/solr.variables"; then
+    prettyEcho "<error>Please create a file called, solr.variables, containing the necessary environment variables to setup solr cloud.</error>"
+    exit 1
+fi
+
+# ========================= utility functions ===========================================
+
+function show_help {
+    cat<<EOF
+  Usage: $0 action collection profile
+
+  Argument description:
+    action       => The action to perform on the solr collection environment [create|delete]
+    collection   => The collection to execute the action on
+    profile      => Indicates the profile of the solr cloud to startup, possible values [dev|test|prod]
+
+  Example: $0 create ontlogy dev -- create an ontology collection in the solr cloud setup of the dev profile 
+
+  WARNING: Please be aware of who is using the cloud services before executing an action them.
+EOF
+}
+
+function create_collection() {
+   local loc_collection=$1
+   local loc_profile=$2
+   local loc_config=$3
+
+   if [ ! -z $loc_config ]; then
+      local loc_num_shards=$(extract_config_value $loc_config "num_shards")
+      local loc_repl_factor=$(extract_config_value $loc_config "repl_factor")
+      local loc_shards_per_node=$(extract_config_value $loc_config "shards_per_node")
+      local loc_vms_array=($(vmsForProfile $loc_profile))
+
+      if [ ${#loc_vms_array[@]} -gt 0 ]; then
+         local loc_vm=${loc_vms_array[0]}
+
+         prettyEcho "<info>Executing: ssh $USER@$loc_vm \"$solr_server_exec create -c $loc_collection -n $loc_collection -s $loc_num_shards -rf $loc_repl_factor\"</info>"
+
+         response=$(ssh $USER@$loc_vm "$solr_server_exec create -c $loc_collection -n $loc_collection -s $loc_num_shards -rf $loc_repl_factor" 2>&1)
+
+         if [[ "$response" == *"ERROR"* ]]; then
+            prettyEcho "<error>$response<error>"
+            exit 1
+         fi
+      else
+        prettyEcho "<error>No vms found for profile: $loc_profile.</error>"
+        exit 1
+      fi
+    else
+       prettyEcho "<error>Unable to find configuration from collection: $collection in profile: $requested_profile.</error>"
+       exit 1
+    fi
+}
+
+function delete_collection() {
+   local loc_collection=$1
+   local loc_profile=$2
+   local loc_vms_array=($(vmsForProfile $loc_profile))
+ 
+   if [ ${#loc_vms_array[@]} -gt 0 ]; then
+      local loc_vm=${loc_vms_array[0]}
+
+      prettyEcho "<info>Executing: ssh $USER@$loc_vm \"$solr_server_exec delete -c $loc_collection -deleteConfig false\".</error>"
+       
+      ssh $USER@$loc_vm "$solr_server_exec delete -c $loc_collection -deleteConfig false"
+   else
+      prettyEcho "<error>No vms found for profile: $loc_profile.</error>"
+      exit 1
+   fi
+}
+
+# ====== check that the script has the right number of arguments ========================
+if [ "$#" -ne 3 ]; then
+   show_help
+   exit 1
+fi
+
+# ====== check if the profile exists ========================================
+if ! isValidProfileId $requested_profile; then
+   prettyEcho "No servers matched profile: <error>$requested_profile</error>"
+   exit 1
+fi
+
+case $action in
+    create)
+       prettyEcho "<info>Creating collection.</info>"
+       config=$(get_configuration_for_collection $collection $requested_profile)
+
+       create_collection $collection $requested_profile $config
+       ;;
+    delete)
+       prettyEcho "<info>Deleting collection.</error>"
+       
+       delete_collection $collection $requested_profile
+       ;;
+    *)
+
+    prettyEcho "<error>Unrecognized action: $action.</error>"
+    exit 1
+esac
+
