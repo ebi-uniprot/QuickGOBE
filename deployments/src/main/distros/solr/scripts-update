@@ -17,7 +17,7 @@ fi
 
 # ======= CONSTANTS =======================================
 scripts_bin_content_dir="bin"
-scripts_bin="scripts-bin.tar.gz"
+scripts_bin="solr-bin.tar.gz"
 
 # ======= FUNCTIONS ======================================================================
 # ======= take a string and add a time-stamp to it =======================================
