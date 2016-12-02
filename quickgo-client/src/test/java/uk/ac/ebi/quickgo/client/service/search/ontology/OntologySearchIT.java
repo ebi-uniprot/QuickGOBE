@@ -6,6 +6,8 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +19,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyFields.Facetable;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
 
 @SpringApplicationConfiguration(classes = {QuickGOREST.class})
 public class OntologySearchIT extends SearchControllerSetup {
@@ -49,6 +52,17 @@ public class OntologySearchIT extends SearchControllerSetup {
         saveToRepository(doc1);
 
         checkInvalidPageInfoInResponse("aaaa", 0, 0, HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
+        int totalEntries = MAX_PAGE_NUMBER + 1;
+        int pageSize = 1;
+        int pageNumWhichIsTooHigh = totalEntries;
+
+        saveNDocs(totalEntries);
+
+        checkInvalidPageInfoInResponse("bbbb", pageNumWhichIsTooHigh, pageSize, HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
@@ -343,6 +357,12 @@ public class OntologySearchIT extends SearchControllerSetup {
         for (OntologyDocument doc : documents) {
             repository.save(doc);
         }
+    }
+
+    private void saveNDocs(int n) {
+        IntStream.range(1, n + 1)
+                .mapToObj(i -> createGODoc(String.valueOf(i), "name " + n))
+                .collect(Collectors.toList());
     }
 
     private OntologyDocument createGODoc(String id, String name) {

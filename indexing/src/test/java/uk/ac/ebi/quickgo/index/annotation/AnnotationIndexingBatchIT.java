@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,6 +56,11 @@ public class AnnotationIndexingBatchIT {
 
     @Autowired
     private AnnotationRepository annotationRepository;
+
+    @Before
+    public void setUp() {
+        annotationRepository.deleteAll();
+    }
 
     @Test
     public void successfulIndexingJob() throws Exception {

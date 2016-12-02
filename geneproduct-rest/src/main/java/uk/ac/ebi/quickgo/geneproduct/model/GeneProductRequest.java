@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import javax.validation.constraints.*;
 
 import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
 import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER;
 
 /**
@@ -69,6 +70,7 @@ public class GeneProductRequest {
     private Map<String, String[]> filterMap = new HashMap<>();
 
     @Min(value = MIN_PAGE_NUMBER, message = "Page number cannot be less than 1")
+    @Max(value = MAX_PAGE_NUMBER, message = "Page number cannot be greater than {value}, but found: ${validatedValue}")
     public int getPage() {
         return page;
     }

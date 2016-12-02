@@ -17,6 +17,7 @@ import javax.validation.constraints.Size;
 
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
 
 /**
@@ -456,7 +457,8 @@ public class AnnotationRequest {
         this.limit = limit;
     }
 
-    @Min(value = MIN_PAGE_NUMBER, message = "Page size cannot be less than {value} but found: ${validatedValue}")
+    @Min(value = MIN_PAGE_NUMBER, message = "Page number cannot be less than {value}, but found: ${validatedValue}")
+    @Max(value = MAX_PAGE_NUMBER, message = "Page number cannot be greater than {value}, but found: ${validatedValue}")
     public int getPage() {
         return page;
     }

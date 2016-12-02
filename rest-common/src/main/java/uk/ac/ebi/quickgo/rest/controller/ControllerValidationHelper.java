@@ -24,5 +24,12 @@ public interface ControllerValidationHelper {
      */
     void validateRequestedResults(int requestedResultsSize);
 
+    /**
+     * Checks whether the requested page number is valid. The purpose
+     * @param requestedPageNumber the page number being requested
+     * @throws IllegalArgumentException if the number is greater than the maximum permissible number paginatable pages.
+     */
+    void validatePageIsLessThanPaginationLimit(int requestedPageNumber);
+
     List<String> csvToList(String csv);
 }

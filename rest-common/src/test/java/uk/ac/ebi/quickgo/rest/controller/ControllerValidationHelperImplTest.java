@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,12 +26,12 @@ public class ControllerValidationHelperImplTest {
                 id -> id.matches(ID_FORMAT));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ParameterException.class)
     public void invalidIdAtStartProducesIllegalArgumentException() {
         controllerValidator.validateCSVIds("wrongFormat");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ParameterException.class)
     public void invalidIdAfterStartProducesIllegalArgumentException() {
         controllerValidator.validateCSVIds("id1,wrongFormat");
     }
@@ -61,7 +63,7 @@ public class ControllerValidationHelperImplTest {
     }
 
     // result validation
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ParameterException.class)
     public void tooManyResultsIsInvalid() {
         controllerValidator.validateRequestedResults(MAX_RESULTS + 1);
     }
@@ -78,7 +80,7 @@ public class ControllerValidationHelperImplTest {
         controllerValidator.validateRequestedResults(1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ParameterException.class)
     public void tooManyResultsIsInvalidForDefaultValidator() {
         defaultControllerValidator.validateRequestedResults(ControllerValidationHelperImpl.MAX_PAGE_RESULTS + 1);
     }

@@ -73,7 +73,9 @@ public abstract class SearchControllerSetup {
         clientRequest.param(PAGE_PARAM, String.valueOf(pageNum));
         clientRequest.param(LIMIT_PARAM, String.valueOf(limit));
 
-        ResultActions result = mockMvc.perform(clientRequest)
+        ResultActions result = mockMvc
+                .perform(clientRequest)
+                .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().is(errorStatus));
 
         checkErrorMessage(result);
@@ -90,7 +92,7 @@ public abstract class SearchControllerSetup {
      */
     protected void checkValidPageInfoInResponse(String query,
             int pageNum,
-            int limit ) throws Exception {
+            int limit) throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         clientRequest.param(PAGE_PARAM, String.valueOf(pageNum));
@@ -175,7 +177,8 @@ public abstract class SearchControllerSetup {
         checkErrorMessage(result);
     }
 
-    protected ResultActions checkValidFilterQueryResponse(String query, int expectedResponseSize, Param... filterQueries)
+    protected ResultActions checkValidFilterQueryResponse(String query, int expectedResponseSize,
+            Param... filterQueries)
             throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
@@ -217,7 +220,7 @@ public abstract class SearchControllerSetup {
     }
 
     private void addFiltersToRequest(MockHttpServletRequestBuilder clientRequest, Param... filters) {
-        if(filters != null) {
+        if (filters != null) {
             Stream.of(filters)
                     .forEach(fq -> clientRequest.param(fq.key, fq.value));
 

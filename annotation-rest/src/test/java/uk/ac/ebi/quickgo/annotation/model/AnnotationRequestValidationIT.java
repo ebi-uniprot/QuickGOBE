@@ -435,7 +435,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("Page size cannot be less than " + MIN_PAGE_NUMBER + " but found: " + invalidPage));
+                is("Page number cannot be less than " + MIN_PAGE_NUMBER + ", but found: " + invalidPage));
     }
 
     @Test

@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.Collections;
@@ -34,6 +33,8 @@ import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_ENTRIES_PER_PAGE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_RESULTS;
 
 /**
  * RESTful end point for Annotations
@@ -688,15 +689,50 @@ public class AnnotationControllerIT {
 
     @Test
     public void pageRequestHigherThanAvailablePagesReturns400() throws Exception {
-
         repository.deleteAll();
 
         int existingPages = 4;
-        createGenericDocs(SearchServiceConfig.MAX_PAGE_RESULTS * existingPages);
+        int resultsPerPage = 10;
+        repository.save(createGenericDocs(resultsPerPage * existingPages));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
+                        .param(LIMIT_PARAM.getName(), String.valueOf(resultsPerPage))
                         .param(PAGE_PARAM.getName(), String.valueOf(existingPages + 1)));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void requestingMoreResultsPerPageThanPermittedReturns400() throws Exception {
+        repository.deleteAll();
+
+        int docsNecessaryToForcePagination = MAX_PAGE_RESULTS + 1;
+        repository.save(createGenericDocs(docsNecessaryToForcePagination));
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(LIMIT_PARAM.getName(), String.valueOf(MAX_PAGE_RESULTS + 1))
+                        .param(PAGE_PARAM.getName(), String.valueOf(1)));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
+        int totalEntries = MAX_PAGE_NUMBER + 1;
+        int pageSize = 1;
+        int pageNumWhichIsTooHigh = totalEntries;
+
+        repository.deleteAll();
+        repository.save(createGenericDocs(totalEntries));
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(LIMIT_PARAM.getName(), String.valueOf(pageSize))
+                        .param(PAGE_PARAM.getName(), String.valueOf(pageNumWhichIsTooHigh)));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
@@ -834,7 +870,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS));
+                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE,
+                        NUMBER_OF_GENERIC_DOCS));
     }
 
     @Test
@@ -872,7 +909,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(
+                        itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
                 .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docA.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docB.reference, 1));
     }
@@ -896,7 +934,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(
+                        itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
                 .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docA.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docB.reference, 1));
     }
@@ -934,7 +973,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1))
-                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(
+                        itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
                 .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docA.reference, 1));
     }
 
@@ -955,7 +995,8 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 2))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 2))
-                .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
+                .andExpect(
+                        itemExistsExpectedTimes(REFERENCE_FIELD, AnnotationDocMocker.REFERENCE, NUMBER_OF_GENERIC_DOCS))
                 .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docA.reference, 1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, docB.reference, 1));
     }
