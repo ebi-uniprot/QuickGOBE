@@ -1,26 +1,25 @@
+source "$QUICKGO_SCRIPTS_DIR/vm-profile.variables"
+
 # ---------------------------- CHECK USER PERMISSIONS ----------------------------
-function user_can_execute_script {
+function user_can_execute_script() {
    local name_to_check="$1"
-   local allowed_users="$2[@]"
+   local allowed_users="$2"
 
    local user_is_allowed=1
 
-   for user in "${!allowed_users}"; do
-      if [ "$user" = "$name_to_check" ]; then
-         user_is_allowed=0
-         break
-      fi
-   done
+   if array_contains $allowed_users $name_to_check; then
+      user_is_allowed=0;
+   fi
 
    return $user_is_allowed
 }
 
-# ---------------------------- CHECK VALUE IN ARRAY ----------------------------
+# --------------------------- UTILITY FUNCTIONS -----------------------------------
 array_contains () {
     local array="$1[@]"
-    local seeking=$2
+    local seeking="$2"
     local in=1
-    
+
     for element in "${!array}"; do
         if [[ $element == $seeking ]]; then
             in=0
@@ -31,34 +30,7 @@ array_contains () {
     return $in
 }
 
-# ---------------------------- PRINT ARRAY CONTENTS ----------------------------
-function join_by() {
-   local IFS="$1"; 
-   shift; 
-   echo "$*"; 
-}
-
-function print_valid_profiles () {
-    local array="$1[@]"
-    echo $(join_by , "${!array}")
-}
-
-# ---------------------------- CHECK VALUE AGAINST PROFILE ----------------------------
-function check_profile() {
-    local value="$1"
-    local is_profile=0;
-
-    if [ -z "$value" ]; then
-      is_profile=1;
-    elif ! array_contains VALID_PROFILES $value; then
-      is_profile=1;
-    fi
-    
-    return $is_profile;
-}
-
-# ------------------------- GET PROFILE DATA -----------------------------
-# Retrieves profiles for a core, e.g., profiles
+# -------------------------- PROFILE FUNCTIONS -----------------------------------
 function profiles() {
     local __PROFILES=()
     for vmInfo in "${PROFILE_VM_MAP[@]}" ; do
@@ -70,6 +42,23 @@ function profiles() {
     echo "$PROFILES"
 }
 
+
+# Retrieves profiles for a core, e.g., profiles
+function check_profile() {
+    local value="$1"
+    local profile_array=($(profiles));
+    local is_profile=0;
+
+    if [ -z "$value" ]; then
+      is_profile=1;
+    elif ! array_contains profile_array $value; then
+      is_profile=1;
+    fi
+
+    return $is_profile;
+}
+
+# ------------------------- GET PROFILE DATA -----------------------------
 # Retrieves VMS for a profile, e.g., vmsForProfile "dev"
 # Stores result in array, PROFILE_VMS
 function vmsForProfile() {
@@ -130,64 +119,16 @@ function isValidProfileId {
     return 1
 }
 
-## ------------------------- SERVER LIVENESS CHECKING -------------------------
-function serverIsUp {
-    return $(curl --output /dev/null --silent --head --fail "http://$1");
-}
-function printServerStatus {
-    local addr="";
-    local tabCount="";
-
-    if [ $# -eq 2 ]; then
-        tabCount="$1"
-        addr="$2"
-    else
-        tabCount="0"
-        addr="$1"
-    fi
-
-    addr="$(buildSolrAddress $addr)";
-
-    local server_message="";
-    if serverIsUp "$addr"; then
-        server_message="<success>UP</success>";
-    else
-        server_message="<error>DOWN</error>";
-    fi
-
-    prettyEcho "$tabCount" "Server @ $addr is $server_message";
+# ---------------------------- PRINT CONTENTS ----------------------------
+function join_by() {
+   local IFS="$1";
+   shift;
+   echo "$*";
 }
 
-function printServerStatusForProfile {
-    local requestedProfile="$1"
-
-    somethingWasPrinted=1
-    for profile in $(profiles); do
-        if [ "$profile" = "$requestedProfile" ]; then
-            for vm in $(vmsForProfile "$profile"); do
-                printServerStatus "$vm"
-                somethingWasPrinted=0
-            done
-        fi
-    done
-
-    return $somethingWasPrinted
-}
-
-function allServersUpForProfile {
-    local requestedProfile="$1"
-
-    for profile in $(profiles); do
-        if [ "$profile" = "$requestedProfile" ]; then
-            for vm in $(vmsForProfile "$profile"); do
-                if ! serverIsUp "$vm"; then
-                    return 1;
-                fi
-            done
-        fi
-    done
-
-    return 0;
+function print_valid_profiles () {
+   local array="$profiles"
+   echo $(join_by , "${!array}")
 }
 
 ## ---------------------------- GENERAL UTILITY FUNCTIONS ----------------------------
@@ -198,6 +139,7 @@ function allServersUpForProfile {
 function prettyEcho {
     local prefix="$1";
     local string="$2";
+
     if [ $# -eq 1 ]; then
         prefix="0"
         string="$1"
@@ -208,21 +150,12 @@ function prettyEcho {
     string=$(echo $string | perl -pe 's@<error>(.*?)<\/error>@\$(tput setaf 1)\$(tput bold)\1\$(tput sgr 0)@g');
     string=$(echo $string | perl -pe 's@<success>(.*?)<\/success>@\$(tput setaf 2)\$(tput bold)\1\$(tput sgr 0)@g');
     string=$(echo $string | perl -pe 's@<bold>(.*?)<\/bold>@\$(tput bold)\1\$(tput sgr 0)@g');
+
     for i in $(seq 1 $prefix); do
         echo -n "   "
     done
-    eval "echo "$string"";
-}
 
-
-function printSolrServerStatus {
-    server_status="$(solrServerStatus)"
-    local server_message="<error>$server_status</error>";
-    if [ "$server_status" == "UP" ]; then
-            server_message="<success>$server_status</success>";
-    fi
-
-    prettyEcho "Solr @ $solr_addr is $server_message";
+    echo "$string";
 }
 
 function printReleaseBaseDirContents {

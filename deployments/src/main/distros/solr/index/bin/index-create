@@ -1,74 +1,72 @@
 #!/bin/bash
 
 #fail on error
-set -e
+set -eo pipefail
 
-VALID_USERS=("uni_qgo" "eddturner");
+readonly valid_users=("uni_qgo")
 
-# ------------------------ SOURCE NECESSARY FILES ------------------------
-if ! source "../common/common" || ! source "../common/common.variables" || ! source "index.variables" || ! source "../common/lsf.command.variables"; then
-    echo "Required properties files were not found. Please make sure you're in the right directory";
+## ------------------------ SOURCE NECESSARY FILES ------------------------
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" || ! source "index.variables" || ! source "../common/lsf.command.variables"; then
+    prettyEcho "<error>Required properties files were not found. Please make sure you're in the right directory</error>";
     exit 1;
 fi
+
+readonly solr_collection_script="$admin_scripts_dir/bin/solr-collection-manager"
+readonly collection=$core_name
 
 ## ---------------------------- UTILITY FUNCTIONS ----------------------------
 function showHelp {
     cat<<EOF
-Usage: $0 profile vm [submit]
+Usage: $0 profile [submit]
 
 Argument description:
   profile    =>    the profile for which we want to create a new Solr index
-  vm         =>    the VM to whom the indexing job is to be sent
   submit     =>    submits the indexing job to the load sharing facility
 
-  Example: $0 dev ves-hx-c7
+  Example: $0 dev
 EOF
 }
 
 # ------------------------ VALIDATE PARAMETERS ------------------------
-if [ $# -eq 0 -o $# -gt 3 ]; then
+if [ $# -eq 0 -o $# -gt 2 ]; then
     showHelp;
     exit 1;
 fi
-requestedProfile="$1"
-requestedVM="$2"
-action="$3"
 
-# ------------------------ check profile/vm specified is correct ------------------------
-if ! isValidProfileId "$requestedProfile" "$requestedVM"; then
-    prettyEcho "<error>Invalid profile/vm name specified: $requestedProfile/$requestedVM.
+readonly requested_profile="$1"
+readonly action="$2"
+
+# ------------------------ check profile specified is correct ------------------------
+if ! isValidProfileId "$requested_profile"; then
+    prettyEcho "<error>Invalid profile name specified: $requested_profile.
                     Please check your index.variables and vm-profiles.properties file.</error>";
     exit 1;
 fi
 
 # ------------------------ abort if we're building in a staging environment ------------------------
-if [ "$requestedProfile" == "stage" ] ; then
+if [ "$requested_profile" == "stage" ] ; then
     prettyEcho "QuickGO <bold>build related tasks</bold> should not take place in a <bold>STAGING</bold> environment";
     exit 1;
 fi
 
 # ------------------------ compute the java indexing job string ------------------------
-QUICKGO_SERVICE_JAR=${QUICKGO_SERVICE_JAR/PROFILE_PLACEHOLDER/$requestedProfile}
-QUICKGO_SERVICE_JAR=${QUICKGO_SERVICE_JAR/VM_PLACEHOLDER/$requestedVM}
+quickgo_service_jar=${quickgo_service_jar/PROFILE_PLACEHOLDER/$requested_profile}
 javaJob="bsub $(lsfJavaJobOptions)";
 
 # ------------------------ start off the indexing via LSF ------------------------
 if [ "$action" = "submit" ]; then
-
     # ensure indexing job variable is defined
     if [ ! -z "$javaJob" ]; then
-        # check the Solr server status
-        if serverIsUp $(buildSolrAddress "$requestedVM"); then
-            echo "executing command:"
-            echo "$javaJob";
-
-            eval "$javaJob";
+        if ! $solr_collection_script "create" $collection $requested_profile; then
+           prettyEcho "<error>Error creating collection $?</error>"
         else
-            echo "Solr server is currently down. Please start server before restarting index-create";
-            exit 1;
+           prettyEcho "<info>executing command:</info>"
+           prettyEcho "<info>$javaJob</info>";
+
+           eval "$javaJob";
         fi
     else
-          echo "\$javaJob variable must be set";
+          prettyEcho "<error>\$javaJob variable must be set</error>";
           exit 1;
     fi
 else

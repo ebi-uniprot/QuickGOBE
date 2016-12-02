@@ -5,5 +5,5 @@
 ##      <profile-name>|<virtual-machine>[,<virtual-machine]*
 
 PROFILE_VM_MAP=( \
-  "dev|ves-hx-c7,ves-hx-c8" \
+  "dev|ves-hx-c7" \
   "test|ves-hx-t2" )

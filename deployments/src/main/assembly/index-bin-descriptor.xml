@@ -9,17 +9,14 @@
 
     <files>
         <file>
-            <source>${project.basedir}/src/main/distros/index/bin/bin-dir-update</source>
+            <source>${project.basedir}/src/main/distros/scripts/scripts-update</source>
         </file>
     </files>
 
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}/src/main/distros/index/bin</directory>
-            <outputDirectory>bin</outputDirectory>
-            <excludes>
-                <exclude>bin-dir-update</exclude>
-            </excludes>
+            <directory>${project.basedir}/src/main/distros/scripts</directory>
+            <outputDirectory>scripts</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>

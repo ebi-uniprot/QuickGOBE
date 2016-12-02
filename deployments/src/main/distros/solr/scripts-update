@@ -6,25 +6,18 @@
 # that run the applications change.
 ##=========================================================================================
 
-set -euo pipefail
+set -eo pipefail
 
-VALID_USERS=("uni_qgo" "eddturner");
-if ! source "./bin/common/common" ]; then
-    echo "Required properties files were not found. Please make sure you're in the right directory";
-    exit 1;
-fi
-if [ ! user_can_execute_script "$(whoami)" "$VALID_USERS" ]; then
-    echo "You $(whoami) are not permitted to run this script. You must be one of: $VALID_USERS";
+valid_users=("uni_qgo");
+
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables"; then
+    prettyEcho "<error>Required properties files were not found. Please make sure you're in the right directory.</error>";
     exit 1;
 fi
 
 # ======= CONSTANTS =======================================
-REPO_DIR="$(pwd -P)/repos"
-INDEX_BIN_CONTENT_DIR="bin"
-INDEX_BIN="index-bin.tar.gz"
-PERMITTED_USER="uni_qgo"
-#BRANCH="master"
-BRANCH="GOA-2385_indexing-scripts-to-handle-diff-envs"
+scripts_bin_content_dir="bin"
+scripts_bin="scripts-bin.tar.gz"
 
 # ======= FUNCTIONS ======================================================================
 # ======= take a string and add a time-stamp to it =======================================
@@ -43,47 +36,47 @@ function addTimeStamp() {
 dirs -c
 pushd . > /dev/null
 
-cd "$REPO_DIR/QuickGOBE"
+cd "$quickgo_repo_dir"
 git fetch
-git checkout "$BRANCH"
+git checkout "$quickgo_branch"
 git pull
 cd "deployments"
 mvn -U -DskipTests -P assemble-index-bin-archive package
-eval "mv" "target/$INDEX_BIN" "$(dirs +1)"
+eval "mv" "target/$scripts_bin" "$(dirs +1)"
 
 eval "cd" "$(dirs +1)"
 
-# backup $INDEX_BIN_CONTENT_DIR, before replacing it
-if [ -d "$INDEX_BIN_CONTENT_DIR" ]; then
-        archives=".$INDEX_BIN_CONTENT_DIR-archives";
+# backup $scripts_bin_content_dir, before replacing it
+if [ -d "$scripts_bin_content_dir" ]; then
+        archives=".$scripts_bin_content_dir-archives";
         if [ ! -d "$archives" ]; then
-                mkdir "$archives";
+          mkdir "$archives";
         fi
 
-        backup="$archives/$(addTimeStamp $INDEX_BIN_CONTENT_DIR).old";
-        echo "Archiving old bin directory '$INDEX_BIN_CONTENT_DIR' to '$backup'"
-        mv $INDEX_BIN_CONTENT_DIR $backup
+        backup="$archives/$(addTimeStamp $scripts_bin_content_dir).old";
+        prettyEcho "<info>Archiving old bin directory '$scripts_bin_content_dir' to '$backup'</info>"
+        mv $scripts_bin_content_dir $backup
 
-        # replace $INDEX_BIN_CONTENT_DIR
-        echo "extracting contents of $INDEX_BIN to $(readlink -f .)"
-        tar xzf $INDEX_BIN
+        # replace $scripts_bin_content_dir
+        prettyEcho "<info>Extracting contents of $scripts_bin to $(readlink -f .)</info>"
+        tar xzf $scripts_bin
 
         # remove the archive after it's been decompressed
-        rm $INDEX_BIN
+        rm $scripts_bin
 
         cd "$archives";
         if [ "$(basename $(pwd))" == "$archives" ]; then # double check we're actually in the backup directory, before deleting anything!
-                echo "Deleting oldest archives, but keeping newest 5";
+                prettyEcho "<info>Deleting oldest archives, but keeping newest 5</info>";
                 (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf
         fi
 else
-    # replace $INDEX_BIN_CONTENT_DIR
+    # replace $scripts_bin_content_dir
     eval "cd" "$(dirs +1)"
-    echo "extracting contents of $INDEX_BIN to $(readlink -f .)"
-    tar xzf $INDEX_BIN
+    prettyEcho "<info>Extracting contents of $scripts_bin to $(readlink -f .)</info>"
+    tar xzf $scripts_bin
 
     # remove the archive after it's been decompressed
-    rm $INDEX_BIN
+    rm $scripts_bin
 fi
 
 # ======= jump back to saved directory =======================================

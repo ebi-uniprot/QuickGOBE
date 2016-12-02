@@ -1,0 +1,82 @@
+#! /bin/bash
+
+#fail on error
+set -eo pipefail
+
+valid_users=("uni_qgo");
+
+## ------------------------ SOURCE NECESSARY FILES ---------------------------
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" ; then
+    prettyEcho "<error>Required properties files were not found. Please make sure you're in the right directory.</error>";
+    exit 1;
+fi
+
+## ---------------------------- UTILITY FUNCTIONS ----------------------------
+function showHelp {
+    cat<<EOF
+Usage: $0 config_release_dir profile
+
+Argument description:
+  config_release_dir    =>   Directory where files necesary for the release to be saved
+  profile               =>   The profile to run the release on 
+
+  Example: $0 /release/v1/ dev
+
+  NOTE: this script is usually used by prepare-index-create to prepare solr for indexing a collection. Considering using that 
+  script, instead of this one.
+EOF
+}
+
+## ------------------------ VALIDATE PARAMETERS ------------------------
+if [ $# -ne 2 ]; then
+    showHelp
+    exit 1;
+else
+   readonly conf_release_dir=$1;
+   readonly request_profile=$2;
+fi
+
+readonly quickgo_lib_path="$request_profile/lib/quickgo"
+
+## ------------------------ MANIPULATE RELEASE DIR ------------------------
+if [ ! -d "$conf_release_dir" ]; then
+    prettyEcho "<error>Release directory does not exist: $conf_release_dir</error>";
+    exit 1;
+else
+    readonly target_lib_dir="${conf_release_dir}/lib/quickgo"
+    mkdir -p "$target_lib_dir"
+fi
+
+pushd . > /dev/null
+cd "$quickgo_repo_dir"
+
+## ----------------------- FETCH INDEXING JAR -----------------------------
+git fetch
+git checkout "$quickgo_branch"
+git pull
+mvn -U -DskipTests -P indexing,solr-plugins package
+
+## ---------------------- COPY QUICKGO JAR -------------------------------
+mv ./indexing/target/*.jar "$target_lib_dir"
+prettyEcho "<success>Copied QuickGO indexing libraries into ${target_lib_dir}</success>"
+
+## --------------------- FETCH SOLR PLUGIN JARS --------------------------
+mv ./solr-plugin/target/*.jar "$target_lib_dir"
+prettyEcho "<success>Copied QuickGO Solr plugins into ${target_lib_dir}</success>"
+
+popd > /dev/null
+
+## -------------------- UPDATE SYMLINK TO LATEST VERSION OF INDEXING JAR -
+readonly symlink_name="${solr_config_dir}/${quickgo_lib_path}"
+
+if [ ! -d "$(dirname $symlink_name)" ]; then
+    mkdir -p "$(dirname $symlink_name)";
+fi
+
+ln -snf "$target_lib_dir" "${solr_config_dir}/${quickgo_lib_path}"
+
+prettyEcho "<success>Symlink</success> ${target_lib_dir} has been <success>updated</success> with new library definitions"
+echo
+
+ls -l "${solr_config_dir}/${quickgo_lib_path}" | sed -e 's/^/    /g';
+echo
