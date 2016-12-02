@@ -15,7 +15,7 @@ if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_D
     prettyEcho "<error>Required common files were not found. Please make sure you're in the right directory.</error>";
 fi
 
-if ! source "$solr_scripts_dir/common/zookeeper.variables" ; then
+if ! source "$admin_scripts_dir/common/zookeeper.variables" ; then
     prettyEcho "<error>Please create a file called, zookeeper.variables, containing the necessary environment variables.</error>"
     exit 1
 fi

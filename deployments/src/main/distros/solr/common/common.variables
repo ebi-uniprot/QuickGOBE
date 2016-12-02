@@ -27,7 +27,7 @@ rsync="/usr/bin/rsync"
 
 
 # ---------------------------- INDEX SCRIPTS BASE DIRECTORY  ----------------------------
-solr_scripts_dir="$QUICKGO_SCRIPTS_DIR/solr"
+admin_scripts_dir="$QUICKGO_SCRIPTS_DIR/admin"
 index_scripts_dir="$QUICKGO_SCRIPTS_DIR/index"
 
 # ---------------------------- GIT INFO ----------------------------------

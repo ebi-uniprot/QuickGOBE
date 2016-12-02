@@ -21,7 +21,7 @@ if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_D
 fi
 
 # ======= read the variables used by the control scripts ================================
-if ! source "$solr_scripts_dir/common/solr.variables"; then
+if ! source "$admin_scripts_dir/common/solr.variables"; then
     prettyEcho "<error>Please create a file called, solr.variables, containing the necessary environment variables to setup solr cloud.</error>"
     exit 1
 fi

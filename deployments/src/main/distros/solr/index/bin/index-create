@@ -11,7 +11,7 @@ if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_D
     exit 1;
 fi
 
-readonly solr_collection_script="$solr_scripts_dir/bin/solr-collection-manager"
+readonly solr_collection_script="$admin_scripts_dir/bin/solr-collection-manager"
 readonly collection=$core_name
 
 ## ---------------------------- UTILITY FUNCTIONS ----------------------------

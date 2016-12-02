@@ -13,7 +13,7 @@ then
     exit 1;
 fi
 
-readonly solr_scripts_bin="$solr_scripts_dir/bin"
+readonly admin_scripts_bin="$admin_scripts_dir/bin"
 
 ## ---------------------------- UTILITY FUNCTIONS ----------------------------
 function show_help {
@@ -50,12 +50,12 @@ git pull
 popd > /dev/null
 
 ## ---------------------- CHECK IF ZOOKEEPER IS UP ----------------------------------
-if ! $solr_scripts_bin/zookeeper "status" $requested_profile; then
+if ! $admin_scripts_bin/zookeeper "status" $requested_profile; then
     exit 1
 fi
 
 ## --------- CALL ZOOKEEPER SCHEMA MANAGER AND UPLOAD CORE CONFIG -------------------
 prettyEcho "<info>Uploading '$schema' config into '$requested_profile' Zookeeper.</info>"
-$solr_scripts_bin/zookeeper-schema-manager update $schema $requested_profile
+$admin_scripts_bin/zookeeper-schema-manager update $schema $requested_profile
 
 prettyEcho "<success>Done</success>"
