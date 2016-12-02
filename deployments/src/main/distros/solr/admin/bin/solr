@@ -1,0 +1,123 @@
+#! /bin/bash
+
+##=======================================================================================
+# Starts up a solr cloud environment
+##=======================================================================================
+
+set -eo pipefail
+IFS=$'\n\t '
+
+readonly valid_users=("uni_qgo")
+
+readonly action=$1
+readonly requested_profile=$2
+
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables"; then
+  prettyEcho "<error>Required common files were not found. Please make sure you're in the right directory.</error>";
+  exit 1
+fi
+
+# ======= read the variables used by the control scripts ================================
+if ! source "$admin_scripts_dir/common/solr.variables"; then
+    prettyEcho "<error>Please create a file called, solr.variables, containing the necessary environment variables to setup solr cloud.</error>"
+    exit 1
+fi
+
+if ! source "$admin_scripts_dir/common/zookeeper.variables"; then
+    prettyEcho "<error>Please create a file called, zookeeper.variables, containing the necessary environment variables to setup zookeeper.</error>"
+    exit 1
+fi
+
+readonly solr_xml_name="solr.xml"
+readonly solr_xml_file="$quickgo_repo_dir/solr-cores/src/main/cores/$solr_xml_name"
+
+# ========================= utility functions ===========================================
+function show_help {
+    cat<<EOF
+  Usage: $0 action profile
+
+  Argument description:
+    action       => The action to perform on the solr cloud environment [start|stop|status]
+    profile      => Indicates the profile of the solr cloud to startup, possible values [dev|test|prod]
+
+  Example: start dev -- starts up all solr cloud instances for the development environment
+
+  WARNING: Please be aware of who is using the machine before starting/stopping them.
+EOF
+}
+
+function solr_vm_data_dir() {
+   local loc_hostname="$1"
+   local loc_profile="$2"
+   local loc_vm_data_dir="$QUICKGO_BASE_DIR/data/$loc_hostname/$loc_profile"
+
+   echo "$loc_vm_data_dir"
+}
+
+function solr_start_command() {
+  local loc_data_dir=$1
+  local loc_concat_zkhosts=$(zookeeper_hosts ${zoo_hosts[$requested_profile]})
+
+  echo "$solr_server_exec start $solr_system_properties -a $solr_jvm_properties -cloud -m $solr_memory -s $loc_data_dir -p $solr_port -z $loc_concat_zkhosts -noprompt"
+}
+
+function solr_stop_command() {
+  echo "$solr_server_exec stop -p $solr_port"
+}
+
+function solr_status_command() {
+  echo "$solr_server_exec status"
+}
+
+# ====== check that the script has the right number of argument ========================
+if [ "$#" -ne 2 ]; then
+   show_help
+   exit 1
+fi
+
+# ====== check which environment will be started ========================================
+if ! isValidProfileId $requested_profile; then
+   prettyEcho "No servers matched profile: <error>$requested_profile</error>"
+   exit 1
+fi
+
+readonly vms=$(vmsForProfile $requested_profile)
+
+if [ -z "$vms" ]; then
+   prettyEcho "No VMs found for profile: <error>$requested_profile</error>"
+   exit 1
+fi
+
+#start-up all vms for given profile
+for vm in $vms; do
+   updateSolrVariables $requested_profile $vm;
+   case $action in
+      start)
+         prettyEcho "<info>Starting: $vm</info>"
+
+         vm_data_dir=$(solr_vm_data_dir $requested_profile $vm)
+
+         if [ ! -d "$vm_data_dir" ]; then
+            mkdir -p "$vm_data_dir"
+		
+            if [ ! -f "$vm_data_dir/$solr_xml_name" ]; then
+              cp $solr_xml_file $vm_data_dir
+            fi
+         fi
+
+         ssh "$USER"@"$vm" $(solr_start_command $vm_data_dir)
+         ;;
+      stop)
+         prettyEcho "<info>Stopping: $vm</info>"
+         ssh "$USER"@"$vm" $(solr_stop_command)
+         ;;
+      status)
+         prettyEcho "<info>Checking status: $vm<info>"
+         ssh "$USER"@"$vm" $(solr_status_command)
+         ;;
+      *)
+
+      prettyEcho "<error>Unrecognized action: $action.</error>"
+      exit 1
+   esac
+done

@@ -1,0 +1,61 @@
+#! /bin/bash
+
+#fail on error
+set -eo pipefail
+
+readonly valid_users=("uni_qgo")
+readonly schema=$(basename $(pwd))
+
+## ------------------------ SOURCE NECESSARY FILES ---------------------------
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" || ! source "index.variables";
+then
+    prettyEcho "<error>Required properties files were not found. Please make sure you're in the right directory.</error>";
+    exit 1;
+fi
+
+readonly admin_scripts_bin="$admin_scripts_dir/bin"
+
+## ---------------------------- UTILITY FUNCTIONS ----------------------------
+function show_help {
+    cat<<EOF
+  Usage: $0 dev
+
+  Argument description:
+    profile      => Indicates the solr environment to update. Possible values: [$(print_valid_profiles)]
+
+  Example: $0 dev -- uploads the solr core to the dev zookeeper
+EOF
+}
+
+if [ $# -ne 1 ]; then
+    show_help
+    exit 1;
+else
+   readonly requested_profile=$1;
+fi
+
+## ------------------------ CHECK SPECIFIED PROFILE IS CORRECT ------------------------
+if ! isValidProfileId $requested_profile; then
+    show_help
+    exit 1;
+fi
+
+## ---- UPDATE GIT REPO AND GRAB LATEST CHANGES TO SOLR CORE CONFIG ------------------
+pushd . > /dev/null
+cd "$quickgo_repo_dir"
+
+git fetch
+git checkout "$quickgo_branch"
+git pull
+popd > /dev/null
+
+## ---------------------- CHECK IF ZOOKEEPER IS UP ----------------------------------
+if ! $admin_scripts_bin/zookeeper "status" $requested_profile; then
+    exit 1
+fi
+
+## --------- CALL ZOOKEEPER SCHEMA MANAGER AND UPLOAD CORE CONFIG -------------------
+prettyEcho "<info>Uploading '$schema' config into '$requested_profile' Zookeeper.</info>"
+$admin_scripts_bin/zookeeper-schema-manager update $schema $requested_profile
+
+prettyEcho "<success>Done</success>"

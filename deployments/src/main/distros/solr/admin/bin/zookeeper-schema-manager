@@ -1,0 +1,87 @@
+#! /bin/bash
+
+##=======================================================================================
+# Manages the schemas for solr cloud
+#
+# In this script schemas are managed via zookeeper. This approach was chosen because
+# zookeeper is the central resource management tool for Solr cloud. So it makes sense to
+# keep the schemas house in zookeeper
+##=======================================================================================
+
+set -eo pipefail
+IFS=$'\n\t '
+
+readonly valid_users=("uni_qgo")
+
+#TODO change the repo directory to be relative to path
+readonly replacement_symbol="_replace_"
+readonly repo_schema_dir="/nfs/public/rw/goa/.solr/repos/QuickGOBE/solr-cores/src/main/cores/${replacement_symbol}/conf"
+
+
+readonly action="$1"
+readonly schema="$2"
+readonly requested_profile="$3"
+
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables"; then 
+    prettyEcho "<error>Required common properties files were not found. Please make sure you're in the right directory.</error>";
+    exit 1;
+fi
+
+# ======= read the variables used by the control scripts ================================
+if ! source "$admin_scripts_dir/common/zookeeper.variables"; then
+    prettyEcho "<error>Required files zookeeper.variables or solr.variables not found. Please make sure these are available.</error>"
+    exit 1
+fi
+
+readonly solr_zkcli=$dist_dir/solr/current/server/scripts/cloud-scripts/zkcli.sh
+
+# ========================= utility functions ===========================================
+function show_help {
+    cat<<EOF
+  Usage: $0 action schema profile
+
+  Argument description:
+    action       => The action to perform on zookeeper [update]
+    schema       => Name of the schema to perform an action on [annotation|geneproduct|ontology]
+    profile      => Indicates the profile of the zookeeper instances to execute the action on [dev|test|prod]
+
+  Example: update annotation dev -- updates the annotation schema on the dev zookeeper instances
+
+  WARNING: Please be aware that executing actions will have side effects on the solr cloud instances.
+EOF
+}
+
+function schema_location() {
+   local loc_schema="$1"
+
+   echo ${repo_schema_dir/_replace_/$loc_schema}
+}
+
+# ====== check that the script has the right number of argument ========================
+if [ "$#" -ne 3 ]; then
+   show_help
+   exit 1
+fi
+
+# ====== check which environment will be started ========================================
+if ! check_zookeeper_profile $requested_profile ; then
+    prettyEcho "<error>Invalid zookeeper profile specified: $requested_profile.
+                   Please check your zookeeper.variables file.</error>";
+    exit 1;
+fi
+
+case $action in
+  update)
+     schema_dir=$(schema_location $schema)
+
+     if [ ! -d "$schema_dir" ]; then
+        prettyEcho "<error>Schema: '$schema' does not exist in: ${repo_schema_dir%$replacement_symbol}. Make sure schema has been commited th VCS system.</error>"
+        exit 1;
+     fi
+
+     $solr_zkcli -zkhost $(zookeeper_hosts ${zoo_hosts[$requested_profile]} $zoo_port) -cmd upconfig -confname $schema -confdir $schema_dir
+     ;;
+  *)
+  prettyEcho "<error>Unrecognized action: $action</error>"
+  exit 1
+esac
