@@ -16,7 +16,7 @@ if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_D
 fi
 
 # ======= CONSTANTS =======================================
-scripts_bin_content_dir="bin"
+scripts_bin_content_dir="solr"
 scripts_bin="solr-bin.tar.gz"
 
 # ======= FUNCTIONS ======================================================================
