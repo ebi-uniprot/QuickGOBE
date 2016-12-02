@@ -6,4 +6,4 @@
 
 PROFILE_VM_MAP=( \
   "dev|ves-hx-c7" \
-  "test|ves-hx-t2" )
+  "test|ves-hx-ac,ves-hx-b4,ves-hx-c4,ves-hx-c6" )
