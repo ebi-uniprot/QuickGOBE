@@ -1,7 +1,7 @@
 #! /bin/bash
 
 ##=========================================================================================
-# Updates from Git the directory used for running the indexing application.
+# Updates from Git the directory used for administrating Solr.
 # It is not necessary to update with each release, only when the scripts
 # that run the applications change.
 ##=========================================================================================
@@ -41,7 +41,7 @@ git fetch
 git checkout "$quickgo_branch"
 git pull
 cd "deployments"
-mvn -U -DskipTests -P assemble-index-bin-archive package
+mvn -U -DskipTests -P assemble-solr-bin-archive package
 eval "mv" "target/$scripts_bin" "$(dirs +1)"
 
 eval "cd" "$(dirs +1)"

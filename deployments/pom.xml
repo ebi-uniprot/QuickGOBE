@@ -53,10 +53,10 @@
             </build>
         </profile>
         <profile>
-            <id>assemble-index-bin-archive</id>
+            <id>assemble-solr-bin-archive</id>
 
             <properties>
-                <index-bin-archive>index-bin</index-bin-archive>
+                <solr-bin-archive>solr-bin</solr-bin-archive>
             </properties>
 
             <build>
@@ -67,7 +67,7 @@
                         <version>2.6</version>
                         <executions>
                             <execution>
-                                <id>assemble-index-bin-archive</id>
+                                <id>assemble-solr-bin-archive</id>
                                 <!-- this is used for inheritance merges -->
                                 <phase>package</phase>
                                 <!-- bind to the packaging phase -->
@@ -77,10 +77,10 @@
                                 <configuration>
                                     <descriptors>
                                         <descriptor>
-                                            ${project.basedir}/src/main/assembly/index-bin-descriptor.xml
+                                            ${project.basedir}/src/main/assembly/solr-bin-descriptor.xml
                                         </descriptor>
                                     </descriptors>
-                                    <finalName>${index-bin-archive}</finalName>
+                                    <finalName>${solr-bin-archive}</finalName>
                                     <appendAssemblyId>false</appendAssemblyId>
                                 </configuration>
                             </execution>
