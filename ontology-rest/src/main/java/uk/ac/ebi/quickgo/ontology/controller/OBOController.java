@@ -475,8 +475,9 @@ public abstract class OBOController<T extends OBOTerm> {
                         .getGraphImage()
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(renderedImage, "png", os);
-        InputStream is = new ByteArrayInputStream(Base64.getMimeEncoder().encode(os.toByteArray()));
+        ImageIO.write(renderedImage, "png", Base64.getMimeEncoder().wrap(os));
+
+        InputStream is = new ByteArrayInputStream(os.toByteArray());
 
         return ResponseEntity
                 .ok()
