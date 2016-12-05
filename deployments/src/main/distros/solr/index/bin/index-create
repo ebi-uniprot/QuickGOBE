@@ -4,6 +4,7 @@
 set -eo pipefail
 
 readonly valid_users=("uni_qgo")
+readonly release_version_prefix="v";
 
 ## ------------------------ SOURCE NECESSARY FILES ------------------------
 if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" || ! source "index.variables" || ! source "../common/lsf.command.variables"; then
@@ -27,6 +28,16 @@ Argument description:
 EOF
 }
 
+function nextReleaseVersion {
+   current_release="$(ls $release_dir | sed "s/${release_version_prefix}//g" | sort -n | tail -1)";
+
+   if [ ! -z "$current_release" ]; then
+    next_release="${release_version_prefix}$((current_release + 1))";
+   else
+    next_release="${release_version_prefix}1";
+   fi
+}
+
 # ------------------------ VALIDATE PARAMETERS ------------------------
 if [ $# -eq 0 -o $# -gt 2 ]; then
     showHelp;
@@ -48,6 +59,27 @@ if [ "$requested_profile" == "stage" ] ; then
     prettyEcho "QuickGO <bold>build related tasks</bold> should not take place in a <bold>STAGING</bold> environment";
     exit 1;
 fi
+
+# ------------------------ fetch the dependencies for the current release ------------------------
+readonly release_dir="${solr_index_dir}/${requested_profile}";
+
+if [ ! -d "$release_dir" ]; then
+    prettyEcho "<info>Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...</info>";
+    mkdir -p "$release_dir";
+fi
+
+# calculate the next release for the current $release_dir
+nextReleaseVersion;
+
+# create dir for current release
+release_dir="${release_dir}/${next_release}/conf";
+mkdir -p "$release_dir";
+
+prettyEcho "<info>Executing fetch-libraries.</info>"
+../fetch-libraries "$release_dir" "$requested_profile";
+
+prettyEcho "<info>Executing update-solr-schema.</info>"
+../update-solr-schema "$requested_profile";
 
 # ------------------------ compute the java indexing job string ------------------------
 quickgo_service_jar=${quickgo_service_jar/PROFILE_PLACEHOLDER/$requested_profile}
