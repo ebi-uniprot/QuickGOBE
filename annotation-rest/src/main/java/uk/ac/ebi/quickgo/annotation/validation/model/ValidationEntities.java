@@ -10,13 +10,13 @@ import java.util.List;
  * Time: 15:07
  * Created with IntelliJ IDEA.
  */
-public interface ValidationEntities<T>{
+public interface ValidationEntities{
 
     /**
      * Return the validation entity for supplied key value
      * @param id identifying value
      * @return an instance of ValidationEntity or null if not found
      */
-    List<T> get(String id);
+    List<? extends ValidationEntity> get(String id);
 
 }

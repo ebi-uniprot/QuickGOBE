@@ -10,14 +10,14 @@ import java.util.List;
  * Time: 15:06
  * Created with IntelliJ IDEA.
  */
-public class ValidationEntitiesImpl implements ValidationEntities<ValidationEntity> {
+public class ValidationEntitiesImpl implements ValidationEntities {
     private final ValidationEntitiesAggregator aggregator;
 
     public ValidationEntitiesImpl(ValidationEntitiesAggregator aggregator) {
         this.aggregator = aggregator;
     }
 
-    public List<ValidationEntity> get(String id) {
+    public List<? extends ValidationEntity> get(String id) {
         return aggregator.mappedEntities.get(id);
     }
 }
