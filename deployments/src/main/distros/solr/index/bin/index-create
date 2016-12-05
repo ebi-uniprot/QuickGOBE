@@ -51,7 +51,16 @@ fi
 
 # ------------------------ compute the java indexing job string ------------------------
 quickgo_service_jar=${quickgo_service_jar/PROFILE_PLACEHOLDER/$requested_profile}
-javaJob="bsub $(lsfJavaJobOptions)";
+
+indexing_vms=($(vmsForProfile $requested_profile))
+
+if [ ${#indexing_vms[@]} -gt 0 ]; then
+  indexing_vm=${indexing_vms[0]}
+else
+   prettyEcho "<error>No VMs associated with profile: $requested_profile.</error>"
+fi
+
+javaJob="bsub $(lsfJavaJobOptions $(buildSolrAddress $indexing_vm))";
 
 # ------------------------ start off the indexing via LSF ------------------------
 if [ "$action" = "submit" ]; then

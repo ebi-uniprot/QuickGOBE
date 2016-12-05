@@ -37,6 +37,7 @@ function lsfOptionsBase {
 
 function javaCommand {
     set -f
+    local loc_indexing_vm=$1
     local str="$jvm \
                   -Dcom.sun.management.jmxremote.port=$jmx_port \
                   -Dcom.sun.management.jmxremote.ssl=false \
@@ -49,6 +50,7 @@ function javaCommand {
                   -XX:+HeapDumpOnOutOfMemoryError \
                   -XX:HeapDumpPath=$lsf_heapdump_path  \
                   $jvm_params \
+                  -Dsolr.host=$loc_indexing_vm \
                   -jar $quickgo_service_jar $main_class $main_class_params";
 
     echo $(eval "echo "$str"");
@@ -70,5 +72,6 @@ function lsfJobOptions {
 }
 
 function lsfJavaJobOptions {
-    lsfJobOptions "$(javaCommand)";
+    local loc_indexing_vm=$1
+    lsfJobOptions "$(javaCommand $loc_indexing_vm)";
 }
