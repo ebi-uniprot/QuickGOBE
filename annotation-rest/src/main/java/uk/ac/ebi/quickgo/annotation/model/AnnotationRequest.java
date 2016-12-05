@@ -222,17 +222,44 @@ public class AnnotationRequest {
             example = "EXP,IDA")
     private String goIdEvidence;
 
-    @ApiModelProperty(
-            value = "Relationships that can occur within an annotation extension. Accepts comma separated values",
-            example = "occurs_in, part_of, regulates_o_occurs_in")
-    private String[] extensionRelationships;
-
-    @ApiModelProperty(
-            value = "Databases that can occur within an annotation extension. Filtering can be done by " +
-                    "database type, a database id or database_type:database_id. Accepts comma separated " +
-                    "values",
-            example = "occurs_in, part_of, regulates_o_occurs_in")
-    private String[] extensionDatabases;
+    @ApiModelProperty(value = "An annotation extension is used to extend " +
+            "(i.e., add more specificity to) the GO term used in an annotation; the combination of the GO term plus the" +
+            " extension is equivalent to a more specific GO term." +
+            "An annotation extension is stored in the database, and transmitted in annotation files, as a single " +
+            "string, structured as a pipe-separated list of comma-separated lists of components. So, the following " +
+            "are all valid (where c represents a component):\n" +
+            "c" +
+            "c|c|c" +
+            "c,c" +
+            "c|c,c|c,c,c" +
+            "The lists of comma-separated components are referred to as \"conjunctive statements\", while the " +
+            "pipe-separated ones are referred to as \"independent statements\"; the pipe characters can be read as " +
+            "\"OR\", while the commas can be read as \"AND\"." +
+            "Each independent statement represents logically a separate annotation. For example, if we have the " +
+            "following annotation (where GP1 is the identifier of a gene product, and G1 is the identifier of a GO " +
+            "term):" +
+            "GP1 G1 c1,c2|c3|c4,c5" +
+            "then that is logically equivalent to these three annotations:" +
+            "GP1 G1 c1,c2" +
+            "GP1 G1 c3" +
+            "GP1 G1 c4,c5" +
+            "A component takes the form:" +
+            "r(t)" +
+            "where r is the name of a relation (one of the subset \"valid_for_annotation_extension\" defined in " +
+            "http://viewvc.geneontology.org/viewvc/GO-SVN/trunk/ontology/extensions/gorel.obo, and provided in the " +
+            "file ANNOTATION_EXTENSION_RELATIONS.dat.gz), and t is the target (or, to be strictly correct, the local " +
+            "range) of the relation, which is the fully-qualified identifier (i.e., db:id format) of an entry in some" +
+            " database / ontology." +
+            "The following are all valid examples of annotation extension components:" +
+            "causally_upstream_of(GO:1903406)" +
+            "has_regulation_target(UniProtKB:Q6PIC6)" +
+            "occurs_in(CL:0002131)" +
+            "occurs_in(GO:0005886)" +
+            "occurs_in(UBERON:0000922)",
+            example = "occurs_in(CL:0000032),transports_or_maintains_localization_of(UniProtKB:P10288)|" +
+                    "results_in_formation_of(UBERON:0003070),occurs_in(CL:0000032),occurs_in(CL:0000008)," +
+                    "results_in_formation_of(UBERON:0001675)")
+    private String[] extensions;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
@@ -480,44 +507,19 @@ public class AnnotationRequest {
 
     /**
      * A list of extension relationship values, separated by commas
-     * In the format extension=occurrs_in(PomBase:SPBP23A10.14c),RGD:621207 etc
+     * In the format extension=occurs_in(PomBase:SPBP23A10.14c),RGD:621207 etc
      * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
-     * @param withFrom comma separated with/from values
      */
-
-
-    /**
-     * A list of extension relationship values, separated by commas
-     * In the format extension=occurrs_in,part_of etc
-     * @param extensionRelationships comma separated extension relationships values
-     */
-    public void setExtensionRelationships(String... extensionRelationships) {
-        filterMap.put(Searchable.EXTENSION, extensionRelationships);
+    public void setExtension(String... extension) {
+        filterMap.put(Searchable.EXTENSION, extension);
     }
 
     /**
-     * Return a list of annotation extension relationship values, separated by commas
-     * @return String containing comma separated list of extension relationship values.
+     * Return a list of annotation extension values, separated by commas
+     * @return String containing comma separated list of extension values.
      */
-    public String[] getExtensionRelationships() {
+    public String[] getExtension() {
         return filterMap.get(Searchable.EXTENSION);
-    }
-
-    /**
-     * Return a list of annotation extension database values, separated by commas
-     * @return String containing comma separated list of extension database values.
-     */
-    public String[] getExtensionDatabases() {
-        return filterMap.get(Searchable.EXTENSION);
-    }
-
-    /**
-     * A list of extension database values, separated by commas
-     * In the format extension=UniProtKB:P01130 etc
-     * @param extensionDatabases comma separated extension relationships values
-     */
-    public void setExtensionDatabases(String... extensionDatabases) {
-        filterMap.put(Searchable.EXTENSION, extensionDatabases);
     }
 
     /**
