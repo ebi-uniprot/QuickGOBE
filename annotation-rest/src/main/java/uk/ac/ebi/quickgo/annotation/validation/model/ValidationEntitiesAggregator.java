@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.groupingBy;
  */
 public class ValidationEntitiesAggregator implements ItemWriter<ValidationEntity> {
 
-    public Map<String, List<ValidationEntity>> mappedEntities = new HashMap<>();
+    Map<String, List<ValidationEntity>> mappedEntities = new HashMap<>();
 
     @Override public void write(List<? extends ValidationEntity> items) {
         Preconditions.checkArgument(items != null, "The list of items written to ValidationEntitiesAggregator " +
