@@ -12,7 +12,7 @@ package uk.ac.ebi.quickgo.annotation.validation.loader;
  * DATABASE        ENTITY_TYPE_ID  ENTITY_TYPE_NAME        LOCAL_ID_SYNTAX URL_SYNTAX
  *
  */
-public enum DBXrefEntityColumns {
+enum DBXrefEntityColumns {
 
     COLUMN_DB(0),
     COLUMN_ENTITY_TYPE_ID(1),
