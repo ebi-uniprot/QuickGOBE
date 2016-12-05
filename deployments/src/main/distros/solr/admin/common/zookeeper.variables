@@ -1,6 +1,6 @@
 ## Zookeeper hosts
 declare -A zoo_hosts
-zoo_hosts[test]="ves-hx-ec"
+zoo_hosts[test]="ves-hx-ed"
 zoo_hosts[dev]="ves-hx-c2"
 zoo_port=2181
 
