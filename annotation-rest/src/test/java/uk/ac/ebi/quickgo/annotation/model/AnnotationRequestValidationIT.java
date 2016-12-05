@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME;
+import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
@@ -640,7 +640,7 @@ public class AnnotationRequestValidationIT {
     private static boolean HAS_RUN = false;
     private void setupDbXrefValidationData(){
         if(!HAS_RUN) {
-            JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME);
+            JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME);
             assertThat(jobExecution.getStatus(), Is.is(BatchStatus.COMPLETED));
             HAS_RUN = true;
         }

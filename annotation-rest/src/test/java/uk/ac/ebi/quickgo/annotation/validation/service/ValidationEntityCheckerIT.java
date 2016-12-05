@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME;
+import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
 
 
 /**
@@ -38,7 +38,7 @@ public class ValidationEntityCheckerIT {
 
     @Test
     public void validationSucceedsIfKnownDb(){
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME);
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME);
         assertThat(jobExecution.getStatus(), Is.is(BatchStatus.COMPLETED));
         assertThat(validator.isValid("PMID:123456"), is(true));
     }

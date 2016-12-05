@@ -42,8 +42,7 @@ import org.springframework.core.io.Resource;
 @EnableConfigurationProperties(ValidationProperties.class)
 public class ValidationConfig {
 
-    public static final String LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME =
-            "Load Annotation DB Xref Entities Validation Values";
+    public static final String LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME = "loadAnnotationDbXrefEntitiesValidationValues";
     private static final String LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME = "validationLoadingJob";
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidationConfig.class);
     private static final String TAB = "\t";
@@ -70,7 +69,7 @@ public class ValidationConfig {
     Step validationEntitiesStep() {
         System.out.println(validationProperties.getChunk());
         return stepBuilders
-                .get(LOAD_ANNOTATION_DBXREF_ENTITIES_STEP_NAME)
+                .get(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME)
                 .<DBXRefEntity, DBXRefEntity>chunk(Integer.parseInt(validationProperties.getChunk()))
                 .reader(dbXrefReader())
                 .writer(validationEntitiesAggregator())
