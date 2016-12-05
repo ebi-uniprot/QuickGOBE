@@ -43,10 +43,10 @@ function buildSolrAddress {
 ##      collection-name|profile-name|num_shards:value|repl_factor:value|shards_per_node:value
 COLL_MAP=(\
 "coll:ontology|profile:dev|num_shards:1|repl_factor:1|shards_per_node:1"  \
-"coll:geneProduct|profile:dev|num_shards:1|repl_factor:1|shards_per_node:1"  \
+"coll:geneproduct|profile:dev|num_shards:1|repl_factor:1|shards_per_node:1"  \
 "coll:annotation|profile:dev|num_shards:1|repl_factor:1|shards_per_node:1"  \
 "coll:ontology|profile:test|num_shards:1|repl_factor:4|shards_per_node:1"  \
-"coll:geneProduct|profile:test|num_shards:4|repl_factor:2|shards_per_node:2"  \
+"coll:geneproduct|profile:test|num_shards:4|repl_factor:2|shards_per_node:2"  \
 "coll:annotation|profile:test|num_shards:8|repl_factor:2|shards_per_node:4"  )
 
 
