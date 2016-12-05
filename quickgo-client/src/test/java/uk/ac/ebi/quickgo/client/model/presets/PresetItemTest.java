@@ -130,7 +130,7 @@ public class PresetItemTest {
     public void canCreateWithValidAssociations() {
         correctlyBuildsValidPreset(
                 validPresetBuilder::withAssociations,
-                asList("a", "b"),
+                asList(PropertiesItem.createWithId("a").build(), PropertiesItem.createWithId("b").build()),
                 PresetItem::getAssociations);
     }
 

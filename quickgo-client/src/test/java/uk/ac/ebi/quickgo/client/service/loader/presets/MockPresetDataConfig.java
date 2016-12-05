@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PropertiesItem;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 
@@ -117,17 +118,22 @@ public class MockPresetDataConfig {
 
         PRESET_GO_SLIM_METAGENOMICS = PresetItem
                 .createWithName("goslim_metagenomics")
-                .withAssociations(asList("GO:0006259", "GO:0008233", "GO:0016740"))
+                .withAssociations(asList(
+                        PropertiesItem.createWithId("GO:0006259").build(),
+                        PropertiesItem.createWithId("GO:0008233").build(),
+                        PropertiesItem.createWithId("GO:0016740").build()))
                 .build();
 
         PRESET_GO_SLIM_POMBE = PresetItem
                 .createWithName("goslim_pombe")
-                .withAssociations(asList("GO:0002181", "GO:0006355"))
+                .withAssociations(asList(
+                        PropertiesItem.createWithId("GO:0002181").build(),
+                        PropertiesItem.createWithId("GO:0006355").build()))
                 .build();
 
         PRESET_GO_SLIM_SYNAPSE = PresetItem
                 .createWithName("goslim_synapse")
-                .withAssociations(singletonList("GO:0004444"))
+                .withAssociations(singletonList(PropertiesItem.createWithId("GO:0004444").build()))
                 .build();
     }
 
@@ -174,7 +180,7 @@ public class MockPresetDataConfig {
 
     @Bean @Profile(NO_SEARCH_ATTRIBUTES)
     public SearchableField searchableDocumentFields() {
-       return new NoSearchablePresetDocumentFields();
+        return new NoSearchablePresetDocumentFields();
     }
 
     private static class NoSearchablePresetDocumentFields implements SearchableField {

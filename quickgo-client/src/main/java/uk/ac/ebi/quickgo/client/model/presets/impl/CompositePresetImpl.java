@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.client.model.presets.impl;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PropertiesItem;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -44,10 +45,10 @@ import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.Pr
  * @author Edd
  */
 public class CompositePresetImpl implements CompositePreset {
-    private final Map<PresetType, Set<PresetItem>> presetsMap;
+    private final EnumMap<PresetType, Set<PresetItem>> presetsMap;
 
     public CompositePresetImpl() {
-        presetsMap = new HashMap<>();
+        presetsMap = new EnumMap<>(PresetType.class);
 
         for (PresetType presetType : PresetType.values()) {
             presetsMap.put(presetType, new LinkedHashSet<>());
@@ -141,8 +142,9 @@ public class CompositePresetImpl implements CompositePreset {
 
         if (presetType == GO_SLIMS_SETS) {
             presetBuilder.withAssociations(groupedEntry.getValue().stream()
-                    .map(PresetItem::getId)
-                    .collect(Collectors.toList()));
+                    .map(this::presetItemToPropertiesItem)
+                    .collect(Collectors.toList())
+            );
         } else {
             ifPresetItemMatchesThenApply(groupedEntry.getValue(),
                     p -> p.getId() != null && !p.getId().trim().isEmpty(),
@@ -150,6 +152,21 @@ public class CompositePresetImpl implements CompositePreset {
         }
 
         return presetBuilder.build();
+    }
+
+    private PropertiesItem presetItemToPropertiesItem(PresetItem presetItem) {
+        PropertiesItem.Builder propertiesItem = PropertiesItem
+                .createWithId(presetItem.getId());
+        if (presetItem.getAssociations() != null) {
+            presetItem.getAssociations().stream()
+                    .findFirst()
+                    .ifPresent(item -> propertiesItem.withProperty(SlimAdditionalProperty.NAME.name, item.getId()));
+        }
+
+        StaticAspects.Aspect.findByAbbrev(presetItem.getDescription())
+                .ifPresent(aspect -> propertiesItem.withProperty(SlimAdditionalProperty.ASPECT.name, aspect.name));
+
+        return propertiesItem.build();
     }
 
     /**
@@ -164,6 +181,7 @@ public class CompositePresetImpl implements CompositePreset {
             List<PresetItem> presets,
             Predicate<PresetItem> presetPredicate,
             Consumer<PresetItem> itemConsumer) {
+
         presets.stream()
                 .filter(presetPredicate)
                 .findFirst()
@@ -183,21 +201,42 @@ public class CompositePresetImpl implements CompositePreset {
         ASPECTS
     }
 
+    private enum SlimAdditionalProperty {
+        NAME("name"), ASPECT("aspect");
+
+        private final String name;
+
+        SlimAdditionalProperty(String name) {
+            this.name = name;
+        }
+    }
+
     private static class StaticAspects {
 
         private enum Aspect {
-            FUNCTION("Molecular Function", "function", "molecular_function"),
-            PROCESS("Biological Process", "process", "biological_process"),
-            COMPONENT("Cellular Component", "component", "cellular_component");
+            FUNCTION("Molecular Function", "function", "molecular_function", "F"),
+            PROCESS("Biological Process", "process", "biological_process", "P"),
+            COMPONENT("Cellular Component", "component", "cellular_component", "C");
 
             private final String name;
             private final String shortName;
             private final String scientificName;
+            private final String abbrev;
 
-            Aspect(String name, String shortName, String scientificName) {
+            Aspect(String name, String shortName, String scientificName, String abbrev) {
                 this.name = name;
                 this.shortName = shortName;
                 this.scientificName = scientificName;
+                this.abbrev = abbrev;
+            }
+
+            private static Optional<Aspect> findByAbbrev(String abbrev) {
+                for (Aspect aspect : Aspect.values()) {
+                    if (aspect.abbrev.equals(abbrev)) {
+                        return Optional.of(aspect);
+                    }
+                }
+                return Optional.empty();
             }
         }
 

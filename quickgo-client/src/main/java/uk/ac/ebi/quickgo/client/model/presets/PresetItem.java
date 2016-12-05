@@ -7,10 +7,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * A preset DTO. The class exposes a {@link Builder} interface, via {@link PresetItem#createWithName(String)} which
- * is to be used to
- * correctly construct a
- * new
- * instance.
+ * is to be used to correctly construct a new instance.
  *
  * Created 04/10/16
  * @author Edd
@@ -22,15 +19,15 @@ public class PresetItem implements Comparable<PresetItem> {
     private Integer relevancy;
     private String id;
     private String url;
-    private List<String> associations;
+    private List<PropertiesItem> associations;
 
     private PresetItem(Builder builder) {
         this.name = builder.name;
         this.description = builder.description;
         this.url = builder.url;
-        this.associations = builder.associations;
         this.id = builder.id;
         this.relevancy = builder.relevancy;
+        this.associations = builder.associations;
     }
 
     public String getId() {
@@ -53,7 +50,7 @@ public class PresetItem implements Comparable<PresetItem> {
         return url;
     }
 
-    public List<String> getAssociations() {
+    public List<PropertiesItem> getAssociations() {
         return associations;
     }
 
@@ -106,7 +103,7 @@ public class PresetItem implements Comparable<PresetItem> {
     }
 
     @Override public String toString() {
-        return "PresetItem2{" +
+        return "PresetItem{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", relevancy=" + relevancy +
@@ -123,8 +120,13 @@ public class PresetItem implements Comparable<PresetItem> {
      *     <li>alphabetically by {@link PresetItem#getName()}}</li>
      * </ol>
      *
-     * @param presetItem
-     * @return
+     * @param presetItem the preset item to compare
+     * @return when comparing {@code presetItem} against this object, return:
+     * <ul>
+     *     <li>-1, if it is less than this object</li>
+     *     <li>0, if they are the same</li>
+     *     <li>1, if it is greater than this object</li>
+     * </ul>;
      */
     @Override public int compareTo(PresetItem presetItem) {
         int relevancyComparison = this.getRelevancy().compareTo(presetItem.getRelevancy());
@@ -142,7 +144,7 @@ public class PresetItem implements Comparable<PresetItem> {
         private String description;
         private String id;
         private String url;
-        private List<String> associations;
+        private List<PropertiesItem> associations;
 
         private Builder(String name) {
             checkArgument(name != null && !name.isEmpty(), "Name cannot be null or empty");
@@ -162,7 +164,7 @@ public class PresetItem implements Comparable<PresetItem> {
             return this;
         }
 
-        public Builder withAssociations(List<String> associations) {
+        public Builder withAssociations(List<PropertiesItem> associations) {
             checkArgument(associations != null, "Associations cannot be null");
             this.associations = associations;
             return this;
