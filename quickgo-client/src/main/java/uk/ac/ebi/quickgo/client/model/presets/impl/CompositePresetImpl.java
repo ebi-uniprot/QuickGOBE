@@ -128,18 +128,6 @@ public class CompositePresetImpl implements CompositePreset {
             Map.Entry<String, List<PresetItem>> groupedEntry) {
         PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
 
-        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
-                p -> p != null && p.getRelevancy() != 0,
-                p -> presetBuilder.withRelevancy(p.getRelevancy()));
-
-        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
-                p -> p.getDescription() != null && !p.getDescription().trim().isEmpty(),
-                p -> presetBuilder.withDescription(p.getDescription()));
-
-        ifPresetItemMatchesThenApply(groupedEntry.getValue(),
-                p -> p.getUrl() != null && !p.getUrl().trim().isEmpty(),
-                p -> presetBuilder.withUrl(p.getUrl()));
-
         if (presetType == GO_SLIMS_SETS) {
             presetBuilder.withAssociations(groupedEntry.getValue().stream()
                     .map(this::presetItemToPropertiesItem)
@@ -149,6 +137,18 @@ public class CompositePresetImpl implements CompositePreset {
             ifPresetItemMatchesThenApply(groupedEntry.getValue(),
                     p -> p.getId() != null && !p.getId().trim().isEmpty(),
                     p -> presetBuilder.withId(p.getId()));
+
+            ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                    p -> p != null && p.getRelevancy() != 0,
+                    p -> presetBuilder.withRelevancy(p.getRelevancy()));
+
+            ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                    p -> p.getDescription() != null && !p.getDescription().trim().isEmpty(),
+                    p -> presetBuilder.withDescription(p.getDescription()));
+
+            ifPresetItemMatchesThenApply(groupedEntry.getValue(),
+                    p -> p.getUrl() != null && !p.getUrl().trim().isEmpty(),
+                    p -> presetBuilder.withUrl(p.getUrl()));
         }
 
         return presetBuilder.build();
