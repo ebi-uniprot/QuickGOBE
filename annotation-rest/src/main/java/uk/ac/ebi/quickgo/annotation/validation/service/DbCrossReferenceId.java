@@ -18,7 +18,7 @@ public class DbCrossReferenceId {
     public static String db(final String idWithDb) {
         Preconditions.checkArgument(Objects.nonNull(idWithDb), "The id should not be null");
         Preconditions.checkArgument(idWithDb.contains(DELIMITER), "The id should contain the delimiter %s", DELIMITER);
-        return idWithDb.substring(0, idWithDb.indexOf(":")).toLowerCase().trim();
+        return idWithDb.substring(0, idWithDb.indexOf(":")).trim();
     }
 
     public static String id(final String idWithDb){
