@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 public class ValidationEntitiesImplTest {
 
     private static final String INTERPRO = "INTERPRO";
-    private ValidationEntities<ValidationEntity> validationEntities;
+    private ValidationEntities validationEntities;
     private ValidationEntity mockEntity;
 
     @Before

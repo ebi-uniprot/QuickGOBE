@@ -17,6 +17,6 @@ public interface ValidationEntities{
      * @param id identifying value
      * @return an instance of ValidationEntity or null if not found
      */
-    List<? extends ValidationEntity> get(String id);
+    List<ValidationEntity> get(String id);
 
 }

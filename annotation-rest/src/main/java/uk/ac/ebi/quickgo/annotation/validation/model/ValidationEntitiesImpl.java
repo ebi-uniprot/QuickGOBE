@@ -17,7 +17,7 @@ public class ValidationEntitiesImpl implements ValidationEntities {
         this.aggregator = aggregator;
     }
 
-    public List<? extends ValidationEntity> get(String id) {
+    public List<ValidationEntity> get(String id) {
         return aggregator.mappedEntities.get(id);
     }
 }
