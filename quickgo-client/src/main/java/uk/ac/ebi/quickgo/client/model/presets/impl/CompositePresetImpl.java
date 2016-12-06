@@ -102,6 +102,11 @@ public class CompositePresetImpl implements CompositePreset {
         return sortedPresetItems(GENE_PRODUCT_TYPES);
     }
 
+    @Override
+    public List<PresetItem> getExtRelations() {
+        return sortedPresetItems(EXT_RELATIONS);
+    }
+
     private void initialiseStaticPresets() {
         presetsMap.put(ASPECTS, StaticAspects.createAspects());
         presetsMap.put(GENE_PRODUCT_TYPES, StaticGeneProductTypes.createGeneProductTypes());
@@ -180,10 +185,24 @@ public class CompositePresetImpl implements CompositePreset {
         GO_SLIMS_SETS,
         TAXONS,
         QUALIFIERS,
-        ASPECTS
+        ASPECTS,
+        EXT_RELATIONS
     }
 
     private static class StaticAspects {
+
+        static Set<PresetItem> createAspects() {
+            Set<PresetItem> presetAspects = new HashSet<>();
+            Arrays.stream(Aspect.values())
+                    .forEach(aspect -> insertAspect(presetAspects, aspect));
+            return presetAspects;
+        }
+
+        private static void insertAspect(Set<PresetItem> presets, Aspect aspect) {
+            presets.add(PresetItem
+                    .createWithName(aspect.name)
+                    .withId(aspect.scientificName).build());
+        }
 
         private enum Aspect {
             FUNCTION("Molecular Function", "function", "molecular_function"),
@@ -200,22 +219,22 @@ public class CompositePresetImpl implements CompositePreset {
                 this.scientificName = scientificName;
             }
         }
-
-        static Set<PresetItem> createAspects() {
-            Set<PresetItem> presetAspects = new HashSet<>();
-            Arrays.stream(Aspect.values())
-                    .forEach(aspect -> insertAspect(presetAspects, aspect));
-            return presetAspects;
-        }
-
-        private static void insertAspect(Set<PresetItem> presets, Aspect aspect) {
-            presets.add(PresetItem
-                    .createWithName(aspect.name)
-                    .withId(aspect.scientificName).build());
-        }
     }
 
     private static class StaticGeneProductTypes {
+
+        static Set<PresetItem> createGeneProductTypes() {
+            Set<PresetItem> presetAspects = new HashSet<>();
+            Arrays.stream(GeneProductType.values())
+                    .forEach(aspect -> insertGeneProductType(presetAspects, aspect));
+            return presetAspects;
+        }
+
+        private static void insertGeneProductType(Set<PresetItem> presets, GeneProductType geneProductType) {
+            presets.add(PresetItem
+                    .createWithName(geneProductType.name)
+                    .withId(geneProductType.shortName).build());
+        }
 
         private enum GeneProductType {
             PROTEINS("Proteins", "protein"),
@@ -229,19 +248,6 @@ public class CompositePresetImpl implements CompositePreset {
                 this.name = name;
                 this.shortName = shortName;
             }
-        }
-
-        static Set<PresetItem> createGeneProductTypes() {
-            Set<PresetItem> presetAspects = new HashSet<>();
-            Arrays.stream(GeneProductType.values())
-                    .forEach(aspect -> insertGeneProductType(presetAspects, aspect));
-            return presetAspects;
-        }
-
-        private static void insertGeneProductType(Set<PresetItem> presets, GeneProductType geneProductType) {
-            presets.add(PresetItem
-                    .createWithName(geneProductType.name)
-                    .withId(geneProductType.shortName).build());
         }
     }
 }
