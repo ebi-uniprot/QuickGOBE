@@ -11,7 +11,7 @@ import java.util.Objects;
  * Time: 13:41
  * Created with IntelliJ IDEA.
  */
-public class DbCrossReferenceId {
+class DbCrossReferenceId {
 
     private static final String DELIMITER = ":";
 
