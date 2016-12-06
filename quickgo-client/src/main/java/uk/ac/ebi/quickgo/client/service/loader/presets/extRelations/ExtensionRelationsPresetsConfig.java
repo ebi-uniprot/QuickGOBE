@@ -26,11 +26,12 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelpe
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.EXT_RELATION_COLUMNS;
 
 /**
- * Exposes the {@link Step} bean that is used to read and populate information relating to the gene product preset data.
+ * Exposes the {@link Step} bean that is used to read and populate information relating to the annotation extension relations
+ * preset data.
  * <p>
- * Created 01/09/16
+ * Created 06/12/16
  *
- * @author Edd
+ * @author TonyW
  */
 @Configuration
 @Import({PresetsCommonConfig.class})
