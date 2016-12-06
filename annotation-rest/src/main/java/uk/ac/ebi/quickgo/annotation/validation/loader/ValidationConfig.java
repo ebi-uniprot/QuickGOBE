@@ -3,7 +3,9 @@ package uk.ac.ebi.quickgo.annotation.validation.loader;
 import uk.ac.ebi.quickgo.annotation.validation.model.*;
 import uk.ac.ebi.quickgo.annotation.validation.service.ValidationEntityChecker;
 
+import com.google.common.base.Preconditions;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +61,8 @@ public class ValidationConfig {
 
     @Bean
     public Job validationJob(Step validationEntitiesStep) {
+        Preconditions.checkArgument(Objects.nonNull(validationEntitiesStep), "Cannot run %s as %s is null",
+                                    LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME, validationEntitiesStep );
         return jobBuilders.get(LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME)
                 .start(validationEntitiesStep)
                 .listener(logJobListener())
@@ -67,15 +71,19 @@ public class ValidationConfig {
 
     @Bean
     Step validationEntitiesStep() {
-        System.out.println(validationProperties.getChunk());
-        return stepBuilders
-                .get(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME)
-                .<DBXRefEntity, DBXRefEntity>chunk(Integer.parseInt(validationProperties.getChunk()))
-                .reader(dbXrefReader())
-                .writer(validationEntitiesAggregator())
-                .listener(logStepListener())
-                .listener(skipLogListener())
-                .build();
+        try {
+            return stepBuilders
+                    .get(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME)
+                    .<DBXRefEntity, DBXRefEntity>chunk(validationProperties.getChunk())
+                    .reader(dbXrefReader())
+                    .writer(validationEntitiesAggregator())
+                    .listener(logStepListener())
+                    .listener(skipLogListener())
+                    .build();
+        } catch (IOException e) {
+            LOGGER.error("Exception occurred while building " + LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME, e );
+        }
+        return null;
     }
 
     @Bean
@@ -102,12 +110,12 @@ public class ValidationConfig {
     }
 
     @Bean
-    ValidationEntityChecker validationEntityChecker(ValidationEntities<ValidationEntity> validationEntities) {
+    ValidationEntityChecker validationEntityChecker(ValidationEntities validationEntities) {
         return new ValidationEntityChecker(validationEntities);
     }
 
     @Bean
-    ValidationEntities<ValidationEntity> validationEntities(ValidationEntitiesAggregator validationEntitiesAggregator) {
+    ValidationEntities validationEntities(ValidationEntitiesAggregator validationEntitiesAggregator) {
         return new ValidationEntitiesImpl(validationEntitiesAggregator);
     }
 
@@ -123,18 +131,11 @@ public class ValidationConfig {
         return new SkipLoggerListener<>();
     }
 
-    private FlatFileItemReader<DBXRefEntity> dbXrefReader() {
+    private FlatFileItemReader<DBXRefEntity> dbXrefReader() throws IOException {
         FlatFileItemReader<DBXRefEntity> reader = new FlatFileItemReader<>();
         reader.setLineMapper(dbXrefEntityLineMapper());
         reader.setLinesToSkip(HEADER_LINES);
-        try {
-            reader.setResource(new GZIPResource(new FileSystemResource(validationProperties.getValidationFile())));
-        } catch (IOException e) {
-            LOGGER.error(
-                    "Failed to load " + validationProperties.getValidationFile() + ". " +
-                            "No corresponding information for this annotation validation will be available.", e);
-        }
-
+        reader.setResource(new GZIPResource(validationProperties.getValidationResource()));
         return reader;
     }
 
