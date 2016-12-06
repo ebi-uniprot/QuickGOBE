@@ -274,20 +274,6 @@ public class AnnotationRequestValidationIT {
                 is(createMaxSizeErrorMessage(GENE_PRODUCT_PARAM, MAX_GENE_PRODUCT_IDS)));
     }
 
-    @Test
-    public void qualifiedGeneProductIdIsValid() {
-        annotationRequest.setGeneProductId("UniProtKB:A0A000");
-
-        assertThat(validator.validate(annotationRequest), hasSize(0));
-    }
-
-    @Test
-    public void dbOnlyIsValid() {
-        annotationRequest.setGeneProductId("UniProtKB");
-
-        assertThat(validator.validate(annotationRequest), hasSize(0));
-    }
-
     //GO ID PARAMETER
     @Test
     public void goIdIsValid() {
