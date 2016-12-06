@@ -35,7 +35,7 @@ public class ValidationEntityChecker {
     }
 
     private boolean isValidAgainstEntity(String value) {
-        final List<ValidationEntity> entities = validationEntities.get(DbCrossReferenceId.db(value));
+        final List<ValidationEntity> entities = validationEntities.get(DbCrossReferenceId.db(value).toLowerCase());
         return entities != null && entities.stream().anyMatch(e -> e.test(DbCrossReferenceId.id(value)));
     }
 }
