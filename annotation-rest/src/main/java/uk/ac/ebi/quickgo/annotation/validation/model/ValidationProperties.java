@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.validation.model;
 
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,24 +17,24 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "annotation.validation")
 public class ValidationProperties {
 
-    private String chunk;
-    private String validationFile;
+    private int chunk;
+    private Resource validationResource;
     private List<String> referenceDbs;
 
-    public String getChunk() {
+    public int getChunk() {
         return chunk;
     }
 
-    public void setChunk(String chunk) {
+    public void setChunk(int chunk) {
         this.chunk = chunk;
     }
 
-    public String getValidationFile() {
-        return validationFile;
+    public Resource getValidationResource() {
+        return validationResource;
     }
 
-    public void setValidationFile(String validationFile) {
-        this.validationFile = validationFile;
+    public void setValidationResource(Resource validationResource) {
+        this.validationResource = validationResource;
     }
 
     public List<String> getReferenceDbs() {
