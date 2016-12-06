@@ -1247,6 +1247,44 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1));
     }
 
+    @Test
+    public void filterByMultipleUniqueExtensionTargets() throws Exception {
+
+        String extension1 = "results_in_development_of(UBERON:888888)";
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.extensions = Collections.singletonList(extension1);
+        repository.save(doc);
+
+        String extension2 = "results_in_development_of(UBERON:999999)";
+        doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.extensions = Collections.singletonList(extension2);
+        repository.save(doc);
+
+        String fullSearch = extension1 + "," + extension2;
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_PARAM.getName(), fullSearch));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
+
+    @Test
+    public void filterByMultipleExtensionTargetsReturnsHitAnnotationOnlyOnce() throws Exception {
+        String extension = "results_in_development_of(UBERON:0001675),acts_on_population_of(CL:0000032)";
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_PARAM.getName(), extension));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
     //----- Setup data ---------------------//
 
     private List<AnnotationDocument> createGenericDocs(int n) {
