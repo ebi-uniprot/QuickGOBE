@@ -7,7 +7,8 @@ readonly valid_users=("uni_qgo")
 readonly release_version_prefix="v";
 
 ## ------------------------ SOURCE NECESSARY FILES ------------------------
-if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" || ! source "index.variables" || ! source "../common/lsf.command.variables"; then
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" || ! 
+source "index.variables" || ! source "../common/lsf.command.variables" || ! source "$admin_scripts_dir/common/solr.variables"; then
     prettyEcho "<error>Required properties files were not found. Please make sure you're in the right directory</error>";
     exit 1;
 fi
