@@ -37,6 +37,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 @Import({PresetsCommonConfig.class})
 public class ExtensionRelationsPresetsConfig {
     public static final String EXTENSION_RELATIONS_LOADING_STEP_NAME = "ExtensionRelationsReadingStep";
+    private static final String ROOT_RELATION = "_ROOT_AER_";
 
     @Value("#{'${extrelations.preset.source:}'.split(',')}")
     private Resource[] resources;
@@ -70,10 +71,12 @@ public class ExtensionRelationsPresetsConfig {
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.addPreset(CompositePresetImpl.PresetType.EXT_RELATIONS,
-                    PresetItem.createWithName(rawItem.name)
-                            .withId(rawItem.id)
-                            .build());
+            if(!rawItem.id.equals(ROOT_RELATION)) {
+                presets.addPreset(CompositePresetImpl.PresetType.EXT_RELATIONS,
+                                  PresetItem.createWithName(rawItem.name)
+                                            .withId(rawItem.id)
+                                            .build());
+            }
         });
     }
 
