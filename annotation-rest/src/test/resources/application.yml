@@ -36,7 +36,7 @@ model:
     }
 annotation:
   validation:
-    validationFile: src/test/resources/DB_XREFS_ENTITIES.dat.gz
+    validationResource: classpath:DB_XREFS_ENTITIES.dat.gz
     chunk: 30
     reference_dbs:
       - pmid
