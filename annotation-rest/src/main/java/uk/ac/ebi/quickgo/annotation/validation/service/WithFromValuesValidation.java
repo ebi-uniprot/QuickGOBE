@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.validation.service;
 
+import com.google.common.base.Preconditions;
+import java.util.Objects;
 import java.util.stream.Stream;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -19,6 +21,7 @@ public class WithFromValuesValidation implements ConstraintValidator<WithFromVal
 
     @Autowired
     public WithFromValuesValidation(ValidationEntityChecker validator) {
+        Preconditions.checkArgument(Objects.nonNull(validator), "The ValidationEntityChecker instance cannot be null");
         this.validator = validator;
     }
 

@@ -29,6 +29,11 @@ public class WithFromValuesValidationTest {
         when(validationEntityChecker.isValid(ID_FAILS)).thenReturn(false);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void failsConstructionIfPassedInValidatorIsNull(){
+        new WithFromValuesValidation(null);
+    }
+
     @Test
     public void passesValidation() {
         String[] idList = {ID_SUCCEEDS};
