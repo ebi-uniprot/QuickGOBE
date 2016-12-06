@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.validation.service;
 import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntities;
 import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntity;
 
+import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.Objects;
 
@@ -21,6 +22,8 @@ public class ValidationEntityChecker {
     private final ValidationEntities validationEntities;
 
     public ValidationEntityChecker(ValidationEntities validationEntities) {
+        Preconditions.checkArgument(Objects.nonNull(validationEntities), "ValidationEntities instance cannot be null" +
+                ".");
         this.validationEntities = validationEntities;
     }
 

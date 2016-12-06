@@ -42,6 +42,11 @@ public class ValidationEntityCheckerTest {
         when(validationEntity.test("ZZZ123456")).thenReturn(false);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void failsConstructionIfPassedInValidatorIsNull(){
+        new ValidationEntityChecker(null);
+    }
+
     @Test
     public void verificationPasses() {
         assertThat(checker.isValid("InterPro:IPR123456"), is(true));
