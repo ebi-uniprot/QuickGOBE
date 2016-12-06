@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.validation.service;
 
 import uk.ac.ebi.quickgo.annotation.validation.model.ValidationProperties;
 
+import com.google.common.base.Preconditions;
 import java.util.Objects;
 import java.util.stream.Stream;
 import javax.validation.ConstraintValidator;
@@ -29,6 +30,10 @@ public class ReferenceValuesValidation implements ConstraintValidator<ReferenceV
 
     @Autowired
     public ReferenceValuesValidation(ValidationEntityChecker validator, ValidationProperties validationLoadProperties) {
+        Preconditions.checkArgument(Objects.nonNull(validator), "The ValidationEntityChecker instance cannot be null" +
+                ".");
+        Preconditions.checkArgument(Objects.nonNull(validationLoadProperties), "The ValidationProperties instance " +
+                "cannot be null.");
         this.validator = validator;
         this.validationLoadProperties = validationLoadProperties;
     }

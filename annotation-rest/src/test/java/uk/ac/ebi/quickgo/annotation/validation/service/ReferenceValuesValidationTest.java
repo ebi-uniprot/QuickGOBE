@@ -44,6 +44,16 @@ public class ReferenceValuesValidationTest {
         when(validationProperties.getReferenceDbs()).thenReturn(referenceDatabases);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void failsConstructionIfPassedInValidatorIsNull(){
+        new ReferenceValuesValidation(null,mock(ValidationProperties.class) );
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsConstructionIfPassedInValidationPropertiesIsNull(){
+        new ReferenceValuesValidation(mock(ValidationEntityChecker.class),null);
+    }
+
     @Test
     public void validationSucceedsIfKnownDb(){
         assertThat(refValidator.isValid(new String[]{ID_SUCCEEDS_1}, null), is(true));
