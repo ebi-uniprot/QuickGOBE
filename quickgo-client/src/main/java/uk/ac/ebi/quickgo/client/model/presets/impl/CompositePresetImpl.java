@@ -160,11 +160,11 @@ public class CompositePresetImpl implements CompositePreset {
         if (presetItem.getAssociations() != null) {
             presetItem.getAssociations().stream()
                     .findFirst()
-                    .ifPresent(item -> propertiesItem.withProperty(SlimAdditionalProperty.NAME.name, item.getId()));
+                    .ifPresent(item -> propertiesItem.withProperty(SlimAdditionalProperty.NAME.key, item.getId()));
         }
 
         StaticAspects.Aspect.findByAbbrev(presetItem.getDescription())
-                .ifPresent(aspect -> propertiesItem.withProperty(SlimAdditionalProperty.ASPECT.name, aspect.name));
+                .ifPresent(aspect -> propertiesItem.withProperty(SlimAdditionalProperty.ASPECT.key, aspect.name));
 
         return propertiesItem.build();
     }
@@ -201,13 +201,17 @@ public class CompositePresetImpl implements CompositePreset {
         ASPECTS
     }
 
-    private enum SlimAdditionalProperty {
+    public enum SlimAdditionalProperty {
         NAME("name"), ASPECT("aspect");
 
-        private final String name;
+        private final String key;
 
-        SlimAdditionalProperty(String name) {
-            this.name = name;
+        SlimAdditionalProperty(String key) {
+            this.key = key;
+        }
+
+        public String getKey() {
+            return key;
         }
     }
 

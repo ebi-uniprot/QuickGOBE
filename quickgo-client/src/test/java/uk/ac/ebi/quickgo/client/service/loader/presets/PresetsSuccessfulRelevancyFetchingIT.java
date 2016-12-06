@@ -164,12 +164,13 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(presets.getGoSlimSets(), hasSize(3));
+        assertThat(presets.getGoSlimSets(), hasSize(4));
 
         List<PresetItem> presetItems = extractPresets(presets.getGoSlimSets());
-        assertThat(presetItems.get(0), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_METAGENOMICS)));
-        assertThat(presetItems.get(1), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_POMBE)));
-        assertThat(presetItems.get(2), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_SYNAPSE)));
+        assertThat(presetItems.get(0), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_ASPERGILLUS)));
+        assertThat(presetItems.get(1), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_METAGENOMICS)));
+        assertThat(presetItems.get(2), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_POMBE)));
+        assertThat(presetItems.get(3), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_SYNAPSE)));
     }
 
     @Test

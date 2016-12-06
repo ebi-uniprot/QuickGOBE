@@ -21,6 +21,36 @@ public class PropertiesItem {
         this.properties = builder.properties;
     }
 
+    @Override public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        return result;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        PropertiesItem that = (PropertiesItem) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) {
+            return false;
+        }
+        return properties != null ? properties.equals(that.properties) : that.properties == null;
+
+    }
+
+    @Override public String toString() {
+        return "PropertiesItem{" +
+                "id='" + id + '\'' +
+                ", properties=" + properties +
+                '}';
+    }
+
     public String getId() {
         return id;
     }
@@ -50,8 +80,8 @@ public class PropertiesItem {
         }
 
         /**
-         * Builds the {@link PresetItem}.
-         * @return the {@link PresetItem}
+         * Builds the {@link PropertiesItem}.
+         * @return the corresponding {@link PropertiesItem}
          */
         public PropertiesItem build() {
             return new PropertiesItem(this);

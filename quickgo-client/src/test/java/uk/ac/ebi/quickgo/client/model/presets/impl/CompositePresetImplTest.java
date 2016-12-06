@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.model.presets.impl;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PropertiesItem;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.Collection;
@@ -48,7 +49,7 @@ public class CompositePresetImplTest {
             assertThat(presets, hasSize(1));
             PresetItem presetItem = presets.stream().findFirst().orElse(null);
             assertThat(presetItem.getName(), is(name(1)));
-            assertThat(presetItem.getAssociations(), contains(id(1)));
+            assertThat(presetItem.getAssociations(), contains(propertiesItemWithId(1)));
         }
 
         @Test
@@ -62,7 +63,7 @@ public class CompositePresetImplTest {
             assertThat(resultsMap.values().stream()
                     .map(PresetItem::getAssociations)
                     .flatMap(Collection::stream)
-                    .collect(Collectors.toList()), contains(id(1), id(2)));
+                    .collect(Collectors.toList()), contains(propertiesItemWithId(1), propertiesItemWithId(2)));
         }
 
         private Map<String, PresetItem> buildResultsMap(Collection<PresetItem> presetItems) {
@@ -86,8 +87,14 @@ public class CompositePresetImplTest {
             Map<String, PresetItem> resultsMap = buildResultsMap(presetBuilder.getGoSlimSets());
 
             assertThat(resultsMap.keySet(), containsInAnyOrder(name(1), name(2)));
-            assertThat(resultsMap.get(name(1)).getAssociations(), containsInAnyOrder(id(1), id(2)));
-            assertThat(resultsMap.get(name(2)).getAssociations(), contains(id(3)));
+            assertThat(resultsMap.get(name(1)).getAssociations(), containsInAnyOrder(
+                    propertiesItemWithId(1),
+                    propertiesItemWithId(2)));
+            assertThat(resultsMap.get(name(2)).getAssociations(), contains(propertiesItemWithId(3)));
+        }
+
+        private PropertiesItem propertiesItemWithId(int idValue) {
+            return PropertiesItem.createWithId(id(idValue)).build();
         }
 
         @Test
