@@ -21,12 +21,17 @@ public class DbCrossReferenceIdTest {
 
     @Test
     public void retrieveDbSectionSuccessfully(){
-        assertThat(db(ID_WITH_DB), is(DB.toLowerCase()));
+        assertThat(db(ID_WITH_DB), is(DB));
     }
 
     @Test
     public void retrieveIdSectionSuccessfully(){
-        assertThat(id(ID_WITH_DB), is(ID.toLowerCase()));
+        assertThat(id(ID_WITH_DB), is(ID));
+    }
+
+    @Test
+    public void retrieveIdSectionSuccessfullyWithUpperCaseLettersInTheId(){
+        assertThat(id("UniProt:AA"), is("AA"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -71,11 +76,11 @@ public class DbCrossReferenceIdTest {
 
     @Test
     public void retrieveDbSectionWhereDbSectionContainsSpaces(){
-        assertThat(db("   " + DB + "   " + DELIMITER), is(DB.toLowerCase()));
+        assertThat(db("   " + DB + "   " + DELIMITER), is(DB));
     }
 
     @Test
     public void retrieveIdSectionWhereIdSectionContainsSpaces(){
-        assertThat(id(DELIMITER + "    " + ID + "    "), is(ID.toLowerCase()));
+        assertThat(id(DELIMITER + "    " + ID + "    "), is(ID));
     }
 }
