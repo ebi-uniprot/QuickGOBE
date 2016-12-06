@@ -18,9 +18,9 @@ import java.util.Objects;
 
 public class ValidationEntityChecker {
 
-    private final ValidationEntities<ValidationEntity> validationEntities;
+    private final ValidationEntities validationEntities;
 
-    public ValidationEntityChecker(ValidationEntities<ValidationEntity> validationEntities) {
+    public ValidationEntityChecker(ValidationEntities validationEntities) {
         this.validationEntities = validationEntities;
     }
 
