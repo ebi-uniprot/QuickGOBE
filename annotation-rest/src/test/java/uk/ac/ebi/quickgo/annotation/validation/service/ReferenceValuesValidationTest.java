@@ -21,8 +21,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class ReferenceValuesValidationTest {
 
-    private static final String ID_SUCCEEDS = "PMID:123456";
-    private static final String ID_FAILS = "PMID:ZZZZZZZZ";
+    private static final String ID_SUCCEEDS_1 = "PMID:123456";
+    private static final String ID_SUCCEEDS_2 = "PMID:223456";
+    private static final String ID_SUCCEEDS_3 = "PMID:323456";
+    private static final String ID_FAILS_1 = "PMID:ZZZZZZZX";
+    private static final String ID_FAILS_2 = "PMID:ZZZZZZZY";
+    private static final String ID_FAILS_3 = "PMID:ZZZZZZZZ";
     private final List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
     private ReferenceValuesValidation refValidator;
 
@@ -31,14 +35,18 @@ public class ReferenceValuesValidationTest {
         ValidationEntityChecker validationEntityChecker = mock(ValidationEntityChecker.class);
         ValidationProperties validationProperties = mock(ValidationProperties.class);
         refValidator = new ReferenceValuesValidation(validationEntityChecker, validationProperties);
-        when(validationEntityChecker.isValid(ID_SUCCEEDS)).thenReturn(true);
-        when(validationEntityChecker.isValid(ID_FAILS)).thenReturn(false);
+        when(validationEntityChecker.isValid(ID_SUCCEEDS_1)).thenReturn(true);
+        when(validationEntityChecker.isValid(ID_SUCCEEDS_2)).thenReturn(true);
+        when(validationEntityChecker.isValid(ID_SUCCEEDS_3)).thenReturn(true);
+        when(validationEntityChecker.isValid(ID_FAILS_1)).thenReturn(false);
+        when(validationEntityChecker.isValid(ID_FAILS_2)).thenReturn(false);
+        when(validationEntityChecker.isValid(ID_FAILS_3)).thenReturn(false);
         when(validationProperties.getReferenceDbs()).thenReturn(referenceDatabases);
     }
 
     @Test
     public void validationSucceedsIfKnownDb(){
-        assertThat(refValidator.isValid(new String[]{ID_SUCCEEDS}, null), is(true));
+        assertThat(refValidator.isValid(new String[]{ID_SUCCEEDS_1}, null), is(true));
     }
 
     @Test
@@ -52,6 +60,11 @@ public class ReferenceValuesValidationTest {
     }
 
     @Test
+    public void validationFailsIfDbKnownButIdIsIncorrect(){
+        assertThat(refValidator.isValid(new String[]{ID_FAILS_1}, null), is(false));
+    }
+
+    @Test
     public void validationFailsIfUnknownDb(){
         assertThat(refValidator.isValid(new String[]{"XXXX:123456"}, null), is(false));
     }
@@ -59,6 +72,20 @@ public class ReferenceValuesValidationTest {
     @Test
     public void validationFailsIfArgumentListContainsNull(){
         assertThat(refValidator.isValid(new String[]{null}, null), is(false));
+    }
 
+    @Test
+    public void validationSucceedsForMultipleValidValues(){
+        assertThat(refValidator.isValid(new String[]{ID_SUCCEEDS_1, ID_SUCCEEDS_2, ID_SUCCEEDS_3}, null), is(true));
+    }
+
+    @Test
+    public void validationFailsForMultipleInvalidValues(){
+        assertThat(refValidator.isValid(new String[]{ID_FAILS_1, ID_FAILS_2, ID_FAILS_3}, null), is(false));
+    }
+
+    @Test
+    public void validationFailsForMixtureOfValidAndInvalidValues(){
+        assertThat(refValidator.isValid(new String[]{ID_SUCCEEDS_1, ID_FAILS_2, ID_SUCCEEDS_3}, null), is(false));
     }
 }
