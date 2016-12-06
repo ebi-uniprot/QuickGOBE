@@ -36,6 +36,12 @@ public class ValidationEntitiesImplTest {
         when(mockEntity.keyValue()).thenReturn(INTERPRO);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void failsConstructionIfConstructorArgumentIsNull(){
+        new ValidationEntitiesImpl(null);
+    }
+
+
     @Test
     public void checkTwoSuccessfulElements(){
         assertThat(validationEntities.get(INTERPRO.toLowerCase()), hasSize(equalTo(2)));
