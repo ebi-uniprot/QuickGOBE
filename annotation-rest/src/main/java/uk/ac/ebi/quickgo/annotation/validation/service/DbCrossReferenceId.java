@@ -15,6 +15,8 @@ class DbCrossReferenceId {
 
     private static final String DELIMITER = ":";
 
+    private DbCrossReferenceId() {}
+
     public static String db(final String idWithDb) {
         checkPreconditions(idWithDb);
         return idWithDb.substring(0, idWithDb.indexOf(":")).trim();
