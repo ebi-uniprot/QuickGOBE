@@ -21,7 +21,8 @@ public class WithFromValuesValidation implements ConstraintValidator<WithFromVal
 
     @Autowired
     public WithFromValuesValidation(ValidationEntityChecker validator) {
-        Preconditions.checkArgument(Objects.nonNull(validator), "The ValidationEntityChecker instance cannot be null");
+        Preconditions.checkArgument(Objects.nonNull(validator), "The ValidationEntityChecker instance cannot be null" +
+                ".");
         this.validator = validator;
     }
 
