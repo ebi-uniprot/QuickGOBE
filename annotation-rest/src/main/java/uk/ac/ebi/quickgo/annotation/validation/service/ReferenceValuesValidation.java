@@ -52,7 +52,7 @@ public class ReferenceValuesValidation implements ConstraintValidator<ReferenceV
             return true;
         }
 
-        if (!validationLoadProperties.getReferenceDbs().contains(db(value))) {
+        if (!validationLoadProperties.getReferenceDbs().contains(db(value).toLowerCase())) {
             return false;
         }
 
