@@ -1,6 +1,6 @@
-package uk.ac.ebi.quickgo.annotation.validation.model;
+package uk.ac.ebi.quickgo.annotation.validation.loader;
 
-import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationEntitiesAggregator;
+import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntity;
 import uk.ac.ebi.quickgo.annotation.validation.service.ValidationEntityChecker;
 
 import java.util.Arrays;
