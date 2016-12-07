@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 class DbCrossReferenceId {
 
-    private static final String DELIMITER = ":";
+    public static final String DELIMITER = ":";
 
     private DbCrossReferenceId() {}
 
@@ -48,7 +48,7 @@ class DbCrossReferenceId {
      * @param value a DB:ID candidate.
      * @return true if contains delimiter, else false.
      */
-    public static boolean isFullId(String value){
+    static boolean isFullId(String value){
         return (value.contains(DELIMITER));
     }
 
