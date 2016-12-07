@@ -174,7 +174,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param(usageParam, SLIM_USAGE)
-                        .param(idParam, csv(ontologyId(1), ontologyId(2))));;
+                        .param(idParam, csv(ontologyId(1), ontologyId(2))));
 
         response.andDo(print())
                 .andExpect(status().isOk())
