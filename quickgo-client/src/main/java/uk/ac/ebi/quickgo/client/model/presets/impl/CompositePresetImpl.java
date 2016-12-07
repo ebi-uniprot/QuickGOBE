@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.client.model.presets.impl;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -11,7 +12,11 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.mapping;
-import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.*;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetType.ASPECTS;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetType.GENE_PRODUCT_TYPES;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetType.GO_SLIMS_SETS;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetType.QUALIFIERS;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetType.TAXONS;
 
 /**
  * <p>Represents preset information relating to different aspects of QuickGO.
@@ -217,19 +222,6 @@ public class CompositePresetImpl implements CompositePreset {
                 .filter(presetPredicate)
                 .findFirst()
                 .ifPresent(itemConsumer);
-    }
-
-    public enum PresetType {
-        ASSIGNED_BY,
-        REFERENCES,
-        EVIDENCES,
-        WITH_FROM,
-        GENE_PRODUCT,
-        GENE_PRODUCT_TYPES,
-        GO_SLIMS_SETS,
-        TAXONS,
-        QUALIFIERS,
-        ASPECTS
     }
 
     private static class StaticAspects {

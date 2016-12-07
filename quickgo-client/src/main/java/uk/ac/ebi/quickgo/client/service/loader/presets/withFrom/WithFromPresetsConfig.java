@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.withFrom;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
@@ -78,7 +79,7 @@ public class WithFromPresetsConfig {
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem ->
-            presets.addPreset(CompositePresetImpl.PresetType.WITH_FROM,
+            presets.addPreset(PresetType.WITH_FROM,
                     PresetItem.createWithName(rawItem.name)
                             .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
                             .withRelevancy(rawItem.relevancy)
