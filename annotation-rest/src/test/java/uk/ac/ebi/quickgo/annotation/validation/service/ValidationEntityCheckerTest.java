@@ -1,10 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.validation.service;
 
-import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntities;
 import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntity;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,24 +30,25 @@ public class ValidationEntityCheckerTest {
 
     @Before
     public void setup() throws Exception {
-        ValidationEntity validationEntity = mock(ValidationEntity.class);
-        List<ValidationEntity> entities = Collections.singletonList(validationEntity);
-        ValidationEntities validationEntities = mock(ValidationEntities.class);
+        ValidationEntity validationEntity1 = mock(ValidationEntity.class);
+        ValidationEntity validationEntity2 = mock(ValidationEntity.class);
+        ValidationEntity validationEntity3 = mock(ValidationEntity.class);
 
-        checker = new ValidationEntityChecker(validationEntities);
-        when(validationEntities.get("interpro")).thenReturn(entities);
-        when(validationEntity.test("IPR123456")).thenReturn(true);
-        when(validationEntity.test("ZZZ123456")).thenReturn(false);
-    }
+        checker = new ValidationEntityChecker();
 
-    @Test(expected = IllegalArgumentException.class)
-    public void failsConstructionIfPassedInValidatorIsNull(){
-        new ValidationEntityChecker(null);
+        when(validationEntity1.keyValue()).thenReturn("interpro");
+        when(validationEntity2.keyValue()).thenReturn("intact");
+        when(validationEntity3.keyValue()).thenReturn("uniprotkb");
+        when(validationEntity1.test("IPR123456")).thenReturn(true);
+        when(validationEntity2.test("EBI-11166735")).thenReturn(true);
+        when(validationEntity3.test("A0A000")).thenReturn(true);
+        checker.addEntities(Arrays.asList(validationEntity1, validationEntity2, validationEntity3));
+
     }
 
     @Test
     public void verificationPasses() {
-        assertThat(checker.isValid("InterPro:IPR123456"), is(true));
+        assertThat(checker.isValid("IntAct:EBI-11166735"), is(true));
     }
 
     @Test

@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.Objects;
 
+import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.db;
 import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.id;
 import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.isFullId;
@@ -21,15 +22,9 @@ import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId
  * Created with IntelliJ IDEA.
  */
 
-public class ValidationEntityChecker {
+public class ValidationEntityChecker implements ValidationEntities {
 
-    private final ValidationEntities validationEntities;
-
-    public ValidationEntityChecker(ValidationEntities validationEntities) {
-        Preconditions.checkArgument(Objects.nonNull(validationEntities), "ValidationEntities instance cannot be null" +
-                ".");
-        this.validationEntities = validationEntities;
-    }
+    private Map<String, List<ValidationEntity>> mappedEntities = new HashMap<>();
 
     /**
      * If the value passed to this method can be successfully validated isValid will return true.
@@ -42,7 +37,17 @@ public class ValidationEntityChecker {
     }
 
     private boolean isValidAgainstEntity(String value) {
-        final List<ValidationEntity> entities = validationEntities.get(db(value).toLowerCase());
+        final List<ValidationEntity> entities = mappedEntities.get(db(value).toLowerCase());
         return entities != null && entities.stream().anyMatch(e -> e.test(id(value)));
+    }
+
+    public void addEntities(List<? extends ValidationEntity> items){
+        Preconditions.checkArgument(Objects.nonNull(items), "The list of items added to ValidationEntitiesImpl " +
+                "should not be null");
+
+        mappedEntities.putAll(items.stream()
+                                   .filter(Objects::nonNull)
+                                   .filter(e -> Objects.nonNull(e.keyValue()))
+                                   .collect(groupingBy(e -> e.keyValue().toLowerCase())));
     }
 }

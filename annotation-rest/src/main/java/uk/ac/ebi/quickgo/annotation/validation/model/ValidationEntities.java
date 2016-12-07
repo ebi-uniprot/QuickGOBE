@@ -17,7 +17,14 @@ public interface ValidationEntities{
      * @param id identifying value
      * @return an instance of ValidationEntity or null if not found
      */
-    List<ValidationEntity> get(String id);
+//    List<ValidationEntity> get(String id);
+
+    /**
+     * Is the value valid.
+     * @param value is an id string, can be in the format DB:ID, or not!
+     * @return true if valid, else false.
+     */
+    boolean isValid(String value);
 
     /**
      * Add a collection of ValidationEntity instances to the class.

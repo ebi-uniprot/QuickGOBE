@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.validation.loader;
 
 import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntities;
 import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntity;
+import uk.ac.ebi.quickgo.annotation.validation.service.ValidationEntityChecker;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
@@ -18,18 +19,17 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ValidationEntitiesAggregator implements ItemWriter<ValidationEntity> {
 
-    private final ValidationEntities validationEntities;
+    private final ValidationEntityChecker validationEntityChecker;
 
     @Autowired
-    public ValidationEntitiesAggregator(ValidationEntities validationEntities) {
-        this.validationEntities = validationEntities;
+    public ValidationEntitiesAggregator(ValidationEntityChecker validationEntityChecker) {
+        this.validationEntityChecker = validationEntityChecker;
     }
 
     @Override public void write(List<? extends ValidationEntity> items) {
         Preconditions.checkArgument(items != null, "The list of items written to ValidationEntitiesAggregator " +
                 "cannot be null.");
-
-        validationEntities.addEntities(items);
+        this.validationEntityChecker.addEntities(items);
     }
 
 }

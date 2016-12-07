@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.validation.model;
 
 import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationEntitiesAggregator;
+import uk.ac.ebi.quickgo.annotation.validation.service.ValidationEntityChecker;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,12 +23,12 @@ public class ValidationEntitiesAggregatorTest {
     private ValidationEntitiesAggregator aggregator;
     private ValidationEntity mockEntityInterpro;
     private ValidationEntity mockEntityPim;
-    private ValidationEntities mockValidationEntities;
+    private ValidationEntityChecker mockValidationEntityChecker;
 
     @Before
     public void setup(){
-        mockValidationEntities = mock(ValidationEntities.class);
-        aggregator = new ValidationEntitiesAggregator(mockValidationEntities);
+        mockValidationEntityChecker = mock(ValidationEntityChecker.class);
+        aggregator = new ValidationEntitiesAggregator(mockValidationEntityChecker);
         mockEntityInterpro = mock(ValidationEntity.class);
         mockEntityPim = mock(ValidationEntity.class);
     }
@@ -41,7 +42,7 @@ public class ValidationEntitiesAggregatorTest {
     public void writeEntitiesPassedOn(){
         final List<ValidationEntity> items = Arrays.asList(mockEntityInterpro, mockEntityPim);
         aggregator.write(items);
-        verify(mockValidationEntities, times(1)).addEntities(items);
+        verify(mockValidationEntityChecker, times(1)).addEntities(items);
     }
 
 }

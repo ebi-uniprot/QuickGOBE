@@ -106,18 +106,13 @@ public class ValidationConfig {
 
     @Bean
     @Autowired
-    ValidationEntitiesAggregator validationEntitiesAggregator(ValidationEntities validationEntities) {
-        return new ValidationEntitiesAggregator(validationEntities);
+    ValidationEntitiesAggregator validationEntitiesAggregator(ValidationEntityChecker validationEntityChecker) {
+        return new ValidationEntitiesAggregator(validationEntityChecker);
     }
 
     @Bean
-    ValidationEntityChecker validationEntityChecker(ValidationEntities validationEntities) {
-        return new ValidationEntityChecker(validationEntities);
-    }
-
-    @Bean
-    ValidationEntities validationEntities() {
-        return new ValidationEntitiesImpl();
+    ValidationEntityChecker validationEntityChecker() {
+        return new ValidationEntityChecker();
     }
 
     private JobExecutionListener logJobListener() {
