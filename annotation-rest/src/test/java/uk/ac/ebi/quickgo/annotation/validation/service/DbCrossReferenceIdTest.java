@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.*;
 
 /**
@@ -16,7 +17,6 @@ public class DbCrossReferenceIdTest {
 
     private static final String DB = "UniProt";
     private static final String ID = "12345";
-    private static final String DELIMITER = ":";
     private static final String ID_WITH_DB = DB + DELIMITER + ID;
 
     @Test
@@ -34,14 +34,14 @@ public class DbCrossReferenceIdTest {
         assertThat(id("UniProt:AA"), is("AA"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void throwExceptionIfValueDoesNotContainDelimiterDb(){
-        db("ABC");
+    @Test
+    public void returnNullIfValueDoesNotContainDelimiterDb(){
+        assertThat(db("ABC"), is(equalTo(null)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void throwExceptionIfValueDoesNotContainDelimiterForId(){
-        id("ABC");
+        assertThat(id("ABC"), is(equalTo(null)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -82,5 +82,15 @@ public class DbCrossReferenceIdTest {
     @Test
     public void retrieveIdSectionWhereIdSectionContainsSpaces(){
         assertThat(id(DELIMITER + "    " + ID + "    "), is(ID));
+    }
+
+    @Test
+    public void detectWhenValueContainsDelimiter(){
+        assertThat(isFullId("DB" + DELIMITER + "ID"), is(true));
+    }
+
+    @Test
+    public void detectWhenValueDoesNotContainDelimiter(){
+        assertThat(isFullId("DBID"), is(false));
     }
 }
