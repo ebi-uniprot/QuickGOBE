@@ -17,7 +17,7 @@ import javax.validation.constraints.Size;
 
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
 
 /**
@@ -32,13 +32,6 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_I
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequest {
-    public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
-    public static final int MAX_ENTRIES_PER_PAGE = 100;
-    public static final int MIN_ENTRIES_PER_PAGE = 0;
-
-    public static final int DEFAULT_PAGE_NUMBER = 1;
-    public static final int MIN_PAGE_NUMBER = 1;
-
     static final int MAX_GO_IDS = 500;
     static final int MAX_GENE_PRODUCT_IDS = 500;
     static final int MAX_EVIDENCE_CODE = 100;

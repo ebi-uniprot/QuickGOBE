@@ -22,6 +22,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
 
 /**
  * A template for performing several functional tests to verify that a search controller
@@ -33,8 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 public abstract class SearchControllerSetup {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
-    private static final int DEFAULT_ENTRIES_PER_PAGE = 25;
 
     private static final String QUERY_PARAM = "query";
     private static final String FACET_PARAM = "facet";

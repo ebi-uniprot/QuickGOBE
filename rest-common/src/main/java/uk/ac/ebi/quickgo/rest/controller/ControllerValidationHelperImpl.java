@@ -19,6 +19,12 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
 
     public static final int MAX_PAGE_RESULTS = 100;
     public static final int MAX_PAGE_NUMBER = 25;
+    public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
+    public static final int MIN_ENTRIES_PER_PAGE = 0;
+    public static final int MIN_PAGE_NUMBER = 1;
+    public static final int DEFAULT_PAGE_NUMBER = 1;
+    public static final int MAX_ENTRIES_PER_PAGE = 100;
+
     private static final Logger LOGGER = getLogger(ControllerValidationHelperImpl.class);
     private static final String COMMA = ",";
 

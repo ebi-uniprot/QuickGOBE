@@ -23,6 +23,9 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_ENTRIES_PER_PAGE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MIN_ENTRIES_PER_PAGE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MIN_PAGE_NUMBER;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
@@ -482,14 +485,14 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void limitValueEqualToMaxEntriesPerPageIsInvalid() {
-        annotationRequest.setLimit(AnnotationRequest.MAX_ENTRIES_PER_PAGE);
+        annotationRequest.setLimit(MAX_ENTRIES_PER_PAGE);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void limitValueAboveMaxEntriesPerPageIsInvalid() {
-        int invalidEntriesPerPage = AnnotationRequest.MAX_ENTRIES_PER_PAGE + 1;
+        int invalidEntriesPerPage = MAX_ENTRIES_PER_PAGE + 1;
         annotationRequest.setLimit(invalidEntriesPerPage);
 
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);

@@ -12,7 +12,11 @@ import java.util.stream.Stream;
 import javax.validation.constraints.*;
 
 import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_ENTRIES_PER_PAGE;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MIN_ENTRIES_PER_PAGE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MIN_PAGE_NUMBER;
 import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER;
 
 /**
@@ -22,11 +26,6 @@ import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_P
  * encapsulates the list and solr field name to use for that argument.
  */
 public class GeneProductRequest {
-    static final int MIN_PAGE_NUMBER = 1;
-
-    static final int DEFAULT_ENTRIES_PER_PAGE = 25;
-    static final int MIN_ENTRIES_PER_PAGE = 0;
-    static final int MAX_ENTRIES_PER_PAGE = 100;
 
     private static final String[] TARGET_FIELDS = new String[]{
             GeneProductFields.Searchable.TYPE,
