@@ -9,9 +9,9 @@ logback_conf=$PWD/logback.xml
 lsf_email="$LOGNAME"
 lsf_cores=8,32
 lsf_q=production-rh6
-lsf_mem=4096
+lsf_mem=16896
 lsf_jvm_min_mem=4096m
-lsf_jvm_max_mem=4096m
+lsf_jvm_max_mem=12288m
 lsf_heapdump_path=$PWD/logs
 jmx_port=3333
 
