@@ -53,11 +53,13 @@ public class ReferenceValuesValidation implements ConstraintValidator<ReferenceV
             return false;
         }
 
-        if (!value.contains(":")) {
+        final String db = db(value);
+
+        if(Objects.isNull(db)){
             return true;
         }
 
-        if (!validationLoadProperties.getReferenceDbs().contains(db(value).toLowerCase())) {
+        if (!validationLoadProperties.getReferenceDbs().contains(db.toLowerCase())) {
             return false;
         }
 
