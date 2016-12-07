@@ -20,6 +20,7 @@ public class ValidationProperties {
     private int chunk;
     private Resource validationResource;
     private List<String> referenceDbs;
+    private int headerLines;
 
     /**
      * The batch size to process when reading validation properties.
@@ -65,5 +66,13 @@ public class ValidationProperties {
      */
     public void setReferenceDbs(List<String> referenceDbs) {
         this.referenceDbs = referenceDbs;
+    }
+
+    public int getHeaderLines() {
+        return headerLines;
+    }
+
+    public void setHeaderLines(int headerLines) {
+        this.headerLines = headerLines;
     }
 }
