@@ -46,8 +46,7 @@ public class ValidationConfig {
     public static final String LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME = "loadAnnotationDbXrefEntitiesValidationValues";
     private static final String LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME = "validationLoadingJob";
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidationConfig.class);
-    private static final String TAB = "\t";
-    private static final int HEADER_LINES = 1;
+    private static final String COLUMNS_DELIMITER = "\t";
 
     @Autowired
     private ValidationProperties validationProperties;
@@ -58,8 +57,7 @@ public class ValidationConfig {
     @Autowired
     private StepBuilderFactory stepBuilders;
 
-    @Bean
-    public Job validationJob(Step validationEntitiesStep) {
+    @Bean Job validationJob(Step validationEntitiesStep) {
         Preconditions.checkArgument(Objects.nonNull(validationEntitiesStep), "Cannot run %s as %s is null",
                                     LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME, validationEntitiesStep );
         return jobBuilders.get(LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME)
@@ -87,24 +85,6 @@ public class ValidationConfig {
     }
 
     @Bean
-    LineMapper<DBXRefEntity> dbXrefEntityLineMapper() {
-        DefaultLineMapper<DBXRefEntity> lineMapper = new DefaultLineMapper<>();
-        lineMapper.setLineTokenizer(dbXrefLineTokenizer());
-        lineMapper.setFieldSetMapper(dbXrefFieldSetMapper());
-        return lineMapper;
-    }
-
-    @Bean
-    LineTokenizer dbXrefLineTokenizer() {
-        return new DelimitedLineTokenizer(TAB);
-    }
-
-    @Bean
-    FieldSetMapper<DBXRefEntity> dbXrefFieldSetMapper() {
-        return new StringToDbXrefEntityMapper();
-    }
-
-    @Bean
     @Autowired
     ValidationEntitiesAggregator validationEntitiesAggregator(ValidationEntityChecker validationEntityChecker) {
         return new ValidationEntitiesAggregator(validationEntityChecker);
@@ -113,6 +93,21 @@ public class ValidationConfig {
     @Bean
     ValidationEntityChecker validationEntityChecker() {
         return new ValidationEntityChecker();
+    }
+
+    private LineMapper<DBXRefEntity> dbXrefEntityLineMapper() {
+        DefaultLineMapper<DBXRefEntity> lineMapper = new DefaultLineMapper<>();
+        lineMapper.setLineTokenizer(dbXrefLineTokenizer());
+        lineMapper.setFieldSetMapper(dbXrefFieldSetMapper());
+        return lineMapper;
+    }
+
+    private LineTokenizer dbXrefLineTokenizer() {
+        return new DelimitedLineTokenizer(COLUMNS_DELIMITER);
+    }
+
+    private FieldSetMapper<DBXRefEntity> dbXrefFieldSetMapper() {
+        return new StringToDbXrefEntityMapper();
     }
 
     private JobExecutionListener logJobListener() {
@@ -130,7 +125,7 @@ public class ValidationConfig {
     private FlatFileItemReader<DBXRefEntity> dbXrefReader() throws IOException {
         FlatFileItemReader<DBXRefEntity> reader = new FlatFileItemReader<>();
         reader.setLineMapper(dbXrefEntityLineMapper());
-        reader.setLinesToSkip(HEADER_LINES);
+        reader.setLinesToSkip(validationProperties.getHeaderLines());
         reader.setResource(new GZIPResource(validationProperties.getValidationResource()));
         return reader;
     }
