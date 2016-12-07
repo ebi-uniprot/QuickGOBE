@@ -67,7 +67,6 @@ public class ValidationConfig {
     }
 
     @Bean
-    @Autowired
     Step validationEntitiesStep(ValidationEntitiesAggregator validationEntitiesAggregator) {
         try {
             return stepBuilders
@@ -85,7 +84,6 @@ public class ValidationConfig {
     }
 
     @Bean
-    @Autowired
     ValidationEntitiesAggregator validationEntitiesAggregator(ValidationEntityChecker validationEntityChecker) {
         return new ValidationEntitiesAggregator(validationEntityChecker);
     }
