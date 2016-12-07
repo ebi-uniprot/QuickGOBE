@@ -67,14 +67,14 @@ public class EvidencePresetsConfig {
      * @return the corresponding {@link ItemWriter}
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
-        return rawItemList -> rawItemList.forEach(rawItem -> {
+        return rawItemList -> rawItemList.forEach(rawItem ->
             presets.addPreset(CompositePresetImpl.PresetType.EVIDENCES,
                     PresetItem.createWithName(rawItem.name)
-                            .withId(rawItem.id)
+                            .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
                             .withRelevancy(rawItem.relevancy)
-                            .withDescription(rawItem.description)
-                            .build());
-        });
+                            .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
+                            .build())
+        );
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {

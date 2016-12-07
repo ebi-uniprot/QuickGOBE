@@ -81,7 +81,7 @@ public class ReferencePresetsConfig {
                 .writer(rawPresetWriter(
                         presets,
                         aRawPresetItem -> PresetItem.createWithName(aRawPresetItem.name)
-                                .withDescription(aRawPresetItem.description)
+                                .withProperty(PresetItem.Property.DESCRIPTION.getKey(), aRawPresetItem.description)
                                 .build()))
                 .listener(new LogStepListener())
                 .build();
@@ -106,7 +106,7 @@ public class ReferencePresetsConfig {
                 .writer(rawPresetWriter(
                         presets,
                         aRawPresetItem -> PresetItem.createWithName(buildGORefID(aRawPresetItem.name))
-                                .withDescription(aRawPresetItem.description)
+                                .withProperty(PresetItem.Property.DESCRIPTION.getKey(), aRawPresetItem.description)
                                 .withRelevancy(aRawPresetItem.relevancy)
                                 .build()))
                 .listener(new LogStepListener())
@@ -116,9 +116,9 @@ public class ReferencePresetsConfig {
     private ItemWriter<RawNamedPreset> rawPresetWriter(
             CompositePresetImpl presets,
             Function<RawNamedPreset, PresetItem> presetItemSupplier) {
-        return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.addPreset(CompositePresetImpl.PresetType.REFERENCES, presetItemSupplier.apply(rawItem));
-        });
+        return rawItemList -> rawItemList.forEach(rawItem ->
+            presets.addPreset(CompositePresetImpl.PresetType.REFERENCES, presetItemSupplier.apply(rawItem))
+        );
     }
 
     private String buildGORefID(String name) {

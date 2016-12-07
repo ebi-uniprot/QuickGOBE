@@ -97,15 +97,14 @@ public class AssignedByPresetsConfig {
      * @return the corresponding {@link ItemWriter}
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
-        return rawItemList -> {
-            rawItemList.forEach(rawItem -> {
+        return rawItemList ->
+            rawItemList.forEach(rawItem ->
                 presets.addPreset(CompositePresetImpl.PresetType.ASSIGNED_BY,
                         PresetItem.createWithName(rawItem.name)
-                                .withDescription(rawItem.description)
+                                .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
                                 .withRelevancy(rawItem.relevancy)
-                                .build());
-            });
-        };
+                                .build())
+            );
     }
 
     private FieldSetMapper<RawNamedPreset> rawAssignedByPresetFieldSetMapper() {

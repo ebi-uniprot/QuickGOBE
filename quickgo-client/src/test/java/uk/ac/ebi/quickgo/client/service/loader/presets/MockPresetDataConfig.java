@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.PropertiesItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
@@ -99,58 +98,63 @@ public class MockPresetDataConfig {
 
         PRESET_ECO_32 = PresetItem
                 .createWithName("All manual codes")
-                .withId("ECO:0000352")
-                .withDescription("evidence used in manual assertion")
-                .withRelevancy(1).build();
+                .withProperty(PresetItem.Property.ID, "ECO:0000352")
+                .withProperty(PresetItem.Property.DESCRIPTION, "evidence used in manual assertion")
+                .withRelevancy(1)
+                .build();
 
         PRESET_BHF_UCL = PresetItem
                 .createWithName("BHF-UCL")
-                .withDescription(
+                .withProperty(PresetItem.Property.DESCRIPTION,
                         "The set of Cardiovascular-associated proteins being prioritised for annotation by the " +
                                 "Cardiovascular Gene Ontology Annotation Initiative located at University College " +
                                 "London")
-                .withUrl("http://www.ucl.ac.uk/cardiovasculargeneontology")
+                .withProperty(PresetItem.Property.URL, "http://www.ucl.ac.uk/cardiovasculargeneontology")
                 .build();
 
         PRESET_DICTY_BASE = PresetItem
                 .createWithName("dictyBase")
-                .withDescription("dictyBase")
+                .withProperty(PresetItem.Property.DESCRIPTION, "dictyBase")
                 .withRelevancy(62)
                 .build();
 
         PRESET_GO_SLIM_ASPERGILLUS = PresetItem
                 .createWithName("goslim_aspergillus")
                 .withAssociations(asList(
-                        createPropertiesItem("GO:0005575", "cellular_component", "Cellular Component"),
-                        createPropertiesItem("GO:0005576", "extracellular region", "Cellular Component"),
-                        createPropertiesItem("GO:0000988", "transcription factor activity, protein binding", "Molecular Function")))
+                        createPresetItem("GO:0005575", "cellular_component", "Cellular Component"),
+                        createPresetItem("GO:0005576", "extracellular region", "Cellular Component"),
+                        createPresetItem("GO:0000988", "transcription factor activity, protein binding",
+                                "Molecular Function")))
                 .build();
 
         PRESET_GO_SLIM_METAGENOMICS = PresetItem
                 .createWithName("goslim_metagenomics")
                 .withAssociations(asList(
-                        createPropertiesItem("GO:0006259", "DNA metabolic process", "Biological Process"),
-                        createPropertiesItem("GO:0008233", "peptidase activity", "Molecular Function"),
-                        createPropertiesItem("GO:0016740", "transferase activity", "Molecular Function")))
+                        createPresetItem("GO:0006259", "DNA metabolic process", "Biological Process"),
+                        createPresetItem("GO:0008233", "peptidase activity", "Molecular Function"),
+                        createPresetItem("GO:0016740", "transferase activity", "Molecular Function")))
                 .build();
 
         PRESET_GO_SLIM_POMBE = PresetItem
                 .createWithName("goslim_pombe")
                 .withAssociations(asList(
-                        createPropertiesItem("GO:0002181", "cytoplasmic translation", "Biological Process"),
-                        createPropertiesItem("GO:0006355", "regulation of transcription, DNA-templated", "Biological Process")))
+                        createPresetItem("GO:0002181", "cytoplasmic translation", "Biological Process"),
+                        createPresetItem("GO:0006355", "regulation of transcription, DNA-templated",
+                                "Biological Process")))
                 .build();
 
         PRESET_GO_SLIM_SYNAPSE = PresetItem
                 .createWithName("goslim_synapse")
                 .withAssociations(singletonList(
-                        createPropertiesItem("GO:0004444", "obsolete inositol-1,4,5-trisphosphate 1-phosphatase", "Cellular Component")))
+                        createPresetItem("GO:0004444", "obsolete inositol-1,4,5-trisphosphate 1-phosphatase",
+                                "Cellular Component")))
                 .build();
     }
 
-    private static PropertiesItem createPropertiesItem(String id, String name, String aspect) {
-        return PropertiesItem
-                .createWithId(id)
+    private static PresetItem createPresetItem(String id, String name, String aspect) {
+        return PresetItem
+                .createWithName(id)
+                .withProperty(PresetItem.Property.ID, id)
                 .withProperty(CompositePresetImpl.SlimAdditionalProperty.NAME.getKey(), name)
                 .withProperty(CompositePresetImpl.SlimAdditionalProperty.ASPECT.getKey(), aspect)
                 .build();

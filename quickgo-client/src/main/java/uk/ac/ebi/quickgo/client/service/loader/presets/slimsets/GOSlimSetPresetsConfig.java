@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.slimsets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.PropertiesItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
@@ -72,9 +71,9 @@ public class GOSlimSetPresetsConfig {
         return rawItemList -> rawItemList.forEach(rawItem ->
                 presets.addPreset(CompositePresetImpl.PresetType.GO_SLIMS_SETS,
                         PresetItem.createWithName(rawItem.name)
-                                .withId(rawItem.id)
-                                .withDescription(rawItem.description)
-                                .withAssociations(singletonList(PropertiesItem.createWithId(rawItem.association).build()))
+                                .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
+                                .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
+                                .withAssociations(singletonList(PresetItem.createWithName(rawItem.association).build()))
                                 .build())
         );
     }

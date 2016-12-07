@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.client.model.presets.impl;
 
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.PropertiesItem;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -20,7 +19,7 @@ import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.Pr
  * <p>Presets returned are ordered by three criteria:
  * <ol>
  *     <li>natural ordering (low to high) by {@link PresetItem#getRelevancy()}</li>
- *     <li>alphabetically by {@link PresetItem#getName()}}</li>
+ *     <li>alphabetically by {@link uk.ac.ebi.quickgo.client.model.presets.PresetItem.Property#NAME}}</li>
  *     <li>by insertion order</li>
  * </ol>
  *
@@ -29,17 +28,25 @@ import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.Pr
  *
  * <p>For example, by adding:
  * <ul>
- *     <li>{@link PresetItem} with {@code name} = "n1", {@code id} = "id1"</li>
- *     <li>{@link PresetItem} with {@code name} = "n1", {@code id} = "id2"</li>
- *     <li>{@link PresetItem} with {@code name} = "n2", {@code id} = "id3"</li>
+ *     <li>{@link PresetItem} with {@code name} = "n1", {@code id} = "id1", {@code assoc} = "a1"</li>
+ *     <li>{@link PresetItem} with {@code name} = "n1", {@code id} = "id2", {@code assoc} = "a2"</li>
+ *     <li>{@link PresetItem} with {@code name} = "n2", {@code id} = "id3", {@code assoc} = "a3"</li>
  * </ul>
  *
  * <p>The corresponding grouped presets will be:
  * <ul>
- *     <li>{@link PresetItem} with {@code name} = "n1", {@code associations} = ["id1", "id2"]</li>
- *     <li>{@link PresetItem} with {@code name} = "n3", {@code associations} = ["id3"]</li>
+ *     <li>{@link PresetItem} with {@code name} = "n1", {@code associations} = [
+ *     <ul>
+ *         <li>{@link PresetItem} with {@code name} = "a1", {@code id} = "id1"</li>
+ *         <li>{@link PresetItem} with {@code name} = "a2", {@code id} = "id2"</li>
+ *     </ul>
+ *     ]</li>
+ *     <li>{@link PresetItem} with {@code name} = "n3", {@code associations} = [
+ *     <ul>
+ *         <li>{@link PresetItem} with {@code name} = "a3", {@code id} = "id3"</li>
+ *     </ul>
+ *     ]</li>
  * </ul>
- *
  *
  * Created 30/08/16
  * @author Edd
@@ -116,7 +123,7 @@ public class CompositePresetImpl implements CompositePreset {
     private List<PresetItem> sortedPresetItems(PresetType presetType) {
         return presetsMap.get(presetType).stream()
                 .collect(Collectors.groupingBy(
-                        PresetItem::getName,
+                        p -> p.getProperty(PresetItem.Property.NAME.getKey()),
                         mapping(Function.identity(), Collectors.toList())))
                 .entrySet().stream()
                 .map(groupedEntry -> transformGroupedEntryToPresetItem(presetType, groupedEntry))
@@ -129,44 +136,43 @@ public class CompositePresetImpl implements CompositePreset {
         PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
 
         if (presetType == GO_SLIMS_SETS) {
-            presetBuilder.withAssociations(groupedEntry.getValue().stream()
-                    .map(this::presetItemToPropertiesItem)
-                    .collect(Collectors.toList())
+            List<PresetItem> associations = groupedEntry.getValue().stream()
+                    .map(this::presetItemToGroupedPresetItem)
+                    .collect(Collectors.toList());
+            presetBuilder.withAssociations(associations
             );
         } else {
-            ifPresetItemMatchesThenApply(groupedEntry.getValue(),
-                    p -> p.getId() != null && !p.getId().trim().isEmpty(),
-                    p -> presetBuilder.withId(p.getId()));
+            groupedEntry.getValue().stream()
+                    .findFirst()
+                    .map(PresetItem::getProperties)
+                    .map(Map::entrySet)
+                    .ifPresent(entrySet -> entrySet.forEach(entry ->
+                            presetBuilder.withProperty(entry.getKey(), entry.getValue())));
 
             ifPresetItemMatchesThenApply(groupedEntry.getValue(),
                     p -> p != null && p.getRelevancy() != 0,
                     p -> presetBuilder.withRelevancy(p.getRelevancy()));
-
-            ifPresetItemMatchesThenApply(groupedEntry.getValue(),
-                    p -> p.getDescription() != null && !p.getDescription().trim().isEmpty(),
-                    p -> presetBuilder.withDescription(p.getDescription()));
-
-            ifPresetItemMatchesThenApply(groupedEntry.getValue(),
-                    p -> p.getUrl() != null && !p.getUrl().trim().isEmpty(),
-                    p -> presetBuilder.withUrl(p.getUrl()));
         }
 
         return presetBuilder.build();
     }
 
-    private PropertiesItem presetItemToPropertiesItem(PresetItem presetItem) {
-        PropertiesItem.Builder propertiesItem = PropertiesItem
-                .createWithId(presetItem.getId());
+    private PresetItem presetItemToGroupedPresetItem(PresetItem presetItem) {
+        PresetItem.Builder presetItemBuilder = PresetItem
+                .createWithName(presetItem.getProperty(PresetItem.Property.NAME))
+                        .withProperty(PresetItem.Property.ID, presetItem.getProperty(PresetItem.Property.ID));
         if (presetItem.getAssociations() != null) {
             presetItem.getAssociations().stream()
                     .findFirst()
-                    .ifPresent(item -> propertiesItem.withProperty(SlimAdditionalProperty.NAME.key, item.getId()));
+                    .ifPresent(item -> presetItemBuilder.withProperty(
+                            SlimAdditionalProperty.NAME.key,
+                            item.getProperty(PresetItem.Property.NAME)));
         }
 
-        StaticAspects.Aspect.findByAbbrev(presetItem.getDescription())
-                .ifPresent(aspect -> propertiesItem.withProperty(SlimAdditionalProperty.ASPECT.key, aspect.name));
+        StaticAspects.Aspect.findByAbbrev(presetItem.getProperty(PresetItem.Property.DESCRIPTION))
+                .ifPresent(aspect -> presetItemBuilder.withProperty(SlimAdditionalProperty.ASPECT.key, aspect.name));
 
-        return propertiesItem.build();
+        return presetItemBuilder.build();
     }
 
     /**
@@ -254,7 +260,7 @@ public class CompositePresetImpl implements CompositePreset {
         private static void insertAspect(Set<PresetItem> presets, Aspect aspect) {
             presets.add(PresetItem
                     .createWithName(aspect.name)
-                    .withId(aspect.scientificName).build());
+                    .withProperty(PresetItem.Property.ID.getKey(), aspect.scientificName).build());
         }
     }
 
@@ -284,7 +290,7 @@ public class CompositePresetImpl implements CompositePreset {
         private static void insertGeneProductType(Set<PresetItem> presets, GeneProductType geneProductType) {
             presets.add(PresetItem
                     .createWithName(geneProductType.name)
-                    .withId(geneProductType.shortName).build());
+                    .withProperty(PresetItem.Property.ID.getKey(), geneProductType.shortName).build());
         }
     }
 }
