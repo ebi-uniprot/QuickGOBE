@@ -7,6 +7,10 @@ import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.Objects;
 
+import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.db;
+import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.id;
+import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.isFullId;
+
 /**
  * Use the database cross reference information contained in this class to verify a list of potential database cross
  * reference identifiers.
@@ -34,11 +38,11 @@ public class ValidationEntityChecker {
      */
 
     public boolean isValid(String value) {
-        return Objects.nonNull(value) && (!value.contains(":") || isValidAgainstEntity(value));
+        return Objects.nonNull(value) && (!isFullId(value) || isValidAgainstEntity(value));
     }
 
     private boolean isValidAgainstEntity(String value) {
-        final List<ValidationEntity> entities = validationEntities.get(DbCrossReferenceId.db(value).toLowerCase());
-        return entities != null && entities.stream().anyMatch(e -> e.test(DbCrossReferenceId.id(value)));
+        final List<ValidationEntity> entities = validationEntities.get(db(value).toLowerCase());
+        return entities != null && entities.stream().anyMatch(e -> e.test(id(value)));
     }
 }
