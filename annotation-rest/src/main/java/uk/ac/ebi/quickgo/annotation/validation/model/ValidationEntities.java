@@ -19,4 +19,10 @@ public interface ValidationEntities{
      */
     List<ValidationEntity> get(String id);
 
+    /**
+     * Add a collection of ValidationEntity instances to the class.
+     * @param items
+     */
+    void addEntities(List<? extends ValidationEntity> items);
+
 }
