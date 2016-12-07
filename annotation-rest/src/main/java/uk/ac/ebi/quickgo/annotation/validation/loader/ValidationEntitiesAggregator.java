@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.validation.loader;
 
-import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntities;
 import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntity;
 import uk.ac.ebi.quickgo.annotation.validation.service.ValidationEntityChecker;
 
@@ -17,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Time: 11:56
  * Created with IntelliJ IDEA.
  */
-public class ValidationEntitiesAggregator implements ItemWriter<ValidationEntity> {
+class ValidationEntitiesAggregator implements ItemWriter<ValidationEntity> {
 
     private final ValidationEntityChecker validationEntityChecker;
 
