@@ -9,7 +9,6 @@ import org.springframework.batch.item.file.transform.IncorrectTokenCountExceptio
 import org.springframework.validation.BindException;
 
 import static uk.ac.ebi.quickgo.annotation.validation.loader.DBXrefEntityColumns.*;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.DBXrefEntityColumns.numColumns;
 
 /**
  * Class responsible for mapping a {@link FieldSet} that contains data related to Database Cross references
