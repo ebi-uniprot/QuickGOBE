@@ -595,14 +595,9 @@ public class AnnotationRequestValidationIT {
         setupDbXrefValidationData();
 
         int numRefs = AnnotationRequest.MAX_REFERENCES + 1;
-
-        //String[] refs = generateValues(IdGeneratorUtil::createGoRef, numRefs);
-        List<String> refs = new ArrayList<>();
-
-        for(int i=0; i<numRefs; i++){
-            refs.add("PMID:123456");
-        }
-
+        List<String> refs = IntStream.range(0, numRefs)
+                                     .mapToObj(i -> "PMID:123456")
+                                     .collect(Collectors.toList());
         annotationRequest.setReference(refs.toArray(new String[0]));
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(1));
