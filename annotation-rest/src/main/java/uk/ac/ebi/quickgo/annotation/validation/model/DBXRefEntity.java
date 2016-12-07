@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.validation.model;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -20,6 +21,11 @@ public class DBXRefEntity implements ValidationEntity {
 
     @Override
     public boolean test(String value) {
+        //If we can't validate, then the value will be treated as valid as long as it' not null
+        if(Objects.isNull(idValidationPattern)){
+            return Objects.nonNull(value);
+        }
+
         return idValidationPattern.matcher(value).matches();
     }
 

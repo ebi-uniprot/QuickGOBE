@@ -43,4 +43,11 @@ public class DBXRefEntityTest {
     public void retrieveKeyValueSuccessfully(){
         assertThat(entity1.keyValue(), is(entity1.database));
     }
+
+    @Test
+    public void ifPatternIsNullAllNonNullValuesAreValid(){
+        entity1.idValidationPattern = null;
+        assertThat(entity1.test("ZZZ123456"), is(true));
+        assertThat(entity1.test(null), is(false));
+    }
 }
