@@ -69,13 +69,14 @@ public class ValidationConfig {
     }
 
     @Bean
-    Step validationEntitiesStep() {
+    @Autowired
+    Step validationEntitiesStep(ValidationEntitiesAggregator validationEntitiesAggregator) {
         try {
             return stepBuilders
                     .get(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME)
                     .<DBXRefEntity, DBXRefEntity>chunk(validationProperties.getChunk())
                     .reader(dbXrefReader())
-                    .writer(validationEntitiesAggregator())
+                    .writer(validationEntitiesAggregator)
                     .listener(logStepListener())
                     .listener(skipLogListener())
                     .build();
@@ -104,8 +105,9 @@ public class ValidationConfig {
     }
 
     @Bean
-    ValidationEntitiesAggregator validationEntitiesAggregator() {
-        return new ValidationEntitiesAggregator();
+    @Autowired
+    ValidationEntitiesAggregator validationEntitiesAggregator(ValidationEntities validationEntities) {
+        return new ValidationEntitiesAggregator(validationEntities);
     }
 
     @Bean
@@ -114,8 +116,8 @@ public class ValidationConfig {
     }
 
     @Bean
-    ValidationEntities validationEntities(ValidationEntitiesAggregator validationEntitiesAggregator) {
-        return new ValidationEntitiesImpl(validationEntitiesAggregator);
+    ValidationEntities validationEntities() {
+        return new ValidationEntitiesImpl();
     }
 
     private JobExecutionListener logJobListener() {
