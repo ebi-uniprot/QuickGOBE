@@ -77,11 +77,18 @@ public class CoTermController {
 
         validateGoTerm(id);
 
-        final List<CoTerm> coTerms = coTermRepository.findCoTerms(id, toCoTermSource(source));
+        final List<CoTerm> coTerms;
+        try {
+            coTerms = coTermRepository.findCoTerms(id, toCoTermSource(source));
+
         return getResultsResponse(coTerms.stream()
                 .filter(ct -> ct.getSimilarityRatio() >= similarityThreshold)
                 .limit(workoutLimit(limit))
                 .collect(Collectors.toList()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
