@@ -77,7 +77,6 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * product as the id. Each CoTerm holds statistics related to that co-occurrence.
      */
     public List<CoTerm> findCoTerms(String id, CoTermSource source) {
-
         Preconditions.checkArgument(id != null, "The findCoTerms id is null.");
         Preconditions.checkArgument(source != null, "The findCoTerms source is null.");
         return source == CoTermSource.MANUAL ? findCoTermsFromMap(coTermsManual, id)
@@ -90,8 +89,10 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @param id the GO Term for which we will lookup co-occurring terms.
      * @return a list of CoTerms, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each CoTerm holds statistics related to that co-occurrence.
+     * @throws IllegalStateException if the target map is empty.
      */
     private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id) {
+        Preconditions.checkState(map.size()>0, "The coterms map is empty!");
         List<CoTerm> results = map.get(id);
         if (results == null) {
             return Collections.emptyList();
