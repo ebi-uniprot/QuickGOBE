@@ -91,7 +91,7 @@ public class CompositePresetImpl implements CompositePreset {
     }
 
     @Override public List<PresetItem> getGoSlimSets() {
-        return sortedPresetItems(GO_SLIMS_SETS);
+        return sortedPresetItems(GO_SLIMS_SETS, goSlimsGrouping());
     }
 
     @Override public List<PresetItem> getTaxons() {
@@ -116,32 +116,41 @@ public class CompositePresetImpl implements CompositePreset {
     }
 
     /**
-     * Sorts the presets according to the ordering rules defined in the class description.
+     * Sorts the presets according to the ordering rules defined in the class description. This method
+     * makes use of the default grouping function defined by {@link CompositePresetImpl#defaultGrouping()}.
      * @param presetType the {@link PresetType} whose list of {@link PresetItem}s are to be to returned.
      * @return the list of {@link PresetItem}s corresponding to the specified {@code presetType}.
      */
     private List<PresetItem> sortedPresetItems(PresetType presetType) {
+        return sortedPresetItems(presetType, defaultGrouping());
+    }
+
+    /**
+     * Sorts the presets according to the ordering rules defined in the class description.
+     * @param presetType the {@link PresetType} whose list of {@link PresetItem}s are to be to returned.
+     * @param groupingFunction the specific function used to group the {@link PresetItem} instances.
+     * @return the list of {@link PresetItem}s corresponding to the specified {@code presetType}.
+     */
+    private List<PresetItem> sortedPresetItems(
+            PresetType presetType,
+            Function<Map.Entry<String, List<PresetItem>>, PresetItem> groupingFunction) {
         return presetsMap.get(presetType).stream()
                 .collect(Collectors.groupingBy(
-                        p -> p.getProperty(PresetItem.Property.NAME.getKey()),
+                        p -> p.getProperty(PresetItem.Property.NAME),
                         mapping(Function.identity(), Collectors.toList())))
                 .entrySet().stream()
-                .map(groupedEntry -> transformGroupedEntryToPresetItem(presetType, groupedEntry))
+                .map(groupingFunction)
                 .sorted()
                 .collect(Collectors.toList());
     }
 
-    private PresetItem transformGroupedEntryToPresetItem(PresetType presetType,
-            Map.Entry<String, List<PresetItem>> groupedEntry) {
-        PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
-
-        if (presetType == GO_SLIMS_SETS) {
-            List<PresetItem> associations = groupedEntry.getValue().stream()
-                    .map(this::presetItemToGroupedPresetItem)
-                    .collect(Collectors.toList());
-            presetBuilder.withAssociations(associations
-            );
-        } else {
+    /**
+     * Defines the default strategy for grouping a list of {@link PresetItem}s, into a grouped {@link PresetItem}.
+     * @return the grouping function.
+     */
+    private static Function<Map.Entry<String, List<PresetItem>>, PresetItem> defaultGrouping() {
+        return groupedEntry -> {
+            PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
             groupedEntry.getValue().stream()
                     .findFirst()
                     .map(PresetItem::getProperties)
@@ -152,25 +161,41 @@ public class CompositePresetImpl implements CompositePreset {
             ifPresetItemMatchesThenApply(groupedEntry.getValue(),
                     p -> p != null && p.getRelevancy() != 0,
                     p -> presetBuilder.withRelevancy(p.getRelevancy()));
-        }
 
-        return presetBuilder.build();
+            return presetBuilder.build();
+        };
     }
 
-    private PresetItem presetItemToGroupedPresetItem(PresetItem presetItem) {
+    /**
+     * Defines the strategy for grouping a list of GO Slim {@link PresetItem}s into a grouped
+     * {@link PresetItem}.
+     * @return the grouping function.
+     */
+    private static Function<Map.Entry<String, List<PresetItem>>, PresetItem> goSlimsGrouping() {
+        return groupedEntry -> {
+            PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
+            return presetBuilder.withAssociations(groupedEntry.getValue().stream()
+                    .map(CompositePresetImpl::transformGOSlimPreset)
+                    .collect(Collectors.toList()))
+                    .build();
+        };
+    }
+
+    private static PresetItem transformGOSlimPreset(PresetItem presetItem) {
         PresetItem.Builder presetItemBuilder = PresetItem
                 .createWithName(presetItem.getProperty(PresetItem.Property.NAME))
-                        .withProperty(PresetItem.Property.ID, presetItem.getProperty(PresetItem.Property.ID));
+                .withProperty(PresetItem.Property.ID, presetItem.getProperty(PresetItem.Property.ID));
         if (presetItem.getAssociations() != null) {
             presetItem.getAssociations().stream()
                     .findFirst()
                     .ifPresent(item -> presetItemBuilder.withProperty(
-                            SlimAdditionalProperty.NAME.key,
+                            SlimAdditionalProperty.NAME.getKey(),
                             item.getProperty(PresetItem.Property.NAME)));
         }
 
         StaticAspects.Aspect.findByAbbrev(presetItem.getProperty(PresetItem.Property.DESCRIPTION))
-                .ifPresent(aspect -> presetItemBuilder.withProperty(SlimAdditionalProperty.ASPECT.key, aspect.name));
+                .ifPresent(
+                        aspect -> presetItemBuilder.withProperty(SlimAdditionalProperty.ASPECT.getKey(), aspect.name));
 
         return presetItemBuilder.build();
     }
@@ -183,7 +208,7 @@ public class CompositePresetImpl implements CompositePreset {
      * @param presetPredicate the {@link Predicate} which must be true for {@code itemConsumer} to be applied
      * @param itemConsumer the {@link Consumer} action to apply to an item
      */
-    private void ifPresetItemMatchesThenApply(
+    private static void ifPresetItemMatchesThenApply(
             List<PresetItem> presets,
             Predicate<PresetItem> presetPredicate,
             Consumer<PresetItem> itemConsumer) {
@@ -205,20 +230,6 @@ public class CompositePresetImpl implements CompositePreset {
         TAXONS,
         QUALIFIERS,
         ASPECTS
-    }
-
-    public enum SlimAdditionalProperty {
-        NAME("name"), ASPECT("aspect");
-
-        private final String key;
-
-        SlimAdditionalProperty(String key) {
-            this.key = key;
-        }
-
-        public String getKey() {
-            return key;
-        }
     }
 
     private static class StaticAspects {

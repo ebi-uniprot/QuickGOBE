@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 
@@ -70,6 +69,8 @@ public class MockPresetDataConfig {
     private static final RelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
     private static final RelevancyResponseType DEFAULT_RELEVANT_TAXONS;
     private static final RelevancyResponseType DEFAULT_RELEVANT_QUALIFIERS;
+    private static final String SLIM_NAME = "name";
+    private static final String SLIM_ASPECT = "aspect";
 
     static {
         DEFAULT_RELEVANT_ASSIGNED_BYS = new RelevancyResponseType();
@@ -155,8 +156,8 @@ public class MockPresetDataConfig {
         return PresetItem
                 .createWithName(id)
                 .withProperty(PresetItem.Property.ID, id)
-                .withProperty(CompositePresetImpl.SlimAdditionalProperty.NAME.getKey(), name)
-                .withProperty(CompositePresetImpl.SlimAdditionalProperty.ASPECT.getKey(), aspect)
+                .withProperty(SLIM_NAME, name)
+                .withProperty(SLIM_ASPECT, aspect)
                 .build();
     }
 
