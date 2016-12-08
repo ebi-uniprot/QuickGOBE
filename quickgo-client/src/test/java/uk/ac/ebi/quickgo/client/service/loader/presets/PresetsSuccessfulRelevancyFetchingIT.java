@@ -33,6 +33,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetItem.Property.*;
 
 /**
  * Tests the population of preset information.
@@ -63,7 +64,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                extractPresetValues(presets.getAssignedBy(), PresetItem::getName),
+                extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(NAME)),
                 IsIterableContainingInOrder.contains(MockPresetDataConfig.UNIPROT_KB, MockPresetDataConfig.ENSEMBL));
     }
 
@@ -78,7 +79,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                extractPresetValues(presets.getReferences(), PresetItem::getName),
+                extractPresetValues(presets.getReferences(), p -> p.getProperty(NAME)),
                 IsIterableContainingInOrder.contains(MockPresetDataConfig.DOI, MockPresetDataConfig.REACTOME));
     }
 
@@ -93,7 +94,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                extractPresetValues(presets.getReferences(), PresetItem::getName),
+                extractPresetValues(presets.getReferences(), p -> p.getProperty(NAME)),
                 CoreMatchers.is(MockPresetDataConfig.GO_REFS_FROM_RESOURCE));
     }
 
@@ -109,11 +110,11 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(presets.getEvidences(), hasSize(22));
 
         PresetItem firstPresetItem = extractFirstPreset(presets.getEvidences());
-        assertThat(firstPresetItem.getName(), CoreMatchers.is(MockPresetDataConfig.PRESET_ECO_32.getName()));
-        assertThat(firstPresetItem.getId(), CoreMatchers.is(MockPresetDataConfig.PRESET_ECO_32.getId()));
-        assertThat(firstPresetItem.getDescription(),
-                CoreMatchers.is(MockPresetDataConfig.PRESET_ECO_32.getDescription()));
-        assertThat(firstPresetItem.getRelevancy(), CoreMatchers.is(MockPresetDataConfig.PRESET_ECO_32.getRelevancy()));
+        assertThat(firstPresetItem.getProperty(NAME), is(MockPresetDataConfig.PRESET_ECO_32.getProperty(NAME)));
+        assertThat(firstPresetItem.getProperty(ID), is(MockPresetDataConfig.PRESET_ECO_32.getProperty(ID)));
+        assertThat(firstPresetItem.getProperty(DESCRIPTION),
+                CoreMatchers.is(MockPresetDataConfig.PRESET_ECO_32.getProperty(DESCRIPTION)));
+        assertThat(firstPresetItem.getRelevancy(), is(MockPresetDataConfig.PRESET_ECO_32.getRelevancy()));
     }
 
     @Test
@@ -128,12 +129,12 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(presets.getWithFrom(), hasSize(7));
 
         PresetItem lastPresetItem = extractLastPreset(presets.getWithFrom());
-        assertThat(lastPresetItem.getName(), CoreMatchers.is(MockPresetDataConfig.PRESET_DICTY_BASE.getName()));
-        assertThat(lastPresetItem.getId(), CoreMatchers.is(MockPresetDataConfig.PRESET_DICTY_BASE.getId()));
-        assertThat(lastPresetItem.getDescription(),
-                CoreMatchers.is(MockPresetDataConfig.PRESET_DICTY_BASE.getDescription()));
+        assertThat(lastPresetItem.getProperty(NAME), is(MockPresetDataConfig.PRESET_DICTY_BASE.getProperty(NAME)));
+        assertThat(lastPresetItem.getProperty(ID), is(MockPresetDataConfig.PRESET_DICTY_BASE.getProperty(ID)));
+        assertThat(lastPresetItem.getProperty(DESCRIPTION),
+                is(MockPresetDataConfig.PRESET_DICTY_BASE.getProperty(DESCRIPTION)));
         assertThat(lastPresetItem.getRelevancy(),
-                CoreMatchers.is(MockPresetDataConfig.PRESET_DICTY_BASE.getRelevancy()));
+                is(MockPresetDataConfig.PRESET_DICTY_BASE.getRelevancy()));
     }
 
     @Test
@@ -148,11 +149,11 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(presets.getGeneProducts(), hasSize(5));
 
         PresetItem firstPresetItem = extractFirstPreset(presets.getGeneProducts());
-        assertThat(firstPresetItem.getName(), CoreMatchers.is(MockPresetDataConfig.PRESET_BHF_UCL.getName()));
-        assertThat(firstPresetItem.getId(), CoreMatchers.is(MockPresetDataConfig.PRESET_BHF_UCL.getId()));
-        assertThat(firstPresetItem.getDescription(),
-                CoreMatchers.is(MockPresetDataConfig.PRESET_BHF_UCL.getDescription()));
-        assertThat(firstPresetItem.getRelevancy(), CoreMatchers.is(MockPresetDataConfig.PRESET_BHF_UCL.getRelevancy()));
+        assertThat(firstPresetItem.getProperty(NAME), is(MockPresetDataConfig.PRESET_BHF_UCL.getProperty(NAME)));
+        assertThat(firstPresetItem.getProperty(ID), is(MockPresetDataConfig.PRESET_BHF_UCL.getProperty(ID)));
+        assertThat(firstPresetItem.getProperty(DESCRIPTION),
+                is(MockPresetDataConfig.PRESET_BHF_UCL.getProperty(DESCRIPTION)));
+        assertThat(firstPresetItem.getRelevancy(), is(MockPresetDataConfig.PRESET_BHF_UCL.getRelevancy()));
     }
 
     @Test
@@ -164,12 +165,13 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(presets.getGoSlimSets(), hasSize(3));
+        assertThat(presets.getGoSlimSets(), hasSize(4));
 
         List<PresetItem> presetItems = extractPresets(presets.getGoSlimSets());
-        assertThat(presetItems.get(0), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_METAGENOMICS)));
-        assertThat(presetItems.get(1), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_POMBE)));
-        assertThat(presetItems.get(2), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_SYNAPSE)));
+        assertThat(presetItems.get(0), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_ASPERGILLUS)));
+        assertThat(presetItems.get(1), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_METAGENOMICS)));
+        assertThat(presetItems.get(2), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_POMBE)));
+        assertThat(presetItems.get(3), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_SYNAPSE)));
     }
 
     @Test
@@ -182,7 +184,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                extractPresetValues(presets.getTaxons(), PresetItem::getName),
+                extractPresetValues(presets.getTaxons(), p -> p.getProperty(NAME)),
                 IsIterableContainingInOrder
                         .contains(MockPresetDataConfig.TAXON_HUMAN, MockPresetDataConfig.TAXON_BACTERIA));
     }
@@ -197,7 +199,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                extractPresetValues(presets.getQualifiers(), PresetItem::getName),
+                extractPresetValues(presets.getQualifiers(), p -> p.getProperty(NAME)),
                 IsIterableContainingInOrder
                         .contains(MockPresetDataConfig.QUALIFIER_ENABLES, MockPresetDataConfig.QUALIFIER_INVOLVED_IN));
     }

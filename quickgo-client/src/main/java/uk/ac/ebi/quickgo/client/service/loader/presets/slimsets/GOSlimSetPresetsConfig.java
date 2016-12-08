@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.slimsets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
@@ -21,8 +22,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 
+import static java.util.Collections.singletonList;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.GO_SLIM_SET_COLUMNS;
@@ -37,8 +38,6 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 @Import({PresetsCommonConfig.class})
 public class GOSlimSetPresetsConfig {
     public static final String GO_SLIM_SET_LOADING_STEP_NAME = "GOSlimSetReadingStep";
-    public static final String SLIM = "SLIM";
-    private static final RawNamedPreset INVALID_PRESET = null;
 
     @Value("#{'${go.slimset.preset.source:}'.split(',')}")
     private Resource[] resources;
@@ -58,9 +57,7 @@ public class GOSlimSetPresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
-                .processor(compositeItemProcessor(
-                        rawPresetValidator(),
-                        rawPresetFilter()))
+                .processor(rawPresetValidator())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -72,21 +69,18 @@ public class GOSlimSetPresetsConfig {
      * @return the corresponding {@link ItemWriter}
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
-        return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.addPreset(CompositePresetImpl.PresetType.GO_SLIMS_SETS,
-                    PresetItem.createWithName(rawItem.name)
-                            .withId(rawItem.id)
-                            .build());
-        });
+        return rawItemList -> rawItemList.forEach(rawItem ->
+                presets.addPreset(PresetType.GO_SLIMS_SETS,
+                        PresetItem.createWithName(rawItem.name)
+                                .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
+                                .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
+                                .withAssociations(singletonList(PresetItem.createWithName(rawItem.association).build()))
+                                .build())
+        );
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
         return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(GO_SLIM_SET_COLUMNS));
-    }
-
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetFilter() {
-        return rawNamedPreset ->
-                rawNamedPreset.description.equals(SLIM) ? rawNamedPreset : INVALID_PRESET;
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
