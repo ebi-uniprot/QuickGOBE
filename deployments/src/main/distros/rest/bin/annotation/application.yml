@@ -33,3 +33,13 @@ model:
     transformations: {
       goId_join: goId
     }
+annotation:
+  validation:
+    validationResource: classpath:DB_XREFS_ENTITIES.dat.gz
+    chunk: 30
+    headerLines: 1
+    reference_dbs:
+      - pmid
+      - doi
+      - go_ref
+      - reactome
