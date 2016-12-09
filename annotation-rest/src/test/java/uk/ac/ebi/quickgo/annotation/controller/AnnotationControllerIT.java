@@ -772,13 +772,12 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void searchingForUnknownWithFromBringsBackNoResults() throws Exception {
+    public void searchingForUnknownWithFromCreatesError() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM.getName(), "XXX:54321"));
 
-        response.andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(0));
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test

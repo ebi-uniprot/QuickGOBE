@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
+import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
@@ -240,7 +242,7 @@ public class AnnotationRequest {
         filterMap.put(Searchable.REFERENCE, reference);
     }
 
-    //todo create validation pattern @Pattern(regexp = "")
+    @ReferenceValidator
     @Size(max = MAX_REFERENCES,
             message = "Number of items in '" + REFERENCE_PARAM + "' is larger than: {max}")
     public String[] getReference() {
@@ -315,6 +317,7 @@ public class AnnotationRequest {
      * Return a list of with/from values, separated by commas
      * @return String containing comma separated list of with/From values.
      */
+    @WithFromValidator
     public String[] getWithFrom() {
         return filterMap.get(Searchable.WITH_FROM);
     }
