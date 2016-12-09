@@ -49,7 +49,7 @@ public class CoTermsConfig {
     @Value("${indexing.coterms.manual:/nfs/public/rw/goa/quickgo_origin/full/CoTermsManual}")
     private String manualCoTermsPath;
 
-    @Value("${indexing.coterms.manual:/nfs/public/rw/goa/quickgo_origin/full/CoTermsAll}")
+    @Value("${indexing.coterms.all:/nfs/public/rw/goa/quickgo_origin/full/CoTermsAll}")
     private String allCoTermsPath;
 
     @Bean
