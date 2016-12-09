@@ -35,7 +35,6 @@ final class ResponseVerifier {
     public static final String REFERENCE_FIELD = "reference";
     public static final String TAXON_ID_FIELD = "taxonId";
     public static final String WITH_FROM_FIELD = "withFrom";
-    public static final String EXTENSION = "extension";
 
     private static final String ERROR_MESSAGE = "messages";
     private static final String RESULTS_CONTENT_BY_INDEX = RESULTS + "[%d].";
