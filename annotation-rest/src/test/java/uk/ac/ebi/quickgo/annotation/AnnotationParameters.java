@@ -22,8 +22,7 @@ public enum AnnotationParameters {
     GENE_PRODUCT_TYPE_PARAM("geneProductType"),
     GP_SUBSET_PARAM("geneProductSubset"),
     TARGET_SET_PARAM("targetSet"),
-    GO_ASPECT_PARAM("aspect"),
-    EXTENSION_PARAM("extension");
+    GO_ASPECT_PARAM("aspect");
 
     private String name;
 
