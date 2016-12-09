@@ -12,11 +12,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.mapping;
-import static uk.ac.ebi.quickgo.client.model.presets.PresetType.ASPECTS;
-import static uk.ac.ebi.quickgo.client.model.presets.PresetType.GENE_PRODUCT_TYPES;
-import static uk.ac.ebi.quickgo.client.model.presets.PresetType.GO_SLIMS_SETS;
-import static uk.ac.ebi.quickgo.client.model.presets.PresetType.QUALIFIERS;
-import static uk.ac.ebi.quickgo.client.model.presets.PresetType.TAXONS;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetType.*;
 
 /**
  * <p>Represents preset information relating to different aspects of QuickGO.

@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
@@ -72,9 +73,9 @@ public class ExtensionRelationsPresetsConfig {
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem -> {
             if(!rawItem.id.equals(ROOT_RELATION)) {
-                presets.addPreset(CompositePresetImpl.PresetType.EXT_RELATIONS,
+                presets.addPreset(PresetType.EXT_RELATIONS,
                                   PresetItem.createWithName(rawItem.name)
-                                            .withId(rawItem.id)
+                                            .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
                                             .build());
             }
         });
