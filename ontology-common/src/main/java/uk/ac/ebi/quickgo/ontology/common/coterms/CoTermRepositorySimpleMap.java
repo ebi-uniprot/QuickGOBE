@@ -80,7 +80,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      */
     public List<CoTerm> findCoTerms(String id, CoTermSource source) {
         Preconditions.checkArgument(id != null, "The findCoTerms id is null.");
-        Preconditions.checkState(source != null, "The findCoTerms source is null.");
+        Preconditions.checkArgument(source != null, "The findCoTerms source is null.");
         return source == CoTermSource.MANUAL ? findCoTermsFromMap(coTermsManual, id)
                 : findCoTermsFromMap(coTermsAll, id);
     }
