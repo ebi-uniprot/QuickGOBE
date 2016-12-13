@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
+import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
@@ -56,6 +58,7 @@ public class AnnotationRequest {
     static final String GENE_PRODUCT_SUBSET_PARAM = "Gene Product Subset identifier";
     static final String GENE_PRODUCT_PARAM = "Gene Product ID";
     static final String REFERENCE_PARAM = "Reference";
+    static final String QUALIFIER_PARAM = "Qualifer";
 
     static final String GO_USAGE_ID = "goId";
     static final String GO_USAGE_FIELD = "goUsage";
@@ -246,7 +249,7 @@ public class AnnotationRequest {
         filterMap.put(Searchable.REFERENCE, reference);
     }
 
-    //todo create validation pattern @Pattern(regexp = "")
+    @ReferenceValidator
     @Size(max = MAX_REFERENCES,
             message = "Number of items in '" + REFERENCE_PARAM + "' is larger than: {max}")
     public String[] getReference() {
@@ -303,6 +306,7 @@ public class AnnotationRequest {
         filterMap.put(Searchable.QUALIFIER, qualifier);
     }
 
+    @ArrayPattern(regexp = "^(NOT\\|)?[A-Z_]+$", flags = CASE_INSENSITIVE, paramName = QUALIFIER_PARAM)
     public String[] getQualifier() {
         return filterMap.get(Searchable.QUALIFIER);
     }
@@ -321,6 +325,7 @@ public class AnnotationRequest {
      * Return a list of with/from values, separated by commas
      * @return String containing comma separated list of with/From values.
      */
+    @WithFromValidator
     public String[] getWithFrom() {
         return filterMap.get(Searchable.WITH_FROM);
     }

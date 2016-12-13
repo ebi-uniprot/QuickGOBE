@@ -44,6 +44,8 @@ public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPres
         rawPreset.relevancy = extractRelevancy(fieldSet);
         rawPreset.id = trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getIdPosition()));
         rawPreset.url = trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getURLPosition()));
+        rawPreset.association =
+                trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getAssociationPosition()));
 
         return rawPreset;
     }

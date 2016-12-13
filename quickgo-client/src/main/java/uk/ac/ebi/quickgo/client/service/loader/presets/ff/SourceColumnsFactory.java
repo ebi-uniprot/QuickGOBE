@@ -12,34 +12,30 @@ public class SourceColumnsFactory {
     public static RawNamedPresetColumns createFor(Source source) {
         switch (source) {
             case DB_COLUMNS:
-                return RawNamedPresetColumnsBuilder
-                        .createWithNamePosition(0)
+                return RawNamedPresetColumnsBuilder.createWithNamePosition(0)
                         .withDescriptionPosition(1)
                         .build();
             case REF_COLUMNS:
-                return RawNamedPresetColumnsBuilder
-                        .createWithNamePosition(0)
+                return RawNamedPresetColumnsBuilder.createWithNamePosition(0)
                         .withDescriptionPosition(1)
                         .withRelevancyPosition(2)
                         .build();
             case ECO2GO_COLUMNS:
-                return RawNamedPresetColumnsBuilder
-                        .createWithNamePosition(2)
+                return RawNamedPresetColumnsBuilder.createWithNamePosition(2)
                         .withIdPosition(0)
                         .withDescriptionPosition(1)
                         .withRelevancyPosition(3)
                         .build();
             case GENE_PRODUCT_COLUMNS:
-                return RawNamedPresetColumnsBuilder
-                        .createWithNamePosition(0)
+                return RawNamedPresetColumnsBuilder.createWithNamePosition(0)
                         .withDescriptionPosition(1)
                         .withURLPosition(3)
                         .build();
             case GO_SLIM_SET_COLUMNS:
-                return RawNamedPresetColumnsBuilder
-                        .createWithNamePosition(1)
+                return RawNamedPresetColumnsBuilder.createWithNamePosition(0)
+                        .withIdPosition(1)
                         .withDescriptionPosition(2)
-                        .withIdPosition(0)
+                        .withAssociationPosition(3)
                         .build();
             default:
                 throw new IllegalStateException("Source type: " + source + " is not handled.");
