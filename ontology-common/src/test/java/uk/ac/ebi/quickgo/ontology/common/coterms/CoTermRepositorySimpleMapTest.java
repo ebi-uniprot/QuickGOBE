@@ -41,39 +41,16 @@ public class CoTermRepositorySimpleMapTest {
 
     private CoTermRepositorySimpleMap coTermRepository;
 
-    @Before
-    public void setup() throws Exception{
-        Map<String, List<CoTerm>> coTermsAll = new HashMap<>();
-        coTermsAll.put(ID_1, Arrays.asList(CO_TERM_A, CO_TERM_B, CO_TERM_C));
-        coTermsAll.put(ID_4, Collections.singletonList(CO_TERM_D));
-
-        Map<String, List<CoTerm>> coTermsManual = new HashMap<>();
-        coTermsManual.put(ID_6, Arrays.asList(CO_TERM_E, CO_TERM_F));
-
-        coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(coTermsAll, coTermsManual);
-
-    }
-
-    // Test factory method with Maps
 
     @Test
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllMapIsNull() {
+    public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllMapIsNull() throws IOException{
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Map coTermsAll is null.");
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, new HashMap());
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, null);
     }
 
     @Test
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualMapIsNull() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Map coTermsManual is null.");
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(new HashMap<>(), null);
-    }
-
-    // Test factory method with Resources
-
-    @Test
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualResourceIsNull() throws Exception {
+    public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualResourceIsNull() throws IOException {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Resource manualCoTermsSource is null.");
         Resource mockAllResource = mock(Resource.class);
@@ -81,7 +58,7 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllResourceIsNull() throws Exception {
+    public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllResourceIsNull() throws IOException {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Resource allCoTermSource is null.");
         Resource mockManualResource = mock(Resource.class);
@@ -120,21 +97,6 @@ public class CoTermRepositorySimpleMapTest {
         when(mockAllResource.exists()).thenReturn(true);
         when(mockAllResource.getURI()).thenThrow(IOException.class);
         CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
-    }
-
-// Test retrieval - successful
-
-    @Test
-    public void retrievalIsSuccessfulFromAll() {
-        List<CoTerm> results = coTermRepository.findCoTerms(ID_1, CoTermSource.ALL);
-        assertThat(results, hasSize(3));
-        assertThat(results, containsInAnyOrder(CO_TERM_A, CO_TERM_B, CO_TERM_C));
-    }
-
-    @Test
-    public void retrievalIsSuccessfulFromManual() {
-        List<CoTerm> results = coTermRepository.findCoTerms(ID_6, CoTermSource.MANUAL);
-        assertThat(results, hasSize(2));
     }
 
     // Test retrieval - failure
