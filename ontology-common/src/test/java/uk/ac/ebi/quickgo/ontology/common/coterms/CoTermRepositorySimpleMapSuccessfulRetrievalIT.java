@@ -5,14 +5,17 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.omg.PortableInterceptor.SUCCESSFUL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepoTestConfig.SUCCESSFUL_RETRIEVAL;
 
 /**
  * @author Tony Wardell
@@ -21,10 +24,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-        classes = {CoTermRepoTestConfig.class},
-        loader = SpringApplicationContextLoader.class)
-public class CoTermRepositorySimpleMapIT {
+@ContextConfiguration(classes = {CoTermRepoTestConfig.class}, loader = SpringApplicationContextLoader.class)
+@ActiveProfiles(profiles = SUCCESSFUL_RETRIEVAL)
+public class CoTermRepositorySimpleMapSuccessfulRetrievalIT {
 
     private static final String GO_TERM_ID_ALL_ONLY = "GO:7777771";
     private static final String GO_TERM_ID_MANUAL_ONLY = "GO:8888881";

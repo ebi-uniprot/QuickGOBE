@@ -23,7 +23,7 @@ import static java.util.stream.Collectors.groupingBy;
  * Time: 13:48
  * Created with IntelliJ IDEA.
  */
-@Component
+
 public class CoTermRepositorySimpleMap implements CoTermRepository {
 
     private Map<String, List<CoTerm>> coTermsAll;
