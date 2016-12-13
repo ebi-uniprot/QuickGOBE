@@ -76,7 +76,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @return a list of CoTerms, each one of which represent a GO Term that is used to annotate the same gene
      * product as the id. Each CoTerm holds statistics related to that co-occurrence.
      * @throws IllegalArgumentException if the id is null
-     * @throws IllegalStateException if the requested CoTermSource is null
+     * @throws IllegalArgumentException if the requested CoTermSource is null
      */
     public List<CoTerm> findCoTerms(String id, CoTermSource source) {
         Preconditions.checkArgument(id != null, "The findCoTerms id is null.");
