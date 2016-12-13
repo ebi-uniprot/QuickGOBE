@@ -14,12 +14,13 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 class RawNamedPresetColumnsBuilder {
     static final int UNINITIALIZED_POSITION = -1;
-
     private int idPosition;
+
     private int namePosition;
     private int descriptionPosition;
     private int relevancyPosition;
     private int urlPosition;
+    private int associationPosition;
 
     private RawNamedPresetColumnsBuilder(int namePosition) {
         checkColumnPosition(namePosition);
@@ -29,6 +30,7 @@ class RawNamedPresetColumnsBuilder {
         this.descriptionPosition = UNINITIALIZED_POSITION;
         this.relevancyPosition = UNINITIALIZED_POSITION;
         this.urlPosition = UNINITIALIZED_POSITION;
+        this.associationPosition = UNINITIALIZED_POSITION;
     }
 
     public RawNamedPresetColumns build() {
@@ -63,6 +65,12 @@ class RawNamedPresetColumnsBuilder {
         return this;
     }
 
+    RawNamedPresetColumnsBuilder withAssociationPosition(int associationPosition) {
+        checkColumnPosition(associationPosition);
+        this.associationPosition = associationPosition;
+        return this;
+    }
+
     private void checkColumnPosition(int columnPosition) {
         checkArgument(columnPosition >= 0,
                 "Column position [" + columnPosition + "] must be greater than or equal to 0");
@@ -71,12 +79,14 @@ class RawNamedPresetColumnsBuilder {
     private static class RawNamedPresetColumnsImpl implements RawNamedPresetColumns {
         static final int MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED = -1;
         private static final int DEFAULT_COLUMN_POSITION_NOT_INITIALIZED = 0;
-        private final int urlPosition;
         private int maxRequiredColumnPosition = MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED;
+
+        private final int urlPosition;
         private int idPosition;
         private int namePosition;
         private int descriptionPosition;
         private int relevancyPosition;
+        private int associationPosition;
 
         private RawNamedPresetColumnsImpl(RawNamedPresetColumnsBuilder builder) {
             this.idPosition = builder.idPosition;
@@ -84,6 +94,7 @@ class RawNamedPresetColumnsBuilder {
             this.descriptionPosition = builder.descriptionPosition;
             this.relevancyPosition = builder.relevancyPosition;
             this.urlPosition = builder.urlPosition;
+            this.associationPosition = builder.associationPosition;
         }
 
         @Override public int getIdPosition() {
@@ -106,6 +117,10 @@ class RawNamedPresetColumnsBuilder {
             return urlPosition;
         }
 
+        @Override public int getAssociationPosition() {
+            return associationPosition;
+        }
+
         @Override public int getMaxRequiredColumnCount() {
             if (maxRequiredColumnPosition == MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED) {
                 maxRequiredColumnPosition =
@@ -113,7 +128,8 @@ class RawNamedPresetColumnsBuilder {
                                 getDescriptionPosition(),
                                 getIdPosition(),
                                 getNamePosition(),
-                                getRelevancyPosition()
+                                getRelevancyPosition(),
+                                getAssociationPosition()
                         ).max(Comparator.naturalOrder())
                                 .map(columnPosition -> columnPosition + 1)
                                 .orElse(DEFAULT_COLUMN_POSITION_NOT_INITIALIZED);

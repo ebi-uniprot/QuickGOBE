@@ -11,6 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetItem.Property.DESCRIPTION;
 
 /**
  * Created 04/10/16
@@ -36,7 +37,7 @@ public class PresetItemTest {
         correctlyBuildsValidPreset(
                 PresetItem::createWithName,
                 VALID_VALUE,
-                PresetItem::getName);
+                extractProperty(PresetItem.Property.NAME));
     }
 
     @Test
@@ -72,57 +73,57 @@ public class PresetItemTest {
     @Test
     public void canCreateWithValidDescription() {
         correctlyBuildsValidPreset(
-                validPresetBuilder::withDescription,
+                addProperty(DESCRIPTION),
                 VALID_VALUE,
-                PresetItem::getDescription);
+                extractProperty(DESCRIPTION));
     }
 
     @Test
     public void cannotCreateWithNullDescription() {
-        exceptionIsThrownFor(validPresetBuilder::withDescription, null, IllegalArgumentException.class);
+        exceptionIsThrownFor(addProperty(DESCRIPTION), null, IllegalArgumentException.class);
     }
 
     @Test
     public void cannotCreateWithEmptyDescription() {
-        exceptionIsThrownFor(validPresetBuilder::withDescription, EMPTY_VALUE, IllegalArgumentException.class);
+        exceptionIsThrownFor(addProperty(DESCRIPTION), EMPTY_VALUE, IllegalArgumentException.class);
     }
 
     // id
     @Test
     public void canCreateWithValidId() {
         correctlyBuildsValidPreset(
-                validPresetBuilder::withId,
+                addProperty(PresetItem.Property.ID),
                 VALID_VALUE,
-                PresetItem::getId);
+                extractProperty(PresetItem.Property.ID));
     }
 
     @Test
     public void cannotCreateWithNullId() {
-        exceptionIsThrownFor(validPresetBuilder::withId, null, IllegalArgumentException.class);
+        exceptionIsThrownFor(addProperty(PresetItem.Property.ID), null, IllegalArgumentException.class);
     }
 
     @Test
     public void cannotCreateWithEmptyId() {
-        exceptionIsThrownFor(validPresetBuilder::withId, EMPTY_VALUE, IllegalArgumentException.class);
+        exceptionIsThrownFor(addProperty(PresetItem.Property.ID), EMPTY_VALUE, IllegalArgumentException.class);
     }
 
     // url
     @Test
     public void canCreateWithValidUrl() {
         correctlyBuildsValidPreset(
-                validPresetBuilder::withUrl,
+                addProperty(PresetItem.Property.URL),
                 VALID_VALUE,
-                PresetItem::getUrl);
+                extractProperty(PresetItem.Property.URL));
     }
 
     @Test
     public void cannotCreateWithNullUrl() {
-        exceptionIsThrownFor(validPresetBuilder::withUrl, null, IllegalArgumentException.class);
+        exceptionIsThrownFor(addProperty(PresetItem.Property.URL), null, IllegalArgumentException.class);
     }
 
     @Test
     public void cannotCreateWithEmptyUrl() {
-        exceptionIsThrownFor(validPresetBuilder::withUrl, EMPTY_VALUE, IllegalArgumentException.class);
+        exceptionIsThrownFor(addProperty(PresetItem.Property.URL), EMPTY_VALUE, IllegalArgumentException.class);
     }
 
     // associations
@@ -130,13 +131,21 @@ public class PresetItemTest {
     public void canCreateWithValidAssociations() {
         correctlyBuildsValidPreset(
                 validPresetBuilder::withAssociations,
-                asList("a", "b"),
+                asList(PresetItem.createWithName("a").build(), PresetItem.createWithName("b").build()),
                 PresetItem::getAssociations);
     }
 
     @Test
     public void cannotCreateWithNullAssociations() {
         exceptionIsThrownFor(validPresetBuilder::withAssociations, null, IllegalArgumentException.class);
+    }
+
+    private Function<PresetItem, String> extractProperty(PresetItem.Property property) {
+        return p -> p.getProperties().get(property.getKey());
+    }
+
+    private Function<String, PresetItem.Builder> addProperty(PresetItem.Property property) {
+        return value -> validPresetBuilder.withProperty(property.getKey(), value);
     }
 
     private <T, E extends Exception> void exceptionIsThrownFor(

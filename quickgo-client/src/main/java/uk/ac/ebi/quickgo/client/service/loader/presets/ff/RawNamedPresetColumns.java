@@ -18,4 +18,6 @@ interface RawNamedPresetColumns {
     int getURLPosition();
 
     int getMaxRequiredColumnCount();
+
+    int getAssociationPosition();
 }

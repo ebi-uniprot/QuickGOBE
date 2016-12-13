@@ -3,10 +3,7 @@ package uk.ac.ebi.quickgo.client.model.presets.impl;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -19,8 +16,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
 import static uk.ac.ebi.quickgo.client.model.presets.PresetItem.createWithName;
-import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.ASSIGNED_BY;
-import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.PresetType.GO_SLIMS_SETS;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetType.ASSIGNED_BY;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetType.GO_SLIMS_SETS;
 
 /**
  * Created 03/10/16
@@ -30,6 +27,7 @@ import static uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl.Pr
 public class CompositePresetImplTest {
     private static final String NAME = "name";
     private static final String ID = "id";
+    private static final String ASSOC = "assoc";
 
     public class GroupingPresetIdsByName {
 
@@ -42,36 +40,47 @@ public class CompositePresetImplTest {
 
         @Test
         public void canAdd1AndRetrievePreset() {
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName(name(1)).withId(id(1)).build());
+            presetBuilder.addPreset(
+                    GO_SLIMS_SETS,
+                    createWithName(name(1))
+                            .withProperty(ID, id(1))
+                            .build());
             Collection<PresetItem> presets = presetBuilder.getGoSlimSets();
 
             assertThat(presets, hasSize(1));
             PresetItem presetItem = presets.stream().findFirst().orElse(null);
-            assertThat(presetItem.getName(), is(name(1)));
-            assertThat(presetItem.getAssociations(), contains(id(1)));
+            assertThat(presetItem.getProperty(NAME), is(name(1)));
+            assertThat(presetItem.getAssociations(), contains(presetItemWithId(1)));
         }
 
         @Test
         public void canAddGroupOf2PresetsAndRetrieveCorrectly() {
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName(name(1)).withId(id(1)).build());
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName(name(1)).withId(id(2)).build());
+            presetBuilder.addPreset(
+                    GO_SLIMS_SETS,
+                    presetItemWith(name(1), id(1), assoc(10)));
+            presetBuilder.addPreset(
+                    GO_SLIMS_SETS,
+                    presetItemWith(name(1), id(2), assoc(11)));
 
             Map<String, PresetItem> resultsMap = buildResultsMap(presetBuilder.getGoSlimSets());
 
             assertThat(resultsMap.keySet(), contains(name(1)));
             assertThat(resultsMap.values().stream()
-                    .map(PresetItem::getAssociations)
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toList()), contains(id(1), id(2)));
+                            .map(PresetItem::getAssociations)
+                            .flatMap(Collection::stream)
+                            .collect(Collectors.toList()),
+                    contains(
+                            presetItemWith(assoc(10), id(1)),
+                            presetItemWith(assoc(11), id(2))));
         }
 
         private Map<String, PresetItem> buildResultsMap(Collection<PresetItem> presetItems) {
             Map<String, PresetItem> resultsMap = new HashMap<>();
             presetItems.forEach(p -> {
-                if (resultsMap.containsKey(p.getName())) {
+                if (resultsMap.containsKey(p.getProperty(NAME))) {
                     throw new IllegalStateException("Presets should not contain multiple items with the same name.");
                 }
-                resultsMap.put(p.getName(), p);
+                resultsMap.put(p.getProperty(NAME), p);
             });
 
             return resultsMap;
@@ -79,28 +88,66 @@ public class CompositePresetImplTest {
 
         @Test
         public void canAddGroupOf2PresetsAndGroupOf1PresetsAndRetrieveCorrectly() {
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName(name(1)).withId(id(1)).build());
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName(name(1)).withId(id(2)).build());
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName(name(2)).withId(id(3)).build());
+            presetBuilder.addPreset(
+                    GO_SLIMS_SETS,
+                    presetItemWith(name(1), id(1), assoc(10)));
+            presetBuilder.addPreset(
+                    GO_SLIMS_SETS,
+                    presetItemWith(name(1), id(2), assoc(11)));
+            presetBuilder.addPreset(
+                    GO_SLIMS_SETS,
+                    presetItemWith(name(2), id(3), assoc(20)));
 
             Map<String, PresetItem> resultsMap = buildResultsMap(presetBuilder.getGoSlimSets());
 
             assertThat(resultsMap.keySet(), containsInAnyOrder(name(1), name(2)));
-            assertThat(resultsMap.get(name(1)).getAssociations(), containsInAnyOrder(id(1), id(2)));
-            assertThat(resultsMap.get(name(2)).getAssociations(), contains(id(3)));
+            assertThat(resultsMap.get(name(1)).getAssociations(), containsInAnyOrder(
+                    presetItemWith(assoc(10), id(1)),
+                    presetItemWith(assoc(11), id(2))));
+            assertThat(resultsMap.get(name(2)).getAssociations(), contains(
+                    presetItemWith(assoc(20), id(3))));
+        }
+
+        private PresetItem presetItemWithId(int idValue) {
+            return PresetItem
+                    .createWithName(name(idValue))
+                    .withProperty(ID, id(idValue))
+                    .build();
+        }
+
+        private PresetItem presetItemWith(String name) {
+            return PresetItem.createWithName(name).build();
+        }
+
+        private PresetItem presetItemWith(String name, String id) {
+            return PresetItem.createWithName(name).withProperty(ID, id).build();
+        }
+
+        private PresetItem presetItemWith(String name, String id, String... assoc) {
+            return PresetItem.createWithName(name)
+                    .withProperty(ID, id)
+                    .withAssociations(Arrays.stream(assoc)
+                            .map(this::presetItemWith)
+                            .collect(Collectors.toList()))
+                    .build();
         }
 
         @Test
         public void presetsAreReturnedInAlphabeticalOrder() {
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName("B").withId(anyId()).build());
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName("A").withId(anyId()).build());
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName("C").withId(anyId()).build());
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName("C").withId(anyId()).build());
-            presetBuilder.addPreset(GO_SLIMS_SETS, createWithName("A").withId(anyId()).build());
+            presetBuilder.addPreset(GO_SLIMS_SETS,
+                    createWithName("B").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(GO_SLIMS_SETS,
+                    createWithName("A").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(GO_SLIMS_SETS,
+                    createWithName("C").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(GO_SLIMS_SETS,
+                    createWithName("C").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(GO_SLIMS_SETS,
+                    createWithName("A").withProperty(ID, anyId()).build());
 
             Collection<PresetItem> presets = presetBuilder.getGoSlimSets();
 
-            assertThat(presets.stream().map(PresetItem::getName).collect(Collectors.toList()),
+            assertThat(presets.stream().map(p -> p.getProperty(NAME)).collect(Collectors.toList()),
                     contains("A", "B", "C"));
         }
 
@@ -121,13 +168,12 @@ public class CompositePresetImplTest {
 
         @Test
         public void canAdd1PresetAndRetrieveCorrectly() {
-            presetBuilder.addPreset(ASSIGNED_BY, createWithName(name
-                    (1)).build());
+            presetBuilder.addPreset(ASSIGNED_BY, createWithName(name(1)).build());
             List<PresetItem> presets = presetBuilder.getAssignedBy();
             assertThat(presets, hasSize(1));
 
             PresetItem presetItem = presets.stream().findFirst().orElse(null);
-            assertThat(presetItem.getName(), is(name(1)));
+            assertThat(presetItem.getProperty(NAME), is(name(1)));
         }
 
         @Test
@@ -137,7 +183,8 @@ public class CompositePresetImplTest {
             List<PresetItem> presets = presetBuilder.getAssignedBy();
             assertThat(presets, hasSize(2));
 
-            List<String> presetsNames = presets.stream().map(PresetItem::getName).collect(Collectors.toList());
+            List<String> presetsNames =
+                    presets.stream().map(p -> p.getProperty(NAME)).collect(Collectors.toList());
             assertThat(presetsNames, Matchers.contains(name(1), name(2)));
         }
 
@@ -151,7 +198,8 @@ public class CompositePresetImplTest {
             List<PresetItem> presets = presetBuilder.getAssignedBy();
             assertThat(presets, hasSize(4));
 
-            List<String> presetsNames = presets.stream().map(PresetItem::getName).collect(Collectors.toList());
+            List<String> presetsNames =
+                    presets.stream().map(p -> p.getProperty(NAME)).collect(Collectors.toList());
             assertThat(presetsNames, Matchers.contains(name(1), name(2), name(3), name(4)));
         }
     }
@@ -172,5 +220,11 @@ public class CompositePresetImplTest {
 
     private static String anyId() {
         return ID + Math.random();
+    }
+
+
+
+    private String assoc(int id) {
+        return ASSOC + id;
     }
 }

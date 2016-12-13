@@ -57,7 +57,7 @@ public class PresetsFailedRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                extractPresetValues(presets.getAssignedBy(), PresetItem::getName),
+                extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
                 IsIterableContainingInOrder.contains(MockPresetDataConfig.UNIPROT_KB));
     }
 
@@ -71,7 +71,7 @@ public class PresetsFailedRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                extractPresetValues(presets.getTaxons(), PresetItem::getName),
+                extractPresetValues(presets.getTaxons(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
                 is(empty()));
     }
 
@@ -85,7 +85,7 @@ public class PresetsFailedRelevancyFetchingIT {
 
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
-                extractPresetValues(presets.getQualifiers(), PresetItem::getName),
+                extractPresetValues(presets.getQualifiers(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
                 is(empty()));
     }
 
