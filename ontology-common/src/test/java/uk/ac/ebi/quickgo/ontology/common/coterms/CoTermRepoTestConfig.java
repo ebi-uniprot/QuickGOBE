@@ -44,9 +44,6 @@ public class CoTermRepoTestConfig {
     @Bean
     @Profile(FAILED_RETRIEVAL)
     public CoTermRepository failedCoTermLoading() throws IOException {
-        CoTermRepositorySimpleMap coTermRepository = null;
-        Resource emptyResource = new FileSystemResource(File.createTempFile("CoTermRepoTestConfig", null, null));
-        coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(emptyResource, emptyResource);
-        return coTermRepository;
+        return CoTermRepositorySimpleMap.createEmptyRepository();
     }
 }
