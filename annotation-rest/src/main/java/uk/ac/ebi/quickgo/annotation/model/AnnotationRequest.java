@@ -58,6 +58,7 @@ public class AnnotationRequest {
     static final String GENE_PRODUCT_SUBSET_PARAM = "Gene Product Subset identifier";
     static final String GENE_PRODUCT_PARAM = "Gene Product ID";
     static final String REFERENCE_PARAM = "Reference";
+    static final String QUALIFIER_PARAM = "Qualifer";
 
     static final String GO_USAGE_ID = "goId";
     static final String GO_USAGE_FIELD = "goUsage";
@@ -305,6 +306,7 @@ public class AnnotationRequest {
         filterMap.put(Searchable.QUALIFIER, qualifier);
     }
 
+    @ArrayPattern(regexp = "^(NOT\\|)?[A-Z_]+$", flags = CASE_INSENSITIVE, paramName = QUALIFIER_PARAM)
     public String[] getQualifier() {
         return filterMap.get(Searchable.QUALIFIER);
     }

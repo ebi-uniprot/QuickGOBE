@@ -623,6 +623,50 @@ public class AnnotationRequestValidationIT {
         assertThat(violations, hasSize(1));
     }
 
+    // QUALIFIER
+    @Test
+    public void qualifierWithUnderscoreNoSpacesOrNumbersIsValid() {
+        annotationRequest.setQualifier("foobar","foo_bar");
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void qualifierWithNoSpacesAroundPipeIsValid() {
+        annotationRequest.setQualifier("NOT|enables");
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void qualifierWithSpacesAroundPipeIsInvalid() {
+        annotationRequest.setQualifier("NOT | enables");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        annotationRequest.setQualifier("NOT |enables");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+        annotationRequest.setQualifier("NOT| enables");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void qualifierNotValueCaseInsensitiveIsValid() {
+        annotationRequest.setQualifier("Not|enable");
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+        annotationRequest.setQualifier("nOT|enable");
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void qualifierWithNotAndNoPipeIsInvalid() {
+        annotationRequest.setQualifier("not boo");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void StringWithNumbersIsAnInvalidQualifier() {
+        annotationRequest.setQualifier("foo3bar");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
         return String.format(ArrayPattern.DEFAULT_ERROR_MSG, paramName, csvInvalidItems);
