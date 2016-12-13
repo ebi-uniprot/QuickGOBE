@@ -4,9 +4,7 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,24 +30,6 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
     private CoTermRepositorySimpleMap() {}
 
     /**
-     * Create a instance of CoTermRepositorySimpleMap using maps of CoTerms from all sources and manual sources
-     * respectively.
-     * @param coTermsAll CoTerms derived from all sources.
-     * @param coTermsManual CoTerms derived from non-electronic source.
-     */
-    public static CoTermRepositorySimpleMap createCoTermRepositorySimpleMap(Map<String, List<CoTerm>> coTermsAll,
-            Map<String, List<CoTerm>> coTermsManual) {
-
-        Preconditions.checkArgument(coTermsAll != null, "Map coTermsAll is null.");
-        Preconditions.checkArgument(coTermsManual != null, "Map coTermsManual is null.");
-
-        CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
-        coTermRepository.coTermsAll = coTermsAll;
-        coTermRepository.coTermsManual = coTermsManual;
-        return coTermRepository;
-    }
-
-    /**
      * Create a instance of CoTermRepositorySimpleMap loading the co-occurring data from the resources.
      * @param manualCoTermsSource source of co-occurring terms for Terms used in manually derived annotations.
      * @param allCoTermSource source of co-occurring terms for Terms used in annotations derived from all sources.
@@ -67,6 +47,17 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
         CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
                 coTermRepository.new CoTermLoader(manualCoTermsSource, allCoTermSource);
         coTermLoader.load();
+        return coTermRepository;
+    }
+
+    /**
+     * Create a instance of CoTermRepositorySimpleMap that contains no data.
+     * The source hash maps are deliberately NOT populated so an error is throw every time an attempt is made to
+     * retrieve a CoTerm.
+     * @throws IOException if the source of the co-occurring terms exists, but fails to be read.
+     */
+    public static CoTermRepositorySimpleMap createEmptyRepository() {
+        CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
         return coTermRepository;
     }
 
@@ -94,7 +85,8 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @throws IllegalStateException if the target map is empty.
      */
     private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id) {
-        Preconditions.checkState(map.size()>0, "The coterms map is empty!");
+        Preconditions.checkState(Objects.nonNull(map), "The CoTerms map is null.");
+        Preconditions.checkState(map.size()>0, "The CoTerms map is empty.");
         List<CoTerm> results = map.get(id);
         if (results == null) {
             return Collections.emptyList();
