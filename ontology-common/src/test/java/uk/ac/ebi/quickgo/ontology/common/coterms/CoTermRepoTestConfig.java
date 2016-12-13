@@ -37,13 +37,7 @@ public class CoTermRepoTestConfig {
     @Profile(SUCCESSFUL_RETRIEVAL)
     public CoTermRepository coTermRepository() throws IOException {
         CoTermRepositorySimpleMap coTermRepository;
-        try{
-            coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource);
-        } catch (IOException e) {
-            throw new IOException("Failed to load co-occurring terms from manual source " +
-                    (manualResource!=null?manualResource.getDescription():"unknown") + " or from all source " +
-                    (allResource!=null?allResource.getDescription():"unknown"));
-        }
+        coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource);
         return coTermRepository;
     }
 
@@ -51,15 +45,8 @@ public class CoTermRepoTestConfig {
     @Profile(FAILED_RETRIEVAL)
     public CoTermRepository failedCoTermLoading() throws IOException {
         CoTermRepositorySimpleMap coTermRepository = null;
-        try{
-            Resource emptyResource = new FileSystemResource(File.createTempFile("CoTermRepoTestConfig", null, null));
-
-            coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(emptyResource, emptyResource);
-        } catch (Exception e) {
-            LOGGER.error("Failed to load co-occurring terms from 'MANUAL' source " +
-                                 (manualResource!=null?manualResource.getDescription():"unknown") + " or from 'ALL' source " +
-                                 (allResource!=null?allResource.getDescription():"unknown"));
-        }
+        Resource emptyResource = new FileSystemResource(File.createTempFile("CoTermRepoTestConfig", null, null));
+        coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(emptyResource, emptyResource);
         return coTermRepository;
     }
 }
