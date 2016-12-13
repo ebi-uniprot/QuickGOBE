@@ -102,11 +102,6 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
         return results;
     }
 
-//    public void clearData(){
-//        this.coTermsAll.clear();
-//        this.coTermsManual.clear();
-//    }
-
     static class CoTermRecordParser {
         private static final int COLUMN_ID = 0;
         private static final int COLUMN_COMPARE = 1;
