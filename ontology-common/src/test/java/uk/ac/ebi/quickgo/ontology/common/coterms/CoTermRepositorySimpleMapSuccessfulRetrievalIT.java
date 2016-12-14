@@ -64,7 +64,7 @@ public class CoTermRepositorySimpleMapSuccessfulRetrievalIT {
         coTermRepository.findCoTerms(null, CoTermSource.ALL);
     }
     @Test
-    public void findCoTermsThrowsExceptionIfCoTermSearchIsNull() {
+    public void findCoTermsThrowsExceptionIfCoTermSourceIsNull() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The findCoTerms source is null.");
         coTermRepository.findCoTerms(GO_TERM_ID_ALL_ONLY, null);
