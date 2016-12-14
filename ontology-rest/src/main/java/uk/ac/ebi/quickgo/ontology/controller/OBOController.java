@@ -290,6 +290,7 @@ public abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         validationHelper.validateRequestedResults(limit);
+        validationHelper.validatePageIsLessThanPaginationLimit(page);
 
         QueryRequest request = buildRequest(
                 query,

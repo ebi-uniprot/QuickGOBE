@@ -6,13 +6,13 @@ import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,13 +24,18 @@ import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
+import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig
+        .LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_ENTRIES_PER_PAGE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MIN_ENTRIES_PER_PAGE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MIN_PAGE_NUMBER;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
@@ -40,6 +45,7 @@ import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LO
         .class}, initializers = ConfigFileApplicationContextInitializer.class)
 public class AnnotationRequestValidationIT {
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
+    private static boolean HAS_RUN = false;
 
     @Autowired
     private Validator validator;
@@ -447,7 +453,7 @@ public class AnnotationRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("Page size cannot be less than " + MIN_PAGE_NUMBER + " but found: " + invalidPage));
+                is("Page number cannot be less than " + MIN_PAGE_NUMBER + ", but found: " + invalidPage));
     }
 
     @Test
@@ -494,14 +500,14 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void limitValueEqualToMaxEntriesPerPageIsInvalid() {
-        annotationRequest.setLimit(AnnotationRequest.MAX_ENTRIES_PER_PAGE);
+        annotationRequest.setLimit(MAX_ENTRIES_PER_PAGE);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void limitValueAboveMaxEntriesPerPageIsInvalid() {
-        int invalidEntriesPerPage = AnnotationRequest.MAX_ENTRIES_PER_PAGE + 1;
+        int invalidEntriesPerPage = MAX_ENTRIES_PER_PAGE + 1;
         annotationRequest.setLimit(invalidEntriesPerPage);
 
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
@@ -597,9 +603,10 @@ public class AnnotationRequestValidationIT {
         int numRefs = AnnotationRequest.MAX_REFERENCES + 1;
         List<String> refs = IntStream.range(0, numRefs)
                                      .mapToObj(i -> "PMID:123456")
-                                     .collect(Collectors.toList());
+                                     .collect(toList());
         annotationRequest.setReference(refs.toArray(new String[0]));
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
                 is(createMaxSizeErrorMessage(REFERENCE_PARAM, MAX_REFERENCES)));
@@ -676,11 +683,10 @@ public class AnnotationRequestValidationIT {
         return "Number of items in '" + paramName + "' is larger than: " + maxSize;
     }
 
-    private static boolean HAS_RUN = false;
     private void setupDbXrefValidationData(){
         if(!HAS_RUN) {
             JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME);
-            assertThat(jobExecution.getStatus(), Is.is(BatchStatus.COMPLETED));
+            assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
             HAS_RUN = true;
         }
 

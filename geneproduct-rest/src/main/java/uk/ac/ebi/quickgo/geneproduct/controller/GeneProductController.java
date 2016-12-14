@@ -116,8 +116,9 @@ public class GeneProductController {
      * @return the search results
      */
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<GeneProduct>> geneProductSearch(@Valid @ModelAttribute GeneProductRequest
-            request, BindingResult bindingResult) {
+    public ResponseEntity<QueryResult<GeneProduct>> geneProductSearch(
+            @Valid @ModelAttribute GeneProductRequest request,
+            BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);
@@ -126,9 +127,7 @@ public class GeneProductController {
         DefaultSearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
                 .setQuery(request.createQuery())
                 .addFacets(request.getFacet() == null ? null : Arrays.asList(request.getFacet()))
-                .addFilters(
-                        convertFilterRequestsToQueries(request.createFilterRequests())
-                )
+                .addFilters(convertFilterRequestsToQueries(request.createFilterRequests()))
                 .useHighlighting(request.isHighlighting())
                 .setPage(request.getPage())
                 .setPageSize(request.getLimit());
@@ -149,12 +148,11 @@ public class GeneProductController {
      * @param name name of target set
      * @return lookup results
      */
-    @RequestMapping(value="/targetset/{name}", method = {RequestMethod.GET}, produces = {MediaType
+    @RequestMapping(value = "/targetset/{name}", method = {RequestMethod.GET}, produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findByTargetSet(@PathVariable String name) {
         return getGeneProductResponse(geneProductService.findByTargetSet(name));
     }
-
 
     /**
      * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of documents.
