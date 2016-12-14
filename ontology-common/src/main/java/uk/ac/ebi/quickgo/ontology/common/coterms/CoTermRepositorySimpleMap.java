@@ -77,8 +77,8 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @throws IllegalArgumentException if the requested CoTermSource is null.
      */
     public List<CoTerm> findCoTerms(String id, CoTermSource source) {
-        Preconditions.checkArgument(id != null, "The findCoTerms id is null.");
-        Preconditions.checkArgument(source != null, "The findCoTerms source is null.");
+        Preconditions.checkArgument(id != null, "The requested id is null.");
+        Preconditions.checkArgument(source != null, "The requested co-occurring source is null.");
         return source == CoTermSource.MANUAL ? findCoTermsFromMap(coTermsManual, id)
                 : findCoTermsFromMap(coTermsAll, id);
     }
@@ -92,8 +92,8 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @throws IllegalStateException if the target map is empty.
      */
     private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id) {
-        Preconditions.checkState(Objects.nonNull(map), "No Co-occurring data is available.");
-        Preconditions.checkState(map.size() > 0, "The Co-occurring data is empty.");
+        Preconditions.checkState(Objects.nonNull(map), "No co-occurring data is available.");
+        Preconditions.checkState(map.size() > 0, "The co-occurring repository is empty.");
         List<CoTerm> results = map.get(id);
         if (results == null) {
             return Collections.emptyList();
