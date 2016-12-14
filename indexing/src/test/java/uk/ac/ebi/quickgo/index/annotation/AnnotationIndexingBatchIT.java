@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,6 +57,11 @@ public class AnnotationIndexingBatchIT {
     @Autowired
     private AnnotationRepository annotationRepository;
 
+    @Before
+    public void setUp() {
+        annotationRepository.deleteAll();
+    }
+
     @Test
     public void successfulIndexingJob() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -63,7 +69,7 @@ public class AnnotationIndexingBatchIT {
 
         List<StepExecution> jobsSingleStepAsList = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals (ANNOTATION_INDEXING_STEP_NAME))
+                .filter(step -> step.getStepName().equals(ANNOTATION_INDEXING_STEP_NAME))
                 .collect(Collectors.toList());
         assertThat(jobsSingleStepAsList, hasSize(1));
 
@@ -89,7 +95,7 @@ public class AnnotationIndexingBatchIT {
         //Manual
         List<StepExecution> jobsSingleStepCoTermManual = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals (CO_TERM_MANUAL_SUMMARIZATION_STEP))
+                .filter(step -> step.getStepName().equals(CO_TERM_MANUAL_SUMMARIZATION_STEP))
                 .collect(Collectors.toList());
         assertThat(jobsSingleStepCoTermManual, hasSize(1));
         StepExecution coTermsManualStep = jobsSingleStepCoTermManual.get(0);
@@ -100,7 +106,7 @@ public class AnnotationIndexingBatchIT {
 
         List<StepExecution> jobsSingleStepCoTermAll = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals (CO_TERM_ALL_SUMMARIZATION_STEP))
+                .filter(step -> step.getStepName().equals(CO_TERM_ALL_SUMMARIZATION_STEP))
                 .collect(Collectors.toList());
         assertThat(jobsSingleStepCoTermAll, hasSize(1));
         StepExecution coTermsAllStep = jobsSingleStepCoTermAll.get(0);

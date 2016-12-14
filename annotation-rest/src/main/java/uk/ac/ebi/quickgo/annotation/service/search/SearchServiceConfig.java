@@ -68,8 +68,7 @@ public class SearchServiceConfig {
     @Value("${geneproduct.db.xref.valid.casesensitive:" + DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE + "}")
     boolean xrefValidationCaseSensitive;
 
-    @Value("${annotation.terms.query.compatible.fields:" +
-            DEFAULT_UNSORTED_QUERY_FIELDS + "}")
+    @Value("${annotation.terms.query.compatible.fields:" + DEFAULT_UNSORTED_QUERY_FIELDS + "}")
     private String fieldsThatCanBeUnsorted;
 
     @Bean

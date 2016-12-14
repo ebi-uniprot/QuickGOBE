@@ -6,6 +6,8 @@ import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,7 @@ import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.DB_SUBSET_PARA
 import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.TAXON_ID_PARAM;
 import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.TYPE_PARAM;
 import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.createDocWithId;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
 
 @SpringApplicationConfiguration(classes = {GeneProductREST.class})
 public class GeneProductSearchIT extends SearchControllerSetup {
@@ -41,6 +44,17 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         saveToRepository(doc1);
 
         checkValidEmptyResultsResponse("doesn't exist");
+    }
+
+    @Test
+    public void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
+        int totalEntries = MAX_PAGE_NUMBER + 1;
+        int pageSize = 1;
+        int pageNumWhichIsTooHigh = totalEntries;
+
+        saveNDocs(totalEntries);
+
+        checkInvalidPageInfoInResponse("aaaa", pageNumWhichIsTooHigh, pageSize, HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
@@ -352,6 +366,12 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         for (GeneProductDocument doc : documents) {
             repository.save(doc);
         }
+    }
+
+    private void saveNDocs(int n) {
+        IntStream.range(1, n + 1)
+                .mapToObj(i -> createDocWithId(String.valueOf(i)))
+                .collect(Collectors.toList());
     }
 
     private GeneProductDocument createGeneProductDocWithName(String id, String name) {
