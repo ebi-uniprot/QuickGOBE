@@ -25,36 +25,14 @@ public class CoTermRepositorySimpleMapTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private static final String ID_1 = "GO:0001234";
-    private static final String ID_2 = "GO:0003870";
-    private static final String ID_3 = "GO:0009058";
-    private static final String ID_4 = "GO:0016857";
-    private static final String ID_5 = "GO:0009999";
-    private static final String ID_6 = "GO:0055085";
-
-    private static final CoTerm CO_TERM_A = new CoTerm(ID_1, ID_1, 79f, 46f, 838, 933);
-    private static final CoTerm CO_TERM_B = new CoTerm(ID_1, ID_2, 54f, 55f, 335, 9424);
-    private static final CoTerm CO_TERM_C = new CoTerm(ID_1, ID_3, 24f, 24f, 5732, 355);
-    private static final CoTerm CO_TERM_D = new CoTerm(ID_4, ID_1, 34f, 66f, 556, 872);
-    private static final CoTerm CO_TERM_E = new CoTerm(ID_6, ID_5, 99f, 47f, 34356, 456);
-    private static final CoTerm CO_TERM_F = new CoTerm(ID_6, ID_1, 24f, 4f, 465, 4564);
-
-    private CoTermRepositorySimpleMap coTermRepository;
-
-
-    @Test
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllMapIsNull() throws IOException{
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Map coTermsAll is null.");
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, null);
-    }
+    private static final int headerLines = 1;
 
     @Test
     public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualResourceIsNull() throws IOException {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Resource manualCoTermsSource is null.");
         Resource mockAllResource = mock(Resource.class);
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, mockAllResource);
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, mockAllResource, headerLines);
     }
 
     @Test
@@ -62,9 +40,8 @@ public class CoTermRepositorySimpleMapTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Resource allCoTermSource is null.");
         Resource mockManualResource = mock(Resource.class);
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, null);
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, null, headerLines);
     }
-
 
     @Test
     public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualResourceIsNonExistent() throws IOException {
@@ -74,7 +51,7 @@ public class CoTermRepositorySimpleMapTest {
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(false);
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, headerLines);
     }
 
     @Test
@@ -86,7 +63,7 @@ public class CoTermRepositorySimpleMapTest {
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(true);
         when(mockAllResource.exists()).thenReturn(false);
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, headerLines);
     }
 
     @Test(expected = IOException.class)
@@ -96,21 +73,18 @@ public class CoTermRepositorySimpleMapTest {
         when(mockManualResource.exists()).thenReturn(true);
         when(mockAllResource.exists()).thenReturn(true);
         when(mockAllResource.getURI()).thenThrow(IOException.class);
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource);
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, headerLines);
     }
 
-    // Test retrieval - failure
-
     @Test
-    public void findCoTermsThrowsExceptionIfSearchIdIsNull() {
+    public void exceptionIfHeaderLinesNegative() throws IOException{
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms id is null.");
-        coTermRepository.findCoTerms(null, CoTermSource.ALL);
-    }
-    @Test
-    public void findCoTermsThrowsExceptionIfCoTermSearchIsNull() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms source is null.");
-        coTermRepository.findCoTerms(ID_1, null);
+        thrown.expectMessage("The number of header lines is less than zero.");
+        Resource mockManualResource = mock(Resource.class);
+        Resource mockAllResource = mock(Resource.class);
+        when(mockManualResource.exists()).thenReturn(true);
+        when(mockAllResource.exists()).thenReturn(true);
+        int negHeaderLines = -1;
+        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, negHeaderLines);
     }
 }
