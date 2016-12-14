@@ -22,7 +22,7 @@ public class CoTermRepositorySimpleMapTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualResourceIsNull() throws IOException {
+    public void createFailsIfManualResourceIsNull() throws IOException {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Resource manualCoTermsSource is null.");
         Resource mockAllResource = mock(Resource.class);
@@ -30,7 +30,7 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllResourceIsNull() throws IOException {
+    public void createFailsIfAllResourceIsNull() throws IOException {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Resource allCoTermSource is null.");
         Resource mockManualResource = mock(Resource.class);
@@ -38,7 +38,7 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualResourceIsNonExistent() throws IOException {
+    public void createFailsIfManualResourceIsNonExistent() throws IOException {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("Resource manualCoTermsSource does not exist.");
 
@@ -49,7 +49,7 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllResourceIsNonExistent() throws Exception {
+    public void createFailsIfAllResourceIsNonExistent() throws Exception {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("Resource allCoTermSource does not exist.");
 
@@ -61,7 +61,7 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test(expected = IOException.class)
-    public void createCoTermRepositorySimpleMapFailsWithExceptionIfAllResourceIsBad() throws Exception {
+    public void createFailsWithIfAllResourceIsBad() throws Exception {
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(true);
@@ -71,7 +71,7 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test
-    public void exceptionIfHeaderLinesNegative() throws IOException {
+    public void createFailsIfHeaderLinesNegative() throws IOException {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The number of header lines is less than zero.");
         Resource mockManualResource = mock(Resource.class);
