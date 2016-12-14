@@ -1,9 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
-import java.io.File;
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +17,6 @@ import org.springframework.core.io.Resource;
  */
 @Configuration
 public class CoTermRepoTestConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CoTermRepoTestConfig.class);
     static final String FAILED_RETRIEVAL = "failedRetrieval";
     static final String SUCCESSFUL_RETRIEVAL = "successfulRetrieval";
 
