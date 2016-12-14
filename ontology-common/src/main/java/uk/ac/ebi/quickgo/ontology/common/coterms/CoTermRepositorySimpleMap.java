@@ -4,12 +4,14 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -24,10 +26,15 @@ import static java.util.stream.Collectors.groupingBy;
 
 public class CoTermRepositorySimpleMap implements CoTermRepository {
 
+    private int headerLines = 0;
     private Map<String, List<CoTerm>> coTermsAll;
     private Map<String, List<CoTerm>> coTermsManual;
 
     private CoTermRepositorySimpleMap() {}
+
+    private CoTermRepositorySimpleMap(int headerLines) {
+        this.headerLines = headerLines;
+    }
 
     /**
      * Create a instance of CoTermRepositorySimpleMap loading the co-occurring data from the resources.
@@ -36,14 +43,15 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @throws IOException if the source of the co-occurring terms exists, but fails to be read.
      */
     public static CoTermRepositorySimpleMap createCoTermRepositorySimpleMap(Resource manualCoTermsSource, Resource
-            allCoTermSource) throws IOException {
+            allCoTermSource, int headerLines) throws IOException {
 
         Preconditions.checkArgument(manualCoTermsSource != null, "Resource manualCoTermsSource is null.");
         Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource is null.");
         Preconditions.checkState(manualCoTermsSource.exists(), "Resource manualCoTermsSource does not exist.");
         Preconditions.checkState(allCoTermSource.exists(), "Resource allCoTermSource does not exist.");
+        Preconditions.checkArgument(headerLines >= 0, "The number of header lines is less than zero.");
 
-        CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
+        CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap(headerLines);
         CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
                 coTermRepository.new CoTermLoader(manualCoTermsSource, allCoTermSource);
         coTermLoader.load();
@@ -54,11 +62,9 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * Create a instance of CoTermRepositorySimpleMap that contains no data.
      * The source hash maps are deliberately NOT populated so an error is throw every time an attempt is made to
      * retrieve a CoTerm.
-     * @throws IOException if the source of the co-occurring terms exists, but fails to be read.
      */
     public static CoTermRepositorySimpleMap createEmptyRepository() {
-        CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap();
-        return coTermRepository;
+        return new CoTermRepositorySimpleMap();
     }
 
     /**
@@ -86,7 +92,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      */
     private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id) {
         Preconditions.checkState(Objects.nonNull(map), "The CoTerms map is null.");
-        Preconditions.checkState(map.size()>0, "The CoTerms map is empty.");
+        Preconditions.checkState(map.size() > 0, "The CoTerms map is empty.");
         List<CoTerm> results = map.get(id);
         if (results == null) {
             return Collections.emptyList();
@@ -105,8 +111,8 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
         static CoTerm createFromText(String line) {
             String[] columns = line.split("\\t");
             return new CoTerm(columns[COLUMN_ID], columns[COLUMN_COMPARE],
-                    Float.parseFloat(columns[COLUMN_PROB]), Float.parseFloat(columns[COLUMN_SIG]),
-                    Long.parseLong(columns[COLUMN_TOGETHER]), Long.parseLong(columns[COLUMN_COMPARED]));
+                              Float.parseFloat(columns[COLUMN_PROB]), Float.parseFloat(columns[COLUMN_SIG]),
+                              Long.parseLong(columns[COLUMN_TOGETHER]), Long.parseLong(columns[COLUMN_COMPARED]));
         }
     }
 
@@ -149,16 +155,11 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
          */
         private Map<String, List<CoTerm>> loadCoTermsSource(Resource source) throws IOException {
 
-            try (Stream<String> lines = Files.lines(Paths.get(source.getURI()))) {
-                return lines
-                        .skip(1)    //header
-                        .map(CoTermRecordParser::createFromText)
-                        .collect(groupingBy(CoTerm::getTarget));
-
-            } catch (IOException e) {
-                throw e;
-            }
-
+            Stream<String> lines = Files.lines(Paths.get(source.getURI()));
+            return lines
+                    .skip(headerLines)
+                    .map(CoTermRecordParser::createFromText)
+                    .collect(groupingBy(CoTerm::getTarget));
         }
     }
 }
