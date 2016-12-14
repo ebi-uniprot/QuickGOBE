@@ -221,7 +221,7 @@ public class AnnotationRequest {
 
     @ApiModelProperty(value = "An annotation extension is used to extend " +
             "(i.e., add more specificity to) the GO term used in an annotation; the combination of the GO term plus the" +
-            " extension is equivalent to a more specific GO term." +
+            " extension is equivalent to a more specific GO term. " +
             "An annotation extension is stored in the database, and transmitted in annotation files, as a single " +
             "string, structured as a pipe-separated list of comma-separated lists of components.",
             example = "occurs_in(CL:0000032),transports_or_maintains_localization_of(UniProtKB:P10288)|" +
@@ -479,7 +479,7 @@ public class AnnotationRequest {
     /**
      * A list of extension relationship values, separated by commas
      * In the format extension=occurs_in(PomBase:SPBP23A10.14c),RGD:621207 etc
-     * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
+     * Users can supply just the database (e.g. PomBase) or id SPBP23A10.14c
      */
     public void setExtension(String... extension) {
         filterMap.put(Searchable.EXTENSION, extension);
@@ -487,7 +487,7 @@ public class AnnotationRequest {
 
     /**
      * Return a list of annotation extension values, separated by commas
-     * @return String containing comma separated list of extension values.
+     * @return String array containing comma separated list of extension values.
      */
     public String[] getExtension() {
         return filterMap.get(Searchable.EXTENSION);
