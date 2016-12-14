@@ -8,11 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.Resource;
-
-import static org.mockito.Mockito.mock;
-import static org.springframework.data.solr.core.query.IfFunction.when;
 
 /**
  * Configuration class related to loading and using co-occurring terms information.
@@ -33,11 +30,19 @@ public class CoTermRepoTestConfig {
     @Value("${coterm.source.all}")
     private Resource allResource;
 
+    @Value("${coterm.source.header.lines:1}")
+    private int headerLines;
+
+    @Bean
+    static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
     @Bean
     @Profile(SUCCESSFUL_RETRIEVAL)
     public CoTermRepository coTermRepository() throws IOException {
         CoTermRepositorySimpleMap coTermRepository;
-        coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource);
+        coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource, headerLines);
         return coTermRepository;
     }
 
