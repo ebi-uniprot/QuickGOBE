@@ -1,16 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
 import java.io.IOException;
-import java.util.*;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.core.io.Resource;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,10 +17,9 @@ import static org.mockito.Mockito.when;
  */
 public class CoTermRepositorySimpleMapTest {
 
+    private static final int headerLines = 1;
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    private static final int headerLines = 1;
 
     @Test
     public void createCoTermRepositorySimpleMapFailsWithExceptionIfManualResourceIsNull() throws IOException {
@@ -77,7 +71,7 @@ public class CoTermRepositorySimpleMapTest {
     }
 
     @Test
-    public void exceptionIfHeaderLinesNegative() throws IOException{
+    public void exceptionIfHeaderLinesNegative() throws IOException {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The number of header lines is less than zero.");
         Resource mockManualResource = mock(Resource.class);
