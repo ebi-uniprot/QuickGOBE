@@ -49,7 +49,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
         Preconditions.checkArgument(allCoTermSource != null, "Resource allCoTermSource is null.");
         Preconditions.checkState(manualCoTermsSource.exists(), "Resource manualCoTermsSource does not exist.");
         Preconditions.checkState(allCoTermSource.exists(), "Resource allCoTermSource does not exist.");
-        Preconditions.checkArgument(headerLines < 0, "The number of header lines is less than zero.");
+        Preconditions.checkArgument(headerLines > -1, "The number of header lines is less than zero.");
 
         CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap(headerLines);
         CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
