@@ -60,13 +60,13 @@ public class CoTermRepositorySimpleMapSuccessfulRetrievalIT {
     @Test
     public void findCoTermsThrowsExceptionIfSearchIdIsNull() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms id is null.");
+        thrown.expectMessage("The requested id is null.");
         coTermRepository.findCoTerms(null, CoTermSource.ALL);
     }
     @Test
     public void findCoTermsThrowsExceptionIfCoTermSourceIsNull() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The findCoTerms source is null.");
+        thrown.expectMessage("The requested co-occurring source is null.");
         coTermRepository.findCoTerms(GO_TERM_ID_ALL_ONLY, null);
     }
 }
