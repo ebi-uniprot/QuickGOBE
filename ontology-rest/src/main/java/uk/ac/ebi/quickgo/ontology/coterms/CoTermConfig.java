@@ -32,6 +32,9 @@ public class CoTermConfig {
     @Value("${coterm.source.all}")
     private Resource allResource;
 
+    @Value("${coterm.source.headerLines:1}")
+    private int headerLines;
+
     /**
      * If we have been unable to load the CoTermRepository, do not propagate the exception (as this will stop all
      * configuration completing and the ontology service will not be available.
@@ -41,11 +44,13 @@ public class CoTermConfig {
     public CoTermRepository coTermRepository() {
         CoTermRepositorySimpleMap coTermRepository = null;
         try{
-            coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource);
+            coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource,
+                                                                                         headerLines);
         } catch (Exception e) {
             LOGGER.error("Failed to load co-occurring terms from 'MANUAL' source " +
                     (manualResource!=null?manualResource.getDescription():"unknown") + " or from 'ALL' source " +
                     (allResource!=null?allResource.getDescription():"unknown"));
+            coTermRepository = CoTermRepositorySimpleMap.createEmptyRepository();
         }
         return coTermRepository;
     }
