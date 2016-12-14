@@ -92,8 +92,8 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @throws IllegalStateException if the target map is empty.
      */
     private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id) {
-        Preconditions.checkState(Objects.nonNull(map), "The CoTerms map is null.");
-        Preconditions.checkState(map.size() > 0, "The CoTerms map is empty.");
+        Preconditions.checkState(Objects.nonNull(map), "No Co-occurring data is available.");
+        Preconditions.checkState(map.size() > 0, "The Co-occurring data is empty.");
         List<CoTerm> results = map.get(id);
         if (results == null) {
             return Collections.emptyList();
