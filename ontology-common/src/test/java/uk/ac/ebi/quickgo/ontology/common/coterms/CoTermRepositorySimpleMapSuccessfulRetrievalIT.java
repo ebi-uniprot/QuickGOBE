@@ -6,9 +6,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -22,7 +21,7 @@ import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepoTestConfig.SUC
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {CoTermRepoTestConfig.class}, loader = SpringApplicationContextLoader.class)
+@SpringApplicationConfiguration(classes = {CoTermRepoTestConfig.class})
 @ActiveProfiles(profiles = SUCCESSFUL_RETRIEVAL)
 public class CoTermRepositorySimpleMapSuccessfulRetrievalIT {
 
