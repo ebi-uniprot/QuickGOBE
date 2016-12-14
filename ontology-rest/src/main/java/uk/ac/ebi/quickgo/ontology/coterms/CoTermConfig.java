@@ -2,9 +2,7 @@ package uk.ac.ebi.quickgo.ontology.coterms;
 
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
 import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepositorySimpleMap;
-import uk.ac.ebi.quickgo.rest.service.ServiceConfigException;
 
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,22 +36,22 @@ public class CoTermConfig {
     /**
      * If we have been unable to load the CoTermRepository, do not propagate the exception (as this will stop all
      * configuration completing and the ontology service will not be available.
-     * @return
+     * @return CoTerm repository instance.
      */
     @Bean
     public CoTermRepository coTermRepository() {
-        CoTermRepositorySimpleMap coTermRepository = null;
-        try{
+        CoTermRepositorySimpleMap coTermRepository;
+        try {
             coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource,
                                                                                          headerLines);
         } catch (Exception e) {
             LOGGER.error("Failed to load co-occurring terms from 'MANUAL' source " +
-                    (manualResource!=null?manualResource.getDescription():"unknown") + " or from 'ALL' source " +
-                    (allResource!=null?allResource.getDescription():"unknown"));
+                                 (manualResource != null ? manualResource.getDescription() : "unknown") +
+                                 " or from 'ALL' source " +
+                                 (allResource != null ? allResource.getDescription() : "unknown"));
             coTermRepository = CoTermRepositorySimpleMap.createEmptyRepository();
         }
         return coTermRepository;
     }
-
 
 }
