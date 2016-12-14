@@ -9,6 +9,8 @@ import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.EXTENSIONS;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
@@ -71,7 +74,9 @@ public class AnnotationControllerIT {
 
     @Autowired
     private AnnotationRepository repository;
-
+    private static final Pattern DATABASE_REGEX = Pattern.compile("(?<=\\()(\\w+)(?=:)");
+    private static final Pattern ID_REGEX = Pattern.compile(".+(((?<=:)(\\w+)(?=\\))))\\)");
+    private static final Pattern RELATION_REGEX = Pattern.compile("\\(");
     @Before
     public void setup() {
         repository.deleteAll();
@@ -1229,9 +1234,10 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByExtensionRelationship() throws Exception {
-        String extension = "results_in_development_of";
+//        String filter = RELATION_REGEX.matcher(EXTENSIONS.get(1)).toString();
+        String filter = (RELATION_REGEX.split(EXTENSIONS.get(1)))[0];
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), extension));
+                                                         .param(EXTENSION_PARAM.getName(), filter));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1242,9 +1248,11 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByExtensionDatabase() throws Exception {
-        String extension = "UBERON";
+        final Matcher matcher = DATABASE_REGEX.matcher(EXTENSIONS.get(1));
+        matcher.find();
+        String database = matcher.group(1);
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), extension));
+                                                         .param(EXTENSION_PARAM.getName(), database));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1255,9 +1263,11 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterById() throws Exception {
-        String extension = "0001675";
+        final Matcher matcher = ID_REGEX.matcher(EXTENSIONS.get(1));
+        matcher.find();
+        String id = matcher.group(1);
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), extension));
+                                                         .param(EXTENSION_PARAM.getName(), id));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1268,10 +1278,8 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByExtensionTarget() throws Exception {
-        String extension = "results_in_development_of(UBERON:0001675)";
-
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), extension));
+                                                         .param(EXTENSION_PARAM.getName(),  EXTENSIONS.get(1)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1286,7 +1294,7 @@ public class AnnotationControllerIT {
 
         String extension = "results_in_development_of(UBERON:1234567)";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.extensions = Collections.singletonList("results_in_development_of(UBERON:1234567)");
+        doc.extensions = Collections.singletonList(extension);
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
@@ -1325,10 +1333,9 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByMultipleExtensionTargetsReturnsHitAnnotationOnlyOnce() throws Exception {
-        String extension = "results_in_development_of(UBERON:0001675),acts_on_population_of(CL:0000032)";
+    public void multipleMatchingExtensionFilterValuesForAnAnnotationReturnsItOnlyOnce() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), extension));
+                                                         .param(EXTENSION_PARAM.getName(),  EXTENSIONS.get(0)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
