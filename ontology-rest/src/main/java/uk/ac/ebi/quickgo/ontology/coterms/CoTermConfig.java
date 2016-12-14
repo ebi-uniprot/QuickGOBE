@@ -34,8 +34,9 @@ public class CoTermConfig {
     private int headerLines;
 
     /**
-     * If we have been unable to load the CoTermRepository, do not propagate the exception (as this will stop all
-     * configuration completing and the ontology service will not be available.
+     * If we have been unable to load the CoTermRepository, do not propagate the exception as this will stop all
+     * configuration completing and the ontology service will not be available. Instead return a repository instance
+     * that contains no data. It will throw an error everytime it is used to look up CoTerms for an id.
      * @return CoTerm repository instance.
      */
     @Bean
