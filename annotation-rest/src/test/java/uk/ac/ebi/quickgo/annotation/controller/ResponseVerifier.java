@@ -115,6 +115,14 @@ final class ResponseVerifier {
         return matcher;
     }
 
+
+    static ResultMatcher fieldInRowHasValue(String fieldName, int index, String value) throws Exception {
+        String path = String.format(RESULTS_CONTENT_BY_INDEX, index);
+        return new CompositeResultMatcher().addMatcher(jsonPath(path + fieldName, is(value)));
+
+    }
+
+
     static ResultMatcher resultsInPage(int numResults) throws Exception {
         return jsonPath("$.results", hasSize(numResults));
     }
