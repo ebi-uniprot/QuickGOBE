@@ -37,6 +37,7 @@ public class AnnotationDocMocker {
 
     public static final String EXTENSION_DB1 = "UBERON";
     public static final String EXTENSION_DB2 = "CL";
+    public static final String EXTENSION_DB3 = "UNIPROT";
     public static final String EXTENSION_ID1 = "0001675";
     public static final String EXTENSION_ID2 = "0000032";
     public static final String EXTENSION_ID3 = "0006000";
@@ -45,8 +46,8 @@ public class AnnotationDocMocker {
     public static final String EXTENSION_RELATIONSHIP3 = "indicative_of";
 
     public static final String EXTENSION_1 = asExtension(EXTENSION_RELATIONSHIP1, EXTENSION_DB1, EXTENSION_ID1);
-    public static final String EXTENSION_2 = asExtension(EXTENSION_RELATIONSHIP1 ,EXTENSION_DB2 ,EXTENSION_ID2);
-    public static final String EXTENSION_3 = asExtension(EXTENSION_RELATIONSHIP2 ,EXTENSION_DB1,EXTENSION_ID3);
+    public static final String EXTENSION_2 = asExtension(EXTENSION_RELATIONSHIP2 ,EXTENSION_DB2 ,EXTENSION_ID2);
+    public static final String EXTENSION_3 = asExtension(EXTENSION_RELATIONSHIP3 ,EXTENSION_DB3,EXTENSION_ID3);
     public static final List<String> EXTENSIONS = asList(String.format("%s,%s", EXTENSION_1, EXTENSION_2), EXTENSION_3);
 
     private AnnotationDocMocker() {}
