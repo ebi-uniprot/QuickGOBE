@@ -1277,7 +1277,6 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
 
-    //todo EXTENSION_2 not being saved to extension search
     @Test
     public void filterByExtensionTarget2() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
