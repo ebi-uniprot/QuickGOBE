@@ -34,8 +34,7 @@ public class PresetsRetrievalIT {
     private static final String RESOURCE_URL = "/internal/presets";
     private static final String FIELDS_PARAM = "fields";
 
-    @Autowired
-    protected WebApplicationContext webApplicationContext;
+    @Autowired private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
 
