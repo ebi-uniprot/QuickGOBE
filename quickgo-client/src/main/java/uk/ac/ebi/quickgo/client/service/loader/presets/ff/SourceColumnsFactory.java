@@ -37,6 +37,11 @@ public class SourceColumnsFactory {
                         .withDescriptionPosition(2)
                         .withAssociationPosition(3)
                         .build();
+            case EXT_RELATION_COLUMNS:
+                return RawNamedPresetColumnsBuilder
+                        .createWithNamePosition(1)
+                        .withIdPosition(0)
+                        .build();
             default:
                 throw new IllegalStateException("Source type: " + source + " is not handled.");
         }
@@ -47,6 +52,7 @@ public class SourceColumnsFactory {
         ECO2GO_COLUMNS,
         GENE_PRODUCT_COLUMNS,
         GO_SLIM_SET_COLUMNS,
-        REF_COLUMNS
+        REF_COLUMNS,
+        EXT_RELATION_COLUMNS
     }
 }
