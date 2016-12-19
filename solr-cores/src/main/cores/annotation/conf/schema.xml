@@ -145,6 +145,9 @@
     <field name="goAspect_search" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="goAspect" dest="goAspect_search"/>
 
+    <field name="extension_search" type="extension_ignorecase" indexed="true" stored="false" multiValued="true"/>
+    <copyField source="extension" dest="extension_search"/>
+
 
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->
@@ -204,12 +207,35 @@
         </analyzer>
     </fieldType>
 
-    <!-- Be able to search for database references in the form database:id, with by database, id or combined -->
+    <!-- Be able to search for database references in the form database:id, by database, id or combined -->
     <fieldType name="database_ignorecase" class="solr.TextField" positionIncrementGap="100">
         <analyzer type="index">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
             <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"
                     preserve_original="true"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
+    <!-- Be able to search for annotation extensions by relation type and database references in the form database:id,
+    with by database, id or combined
+    E.g. positively_regulates(GO:0050840)
+    Match 1
+    Full match	0-32	`positively_regulates(GO:0050840)`
+    Group 1.	0-20	`positively_regulates`
+    Group 2.	21-31	`GO:0050840`
+    Group 3.	21-23	`GO`
+    Group 4.	24-31	`0050840`
+    -->
+    <fieldType name="extension_ignorecase" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(([\w_]+)\((([^,]+):([^,]+))\))"
+                    preserve_original="false"/>
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
         <analyzer type="query">

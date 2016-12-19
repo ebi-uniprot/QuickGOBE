@@ -76,7 +76,8 @@ public class AnnotationRequest {
             Searchable.REFERENCE,
             Searchable.TAXON_ID,
             Searchable.TARGET_SET,
-            Searchable.WITH_FROM
+            Searchable.WITH_FROM,
+            Searchable.EXTENSION
     };
 
     /**
@@ -217,6 +218,16 @@ public class AnnotationRequest {
                     "separated values.",
             example = "EXP,IDA")
     private String goIdEvidence;
+
+    @ApiModelProperty(value = "An annotation extension is used to extend " +
+            "(i.e., add more specificity to) the GO term used in an annotation; the combination of the GO term plus the" +
+            " extension is equivalent to a more specific GO term. " +
+            "An annotation extension is stored in the database, and transmitted in annotation files, as a single " +
+            "string, structured as a pipe-separated list of comma-separated lists of components.",
+            example = "occurs_in(CL:0000032),transports_or_maintains_localization_of(UniProtKB:P10288)|" +
+                    "results_in_formation_of(UBERON:0003070),occurs_in(CL:0000032),occurs_in(CL:0000008)," +
+                    "results_in_formation_of(UBERON:0001675)")
+    private String[] extensions;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
@@ -463,6 +474,23 @@ public class AnnotationRequest {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    /**
+     * A list of extension relationship values, separated by commas
+     * In the format extension=occurs_in(PomBase:SPBP23A10.14c),RGD:621207 etc
+     * Users can supply just the database (e.g. PomBase) or id SPBP23A10.14c
+     */
+    public void setExtension(String... extension) {
+        filterMap.put(Searchable.EXTENSION, extension);
+    }
+
+    /**
+     * Return a list of annotation extension values, separated by commas
+     * @return String array containing comma separated list of extension values.
+     */
+    public String[] getExtension() {
+        return filterMap.get(Searchable.EXTENSION);
     }
 
     /**
