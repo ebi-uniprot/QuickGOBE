@@ -78,7 +78,7 @@ public class CoTermController {
         validateGoTerm(id);
 
         final List<CoTerm> coTerms = coTermRepository.findCoTerms(id, toCoTermSource(source));
-        return getResultsResponse(coTerms.stream()
+        return getResultsResponse(coTerms.size(), coTerms.stream()
                 .filter(ct -> ct.getSimilarityRatio() >= similarityThreshold)
                 .limit(workoutLimit(limit))
                 .collect(Collectors.toList()));
@@ -90,11 +90,14 @@ public class CoTermController {
      * @param results a list of results
      * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of results
      */
-    private <ResponseType> ResponseEntity<QueryResult<ResponseType>> getResultsResponse(List<ResponseType> results) {
+    private <ResponseType> ResponseEntity<QueryResult<ResponseType>> getResultsResponse(long
+            numberOfHits, List<ResponseType>
+            results) {
         if (results == null) {
             results = Collections.emptyList();
         }
-        QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(results.size(), results).build();
+        QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(numberOfHits, results)
+                .build();
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 
