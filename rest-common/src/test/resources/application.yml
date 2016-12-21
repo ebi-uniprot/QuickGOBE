@@ -16,3 +16,12 @@ model:
       field1: transformedField1,
       field2: transformedField2
     }
+## ================= CORS =================
+spring:
+   profiles: test-cors-filter
+cors:
+  filters:
+    - allow-origins: "http://www.ebi.ac.uk, http://localhost:9090"
+      path: "/resource1/subresource1/**"
+    - allow-origins: "http://www.ebi.ac.uk"
+      path: "/resource2/subresource2/**"

@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.rest.controller.CORSFilter.*;
+import static uk.ac.ebi.quickgo.rest.controller.CORSFilter2.*;
 
 /**
  * Created 31/10/16
@@ -32,7 +32,7 @@ import static uk.ac.ebi.quickgo.rest.controller.CORSFilter.*;
 @SpringApplicationConfiguration(classes = CORSFilterReadingPropertiesTest.FakeApplication.class)
 public class CORSFilterReadingPropertiesTest {
     @Autowired
-    private CORSFilter filter;
+    private CORSFilter2 filter;
     private MockHttpServletResponse response;
 
     @Before
@@ -45,7 +45,7 @@ public class CORSFilterReadingPropertiesTest {
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
         String requestHost = "www.this.is.okay.com";
         String requestOrigin = "http://" + requestHost;
-        servletRequest.setServerName(requestHost);
+        servletRequest.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, requestOrigin);
         filter.doFilter(servletRequest, response, new MockFilterChain());
         assertThat(response.getHeader(ACCESS_CONTROL_ALLOW_ORIGIN), is(requestOrigin));
     }
@@ -84,6 +84,6 @@ public class CORSFilterReadingPropertiesTest {
     @Configuration
     @EnableAutoConfiguration
     @PropertySource(value = "cors.test.properties")
-    @Import(CORSFilter.class)
+    @Import(CORSFilter2.class)
     public static class FakeApplication {}
 }

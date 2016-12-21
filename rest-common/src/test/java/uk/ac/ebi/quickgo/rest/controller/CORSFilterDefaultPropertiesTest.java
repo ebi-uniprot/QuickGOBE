@@ -21,7 +21,7 @@ import java.io.IOException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static uk.ac.ebi.quickgo.rest.controller.CORSFilter.*;
+import static uk.ac.ebi.quickgo.rest.controller.CORSFilter2.*;
 
 /**
  * Created 31/10/16
@@ -32,7 +32,7 @@ import static uk.ac.ebi.quickgo.rest.controller.CORSFilter.*;
 @SpringApplicationConfiguration(classes = CORSFilterDefaultPropertiesTest.FakeApplication.class)
 public class CORSFilterDefaultPropertiesTest {
     @Autowired
-    private CORSFilter filter;
+    private CORSFilter2 filter;
     private MockHttpServletResponse response;
 
     @Before
@@ -79,6 +79,6 @@ public class CORSFilterDefaultPropertiesTest {
     @Profile("cors-test")
     @Configuration
     @EnableAutoConfiguration
-    @Import(CORSFilter.class)
+    @Import(CORSFilter2.class)
     public static class FakeApplication {}
 }

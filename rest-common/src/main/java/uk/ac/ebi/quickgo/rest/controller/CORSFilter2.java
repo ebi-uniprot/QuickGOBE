@@ -10,8 +10,6 @@ import java.util.stream.Stream;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -32,9 +30,9 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Created 16/05/16
  * @author Edd
  */
-@Component
-@ConfigurationProperties(prefix = "cors")
-public class CORSFilter implements Filter {
+//@Component
+//@ConfigurationProperties(prefix = "cors")
+public class CORSFilter2 implements Filter {
     static final String DEFAULT_ACCESS_CONTROL_ALLOW_CREDENTIALS = "true";
     static final String DEFAULT_ACCESS_CONTROL_ALLOW_HEADERS =
             "Origin, " +
@@ -52,7 +50,7 @@ public class CORSFilter implements Filter {
     static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
     static final String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
     static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
-    private static final Logger LOGGER = getLogger(CORSFilter.class);
+    private static final Logger LOGGER = getLogger(CORSFilter2.class);
     private static final Set<String> DEFAULT_CONTROL_ALLOW_ORIGINS_LIST =
             Stream.of(DEFAULT_ACCESS_CONTROL_ALLOW_ORIGIN).collect(Collectors.toSet());
     private static final String DELIMITER = " ";
