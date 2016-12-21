@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FakeCORSFilteringRESTApp {
     static final String RESOURCE_1_URL = "/resource1";
     static final String RESOURCE_2_URL = "/resource2";
+    static final String RESOURCE_2_SUB_RESOURCE_URL = "/resource2/sub-resource";
 
     public static void main(String[] args) {
         SpringApplication.run(FakeCORSFilteringRESTApp.class, args);
@@ -62,6 +63,12 @@ public class FakeCORSFilteringRESTApp {
                 produces = {MediaType.APPLICATION_JSON_VALUE})
         public String getResource2() {
             return "{ resource2Attribute : " + this.value+" }";
+        }
+
+        @RequestMapping(value = RESOURCE_2_SUB_RESOURCE_URL, method = {RequestMethod.GET},
+                produces = {MediaType.APPLICATION_JSON_VALUE})
+        public String getSubResource2() {
+            return "{ sub-resource2Attribute : " + this.value+" }";
         }
     }
 
