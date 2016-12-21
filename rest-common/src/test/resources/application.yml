@@ -22,6 +22,6 @@ spring:
 cors:
   filters:
     - allow-origins: "http://www.ebi.ac.uk, http://localhost:9090"
-      path: "/resource1/subresource1/**"
-    - allow-origins: "http://www.ebi.ac.uk"
-      path: "/resource2/subresource2/**"
+      path: "/resource1/**"
+    - allow-origins: "http://wwwdev.ebi.ac.uk:1234"
+      path: "/resource2/**"

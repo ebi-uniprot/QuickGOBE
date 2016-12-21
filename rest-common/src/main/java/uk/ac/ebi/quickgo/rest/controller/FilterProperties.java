@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  */
 public class FilterProperties {
     static final boolean DEFAULT_ACCESS_CONTROL_ALLOW_CREDENTIALS = true;
-    static final String DEFAULT_ACCESS_CONTROL_MAX_AGE = "3600";
+    static final long DEFAULT_ACCESS_CONTROL_MAX_AGE = 3600;
     static final Set<String> DEFAULT_ACCESS_CONTROL_ALLOW_HEADERS =
             asSet("Origin",
                     "Accept",
@@ -29,7 +29,7 @@ public class FilterProperties {
     private Set<String> allowOrigins = DEFAULT_ACCESS_CONTROL_ALLOW_ORIGIN;
     private String path = DEFAULT_PATH;
     private Set<String> exposeHeaders = DEFAULT_EXPOSE_HEADERS;
-    private String maxAge = DEFAULT_ACCESS_CONTROL_MAX_AGE;
+    private long maxAge = DEFAULT_ACCESS_CONTROL_MAX_AGE;
 
     public String getPath() {
         return path;
@@ -79,11 +79,11 @@ public class FilterProperties {
         this.exposeHeaders = exposeHeaders;
     }
 
-    public String getMaxAge() {
+    public long getMaxAge() {
         return maxAge;
     }
 
-    public void setMaxAge(String maxAge) {
+    public void setMaxAge(long maxAge) {
         this.maxAge = maxAge;
     }
 
