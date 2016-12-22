@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
+import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepositorySimpleMap.createEmptyRepository;
+
 /**
  * @author Tony Wardell
  * Date: 29/09/2016
@@ -36,7 +38,7 @@ public class CoTermConfig {
     /**
      * If we have been unable to load the CoTermRepository, do not propagate the exception as this will stop all
      * configuration completing and the ontology service will not be available. Instead return a repository instance
-     * that contains no data. It will throw an error everytime it is used to look up CoTerms for an id.
+     * that contains no data. It will throw an error every time it is used to look up CoTerms for an id.
      * @return CoTerm repository instance.
      */
     @Bean
@@ -46,11 +48,12 @@ public class CoTermConfig {
             coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource,
                                                                                          headerLines);
         } catch (Exception e) {
-            LOGGER.error("Failed to load co-occurring terms from 'MANUAL' source " +
-                                 (manualResource != null ? manualResource.getDescription() : "unknown") +
-                                 " or from 'ALL' source " +
-                                 (allResource != null ? allResource.getDescription() : "unknown"));
-            coTermRepository = CoTermRepositorySimpleMap.createEmptyRepository();
+            final String errorMessage = "Failed to load co-occurring terms from 'MANUAL' source " +
+                    (manualResource == null ? "unknown" : manualResource.getDescription()) +
+                    " or from 'ALL' source " +
+                    (allResource == null ? "unknown" : allResource.getDescription());
+            LOGGER.error(errorMessage);
+            coTermRepository = createEmptyRepository();
         }
         return coTermRepository;
     }
