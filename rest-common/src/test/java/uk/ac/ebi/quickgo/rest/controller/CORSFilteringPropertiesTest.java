@@ -22,8 +22,8 @@ import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.HttpHeaders.*;
-import static uk.ac.ebi.quickgo.rest.controller.FilterProperties.DEFAULT_ACCESS_CONTROL_ALLOW_HEADERS;
-import static uk.ac.ebi.quickgo.rest.controller.FilterProperties.DEFAULT_ACCESS_CONTROL_ALLOW_METHODS;
+import static uk.ac.ebi.quickgo.rest.controller.CORSFilterProperties.DEFAULT_ACCESS_CONTROL_ALLOW_HEADERS;
+import static uk.ac.ebi.quickgo.rest.controller.CORSFilterProperties.DEFAULT_ACCESS_CONTROL_ALLOW_METHODS;
 
 /**
  * This class tests that the all loaded CORS properties from a YAML file are used by the CORS filter as appropriate.
@@ -33,8 +33,8 @@ import static uk.ac.ebi.quickgo.rest.controller.FilterProperties.DEFAULT_ACCESS_
  */
 @ActiveProfiles("cors-config-filtering-test")
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = CORSFilterPropertiesTest.FakeApplication.class)
-public class CORSFilterPropertiesTest {
+@SpringApplicationConfiguration(classes = CORSFilteringPropertiesTest.FakeApplication.class)
+public class CORSFilteringPropertiesTest {
     private static final String TEST_ORIGIN = "http://any-host";
     private static final String TEST_EXPOSED_HEADERS = "1st-exposed-header, 2nd-exposed-header";
 

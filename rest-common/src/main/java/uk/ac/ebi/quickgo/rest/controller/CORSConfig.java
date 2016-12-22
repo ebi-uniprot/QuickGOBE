@@ -11,9 +11,25 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import static uk.ac.ebi.quickgo.rest.controller.FilterProperties.*;
+import static uk.ac.ebi.quickgo.rest.controller.CORSFilterProperties.*;
 
 /**
+ * Defines configurable cross-origin-resource-sharing beans. Configuration of the bean properties, e.g.,
+ * allowed origins, exposed headers, etc., can be specified via the following properties (shown in YAML format):
+ *
+ * <pre>
+        cors:
+        filters:
+        - allow-origins: "http://any-host"
+          allow-methods: "GET"
+          max-age: 3600
+          allow-credentials: true
+          expose-headers: "1st-exposed-header, 2nd-exposed-header"
+          path: "/**"
+        - allow-origins: "http://localhost"
+          path: "/resource/**"
+ * </pre>
+ *
  * Created 21/12/16
  * @author Edd
  */
@@ -22,13 +38,13 @@ import static uk.ac.ebi.quickgo.rest.controller.FilterProperties.*;
 public class CORSConfig {
 
     @NestedConfigurationProperty
-    private List<FilterProperties> filters = new ArrayList<>();
+    private List<CORSFilterProperties> filters = new ArrayList<>();
 
-    public List<FilterProperties> getFilters() {
+    public List<CORSFilterProperties> getFilters() {
         return filters;
     }
 
-    public void setFilters(List<FilterProperties> filters) {
+    public void setFilters(List<CORSFilterProperties> filters) {
         this.filters = filters;
     }
 
@@ -57,7 +73,7 @@ public class CORSConfig {
             DEFAULT_ACCESS_CONTROL_ALLOW_METHODS.forEach(config::addAllowedMethod);
             config.setMaxAge(DEFAULT_ACCESS_CONTROL_MAX_AGE);
             config.setAllowCredentials(DEFAULT_ACCESS_CONTROL_ALLOW_CREDENTIALS);
-            source.registerCorsConfiguration(FilterProperties.DEFAULT_PATH, config);
+            source.registerCorsConfiguration(CORSFilterProperties.DEFAULT_PATH, config);
         }
         return new CorsFilter(source);
     }

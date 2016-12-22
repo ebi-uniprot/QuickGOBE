@@ -6,10 +6,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * Models the properties associated with CORS filters, together with default values. Instances of this class
+ * are automatically populated and configured via the {@link CORSConfig} class.
+ *
  * Created 20/12/16
  * @author Edd
  */
-public class FilterProperties {
+public class CORSFilterProperties {
     static final boolean DEFAULT_ACCESS_CONTROL_ALLOW_CREDENTIALS = true;
     static final long DEFAULT_ACCESS_CONTROL_MAX_AGE = 3600;
     static final Set<String> DEFAULT_ACCESS_CONTROL_ALLOW_HEADERS =
