@@ -26,14 +26,17 @@ import static uk.ac.ebi.quickgo.rest.controller.FakeCORSFilteringRESTApp.RESOURC
 import static uk.ac.ebi.quickgo.rest.controller.FakeCORSFilteringRESTApp.RESOURCE_2_URL;
 
 /**
+ * This class performs an integration test demonstrating the acceptance and refusal of HTTP requests based on their
+ * origin, via the {@link CORSConfig} configuration that is loaded on application startup.
+ *
  * Created 21/12/16
  * @author Edd
  */
-@ActiveProfiles("test-cors-filter")
+@ActiveProfiles("cors-config-integration-test")
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {FakeCORSFilteringRESTApp.class})
 @WebAppConfiguration
-public class CORSConfigurerIT {
+public class CORSConfigIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
@@ -101,12 +104,6 @@ public class CORSConfigurerIT {
         assertThat(result.getResponse().getHeader(ACCESS_CONTROL_ALLOW_ORIGIN), is(origin));
     }
 
-    private HttpHeaders originHeader(String origin) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setOrigin(origin);
-        return httpHeaders;
-    }
-
     @Test
     public void firstOriginInPropertiesWithWrongPortForSecondResourceIsAccepted() throws Exception {
         String origin = "http://wwwdev.ebi.ac.uk:9999";
@@ -130,7 +127,7 @@ public class CORSConfigurerIT {
     }
 
     @Test
-    public void firstOriginInPropertiesForSubResourceIsAccepted() throws Exception {
+    public void firstOriginInPropertiesForSecondResourceSubResourceIsAccepted() throws Exception {
         String origin = "http://wwwdev.ebi.ac.uk:1234";
 
         MvcResult result = mockMvc.perform(
@@ -141,5 +138,11 @@ public class CORSConfigurerIT {
                 .andReturn();
 
         assertThat(result.getResponse().getHeader(ACCESS_CONTROL_ALLOW_ORIGIN), is(origin));
+    }
+
+    private HttpHeaders originHeader(String origin) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setOrigin(origin);
+        return httpHeaders;
     }
 }

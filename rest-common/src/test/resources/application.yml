@@ -16,12 +16,31 @@ model:
       field1: transformedField1,
       field2: transformedField2
     }
+
+---
 ## ================= CORS =================
 spring:
-   profiles: test-cors-filter
+   profiles: cors-config-integration-test
 cors:
   filters:
     - allow-origins: "http://www.ebi.ac.uk, http://localhost:9090"
+      max-age: 3600
+      allow-credentials: false
+      exposed-headers: "Something"
       path: "/resource1/**"
     - allow-origins: "http://wwwdev.ebi.ac.uk:1234"
+      allow-methods: "GET, POST"
       path: "/resource2/**"
+
+---
+## ==========
+spring:
+   profiles: cors-config-filtering-test
+cors:
+  filters:
+    - allow-origins: "http://any-host"
+      allow-methods: "GET"
+      max-age: 3600
+      allow-credentials: true
+      expose-headers: "1st-exposed-header, 2nd-exposed-header"
+      path: "/**"

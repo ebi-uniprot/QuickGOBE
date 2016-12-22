@@ -1,10 +1,5 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
-/**
- * Created 21/12/16
- * @author Edd
- */
-
 import uk.ac.ebi.quickgo.common.SearchableField;
 
 import java.util.stream.Stream;
@@ -23,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Created 15/12/16
  * @author Edd
  */
-@Profile("test-cors-filter")
+@Profile("cors-config-integration-test")
 @SpringBootApplication
 @ComponentScan({"uk.ac.ebi.quickgo.rest"})
 @Import({FakeCORSFilteringRESTApp.FakeController.class})
@@ -36,7 +31,7 @@ public class FakeCORSFilteringRESTApp {
         SpringApplication.run(FakeCORSFilteringRESTApp.class, args);
     }
 
-    @Profile("test-cors-filter")
+    @Profile("cors-config-integration-test")
     @RestController static class FakeController {
         private String value;
         private final static String DEFAULT_VALUE = "value";
@@ -72,7 +67,7 @@ public class FakeCORSFilteringRESTApp {
         }
     }
 
-    @Profile("test-cors-filter")
+    @Profile("cors-config-integration-test")
     @Configuration static class FakeAppConfig {
         @Bean SearchableField searchableField() {
             return new SearchableField() {
