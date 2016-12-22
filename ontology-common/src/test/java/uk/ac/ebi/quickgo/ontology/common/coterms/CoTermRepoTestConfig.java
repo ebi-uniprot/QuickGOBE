@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.Resource;
 
+import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepositorySimpleMap.*;
+
 /**
  * Configuration class related to loading and using co-occurring terms information.
  * @author Tony Wardell
@@ -37,14 +39,12 @@ public class CoTermRepoTestConfig {
     @Bean
     @Profile(SUCCESSFUL_RETRIEVAL)
     public CoTermRepository coTermRepository() throws IOException {
-        CoTermRepositorySimpleMap coTermRepository;
-        coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource, headerLines);
-        return coTermRepository;
+        return createCoTermRepositorySimpleMap(manualResource, allResource, headerLines);
     }
 
     @Bean
     @Profile(FAILED_RETRIEVAL)
     public CoTermRepository failedCoTermLoading() throws IOException {
-        return CoTermRepositorySimpleMap.createEmptyRepository();
+        return createEmptyRepository();
     }
 }
