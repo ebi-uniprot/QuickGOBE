@@ -76,7 +76,6 @@ public class CoTermController {
             @RequestParam(value = "similarityThreshold", defaultValue = "0.0") float similarityThreshold) {
 
         validateGoTerm(id);
-
         final List<CoTerm> coTerms = coTermRepository.findCoTerms(id, toCoTermSource(source));
         return getResultsResponse(coTerms.size(), coTerms.stream()
                                                          .filter(ct -> ct.getSimilarityRatio() >= similarityThreshold)

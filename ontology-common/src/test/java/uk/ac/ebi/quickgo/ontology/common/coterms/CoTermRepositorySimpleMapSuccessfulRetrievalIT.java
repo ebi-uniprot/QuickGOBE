@@ -1,18 +1,18 @@
 package uk.ac.ebi.quickgo.ontology.common.coterms;
 
-import java.io.IOException;
 import java.util.List;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepoTestConfig.SUCCESSFUL_RETRIEVAL;
 
 /**
  * @author Tony Wardell
@@ -21,10 +21,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-        classes = {CoTermRepoTestConfig.class},
-        loader = SpringApplicationContextLoader.class)
-public class CoTermRepositorySimpleMapIT {
+@SpringApplicationConfiguration(classes = {CoTermRepoTestConfig.class})
+@ActiveProfiles(profiles = SUCCESSFUL_RETRIEVAL)
+public class CoTermRepositorySimpleMapSuccessfulRetrievalIT {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     private static final String GO_TERM_ID_ALL_ONLY = "GO:7777771";
     private static final String GO_TERM_ID_MANUAL_ONLY = "GO:8888881";
@@ -52,5 +54,18 @@ public class CoTermRepositorySimpleMapIT {
         assertThat(coTerms.get(0).getSimilarityRatio(), is(78.28f));
         assertThat(coTerms.get(0).getTogether(), is(1933L));
         assertThat(coTerms.get(0).getCompared(), is(5219L));
+    }
+
+    @Test
+    public void findCoTermsThrowsExceptionIfSearchIdIsNull() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The requested id is null.");
+        coTermRepository.findCoTerms(null, CoTermSource.ALL);
+    }
+    @Test
+    public void findCoTermsThrowsExceptionIfCoTermSourceIsNull() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The requested co-occurring source is null.");
+        coTermRepository.findCoTerms(GO_TERM_ID_ALL_ONLY, null);
     }
 }
