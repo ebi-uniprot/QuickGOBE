@@ -78,10 +78,28 @@ public class CoTermController {
         validateGoTerm(id);
 
         final List<CoTerm> coTerms = coTermRepository.findCoTerms(id, toCoTermSource(source));
-        return getResultsResponse(coTerms.stream()
-                .filter(ct -> ct.getSimilarityRatio() >= similarityThreshold)
-                .limit(workoutLimit(limit))
-                .collect(Collectors.toList()));
+        return getResultsResponse(coTerms.size(), coTerms.stream()
+                                                         .filter(ct -> ct.getSimilarityRatio() >= similarityThreshold)
+                                                         .limit(workoutLimit(limit))
+                                                         .collect(Collectors.toList()));
+    }
+
+    private int workoutLimit(String limit) {
+        if (limitNotSpecified(limit)) {
+            return defaultLimit;
+        }
+        if (userHasRequestedAllCoTerms(limit)) {
+            return Integer.MAX_VALUE;
+        }
+        try {
+            int numLimit = Integer.parseInt(limit);
+            if (numLimit <= 0) {
+                throw new ParameterException("The value for limit should be a positive integer, or 'ALL'");
+            }
+            return numLimit;
+        } catch (NumberFormatException e) {
+            throw new ParameterException("The value for limit should be a positive integer, or 'ALL'");
+        }
     }
 
     /**
@@ -90,11 +108,11 @@ public class CoTermController {
      * @param results a list of results
      * @return a {@link ResponseEntity} containing a {@link QueryResult} for a list of results
      */
-    private <ResponseType> ResponseEntity<QueryResult<ResponseType>> getResultsResponse(List<ResponseType> results) {
-        if (results == null) {
-            results = Collections.emptyList();
-        }
-        QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(results.size(), results).build();
+    private <ResponseType> ResponseEntity<QueryResult<ResponseType>> getResultsResponse
+    (long numberOfHits, List<ResponseType> results) {
+
+        final List<ResponseType> queryResults = results == null ? Collections.emptyList() : results;
+        QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(numberOfHits, queryResults).build();
         return new ResponseEntity<>(queryResult, HttpStatus.OK);
     }
 
@@ -109,32 +127,17 @@ public class CoTermController {
         final String asUpperCase = source.toUpperCase();
         if (!CoTermSource.isValidValue(asUpperCase)) {
             throw new ParameterException("The value for source should be one of " + CoTermSource.valuesAsCSV() +
-                    " and not " + source + ".");
+                                                 " and not " + source + ".");
         }
         return CoTermSource.valueOf(asUpperCase);
     }
 
-    public int workoutLimit(String limit) {
-        if (limitNotSpecified(limit))return defaultLimit;
-        if (userHasRequestedAllCoTerms(limit)) return Integer.MAX_VALUE;
-        try {
-            int numLimit =  Integer.parseInt(limit);
-            if(numLimit <=0) {
-                throw new ParameterException("The value for limit should be a positive integer, or 'ALL'");
-            }
-            return numLimit;
-        } catch (NumberFormatException e) {
-            throw new ParameterException("The value for limit should be a positive integer, or 'ALL'");
-        }
+    private boolean limitNotSpecified(String limit) {
+        return limit == null || limit.trim().isEmpty();
     }
 
-    private boolean limitNotSpecified(String limit){
-        return limit==null || limit.trim().isEmpty();
-    }
-
-    private boolean userHasRequestedAllCoTerms(String limit){
+    private boolean userHasRequestedAllCoTerms(String limit) {
         return LIMIT_ALL.equalsIgnoreCase(limit);
     }
-
 
 }
