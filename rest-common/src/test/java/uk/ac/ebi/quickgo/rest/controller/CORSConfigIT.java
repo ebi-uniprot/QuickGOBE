@@ -17,10 +17,10 @@ import org.springframework.web.filter.CorsFilter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.quickgo.rest.controller.CORSFilter2.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static uk.ac.ebi.quickgo.rest.controller.FakeCORSFilteringRESTApp.RESOURCE_1_URL;
 import static uk.ac.ebi.quickgo.rest.controller.FakeCORSFilteringRESTApp.RESOURCE_2_SUB_RESOURCE_URL;
 import static uk.ac.ebi.quickgo.rest.controller.FakeCORSFilteringRESTApp.RESOURCE_2_URL;
