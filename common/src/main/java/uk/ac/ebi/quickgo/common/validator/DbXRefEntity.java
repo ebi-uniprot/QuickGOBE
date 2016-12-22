@@ -35,7 +35,7 @@ public class DbXRefEntity {
         checkArgument(database != null, "The database ID should not be null");
         checkArgument(entityType != null, "The entity type should not be null");
         checkArgument(idValidationPattern != null,
-                "The regex for the validation of ids from " + database + " is null and therefore invalid");
+                      "The regex for the validation of ids from " + database + " is null and therefore invalid");
         this.database = database;
         this.entityType = entityType;
         this.validationCaseSensitive = validationCaseSensitive;
@@ -68,21 +68,16 @@ public class DbXRefEntity {
                 //id has the format just id e.g. P19712
                 return idValidationPattern.matcher(idComponents[0]).matches();
             case 2:
-                if(idIncludesDatabase(idComponents)) {
+                if (idIncludesDatabase(idComponents)) {
                     //id has the format db:id e.g. UniProtKB:P19712
                     return idValidationPattern.matcher(idComponents[1]).matches();
-                }else{
+                } else {
                     // id has the format id:feature or variation e.g. 'P19712:PRO_0000038050'
                     return idValidationPattern.matcher(id).matches();
                 }
             default:
                 return false;
         }
-    }
-
-    private boolean idIncludesDatabase(String[] idComponents) {
-        return validationCaseSensitive ?
-                idComponents[0].equals(database) : idComponents[0].equalsIgnoreCase(database);
     }
 
     /**
@@ -131,5 +126,10 @@ public class DbXRefEntity {
                 ", idValidationPattern=" + idValidationPattern +
                 ", databaseURL='" + databaseURL + '\'' +
                 '}';
+    }
+
+    private boolean idIncludesDatabase(String[] idComponents) {
+        return validationCaseSensitive ?
+                idComponents[0].equals(database) : idComponents[0].equalsIgnoreCase(database);
     }
 }
