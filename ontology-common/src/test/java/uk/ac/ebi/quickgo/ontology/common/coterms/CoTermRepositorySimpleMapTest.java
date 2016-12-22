@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.core.io.Resource;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -66,7 +67,7 @@ public class CoTermRepositorySimpleMapTest {
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(true);
         when(mockAllResource.exists()).thenReturn(true);
-        when(mockAllResource.getURI()).thenThrow(IOException.class);
+        doThrow(IOException.class).when(mockAllResource).getURI();
         CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, headerLines);
     }
 
