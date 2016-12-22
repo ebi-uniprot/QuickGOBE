@@ -537,6 +537,18 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(ASSIGNED_BY_FIELD, genericDocs.get(1).assignedBy, 1));
     }
 
+
+    @Test
+    public void idValidationTestWorksCorrectlyForGeneProductIDWithFeature()throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(GENE_PRODUCT_ID_PARAM.getName(), "P19712:PRO_0000038050"));
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
     //---------- Gene Ontology Id
 
     @Test
