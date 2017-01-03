@@ -6,10 +6,9 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringJoiner;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang.StringUtils;
@@ -53,7 +52,7 @@ public class AnnotationControllerIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
+    public static final String DATE_STRING_FORMAT = "%04d%02d%02d";
     //Test Data
     private static final String MISSING_ASSIGNED_BY = "ZZZZZ";
     private static final String RESOURCE_URL = "/annotation";
@@ -62,10 +61,8 @@ public class AnnotationControllerIT {
     private static final String ECO_ID2 = "ECO:0000323";
     private static final String MISSING_ECO_ID = "ECO:0000888";
     private static final String WITH_FROM_PATH = "withFrom.*.connectedXrefs";
-
     //Configuration
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
-
     private MockMvc mockMvc;
     private List<AnnotationDocument> genericDocs;
     @Autowired
@@ -873,22 +870,6 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
-    private AnnotationDocument createDocWithAssignedBy(String geneProductId, String assignedBy) {
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
-        doc.assignedBy = assignedBy;
-
-        return doc;
-    }
-
-    private AnnotationDocument createDocWithTaxonId(String geneProductId, int taxonId) {
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
-        doc.taxonId = taxonId;
-
-        return doc;
-    }
-
-    //----- Tests for reference ---------------------//
-
     @Test
     public void filterBySingleReferenceReturnsDocumentsThatContainTheReference() throws Exception {
 
@@ -920,6 +901,8 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, doc.reference, 1));
     }
+
+    //----- Tests for reference ---------------------//
 
     @Test
     public void filterByThreeReferencesReturnsDocumentsThatContainThoseReferences() throws Exception {
@@ -1041,8 +1024,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    //----- Tests for GeneProductType ---------------------//
-
     @Test
     public void filterByGeneProductTypeReturnsMatchingDocuments() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(),
@@ -1070,6 +1051,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1));
     }
+
+    //----- Tests for GeneProductType ---------------------//
 
     @Test
     public void filterAnnotationsByTwoGeneProductTypesAsOneParameterReturnsMatchingDocuments() throws Exception {
@@ -1118,8 +1101,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    //----- Target Sets
-
     @Test
     public void filterByTargetSetReturnsMatchingDocuments() throws Exception {
         ResultActions response =
@@ -1143,6 +1124,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
+
+    //----- Target Sets
 
     @Test
     public void filterByNewTargetSetValueReturnsMatchingDocuments() throws Exception {
@@ -1187,8 +1170,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    //---------- GO Aspect related tests.
-
     @Test
     public void filterAnnotationsByGoAspectSuccessfully() throws Exception {
         String goAspect = AnnotationDocMocker.GO_ASPECT;
@@ -1213,6 +1194,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
+
+    //---------- GO Aspect related tests.
 
     @Test
     public void filterAnnotationsByInvalidGoAspectReturnsError() throws Exception {
@@ -1239,8 +1222,6 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1));
     }
 
-    //----- Tests for Annotation Extension ---------------------//
-
     @Test
     public void filterByExtensionRelationship() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
@@ -1264,6 +1245,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
+
+    //----- Tests for Annotation Extension ---------------------//
 
     @Test
     public void filterById() throws Exception {
@@ -1367,7 +1350,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
-
 
     @Test
     public void exactMatchRequestedThatMatchesExceptForDBReturnsNoAnnotations() throws Exception{
@@ -1492,6 +1474,50 @@ public class AnnotationControllerIT {
                 .andExpect(fieldInRowHasValue("geneProductId", 0, expected));
     }
 
+    // ------------------------------- Check date format -------------------------------
+    @Test
+    public void checkDateFormatIsCorrect() throws Exception {
+        String geneProductId = "P99999";
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        int year = 1900;
+        int month = 1;
+        int date = 31;
+        doc.date = Date.from(
+                LocalDate.of(year, month, date).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId));
+
+        String expectedResponseDate = getRequiredDateString(year, month, date);
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId))
+                .andExpect(valuesOccurInField(DATE_FIELD, expectedResponseDate));
+    }
+
+    // ------------------------------- Helpers -------------------------------
+    private AnnotationDocument createDocWithAssignedBy(String geneProductId, String assignedBy) {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        doc.assignedBy = assignedBy;
+
+        return doc;
+    }
+
+    private AnnotationDocument createDocWithTaxonId(String geneProductId, int taxonId) {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        doc.taxonId = taxonId;
+
+        return doc;
+    }
+
+    private String getRequiredDateString(int year, int month, int date) {
+        return String.format(DATE_STRING_FORMAT, year, month, date);
+    }
 
     //----- Setup data ---------------------//
 
