@@ -1,6 +1,10 @@
 package uk.ac.ebi.quickgo.common.converter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +32,6 @@ public class FlatFieldBuilder extends FlatField {
     private static final String LEVEL_SEPARATOR_END_REGEX = "\\" + LEVEL_SEPARATOR_END;
     static final String VALUE_SEPARATOR = ";;;";
     private static final String VALUE_SEPARATOR_REGEX = VALUE_SEPARATOR;
-
     private static final String TAB = "\t";
 
     /**
@@ -44,6 +47,8 @@ public class FlatFieldBuilder extends FlatField {
             "(?<=" + LEVEL_SEPARATOR_START_REGEX + ")|" +
                     "(?=" + LEVEL_SEPARATOR_END_REGEX + ")|" +
                     VALUE_SEPARATOR_REGEX;
+
+    private static final Pattern STRING_BREAKDOWN_PATTERN = Pattern.compile(STRING_BREAKDOWN_REGEX);
 
     private List<FlatField> fields;
 
@@ -62,7 +67,7 @@ public class FlatFieldBuilder extends FlatField {
      * @return an
      */
     public static FlatField parse(String flatFieldText) {
-        List<String> values = Arrays.asList(flatFieldText.split(STRING_BREAKDOWN_REGEX));
+        List<String> values = Arrays.asList(STRING_BREAKDOWN_PATTERN.split(flatFieldText));
         LOGGER.debug("flatFieldText: [{}], has been broken down into {}", flatFieldText, values);
         FlatFieldBuilder builder;
 
