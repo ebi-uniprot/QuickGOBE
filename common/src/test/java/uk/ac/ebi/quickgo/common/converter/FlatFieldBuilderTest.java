@@ -49,10 +49,6 @@ public class FlatFieldBuilderTest {
         assertThat(actualString, is(expectedField("level1:A", "level1:B")));
     }
 
-    private String expectedField(String... values) {
-        return START_DELIM + Stream.of(values).collect(Collectors.joining(SEPARATOR)) + END_DELIM;
-    }
-
     @Test
     public void createStringUsingFlatFieldWith2Values1AtEachLevel() throws Exception {
         FlatField flatField = newFlatField()
@@ -275,28 +271,28 @@ public class FlatFieldBuilderTest {
 
     @Test
     public void parseFlatFieldBuilderString4NestingLevels() {
-        FlatFieldBuilder flatFieldBuilderOrig = FlatFieldBuilder.newFlatField()
+        FlatFieldBuilder flatFieldBuilderOrig = newFlatField()
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
                 .addField(
-                        FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:A"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:A"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:B"))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:C")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:B")))
+                        newFlatField()
+                                .addField(newFlatFieldLeaf("level2:A"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:A"))
+                                        .addField(newFlatFieldLeaf("level3:B"))
+                                        .addField(newFlatFieldLeaf("level3:C")))
+                                .addField(newFlatFieldLeaf("level2:B")))
                 .addField(
                         FlatFieldBuilder.newFlatField()
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C"))
-                                .addField(FlatFieldBuilder.newFlatField()
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:D"))
-                                        .addField(FlatFieldBuilder.newFlatField()
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:A"))
-                                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level4:B")))
-                                        .addField(FlatFieldLeaf.newFlatFieldLeaf("level3:E")))
-                                .addField(FlatFieldLeaf.newFlatFieldLeaf("level2:C")))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C"));
+                                .addField(newFlatFieldLeaf("level2:C"))
+                                .addField(newFlatField()
+                                        .addField(newFlatFieldLeaf("level3:D"))
+                                        .addField(newFlatField()
+                                                .addField(newFlatFieldLeaf("level4:A"))
+                                                .addField(newFlatFieldLeaf("level4:B")))
+                                        .addField(newFlatFieldLeaf("level3:E")))
+                                .addField(newFlatFieldLeaf("level2:C")))
+                .addField(newFlatFieldLeaf("level1:C"));
         String origStr = flatFieldBuilderOrig.buildString(); // serialise
 
         FlatField flatFieldBuilderParsed = parse(origStr);
@@ -342,5 +338,76 @@ public class FlatFieldBuilderTest {
 
         assertThat(ff2FromFf1Model, is(ff1Model));
         assertThat(ff2FromFf1Str, is(ff1Str));
+    }
+
+    @Test
+    public void canConvertFieldContainingSquareBrackets() {
+        String fieldValue = "holo-[acyl-carrier-protein] synthase complex";
+        FlatField actualFlatField = parse(expectedField(fieldValue));
+
+        FlatField expectedField = newFlatField()
+                .addField(newFlatFieldLeaf(fieldValue));
+
+        assertThat(actualFlatField, is(expectedField));
+    }
+
+    @Test
+    public void canConvertMultipleFieldsContainingSquareBrackets() {
+        FlatField actualFlatField =
+                parse(
+                        expectedField(
+                                "fatty acid [synthase] complex",
+                                "2007-08-09",
+                                "Deleted",
+                                "SYNONYM",
+                                "holo-[acyl-carrier-protein] synthase complex"));
+
+        FlatField expectedField = newFlatField()
+                .addField(newFlatFieldLeaf("fatty acid [synthase] complex"))
+                .addField(newFlatFieldLeaf("2007-08-09"))
+                .addField(newFlatFieldLeaf("Deleted"))
+                .addField(newFlatFieldLeaf("SYNONYM"))
+                .addField(newFlatFieldLeaf("holo-[acyl-carrier-protein] synthase complex"));
+
+        assertThat(actualFlatField, is(expectedField));
+    }
+
+    @Test
+    public void canConvertNestedFieldsContainingSquareBrackets() {
+        FlatField actualFlatField =
+                parse(expectedField("level1:value [1]",
+                        expectedField("level2:value [2]",
+                                expectedField("level3:value [3]"))));
+
+        FlatField expectedField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:value [1]"))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("level2:value [2]"))
+                        .addField(newFlatField()
+                                .addField(newFlatFieldLeaf("level3:value [3]"))));
+
+        assertThat(actualFlatField, is(expectedField));
+    }
+
+    @Test
+    public void canConvertNestedFieldsContainingSpecialCharacters() {
+        String specialChars = "`¬|\\£$%^&*()_-=+./<>?:@~#{}[]";
+        FlatField actualFlatField =
+                parse(expectedField("level1:" + specialChars,
+                        expectedField("level2:" + specialChars,
+                                expectedField("level3:" + specialChars))));
+
+        FlatField expectedField = newFlatField()
+                .addField(newFlatFieldLeaf("level1:" + specialChars))
+                .addField(newFlatField()
+                        .addField(newFlatFieldLeaf("level2:" + specialChars))
+                        .addField(newFlatField()
+                                .addField(newFlatFieldLeaf("level3:" + specialChars))));
+
+        assertThat(actualFlatField, is(expectedField));
+    }
+
+    private String expectedField(String... values) {
+        return START_DELIM + Stream.of(values).collect(Collectors.joining(SEPARATOR)) + END_DELIM;
     }
 }
