@@ -19,15 +19,16 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
  * @author Edd
  */
 public class FlatFieldBuilder extends FlatField {
-    public static final String VALUE_SEPARATOR = "|";
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(FlatFieldBuilder.class);
 
-    private static final String LEVEL_SEPARATOR_START = "[";
+    static final String LEVEL_SEPARATOR_START = "{--";
     private static final String LEVEL_SEPARATOR_START_REGEX = "\\" + LEVEL_SEPARATOR_START;
-    private static final String LEVEL_SEPARATOR_END = "]";
+    static final String LEVEL_SEPARATOR_END = "--}";
     private static final String LEVEL_SEPARATOR_END_REGEX = "\\" + LEVEL_SEPARATOR_END;
-    private static final String VALUE_SEPARATOR_REGEX = "\\|";
+    static final String VALUE_SEPARATOR = ";;;";
+    private static final String VALUE_SEPARATOR_REGEX = VALUE_SEPARATOR;
+
     private static final String TAB = "\t";
 
     /**
@@ -131,7 +132,7 @@ public class FlatFieldBuilder extends FlatField {
     public String buildString() {
         return fields.stream()
                 .map(FlatField::buildString)
-                .collect(joining(VALUE_SEPARATOR, "[", "]"));
+                .collect(joining(VALUE_SEPARATOR, LEVEL_SEPARATOR_START, LEVEL_SEPARATOR_END));
     }
 
     @Override public boolean equals(Object o) {

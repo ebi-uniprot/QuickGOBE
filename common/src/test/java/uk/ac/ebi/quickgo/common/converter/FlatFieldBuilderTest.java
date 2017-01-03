@@ -1,11 +1,12 @@
 package uk.ac.ebi.quickgo.common.converter;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.*;
-import static uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder.newFlatField;
 import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
 
 /**
@@ -13,13 +14,18 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
  * @author Edd
  */
 public class FlatFieldBuilderTest {
+
+    private static final String START_DELIM = LEVEL_SEPARATOR_START;
+    private static final String END_DELIM = LEVEL_SEPARATOR_END;
+    private static final String SEPARATOR = VALUE_SEPARATOR;
+
     @Test
     public void createStringUsingEmptyFlatField() throws Exception {
         FlatField emptyFlatField = newFlatField();
 
         String actualString = emptyFlatField.buildString();
 
-        assertThat(actualString, is("[]"));
+        assertThat(actualString, is(expectedField()));
     }
 
     @Test
@@ -29,7 +35,7 @@ public class FlatFieldBuilderTest {
 
         String actualString = flatField.buildString();
 
-        assertThat(actualString, is("[level1:A]"));
+        assertThat(actualString, is(expectedField("level1:A")));
     }
 
     @Test
@@ -40,7 +46,11 @@ public class FlatFieldBuilderTest {
 
         String actualString = flatField.buildString();
 
-        assertThat(actualString, is("[level1:A|level1:B]"));
+        assertThat(actualString, is(expectedField("level1:A", "level1:B")));
+    }
+
+    private String expectedField(String... values) {
+        return START_DELIM + Stream.of(values).collect(Collectors.joining(SEPARATOR)) + END_DELIM;
     }
 
     @Test
@@ -52,7 +62,8 @@ public class FlatFieldBuilderTest {
 
         String actualString = flatField.buildString();
 
-        assertThat(actualString, is("[level1:A|[level2:A]]"));
+        assertThat(actualString,
+                is(expectedField("level1:A", expectedField("level2:A"))));
     }
 
     @Test
@@ -65,7 +76,8 @@ public class FlatFieldBuilderTest {
 
         String actualString = flatField.buildString();
 
-        assertThat(actualString, is("[level1:A|[level2:A]|level1:B]"));
+        assertThat(actualString,
+                is(expectedField("level1:A", expectedField("level2:A"), "level1:B")));
     }
 
     @Test
@@ -78,7 +90,8 @@ public class FlatFieldBuilderTest {
 
         String actualString = flatField.buildString();
 
-        assertThat(actualString, is("[level1:A|[level2:A|level2:B]]"));
+        assertThat(actualString,
+                is(expectedField("level1:A", expectedField("level2:A", "level2:B"))));
     }
 
     @Test
@@ -92,19 +105,20 @@ public class FlatFieldBuilderTest {
 
         String actualString = flatField.buildString();
 
-        assertThat(actualString, is("[level1:A|[level2:A|[level3:A]]]"));
+        assertThat(actualString,
+                is(expectedField("level1:A", expectedField("level2:A", expectedField("level3:A")))));
     }
 
     @Test
     public void createsFlatFieldFromEmptyString() throws Exception {
-        FlatField actualFlatField = parse("[]");
+        FlatField actualFlatField = parse(expectedField());
 
         assertThat(actualFlatField, is(newFlatField()));
     }
 
     @Test
     public void createsFlatFieldFromStringWith1ValueAtLevel1() throws Exception {
-        FlatField actualFlatField = parse("[level1:A]");
+        FlatField actualFlatField = parse(expectedField("level1:A"));
 
         FlatField expectedField = newFlatField().addField(newFlatFieldLeaf("level1:A"));
 
@@ -113,7 +127,7 @@ public class FlatFieldBuilderTest {
 
     @Test
     public void createsFlatFieldFromStringWith2ValuesAtLevel1() throws Exception {
-        FlatField actualFlatField = parse("[level1:A|level1:B]");
+        FlatField actualFlatField = parse(expectedField("level1:A", "level1:B"));
 
         FlatField expectedField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
@@ -124,7 +138,7 @@ public class FlatFieldBuilderTest {
 
     @Test
     public void createsFlatFieldFromStringWith1ValueAtLevel1And1ValueAtLevel2() throws Exception {
-        FlatField actualFlatField = parse("[level1:A|[level2:A]]");
+        FlatField actualFlatField = parse(expectedField("level1:A", expectedField("level2:A")));
 
         FlatField expectedField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
@@ -136,7 +150,7 @@ public class FlatFieldBuilderTest {
 
     @Test
     public void createsFlatFieldFromStringWith2ValuesAtLevel1And1ValueAtLevel2() throws Exception {
-        FlatField actualFlatField = parse("[level1:A|[level2:A]|level1:B]");
+        FlatField actualFlatField = parse(expectedField("level1:A", expectedField("level2:A"), "level1:B"));
 
         FlatField expectedField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
@@ -149,7 +163,7 @@ public class FlatFieldBuilderTest {
 
     @Test
     public void createsFlatFieldFromStringWith1ValueAtLevel1And2ValuesAtLevel2() throws Exception {
-        FlatField actualFlatField = parse("[level1:A|[level2:A|level2:B]]");
+        FlatField actualFlatField = parse(expectedField("level1:A", expectedField("level2:A", "level2:B")));
 
         FlatField expectedField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
@@ -162,7 +176,11 @@ public class FlatFieldBuilderTest {
 
     @Test
     public void createsFlatFieldFromStringWith3Levels1ValueForEachLevel() throws Exception {
-        FlatField actualFlatField = parse("[level1:A|[level2:A|[level3:A]]]");
+        FlatField actualFlatField =
+                parse(
+                        expectedField("level1:A",
+                                expectedField("level2:A",
+                                        expectedField("level3:A"))));
 
         FlatField expectedField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
@@ -207,7 +225,7 @@ public class FlatFieldBuilderTest {
         assertThat(origFlatFieldBuilder.getFields().size(), is(6));
     }
 
-    /** Check one can newInstance a flat field object, write itself as a String A, then parse
+    /** Check one can create a new flat field object, write itself as a String A, then parse
      * this written value into a new flat field object, and write it again as String B. A and B
      * must be equal.
      */
