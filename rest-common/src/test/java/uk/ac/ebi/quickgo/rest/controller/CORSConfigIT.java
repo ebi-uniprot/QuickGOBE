@@ -40,8 +40,8 @@ public class CORSConfigIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
-    @Autowired private
-    CorsFilter corsFilter;
+    @Autowired
+    private CorsFilter corsFilter;
 
     @Before
     public void setUp() {
@@ -105,7 +105,7 @@ public class CORSConfigIT {
     }
 
     @Test
-    public void firstOriginInPropertiesWithWrongPortForSecondResourceIsAccepted() throws Exception {
+    public void firstOriginInPropertiesWithWrongPortForSecondResourceIsForbidden() throws Exception {
         String origin = "http://wwwdev.ebi.ac.uk:9999";
 
         mockMvc.perform(
@@ -116,7 +116,7 @@ public class CORSConfigIT {
     }
 
     @Test
-    public void firstOriginInPropertiesWithNoPortForSecondResourceIsAccepted() throws Exception {
+    public void firstOriginInPropertiesWithNoPortForSecondResourceIsForbidden() throws Exception {
         String origin = "http://wwwdev.ebi.ac.uk";
 
         mockMvc.perform(
