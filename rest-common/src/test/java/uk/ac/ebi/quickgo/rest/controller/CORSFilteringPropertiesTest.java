@@ -43,7 +43,7 @@ public class CORSFilteringPropertiesTest {
 
     @Test
     public void checkAllowOriginIsPermitted() throws IOException, ServletException {
-        MockHttpServletRequest request = createStandardRequest("GET");
+        MockHttpServletRequest request = createStandardRequestForTestOrigin("GET");
         MockHttpServletResponse response = createResponse();
 
         corsFilter.doFilter(request, response, new MockFilterChain());
@@ -53,7 +53,7 @@ public class CORSFilteringPropertiesTest {
     @Test
     public void checkDisallowedOriginIsNotPermitted() throws IOException, ServletException {
         String origin = "THIS-ORIGIN-IS-DISALLOWED";
-        MockHttpServletRequest request = createStandardRequest(origin,"GET");
+        MockHttpServletRequest request = createStandardRequestForTestOrigin(origin,"GET");
         request.addHeader(ORIGIN, origin);
         MockHttpServletResponse response = createResponse();
 
@@ -63,7 +63,7 @@ public class CORSFilteringPropertiesTest {
 
     @Test
     public void checkAllowCredentialsIsShown() throws IOException, ServletException {
-        MockHttpServletRequest request = createStandardRequest("GET");
+        MockHttpServletRequest request = createStandardRequestForTestOrigin("GET");
         MockHttpServletResponse response = createResponse();
 
         corsFilter.doFilter(request, response, new MockFilterChain());
@@ -132,7 +132,7 @@ public class CORSFilteringPropertiesTest {
         assertThat(response.getHeader(ACCESS_CONTROL_MAX_AGE), is(String.valueOf(3600)));
     }
 
-    private MockHttpServletRequest createStandardRequest(String origin, String method) {
+    private MockHttpServletRequest createStandardRequestForTestOrigin(String origin, String method) {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader(ORIGIN, origin);
         request.setMethod(method);
@@ -151,8 +151,8 @@ public class CORSFilteringPropertiesTest {
         return request;
     }
 
-    private MockHttpServletRequest createStandardRequest(String method) {
-        return createStandardRequest(TEST_ORIGIN, method);
+    private MockHttpServletRequest createStandardRequestForTestOrigin(String method) {
+        return createStandardRequestForTestOrigin(TEST_ORIGIN, method);
     }
 
     @Profile("cors-config-filtering-test")

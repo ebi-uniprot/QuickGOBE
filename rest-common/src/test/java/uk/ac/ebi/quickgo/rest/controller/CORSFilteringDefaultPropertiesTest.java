@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 /**
- * This class demonstrates that the absense of CORS properties specified in a YAML file, does not cause
+ * This class demonstrates that the absence of CORS properties specified in a YAML file, does not cause
  * the application to fail at start up.
  *
  * Created 31/10/16
@@ -28,8 +28,8 @@ import static org.hamcrest.Matchers.nullValue;
  */
 @ActiveProfiles("cors-test")
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = CORSFilterDefaultPropertiesTest.FakeApplication.class)
-public class CORSFilterDefaultPropertiesTest {
+@SpringApplicationConfiguration(classes = CORSFilteringDefaultPropertiesTest.FakeApplication.class)
+public class CORSFilteringDefaultPropertiesTest {
     @Autowired
     private CorsFilter corsFilter;
 
