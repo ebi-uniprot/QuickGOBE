@@ -49,7 +49,12 @@ public class CORSConfig {
     }
 
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsFilter corsFilter(UrlBasedCorsConfigurationSource corsConfigurationSource) {
+        return new CorsFilter(corsConfigurationSource);
+    }
+
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         if (!filters.isEmpty()) {
@@ -75,7 +80,8 @@ public class CORSConfig {
             config.setAllowCredentials(DEFAULT_ACCESS_CONTROL_ALLOW_CREDENTIALS);
             source.registerCorsConfiguration(CORSFilterProperties.DEFAULT_PATH, config);
         }
-        return new CorsFilter(source);
+
+        return source;
     }
 
     @Bean
