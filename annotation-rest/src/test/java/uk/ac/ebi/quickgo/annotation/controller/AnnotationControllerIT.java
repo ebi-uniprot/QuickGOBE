@@ -86,6 +86,29 @@ public class AnnotationControllerIT {
         repository.save(genericDocs);
     }
 
+    // CONSISTENT ORDER
+    @Test
+    public void annotationsAlwaysReturnedInOrderWrittenToRepository() throws Exception{
+
+        String geneProductId = "A0";
+
+        AnnotationDocument document = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        repository.save(document);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(4))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 0, genericDocs.get(0).geneProductId))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 1, genericDocs.get(1).geneProductId))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 2, genericDocs.get(2).geneProductId))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 3, geneProductId));
+    }
+
+
     //ASSIGNED BY
     @Test
     public void lookupAnnotationFilterByAssignedBySuccessfully() throws Exception {
