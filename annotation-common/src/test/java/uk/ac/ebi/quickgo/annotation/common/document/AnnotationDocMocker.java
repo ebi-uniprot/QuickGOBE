@@ -59,7 +59,7 @@ public class AnnotationDocMocker {
         // automatically compute a document identifier,
         // to overcome non-uniqueness of all other annotation fields
         // (in solrconfig.xml this is set automatically as a UUID)
-        doc.id = geneProductId + "-" + System.nanoTime();
+        doc.id = geneProductId + "!" + System.nanoTime();
 
         doc.goId = GO_ID;
         doc.evidenceCode = ECO_ID;
