@@ -62,6 +62,11 @@ public class DbXRefEntityTest {
 	}
 
 	@Test
+	public void validIdWhenIDincludesFeature() {
+		assertThat(dbXrefEntity.matches("a0a000:PRO_0123456789"), is(true));
+	}
+
+	@Test
     public void isInvalidId() {
         assertThat(dbXrefEntity.matches("99999"), is(false));
     }

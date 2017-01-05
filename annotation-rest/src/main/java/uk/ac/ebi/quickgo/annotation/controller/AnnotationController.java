@@ -145,8 +145,6 @@ public class AnnotationController {
             throw new ParameterBindingException(bindingResult);
         }
 
-        validationHelper.validateRequestedResults(request.getLimit());
-
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
 
         QueryRequest queryRequest = queryTemplate.newBuilder()

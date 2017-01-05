@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.controller;
 
+import uk.ac.ebi.quickgo.rest.ParameterException;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -16,17 +18,35 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class ControllerValidationHelperImpl implements ControllerValidationHelper {
 
     public static final int MAX_PAGE_RESULTS = 100;
+    public static final int MAX_PAGE_NUMBER = 25;
+    public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
+    public static final int MIN_ENTRIES_PER_PAGE = 0;
+    public static final int MIN_PAGE_NUMBER = 1;
+    public static final int DEFAULT_PAGE_NUMBER = 1;
+    public static final int MAX_ENTRIES_PER_PAGE = 100;
+
     private static final Logger LOGGER = getLogger(ControllerValidationHelperImpl.class);
     private static final String COMMA = ",";
 
     private final Predicate<String> entityValidation;
     private final Predicate<Integer> validNumberOfPageResults;
     private final int maxPageResults;
+    private final int paginationLimit;
 
-    public ControllerValidationHelperImpl(int maxPageResults, Predicate<String> validCondition) {
+    public ControllerValidationHelperImpl(
+            int maxPageResults,
+            Predicate<String> validCondition) {
+        this(maxPageResults, MAX_PAGE_NUMBER, validCondition);
+    }
+
+    public ControllerValidationHelperImpl(
+            int maxPageResults,
+            int paginationLimit,
+            Predicate<String> validCondition) {
         this.validNumberOfPageResults = pageResults -> pageResults <= maxPageResults;
         this.entityValidation = validCondition;
         this.maxPageResults = maxPageResults;
+        this.paginationLimit = paginationLimit;
     }
 
     public ControllerValidationHelperImpl(int maxPageResults) {
@@ -51,7 +71,7 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
                 .forEach(badId -> {
                     String errorMessage = "Provided ID: '" + badId + "' is invalid";
                     LOGGER.error(errorMessage);
-                    throw new IllegalArgumentException(errorMessage);
+                    throw new ParameterException(errorMessage);
                 });
 
         return idList;
@@ -63,7 +83,16 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
                     maxPageResults + ". Please consider using end-points that " +
                     "return paged results.";
             LOGGER.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+            throw new ParameterException(errorMessage);
+        }
+    }
+
+    @Override public void validatePageIsLessThanPaginationLimit(int requestedPageNumber) {
+        if (requestedPageNumber > paginationLimit) {
+            String errorMessage = "Cannot retrieve the requested page number. Upper limit is: " +
+                    paginationLimit + ". Please refine results set.";
+            LOGGER.error(errorMessage);
+            throw new ParameterException(errorMessage);
         }
     }
 

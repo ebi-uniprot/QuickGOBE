@@ -14,5 +14,6 @@ public enum PresetType {
     GO_SLIMS_SETS,
     TAXONS,
     QUALIFIERS,
-    ASPECTS
+    ASPECTS,
+    EXT_RELATIONS
 }

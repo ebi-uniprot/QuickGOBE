@@ -106,7 +106,8 @@ public class SearchServiceConfig {
 
     @Bean
     public GeneProductCompositeRetrievalConfig geneProductRetrievalConfig(
-            @Value("${search.return.fields:" + DEFAULT_GENE_PRODUCT_SEARCH_RETURN_FIELDS + "}") String geneProductSearchSolrReturnedFields,
+            @Value("${search.return.fields:" + DEFAULT_GENE_PRODUCT_SEARCH_RETURN_FIELDS + "}")
+                    String geneProductSearchSolrReturnedFields,
             @Value("${search.field.repo2domain.map:}") String geneProductSearchRepo2DomainFieldMap,
             @Value("${search.highlight.delims:" + DEFAULT_HIGHLIGHT_DELIMS + "}") String highlightDelims) {
 

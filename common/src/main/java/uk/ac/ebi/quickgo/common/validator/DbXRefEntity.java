@@ -35,7 +35,7 @@ public class DbXRefEntity {
         checkArgument(database != null, "The database ID should not be null");
         checkArgument(entityType != null, "The entity type should not be null");
         checkArgument(idValidationPattern != null,
-                "The regex for the validation of ids from " + database + " is null and therefore invalid");
+                      "The regex for the validation of ids from " + database + " is null and therefore invalid");
         this.database = database;
         this.entityType = entityType;
         this.validationCaseSensitive = validationCaseSensitive;
@@ -48,7 +48,14 @@ public class DbXRefEntity {
     /**
      * This method checks whether the supplied {@code id} matches the regular expression
      * that determines a valid entity.
-     *
+     * <p>
+     * The id will be structured in one of the following ways.
+     * <ul>
+     * <li> id e.g. P19712
+     * <li> db:id e.g. UniProtKB:P19712
+     * <li> id:feature or variation e.g. 'P19712:PRO_0000038050'
+     * <li> db:id:feature or variation e.g. 'UniProtKB:P19712:PRO_0000038050'
+     * </ul>
      * @param id the gene product id to be checked. This can be either the qualified (e.g., UniProtKB:Q12345),
      *           or unqualified value (e.g., Q12345)
      * @return true if the gene product id is a valid identifier according to this {@link DbXRefEntity}.
@@ -58,11 +65,16 @@ public class DbXRefEntity {
 
         switch (idComponents.length) {
             case 1:
+                //id has the format just id e.g. P19712
                 return idValidationPattern.matcher(idComponents[0]).matches();
             case 2:
-                return idValidationPattern.matcher(idComponents[1]).matches() &&
-                        (validationCaseSensitive ?
-                                 idComponents[0].equals(database) : idComponents[0].equalsIgnoreCase(database));
+                if (idIncludesDatabase(idComponents)) {
+                    //id has the format db:id e.g. UniProtKB:P19712
+                    return idValidationPattern.matcher(idComponents[1]).matches();
+                } else {
+                    // id has the format id:feature or variation e.g. 'P19712:PRO_0000038050'
+                    return idValidationPattern.matcher(id).matches();
+                }
             default:
                 return false;
         }
@@ -114,5 +126,10 @@ public class DbXRefEntity {
                 ", idValidationPattern=" + idValidationPattern +
                 ", databaseURL='" + databaseURL + '\'' +
                 '}';
+    }
+
+    private boolean idIncludesDatabase(String[] idComponents) {
+        return validationCaseSensitive ?
+                idComponents[0].equals(database) : idComponents[0].equalsIgnoreCase(database);
     }
 }

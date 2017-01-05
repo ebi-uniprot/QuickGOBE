@@ -21,8 +21,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -202,6 +204,16 @@ public class CoTermControllerIT {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
         response.andExpect(status().isBadRequest());
         expectLimitErrorMessage(response);
+    }
+
+
+    @Test
+    public void numberOfHitsIsNotLimitedToRequestedLimit() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=4")));
+        expectFieldsInResults(response, Collections.singletonList(GO_0000001))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*", hasSize(4)))
+                .andExpect(jsonPath("$.numberOfHits", is(equalTo(12))));
     }
 
 

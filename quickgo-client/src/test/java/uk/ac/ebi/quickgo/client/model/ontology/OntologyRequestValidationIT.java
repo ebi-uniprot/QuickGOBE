@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_ENTRIES_PER_PAGE;
 import static uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets.DEFAULT_ERROR_MESSAGE;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.DEFAULT_ERROR_MSG;
 
@@ -146,20 +147,20 @@ public class OntologyRequestValidationIT {
 
     @Test
     public void limitValueEqualToMaxEntriesPerPageIsInvalid() {
-        ontologyRequest.setLimit(ontologyRequest.MAX_ENTRIES_PER_PAGE);
+        ontologyRequest.setLimit(MAX_ENTRIES_PER_PAGE);
 
         assertThat(validator.validate(ontologyRequest), hasSize(0));
     }
 
     @Test
     public void limitValueAboveMaxEntriesPerPageIsInvalid() {
-        ontologyRequest.setLimit(ontologyRequest.MAX_ENTRIES_PER_PAGE + 1);
+        ontologyRequest.setLimit(MAX_ENTRIES_PER_PAGE + 1);
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(), is("Number of results per page cannot be greater than " +
-                ontologyRequest.MAX_ENTRIES_PER_PAGE));
+                MAX_ENTRIES_PER_PAGE));
     }
 
     //ASPECT FILTER
