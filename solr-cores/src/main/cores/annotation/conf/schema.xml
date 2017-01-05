@@ -148,6 +148,10 @@
     <field name="extension_search" type="extension_ignorecase" indexed="true" stored="false" multiValued="true"/>
     <copyField source="extension" dest="extension_search"/>
 
+    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- Fields that are used specifically for Ordering -->
+    <field name="rn" type="row_number" indexed="true" stored="false" multiValued="false"/>
+    <copyField source="id" dest="rn"/>
 
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->
@@ -255,6 +259,20 @@
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
+
+    <fieldType name="row_number" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.StandardTokenizerFactory"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="!(.+)"
+                    preserve_original="false"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+        </analyzer>
+    </fieldType>
+
+   <!-- Create a unique id -->
+    <!--<fieldType name="uuid" class="solr.UUIDField" indexed="true" />-->
 
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"
