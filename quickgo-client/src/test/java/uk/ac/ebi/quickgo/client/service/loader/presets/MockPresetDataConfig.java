@@ -122,33 +122,33 @@ public class MockPresetDataConfig {
         PRESET_GO_SLIM_ASPERGILLUS = PresetItem
                 .createWithName("goslim_aspergillus")
                 .withAssociations(asList(
-                        createPresetItem("GO:0005575", "cellular_component", "Cellular Component"),
-                        createPresetItem("GO:0005576", "extracellular region", "Cellular Component"),
+                        createPresetItem("GO:0005575", "cellular_component", "cellular_component"),
+                        createPresetItem("GO:0005576", "extracellular region", "cellular_component"),
                         createPresetItem("GO:0000988", "transcription factor activity, protein binding",
-                                "Molecular Function")))
+                                "molecular_function")))
                 .build();
 
         PRESET_GO_SLIM_METAGENOMICS = PresetItem
                 .createWithName("goslim_metagenomics")
                 .withAssociations(asList(
-                        createPresetItem("GO:0006259", "DNA metabolic process", "Biological Process"),
-                        createPresetItem("GO:0008233", "peptidase activity", "Molecular Function"),
-                        createPresetItem("GO:0016740", "transferase activity", "Molecular Function")))
+                        createPresetItem("GO:0006259", "DNA metabolic process", "biological_process"),
+                        createPresetItem("GO:0008233", "peptidase activity", "molecular_function"),
+                        createPresetItem("GO:0016740", "transferase activity", "molecular_function")))
                 .build();
 
         PRESET_GO_SLIM_POMBE = PresetItem
                 .createWithName("goslim_pombe")
                 .withAssociations(asList(
-                        createPresetItem("GO:0002181", "cytoplasmic translation", "Biological Process"),
+                        createPresetItem("GO:0002181", "cytoplasmic translation", "biological_process"),
                         createPresetItem("GO:0006355", "regulation of transcription, DNA-templated",
-                                "Biological Process")))
+                                "biological_process")))
                 .build();
 
         PRESET_GO_SLIM_SYNAPSE = PresetItem
                 .createWithName("goslim_synapse")
                 .withAssociations(singletonList(
                         createPresetItem("GO:0004444", "obsolete inositol-1,4,5-trisphosphate 1-phosphatase",
-                                "Cellular Component")))
+                                "cellular_component")))
                 .build();
     }
 
