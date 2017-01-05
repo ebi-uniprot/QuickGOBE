@@ -6,10 +6,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang.StringUtils;
@@ -89,11 +86,16 @@ public class AnnotationControllerIT {
     // CONSISTENT ORDER
     @Test
     public void annotationsAlwaysReturnedInOrderWrittenToRepository() throws Exception{
+        repository.deleteAll();
+        String geneProductId1 = "BBBBB";
+        String geneProductId2 = "ZZZZZ";
+        String geneProductId3 = "AAAAA";
 
-        String geneProductId = "A0";
-
-        AnnotationDocument document = AnnotationDocMocker.createAnnotationDoc(geneProductId);
-        repository.save(document);
+        List<AnnotationDocument> documents = new ArrayList<>();
+        documents.add(AnnotationDocMocker.createAnnotationDoc(geneProductId1));
+        documents.add(AnnotationDocMocker.createAnnotationDoc(geneProductId2));
+        documents.add(AnnotationDocMocker.createAnnotationDoc(geneProductId3));
+        repository.save(documents);
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search"));
@@ -101,11 +103,10 @@ public class AnnotationControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(4))
-                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 0, genericDocs.get(0).geneProductId))
-                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 1, genericDocs.get(1).geneProductId))
-                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 2, genericDocs.get(2).geneProductId))
-                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 3, geneProductId));
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 0, geneProductId1))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 1, geneProductId2))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 2, geneProductId3));
     }
 
 
@@ -1487,32 +1488,6 @@ public class AnnotationControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(3));
-    }
-
-    @Test
-    public void resultsReturnedInOrderWrittenToSolrRelevancyNotUsed() throws Exception {
-
-        //Create an Annotation with a mixture of new and existing extensions.
-        String newExtension = "results_in_development_of(UBERON:8888888)";
-        final String newGeneProduct = "A0A123";
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(newGeneProduct);
-        doc.extensions = Arrays.asList(newExtension, EXTENSION_3);
-        repository.save(doc);
-
-        //Although this filter will match the newly added Annotation for two extension strings (the existing test
-        // Annotations only have one matching extension) the results will still come back in the standard (written to
-        // Solr) order.
-        String filter = String.format("%s,%s", newExtension, EXTENSION_3);
-        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), filter));
-
-        String expected = "A0A000";
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(4))
-                .andExpect(fieldInRowHasValue("geneProductId", 0, expected));
     }
 
 
