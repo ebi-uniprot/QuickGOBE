@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang.StringUtils;
@@ -87,26 +88,35 @@ public class AnnotationControllerIT {
     @Test
     public void annotationsAlwaysReturnedInOrderWrittenToRepository() throws Exception{
         repository.deleteAll();
-        String geneProductId1 = "BBBBB";
-        String geneProductId2 = "ZZZZZ";
-        String geneProductId3 = "AAAAA";
+        String geneProductId1 = "AAAAA";
+        String geneProductId2 = "BBBBB";
+        String geneProductId3 = "ZZZZZ";
 
-        List<AnnotationDocument> documents = new ArrayList<>();
-        documents.add(AnnotationDocMocker.createAnnotationDoc(geneProductId1));
-        documents.add(AnnotationDocMocker.createAnnotationDoc(geneProductId2));
-        documents.add(AnnotationDocMocker.createAnnotationDoc(geneProductId3));
-        repository.save(documents);
+        //Create sequence number as B,Z,A
+        AnnotationDocMocker.rowNumberGenerator = new AtomicLong(100);
+        final AnnotationDocument annotationDoc1 = AnnotationDocMocker.createAnnotationDoc(geneProductId1);
+        AnnotationDocMocker.rowNumberGenerator = new AtomicLong(10);
+        final AnnotationDocument annotationDoc2 = AnnotationDocMocker.createAnnotationDoc(geneProductId2);
+        AnnotationDocMocker.rowNumberGenerator = new AtomicLong(50);
+        final AnnotationDocument annotationDoc3 = AnnotationDocMocker.createAnnotationDoc(geneProductId3);
+
+        //save in order A, B, Z
+        repository.save(annotationDoc1);
+        repository.save(annotationDoc2);
+        repository.save(annotationDoc3);
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search"));
 
+        //Results should arrive in sequence number
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(3))
-                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 0, geneProductId1))
-                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 1, geneProductId2))
-                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 2, geneProductId3));
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 0, geneProductId2))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 1, geneProductId3))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 2, geneProductId1));
+
     }
 
 
