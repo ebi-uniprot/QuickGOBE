@@ -13,7 +13,6 @@ import org.apache.solr.client.solrj.beans.Field;
  * @author Edd
  */
 public class AnnotationDocument implements QuickGODocument {
-    public long rowNumber;
 
     @Field(AnnotationFields.ID)
     public String id;
