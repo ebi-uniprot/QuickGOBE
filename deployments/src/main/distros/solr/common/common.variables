@@ -35,6 +35,7 @@ repos_dir="$QUICKGO_BASE_DIR/repos"
 
 quickgo_repo_dir="$repos_dir/QuickGOBE"
 quickgo_branch="GOA-2448_create_solr_cloud_run_scripts"
+quickgo_branch="master"
 
 solr_index_dir="${QUICKGO_BASE_DIR}/.quickgo-indexes"
 solr_config_dir="${QUICKGO_BASE_DIR}/solr-conf"
