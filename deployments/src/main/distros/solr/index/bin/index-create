@@ -7,8 +7,7 @@ readonly valid_users=("uni_qgo")
 readonly release_version_prefix="v";
 
 ## ------------------------ SOURCE NECESSARY FILES ------------------------
-if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" || ! 
-source "index.variables" || ! source "../common/lsf.command.variables" || ! source "$admin_scripts_dir/common/solr.variables"; then
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" || !source "index.variables" || ! source "../common/lsf.command.variables" || ! source "$admin_scripts_dir/common/solr.variables"; then
     prettyEcho "<error>Required properties files were not found. Please make sure you're in the right directory</error>";
     exit 1;
 fi
@@ -62,7 +61,7 @@ if [ "$requested_profile" == "stage" ] ; then
 fi
 
 # ------------------------ fetch the dependencies for the current release ------------------------
-readonly release_dir="${solr_index_dir}/${requested_profile}";
+release_dir="${solr_index_dir}/${requested_profile}";
 
 if [ ! -d "$release_dir" ]; then
     prettyEcho "<info>Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...</info>";
