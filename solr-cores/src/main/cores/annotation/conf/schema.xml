@@ -148,6 +148,10 @@
     <field name="extension_search" type="extension_ignorecase" indexed="true" stored="false" multiValued="true"/>
     <copyField source="extension" dest="extension_search"/>
 
+    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- Fields that are used specifically for Ordering -->
+    <field name="rowNumber" type="row_number" indexed="true" stored="true" multiValued="false"/>
+    <copyField source="id" dest="rowNumber"/>
 
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->
@@ -255,6 +259,27 @@
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
+
+    <fieldType name="row_number" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern=".+!(\d+)" preserve_original="false"/>
+
+            <!-- Left-pad numbers with zeroes -->
+            <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="(\d+)" replacement="00000000000$1" replace="all" />
+            <!-- Left-trim zeroes to produce 6 digit numbers -->
+            <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="0*([0-9]{13,})" replacement="$1" replace="all" />
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.StandardTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
+   <!-- Create a unique id -->
+    <!--<fieldType name="uuid" class="solr.UUIDField" indexed="true" />-->
 
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"

@@ -68,6 +68,7 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.DATE)
     public Date date;
 
+
     @Override public String getUniqueName() {
         return id;
     }
