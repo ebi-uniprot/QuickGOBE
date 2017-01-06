@@ -1,0 +1,58 @@
+#! /bin/bash
+
+##=========================================================================================
+# Checks if the self-contained web-application is running
+##=========================================================================================
+
+set -eo pipefail
+
+if [ -z "$CURRENT_DIR" ]; then
+    SERVICE_CONF_PATH="$(pwd -P)"
+else
+    SERVICE_CONF_PATH="$CURRENT_DIR"
+fi
+
+# ======= CONSTANTS =====================================================================
+readonly PERMITTED_USER=("uni_qgo")
+
+# ======= read the variables used by the control scripts =======================================
+source "${SERVICE_CONF_PATH}/environment.variables" || {
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1
+}
+
+source "$(dirname $(which $0))/common/common"
+
+# ====== load the profile from the vm ===================================
+readonly PROFILE=$(get_profile_from_vm "$(hostname)")
+
+if [ -z "$PROFILE" ]; then 
+   echo "Current VM: $(hostname) does not belong to any profile"
+   exit 1
+fi
+
+# ======= check the right user runs this script =======================================
+if ! user_can_execute_script $USER PERMITTED_USER; then
+    echo "This service can only be run as user(s), '${PERMITTED_USER[@]}'"
+    exit 1
+fi
+
+# ======= check if script is run on the right VM =====================================
+if [[ $(hostname) =~ ^ebi.* ]]; then
+    echo "This script can only be run on NON EBI cluster machines"
+    exit 1
+fi
+
+# ======= check necessary variables exist for upcoming tests =======================================
+if [ -z "$PORT" ]; then
+    echo "$PORT environment variable must be set. Aborting."
+    exit 1
+fi
+
+readonly TEST_URL="http://127.0.0.1:$PORT"
+nc -zv 127.0.0.1 $PORT > /dev/null 2>&1 || {
+    echo "Status Check: $TEST_URL is DOWN"
+    exit 1
+}
+
+echo "Status Check: $TEST_URL is UP"

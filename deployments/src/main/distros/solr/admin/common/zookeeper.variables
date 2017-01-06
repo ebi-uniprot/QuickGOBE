@@ -1,0 +1,34 @@
+## Zookeeper hosts
+declare -A zoo_hosts
+zoo_hosts[test]="ves-hx-ed"
+zoo_hosts[dev]="ves-hx-c2"
+zoo_port=2181
+
+#----- CHECK IF PROFILE DECLARED IN ZOOKEEPER PROFILES -------
+function check_zookeeper_profile() {
+    local value="$1"
+    local valid_profiles=(${!zoo_hosts[@]})
+    local is_profile=0;
+
+    if [ -z "$value" ]; then
+      is_profile=1;
+    elif ! array_contains valid_profiles $value; then
+      is_profile=1;
+    fi
+
+    return $is_profile;
+}
+
+#----- CONCATENATE ZOOKEEPER HOSTS WITH RESPECTIVE PORTS ----- 
+function zookeeper_hosts() {
+    local hosts="$1"
+    local port="$2"
+
+    local concat_hosts=""
+
+    for host in "$hosts"; do
+        concat_hosts+="$host:$port,"
+    done
+
+    echo "${concat_hosts%,}"
+}

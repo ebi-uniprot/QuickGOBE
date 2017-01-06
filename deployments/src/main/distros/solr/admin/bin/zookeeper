@@ -1,0 +1,128 @@
+#! /bin/bash
+
+##=========================================================================================
+# Starts up the zookeeper instances.
+#
+# Zookeeper is responsible for managing the Solr cloud nodes
+##=========================================================================================
+
+set -eo pipefail
+IFS=$' '
+
+readonly valid_users=("uni_qgo")
+
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" ; then
+    prettyEcho "<error>Required common files were not found. Please make sure you're in the right directory.</error>";
+fi
+
+if ! source "$admin_scripts_dir/common/zookeeper.variables" ; then
+    prettyEcho "<error>Please create a file called, zookeeper.variables, containing the necessary environment variables.</error>"
+    exit 1
+fi
+
+# ========================= CONSTANTS ==================================================
+readonly action="$1"
+readonly requested_profile="$2"
+readonly vm="$3"
+readonly supported_actions=("start" "stop" "status")
+readonly zookeeper_dir="$dist_dir/zookeeper/current"
+
+# ========================= utility functions ===========================================
+function show_help {
+    cat<<EOF
+  Usage: $0 action profile [vm_name]
+
+  Argument description:
+    action       => The action to perform on the zookeeper service(s). Possible values: [$(join_by , "${supported_actions[@]}")]
+    profile      => Indicates the profile of the zookeeper instances to perform the action on. Possible values: [$(join_by , "${VALID_PROFILES[@]}")]
+    vm_name      => The name of the virtual machine perform action on
+
+  Example: $0 start dev -- starts up all development zookeper services
+           $0 stop dev  -- stops all development zookeeper services
+  WARNING: Please be aware of who is using the machine before starting/stopping them.
+EOF
+}
+
+function action_is_supported {
+    local loc_action="$1"
+    local is_supported=1
+
+    for valid_action in "${supported_actions[@]}"; do
+       if [ "$loc_action" = "$valid_action" ]; then
+          is_supported=0
+          break
+       fi
+    done
+
+    return $is_supported
+}
+
+function action_on_zookeeper() {
+   local loc_vm="$1"
+   local loc_action="$2"
+
+   ssh "$USER"@"$loc_vm" "$zookeeper_dir/bin/zkServer.sh $loc_action $loc_vm.cfg"
+}
+
+function vm_belongs_to_profile() {
+   local valid_vms="$1"
+   local vm_to_check="$2"
+
+   local belongs_to_profile=1
+
+   for _vm in "${valid_vms}"; do
+      if [ "$_vm" = "$vm_to_check" ]; then
+          belongs_to_profile=0
+          break
+      fi
+   done
+
+   return $belongs_to_profile
+}
+
+# ====== check that the script has the right number of arguments ========================
+if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
+   show_help
+   exit 1
+fi
+
+# ====== check chosen action is supported ========================
+if ! action_is_supported $action; then
+   prettyEcho "<error>Chosen action: $action, is not supported. Supported values are: [$(join_by , ${supported_actions[@]})].</error>"
+   exit 1
+fi
+
+# ====== check which environment will be started ========================================
+if ! check_zookeeper_profile $requested_profile ; then
+    prettyEcho "<error>Invalid zookeeper profile specified: $requested_profile.
+                   Please check your zookeeper.variables file.</error>";
+    exit 1;
+fi
+
+if [ ! -z $vm ] && ! vm_belongs_to_profile ${zoo_hosts[$requested_profile]} $vm; then
+  prettyEcho "<error>Specified zookeper vm: $vm does not belong to profile: $requested_profile.</error>"
+  exit 1
+fi
+
+for vm_in_profile in "${zoo_hosts[$requested_profile]}"; do
+   if [ -z $vm ] || [ "$vm_in_profile" = "$vm" ]; then
+       case $action in
+           start)
+             prettyEcho "<info>Starting Zookeeper vm: $vm_in_profile.</info>"
+             action_on_zookeeper $vm_in_profile $action
+             ;;
+           stop)
+             prettyEcho "<info>Stopping Zookeeper vm: $vm_in_profile.</info>"
+             action_on_zookeeper $vm_in_profile $action
+             ;;
+           status)
+             prettyEcho "<info>Checking zookeeper status: $vm_in_profile.</info>"
+             action_on_zookeeper $vm_in_profile $action
+             ;;
+           *)
+
+           prettyEcho "<error>Unrecognized action: $action.</error>"
+           exit 1
+      esac
+   fi
+done
