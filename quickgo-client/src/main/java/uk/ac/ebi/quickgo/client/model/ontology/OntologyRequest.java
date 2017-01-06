@@ -44,9 +44,9 @@ public class OntologyRequest {
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @ApiModelProperty(value = "Fields to generate facets from", allowableValues = "facet,aspect",
-            example = "aspect, type")
-    private String[] facets;
+    @ApiModelProperty(value = "Fields to generate facets from", allowableValues = "aspect, ontologyType",
+            example = "aspect, ontologyType")
+    private String[] facet;
 
     @ApiModelProperty(value = "The query used to filter the gene products", example = "kinase", required = true)
     private String query;
@@ -106,11 +106,11 @@ public class OntologyRequest {
 
     @AllowableFacets
     public String[] getFacet() {
-        return facets;
+        return facet;
     }
 
-    public void setFacet(String[] facets) {
-        this.facets = facets;
+    public void setFacet(String[] facet) {
+        this.facet = facet;
     }
 
     @ArrayPattern(regexp = "biological_process|molecular_function|cellular_component",
