@@ -58,6 +58,7 @@ public class MockPresetDataConfig {
     static final PresetItem PRESET_ECO_32;
     static final PresetItem PRESET_DICTY_BASE;
     static final PresetItem PRESET_BHF_UCL;
+    static final PresetItem PRESET_GO_SLIM_ASPERGILLUS;
     static final PresetItem PRESET_GO_SLIM_METAGENOMICS;
     static final PresetItem PRESET_GO_SLIM_POMBE;
     static final PresetItem PRESET_GO_SLIM_SYNAPSE;
@@ -68,6 +69,8 @@ public class MockPresetDataConfig {
     private static final RelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
     private static final RelevancyResponseType DEFAULT_RELEVANT_TAXONS;
     private static final RelevancyResponseType DEFAULT_RELEVANT_QUALIFIERS;
+    private static final String SLIM_NAME = "name";
+    private static final String SLIM_ASPECT = "aspect";
 
     static {
         DEFAULT_RELEVANT_ASSIGNED_BYS = new RelevancyResponseType();
@@ -96,38 +99,65 @@ public class MockPresetDataConfig {
 
         PRESET_ECO_32 = PresetItem
                 .createWithName("All manual codes")
-                .withId("ECO:0000352")
-                .withDescription("evidence used in manual assertion")
-                .withRelevancy(1).build();
+                .withProperty(PresetItem.Property.ID, "ECO:0000352")
+                .withProperty(PresetItem.Property.DESCRIPTION, "evidence used in manual assertion")
+                .withRelevancy(1)
+                .build();
 
         PRESET_BHF_UCL = PresetItem
                 .createWithName("BHF-UCL")
-                .withDescription(
+                .withProperty(PresetItem.Property.DESCRIPTION,
                         "The set of Cardiovascular-associated proteins being prioritised for annotation by the " +
                                 "Cardiovascular Gene Ontology Annotation Initiative located at University College " +
                                 "London")
-                .withUrl("http://www.ucl.ac.uk/cardiovasculargeneontology")
+                .withProperty(PresetItem.Property.URL, "http://www.ucl.ac.uk/cardiovasculargeneontology")
                 .build();
 
         PRESET_DICTY_BASE = PresetItem
                 .createWithName("dictyBase")
-                .withDescription("dictyBase")
+                .withProperty(PresetItem.Property.DESCRIPTION, "dictyBase")
                 .withRelevancy(62)
+                .build();
+
+        PRESET_GO_SLIM_ASPERGILLUS = PresetItem
+                .createWithName("goslim_aspergillus")
+                .withAssociations(asList(
+                        createPresetItem("GO:0005575", "cellular_component", "cellular_component"),
+                        createPresetItem("GO:0005576", "extracellular region", "cellular_component"),
+                        createPresetItem("GO:0000988", "transcription factor activity, protein binding",
+                                "molecular_function")))
                 .build();
 
         PRESET_GO_SLIM_METAGENOMICS = PresetItem
                 .createWithName("goslim_metagenomics")
-                .withAssociations(asList("GO:0006259", "GO:0008233", "GO:0016740"))
+                .withAssociations(asList(
+                        createPresetItem("GO:0006259", "DNA metabolic process", "biological_process"),
+                        createPresetItem("GO:0008233", "peptidase activity", "molecular_function"),
+                        createPresetItem("GO:0016740", "transferase activity", "molecular_function")))
                 .build();
 
         PRESET_GO_SLIM_POMBE = PresetItem
                 .createWithName("goslim_pombe")
-                .withAssociations(asList("GO:0002181", "GO:0006355"))
+                .withAssociations(asList(
+                        createPresetItem("GO:0002181", "cytoplasmic translation", "biological_process"),
+                        createPresetItem("GO:0006355", "regulation of transcription, DNA-templated",
+                                "biological_process")))
                 .build();
 
         PRESET_GO_SLIM_SYNAPSE = PresetItem
                 .createWithName("goslim_synapse")
-                .withAssociations(singletonList("GO:0004444"))
+                .withAssociations(singletonList(
+                        createPresetItem("GO:0004444", "obsolete inositol-1,4,5-trisphosphate 1-phosphatase",
+                                "cellular_component")))
+                .build();
+    }
+
+    private static PresetItem createPresetItem(String id, String name, String aspect) {
+        return PresetItem
+                .createWithName(id)
+                .withProperty(PresetItem.Property.ID, id)
+                .withProperty(SLIM_NAME, name)
+                .withProperty(SLIM_ASPECT, aspect)
                 .build();
     }
 
@@ -174,7 +204,7 @@ public class MockPresetDataConfig {
 
     @Bean @Profile(NO_SEARCH_ATTRIBUTES)
     public SearchableField searchableDocumentFields() {
-       return new NoSearchablePresetDocumentFields();
+        return new NoSearchablePresetDocumentFields();
     }
 
     private static class NoSearchablePresetDocumentFields implements SearchableField {

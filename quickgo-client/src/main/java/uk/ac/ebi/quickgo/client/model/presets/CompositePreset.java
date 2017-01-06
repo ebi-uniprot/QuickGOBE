@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.model.presets;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+
 import java.util.List;
 
 /**
@@ -30,4 +31,6 @@ public interface CompositePreset {
     List<PresetItem> getAspects();
 
     List<PresetItem> getGeneProductTypes();
+
+    List<PresetItem> getExtRelations();
 }

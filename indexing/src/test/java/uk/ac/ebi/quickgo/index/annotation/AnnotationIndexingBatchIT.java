@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,6 +57,11 @@ public class AnnotationIndexingBatchIT {
     @Autowired
     private AnnotationRepository annotationRepository;
 
+    @Before
+    public void setUp() {
+        annotationRepository.deleteAll();
+    }
+
     @Test
     public void successfulIndexingJob() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -63,7 +69,7 @@ public class AnnotationIndexingBatchIT {
 
         List<StepExecution> jobsSingleStepAsList = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals (ANNOTATION_INDEXING_STEP_NAME))
+                .filter(step -> step.getStepName().equals(ANNOTATION_INDEXING_STEP_NAME))
                 .collect(Collectors.toList());
         assertThat(jobsSingleStepAsList, hasSize(1));
 
@@ -87,27 +93,28 @@ public class AnnotationIndexingBatchIT {
         ));
 
         //Manual
-        List<StepExecution> jobsSingleStepCoTermManual = jobExecution.getStepExecutions()
+        List<StepExecution> summarizeCoTermManualSteps = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals (CO_TERM_MANUAL_SUMMARIZATION_STEP))
+                .filter(step -> step.getStepName().equals(CO_TERM_MANUAL_SUMMARIZATION_STEP))
                 .collect(Collectors.toList());
-        assertThat(jobsSingleStepCoTermManual, hasSize(1));
-        StepExecution coTermsManualStep = jobsSingleStepCoTermManual.get(0);
+        assertThat(summarizeCoTermManualSteps, hasSize(1));
+        StepExecution coTermsManualStep = summarizeCoTermManualSteps.get(0);
         assertThat(coTermsManualStep.getReadCount(), is(4));
         assertThat(coTermsManualStep.getReadSkipCount(), is(0));
         assertThat(coTermsManualStep.getProcessSkipCount(), is(0));
         assertThat(coTermsManualStep.getWriteCount(), is(4));
 
-        List<StepExecution> jobsSingleStepCoTermAll = jobExecution.getStepExecutions()
+        List<StepExecution> summarizeCoTermAllSteps = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals (CO_TERM_ALL_SUMMARIZATION_STEP))
+                .filter(step -> step.getStepName().equals(CO_TERM_ALL_SUMMARIZATION_STEP))
                 .collect(Collectors.toList());
-        assertThat(jobsSingleStepCoTermAll, hasSize(1));
-        StepExecution coTermsAllStep = jobsSingleStepCoTermAll.get(0);
+        assertThat(summarizeCoTermAllSteps, hasSize(1));
+        StepExecution coTermsAllStep = summarizeCoTermAllSteps.get(0);
         assertThat(coTermsAllStep.getReadCount(), is(5));
         assertThat(coTermsAllStep.getReadSkipCount(), is(0));
         assertThat(coTermsAllStep.getProcessSkipCount(), is(0));
         assertThat(coTermsAllStep.getWriteCount(), is(5));
+        assertThat(coTermsAllStep.getExecutionContext().get("FlatFileItemWriter.written"), is(7L));
 
         //Has finished
         BatchStatus status = jobExecution.getStatus();

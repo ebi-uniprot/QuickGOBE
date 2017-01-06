@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
+import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
@@ -17,6 +19,7 @@ import javax.validation.constraints.Size;
 
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
 
 /**
@@ -31,13 +34,6 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_I
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequest {
-    public static final int DEFAULT_ENTRIES_PER_PAGE = 25;
-    public static final int MAX_ENTRIES_PER_PAGE = 100;
-    public static final int MIN_ENTRIES_PER_PAGE = 0;
-
-    public static final int DEFAULT_PAGE_NUMBER = 1;
-    public static final int MIN_PAGE_NUMBER = 1;
-
     static final int MAX_GO_IDS = 500;
     static final int MAX_GENE_PRODUCT_IDS = 500;
     static final int MAX_EVIDENCE_CODE = 100;
@@ -56,6 +52,7 @@ public class AnnotationRequest {
     static final String GENE_PRODUCT_SUBSET_PARAM = "Gene Product Subset identifier";
     static final String GENE_PRODUCT_PARAM = "Gene Product ID";
     static final String REFERENCE_PARAM = "Reference";
+    static final String QUALIFIER_PARAM = "Qualifer";
 
     static final String GO_USAGE_ID = "goId";
     static final String GO_USAGE_FIELD = "goUsage";
@@ -79,7 +76,8 @@ public class AnnotationRequest {
             Searchable.REFERENCE,
             Searchable.TAXON_ID,
             Searchable.TARGET_SET,
-            Searchable.WITH_FROM
+            Searchable.WITH_FROM,
+            Searchable.EXTENSION
     };
 
     /**
@@ -221,6 +219,16 @@ public class AnnotationRequest {
             example = "EXP,IDA")
     private String goIdEvidence;
 
+    @ApiModelProperty(value = "An annotation extension is used to extend " +
+            "(i.e., add more specificity to) the GO term used in an annotation; the combination of the GO term plus the" +
+            " extension is equivalent to a more specific GO term. " +
+            "An annotation extension is stored in the database, and transmitted in annotation files, as a single " +
+            "string, structured as a pipe-separated list of comma-separated lists of components.",
+            example = "occurs_in(CL:0000032),transports_or_maintains_localization_of(UniProtKB:P10288)|" +
+                    "results_in_formation_of(UBERON:0003070),occurs_in(CL:0000032),occurs_in(CL:0000008)," +
+                    "results_in_formation_of(UBERON:0001675)")
+    private String[] extensions;
+
     private final Map<String, String[]> filterMap = new HashMap<>();
 
     /**
@@ -246,7 +254,7 @@ public class AnnotationRequest {
         filterMap.put(Searchable.REFERENCE, reference);
     }
 
-    //todo create validation pattern @Pattern(regexp = "")
+    @ReferenceValidator
     @Size(max = MAX_REFERENCES,
             message = "Number of items in '" + REFERENCE_PARAM + "' is larger than: {max}")
     public String[] getReference() {
@@ -303,6 +311,7 @@ public class AnnotationRequest {
         filterMap.put(Searchable.QUALIFIER, qualifier);
     }
 
+    @ArrayPattern(regexp = "^(NOT\\|)?[A-Z_]+$", flags = CASE_INSENSITIVE, paramName = QUALIFIER_PARAM)
     public String[] getQualifier() {
         return filterMap.get(Searchable.QUALIFIER);
     }
@@ -321,6 +330,7 @@ public class AnnotationRequest {
      * Return a list of with/from values, separated by commas
      * @return String containing comma separated list of with/From values.
      */
+    @WithFromValidator
     public String[] getWithFrom() {
         return filterMap.get(Searchable.WITH_FROM);
     }
@@ -456,13 +466,31 @@ public class AnnotationRequest {
         this.limit = limit;
     }
 
-    @Min(value = MIN_PAGE_NUMBER, message = "Page size cannot be less than {value} but found: ${validatedValue}")
+    @Min(value = MIN_PAGE_NUMBER, message = "Page number cannot be less than {value}, but found: ${validatedValue}")
+    @Max(value = MAX_PAGE_NUMBER, message = "Page number cannot be greater than {value}, but found: ${validatedValue}")
     public int getPage() {
         return page;
     }
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    /**
+     * A list of extension relationship values, separated by commas
+     * In the format extension=occurs_in(PomBase:SPBP23A10.14c),RGD:621207 etc
+     * Users can supply just the database (e.g. PomBase) or id SPBP23A10.14c
+     */
+    public void setExtension(String... extension) {
+        filterMap.put(Searchable.EXTENSION, extension);
+    }
+
+    /**
+     * Return a list of annotation extension values, separated by commas
+     * @return String array containing comma separated list of extension values.
+     */
+    public String[] getExtension() {
+        return filterMap.get(Searchable.EXTENSION);
     }
 
     /**

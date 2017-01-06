@@ -34,7 +34,6 @@ final class ResponseVerifier {
     public static final String QUALIFIER_FIELD = "qualifier";
     public static final String REFERENCE_FIELD = "reference";
     public static final String TAXON_ID_FIELD = "taxonId";
-    public static final String WITH_FROM_FIELD = "withFrom";
 
     private static final String ERROR_MESSAGE = "messages";
     private static final String RESULTS_CONTENT_BY_INDEX = RESULTS + "[%d].";
@@ -113,6 +112,14 @@ final class ResponseVerifier {
 
         return matcher;
     }
+
+
+    static ResultMatcher fieldInRowHasValue(String fieldName, int index, String value) throws Exception {
+        String path = String.format(RESULTS_CONTENT_BY_INDEX, index);
+        return new CompositeResultMatcher().addMatcher(jsonPath(path + fieldName, is(value)));
+
+    }
+
 
     static ResultMatcher resultsInPage(int numResults) throws Exception {
         return jsonPath("$.results", hasSize(numResults));

@@ -17,10 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -52,6 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
 
 /**
  * Performs common tests on REST controllers that derive from {@link OBOController}.
@@ -69,6 +67,7 @@ public abstract class OBOControllerIT {
 
     private static final String QUERY_PARAM = "query";
     private static final String PAGE_PARAM = "page";
+    private static final String LIMIT_PARAM = "limit";
     private static final String RELATIONS_PARAM = "relations";
 
     private static final int RELATIONSHIP_CHAIN_LENGTH = 10;
@@ -430,6 +429,26 @@ public abstract class OBOControllerIT {
     }
 
     @Test
+    public void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
+        ontologyRepository.deleteAll();
+
+        int totalEntries = MAX_PAGE_NUMBER + 1;
+        int pageSize = 1;
+        int pageNumWhichIsTooHigh = totalEntries;
+
+        createAndSaveDocs(totalEntries);
+
+        ResultActions response = mockMvc.perform(
+                get(buildSearchURL())
+                        .param(QUERY_PARAM, validId)
+                        .param(LIMIT_PARAM, String.valueOf(pageSize))
+                        .param(PAGE_PARAM, String.valueOf(pageNumWhichIsTooHigh)));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void retrievesFirstPageOfAllEntriesRequest() throws Exception {
         ontologyRepository.deleteAll();
 
@@ -513,6 +532,7 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canFetchAllAncestorsFromRelation() throws Exception {
+
         String bottom = relationships.get(0).child;
 
         ResultActions response = mockMvc.perform(

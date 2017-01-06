@@ -1,8 +1,5 @@
 package uk.ac.ebi.quickgo.client.controller;
 
-import uk.ac.ebi.quickgo.client.QuickGOREST;
-import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +10,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.quickgo.client.QuickGOREST;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -34,8 +33,7 @@ public class PresetsRetrievalIT {
     private static final String RESOURCE_URL = "/internal/presets";
     private static final String FIELDS_PARAM = "fields";
 
-    @Autowired
-    protected WebApplicationContext webApplicationContext;
+    @Autowired private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
 
@@ -122,6 +120,14 @@ public class PresetsRetrievalIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.geneProductTypes.*", hasSize(3)));
+    }
+
+    @Test
+    public void canRetrieveAnnotationExtensionRelationsPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.extRelations.*", hasSize(greaterThan(0))));
     }
 
     @Test
