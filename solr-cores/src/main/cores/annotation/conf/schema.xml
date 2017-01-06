@@ -262,14 +262,12 @@
 
     <fieldType name="row_number" class="solr.TextField" positionIncrementGap="100">
         <analyzer type="index">
-            <tokenizer class="solr.StandardTokenizerFactory"/>
-            <!--<tokenizer class="solr.KeywordTokenizerFactory"/>-->
-            <!--<tokenizer class="solr.PatternTokenizerFactory" pattern="(?&lt;=!)(\d+)" group="0"/>-->
-            <!--<tokenizer class="solr.PatternTokenizerFactory" pattern="(?&lt;=!)(\d+)" group="1"/>-->
-            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="\d+" preserve_original="false"/>
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern=".+!(\d+)" preserve_original="false"/>
         </analyzer>
         <analyzer type="query">
-            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <tokenizer class="solr.StandardTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
 
