@@ -264,6 +264,13 @@
         <analyzer type="index">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
             <filter class="solr.PatternCaptureGroupFilterFactory" pattern=".+!(\d+)" preserve_original="false"/>
+
+            <!-- Left-pad numbers with zeroes -->
+            <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="(\d+)" replacement="00000000000$1" replace="all" />
+            <!-- Left-trim zeroes to produce 6 digit numbers -->
+            <filter class="solr.PatternReplaceFilterFactory"
+                    pattern="0*([0-9]{13,})" replacement="$1" replace="all" />
         </analyzer>
         <analyzer type="query">
             <tokenizer class="solr.StandardTokenizerFactory"/>
