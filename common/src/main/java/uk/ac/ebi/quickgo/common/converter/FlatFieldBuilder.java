@@ -22,7 +22,7 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
  * Created 26/11/15
  * @author Edd
  */
-public class FlatFieldBuilder extends FlatField {
+public class FlatFieldBuilder implements FlatField {
     // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(FlatFieldBuilder.class);
 

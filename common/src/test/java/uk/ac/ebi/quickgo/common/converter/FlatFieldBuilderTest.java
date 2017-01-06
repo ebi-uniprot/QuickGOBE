@@ -272,8 +272,8 @@ public class FlatFieldBuilderTest {
     @Test
     public void parseFlatFieldBuilderString4NestingLevels() {
         FlatFieldBuilder flatFieldBuilderOrig = newFlatField()
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
-                .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
+                .addField(newFlatFieldLeaf("level1:A"))
+                .addField(newFlatFieldLeaf("level1:B"))
                 .addField(
                         newFlatField()
                                 .addField(newFlatFieldLeaf("level2:A"))
@@ -353,21 +353,27 @@ public class FlatFieldBuilderTest {
 
     @Test
     public void canConvertMultipleFieldsContainingSquareBrackets() {
+        String complex = "fatty acid [synthase] complex";
+        String date = "2007-08-09";
+        String action = "Deleted";
+        String type = "SYNONYM";
+        String proteinComplex = "holo-[acyl-carrier-protein] synthase complex";
+
         FlatField actualFlatField =
                 parse(
                         expectedField(
-                                "fatty acid [synthase] complex",
-                                "2007-08-09",
-                                "Deleted",
-                                "SYNONYM",
-                                "holo-[acyl-carrier-protein] synthase complex"));
+                                complex,
+                                date,
+                                action,
+                                type,
+                                proteinComplex));
 
         FlatField expectedField = newFlatField()
-                .addField(newFlatFieldLeaf("fatty acid [synthase] complex"))
-                .addField(newFlatFieldLeaf("2007-08-09"))
-                .addField(newFlatFieldLeaf("Deleted"))
-                .addField(newFlatFieldLeaf("SYNONYM"))
-                .addField(newFlatFieldLeaf("holo-[acyl-carrier-protein] synthase complex"));
+                .addField(newFlatFieldLeaf(complex))
+                .addField(newFlatFieldLeaf(date))
+                .addField(newFlatFieldLeaf(action))
+                .addField(newFlatFieldLeaf(type))
+                .addField(newFlatFieldLeaf(proteinComplex));
 
         assertThat(actualFlatField, is(expectedField));
     }
@@ -392,10 +398,15 @@ public class FlatFieldBuilderTest {
     @Test
     public void canConvertNestedFieldsContainingSpecialCharacters() {
         String specialChars = "`¬|\\£$%^&*()_-=+./<>?:@~#{}[]";
+        String flatFieldText = expectedField("level1:" + specialChars,
+                expectedField("level2:" + specialChars,
+                        expectedField("level3:" + specialChars)));
+
+        System.out.println(flatFieldText);
         FlatField actualFlatField =
-                parse(expectedField("level1:" + specialChars,
-                        expectedField("level2:" + specialChars,
-                                expectedField("level3:" + specialChars))));
+                parse(flatFieldText);
+
+
 
         FlatField expectedField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:" + specialChars))
