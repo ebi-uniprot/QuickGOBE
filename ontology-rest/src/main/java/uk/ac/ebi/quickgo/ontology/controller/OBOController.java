@@ -71,7 +71,7 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String CHART_SUB_RESOURCE = "chart";
     static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
 
-    static final int MAX_PAGE_RESULTS = 750;
+    static final int MAX_PAGE_RESULTS = 600;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COLON = ":";
