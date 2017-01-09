@@ -91,16 +91,16 @@ public class QueryResultTest {
     }
 
     @Test
-    public void validQueryResultWithCursor() {
+    public void validQueryResultWithNextCursor() {
         long numberOfHits = 2;
         List<String> results = Arrays.asList("result1", "result2");
-        String cursor = "fakeCursor";
+        String nextCursor = "fakeCursor";
 
         QueryResult<String> result = new QueryResult.Builder<>(numberOfHits, results)
-                .withCursor(cursor)
+                .withNextCursor(nextCursor)
                 .build();
 
-        assertThat(result.getCursor(), is(cursor));
+        assertThat(result.getCursor(), is(nextCursor));
         assertThat(result.getResults(), is(results));
         assertThat(result.getNumberOfHits(), is(numberOfHits));
     }

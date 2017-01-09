@@ -27,7 +27,7 @@ public class QueryResult<T> {
         this.results = Collections.unmodifiableList(builder.results);
         this.pageInfo = builder.pageInfo;
         this.facet = builder.facets;
-        this.cursor = builder.cursor;
+        this.cursor = builder.nextCursor;
 
         this.highlighting = (builder.highlights != null) ?
                 Collections.unmodifiableList(new ArrayList<>(builder.highlights)) : null;
@@ -81,7 +81,7 @@ public class QueryResult<T> {
                 ", facet=" + facet +
                 ", highlighting=" + highlighting +
                 ", aggregation=" + aggregation +
-                ", cursor='" + cursor + '\'' +
+                ", nextCursor='" + cursor + '\'' +
                 '}';
     }
 
@@ -140,7 +140,7 @@ public class QueryResult<T> {
         private Facet facets;
         private Set<DocHighlight> highlights;
         private AggregateResponse aggregation;
-        private String cursor;
+        private String nextCursor;
 
         public Builder(long hits, List<T> results) {
             this.numberOfHits = hits;
@@ -179,8 +179,8 @@ public class QueryResult<T> {
             return this;
         }
 
-        public Builder<T> withCursor(String cursor) {
-            this.cursor = cursor;
+        public Builder<T> withNextCursor(String nextCursor) {
+            this.nextCursor = nextCursor;
             return this;
         }
 
