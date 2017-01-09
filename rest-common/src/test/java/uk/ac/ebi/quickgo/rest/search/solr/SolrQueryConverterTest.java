@@ -12,8 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
-import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
+import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createPage;
 
 /**
  * Tests the implementations of the {@link SolrQueryConverter} implementation.
@@ -71,7 +70,7 @@ public class SolrQueryConverterTest {
         int pageSize = 25;
 
         QueryRequest request = new QueryRequest.Builder(fieldQuery)
-                .setPageParameters(currentPage, pageSize)
+                .setPage(createPage(currentPage, pageSize))
                 .build();
 
         SolrQuery query = converter.convert(request);

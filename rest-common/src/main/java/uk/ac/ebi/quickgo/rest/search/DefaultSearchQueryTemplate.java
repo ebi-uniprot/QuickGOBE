@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -185,7 +184,7 @@ public class DefaultSearchQueryTemplate {
 
         @Override public QueryRequest build() {
             QueryRequest.Builder builder = new QueryRequest.Builder(query);
-            builder.setPageParameters(page, pageSize);
+//            builder.setPageParameters(page, pageSize);
 
             facets.forEach(builder::addFacetField);
 

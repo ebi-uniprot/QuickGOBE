@@ -3,10 +3,17 @@ package uk.ac.ebi.quickgo.rest.search.query;
 import com.google.common.base.Preconditions;
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.CURSOR_PAGE_NUMBER;
+
 /**
  * Contains all of the information necessary to put in a search request to a searchable data source.
  */
 public class QueryRequest {
+
+    public static final String FIRST_CURSOR_POSITION = "*";
+
     private final QuickGOQuery query;
     private final Page page;
     private final List<Facet> facets;
@@ -16,25 +23,19 @@ public class QueryRequest {
     private final AggregateRequest aggregate;
     private final String highlightStartDelim;
     private final String highlightEndDelim;
+    private final String cursor;
 
-    private QueryRequest(QuickGOQuery query,
-            Page page,
-            List<Facet> facets,
-            List<QuickGOQuery> filters,
-            List<FieldProjection> projectedFields,
-            List<FieldHighlight> highlightedFields,
-            AggregateRequest aggregate,
-            String highlightStartDelim,
-            String highlightEndDelim) {
-        this.query = query;
-        this.page = page;
-        this.facets = Collections.unmodifiableList(facets);
-        this.filters = filters;
-        this.projectedFields = projectedFields;
-        this.highlightedFields = highlightedFields;
-        this.aggregate = aggregate;
-        this.highlightStartDelim = highlightStartDelim;
-        this.highlightEndDelim = highlightEndDelim;
+    private QueryRequest(Builder builder) {
+        this.query = builder.query;
+        this.page = builder.page;
+        this.facets = Collections.unmodifiableList(new ArrayList<>(builder.facets));
+        this.filters = new ArrayList<>(builder.filters);
+        this.projectedFields = new ArrayList<>(builder.projectedFields);
+        this.highlightedFields = new ArrayList<>(builder.highlightedFields);
+        this.aggregate = builder.aggregate;
+        this.highlightStartDelim = builder.highlightStartDelim;
+        this.highlightEndDelim = builder.highlightEndDelim;
+        this.cursor = builder.cursor;
     }
 
     public QuickGOQuery getQuery() {
@@ -77,6 +78,10 @@ public class QueryRequest {
         return highlightEndDelim;
     }
 
+    public String getCursor() {
+        return cursor;
+    }
+
     public static class Builder {
         private QuickGOQuery query;
         private Page page;
@@ -87,6 +92,7 @@ public class QueryRequest {
         private AggregateRequest aggregate;
         private String highlightStartDelim;
         private String highlightEndDelim;
+        private String cursor;
 
         public Builder(QuickGOQuery query) {
             Preconditions.checkArgument(query != null, "Query cannot be null");
@@ -98,8 +104,12 @@ public class QueryRequest {
             highlightedFields = new LinkedHashSet<>();
         }
 
-        public Builder setPageParameters(int currentPage, int pageSize) {
-            this.page = new Page(currentPage, pageSize);
+        public Builder setPage(Page page) {
+            checkState(this.cursor == null || page.getPageNumber() == CURSOR_PAGE_NUMBER,
+                    "Cannot use a non-zero page number when using a cursor");
+
+            checkArgument(page != null, "Page cannot be null");
+            this.page = page;
 
             return this;
         }
@@ -143,18 +153,38 @@ public class QueryRequest {
             return this;
         }
 
-        public QueryRequest build() {
-            return new QueryRequest(
-                    query,
-                    page,
-                    new ArrayList<>(facets),
-                    new ArrayList<>(filters),
-                    new ArrayList<>(projectedFields),
-                    new ArrayList<>(highlightedFields),
-                    aggregate,
-                    highlightStartDelim,
-                    highlightEndDelim);
+        public Builder useCursor() {
+            checkState(this.page == null || this.page.getPageNumber() == CURSOR_PAGE_NUMBER,
+                    "Cannot use a cursor when a page number is non-zero");
+            this.cursor = FIRST_CURSOR_POSITION;
+            return this;
         }
+
+        public Builder setCursorPosition(String cursor) {
+            checkState(this.page == null || this.page.getPageNumber() == CURSOR_PAGE_NUMBER,
+                    "Cannot use a cursor when a page number is non-zero");
+            this.cursor = cursor;
+            return this;
+        }
+
+        public QueryRequest build() {
+            return new QueryRequest(this);
+        }
+    }
+
+    @Override public String toString() {
+        return "QueryRequest{" +
+                "query=" + query +
+                ", page=" + page +
+                ", facets=" + facets +
+                ", filters=" + filters +
+                ", projectedFields=" + projectedFields +
+                ", highlightedFields=" + highlightedFields +
+                ", aggregate=" + aggregate +
+                ", highlightStartDelim='" + highlightStartDelim + '\'' +
+                ", highlightEndDelim='" + highlightEndDelim + '\'' +
+                ", cursor='" + cursor + '\'' +
+                '}';
     }
 
     @Override public boolean equals(Object o) {
@@ -193,9 +223,11 @@ public class QueryRequest {
                 that.highlightStartDelim != null) {
             return false;
         }
-        return highlightEndDelim != null ? highlightEndDelim.equals(that.highlightEndDelim) :
-                that.highlightEndDelim == null;
-
+        if (highlightEndDelim != null ? !highlightEndDelim.equals(that.highlightEndDelim) :
+                that.highlightEndDelim != null) {
+            return false;
+        }
+        return cursor != null ? cursor.equals(that.cursor) : that.cursor == null;
     }
 
     @Override public int hashCode() {
@@ -208,20 +240,8 @@ public class QueryRequest {
         result = 31 * result + (aggregate != null ? aggregate.hashCode() : 0);
         result = 31 * result + (highlightStartDelim != null ? highlightStartDelim.hashCode() : 0);
         result = 31 * result + (highlightEndDelim != null ? highlightEndDelim.hashCode() : 0);
+        result = 31 * result + (cursor != null ? cursor.hashCode() : 0);
         return result;
     }
 
-    @Override public String toString() {
-        return "QueryRequest{" +
-                "query=" + query +
-                ", page=" + page +
-                ", facets=" + facets +
-                ", filters=" + filters +
-                ", projectedFields=" + projectedFields +
-                ", highlightedFields=" + highlightedFields +
-                ", aggregate=" + aggregate +
-                ", highlightStartDelim='" + highlightStartDelim + '\'' +
-                ", highlightEndDelim='" + highlightEndDelim + '\'' +
-                '}';
-    }
 }

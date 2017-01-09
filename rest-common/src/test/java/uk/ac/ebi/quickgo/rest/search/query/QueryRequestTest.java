@@ -8,6 +8,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createCursorPage;
+import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createPage;
 
 /**
  * Tests the {@link QueryRequest} implementation
@@ -34,7 +36,7 @@ public class QueryRequestTest {
     public void invalidPageParametersThrowsException() throws Exception {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
 
-        new QueryRequest.Builder(query).setPageParameters(-1, 2).build();
+        new QueryRequest.Builder(query).setPage(createPage(-1, 2)).build();
     }
 
     @Test
@@ -42,7 +44,7 @@ public class QueryRequestTest {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
 
         QueryRequest request = new QueryRequest.Builder(query)
-                .setPageParameters(1, 2)
+                .setPage(createPage(1, 2))
                 .build();
 
         assertThat(request.getQuery(), is(equalTo(query)));
@@ -163,5 +165,61 @@ public class QueryRequestTest {
                 .build();
 
         assertThat(request.getHighlightedFields(), is(empty()));
+    }
+
+    @Test
+    public void buildsQueryWithCursorUsage() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        QueryRequest request = new QueryRequest.Builder(query)
+                .useCursor()
+                .build();
+
+        assertThat(request.getCursor(), is(QueryRequest.FIRST_CURSOR_POSITION));
+    }
+
+    @Test
+    public void buildsQueryWithNextCursorSpecified() {
+        String cursor = "fakeCursor";
+
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        QueryRequest request = new QueryRequest.Builder(query)
+                .setCursorPosition(cursor)
+                .build();
+
+        assertThat(request.getCursor(), is(cursor));
+    }
+
+    @Test
+    public void buildsQueryWithCursorAndPageSize() {
+        String cursor = "fakeCursor";
+        int pageSize = 10;
+
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        QueryRequest request = new QueryRequest.Builder(query)
+                .setPage(createCursorPage(pageSize))
+                .setCursorPosition(cursor)
+                .build();
+
+        assertThat(request.getCursor(), is(cursor));
+        assertThat(request.getPage().getPageNumber(), is(0));
+        assertThat(request.getPage().getPageSize(), is(pageSize));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void buildingAQueryThatSetsCursorThenStartPageCausesIllegalArgumentException() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        new QueryRequest.Builder(query)
+                .setCursorPosition("fakeCursor")
+                .setPage(createPage(1, 10))
+                .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void buildingAQueryThatSetsStartPageThenCursorCausesIllegalArgumentException() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        new QueryRequest.Builder(query)
+                .setPage(createPage(1, 10))
+                .setCursorPosition("fakeCursor")
+                .build();
     }
 }

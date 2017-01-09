@@ -4,7 +4,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,31 +16,6 @@ import static org.hamcrest.core.Is.is;
 public class PageTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    @Mock
-    private QueryVisitor visitorMock;
-
-    @Test
-    public void negativePageNumberThrowsException() throws Exception {
-        int pageNumber = -1;
-        int pageSize = 1;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Page number must be greater than 0");
-
-        new Page(pageNumber, pageSize);
-    }
-
-    @Test
-    public void zeroPageNumberThrowsException() throws Exception {
-        int pageNumber = 0;
-        int pageSize = 1;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Page number must be greater than 0");
-
-        new Page(pageNumber, pageSize);
-    }
 
     @Test
     public void negativePageResultSizeThrowsException() throws Exception {
