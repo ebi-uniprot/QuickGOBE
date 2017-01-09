@@ -13,24 +13,26 @@ public class QueryResult<T> {
     private final Facet facet;
     private final List<DocHighlight> highlighting;
     private final AggregateResponse aggregation;
+    private final String cursor;
 
-    private QueryResult(long numberOfHits, List<T> results, PageInfo pageInfo, Facet facet,
-            List<DocHighlight> highlighting, AggregateResponse aggregation) {
-        Preconditions.checkArgument(numberOfHits >= 0, "Total number of hits can not be negative: " + numberOfHits);
-        Preconditions.checkArgument(results != null, "Results list can not be null");
-        Preconditions.checkArgument(results.size() <= numberOfHits,
-                "Total number of results is less than number of results in list: [total: " + numberOfHits + ", " +
-                        "results: " + results.size() + "]");
+    private QueryResult(Builder<T> builder) {
+        Preconditions.checkArgument(builder.numberOfHits >= 0,
+                "Total number of hits can not be negative: " + builder.numberOfHits);
+        Preconditions.checkArgument(builder.results != null, "Results list can not be null");
+        Preconditions.checkArgument(builder.results.size() <= builder.numberOfHits,
+                "Total number of results is less than number of results in list: [total: "
+                        + builder.numberOfHits + ", results: " + builder.results.size() + "]");
 
-        this.numberOfHits = numberOfHits;
-        this.results = Collections.unmodifiableList(results);
-        this.pageInfo = pageInfo;
-        this.facet = facet;
+        this.numberOfHits = builder.numberOfHits;
+        this.results = Collections.unmodifiableList(builder.results);
+        this.pageInfo = builder.pageInfo;
+        this.facet = builder.facets;
+        this.cursor = builder.cursor;
 
-        this.highlighting = (highlighting != null) ?
-                Collections.unmodifiableList(highlighting) : null;
+        this.highlighting = (builder.highlights != null) ?
+                Collections.unmodifiableList(new ArrayList<>(builder.highlights)) : null;
 
-        this.aggregation = aggregation;
+        this.aggregation = builder.aggregation;
     }
 
     /**
@@ -59,12 +61,28 @@ public class QueryResult<T> {
     }
 
     /**
-     * Container that represents the results of all the aggregation calculatuions don on the result set.
+     * Container that represents the results of all the aggregation calculations don on the result set.
      *
      * @return the aggregation result
      */
     public AggregateResponse getAggregation() {
         return aggregation;
+    }
+
+    public String getCursor() {
+        return cursor;
+    }
+
+    @Override public String toString() {
+        return "QueryResult{" +
+                "numberOfHits=" + numberOfHits +
+                ", results=" + results +
+                ", pageInfo=" + pageInfo +
+                ", facet=" + facet +
+                ", highlighting=" + highlighting +
+                ", aggregation=" + aggregation +
+                ", cursor='" + cursor + '\'' +
+                '}';
     }
 
     @Override public boolean equals(Object o) {
@@ -80,10 +98,10 @@ public class QueryResult<T> {
         if (numberOfHits != that.numberOfHits) {
             return false;
         }
-        if (!results.equals(that.results)) {
+        if (results != null ? !results.equals(that.results) : that.results != null) {
             return false;
         }
-        if (!pageInfo.equals(that.pageInfo)) {
+        if (pageInfo != null ? !pageInfo.equals(that.pageInfo) : that.pageInfo != null) {
             return false;
         }
         if (facet != null ? !facet.equals(that.facet) : that.facet != null) {
@@ -92,29 +110,21 @@ public class QueryResult<T> {
         if (highlighting != null ? !highlighting.equals(that.highlighting) : that.highlighting != null) {
             return false;
         }
-        return aggregation != null ? aggregation.equals(that.aggregation) : that.aggregation == null;
-
+        if (aggregation != null ? !aggregation.equals(that.aggregation) : that.aggregation != null) {
+            return false;
+        }
+        return cursor != null ? cursor.equals(that.cursor) : that.cursor == null;
     }
 
     @Override public int hashCode() {
         int result = (int) (numberOfHits ^ (numberOfHits >>> 32));
-        result = 31 * result + results.hashCode();
-        result = 31 * result + pageInfo.hashCode();
+        result = 31 * result + (results != null ? results.hashCode() : 0);
+        result = 31 * result + (pageInfo != null ? pageInfo.hashCode() : 0);
         result = 31 * result + (facet != null ? facet.hashCode() : 0);
         result = 31 * result + (highlighting != null ? highlighting.hashCode() : 0);
         result = 31 * result + (aggregation != null ? aggregation.hashCode() : 0);
+        result = 31 * result + (cursor != null ? cursor.hashCode() : 0);
         return result;
-    }
-
-    @Override public String toString() {
-        return "QueryResult{" +
-                "numberOfHits=" + numberOfHits +
-                ", results=" + results +
-                ", pageInfo=" + pageInfo +
-                ", facet=" + facet +
-                ", highlighting=" + highlighting +
-                ", aggregation=" + aggregation +
-                '}';
     }
 
     /**
@@ -130,6 +140,7 @@ public class QueryResult<T> {
         private Facet facets;
         private Set<DocHighlight> highlights;
         private AggregateResponse aggregation;
+        private String cursor;
 
         public Builder(long hits, List<T> results) {
             this.numberOfHits = hits;
@@ -168,13 +179,13 @@ public class QueryResult<T> {
             return this;
         }
 
+        public Builder<T> withCursor(String cursor) {
+            this.cursor = cursor;
+            return this;
+        }
+
         public QueryResult<T> build() {
-            return new QueryResult<>(numberOfHits,
-                    results,
-                    pageInfo,
-                    facets,
-                    new ArrayList<>(highlights),
-                    aggregation);
+            return new QueryResult<>(this);
         }
     }
 }

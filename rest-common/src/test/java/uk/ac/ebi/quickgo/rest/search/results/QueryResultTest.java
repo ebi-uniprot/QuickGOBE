@@ -1,39 +1,35 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import uk.ac.ebi.quickgo.rest.search.results.DocHighlight;
-import uk.ac.ebi.quickgo.rest.search.results.Facet;
-import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
-import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Tests the {@link QueryResult} implementation
  */
 public class QueryResultTest {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void negativeTotalNumberResultsThrowsException() throws Exception {
         long numberOfHits = -1;
         List<String> results = Collections.emptyList();
 
-        try {
-            new QueryResult.Builder<>(numberOfHits, results).build();
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), startsWith("Total number of hits can not be negative"));
-        }
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Total number of hits can not be negative");
+
+        new QueryResult.Builder<>(numberOfHits, results).build();
     }
 
     @Test
@@ -41,12 +37,10 @@ public class QueryResultTest {
         long numberOfHits = 1;
         List<String> results = null;
 
-        try {
-            new QueryResult.Builder<>(numberOfHits, results).build();
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), startsWith("Results list can not be null"));
-        }
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Results list can not be null");
+
+        new QueryResult.Builder<>(numberOfHits, results).build();
     }
 
     @Test
@@ -54,12 +48,10 @@ public class QueryResultTest {
         long numberOfHits = 1;
         List<String> results = Arrays.asList("result1", "result2");
 
-        try {
-            new QueryResult.Builder<>(numberOfHits, results).build();
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), startsWith("Total number of results is less than number of results in list"));
-        }
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Total number of results is less than number of results in list");
+
+        new QueryResult.Builder<>(numberOfHits, results).build();
     }
 
     @Test
@@ -74,6 +66,7 @@ public class QueryResultTest {
         assertThat(result.getPageInfo(), is(nullValue()));
         assertThat(result.getFacet(), is(nullValue()));
         assertThat(result.getHighlighting(), is(emptyIterable()));
+        assertThat(result.getCursor(), is(nullValue()));
     }
 
     @Test
@@ -95,5 +88,20 @@ public class QueryResultTest {
         assertThat(result.getPageInfo(), is(pageInfo));
         assertThat(result.getFacet(), is(facet));
         assertThat(result.getHighlighting(), is(highlights));
+    }
+
+    @Test
+    public void validQueryResultWithCursor() {
+        long numberOfHits = 2;
+        List<String> results = Arrays.asList("result1", "result2");
+        String cursor = "fakeCursor";
+
+        QueryResult<String> result = new QueryResult.Builder<>(numberOfHits, results)
+                .withCursor(cursor)
+                .build();
+
+        assertThat(result.getCursor(), is(cursor));
+        assertThat(result.getResults(), is(results));
+        assertThat(result.getNumberOfHits(), is(numberOfHits));
     }
 }
