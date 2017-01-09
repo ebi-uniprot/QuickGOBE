@@ -7,6 +7,9 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
 
@@ -85,7 +88,32 @@ public class AnnotationDocMocker {
         return doc;
     }
 
+    public static AnnotationDocument createAnnotationDoc(String geneProductId, String goTerm){
+        AnnotationDocument doc = createAnnotationDoc(geneProductId);
+        doc.goId = goTerm;
+        return doc;
+    }
+
     public static String asExtension(String relationship, String db, String id) {
         return String.format("%s(%s:%s)",relationship, db, id);
+    }
+
+    //----- Setup data ---------------------//
+
+    public static List<AnnotationDocument> createGenericDocs(int n) {
+        return IntStream.range(0, n)
+                        .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createGPId(i))).collect
+                        (Collectors.toList());
+    }
+
+    public static List<AnnotationDocument> createGenericDocs(int n, Supplier<String> gpIdCreator) {
+        return IntStream.range(0, n)
+                        .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(gpIdCreator.get())).collect
+                        (Collectors.toList());
+    }
+
+
+    public static String createGPId(int idNum) {
+        return String.format("A0A%03d", idNum);
     }
 }
