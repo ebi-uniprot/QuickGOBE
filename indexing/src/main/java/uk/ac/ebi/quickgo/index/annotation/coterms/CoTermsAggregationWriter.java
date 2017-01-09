@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTerm.calculateProbabilityRatio;
+import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTerm.calculateSimilarityRatio;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.GeneProductBatch.buildBatch;
 
 /**
@@ -77,7 +79,6 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
      */
     Iterator<String> getCoTermsIterator() {
         return this.coTerms.coTermMatrix.keySet().iterator();
-
     }
 
     /**
@@ -98,29 +99,21 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
 
         for (String comparedTerm : getCoTermsAndCounts(goTerm).keySet()) {
 
-            long targetCount = getCountOfGeneProductsForTerm(goTerm);
+            long selected = getCountOfGeneProductsForTerm(goTerm);
             long together = getTogether(goTerm, comparedTerm);
-            long comparedCount = getCountOfGeneProductsForTerm(comparedTerm);
+            long compared = getCountOfGeneProductsForTerm(comparedTerm);
 
             coTermsBuilder.addCoTerm(new CoTerm.Builder()
                     .setTarget(goTerm)
                     .setComparedTerm(comparedTerm)
                     .setCompared(getCountOfGeneProductsForTerm(comparedTerm))
                     .setTogether(getTogether(goTerm, comparedTerm))
-                    .setProbabilityRatio(calculateProbabilityRatio(targetCount, together, comparedCount))
-                    .setSimilarityRatio(calculateSimilarityRatio(targetCount, together))
-                    .setGpCount(targetCount)
+                    .setProbabilityRatio(calculateProbabilityRatio(selected, together, getGeneProductTotal(), compared))
+                    .setSimilarityRatio(calculateSimilarityRatio(selected, together, compared))
+                    .setGpCount(selected)
                     .build());
         }
         return coTermsBuilder.build();
-    }
-
-    private float calculateProbabilityRatio(long targetCount, long together, long comparedCount) {
-        return CoTerm.calculateProbabilityRatio(targetCount, together, getGeneProductTotal(), comparedCount);
-    }
-
-    private float calculateSimilarityRatio(long targetCount, long together) {
-        return CoTerm.calculateSimilarityRatio(targetCount, together, getGeneProductTotal());
     }
 
     /**
