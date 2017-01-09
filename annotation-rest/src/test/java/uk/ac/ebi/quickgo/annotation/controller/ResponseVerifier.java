@@ -34,6 +34,7 @@ final class ResponseVerifier {
     public static final String QUALIFIER_FIELD = "qualifier";
     public static final String REFERENCE_FIELD = "reference";
     public static final String TAXON_ID_FIELD = "taxonId";
+    public static final String DATE_FIELD = "date";
 
     private static final String ERROR_MESSAGE = "messages";
     private static final String RESULTS_CONTENT_BY_INDEX = RESULTS + "[%d].";

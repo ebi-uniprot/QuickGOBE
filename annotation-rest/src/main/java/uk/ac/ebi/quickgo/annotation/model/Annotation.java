@@ -49,7 +49,7 @@ public class Annotation {
 
     public String symbol;
 
-    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
     public Date date;
 
     @Override public String toString() {
