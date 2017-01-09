@@ -88,12 +88,6 @@ public class QueryRequestTest {
         assertThat(request.getFilters(), hasSize(0));
     }
 
-    private Collection<String> extractFacetFields(Collection<Facet> facets) {
-        return facets.stream()
-                .map(Facet::getField)
-                .collect(Collectors.toList());
-    }
-
     @Test
     public void buildsQueryRequestWithQueryAndFilterQuery() throws Exception {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
@@ -206,7 +200,7 @@ public class QueryRequestTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void buildingAQueryThatSetsCursorThenStartPageCausesIllegalArgumentException() {
+    public void buildingAQueryThatSetsCursorThenStartPageCausesIllegalStateException() {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
         new QueryRequest.Builder(query)
                 .setCursorPosition("fakeCursor")
@@ -215,11 +209,25 @@ public class QueryRequestTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void buildingAQueryThatSetsStartPageThenCursorCausesIllegalArgumentException() {
+    public void buildingAQueryThatSetsStartPageThenCursorCausesIllegalStateException() {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
         new QueryRequest.Builder(query)
                 .setPage(createPage(1, 10))
                 .setCursorPosition("fakeCursor")
                 .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullCursorPositionCausesIllegalArgument() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        new QueryRequest.Builder(query)
+                .setCursorPosition(null)
+                .build();
+    }
+
+    private Collection<String> extractFacetFields(Collection<Facet> facets) {
+        return facets.stream()
+                .map(Facet::getField)
+                .collect(Collectors.toList());
     }
 }

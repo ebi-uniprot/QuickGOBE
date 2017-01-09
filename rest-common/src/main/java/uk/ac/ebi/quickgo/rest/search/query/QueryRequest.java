@@ -105,10 +105,10 @@ public class QueryRequest {
         }
 
         public Builder setPage(Page page) {
+            checkArgument(page != null, "Page cannot be null");
             checkState(this.cursor == null || page.getPageNumber() == CURSOR_PAGE_NUMBER,
                     "Cannot use a non-zero page number when using a cursor");
 
-            checkArgument(page != null, "Page cannot be null");
             this.page = page;
 
             return this;
@@ -161,6 +161,7 @@ public class QueryRequest {
         }
 
         public Builder setCursorPosition(String cursor) {
+            checkArgument(cursor != null, "Cursor cannot be null");
             checkState(this.page == null || this.page.getPageNumber() == CURSOR_PAGE_NUMBER,
                     "Cannot use a cursor when a page number is non-zero");
             this.cursor = cursor;
