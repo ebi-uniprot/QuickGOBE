@@ -1,0 +1,173 @@
+source "$QUICKGO_SCRIPTS_DIR/vm-profile.variables"
+
+# ---------------------------- CHECK USER PERMISSIONS ----------------------------
+function user_can_execute_script() {
+   local name_to_check="$1"
+   local allowed_users="$2"
+
+   local user_is_allowed=1
+
+   if array_contains $allowed_users $name_to_check; then
+      user_is_allowed=0;
+   fi
+
+   return $user_is_allowed
+}
+
+# --------------------------- UTILITY FUNCTIONS -----------------------------------
+array_contains () {
+    local array="$1[@]"
+    local seeking="$2"
+    local in=1
+
+    for element in "${!array}"; do
+        if [[ $element == $seeking ]]; then
+            in=0
+            break
+        fi
+    done
+
+    return $in
+}
+
+# -------------------------- PROFILE FUNCTIONS -----------------------------------
+function profiles() {
+    local __PROFILES=()
+    for vmInfo in "${PROFILE_VM_MAP[@]}" ; do
+        local profileData=()
+        IFS='|' read -ra profileData <<< "$vmInfo"
+        __PROFILES+=(${profileData[0]})
+    done
+    local PROFILES=$(tr ' ' '\n' <<< "${__PROFILES[@]}" | sort -u | tr '\n' ' ')
+    echo "$PROFILES"
+}
+
+
+# Retrieves profiles for a core, e.g., profiles
+function check_profile() {
+    local value="$1"
+    local profile_array=($(profiles));
+    local is_profile=0;
+
+    if [ -z "$value" ]; then
+      is_profile=1;
+    elif ! array_contains profile_array $value; then
+      is_profile=1;
+    fi
+
+    return $is_profile;
+}
+
+# ------------------------- GET PROFILE DATA -----------------------------
+# Retrieves VMS for a profile, e.g., vmsForProfile "dev"
+# Stores result in array, PROFILE_VMS
+function vmsForProfile() {
+    local requestedProfile="$1"
+
+    local __PROFILE_VMS=()
+    for vmInfo in "${PROFILE_VM_MAP[@]}" ; do
+        local profileData=()
+        IFS='|' read -ra profileData <<< "$vmInfo"
+        if [ "${profileData[0]}" = "$requestedProfile" ]; then
+            IFS=',' read -ra vmsForProfileArray <<< "${profileData[1]}"
+            for vm in "${vmsForProfileArray[@]}"; do
+                __PROFILE_VMS+=($vm)
+            done
+        fi
+    done
+
+    local PROFILE_VMS=$(tr ' ' '\n' <<< "${__PROFILE_VMS[@]}" | sort -u | tr '\n' ' ')
+    echo "$PROFILE_VMS"
+}
+
+# e.g., extractVMFromURL "ves-hx-c7:8090/solr" produces "ves-hx-c7"
+function extractVMFromURL {
+    echo "${1%%:*}"
+}
+
+# e.g., extractPortFromURL "ves-hx-c7:8090/solr" produces "8090"
+function extractPortFromURL {
+    local vmWithoutResource=${1%%/*}
+    vmWithoutIpAndResource=${vmWithoutResource%%:*}
+    vmWithoutIpAndResourceLen=$((${#vmWithoutIpAndResource} + 1))
+    echo ${vmWithoutResource:vmWithoutIpAndResourceLen}
+}
+
+# Checks whether a (core, profile, vm) is a valid definition, e.g., isValidProfileId "dev" "ves-hx-c2"
+# Returns 0 if true, 1 if false
+function isValidProfileId {
+    local requestedProfile="$1"
+    local requestedVM="$2"
+
+    for vmInfo in "${PROFILE_VM_MAP[@]}" ; do
+        local profileData=()
+        IFS='|' read -ra profileData <<< "$vmInfo"
+        local profileName=${profileData[0]}
+        local profileVMs=${profileData[1]}
+
+        if [ $# -eq 1 -a "$requestedProfile" = "$profileName" ]; then
+            return 0
+        elif [ $# -eq 2 ]; then
+            IFS=',' read -ra vmsForProfileArray <<< "$profileVMs"
+            for vm in "${vmsForProfileArray[@]}"; do
+                if [ "$vm" = "$requestedVM" ]; then
+                    return 0
+                fi
+            done
+        fi
+    done
+    return 1
+}
+
+# ---------------------------- PRINT CONTENTS ----------------------------
+function join_by() {
+   local IFS="$1";
+   shift;
+   echo "$*";
+}
+
+function print_valid_profiles () {
+   local array="$profiles"
+   echo $(join_by , "${!array}")
+}
+
+## ---------------------------- GENERAL UTILITY FUNCTIONS ----------------------------
+# quick way for echoing coloured text
+# e.g., prettyEcho "<warn>warning message</warn>"
+# e.g., prettyEcho "<info>info message: <warn>specific message</warn></info>"
+# e.g., prettyEcho "<error>warning message</error>"
+function prettyEcho {
+    local prefix="$1";
+    local string="$2";
+
+    if [ $# -eq 1 ]; then
+        prefix="0"
+        string="$1"
+    fi
+
+    string=$(echo $string | perl -pe 's@<warn>(.*?)<\/warn>@\$(tput setaf 3)\1\$(tput sgr 0)@g');
+    string=$(echo $string | perl -pe 's@<info>(.*?)<\/info>@\$(tput setaf 2)\1\$(tput sgr 0)@g');
+    string=$(echo $string | perl -pe 's@<error>(.*?)<\/error>@\$(tput setaf 1)\$(tput bold)\1\$(tput sgr 0)@g');
+    string=$(echo $string | perl -pe 's@<success>(.*?)<\/success>@\$(tput setaf 2)\$(tput bold)\1\$(tput sgr 0)@g');
+    string=$(echo $string | perl -pe 's@<bold>(.*?)<\/bold>@\$(tput bold)\1\$(tput sgr 0)@g');
+
+    for i in $(seq 1 $prefix); do
+        echo -n "   "
+    done
+
+    echo "$string";
+}
+
+function printReleaseBaseDirContents {
+    prettyEcho "Listing contents of release base directory, $SOLR_INDEX_DIR:";
+    ls -l "$SOLR_INDEX_DIR" | sed 's/^/     /';
+}
+
+function printDivider {
+    if [ $# -eq 1 ]; then
+        title=" $1 ";
+    else
+        title="";
+    fi
+    echo "===========================$title===========================";
+}

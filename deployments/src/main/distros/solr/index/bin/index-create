@@ -1,0 +1,120 @@
+#!/bin/bash
+
+#fail on error
+set -eo pipefail
+
+readonly valid_users=("uni_qgo")
+readonly release_version_prefix="v";
+
+## ------------------------ SOURCE NECESSARY FILES ------------------------
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" || !source "index.variables" || ! source "../common/lsf.command.variables" || ! source "$admin_scripts_dir/common/solr.variables"; then
+    prettyEcho "<error>Required properties files were not found. Please make sure you're in the right directory</error>";
+    exit 1;
+fi
+
+readonly solr_collection_script="$admin_scripts_dir/bin/solr-collection-manager"
+readonly collection=$core_name
+
+## ---------------------------- UTILITY FUNCTIONS ----------------------------
+function showHelp {
+    cat<<EOF
+Usage: $0 profile [submit]
+
+Argument description:
+  profile    =>    the profile for which we want to create a new Solr index
+  submit     =>    submits the indexing job to the load sharing facility
+
+  Example: $0 dev
+EOF
+}
+
+function nextReleaseVersion {
+   current_release="$(ls $release_dir | sed "s/${release_version_prefix}//g" | sort -n | tail -1)";
+
+   if [ ! -z "$current_release" ]; then
+    next_release="${release_version_prefix}$((current_release + 1))";
+   else
+    next_release="${release_version_prefix}1";
+   fi
+}
+
+# ------------------------ VALIDATE PARAMETERS ------------------------
+if [ $# -eq 0 -o $# -gt 2 ]; then
+    showHelp;
+    exit 1;
+fi
+
+readonly requested_profile="$1"
+readonly action="$2"
+
+# ------------------------ check profile specified is correct ------------------------
+if ! isValidProfileId "$requested_profile"; then
+    prettyEcho "<error>Invalid profile name specified: $requested_profile.
+                    Please check your index.variables and vm-profiles.properties file.</error>";
+    exit 1;
+fi
+
+# ------------------------ abort if we're building in a staging environment ------------------------
+if [ "$requested_profile" == "stage" ] ; then
+    prettyEcho "QuickGO <bold>build related tasks</bold> should not take place in a <bold>STAGING</bold> environment";
+    exit 1;
+fi
+
+# ------------------------ fetch the dependencies for the current release ------------------------
+release_dir="${solr_index_dir}/${requested_profile}";
+
+if [ ! -d "$release_dir" ]; then
+    prettyEcho "<info>Directory for storing solr-indexes [${release_dir}] NOT FOUND. Creating...</info>";
+    mkdir -p "$release_dir";
+fi
+
+# calculate the next release for the current $release_dir
+nextReleaseVersion;
+
+# create dir for current release
+release_dir="${release_dir}/${next_release}/conf";
+mkdir -p "$release_dir";
+
+prettyEcho "<info>Executing fetch-libraries.</info>"
+../fetch-libraries "$release_dir" "$requested_profile";
+
+prettyEcho "<info>Executing update-solr-schema.</info>"
+../update-solr-schema "$requested_profile";
+
+# ------------------------ compute the java indexing job string ------------------------
+quickgo_service_jar=${quickgo_service_jar/PROFILE_PLACEHOLDER/$requested_profile}
+
+indexing_vms=($(vmsForProfile $requested_profile))
+
+if [ ${#indexing_vms[@]} -gt 0 ]; then
+  indexing_vm=${indexing_vms[0]}
+else
+   prettyEcho "<error>No VMs associated with profile: $requested_profile.</error>"
+fi
+
+javaJob="bsub $(lsfJavaJobOptions $(buildSolrAddress $indexing_vm))";
+
+# ------------------------ start off the indexing via LSF ------------------------
+if [ "$action" = "submit" ]; then
+    # ensure indexing job variable is defined
+    if [ ! -z "$javaJob" ]; then
+        if ! $solr_collection_script "create" $collection $requested_profile; then
+           prettyEcho "<error>Error creating collection $?</error>"
+        else
+           prettyEcho "<info>executing command:</info>"
+           prettyEcho "<info>$javaJob</info>";
+
+           eval "$javaJob";
+        fi
+    else
+          prettyEcho "<error>\$javaJob variable must be set</error>";
+          exit 1;
+    fi
+else
+      printDivider "Simulation";
+      echo "The following command will be executed:";
+      echo "$javaJob";
+      echo ""
+      echo "Variables used to create these command(s) can be changed in index.variables, if necessary.";
+      echo "Otherwise, if this is all correct and you want to submit this command, please re-run this script with parameter \"submit\"";
+fi

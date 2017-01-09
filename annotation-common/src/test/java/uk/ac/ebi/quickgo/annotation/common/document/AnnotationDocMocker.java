@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static java.util.Arrays.asList;
 
@@ -50,6 +51,8 @@ public class AnnotationDocMocker {
     public static final String EXTENSION_3 = asExtension(EXTENSION_RELATIONSHIP3 ,EXTENSION_DB3,EXTENSION_ID3);
     public static final List<String> EXTENSIONS = asList(String.format("%s,%s", EXTENSION_1, EXTENSION_2), EXTENSION_3);
 
+    public static AtomicLong rowNumberGenerator = new AtomicLong();
+
     private AnnotationDocMocker() {}
 
     public static AnnotationDocument createAnnotationDoc(String geneProductId) {
@@ -59,7 +62,8 @@ public class AnnotationDocMocker {
         // automatically compute a document identifier,
         // to overcome non-uniqueness of all other annotation fields
         // (in solrconfig.xml this is set automatically as a UUID)
-        doc.id = geneProductId + "-" + System.nanoTime();
+        long rowNumber = rowNumberGenerator.incrementAndGet();
+        doc.id = geneProductId + "!" + rowNumber;
 
         doc.goId = GO_ID;
         doc.evidenceCode = ECO_ID;

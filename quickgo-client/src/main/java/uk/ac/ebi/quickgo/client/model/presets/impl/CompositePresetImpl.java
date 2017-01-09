@@ -201,7 +201,7 @@ public class CompositePresetImpl implements CompositePreset {
 
         StaticAspects.Aspect.findByAbbrev(presetItem.getProperty(PresetItem.Property.DESCRIPTION))
                 .ifPresent(
-                        aspect -> presetItemBuilder.withProperty(SlimAdditionalProperty.ASPECT.getKey(), aspect.name));
+                        aspect -> presetItemBuilder.withProperty(SlimAdditionalProperty.ASPECT.getKey(), aspect.scientificName));
 
         return presetItemBuilder.build();
     }

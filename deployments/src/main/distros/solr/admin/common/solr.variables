@@ -1,0 +1,115 @@
+#! /bin/bash
+
+## This script contains variables that are used when starting/stopping a Solr service.
+## Functions are defined to make available up-to-date values for the Solr variables.
+## Note: the port and resource used by Solr are expected to remain constant for our use-case.
+
+readonly solr_server_dir="$dist_dir/solr/current"
+readonly solr_server_exec="$solr_server_dir/bin/solr"
+readonly solr_port="8090"
+readonly solr_resource="solr"
+
+function updateSolrVariables {
+    local loc_profile="$1";
+    local loc_vm="$2";
+    local loc_vm_and_profile="$loc_profile/$loc_vm";
+
+    solr_memory="8g"
+    solr_config_base="$QUICKGO_BASE_DIR/solr-conf/$loc_profile"
+
+    solr_lib="$solr_config_base/lib/quickgo"
+
+    solr_system_properties="-Dsolr.lib=$solr_server_dir \
+-Dsolr.log=$QUICKGO_BASE_DIR/solr-logs/$loc_vm_and_profile/ \
+-Dsolr.similarity.plugin=$solr_lib/similarity_plugin.jar \
+-Dsolr.jetty.request.header.size=5242880"
+    solr_jvm_properties="\"-server -Xss50m -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=loglevel=debug -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1$solr_port -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false\""
+}
+
+function buildSolrAddress {
+    if [ $# -ne 1 ]; then
+        echo "buildSolrAddress: cannot build solr address; please supply VM as parameter";
+        exit 1;
+    fi
+    local vm_name="$1";
+    echo "http://$vm_name:$solr_port/$solr_resource";
+}
+
+
+## This file should contain a single COLLECTION_MAP array variable
+## containing the configurations of the collections according to profile and solr cloud parameters.
+##
+## Format of each array element:
+##      collection-name|profile-name|num_shards:value|repl_factor:value|shards_per_node:value
+COLL_MAP=(\
+"coll:ontology|profile:dev|num_shards:1|repl_factor:1|shards_per_node:1"  \
+"coll:geneproduct|profile:dev|num_shards:1|repl_factor:1|shards_per_node:1"  \
+"coll:annotation|profile:dev|num_shards:1|repl_factor:1|shards_per_node:1"  \
+"coll:ontology|profile:test|num_shards:1|repl_factor:4|shards_per_node:1"  \
+"coll:geneproduct|profile:test|num_shards:4|repl_factor:2|shards_per_node:2"  \
+"coll:annotation|profile:test|num_shards:8|repl_factor:2|shards_per_node:4"  )
+
+
+# ----------------------------- COLLECTION MAP FUNCTIONS ------------------------------
+function get_configuration_for_collection() {
+   local loc_coll=$1
+   local loc_profile=$2
+
+   for config in "${COLL_MAP[@]}"; do
+     if belongs_to_profile $config $loc_profile && belongs_to_collection $config $loc_coll; then
+        echo $config
+     fi
+   done
+
+   echo ""
+}
+
+function belongs_to_profile() {
+   local loc_coll_entry=$1
+   local loc_profile=$2
+
+   return $(belongs_to_key_value $loc_coll_entry $loc_profile "profile")
+}
+
+function belongs_to_collection() {
+  local loc_coll_entry=$1
+  local loc_coll=$2
+
+  return $(belongs_to_key_value $loc_coll_entry $loc_coll "coll")
+}
+
+function belongs_to_key_value() {
+   local loc_coll_entry=$1
+   local loc_value=$2   
+   local loc_key=$3
+
+   local loc_belongs=1
+
+   IFS='|' read -ra parsed_config <<< "$loc_coll_entry"
+
+   for key_value in "${parsed_config[@]}"; do
+      if [ "$key_value" ==  "$loc_key:$loc_value" ]; then
+         loc_belongs=0
+         break
+      fi;
+   done  
+
+   return $loc_belongs
+}
+
+function extract_config_value() {
+   local loc_coll_entry=$1
+   local loc_key=$2
+
+   IFS='|' read -ra parsed_config <<< "$loc_coll_entry"
+
+   for key_value in "${parsed_config[@]}"; do
+     IFS=':' read -a key_value_pair <<< "$key_value"
+
+     if [ "${key_value_pair[0]}" == "$loc_key" ]; then
+        echo ${key_value_pair[1]}
+     fi;
+   done
+
+   echo ""
+}

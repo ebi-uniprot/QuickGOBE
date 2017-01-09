@@ -9,6 +9,8 @@ import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang.StringUtils;
@@ -83,7 +85,43 @@ public class AnnotationControllerIT {
         repository.save(genericDocs);
     }
 
-    //ASSIGNED BY
+    // CONSISTENT ORDER
+    @Test
+    public void annotationsAlwaysReturnedInOrderWrittenToRepository() throws Exception{
+        repository.deleteAll();
+        String geneProductId1 = "AAAAA";
+        String geneProductId2 = "BBBBB";
+        String geneProductId3 = "ZZZZZ";
+
+        //Create sequence number as B,Z,A
+        AnnotationDocMocker.rowNumberGenerator = new AtomicLong(100);
+        final AnnotationDocument annotationDoc1 = AnnotationDocMocker.createAnnotationDoc(geneProductId1);
+        AnnotationDocMocker.rowNumberGenerator = new AtomicLong(10);
+        final AnnotationDocument annotationDoc2 = AnnotationDocMocker.createAnnotationDoc(geneProductId2);
+        AnnotationDocMocker.rowNumberGenerator = new AtomicLong(50);
+        final AnnotationDocument annotationDoc3 = AnnotationDocMocker.createAnnotationDoc(geneProductId3);
+
+        //save in order A, B, Z
+        repository.save(annotationDoc1);
+        repository.save(annotationDoc2);
+        repository.save(annotationDoc3);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search"));
+
+        //Results should arrive in sequence number
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 0, geneProductId2))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 1, geneProductId3))
+                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 2, geneProductId1));
+
+    }
+
+
+    // ASSIGNED BY
     @Test
     public void lookupAnnotationFilterByAssignedBySuccessfully() throws Exception {
         String geneProductId = "P99999";
@@ -195,7 +233,7 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
-    //TAXON ID
+    // TAXON ID
     @Test
     public void lookupAnnotationFilterByTaxonIdSuccessfully() throws Exception {
         String geneProductId = "P99999";
@@ -870,6 +908,8 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
+    //----- Tests for reference ---------------------//
+
     @Test
     public void filterBySingleReferenceReturnsDocumentsThatContainTheReference() throws Exception {
 
@@ -901,8 +941,6 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, doc.reference, 1));
     }
-
-    //----- Tests for reference ---------------------//
 
     @Test
     public void filterByThreeReferencesReturnsDocumentsThatContainThoseReferences() throws Exception {
@@ -1024,6 +1062,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
+    //----- Tests for GeneProductType ---------------------//
+
     @Test
     public void filterByGeneProductTypeReturnsMatchingDocuments() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(),
@@ -1051,8 +1091,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1));
     }
-
-    //----- Tests for GeneProductType ---------------------//
 
     @Test
     public void filterAnnotationsByTwoGeneProductTypesAsOneParameterReturnsMatchingDocuments() throws Exception {
@@ -1101,6 +1139,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
+    //----- Target Sets
+
     @Test
     public void filterByTargetSetReturnsMatchingDocuments() throws Exception {
         ResultActions response =
@@ -1124,8 +1164,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
-
-    //----- Target Sets
 
     @Test
     public void filterByNewTargetSetValueReturnsMatchingDocuments() throws Exception {
@@ -1170,6 +1208,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
+    //---------- GO Aspect related tests.
+
     @Test
     public void filterAnnotationsByGoAspectSuccessfully() throws Exception {
         String goAspect = AnnotationDocMocker.GO_ASPECT;
@@ -1194,8 +1234,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
-
-    //---------- GO Aspect related tests.
 
     @Test
     public void filterAnnotationsByInvalidGoAspectReturnsError() throws Exception {

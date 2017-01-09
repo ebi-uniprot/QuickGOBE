@@ -26,3 +26,7 @@ search:
           responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseType",
           responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseConverter"
         }
+cors:
+  filters:
+    - allow-origins: "http://www.ebi.ac.uk, http://wwwdev.ebi.ac.uk, http://localhost"
+      path: "/**"
