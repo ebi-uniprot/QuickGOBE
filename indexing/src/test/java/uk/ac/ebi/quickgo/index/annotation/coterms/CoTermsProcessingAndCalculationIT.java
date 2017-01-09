@@ -9,12 +9,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createAnnotationDoc;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
 
@@ -25,7 +27,8 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {CoTermsConfig.class})
+@ContextConfiguration(classes = {CoTermsConfig.class})
+@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class CoTermsProcessingAndCalculationIT {
 
     @Autowired
@@ -82,18 +85,17 @@ public class CoTermsProcessingAndCalculationIT {
         assertThat(genericDocs, hasSize(10));
         assertThat(result.getCompared(), is(1L));
         assertThat(result.getTogether(), is(1L));
-
     }
 
     @Test
-    public void coTermCalculationForSome() throws Exception{
+    public void coTermCalculationInDepth() throws Exception{
 
         List<AnnotationDocument> docs = new ArrayList<>();
 
         final String gp1 = "A0A000";
         final String term1 = "GO:0003824";
-        docs.add(createAnnotationDoc(gp1));
-        docs.add(createAnnotationDoc(gp1));
+        docs.add(createAnnotationDoc(gp1, term1));
+        docs.add(createAnnotationDoc(gp1, term1));
 
         final String gp2 = "A0A001";
         final String term2 = "GO:0016887";
@@ -108,13 +110,40 @@ public class CoTermsProcessingAndCalculationIT {
 
         //For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
         List<CoTerm> results = coTermsAllCalculator.process(term1);
-
         assertThat(results, hasSize(2));
+
+        //term compared to its self will always be first as it has the highest similarity ratio
+        //term1 vs term1
         CoTerm result = results.get(0);
         assertThat(result.getComparedTerm(), is(term1));
         assertThat(result.getSimilarityRatio(), is(100.0f));
         assertThat(result.getCompared(), is(2L));
         assertThat(result.getTogether(), is(2L));
+
+        //term1 vs term2
+        result = results.get(1);
+        assertThat(result.getComparedTerm(), is(term2));
+        assertThat(result.getSimilarityRatio(), is(50.0f));
+        assertThat(result.getCompared(), is(1L));
+        assertThat(result.getTogether(), is(1L));
+
+        //Next term
+        results = coTermsAllCalculator.process(term2);
+
+        //term2 vs term2
+        assertThat(results, hasSize(2));
+        result = results.get(0);
+        assertThat(result.getComparedTerm(), is(term2));
+        assertThat(result.getSimilarityRatio(), is(100.0f));
+        assertThat(result.getCompared(), is(1L));
+        assertThat(result.getTogether(), is(1L));
+
+        //term2 vs term1
+        result = results.get(1);
+        assertThat(result.getComparedTerm(), is(term1));
+        assertThat(result.getSimilarityRatio(), is(50.0f));
+        assertThat(result.getCompared(), is(2L));
+        assertThat(result.getTogether(), is(1L));
     }
 
 
