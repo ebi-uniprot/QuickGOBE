@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,6 +13,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.CURSOR_PAGE_NUMBER;
+import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createCursorPage;
 import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createPage;
 
 /**
@@ -49,9 +52,7 @@ public class SolrQueryConverterTest {
 
     @Test
     public void solrQueryReferencesCorrectRequestHandlerName() throws Exception {
-        String field = "field1";
-        String value = "value1";
-        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+        QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest.Builder(fieldQuery).build();
 
@@ -62,9 +63,7 @@ public class SolrQueryConverterTest {
 
     @Test
     public void convertQueryRequestWithQueryAndPageParameters() throws Exception {
-        String field = "field1";
-        String value = "value1";
-        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+        QuickGOQuery fieldQuery = createBasicQuery();
 
         int currentPage = 2;
         int pageSize = 25;
@@ -81,9 +80,7 @@ public class SolrQueryConverterTest {
 
     @Test
     public void convertQueryRequestWithQueryAndFacets() throws Exception {
-        String field = "field1";
-        String value = "value1";
-        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+        QuickGOQuery fieldQuery = createBasicQuery();
 
         String facetField1 = "facet1";
         String facetField2 = "facet2";
@@ -100,9 +97,7 @@ public class SolrQueryConverterTest {
 
     @Test
     public void convertQueryRequestWithQueryAndFilterQuery() throws Exception {
-        String field = "field1";
-        String value = "value1";
-        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+        QuickGOQuery fieldQuery = createBasicQuery();
 
         String filterField = "filterField1";
         String filterValue = "filterValue1";
@@ -119,9 +114,7 @@ public class SolrQueryConverterTest {
 
     @Test
     public void defaultConvertQueryRequestDoesNotUseHighlighting() {
-        String field = "field1";
-        String value = "value1";
-        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+        QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest.Builder(fieldQuery).build();
 
@@ -132,9 +125,7 @@ public class SolrQueryConverterTest {
 
     @Test
     public void convertQueryRequestWithHighlightingOffWillNotUseHighlighting() {
-        String field = "field1";
-        String value = "value1";
-        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+        QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest
                 .Builder(fieldQuery)
@@ -147,9 +138,7 @@ public class SolrQueryConverterTest {
 
     @Test
     public void convertQueryRequestWithHighlightingWillUseHighlighting() {
-        String field = "field1";
-        String value = "value1";
-        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+        QuickGOQuery fieldQuery = createBasicQuery();
 
         String highlightedField = "highlightedField";
 
@@ -166,9 +155,7 @@ public class SolrQueryConverterTest {
 
     @Test
     public void convertQueryRequestWithProjectedFieldWillProjectThatField() {
-        String field = "field1";
-        String value = "value1";
-        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+        QuickGOQuery fieldQuery = createBasicQuery();
 
         String projectedField = "projectedField";
 
@@ -184,9 +171,7 @@ public class SolrQueryConverterTest {
 
     @Test
     public void convertQueryRequestWithTwoProjectedFieldsWillProjectTwoFields() {
-        String field = "field1";
-        String value = "value1";
-        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+        QuickGOQuery fieldQuery = createBasicQuery();
 
         String projectedField1 = "projectedField1";
         String projectedField2 = "projectedField2";
@@ -204,9 +189,7 @@ public class SolrQueryConverterTest {
 
     @Test
     public void convertQueryRequestWithNoProjectedFieldWillProjectNoFields() {
-        String field = "field1";
-        String value = "value1";
-        QuickGOQuery fieldQuery = QuickGOQuery.createQuery(field, value);
+        QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest
                 .Builder(fieldQuery)
@@ -215,6 +198,49 @@ public class SolrQueryConverterTest {
         SolrQuery query = converter.convert(request);
 
         assertThat(query.getFields(), is(nullValue()));
+    }
+
+    @Test
+    public void convertFirstQueryRequestWithCursorUsage() {
+        QuickGOQuery fieldQuery = createBasicQuery();
+
+        int pageSize = 10;
+        QueryRequest request = new QueryRequest
+                .Builder(fieldQuery)
+                .useCursor()
+                .setPage(createCursorPage(pageSize))
+                .build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.get(CursorMarkParams.CURSOR_MARK_PARAM), is(QueryRequest.FIRST_CURSOR_POSITION));
+        assertThat(query.getRows(), is(pageSize));
+        assertThat(query.getStart(), is(CURSOR_PAGE_NUMBER));
+    }
+
+    @Test
+    public void convertQueryRequestWithCursorPosition() {
+        QuickGOQuery fieldQuery = createBasicQuery();
+
+        int pageSize = 10;
+        String cursor = "fakeCursor";
+        QueryRequest request = new QueryRequest
+                .Builder(fieldQuery)
+                .setCursorPosition(cursor)
+                .setPage(createCursorPage(pageSize))
+                .build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.get(CursorMarkParams.CURSOR_MARK_PARAM), is(cursor));
+        assertThat(query.getRows(), is(pageSize));
+        assertThat(query.getStart(), is(CURSOR_PAGE_NUMBER));
+    }
+
+    private QuickGOQuery createBasicQuery() {
+        String field = "field1";
+        String value = "value1";
+        return QuickGOQuery.createQuery(field, value);
     }
 
     private String buildFieldQuery(String field, String value) {

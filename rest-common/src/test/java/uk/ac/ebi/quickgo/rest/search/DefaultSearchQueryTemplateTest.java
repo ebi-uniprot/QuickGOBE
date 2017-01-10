@@ -1,10 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.ParameterException;
-import uk.ac.ebi.quickgo.rest.search.query.Facet;
-import uk.ac.ebi.quickgo.rest.search.query.FieldProjection;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +15,7 @@ import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.CURSOR_PAGE_NUMBER;
 
 /**
  * Created 11/04/16
@@ -165,6 +162,27 @@ public class DefaultSearchQueryTemplateTest {
         this.returnedFields.stream().map(FieldProjection::new).forEach(fieldProjections::add);
 
         assertThat(queryRequest.getProjectedFields(), is(fieldProjections));
+    }
+
+    @Test
+    public void queryRequestUseCursorWasSet() {
+        QueryRequest queryRequest = createBuilder()
+                .useCursor()
+                .build();
+
+        assertThat(queryRequest.getCursor(), is(QueryRequest.FIRST_CURSOR_POSITION));
+        assertThat(queryRequest.getPage().getPageNumber(), is(CURSOR_PAGE_NUMBER));
+    }
+
+    @Test
+    public void queryRequestCursorPositionWasSet() {
+        String cursorPosition = "fakeCursorPosition";
+        QueryRequest queryRequest = createBuilder()
+                .setCursorPosition(cursorPosition)
+                .build();
+
+        assertThat(queryRequest.getCursor(), is(cursorPosition));
+        assertThat(queryRequest.getPage().getPageNumber(), is(CURSOR_PAGE_NUMBER));
     }
 
     private DefaultSearchQueryTemplate.Builder createBuilder() {

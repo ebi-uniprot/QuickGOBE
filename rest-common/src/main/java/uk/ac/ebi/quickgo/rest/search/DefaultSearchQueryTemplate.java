@@ -1,10 +1,15 @@
 package uk.ac.ebi.quickgo.rest.search;
 
 import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
+import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
 import java.util.*;
+
+import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createCursorPage;
+import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createPage;
+import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.FIRST_CURSOR_POSITION;
 
 /**
  * Records common configuration details required to create a {@link QueryRequest} instance,
@@ -75,12 +80,13 @@ public class DefaultSearchQueryTemplate {
         private final Set<QuickGOQuery> filterQueries;
 
         private final Set<String> facets;
-
         private QuickGOQuery query;
+
         private int page = DEFAULT_PAGE_NUMBER;
         private int pageSize = DEFAULT_PAGE_SIZE;
         private boolean highlighting;
         private AggregateRequest aggregate;
+        private String cursor;
 
         private Builder(
                 Iterable<String> returnedFields,
@@ -182,9 +188,28 @@ public class DefaultSearchQueryTemplate {
             return this;
         }
 
+        /**
+         * Specifies that the request should return both the current page of results,
+         * in addition to a cursor to the next page of results.
+         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
+         */
+        public DefaultSearchQueryTemplate.Builder useCursor() {
+            this.cursor = FIRST_CURSOR_POSITION;
+            return this;
+        }
+
+        /**
+         * Specifies that the request should return the next page of results starting from
+         * the {@code cursor} position, in addition to a cursor to the next page of results.
+         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
+         */
+        public DefaultSearchQueryTemplate.Builder setCursorPosition(String cursor) {
+            this.cursor = cursor;
+            return this;
+        }
+
         @Override public QueryRequest build() {
             QueryRequest.Builder builder = new QueryRequest.Builder(query);
-//            builder.setPageParameters(page, pageSize);
 
             facets.forEach(builder::addFacetField);
 
@@ -202,7 +227,39 @@ public class DefaultSearchQueryTemplate {
 
             builder.setAggregate(aggregate);
 
+            setStartPositionAndResultsSize(builder);
+
             return builder.build();
+        }
+
+        /**
+         * <p>Sets the start position of the results to fetch, in addition to the
+         * number of results.
+         * <p>If a cursor is being used to indicate the start point, a {@link Page} created via
+         * {@link uk.ac.ebi.quickgo.rest.search.query.PageFactory#createCursorPage(int)} is used. Otherwise,
+         * a standard page is created via {@link uk.ac.ebi.quickgo.rest.search.query.PageFactory#createPage(int, int)}.
+         */
+        void setStartPositionAndResultsSize(QueryRequest.Builder builder) {
+            Page pageRequest;
+            if (isFirstCursorRequest()) {
+                builder.useCursor();
+                pageRequest = createCursorPage(pageSize);
+            } else if (isCursorRequest()) {
+                builder.setCursorPosition(cursor);
+                pageRequest = createCursorPage(pageSize);
+            } else {
+                pageRequest = createPage(page, pageSize);
+            }
+
+            builder.setPage(pageRequest);
+        }
+
+        private boolean isFirstCursorRequest() {
+            return cursor != null && cursor.equals(FIRST_CURSOR_POSITION);
+        }
+
+        private boolean isCursorRequest() {
+            return cursor != null && !cursor.isEmpty();
         }
 
         @Override public QueryRequest.Builder builder() {

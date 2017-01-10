@@ -69,11 +69,14 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
             aggregation = aggregationConverter.convert(toConvert);
         }
 
+        String nextCursorMark = toConvert.getNextCursorMark();
+
         return new QueryResult.Builder<>(totalNumberOfResults, results)
                 .withPageInfo(pageInfo)
                 .withFacets(facet)
                 .withAggregation(aggregation)
                 .appendHighlights(highlights)
+                .withNextCursor(nextCursorMark)
                 .build();
     }
 
@@ -104,7 +107,7 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
 
         final FieldFacet domainFieldFacet = new FieldFacet(name);
 
-        solrField.getValues().stream()
+        solrField.getValues()
                 .forEach(count -> domainFieldFacet.addCategory(count.getName(), count.getCount()));
 
         return domainFieldFacet;
@@ -120,7 +123,7 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
 
             Preconditions.checkArgument((page.getPageNumber() - 1) <= totalPages,
                     "The requested page number should not be greater than the number of pages available.");
-            int currentPage = (totalPages == 0 ? 0 : page.getPageNumber());
+            int currentPage = totalPages == 0 ? 0 : page.getPageNumber();
 
             pageInfo = new PageInfo(totalPages, currentPage, resultsPerPage);
         } else {

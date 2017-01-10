@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.common.params.CursorMarkParams;
 
 /**
  * Converts a {@link QueryRequest} into a {@link SolrQuery} object.
@@ -82,10 +83,14 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
             solrQuery.setParam(FACET_ANALYTICS_ID, aggregateConverter.convert(request.getAggregate()));
         }
 
+        if (request.getCursor() != null && !request.getCursor().isEmpty()) {
+            solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, request.getCursor());
+        }
+
         return solrQuery;
     }
 
     private int calculateRowsFromPage(int page, int numRows) {
-        return (page - 1) * numRows;
+        return page == 0 ? 0 : (page - 1) * numRows;
     }
 }

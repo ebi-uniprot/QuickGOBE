@@ -10,7 +10,7 @@ import com.google.common.base.Preconditions;
  */
 public class PageFactory {
 
-    static final int CURSOR_PAGE_NUMBER = 0;
+    public static final int CURSOR_PAGE_NUMBER = 0;
 
     private PageFactory() {}
 
