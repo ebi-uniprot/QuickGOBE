@@ -32,7 +32,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class CoTermsProcessingAndCalculationIT {
 
-    public static final String NON_IEA_EVIDENCE = "ABC";
+    private static final String NON_IEA_EVIDENCE = "ABC";
     @Autowired
     private CoTermsAggregationWriter coTermsManualAggregationWriter;
     @Autowired
@@ -51,10 +51,10 @@ public class CoTermsProcessingAndCalculationIT {
         assertThat(docsToWrite, hasSize(noOfDocs));
         writeDocsToAllAggregationInstance(docsToWrite);
         final String targetTerm = docsToWrite.get(0).goId;
-        List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(targetTerm);
+        List<CoTerm> coOccurringTerms = coTermsAllCalculator.process(targetTerm);
 
-        assertThat(coOccuringTerms, hasSize(1));
-        CoTerm result = coOccuringTerms.get(0);
+        assertThat(coOccurringTerms, hasSize(1));
+        CoTerm result = coOccurringTerms.get(0);
 
         assertThat(result.getSimilarityRatio(), is(100.0f));
     }
@@ -67,10 +67,10 @@ public class CoTermsProcessingAndCalculationIT {
 
         //For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
         final String targetTerm = docsToWrite.get(0).goId;
-        List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(targetTerm);
+        List<CoTerm> coOccurringTerms = coTermsAllCalculator.process(targetTerm);
 
-        assertThat(coOccuringTerms, hasSize(1));
-        CoTerm result = coOccuringTerms.get(0);
+        assertThat(coOccurringTerms, hasSize(1));
+        CoTerm result = coOccurringTerms.get(0);
         assertThat(result.getComparedTerm(), is(targetTerm));
         assertThat(result.getSimilarityRatio(), is(100.0f));
         assertThat(result.getProbabilityRatio(), is(1.0f));
@@ -87,10 +87,10 @@ public class CoTermsProcessingAndCalculationIT {
         writeDocsToAllAggregationInstance(docsToWrite);
 
         final String targetTerm = docsToWrite.get(0).goId;
-        List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(targetTerm);
+        List<CoTerm> coOccurringTerms = coTermsAllCalculator.process(targetTerm);
 
-        assertThat(coOccuringTerms, hasSize(1));
-        CoTerm result = coOccuringTerms.get(0);
+        assertThat(coOccurringTerms, hasSize(1));
+        CoTerm result = coOccurringTerms.get(0);
         assertThat(result.getComparedTerm(), is(targetTerm));
         assertThat(result.getSimilarityRatio(), is(100.0f));
         assertThat(result.getProbabilityRatio(), is(1.0f));
@@ -99,7 +99,7 @@ public class CoTermsProcessingAndCalculationIT {
     }
 
     @Test
-    public void checkCoTermCalcualtionForMixOfTermAndGeneProductAndEvidenceCode() throws Exception {
+    public void checkCoTermCalculationForMixOfTermAndGeneProductAndEvidenceCode() throws Exception {
         List<AnnotationDocument> docsToWrite = new ArrayList<>();
 
         final String gp1 = "A0A000";
@@ -121,12 +121,12 @@ public class CoTermsProcessingAndCalculationIT {
         writeDocsToAllAggregationInstance(docsToWrite);
 
         //For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
-        List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(term1);
-        assertThat(coOccuringTerms, hasSize(2));
+        List<CoTerm> coOccurringTerms = coTermsAllCalculator.process(term1);
+        assertThat(coOccurringTerms, hasSize(2));
 
         //term compared to its self will always be first as it has the highest similarity ratio
         //term1 vs term1
-        CoTerm result = coOccuringTerms.get(0);
+        CoTerm result = coOccurringTerms.get(0);
         assertThat(result.getComparedTerm(), is(term1));
         assertThat(result.getSimilarityRatio(), is(100.0f));
         assertThat(result.getProbabilityRatio(), is(1.5f));
@@ -134,7 +134,7 @@ public class CoTermsProcessingAndCalculationIT {
         assertThat(result.getTogether(), is(2L));
 
         //term1 vs term2
-        result = coOccuringTerms.get(1);
+        result = coOccurringTerms.get(1);
         assertThat(result.getComparedTerm(), is(term2));
         assertThat(result.getSimilarityRatio(), is(50.0f));
         assertThat(result.getProbabilityRatio(), is(1.5f));
@@ -142,11 +142,11 @@ public class CoTermsProcessingAndCalculationIT {
         assertThat(result.getTogether(), is(1L));
 
         //Next term
-        coOccuringTerms = coTermsAllCalculator.process(term2);
+        coOccurringTerms = coTermsAllCalculator.process(term2);
 
         //term2 vs term2
-        assertThat(coOccuringTerms, hasSize(2));
-        result = coOccuringTerms.get(0);
+        assertThat(coOccurringTerms, hasSize(2));
+        result = coOccurringTerms.get(0);
         assertThat(result.getComparedTerm(), is(term2));
         assertThat(result.getSimilarityRatio(), is(100.0f));
         assertThat(result.getProbabilityRatio(), is(3.0f));
@@ -154,7 +154,7 @@ public class CoTermsProcessingAndCalculationIT {
         assertThat(result.getTogether(), is(1L));
 
         //term2 vs term1
-        result = coOccuringTerms.get(1);
+        result = coOccurringTerms.get(1);
         assertThat(result.getComparedTerm(), is(term1));
         assertThat(result.getSimilarityRatio(), is(50.0f));
         assertThat(result.getProbabilityRatio(), is(1.5f));
@@ -183,10 +183,10 @@ public class CoTermsProcessingAndCalculationIT {
 
         //For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
         final String targetTerm = docsToWrite.get(0).goId;
-        List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(targetTerm);
+        List<CoTerm> coOccurringTerms = coTermsAllCalculator.process(targetTerm);
 
-        assertThat(coOccuringTerms, hasSize(1));
-        CoTerm result = coOccuringTerms.get(0);
+        assertThat(coOccurringTerms, hasSize(1));
+        CoTerm result = coOccurringTerms.get(0);
         assertThat(result.getComparedTerm(), is(targetTerm));
         assertThat(result.getSimilarityRatio(), is(100.0f));
         assertThat(result.getProbabilityRatio(), is(1.0f));
