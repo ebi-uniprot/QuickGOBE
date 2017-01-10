@@ -3,8 +3,10 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparing;
 
 /**
  * Aggregation class for co-occurring terms.
@@ -83,23 +85,24 @@ class CoTermsForSelectedTerm {
         }
 
         /**
-         * @return an immutable list of co-occurring terms, in descending order of similarity.
+         * Create CoTermsForSelectedTerm instance populated with CoTerms
+         * @return CoTermsForSelectedTerm instance
          */
         CoTermsForSelectedTerm build() {
             Preconditions
                     .checkState(totalNumberGeneProducts != 0, "totalNumberGeneProducts" +
                             " should not be zero");
             Preconditions.checkArgument(selected != 0, "selected should not be zero");
-            coTerms.sort(new SignificanceSorter());
-            return new CoTermsForSelectedTerm(Collections.unmodifiableList(coTerms));
+            return new CoTermsForSelectedTerm(Collections.unmodifiableList(sortCoTermsBySimilarityDescending()));
         }
 
-        private class SignificanceSorter implements Comparator<CoTerm> {
-
-            @Override
-            public int compare(CoTerm o1, CoTerm o2) {
-                return Float.compare(o1.getSimilarityRatio(), o2.getSimilarityRatio());
-            }
+        /**
+         * @return an immutable list of co-occurring terms, in descending order of similarity.
+         */
+        private List<CoTerm> sortCoTermsBySimilarityDescending() {
+            return coTerms.stream()
+                          .sorted(comparing(CoTerm::getSimilarityRatio).reversed())
+                          .collect(Collectors.toList());
         }
     }
 }
