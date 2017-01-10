@@ -37,27 +37,34 @@ public class CoTermsProcessingAndCalculationIT {
     @Autowired
     private CoTermsAggregationWriter coTermsAllAggregationWriter;
 
-    //Configuration
-    private static final int NUMBER_OF_GENERIC_DOCS = 10;
+    @Test
+    public void similarityRatioIsAlwaysOneHundredForATermThatCoOccursWithItsSelf() throws Exception {
+        final int noOfDocs = 1;
+        List<AnnotationDocument> docsToWrite = createGenericDocs(noOfDocs);
+        assertThat(docsToWrite, hasSize(noOfDocs));
+        writeDocsToAggregationInstance(docsToWrite);
+        final String targetTerm = docsToWrite.get(0).goId;
+        List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(targetTerm);
 
-    private List<AnnotationDocument> genericDocs;
+        assertThat(coOccuringTerms, hasSize(1));
+        CoTerm result = coOccuringTerms.get(0);
+
+        assertThat(result.getSimilarityRatio(), is(100.0f));
+    }
 
     @Test
-    public void coTermCalculationForSingleTermDifferentGeneProducts() throws Exception{
-        final String TARGET_TERM = "GO:0003824";
-        genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
-        assertThat(genericDocs, hasSize(10));
-
-        //Write to aggregation writer raw data.
-        coTermsAllAggregationWriter.write(genericDocs);
-        coTermsAllAggregationWriter.close();
+    public void coTermCalculationForSingleTermDifferentGeneProducts() throws Exception {
+        List<AnnotationDocument> docsToWrite = createGenericDocs(10);
+        assertThat(docsToWrite, hasSize(10));
+        writeDocsToAggregationInstance(docsToWrite);
 
         //For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
-        List<CoTerm> results = coTermsAllCalculator.process(TARGET_TERM);
+        final String targetTerm = docsToWrite.get(0).goId;
+        List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(targetTerm);
 
-        assertThat(results, hasSize(1));
-        CoTerm result = results.get(0);
-
+        assertThat(coOccuringTerms, hasSize(1));
+        CoTerm result = coOccuringTerms.get(0);
+        assertThat(result.getComparedTerm(), is(targetTerm));
         assertThat(result.getSimilarityRatio(), is(100.0f));
         assertThat(result.getProbabilityRatio(), is(1.0f));
         assertThat(result.getCompared(), is(10L));
@@ -65,61 +72,52 @@ public class CoTermsProcessingAndCalculationIT {
     }
 
     @Test
-    public void coTermCalculationForTenTermsSameGeneProduct() throws Exception{
-
+    public void coTermCalculationForTenTermsSameGeneProduct() throws Exception {
         Supplier<String> gpSupplier = () -> "A0A000";
-        genericDocs = createGenericDocs(10, gpSupplier);
+        List<AnnotationDocument> docsToWrite = createGenericDocs(10, gpSupplier);
+        assertThat(docsToWrite, hasSize(10));
 
-        //Write to aggregation writer raw data.
-        coTermsAllAggregationWriter.write(genericDocs);
-        coTermsAllAggregationWriter.close();
+        writeDocsToAggregationInstance(docsToWrite);
 
+        final String targetTerm = docsToWrite.get(0).goId;
+        List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(targetTerm);
 
-        //For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
-        final String TARGET_TERM = "GO:0003824";
-        List<CoTerm> results = coTermsAllCalculator.process(TARGET_TERM);
-
-        assertThat(results, hasSize(1));
-        CoTerm result = results.get(0);
-
+        assertThat(coOccuringTerms, hasSize(1));
+        CoTerm result = coOccuringTerms.get(0);
+        assertThat(result.getComparedTerm(), is(targetTerm));
         assertThat(result.getSimilarityRatio(), is(100.0f));
         assertThat(result.getProbabilityRatio(), is(1.0f));
-        assertThat(genericDocs, hasSize(10));
         assertThat(result.getCompared(), is(1L));
         assertThat(result.getTogether(), is(1L));
     }
 
     @Test
-    public void coTermCalculationInDepth() throws Exception{
-
-        List<AnnotationDocument> docs = new ArrayList<>();
+    public void coTermCalculationInDepth() throws Exception {
+        List<AnnotationDocument> docsToWrite = new ArrayList<>();
 
         final String gp1 = "A0A000";
         final String term1 = "GO:0003824";
-        docs.add(createAnnotationDoc(gp1, term1));
-        docs.add(createAnnotationDoc(gp1, term1));
+        docsToWrite.add(createAnnotationDoc(gp1, term1));
+        docsToWrite.add(createAnnotationDoc(gp1, term1));
 
         final String gp2 = "A0A001";
         final String term2 = "GO:0016887";
-        docs.add(createAnnotationDoc(gp2, term2));      //no impact on term1
-        docs.add(createAnnotationDoc(gp2, term1));
+        docsToWrite.add(createAnnotationDoc(gp2, term2));      //no impact on term1
+        docsToWrite.add(createAnnotationDoc(gp2, term1));
 
         final String gp3 = "A0A002";
         final String term3 = "GO:0003870";
-        docs.add(createAnnotationDoc(gp3, term3));      //only impacts probability ratio
+        docsToWrite.add(createAnnotationDoc(gp3, term3));      //only impacts probability ratio
 
-        //Write to aggregation writer raw data.
-        coTermsAllAggregationWriter.write(docs);
-        coTermsAllAggregationWriter.close();
-
+        writeDocsToAggregationInstance(docsToWrite);
 
         //For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
-        List<CoTerm> results = coTermsAllCalculator.process(term1);
-        assertThat(results, hasSize(2));
+        List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(term1);
+        assertThat(coOccuringTerms, hasSize(2));
 
         //term compared to its self will always be first as it has the highest similarity ratio
         //term1 vs term1
-        CoTerm result = results.get(0);
+        CoTerm result = coOccuringTerms.get(0);
         assertThat(result.getComparedTerm(), is(term1));
         assertThat(result.getSimilarityRatio(), is(100.0f));
         assertThat(result.getProbabilityRatio(), is(1.5f));
@@ -127,7 +125,7 @@ public class CoTermsProcessingAndCalculationIT {
         assertThat(result.getTogether(), is(2L));
 
         //term1 vs term2
-        result = results.get(1);
+        result = coOccuringTerms.get(1);
         assertThat(result.getComparedTerm(), is(term2));
         assertThat(result.getSimilarityRatio(), is(50.0f));
         assertThat(result.getProbabilityRatio(), is(1.5f));
@@ -135,11 +133,11 @@ public class CoTermsProcessingAndCalculationIT {
         assertThat(result.getTogether(), is(1L));
 
         //Next term
-        results = coTermsAllCalculator.process(term2);
+        coOccuringTerms = coTermsAllCalculator.process(term2);
 
         //term2 vs term2
-        assertThat(results, hasSize(2));
-        result = results.get(0);
+        assertThat(coOccuringTerms, hasSize(2));
+        result = coOccuringTerms.get(0);
         assertThat(result.getComparedTerm(), is(term2));
         assertThat(result.getSimilarityRatio(), is(100.0f));
         assertThat(result.getProbabilityRatio(), is(3.0f));
@@ -147,11 +145,18 @@ public class CoTermsProcessingAndCalculationIT {
         assertThat(result.getTogether(), is(1L));
 
         //term2 vs term1
-        result = results.get(1);
+        result = coOccuringTerms.get(1);
         assertThat(result.getComparedTerm(), is(term1));
         assertThat(result.getSimilarityRatio(), is(50.0f));
         assertThat(result.getProbabilityRatio(), is(1.5f));
         assertThat(result.getCompared(), is(2L));
         assertThat(result.getTogether(), is(1L));
     }
+
+    private void writeDocsToAggregationInstance(List<AnnotationDocument> docsToWrite) throws Exception {
+        //Write to aggregation writer raw data.
+        coTermsAllAggregationWriter.write(docsToWrite);
+        coTermsAllAggregationWriter.close();
+    }
+
 }
