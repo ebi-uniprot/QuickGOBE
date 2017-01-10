@@ -98,10 +98,7 @@ class CoTermsForSelectedTerm {
 
             @Override
             public int compare(CoTerm o1, CoTerm o2) {
-                if (o1.getSimilarityRatio() == o2.getSimilarityRatio()) {
-                    return 0;
-                }
-                return o1.getSimilarityRatio() > o2.getSimilarityRatio() ? -1 : 1;
+                return Float.compare(o1.getSimilarityRatio(), o2.getSimilarityRatio());
             }
         }
     }
