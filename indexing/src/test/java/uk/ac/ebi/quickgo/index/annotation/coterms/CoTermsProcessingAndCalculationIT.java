@@ -198,13 +198,11 @@ public class CoTermsProcessingAndCalculationIT {
     }
 
     private void writeDocsToAllAggregationInstance(List<AnnotationDocument> docsToWrite) throws Exception {
-        //Write to aggregation writer raw data.
         coTermsAllAggregationWriter.write(docsToWrite);
         coTermsAllAggregationWriter.close();
     }
 
     private void writeDocsToManualAggregationInstance(List<AnnotationDocument> docsToWrite) throws Exception {
-        //Write to aggregation writer raw data.
         coTermsManualAggregationWriter.write(docsToWrite);
         coTermsManualAggregationWriter.close();
     }
