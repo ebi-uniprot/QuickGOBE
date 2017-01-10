@@ -88,9 +88,9 @@ public class AnnotationDocMocker {
         return doc;
     }
 
-    public static AnnotationDocument createAnnotationDoc(String geneProductId, String goTerm){
+    public static AnnotationDocument createAnnotationDoc(String geneProductId, String goId){
         AnnotationDocument doc = createAnnotationDoc(geneProductId);
-        doc.goId = goTerm;
+        doc.goId = goId;
         return doc;
     }
 
