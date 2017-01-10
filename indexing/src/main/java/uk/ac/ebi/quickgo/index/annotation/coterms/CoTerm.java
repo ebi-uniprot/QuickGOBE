@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A class that represents the intersection between two GO terms, which have been used to annotate the
@@ -53,13 +51,13 @@ public class CoTerm {
      */
     static float calculateSimilarityRatio(long selected, long together, long compared) {
         Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
-                        " 'selected' should not be zero");
+                " 'selected' should not be zero");
         Preconditions.checkArgument(together != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
-                        " 'together' should not be zero");
+                " 'together' should not be zero");
         Preconditions.checkArgument(compared != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
-                        " 'compared' should not be zero");
+                " 'compared' should not be zero");
 
-        return 100 * ((together) / (float)(selected + compared - together));
+        return 100 * ((together) / (float) (selected + compared - together));
     }
 
     /**
@@ -82,7 +80,7 @@ public class CoTerm {
                 " should not be zero");
         Preconditions.checkArgument(compared != 0, "CoTerm::calculateProbabilityRatio The value for 'compared'" +
                 " should not be zero");
-        return (together / (float)selected) / (compared / (float)all);
+        return (together / (float) selected) / (compared / (float) all);
     }
 
     /**
