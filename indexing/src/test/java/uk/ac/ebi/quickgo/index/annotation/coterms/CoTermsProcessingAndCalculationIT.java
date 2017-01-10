@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemProcessor;
@@ -32,6 +33,11 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
 public class CoTermsProcessingAndCalculationIT {
 
     @Autowired
+    private CoTermsAggregationWriter coTermsManualAggregationWriter;
+    @Autowired
+    private ItemProcessor<String, List<CoTerm>> coTermsManualCalculator;
+
+    @Autowired
     private ItemProcessor<String, List<CoTerm>> coTermsAllCalculator;
 
     @Autowired
@@ -42,7 +48,7 @@ public class CoTermsProcessingAndCalculationIT {
         final int noOfDocs = 1;
         List<AnnotationDocument> docsToWrite = createGenericDocs(noOfDocs);
         assertThat(docsToWrite, hasSize(noOfDocs));
-        writeDocsToAggregationInstance(docsToWrite);
+        writeDocsToAllAggregationInstance(docsToWrite);
         final String targetTerm = docsToWrite.get(0).goId;
         List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(targetTerm);
 
@@ -56,7 +62,7 @@ public class CoTermsProcessingAndCalculationIT {
     public void coTermCalculationForSingleTermDifferentGeneProducts() throws Exception {
         List<AnnotationDocument> docsToWrite = createGenericDocs(10);
         assertThat(docsToWrite, hasSize(10));
-        writeDocsToAggregationInstance(docsToWrite);
+        writeDocsToAllAggregationInstance(docsToWrite);
 
         //For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
         final String targetTerm = docsToWrite.get(0).goId;
@@ -77,7 +83,7 @@ public class CoTermsProcessingAndCalculationIT {
         List<AnnotationDocument> docsToWrite = createGenericDocs(10, gpSupplier);
         assertThat(docsToWrite, hasSize(10));
 
-        writeDocsToAggregationInstance(docsToWrite);
+        writeDocsToAllAggregationInstance(docsToWrite);
 
         final String targetTerm = docsToWrite.get(0).goId;
         List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(targetTerm);
@@ -109,7 +115,7 @@ public class CoTermsProcessingAndCalculationIT {
         final String term3 = "GO:0003870";
         docsToWrite.add(createAnnotationDoc(gp3, term3));      //only impacts probability ratio
 
-        writeDocsToAggregationInstance(docsToWrite);
+        writeDocsToAllAggregationInstance(docsToWrite);
 
         //For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
         List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(term1);
@@ -153,10 +159,48 @@ public class CoTermsProcessingAndCalculationIT {
         assertThat(result.getTogether(), is(1L));
     }
 
-    private void writeDocsToAggregationInstance(List<AnnotationDocument> docsToWrite) throws Exception {
+    @Test
+    public void thereShouldBeZeroCoTermRecordsIfTheAnnotationHasANonManualSource() throws Exception {
+        final int noOfDocs = 1;
+        List<AnnotationDocument> docsToWrite = createGenericDocs(noOfDocs);
+        assertThat(docsToWrite, hasSize(noOfDocs));
+        writeDocsToManualAggregationInstance(docsToWrite);
+        final String targetTerm = docsToWrite.get(0).goId;
+        assertThat(coTermsManualCalculator.process(targetTerm), hasSize(0));
+    }
+
+    @Test
+    public void simpleCalculationForManualOnlyAnnotationsProvesManualOpWorks() throws Exception {
+        List<AnnotationDocument> docsToWrite =  createGenericDocs(10).stream()
+                   .map(ad -> {ad.goEvidence = "ABC"; return ad;})
+                   .collect(Collectors.toList());
+        assertThat(docsToWrite, hasSize(10));
+
+        writeDocsToAllAggregationInstance(docsToWrite);
+
+        //For the passed in GO Term id, find the list of co-occurring terms and calculate CoTerm instances.
+        final String targetTerm = docsToWrite.get(0).goId;
+        List<CoTerm> coOccuringTerms = coTermsAllCalculator.process(targetTerm);
+
+        assertThat(coOccuringTerms, hasSize(1));
+        CoTerm result = coOccuringTerms.get(0);
+        assertThat(result.getComparedTerm(), is(targetTerm));
+        assertThat(result.getSimilarityRatio(), is(100.0f));
+        assertThat(result.getProbabilityRatio(), is(1.0f));
+        assertThat(result.getCompared(), is(10L));
+        assertThat(result.getTogether(), is(10L));
+    }
+
+    private void writeDocsToAllAggregationInstance(List<AnnotationDocument> docsToWrite) throws Exception {
         //Write to aggregation writer raw data.
         coTermsAllAggregationWriter.write(docsToWrite);
         coTermsAllAggregationWriter.close();
+    }
+
+    private void writeDocsToManualAggregationInstance(List<AnnotationDocument> docsToWrite) throws Exception {
+        //Write to aggregation writer raw data.
+        coTermsManualAggregationWriter.write(docsToWrite);
+        coTermsManualAggregationWriter.close();
     }
 
 }
