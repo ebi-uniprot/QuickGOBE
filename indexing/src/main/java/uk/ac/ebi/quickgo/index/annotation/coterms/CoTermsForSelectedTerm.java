@@ -40,6 +40,13 @@ class CoTermsForSelectedTerm {
         private long selected;
 
         /**
+         * @return an empty instance.
+         */
+        static CoTermsForSelectedTerm empty() {
+            return new CoTermsForSelectedTerm(Collections.emptyList());
+        }
+
+        /**
          *
          * @param totalNumberGeneProducts The total count of unique gene products for all terms encountered during
          * processing.
