@@ -38,6 +38,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createECODoc;
 import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createGODoc;
+import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createPage;
 
 /**
  * Testing the {@link OntologyServiceImpl} class.
@@ -160,7 +161,7 @@ public class OntologyServiceImplTest {
             when(goDocumentConverterMock.convert(any(OntologyDocument.class))).thenReturn(createGOTerm("stub"));
 
             uk.ac.ebi.quickgo.rest.search.query.Page page =
-                    new uk.ac.ebi.quickgo.rest.search.query.Page(oneBasedPageNumber, pageSize);
+                    createPage(oneBasedPageNumber, pageSize);
             QueryResult<GOTerm> queryResult = goOntologyService.findAllByOntologyType(OntologyType.GO, page);
 
             assertThat(queryResult.getResults(), hasSize(10));
