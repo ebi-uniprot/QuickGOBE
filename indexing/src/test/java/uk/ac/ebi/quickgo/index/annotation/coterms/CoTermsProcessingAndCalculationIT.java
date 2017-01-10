@@ -46,6 +46,7 @@ public class CoTermsProcessingAndCalculationIT {
     public void coTermCalculationForSingleTermDifferentGeneProducts() throws Exception{
         final String TARGET_TERM = "GO:0003824";
         genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
+        assertThat(genericDocs, hasSize(10));
 
         //Write to aggregation writer raw data.
         coTermsAllAggregationWriter.write(genericDocs);
@@ -58,7 +59,7 @@ public class CoTermsProcessingAndCalculationIT {
         CoTerm result = results.get(0);
 
         assertThat(result.getSimilarityRatio(), is(100.0f));
-        assertThat(genericDocs, hasSize(10));
+        assertThat(result.getProbabilityRatio(), is(1.0f));
         assertThat(result.getCompared(), is(10L));
         assertThat(result.getTogether(), is(10L));
     }
@@ -82,6 +83,7 @@ public class CoTermsProcessingAndCalculationIT {
         CoTerm result = results.get(0);
 
         assertThat(result.getSimilarityRatio(), is(100.0f));
+        assertThat(result.getProbabilityRatio(), is(1.0f));
         assertThat(genericDocs, hasSize(10));
         assertThat(result.getCompared(), is(1L));
         assertThat(result.getTogether(), is(1L));
@@ -102,6 +104,9 @@ public class CoTermsProcessingAndCalculationIT {
         docs.add(createAnnotationDoc(gp2, term2));      //no impact on term1
         docs.add(createAnnotationDoc(gp2, term1));
 
+        final String gp3 = "A0A002";
+        final String term3 = "GO:0003870";
+        docs.add(createAnnotationDoc(gp3, term3));      //only impacts probability ratio
 
         //Write to aggregation writer raw data.
         coTermsAllAggregationWriter.write(docs);
@@ -117,6 +122,7 @@ public class CoTermsProcessingAndCalculationIT {
         CoTerm result = results.get(0);
         assertThat(result.getComparedTerm(), is(term1));
         assertThat(result.getSimilarityRatio(), is(100.0f));
+        assertThat(result.getProbabilityRatio(), is(1.5f));
         assertThat(result.getCompared(), is(2L));
         assertThat(result.getTogether(), is(2L));
 
@@ -124,6 +130,7 @@ public class CoTermsProcessingAndCalculationIT {
         result = results.get(1);
         assertThat(result.getComparedTerm(), is(term2));
         assertThat(result.getSimilarityRatio(), is(50.0f));
+        assertThat(result.getProbabilityRatio(), is(1.5f));
         assertThat(result.getCompared(), is(1L));
         assertThat(result.getTogether(), is(1L));
 
@@ -135,6 +142,7 @@ public class CoTermsProcessingAndCalculationIT {
         result = results.get(0);
         assertThat(result.getComparedTerm(), is(term2));
         assertThat(result.getSimilarityRatio(), is(100.0f));
+        assertThat(result.getProbabilityRatio(), is(3.0f));
         assertThat(result.getCompared(), is(1L));
         assertThat(result.getTogether(), is(1L));
 
@@ -142,9 +150,8 @@ public class CoTermsProcessingAndCalculationIT {
         result = results.get(1);
         assertThat(result.getComparedTerm(), is(term1));
         assertThat(result.getSimilarityRatio(), is(50.0f));
+        assertThat(result.getProbabilityRatio(), is(1.5f));
         assertThat(result.getCompared(), is(2L));
         assertThat(result.getTogether(), is(1L));
     }
-
-
 }
