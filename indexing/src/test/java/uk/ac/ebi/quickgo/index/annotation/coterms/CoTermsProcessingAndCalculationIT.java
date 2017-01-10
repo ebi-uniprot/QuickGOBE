@@ -174,9 +174,12 @@ public class CoTermsProcessingAndCalculationIT {
 
     @Test
     public void simpleCalculationForManualOnlyAnnotationsProvesManualOpWorks() throws Exception {
-        List<AnnotationDocument> docsToWrite =  createGenericDocs(10).stream()
-                   .map(ad -> {ad.goEvidence = NON_IEA_EVIDENCE; return ad;})
-                   .collect(Collectors.toList());
+        List<AnnotationDocument> docsToWrite = createGenericDocs(10).stream()
+                                                                    .map(ad -> {
+                                                                        ad.goEvidence = NON_IEA_EVIDENCE;
+                                                                        return ad;
+                                                                    })
+                                                                    .collect(Collectors.toList());
         assertThat(docsToWrite, hasSize(10));
 
         writeDocsToAllAggregationInstance(docsToWrite);
