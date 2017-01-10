@@ -3,7 +3,9 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.common.writer.ListItemWriter;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,11 +56,19 @@ public class CoTermsConfig {
 
     @Bean
     public Resource manualCoTermsResource() {
+        Preconditions.checkState(Objects.nonNull(manualCoTermsPath), "The output path for the 'manual' coterms" +
+                " file cannot be null");
+        Preconditions.checkState(!manualCoTermsPath.equals(allCoTermsPath), "The output path for manual and all " +
+                "coterms files should not be the same");
         return new FileSystemResource(manualCoTermsPath);
     }
 
     @Bean
     public Resource allCoTermsResource() {
+        Preconditions.checkState(Objects.nonNull(allCoTermsPath), "The output path for the 'all' coterms" +
+                " file cannot be null");
+        Preconditions.checkState(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
+                "coterms files should not be the same");
         return new FileSystemResource(allCoTermsPath);
     }
 
