@@ -32,6 +32,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class CoTermsProcessingAndCalculationIT {
 
+    public static final String NON_IEA_EVIDENCE = "ABC";
     @Autowired
     private CoTermsAggregationWriter coTermsManualAggregationWriter;
     @Autowired
@@ -98,7 +99,7 @@ public class CoTermsProcessingAndCalculationIT {
     }
 
     @Test
-    public void coTermCalculationInDepth() throws Exception {
+    public void checkCoTermCalcualtionForMixOfTermAndGeneProductAndEvidenceCode() throws Exception {
         List<AnnotationDocument> docsToWrite = new ArrayList<>();
 
         final String gp1 = "A0A000";
@@ -108,7 +109,9 @@ public class CoTermsProcessingAndCalculationIT {
 
         final String gp2 = "A0A001";
         final String term2 = "GO:0016887";
-        docsToWrite.add(createAnnotationDoc(gp2, term2));      //no impact on term1
+        final AnnotationDocument docManual = createAnnotationDoc(gp2, term2);
+        docManual.goEvidence = NON_IEA_EVIDENCE;
+        docsToWrite.add(docManual);      //no impact on term1
         docsToWrite.add(createAnnotationDoc(gp2, term1));
 
         final String gp3 = "A0A002";
@@ -172,7 +175,7 @@ public class CoTermsProcessingAndCalculationIT {
     @Test
     public void simpleCalculationForManualOnlyAnnotationsProvesManualOpWorks() throws Exception {
         List<AnnotationDocument> docsToWrite =  createGenericDocs(10).stream()
-                   .map(ad -> {ad.goEvidence = "ABC"; return ad;})
+                   .map(ad -> {ad.goEvidence = NON_IEA_EVIDENCE; return ad;})
                    .collect(Collectors.toList());
         assertThat(docsToWrite, hasSize(10));
 
