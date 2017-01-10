@@ -93,13 +93,16 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
                 .checkArgument(null != goTerm, "Target GO term id passed to createCoTermsForSelectedTerm should not " +
                         "be null");
 
+        final long selected = getCountOfGeneProductsForTerm(goTerm);
+        if(selected == 0){
+            return CoTermsForSelectedTerm.Builder.empty();
+        }
+
         CoTermsForSelectedTerm.Builder coTermsBuilder = new CoTermsForSelectedTerm.Builder()
                 .setTotalNumberOfGeneProducts(getGeneProductTotal())
-                .setSelected(getCountOfGeneProductsForTerm(goTerm));
+                .setSelected(selected);
 
         for (String comparedTerm : getCoTermsAndCounts(goTerm).keySet()) {
-
-            long selected = getCountOfGeneProductsForTerm(goTerm);
             long together = getTogether(goTerm, comparedTerm);
             long compared = getCountOfGeneProductsForTerm(comparedTerm);
 
@@ -122,7 +125,8 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
      * @return count of the number of unique gene products encountered during processing for the request term.
      */
     private long getCountOfGeneProductsForTerm(String goTerm) {
-        return geneProductCountForTerms.id2Count.get(goTerm).get();
+        final AtomicLong gpCountForTerm = geneProductCountForTerms.id2Count.get(goTerm);
+        return gpCountForTerm != null ? gpCountForTerm.get():0L;
     }
 
     /**
@@ -245,41 +249,18 @@ class CoTermMatrix {
      * @param termsInBatch a list of all terms encountered in annotations for a particular gene product.
      */
     void incrementCoTerms(String termId, Set<String> termsInBatch) {
-        Map<String, AtomicLong> coTerms = getCoTerms(termId);
+        Map<String, AtomicLong> coTerms = coTermMatrix.computeIfAbsent(termId, k -> new HashMap<>());
 
         //Loop through all the terms we have encountered in this batch and update the quantities
         for (String term : termsInBatch) {
 
             //Get 'permanent' record for this termId/termId permutation
-            AtomicLong permutationCount = coTerms.get(term);
-
-            //Create if it doesn't exist.
-            if (permutationCount == null) {
-                permutationCount = new AtomicLong();
-                coTerms.put(term, permutationCount);
-            }
+            AtomicLong permutationCount = coTerms.computeIfAbsent(term, k -> new AtomicLong());
 
             //Update it with a count of 'one' as this batch is for one gene protein and so the count must be one
             permutationCount.incrementAndGet();
 
         }
-    }
-
-    /**
-     * Get the co-terms for this {@code termId}
-     *
-     * @param termId GO Term id to use for the lookup.
-     * @return all terms that co-occur with the term specified as parameter.
-     */
-    private Map<String, AtomicLong> getCoTerms(String termId) {
-        Map<String, AtomicLong> termCoTerms = coTermMatrix.get(termId);
-
-        //Create if it doesn't exist.
-        if (termCoTerms == null) {
-            termCoTerms = new HashMap<>();
-            coTermMatrix.put(termId, termCoTerms);
-        }
-        return termCoTerms;
     }
 }
 
