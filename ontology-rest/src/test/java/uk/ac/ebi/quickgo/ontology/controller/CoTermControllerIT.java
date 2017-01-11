@@ -65,7 +65,7 @@ public class CoTermControllerIT {
     @Test
     public void canRetrieveCoTermsForTerm() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001)));
-
+        response.andDo(print());
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
@@ -239,6 +239,7 @@ public class CoTermControllerIT {
     @Test
     public void useValueForSimilarityThresholdThatReturnsOnlyOneRecord() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=99.9")));
+        response.andDo(print());
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
@@ -294,7 +295,7 @@ public class CoTermControllerIT {
         result
                 .andDo(print())
                 .andExpect(jsonPath("$.messages", hasItem(containsString("The value for source should be one of " +
-                        SOURCE_VALUES + " and not " + requestedSource))));
+                        SOURCE_VALUES + ". '" + requestedSource + "' is not a valid value for source."))));
     }
 
     private void expectLimitErrorMessage(ResultActions result) throws Exception {
