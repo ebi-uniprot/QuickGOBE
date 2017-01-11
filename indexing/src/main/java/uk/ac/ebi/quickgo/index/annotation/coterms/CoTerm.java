@@ -49,15 +49,15 @@ public class CoTerm {
      * @param together Count of proteins where both selected and compared terms are annotated
      * @param compared Count of proteins where compared term is annotated
      */
-    static float calculateSimilarityRatio(float selected, long together, long compared) {
+    static float calculateSimilarityRatio(long selected, long together, long compared) {
         Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
-                        " 'selected' should not be zero");
+                " 'selected' should not be zero");
         Preconditions.checkArgument(together != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
-                        " 'together' should not be zero");
+                " 'together' should not be zero");
         Preconditions.checkArgument(compared != 0, "CoTerm::calculateProbabilitySimilarityRatio The value for" +
-                        " 'compared' should not be zero");
+                " 'compared' should not be zero");
 
-        return 100 * ((together) / (selected + compared - together));
+        return 100 * ((together) / (float) (selected + compared - together));
     }
 
     /**
@@ -70,7 +70,7 @@ public class CoTerm {
      * @param all Total count of proteins
      * @param compared Count of proteins where compared term is annotated
      */
-    static float calculateProbabilityRatio(float selected, long together, float all, long compared) {
+    static float calculateProbabilityRatio(long selected, long together, long all, long compared) {
 
         Preconditions.checkArgument(selected != 0, "CoTerm::calculateProbabilityRatio The value for 'selected'" +
                 " should not be zero");
@@ -80,7 +80,7 @@ public class CoTerm {
                 " should not be zero");
         Preconditions.checkArgument(compared != 0, "CoTerm::calculateProbabilityRatio The value for 'compared'" +
                 " should not be zero");
-        return (together / selected) / (compared / all);
+        return (together / (float) selected) / (compared / (float) all);
     }
 
     /**
