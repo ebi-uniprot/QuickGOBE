@@ -48,28 +48,11 @@ public class CoTermsConfig {
             "together", "compared"};
     private static final String DELIMITER = "\t";
 
-    @Value("${indexing.coterms.manual:#{systemProperties['user.dir']}/QuickGO/CoTermsManual}")
-    private String manualCoTermsPath;
-
-    @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}")
-    private String allCoTermsPath;
-
     @Bean
-    public Resource manualCoTermsResource() {
-        Preconditions.checkState(Objects.nonNull(manualCoTermsPath), "The output path for the 'manual' coterms" +
-                " file cannot be null");
-        Preconditions.checkState(!manualCoTermsPath.equals(allCoTermsPath), "The output path for manual and all " +
-                "coterms files should not be the same");
-        return new FileSystemResource(manualCoTermsPath);
-    }
-
-    @Bean
-    public Resource allCoTermsResource() {
-        Preconditions.checkState(Objects.nonNull(allCoTermsPath), "The output path for the 'all' coterms" +
-                " file cannot be null");
-        Preconditions.checkState(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
-                "coterms files should not be the same");
-        return new FileSystemResource(allCoTermsPath);
+    public OutputPath outputPath(@Value("${indexing.coterms.manual:#{systemProperties['user" +
+            ".dir']}/QuickGO/CoTermsManual}") String manualCoTermsPath,
+            @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}") String allCoTermsPath){
+            return new OutputPath(manualCoTermsPath, allCoTermsPath);
     }
 
     @Bean
@@ -106,13 +89,13 @@ public class CoTermsConfig {
     }
 
     @Bean
-    ItemWriter<List<CoTerm>> coTermsManualStatsWriter() {
-        return listItemFlatFileWriter(manualCoTermsResource());
+    ItemWriter<List<CoTerm>> coTermsManualStatsWriter(OutputPath outputPath) {
+        return listItemFlatFileWriter(outputPath.manualCoTermsResource);
     }
 
     @Bean
-    ItemWriter<List<CoTerm>> coTermsAllStatsWriter() {
-        return listItemFlatFileWriter(allCoTermsResource());
+    ItemWriter<List<CoTerm>> coTermsAllStatsWriter(OutputPath outputPath) {
+        return listItemFlatFileWriter(outputPath.allCoTermsResource);
     }
 
     private ListItemWriter<CoTerm> listItemFlatFileWriter(Resource outputFile) {
@@ -142,5 +125,22 @@ public class CoTermsConfig {
         BeanWrapperFieldExtractor<CoTerm> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
         beanWrapperFieldExtractor.setNames(FF_COL_NAMES);
         return beanWrapperFieldExtractor;
+    }
+
+    public class OutputPath {
+        FileSystemResource manualCoTermsResource;
+        FileSystemResource allCoTermsResource;
+        public OutputPath(String manualCoTermsPath, String allCoTermsPath) {
+            Preconditions.checkArgument(Objects.nonNull(manualCoTermsPath), "The output path for the 'manual' coterms" +
+                    " file cannot be null");
+            Preconditions.checkArgument(Objects.nonNull(allCoTermsPath), "The output path for the 'all' coterms" +
+                    " file cannot be null");
+            Preconditions.checkArgument(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
+                    "coterms files should not be the same, but they were both %s", manualCoTermsPath);
+
+            manualCoTermsResource = new FileSystemResource(manualCoTermsPath);
+            allCoTermsResource =  new FileSystemResource(allCoTermsPath);
+
+        }
     }
 }
