@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.*;
 
 import java.util.*;
@@ -20,7 +21,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createPage;
 
 /**
  * Tests the {@link AbstractSolrQueryResultConverter} implementation
@@ -256,7 +256,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     private QueryRequest createRequestWithPaging(QuickGOQuery query, int currentPage, int resultsPerPage) {
-        return new QueryRequest.Builder(query).setPage(createPage(currentPage, resultsPerPage)).build();
+        return new QueryRequest.Builder(query).setPage(new RegularPage(currentPage, resultsPerPage)).build();
     }
 
     private QueryRequest createRequestWithFaceting(QuickGOQuery query, List<String> facets) {

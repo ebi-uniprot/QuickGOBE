@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.CURSOR_PAGE_NUMBER;
 
 /**
  * Created 11/04/16

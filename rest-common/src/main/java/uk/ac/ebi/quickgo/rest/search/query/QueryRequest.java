@@ -153,6 +153,7 @@ public class QueryRequest {
             return this;
         }
 
+        //todo: remove, caller creates page explicitly
         public Builder useCursor() {
             checkState(this.page == null || this.page.getPageNumber() == CURSOR_PAGE_NUMBER,
                     "Cannot use a cursor when a page number is non-zero");

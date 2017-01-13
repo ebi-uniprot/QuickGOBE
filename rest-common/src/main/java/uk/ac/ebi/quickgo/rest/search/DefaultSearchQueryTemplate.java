@@ -1,9 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
-import uk.ac.ebi.quickgo.rest.search.query.Page;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.*;
 
@@ -244,6 +241,7 @@ public class DefaultSearchQueryTemplate {
             if (isFirstCursorRequest()) {
                 builder.useCursor();
                 pageRequest = createCursorPage(pageSize);
+                new CursorPage()
             } else if (isCursorRequest()) {
                 builder.setCursorPosition(cursor);
                 pageRequest = createCursorPage(pageSize);

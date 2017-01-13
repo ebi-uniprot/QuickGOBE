@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
  * Contains the paging information for a {@link QueryResult}.
  */
 public class PageInfo {
+    // change current page -> pageposition and have two subclasses, cursorposition and regularposition
     private final int totalPages;
     private final int currentPage;
     private final int resultsPerPage;
@@ -47,5 +48,20 @@ public class PageInfo {
      */
     public int getResultsPerPage() {
         return resultsPerPage;
+    }
+
+    public static class Builder {
+        public Builder setCurrentPage(int currentPage) {
+            return this;
+        }
+        public Builder setTotalPages(int totalPages) {
+            return this;
+        }
+        public Builder setResultsPerPage(int resultsPerPage) {
+            return this;
+        }
+        public PageInfo build() {
+            return null;
+        }
     }
 }

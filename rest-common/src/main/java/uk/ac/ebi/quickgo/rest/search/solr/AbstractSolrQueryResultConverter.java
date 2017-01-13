@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.QueryResultConverter;
-import uk.ac.ebi.quickgo.rest.search.query.Page;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.query.*;
 import uk.ac.ebi.quickgo.rest.search.results.*;
+import uk.ac.ebi.quickgo.rest.search.results.Facet;
 
 import com.google.common.base.Preconditions;
 import java.util.Collections;
@@ -118,14 +118,37 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
 
         int resultsPerPage = page.getPageSize();
 
+        PageInfo.Builder pageInfoBuilder = new PageInfo.Builder();
         if (resultsPerPage > 0) {
             int totalPages = (int) Math.ceil((double) totalNumberOfResults / (double) resultsPerPage);
 
-            Preconditions.checkArgument((page.getPageNumber() - 1) <= totalPages,
-                    "The requested page number should not be greater than the number of pages available.");
-            int currentPage = totalPages == 0 ? 0 : page.getPageNumber();
+            page.accept(new PageVisitor<PageInfo.Builder>() {
+                @Override public void visit(RegularPage page, PageInfo.Builder subject) {
+                    Preconditions.checkArgument((page.getPageNumber() - 1) <= totalPages,
+                            "The requested page number should not be greater than the number of pages available.");
+                    int currentPage = totalPages == 0 ? 0 : page.getPageNumber();
+                    subject.setTotalPages(totalPages)
+                            .setCurrentPage(currentPage)
+                            // .setCurrentPage(new RegularPosition(currentPage))
+                            .setResultsPerPage(resultsPerPage);
+                }
 
-            pageInfo = new PageInfo(totalPages, currentPage, resultsPerPage);
+                @Override public void visit(CursorPage page, PageInfo.Builder subject) {
+                    Preconditions.checkArgument((page.getCursor() != null && !page.getCursor().isEmpty()),
+                            "The requested page number should not be greater than the number of pages available.");
+                    subject.setTotalPages(totalPages)
+                             //.setCurrentPage(new CursorPosition(page.getCursor()))
+                            .setResultsPerPage(resultsPerPage);
+                }
+            }, pageInfoBuilder);
+
+
+//            Preconditions.checkArgument((page.getPageNumber() - 1) <= totalPages,
+//                    "The requested page number should not be greater than the number of pages available.");
+//            int currentPage = totalPages == 0 ? 0 : page.getPageNumber();
+
+//            pageInfo = new PageInfo(totalPages, currentPage, resultsPerPage);
+            pageInfo = pageInfoBuilder.build();
         } else {
             pageInfo = new PageInfo(1, 1, resultsPerPage);
         }

@@ -6,7 +6,6 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.common.params.CursorMarkParams;
 
 /**
  * Converts a {@link QueryRequest} into a {@link SolrQuery} object.
@@ -47,11 +46,13 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
         solrQuery.setRequestHandler(requestHandler);
 
         Page page = request.getPage();
+        SolrPageVisitor v = new SolrPageVisitor();
+        page.accept(v, solrQuery);
 
-        if (page != null) {
-            solrQuery.setStart(calculateRowsFromPage(page.getPageNumber(), page.getPageSize()));
-            solrQuery.setRows(page.getPageSize());
-        }
+//        if (page != null) {
+//            solrQuery.setStart(calculateRowsFromPage(page.getPageNumber(), page.getPageSize()));
+//            solrQuery.setRows(page.getPageSize());
+//        }
 
         List<QuickGOQuery> filterQueries = request.getFilters();
 
@@ -83,14 +84,14 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
             solrQuery.setParam(FACET_ANALYTICS_ID, aggregateConverter.convert(request.getAggregate()));
         }
 
-        if (request.getCursor() != null && !request.getCursor().isEmpty()) {
-            solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, request.getCursor());
-        }
+//        if (request.getCursor() != null && !request.getCursor().isEmpty()) {
+//            solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, request.getCursor());
+//        }
 
         return solrQuery;
     }
 
-    private int calculateRowsFromPage(int page, int numRows) {
-        return page == 0 ? 0 : (page - 1) * numRows;
-    }
+//    private int calculateRowsFromPage(int page, int numRows) {
+//        return page == 0 ? 0 : (page - 1) * numRows;
+//    }
 }

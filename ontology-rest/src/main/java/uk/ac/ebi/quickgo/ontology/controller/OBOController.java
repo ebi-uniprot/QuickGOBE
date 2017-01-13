@@ -20,6 +20,7 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import io.swagger.annotations.ApiOperation;
@@ -45,7 +46,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
-import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createPage;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 
 /**
@@ -129,7 +129,7 @@ public abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType(getOntologyType(),
-                createPage(page, MAX_PAGE_RESULTS)), HttpStatus.OK);
+                new RegularPage(page, MAX_PAGE_RESULTS)), HttpStatus.OK);
     }
 
     /**
@@ -498,7 +498,7 @@ public abstract class OBOController<T extends OBOTerm> {
 
         QueryRequest.Builder builder = new QueryRequest
                 .Builder(restrictedUserQuery)
-                .setPage(createPage(page, limit));
+                .setPage(new RegularPage(page, limit));
 
         if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
             ontologyRetrievalConfig.getSearchReturnedFields()
