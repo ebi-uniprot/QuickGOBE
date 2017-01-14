@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
  * Contains the paging information for a {@link QueryResult}.
  */
 public class PageInfo {
-    // change current page -> pageposition and have two subclasses, cursorposition and regularposition
+    // todo: change current page -> pageposition and have two subclasses, cursorposition and regularposition
     private final int totalPages;
     private final int currentPage;
     private final int resultsPerPage;
