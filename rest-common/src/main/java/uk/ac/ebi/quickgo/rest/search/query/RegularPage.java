@@ -1,23 +1,23 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Created 13/01/17
  * @author Edd
  */
 public class RegularPage extends Page {
-    private final int pageNum;
+    // todo add creation tests
+    private final int pageNumber;
 
-    private RegularPage(int pageSize) {
-        this(1, pageSize);
-    }
-
-    public RegularPage(int pageNum, int pageSize) {
+    public RegularPage(int pageNumber, int pageSize) {
         super(pageSize);
-        this.pageNum = pageNum;
+        Preconditions.checkArgument(pageNumber >= 0, "Page number cannot be less than 0");
+        this.pageNumber = pageNumber;
     }
 
     public int getPageNumber() {
-        return pageNum;
+        return pageNumber;
     }
 
     @Override public <V> void accept(PageVisitor<V> visitor, V subject) {
@@ -25,7 +25,7 @@ public class RegularPage extends Page {
     }
 
     @Override public int hashCode() {
-        return pageNum;
+        return pageNumber;
     }
 
     @Override public boolean equals(Object o) {
@@ -38,12 +38,12 @@ public class RegularPage extends Page {
 
         RegularPage that = (RegularPage) o;
 
-        return pageNum == that.pageNum;
+        return pageNumber == that.pageNumber;
     }
 
     @Override public String toString() {
         return "RegularPage{" +
-                "pageNum=" + pageNum +
+                "pageNumber=" + pageNumber +
                 '}';
     }
 }
