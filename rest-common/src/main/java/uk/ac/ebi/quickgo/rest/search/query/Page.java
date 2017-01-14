@@ -12,7 +12,6 @@ import com.google.common.base.Preconditions;
  * </ul>
  */
 public abstract class Page {
-//    private int pageNumber;
     private int pageSize;
 
     protected Page(int pageSize) {
