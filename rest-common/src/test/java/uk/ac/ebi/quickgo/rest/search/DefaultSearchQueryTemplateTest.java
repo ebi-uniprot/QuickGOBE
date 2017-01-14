@@ -1,23 +1,21 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.emptyIterable;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Created 11/04/16
+ *
  * @author Edd
  */
 public class DefaultSearchQueryTemplateTest {
@@ -97,30 +95,32 @@ public class DefaultSearchQueryTemplateTest {
     @Test
     public void queryRequestPageWasSetExplicitly() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
-        int page = 11;
-        requestBuilder.setPage(page);
-        assertThat(requestBuilder.build().getPage().getPageNumber(), is(page));
+        int pageNumber = 11;
+        int pageSize = 25;
+        RegularPage expectedPage = new RegularPage(pageNumber, pageSize);
+
+        Page abstractRetrievedPage = requestBuilder
+                .setPage(expectedPage)
+                .build()
+                .getPage();
+
+        assertThat(abstractRetrievedPage, is(instanceOf(RegularPage.class)));
+        RegularPage regularPageRetrieved = (RegularPage) abstractRetrievedPage;
+        assertThat(regularPageRetrieved.getPageNumber(), is(pageNumber));
+        assertThat(regularPageRetrieved.getPageSize(), is(pageSize));
     }
 
     @Test
     public void queryRequestPageWasSetByDefault() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
-        assertThat(requestBuilder.build().getPage().getPageNumber(),
-                is(DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER));
-    }
 
-    @Test
-    public void queryRequestPageSizeWasSetExplicitly() {
-        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
-        int pageSize = 11;
-        requestBuilder.setPageSize(pageSize);
-        assertThat(requestBuilder.build().getPage().getPageSize(), is(pageSize));
-    }
-
-    @Test
-    public void queryRequestPageSizeWasSetByDefault() {
-        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
-        assertThat(requestBuilder.build().getPage().getPageSize(), is(DefaultSearchQueryTemplate.DEFAULT_PAGE_SIZE));
+        Page abstractRetrievedPage = requestBuilder
+                .build()
+                .getPage();
+        assertThat(abstractRetrievedPage, is(instanceOf(RegularPage.class)));
+        RegularPage regularPageRetrieved = (RegularPage) abstractRetrievedPage;
+        assertThat(regularPageRetrieved.getPageNumber(), is(DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER));
+        assertThat(regularPageRetrieved.getPageSize(), is(DefaultSearchQueryTemplate.DEFAULT_PAGE_SIZE));
     }
 
     @Test
@@ -164,24 +164,38 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestUseCursorWasSet() {
-        QueryRequest queryRequest = createBuilder()
-                .useCursor()
-                .build();
+    public void queryRequestFirstCursorPageWasSet() {
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
+        int pageSize = 22;
+        CursorPage expectedPage = CursorPage.createFirstCursorPage(pageSize);
 
-        assertThat(queryRequest.getCursor(), is(QueryRequest.FIRST_CURSOR_POSITION));
-        assertThat(queryRequest.getPage().getPageNumber(), is(CURSOR_PAGE_NUMBER));
+        Page abstractRetrievedPage = requestBuilder
+                .setPage(expectedPage)
+                .build()
+                .getPage();
+
+        assertThat(abstractRetrievedPage, is(instanceOf(CursorPage.class)));
+        CursorPage cursorPageRetrieved = (CursorPage) abstractRetrievedPage;
+        assertThat(cursorPageRetrieved.getPageSize(), is(pageSize));
+        assertThat(cursorPageRetrieved.getCursor(), is(CursorPage.FIRST_CURSOR));
     }
 
     @Test
-    public void queryRequestCursorPositionWasSet() {
-        String cursorPosition = "fakeCursorPosition";
-        QueryRequest queryRequest = createBuilder()
-                .setCursorPosition(cursorPosition)
-                .build();
+    public void queryRequestCursorPageWasSet() {
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
+        int pageSize = 22;
+        String cursor = "fakeCursor";
+        CursorPage expectedPage = CursorPage.createCursorPage(cursor, pageSize);
 
-        assertThat(queryRequest.getCursor(), is(cursorPosition));
-        assertThat(queryRequest.getPage().getPageNumber(), is(CURSOR_PAGE_NUMBER));
+        Page abstractRetrievedPage = requestBuilder
+                .setPage(expectedPage)
+                .build()
+                .getPage();
+
+        assertThat(abstractRetrievedPage, is(instanceOf(CursorPage.class)));
+        CursorPage cursorPageRetrieved = (CursorPage) abstractRetrievedPage;
+        assertThat(cursorPageRetrieved.getPageSize(), is(pageSize));
+        assertThat(cursorPageRetrieved.getCursor(), is(cursor));
     }
 
     private DefaultSearchQueryTemplate.Builder createBuilder() {

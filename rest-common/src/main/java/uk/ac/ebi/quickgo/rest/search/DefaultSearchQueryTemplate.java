@@ -4,10 +4,6 @@ import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.*;
 
-import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createCursorPage;
-import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createPage;
-import static uk.ac.ebi.quickgo.rest.search.query.QueryRequest.FIRST_CURSOR_POSITION;
-
 /**
  * Records common configuration details required to create a {@link QueryRequest} instance,
  * and provides a {@link SearchQueryRequestBuilder} instance that can be used to build
@@ -32,12 +28,14 @@ public class DefaultSearchQueryTemplate {
     private String highlightEndDelim;
     private Iterable<String> returnedFields;
     private Iterable<String> highlightedFields;
+    private Page page;
 
     public DefaultSearchQueryTemplate() {
         this.returnedFields = Collections.emptyList();
         this.highlightedFields = Collections.emptyList();
         this.highlightStartDelim = "";
         this.highlightEndDelim = "";
+        this.page = new RegularPage(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
     }
 
     public void setHighlighting(Collection<String> highlightedFields, String highlightStartDelim,
@@ -66,7 +64,8 @@ public class DefaultSearchQueryTemplate {
                 returnedFields,
                 highlightedFields,
                 highlightStartDelim,
-                highlightEndDelim);
+                highlightEndDelim,
+                page);
     }
 
     public static class Builder implements SearchQueryRequestBuilder {
@@ -79,17 +78,16 @@ public class DefaultSearchQueryTemplate {
         private final Set<String> facets;
         private QuickGOQuery query;
 
-        private int page = DEFAULT_PAGE_NUMBER;
-        private int pageSize = DEFAULT_PAGE_SIZE;
+        private Page page;
         private boolean highlighting;
         private AggregateRequest aggregate;
-        private String cursor;
 
         private Builder(
                 Iterable<String> returnedFields,
                 Iterable<String> highlightedFields,
                 String highlightStartDelim,
-                String highlightEndDelim) {
+                String highlightEndDelim,
+                Page page) {
             this.highlightedFields = highlightedFields;
             this.highlightStartDelim = highlightStartDelim;
             this.highlightEndDelim = highlightEndDelim;
@@ -98,6 +96,7 @@ public class DefaultSearchQueryTemplate {
             this.facets = new HashSet<>();
             this.filterQueries = new HashSet<>();
             this.highlighting = NO_HIGHLIGHTING;
+            this.page = page;
         }
 
         /**
@@ -153,23 +152,12 @@ public class DefaultSearchQueryTemplate {
         }
 
         /**
-         * Specify the number of results to be returned per page, i.e., page size.
-         *
-         * @param pageSize the page size.
-         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
-         */
-        public DefaultSearchQueryTemplate.Builder setPageSize(int pageSize) {
-            this.pageSize = pageSize;
-            return this;
-        }
-
-        /**
          * Specify which page of results to return.
          *
          * @param page the page of results to return.
          * @return this {@link DefaultSearchQueryTemplate.Builder} instance
          */
-        public DefaultSearchQueryTemplate.Builder setPage(int page) {
+        public DefaultSearchQueryTemplate.Builder setPage(Page page) {
             this.page = page;
             return this;
         }
@@ -182,26 +170,6 @@ public class DefaultSearchQueryTemplate {
          */
         public DefaultSearchQueryTemplate.Builder setAggregate(AggregateRequest aggregate) {
             this.aggregate = aggregate;
-            return this;
-        }
-
-        /**
-         * Specifies that the request should return both the current page of results,
-         * in addition to a cursor to the next page of results.
-         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
-         */
-        public DefaultSearchQueryTemplate.Builder useCursor() {
-            this.cursor = FIRST_CURSOR_POSITION;
-            return this;
-        }
-
-        /**
-         * Specifies that the request should return the next page of results starting from
-         * the {@code cursor} position, in addition to a cursor to the next page of results.
-         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
-         */
-        public DefaultSearchQueryTemplate.Builder setCursorPosition(String cursor) {
-            this.cursor = cursor;
             return this;
         }
 
@@ -224,40 +192,9 @@ public class DefaultSearchQueryTemplate {
 
             builder.setAggregate(aggregate);
 
-            setStartPositionAndResultsSize(builder);
+            builder.setPage(page);
 
             return builder.build();
-        }
-
-        /**
-         * <p>Sets the start position of the results to fetch, in addition to the
-         * number of results.
-         * <p>If a cursor is being used to indicate the start point, a {@link Page} created via
-         * {@link uk.ac.ebi.quickgo.rest.search.query.PageFactory#createCursorPage(int)} is used. Otherwise,
-         * a standard page is created via {@link uk.ac.ebi.quickgo.rest.search.query.PageFactory#createPage(int, int)}.
-         */
-        void setStartPositionAndResultsSize(QueryRequest.Builder builder) {
-            Page pageRequest;
-            if (isFirstCursorRequest()) {
-                builder.useCursor();
-                pageRequest = createCursorPage(pageSize);
-                new CursorPage()
-            } else if (isCursorRequest()) {
-                builder.setCursorPosition(cursor);
-                pageRequest = createCursorPage(pageSize);
-            } else {
-                pageRequest = createPage(page, pageSize);
-            }
-
-            builder.setPage(pageRequest);
-        }
-
-        private boolean isFirstCursorRequest() {
-            return cursor != null && cursor.equals(FIRST_CURSOR_POSITION);
-        }
-
-        private boolean isCursorRequest() {
-            return cursor != null && !cursor.isEmpty();
         }
 
         @Override public QueryRequest.Builder builder() {
