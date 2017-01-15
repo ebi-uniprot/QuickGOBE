@@ -111,7 +111,9 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
         @Override public void visit(CursorPage page, SolrQuery subject) {
             subject.setRows(page.getPageSize());
             subject.set(CursorMarkParams.CURSOR_MARK_PARAM, page.getCursor());
-            // todo: introduce configurable value for sorting
+            // todo: could put two here: by default, assume an ID, which is the unique identifier
+            // todo: and also by rownumber -- should these be configurable?
+            // todo: check solradmin behaviour: specify cursormark with just id, and see if results are in row number order (due to request handler)
             subject.addSort("id", SolrQuery.ORDER.asc);
         }
 
