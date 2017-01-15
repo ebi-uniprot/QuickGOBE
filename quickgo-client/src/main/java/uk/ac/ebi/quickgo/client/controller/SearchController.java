@@ -1,24 +1,7 @@
 package uk.ac.ebi.quickgo.client.controller;
 
-import uk.ac.ebi.quickgo.client.model.ontology.OntologyRequest;
-import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
-import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.ParameterBindingException;
-import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
-import uk.ac.ebi.quickgo.rest.search.SearchService;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
-import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
-import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
-
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +12,24 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import uk.ac.ebi.quickgo.client.model.ontology.OntologyRequest;
+import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
+import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.ParameterBindingException;
+import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
+import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
+import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+
+import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 
@@ -88,8 +89,7 @@ public class SearchController {
                 .addFacets(request.getFacet() == null ? null : Arrays.asList(request.getFacet()))
                 .addFilters(convertFilterRequestsToQueries(request.createFilterRequests()))
                 .useHighlighting(request.isHighlighting())
-                .setPage(request.getPage())
-                .setPageSize(request.getLimit());
+                .setPage(new RegularPage(request.getPage(), request.getLimit()));
 
         return search(requestBuilder.build(), ontologySearchService);
     }
