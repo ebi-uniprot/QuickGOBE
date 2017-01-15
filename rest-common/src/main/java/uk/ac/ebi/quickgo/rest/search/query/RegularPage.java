@@ -3,11 +3,13 @@ package uk.ac.ebi.quickgo.rest.search.query;
 import com.google.common.base.Preconditions;
 
 /**
+ * Represents a regular requested page where the starting page number and
+ * page size can be configured.
+ *
  * Created 13/01/17
  * @author Edd
  */
 public class RegularPage extends Page {
-    // todo add creation tests
     private final int pageNumber;
 
     public RegularPage(int pageNumber, int pageSize) {

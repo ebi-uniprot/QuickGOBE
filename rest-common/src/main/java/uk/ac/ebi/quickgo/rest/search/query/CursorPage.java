@@ -3,11 +3,13 @@ package uk.ac.ebi.quickgo.rest.search.query;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
+ * Represents a requested page where the starting position is represented by a
+ * cursor position, and where it is also possible to specify the page size.
+ *
  * Created 13/01/17
  * @author Edd
  */
 public class CursorPage extends Page {
-    // todo add creation tests
     public static final String FIRST_CURSOR = "*";
     private final String cursor;
 
@@ -21,10 +23,31 @@ public class CursorPage extends Page {
         this.cursor = cursor;
     }
 
+    /**
+     * Creates the first page instance to be used in a page request, that wants to utilise
+     * cursor based paging. The {@link uk.ac.ebi.quickgo.rest.search.results.QueryResult}'s
+     * {@link uk.ac.ebi.quickgo.rest.search.results.PageInfo} will contain a corresponding
+     * value indicating the location of the next cursor.
+     *
+     * @param pageSize the maximum number of results to include in the page of results
+     * @return the new instance
+     */
     public static CursorPage createFirstCursorPage(int pageSize) {
         return new CursorPage(pageSize);
     }
 
+    /**
+     * Creates page instances, used in a page request, where the starting cursor position can
+     * be specified. Note, it is therefore necessary to call use this method <i>after</i> results
+     * have been obtained from an initial page request, created via {@link #createFirstCursorPage(int)}.
+     * The {@link uk.ac.ebi.quickgo.rest.search.results.QueryResult}'s
+     * {@link uk.ac.ebi.quickgo.rest.search.results.PageInfo} will contain a corresponding
+     * value indicating the location of the next cursor.
+     *
+     * @param cursor the cursor from where to fetch the next result set
+     * @param pageSize the maximum number of results to include in the page of results
+     * @return the new instance
+     */
     public static CursorPage createCursorPage(String cursor, int pageSize) {
         return new CursorPage(cursor, pageSize);
     }

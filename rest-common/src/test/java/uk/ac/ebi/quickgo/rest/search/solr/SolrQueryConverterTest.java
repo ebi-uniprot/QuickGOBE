@@ -1,21 +1,20 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
-import uk.ac.ebi.quickgo.rest.search.query.*;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.junit.Before;
 import org.junit.Test;
+import uk.ac.ebi.quickgo.rest.search.query.CursorPage;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
-import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.CURSOR_PAGE_NUMBER;
-import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createCursorPage;
-import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createPage;
+import static org.hamcrest.Matchers.*;
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
 
 /**
  * Tests the implementations of the {@link SolrQueryConverter} implementation.
@@ -69,7 +68,7 @@ public class SolrQueryConverterTest {
         int pageSize = 25;
 
         QueryRequest request = new QueryRequest.Builder(fieldQuery)
-                .setPage(createPage(currentPage, pageSize))
+                .setPage(new RegularPage(currentPage, pageSize))
                 .build();
 
         SolrQuery query = converter.convert(request);
@@ -207,15 +206,14 @@ public class SolrQueryConverterTest {
         int pageSize = 10;
         QueryRequest request = new QueryRequest
                 .Builder(fieldQuery)
-                .useCursor()
-                .setPage(createCursorPage(pageSize))
+                .setPage(createFirstCursorPage(pageSize))
                 .build();
 
         SolrQuery query = converter.convert(request);
 
-        assertThat(query.get(CursorMarkParams.CURSOR_MARK_PARAM), is(QueryRequest.FIRST_CURSOR_POSITION));
+        assertThat(query.get(CursorMarkParams.CURSOR_MARK_PARAM), is(CursorPage.FIRST_CURSOR));
         assertThat(query.getRows(), is(pageSize));
-        assertThat(query.getStart(), is(CURSOR_PAGE_NUMBER));
+        assertThat(query.getStart(), is(nullValue()));
     }
 
     @Test
@@ -226,15 +224,14 @@ public class SolrQueryConverterTest {
         String cursor = "fakeCursor";
         QueryRequest request = new QueryRequest
                 .Builder(fieldQuery)
-                .setCursorPosition(cursor)
-                .setPage(createCursorPage(pageSize))
+                .setPage(createCursorPage(cursor, pageSize))
                 .build();
 
         SolrQuery query = converter.convert(request);
 
         assertThat(query.get(CursorMarkParams.CURSOR_MARK_PARAM), is(cursor));
         assertThat(query.getRows(), is(pageSize));
-        assertThat(query.getStart(), is(CURSOR_PAGE_NUMBER));
+        assertThat(query.getStart(), is(nullValue()));
     }
 
     private QuickGOQuery createBasicQuery() {

@@ -1,18 +1,18 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
+import com.google.common.base.Preconditions;
+import org.apache.solr.client.solrj.SolrResponse;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import uk.ac.ebi.quickgo.rest.search.QueryResultConverter;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 import uk.ac.ebi.quickgo.rest.search.results.*;
 import uk.ac.ebi.quickgo.rest.search.results.Facet;
 
-import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.apache.solr.client.solrj.SolrResponse;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
 
 /**
  * Abstract class that deals with the conversion of the non type specific aspects of a {@link QueryResult}.
@@ -25,14 +25,15 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
 
     private AggregationConverter<SolrResponse, AggregateResponse> aggregationConverter;
 
-    @Override public QueryResult<T> convert(QueryResponse toConvert, QueryRequest request) {
-        Preconditions.checkArgument(toConvert != null, "Query response cannot be null");
+    @Override
+    public QueryResult<T> convert(QueryResponse response, QueryRequest request) {
+        Preconditions.checkArgument(response != null, "Query response cannot be null");
         Preconditions.checkArgument(request != null, "Query request cannot be null");
 
-        SolrDocumentList solrResults = toConvert.getResults();
-        Page page = request.getPage();
-        List<FacetField> facetFieldResults = toConvert.getFacetFields();
-        Map<String, Map<String, List<String>>> resultHighlights = toConvert.getHighlighting();
+        SolrDocumentList solrResults = response.getResults();
+        Page requestPage = request.getPage();
+        List<FacetField> facetFieldResults = response.getFacetFields();
+        Map<String, Map<String, List<String>>> resultHighlights = response.getHighlighting();
 
         long totalNumberOfResults = 0;
 
@@ -47,8 +48,8 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
 
         PageInfo pageInfo = null;
 
-        if (page != null) {
-            pageInfo = convertPage(page, totalNumberOfResults);
+        if (requestPage != null) {
+            pageInfo = convertPage(requestPage, response, totalNumberOfResults);
         }
 
         Facet facet = null;
@@ -66,17 +67,14 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
         AggregateResponse aggregation = null;
 
         if (aggregationConverter != null) {
-            aggregation = aggregationConverter.convert(toConvert);
+            aggregation = aggregationConverter.convert(response);
         }
-
-        String nextCursorMark = toConvert.getNextCursorMark();
 
         return new QueryResult.Builder<>(totalNumberOfResults, results)
                 .withPageInfo(pageInfo)
                 .withFacets(facet)
                 .withAggregation(aggregation)
                 .appendHighlights(highlights)
-                .withNextCursor(nextCursorMark)
                 .build();
     }
 
@@ -113,44 +111,20 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
         return domainFieldFacet;
     }
 
-    private PageInfo convertPage(Page page, long totalNumberOfResults) {
+    private PageInfo convertPage(Page page, QueryResponse response, long totalNumberOfResults) {
         PageInfo pageInfo;
 
         int resultsPerPage = page.getPageSize();
 
-        PageInfo.Builder pageInfoBuilder = new PageInfo.Builder();
         if (resultsPerPage > 0) {
             int totalPages = (int) Math.ceil((double) totalNumberOfResults / (double) resultsPerPage);
-
-            page.accept(new PageVisitor<PageInfo.Builder>() {
-                @Override public void visit(RegularPage page, PageInfo.Builder subject) {
-                    Preconditions.checkArgument((page.getPageNumber() - 1) <= totalPages,
-                            "The requested page number should not be greater than the number of pages available.");
-                    int currentPage = totalPages == 0 ? 0 : page.getPageNumber();
-                    subject.setTotalPages(totalPages)
-                            .setCurrentPage(currentPage)
-                            // .setCurrentPage(new RegularPosition(currentPage))
-                            .setResultsPerPage(resultsPerPage);
-                }
-
-                @Override public void visit(CursorPage page, PageInfo.Builder subject) {
-                    Preconditions.checkArgument((page.getCursor() != null && !page.getCursor().isEmpty()),
-                            "The requested page number should not be greater than the number of pages available.");
-                    subject.setTotalPages(totalPages)
-                             //.setCurrentPage(new CursorPosition(page.getCursor()))
-                            .setResultsPerPage(resultsPerPage);
-                }
-            }, pageInfoBuilder);
-
-
-//            Preconditions.checkArgument((page.getPageNumber() - 1) <= totalPages,
-//                    "The requested page number should not be greater than the number of pages available.");
-//            int currentPage = totalPages == 0 ? 0 : page.getPageNumber();
-
-//            pageInfo = new PageInfo(totalPages, currentPage, resultsPerPage);
-            pageInfo = pageInfoBuilder.build();
+            pageInfo = createPageInfo(page, response, totalPages);
         } else {
-            pageInfo = new PageInfo(1, 1, resultsPerPage);
+            pageInfo = new PageInfo.Builder()
+                    .withCurrentPage(1)
+                    .withTotalPages(1)
+                    .withResultsPerPage(resultsPerPage)
+                    .build();
         }
 
         return pageInfo;
@@ -170,5 +144,40 @@ public abstract class AbstractSolrQueryResultConverter<T> implements QueryResult
         if (aggregationConverter != null) {
             this.aggregationConverter = aggregationConverter;
         }
+    }
+
+    /**
+     * Creates a {@link uk.ac.ebi.quickgo.rest.search.results.PageInfo} with appropriate
+     * values according to the type of {@link Page} initially requested, the response,
+     * and the total number of pages.
+     *
+     * @param page            the page
+     * @param response        the response
+     * @param totalPages      the total number of pages of results
+     */
+    private PageInfo createPageInfo(Page page, QueryResponse response, final int totalPages) {
+        PageInfo.Builder pageInfoBuilder = new PageInfo.Builder();
+        pageInfoBuilder
+                .withTotalPages(totalPages)
+                .withResultsPerPage(page.getPageSize());
+
+        page.accept(new PageVisitor<PageInfo.Builder>() {
+            @Override
+            public void visit(RegularPage page, PageInfo.Builder subject) {
+                Preconditions.checkArgument((page.getPageNumber() - 1) <= totalPages,
+                        "The requested page number should not be greater than the number of pages available.");
+                int currentPage = totalPages == 0 ? 0 : page.getPageNumber();
+                subject.withCurrentPage(currentPage);
+            }
+
+            @Override
+            public void visit(CursorPage page, PageInfo.Builder subject) {
+                Preconditions.checkArgument((page.getCursor() != null && !page.getCursor().isEmpty()),
+                        "The cursor cannot be null or empty.");
+                subject.withNextCursor(response.getNextCursorMark());
+            }
+        }, pageInfoBuilder);
+
+        return pageInfoBuilder.build();
     }
 }

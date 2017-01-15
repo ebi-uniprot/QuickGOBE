@@ -20,9 +20,9 @@ public abstract class Page {
         this.pageSize = pageSize;
     }
 
-    public abstract <V> void accept(PageVisitor<V> visitor, V subject);
-
     public int getPageSize() {
         return this.pageSize;
     }
+
+    public abstract <V> void accept(PageVisitor<V> visitor, V subject);
 }

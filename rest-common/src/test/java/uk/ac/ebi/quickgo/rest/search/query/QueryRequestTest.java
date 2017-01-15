@@ -1,15 +1,17 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
 import org.junit.Test;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createCursorPage;
-import static uk.ac.ebi.quickgo.rest.search.query.PageFactory.createPage;
+import static org.hamcrest.Matchers.equalTo;
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.*;
 
 /**
  * Tests the {@link QueryRequest} implementation
@@ -36,22 +38,26 @@ public class QueryRequestTest {
     public void invalidPageParametersThrowsException() throws Exception {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
 
-        new QueryRequest.Builder(query).setPage(createPage(-1, 2)).build();
+        new QueryRequest.Builder(query).setPage(new RegularPage(-1, 2)).build();
     }
 
     @Test
-    public void buildsQueryRequestWithQueryAndPageParameterComponents() throws Exception {
+    public void buildsQueryRequestWithQueryAndRegularPageParameterComponents() throws Exception {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
 
+        int pageNumber = 1;
+        int pageSize = 2;
         QueryRequest request = new QueryRequest.Builder(query)
-                .setPage(createPage(1, 2))
+                .setPage(new RegularPage(pageNumber, pageSize))
                 .build();
 
         assertThat(request.getQuery(), is(equalTo(query)));
 
-        Page expectedPage = request.getPage();
-        assertThat(expectedPage.getPageNumber(), is(1));
-        assertThat(expectedPage.getPageSize(), is(2));
+        Page requestPage = request.getPage();
+        assertThat(requestPage, is(instanceOf(RegularPage.class)));
+        RegularPage expectedPage = (RegularPage) requestPage;
+        assertThat(expectedPage.getPageNumber(), is(pageNumber));
+        assertThat(expectedPage.getPageSize(), is(pageSize));
 
         assertThat(request.getFacets(), hasSize(0));
         assertThat(request.getFilters(), hasSize(0));
@@ -162,67 +168,32 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithCursorUsage() {
+    public void buildsQueryWithFirstCursor() {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        int pageSize = 25;
         QueryRequest request = new QueryRequest.Builder(query)
-                .useCursor()
+                .setPage(createFirstCursorPage(pageSize))
                 .build();
 
-        assertThat(request.getCursor(), is(QueryRequest.FIRST_CURSOR_POSITION));
+        Page requestPage = request.getPage();
+        assertThat(requestPage, is(instanceOf(CursorPage.class)));
+        assertThat(((CursorPage) requestPage).getCursor(), is(FIRST_CURSOR));
+        assertThat(requestPage.getPageSize(), is(pageSize));
     }
 
     @Test
-    public void buildsQueryWithNextCursorSpecified() {
+    public void buildsQueryWithNextCursor() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+        int pageSize = 25;
         String cursor = "fakeCursor";
-
-        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
         QueryRequest request = new QueryRequest.Builder(query)
-                .setCursorPosition(cursor)
+                .setPage(createCursorPage(cursor, pageSize))
                 .build();
 
-        assertThat(request.getCursor(), is(cursor));
-    }
-
-    @Test
-    public void buildsQueryWithCursorAndPageSize() {
-        String cursor = "fakeCursor";
-        int pageSize = 10;
-
-        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
-        QueryRequest request = new QueryRequest.Builder(query)
-                .setPage(createCursorPage(pageSize))
-                .setCursorPosition(cursor)
-                .build();
-
-        assertThat(request.getCursor(), is(cursor));
-        assertThat(request.getPage().getPageNumber(), is(0));
-        assertThat(request.getPage().getPageSize(), is(pageSize));
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void buildingAQueryThatSetsCursorThenStartPageCausesIllegalStateException() {
-        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
-        new QueryRequest.Builder(query)
-                .setCursorPosition("fakeCursor")
-                .setPage(createPage(1, 10))
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void buildingAQueryThatSetsStartPageThenCursorCausesIllegalStateException() {
-        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
-        new QueryRequest.Builder(query)
-                .setPage(createPage(1, 10))
-                .setCursorPosition("fakeCursor")
-                .build();
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullCursorPositionCausesIllegalArgument() {
-        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
-        new QueryRequest.Builder(query)
-                .setCursorPosition(null)
-                .build();
+        Page requestPage = request.getPage();
+        assertThat(requestPage, is(instanceOf(CursorPage.class)));
+        assertThat(((CursorPage) requestPage).getCursor(), is(cursor));
+        assertThat(requestPage.getPageSize(), is(pageSize));
     }
 
     private Collection<String> extractFacetFields(Collection<Facet> facets) {

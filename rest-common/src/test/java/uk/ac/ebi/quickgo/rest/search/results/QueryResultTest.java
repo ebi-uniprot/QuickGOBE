@@ -1,12 +1,13 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.nullValue;
@@ -66,14 +67,17 @@ public class QueryResultTest {
         assertThat(result.getPageInfo(), is(nullValue()));
         assertThat(result.getFacet(), is(nullValue()));
         assertThat(result.getHighlighting(), is(emptyIterable()));
-        assertThat(result.getCursor(), is(nullValue()));
     }
 
     @Test
     public void validFullQueryResult() throws Exception {
         long numberOfHits = 2;
         List<String> results = Arrays.asList("result1", "result2");
-        uk.ac.ebi.quickgo.rest.search.results.PageInfo pageInfo = new PageInfo(1, 1, 5);
+        uk.ac.ebi.quickgo.rest.search.results.PageInfo pageInfo = new PageInfo.Builder()
+                .withTotalPages(1)
+                .withCurrentPage(1)
+                .withResultsPerPage(5)
+                .build();
         Facet facet = new Facet();
         List<DocHighlight> highlights = new ArrayList<>();
 
@@ -88,20 +92,5 @@ public class QueryResultTest {
         assertThat(result.getPageInfo(), is(pageInfo));
         assertThat(result.getFacet(), is(facet));
         assertThat(result.getHighlighting(), is(highlights));
-    }
-
-    @Test
-    public void validQueryResultWithNextCursor() {
-        long numberOfHits = 2;
-        List<String> results = Arrays.asList("result1", "result2");
-        String nextCursor = "fakeCursor";
-
-        QueryResult<String> result = new QueryResult.Builder<>(numberOfHits, results)
-                .withNextCursor(nextCursor)
-                .build();
-
-        assertThat(result.getCursor(), is(nextCursor));
-        assertThat(result.getResults(), is(results));
-        assertThat(result.getNumberOfHits(), is(numberOfHits));
     }
 }

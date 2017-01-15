@@ -9,8 +9,6 @@ import java.util.*;
  */
 public class QueryRequest {
 
-    public static final String FIRST_CURSOR_POSITION = "*";
-
     private final QuickGOQuery query;
     private final Page page;
     private final List<Facet> facets;
