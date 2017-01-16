@@ -12,8 +12,11 @@ import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,8 +36,11 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String RESOURCE_URL = "/ontology/go";
     private static final String GO_0000001 = "GO:0000001";
     private static final String GO_0000002 = "GO:0000002";
+    private static final String GO_0000003 = "GO:0000003";
+    private static final String GO_0000004 = "GO:0000004";
 
-    @Test
+
+        @Test
     public void canRetrieveBlacklistByIds() throws Exception {
         ResultActions response = mockMvc.perform(get(
                 buildTermsURLWithSubResource(toCSV(GO_0000001, GO_0000002), CONSTRAINTS_SUB_RESOURCE)));
@@ -96,7 +102,9 @@ public class GOControllerIT extends OBOControllerIT {
     protected List<OntologyDocument> createBasicDocs() {
         return Arrays.asList(
                 OntologyDocMocker.createGODoc(GO_0000001, "go name 1"),
-                OntologyDocMocker.createGODoc(GO_0000002, "go name 2"));
+                OntologyDocMocker.createGODoc(GO_0000002, "go name 2"),
+                OntologyDocMocker.createGODoc(GO_0000003, "go name 3"),
+                OntologyDocMocker.createGODoc(GO_0000004, "go name 4"));
     }
 
     @Override
