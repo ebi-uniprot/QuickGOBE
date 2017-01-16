@@ -70,7 +70,7 @@ public class PageInfoTest {
         int currentPage = 2;
         int resultsPerPage = 1;
 
-        thrown.expect(IllegalStateException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Current page cannot be larger than total amount of pages");
 
         new PageInfo.Builder()
@@ -87,7 +87,7 @@ public class PageInfoTest {
         int resultsPerPage = 1;
         String cursor = "fakeCursor";
 
-        thrown.expect(IllegalStateException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot set both next cursor and current page");
 
         new PageInfo.Builder()
@@ -105,7 +105,7 @@ public class PageInfoTest {
         int resultsPerPage = 1;
         String cursor = "fakeCursor";
 
-        thrown.expect(IllegalStateException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot set both current page and next cursor");
 
         new PageInfo.Builder()

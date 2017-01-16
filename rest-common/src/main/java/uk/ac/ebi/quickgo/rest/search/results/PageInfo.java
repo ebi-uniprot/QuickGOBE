@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Contains the paging information for a {@link QueryResult}.
@@ -78,26 +77,26 @@ public class PageInfo {
 
         public Builder withCurrentPage(int currentPage) {
             checkArgument(currentPage >= 0, "Current page cannot be negative: " + currentPage);
-            checkState(nextCursor == null, "Cannot set both current page and next cursor");
+            checkArgument(nextCursor == null, "Cannot set both current page and next cursor");
             this.currentPage = currentPage;
             return this;
         }
 
         public Builder withNextCursor(String cursor) {
             checkArgument(cursor != null && !cursor.isEmpty(), "Next cursor cannot be null or empty: " + cursor);
-            checkState(currentPage == UNINITIALISED_PAGE_NUMBER, "Cannot set both next cursor and current page");
+            checkArgument(currentPage == UNINITIALISED_PAGE_NUMBER, "Cannot set both next cursor and current page");
             this.nextCursor = cursor;
             this.currentPage = CURSOR_PAGE_NUMBER;
             return this;
         }
 
-        private void validateState() {
-            checkState(totalPages >= currentPage, "Current page cannot be larger than total amount of pages: " +
+        private void validateSuppliedArguments() {
+            checkArgument(totalPages >= currentPage, "Current page cannot be larger than total amount of pages: " +
                     "[current: " + currentPage + ", total: " + totalPages + "]");
         }
 
         public PageInfo build() {
-            validateState();
+            validateSuppliedArguments();
             return new PageInfo(this);
         }
     }
