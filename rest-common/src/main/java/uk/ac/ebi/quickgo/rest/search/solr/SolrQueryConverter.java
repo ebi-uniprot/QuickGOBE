@@ -1,12 +1,12 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
-import com.google.common.base.Preconditions;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.common.params.CursorMarkParams;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.common.params.CursorMarkParams;
 
 /**
  * Converts a {@link QueryRequest} into a {@link SolrQuery} object.
@@ -83,7 +83,23 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
             solrQuery.setParam(FACET_ANALYTICS_ID, aggregateConverter.convert(request.getAggregate()));
         }
 
+        if (!request.getSortCriteria().isEmpty()) {
+            request.getSortCriteria().forEach(criterion ->
+                    solrQuery.addSort(criterion.getSortField().getField(), sortOrderOf(criterion.getSortOrder())));
+        }
+
         return solrQuery;
+    }
+
+    private SolrQuery.ORDER sortOrderOf(SortCriterion.SortOrder sortOrder) {
+        switch (sortOrder) {
+            case ASC:
+                return SolrQuery.ORDER.asc;
+            case DESC:
+                return SolrQuery.ORDER.desc;
+            default:
+                throw new IllegalStateException("Unknown sort order specified");
+        }
     }
 
     /**
@@ -114,7 +130,7 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
             // todo: could put two here: by default, assume an ID, which is the unique identifier
             // todo: and also by rownumber -- should these be configurable?
             // todo: check solradmin behaviour: specify cursormark with just id, and see if results are in row number order (due to request handler)
-            subject.addSort("id", SolrQuery.ORDER.asc);
+//            subject.addSort("id", SolrQuery.ORDER.asc);
         }
 
         private int calculateRowsFromPage(int page, int numRows) {

@@ -28,6 +28,7 @@ public class DefaultSearchQueryTemplate {
     private String highlightEndDelim;
     private Iterable<String> returnedFields;
     private Iterable<String> highlightedFields;
+    private List<SortCriterion> sortCriteria;
     private Page page;
 
     public DefaultSearchQueryTemplate() {
@@ -36,6 +37,7 @@ public class DefaultSearchQueryTemplate {
         this.highlightStartDelim = "";
         this.highlightEndDelim = "";
         this.page = new RegularPage(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
+        this.sortCriteria = new ArrayList<>();
     }
 
     public void setHighlighting(Collection<String> highlightedFields, String highlightStartDelim,
@@ -59,13 +61,12 @@ public class DefaultSearchQueryTemplate {
         }
     }
 
+    public void addSortCriterion(String field, SortCriterion.SortOrder order) {
+        this.sortCriteria.add(new SortCriterion(field, order));
+    }
+
     public Builder newBuilder() {
-        return new Builder(
-                returnedFields,
-                highlightedFields,
-                highlightStartDelim,
-                highlightEndDelim,
-                page);
+        return new Builder(this);
     }
 
     public static class Builder implements SearchQueryRequestBuilder {
@@ -73,8 +74,9 @@ public class DefaultSearchQueryTemplate {
         private final String highlightEndDelim;
         private final Iterable<String> highlightedFields;
         private final Iterable<String> returnedFields;
-        private final Set<QuickGOQuery> filterQueries;
+        private final Set<SortCriterion> sortCriteria;
 
+        private final Set<QuickGOQuery> filterQueries;
         private final Set<String> facets;
         private QuickGOQuery query;
 
@@ -82,21 +84,19 @@ public class DefaultSearchQueryTemplate {
         private boolean highlighting;
         private AggregateRequest aggregate;
 
-        private Builder(
-                Iterable<String> returnedFields,
-                Iterable<String> highlightedFields,
-                String highlightStartDelim,
-                String highlightEndDelim,
-                Page page) {
-            this.highlightedFields = highlightedFields;
-            this.highlightStartDelim = highlightStartDelim;
-            this.highlightEndDelim = highlightEndDelim;
-            this.returnedFields = returnedFields;
+        private Builder(DefaultSearchQueryTemplate template) {
+            this.highlightedFields = template.highlightedFields;
+            this.highlightStartDelim = template.highlightStartDelim;
+            this.highlightEndDelim = template.highlightEndDelim;
+            this.returnedFields = template.returnedFields;
 
             this.facets = new HashSet<>();
             this.filterQueries = new HashSet<>();
             this.highlighting = NO_HIGHLIGHTING;
-            this.page = page;
+            this.page = template.page;
+
+            this.sortCriteria = new LinkedHashSet<>();
+            template.sortCriteria.forEach(sortCriteria::add);
         }
 
         /**
@@ -126,6 +126,19 @@ public class DefaultSearchQueryTemplate {
             if (filters != null) {
                 this.filterQueries.addAll(filters);
             }
+            return this;
+        }
+
+        /**
+         * Add a sort criteria that should be used.
+         *
+         * @param field the field to sort on
+         * @param sortOrder the sort order
+         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
+         */
+        public DefaultSearchQueryTemplate.Builder addSortCriterion(String field, SortCriterion.SortOrder sortOrder) {
+            this.sortCriteria.add(new SortCriterion(field, sortOrder));
+
             return this;
         }
 
@@ -193,6 +206,9 @@ public class DefaultSearchQueryTemplate {
             builder.setAggregate(aggregate);
 
             builder.setPage(page);
+
+            sortCriteria.forEach(criterion ->
+                    builder.addSortCriterion(criterion.getSortField().getField(), criterion.getSortOrder()));
 
             return builder.build();
         }

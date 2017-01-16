@@ -1,18 +1,19 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
+import uk.ac.ebi.quickgo.rest.search.query.*;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.quickgo.rest.search.query.CursorPage;
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
 
@@ -232,6 +233,79 @@ public class SolrQueryConverterTest {
         assertThat(query.get(CursorMarkParams.CURSOR_MARK_PARAM), is(cursor));
         assertThat(query.getRows(), is(pageSize));
         assertThat(query.getStart(), is(nullValue()));
+    }
+
+    @Test
+    public void convertQueryRequestWithZeroSortCriteria() {
+        QuickGOQuery fieldQuery = createBasicQuery();
+
+        QueryRequest request = new QueryRequest
+                .Builder(fieldQuery)
+                .build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.getSorts(), hasSize(0));
+    }
+
+    @Test
+    public void convertQueryRequestWithSortCriterion() {
+        QuickGOQuery fieldQuery = createBasicQuery();
+
+        String sortField = "field";
+        SortCriterion.SortOrder sortOrder = SortCriterion.SortOrder.ASC;
+        QueryRequest request = new QueryRequest
+                .Builder(fieldQuery)
+                .addSortCriterion(sortField, sortOrder)
+                .build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.getSorts(), hasSize(1));
+        checkSortCriterion(query.getSorts().get(0), sortField, sortOrder);
+    }
+
+    @Test
+    public void convertQueryRequestWithSortCriteria() {
+        QuickGOQuery fieldQuery = createBasicQuery();
+
+        String sortField0 = "field0";
+        SortCriterion.SortOrder sortOrder0 = SortCriterion.SortOrder.ASC;
+        String sortField1 = "fiel1";
+        SortCriterion.SortOrder sortOrder1 = SortCriterion.SortOrder.DESC;
+        String sortField2 = "field2";
+        SortCriterion.SortOrder sortOrder2 = SortCriterion.SortOrder.ASC;
+
+        QueryRequest request = new QueryRequest
+                .Builder(fieldQuery)
+                .addSortCriterion(sortField0, sortOrder0)
+                .addSortCriterion(sortField1, sortOrder1)
+                .addSortCriterion(sortField2, sortOrder2)
+                .build();
+
+        SolrQuery query = converter.convert(request);
+
+        assertThat(query.getSorts(), hasSize(3));
+        checkSortCriterion(query.getSorts().get(0), sortField0, sortOrder0);
+        checkSortCriterion(query.getSorts().get(1), sortField1, sortOrder1);
+        checkSortCriterion(query.getSorts().get(2), sortField2, sortOrder2);
+    }
+
+    private void checkSortCriterion(
+            SolrQuery.SortClause sortClause,
+            String sortField,
+            SortCriterion.SortOrder sortOrder) {
+        assertThat(sortClause.getItem(), is(sortField));
+        switch (sortClause.getOrder()) {
+            case desc:
+                assertThat(sortOrder, is(SortCriterion.SortOrder.DESC));
+                break;
+            case asc:
+                assertThat(sortOrder, is(SortCriterion.SortOrder.ASC));
+                break;
+            default:
+                throw new IllegalStateException("Could not verify sort criterion");
+        }
     }
 
     private QuickGOQuery createBasicQuery() {

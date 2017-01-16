@@ -1,15 +1,16 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -196,6 +197,81 @@ public class DefaultSearchQueryTemplateTest {
         CursorPage cursorPageRetrieved = (CursorPage) abstractRetrievedPage;
         assertThat(cursorPageRetrieved.getPageSize(), is(pageSize));
         assertThat(cursorPageRetrieved.getCursor(), is(cursor));
+    }
+
+    @Test
+    public void queryRequestWithNoSortingShowsZeroSortCriteria() {
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
+        List<SortCriterion> sortCriteria = requestBuilder.build().getSortCriteria();
+
+        assertThat(sortCriteria, hasSize(0));
+    }
+
+    @Test
+    public void queryRequestSortCriterionWasSetViaBuilder() {
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
+        String sortField = "field";
+        SortCriterion.SortOrder sortOrder = SortCriterion.SortOrder.DESC;
+        List<SortCriterion> sortCriteria =
+                requestBuilder
+                        .addSortCriterion(sortField, sortOrder)
+                        .build()
+                        .getSortCriteria();
+
+        assertThat(sortCriteria, hasSize(1));
+        checkSortCriterion(sortCriteria.get(0), sortField, sortOrder);
+    }
+
+    @Test
+    public void queryRequestSortCriteriaWereSetViaBuilder() {
+        DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
+        String sortField0 = "sortField0";
+        SortCriterion.SortOrder sortOrder0 = SortCriterion.SortOrder.ASC;
+        String sortField1 = "sortField1";
+        SortCriterion.SortOrder sortOrder1 = SortCriterion.SortOrder.DESC;
+        String sortField2 = "sortField2";
+        SortCriterion.SortOrder sortOrder2 = SortCriterion.SortOrder.ASC;
+
+        List<SortCriterion> sortCriteria =
+                requestBuilder
+                        .addSortCriterion(sortField0, sortOrder0)
+                        .addSortCriterion(sortField1, sortOrder1)
+                        .addSortCriterion(sortField2, sortOrder2)
+                        .build()
+                        .getSortCriteria();
+
+        assertThat(sortCriteria, hasSize(3));
+        checkSortCriterion(sortCriteria.get(0), sortField0, sortOrder0);
+        checkSortCriterion(sortCriteria.get(1), sortField1, sortOrder1);
+        checkSortCriterion(sortCriteria.get(2), sortField2, sortOrder2);
+    }
+
+    @Test
+    public void queryRequestSortCriteriaWasSetInTemplate() {
+        String sortField0 = "sortField0";
+        SortCriterion.SortOrder sortOrder0 = SortCriterion.SortOrder.ASC;
+        String sortField1 = "sortField1";
+        SortCriterion.SortOrder sortOrder1 = SortCriterion.SortOrder.DESC;
+        String sortField2 = "sortField2";
+        SortCriterion.SortOrder sortOrder2 = SortCriterion.SortOrder.ASC;
+
+        defaultSearchQueryTemplate.addSortCriterion(sortField0, sortOrder0);
+        defaultSearchQueryTemplate.addSortCriterion(sortField1, sortOrder1);
+        defaultSearchQueryTemplate.addSortCriterion(sortField2, sortOrder2);
+
+        List<SortCriterion> sortCriteria = createBuilder()
+                .build()
+                .getSortCriteria();
+
+        assertThat(sortCriteria, hasSize(3));
+        checkSortCriterion(sortCriteria.get(0), sortField0, sortOrder0);
+        checkSortCriterion(sortCriteria.get(1), sortField1, sortOrder1);
+        checkSortCriterion(sortCriteria.get(2), sortField2, sortOrder2);
+    }
+
+    private void checkSortCriterion(SortCriterion criterion, String field, SortCriterion.SortOrder order) {
+        assertThat(criterion.getSortField().getField(), is(field));
+        assertThat(criterion.getSortOrder(), is(order));
     }
 
     private DefaultSearchQueryTemplate.Builder createBuilder() {

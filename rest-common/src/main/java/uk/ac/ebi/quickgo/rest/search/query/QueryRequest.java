@@ -8,7 +8,6 @@ import java.util.*;
  * Contains all of the information necessary to put in a search request to a searchable data source.
  */
 public class QueryRequest {
-
     private final QuickGOQuery query;
     private final Page page;
     private final List<Facet> facets;
@@ -18,6 +17,7 @@ public class QueryRequest {
     private final AggregateRequest aggregate;
     private final String highlightStartDelim;
     private final String highlightEndDelim;
+    private final List<SortCriterion> sortCriteria;
 
     private QueryRequest(Builder builder) {
         this.query = builder.query;
@@ -29,6 +29,7 @@ public class QueryRequest {
         this.aggregate = builder.aggregate;
         this.highlightStartDelim = builder.highlightStartDelim;
         this.highlightEndDelim = builder.highlightEndDelim;
+        this.sortCriteria = new ArrayList<>(builder.sortCriteria);
     }
 
     public QuickGOQuery getQuery() {
@@ -71,6 +72,10 @@ public class QueryRequest {
         return highlightEndDelim;
     }
 
+    public List<SortCriterion> getSortCriteria() {
+        return sortCriteria;
+    }
+
     public static class Builder {
         private QuickGOQuery query;
         private Page page;
@@ -81,6 +86,7 @@ public class QueryRequest {
         private AggregateRequest aggregate;
         private String highlightStartDelim;
         private String highlightEndDelim;
+        private Set<SortCriterion> sortCriteria;
 
         public Builder(QuickGOQuery query) {
             Preconditions.checkArgument(query != null, "Query cannot be null");
@@ -88,12 +94,19 @@ public class QueryRequest {
             this.query = query;
             facets = new LinkedHashSet<>();
             filters = new LinkedHashSet<>();
+            sortCriteria = new LinkedHashSet<>();
             projectedFields = new LinkedHashSet<>();
             highlightedFields = new LinkedHashSet<>();
         }
 
         public Builder setPage(Page page) {
             this.page = page;
+
+            return this;
+        }
+
+        public Builder addSortCriterion(String sortField, SortCriterion.SortOrder sortOrder) {
+            this.sortCriteria.add(new SortCriterion(sortField, sortOrder));
 
             return this;
         }
@@ -142,8 +155,64 @@ public class QueryRequest {
         }
     }
 
-    @Override
-    public String toString() {
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        QueryRequest that = (QueryRequest) o;
+
+        if (query != null ? !query.equals(that.query) : that.query != null) {
+            return false;
+        }
+        if (page != null ? !page.equals(that.page) : that.page != null) {
+            return false;
+        }
+        if (facets != null ? !facets.equals(that.facets) : that.facets != null) {
+            return false;
+        }
+        if (filters != null ? !filters.equals(that.filters) : that.filters != null) {
+            return false;
+        }
+        if (projectedFields != null ? !projectedFields.equals(that.projectedFields) : that.projectedFields != null) {
+            return false;
+        }
+        if (highlightedFields != null ? !highlightedFields.equals(that.highlightedFields) :
+                that.highlightedFields != null) {
+            return false;
+        }
+        if (aggregate != null ? !aggregate.equals(that.aggregate) : that.aggregate != null) {
+            return false;
+        }
+        if (highlightStartDelim != null ? !highlightStartDelim.equals(that.highlightStartDelim) :
+                that.highlightStartDelim != null) {
+            return false;
+        }
+        if (highlightEndDelim != null ? !highlightEndDelim.equals(that.highlightEndDelim) :
+                that.highlightEndDelim != null) {
+            return false;
+        }
+        return sortCriteria != null ? sortCriteria.equals(that.sortCriteria) : that.sortCriteria == null;
+    }
+
+    @Override public int hashCode() {
+        int result = query != null ? query.hashCode() : 0;
+        result = 31 * result + (page != null ? page.hashCode() : 0);
+        result = 31 * result + (facets != null ? facets.hashCode() : 0);
+        result = 31 * result + (filters != null ? filters.hashCode() : 0);
+        result = 31 * result + (projectedFields != null ? projectedFields.hashCode() : 0);
+        result = 31 * result + (highlightedFields != null ? highlightedFields.hashCode() : 0);
+        result = 31 * result + (aggregate != null ? aggregate.hashCode() : 0);
+        result = 31 * result + (highlightStartDelim != null ? highlightStartDelim.hashCode() : 0);
+        result = 31 * result + (highlightEndDelim != null ? highlightEndDelim.hashCode() : 0);
+        result = 31 * result + (sortCriteria != null ? sortCriteria.hashCode() : 0);
+        return result;
+    }
+
+    @Override public String toString() {
         return "QueryRequest{" +
                 "query=" + query +
                 ", page=" + page +
@@ -154,43 +223,8 @@ public class QueryRequest {
                 ", aggregate=" + aggregate +
                 ", highlightStartDelim='" + highlightStartDelim + '\'' +
                 ", highlightEndDelim='" + highlightEndDelim + '\'' +
+                ", sortCriteria=" + sortCriteria +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        QueryRequest that = (QueryRequest) o;
-
-        if (query != null ? !query.equals(that.query) : that.query != null) return false;
-        if (page != null ? !page.equals(that.page) : that.page != null) return false;
-        if (facets != null ? !facets.equals(that.facets) : that.facets != null) return false;
-        if (filters != null ? !filters.equals(that.filters) : that.filters != null) return false;
-        if (projectedFields != null ? !projectedFields.equals(that.projectedFields) : that.projectedFields != null)
-            return false;
-        if (highlightedFields != null ? !highlightedFields.equals(that.highlightedFields) : that.highlightedFields != null)
-            return false;
-        if (aggregate != null ? !aggregate.equals(that.aggregate) : that.aggregate != null) return false;
-        if (highlightStartDelim != null ? !highlightStartDelim.equals(that.highlightStartDelim) : that.highlightStartDelim != null)
-            return false;
-        return !(highlightEndDelim != null ? !highlightEndDelim.equals(that.highlightEndDelim) : that.highlightEndDelim != null);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = query != null ? query.hashCode() : 0;
-        result = 31 * result + (page != null ? page.hashCode() : 0);
-        result = 31 * result + (facets != null ? facets.hashCode() : 0);
-        result = 31 * result + (filters != null ? filters.hashCode() : 0);
-        result = 31 * result + (projectedFields != null ? projectedFields.hashCode() : 0);
-        result = 31 * result + (highlightedFields != null ? highlightedFields.hashCode() : 0);
-        result = 31 * result + (aggregate != null ? aggregate.hashCode() : 0);
-        result = 31 * result + (highlightStartDelim != null ? highlightStartDelim.hashCode() : 0);
-        result = 31 * result + (highlightEndDelim != null ? highlightEndDelim.hashCode() : 0);
-        return result;
     }
 
 }
