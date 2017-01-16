@@ -14,6 +14,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * Created 16/01/17
  * @author Edd
  */
-public abstract class NoCursorMarkPageInfo {
+public abstract class NoNextCursorPageInfo {
     @JsonIgnore abstract String getNextCursor();
 }

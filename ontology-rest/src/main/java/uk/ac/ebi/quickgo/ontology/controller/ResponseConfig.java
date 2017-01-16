@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import uk.ac.ebi.quickgo.rest.controller.response.NoCursorMarkPageInfo;
 import uk.ac.ebi.quickgo.rest.controller.response.NoFacetNoHighlightNoAggregateQueryResult;
+import uk.ac.ebi.quickgo.rest.controller.response.NoNextCursorPageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -26,7 +26,7 @@ import java.util.Map;
         mapper.setMixIns(Collections.singletonMap(QueryResult.class, NoFacetNoHighlightNoAggregateQueryResult.class));
         Map<Class<?>, Class<?>> mixinMap = new HashMap<>();
         mixinMap.put(QueryResult.class, NoFacetNoHighlightNoAggregateQueryResult.class);
-        mixinMap.put(PageInfo.class, NoCursorMarkPageInfo.class);
+        mixinMap.put(PageInfo.class, NoNextCursorPageInfo.class);
         mapper.setMixIns(Collections.unmodifiableMap(mixinMap));
         return mapper;
     }

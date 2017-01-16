@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import uk.ac.ebi.quickgo.rest.controller.response.NoAggregateQueryResult;
-import uk.ac.ebi.quickgo.rest.controller.response.NoCursorMarkPageInfo;
+import uk.ac.ebi.quickgo.rest.controller.response.NoNextCursorPageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -25,7 +25,7 @@ import java.util.Map;
         ObjectMapper mapper = new ObjectMapper();
         Map<Class<?>, Class<?>> mixinMap = new HashMap<>();
         mixinMap.put(QueryResult.class, NoAggregateQueryResult.class);
-        mixinMap.put(PageInfo.class, NoCursorMarkPageInfo.class);
+        mixinMap.put(PageInfo.class, NoNextCursorPageInfo.class);
         mapper.setMixIns(Collections.unmodifiableMap(mixinMap));
         return mapper;
     }
