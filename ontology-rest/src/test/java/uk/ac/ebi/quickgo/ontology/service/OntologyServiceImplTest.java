@@ -160,8 +160,7 @@ public class OntologyServiceImplTest {
 
             when(goDocumentConverterMock.convert(any(OntologyDocument.class))).thenReturn(createGOTerm("stub"));
 
-            uk.ac.ebi.quickgo.rest.search.query.Page page =
-                    new RegularPage(oneBasedPageNumber, pageSize);
+            RegularPage page = new RegularPage(oneBasedPageNumber, pageSize);
             QueryResult<GOTerm> queryResult = goOntologyService.findAllByOntologyType(OntologyType.GO, page);
 
             assertThat(queryResult.getResults(), hasSize(10));
