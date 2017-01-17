@@ -17,7 +17,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -105,7 +108,7 @@ public abstract class OBOControllerIT {
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .build();
+                                 .build();
 
         resourceUrl = getResourceURL();
 
@@ -121,7 +124,7 @@ public abstract class OBOControllerIT {
 
         setupSimpleRelationshipChain();
 
-        validIdList = superSetOfValidIdList.subList(0,2);
+        validIdList = superSetOfValidIdList.subList(0, 2);
         validIdsCSV = toCSV(validIdList);
     }
 
@@ -352,29 +355,29 @@ public abstract class OBOControllerIT {
     @Test
     public void finds400IfUrlIsEmpty() throws Exception {
         mockMvc.perform(get(resourceUrl + "/"))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+               .andDo(print())
+               .andExpect(status().isBadRequest());
     }
 
     @Test
     public void finds400IfUrlIsJustWrong() throws Exception {
         mockMvc.perform(get(resourceUrl + "/thisIsAnEndPointThatDoesNotExist"))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+               .andDo(print())
+               .andExpect(status().isBadRequest());
     }
 
     @Test
     public void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
         mockMvc.perform(get(buildTermsURL(idMissingInRepository())))
-                .andDo(print())
-                .andExpect(status().isOk());
+               .andDo(print())
+               .andExpect(status().isOk());
     }
 
     @Test
     public void finds400OnInvalidId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(invalidId())))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+                                        .andDo(print())
+                                        .andExpect(status().isBadRequest());
 
         expectInvalidIdError(response, invalidId());
     }
@@ -433,8 +436,8 @@ public abstract class OBOControllerIT {
         mockMvc.perform(
                 get(buildTermsURL())
                         .param(PAGE_PARAM, "-1"))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+               .andDo(print())
+               .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -447,8 +450,8 @@ public abstract class OBOControllerIT {
         mockMvc.perform(
                 get(buildTermsURL())
                         .param(PAGE_PARAM, String.valueOf(existingPages + 1)))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+               .andDo(print())
+               .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -528,10 +531,10 @@ public abstract class OBOControllerIT {
         createAndSaveDocs(recordsToCreate);
         ResultActions response = mockMvc.perform(get(buildTermsURL()));
         expectBasicFieldsInResults(response, validIdList)
-            .andDo(print())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.results", hasSize(defaultPageSize)));
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results", hasSize(defaultPageSize)));
     }
 
     @Test
@@ -911,7 +914,6 @@ public abstract class OBOControllerIT {
         String csv = ids.stream().collect(Collectors.joining(","));
         return getResourceURL() + "/" + TERMS_RESOURCE + "/" + csv;
     }
-
 
     protected String buildTermsURLWithSubResource(String id, String subResource) {
         return buildTermsURL(id) + "/" + subResource;
