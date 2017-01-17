@@ -97,10 +97,10 @@ public abstract class OBOControllerIT {
     private String invalidRelation;
 
     @Value("${ontology.default_page_size:25}")
-    int defaultPageSize;
+    private int defaultPageSize;
 
     @Value("${ontology.max_page_size:30}")
-    int maxPageSize;
+    private int maxPageSize;
 
     @Before
     public void setup() {
