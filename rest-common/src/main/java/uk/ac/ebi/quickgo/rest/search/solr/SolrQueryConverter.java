@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.common.params.CursorMarkParams;
 
 /**
  * Converts a {@link QueryRequest} into a {@link SolrQuery} object.
@@ -21,6 +22,7 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
     private final String requestHandler;
     private final QueryVisitor<String> solrQuerySerializer;
     private final AggregateConverter<String> aggregateConverter;
+    private final SolrPageVisitor solrPageVistor;
 
     public SolrQueryConverter(String requestHandler) {
         this(requestHandler, new SortedSolrQuerySerializer());
@@ -35,6 +37,7 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
         this.requestHandler = requestHandler;
         this.solrQuerySerializer = solrQuerySerializer;
         this.aggregateConverter = new AggregateToStringConverter();
+        this.solrPageVistor = new SolrPageVisitor();
     }
 
     @Override public SolrQuery convert(QueryRequest request) {
@@ -46,10 +49,8 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
         solrQuery.setRequestHandler(requestHandler);
 
         Page page = request.getPage();
-
         if (page != null) {
-            solrQuery.setStart(calculateRowsFromPage(page.getPageNumber(), page.getPageSize()));
-            solrQuery.setRows(page.getPageSize());
+            setPageData(page, solrQuery);
         }
 
         List<QuickGOQuery> filterQueries = request.getFilters();
@@ -82,10 +83,54 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
             solrQuery.setParam(FACET_ANALYTICS_ID, aggregateConverter.convert(request.getAggregate()));
         }
 
+        if (!request.getSortCriteria().isEmpty()) {
+            request.getSortCriteria().forEach(criterion ->
+                    solrQuery.addSort(criterion.getSortField().getField(), sortOrderOf(criterion.getSortOrder())));
+        }
+
         return solrQuery;
     }
 
-    private int calculateRowsFromPage(int page, int numRows) {
-        return (page - 1) * numRows;
+    private SolrQuery.ORDER sortOrderOf(SortCriterion.SortOrder sortOrder) {
+        switch (sortOrder) {
+            case ASC:
+                return SolrQuery.ORDER.asc;
+            case DESC:
+                return SolrQuery.ORDER.desc;
+            default:
+                throw new IllegalStateException("Unknown sort order specified");
+        }
+    }
+
+    /**
+     * Uses the {@link SolrPageVisitor} to visit the {@link Page} structure, and set the appropriate
+     * attributes of {@code solrQuery} accordingly.
+     *
+     * @param page the page instance
+     * @param solrQuery the query whose attributes are to be set
+     */
+    private void setPageData(Page page, SolrQuery solrQuery) {
+        page.accept(solrPageVistor, solrQuery);
+    }
+
+    /**
+     * A {@link PageVisitor} implementation whose role is to set {@link SolrQuery}
+     * attributes accordingly, based upon values within the {@link Page} structure.
+     */
+    private static class SolrPageVisitor implements PageVisitor<SolrQuery> {
+
+        @Override public void visit(RegularPage page, SolrQuery subject) {
+            subject.setRows(page.getPageSize());
+            subject.setStart(calculateRowsFromPage(page.getPageNumber(), page.getPageSize()));
+        }
+
+        @Override public void visit(CursorPage page, SolrQuery subject) {
+            subject.setRows(page.getPageSize());
+            subject.set(CursorMarkParams.CURSOR_MARK_PARAM, page.getCursor());
+        }
+
+        private int calculateRowsFromPage(int page, int numRows) {
+            return page == 0 ? 0 : (page - 1) * numRows;
+        }
     }
 }

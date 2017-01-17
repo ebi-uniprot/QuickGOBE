@@ -3,12 +3,12 @@ package uk.ac.ebi.quickgo.rest.search.query;
 import com.google.common.base.Preconditions;
 
 /**
- * Simple implementation of a field.
+ * A simple abstract field representation.
  *
  * Created 11/02/16
  * @author Edd
  */
-public class AbstractField implements Field {
+public abstract class AbstractField implements Field {
     protected String field;
 
     public AbstractField(String field) {

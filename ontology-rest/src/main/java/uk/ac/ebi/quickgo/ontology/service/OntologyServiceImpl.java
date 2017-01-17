@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
+import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
@@ -9,20 +13,16 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
-import uk.ac.ebi.quickgo.rest.search.query.Page;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import static java.util.Collections.singleton;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -30,8 +30,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Service to query information from the {@link OntologyRepository}
  * and return {@link OBOTerm} subclasses.
- *
+ * <p>
  * Created 11/11/15
+ *
  * @author Edd
  */
 public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T> {
@@ -46,7 +47,8 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     private String ontologyType;
 
     // necessary for Spring to create a proxy class
-    private OntologyServiceImpl() {}
+    private OntologyServiceImpl() {
+    }
 
     OntologyServiceImpl(
             OntologyRepository repository,
@@ -68,7 +70,8 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         this.ontologyTraversal = ontologyTraversal;
     }
 
-    @Override public QueryResult<T> findAllByOntologyType(OntologyType type, Page page) {
+    @Override
+    public QueryResult<T> findAllByOntologyType(OntologyType type, RegularPage page) {
         Pageable pageable = new PageRequest(calculatePageNumber(page.getPageNumber()), page.getPageSize());
 
         org.springframework.data.domain.Page<OntologyDocument> pagedResult =
@@ -77,53 +80,63 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return buildQueryResult(pagedResult, page);
     }
 
-    @Override public List<T> findCompleteInfoByOntologyId(List<String> ids) {
+    @Override
+    public List<T> findCompleteInfoByOntologyId(List<String> ids) {
         return convertDocs(ontologyRepository.findCompleteByTermId(ontologyType, buildIdList(ids)))
                 .collect(Collectors.toList());
     }
 
-    @Override public List<T> findCoreInfoByOntologyId(List<String> ids) {
+    @Override
+    public List<T> findCoreInfoByOntologyId(List<String> ids) {
         return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
                 .collect(Collectors.toList());
     }
 
-    @Override public List<T> findHistoryInfoByOntologyId(List<String> ids) {
+    @Override
+    public List<T> findHistoryInfoByOntologyId(List<String> ids) {
         return convertDocs(ontologyRepository.findHistoryByTermId(ontologyType, buildIdList(ids)))
                 .collect(Collectors.toList());
     }
 
-    @Override public List<T> findXRefsInfoByOntologyId(List<String> ids) {
+    @Override
+    public List<T> findXRefsInfoByOntologyId(List<String> ids) {
         return convertDocs(ontologyRepository.findXRefsByTermId(ontologyType, buildIdList(ids)))
                 .collect(Collectors.toList());
     }
 
-    @Override public List<T> findTaxonConstraintsInfoByOntologyId(List<String> ids) {
+    @Override
+    public List<T> findTaxonConstraintsInfoByOntologyId(List<String> ids) {
         return convertDocs(ontologyRepository.findTaxonConstraintsByTermId(ontologyType, buildIdList(ids)))
                 .collect(Collectors.toList());
     }
 
-    @Override public List<T> findXORelationsInfoByOntologyId(List<String> ids) {
+    @Override
+    public List<T> findXORelationsInfoByOntologyId(List<String> ids) {
         return convertDocs(ontologyRepository.findXOntologyRelationsByTermId(ontologyType, buildIdList(ids)))
                 .collect(Collectors.toList());
     }
 
-    @Override public List<T> findAnnotationGuideLinesInfoByOntologyId(List<String> ids) {
+    @Override
+    public List<T> findAnnotationGuideLinesInfoByOntologyId(List<String> ids) {
         return convertDocs(ontologyRepository.findAnnotationGuidelinesByTermId(ontologyType, buildIdList(ids)))
                 .collect(Collectors.toList());
     }
 
-    @Override public List<List<OntologyRelationship>> paths(Set<String> startingIds, Set<String> endingIds,
-            OntologyRelationType... relations) {
+    @Override
+    public List<List<OntologyRelationship>> paths(Set<String> startingIds, Set<String> endingIds,
+                                                  OntologyRelationType... relations) {
         return ontologyTraversal.paths(startingIds, endingIds, relations);
     }
 
-    @Override public List<T> findAncestorsInfoByOntologyId(List<String> ids, OntologyRelationType... relations) {
+    @Override
+    public List<T> findAncestorsInfoByOntologyId(List<String> ids, OntologyRelationType... relations) {
         return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
                 .map(term -> this.insertAncestors(term, relations))
                 .collect(Collectors.toList());
     }
 
-    @Override public List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations) {
+    @Override
+    public List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations) {
         return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
                 .map(term -> this.insertDescendants(term, relations))
                 .collect(Collectors.toList());
@@ -138,7 +151,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     /**
      * <p>Converts a specified list of {@link OntologyDocument}s into a {@link Stream}
      * of {@link T} instances.
-     *
+     * <p>
      * <p>No ontology graph data is added to the {@link OntologyDocument}s.
      *
      * @param docs the list od {@link OntologyDocument}s to convertRelation
@@ -200,8 +213,8 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
      * Specifically, this can either be ancestors, or descendants.
      *
      * @param traversalFunction the function used to traverse the ontology graph
-     * @param term the starting {@code term}
-     * @param relations the relationship types that can be navigated
+     * @param term              the starting {@code term}
+     * @param relations         the relationship types that can be navigated
      * @return a list of term ids that are the relatives of {@code term}
      */
     private List<String> getRelatives(
@@ -219,10 +232,13 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     private QueryResult<T> buildQueryResult(org.springframework.data.domain.Page<OntologyDocument> pagedResult,
-            Page page) {
+                                            RegularPage page) {
         long totalNumberOfHits = pagedResult.getTotalElements();
 
-        PageInfo pageInfo = new PageInfo(pagedResult.getTotalPages(), page.getPageNumber(), page.getPageSize());
+        PageInfo pageInfo = new PageInfo.Builder()
+                .withTotalPages(pagedResult.getTotalPages())
+                .withCurrentPage(page.getPageNumber())
+                .withResultsPerPage(page.getPageSize()).build();
 
         List<T> entryHits = pagedResult.getContent().stream()
                 .map(converter::convert)
@@ -237,13 +253,15 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     private class AncestorFetcher implements BiFunction<T, OntologyRelationType[], List<String>> {
-        @Override public List<String> apply(T term, OntologyRelationType[] relations) {
+        @Override
+        public List<String> apply(T term, OntologyRelationType[] relations) {
             return ontologyTraversal.ancestors(singleton(term.id), relations);
         }
     }
 
     private class DescendantFetcher implements BiFunction<T, OntologyRelationType[], List<String>> {
-        @Override public List<String> apply(T term, OntologyRelationType[] relations) {
+        @Override
+        public List<String> apply(T term, OntologyRelationType[] relations) {
             return ontologyTraversal.descendants(singleton(term.id), relations);
         }
     }

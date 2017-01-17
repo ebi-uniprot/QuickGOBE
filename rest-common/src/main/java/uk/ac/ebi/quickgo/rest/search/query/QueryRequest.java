@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
 import com.google.common.base.Preconditions;
+
 import java.util.*;
 
 /**
@@ -16,25 +17,19 @@ public class QueryRequest {
     private final AggregateRequest aggregate;
     private final String highlightStartDelim;
     private final String highlightEndDelim;
+    private final List<SortCriterion> sortCriteria;
 
-    private QueryRequest(QuickGOQuery query,
-            Page page,
-            List<Facet> facets,
-            List<QuickGOQuery> filters,
-            List<FieldProjection> projectedFields,
-            List<FieldHighlight> highlightedFields,
-            AggregateRequest aggregate,
-            String highlightStartDelim,
-            String highlightEndDelim) {
-        this.query = query;
-        this.page = page;
-        this.facets = Collections.unmodifiableList(facets);
-        this.filters = filters;
-        this.projectedFields = projectedFields;
-        this.highlightedFields = highlightedFields;
-        this.aggregate = aggregate;
-        this.highlightStartDelim = highlightStartDelim;
-        this.highlightEndDelim = highlightEndDelim;
+    private QueryRequest(Builder builder) {
+        this.query = builder.query;
+        this.page = builder.page;
+        this.facets = Collections.unmodifiableList(new ArrayList<>(builder.facets));
+        this.filters = new ArrayList<>(builder.filters);
+        this.projectedFields = new ArrayList<>(builder.projectedFields);
+        this.highlightedFields = new ArrayList<>(builder.highlightedFields);
+        this.aggregate = builder.aggregate;
+        this.highlightStartDelim = builder.highlightStartDelim;
+        this.highlightEndDelim = builder.highlightEndDelim;
+        this.sortCriteria = new ArrayList<>(builder.sortCriteria);
     }
 
     public QuickGOQuery getQuery() {
@@ -77,6 +72,10 @@ public class QueryRequest {
         return highlightEndDelim;
     }
 
+    public List<SortCriterion> getSortCriteria() {
+        return sortCriteria;
+    }
+
     public static class Builder {
         private QuickGOQuery query;
         private Page page;
@@ -87,6 +86,7 @@ public class QueryRequest {
         private AggregateRequest aggregate;
         private String highlightStartDelim;
         private String highlightEndDelim;
+        private Set<SortCriterion> sortCriteria;
 
         public Builder(QuickGOQuery query) {
             Preconditions.checkArgument(query != null, "Query cannot be null");
@@ -94,12 +94,19 @@ public class QueryRequest {
             this.query = query;
             facets = new LinkedHashSet<>();
             filters = new LinkedHashSet<>();
+            sortCriteria = new LinkedHashSet<>();
             projectedFields = new LinkedHashSet<>();
             highlightedFields = new LinkedHashSet<>();
         }
 
-        public Builder setPageParameters(int currentPage, int pageSize) {
-            this.page = new Page(currentPage, pageSize);
+        public Builder setPage(Page page) {
+            this.page = page;
+
+            return this;
+        }
+
+        public Builder addSortCriterion(String sortField, SortCriterion.SortOrder sortOrder) {
+            this.sortCriteria.add(new SortCriterion(sortField, sortOrder));
 
             return this;
         }
@@ -144,16 +151,7 @@ public class QueryRequest {
         }
 
         public QueryRequest build() {
-            return new QueryRequest(
-                    query,
-                    page,
-                    new ArrayList<>(facets),
-                    new ArrayList<>(filters),
-                    new ArrayList<>(projectedFields),
-                    new ArrayList<>(highlightedFields),
-                    aggregate,
-                    highlightStartDelim,
-                    highlightEndDelim);
+            return new QueryRequest(this);
         }
     }
 
@@ -193,9 +191,11 @@ public class QueryRequest {
                 that.highlightStartDelim != null) {
             return false;
         }
-        return highlightEndDelim != null ? highlightEndDelim.equals(that.highlightEndDelim) :
-                that.highlightEndDelim == null;
-
+        if (highlightEndDelim != null ? !highlightEndDelim.equals(that.highlightEndDelim) :
+                that.highlightEndDelim != null) {
+            return false;
+        }
+        return sortCriteria != null ? sortCriteria.equals(that.sortCriteria) : that.sortCriteria == null;
     }
 
     @Override public int hashCode() {
@@ -208,6 +208,7 @@ public class QueryRequest {
         result = 31 * result + (aggregate != null ? aggregate.hashCode() : 0);
         result = 31 * result + (highlightStartDelim != null ? highlightStartDelim.hashCode() : 0);
         result = 31 * result + (highlightEndDelim != null ? highlightEndDelim.hashCode() : 0);
+        result = 31 * result + (sortCriteria != null ? sortCriteria.hashCode() : 0);
         return result;
     }
 
@@ -222,6 +223,8 @@ public class QueryRequest {
                 ", aggregate=" + aggregate +
                 ", highlightStartDelim='" + highlightStartDelim + '\'' +
                 ", highlightEndDelim='" + highlightEndDelim + '\'' +
+                ", sortCriteria=" + sortCriteria +
                 '}';
     }
+
 }

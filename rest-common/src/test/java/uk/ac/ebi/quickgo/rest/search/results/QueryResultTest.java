@@ -1,39 +1,36 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import uk.ac.ebi.quickgo.rest.search.results.DocHighlight;
-import uk.ac.ebi.quickgo.rest.search.results.Facet;
-import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
-import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Test;
 
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Tests the {@link QueryResult} implementation
  */
 public class QueryResultTest {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void negativeTotalNumberResultsThrowsException() throws Exception {
         long numberOfHits = -1;
         List<String> results = Collections.emptyList();
 
-        try {
-            new QueryResult.Builder<>(numberOfHits, results).build();
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), startsWith("Total number of hits can not be negative"));
-        }
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Total number of hits can not be negative");
+
+        new QueryResult.Builder<>(numberOfHits, results).build();
     }
 
     @Test
@@ -41,12 +38,10 @@ public class QueryResultTest {
         long numberOfHits = 1;
         List<String> results = null;
 
-        try {
-            new QueryResult.Builder<>(numberOfHits, results).build();
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), startsWith("Results list can not be null"));
-        }
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Results list can not be null");
+
+        new QueryResult.Builder<>(numberOfHits, results).build();
     }
 
     @Test
@@ -54,12 +49,10 @@ public class QueryResultTest {
         long numberOfHits = 1;
         List<String> results = Arrays.asList("result1", "result2");
 
-        try {
-            new QueryResult.Builder<>(numberOfHits, results).build();
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), startsWith("Total number of results is less than number of results in list"));
-        }
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Total number of results is less than number of results in list");
+
+        new QueryResult.Builder<>(numberOfHits, results).build();
     }
 
     @Test
@@ -80,7 +73,11 @@ public class QueryResultTest {
     public void validFullQueryResult() throws Exception {
         long numberOfHits = 2;
         List<String> results = Arrays.asList("result1", "result2");
-        uk.ac.ebi.quickgo.rest.search.results.PageInfo pageInfo = new PageInfo(1, 1, 5);
+        uk.ac.ebi.quickgo.rest.search.results.PageInfo pageInfo = new PageInfo.Builder()
+                .withTotalPages(1)
+                .withCurrentPage(1)
+                .withResultsPerPage(5)
+                .build();
         Facet facet = new Facet();
         List<DocHighlight> highlights = new ArrayList<>();
 

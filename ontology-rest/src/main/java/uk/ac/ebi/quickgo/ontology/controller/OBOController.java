@@ -18,9 +18,9 @@ import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.StringToQuickGOQueryConverter;
-import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import io.swagger.annotations.ApiOperation;
@@ -129,7 +129,7 @@ public abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType(getOntologyType(),
-                new Page(page, MAX_PAGE_RESULTS)), HttpStatus.OK);
+                new RegularPage(page, MAX_PAGE_RESULTS)), HttpStatus.OK);
     }
 
     /**
@@ -498,7 +498,7 @@ public abstract class OBOController<T extends OBOTerm> {
 
         QueryRequest.Builder builder = new QueryRequest
                 .Builder(restrictedUserQuery)
-                .setPageParameters(page, limit);
+                .setPage(new RegularPage(page, limit));
 
         if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
             ontologyRetrievalConfig.getSearchReturnedFields()

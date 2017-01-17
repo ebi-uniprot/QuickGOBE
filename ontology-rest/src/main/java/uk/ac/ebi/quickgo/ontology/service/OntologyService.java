@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-import uk.ac.ebi.quickgo.rest.search.query.Page;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public interface OntologyService<T extends OBOTerm> {
      * @param page the requested page of results
      * @return the page of results
      */
-    QueryResult<T> findAllByOntologyType(OntologyType type, Page page);
+    QueryResult<T> findAllByOntologyType(OntologyType type, RegularPage page);
 
     /**
      * Find the complete data set stored for a specified list of ontology IDs.
