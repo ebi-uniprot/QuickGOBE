@@ -283,7 +283,7 @@ public class FlatFieldBuilderTest {
                                         .addField(newFlatFieldLeaf("level3:C")))
                                 .addField(newFlatFieldLeaf("level2:B")))
                 .addField(
-                        FlatFieldBuilder.newFlatField()
+                        newFlatField()
                                 .addField(newFlatFieldLeaf("level2:C"))
                                 .addField(newFlatField()
                                         .addField(newFlatFieldLeaf("level3:D"))
@@ -405,8 +405,6 @@ public class FlatFieldBuilderTest {
         System.out.println(flatFieldText);
         FlatField actualFlatField =
                 parse(flatFieldText);
-
-
 
         FlatField expectedField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:" + specialChars))
