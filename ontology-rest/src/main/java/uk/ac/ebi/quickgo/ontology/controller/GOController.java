@@ -40,15 +40,6 @@ public class GOController extends OBOController<GOTerm> {
             OBOControllerValidationHelper goValidationHelper,
             OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig) {
         super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-              goValidationHelper, ontologyPagingConfig);
+              goValidationHelper, ontologyPagingConfig, OntologyType.GO);
     }
-
-    public static Predicate<String> idValidator() {
-        return isValidGOTermId();
-    }
-
-    @Override protected OntologyType getOntologyType() {
-        return OntologyType.GO;
-    }
-
 }

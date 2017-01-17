@@ -38,15 +38,6 @@ public class ECOController extends OBOController<ECOTerm> {
             OBOControllerValidationHelper ecoValidationHelper,
             OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig) {
         super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-              ecoValidationHelper, ontologyPagingConfig);
-    }
-
-
-    public static Predicate<String> idValidator() {
-        return OntologyIdPredicate.isValidECOTermId();
-    }
-
-    @Override protected OntologyType getOntologyType() {
-        return OntologyType.ECO;
+              ecoValidationHelper, ontologyPagingConfig, OntologyType.ECO);
     }
 }
