@@ -98,7 +98,7 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
             case DESC:
                 return SolrQuery.ORDER.desc;
             default:
-                throw new IllegalStateException("Unknown sort order specified");
+                throw new IllegalStateException("Unknown sort order specified: " + sortOrder.name());
         }
     }
 
