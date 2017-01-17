@@ -46,6 +46,9 @@ public class OBOControllerTest {
 
     private OBOController<FakeOBOTerm> controller;
 
+    private static final int MAX_PAGE_SIZE=30;
+    private static final int DEFAULT_PAGE_SIZE=25;
+
     @Before
     public void setUp() {
         this.controller = createOBOController(ontologyService, searchService, searchableField, retrievalConfig,
@@ -106,7 +109,7 @@ public class OBOControllerTest {
             final SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig,
             final GraphImageService graphImageService) {
         return new OBOController<FakeOBOTerm>(ontologyService, searchService, searchableField, retrievalConfig,
-                graphImageService) {
+                graphImageService, MAX_PAGE_SIZE, DEFAULT_PAGE_SIZE) {
             @Override protected Predicate<String> idValidator() {
                 return id -> ID_FORMAT.matcher(id).matches();
             }
