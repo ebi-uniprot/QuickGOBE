@@ -71,8 +71,6 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String CHART_SUB_RESOURCE = "chart";
     static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
 
-    static final int MAX_PAGE_RESULTS = 600;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
@@ -84,12 +82,16 @@ public abstract class OBOController<T extends OBOTerm> {
     private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
     private final OBOControllerValidationHelper validationHelper;
     private final GraphImageService graphImageService;
+    public final int maxPageSize;
+    public final int defaultPageSize;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
-            GraphImageService graphImageService) {
+            GraphImageService graphImageService,
+            int maxPageSize,
+            int defaultPageSize) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
@@ -100,8 +102,10 @@ public abstract class OBOController<T extends OBOTerm> {
         this.ontologySearchService = ontologySearchService;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
         this.ontologyRetrievalConfig = ontologyRetrievalConfig;
-        this.validationHelper = new OBOControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
+        this.validationHelper = new OBOControllerValidationHelperImpl(maxPageSize, idValidator());
         this.graphImageService = graphImageService;
+        this.maxPageSize = maxPageSize;
+        this.defaultPageSize = defaultPageSize;
     }
 
     /**
@@ -129,7 +133,7 @@ public abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType(getOntologyType(),
-                new Page(page, MAX_PAGE_RESULTS)), HttpStatus.OK);
+                new Page(page, defaultPageSize)), HttpStatus.OK);
     }
 
     /**
