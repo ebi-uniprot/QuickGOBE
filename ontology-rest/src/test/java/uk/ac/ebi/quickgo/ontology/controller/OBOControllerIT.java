@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -49,7 +50,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
 
 /**
  * Performs common tests on REST controllers that derive from {@link OBOController}.
@@ -89,10 +89,18 @@ public abstract class OBOControllerIT {
     private String resourceUrl;
     private String validId;
     private String validIdsCSV;
+    private String superSetOfValidIdsCSV;
     private List<String> validIdList;
+    private List<String> superSetOfValidIdList;
     private List<OntologyRelationship> relationships;
     private String validRelation;
     private String invalidRelation;
+
+    @Value("${ontology.default_page_size:25}")
+    int defaultPageSize;
+
+    @Value("${ontology.max_page_size:30}")
+    int maxPageSize;
 
     @Before
     public void setup() {
@@ -105,13 +113,16 @@ public abstract class OBOControllerIT {
         assertThat(basicDocs.size(), is(greaterThan(1)));
 
         validId = basicDocs.get(0).id;
-        validIdList = basicDocs.stream().map(doc -> doc.id).collect(Collectors.toList());
-        validIdsCSV = toCSV(validIdList);
+        superSetOfValidIdList = basicDocs.stream().map(doc -> doc.id).collect(Collectors.toList());
+        superSetOfValidIdsCSV = toCSV(superSetOfValidIdList);
 
         ontologyRepository.deleteAll();
         ontologyRepository.save(basicDocs);
 
         setupSimpleRelationshipChain();
+
+        validIdList = superSetOfValidIdList.subList(0,2);
+        validIdsCSV = toCSV(validIdList);
     }
 
     @After
@@ -194,11 +205,23 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCoreAttrByTwoIds() throws Exception {
+    public void canRetrieveCoreAttrBySubsetOfSavedIds() throws Exception {
+
+        ResultActions response = mockMvc.perform(get(buildTermsURL(superSetOfValidIdsCSV)));
+
+        expectCoreFieldsInResults(response, superSetOfValidIdList)
+                .andExpect(jsonPath("$.results.*.id", hasSize(superSetOfValidIdList.size())))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveCoreAttrByAllIds() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV)));
 
         expectCoreFieldsInResults(response, validIdList)
-                .andExpect(jsonPath("$.results.*.id", hasSize(2)))
+                .andDo(print())
+                .andExpect(jsonPath("$.results.*.id", hasSize(validIdList.size())))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
@@ -405,7 +428,7 @@ public abstract class OBOControllerIT {
         ontologyRepository.deleteAll();
 
         int existingPages = 4;
-        createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
+        createAndSaveDocs(defaultPageSize * existingPages);
 
         mockMvc.perform(
                 get(buildTermsURL())
@@ -419,7 +442,7 @@ public abstract class OBOControllerIT {
         ontologyRepository.deleteAll();
 
         int existingPages = 4;
-        createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
+        createAndSaveDocs(defaultPageSize * existingPages);
 
         mockMvc.perform(
                 get(buildTermsURL())
@@ -432,7 +455,7 @@ public abstract class OBOControllerIT {
     public void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
         ontologyRepository.deleteAll();
 
-        int totalEntries = MAX_PAGE_NUMBER + 1;
+        int totalEntries = defaultPageSize + 1;
         int pageSize = 1;
         int pageNumWhichIsTooHigh = totalEntries;
 
@@ -453,7 +476,7 @@ public abstract class OBOControllerIT {
         ontologyRepository.deleteAll();
 
         int existingPages = 4;
-        createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
+        createAndSaveDocs(defaultPageSize * existingPages);
 
         ResultActions response = mockMvc.perform(
                 get(buildTermsURL())
@@ -461,7 +484,7 @@ public abstract class OBOControllerIT {
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.results").isArray())
-                .andExpect(jsonPath("$.results", hasSize(OBOController.MAX_PAGE_RESULTS)));
+                .andExpect(jsonPath("$.results", hasSize(defaultPageSize)));
     }
 
     @Test
@@ -469,7 +492,7 @@ public abstract class OBOControllerIT {
         ontologyRepository.deleteAll();
 
         int existingPages = 4;
-        createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
+        createAndSaveDocs(defaultPageSize * existingPages);
 
         ResultActions response = mockMvc.perform(
                 get(buildTermsURL())
@@ -477,7 +500,7 @@ public abstract class OBOControllerIT {
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.results").isArray())
-                .andExpect(jsonPath("$.results", hasSize(OBOController.MAX_PAGE_RESULTS)));
+                .andExpect(jsonPath("$.results", hasSize(defaultPageSize)));
     }
 
     @Test
@@ -485,7 +508,7 @@ public abstract class OBOControllerIT {
         ontologyRepository.deleteAll();
 
         int existingPages = 4;
-        createAndSaveDocs(OBOController.MAX_PAGE_RESULTS * existingPages);
+        createAndSaveDocs(defaultPageSize * existingPages);
 
         ResultActions response = mockMvc.perform(
                 get(buildTermsURL())
@@ -493,16 +516,37 @@ public abstract class OBOControllerIT {
 
         expectResultsInfoExists(response)
                 .andExpect(jsonPath("$.results").isArray())
-                .andExpect(jsonPath("$.results", hasSize(OBOController.MAX_PAGE_RESULTS)));
+                .andExpect(jsonPath("$.results", hasSize(defaultPageSize)));
     }
 
     @Test
-    public void canRetrieveCompleteByFindAll() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL()));
+    public void retrieveDefaultPageSizeWhenNoIdsSpecified() throws Exception {
 
-        expectCompleteFieldsInResults(response, validIdList)
+        ontologyRepository.deleteAll();
+        int createPages = 2;
+        final int recordsToCreate = defaultPageSize * createPages;
+        createAndSaveDocs(recordsToCreate);
+        ResultActions response = mockMvc.perform(get(buildTermsURL()));
+        expectBasicFieldsInResults(response, validIdList)
+            .andDo(print())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.results", hasSize(defaultPageSize)));
+    }
+
+    @Test
+    public void canRetrieveMaxPageSizeWhenIdsAreSpecified() throws Exception {
+        ontologyRepository.deleteAll();
+        List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize);
+        List<String> ids = nDocs.stream()
+                                .map(OntologyDocument::getUniqueName)
+                                .collect(Collectors.toList());
+        ResultActions response = mockMvc.perform(get(buildTermsURL(ids)));
+        expectBasicFieldsInResults(response, ids)
+                .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results", hasSize(maxPageSize)));
     }
 
     @Test
@@ -619,7 +663,7 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(buildTermsURL()));
 
         response.andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(validIdList.size()))
+                .andExpect(jsonPath("$.numberOfHits").value(superSetOfValidIdList.size()))
                 .andExpect(jsonPath("$.results.*.children").exists());
     }
 
@@ -863,6 +907,12 @@ public abstract class OBOControllerIT {
         return getResourceURL() + "/" + TERMS_RESOURCE + "/" + id;
     }
 
+    protected String buildTermsURL(List<String> ids) {
+        String csv = ids.stream().collect(Collectors.joining(","));
+        return getResourceURL() + "/" + TERMS_RESOURCE + "/" + csv;
+    }
+
+
     protected String buildTermsURLWithSubResource(String id, String subResource) {
         return buildTermsURL(id) + "/" + subResource;
     }
@@ -978,8 +1028,10 @@ public abstract class OBOControllerIT {
         return resultActions.andReturn().getRequest().getRequestURL().toString();
     }
 
-    private void createAndSaveDocs(int n) {
-        ontologyRepository.save(createNDocs(n));
+    private List<OntologyDocument> createAndSaveDocs(int n) {
+        final List<OntologyDocument> nDocs = createNDocs(n);
+        ontologyRepository.save(nDocs);
         setupSimpleRelationshipChain(n);
+        return nDocs;
     }
 }
