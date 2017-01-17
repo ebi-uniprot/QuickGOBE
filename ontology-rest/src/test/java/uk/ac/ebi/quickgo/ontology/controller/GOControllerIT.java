@@ -12,11 +12,8 @@ import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,7 +35,6 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String GO_0000002 = "GO:0000002";
     private static final String GO_0000003 = "GO:0000003";
     private static final String GO_0000004 = "GO:0000004";
-
 
         @Test
     public void canRetrieveBlacklistByIds() throws Exception {
@@ -109,7 +105,7 @@ public class GOControllerIT extends OBOControllerIT {
 
     @Override
     protected String idMissingInRepository() {
-        return "GO:0000003";
+        return "GO:0000399";
     }
 
     @Override

@@ -53,7 +53,7 @@ public class ECOControllerIT extends OBOControllerIT {
 
     @Override
     protected String idMissingInRepository() {
-        return "ECO:0000003";
+        return "ECO:0000399";
     }
 
     @Override
