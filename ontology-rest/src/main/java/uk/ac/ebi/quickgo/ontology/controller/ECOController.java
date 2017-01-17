@@ -3,7 +3,9 @@ package uk.ac.ebi.quickgo.ontology.controller;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
+import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
+import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
@@ -12,7 +14,6 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,14 +35,14 @@ public class ECOController extends OBOController<ECOTerm> {
             SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
             GraphImageService graphImageService,
-           @Value("${ontology.max_page_size:600}") int maxPageSize,
-           @Value("${ontology.default_page_size:25}") int defaultPageSize) {
+            OBOControllerValidationHelper ecoValidationHelper,
+            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig) {
         super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-              maxPageSize, defaultPageSize);
+              ecoValidationHelper, ontologyPagingConfig);
     }
 
-    @Override
-    public Predicate<String> idValidator() {
+
+    public static Predicate<String> idValidator() {
         return OntologyIdPredicate.isValidECOTermId();
     }
 
