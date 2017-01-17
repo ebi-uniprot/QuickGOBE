@@ -82,6 +82,7 @@ public abstract class OBOController<T extends OBOTerm> {
     private final OBOControllerValidationHelper validationHelper;
     private final GraphImageService graphImageService;
     private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
+    private final OntologyType ontologyType;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
@@ -89,7 +90,8 @@ public abstract class OBOController<T extends OBOTerm> {
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
             GraphImageService graphImageService,
             OBOControllerValidationHelper oboControllerValidationHelper,
-            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig) {
+            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
+            OntologyType ontologyType) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
@@ -97,6 +99,8 @@ public abstract class OBOController<T extends OBOTerm> {
         checkArgument(graphImageService != null, "Graph image service cannot be null");
         checkArgument(oboControllerValidationHelper != null, "OBO validation helper cannot be null");
         checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
+        checkArgument(ontologyType != null, "Ontology type config cannot be null");
+
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
@@ -105,6 +109,7 @@ public abstract class OBOController<T extends OBOTerm> {
         this.validationHelper = oboControllerValidationHelper;
         this.graphImageService = graphImageService;
         this.ontologyPagingConfig = ontologyPagingConfig;
+        this.ontologyType = ontologyType;
     }
 
     /**
@@ -131,7 +136,7 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
-        return new ResponseEntity<>(ontologyService.findAllByOntologyType(getOntologyType(),
+        return new ResponseEntity<>(ontologyService.findAllByOntologyType(this.ontologyType,
                 new Page(page, ontologyPagingConfig.defaultPageSize())), HttpStatus.OK);
     }
 
@@ -395,7 +400,7 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<GraphImageLayout> getChartCoordinates(@PathVariable(value = "ids") String ids) {
         try {
             GraphImageLayout layout = graphImageService
-                    .createChart(validationHelper.validateCSVIds(ids), getOntologyType().name()).getLayout();
+                    .createChart(validationHelper.validateCSVIds(ids), ontologyType.name()).getLayout();
 
             return ResponseEntity
                     .ok()
@@ -404,19 +409,6 @@ public abstract class OBOController<T extends OBOTerm> {
             throw createChartGraphicsException(e);
         }
     }
-
-//    /**
-//     * Predicate that determines the validity of an ID.
-//     * @return {@link Predicate<String>} indicating the validity of an ID.
-//     */
-//    protected abstract Predicate<String> idValidator();
-
-    /**
-     * Returns the {@link OntologyType} that corresponds to this controller.
-     *
-     * @return the ontology type corresponding to this controller's behaviour.
-     */
-    protected abstract OntologyType getOntologyType();
 
     /**
      * Wrap a collection as a {@link Set}
@@ -475,7 +467,7 @@ public abstract class OBOController<T extends OBOTerm> {
             throws IOException, RenderingGraphException {
         RenderedImage renderedImage =
                 graphImageService
-                        .createChart(ids, getOntologyType().name())
+                        .createChart(ids, ontologyType.name())
                         .getGraphImage()
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -514,7 +506,7 @@ public abstract class OBOController<T extends OBOTerm> {
     /**
      * Given a {@link QuickGOQuery}, create a composite {@link QuickGOQuery} by
      * performing a conjunction with another query, which restricts all results
-     * to be of a type corresponding to that provided by {@link #getOntologyType()}.
+     * to be of a type corresponding to ontology type}.
      *
      * @param query the query that is constrained
      * @return the new constrained query
@@ -522,6 +514,6 @@ public abstract class OBOController<T extends OBOTerm> {
     private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
         return and(query,
                 ontologyQueryConverter.convert(
-                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + getOntologyType().name()));
+                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
     }
 }
