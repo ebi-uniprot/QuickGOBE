@@ -11,6 +11,7 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,8 +35,11 @@ public class GOController extends OBOController<GOTerm> {
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
-            GraphImageService graphImageService) {
-        super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService);
+            GraphImageService graphImageService,
+            @Value("${ontology.max_page_size:600}") int maxPageSize,
+            @Value("${ontology.default_page_size:25}") int defaultPageSize) {
+        super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
+              maxPageSize, defaultPageSize);
     }
 
     @Override
