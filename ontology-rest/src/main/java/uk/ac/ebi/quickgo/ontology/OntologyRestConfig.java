@@ -1,13 +1,14 @@
 package uk.ac.ebi.quickgo.ontology;
 
-import uk.ac.ebi.quickgo.ontology.controller.ECOController;
-import uk.ac.ebi.quickgo.ontology.controller.GOController;
+import uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 
 /**
  * @author Tony Wardell
@@ -27,15 +28,16 @@ public class OntologyRestConfig {
 
     public interface OntologyPagingConfig{
         int defaultPageSize();
+
     }
 
     @Bean
     public OBOControllerValidationHelper goValidationHelper(@Value("${ontology.max_page_size:600}") int maxPageSize){
-        return new OBOControllerValidationHelperImpl(maxPageSize, GOController.idValidator());
+        return new OBOControllerValidationHelperImpl(maxPageSize, isValidGOTermId());
     }
 
     @Bean
     public OBOControllerValidationHelper ecoValidationHelper(@Value("${ontology.max_page_size:600}") int maxPageSize){
-        return new OBOControllerValidationHelperImpl(maxPageSize, ECOController.idValidator());
+        return new OBOControllerValidationHelperImpl(maxPageSize, OntologyIdPredicate.isValidECOTermId());
     }
 }
