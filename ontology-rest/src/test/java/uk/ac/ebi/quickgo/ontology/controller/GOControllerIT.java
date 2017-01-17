@@ -36,7 +36,7 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String GO_0000003 = "GO:0000003";
     private static final String GO_0000004 = "GO:0000004";
 
-        @Test
+    @Test
     public void canRetrieveBlacklistByIds() throws Exception {
         ResultActions response = mockMvc.perform(get(
                 buildTermsURLWithSubResource(toCSV(GO_0000001, GO_0000002), CONSTRAINTS_SUB_RESOURCE)));
