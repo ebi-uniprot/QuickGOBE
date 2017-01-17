@@ -524,7 +524,6 @@ public abstract class OBOControllerIT {
 
     @Test
     public void retrieveDefaultPageSizeWhenNoIdsSpecified() throws Exception {
-
         ontologyRepository.deleteAll();
         int createPages = 2;
         final int recordsToCreate = defaultPageSize * createPages;
@@ -542,7 +541,7 @@ public abstract class OBOControllerIT {
         ontologyRepository.deleteAll();
         List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize);
         List<String> ids = nDocs.stream()
-                                .map(OntologyDocument::getUniqueName)
+                                .map(doc -> doc.id)
                                 .collect(Collectors.toList());
         ResultActions response = mockMvc.perform(get(buildTermsURL(ids)));
         expectBasicFieldsInResults(response, ids)
@@ -550,6 +549,20 @@ public abstract class OBOControllerIT {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results", hasSize(maxPageSize)));
+    }
+
+
+    @Test
+    public void badRequestWhenMoreThanMaxPageSizeRequested() throws Exception {
+        ontologyRepository.deleteAll();
+        List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize+1);
+        List<String> ids = nDocs.stream()
+                                .map(doc -> doc.id)
+                                .collect(Collectors.toList());
+        ResultActions response = mockMvc.perform(get(buildTermsURL(ids)));
+        expectBasicFieldsInResults(response, ids)
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
