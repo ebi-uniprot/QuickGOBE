@@ -4,10 +4,10 @@ import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
+import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
-import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -30,7 +30,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
@@ -82,30 +81,30 @@ public abstract class OBOController<T extends OBOTerm> {
     private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
     private final OBOControllerValidationHelper validationHelper;
     private final GraphImageService graphImageService;
-    public final int maxPageSize;
-    public final int defaultPageSize;
+    private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
             GraphImageService graphImageService,
-            int maxPageSize,
-            int defaultPageSize) {
+            OBOControllerValidationHelper oboControllerValidationHelper,
+            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
         checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
         checkArgument(graphImageService != null, "Graph image service cannot be null");
+        checkArgument(oboControllerValidationHelper != null, "OBO validation helper cannot be null");
+        checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
         this.ontologyRetrievalConfig = ontologyRetrievalConfig;
-        this.validationHelper = new OBOControllerValidationHelperImpl(maxPageSize, idValidator());
+        this.validationHelper = oboControllerValidationHelper;
         this.graphImageService = graphImageService;
-        this.maxPageSize = maxPageSize;
-        this.defaultPageSize = defaultPageSize;
+        this.ontologyPagingConfig = ontologyPagingConfig;
     }
 
     /**
@@ -133,7 +132,7 @@ public abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType(getOntologyType(),
-                new Page(page, defaultPageSize)), HttpStatus.OK);
+                new Page(page, ontologyPagingConfig.defaultPageSize())), HttpStatus.OK);
     }
 
     /**
@@ -406,11 +405,11 @@ public abstract class OBOController<T extends OBOTerm> {
         }
     }
 
-    /**
-     * Predicate that determines the validity of an ID.
-     * @return {@link Predicate<String>} indicating the validity of an ID.
-     */
-    protected abstract Predicate<String> idValidator();
+//    /**
+//     * Predicate that determines the validity of an ID.
+//     * @return {@link Predicate<String>} indicating the validity of an ID.
+//     */
+//    protected abstract Predicate<String> idValidator();
 
     /**
      * Returns the {@link OntologyType} that corresponds to this controller.
