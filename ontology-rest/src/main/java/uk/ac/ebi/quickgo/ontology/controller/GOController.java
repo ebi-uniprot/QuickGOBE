@@ -11,12 +11,9 @@ import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
-import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 
 /**
  * REST controller for accessing GO related information.
