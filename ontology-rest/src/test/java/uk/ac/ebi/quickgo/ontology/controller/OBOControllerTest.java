@@ -36,11 +36,11 @@ public class OBOControllerTest {
     private static final int MAX_PAGE_SIZE = 30;
     private static final int DEFAULT_PAGE_SIZE = 25;
     @Mock
-    SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig;
+    private SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig;
     @Mock
-    OBOControllerValidationHelper oboControllerValidationHelper;
+    private OBOControllerValidationHelper oboControllerValidationHelper;
     @Mock
-    OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
+    private OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
     @Mock
     private OntologyService<FakeOBOTerm> ontologyService;
     @Mock
