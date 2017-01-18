@@ -15,6 +15,9 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
  * Date: 17/01/2017
  * Time: 13:32
  * Created with IntelliJ IDEA.
+ *
+ * Configure the beans related to the operation of the restful service - id validation helpers and configuration
+ * object for page sizes.
  */
 @Configuration
 public class OntologyRestConfig {
@@ -22,22 +25,20 @@ public class OntologyRestConfig {
     @Bean
     public OntologyPagingConfig ontologyPagingConfig(
             @Value("${ontology.default_page_size:25}") int defaultPageSize) {
-
         return () -> defaultPageSize;
     }
 
-    public interface OntologyPagingConfig{
-        int defaultPageSize();
-
-    }
-
     @Bean
-    public OBOControllerValidationHelper goValidationHelper(@Value("${ontology.max_page_size:600}") int maxPageSize){
+    public OBOControllerValidationHelper goValidationHelper(@Value("${ontology.max_page_size:600}") int maxPageSize) {
         return new OBOControllerValidationHelperImpl(maxPageSize, isValidGOTermId());
     }
 
     @Bean
-    public OBOControllerValidationHelper ecoValidationHelper(@Value("${ontology.max_page_size:600}") int maxPageSize){
+    public OBOControllerValidationHelper ecoValidationHelper(@Value("${ontology.max_page_size:600}") int maxPageSize) {
         return new OBOControllerValidationHelperImpl(maxPageSize, OntologyIdPredicate.isValidECOTermId());
+    }
+
+    public interface OntologyPagingConfig {
+        int defaultPageSize();
     }
 }
