@@ -91,10 +91,10 @@ public abstract class OBOControllerIT {
 
     private String resourceUrl;
     private String validId;
+    private String validIdsShortCSV;
     private String validIdsCSV;
-    private String superSetOfValidIdsCSV;
+    private List<String> validIdShortList;
     private List<String> validIdList;
-    private List<String> superSetOfValidIdList;
     private List<OntologyRelationship> relationships;
     private String validRelation;
     private String invalidRelation;
@@ -116,16 +116,16 @@ public abstract class OBOControllerIT {
         assertThat(basicDocs.size(), is(greaterThan(1)));
 
         validId = basicDocs.get(0).id;
-        superSetOfValidIdList = basicDocs.stream().map(doc -> doc.id).collect(Collectors.toList());
-        superSetOfValidIdsCSV = toCSV(superSetOfValidIdList);
+        validIdList = basicDocs.stream().map(doc -> doc.id).collect(Collectors.toList());
+        validIdsCSV = toCSV(validIdList);
 
         ontologyRepository.deleteAll();
         ontologyRepository.save(basicDocs);
 
         setupSimpleRelationshipChain();
 
-        validIdList = superSetOfValidIdList.subList(0, 2);
-        validIdsCSV = toCSV(validIdList);
+        validIdShortList = validIdList.subList(0, 2);
+        validIdsShortCSV = toCSV(validIdShortList);
     }
 
     @After
@@ -210,21 +210,21 @@ public abstract class OBOControllerIT {
     @Test
     public void canRetrieveCoreAttrBySubsetOfSavedIds() throws Exception {
 
-        ResultActions response = mockMvc.perform(get(buildTermsURL(superSetOfValidIdsCSV)));
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV)));
 
-        expectCoreFieldsInResults(response, superSetOfValidIdList)
-                .andExpect(jsonPath("$.results.*.id", hasSize(superSetOfValidIdList.size())))
+        expectCoreFieldsInResults(response, validIdList)
+                .andExpect(jsonPath("$.results.*.id", hasSize(validIdList.size())))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void canRetrieveCoreAttrByAllIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV)));
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsShortCSV)));
 
-        expectCoreFieldsInResults(response, validIdList)
+        expectCoreFieldsInResults(response, validIdShortList)
                 .andDo(print())
-                .andExpect(jsonPath("$.results.*.id", hasSize(validIdList.size())))
+                .andExpect(jsonPath("$.results.*.id", hasSize(validIdShortList.size())))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
@@ -241,9 +241,9 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveCompleteByTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, COMPLETE_SUB_RESOURCE)));
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, COMPLETE_SUB_RESOURCE)));
 
-        expectCompleteFieldsInResults(response, validIdList)
+        expectCompleteFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -261,9 +261,9 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveHistoryByTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, HISTORY_SUB_RESOURCE)));
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, HISTORY_SUB_RESOURCE)));
 
-        expectBasicFieldsInResults(response, validIdList)
+        expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -281,9 +281,9 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveXRefsByTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, XREFS_SUB_RESOURCE)));
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, XREFS_SUB_RESOURCE)));
 
-        expectBasicFieldsInResults(response, validIdList)
+        expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.xRefs", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -302,9 +302,9 @@ public abstract class OBOControllerIT {
     @Test
     public void canRetrieveTaxonConstraintsByTwoIds() throws Exception {
         ResultActions response =
-                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, CONSTRAINTS_SUB_RESOURCE)));
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, CONSTRAINTS_SUB_RESOURCE)));
 
-        expectBasicFieldsInResults(response, validIdList)
+        expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.taxonConstraints", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -323,9 +323,9 @@ public abstract class OBOControllerIT {
     @Test
     public void canRetrieveAnnotationGuideLinesByTwoIds() throws Exception {
         ResultActions response =
-                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, GUIDELINES_SUB_RESOURCE)));
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, GUIDELINES_SUB_RESOURCE)));
 
-        expectBasicFieldsInResults(response, validIdList)
+        expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.annotationGuidelines", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -344,9 +344,9 @@ public abstract class OBOControllerIT {
     @Test
     public void canRetrieveXORelsByTwoIds() throws Exception {
         ResultActions response =
-                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsCSV, XRELATIONS_SUB_RESOURCE)));
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, XRELATIONS_SUB_RESOURCE)));
 
-        expectBasicFieldsInResults(response, validIdList)
+        expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.xRelations", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -529,7 +529,7 @@ public abstract class OBOControllerIT {
         final int recordsToCreate = defaultPageSize * createPages;
         createAndSaveDocs(recordsToCreate);
         ResultActions response = mockMvc.perform(get(buildTermsURL()));
-        expectBasicFieldsInResults(response, validIdList)
+        expectBasicFieldsInResults(response, validIdShortList)
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -679,7 +679,7 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(buildTermsURL()));
 
         response.andDo(print())
-                .andExpect(jsonPath("$.numberOfHits").value(superSetOfValidIdList.size()))
+                .andExpect(jsonPath("$.numberOfHits").value(validIdList.size()))
                 .andExpect(jsonPath("$.results.*.children").exists());
     }
 
