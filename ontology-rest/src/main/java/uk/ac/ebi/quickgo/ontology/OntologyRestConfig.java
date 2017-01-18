@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.ontology;
 
-import uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 
@@ -12,13 +11,14 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidECOT
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 
 /**
+ * Configure the beans related to the operation of the restful service - id validation helpers and configuration
+ * object for page sizes.
+ *
  * @author Tony Wardell
  * Date: 17/01/2017
  * Time: 13:32
  * Created with IntelliJ IDEA.
  *
- * Configure the beans related to the operation of the restful service - id validation helpers and configuration
- * object for page sizes.
  */
 @Configuration
 public class OntologyRestConfig {
