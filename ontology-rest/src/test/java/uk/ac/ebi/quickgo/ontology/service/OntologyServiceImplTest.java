@@ -11,6 +11,7 @@ import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
@@ -159,8 +160,7 @@ public class OntologyServiceImplTest {
 
             when(goDocumentConverterMock.convert(any(OntologyDocument.class))).thenReturn(createGOTerm("stub"));
 
-            uk.ac.ebi.quickgo.rest.search.query.Page page =
-                    new uk.ac.ebi.quickgo.rest.search.query.Page(oneBasedPageNumber, pageSize);
+            RegularPage page = new RegularPage(oneBasedPageNumber, pageSize);
             QueryResult<GOTerm> queryResult = goOntologyService.findAllByOntologyType(OntologyType.GO, page);
 
             assertThat(queryResult.getResults(), hasSize(10));

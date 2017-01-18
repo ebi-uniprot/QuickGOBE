@@ -11,53 +11,18 @@ import com.google.common.base.Preconditions;
  *     <li>Number of results to display in page</li>
  * </ul>
  */
-public class Page {
-    private int pageNumber;
+public abstract class Page {
     private int pageSize;
 
-    public Page(int pageNumber, int pageSize) {
-        Preconditions.checkArgument(pageNumber > 0, "Page number must be greater than 0");
+    protected Page(int pageSize) {
         Preconditions.checkArgument(pageSize >= 0, "Page result size cannot be less than 0");
 
-        this.pageNumber = pageNumber;
         this.pageSize = pageSize;
-    }
-
-    public int getPageNumber() {
-        return this.pageNumber;
     }
 
     public int getPageSize() {
         return this.pageSize;
     }
 
-    @Override public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Page page = (Page) o;
-
-        if (pageNumber != page.pageNumber) {
-            return false;
-        }
-        return pageSize == page.pageSize;
-
-    }
-
-    @Override public int hashCode() {
-        int result = pageNumber;
-        result = 31 * result + pageSize;
-        return result;
-    }
-
-    @Override public String toString() {
-        return "Page{" +
-                "pageNumber=" + pageNumber +
-                ", pageSize=" + pageSize +
-                '}';
-    }
+    public abstract <V> void accept(PageVisitor<V> visitor, V subject);
 }

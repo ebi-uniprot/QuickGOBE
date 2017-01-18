@@ -1,5 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
+import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import uk.ac.ebi.quickgo.annotation.model.*;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
@@ -7,6 +12,7 @@ import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
@@ -14,16 +20,11 @@ import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * Service that collects distribution statistics of annotations and gene products throughout a given set of annotation
@@ -94,8 +95,7 @@ public class AnnotationStatisticsService implements StatisticsService {
                         .map(converterFactory::convert)
                         .map(ConvertedFilter::getConvertedValue)
                         .collect(Collectors.toSet()))
-                .setPage(FIRST_PAGE)
-                .setPageSize(RESULTS_PER_PAGE)
+                .setPage(new RegularPage(FIRST_PAGE, RESULTS_PER_PAGE))
                 .setAggregate(converter.convert(request.createStatsRequests()))
                 .build();
     }

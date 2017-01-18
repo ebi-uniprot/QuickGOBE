@@ -1,12 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
-import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
-import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
-import uk.ac.ebi.quickgo.rest.search.results.*;
-import uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter;
-
-import java.util.*;
-import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -16,16 +9,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import uk.ac.ebi.quickgo.rest.search.query.Page;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
+import uk.ac.ebi.quickgo.rest.search.results.*;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
 
 /**
  * Tests the {@link AbstractSolrQueryResultConverter} implementation
- *
+ * <p>
  * Created 08/02/16
+ *
  * @author Edd
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -44,7 +48,8 @@ public class AbstractSolrQueryResultConverterTest {
     public void setUp() throws Exception {
         converter = new AbstractSolrQueryResultConverter<String>() {
 
-            @Override protected List<String> convertResults(SolrDocumentList results) {
+            @Override
+            protected List<String> convertResults(SolrDocumentList results) {
                 return results.stream()
                         .map(SolrDocument::toString)
                         .collect(Collectors.toList());
@@ -93,8 +98,8 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void requestWithPagingRendersResponseWithNoResults() throws Exception {
-        QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, 1, 1);
+    public void requestWithRegularPagingRendersResponseWithNoResults() throws Exception {
+        QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, new RegularPage(1, 1));
 
         QueryResult result = converter.convert(responseMock, request);
 
@@ -107,6 +112,42 @@ public class AbstractSolrQueryResultConverterTest {
 
         checkPageInfo(result.getPageInfo(), expectedTotalPages, expectedCurrentPage, expectedResultsPerPage);
 
+        assertThat(result.getFacet(), is(nullValue()));
+    }
+
+    @Test
+    public void requestWithFirstCursorPageRendersResponseWithNoResults() throws Exception {
+        QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, createFirstCursorPage(1));
+        String expectedNextCursor = "fakeCursor";
+
+        when(responseMock.getNextCursorMark()).thenReturn(expectedNextCursor);
+        QueryResult result = converter.convert(responseMock, request);
+
+        assertThat(result.getNumberOfHits(), is(0L));
+        assertThat(result.getResults().isEmpty(), is(true));
+
+        int expectedTotalPages = 0;
+        int expectedResultsPerPage = 1;
+
+        checkPageInfo(result.getPageInfo(), expectedTotalPages, PageInfo.CURSOR_PAGE_NUMBER, expectedNextCursor, expectedResultsPerPage);
+        assertThat(result.getFacet(), is(nullValue()));
+    }
+
+    @Test
+    public void requestWithNextCursorPageRendersResponseWithNoResults() throws Exception {
+        QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, createCursorPage("cursor", 1));
+        String expectedNextCursor = "fakeCursor";
+
+        when(responseMock.getNextCursorMark()).thenReturn(expectedNextCursor);
+        QueryResult result = converter.convert(responseMock, request);
+
+        assertThat(result.getNumberOfHits(), is(0L));
+        assertThat(result.getResults().isEmpty(), is(true));
+
+        int expectedTotalPages = 0;
+        int expectedResultsPerPage = 1;
+
+        checkPageInfo(result.getPageInfo(), expectedTotalPages, PageInfo.CURSOR_PAGE_NUMBER, expectedNextCursor, expectedResultsPerPage);
         assertThat(result.getFacet(), is(nullValue()));
     }
 
@@ -145,8 +186,8 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void responseWith2ResultsAndPaging() {
-        QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, 1, 1);
+    public void responseWith2ResultsAndRegularPaging() {
+        QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, new RegularPage(1, 1));
 
         SolrDocumentList docList = new SolrDocumentList();
         docList.add(new SolrDocument());
@@ -158,6 +199,24 @@ public class AbstractSolrQueryResultConverterTest {
         QueryResult result = converter.convert(responseMock, request);
 
         checkPageInfo(result.getPageInfo(), 2, 1, 1);
+    }
+
+    @Test
+    public void responseWith2ResultsAndCursorPaging() {
+        QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, createCursorPage("anyCursor", 1));
+        String expectedNextCursor = "fakeCursor";
+
+        SolrDocumentList docList = new SolrDocumentList();
+        docList.add(new SolrDocument());
+        docList.add(new SolrDocument());
+        docList.setNumFound(2);
+
+        when(responseMock.getResults()).thenReturn(docList);
+        when(responseMock.getNextCursorMark()).thenReturn(expectedNextCursor);
+
+        QueryResult result = converter.convert(responseMock, request);
+
+        checkPageInfo(result.getPageInfo(), 2, PageInfo.CURSOR_PAGE_NUMBER, expectedNextCursor, 1);
     }
 
     @Test
@@ -251,12 +310,20 @@ public class AbstractSolrQueryResultConverterTest {
         assertThat(pageInfo.getTotal(), is(expectedTotalPages));
     }
 
+    private void checkPageInfo(PageInfo pageInfo, int expectedTotalPages, int expectedCurrentPage, String nextCursor,
+                               int expectedResultsPerPage) {
+        assertThat(pageInfo.getResultsPerPage(), is(expectedResultsPerPage));
+        assertThat(pageInfo.getCurrent(), is(expectedCurrentPage));
+        assertThat(pageInfo.getNextCursor(), is(nextCursor));
+        assertThat(pageInfo.getTotal(), is(expectedTotalPages));
+    }
+
     private QueryRequest createDefaultRequest(QuickGOQuery query) {
         return new QueryRequest.Builder(query).build();
     }
 
-    private QueryRequest createRequestWithPaging(QuickGOQuery query, int currentPage, int resultsPerPage) {
-        return new QueryRequest.Builder(query).setPageParameters(currentPage, resultsPerPage).build();
+    private QueryRequest createRequestWithPaging(QuickGOQuery query, Page page) {
+        return new QueryRequest.Builder(query).setPage(page).build();
     }
 
     private QueryRequest createRequestWithFaceting(QuickGOQuery query, List<String> facets) {

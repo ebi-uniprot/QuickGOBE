@@ -1,5 +1,14 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProductRequest;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
@@ -11,26 +20,18 @@ import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
+import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import io.swagger.annotations.ApiOperation;
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
@@ -129,8 +130,7 @@ public class GeneProductController {
                 .addFacets(request.getFacet() == null ? null : Arrays.asList(request.getFacet()))
                 .addFilters(convertFilterRequestsToQueries(request.createFilterRequests()))
                 .useHighlighting(request.isHighlighting())
-                .setPage(request.getPage())
-                .setPageSize(request.getLimit());
+                .setPage(new RegularPage(request.getPage(), request.getLimit()));
 
         return search(requestBuilder.build(), geneProductSearchService);
     }

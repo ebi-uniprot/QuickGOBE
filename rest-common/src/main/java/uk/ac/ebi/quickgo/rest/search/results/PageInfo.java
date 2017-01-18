@@ -1,25 +1,23 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Contains the paging information for a {@link QueryResult}.
  */
 public class PageInfo {
+    public static final int CURSOR_PAGE_NUMBER = 0;
+
     private final int totalPages;
     private final int currentPage;
+    private final String nextCursor;
     private final int resultsPerPage;
 
-    public PageInfo(int totalPages, int currentPage, int resultsPerPage) {
-        Preconditions.checkArgument(totalPages >= 0, "Total number of pages can not be negative: " + totalPages);
-        Preconditions.checkArgument(currentPage >= 0, "Current page can not be negative: " + currentPage);
-        Preconditions.checkArgument(totalPages >= currentPage, "Current page can not be larger than total amount of " +
-                "pages: [current: " + currentPage + ", total: " + totalPages + "]");
-        Preconditions.checkArgument(resultsPerPage >= 0, "Results per page can not be less than 0: " + resultsPerPage);
-
-        this.totalPages = totalPages;
-        this.currentPage = currentPage;
-        this.resultsPerPage = resultsPerPage;
+    private PageInfo(Builder builder) {
+        this.currentPage = builder.currentPage;
+        this.nextCursor = builder.nextCursor;
+        this.resultsPerPage = builder.resultsPerPage;
+        this.totalPages = builder.totalPages;
     }
 
     /**
@@ -41,11 +39,65 @@ public class PageInfo {
     }
 
     /**
+     * The cursor position from which one can receive the next page of results.
+     *
+     * @return the next cursor position
+     */
+    public String getNextCursor() {
+        return nextCursor;
+    }
+
+    /**
      * The maximum number of query results a page can display
      *
      * @return the maximum number of query results per page
      */
     public int getResultsPerPage() {
         return resultsPerPage;
+    }
+
+    public static class Builder {
+        private static final int UNINITIALISED_PAGE_NUMBER = -1;
+        private int totalPages;
+        private int resultsPerPage;
+        private int currentPage = UNINITIALISED_PAGE_NUMBER;
+        private String nextCursor;
+
+        public Builder withTotalPages(int totalPages) {
+            checkArgument(totalPages >= 0, "Total number of pages cannot be negative: " + totalPages);
+            this.totalPages = totalPages;
+            return this;
+        }
+
+        public Builder withResultsPerPage(int resultsPerPage) {
+            checkArgument(resultsPerPage >= 0, "Results per page cannot be less than 0: " + resultsPerPage);
+            this.resultsPerPage = resultsPerPage;
+            return this;
+        }
+
+        public Builder withCurrentPage(int currentPage) {
+            checkArgument(currentPage >= 0, "Current page cannot be negative: " + currentPage);
+            checkArgument(nextCursor == null, "Cannot set both current page and next cursor");
+            this.currentPage = currentPage;
+            return this;
+        }
+
+        public Builder withNextCursor(String cursor) {
+            checkArgument(cursor != null && !cursor.isEmpty(), "Next cursor cannot be null or empty: " + cursor);
+            checkArgument(currentPage == UNINITIALISED_PAGE_NUMBER, "Cannot set both next cursor and current page");
+            this.nextCursor = cursor;
+            this.currentPage = CURSOR_PAGE_NUMBER;
+            return this;
+        }
+
+        private void validateSuppliedArguments() {
+            checkArgument(totalPages >= currentPage, "Current page cannot be larger than total amount of pages: " +
+                    "[current: " + currentPage + ", total: " + totalPages + "]");
+        }
+
+        public PageInfo build() {
+            validateSuppliedArguments();
+            return new PageInfo(this);
+        }
     }
 }
