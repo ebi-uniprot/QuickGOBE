@@ -33,6 +33,8 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String RESOURCE_URL = "/ontology/go";
     private static final String GO_0000001 = "GO:0000001";
     private static final String GO_0000002 = "GO:0000002";
+    private static final String GO_0000003 = "GO:0000003";
+    private static final String GO_0000004 = "GO:0000004";
 
     @Test
     public void canRetrieveBlacklistByIds() throws Exception {
@@ -96,12 +98,14 @@ public class GOControllerIT extends OBOControllerIT {
     protected List<OntologyDocument> createBasicDocs() {
         return Arrays.asList(
                 OntologyDocMocker.createGODoc(GO_0000001, "go name 1"),
-                OntologyDocMocker.createGODoc(GO_0000002, "go name 2"));
+                OntologyDocMocker.createGODoc(GO_0000002, "go name 2"),
+                OntologyDocMocker.createGODoc(GO_0000003, "go name 3"),
+                OntologyDocMocker.createGODoc(GO_0000004, "go name 4"));
     }
 
     @Override
     protected String idMissingInRepository() {
-        return "GO:0000003";
+        return "GO:0000399";
     }
 
     @Override

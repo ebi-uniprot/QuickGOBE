@@ -2,19 +2,18 @@ package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
+import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
+import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
-import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 
 /**
  * REST controller for accessing GO related information.
@@ -34,17 +33,10 @@ public class GOController extends OBOController<GOTerm> {
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
-            GraphImageService graphImageService) {
-        super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService);
+            GraphImageService graphImageService,
+            OBOControllerValidationHelper goValidationHelper,
+            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig) {
+        super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
+              goValidationHelper, ontologyPagingConfig, OntologyType.GO);
     }
-
-    @Override
-    public Predicate<String> idValidator() {
-        return isValidGOTermId();
-    }
-
-    @Override protected OntologyType getOntologyType() {
-        return OntologyType.GO;
-    }
-
 }
