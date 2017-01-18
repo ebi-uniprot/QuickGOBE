@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidECOTermId;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 
 /**
@@ -35,7 +36,7 @@ public class OntologyRestConfig {
 
     @Bean
     public OBOControllerValidationHelper ecoValidationHelper(@Value("${ontology.max_page_size:600}") int maxPageSize) {
-        return new OBOControllerValidationHelperImpl(maxPageSize, OntologyIdPredicate.isValidECOTermId());
+        return new OBOControllerValidationHelperImpl(maxPageSize, isValidECOTermId());
     }
 
     public interface OntologyPagingConfig {
