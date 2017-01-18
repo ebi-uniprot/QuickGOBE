@@ -1,0 +1,77 @@
+#! /bin/bash
+
+job_basename="QuickGO-Alpha:"
+timestamp=$(date "+%N.%s")
+
+logback_conf=$PWD/logback.xml
+
+# who to email when LSF jobs finish; comma separated format on a single line
+lsf_email="$LOGNAME"
+lsf_cores=8,32
+lsf_q=production-rh6
+lsf_mem=16896
+lsf_jvm_min_mem=4096m
+lsf_jvm_max_mem=12288m
+lsf_heapdump_path=$PWD/logs
+jmx_port=3333
+
+## ---------------------------- FOR JAVA ----------------------------
+quickgo_service_jar="${solr_config_dir}/PROFILE_PLACEHOLDER/lib/quickgo/*"
+
+
+function lsfOptionsBase {
+    if [ -z "$lsf_job_name" ]; then
+        echo '$lsf_job_name variable must be set';
+        exit 1;
+    fi
+    local str="-u $lsf_email \
+            -n $lsf_cores \
+            -o $lsf_log_file \
+            -N \
+            -q $lsf_q \
+            -M $lsf_mem \
+            -J \\\"$job_basename $lsf_job_name, timestamp=$timestamp\\\" \
+            -R \\\"rusage[mem=$lsf_mem]\\\"";
+    echo $(eval "echo "$str"");
+}
+
+function javaCommand {
+    set -f
+    local loc_indexing_vm=$1
+    local str="$jvm \
+                  -Dcom.sun.management.jmxremote.port=$jmx_port \
+                  -Dcom.sun.management.jmxremote.ssl=false \
+                  -Dcom.sun.management.jmxremote.authenticate=false \
+                  -Dlogback.configurationFile=$logback_conf \
+                  -XX:+UnlockCommercialFeatures -XX:+FlightRecorder \
+                  -XX:FlightRecorderOptions=loglevel=debug \
+                  -Xms$lsf_jvm_min_mem \
+                  -Xmx$lsf_jvm_max_mem \
+                  -XX:+HeapDumpOnOutOfMemoryError \
+                  -XX:HeapDumpPath=$lsf_heapdump_path  \
+                  $jvm_params \
+                  -Dsolr.host=$loc_indexing_vm \
+                  -jar $quickgo_service_jar $main_class $main_class_params";
+
+    echo $(eval "echo "$str"");
+}
+
+# prints options to pass to a bsub command
+# using the $JOB contents as the job to run
+# require JOB to be defined
+function lsfJobOptions {
+    if [ "$#" -ne "1" ]; then
+        echo "Expected 1 argument: the job to run. Received $@"
+        exit 1;
+    elif [ -z "$1" ]; then
+        echo "Argument 1 (the job) must be set";
+        exit 1;
+    fi
+
+    echo "$(lsfOptionsBase) '$1'";
+}
+
+function lsfJavaJobOptions {
+    local loc_indexing_vm=$1
+    lsfJobOptions "$(javaCommand $loc_indexing_vm)";
+}

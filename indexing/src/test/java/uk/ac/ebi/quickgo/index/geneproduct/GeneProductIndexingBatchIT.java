@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +45,11 @@ public class GeneProductIndexingBatchIT {
 
     @Autowired
     private GeneProductRepository geneProductRepository;
+
+    @Before
+    public void setUp() {
+        geneProductRepository.deleteAll();
+    }
 
     @Test
     public void successfulJobRun() throws Exception {

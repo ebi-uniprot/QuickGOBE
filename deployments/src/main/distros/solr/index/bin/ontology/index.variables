@@ -1,0 +1,21 @@
+# note: this file should  be sourced after ../common.variables, to
+# ensure duplicated values here take precedence, e.g., lsf_mem
+
+
+## ---------------------------- ASSOCIATED SOLR CORE INFO ----------------------------
+core_name="ontology";
+job_name="ontologyIndexingJob";
+
+
+## ---------------------------- FOR JAVA ----------------------------
+#SOLR_ADDRESS="$SOLR_ADDRESS_BASE/$core_name"
+jvm_params="-Dspring.batch.job.names=$job_name"
+
+
+## ---------------------------- LSF ----------------------------
+lsf_mem=16896           # mem requested for LSF job
+lsf_jvm_min_mem=4096m   # min mem used by JVM
+lsf_jvm_max_mem=12288m  # max mem used by JVM
+lsf_job_name="Ontology-Solr-Index-Creation"
+log_file_name=$(date "+$core_name-index-%N.%s.log") # time stamp the log file
+lsf_log_file="${solr_config_dir}/logs/${log_file_name}"

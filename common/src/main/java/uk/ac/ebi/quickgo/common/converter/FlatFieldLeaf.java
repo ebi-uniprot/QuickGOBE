@@ -13,11 +13,15 @@ import static java.util.Objects.nonNull;
  * Created 26/11/15
  * @author Edd
  */
-public class FlatFieldLeaf extends FlatField {
+public class FlatFieldLeaf implements FlatField {
     private static final String PRINTED_NULL_STRING = " ";
 
     private String value;
-    private final static List<FlatField> EMPTY_LIST = Collections.unmodifiableList(Collections.emptyList());
+    private static final List<FlatField> EMPTY_LIST;
+
+    static {
+        EMPTY_LIST = Collections.unmodifiableList(Collections.emptyList());
+    }
 
     private FlatFieldLeaf(String value) {
         if (nonNull(value) && !value.trim().isEmpty()) {

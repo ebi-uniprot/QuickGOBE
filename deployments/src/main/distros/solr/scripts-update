@@ -1,0 +1,83 @@
+#! /bin/bash
+
+##=========================================================================================
+# Updates from Git the directory used for administrating Solr.
+# It is not necessary to update with each release, only when the scripts
+# that run the applications change.
+##=========================================================================================
+
+set -eo pipefail
+
+valid_users=("uni_qgo");
+
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables"; then
+    prettyEcho "<error>Required properties files were not found. Please make sure you're in the right directory.</error>";
+    exit 1;
+fi
+
+# ======= CONSTANTS =======================================
+scripts_bin_content_dir="solr"
+scripts_bin="solr-bin.tar.gz"
+
+# ======= FUNCTIONS ======================================================================
+# ======= take a string and add a time-stamp to it =======================================
+function addTimeStamp() {
+    local dirname="$(dirname $1)"
+    local fname=$(basename "$1")
+    local fext=""
+    if echo "$fname" | grep '\.'; then
+        fext=".${fname##*.}"
+    fi
+    local fname="${fname%.*}"
+    echo "$dirname/$fname-$(date '+%s.%N')$fext"
+}
+
+# ======= save current directory =======================================
+dirs -c
+pushd . > /dev/null
+
+cd "$quickgo_repo_dir"
+git fetch
+git checkout "$quickgo_branch"
+git pull
+cd "deployments"
+mvn -U -DskipTests -P assemble-solr-bin-archive package
+eval "mv" "target/$scripts_bin" "$(dirs +1)"
+
+eval "cd" "$(dirs +1)"
+
+# backup $scripts_bin_content_dir, before replacing it
+if [ -d "$scripts_bin_content_dir" ]; then
+        archives=".$scripts_bin_content_dir-archives";
+        if [ ! -d "$archives" ]; then
+          mkdir "$archives";
+        fi
+
+        backup="$archives/$(addTimeStamp $scripts_bin_content_dir).old";
+        prettyEcho "<info>Archiving old bin directory '$scripts_bin_content_dir' to '$backup'</info>"
+        mv $scripts_bin_content_dir $backup
+
+        # replace $scripts_bin_content_dir
+        prettyEcho "<info>Extracting contents of $scripts_bin to $(readlink -f .)</info>"
+        tar xzf $scripts_bin
+
+        # remove the archive after it's been decompressed
+        rm $scripts_bin
+
+        cd "$archives";
+        if [ "$(basename $(pwd))" == "$archives" ]; then # double check we're actually in the backup directory, before deleting anything!
+                prettyEcho "<info>Deleting oldest archives, but keeping newest 5</info>";
+                (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf
+        fi
+else
+    # replace $scripts_bin_content_dir
+    eval "cd" "$(dirs +1)"
+    prettyEcho "<info>Extracting contents of $scripts_bin to $(readlink -f .)</info>"
+    tar xzf $scripts_bin
+
+    # remove the archive after it's been decompressed
+    rm $scripts_bin
+fi
+
+# ======= jump back to saved directory =======================================
+popd > /dev/null
