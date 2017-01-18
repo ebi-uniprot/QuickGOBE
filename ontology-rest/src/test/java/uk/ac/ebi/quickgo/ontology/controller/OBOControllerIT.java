@@ -553,16 +553,14 @@ public abstract class OBOControllerIT {
 
 
     @Test
-    public void badRequestWhenMoreThanMaxPageSizeRequested() throws Exception {
+    public void numberOfTermsRequestedGreaterThanTermLimitReturns400() throws Exception {
         ontologyRepository.deleteAll();
         List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize+1);
         List<String> ids = nDocs.stream()
                                 .map(doc -> doc.id)
                                 .collect(Collectors.toList());
         ResultActions response = mockMvc.perform(get(buildTermsURL(ids)));
-        expectBasicFieldsInResults(response, ids)
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+        response.andExpect(status().isBadRequest());
     }
 
     @Test
