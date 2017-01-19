@@ -1,14 +1,21 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.quickgo.common.SearchableField;
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
+import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -22,6 +29,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
  * Created 07/04/16
  * @author Edd
  */
+@RunWith(MockitoJUnitRunner.class)
 public class SearchDispatcherTest {
     private static class MockSearchableField implements SearchableField {
 
@@ -146,5 +154,36 @@ public class SearchDispatcherTest {
 
         filterQueries.add("aFieldThatDoesntExist:value"); // then add a non-searchable field
         assertThat(isValidFilterQueries(searchableField, filterQueries), is(false));
+    }
+
+
+    @Mock
+    private QueryRequest queryRequest;
+    @Mock
+    private DefaultSearchQueryTemplate queryTemplate;
+    @Mock
+    private SearchService<String> searchService;
+    @Mock
+    private ResultTransformerChain<QueryResult<String>> transformer;
+    @Mock
+    private FilterContext context;
+
+    @Test
+    public void streamingSearchResultsCreatesStreamCorrectly() {
+        /**
+         * QueryRequest queryRequest,
+         DefaultSearchQueryTemplate queryTemplate,
+         SearchService<T> searchService,
+         ResultTransformerChain<QueryResult<T>> transformer,
+         FilterContext context
+         */
+
+        Stream<QueryResult<String>> resultStream = streamSearchResults(
+                queryRequest,
+                queryTemplate,
+                searchService,
+                transformer,
+                context);
+        System.out.println(resultStream);
     }
 }

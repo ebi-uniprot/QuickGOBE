@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
@@ -7,14 +11,9 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.FIRST_CURSOR;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
@@ -121,31 +120,46 @@ public final class SearchDispatcher {
             SearchService<T> searchService,
             ResultTransformerChain<QueryResult<T>> transformer,
             FilterContext context) {
-
-        ResponseEntity<QueryResult<T>> response;
         Stream<QueryResult<T>> resultStream;
-        QueryRequest request = queryRequest;
 
         if (queryRequest == null) {
             resultStream = Stream.empty();
         } else {
             try {
-                String cursor = FIRST_CURSOR;
+                class MutableType<V> {
+                    private V value;
+
+                    MutableType(V value) {
+                        setValue(value);
+                    }
+
+                    void setValue(V value) {
+                        this.value = value;
+                    }
+
+                    V getValue() {
+                        return this.value;
+                    }
+                }
+
+                MutableType<String> cursor = new MutableType<>(FIRST_CURSOR);
+                MutableType<Boolean> first = new MutableType<>(true);
+
                 // first result
                 QueryResult<T> queryResult = transformer.applyTransformations(
                         searchService.findByQuery(queryRequest),
                         context);
 
-                AtomicInteger counter = new AtomicInteger(0);
                 resultStream = Stream.iterate(queryResult, qr -> {
-                    if (counter.get() == 0) {
+                    if (first.getValue()) {
+                        first.setValue(false);
                         return qr;
                     } else {
                         String nextCursor = qr.getPageInfo().getNextCursor();
-                        if (cursor.equals(nextCursor)) {
+                        if (cursor.getValue().equals(nextCursor)) {
                             return null;
                         } else {
-                            cursor = nextCursor;
+                            cursor.setValue(nextCursor);
                             QueryRequest nextQueryRequest = queryTemplate.newBuilder()
                                     .setQuery(queryRequest.getQuery())
                                     .addFilters(queryRequest.getFilters())
