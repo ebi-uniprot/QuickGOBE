@@ -91,7 +91,7 @@ public class CoTermTest {
 
     @Test
     public void similarityRatioNotCalculatedAsZero() {
-        float selected = 1;
+        long selected = 1;
         long together = 1;
         long compared = 3201;
         assertThat(CoTerm.calculateSimilarityRatio(selected, together, compared), equalTo(0.031240238F));

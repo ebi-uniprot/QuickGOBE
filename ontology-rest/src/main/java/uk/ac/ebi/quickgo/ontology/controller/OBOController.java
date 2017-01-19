@@ -4,10 +4,10 @@ import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
+import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
-import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -30,7 +30,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
@@ -71,8 +70,6 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String CHART_SUB_RESOURCE = "chart";
     static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
 
-    static final int MAX_PAGE_RESULTS = 100;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
@@ -84,24 +81,35 @@ public abstract class OBOController<T extends OBOTerm> {
     private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
     private final OBOControllerValidationHelper validationHelper;
     private final GraphImageService graphImageService;
+    private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
+    private final OntologyType ontologyType;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
-            GraphImageService graphImageService) {
+            GraphImageService graphImageService,
+            OBOControllerValidationHelper oboControllerValidationHelper,
+            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
+            OntologyType ontologyType) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
         checkArgument(ontologyRetrievalConfig != null, "Ontology retrieval configuration cannot be null");
         checkArgument(graphImageService != null, "Graph image service cannot be null");
+        checkArgument(oboControllerValidationHelper != null, "OBO validation helper cannot be null");
+        checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
+        checkArgument(ontologyType != null, "Ontology type config cannot be null");
+
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
         this.ontologyQueryConverter = new StringToQuickGOQueryConverter(searchableField);
         this.ontologyRetrievalConfig = ontologyRetrievalConfig;
-        this.validationHelper = new OBOControllerValidationHelperImpl(MAX_PAGE_RESULTS, idValidator());
+        this.validationHelper = oboControllerValidationHelper;
         this.graphImageService = graphImageService;
+        this.ontologyPagingConfig = ontologyPagingConfig;
+        this.ontologyType = ontologyType;
     }
 
     /**
@@ -128,8 +136,8 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
-        return new ResponseEntity<>(ontologyService.findAllByOntologyType(getOntologyType(),
-                new RegularPage(page, MAX_PAGE_RESULTS)), HttpStatus.OK);
+        return new ResponseEntity<>(ontologyService.findAllByOntologyType(this.ontologyType,
+                new RegularPage(page, ontologyPagingConfig.defaultPageSize())), HttpStatus.OK);
     }
 
     /**
@@ -392,7 +400,7 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<GraphImageLayout> getChartCoordinates(@PathVariable(value = "ids") String ids) {
         try {
             GraphImageLayout layout = graphImageService
-                    .createChart(validationHelper.validateCSVIds(ids), getOntologyType().name()).getLayout();
+                    .createChart(validationHelper.validateCSVIds(ids), ontologyType.name()).getLayout();
 
             return ResponseEntity
                     .ok()
@@ -401,19 +409,6 @@ public abstract class OBOController<T extends OBOTerm> {
             throw createChartGraphicsException(e);
         }
     }
-
-    /**
-     * Predicate that determines the validity of an ID.
-     * @return {@link Predicate<String>} indicating the validity of an ID.
-     */
-    protected abstract Predicate<String> idValidator();
-
-    /**
-     * Returns the {@link OntologyType} that corresponds to this controller.
-     *
-     * @return the ontology type corresponding to this controller's behaviour.
-     */
-    protected abstract OntologyType getOntologyType();
 
     /**
      * Wrap a collection as a {@link Set}
@@ -472,7 +467,7 @@ public abstract class OBOController<T extends OBOTerm> {
             throws IOException, RenderingGraphException {
         RenderedImage renderedImage =
                 graphImageService
-                        .createChart(ids, getOntologyType().name())
+                        .createChart(ids, ontologyType.name())
                         .getGraphImage()
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -511,7 +506,7 @@ public abstract class OBOController<T extends OBOTerm> {
     /**
      * Given a {@link QuickGOQuery}, create a composite {@link QuickGOQuery} by
      * performing a conjunction with another query, which restricts all results
-     * to be of a type corresponding to that provided by {@link #getOntologyType()}.
+     * to be of a type corresponding to ontology type}.
      *
      * @param query the query that is constrained
      * @return the new constrained query
@@ -519,6 +514,6 @@ public abstract class OBOController<T extends OBOTerm> {
     private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
         return and(query,
                 ontologyQueryConverter.convert(
-                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + getOntologyType().name()));
+                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
     }
 }
