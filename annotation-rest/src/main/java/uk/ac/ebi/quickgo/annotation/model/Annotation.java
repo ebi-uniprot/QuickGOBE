@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Annotation DTO used by the service layer.
@@ -253,6 +254,10 @@ public class Annotation {
                     ", id='" + id + '\'' +
                     '}';
         }
+
+        public String asXref() {
+            return String.format("%s:%s", db, id);
+        }
     }
 
     /**
@@ -286,6 +291,11 @@ public class Annotation {
 
             return qualifier != null ? qualifier.equals(that.qualifier) : that.qualifier == null;
 
+        }
+
+
+        public String asXref() {
+            return String.format("%s(%s:%s)", qualifier, db, id);
         }
 
         @Override public int hashCode() {
