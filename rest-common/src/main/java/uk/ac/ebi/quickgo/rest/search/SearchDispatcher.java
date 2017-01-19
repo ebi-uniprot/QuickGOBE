@@ -7,12 +7,17 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.FIRST_CURSOR;
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
 
 /**
  * Helper class that dispatches search requests, in the form of
@@ -108,6 +113,57 @@ public final class SearchDispatcher {
         }
 
         return response;
+    }
+
+    public static <T> Stream<QueryResult<T>> streamSearchResults(
+            QueryRequest queryRequest,
+            DefaultSearchQueryTemplate queryTemplate,
+            SearchService<T> searchService,
+            ResultTransformerChain<QueryResult<T>> transformer,
+            FilterContext context) {
+
+        ResponseEntity<QueryResult<T>> response;
+        Stream<QueryResult<T>> resultStream;
+        QueryRequest request = queryRequest;
+
+        if (queryRequest == null) {
+            resultStream = Stream.empty();
+        } else {
+            try {
+                String cursor = FIRST_CURSOR;
+                // first result
+                QueryResult<T> queryResult = transformer.applyTransformations(
+                        searchService.findByQuery(queryRequest),
+                        context);
+
+                AtomicInteger counter = new AtomicInteger(0);
+                resultStream = Stream.iterate(queryResult, qr -> {
+                    if (counter.get() == 0) {
+                        return qr;
+                    } else {
+                        String nextCursor = qr.getPageInfo().getNextCursor();
+                        if (cursor.equals(nextCursor)) {
+                            return null;
+                        } else {
+                            cursor = nextCursor;
+                            QueryRequest nextQueryRequest = queryTemplate.newBuilder()
+                                    .setQuery(queryRequest.getQuery())
+                                    .addFilters(queryRequest.getFilters())
+                                    .setPage(createCursorPage(nextCursor, queryRequest.getPage().getPageSize()))
+                                    .build();
+                            return transformer.applyTransformations(
+                                    searchService.findByQuery(nextQueryRequest),
+                                    context);
+                        }
+                    }
+                });
+            } catch (RetrievalException e) {
+                LOGGER.error(createErrorMessage(queryRequest), e);
+                throw e;
+            }
+        }
+
+        return resultStream;
     }
 
     /**
