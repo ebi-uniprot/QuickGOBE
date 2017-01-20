@@ -1,19 +1,22 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
+import uk.ac.ebi.quickgo.rest.search.query.AbstractField;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
+import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.FIRST_CURSOR;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
@@ -115,64 +118,47 @@ public final class SearchDispatcher {
     }
 
     public static <T> Stream<QueryResult<T>> streamSearchResults(
-            QueryRequest queryRequest,
+            QueryRequest firstQueryRequest,
             DefaultSearchQueryTemplate queryTemplate,
             SearchService<T> searchService,
             ResultTransformerChain<QueryResult<T>> transformer,
-            FilterContext context) {
+            FilterContext context,
+            int limit) {
         Stream<QueryResult<T>> resultStream;
 
-        if (queryRequest == null) {
+        if (firstQueryRequest == null) {
             resultStream = Stream.empty();
         } else {
             try {
-                class MutableType<V> {
-                    private V value;
-
-                    MutableType(V value) {
-                        setValue(value);
-                    }
-
-                    void setValue(V value) {
-                        this.value = value;
-                    }
-
-                    V getValue() {
-                        return this.value;
-                    }
-                }
-
-                MutableType<String> cursor = new MutableType<>(FIRST_CURSOR);
-                MutableType<Boolean> first = new MutableType<>(true);
-
-                // first result
-                QueryResult<T> queryResult = transformer.applyTransformations(
-                        searchService.findByQuery(queryRequest),
+                // fetch first result
+                QueryResult<T> firstQueryResult = transformer.applyTransformations(
+                        searchService.findByQuery(firstQueryRequest),
                         context);
+                firstQueryResult = resizeResults(firstQueryResult, limit);
+                MutableValue<String> cursor = new MutableValue<>(FIRST_CURSOR);
 
-                resultStream = Stream.iterate(queryResult, qr -> {
-                    if (first.getValue()) {
-                        first.setValue(false);
+                int maxResultsToFetch = firstQueryResult.getNumberOfHits() < limit ?
+                        (int) firstQueryResult.getNumberOfHits() : limit;
+                int pageSize = firstQueryRequest.getPage().getPageSize();
+                int requiredIterations = (int) Math.ceil((double) maxResultsToFetch / pageSize);
+
+               resultStream = Stream.iterate(firstQueryResult, qr -> {
+                    String nextCursor = qr.getPageInfo().getNextCursor();
+                    if (isCursorAtEnd(cursor.getValue(), nextCursor)) {
                         return qr;
                     } else {
-                        String nextCursor = qr.getPageInfo().getNextCursor();
-                        if (cursor.getValue().equals(nextCursor)) {
-                            return null;
-                        } else {
-                            cursor.setValue(nextCursor);
-                            QueryRequest nextQueryRequest = queryTemplate.newBuilder()
-                                    .setQuery(queryRequest.getQuery())
-                                    .addFilters(queryRequest.getFilters())
-                                    .setPage(createCursorPage(nextCursor, queryRequest.getPage().getPageSize()))
-                                    .build();
-                            return transformer.applyTransformations(
-                                    searchService.findByQuery(nextQueryRequest),
-                                    context);
-                        }
+                        cursor.setValue(nextCursor);
+
+                        QueryRequest nextQueryRequest =
+                                createNextCursorQueryRequest(queryTemplate, firstQueryRequest, nextCursor);
+
+                        return transformer.applyTransformations(
+                                searchService.findByQuery(nextQueryRequest),
+                                context);
                     }
-                });
+                }).limit(requiredIterations);
             } catch (RetrievalException e) {
-                LOGGER.error(createErrorMessage(queryRequest), e);
+                LOGGER.error(createErrorMessage(firstQueryRequest), e);
                 throw e;
             }
         }
@@ -250,7 +236,80 @@ public final class SearchDispatcher {
         return true;
     }
 
+    private static boolean isCursorAtEnd(String cursor, String nextCursor) {
+        return cursor.equals(nextCursor);
+    }
+
+    /**
+     * Creates the next {@link QueryRequest} in a sequence of cursored requests
+     * being made to satisfy an initial request. This next request is based primarily
+     * on the initial request, but differs in its {@code nextCursor} value.
+     *
+     * @param queryTemplate the builder used to create (partially pre-populated) {@link QueryRequest}s
+     * @param queryRequest the initial {@link QueryRequest}
+     * @param nextCursor the next cursor
+     * @return the next {@link QueryRequest}
+     */
+    static QueryRequest createNextCursorQueryRequest(
+            DefaultSearchQueryTemplate queryTemplate,
+            QueryRequest queryRequest,
+            String nextCursor) {
+        DefaultSearchQueryTemplate.Builder queryRequestBuilder = queryTemplate.newBuilder()
+                .setQuery(queryRequest.getQuery())
+                .addFilters(queryRequest.getFilters())
+                .addFacets(queryRequest.getFacets().stream().map(AbstractField::getField).collect(Collectors.toList()))
+                .setAggregate(queryRequest.getAggregate())
+                .setPage(createCursorPage(nextCursor, queryRequest.getPage().getPageSize()));
+        queryRequest.getSortCriteria()
+                .forEach(criterion ->
+                        queryRequestBuilder
+                                .addSortCriterion(criterion.getSortField().getField(), criterion.getSortOrder()));
+        return queryRequestBuilder.build();
+    }
+
+    /**
+     * Retains only the first {@code limit} elements of the results stored in {@link QueryResult}.
+     *
+     * @param queryResult the {@link QueryResult} whose list of results should be adjusted in size
+     * @param limit the number of results in {@code queryResult} to retain
+     * @param <T> the type of result stored in {@code queryResult}
+     * @return the adjusted {@code queryResult}
+     */
+    static <T> QueryResult<T> resizeResults(QueryResult<T> queryResult, int limit) {
+        if (queryResult.getResults().size() <= limit) {
+            return queryResult;
+        } else {
+            return new QueryResult.Builder<>(
+                    queryResult.getNumberOfHits(),
+                    queryResult.getResults().subList(0, limit))
+                    .withFacets(queryResult.getFacet())
+                    .withPageInfo(new PageInfo.Builder()
+                            .withNextCursor(queryResult.getPageInfo().getNextCursor())
+                            .withResultsPerPage(limit)
+                            .withTotalPages(queryResult.getPageInfo().getTotal())
+                            .build())
+                    .withAggregation(queryResult.getAggregation())
+                    .build();
+        }
+    }
+
     private static String createErrorMessage(QueryRequest request) {
         return "Unable to process search query request: [" + request + "]";
+    }
+
+    private static class MutableValue<V> {
+        private V value;
+
+        private MutableValue(V value) {
+            setValue(value);
+        }
+
+        V getValue() {
+            return this.value;
+        }
+
+        void setValue(V value) {
+            this.value = value;
+        }
     }
 }

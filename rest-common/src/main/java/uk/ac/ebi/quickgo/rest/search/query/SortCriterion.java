@@ -33,4 +33,33 @@ public class SortCriterion {
     public enum SortOrder {
         ASC, DESC;
     }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SortCriterion that = (SortCriterion) o;
+
+        if (sortOrder != that.sortOrder) {
+            return false;
+        }
+        return field != null ? field.equals(that.field) : that.field == null;
+    }
+
+    @Override public int hashCode() {
+        int result = sortOrder != null ? sortOrder.hashCode() : 0;
+        result = 31 * result + (field != null ? field.hashCode() : 0);
+        return result;
+    }
+
+    @Override public String toString() {
+        return "SortCriterion{" +
+                "sortOrder=" + sortOrder +
+                ", field=" + field +
+                '}';
+    }
 }
