@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Annotation DTO used by the service layer.
@@ -21,8 +20,6 @@ public class Annotation {
     public String id;
 
     public String geneProductId;
-
-    public String geneProductType;
 
     public String qualifier;
 
@@ -59,7 +56,6 @@ public class Annotation {
         return "Annotation{" +
                 "id='" + id + '\'' +
                 ", geneProductId='" + geneProductId + '\'' +
-                ", geneProductType='" + geneProductType + '\'' +
                 ", qualifier='" + qualifier + '\'' +
                 ", goId='" + goId + '\'' +
                 ", goEvidence='" + goEvidence + '\'' +
@@ -94,9 +90,6 @@ public class Annotation {
             return false;
         }
         if (geneProductId != null ? !geneProductId.equals(that.geneProductId) : that.geneProductId != null) {
-            return false;
-        }
-        if (geneProductType != null ? !geneProductType.equals(that.geneProductType) : that.geneProductType != null) {
             return false;
         }
         if (qualifier != null ? !qualifier.equals(that.qualifier) : that.qualifier != null) {
@@ -141,7 +134,6 @@ public class Annotation {
     @Override public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (geneProductId != null ? geneProductId.hashCode() : 0);
-        result = 31 * result + (geneProductType != null ? geneProductType.hashCode() : 0);
         result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
         result = 31 * result + (goId != null ? goId.hashCode() : 0);
         result = 31 * result + (goEvidence != null ? goEvidence.hashCode() : 0);
