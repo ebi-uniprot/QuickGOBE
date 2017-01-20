@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.FIRST_CURSOR;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
 
 /**
