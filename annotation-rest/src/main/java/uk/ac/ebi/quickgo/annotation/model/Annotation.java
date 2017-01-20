@@ -22,6 +22,8 @@ public class Annotation {
 
     public String geneProductId;
 
+    public String geneProductType;
+
     public String qualifier;
 
     public String goId;
@@ -57,6 +59,7 @@ public class Annotation {
         return "Annotation{" +
                 "id='" + id + '\'' +
                 ", geneProductId='" + geneProductId + '\'' +
+                ", geneProductType='" + geneProductType + '\'' +
                 ", qualifier='" + qualifier + '\'' +
                 ", goId='" + goId + '\'' +
                 ", goEvidence='" + goEvidence + '\'' +
@@ -91,6 +94,9 @@ public class Annotation {
             return false;
         }
         if (geneProductId != null ? !geneProductId.equals(that.geneProductId) : that.geneProductId != null) {
+            return false;
+        }
+        if (geneProductType != null ? !geneProductType.equals(that.geneProductType) : that.geneProductType != null) {
             return false;
         }
         if (qualifier != null ? !qualifier.equals(that.qualifier) : that.qualifier != null) {
@@ -130,12 +136,12 @@ public class Annotation {
             return false;
         }
         return date != null ? date.equals(that.date) : that.date == null;
-
     }
 
     @Override public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (geneProductId != null ? geneProductId.hashCode() : 0);
+        result = 31 * result + (geneProductType != null ? geneProductType.hashCode() : 0);
         result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
         result = 31 * result + (goId != null ? goId.hashCode() : 0);
         result = 31 * result + (goEvidence != null ? goEvidence.hashCode() : 0);
@@ -215,6 +221,8 @@ public class Annotation {
             return id;
         }
 
+        public abstract String asXref();
+
         @Override public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -255,6 +263,7 @@ public class Annotation {
                     '}';
         }
 
+        @Override
         public String asXref() {
             return String.format("%s:%s", db, id);
         }
@@ -293,7 +302,7 @@ public class Annotation {
 
         }
 
-
+        @Override
         public String asXref() {
             return String.format("%s(%s:%s)", qualifier, db, id);
         }
