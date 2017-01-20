@@ -20,32 +20,31 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.FakeWithFromIt
  * A class for creating stubbed annotations, representing rows of data read from
  * annotation source files.
  *
- * Created 22/04/16
- * @author Edd
+ * Created 20/01/17
+ * @author Tony
  */
 public class AnnotationMocker {
 
     private static final String COMMA = ",";
-    public static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
+    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
             singletonList(IPR_1), asList(IPR_2, IPR_3));
-    public static final String WITH_FROM_AS_STRING = IPR_1 + "|" + IPR_2 + "," + IPR_3;
+    static final String WITH_FROM_AS_STRING = IPR_1 + "|" + IPR_2 + "," + IPR_3;
     private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
             singletonList(OCCURS_IN_CL_1),
             asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
-    private static final String EXTENSIONS_AS_STRING = "OCCURS_IN_CL_1";
-    public static final String SYMBOL = "atf4-creb1_mouse";
-    public static final String QUALIFIER = "enables";
-    public static final String REFERENCE = "PMID:12871976";
-    public static final String PROTEIN_TYPE = "protein";
-    public static final String GENE_PRODUCT_ID = "IntAct:EBI-10043081";
-    public static final String EVIDENCE_CODE = "ECO:0000353";
-    public static final String ASSIGNED_BY = "IntAct";
-    public static final String GO_EVIDENCE = "IPI";
-    public static final String GO_ASPECT = "molecular_function";
-    public static final int TAXON_ID = 12345;
-    public static final String DB = "IntAct";
-    public static final String ID = "EBI-10043081";
-    public static final String GO_ID = "GO:0003824";
+    static final String EXTENSIONS_AS_STRING = OCCURS_IN_CL_1 + "|" + OCCURS_IN_CL_2 + "," + OCCURS_IN_CL_3;
+    static final String SYMBOL = "atf4-creb1_mouse";
+    static final String QUALIFIER = "enables";
+    static final String REFERENCE = "PMID:12871976";
+    private static final String GENE_PRODUCT_ID = "IntAct:EBI-10043081";
+    static final String EVIDENCE_CODE = "ECO:0000353";
+    private static final String ASSIGNED_BY = "IntAct";
+    private static final String GO_EVIDENCE = "IPI";
+    private static final String GO_ASPECT = "molecular_function";
+    static final int TAXON_ID = 12345;
+    static final String DB = "IntAct";
+    static final String ID = "EBI-10043081";
+    static final String GO_ID = "GO:0003824";
     private static final Date DATE = Date.from(
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
     static final String DATE_AS_STRING = "20121002";
@@ -54,8 +53,7 @@ public class AnnotationMocker {
     public static Annotation createValidAnnotation() {
         Annotation annotation = new Annotation();
         annotation.id = DB + ":" + ID;
-        List<Annotation.ConnectedXRefs> extensions = connectedXrefs(EXTENSIONS);
-        annotation.extensions = extensions;
+        annotation.extensions = connectedXrefs(EXTENSIONS);
         annotation.taxonId  = TAXON_ID;
         annotation.goAspect = GO_ASPECT;     //todo is this populated
         annotation.goEvidence = GO_EVIDENCE;
@@ -63,7 +61,6 @@ public class AnnotationMocker {
         annotation.date = DATE;
         annotation.evidenceCode = EVIDENCE_CODE;
         annotation.geneProductId = GENE_PRODUCT_ID;
-        annotation.geneProductType = PROTEIN_TYPE;
         annotation.qualifier = QUALIFIER;
         annotation.symbol = SYMBOL;
         annotation.reference = REFERENCE;
@@ -71,15 +68,6 @@ public class AnnotationMocker {
         annotation.goId = GO_ID;
         return annotation;
     }
-
-    private static List<Annotation.ConnectedXRefs> createExtensions() {
-        return null;
-    }
-
-    private static List<Annotation.ConnectedXRefs> createWithFrom() {
-        return null;
-    }
-
 
     private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs> connectedXrefs(
             List<List<Supplier<T>>> items) {
@@ -90,7 +78,6 @@ public class AnnotationMocker {
                                   }
         ).collect(Collectors.toList());
     }
-
 
     enum FakeWithFromItem implements Supplier<Annotation.SimpleXRef> {
         IPR_1("InterPro", "IPR015421"),
