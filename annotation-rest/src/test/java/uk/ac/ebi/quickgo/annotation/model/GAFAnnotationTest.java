@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -35,17 +36,19 @@ public class GAFAnnotationTest {
     private static final int COL_GENE_PRODUCT = 16;
 
     private Annotation annotation;
-
+    private AnnotationToGAF annotationToGAF;
     @Before
     public void setup(){
         annotation = AnnotationMocker.createValidAnnotation();
+        annotationToGAF = new AnnotationToGAF();
     }
 
 
     @Test
-    public void createGAFStringFromAnnotationModel(){
+    public void createGAFStringFromAnnotationModelContainingIntAct(){
 
-        String converted = AnnotationToGAF.convert(annotation);
+        String converted = annotationToGAF.convert(annotation);
+        final String gpType = "complex";
 
         String[] elements = converted.split("\t");
         assertThat(elements[COL_DB], is(DB));
@@ -59,13 +62,125 @@ public class GAFAnnotationTest {
         assertThat(elements[COL_ASPECT], is("F"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
         assertThat(elements[COL_DB_OBJECT_SYNONYM], is(""));       //synonym
-        assertThat(elements[COL_DB_OBJECT_TYPE], is(PROTEIN_TYPE));
+        assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
         assertThat(elements[COL_TAXON], is("taxon:"+TAXON_ID));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
-        assertThat(elements[COL_ASSIGNED_BY], equalTo("IntAct"));
-        assertThat(elements[COL_ANNOTATION_EXTENSION], is(DB));
-        assertThat(elements[COL_GENE_PRODUCT], is(""));
+        assertThat(elements[COL_ASSIGNED_BY], equalTo(DB));
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
     }
 
+    @Test
+    public void createGAFStringFromAnnotationModelContainingUniProtGeneProductWithVariantOrIsoForm(){
+        String gpId = "P04637-2";
+        String gpIdCanonical = "P04637";
+        String db = "UniProtKB";
+        String gpType = "protein";
+        annotation.id = String.format("%s:%s",db,gpId);
+        annotation.geneProductId = gpId;
+        annotation.assignedBy = db;
+        annotation.symbol = gpId;
+        String converted = annotationToGAF.convert(annotation);
 
+        String[] elements = converted.split("\t");
+        assertThat(elements[COL_DB], is(db));
+        assertThat(elements[COL_DB_OBJECT_ID], is(gpIdCanonical));
+        assertThat(elements[COL_DB_OBJECT_SYMBOL], is(gpId));
+        assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
+        assertThat(elements[COL_GO_ID], is(GO_ID));
+        assertThat(elements[COL_REFERENCE], is(REFERENCE));
+        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
+        assertThat(elements[COL_ASPECT], is("F"));
+        assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(""));       //synonym
+        assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
+        assertThat(elements[COL_TAXON], is("taxon:"+TAXON_ID));
+        assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
+        assertThat(elements[COL_ASSIGNED_BY], equalTo(db));
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
+        assertThat(elements[COL_GENE_PRODUCT], is(annotation.id));
+    }
+
+    @Test
+    public void createGAFStringFromAnnotationModelContainingRNACentralWithVariantOrIsoForm(){
+
+        String gpId = "URS00000064B1_559292";
+        String gpIdCanonical = "URS00000064B1";
+        String db = "RNAcentral";
+        String gpType = "miRNA";
+        annotation.id = String.format("%s:%s",db,gpId);
+        annotation.geneProductId = gpId;
+        annotation.assignedBy = db;
+        annotation.symbol = gpId;
+        String converted = annotationToGAF.convert(annotation);
+
+        String[] elements = converted.split("\t");
+        assertThat(elements[COL_DB], is(db));
+        assertThat(elements[COL_DB_OBJECT_ID], is(gpIdCanonical));
+        assertThat(elements[COL_DB_OBJECT_SYMBOL], is(gpId));
+        assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
+        assertThat(elements[COL_GO_ID], is(GO_ID));
+        assertThat(elements[COL_REFERENCE], is(REFERENCE));
+        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
+        assertThat(elements[COL_ASPECT], is("F"));
+        assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(""));       //synonym
+        assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
+        assertThat(elements[COL_TAXON], is("taxon:"+TAXON_ID));
+        assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
+        assertThat(elements[COL_ASSIGNED_BY], equalTo(db));
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
+
+    }
+
+    @Test
+    @Ignore // "Q9P2J5" does not match IntAct regex
+    public void createGAFStringFromAnnotationModelContainingIntActWithVariantOrIsoForm(){
+
+        final String gpType = "complex";
+        String gpId = "Q9P2J5-3";
+        String gpIdCanonical = "Q9P2J5";
+        String db = "IntAct";
+        annotation.id = String.format("%s:%s",db,gpId);
+        String converted = annotationToGAF.convert(annotation);
+
+        String[] elements = converted.split("\t");
+        assertThat(elements[COL_DB], is(DB));
+        assertThat(elements[COL_DB_OBJECT_ID], is(gpIdCanonical));
+        assertThat(elements[COL_DB_OBJECT_SYMBOL], is(gpId));
+        assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
+        assertThat(elements[COL_GO_ID], is(GO_ID));
+        assertThat(elements[COL_REFERENCE], is(REFERENCE));
+        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
+        assertThat(elements[COL_ASPECT], is("F"));
+        assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(""));       //synonym
+        assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
+        assertThat(elements[COL_TAXON], is("taxon:"+TAXON_ID));
+        assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
+        assertThat(elements[COL_ASSIGNED_BY], equalTo(DB));
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
+    }
+
+    @Test
+    public void createGAFStringFromAnnotationWhereAspectIsBiologicalProcess(){
+
+        annotation.goAspect = "biological_process";
+        String converted = annotationToGAF.convert(annotation);
+        String[] elements = converted.split("\t");
+        assertThat(elements[COL_ASPECT], is("P"));
+
+    }
+
+    @Test
+    public void createGAFStringFromAnnotationWhereAspectIsCellularComponent(){
+
+        annotation.goAspect = "cellular_component";
+        String converted = annotationToGAF.convert(annotation);
+        String[] elements = converted.split("\t");
+        assertThat(elements[COL_ASPECT], is("C"));
+
+    }
 }
