@@ -203,16 +203,6 @@ public class SearchDispatcherStreamedResultsTest {
         assertThat(argument.getAllValues().get(1).getPage().getPageSize(), is(5));
     }
 
-    private Stream<QueryResult<String>> getQueryResultStream(int limit) {
-        return streamSearchResults(
-                queryRequest,
-                queryTemplate,
-                searchService,
-                transformer,
-                context,
-                limit);
-    }
-
     @Test
     public void createsCorrectlyNextQueryRequest() {
         QuickGOQuery query = new AllQuery();
@@ -301,13 +291,23 @@ public class SearchDispatcherStreamedResultsTest {
 
     @Test
     public void checkGetRequiredIterationsFunctionsCorrectly() {
-        assertThat(getRequiredIterations(10, 1000, 10), is(1));
-        assertThat(getRequiredIterations(10, 10, 10), is(1));
-        assertThat(getRequiredIterations(10, 9, 10), is(1));
-        assertThat(getRequiredIterations(10, 9, 11), is(1));
-        assertThat(getRequiredIterations(10, 100, 11), is(2));
-        assertThat(getRequiredIterations(5000, 350000000, 50000), is(10));
-        assertThat(getRequiredIterations(10, 88, 100), is(9));
+        assertThat(getRequiredNumberOfPagesToFetch(10, 1000, 10), is(1));
+        assertThat(getRequiredNumberOfPagesToFetch(10, 10, 10), is(1));
+        assertThat(getRequiredNumberOfPagesToFetch(10, 9, 10), is(1));
+        assertThat(getRequiredNumberOfPagesToFetch(10, 9, 11), is(1));
+        assertThat(getRequiredNumberOfPagesToFetch(10, 100, 11), is(2));
+        assertThat(getRequiredNumberOfPagesToFetch(5000, 350000000, 50000), is(10));
+        assertThat(getRequiredNumberOfPagesToFetch(10, 88, 100), is(9));
+    }
+
+    private Stream<QueryResult<String>> getQueryResultStream(int limit) {
+        return streamSearchResults(
+                queryRequest,
+                queryTemplate,
+                searchService,
+                transformer,
+                context,
+                limit);
     }
 
     private <T> List<String> extractStrings(Collection<T> fields, Function<T, String> toStringFunction) {

@@ -120,14 +120,22 @@ public final class SearchDispatcher {
     }
 
     /**
-     * @param firstQueryRequest
-     * @param queryTemplate
-     * @param searchService
-     * @param transformer
-     * @param context
-     * @param limit
-     * @param <T>
-     * @return
+     * <p>Dispatch a request to a {@link SearchService} and return a stream of
+     * its results.
+     *
+     * <p>If the number of required results are greater than the page size used
+     * in the request, this method makes use of the request/response cursor
+     * to iterate through the results (i.e., via multiple requests) and stream
+     * them back to the caller.
+     *
+     * @param firstQueryRequest the {@link QueryRequest}
+     * @param queryTemplate the template used to build any required subsequent {@link QueryRequest}s
+     * @param searchService the service which is to be searched
+     * @param transformer the result transformer
+     * @param context data made available to the result transformations
+     * @param limit the number of results to be streamed back to the caller
+     * @param <T> the type of the {@link QueryResult}
+     * @return a stream of {@link QueryResult} instances, containing up to {@code limit} results in total
      */
     public static <T> Stream<QueryResult<T>> streamSearchResults(
             QueryRequest firstQueryRequest,
@@ -142,7 +150,6 @@ public final class SearchDispatcher {
             resultStream = Stream.empty();
         } else {
             try {
-                // fetch first result
                 QueryResult<T> firstQueryResult = transformer.applyTransformations(
                         searchService.findByQuery(firstQueryRequest),
                         context);
@@ -152,7 +159,7 @@ public final class SearchDispatcher {
                 MutableValue<Integer> fetchedCount = new MutableValue<>(0);
 
                 int pageSize = firstQueryRequest.getPage().getPageSize();
-                int requiredIterations = getRequiredIterations(
+                int requiredIterations = getRequiredNumberOfPagesToFetch(
                         pageSize,
                         totalHits,
                         limit);
@@ -183,6 +190,16 @@ public final class SearchDispatcher {
         return resultStream;
     }
 
+    /**
+     * Finds the size of the next page, that can be used in a {@link QueryRequest}, given
+     * that one has already fetched {@code fetchedCount} results, wants {@code limit} results
+     * and is using a current page size of {@code pageSize}.
+     *
+     * @param fetchedCount the number of results already fetched
+     * @param limit the number of results to fetch
+     * @param pageSize the current page size being used to fetch results
+     * @return the page size of the next page of results to fetch
+     */
     static int getNextPageSize(int fetchedCount, int limit, int pageSize) {
         int itemsStillRequired = limit - fetchedCount;
         if (itemsStillRequired > pageSize) {
@@ -196,8 +213,15 @@ public final class SearchDispatcher {
         fetchedCount.setValue(fetchedCount.getValue() + qr.getPageInfo().getResultsPerPage());
     }
 
-    // todo: test
-    static int getRequiredIterations(int pageSize, long totalHits, int limit) {
+    /**
+     * Finds the number of pages of {@code pageSize} that are required to fetch {@code limit}
+     * results, given that there are {@code totalHits}.
+     * @param pageSize the page size
+     * @param totalHits the total number of hits available to fetch
+     * @param limit the desired number of results to fetch
+     * @return the number of pages required to fetch {@code limit} results.
+     */
+    static int getRequiredNumberOfPagesToFetch(int pageSize, long totalHits, int limit) {
         int maxResultsToFetch = totalHits < limit ?
                 (int) totalHits : limit;
         return (int) Math.ceil((double) maxResultsToFetch / pageSize);
