@@ -1,5 +1,11 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
@@ -12,12 +18,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -26,18 +26,15 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.createNextCursorQueryRequest;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.resizeResults;
-import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
+import static org.mockito.Mockito.*;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
 
 /**
  * Tests the streaming of search results provided by {@link SearchDispatcher}.
- *
+ * <p>
  * Created 20/01/17
+ *
  * @author Edd
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -182,12 +179,12 @@ public class SearchDispatcherStreamedResultsTest {
 
         QueryResult<String> firstResult =
                 new QueryResult.Builder<>(hitCount, rangeStringList(startElement, pageSize))
-                        .withPageInfo(new PageInfo.Builder().withNextCursor(secondCursor).build())
+                        .withPageInfo(new PageInfo.Builder().withResultsPerPage(pageSize).withNextCursor(secondCursor).build())
                         .build();
 
         QueryResult<String> secondResult =
                 new QueryResult.Builder<>(hitCount, rangeStringList(startElement, lastPageSize))
-                        .withPageInfo(new PageInfo.Builder().withNextCursor(secondCursor).build())
+                        .withPageInfo(new PageInfo.Builder().withResultsPerPage(lastPageSize).withNextCursor(secondCursor).build())
                         .build();
 
         when(searchService.findByQuery(any()))
@@ -203,7 +200,7 @@ public class SearchDispatcherStreamedResultsTest {
 
         verify(searchService, times(2)).findByQuery(argument.capture());
         assertThat(argument.getAllValues().get(0).getPage().getPageSize(), is(10));
-        assertThat(argument.getAllValues().get(1).getPage().getPageSize(), is(10));
+        assertThat(argument.getAllValues().get(1).getPage().getPageSize(), is(5));
     }
 
     private Stream<QueryResult<String>> getQueryResultStream(int limit) {
@@ -228,6 +225,7 @@ public class SearchDispatcherStreamedResultsTest {
         List<Facet> facets = singletonList(new Facet("facet1"));
         List<QuickGOQuery> filters = singletonList(new FieldQuery("field", "value"));
         int pageSize = 10;
+        int nextPageSize = 4;
         String nextCursor = "nextCursor";
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
@@ -240,7 +238,7 @@ public class SearchDispatcherStreamedResultsTest {
                 .addFilters(filters)
                 .build();
 
-        QueryRequest nextQueryRequest = createNextCursorQueryRequest(queryTemplate, queryRequest, nextCursor);
+        QueryRequest nextQueryRequest = createNextCursorQueryRequest(queryTemplate, queryRequest, nextCursor, nextPageSize);
 
         assertThat(
                 nextQueryRequest.getSortCriteria(),
@@ -255,7 +253,7 @@ public class SearchDispatcherStreamedResultsTest {
         assertThat(
                 extractStrings(nextQueryRequest.getFilters(), QuickGOQuery::toString),
                 is(extractStrings(filters, QuickGOQuery::toString)));
-        assertThat(nextQueryRequest.getPage().getPageSize(), is(pageSize));
+        assertThat(nextQueryRequest.getPage().getPageSize(), is(nextPageSize));
         assertThat(((CursorPage) nextQueryRequest.getPage()).getCursor(), is(nextCursor));
     }
 
@@ -265,7 +263,7 @@ public class SearchDispatcherStreamedResultsTest {
                 new QueryResult.Builder<>(100, rangeStringList(1, 100))
                         .withPageInfo(new PageInfo.Builder().withNextCursor("anything").build())
                         .build();
-        QueryResult<String> resizedResults = resizeResults(result, 100);
+        QueryResult<String> resizedResults = resizeResultsIfRequired(result, 100);
 
         assertThat(resizedResults.getResults(), hasSize(100));
     }
@@ -276,7 +274,7 @@ public class SearchDispatcherStreamedResultsTest {
                 new QueryResult.Builder<>(100, rangeStringList(1, 100))
                         .withPageInfo(new PageInfo.Builder().withNextCursor("anything").build())
                         .build();
-        QueryResult<String> resizedResults = resizeResults(result, 500);
+        QueryResult<String> resizedResults = resizeResultsIfRequired(result, 500);
 
         assertThat(resizedResults.getResults(), hasSize(100));
     }
@@ -287,9 +285,29 @@ public class SearchDispatcherStreamedResultsTest {
                 new QueryResult.Builder<>(100, rangeStringList(1, 100))
                         .withPageInfo(new PageInfo.Builder().withNextCursor("anything").build())
                         .build();
-        QueryResult<String> resizedResults = resizeResults(result, 80);
+        QueryResult<String> resizedResults = resizeResultsIfRequired(result, 80);
 
         assertThat(resizedResults.getResults(), hasSize(80));
+    }
+
+    @Test
+    public void checkGetNextPageSizeFunctionsCorrectly() {
+        assertThat(getNextPageSize(0, 100, 10), is(10));
+        assertThat(getNextPageSize(0, 10, 10), is(10));
+        assertThat(getNextPageSize(0, 9, 10), is(9));
+        assertThat(getNextPageSize(1, 8, 10), is(7));
+        assertThat(getNextPageSize(100, 100, 10), is(0));
+    }
+
+    @Test
+    public void checkGetRequiredIterationsFunctionsCorrectly() {
+        assertThat(getRequiredIterations(10, 1000, 10), is(1));
+        assertThat(getRequiredIterations(10, 10, 10), is(1));
+        assertThat(getRequiredIterations(10, 9, 10), is(1));
+        assertThat(getRequiredIterations(10, 9, 11), is(1));
+        assertThat(getRequiredIterations(10, 100, 11), is(2));
+        assertThat(getRequiredIterations(5000, 350000000, 50000), is(10));
+        assertThat(getRequiredIterations(10, 88, 100), is(9));
     }
 
     private <T> List<String> extractStrings(Collection<T> fields, Function<T, String> toStringFunction) {
@@ -301,8 +319,8 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     private static class IdentityResultsTransformationChain extends ResultTransformerChain<QueryResult<String>> {
-        @Override public QueryResult<String> applyTransformations(QueryResult<String> result,
-                FilterContext filterContext) {
+        @Override
+        public QueryResult<String> applyTransformations(QueryResult<String> result, FilterContext filterContext) {
             return result;
         }
     }

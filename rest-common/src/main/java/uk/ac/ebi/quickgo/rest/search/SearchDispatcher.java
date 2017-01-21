@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.AbstractField;
@@ -13,10 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.FIRST_CURSOR;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
@@ -24,11 +24,12 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
 /**
  * Helper class that dispatches search requests, in the form of
  * {@link QueryRequest} instances, to a {@link SearchService}.
- *
+ * <p>
  * Validity check methods are also provided for common search parameters.
  * Note that this class is stateless.
- *
+ * <p>
  * Created 27/01/16
+ *
  * @author Edd
  */
 public final class SearchDispatcher {
@@ -36,23 +37,25 @@ public final class SearchDispatcher {
 
     private static final Pattern VALID_FILTER_QUERY_FORMAT = Pattern.compile("(\\w+):(\\w|-)+");
 
-    private SearchDispatcher() { }
+    private SearchDispatcher() {
+    }
 
     /**
      * Dispatch a {@link QueryRequest} to a {@link SearchService} and handle its responses
      * appropriately.
      * <ul>
-     *      <li>If the request is {@code null} a {@link ResponseEntity} denoting an HTTP
-     *          {@code BAD REQUEST (400)}, is returned</li>
-     *     <li>If the service responds successfully, a {@link ResponseEntity} is returned
-     *         containing the {@link QueryResult}.</li>
-     *     <li>If an error occurs when processing the response, a
-     *     {@link ResponseEntity}, denoting an HTTP {@code INTERNAL SERVER ERROR (500)}, is
-     *      returned</li>
+     * <li>If the request is {@code null} a {@link ResponseEntity} denoting an HTTP
+     * {@code BAD REQUEST (400)}, is returned</li>
+     * <li>If the service responds successfully, a {@link ResponseEntity} is returned
+     * containing the {@link QueryResult}.</li>
+     * <li>If an error occurs when processing the response, a
+     * {@link ResponseEntity}, denoting an HTTP {@code INTERNAL SERVER ERROR (500)}, is
+     * returned</li>
      * </ul>
-     * @param request the request
+     *
+     * @param request       the request
      * @param searchService the service in which to search
-     * @param <T> the type of object being returned
+     * @param <T>           the type of object being returned
      * @return the response
      */
     public static <T> ResponseEntity<QueryResult<T>> search(QueryRequest request, SearchService<T> searchService) {
@@ -77,22 +80,21 @@ public final class SearchDispatcher {
      * Dispatch a {@link QueryRequest} to a {@link SearchService} and handle its responses
      * appropriately.
      * <ul>
-     *      <li>If the request is {@code null} a {@link ResponseEntity} denoting an HTTP
-     *          {@code BAD REQUEST (400)}, is returned</li>
-     *     <li>If the service responds successfully, a {@link ResponseEntity} is returned
-     *         containing the {@link QueryResult}.</li>
-     *     <li>If an error occurs when processing the response, a
-     *     {@link ResponseEntity}, denoting an HTTP {@code INTERNAL SERVER ERROR (500)}, is
-     *      returned</li>
+     * <li>If the request is {@code null} a {@link ResponseEntity} denoting an HTTP
+     * {@code BAD REQUEST (400)}, is returned</li>
+     * <li>If the service responds successfully, a {@link ResponseEntity} is returned
+     * containing the {@link QueryResult}.</li>
+     * <li>If an error occurs when processing the response, a
+     * {@link ResponseEntity}, denoting an HTTP {@code INTERNAL SERVER ERROR (500)}, is
+     * returned</li>
      * </ul>
      *
-     * @param request the request
+     * @param request       the request
      * @param searchService the service in which to search
-     * @param transformer the transformations to apply to the results
-     * @param context data made available to the result transformations
-     * @param <T> the type of object being returned
+     * @param transformer   the transformations to apply to the results
+     * @param context       data made available to the result transformations
+     * @param <T>           the type of object being returned
      * @return the response
-     *
      */
     public static <T> ResponseEntity<QueryResult<T>> searchAndTransform(
             QueryRequest request,
@@ -118,8 +120,6 @@ public final class SearchDispatcher {
     }
 
     /**
-     *
-     *
      * @param firstQueryRequest
      * @param queryTemplate
      * @param searchService
@@ -146,23 +146,28 @@ public final class SearchDispatcher {
                 QueryResult<T> firstQueryResult = transformer.applyTransformations(
                         searchService.findByQuery(firstQueryRequest),
                         context);
-                firstQueryResult = resizeResults(firstQueryResult, limit);
+                long totalHits = firstQueryResult.getNumberOfHits();
+                firstQueryResult = resizeResultsIfRequired(firstQueryResult, limit);
                 MutableValue<String> cursor = new MutableValue<>(FIRST_CURSOR);
+                MutableValue<Integer> fetchedCount = new MutableValue<>(0);
 
-                int maxResultsToFetch = firstQueryResult.getNumberOfHits() < limit ?
-                        (int) firstQueryResult.getNumberOfHits() : limit;
                 int pageSize = firstQueryRequest.getPage().getPageSize();
-                int requiredIterations = (int) Math.ceil((double) maxResultsToFetch / pageSize);
+                int requiredIterations = getRequiredIterations(
+                        pageSize,
+                        totalHits,
+                        limit);
 
-               resultStream = Stream.iterate(firstQueryResult, qr -> {
+                resultStream = Stream.iterate(firstQueryResult, qr -> {
                     String nextCursor = qr.getPageInfo().getNextCursor();
                     if (isCursorAtEnd(cursor.getValue(), nextCursor)) {
                         return qr;
                     } else {
                         cursor.setValue(nextCursor);
 
+                        incrementFetchedCount(fetchedCount, qr);
+                        int nextPageSize = getNextPageSize(fetchedCount.getValue(), limit, pageSize);
                         QueryRequest nextQueryRequest =
-                                createNextCursorQueryRequest(queryTemplate, firstQueryRequest, nextCursor);
+                                createNextCursorQueryRequest(queryTemplate, firstQueryRequest, nextCursor, nextPageSize);
 
                         return transformer.applyTransformations(
                                 searchService.findByQuery(nextQueryRequest),
@@ -178,8 +183,29 @@ public final class SearchDispatcher {
         return resultStream;
     }
 
+    static int getNextPageSize(int fetchedCount, int limit, int pageSize) {
+        int itemsStillRequired = limit - fetchedCount;
+        if (itemsStillRequired > pageSize) {
+            return pageSize;
+        } else {
+            return itemsStillRequired;
+        }
+    }
+
+    private static <T> void incrementFetchedCount(MutableValue<Integer> fetchedCount, QueryResult<T> qr) {
+        fetchedCount.setValue(fetchedCount.getValue() + qr.getPageInfo().getResultsPerPage());
+    }
+
+    // todo: test
+    static int getRequiredIterations(int pageSize, long totalHits, int limit) {
+        int maxResultsToFetch = totalHits < limit ?
+                (int) totalHits : limit;
+        return (int) Math.ceil((double) maxResultsToFetch / pageSize);
+    }
+
     /**
      * Determines if a given query string is valid.
+     *
      * @param query the query string
      * @return validity of query
      */
@@ -189,6 +215,7 @@ public final class SearchDispatcher {
 
     /**
      * Determines if a specified row number is valid.
+     *
      * @param rows the row number specified
      * @return validity of row number
      */
@@ -198,6 +225,7 @@ public final class SearchDispatcher {
 
     /**
      * Determines if a specified page number is valid.
+     *
      * @param page the page number specified
      * @return validity of page number
      */
@@ -210,8 +238,9 @@ public final class SearchDispatcher {
      * a specification of which fields are searchable. A facet is
      * valid if it is also a searchable field. This method returns {@code false}
      * if any of the specified facets are not searchable.
+     *
      * @param searchableField a specification of which fields are searchable
-     * @param facets the facet names
+     * @param facets          the facet names
      * @return validity of the facets
      */
     public static boolean isValidFacets(SearchableField searchableField, Iterable<String> facets) {
@@ -231,8 +260,9 @@ public final class SearchDispatcher {
      * of the form {@code "field:value"}, and a query is valid if its {@code field}
      * refers to a searchable field. This method returns {@code false}
      * if any of the specified fields are not searchable.
+     *
      * @param searchableField a specification of which fields are searchable
-     * @param filterQueries the filter queries
+     * @param filterQueries   the filter queries
      * @return validity of the filter queries
      */
     public static boolean isValidFilterQueries(SearchableField searchableField, Iterable<String> filterQueries) {
@@ -258,20 +288,21 @@ public final class SearchDispatcher {
      * on the initial request, but differs in its {@code nextCursor} value.
      *
      * @param queryTemplate the builder used to create (partially pre-populated) {@link QueryRequest}s
-     * @param queryRequest the initial {@link QueryRequest}
-     * @param nextCursor the next cursor
+     * @param queryRequest  the initial {@link QueryRequest}
+     * @param nextCursor    the next cursor
      * @return the next {@link QueryRequest}
      */
     static QueryRequest createNextCursorQueryRequest(
             DefaultSearchQueryTemplate queryTemplate,
             QueryRequest queryRequest,
-            String nextCursor) {
+            String nextCursor,
+            int nextPageSize) {
         DefaultSearchQueryTemplate.Builder queryRequestBuilder = queryTemplate.newBuilder()
                 .setQuery(queryRequest.getQuery())
                 .addFilters(queryRequest.getFilters())
                 .addFacets(queryRequest.getFacets().stream().map(AbstractField::getField).collect(Collectors.toList()))
                 .setAggregate(queryRequest.getAggregate())
-                .setPage(createCursorPage(nextCursor, queryRequest.getPage().getPageSize()));
+                .setPage(createCursorPage(nextCursor, nextPageSize));
         queryRequest.getSortCriteria()
                 .forEach(criterion ->
                         queryRequestBuilder
@@ -283,11 +314,11 @@ public final class SearchDispatcher {
      * Retains only the first {@code limit} elements of the results stored in {@link QueryResult}.
      *
      * @param queryResult the {@link QueryResult} whose list of results should be adjusted in size
-     * @param limit the number of results in {@code queryResult} to retain
-     * @param <T> the type of result stored in {@code queryResult}
+     * @param limit       the number of results in {@code queryResult} to retain
+     * @param <T>         the type of result stored in {@code queryResult}
      * @return the adjusted {@code queryResult}
      */
-    static <T> QueryResult<T> resizeResults(QueryResult<T> queryResult, int limit) {
+    static <T> QueryResult<T> resizeResultsIfRequired(QueryResult<T> queryResult, int limit) {
         if (queryResult.getResults().size() <= limit) {
             return queryResult;
         } else {
