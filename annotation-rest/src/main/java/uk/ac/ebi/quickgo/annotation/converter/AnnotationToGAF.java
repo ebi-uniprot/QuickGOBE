@@ -3,13 +3,8 @@ package uk.ac.ebi.quickgo.annotation.converter;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.ConversionUtil;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Convert an {@link Annotation}  to a String representation. See http://geneontology
@@ -61,11 +56,8 @@ import java.util.stream.Collectors;
  *
  */
 public class AnnotationToGAF {
-    private static final String ID_DELIMITER = ":";
-    private static final String OUTPUT_DELIMITER = "\t";
+    static final String OUTPUT_DELIMITER = "\t";
     private static final String UNIPROT_KB = "UniProtKB";
-    private static final String COMMA = ",";
-    private static final String PIPE = "|";
     private static final int CANONICAL_GROUP_NUMBER = 2;
     private static final int INTACT_GROUP_NUMBER = 1;
 
@@ -76,11 +68,10 @@ public class AnnotationToGAF {
     private static final Pattern RNA_CENTRAL_CANONICAL_PATTERN = Pattern.compile(RNA_CENTRAL_REGEX);
     private static final String INTACT_CANONICAL_REGEX = "^(?:IntAct:)(EBI-[0-9]+)$";
     private static final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
-    private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
     private ConversionUtil conversionUtil;
 
-    public AnnotationToGAF(ConversionUtil conversionUtil) {
+    AnnotationToGAF(ConversionUtil conversionUtil) {
         this.conversionUtil = conversionUtil;
     }
 
@@ -90,7 +81,7 @@ public class AnnotationToGAF {
      * @return String TSV delimited representation of an annotation in GAF format.
      */
     public String convert(Annotation annotation) {
-        String[] idElements = annotation.id.split(ID_DELIMITER);
+        String[] idElements = conversionUtil.idToComponents(annotation);
 
         return idElements[0] + OUTPUT_DELIMITER +
                 toCanonical(annotation.id) + OUTPUT_DELIMITER +
@@ -105,7 +96,7 @@ public class AnnotationToGAF {
                 OUTPUT_DELIMITER +   //synonym, - in GP core  e.g. 'Nit79A3_0905' optional not used
                 toGeneProductType(idElements[0]) + OUTPUT_DELIMITER +
                 "taxon:" + annotation.taxonId + OUTPUT_DELIMITER +
-                toYMD(annotation.date) + OUTPUT_DELIMITER +
+                conversionUtil.toYMD(annotation.date) + OUTPUT_DELIMITER +
                 annotation.assignedBy + OUTPUT_DELIMITER +
                 conversionUtil.extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER +
                 (UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB, idElements[1]) : "");
@@ -122,10 +113,6 @@ public class AnnotationToGAF {
                 return "miRNA";
         }
         throw new IllegalArgumentException("Cannot determine gene product type for based on DB of " + idElement);
-    }
-
-    private String toYMD(Date date) {
-        return YYYYMMDD_DATE_FORMAT.format(date);
     }
 
     /**
@@ -149,39 +136,6 @@ public class AnnotationToGAF {
         }
         throw new IllegalArgumentException(String.format("Can not extract the canonical version of the id from %s",
                                                          idCouldHaveVariationOrIsoform));
-    }
-
-    private String toWithFromString(List<Annotation.ConnectedXRefs> connectedXRefs) {
-        return connectedXRefs.stream()
-                             .map(itemList -> simpleRefAndToString(itemList))
-                             .collect(Collectors.joining(PIPE));
-    }
-
-    private String simpleRefAndToString(Annotation.ConnectedXRefs itemList) {
-        return itemList.getConnectedXrefs()
-                       .stream()
-                       .map(cr -> {
-                           Annotation.SimpleXRef sr = ((Annotation.SimpleXRef) cr);
-                           return sr.asXref();
-                       })
-                       .collect(Collectors.joining(COMMA)).toString();
-
-    }
-
-    private String toExtensionsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
-        return connectedXRefs.stream()
-                             .map(itemList -> qualifiedRefAndToString(itemList))
-                             .collect(Collectors.joining(PIPE));
-    }
-
-    private String qualifiedRefAndToString(Annotation.ConnectedXRefs itemList) {
-        return itemList.getConnectedXrefs()
-                       .stream()
-                       .map(cr -> {
-                           Annotation.QualifiedXref sr = ((Annotation.QualifiedXref) cr);
-                           return sr.asXref();
-                       })
-                       .collect(Collectors.joining(COMMA)).toString();
     }
 
     public enum Aspect {
