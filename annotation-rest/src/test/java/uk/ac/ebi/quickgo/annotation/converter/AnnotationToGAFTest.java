@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.converter;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 
+import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -43,13 +44,12 @@ public class AnnotationToGAFTest {
     @Before
     public void setup(){
         annotation = AnnotationMocker.createValidAnnotation();
-        annotationToGAF = new AnnotationToGAF(new ConversionUtil());
+        annotationToGAF = new AnnotationToGAF();
     }
 
 
     @Test
     public void createGAFStringFromAnnotationModelContainingIntAct(){
-
         String converted = annotationToGAF.convert(annotation);
         final String gpType = "complex";
 
@@ -106,7 +106,6 @@ public class AnnotationToGAFTest {
 
     @Test
     public void createGAFStringFromAnnotationModelContainingRNACentralWithVariantOrIsoForm(){
-
         String gpId = "URS00000064B1_559292";
         String gpIdCanonical = "URS00000064B1";
         String db = "RNAcentral";
@@ -140,7 +139,6 @@ public class AnnotationToGAFTest {
     @Test
     @Ignore // "Q9P2J5" does not match IntAct regex
     public void createGAFStringFromAnnotationModelContainingIntActWithVariantOrIsoForm(){
-
         final String gpType = "complex";
         String gpId = "Q9P2J5-3";
         String gpIdCanonical = "Q9P2J5";
@@ -169,7 +167,6 @@ public class AnnotationToGAFTest {
 
     @Test
     public void createGAFStringFromAnnotationWhereAspectIsBiologicalProcess(){
-
         annotation.goAspect = "biological_process";
         String converted = annotationToGAF.convert(annotation);
         String[] elements = converted.split("\t");
@@ -179,11 +176,20 @@ public class AnnotationToGAFTest {
 
     @Test
     public void createGAFStringFromAnnotationWhereAspectIsCellularComponent(){
-
         annotation.goAspect = "cellular_component";
         String converted = annotationToGAF.convert(annotation);
         String[] elements = converted.split("\t");
         assertThat(elements[COL_ASPECT], is("C"));
 
     }
+
+    @Test
+    public void slimmedToGoIdReplacesGoIdIfItExists(){
+        final String slimmedToGoId = "GO:0005524";
+        annotation.slimmedIds = Arrays.asList(slimmedToGoId);
+        String converted = annotationToGAF.convert(annotation);
+        String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER);
+        assertThat(elements[COL_GO_ID], is(slimmedToGoId));
+    }
+
 }

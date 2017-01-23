@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.converter;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 
+import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,7 +38,7 @@ public class AnnotationToGPADTest {
     @Before
     public void setup(){
         annotation = AnnotationMocker.createValidAnnotation();
-        annotationToGPAD = new AnnotationToGPAD(new ConversionUtil());
+        annotationToGPAD = new AnnotationToGPAD();
     }
 
     @Test
@@ -56,5 +57,14 @@ public class AnnotationToGPADTest {
         assertThat(elements[COL_ASSIGNED_BY], equalTo(DB));
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
         assertThat(elements[COL_GO_EVIDENCE], is("goEvidence=" + GO_EVIDENCE));
+    }
+
+    @Test
+    public void slimmedToGoIdReplacesGoIdIfItExists(){
+        final String slimmedToGoId = "GO:0005524";
+        annotation.slimmedIds = Arrays.asList(slimmedToGoId);
+        String converted = annotationToGPAD.convert(annotation);
+        String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER);
+        assertThat(elements[COL_GO_ID], is(slimmedToGoId));
     }
 }
