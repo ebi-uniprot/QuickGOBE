@@ -55,7 +55,7 @@ public class AnnotationToGAFTest {
         String converted = annotationToGAF.convert(annotation);
         final String gpType = "complex";
 
-        String[] elements = converted.split("\t");
+        String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER);
         assertThat(elements[COL_DB], is(DB));
         assertThat(elements[COL_DB_OBJECT_ID], is(ID));
         assertThat(elements[COL_DB_OBJECT_SYMBOL], is(SYMBOL));
