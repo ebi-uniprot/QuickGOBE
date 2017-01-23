@@ -39,9 +39,10 @@ public class AnnotationMocker {
     private static final String GENE_PRODUCT_ID = "IntAct:EBI-10043081";
     public static final String EVIDENCE_CODE = "ECO:0000353";
     private static final String ASSIGNED_BY = "IntAct";
-    private static final String GO_EVIDENCE = "IPI";
+    public static final String GO_EVIDENCE = "IPI";
     private static final String GO_ASPECT = "molecular_function";
     public static final int TAXON_ID = 12345;
+    public static final String INTERACTING_TAXON_ID = "54321";
     public static final String DB = "IntAct";
     public static final String ID = "EBI-10043081";
     public static final String GO_ID = "GO:0003824";
@@ -66,6 +67,7 @@ public class AnnotationMocker {
         annotation.reference = REFERENCE;
         annotation.withFrom = connectedXrefs(WITH_FROM);
         annotation.goId = GO_ID;
+        annotation.interactingTaxonId = INTERACTING_TAXON_ID;
         return annotation;
     }
 
