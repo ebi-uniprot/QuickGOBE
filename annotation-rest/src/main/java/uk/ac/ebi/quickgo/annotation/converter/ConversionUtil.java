@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
  * Time: 17:01
  * Created with IntelliJ IDEA.
  */
-public class ConversionUtil {
+class ConversionUtil {
     private static final String ID_DELIMITER = ":";
     private static final String COMMA = ",";
     private static final String PIPE = "|";
     private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
-    public String withFromAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
+    String withFromAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
         return connectedXRefs.stream()
                              .map(itemList -> simpleRefAndToString(itemList))
                              .collect(Collectors.joining(PIPE));
