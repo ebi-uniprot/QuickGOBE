@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
  * Convert an {@link Annotation}  to a String representation. See http://geneontology
  * .org/page/go-annotation-file-gaf-format-21}
  *
- *
  * @author Tony Wardell
  * Date: 17/01/2017
  * Time: 11:54
@@ -68,15 +67,38 @@ public class AnnotationToGAF {
     private static final String INTACT_CANONICAL_REGEX = "^(?:IntAct:)(EBI-[0-9]+)$";
     private static final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
 
-    private ConversionUtil conversionUtil;
+    private final ConversionUtil conversionUtil;
 
     AnnotationToGAF(ConversionUtil conversionUtil) {
         this.conversionUtil = conversionUtil;
     }
 
     /**
+     * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
+     * @param id Annotation id, could had isoform or variant suffix.
+     * @return canonical form of the id with the soform or variant suffix removed.
+     */
+    private static String toCanonical(String id) {
+        Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(id);
+        if (uniprotMatcher.matches()) {
+            return uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
+        }
+        Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(id);
+        if (rnaMatcher.matches()) {
+            return rnaMatcher.group(CANONICAL_GROUP_NUMBER);
+        }
+
+        Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(id);
+        if (intactMatcher.matches()) {
+            return intactMatcher.group(INTACT_GROUP_NUMBER);
+        }
+        throw new IllegalArgumentException(String.format("Can not extract the canonical version of the id from %s",
+                                                         id));
+    }
+
+    /**
      * Convert an {@link Annotation} to a String representation.
-     * @param annotation
+     * @param annotation instance
      * @return String TSV delimited representation of an annotation in GAF format.
      */
     public String convert(Annotation annotation) {
@@ -112,29 +134,6 @@ public class AnnotationToGAF {
                 return "miRNA";
         }
         throw new IllegalArgumentException("Cannot determine gene product type for based on DB of " + idElement);
-    }
-
-    /**
-     * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
-     * @param idCouldHaveVariationOrIsoform
-     * @return
-     */
-    private static String toCanonical(String idCouldHaveVariationOrIsoform) {
-        Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(idCouldHaveVariationOrIsoform);
-        if (uniprotMatcher.matches()) {
-            return uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
-        }
-        Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(idCouldHaveVariationOrIsoform);
-        if (rnaMatcher.matches()) {
-            return rnaMatcher.group(CANONICAL_GROUP_NUMBER);
-        }
-
-        Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(idCouldHaveVariationOrIsoform);
-        if (intactMatcher.matches()) {
-            return intactMatcher.group(INTACT_GROUP_NUMBER);
-        }
-        throw new IllegalArgumentException(String.format("Can not extract the canonical version of the id from %s",
-                                                         idCouldHaveVariationOrIsoform));
     }
 
     public enum Aspect {
