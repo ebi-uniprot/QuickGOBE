@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,7 +58,7 @@ import java.util.regex.Pattern;
  * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:P35240	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
  * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:Q68EM7	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
  */
-public class AnnotationToGAF extends AnnotationTo{
+public class AnnotationToGAF extends AnnotationTo implements Function<Annotation, String>{
     static final String OUTPUT_DELIMITER = "\t";
     private static final String UNIPROT_KB = "UniProtKB";
     private static final int CANONICAL_GROUP_NUMBER = 2;
@@ -71,40 +72,40 @@ public class AnnotationToGAF extends AnnotationTo{
     private static final String INTACT_CANONICAL_REGEX = "^(?:IntAct:)(EBI-[0-9]+)$";
     private static final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
 
-    /**
-     * Convert an {@link Annotation} to a String representation.
-     * @param annotation instance
-     * @return String TSV delimited representation of an annotation in GAF format.
-     */
-    public String convert(Annotation annotation) {
-        String[] idElements = idToComponents(annotation);
+        /**
+         * Convert an {@link Annotation} to a String representation.
+         * @param annotation instance
+         * @return String TSV delimited representation of an annotation in GAF format.
+         */
+        public String apply(Annotation annotation) {
+            String[] idElements = idToComponents(annotation);
 
-        return idElements[0] + OUTPUT_DELIMITER +
-                toCanonical(annotation.id) + OUTPUT_DELIMITER +
-                annotation.symbol + OUTPUT_DELIMITER +
-                annotation.qualifier + OUTPUT_DELIMITER +
-                idOrSlimmedId(annotation)+ OUTPUT_DELIMITER +
-                annotation.reference + OUTPUT_DELIMITER +
-                annotation.evidenceCode + OUTPUT_DELIMITER +
-                withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
-                Aspect.fromScientificName(annotation.goAspect).character + OUTPUT_DELIMITER +
-                OUTPUT_DELIMITER +   // name - in GP core e.g. '5-formyltetrahydrofolate cyclo-ligase' optional not used
-                OUTPUT_DELIMITER +   //synonym, - in GP core  e.g. 'Nit79A3_0905' optional not used
-                toGeneProductType(idElements[0]) + OUTPUT_DELIMITER +
-                "taxon:" + annotation.taxonId + OUTPUT_DELIMITER +
-                toYMD(annotation.date) + OUTPUT_DELIMITER +
-                annotation.assignedBy + OUTPUT_DELIMITER +
-                extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER +
-                (UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB, idElements[1]) : "");
-    }
-
+            return idElements[0] + OUTPUT_DELIMITER +
+                    toCanonical(annotation.id) + OUTPUT_DELIMITER +
+                    annotation.symbol + OUTPUT_DELIMITER +
+                    annotation.qualifier + OUTPUT_DELIMITER +
+                    idOrSlimmedId(annotation) + OUTPUT_DELIMITER +
+                    annotation.reference + OUTPUT_DELIMITER +
+                    annotation.evidenceCode + OUTPUT_DELIMITER +
+                    withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
+                    Aspect.fromScientificName(annotation.goAspect).character + OUTPUT_DELIMITER +
+                    OUTPUT_DELIMITER +
+                    // name - in GP core e.g. '5-formyltetrahydrofolate cyclo-ligase' optional not used
+                    OUTPUT_DELIMITER +   //synonym, - in GP core  e.g. 'Nit79A3_0905' optional not used
+                    toGeneProductType(idElements[0]) + OUTPUT_DELIMITER +
+                    "taxon:" + annotation.taxonId + OUTPUT_DELIMITER +
+                    toYMD(annotation.date) + OUTPUT_DELIMITER +
+                    annotation.assignedBy + OUTPUT_DELIMITER +
+                    extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER +
+                    (UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB, idElements[1]) : "");
+        }
 
     /**
      * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
      * @param id Annotation id, could had isoform or variant suffix.
      * @return canonical form of the id with the soform or variant suffix removed.
      */
-    private static String toCanonical(String id) {
+    private String toCanonical(String id) {
         Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(id);
         if (uniprotMatcher.matches()) {
             return uniprotMatcher.group(CANONICAL_GROUP_NUMBER);

@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.annotation.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
+import java.util.function.Function;
+
 /**
  * @author Tony Wardell
  * Date: 17/01/2017
@@ -36,12 +38,12 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
  * UniProtKB	A0A000	involved_in	GO:0033014	GO_REF:0000002	ECO:0000256	InterPro:IPR010961		20170107	InterPro		go_evidence=IEA
  *
  */
-public class AnnotationToGPAD extends AnnotationTo {
+public class AnnotationToGPAD extends AnnotationTo implements Function<Annotation, String> {
 
     static final String OUTPUT_DELIMITER = "\t";
 
     @Override
-    public String convert(Annotation annotation) {
+    public String apply(Annotation annotation) {
 
         String[] idElements = idToComponents(annotation);
 

@@ -43,7 +43,7 @@ public class AnnotationToGPADTest {
 
     @Test
     public void createGAFStringFromAnnotationModelContainingIntAct(){
-        String converted = annotationToGPAD.convert(annotation);
+        String converted = annotationToGPAD.apply(annotation);
         String[] elements = converted.split(AnnotationToGPAD.OUTPUT_DELIMITER);
         assertThat(elements[COL_DB], is(DB));
         assertThat(elements[COL_DB_OBJECT_ID], is(ID));
@@ -63,7 +63,7 @@ public class AnnotationToGPADTest {
     public void slimmedToGoIdReplacesGoIdIfItExists(){
         final String slimmedToGoId = "GO:0005524";
         annotation.slimmedIds = Arrays.asList(slimmedToGoId);
-        String converted = annotationToGPAD.convert(annotation);
+        String converted = annotationToGPAD.apply(annotation);
         String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER);
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
     }

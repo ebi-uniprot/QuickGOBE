@@ -50,7 +50,7 @@ public class AnnotationToGAFTest {
 
     @Test
     public void createGAFStringFromAnnotationModelContainingIntAct(){
-        String converted = annotationToGAF.convert(annotation);
+        String converted = annotationToGAF.apply(annotation);
         final String gpType = "complex";
 
         String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER);
@@ -82,7 +82,7 @@ public class AnnotationToGAFTest {
         annotation.geneProductId = gpId;
         annotation.assignedBy = db;
         annotation.symbol = gpId;
-        String converted = annotationToGAF.convert(annotation);
+        String converted = annotationToGAF.apply(annotation);
 
         String[] elements = converted.split("\t");
         assertThat(elements[COL_DB], is(db));
@@ -114,7 +114,7 @@ public class AnnotationToGAFTest {
         annotation.geneProductId = gpId;
         annotation.assignedBy = db;
         annotation.symbol = gpId;
-        String converted = annotationToGAF.convert(annotation);
+        String converted = annotationToGAF.apply(annotation);
 
         String[] elements = converted.split("\t");
         assertThat(elements[COL_DB], is(db));
@@ -144,7 +144,7 @@ public class AnnotationToGAFTest {
         String gpIdCanonical = "Q9P2J5";
         String db = "IntAct";
         annotation.id = String.format("%s:%s",db,gpId);
-        String converted = annotationToGAF.convert(annotation);
+        String converted = annotationToGAF.apply(annotation);
 
         String[] elements = converted.split("\t");
         assertThat(elements[COL_DB], is(DB));
@@ -168,7 +168,7 @@ public class AnnotationToGAFTest {
     @Test
     public void createGAFStringFromAnnotationWhereAspectIsBiologicalProcess(){
         annotation.goAspect = "biological_process";
-        String converted = annotationToGAF.convert(annotation);
+        String converted = annotationToGAF.apply(annotation);
         String[] elements = converted.split("\t");
         assertThat(elements[COL_ASPECT], is("P"));
 
@@ -177,7 +177,7 @@ public class AnnotationToGAFTest {
     @Test
     public void createGAFStringFromAnnotationWhereAspectIsCellularComponent(){
         annotation.goAspect = "cellular_component";
-        String converted = annotationToGAF.convert(annotation);
+        String converted = annotationToGAF.apply(annotation);
         String[] elements = converted.split("\t");
         assertThat(elements[COL_ASPECT], is("C"));
 
@@ -187,7 +187,7 @@ public class AnnotationToGAFTest {
     public void slimmedToGoIdReplacesGoIdIfItExists(){
         final String slimmedToGoId = "GO:0005524";
         annotation.slimmedIds = Arrays.asList(slimmedToGoId);
-        String converted = annotationToGAF.convert(annotation);
+        String converted = annotationToGAF.apply(annotation);
         String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER);
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
     }
