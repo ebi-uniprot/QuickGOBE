@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.EXTENSIONS_AS_STRING;
 
 /**
  * @author Tony Wardell
@@ -59,5 +58,4 @@ public class AnnotationToGPADTest {
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
         assertThat(elements[COL_GO_EVIDENCE], is("goEvidence=" + GO_EVIDENCE));
     }
-
 }
