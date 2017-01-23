@@ -15,7 +15,7 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
  * Time: 14:19
  * Created with IntelliJ IDEA.
  */
-public class GAFAnnotationTest {
+public class AnnotationToGAFTest {
 
     private static final int COL_DB = 0;
     private static final int COL_DB_OBJECT_ID = 1;
@@ -40,7 +40,7 @@ public class GAFAnnotationTest {
     @Before
     public void setup(){
         annotation = AnnotationMocker.createValidAnnotation();
-        annotationToGAF = new AnnotationToGAF();
+        annotationToGAF = new AnnotationToGAF(new ConversionUtil());
     }
 
 
